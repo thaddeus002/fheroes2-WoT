@@ -682,7 +682,12 @@ void AIToResource(Heroes & hero, const u8 & obj, const s32 & dst_index)
     if(rc.isValid())
 	world.GetKingdom(hero.GetColor()).AddFundsResource(Funds(rc));
 
+    if((obj == MP2::OBJ_WINDMILL || obj == MP2::OBJ_WATERWHEEL) &&
+	Settings::Get().ExtWorldWindWaterMillsCaptured())
+        AIToCaptureObject(hero, obj, dst_index);
+
     tile.QuantityReset();
+    hero.SetVisited(dst_index, Visit::GLOBAL);
 
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
@@ -742,10 +747,8 @@ void AIToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 	if(tile.CaptureObjectIsProtection())
 	{
-	    const Army::Troop & troop = tile.QuantityTroop();
-	    Army::army_t army;
-	    army.JoinTroop(troop);
-	    army.SetColor(tile.QuantityColor());
+	    Army::army_t army(tile);
+            const Monster & mons =  tile.QuantityMonster();
 
 	    Battle2::Result result = Battle2::Loader(hero.GetArmy(), army, dst_index);
 
@@ -758,7 +761,7 @@ void AIToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
 		capture = false;
 	        AIBattleLose(hero, result, true);
 		if(Settings::Get().ExtSaveMonsterBattle())
-		    tile.MonsterSetCount(army.MonsterCounts(troop()));
+		    tile.MonsterSetCount(army.MonsterCounts(mons));
 	    }
 	}
 
