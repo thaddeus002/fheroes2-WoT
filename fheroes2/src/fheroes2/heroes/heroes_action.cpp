@@ -1645,7 +1645,7 @@ void ActionToShipwreckSurvivor(Heroes & hero, const u8 & obj, const s32 & dst_in
 	const Artifact & art = tile.QuantityArtifact();
 	std::string str = _("You've pulled a shipwreck survivor from certain death in an unforgiving ocean. Grateful, he rewards you for your act of kindness by giving you the %{art}.");
 	String::Replace(str, "%{art}", art.GetName());
-	Dialog::ArtifactInfo(MP2::StringObject(obj), str, art);
+	Dialog::ArtifactInfo("", str, art);
 	hero.PickupArtifact(art);
     }
 
@@ -1722,7 +1722,7 @@ void ActionToArtifact(Heroes & hero, const u8 & obj, const s32 & dst_index)
 		PlaySoundSuccess;
 		msg = _("You've found the artifact: ");
 		msg.append(art.GetName());
-		Dialog::ArtifactInfo(MP2::StringObject(obj), msg, art, Dialog::OK);
+		Dialog::ArtifactInfo("", msg, art, Dialog::OK);
 		result = true;
 	    }
 	    else
@@ -1771,7 +1771,7 @@ void ActionToArtifact(Heroes & hero, const u8 & obj, const s32 & dst_index)
 		    PlaySoundSuccess;
 		    msg = _("Victorious, you take your prize, the %{art}.");
 		    String::Replace(msg, "%{art}", art.GetName());
-		    Dialog::ArtifactInfo(MP2::StringObject(obj), msg, art());
+		    Dialog::ArtifactInfo("", msg, art());
 		}
 		else
 		{
@@ -1797,7 +1797,7 @@ void ActionToArtifact(Heroes & hero, const u8 & obj, const s32 & dst_index)
 		msg.append(art.GetName());
 	    }
 
-	    Dialog::ArtifactInfo(MP2::StringObject(obj), msg, art);
+	    Dialog::ArtifactInfo("", msg, art);
 	    result = true;
 	}
 
@@ -1891,7 +1891,7 @@ void ActionToTreasureChest(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    {
 		msg = _("After scouring the area, you fall upon a hidden chest, containing the ancient artifact %{art}.");
 		String::Replace(msg, "%{art}", art.GetName());
-		Dialog::ArtifactInfo(hdr, msg, art);
+		Dialog::ArtifactInfo("", msg, art);
 		hero.PickupArtifact(art);
 	    }
 	}

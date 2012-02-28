@@ -299,7 +299,7 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 		    }
 		}
 		else
-		    Dialog::ArtifactInfo(art1.GetName(), art1.GetDescription(), art1);
+		    Dialog::ArtifactInfo(art1.GetName(), "", art1);
 	    }
 	    // exchange
 	    else
@@ -343,7 +343,7 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
                 change = true;                                                                                                 
     	    }
 	    else
-	    Dialog::ArtifactInfo(art1.GetName(), art1.GetDescription(), art1, 0);
+	    Dialog::ArtifactInfo(art1.GetName(), "", art1, 0);
 	}
     }
 
@@ -404,7 +404,7 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar1, SelectA
 	if(le.MousePressRight(bar2.GetArea()))
 	{
 	    bar1.Reset();
-	    Dialog::ArtifactInfo(art2.GetName(), art2.GetDescription(), art2, 0);
+	    Dialog::ArtifactInfo(art2.GetName(), "", art2, 0);
 	}
 
 	Cursor::Get().Show();
@@ -449,7 +449,7 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar1, SelectA
 	if(le.MousePressRight(bar1.GetArea()))
 	{
 	    bar2.Reset();
-	    Dialog::ArtifactInfo(art1.GetName(), art1.GetDescription(), art1, 0);
+	    Dialog::ArtifactInfo(art1.GetName(), "", art1, 0);
 	}
 
 	Cursor::Get().Show();

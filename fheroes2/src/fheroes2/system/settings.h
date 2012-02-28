@@ -203,9 +203,9 @@ public:
 	HEROES_ARENA_ANY_SKILLS		= 0x30000080,
 	WORLD_USE_UNIQUE_ARTIFACTS1	= 0x30000100,
 	WORLD_USE_UNIQUE_ARTIFACTS2	= 0x30000200,
-	//WORLD_USE_UNIQUE_ARTIFACTS3	= 0x30000400,
-	//WORLD_USE_UNIQUE_ARTIFACTS4	= 0x30000800,
-	WORLD_ENHANCED_ARTIFACT_INFO	= 0x30001000,
+	//UNUSED			= 0x30000400,
+	//UNUSED			= 0x30000800,
+	//UNUSED			= 0x30001000,
 	WORLD_WIND_WATER_MILLS_CAPTURED = 0x30004000,
 
 	BATTLE_ARCHMAGE_RESIST_BAD_SPELL= 0x40001000,
@@ -327,7 +327,6 @@ public:
     bool ExtWorldUseUniqueArtifacts2(void) const;
     bool ExtWorldWindWaterMillsCaptured(void) const;
     bool ExtWorldGuardianObjectsTwoDefense(void) const;
-    bool ExtWorldEnhancedArtifactInfo(void) const;
     bool ExtCastleAllowFlash(void) const;
     bool ExtCastleGuildRestorePointsTurn(void) const;
     bool ExtCastleAllowRecruitSpecialHeroes(void) const;

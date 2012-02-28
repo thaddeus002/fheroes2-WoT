@@ -34,7 +34,14 @@ u16 Dialog::ArtifactInfo(const std::string & hdr, const std::string & msg, const
     Surface image(border.w(), border.h());
     border.Blit(image);
     artifact.Blit(5, 5, image);
-    return Dialog::SpriteInfo(hdr, msg, image, buttons);
+
+    std::string ext = msg;
+    ext.append("\n");
+    ext.append(" ");
+    ext.append("\n");
+    ext.append(art.GetDescription());
+
+    return Dialog::SpriteInfo(hdr, ext, image, buttons);
 }
 
 u16 Dialog::SpriteInfo(const std::string &header, const std::string &message, const Surface & sprite, u16 buttons)

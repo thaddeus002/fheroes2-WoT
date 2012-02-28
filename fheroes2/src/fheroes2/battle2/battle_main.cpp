@@ -203,7 +203,7 @@ void Battle2::PickupArtifactsAction(HeroBase & hero1, HeroBase & hero2, bool loc
         	if(local)
 		{
 		    PlayPickupSound();
-		    Dialog::ArtifactInfo(_("You have captured an enemy artifact!"), art.GetName(), art);
+		    Dialog::ArtifactInfo(_("You have captured an enemy artifact!"), "", art);
 		}
     	    }
     	    art = Artifact::UNKNOWN;

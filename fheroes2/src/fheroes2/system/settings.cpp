@@ -128,7 +128,6 @@ const settings_t settingsFHeroes2[] =
     { Settings::GAME_BATTLE_SHOW_MOVE_SHADOW,	_("game: battle move shadow"),				},
     { Settings::GAME_BATTLE_SHOW_DAMAGE,	_("game: battle show damage info"),  			},
     { Settings::GAME_CASTLE_FLASH_BUILDING,	_("game: castle flash building"),			},
-    { Settings::WORLD_ENHANCED_ARTIFACT_INFO,	_("world: use enhanced artifact info dialog"),		},
     { Settings::WORLD_SHOW_VISITED_CONTENT,	_("world: show visited content from objects"),		},
     { Settings::WORLD_SCOUTING_EXTENDED,	_("world: scouting skill show extended content info"),  },
     { Settings::WORLD_ABANDONED_MINE_RANDOM,	_("world: abandoned mine random resource"),		},
@@ -1233,11 +1232,6 @@ bool Settings::ExtEyeEagleAsScholar(void) const
 bool Settings::ExtBuySpellBookFromShrine(void) const
 {
     return ExtModes(WORLD_BUY_BOOK_FROM_SHRINES);
-}
-
-bool Settings::ExtWorldEnhancedArtifactInfo(void) const
-{
-    return ExtModes(WORLD_ENHANCED_ARTIFACT_INFO);
 }
 
 bool Settings::ExtHeroRecruitCostDependedFromLevel(void) const
