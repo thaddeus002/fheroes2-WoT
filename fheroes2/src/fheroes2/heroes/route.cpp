@@ -50,7 +50,7 @@ Route::Path::Path(const Heroes & h)
 u16 Route::Path::GetFrontDirection(void) const
 {
     return empty() ?
-	(dst != hero.GetIndex() ? Direction::Get(dst, hero.GetIndex())
+	(dst != hero.GetIndex() ? Direction::Get(hero.GetIndex(), dst)
 					    : Direction::CENTER) : front().direction;
 }
 
@@ -118,7 +118,7 @@ void Route::Path::Reset(void)
 bool Route::Path::isValid(void) const
 {
     return !empty() || (dst != hero.GetIndex() &&
-			Direction::UNKNOWN != Direction::Get(dst, hero.GetIndex()));
+			Direction::UNKNOWN != Direction::Get(hero.GetIndex(), dst));
 }
 
 /*
