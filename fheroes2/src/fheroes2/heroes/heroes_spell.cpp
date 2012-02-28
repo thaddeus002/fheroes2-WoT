@@ -265,7 +265,9 @@ bool ActionSpellSummonBoat(Heroes & hero)
     const MapsIndexes & boats = Maps::GetObjectPositions(center, MP2::OBJ_BOAT, false);
 
     if(boats.empty())
+    {
 	DEBUG(DBG_GAME, DBG_WARN, "free boat: " << "not found");
+    }
     else
     {
 	const s32 & src = boats.front();
