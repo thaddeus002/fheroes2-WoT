@@ -49,7 +49,7 @@ Game::menu_t Game::LoadGame(void)
     AGG::PlayMusic(MUS::MAINMENU);
 
     if(Settings::Get().QVGA()) return PocketPC::LoadGame();
-    
+
     // preload
     AGG::PreloadObject(ICN::HEROES);
     AGG::PreloadObject(ICN::BTNNEWGM);
@@ -114,6 +114,7 @@ Game::menu_t Game::LoadStandard(void)
     cursor.SetThemes(cursor.POINTER);
 
     Display & display = Display::Get();
+    display.Fill(0);
 
     // image background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);

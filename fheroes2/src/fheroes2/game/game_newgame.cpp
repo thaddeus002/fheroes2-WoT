@@ -140,7 +140,7 @@ Game::menu_t Game::NewGame(void)
     Game::IO::last_name.clear();
 
     if(Settings::Get().QVGA()) return PocketPC::NewGame();
-  
+
     // preload
     AGG::PreloadObject(ICN::HEROES);
     AGG::PreloadObject(ICN::BTNNEWGM);
@@ -152,6 +152,7 @@ Game::menu_t Game::NewGame(void)
     cursor.SetThemes(cursor.POINTER);
 
     Display & display = Display::Get();
+    display.Fill(0);
 
     // load game settings
     conf.BinaryLoad();
@@ -281,7 +282,7 @@ Game::menu_t Game::NewMulti(void)
         // right info
 	if(le.MousePressRight(buttonHotSeat)) Dialog::Message(_("Hot Seat"), _("Play a Hot Seat game, where 2 to 4 players play around the same computer, switching into the 'Hot Seat' when it is their turn."), Font::BIG);
 	if(le.MousePressRight(buttonCancelGame)) Dialog::Message(_("Cancel"), _("Cancel back to the main menu."), Font::BIG);
-	
+
 	if(buttonNetwork.isEnable())
 	{
 	    le.MousePressLeft(buttonNetwork) ? buttonNetwork.PressDraw() : buttonNetwork.ReleaseDraw();
