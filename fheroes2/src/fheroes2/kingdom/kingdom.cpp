@@ -189,7 +189,7 @@ void Kingdom::ActionNewDay(void)
 	}
     }
 
-    // check event day
+    // check event day AI
     EventsDate events = world.GetEventsDate(GetColor());
     for(EventsDate::const_iterator
 	it = events.begin(); it != events.end(); ++it)
@@ -750,19 +750,22 @@ void Kingdoms::AddTributeEvents(CapturedObjects & captureobj, u16 day, u8 obj)
 	if(kingdoms[ii].isPlay())
     {
 	const u8 & color = kingdoms[ii].GetColor();
-        const Funds funds = captureobj.TributeCapturedObject(color, obj);
+	const Funds & funds = captureobj.TributeCapturedObject(color, obj);
 
-        if(funds.GetValidItems())
+	kingdoms[ii].AddFundsResource(funds);
+
+	// for show dialogs
+        if(kingdoms[ii].GetControl() == CONTROL_HUMAN)
         {
             EventDate event;
 
             event.computer = true;
             event.first = day;
             event.colors = color;
-            event.resource = funds;
+	    event.resource = funds;
 	    event.message = MP2::StringObject(obj);
 
-            world.AddEventDate(event);
-        }
+	    world.AddEventDate(event);
+	}
     }
 }
