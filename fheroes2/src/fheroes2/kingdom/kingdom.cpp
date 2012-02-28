@@ -755,7 +755,7 @@ void Kingdoms::AddTributeEvents(CapturedObjects & captureobj, u16 day, u8 obj)
 	kingdoms[ii].AddFundsResource(funds);
 
 	// for show dialogs
-        if(kingdoms[ii].GetControl() == CONTROL_HUMAN)
+        if(funds.GetValidItems() && kingdoms[ii].GetControl() == CONTROL_HUMAN)
         {
             EventDate event;
 
