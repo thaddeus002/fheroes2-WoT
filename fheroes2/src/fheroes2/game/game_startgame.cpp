@@ -518,8 +518,14 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
     switch(tile.GetObject())
     {
 	case MP2::OBJ_MONSTER:
-    	    return from_hero.Modes(Heroes::GUARDIAN) ? Cursor::POINTER :
-		    Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(tile.GetIndex()));
+    	    if(from_hero.Modes(Heroes::GUARDIAN))
+		return Cursor::POINTER;
+	    else
+		// for direct monster attack
+		return Direction::UNKNOWN != Direction::Get(from_hero.GetIndex(), tile.GetIndex()) ?
+			Cursor::FIGHT :
+			Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(tile.GetIndex()));
+	    break;
 
 	case MP2::OBJN_CASTLE:
     	{

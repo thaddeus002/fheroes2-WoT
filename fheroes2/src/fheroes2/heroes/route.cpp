@@ -100,7 +100,7 @@ bool Route::Path::Calculate(const s32 dst_index, const u16 limit)
 	MP2::OBJ_MONSTER == world.GetTiles(dst_index).GetObject())
 	pop_back();
 
-    dst = empty() ? hero.GetIndex() : dst_index;
+    dst = dst_index;
 
     return !empty();
 }
