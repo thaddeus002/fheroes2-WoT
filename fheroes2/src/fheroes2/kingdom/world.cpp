@@ -1109,10 +1109,11 @@ void World::NewWeek(void)
     }
 
     // add events
-    if(Settings::Get().ExtWorldWindWaterMillsCaptured())
+    if(Settings::Get().ExtWorldExtObjectsCaptured())
     {
 	vec_kingdoms.AddTributeEvents(map_captureobj, day, MP2::OBJ_WATERWHEEL);
 	vec_kingdoms.AddTributeEvents(map_captureobj, day, MP2::OBJ_WINDMILL);
+	vec_kingdoms.AddTributeEvents(map_captureobj, day, MP2::OBJ_MAGICGARDEN);
     }
 }
 

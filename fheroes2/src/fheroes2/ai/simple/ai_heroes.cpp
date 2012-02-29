@@ -682,8 +682,7 @@ void AIToResource(Heroes & hero, const u8 & obj, const s32 & dst_index)
     if(rc.isValid())
 	world.GetKingdom(hero.GetColor()).AddFundsResource(Funds(rc));
 
-    if((obj == MP2::OBJ_WINDMILL || obj == MP2::OBJ_WATERWHEEL) &&
-	Settings::Get().ExtWorldWindWaterMillsCaptured())
+    if(MP2::isCaptureObject(obj))
         AIToCaptureObject(hero, obj, dst_index);
 
     tile.QuantityReset();
@@ -1577,7 +1576,7 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 
 	case MP2::OBJ_WATERWHEEL:
 	case MP2::OBJ_WINDMILL:
-	    if(Settings::Get().ExtWorldWindWaterMillsCaptured())
+	    if(Settings::Get().ExtWorldExtObjectsCaptured())
 	    {
 		if(! Players::isFriends(hero.GetColor(), tile.QuantityColor()))
 		{

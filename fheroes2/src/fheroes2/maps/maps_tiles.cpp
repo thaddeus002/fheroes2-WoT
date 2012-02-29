@@ -2117,6 +2117,7 @@ void Maps::Tiles::CaptureFlags32(u8 obj, u8 col)
     {
 	case MP2::OBJ_WINDMILL:		index += 42; CorrectFlags32(index, false); break;
 	case MP2::OBJ_WATERWHEEL:	index += 14; CorrectFlags32(index, false); break;
+	case MP2::OBJ_MAGICGARDEN:	index += 42; CorrectFlags32(index, false); break;
 
 	case MP2::OBJ_MINES:		index += 14; CorrectFlags32(index, true); break;
 	//case MP2::OBJ_DRAGONCITY:	index += 35; CorrectFlags32(index); break; unused
@@ -2172,7 +2173,7 @@ void Maps::Tiles::CorrectFlags32(const u8 index, bool up)
     TilesAddon* taddon = FindFlags();
 
     // replace flag
-    if(NULL != taddon)
+    if(taddon)
 	taddon->index = index;
     else
     if(up)

@@ -931,7 +931,7 @@ void ActionToResource(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const ResourceCount & rc = tile.QuantityResourceCount();
-    bool cancapture = Settings::Get().ExtWorldWindWaterMillsCaptured();
+    bool cancapture = Settings::Get().ExtWorldExtObjectsCaptured();
     bool showinvalid = cancapture && hero.GetColor() == tile.QuantityColor() ? false : true;
 
     std::string msg;
@@ -959,7 +959,6 @@ void ActionToResource(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    break;
 
     	case MP2::OBJ_MAGICGARDEN:
-	    cancapture = false;
 	    msg = rc.isValid() ? 
 		    _("You catch a leprechaun foolishly sleeping amidst a cluster of magic mushrooms.\nIn exchange for his freedom, he guides you to a small pot filled with precious things.") :
 		    _("You've found a magic garden, the kind of place that leprechauns and faeries like to cavort in, but there is no one here today.\nPerhaps you should try again next week.");

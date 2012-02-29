@@ -913,7 +913,8 @@ bool MP2::isCaptureObject(const u8 obj)
 
         case OBJ_WATERWHEEL:
         case OBJ_WINDMILL:
-           return Settings::Get().ExtWorldWindWaterMillsCaptured();
+        case OBJ_MAGICGARDEN:
+           return Settings::Get().ExtWorldExtObjectsCaptured();
 
 	default: break;
     }

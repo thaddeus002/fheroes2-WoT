@@ -151,7 +151,7 @@ const settings_t settingsFHeroes2[] =
     { Settings::WORLD_USE_UNIQUE_ARTIFACTS_RS,	_("world: use unique artifacts for resource affecting"),},
     { Settings::WORLD_USE_UNIQUE_ARTIFACTS_PS,	_("world: use unique artifacts for for primary skills"),},
     { Settings::WORLD_USE_UNIQUE_ARTIFACTS_SS,	_("world: use unique artifacts for secondary skills"),},
-    { Settings::WORLD_WIND_WATER_MILLS_CAPTURED,_("world: Wind/Water Mills can be captured"),           },
+    { Settings::WORLD_EXT_OBJECTS_CAPTURED,	_("world: Wind/Water Mills and Magic Garden can be captured"),},
     { Settings::CASTLE_ALLOW_BUY_FROM_WELL,	_("castle: allow buy from well"),			},
     { Settings::CASTLE_ALLOW_GUARDIANS,		_("castle: allow guardians"),				},
     { Settings::CASTLE_MAGEGUILD_POINTS_TURN,	_("castle: higher mage guilds regenerate more spell points/turn (20/40/60/80/100%)"), },
@@ -1506,9 +1506,9 @@ bool Settings::ExtHeroArenaCanChoiseAnySkills(void) const
     return ExtModes(HEROES_ARENA_ANY_SKILLS);
 }
 
-bool Settings::ExtWorldWindWaterMillsCaptured(void) const
+bool Settings::ExtWorldExtObjectsCaptured(void) const
 {
-    return ExtModes(WORLD_WIND_WATER_MILLS_CAPTURED);
+    return ExtModes(WORLD_EXT_OBJECTS_CAPTURED);
 }
 
 bool Settings::ExtWorldGuardianObjectsTwoDefense(void) const

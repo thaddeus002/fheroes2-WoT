@@ -206,7 +206,7 @@ public:
 	WORLD_USE_UNIQUE_ARTIFACTS_PS	= 0x30000400,
 	WORLD_USE_UNIQUE_ARTIFACTS_SS	= 0x30000800,
 	//UNUSED			= 0x30001000,
-	WORLD_WIND_WATER_MILLS_CAPTURED = 0x30004000,
+	WORLD_EXT_OBJECTS_CAPTURED 	= 0x30004000,
 
 	BATTLE_ARCHMAGE_RESIST_BAD_SPELL= 0x40001000,
 	BATTLE_MAGIC_TROOP_RESIST	= 0x40002000,
@@ -327,7 +327,7 @@ public:
     bool ExtWorldUseUniqueArtifactsRS(void) const;
     bool ExtWorldUseUniqueArtifactsPS(void) const;
     bool ExtWorldUseUniqueArtifactsSS(void) const;
-    bool ExtWorldWindWaterMillsCaptured(void) const;
+    bool ExtWorldExtObjectsCaptured(void) const;
     bool ExtWorldGuardianObjectsTwoDefense(void) const;
     bool ExtCastleAllowFlash(void) const;
     bool ExtCastleGuildRestorePointsTurn(void) const;

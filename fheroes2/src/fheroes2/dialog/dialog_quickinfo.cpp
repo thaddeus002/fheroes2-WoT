@@ -388,13 +388,13 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	case MP2::OBJ_WAGON:
 	case MP2::OBJ_SKELETON:
 	case MP2::OBJ_LEANTO:
-	case MP2::OBJ_MAGICGARDEN:
 	    name_object = ShowGlobalVisitInfo(tile, kingdom, show);
 	    break;
 
 	case MP2::OBJ_WINDMILL:
 	case MP2::OBJ_WATERWHEEL:
-	    name_object = Settings::Get().ExtWorldWindWaterMillsCaptured() ? 
+	case MP2::OBJ_MAGICGARDEN:
+	    name_object = Settings::Get().ExtWorldExtObjectsCaptured() ? 
 		    MP2::StringObject(tile.GetObject()) : ShowGlobalVisitInfo(tile, kingdom, show);
 	    break;
 

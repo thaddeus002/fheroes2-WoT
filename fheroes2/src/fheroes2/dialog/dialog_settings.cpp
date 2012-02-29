@@ -151,7 +151,7 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::WORLD_ALLOW_SET_GUARDIAN);
     if(conf.ExtAllowSetGuardian())
 	states.push_back(Settings::WORLD_GUARDIAN_TWO_DEFENSE);
-    states.push_back(Settings::WORLD_WIND_WATER_MILLS_CAPTURED);
+    states.push_back(Settings::WORLD_EXT_OBJECTS_CAPTURED);
     states.push_back(Settings::WORLD_NOREQ_FOR_ARTIFACTS);
     states.push_back(Settings::WORLD_SCOUTING_EXTENDED);
     states.push_back(Settings::WORLD_ARTSPRING_SEPARATELY_VISIT);
