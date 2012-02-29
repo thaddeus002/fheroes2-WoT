@@ -147,8 +147,10 @@ const settings_t settingsFHeroes2[] =
     { Settings::WORLD_STARTHERO_LOSSCOND4HUMANS,_("world: Starting heroes as Loss Conditions for Human Players"), },
     { Settings::WORLD_1HERO_HIRED_EVERY_WEEK,	_("world: Only 1 hero can be hired by the one player every week"), },
     { Settings::WORLD_DWELLING_ACCUMULATE_UNITS,_("world: Outer creature dwellings should accumulate units"), },
-    { Settings::WORLD_USE_UNIQUE_ARTIFACTS1,	_("world: use unique artifacts for morale/luck"),       },
-    { Settings::WORLD_USE_UNIQUE_ARTIFACTS2,	_("world: use unique artifacts for resource affecting"),},
+    { Settings::WORLD_USE_UNIQUE_ARTIFACTS_ML,	_("world: use unique artifacts for morale/luck"),       },
+    { Settings::WORLD_USE_UNIQUE_ARTIFACTS_RS,	_("world: use unique artifacts for resource affecting"),},
+    { Settings::WORLD_USE_UNIQUE_ARTIFACTS_PS,	_("world: use unique artifacts for for primary skills"),},
+    { Settings::WORLD_USE_UNIQUE_ARTIFACTS_SS,	_("world: use unique artifacts for secondary skills"),},
     { Settings::WORLD_WIND_WATER_MILLS_CAPTURED,_("world: Wind/Water Mills can be captured"),           },
     { Settings::CASTLE_ALLOW_BUY_FROM_WELL,	_("castle: allow buy from well"),			},
     { Settings::CASTLE_ALLOW_GUARDIANS,		_("castle: allow guardians"),				},
@@ -1479,14 +1481,24 @@ bool Settings::ExtWorldDwellingsAccumulateUnits(void) const
     return ExtModes(WORLD_DWELLING_ACCUMULATE_UNITS);
 }
 
-bool Settings::ExtWorldUseUniqueArtifacts1(void) const
+bool Settings::ExtWorldUseUniqueArtifactsML(void) const
 {
-    return ExtModes(WORLD_USE_UNIQUE_ARTIFACTS1);
+    return ExtModes(WORLD_USE_UNIQUE_ARTIFACTS_ML);
 }
 
-bool Settings::ExtWorldUseUniqueArtifacts2(void) const
+bool Settings::ExtWorldUseUniqueArtifactsRS(void) const
 {
-    return ExtModes(WORLD_USE_UNIQUE_ARTIFACTS2);
+    return ExtModes(WORLD_USE_UNIQUE_ARTIFACTS_RS);
+}
+
+bool Settings::ExtWorldUseUniqueArtifactsPS(void) const
+{
+    return ExtModes(WORLD_USE_UNIQUE_ARTIFACTS_PS);
+}
+
+bool Settings::ExtWorldUseUniqueArtifactsSS(void) const
+{
+    return ExtModes(WORLD_USE_UNIQUE_ARTIFACTS_SS);
 }
 
 bool Settings::ExtHeroArenaCanChoiseAnySkills(void) const

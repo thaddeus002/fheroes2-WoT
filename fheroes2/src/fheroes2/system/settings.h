@@ -201,10 +201,10 @@ public:
 	WORLD_DWELLING_ACCUMULATE_UNITS = 0x30000020,
 	WORLD_GUARDIAN_TWO_DEFENSE	= 0x30000040,
 	HEROES_ARENA_ANY_SKILLS		= 0x30000080,
-	WORLD_USE_UNIQUE_ARTIFACTS1	= 0x30000100,
-	WORLD_USE_UNIQUE_ARTIFACTS2	= 0x30000200,
-	//UNUSED			= 0x30000400,
-	//UNUSED			= 0x30000800,
+	WORLD_USE_UNIQUE_ARTIFACTS_ML	= 0x30000100,
+	WORLD_USE_UNIQUE_ARTIFACTS_RS	= 0x30000200,
+	WORLD_USE_UNIQUE_ARTIFACTS_PS	= 0x30000400,
+	WORLD_USE_UNIQUE_ARTIFACTS_SS	= 0x30000800,
 	//UNUSED			= 0x30001000,
 	WORLD_WIND_WATER_MILLS_CAPTURED = 0x30004000,
 
@@ -323,8 +323,10 @@ public:
     bool ExtWorldStartHeroLossCond4Humans(void) const;
     bool ExtWorldOneHeroHiredEveryWeek(void) const;
     bool ExtWorldDwellingsAccumulateUnits(void) const;
-    bool ExtWorldUseUniqueArtifacts1(void) const;
-    bool ExtWorldUseUniqueArtifacts2(void) const;
+    bool ExtWorldUseUniqueArtifactsML(void) const;
+    bool ExtWorldUseUniqueArtifactsRS(void) const;
+    bool ExtWorldUseUniqueArtifactsPS(void) const;
+    bool ExtWorldUseUniqueArtifactsSS(void) const;
     bool ExtWorldWindWaterMillsCaptured(void) const;
     bool ExtWorldGuardianObjectsTwoDefense(void) const;
     bool ExtCastleAllowFlash(void) const;
