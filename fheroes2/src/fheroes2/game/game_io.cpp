@@ -667,7 +667,6 @@ void Game::IO::UnpackPlayers(QueueMessage & msg, Players & players, u16 version)
 	msg.Pop(player.control);
 	msg.Pop(player.race);
 	msg.Pop(player.friends);
-	if(version >= FORMAT_VERSION_2602)
 	msg.Pop(player.mode);
 	msg.Pop(player.name);
 
@@ -712,15 +711,6 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     else
     {
     	DEBUG(DBG_GAME , DBG_INFO, "format: " << format);
-    }
-
-
-    if(format < FORMAT_VERSION_2522)
-    {
-	// major version
-        msg.Pop(byte8);
-	// minor version
-        msg.Pop(byte8);
     }
 
     // version
@@ -823,10 +813,6 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(world.width);
     msg.Pop(world.height);
 
-    s32 ultimate_index = -1;
-    u8  ultimate_art = Artifact::UNKNOWN;
-    if(format < FORMAT_VERSION_2629)
-	msg.Pop(ultimate_index);
     msg.Pop(world.uniq0);
 
     msg.Pop(world.week_current.first);
@@ -908,9 +894,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     if(byte16 != 0xFF0B) DEBUG(DBG_GAME, DBG_WARN, "0xFF0B");
     msg.Pop(byte32);
     byte16 = byte32;
-
-    if(format >= FORMAT_VERSION_2632)
-	world.map_captureobj.clear();
+    world.map_captureobj.clear();
 
     for(u16 ii = 0; ii < byte16; ++ii)
     {
@@ -918,12 +902,10 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 	CapturedObject & co = world.map_captureobj[byte32];
 	msg.Pop(co.objcol.first);
 	msg.Pop(co.objcol.second);
-	if(format >= FORMAT_VERSION_2632)
-	{
-	    msg.Pop(byte8);
-	    msg.Pop(byte32);
-	    co.guardians.Set(byte8, byte32);
-	}
+
+	msg.Pop(byte8);
+	msg.Pop(byte32);
+	co.guardians.Set(byte8, byte32);
     }
 
     // rumors
@@ -1025,17 +1007,16 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     }
 
     // ultimate
-    if(format >= FORMAT_VERSION_2629)
-    {
-	msg.Pop(byte16);
-	if(byte16 != 0xFF10) DEBUG(DBG_GAME, DBG_WARN, "0xFF10");
-	msg.Pop(ultimate_art);
-	msg.Pop(world.ultimate_artifact.isfound);
-	msg.Pop(ultimate_index);
-    }
-    else
-	ultimate_art = world.GetTiles(ultimate_index).GetQuantity1();
+    s32 ultimate_index = -1;
+    u8  ultimate_art = Artifact::UNKNOWN;
 
+    msg.Pop(byte16);
+    if(byte16 != 0xFF10) DEBUG(DBG_GAME, DBG_WARN, "0xFF10");
+    msg.Pop(ultimate_art);
+    msg.Pop(world.ultimate_artifact.isfound);
+    msg.Pop(ultimate_index);
+
+    // end 0xFFFF
     msg.Pop(byte16);
 
     // add castles to kingdoms
@@ -1044,73 +1025,9 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     // add heroes to kingdoms
     world.vec_kingdoms.AddHeroes(world.vec_heroes);
 
-    if(format < FORMAT_VERSION_2663)
-    {
-	if(format < FORMAT_VERSION_2655)
-	{
-	    for(MapsTiles::iterator
-		it = world.vec_tiles.begin(); it != world.vec_tiles.end(); ++it)
-	    if((*it).mp2_object == MP2::OBJ_HEROES)
-	    {
-		Heroes* hero = world.GetHeroes((*it).GetIndex());
-		(*it).SetObject(hero ? hero->save_maps_object : MP2::OBJ_ZERO);
-		(*it).SetHeroes(hero);
-	    }
-	}
-	else
-	{
-	    for(MapsTiles::iterator
-		it = world.vec_tiles.begin(); it != world.vec_tiles.end(); ++it)
-	    if(0x01 == (*it).GetQuantity3())
-	    {
-		Heroes* hero = world.GetHeroes((*it).GetIndex());
-		(*it).SetHeroes(hero);
-	    }
-	}
-    }
-    else
-    if(format < FORMAT_VERSION_2667)
-    {
-	for(MapsTiles::iterator
-	    it = world.vec_tiles.begin(); it != world.vec_tiles.end(); ++it)
-	{
-	    Maps::Tiles & tile = *it;
-    	    Heroes* hero = world.GetHeroes(static_cast<Heroes::heroes_t>(0x7F & tile.GetQuantity3()));
-	    if(hero)
-	    {
-		hero->SetMapsObject(tile.GetObject());
-		tile.SetQuantity3(hero->GetID());
-		tile.SetObject(MP2::OBJ_HEROES);
-	    }
-	    else
-	    {
-		tile.SetQuantity3(0);
-		tile.SetObject(MP2::OBJ_ZERO);
-	    }
-	}
-    }
-
-    if(format < FORMAT_VERSION_2667)
-    {
-	for(MapsTiles::iterator
-	    it = world.vec_tiles.begin(); it != world.vec_tiles.end(); ++it)
-	{
-	    Maps::Tiles & tile = *it;
-	    if(MP2::OBJ_MONSTER == tile.GetObject())
-	    {
-        	const Maps::TilesAddon *addon = tile.FindObjectConst(MP2::OBJ_MONSTER);
-        	if(addon) tile.SetQuantity3(addon->index + 1);
- 	    }
-	}
-    }
-
     // update tile passable
     std::for_each(world.vec_tiles.begin(), world.vec_tiles.end(),
         std::mem_fun_ref(&Maps::Tiles::UpdatePassable));
-
-    for(MapsTiles::iterator
-	it = world.vec_tiles.begin(); it != world.vec_tiles.end(); ++it)
-    	    (*it).FixLoadOldVersion2(format);
 
     // init ultimate art
     if(0 <= ultimate_index)
@@ -1139,45 +1056,14 @@ extern u16 PackTileSpriteIndex(u16, u16);
 
 void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u32 maps_index, u16 check_version)
 {
-    u8 byte8;
-
-    if(check_version >= FORMAT_VERSION_2655)
-	msg.Pop(tile.pack_maps_index);
-    else
-    {
-	tile.pack_maps_index = 0x00FFFFFF & maps_index;
-    }
-
+    msg.Pop(tile.pack_maps_index);
     msg.Pop(tile.pack_sprite_index);
-    if(check_version < FORMAT_VERSION_2632)
-    {
-	msg.Pop(byte8);	// shape
-	tile.pack_sprite_index = PackTileSpriteIndex(tile.pack_sprite_index, byte8);
-    }
-
     msg.Pop(tile.mp2_object);
     msg.Pop(tile.quantity1);
     msg.Pop(tile.quantity2);
 
-    u8 quantity3, quantity4, quantity5, quantity6, quantity7;
-
-    if(check_version < FORMAT_VERSION_2632)
-    {
-	msg.Pop(quantity3);
-	msg.Pop(quantity4);
-    }
-
     msg.Pop(tile.fog_colors);
-
-    if(check_version >= FORMAT_VERSION_2632)
-	msg.Pop(tile.tile_passable);
-
-    if(check_version < FORMAT_VERSION_2632)
-    {
-	msg.Pop(quantity5);
-	msg.Pop(quantity6);
-	msg.Pop(quantity7);
-    }
+    msg.Pop(tile.tile_passable);
 
 #ifdef WITH_DEBUG
     if(IS_DEVEL()) tile.fog_colors &= ~Players::HumanColors();
@@ -1188,7 +1074,6 @@ void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u32 maps_index
     // addons 2
     UnpackTileAddons(msg, tile.addons_level2, check_version);
 
-    tile.FixLoadOldVersion(check_version, quantity3, quantity4, quantity5, quantity6, quantity7);
     tile.FixObject();
 }
 
@@ -1204,7 +1089,6 @@ void Game::IO::UnpackTileAddons(QueueMessage & msg, Maps::Addons & addons, u16 c
 	msg.Pop(addon.uniq);
 	msg.Pop(addon.object);
 	msg.Pop(addon.index);
-	if(check_version >= FORMAT_VERSION_2632)
 	msg.Pop(addon.tmp);
 	addons.push_back(addon);
     }
@@ -1216,22 +1100,9 @@ void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_ve
     u16 byte16;
     u32 byte32;
 
-    // kingdom: color
+    // kingdom: color, modes
     msg.Pop(kingdom.color);
-
-    if(check_version < FORMAT_VERSION_2562)
-    {
-	msg.Pop(byte16);
-	kingdom.modes = byte16;
-    }
-    else
-	msg.Pop(kingdom.modes);
-
-    if(check_version < FORMAT_VERSION_2602)
-    {
-	Players::SetPlayerInGame(kingdom.color, kingdom.modes & 0x0001);
-    }
-
+    msg.Pop(kingdom.modes);
     msg.Pop(kingdom.lost_town_days);
     // unused
     msg.Pop(byte16);
@@ -1262,11 +1133,8 @@ void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_ve
     msg.Pop(byte8); kingdom.recruits.SetID2(byte8);
 
     // lost_hero
-    if(check_version >= FORMAT_VERSION_2626)
-    {
-	msg.Pop(byte8); kingdom.lost_hero.first = static_cast<Heroes::heroes_t>(byte8);
-	msg.Pop(kingdom.lost_hero.second);
-    }
+    msg.Pop(byte8); kingdom.lost_hero.first = static_cast<Heroes::heroes_t>(byte8);
+    msg.Pop(kingdom.lost_hero.second);
 
     std::string str;
 
@@ -1289,15 +1157,13 @@ void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_ve
     // visited tents
     msg.Pop(kingdom.visited_tents_colors);
 
-    if(check_version >= FORMAT_VERSION_2566)
+    // conditions loss
+    msg.Pop(byte32);
+    kingdom.heroes_cond_loss.clear();
+    for(u32 jj = 0; jj < byte32; ++jj)
     {
-	msg.Pop(byte32);
-	kingdom.heroes_cond_loss.clear();
-	for(u32 jj = 0; jj < byte32; ++jj)
-	{
-	    msg.Pop(byte8);
-	    kingdom.heroes_cond_loss.push_back(world.GetHeroes(static_cast<Heroes::heroes_t>(byte8)));
-	}
+	msg.Pop(byte8);
+	kingdom.heroes_cond_loss.push_back(world.GetHeroes(static_cast<Heroes::heroes_t>(byte8)));
     }
 }
 
@@ -1422,14 +1288,7 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     msg.Pop(hero.experience);
     msg.Pop(hero.direction);
     msg.Pop(hero.sprite_index);
-
-    if(check_version < FORMAT_VERSION_2655)
-    {
-	msg.Pop(byte8); hero.save_maps_object = static_cast<MP2::object_t>(byte8);
-    }
-
-    if(check_version >= FORMAT_VERSION_2667)
-	msg.Pop(hero.save_maps_object);
+    msg.Pop(hero.save_maps_object);
 
     msg.Pop(hero.patrol_center.x);
     msg.Pop(hero.patrol_center.y);

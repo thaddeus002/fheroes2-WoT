@@ -165,8 +165,6 @@ namespace Maps
 	void SetObject(u8 object);
 
 	void FixObject(void);
-	void FixLoadOldVersion(u16 version, u8 quantity3, u8 quantity4, u8 quantity5, u8 quantity6, u8 quantity7);
-	void FixLoadOldVersion2(u16 version);
 
 	void UpdatePassable(void);
 	void CaptureFlags32(u8 obj, u8 col);
