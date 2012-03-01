@@ -1,3 +1,25 @@
+Mar, 01, 2012 (2764 rev.)
+
++ Fixed: world: maps passable new version algorithm.
++ Fixed: world: capture object abandone mine
++ Fixed: world: hero join troop and recruit monster from tile
++ Fixed: world: capture objects WindMill and WaterWheel for AI, automatic collection from  Wind/Water mills, add Magic Garden
++ Fixed: world: bugs of monster units deployment at a "Month of ..."
++ Fixed: battle: disable resurrect for elemental
++ Fixed: battle: fixed animation attack with empty sprite (blink)
++ Fixed: game: remove stop hero, for invalid event maps
++ Fixed: game: default action key for hero focus
++ Fixed: game: close spell book (empty spell)
++ Fixed: game: redrawing window borders with black on calling NewGame or LoadGame menu with high resolution (thanks ghox@users.sourceforge.net)
++ Fixed: game: load game with incorrect hero path, fixed loadgame crash
++ Fixed: game: hero directly attack monster
++ Fixed: game: add always ask for poor morale/luck visiting
++ Fixed: game: update luck stats
++ Remove: option: "unions: allow view maps", set always on
++ Remove: option: "world: use enhanced artifact info dialog", add artifact description info to dialog box
++ Remove: game: old format game support
++ Added:  option: "unique artifacts for primary and secondary skills"
+
 Nov, 17, 2011 (2704 rev.)
 
 + Fixed: world: old format load: huge population
