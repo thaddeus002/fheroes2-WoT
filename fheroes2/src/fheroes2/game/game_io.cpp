@@ -824,6 +824,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(world.height);
 
     s32 ultimate_index = -1;
+    u8  ultimate_art = Artifact::UNKNOWN;
     if(format < FORMAT_VERSION_2629)
 	msg.Pop(ultimate_index);
     msg.Pop(world.uniq0);
@@ -846,10 +847,6 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     world.vec_tiles.resize(byte32);
     for(u32 maps_index = 0; maps_index < byte32; ++maps_index)
 	UnpackTile(msg, world.vec_tiles[maps_index], maps_index, format);
-
-    // update tile passable
-    std::for_each(world.vec_tiles.begin(), world.vec_tiles.end(),
-        std::mem_fun_ref(&Maps::Tiles::UpdatePassable));
 
     // heroes
     msg.Pop(byte16);
@@ -1032,19 +1029,12 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     {
 	msg.Pop(byte16);
 	if(byte16 != 0xFF10) DEBUG(DBG_GAME, DBG_WARN, "0xFF10");
-	bool isfound;
-	msg.Pop(byte8);
-	msg.Pop(isfound);
-	msg.Pop(byte32);
-
-	world.ultimate_artifact.Set(byte32, Artifact(byte8));
-	world.ultimate_artifact.isfound = isfound;
+	msg.Pop(ultimate_art);
+	msg.Pop(world.ultimate_artifact.isfound);
+	msg.Pop(ultimate_index);
     }
     else
-    if(0 <= ultimate_index)
-	world.ultimate_artifact.Set(ultimate_index, Artifact(world.GetTiles(ultimate_index).GetQuantity1()));
-    else
-	world.ultimate_artifact.Reset();
+	ultimate_art = world.GetTiles(ultimate_index).GetQuantity1();
 
     msg.Pop(byte16);
 
@@ -1121,6 +1111,26 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     for(MapsTiles::iterator
 	it = world.vec_tiles.begin(); it != world.vec_tiles.end(); ++it)
     	    (*it).FixLoadOldVersion2(format);
+
+    // init ultimate art
+    if(0 <= ultimate_index)
+	world.ultimate_artifact.Set(ultimate_index, Artifact(ultimate_art));
+    else
+	world.ultimate_artifact.Reset();
+
+    // heroes postfix
+    for(u32 ii = 0; ii < world.vec_heroes.size(); ++ii)
+    {
+	Heroes* hero = world.vec_heroes[ii];
+
+	if(hero)
+	{
+	    if(format < FORMAT_VERSION_2707)
+		hero->path.Reset();
+
+	    hero->path.RescanPassable();
+	}
+    }
 
     return byte16 == 0xFFFF;
 }
@@ -1475,10 +1485,4 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
 	msg.Pop(step.penalty);
 	hero.path.push_back(step);
     }
-
-    // check path
-    if(check_version < FORMAT_VERSION_2707)
-	hero.path.Reset();
-
-    hero.path.RescanPassable();
 }
