@@ -1913,14 +1913,14 @@ u8 Battle2::Arena::GetObstaclesPenalty(const Stats & attacker, const Stats & def
 	if(indexes.size())
 	{
 	    std::sort(indexes.begin(), indexes.end());
-	    indexes.resize(std::unique(indexes.begin(), indexes.end()) - indexes.begin());
+	    indexes.resize(std::distance(indexes.begin(), std::unique(indexes.begin(), indexes.end())));
 	}
 
 	for(std::vector<u16>::iterator
 	    it = indexes.begin(); it != indexes.end(); ++it)
 	{
 	    // obstacles
-	    switch(board[std::distance(indexes.begin(), it)].object)
+	    switch(board[*it].object)
 	    {
 		    // tree
 		    case 0x82:
