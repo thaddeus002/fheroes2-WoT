@@ -712,25 +712,6 @@ u32 Battle2::Stats::GetDamage(const Stats & enemy) const
     else
     if(Modes(LUCK_BAD)) res >>= 1; // div 2
 
-    switch(troop().GetID())
-    {
-	case Monster::GENIE:
-	    // 10% half
-	    if(enemy.count > 1 && genie_enemy_half_percent >= Rand::Get(1, 100))
-	    {
-		res = enemy.hp / 2;
-		if(arena->interface)
-		{
-		    std::string str(_("%{name} half the enemy troops!"));
-		    String::Replace(str, "%{name}", GetName());
-		    arena->interface->SetStatus(str, true);
-		}
-	    }
-	    break;
-
-	default: break;
-    }
-
     return res;
 }
 
@@ -836,8 +817,29 @@ u32 Battle2::Stats::Resurrect(u32 points, bool allow_overflow, bool skip_dead)
 
 u32 Battle2::Stats::ApplyDamage(Stats & enemy, u32 dmg)
 {
-    const u32 killed = ApplyDamage(dmg);
+    u32 killed = ApplyDamage(dmg);
     u32 resurrect;
+
+    switch(enemy.troop().GetID())
+    {
+    	case Monster::GENIE:
+    	    // 10% half
+    	    if(1 < count && killed < count &&
+		genie_enemy_half_percent >= Rand::Get(1, 100))
+            {
+		killed = ApplyDamage(hp / 2);
+
+                if(arena->interface)
+                {
+                    std::string str(_("%{name} half the enemy troops!"));
+                    String::Replace(str, "%{name}", enemy.GetName());
+                    arena->interface->SetStatus(str, true);
+                }
+            }
+            break;
+
+        default: break;
+    }
 
     if(killed) switch(enemy.troop().GetID())
     {
