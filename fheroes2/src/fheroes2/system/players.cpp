@@ -453,9 +453,9 @@ void Interface::PlayersInfo::RedrawInfo(void) const
     for(const_iterator it = begin(); it != end(); ++it)
     {
 	const Player & player = *((*it).player);
-	const Rect rect1 = (*it).rect1;
-	const Rect rect2 = (*it).rect2;
-	const Rect rect3= (*it).rect3;
+	const Rect & rect1 = (*it).rect1;
+	const Rect & rect2 = (*it).rect2;
+	const Rect & rect3 = (*it).rect3;
 
 	// 1. redraw opponents
 
