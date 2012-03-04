@@ -1090,6 +1090,7 @@ void Maps::Tiles::UpdateDwellingPopulation(Tiles & tile)
         case MP2::OBJ_EARTHALTAR:
 	case MP2::OBJ_BARROWMOUNDS:
 	    count = troop().GetRNDSize(true);
+	    // increase small if dwelling not open
 	    if(! Settings::Get().ExtWorldDwellingsAccumulateUnits() && count <= troop.GetCount())
 	    	count = troop.GetCount() + Rand::Get(1, 3);
 	    break;

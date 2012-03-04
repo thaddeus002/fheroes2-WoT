@@ -883,11 +883,15 @@ void World::LoadMaps(const std::string &filename)
             case MP2::OBJ_TROLLBRIDGE:
             case MP2::OBJ_DRAGONCITY:
             case MP2::OBJ_CITYDEAD:
+    		tile.QuantityUpdate();
+		break;
+
 	    case MP2::OBJ_WATERALTAR:
     	    case MP2::OBJ_AIRALTAR:
     	    case MP2::OBJ_FIREALTAR:
     	    case MP2::OBJ_EARTHALTAR:
 	    case MP2::OBJ_BARROWMOUNDS:
+    		tile.QuantityReset();
     		tile.QuantityUpdate();
 		break;
 
