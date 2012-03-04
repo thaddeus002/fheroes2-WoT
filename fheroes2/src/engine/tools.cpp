@@ -761,7 +761,11 @@ bool IsFile(const std::string & name, bool writable)
     if(stat(name.c_str(), &fs) || !S_ISREG(fs.st_mode))
 	return false;
 
+#if defined(ANDROID)
+    return writable ? 0 == access(name.c_str(), W_OK) : true;
+#else
     return writable ? 0 == access(name.c_str(), W_OK) : S_IRUSR & fs.st_mode;
+#endif
 }
 
 bool IsDirectory(const std::string & name, bool writable)

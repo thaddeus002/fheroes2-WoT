@@ -104,9 +104,10 @@ enum
 #elif defined(ANDROID)
 namespace std
 {
- #define endl "\n"
+ static const char* android_endl = "\n";
 }
- #define VERBOSE(x) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "FHeroes", "%s", osss.str().c_str()); }
+ #define endl android_endl
+ #define VERBOSE(x) if(true) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "FHeroes", "%s", osss.str().c_str()); } else String::GetTime()
 #else
  #define VERBOSE(x) std::cout << x << std::endl
 #endif

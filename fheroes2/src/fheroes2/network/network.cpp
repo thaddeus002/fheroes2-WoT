@@ -159,7 +159,9 @@ int Network::RunDedicatedServer(void)
     Network::SetProtocolVersion(static_cast<u16>(MAJOR_VERSION << 8) | MINOR_VERSION);
     
     if(SDL::Init(INIT_TIMER))
+#ifndef ANDROID
     try
+#endif
     {
         std::atexit(SDL::Quit);
 
@@ -177,6 +179,7 @@ int Network::RunDedicatedServer(void)
 
         return FH2Server::Main(NULL);
     }
+#ifndef ANDROID
     catch(std::bad_alloc)
     {
     }
@@ -184,7 +187,7 @@ int Network::RunDedicatedServer(void)
     {
         VERBOSE(conf.String());
     }
-
+#endif
     return 0;
 }
 
