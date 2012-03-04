@@ -490,7 +490,7 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 	    {
 		MapsFileInfoList lists;
 		Network::PacketPopMapsFileInfoList(packet, lists);
-		if(Maps::FileInfo *fi = Dialog::SelectScenario(lists))
+		if(const Maps::FileInfo *fi = Dialog::SelectScenario(lists))
         	{
 		    // send set_maps_info
 	    	    packet.Reset();
@@ -626,7 +626,7 @@ Game::menu_t Game::NetworkGuest(void)
     // clear background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
     cursor.Hide();
-    display.Blit(back);
+    back.Blit(display);
     cursor.Show();
     display.Flip();
 

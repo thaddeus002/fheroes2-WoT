@@ -876,7 +876,7 @@ bool FH2Server::BattleSendEarthQuakeSpell(u8 color, const std::vector<u8> & targ
 
 int FH2Server::RunServerProcess(void*)
 {
-    const std::string command = Settings::GetProgramPath();
+    const std::string command = Settings::Get().GetProgramPath();
     std::ostringstream os;
     os << command << " -s" << ">" << GetDirname(command) << SEPARATOR << "fh2server.log";
     return system(os.str().c_str());
@@ -899,7 +899,7 @@ Game::menu_t Game::NetworkHost(void)
 
 	// clear background
 	cursor.Hide();
-	display.Blit(AGG::GetICN(ICN::HEROES, 0));
+	AGG::GetICN(ICN::HEROES, 0).Blit(display);
 	cursor.Show();
 	display.Flip();
     }
