@@ -402,13 +402,13 @@ void Dialog::Marketplace(bool fromTradingPost)
 	// click max
 	if(buttonMax.w && max_buy && le.MouseClickLeft(buttonMax))
 	{
-	    u32 seek = splitter.Max();
+	    const u32 & max = splitter.Max();
 
-            count_buy  = max_buy * (Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) : 1);
-            count_sell = max_buy * (Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo, fromTradingPost));
+            count_buy  = max * (Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) : 1);
+            count_sell = max * (Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo, fromTradingPost));
 
             cursor.Hide();
-            splitter.Move(seek);
+            splitter.Move(max);
             gui.RedrawInfoBuySell(count_sell, count_buy);
             cursor.Show();
             display.Flip();
