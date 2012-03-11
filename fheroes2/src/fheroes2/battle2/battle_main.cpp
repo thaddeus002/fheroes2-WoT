@@ -62,7 +62,7 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
 
     DEBUG(DBG_BATTLE, DBG_INFO, "start");
     DEBUG(DBG_BATTLE, DBG_INFO, "army1 " << army1.String());
-    DEBUG(DBG_BATTLE, DBG_INFO, "army2 " << army1.String());
+    DEBUG(DBG_BATTLE, DBG_INFO, "army2 " << army2.String());
 
     if(conf.ExtLowMemory())
         AGG::ICNRegistryEnable(true);

@@ -1509,7 +1509,7 @@ void AI::HeroesLevelUp(Heroes & hero)
 void AI::HeroesPreBattle(HeroBase & hero)
 {
     Castle* castle = world.GetCastle(hero.GetIndex());
-    if(castle)
+    if(castle && hero.GetType() != Skill::Primary::CAPTAIN)
 	hero.GetArmy().JoinArmy(castle->GetArmy());
 }
 

@@ -1219,6 +1219,9 @@ void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle, u16 check_versi
 
     // captain
     UnpackHeroBase(msg, castle.captain, check_version);
+
+    if(castle.isBuild(BUILD_CAPTAIN))
+	castle.army.SetCommander(&castle.captain);
 }
 
 void Game::IO::UnpackHeroBase(QueueMessage & msg, HeroBase & hero, u16 check_version)
