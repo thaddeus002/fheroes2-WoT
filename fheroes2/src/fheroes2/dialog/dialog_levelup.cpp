@@ -75,7 +75,7 @@ u8 DialogSelectSecondary(const std::string & name, const std::string & primary, 
     String::Replace(header, "%{skill}", primary);
 
     Display & display = Display::Get();
-    const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+    const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     // preload
     AGG::PreloadObject(system);

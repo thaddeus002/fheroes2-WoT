@@ -139,7 +139,7 @@ void Game::Init(void)
     le.SetGlobalFilterKeysEvents(Game::KeyboardGlobalFilter);
     le.SetGlobalFilter(true);
 
-    le.SetTapMode(conf.ExtTapMode());
+    le.SetTapMode(conf.ExtPocketTapMode());
 
     Game::AnimateDelaysInitialize();
 
@@ -175,9 +175,9 @@ void Game::SetFixVideoMode(void)
 
     Size fixsize(conf.VideoMode());
 
-    u16 max_x = Settings::Get().HideInterface() ? conf.MapsWidth() * TILEWIDTH :
+    u16 max_x = Settings::Get().ExtGameHideInterface() ? conf.MapsWidth() * TILEWIDTH :
 			    (6 + conf.MapsWidth()) * TILEWIDTH; // RADARWIDTH + 3 * BORDERWIDTH
-    u16 max_y = Settings::Get().HideInterface() ? conf.MapsWidth() * TILEWIDTH :
+    u16 max_y = Settings::Get().ExtGameHideInterface() ? conf.MapsWidth() * TILEWIDTH :
 			    (1 + conf.MapsWidth()) * TILEWIDTH; // 2 * BORDERWIDTH
 
     if(conf.VideoMode().w > max_x) fixsize.w = max_x;

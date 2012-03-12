@@ -78,7 +78,7 @@ bool FH2LocalClient::StartGame(void)
     AGG::FreeObject(ICN::HSBKG);
     AGG::FreeObject(ICN::HISCORE);
 
-    if(Settings::Get().ExtLowMemory())
+    if(Settings::Get().ExtPocketLowMemory())
     {
         AGG::ICNRegistryEnable(false);
         AGG::ICNRegistryFreeObjects();

@@ -197,7 +197,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     heroes2.MovePointsScaleFixed();
 
     // scholar action
-    if(Settings::Get().ExtEyeEagleAsScholar())
+    if(Settings::Get().ExtWorldEyeEagleAsScholar())
 	Heroes::ScholarAction(*this, heroes2);
 
     LocalEvent & le = LocalEvent::Get();
@@ -340,7 +340,7 @@ void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
 	return;
     }
     else
-    if(! Settings::Get().ExtEyeEagleAsScholar())
+    if(! Settings::Get().ExtWorldEyeEagleAsScholar())
     {
 	DEBUG(DBG_GAME, DBG_WARN, "EyeEagleAsScholar settings disabled");
 	return;

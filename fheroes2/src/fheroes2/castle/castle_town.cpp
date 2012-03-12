@@ -43,7 +43,7 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
 {
     if(!hero) return Dialog::CANCEL;
 
-    const ICN::icn_t system = (Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM);
+    const ICN::icn_t system = (Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM);
 
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();

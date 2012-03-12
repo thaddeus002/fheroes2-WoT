@@ -1502,7 +1502,7 @@ void Maps::Tiles::RedrawMonster(Surface & dst) const
     const u8 sprite_index = QuantityMonster().GetSpriteIndex();
 
     // draw attack sprite
-    if(-1 != dst_index && !conf.ExtOnlyFirstMonsterAttack())
+    if(-1 != dst_index && !conf.ExtWorldOnlyFirstMonsterAttack())
     {
 	bool revert = false;
 

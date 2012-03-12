@@ -520,7 +520,7 @@ void Maps::Tiles::QuantityUpdate(void)
                         u8 cond = Rand::Get(1, 10) < 4 ? Rand::Get(1, 13) : 0;
 
                         // always available
-                        if(Settings::Get().ExtNoRequirementsForArtifacts())
+                        if(Settings::Get().ExtWorldNoRequirementsForArtifacts())
                     	    cond = 0;
 
             		QuantitySetVariant(cond);
@@ -781,7 +781,7 @@ void Maps::Tiles::QuantityUpdate(void)
             // I checked in Heroes II: min 3 x 13, and max 3 x 15
 	    troop.Set(Monster::GHOST, 3 * Rand::Get(13, 15));
 
-            if(! Settings::Get().ExtAbandonedMineRandom())
+            if(! Settings::Get().ExtWorldAbandonedMineRandom())
 		QuantitySetResource(Resource::GOLD, 1000);
             else
             switch(Rand::Get(1, 5))

@@ -1358,7 +1358,7 @@ void Heroes::SetFreeman(const u8 reason)
 
     if((Battle2::RESULT_RETREAT | Battle2::RESULT_SURRENDER) & reason)
     {
-	if(Settings::Get().ExtRememberPointsForHeroRetreating()) savepoints = true;
+	if(Settings::Get().ExtHeroRememberPointsForRetreating()) savepoints = true;
 	kingdom.SetLastLostHero(*this);
     }
 
@@ -1496,7 +1496,7 @@ void Heroes::ActionNewPosition(void)
 	{
 	    RedrawGameAreaAndHeroAttackMonster(*this, *it);
 	    targets.erase(it);
-	    if(conf.ExtOnlyFirstMonsterAttack()) skip_battle = true;
+	    if(conf.ExtWorldOnlyFirstMonsterAttack()) skip_battle = true;
 	}
 
 	// other around targets
@@ -1504,7 +1504,7 @@ void Heroes::ActionNewPosition(void)
 	    it = targets.begin(); it != targets.end() && !isFreeman() && !skip_battle; ++it)
 	{
 	    RedrawGameAreaAndHeroAttackMonster(*this, *it);
-	    if(conf.ExtOnlyFirstMonsterAttack()) skip_battle = true;
+	    if(conf.ExtWorldOnlyFirstMonsterAttack()) skip_battle = true;
 	}
     }
 
@@ -1568,7 +1568,7 @@ u8 Heroes::CanScouteTile(s32 dst) const
     }
     else
     {
-	if(Settings::Get().ExtScouteExtended())
+	if(Settings::Get().ExtWorldScouteExtended())
 	{
 	    //const Maps::Tiles & tile = world.GetTiles(dst);
 
@@ -1784,7 +1784,7 @@ Heroes* AllHeroes::GetGuest(const Castle & castle) const
 
 Heroes* AllHeroes::GetGuard(const Castle & castle) const
 {
-    const_iterator it = Settings::Get().ExtAllowCastleGuardians() ?                                                          
+    const_iterator it = Settings::Get().ExtCastleAllowGuardians() ?                                                          
         std::find_if(begin(), end(), std::bind1st(InCastleAndGuardian(), &castle)) : end();
     return end() != it ? *it : NULL;
 }

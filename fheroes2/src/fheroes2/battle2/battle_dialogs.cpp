@@ -58,7 +58,7 @@ void Battle2::DialogBattleSettings(void)
 
     cursor.Hide();
 
-    const Sprite & dialog = AGG::GetICN((conf.EvilInterface() ? ICN::CSPANBKE : ICN::CSPANBKG), 0);
+    const Sprite & dialog = AGG::GetICN((conf.ExtGameEvilInterface() ? ICN::CSPANBKE : ICN::CSPANBKG), 0);
 
     Rect pos_rt;
     pos_rt.x = (display.w() - dialog.w()) / 2;
@@ -72,7 +72,7 @@ void Battle2::DialogBattleSettings(void)
     display.FillRect(0x00, 0x00, 0x00, back.GetRect());
     dialog.Blit(pos_rt.x, pos_rt.y);
     
-    Button btn_ok(pos_rt.x + 113, pos_rt.y + 252, (conf.EvilInterface() ? ICN::CSPANBTE : ICN::CSPANBTN), 0, 1);
+    Button btn_ok(pos_rt.x + 113, pos_rt.y + 252, (conf.ExtGameEvilInterface() ? ICN::CSPANBTE : ICN::CSPANBTN), 0, 1);
 
     Rect   opt_speed(pos_rt.x + 36, pos_rt.y + 47, AGG::GetICN(ICN::CSPANEL, 0).w(), AGG::GetICN(ICN::CSPANEL, 0).h());
     Button opt_grid(pos_rt.x + 36, pos_rt.y + 157, ICN::CSPANEL, 8, 9);
@@ -250,7 +250,7 @@ void Battle2::Arena::DialogBattleSummary(const Result & res) const
 	}
     }
 
-    const Sprite & dialog = AGG::GetICN((conf.EvilInterface() ? ICN::WINLOSEE : ICN::WINLOSE), 0);
+    const Sprite & dialog = AGG::GetICN((conf.ExtGameEvilInterface() ? ICN::WINLOSEE : ICN::WINLOSE), 0);
 
     Rect pos_rt;
     pos_rt.x = (display.w() - dialog.w()) / 2;
@@ -281,7 +281,7 @@ void Battle2::Arena::DialogBattleSummary(const Result & res) const
 	sprite2.Blit(pos_rt.x + anime_ox + sprite2.x(), pos_rt.y + anime_oy + sprite2.y());
     }
 
-    Button btn_ok(pos_rt.x + 121, pos_rt.y + (conf.QVGA() ? 176 : 410), (conf.EvilInterface() ? ICN::WINCMBBE : ICN::WINCMBTB), 0, 1);
+    Button btn_ok(pos_rt.x + 121, pos_rt.y + (conf.QVGA() ? 176 : 410), (conf.ExtGameEvilInterface() ? ICN::WINCMBBE : ICN::WINCMBTB), 0, 1);
 
     TextBox box(msg, Font::BIG, 270);
     box.Blit(pos_rt.x + 25, pos_rt.y + (conf.QVGA() ? 20 : 175));
@@ -364,7 +364,7 @@ u8 Battle2::Arena::DialogBattleHero(const HeroBase & hero) const
     cursor.SetThemes(Cursor::POINTER);
 
     const bool readonly = current_color != hero.GetColor();
-    const Sprite & dialog = AGG::GetICN((conf.EvilInterface() ? ICN::VGENBKGE : ICN::VGENBKG), 0);
+    const Sprite & dialog = AGG::GetICN((conf.ExtGameEvilInterface() ? ICN::VGENBKGE : ICN::VGENBKG), 0);
 
     Rect pos_rt;
     pos_rt.x = (display.w() - dialog.w()) / 2;
@@ -508,7 +508,7 @@ bool Battle2::DialogBattleSurrender(const HeroBase & hero, u32 cost)
     cursor.Hide();
     cursor.SetThemes(Cursor::POINTER);
 
-    const Sprite & dialog = AGG::GetICN(conf.EvilInterface() ? ICN::SURDRBKE : ICN::SURDRBKG, 0);
+    const Sprite & dialog = AGG::GetICN(conf.ExtGameEvilInterface() ? ICN::SURDRBKE : ICN::SURDRBKG, 0);
 
     Rect pos_rt;
     pos_rt.x = (display.w() - dialog.w() + 16) / 2;
@@ -521,7 +521,7 @@ bool Battle2::DialogBattleSurrender(const HeroBase & hero, u32 cost)
 
     dialog.Blit(pos_rt.x, pos_rt.y);
 
-    const ICN::icn_t icn = conf.EvilInterface() ? ICN::SURRENDE : ICN::SURRENDR;
+    const ICN::icn_t icn = conf.ExtGameEvilInterface() ? ICN::SURRENDE : ICN::SURRENDR;
 
     Button btnAccept(pos_rt.x + 90, pos_rt.y + 150, icn, 0, 1);
     Button btnDecline(pos_rt.x + 295, pos_rt.y + 150, icn, 2, 3);

@@ -361,7 +361,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
 	}
 
 	// move hero to guardian
-        if(conf.ExtAllowCastleGuardians() && !readonly && heroes.Guest() && !heroes.Guard() && le.MouseClickLeft(rectSign1))
+        if(conf.ExtCastleAllowGuardians() && !readonly && heroes.Guest() && !heroes.Guard() && le.MouseClickLeft(rectSign1))
         {
             if(! heroes.Guest()->GetArmy().CanJoinArmy(castle.GetArmy()))
             {
@@ -398,7 +398,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
         }
 	else
 	// move guardian to hero
-        if(conf.ExtAllowCastleGuardians() && !readonly && !heroes.Guest() && heroes.Guard() && le.MouseClickLeft(rectSign2))
+        if(conf.ExtCastleAllowGuardians() && !readonly && !heroes.Guest() && heroes.Guard() && le.MouseClickLeft(rectSign2))
         {
             heroes.Guard()->ResetModes(Heroes::GUARDIAN);
 	    heroes.Swap();

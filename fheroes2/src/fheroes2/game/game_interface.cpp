@@ -47,7 +47,7 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
     const u16 & px = display.w() - BORDERWIDTH - RADARWIDTH;
     const u8 scroll_width = conf.QVGA() ? 12 : BORDERWIDTH;
 
-    if(conf.HideInterface())
+    if(conf.ExtGameHideInterface())
     {
         iconsPanel.SetCount(2);
 	conf.SetShowPanel(true);
@@ -135,28 +135,28 @@ void Interface::Basic::Redraw(u8 force)
 
     if((redraw | force) & REDRAW_GAMEAREA) gameArea.Redraw(Display::Get(), LEVEL_ALL);
 
-    if((conf.HideInterface() && conf.ShowRadar()) || ((redraw | force) & REDRAW_RADAR)) radar.Redraw();
+    if((conf.ExtGameHideInterface() && conf.ShowRadar()) || ((redraw | force) & REDRAW_RADAR)) radar.Redraw();
 
-    if((conf.HideInterface() && conf.ShowIcons()) || ((redraw | force) & REDRAW_ICONS)) iconsPanel.Redraw();
+    if((conf.ExtGameHideInterface() && conf.ShowIcons()) || ((redraw | force) & REDRAW_ICONS)) iconsPanel.Redraw();
     else
     if((redraw | force) & REDRAW_HEROES) iconsPanel.RedrawIcons(ICON_HEROES);
     else
     if((redraw | force) & REDRAW_CASTLES) iconsPanel.RedrawIcons(ICON_CASTLES);
 
-    if((conf.HideInterface() && conf.ShowButtons()) || ((redraw | force) & REDRAW_BUTTONS)) buttonsArea.Redraw();
+    if((conf.ExtGameHideInterface() && conf.ShowButtons()) || ((redraw | force) & REDRAW_BUTTONS)) buttonsArea.Redraw();
 
-    if((conf.HideInterface() && conf.ShowStatus()) || ((redraw | force) & REDRAW_STATUS)) statusWindow.Redraw();
+    if((conf.ExtGameHideInterface() && conf.ShowStatus()) || ((redraw | force) & REDRAW_STATUS)) statusWindow.Redraw();
 
-    if(conf.HideInterface() && conf.ShowControlPanel() && (redraw & REDRAW_GAMEAREA)) controlPanel.Redraw();
+    if(conf.ExtGameHideInterface() && conf.ShowControlPanel() && (redraw & REDRAW_GAMEAREA)) controlPanel.Redraw();
 
     u32 usage = GetMemoryUsage();
 
     // show system info
-    if(conf.ExtShowSystemInfo() && usage)
-	RedrawSystemInfo((conf.HideInterface() ? 10 : 26), Display::Get().h() - (conf.HideInterface() ? 14 : 30), usage);
+    if(conf.ExtGameShowSystemInfo() && usage)
+	RedrawSystemInfo((conf.ExtGameHideInterface() ? 10 : 26), Display::Get().h() - (conf.ExtGameHideInterface() ? 14 : 30), usage);
 
     // memory limit trigger
-    if(conf.ExtLowMemory() && conf.MemoryLimit() && usage)
+    if(conf.ExtPocketLowMemory() && conf.MemoryLimit() && usage)
     {
 	if(conf.MemoryLimit() < usage)
 	{
@@ -185,7 +185,7 @@ void Interface::Basic::Redraw(u8 force)
 	    VERBOSE("MemoryLimit: " << "free all " << "MID" << ", game usage: " << GetMemoryUsage());
 
 	    redraw = 0xFF;
-	    if(conf.HideInterface()) redraw &= ~REDRAW_BORDER;
+	    if(conf.ExtGameHideInterface()) redraw &= ~REDRAW_BORDER;
 
 	    cursor.SetThemes(cursor.Themes(), true);
 	    cursor.Show();

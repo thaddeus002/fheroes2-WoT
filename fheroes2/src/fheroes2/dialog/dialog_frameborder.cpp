@@ -118,7 +118,7 @@ Dialog::FrameBorder::~FrameBorder()
 
 void DrawBorder1(s16 posx, s16 posy, u16 posw, u16 posh, Surface & sf)
 {
-    const Sprite & surdbkg = (Settings::Get().EvilInterface() ? AGG::GetICN(ICN::SURDRBKE, 0) : AGG::GetICN(ICN::SURDRBKG, 0));
+    const Sprite & surdbkg = (Settings::Get().ExtGameEvilInterface() ? AGG::GetICN(ICN::SURDRBKE, 0) : AGG::GetICN(ICN::SURDRBKG, 0));
     Rect  src_rt;
     Point dst_pt;
 

@@ -46,7 +46,7 @@ Interface::ControlPanel::ControlPanel() : alpha(130)
 
 void Interface::ControlPanel::ResetTheme(void)
 {
-    ICN::icn_t icn = Settings::Get().EvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
+    ICN::icn_t icn = Settings::Get().ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
 
     btn_radr.Set(AGG::GetICN(icn, 4));
     btn_icon.Set(AGG::GetICN(icn, 0));

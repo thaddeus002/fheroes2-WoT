@@ -706,7 +706,7 @@ Battle2::Interface::Interface(Arena & a, s32 center) : arena(a), icn_cbkg(ICN::U
     }
 
     if(grave){ icn_cbkg = ICN::CBKGGRAV; light = true; icn_frng = ICN::FRNG0001; }
-    if(conf.QVGA() || conf.ExtLowMemory()) icn_frng = ICN::UNKNOWN;
+    if(conf.QVGA() || conf.ExtPocketLowMemory()) icn_frng = ICN::UNKNOWN;
 
     // hexagon
     DrawHexagon(sf_hexagon, (light ? 0xE0 : 0xE5));
@@ -738,7 +738,7 @@ Battle2::Interface::Interface(Arena & a, s32 center) : arena(a), icn_cbkg(ICN::U
 
     status.SetPosition(area.x + btn_auto.w, btn_auto.y);
 
-    if(!conf.QVGA() && !conf.ExtLowMemory())
+    if(!conf.QVGA() && !conf.ExtPocketLowMemory())
 	listlog = new StatusListBox();
 
     if(listlog)
@@ -799,7 +799,7 @@ void Battle2::Interface::RedrawInterface(void)
     if(conf.ExtBattleSoftWait()) btn_wait.Draw();
     btn_skip.Draw();
 
-    if(!conf.QVGA() && !conf.ExtLowMemory())
+    if(!conf.QVGA() && !conf.ExtPocketLowMemory())
 	popup.Redraw(rectBoard.x + rectBoard.w + 60, rectBoard.y + rectBoard.h);
 
     if(openlog && listlog)
@@ -1831,7 +1831,7 @@ void Battle2::Interface::FadeArena(void)
     cursor.Show();
     display.Flip();
 
-    if(!conf.QVGA())
+    if(!conf.QVGA() && conf.ExtGameUseFade())
     {
 	Surface temp(640, 480, false);
 	temp.Fill(0, 0, 0);
@@ -1967,7 +1967,7 @@ void Battle2::Interface::MousePressRightBoardAction(u16 themes, s16 index, Actio
 	    const Settings & conf = Settings::Get();
 	    const u8 allow = GetAllowSwordDirection(index);
 
-	    if(arena.current_color == b->GetColor() || !conf.ExtTapMode() || !allow)
+	    if(arena.current_color == b->GetColor() || !conf.ExtPocketTapMode() || !allow)
 		Dialog::ArmyInfo(b->troop, Dialog::READONLY);
 	    else
 	    switch(PocketPC::GetCursorAttackDialog(b->GetCellPosition(), allow))

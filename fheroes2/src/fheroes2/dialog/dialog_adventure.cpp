@@ -31,8 +31,8 @@ Dialog::answer_t Dialog::AdventureOptions(const bool enabledig)
     Display & display = Display::Get();
 
     // preload
-    const ICN::icn_t apanbkg = Settings::Get().EvilInterface() ? ICN::APANBKGE : ICN::APANBKG;
-    const ICN::icn_t apanel  = Settings::Get().EvilInterface() ? ICN::APANELE : ICN::APANEL;
+    const ICN::icn_t apanbkg = Settings::Get().ExtGameEvilInterface() ? ICN::APANBKGE : ICN::APANBKG;
+    const ICN::icn_t apanel  = Settings::Get().ExtGameEvilInterface() ? ICN::APANELE : ICN::APANEL;
 
     AGG::PreloadObject(apanbkg);
     AGG::PreloadObject(apanel);

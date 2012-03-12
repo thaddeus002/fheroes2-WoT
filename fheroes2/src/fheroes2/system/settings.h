@@ -162,7 +162,7 @@ public:
 	WORLD_SCOUTING_EXTENDED		= 0x20000040,
 	WORLD_ONLY_FIRST_MONSTER_ATTACK	= 0x20000080,
 	WORLD_EYE_EAGLE_AS_SCHOLAR	= 0x20000100,
-	WORLD_BUY_BOOK_FROM_SHRINES	= 0x20000200,
+	HEROES_BUY_BOOK_FROM_SHRINES	= 0x20000200,
 	WORLD_BAN_WEEKOF		= 0x20000400,
 	WORLD_BAN_PLAGUES		= 0x20000800,
 	UNIONS_ALLOW_HERO_MEETINGS	= 0x20001000,
@@ -277,22 +277,10 @@ public:
     void ExtSetModes(u32);
     void ExtResetModes(u32);
     const char* ExtName(u32) const;
-    bool ExtAllowBuyFromWell(void) const;
-    bool ExtShowVisitedContent(void) const;
-    bool ExtScouteExtended(void) const;
-    bool ExtRememberLastFocus(void) const;
-    bool ExtRememberLastFilename(void) const;
-    bool ExtAbandonedMineRandom(void) const;
-    bool ExtSaveMonsterBattle(void) const;
-    bool ExtAllowSetGuardian(void) const;
-    bool ExtNoRequirementsForArtifacts(void) const;
-    bool ExtArtifactCrystalBall(void) const;
-    bool ExtLearnSpellsWithDay(void) const;
-    bool ExtOnlyFirstMonsterAttack(void) const;
-    bool ExtEyeEagleAsScholar(void) const;
-    bool ExtBuySpellBookFromShrine(void) const;
+    bool ExtHeroLearnSpellsWithDay(void) const;
+    bool ExtHeroBuySpellBookFromShrine(void) const;
     bool ExtHeroRecruitCostDependedFromLevel(void) const;
-    bool ExtRememberPointsForHeroRetreating(void) const;
+    bool ExtHeroRememberPointsForRetreating(void) const;
     bool ExtHeroSurrenderingGiveExp(void) const;
     bool ExtHeroRecalculateMovement(void) const;
     bool ExtHeroPatrolAllowPickup(void) const;
@@ -303,8 +291,15 @@ public:
     bool ExtUnionsAllowCastleVisiting(void) const;
     bool ExtUnionsAllowHeroesMeetings(void) const;
     bool ExtUnionsAllowViewMaps(void) const;
-    bool ExtAllowCastleGuardians(void) const;
-    bool ExtGameContinueAfterVictory(void) const;
+    bool ExtWorldShowVisitedContent(void) const;
+    bool ExtWorldScouteExtended(void) const;
+    bool ExtWorldAbandonedMineRandom(void) const;
+    bool ExtWorldSaveMonsterBattle(void) const;
+    bool ExtWorldAllowSetGuardian(void) const;
+    bool ExtWorldNoRequirementsForArtifacts(void) const;
+    bool ExtWorldArtifactCrystalBall(void) const;
+    bool ExtWorldOnlyFirstMonsterAttack(void) const;
+    bool ExtWorldEyeEagleAsScholar(void) const;
     bool ExtWorldBanMonthOfMonsters(void) const;
     bool ExtWorldBanWeekOf(void) const;
     bool ExtWorldNewVersionWeekOf(void) const;
@@ -319,6 +314,8 @@ public:
     bool ExtWorldUseUniqueArtifactsSS(void) const;
     bool ExtWorldExtObjectsCaptured(void) const;
     bool ExtWorldGuardianObjectsTwoDefense(void) const;
+    bool ExtCastleAllowBuyFromWell(void) const;
+    bool ExtCastleAllowGuardians(void) const;
     bool ExtCastleAllowFlash(void) const;
     bool ExtCastleGuildRestorePointsTurn(void) const;
     bool ExtCastleAllowRecruitSpecialHeroes(void) const;
@@ -331,24 +328,27 @@ public:
     bool ExtBattleMergeArmies(void) const;
     bool ExtBattleSkipIncreaseDefense(void) const;
     bool ExtBattleReverseWaitOrder(void) const;
-    bool ExtRewriteConfirm(void) const;
-    bool ExtAutosaveConfirm(void) const;
-    bool ExtHideCursor(void) const;
     bool ExtBattleShowGrid(void) const;
     bool ExtBattleShowMouseShadow(void) const;
     bool ExtBattleShowMoveShadow(void) const;
-    bool ExtShowSystemInfo(void) const;
-    bool ExtAutoSaveBeginOfDay(void) const;
-    bool ExtAutoSaveOn(void) const;
-    bool ExtUseFade(void) const;
-    bool ExtShowSDL(void) const;
-    bool ExtLowMemory(void) const;
-    bool ExtTapMode(void) const;
-    bool ExtDragDropScroll(void) const;
-    bool ExtLowResolution(void) const;
-    bool EvilInterface(void) const;
-    bool DynamicInterface(void) const;
-    bool HideInterface(void) const;
+    bool ExtGameRememberLastFocus(void) const;
+    bool ExtGameRememberLastFilename(void) const;
+    bool ExtGameContinueAfterVictory(void) const;
+    bool ExtGameRewriteConfirm(void) const;
+    bool ExtGameAutosaveConfirm(void) const;
+    bool ExtGameShowSystemInfo(void) const;
+    bool ExtGameAutosaveBeginOfDay(void) const;
+    bool ExtGameAutosaveOn(void) const;
+    bool ExtGameUseFade(void) const;
+    bool ExtGameShowSDL(void) const;
+    bool ExtGameEvilInterface(void) const;
+    bool ExtGameDynamicInterface(void) const;
+    bool ExtGameHideInterface(void) const;
+    bool ExtPocketHideCursor(void) const;
+    bool ExtPocketLowMemory(void) const;
+    bool ExtPocketTapMode(void) const;
+    bool ExtPocketDragDropScroll(void) const;
+    bool ExtPocketLowResolution(void) const;
 
     bool NetworkDedicatedServer(void) const;
     bool NetworkLocalClient(void) const;
@@ -364,7 +364,7 @@ public:
     void SetUnicode(bool);
     void SetPriceLoyaltyVersion(void);
     void SetGameDifficulty(u8);
-    void SetEvilInterface(bool);
+    void SetExtGameEvilInterface(bool);
     void SetBattleGrid(bool);
     void SetBattleMovementShaded(bool);
     void SetBattleMouseShaded(bool);

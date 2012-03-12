@@ -43,7 +43,7 @@
 
 void RedrawCastleIcon(const Castle & castle, s16 sx, s16 sy)
 {
-    const bool evil = Settings::Get().EvilInterface();
+    const bool evil = Settings::Get().ExtGameEvilInterface();
     u8 index_sprite = 1;
 
     switch(castle.GetRace())
@@ -108,8 +108,8 @@ void RedrawHeroesIcon(const Heroes & hero, s16 sx, s16 sy)
 
 void Interface::IconsBar::RedrawBackground(const Point & pos)
 {
-    const Sprite & icnadv = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::ADVBORDE : ICN::ADVBORD, 0);
-    const Sprite & back = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::LOCATORE : ICN::LOCATORS, 1);
+    const Sprite & icnadv = AGG::GetICN(Settings::Get().ExtGameEvilInterface() ? ICN::ADVBORDE : ICN::ADVBORD, 0);
+    const Sprite & back = AGG::GetICN(Settings::Get().ExtGameEvilInterface() ? ICN::LOCATORE : ICN::LOCATORS, 1);
     Rect srcrt;
     Point dstpt;
 
@@ -212,7 +212,7 @@ void Interface::CastleIcons::SetShow(bool f)
 
 void Interface::CastleIcons::SetPos(s16 px, s16 py)
 {
-    const ICN::icn_t icnscroll = Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL;
+    const ICN::icn_t icnscroll = Settings::Get().ExtGameEvilInterface() ? ICN::SCROLLE : ICN::SCROLL;
 
     SetTopLeft(Point(px, py));
     SetScrollSplitter(AGG::GetICN(icnscroll, 4),
@@ -303,7 +303,7 @@ void Interface::HeroesIcons::SetShow(bool f)
 
 void Interface::HeroesIcons::SetPos(s16 px, s16 py)
 {
-    const ICN::icn_t icnscroll = Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL;
+    const ICN::icn_t icnscroll = Settings::Get().ExtGameEvilInterface() ? ICN::SCROLLE : ICN::SCROLL;
 
     SetTopLeft(Point(px, py));
     SetScrollSplitter(AGG::GetICN(icnscroll, 4),
@@ -336,7 +336,7 @@ Interface::IconsPanel & Interface::IconsPanel::Get(void)
 
 const Rect & Interface::IconsPanel::GetArea(void) const
 {
-    return Settings::Get().HideInterface() && border.isValid() ? border.GetRect() : *this;
+    return Settings::Get().ExtGameHideInterface() && border.isValid() ? border.GetRect() : *this;
 }
 
 u8 Interface::IconsPanel::CountIcons(void) const
@@ -346,7 +346,7 @@ u8 Interface::IconsPanel::CountIcons(void) const
 
 void Interface::IconsPanel::SetPos(s16 ox, s16 oy)
 {
-    if(Settings::Get().HideInterface())
+    if(Settings::Get().ExtGameHideInterface())
     {
 	FixOutOfDisplay(*this, ox, oy); 
 
@@ -381,7 +381,7 @@ void Interface::IconsPanel::Redraw(void)
     const Settings & conf = Settings::Get();
 
     // is visible
-    if(!conf.HideInterface() || conf.ShowIcons())
+    if(!conf.ExtGameHideInterface() || conf.ShowIcons())
     {
 	//Display::Get().FillRect(0, 0, 0, *this);
 
@@ -389,7 +389,7 @@ void Interface::IconsPanel::Redraw(void)
 	castleIcons.Redraw();
 
 	// redraw border
-	if(conf.HideInterface()) border.Redraw();
+	if(conf.ExtGameHideInterface()) border.Redraw();
     }
 }
 
@@ -417,7 +417,7 @@ void Interface::IconsPanel::QueueEventProcessing(void)
     }
     else
     // move border
-    if(conf.HideInterface() && conf.ShowIcons() && le.MousePressLeft(border.GetTop()))
+    if(conf.ExtGameHideInterface() && conf.ShowIcons() && le.MousePressLeft(border.GetTop()))
     {
         Surface sf(border.GetRect().w, border.GetRect().h);
         Cursor::DrawCursor(sf, 0x70);

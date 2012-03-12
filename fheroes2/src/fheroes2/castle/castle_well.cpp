@@ -101,7 +101,7 @@ void Castle::OpenWell(void)
 
     WellRedrawInfoArea(cur_pt);
 
-    if(! conf.ExtAllowBuyFromWell())
+    if(! conf.ExtCastleAllowBuyFromWell())
 	buttonMax.SetDisable(true);
     else
     {
@@ -134,7 +134,7 @@ void Castle::OpenWell(void)
         if(le.MouseClickLeft(buttonExit) || HotKeyCloseWindow) break;
 
         // extended version (click - buy dialog monster)
-        if(conf.ExtAllowBuyFromWell())
+        if(conf.ExtCastleAllowBuyFromWell())
         {
 	    if(buttonMax.isEnable() && le.MouseClickLeft(buttonMax))
 	    {
@@ -215,7 +215,7 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
     Text text;
     Point dst_pt, pt;
 
-    if(Settings::Get().ExtAllowBuyFromWell())
+    if(Settings::Get().ExtCastleAllowBuyFromWell())
     {
 	const Sprite & button = AGG::GetICN(ICN::BUYMAX, 0);
 	Rect src_rt(0, 461, button.w(), 19);

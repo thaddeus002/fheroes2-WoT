@@ -577,7 +577,7 @@ void AIToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
     	else
     	{
     	    AIBattleLose(hero, res, true);
-    	    if(Settings::Get().ExtSaveMonsterBattle())
+    	    if(Settings::Get().ExtWorldSaveMonsterBattle())
     	    {
             	tile.MonsterSetCount(army.MonsterCounts(troop()));
             	if(tile.MonsterJoinConditionFree()) tile.MonsterSetJoinCondition(Monster::JOIN_CONDITION_MONEY);
@@ -759,7 +759,7 @@ void AIToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    {
 		capture = false;
 	        AIBattleLose(hero, result, true);
-		if(Settings::Get().ExtSaveMonsterBattle())
+		if(Settings::Get().ExtWorldSaveMonsterBattle())
 		    tile.MonsterSetCount(army.MonsterCounts(mons));
 	    }
 	}
@@ -1458,7 +1458,7 @@ void AIToCoast(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 void AIMeeting(Heroes & hero1, Heroes & hero2)
 {
-    if(Settings::Get().ExtEyeEagleAsScholar())
+    if(Settings::Get().ExtWorldEyeEagleAsScholar())
         Heroes::ScholarAction(hero1, hero2);
 
     if(hero1.Modes(Heroes::HUNTER))

@@ -45,7 +45,7 @@ Dialog::Box::Box(u16 height, bool buttons)
 
     if(buttons) height += BUTTON_HEIGHT;
 
-    bool evil = Settings::Get().EvilInterface();
+    bool evil = Settings::Get().ExtGameEvilInterface();
     const u8 count_middle = (height <= BOXAREA_TOP + BOXAREA_BOTTOM ? 0 : 1 + (height - BOXAREA_TOP - BOXAREA_BOTTOM) / BOXAREA_MIDDLE);
     const u16 height_middle = count_middle * BOXAREA_MIDDLE;
     const u16 height_top_bottom = (evil ? BOXE_TOP + BOXE_BOTTOM : BOX_TOP + BOX_BOTTOM);
@@ -82,11 +82,11 @@ Dialog::Box::~Box()
 
 void BoxRedraw(s16 posx, s16 posy, u8 count)
 {
-    const ICN::icn_t buybuild = Settings::Get().EvilInterface() ? ICN::BUYBUILE : ICN::BUYBUILD;
+    const ICN::icn_t buybuild = Settings::Get().ExtGameEvilInterface() ? ICN::BUYBUILE : ICN::BUYBUILD;
 
     // left top sprite
     Point pt(posx, posy);
-    if(!Settings::Get().EvilInterface()) ++pt.x;
+    if(!Settings::Get().ExtGameEvilInterface()) ++pt.x;
     AGG::GetICN(buybuild, 4).Blit(pt);
 
     // right top sprite
@@ -103,7 +103,7 @@ void BoxRedraw(s16 posx, s16 posy, u8 count)
 
 	// right middle sprite
 	pt.x += sl.w();
-	if(!Settings::Get().EvilInterface()) pt.x -= 1;
+	if(!Settings::Get().ExtGameEvilInterface()) pt.x -= 1;
 	const Sprite & sr = AGG::GetICN(buybuild, 1);
 	sr.Blit(Rect(0, 10, sr.w(), BOXAREA_MIDDLE), pt);
 	pt.y += BOXAREA_MIDDLE;

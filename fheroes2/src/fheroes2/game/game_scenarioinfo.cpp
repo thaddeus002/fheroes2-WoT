@@ -292,7 +292,7 @@ Game::menu_t Game::ScenarioInfo(void)
     if(result == STARTGAME)
     {
 	players.SetStartGame();
-	if(conf.ExtUseFade()) display.Fade();
+	if(conf.ExtGameUseFade()) display.Fade();
 	Game::ShowLoadMapsText();
 	// Load maps
 	world.LoadMaps(conf.MapsFile());

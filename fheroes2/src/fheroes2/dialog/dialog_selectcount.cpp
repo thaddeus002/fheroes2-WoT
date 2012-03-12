@@ -34,7 +34,7 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur,
     if(min >= max) min = 0;
     if(cur > max || cur < min) cur = min;
 
-    const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+    const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     // preload
     AGG::PreloadObject(system);
@@ -160,7 +160,7 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur,
 
 bool Dialog::InputString(const std::string &header, std::string &res)
 {
-    const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+    const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
@@ -175,7 +175,7 @@ bool Dialog::InputString(const std::string &header, std::string &res)
 
     TextBox textbox(header, Font::BIG, BOXAREA_WIDTH);
     Point dst_pt;
-    const Surface & sprite = AGG::GetICN((Settings::Get().EvilInterface() ? ICN::BUYBUILD : ICN::BUYBUILE), 3);
+    const Surface & sprite = AGG::GetICN((Settings::Get().ExtGameEvilInterface() ? ICN::BUYBUILD : ICN::BUYBUILE), 3);
 
     Box box(10 + textbox.h() + 10 + sprite.h(), OK|CANCEL);
     const Rect & box_rt = box.GetArea();

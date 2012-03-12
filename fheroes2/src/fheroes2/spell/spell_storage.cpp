@@ -102,7 +102,7 @@ void SpellStorage::Append(const Artifact & art)
     	    break;
 
         case Artifact::CRYSTAL_BALL:
-    	    if(Settings::Get().ExtArtifactCrystalBall())
+    	    if(Settings::Get().ExtWorldArtifactCrystalBall())
             {
                 Append(Spell(Spell::IDENTIFYHERO));
                 Append(Spell(Spell::VISIONS));

@@ -165,7 +165,7 @@ bool Dialog::SelectFileSave(std::string & file)
 	const Settings & conf = Settings::Get();
 	file = Settings::GetSaveDir() + SEPARATOR;
 
-	if(conf.ExtRememberLastFilename() && Game::IO::last_name.size())
+	if(conf.ExtGameRememberLastFilename() && Game::IO::last_name.size())
 	    file = Game::IO::last_name;
 	else
 	if(conf.PocketPC())
@@ -184,7 +184,7 @@ bool Dialog::SelectFileSave(std::string & file)
 bool Dialog::SelectFileLoad(std::string & file)
 {
     // set default
-    if(file.empty() && Settings::Get().ExtRememberLastFilename() && Game::IO::last_name.size()) file = Game::IO::last_name;
+    if(file.empty() && Settings::Get().ExtGameRememberLastFilename() && Game::IO::last_name.size()) file = Game::IO::last_name;
     return SelectFileListSimple(_("File to Load:"), file, false);
 }
 

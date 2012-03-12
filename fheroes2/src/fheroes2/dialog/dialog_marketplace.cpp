@@ -44,7 +44,7 @@ class TradeWindowGUI
 public:
     TradeWindowGUI(const Rect & rt) : 
 	pos_rt(rt), back(rt.x - 5, rt.y + 15, rt.w + 10, 160),
-	tradpost(Settings::Get().EvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST)
+	tradpost(Settings::Get().ExtGameEvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST)
     {
 	back.Save();
 
@@ -196,7 +196,7 @@ void TradeWindowGUI::RedrawInfoBuySell(u32 count_sell, u32 count_buy)
 void Dialog::Marketplace(bool fromTradingPost)
 {
     Display & display = Display::Get();
-    const ICN::icn_t tradpost = Settings::Get().EvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
+    const ICN::icn_t tradpost = Settings::Get().ExtGameEvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
     const std::string & header = _("Marketplace");
 
     Cursor & cursor = Cursor::Get();
@@ -483,7 +483,7 @@ void RedrawResourceSprite(const Surface & sf, s16 px, s16 py, s32 value)
 
 void RedrawFromResource(const Point & pt, const Funds & rs)
 {
-    const ICN::icn_t tradpost = Settings::Get().EvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
+    const ICN::icn_t tradpost = Settings::Get().ExtGameEvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
 
     // wood
     RedrawResourceSprite(AGG::GetICN(tradpost, 7), pt.x, pt.y, rs.wood);
@@ -519,7 +519,7 @@ void RedrawResourceSprite2(const Surface & sf, s16 px, s16 py, bool show, u8 fro
 
 void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from_resource)
 {
-    const ICN::icn_t tradpost = Settings::Get().EvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
+    const ICN::icn_t tradpost = Settings::Get().ExtGameEvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
 
     // wood
     RedrawResourceSprite2(AGG::GetICN(tradpost, 7), pt.x, pt.y, showcost, from_resource, Resource::WOOD, tradingPost);

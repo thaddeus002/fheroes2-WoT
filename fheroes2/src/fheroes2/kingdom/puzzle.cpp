@@ -103,7 +103,7 @@ void Puzzle::ShowMapsDialog(void) const
 
 	AGG::PlayMusic(MUS::PUZZLE, false);
 
-	if(display.w() == 640 && display.h() == 480 && !Settings::Get().HideInterface())
+	if(display.w() == 640 && display.h() == 480 && !Settings::Get().ExtGameHideInterface())
 	    ShowStandardDialog(*this, sf);
 	else
 	    ShowExtendedDialog(*this, sf);
@@ -160,7 +160,7 @@ void ShowStandardDialog(const Puzzle & pzl, const Surface & sf)
     Cursor & cursor = Cursor::Get();
 
     const Rect & radar_pos = Interface::Radar::Get().GetArea();
-    bool evil_interface = Settings::Get().EvilInterface();
+    bool evil_interface = Settings::Get().ExtGameEvilInterface();
 
     Background back(BORDERWIDTH, BORDERWIDTH, sf.w(), sf.h());
     back.Save();
@@ -195,7 +195,7 @@ void ShowExtendedDialog(const Puzzle & pzl, const Surface & sf)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
-    bool evil_interface = Settings::Get().EvilInterface();
+    bool evil_interface = Settings::Get().ExtGameEvilInterface();
 
     Dialog::FrameBorder frameborder;
     frameborder.SetPosition((display.w() - BORDERWIDTH * 2 - sf.w()) / 2,

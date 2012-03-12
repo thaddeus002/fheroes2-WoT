@@ -648,7 +648,7 @@ void ActionToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	else
 	{
     	    BattleLose(hero, res, true);
-    	    if(Settings::Get().ExtSaveMonsterBattle())
+    	    if(Settings::Get().ExtWorldSaveMonsterBattle())
     	    {
         	tile.MonsterSetCount(army.MonsterCounts(troop()));
         	// reset "can join"
@@ -772,7 +772,7 @@ void ActionToCastle(Heroes & hero, const u8 & obj, const s32 & dst_index)
     {
     	DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " goto castle " << castle->GetName());
     	Mixer::Reduce();
-	if(!conf.ExtLearnSpellsWithDay()) castle->MageGuildEducateHero(hero);
+	if(!conf.ExtHeroLearnSpellsWithDay()) castle->MageGuildEducateHero(hero);
     	Game::OpenCastleDialog(castle);
     	Mixer::Enhance();
     }
@@ -1145,7 +1145,7 @@ void ActionToShrine(Heroes & hero, const u8 & obj, const s32 & dst_index)
     // check spell book
     if(!hero.HaveSpellBook())
     {
-	if(!Settings::Get().ExtBuySpellBookFromShrine() || !hero.BuySpellBook(NULL, spell_level))
+	if(!Settings::Get().ExtHeroBuySpellBookFromShrine() || !hero.BuySpellBook(NULL, spell_level))
 	{
 	    PlaySoundFailure;
 	    body += _("\nUnfortunately, you have no Magic Book to record the spell with.");
@@ -2101,7 +2101,7 @@ void ActionToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
     	    {
 		capture = false;
         	BattleLose(hero, result, true);
-		if(Settings::Get().ExtSaveMonsterBattle())
+		if(Settings::Get().ExtWorldSaveMonsterBattle())
             	    tile.MonsterSetCount(army.MonsterCounts(mons));
     	    }
 	}
@@ -2132,7 +2132,7 @@ void ActionToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
     }
     else
     // set guardians
-    if(Settings::Get().ExtAllowSetGuardian())
+    if(Settings::Get().ExtWorldAllowSetGuardian())
     {
 	Army::Troop & troop1 = world.GetCapturedObject(dst_index).GetTroop();
 	Army::Troop   troop2 = troop1;

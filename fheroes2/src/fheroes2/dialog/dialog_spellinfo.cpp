@@ -57,7 +57,7 @@ void Dialog::SpellInfo(const Spell & spell, const bool ok_button)
 void Dialog::SpellInfo(const std::string &header, const std::string &message, const Spell & spell, const bool ok_button)
 {
     Display & display = Display::Get();
-    const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+    const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     // preload
     AGG::PreloadObject(system);

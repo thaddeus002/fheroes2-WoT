@@ -60,11 +60,11 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     Point dst_pt(cur_pt);
 
     // fade
-    if(fade && Settings::Get().ExtUseFade()) display.Fade();
+    if(fade && Settings::Get().ExtGameUseFade()) display.Fade();
     display.FillRect(0, 0, 0, Rect(dst_pt, 640, 480));
 
     AGG::GetICN(ICN::HEROBKG, 0).Blit(dst_pt);
-    AGG::GetICN(Settings::Get().EvilInterface() ? ICN::HEROEXTE : ICN::HEROEXTG, 0).Blit(dst_pt);
+    AGG::GetICN(Settings::Get().ExtGameEvilInterface() ? ICN::HEROEXTE : ICN::HEROEXTG, 0).Blit(dst_pt);
 
     std::string message;
 

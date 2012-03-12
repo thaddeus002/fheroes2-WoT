@@ -40,12 +40,12 @@ Interface::ButtonsArea & Interface::ButtonsArea::Get(void)
 
 const Rect & Interface::ButtonsArea::GetArea(void)
 {
-    return Settings::Get().HideInterface() && border.isValid() ? border.GetRect() : *this;
+    return Settings::Get().ExtGameHideInterface() && border.isValid() ? border.GetRect() : *this;
 }
 
 void Interface::ButtonsArea::SetPos(s16 ox, s16 oy)
 {
-    if(Settings::Get().HideInterface())
+    if(Settings::Get().ExtGameHideInterface())
     {
 	FixOutOfDisplay(*this, ox, oy);
 
@@ -62,7 +62,7 @@ void Interface::ButtonsArea::SetPos(s16 ox, s16 oy)
 	Rect::y = oy;
     }
 
-    const ICN::icn_t icnbtn = Settings::Get().EvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
+    const ICN::icn_t icnbtn = Settings::Get().ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
 
     buttonNextHero.SetSprite(icnbtn, 0, 1);
     buttonMovement.SetSprite(icnbtn, 2, 3);
@@ -92,9 +92,9 @@ void Interface::ButtonsArea::SetPos(s16 ox, s16 oy)
 void Interface::ButtonsArea::Redraw(void)
 {
     const Settings & conf = Settings::Get();
-    if(conf.HideInterface() && !conf.ShowButtons()) return;
+    if(conf.ExtGameHideInterface() && !conf.ShowButtons()) return;
 
-    const ICN::icn_t icnbtn = Settings::Get().EvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
+    const ICN::icn_t icnbtn = Settings::Get().ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
 
     buttonNextHero.SetSprite(icnbtn, 0, 1);
     buttonMovement.SetSprite(icnbtn, 2, 3);
@@ -115,7 +115,7 @@ void Interface::ButtonsArea::Redraw(void)
     buttonSystem.Draw();
 
     // redraw border
-    if(conf.HideInterface()) border.Redraw();
+    if(conf.ExtGameHideInterface()) border.Redraw();
 }
 
 void Interface::ButtonsArea::QueueEventProcessing(Game::menu_t & ret)
@@ -134,7 +134,7 @@ void Interface::ButtonsArea::QueueEventProcessing(Game::menu_t & ret)
     le.MousePressLeft(buttonFile) ? buttonFile.PressDraw() : buttonFile.ReleaseDraw();
     le.MousePressLeft(buttonSystem) ? buttonSystem.PressDraw() : buttonSystem.ReleaseDraw();
 
-    if(conf.HideInterface() && conf.ShowButtons() && le.MousePressLeft(border.GetTop()))
+    if(conf.ExtGameHideInterface() && conf.ShowButtons() && le.MousePressLeft(border.GetTop()))
     {
 	Surface sf(border.GetRect().w, border.GetRect().h);
         Cursor::DrawCursor(sf, 0x70);

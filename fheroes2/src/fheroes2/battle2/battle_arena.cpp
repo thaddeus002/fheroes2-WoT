@@ -818,7 +818,7 @@ Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, s32 index, bool loca
 	cursor.Hide();
 	cursor.SetThemes(Cursor::WAR_NONE);
 
-	if(conf.ExtUseFade()) display.Fade();
+	if(conf.ExtGameUseFade()) display.Fade();
 
 	interface->Redraw();
 	cursor.Show();

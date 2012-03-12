@@ -75,7 +75,7 @@ void Interface::GameArea::SrcRectFixed(Rect & src, s16 & dst_x, s16 & dst_y, con
 
 void Interface::GameArea::Build(void)
 {
-    if(Settings::Get().HideInterface())
+    if(Settings::Get().ExtGameHideInterface())
 	SetAreaPosition(0, 0,
 		    Display::Get().w(),
 		    Display::Get().h());
@@ -465,7 +465,7 @@ void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const s32 index, S
 			    areaPosition.y + pt.y * TILEWIDTH - gamearea.scrollOffset.y);
 	marker.Blit(dst.x, dst.y + 8, sf);
 
-	Settings::Get().EvilInterface() ? sf.GrayScale() : sf.Sepia();
+	Settings::Get().ExtGameEvilInterface() ? sf.GrayScale() : sf.Sepia();
 
 	if(Settings::Get().QVGA())
 	{
@@ -587,14 +587,14 @@ void Interface::GameArea::QueueEventProcessing(void)
     }
 
     // fixed pocket pc tap mode
-    if(conf.HideInterface() && conf.ShowControlPanel() && le.MouseCursor(Interface::ControlPanel::Get().GetArea())) return;
+    if(conf.ExtGameHideInterface() && conf.ShowControlPanel() && le.MouseCursor(Interface::ControlPanel::Get().GetArea())) return;
 
 
 
-    if(conf.ExtTapMode())
+    if(conf.ExtPocketTapMode())
     {
 	// drag&drop gamearea: scroll
-	if(conf.ExtDragDropScroll() && le.MousePressLeft())
+	if(conf.ExtPocketDragDropScroll() && le.MousePressLeft())
 	{
 	    Point pt1 = le.GetMouseCursor();
 	    Interface::Basic & I = Interface::Basic::Get();

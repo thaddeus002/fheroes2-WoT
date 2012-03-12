@@ -255,6 +255,7 @@ Game::menu_t Game::StartGame(void)
     if(m == ENDTURN)
 	display.Fill(0, 0, 0);
     else
+    if(conf.ExtGameUseFade())
 	display.Fade();
 
     return m == ENDTURN ? QUITGAME : m;
@@ -274,7 +275,7 @@ void Game::OpenCastleDialog(Castle *castle)
     Display & display = Display::Get();
     KingdomCastles::const_iterator it = std::find(myCastles.begin(), myCastles.end(), castle);
     Interface::StatusWindow::ResetTimer();
-    bool need_fade = conf.ExtUseFade() && 640 == display.w() && 480 == display.h();
+    bool need_fade = conf.ExtGameUseFade() && 640 == display.w() && 480 == display.h();
 
     if(it != myCastles.end() || Players::isFriends(conf.CurrentColor(), castle->GetColor()))
     {
@@ -294,13 +295,13 @@ void Game::OpenCastleDialog(Castle *castle)
 		DELAY(100);
 	    }
 */
-	    if(Settings::Get().ExtLowMemory())
+	    if(Settings::Get().ExtPocketLowMemory())
     		AGG::ICNRegistryEnable(true);
 
 	    result = castle->OpenDialog((conf.CurrentColor() != castle->GetColor()), need_fade);
 	    if(need_fade) need_fade = false;
 
-	    if(Settings::Get().ExtLowMemory())
+	    if(Settings::Get().ExtPocketLowMemory())
 	    {
     		AGG::ICNRegistryEnable(false);
     		AGG::ICNRegistryFreeObjects();
@@ -354,7 +355,7 @@ void Game::OpenHeroesDialog(Heroes *hero)
     KingdomHeroes::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), hero);
     Interface::StatusWindow::ResetTimer();
     Interface::Basic & I = Interface::Basic::Get();
-    bool need_fade = conf.ExtUseFade() && 640 == display.w() && 480 == display.h();
+    bool need_fade = conf.ExtGameUseFade() && 640 == display.w() && 480 == display.h();
 
     if(it != myHeroes.end())
     {
@@ -362,13 +363,13 @@ void Game::OpenHeroesDialog(Heroes *hero)
 
 	while(Dialog::CANCEL != result)
 	{
-	    if(Settings::Get().ExtLowMemory())
+	    if(Settings::Get().ExtPocketLowMemory())
 		AGG::ICNRegistryEnable(true);
 
 	    result = (*it)->OpenDialog(false, need_fade);
 	    if(need_fade) need_fade = false;
 
-	    if(Settings::Get().ExtLowMemory())
+	    if(Settings::Get().ExtPocketLowMemory())
 	    {
     		AGG::ICNRegistryEnable(false);
     		AGG::ICNRegistryFreeObjects();
@@ -704,7 +705,7 @@ Game::menu_t Game::HumanTurn(bool isload)
     GameOver::Result & gameResult = GameOver::Result::Get();
 
     // set focus
-    if(conf.ExtRememberLastFocus())
+    if(conf.ExtGameRememberLastFocus())
     {
 	if(GameFocus::GetHeroes())
 	    GameFocus::Reset(GameFocus::HEROES);
@@ -734,7 +735,7 @@ Game::menu_t Game::HumanTurn(bool isload)
 	 ShowEventDay();
 
 	// autosave
-	if(conf.ExtAutoSaveOn() && conf.ExtAutoSaveBeginOfDay())
+	if(conf.ExtGameAutosaveOn() && conf.ExtGameAutosaveBeginOfDay())
 	    Game::Save(conf.GetSaveDir() + SEPARATOR + "autosave.sav");
     }
 
@@ -745,7 +746,7 @@ Game::menu_t Game::HumanTurn(bool isload)
     if(myCastles.empty()) ShowWarningLostTowns(res);
 
     // check around actions (and skip for h2 orig, bug?)
-    if(!conf.ExtOnlyFirstMonsterAttack()) myKingdom.HeroesActionNewPosition();
+    if(!conf.ExtWorldOnlyFirstMonsterAttack()) myKingdom.HeroesActionNewPosition();
 
     // auto hide status
     bool autohide_status = conf.QVGA() && conf.ShowStatus();
@@ -858,7 +859,7 @@ Game::menu_t Game::HumanTurn(bool isload)
 	    if(HotKeyPress(EVENT_OPENFOCUS)) EventOpenFocus();
 	}
 
-	if(conf.ExtTapMode())
+	if(conf.ExtPocketTapMode())
 	{
 	    // scroll area maps left
 	    if(le.MouseCursor(I.GetAreaScrollLeft()) && le.MousePressLeft()) I.gameArea.SetScroll(SCROLL_LEFT);
@@ -891,7 +892,7 @@ Game::menu_t Game::HumanTurn(bool isload)
 	}
 
 	// cursor over radar
-        if((!conf.HideInterface() || conf.ShowRadar()) &&
+        if((!conf.ExtGameHideInterface() || conf.ShowRadar()) &&
            le.MouseCursor(I.radar.GetArea()))
 	{
 	    if(Cursor::POINTER != cursor.Themes())
@@ -902,7 +903,7 @@ Game::menu_t Game::HumanTurn(bool isload)
 	}
 	else
 	// cursor over icons panel
-        if((!conf.HideInterface() || conf.ShowIcons()) &&
+        if((!conf.ExtGameHideInterface() || conf.ShowIcons()) &&
            le.MouseCursor(I.iconsPanel.GetArea()))
 	{
 	    if(Cursor::POINTER != cursor.Themes())
@@ -913,7 +914,7 @@ Game::menu_t Game::HumanTurn(bool isload)
 	}
 	else
 	// cursor over buttons area
-        if((!conf.HideInterface() || conf.ShowButtons()) &&
+        if((!conf.ExtGameHideInterface() || conf.ShowButtons()) &&
            le.MouseCursor(I.buttonsArea.GetArea()))
 	{
 	    if(Cursor::POINTER != cursor.Themes())
@@ -924,7 +925,7 @@ Game::menu_t Game::HumanTurn(bool isload)
 	}
 	else
         // cursor over status area
-        if((!conf.HideInterface() || conf.ShowStatus()) &&
+        if((!conf.ExtGameHideInterface() || conf.ShowStatus()) &&
            le.MouseCursor(I.statusWindow.GetArea()))
 	{
 	    if(Cursor::POINTER != cursor.Themes())
@@ -935,7 +936,7 @@ Game::menu_t Game::HumanTurn(bool isload)
 	}
 	else
         // cursor over control panel
-        if(conf.HideInterface() && conf.ShowControlPanel() &&
+        if(conf.ExtGameHideInterface() && conf.ShowControlPanel() &&
            le.MouseCursor(I.controlPanel.GetArea()))
 	{
 	    if(Cursor::POINTER != cursor.Themes())
@@ -974,7 +975,7 @@ Game::menu_t Game::HumanTurn(bool isload)
     	    display.Flip();
 
             // enable right click emulation
-	    if(conf.ExtTapMode())
+	    if(conf.ExtPocketTapMode())
         	le.SetTapMode(true);
 
 	    continue;
@@ -1053,7 +1054,7 @@ Game::menu_t Game::HumanTurn(bool isload)
 	    GameFocus::SetRedraw();
 	}
 
-	if(conf.ExtAutoSaveOn() && !conf.ExtAutoSaveBeginOfDay())
+	if(conf.ExtGameAutosaveOn() && !conf.ExtGameAutosaveBeginOfDay())
 	    Game::Save(conf.GetSaveDir() + SEPARATOR + "autosave.sav");
     }
 
@@ -1343,7 +1344,7 @@ void Game::EventSystemDialog(void)
 	    I.gameArea.SetCenter(GameFocus::GetCenter());
         I.SetRedraw(REDRAW_GAMEAREA);
 
-	if(Settings::Get().HideInterface())
+	if(Settings::Get().ExtGameHideInterface())
 	    I.controlPanel.ResetTheme();
     }
 
@@ -1589,7 +1590,7 @@ void Game::EventSwitchShowRadar(void)
 {
     Settings & conf = Settings::Get();
 
-    if(conf.HideInterface())
+    if(conf.ExtGameHideInterface())
     {
 	if(conf.ShowRadar())
 	{
@@ -1615,7 +1616,7 @@ void Game::EventSwitchShowButtons(void)
 {
     Settings & conf = Settings::Get();
 
-    if(conf.HideInterface())
+    if(conf.ExtGameHideInterface())
     {
 	if(conf.ShowButtons())
 	{
@@ -1641,7 +1642,7 @@ void Game::EventSwitchShowStatus(void)
 {
     Settings & conf = Settings::Get();
 
-    if(conf.HideInterface())
+    if(conf.ExtGameHideInterface())
     {
 	if(conf.ShowStatus())
 	{
@@ -1668,7 +1669,7 @@ void Game::EventSwitchShowIcons(void)
     Settings & conf = Settings::Get();
     Interface::Basic & I = Interface::Basic::Get();
 
-    if(conf.HideInterface())
+    if(conf.ExtGameHideInterface())
     {
 	if(conf.ShowIcons())
 	{
@@ -1695,7 +1696,7 @@ void Game::EventSwitchShowControlPanel(void)
 {
     Settings & conf = Settings::Get();
 
-    if(conf.HideInterface())
+    if(conf.ExtGameHideInterface())
     {
 	conf.SetShowPanel(!conf.ShowControlPanel());
 	Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);

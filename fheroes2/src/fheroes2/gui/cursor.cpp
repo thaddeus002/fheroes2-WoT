@@ -305,7 +305,7 @@ void Cursor::DrawCursor(Surface &surface, const u8 indexcolor, bool solid)
 
 void Cursor::Show(void)
 {
-    if(! Settings::Get().ExtHideCursor()) SpriteCursor::Show();
+    if(! Settings::Get().ExtPocketHideCursor()) SpriteCursor::Show();
 }
 
 Cursor::themes_t Cursor::DistanceThemes(themes_t theme, u16 dist)

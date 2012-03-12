@@ -78,7 +78,7 @@ Interface::Radar::~Radar()
 
 void Interface::Radar::SetPos(s16 ox, s16 oy)
 {
-    if(Settings::Get().HideInterface())
+    if(Settings::Get().ExtGameHideInterface())
     {
 	FixOutOfDisplay(*this, ox, oy); 
 
@@ -97,7 +97,7 @@ void Interface::Radar::SetPos(s16 ox, s16 oy)
 
 const Rect & Interface::Radar::GetArea(void) const
 {
-    return Settings::Get().HideInterface() && border.isValid() ? border.GetRect() : *this;
+    return Settings::Get().ExtGameHideInterface() && border.isValid() ? border.GetRect() : *this;
 }
 
 /* construct gui */
@@ -196,11 +196,11 @@ void Interface::Radar::Redraw(void)
 	RedrawCursor();
     }
     else
-    if(!conf.HideInterface() || conf.ShowRadar())
-	AGG::GetICN((conf.EvilInterface() ? ICN::HEROLOGE : ICN::HEROLOGO), 0).Blit(x, y);
+    if(!conf.ExtGameHideInterface() || conf.ShowRadar())
+	AGG::GetICN((conf.ExtGameEvilInterface() ? ICN::HEROLOGE : ICN::HEROLOGO), 0).Blit(x, y);
 
     // redraw border
-    if(conf.HideInterface() && conf.ShowRadar())
+    if(conf.ExtGameHideInterface() && conf.ShowRadar())
     {
 	border.Redraw();
     }
@@ -210,7 +210,7 @@ void Interface::Radar::Redraw(void)
 void Interface::Radar::RedrawArea(const u8 color)
 {
     const Settings & conf = Settings::Get();
-    if(conf.HideInterface() && !conf.ShowRadar()) return;
+    if(conf.ExtGameHideInterface() && !conf.ShowRadar()) return;
     Display & display = Display::Get();
 
 
@@ -278,7 +278,7 @@ void Interface::Radar::RedrawArea(const u8 color)
 void Interface::Radar::RedrawCursor(void)
 {
     const Settings & conf = Settings::Get();
-    if(conf.HideInterface() && !conf.ShowRadar()) return;
+    if(conf.ExtGameHideInterface() && !conf.ShowRadar()) return;
 
     const Point & rectMaps = Interface::GameArea::Get().GetRectMaps();
     cursorArea->Hide();
@@ -332,7 +332,7 @@ void Interface::Radar::QueueEventProcessing(void)
     LocalEvent & le = LocalEvent::Get();
 
     // move border
-    if(conf.HideInterface() && conf.ShowRadar() && le.MousePressLeft(border.GetTop()))
+    if(conf.ExtGameHideInterface() && conf.ShowRadar() && le.MousePressLeft(border.GetTop()))
     {
 	Surface sf(border.GetRect().w, border.GetRect().h);
         Cursor::DrawCursor(sf, 0x70);
@@ -380,6 +380,6 @@ void Interface::Radar::QueueEventProcessing(void)
 	    }
 	}
 	else
-	if(!conf.ExtTapMode() && le.MousePressRight(*this)) Dialog::Message(_("World Map"), _("A miniature view of the known world. Left click to move viewing area."), Font::BIG);
+	if(!conf.ExtPocketTapMode() && le.MousePressRight(*this)) Dialog::Message(_("World Map"), _("A miniature view of the known world. Left click to move viewing area."), Font::BIG);
     }
 }

@@ -46,8 +46,8 @@ u8 Dialog::SystemOptions(void)
     Settings & conf = Settings::Get();
 
     // preload
-    const ICN::icn_t spanbkg = conf.EvilInterface() ? ICN::SPANBKGE : ICN::SPANBKG;
-    const ICN::icn_t spanbtn = conf.EvilInterface() ? ICN::SPANBTNE : ICN::SPANBTN;
+    const ICN::icn_t spanbkg = conf.ExtGameEvilInterface() ? ICN::SPANBKGE : ICN::SPANBKG;
+    const ICN::icn_t spanbtn = conf.ExtGameEvilInterface() ? ICN::SPANBTNE : ICN::SPANBTN;
 
     AGG::PreloadObject(spanbkg);
     AGG::PreloadObject(spanbtn);
@@ -147,7 +147,7 @@ u8 Dialog::SystemOptions(void)
         // set interface
         if(le.MouseClickLeft(rect7))
         {
-    	    conf.SetEvilInterface(!conf.EvilInterface());
+    	    conf.SetExtGameEvilInterface(!conf.ExtGameEvilInterface());
     	    result |= 0x08;
 	    redraw = true;
     	}
@@ -259,13 +259,13 @@ void Dialog::DrawSystemInfo(const Point & dst)
     text.Blit(rect6.x + (rect6.w - text.w()) / 2, rect6.y + rect6.h + 5);
 
     // interface
-    const Sprite & sprite7 = AGG::GetICN(ICN::SPANEL, (conf.EvilInterface() ? 17 : 16));
+    const Sprite & sprite7 = AGG::GetICN(ICN::SPANEL, (conf.ExtGameEvilInterface() ? 17 : 16));
     const Rect rect7(dst.x + 36, dst.y + 267, sprite7.w(), sprite7.h());
     sprite7.Blit(rect7);
     str.clear();
     str = _("Interface");
     str += ": ";
-    if(conf.EvilInterface())
+    if(conf.ExtGameEvilInterface())
 	str += _("Evil");
     else
 	str += _("Good");

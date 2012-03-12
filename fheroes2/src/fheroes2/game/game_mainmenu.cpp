@@ -154,7 +154,8 @@ Game::menu_t Game::MainMenu(void)
 	else
 	if(HotKeyPress(EVENT_BUTTON_CREDITS) || le.MouseClickLeft(buttonCredits)) return CREDITS;
 	else
-	if(HotKeyPress(EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonQuit)){ display.Fade(); return QUITGAME; }
+	if(HotKeyPress(EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonQuit))
+	{ if(conf.ExtGameUseFade()) display.Fade(); return QUITGAME; }
 
 	// right info
 	if(le.MousePressRight(buttonQuit)) Dialog::Message(_("Quit"), _("Quit Heroes of Might and Magic and return to the operating system."), Font::BIG);

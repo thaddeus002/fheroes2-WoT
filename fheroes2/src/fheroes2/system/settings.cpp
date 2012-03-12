@@ -137,7 +137,6 @@ const settings_t settingsFHeroes2[] =
     { Settings::WORLD_NOREQ_FOR_ARTIFACTS,	_("world: no in-built requirements or guardians for placed artifacts"),	},
     { Settings::WORLD_ONLY_FIRST_MONSTER_ATTACK,_("world: only the first monster will attack (H2 bug)."), },
     { Settings::WORLD_EYE_EAGLE_AS_SCHOLAR,	_("world: Eagle Eye also works like Scholar in H3."),   },
-    { Settings::WORLD_BUY_BOOK_FROM_SHRINES,	_("world: allow buy a spellbook from Shrines"),         },
     { Settings::WORLD_BAN_WEEKOF,		_("world: ban for WeekOf/MonthOf Monsters"),            },
     { Settings::WORLD_NEW_VERSION_WEEKOF,	_("world: new version WeekOf (+growth)"),       	},
     { Settings::WORLD_BAN_PLAGUES,		_("world: ban plagues months"),                         },
@@ -156,6 +155,7 @@ const settings_t settingsFHeroes2[] =
     { Settings::CASTLE_ALLOW_GUARDIANS,		_("castle: allow guardians"),				},
     { Settings::CASTLE_MAGEGUILD_POINTS_TURN,	_("castle: higher mage guilds regenerate more spell points/turn (20/40/60/80/100%)"), },
     { Settings::CASTLE_ALLOW_RECRUITS_SPECIAL,	_("castle: allow recruits special/expansion heroes"), },
+    { Settings::HEROES_BUY_BOOK_FROM_SHRINES,	_("heroes: allow buy a spellbook from Shrines"),         },
     { Settings::HEROES_LEARN_SPELLS_WITH_DAY,	_("heroes: learn new spells with day"),  		},
     { Settings::HEROES_COST_DEPENDED_FROM_LEVEL,_("heroes: recruit cost to be dependent on hero level"),},
     { Settings::HEROES_REMEMBER_POINTS_RETREAT, _("heroes: remember MP/SP for retreat/surrender result"),},
@@ -502,7 +502,7 @@ bool Settings::Read(const std::string & filename)
 	entry = config.Find("fullscreen");
 	if(!entry || entry->StrParams() != "off")
 	    opt_global.SetModes(GLOBAL_FULLSCREEN);
-	if(ExtLowResolution())
+	if(ExtPocketLowResolution())
 	{
 #ifdef ANDROID
 	    video_mode.w = 480;
@@ -1049,7 +1049,7 @@ void Settings::SetPriceLoyaltyVersion(void)
     opt_global.SetModes(GLOBAL_PRICELOYALTY);
 }
 
-void Settings::SetEvilInterface(bool f)
+void Settings::SetExtGameEvilInterface(bool f)
 {
     f ? ExtSetModes(GAME_EVIL_INTERFACE) : ExtResetModes(GAME_EVIL_INTERFACE);
 }
@@ -1162,7 +1162,7 @@ void Settings::ExtResetModes(u32 f)
     }
 }
 
-bool Settings::ExtAllowBuyFromWell(void) const
+bool Settings::ExtCastleAllowBuyFromWell(void) const
 {
     return ExtModes(CASTLE_ALLOW_BUY_FROM_WELL);
 }
@@ -1177,64 +1177,64 @@ bool Settings::ExtCastleAllowFlash(void) const
     return ExtModes(GAME_CASTLE_FLASH_BUILDING);
 }
 
-bool Settings::ExtAllowCastleGuardians(void) const
+bool Settings::ExtCastleAllowGuardians(void) const
 {
     return ExtModes(CASTLE_ALLOW_GUARDIANS);
 }
 
-bool Settings::ExtShowVisitedContent(void) const
+bool Settings::ExtWorldShowVisitedContent(void) const
 {
     return ExtModes(WORLD_SHOW_VISITED_CONTENT);
 }
 
-bool Settings::ExtScouteExtended(void) const
+bool Settings::ExtWorldScouteExtended(void) const
 {
     return ExtModes(WORLD_SCOUTING_EXTENDED);
 }
 
-bool Settings::ExtRememberLastFocus(void) const
+bool Settings::ExtGameRememberLastFocus(void) const
 {
     return ExtModes(GAME_REMEMBER_LAST_FOCUS);
 }
 
-bool Settings::ExtAbandonedMineRandom(void) const
+bool Settings::ExtWorldAbandonedMineRandom(void) const
 {
     return ExtModes(WORLD_ABANDONED_MINE_RANDOM);
 }
 
-bool Settings::ExtSaveMonsterBattle(void) const
+bool Settings::ExtWorldSaveMonsterBattle(void) const
 {
     return ExtModes(WORLD_SAVE_MONSTER_BATTLE);
 }
 
-bool Settings::ExtAllowSetGuardian(void) const
+bool Settings::ExtWorldAllowSetGuardian(void) const
 {
     return ExtModes(WORLD_ALLOW_SET_GUARDIAN);
 }
 
-bool Settings::ExtNoRequirementsForArtifacts(void) const
+bool Settings::ExtWorldNoRequirementsForArtifacts(void) const
 {
     return ExtModes(WORLD_NOREQ_FOR_ARTIFACTS);
 }
 
-bool Settings::ExtArtifactCrystalBall(void) const
+bool Settings::ExtWorldArtifactCrystalBall(void) const
 {
     return ExtModes(WORLD_ARTIFACT_CRYSTAL_BALL);
 }
 
-bool Settings::ExtOnlyFirstMonsterAttack(void) const
+bool Settings::ExtWorldOnlyFirstMonsterAttack(void) const
 {
     return ExtModes(WORLD_ONLY_FIRST_MONSTER_ATTACK);
 }
 
-bool Settings::ExtEyeEagleAsScholar(void) const
+bool Settings::ExtWorldEyeEagleAsScholar(void) const
 {
     return ExtModes(WORLD_EYE_EAGLE_AS_SCHOLAR);
 }
 
-bool Settings::ExtBuySpellBookFromShrine(void) const
+bool Settings::ExtHeroBuySpellBookFromShrine(void) const
 {
-    return ExtModes(WORLD_BUY_BOOK_FROM_SHRINES);
+    return ExtModes(HEROES_BUY_BOOK_FROM_SHRINES);
 }
 
 bool Settings::ExtHeroRecruitCostDependedFromLevel(void) const
@@ -1247,7 +1247,7 @@ bool Settings::ExtHeroPatrolAllowPickup(void) const
     return ExtModes(HEROES_PATROL_ALLOW_PICKUP);
 }
 
-bool Settings::ExtRememberPointsForHeroRetreating(void) const
+bool Settings::ExtHeroRememberPointsForRetreating(void) const
 {
     return ExtModes(HEROES_REMEMBER_POINTS_RETREAT);
 }
@@ -1262,7 +1262,7 @@ bool Settings::ExtHeroRecalculateMovement(void) const
     return ExtModes(HEROES_RECALCULATE_MOVEMENT);
 }
 
-bool Settings::ExtLearnSpellsWithDay(void) const
+bool Settings::ExtHeroLearnSpellsWithDay(void) const
 {
     return ExtModes(HEROES_LEARN_SPELLS_WITH_DAY);
 }
@@ -1347,82 +1347,82 @@ bool Settings::ExtBattleMagicTroopCanResist(void) const
     return ExtModes(BATTLE_MAGIC_TROOP_RESIST);
 }
 
-bool Settings::ExtRewriteConfirm(void) const
+bool Settings::ExtGameRewriteConfirm(void) const
 {
     return ExtModes(GAME_SAVE_REWRITE_CONFIRM);
 }
 
-bool Settings::ExtAutosaveConfirm(void) const
+bool Settings::ExtGameAutosaveConfirm(void) const
 {
     return ExtModes(GAME_ALSO_CONFIRM_AUTOSAVE);
 }
 
-bool Settings::ExtHideCursor(void) const
+bool Settings::ExtPocketHideCursor(void) const
 {
     return ExtModes(POCKETPC_HIDE_CURSOR);
 }
 
-bool Settings::ExtShowSystemInfo(void) const
+bool Settings::ExtGameShowSystemInfo(void) const
 {
     return ExtModes(GAME_SHOW_SYSTEM_INFO);
 }
 
-bool Settings::ExtAutoSaveBeginOfDay(void) const
+bool Settings::ExtGameAutosaveBeginOfDay(void) const
 {
     return ExtModes(GAME_AUTOSAVE_BEGIN_DAY);
 }
 
-bool Settings::ExtAutoSaveOn(void) const
+bool Settings::ExtGameAutosaveOn(void) const
 {
     return ExtModes(GAME_AUTOSAVE_ON);
 }
 
-bool Settings::ExtRememberLastFilename(void) const
+bool Settings::ExtGameRememberLastFilename(void) const
 {
     return ExtModes(GAME_REMEMBER_LAST_FILENAME);
 }
 
-bool Settings::ExtUseFade(void) const
+bool Settings::ExtGameUseFade(void) const
 {
     return video_mode.w == 640 && video_mode.h == 480 && ExtModes(GAME_USE_FADE);
 }
 
-bool Settings::ExtShowSDL(void) const
+bool Settings::ExtGameShowSDL(void) const
 {
     return ExtModes(GAME_SHOW_SDL_LOGO);
 }
 
-bool Settings::EvilInterface(void) const
+bool Settings::ExtGameEvilInterface(void) const
 {
     return ExtModes(GAME_EVIL_INTERFACE);
 }
 
-bool Settings::DynamicInterface(void) const
+bool Settings::ExtGameDynamicInterface(void) const
 {
     return ExtModes(GAME_DYNAMIC_INTERFACE);
 }
 
-bool Settings::HideInterface(void) const
+bool Settings::ExtGameHideInterface(void) const
 {
     return ExtModes(GAME_HIDE_INTERFACE);
 }
 
-bool Settings::ExtLowMemory(void) const
+bool Settings::ExtPocketLowMemory(void) const
 {
     return ExtModes(POCKETPC_LOW_MEMORY);
 }
 
-bool Settings::ExtTapMode(void) const
+bool Settings::ExtPocketTapMode(void) const
 {
     return ExtModes(POCKETPC_TAP_MODE);
 }
 
-bool Settings::ExtDragDropScroll(void) const
+bool Settings::ExtPocketDragDropScroll(void) const
 {
     return ExtModes(POCKETPC_DRAG_DROP_SCROLL);
 }
 
-bool Settings::ExtLowResolution(void) const
+bool Settings::ExtPocketLowResolution(void) const
 {
     return ExtModes(POCKETPC_LOW_RESOLUTION);
 }

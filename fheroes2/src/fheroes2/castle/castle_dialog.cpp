@@ -243,9 +243,9 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     
     if(conf.QVGA()) return PocketPC::CastleOpenDialog(*this, readonly);
 
-    const bool interface = conf.EvilInterface();
-    if(conf.DynamicInterface())
-    	conf.SetEvilInterface(GetRace() & (Race::BARB | Race::WRLK | Race::NECR));
+    const bool interface = conf.ExtGameEvilInterface();
+    if(conf.ExtGameDynamicInterface())
+    	conf.SetExtGameEvilInterface(GetRace() & (Race::BARB | Race::WRLK | Race::NECR));
 
     Display & display = Display::Get();
 
@@ -272,7 +272,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 
 
     // fade
-    if(conf.ExtUseFade()) display.Fade();
+    if(conf.ExtGameUseFade()) display.Fade();
         
     const Point cur_pt(background.GetArea().x, background.GetArea().y);
     Point dst_pt(cur_pt);
@@ -457,7 +457,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	}
 
 	// move hero to guardian
-	if(conf.ExtAllowCastleGuardians() && !readonly && heroes.Guest() && !heroes.Guard() && le.MouseClickLeft(rectSign1))
+	if(conf.ExtCastleAllowGuardians() && !readonly && heroes.Guest() && !heroes.Guard() && le.MouseClickLeft(rectSign1))
 	{
 	    if(! heroes.Guest()->GetArmy().CanJoinArmy(army))
 	    {
@@ -495,7 +495,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	}
 	else
 	// move guardian to hero
-	if(conf.ExtAllowCastleGuardians() && !readonly && !heroes.Guest() && heroes.Guard() && le.MouseClickLeft(rectSign2))
+	if(conf.ExtCastleAllowGuardians() && !readonly && !heroes.Guest() && heroes.Guard() && le.MouseClickLeft(rectSign2))
 	{
 	    heroes.Guard()->ResetModes(Heroes::GUARDIAN);
 	    heroes.Swap();
@@ -923,8 +923,8 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     if(heroes.Guest() && conf.ExtHeroRecalculateMovement())
 	heroes.Guest()->RecalculateMovePoints();
 
-    if(conf.DynamicInterface())
-	conf.SetEvilInterface(interface);
+    if(conf.ExtGameDynamicInterface())
+	conf.SetExtGameEvilInterface(interface);
 
     Game::DisableChangeMusic(false);
 

@@ -35,7 +35,7 @@ void Dialog::SecondarySkillInfo(const Skill::Secondary & skill, const bool ok_bu
 void Dialog::SecondarySkillInfo(const std::string & header, const std::string & message, const Skill::Secondary & skill, const bool ok_button)
 {
     Display & display = Display::Get();
-    const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+    const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     // preload
     AGG::PreloadObject(system);
@@ -114,7 +114,7 @@ void Dialog::SecondarySkillInfo(const std::string & header, const std::string & 
 void Dialog::PrimarySkillInfo(const std::string &header, const std::string &message, const Skill::Primary::skill_t skill)
 {
     Display & display = Display::Get();
-    const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+    const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     // preload
     AGG::PreloadObject(system);

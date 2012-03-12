@@ -138,7 +138,7 @@ void Dialog::ExtSettings(bool readonly)
     if(!conf.PocketPC())
 	states.push_back(Settings::GAME_DYNAMIC_INTERFACE);
     states.push_back(Settings::GAME_AUTOSAVE_ON);
-    if(conf.ExtAutoSaveOn())
+    if(conf.ExtGameAutosaveOn())
 	states.push_back(Settings::GAME_AUTOSAVE_BEGIN_DAY);
     if(conf.VideoMode().w == 640 && conf.VideoMode().h == 480)
 	states.push_back(Settings::GAME_USE_FADE);
@@ -150,7 +150,7 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::WORLD_ABANDONED_MINE_RANDOM);
     states.push_back(Settings::WORLD_SAVE_MONSTER_BATTLE);
     states.push_back(Settings::WORLD_ALLOW_SET_GUARDIAN);
-    if(conf.ExtAllowSetGuardian())
+    if(conf.ExtWorldAllowSetGuardian())
 	states.push_back(Settings::WORLD_GUARDIAN_TWO_DEFENSE);
     states.push_back(Settings::WORLD_EXT_OBJECTS_CAPTURED);
     states.push_back(Settings::WORLD_NOREQ_FOR_ARTIFACTS);
@@ -159,7 +159,6 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::WORLD_ARTIFACT_CRYSTAL_BALL);
     states.push_back(Settings::WORLD_ONLY_FIRST_MONSTER_ATTACK);
     states.push_back(Settings::WORLD_EYE_EAGLE_AS_SCHOLAR);
-    states.push_back(Settings::WORLD_BUY_BOOK_FROM_SHRINES);
     states.push_back(Settings::WORLD_BAN_WEEKOF);
     if(! conf.ExtWorldBanWeekOf())
 	states.push_back(Settings::WORLD_NEW_VERSION_WEEKOF);
@@ -172,6 +171,7 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::WORLD_USE_UNIQUE_ARTIFACTS_RS);
     states.push_back(Settings::WORLD_USE_UNIQUE_ARTIFACTS_PS);
     states.push_back(Settings::WORLD_USE_UNIQUE_ARTIFACTS_SS);
+    states.push_back(Settings::HEROES_BUY_BOOK_FROM_SHRINES);
     states.push_back(Settings::HEROES_LEARN_SPELLS_WITH_DAY);
     states.push_back(Settings::HEROES_COST_DEPENDED_FROM_LEVEL);
     states.push_back(Settings::HEROES_REMEMBER_POINTS_RETREAT);
@@ -256,7 +256,7 @@ void Dialog::ExtSettings(bool readonly)
     // store
     if(result == Dialog::OK)
     {
-	le.SetTapMode(conf.ExtTapMode());
+	le.SetTapMode(conf.ExtPocketTapMode());
 	Settings::Get().BinarySave();
     }
 }

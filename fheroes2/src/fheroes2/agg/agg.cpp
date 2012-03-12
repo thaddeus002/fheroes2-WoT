@@ -355,7 +355,7 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 	{
 	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
 	    LoadOrgICN(sprite,
-			(Settings::Get().EvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST),
+			(Settings::Get().ExtGameEvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST),
 			17 + index, false);
 	    // clean
 	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(10, 6, 72, 15), 6, 4, sprite);

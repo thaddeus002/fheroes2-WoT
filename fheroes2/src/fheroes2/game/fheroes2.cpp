@@ -271,7 +271,7 @@ void LoadZLogo(void)
 #ifdef BUILD_RELEASE
 #ifdef WITH_ZLIB
     // SDL logo
-    if(Settings::Get().ExtShowSDL())
+    if(Settings::Get().ExtGameShowSDL())
     {
 	Display & display = Display::Get();
 

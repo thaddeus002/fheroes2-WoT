@@ -131,7 +131,7 @@ void Button::Draw(void)
 ButtonGroups::ButtonGroups(const Rect & pos, u16 btns) : button1(NULL), button2(NULL), result1(Dialog::ZERO), result2(Dialog::ZERO), buttons(btns)
 {
     Point pt;
-    const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+    const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     switch(buttons)
     {

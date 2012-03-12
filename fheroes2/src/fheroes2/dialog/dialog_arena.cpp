@@ -34,7 +34,7 @@ Skill::Primary::skill_t InfoSkillPrev(Skill::Primary::skill_t);
 Skill::Primary::skill_t Dialog::SelectSkillFromArena(void)
 {
     Display & display = Display::Get();
-    const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+    const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     // cursor
     Cursor & cursor = Cursor::Get();

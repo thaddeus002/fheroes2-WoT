@@ -35,7 +35,7 @@ Dialog::answer_t Dialog::BuyBoat(bool enable)
 {
     Display & display = Display::Get();
 
-    const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+    const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     Cursor & cursor = Cursor::Get();
     cursor.Hide();

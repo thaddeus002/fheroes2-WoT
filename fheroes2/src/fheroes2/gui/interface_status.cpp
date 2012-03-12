@@ -40,7 +40,7 @@
 
 Interface::StatusWindow::StatusWindow() : state(STATUS_UNKNOWN), oldState(STATUS_UNKNOWN)
 {
-    const Sprite & ston = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
+    const Sprite & ston = AGG::GetICN(Settings::Get().ExtGameEvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
     Rect::w = ston.w();
     Rect::h = ston.h();
 }
@@ -84,7 +84,7 @@ u32 Interface::StatusWindow::ResetResourceStatus(u32 tick, void *ptr)
 
 void Interface::StatusWindow::SetPos(s16 ox, s16 oy)
 {
-    if(Settings::Get().HideInterface())
+    if(Settings::Get().ExtGameHideInterface())
     {
 	FixOutOfDisplay(*this, ox, oy); 
 
@@ -104,7 +104,7 @@ void Interface::StatusWindow::SetPos(s16 ox, s16 oy)
 
 const Rect & Interface::StatusWindow::GetArea(void) const
 {
-    return Settings::Get().HideInterface() && border.isValid() ? border.GetRect() : *this;
+    return Settings::Get().ExtGameHideInterface() && border.isValid() ? border.GetRect() : *this;
 }
 
 void Interface::StatusWindow::SetState(info_t info)
@@ -115,13 +115,13 @@ void Interface::StatusWindow::SetState(info_t info)
 void Interface::StatusWindow::Redraw(void)
 {
     const Settings & conf = Settings::Get();
-    if(conf.HideInterface() && !conf.ShowStatus()) return;
+    if(conf.ExtGameHideInterface() && !conf.ShowStatus()) return;
 
     // restore background
     DrawBackground();
 
     // draw info: Day and Funds and Army
-    const Sprite & ston = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
+    const Sprite & ston = AGG::GetICN(Settings::Get().ExtGameEvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
 
     if(STATUS_AITURN == state)
 	DrawAITurns();
@@ -150,7 +150,7 @@ void Interface::StatusWindow::Redraw(void)
     }
     
     // redraw border
-    if(conf.HideInterface()) border.Redraw();
+    if(conf.ExtGameHideInterface()) border.Redraw();
 }
 
 void Interface::StatusWindow::NextState(void)
@@ -214,7 +214,7 @@ void Interface::StatusWindow::DrawDayInfo(const u8 oh) const
 {
     std::string message;
 
-    AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SUNMOONE : ICN::SUNMOON, (world.GetWeek() - 1) % 5).Blit(x, y + 1 + oh);
+    AGG::GetICN(Settings::Get().ExtGameEvilInterface() ? ICN::SUNMOONE : ICN::SUNMOON, (world.GetWeek() - 1) % 5).Blit(x, y + 1 + oh);
 
     message = _("Month: %{month} Week: %{week}");
     String::Replace(message, "%{month}", world.GetMonth());
@@ -301,7 +301,7 @@ void Interface::StatusWindow::DrawArmyInfo(const u8 oh) const
 void Interface::StatusWindow::DrawAITurns(void) const
 {
     const Settings & conf = Settings::Get();
-    if(conf.HideInterface() && !conf.ShowStatus()) return;
+    if(conf.ExtGameHideInterface() && !conf.ShowStatus()) return;
 
     // restore background
     DrawBackground();
@@ -349,9 +349,9 @@ void Interface::StatusWindow::DrawAITurns(void) const
 void Interface::StatusWindow::DrawBackground(void) const
 {
     Display & display = Display::Get();
-    const Sprite & icnston = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
+    const Sprite & icnston = AGG::GetICN(Settings::Get().ExtGameEvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
 
-    if(!Settings::Get().HideInterface() && display.h() - BORDERWIDTH - icnston.h() > y)
+    if(!Settings::Get().ExtGameHideInterface() && display.h() - BORDERWIDTH - icnston.h() > y)
     {
         Rect srcrt;
 	Point dstpt(x, y);
@@ -400,7 +400,7 @@ void Interface::StatusWindow::QueueEventProcessing(void)
     Settings & conf = Settings::Get();
     LocalEvent & le = LocalEvent::Get();
 
-    if(conf.HideInterface() && conf.ShowStatus() && le.MousePressLeft(border.GetTop()))
+    if(conf.ExtGameHideInterface() && conf.ShowStatus() && le.MousePressLeft(border.GetTop()))
     {
         Surface sf(border.GetRect().w, border.GetRect().h);
         Cursor::DrawCursor(sf, 0x70);

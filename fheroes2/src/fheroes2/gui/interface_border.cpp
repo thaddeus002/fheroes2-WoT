@@ -38,11 +38,11 @@ Interface::BorderWindow & Interface::BorderWindow::Get(void)
 void Interface::BorderWindow::Redraw(void)
 {
     const Settings & conf = Settings::Get();
-    if(conf.HideInterface()) return;
+    if(conf.ExtGameHideInterface()) return;
 
     Display & display = Display::Get();
 
-    const bool evil = Settings::Get().EvilInterface();
+    const bool evil = Settings::Get().ExtGameEvilInterface();
     u8 count_w = (display.w() - 640) / TILEWIDTH;
     u8 count_h = (display.h() - 480) / TILEWIDTH;
     const u8 count_icons = count_h > 3 ? 8 : ( count_h < 3 ? 4 : 7);

@@ -356,7 +356,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     const Heroes* from_hero = GameFocus::GetHeroes();
     const Kingdom & kingdom = world.GetKingdom(settings.CurrentColor());
     u8 scoute = from_hero ? from_hero->CanScouteTile(tile.GetIndex()) : 0;
-    const bool & show = settings.ExtShowVisitedContent();
+    const bool & show = settings.ExtWorldShowVisitedContent();
 
     if(tile.isFog(settings.CurrentColor()))
 	name_object = _("Unchartered Territory");
