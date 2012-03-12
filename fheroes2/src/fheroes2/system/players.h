@@ -138,7 +138,7 @@ namespace Interface
 	Player* GetFromOpponentChangeClick(const Point & pt);
 	Player* GetFromClassClick(const Point & pt);
 
-	void RedrawInfo(void) const;
+	void RedrawInfo(bool show_play_info = false) const;
 	bool QueueEventProcessing(void);
 
 	bool show_name;

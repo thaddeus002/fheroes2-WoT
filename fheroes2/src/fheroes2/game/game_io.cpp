@@ -35,6 +35,8 @@
 #include "interface_gamearea.h"
 #include "settings.h"
 #include "tools.h"
+#include "game_over.h"
+#include "game_io.h"
 
 std::string Game::IO::last_name;
 
@@ -397,6 +399,12 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(world.ultimate_artifact.id);
     msg.Push(world.ultimate_artifact.isfound);
     msg.Push(world.ultimate_artifact.index);
+
+    // game over
+    const GameOver::Result & gameover = GameOver::Result::Get();
+    msg.Push(gameover.colors);
+    msg.Push(gameover.result);
+    msg.Push(gameover.continue_game);
 
     msg.Push(static_cast<u16>(0xFFFF));
     return true;
@@ -1015,6 +1023,15 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(ultimate_art);
     msg.Pop(world.ultimate_artifact.isfound);
     msg.Pop(ultimate_index);
+
+    if(format >= FORMAT_VERSION_2777)
+    {
+	// game over
+	GameOver::Result & gameover = GameOver::Result::Get();
+	msg.Pop(gameover.colors);
+	msg.Pop(gameover.result);
+	msg.Pop(gameover.continue_game);
+    }
 
     // end 0xFFFF
     msg.Pop(byte16);

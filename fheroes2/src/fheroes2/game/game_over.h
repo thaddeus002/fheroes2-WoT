@@ -26,6 +26,7 @@
 #include <string>
 #include "game.h"
 
+namespace Game { class IO; }
 namespace GameOver
 {
     enum conditions_t
@@ -65,6 +66,8 @@ namespace GameOver
 	bool LocalCheckGameOver(Game::menu_t &);
 
     private:
+	friend class Game::IO;
+
 	Result();
 
 	u8  colors;

@@ -94,7 +94,7 @@ void Dialog::GameInfo(void)
     Interface::PlayersInfo playersInfo(true, false, false);
 
     playersInfo.UpdateInfo(conf.GetPlayers(), Point(pt.x + 40, pt.y + 165), Point(pt.x + 40, pt.y + 240));
-    playersInfo.RedrawInfo();
+    playersInfo.RedrawInfo(true);
 
     text.Set(_("Victory\nConditions"), Font::SMALL, 80);
     text.Blit(pt.x + 40, pt.y + 345);

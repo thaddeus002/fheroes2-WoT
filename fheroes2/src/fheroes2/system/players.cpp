@@ -442,7 +442,7 @@ Player* Interface::PlayersInfo::GetFromClassClick(const Point & pt)
     return NULL;
 }
 
-void Interface::PlayersInfo::RedrawInfo(void) const
+void Interface::PlayersInfo::RedrawInfo(bool show_play_info) const /* show_play_info: show game info with color status (play/not play) */
 {
     const Settings & conf = Settings::Get();
     const Maps::FileInfo & fi = conf.CurrentFileInfo();
@@ -465,10 +465,24 @@ void Interface::PlayersInfo::RedrawInfo(void) const
         else
         // comp only
         if(fi.ComputerOnlyColors() & player.color)
-            index = 15 + Color::GetIndex(player.color);
-        else
+	{
+	    if(show_play_info)
+	    {
+		index = (player.isPlay() ? 3 : 15) + Color::GetIndex(player.color);
+	    }
+            else
+        	index = 15 + Color::GetIndex(player.color);
+        }
+	else
         // comp/human
-            index = 3 + Color::GetIndex(player.color);
+	{
+	    if(show_play_info)
+	    {
+		index = (player.isPlay() ? 3 : 15) + Color::GetIndex(player.color);
+	    }
+            else
+		index = 3 + Color::GetIndex(player.color);
+	}
 
         // wide sprite offset
         if(show_name) index += 24;
@@ -484,15 +498,21 @@ void Interface::PlayersInfo::RedrawInfo(void) const
 	}
 
 	// 2. redraw class
+	bool class_color = conf.AllowChangeRace(player.color);
+
+	if(show_play_info)
+	{
+	    class_color = player.isPlay();
+	}
 
         switch(player.race)
         {
-            case Race::KNGT: index = conf.AllowChangeRace(player.color) ? 51 : 70; break;
-            case Race::BARB: index = conf.AllowChangeRace(player.color) ? 52 : 71; break;
-            case Race::SORC: index = conf.AllowChangeRace(player.color) ? 53 : 72; break;
-            case Race::WRLK: index = conf.AllowChangeRace(player.color) ? 54 : 73; break;
-            case Race::WZRD: index = conf.AllowChangeRace(player.color) ? 55 : 74; break;
-            case Race::NECR: index = conf.AllowChangeRace(player.color) ? 56 : 75; break;
+            case Race::KNGT: index = class_color ? 51 : 70; break;
+            case Race::BARB: index = class_color ? 52 : 71; break;
+            case Race::SORC: index = class_color ? 53 : 72; break;
+            case Race::WRLK: index = class_color ? 54 : 73; break;
+            case Race::WZRD: index = class_color ? 55 : 74; break;
+            case Race::NECR: index = class_color ? 56 : 75; break;
             case Race::MULT: index = 76; break;
             case Race::RAND: index = 58; break;
             default: continue;
