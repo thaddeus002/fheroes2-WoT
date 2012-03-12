@@ -27,6 +27,7 @@
 #include "kingdom.h"
 #include "castle.h"
 #include "settings.h"
+#include "game_interface.h"
 #include "game_over.h"
 
 const char* GameOver::GetString(conditions_t cond)
@@ -278,7 +279,7 @@ GameOver::Result & GameOver::Result::Get(void)
     return gresult;
 }
 
-GameOver::Result::Result() : colors(0), result(0)
+GameOver::Result::Result() : colors(0), result(0), continue_game(false)
 {
 }
 
@@ -300,6 +301,9 @@ u16  GameOver::Result::GetResult(void) const
 
 bool GameOver::Result::LocalCheckGameOver(Game::menu_t & res)
 {
+    if(continue_game)
+	return false;
+
     const Colors colors2(colors);
 
     for(Colors::const_iterator
@@ -310,13 +314,17 @@ bool GameOver::Result::LocalCheckGameOver(Game::menu_t & res)
         colors &= (~*it);
     }
 
+    Game::menu_t old = res;
+    bool game_over = false;
+
     // local players miss
     if( !(colors & Players::HumanColors()))
     {
         res = Game::MAINMENU;
-	return true;
+	game_over = true;
     }
-
+    else
+    // check normal wins
     if(Settings::Get().CurrentColor() & Players::HumanColors())
     {
 	const Kingdom & myKingdom = world.GetKingdom(Settings::Get().CurrentColor());
@@ -325,16 +333,35 @@ bool GameOver::Result::LocalCheckGameOver(Game::menu_t & res)
 	{
     	    GameOver::DialogWins(result);
     	    res = Game::HIGHSCORES;
-    	    return true;
+	    game_over = true;
 	}
 	else
 	if(GameOver::COND_NONE != (result = world.CheckKingdomLoss(myKingdom)))
 	{
     	    GameOver::DialogLoss(result);
     	    res = Game::MAINMENU;
-    	    return true;
+	    game_over = true;
 	}
     }
 
-    return false;
+    // set: continue after victory
+    if(game_over &&
+	(Settings::Get().CurrentColor() & Players::HumanColors()) &&
+	Settings::Get().ExtGameContinueAfterVictory())
+    {
+	if(Dialog::YES == Dialog::Message("", "Do you wish to continue the game?",
+							Font::BIG, Dialog::YES | Dialog::NO))
+	{
+	    continue_game = true;
+
+    	    if(res == Game::HIGHSCORES) Game::HighScores();
+
+	    res = old;
+	    game_over = false;
+
+	    Interface::Basic::Get().SetRedraw(REDRAW_ALL);
+	}
+    }
+
+    return game_over;
 }

@@ -184,6 +184,7 @@ const settings_t settingsFHeroes2[] =
     { Settings::GAME_EVIL_INTERFACE,		_("game: use evil interface"),				},
     { Settings::GAME_DYNAMIC_INTERFACE,		_("game: also use dynamic interface for castles"),	},
     { Settings::GAME_HIDE_INTERFACE,		_("game: hide interface"),				},
+    { Settings::GAME_CONTINUE_AFTER_VICTORY,	_("game: offer to continue the game afer victory condition"), },
     { Settings::POCKETPC_HIDE_CURSOR,		_("pocketpc: hide cursor"),				},
     { Settings::POCKETPC_TAP_MODE,		_("pocketpc: tap mode"),				},
     { Settings::POCKETPC_DRAG_DROP_SCROLL,	_("pocketpc: drag&drop gamearea as scroll"),		},
@@ -1514,6 +1515,11 @@ bool Settings::ExtWorldExtObjectsCaptured(void) const
 bool Settings::ExtWorldGuardianObjectsTwoDefense(void) const
 {
     return ExtModes(WORLD_GUARDIAN_TWO_DEFENSE);
+}
+
+bool Settings::ExtGameContinueAfterVictory(void) const
+{
+    return ExtModes(GAME_CONTINUE_AFTER_VICTORY);
 }
 
 const Point & Settings::PosRadar(void) const { return pos_radr; }

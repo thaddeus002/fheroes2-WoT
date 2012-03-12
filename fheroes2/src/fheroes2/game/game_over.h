@@ -69,6 +69,7 @@ namespace GameOver
 
 	u8  colors;
 	u16 result;
+	bool continue_game;
     };
 }
 
