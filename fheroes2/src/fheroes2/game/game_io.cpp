@@ -1024,14 +1024,17 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(world.ultimate_artifact.isfound);
     msg.Pop(ultimate_index);
 
+    // game over
+    GameOver::Result & gameover = GameOver::Result::Get();
+
     if(format >= FORMAT_VERSION_2777)
     {
-	// game over
-	GameOver::Result & gameover = GameOver::Result::Get();
 	msg.Pop(gameover.colors);
 	msg.Pop(gameover.result);
 	msg.Pop(gameover.continue_game);
     }
+    else
+	gameover.Reset();
 
     // end 0xFFFF
     msg.Pop(byte16);
