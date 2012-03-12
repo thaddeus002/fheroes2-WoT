@@ -145,7 +145,8 @@ Game::menu_t Game::StartGame(void)
     Settings & conf = Settings::Get();
     Display & display = Display::Get();
 
-    GameOver::Result::Get().Reset();
+    if(! conf.LoadedGameVersion())
+	GameOver::Result::Get().Reset();
 
     cursor.Hide();
 
