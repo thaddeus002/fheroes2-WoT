@@ -81,6 +81,8 @@ namespace Route
 	    s32		dst;
 	    bool	hide;
     };
+
+    bool PathFind(std::list<Route::Step>* result, const s32 from, const s32 to, const u16 limit = MAXU16, const Heroes* = NULL);
 }
 
 #endif

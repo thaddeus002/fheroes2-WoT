@@ -36,7 +36,6 @@
 #include "text.h"
 #include "race.h"
 #include "pairs.h"
-#include "algorithm.h"
 #include "game_over.h"
 #include "resource.h"
 #include "game_focus.h"

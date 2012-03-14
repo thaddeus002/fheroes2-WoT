@@ -24,7 +24,6 @@
 #include "agg.h"
 #include "world.h"
 #include "heroes.h"
-#include "algorithm.h"
 #include "direction.h"
 #include "maps.h"
 #include "game.h"
@@ -92,7 +91,7 @@ s32 Route::Path::GetDestinedIndex(void) const
 bool Route::Path::Calculate(const s32 dst_index, const u16 limit)
 {
     clear();
-    Algorithm::PathFind(this, hero.GetIndex(), dst_index, limit, &hero);
+    Route::PathFind(this, hero.GetIndex(), dst_index, limit, &hero);
 
     // check monster dst
     if(!empty() &&

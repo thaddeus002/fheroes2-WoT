@@ -34,7 +34,6 @@
 #include "kingdom.h"
 #include "morale.h"
 #include "cursor.h"
-#include "algorithm.h"
 #include "payment.h"
 #include "profit.h"
 #include "gameevent.h"

@@ -28,7 +28,6 @@
 #include "settings.h"
 #include "heroes.h"
 #include "route.h"
-#include "algorithm.h"
 
 struct cell_t
 {
@@ -142,7 +141,7 @@ bool PassableFromToTile(const Heroes* hero, const s32 & from, const s32 & to, co
     return PassableToTile(hero, toTile, direct, dst);
 }
 
-bool Algorithm::PathFind(std::list<Route::Step> *result, const s32 from, const s32 to, const u16 limit, const Heroes *hero)
+bool Route::PathFind(std::list<Route::Step>* result, const s32 from, const s32 to, const u16 limit, const Heroes* hero)
 {
     const u8 pathfinding = (hero ? hero->GetLevelSkill(Skill::Secondary::PATHFINDING) : Skill::Level::NONE);
 
