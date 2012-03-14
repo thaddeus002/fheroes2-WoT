@@ -151,6 +151,7 @@ const settings_t settingsFHeroes2[] =
     { Settings::WORLD_USE_UNIQUE_ARTIFACTS_PS,	_("world: use unique artifacts for for primary skills"),},
     { Settings::WORLD_USE_UNIQUE_ARTIFACTS_SS,	_("world: use unique artifacts for secondary skills"),},
     { Settings::WORLD_EXT_OBJECTS_CAPTURED,	_("world: Wind/Water Mills and Magic Garden can be captured"),},
+    { Settings::WORLD_DISABLE_BARROW_MOUNDS,	_("world: disable Barrow Mounds"),			},
     { Settings::CASTLE_ALLOW_BUY_FROM_WELL,	_("castle: allow buy from well"),			},
     { Settings::CASTLE_ALLOW_GUARDIANS,		_("castle: allow guardians"),				},
     { Settings::CASTLE_MAGEGUILD_POINTS_TURN,	_("castle: higher mage guilds regenerate more spell points/turn (20/40/60/80/100%)"), },
@@ -1515,6 +1516,11 @@ bool Settings::ExtWorldExtObjectsCaptured(void) const
 bool Settings::ExtWorldGuardianObjectsTwoDefense(void) const
 {
     return ExtModes(WORLD_GUARDIAN_TWO_DEFENSE);
+}
+
+bool Settings::ExtWorldDisableBarrowMounds(void) const
+{
+    return ExtModes(WORLD_DISABLE_BARROW_MOUNDS);
 }
 
 bool Settings::ExtGameContinueAfterVictory(void) const

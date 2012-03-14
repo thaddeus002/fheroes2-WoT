@@ -171,6 +171,7 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::WORLD_USE_UNIQUE_ARTIFACTS_RS);
     states.push_back(Settings::WORLD_USE_UNIQUE_ARTIFACTS_PS);
     states.push_back(Settings::WORLD_USE_UNIQUE_ARTIFACTS_SS);
+    states.push_back(Settings::WORLD_DISABLE_BARROW_MOUNDS);
     states.push_back(Settings::HEROES_BUY_BOOK_FROM_SHRINES);
     states.push_back(Settings::HEROES_LEARN_SPELLS_WITH_DAY);
     states.push_back(Settings::HEROES_COST_DEPENDED_FROM_LEVEL);

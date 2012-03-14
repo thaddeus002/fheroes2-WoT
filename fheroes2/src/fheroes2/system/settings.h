@@ -194,7 +194,7 @@ public:
 	WORLD_USE_UNIQUE_ARTIFACTS_RS	= 0x30000200,
 	WORLD_USE_UNIQUE_ARTIFACTS_PS	= 0x30000400,
 	WORLD_USE_UNIQUE_ARTIFACTS_SS	= 0x30000800,
-	//UNUSED			= 0x30001000,
+	WORLD_DISABLE_BARROW_MOUNDS	= 0x30001000,
 	WORLD_EXT_OBJECTS_CAPTURED 	= 0x30004000,
 
 	BATTLE_ARCHMAGE_RESIST_BAD_SPELL= 0x40001000,
@@ -314,6 +314,7 @@ public:
     bool ExtWorldUseUniqueArtifactsSS(void) const;
     bool ExtWorldExtObjectsCaptured(void) const;
     bool ExtWorldGuardianObjectsTwoDefense(void) const;
+    bool ExtWorldDisableBarrowMounds(void) const;
     bool ExtCastleAllowBuyFromWell(void) const;
     bool ExtCastleAllowGuardians(void) const;
     bool ExtCastleAllowFlash(void) const;

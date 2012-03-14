@@ -476,7 +476,7 @@ void Kingdom::HeroesActionNewPosition(void)
     std::for_each(heroes2.begin(), heroes2.end(), std::mem_fun(&Heroes::ActionNewPosition));
 }
 
-Funds Kingdom::GetIncome(void)
+Funds Kingdom::GetIncome(void) const
 {
     Funds resource;
 

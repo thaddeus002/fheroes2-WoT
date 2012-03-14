@@ -91,8 +91,8 @@ public:
     u8 GetRace(void) const;
 
     const Funds & GetFunds(void) const{ return resource; }
+    Funds GetIncome(void) const;
 
-    Funds GetIncome(void);
     const Heroes* GetBestHero(void) const;
     u32 GetArmiesStrength(void) const;
 

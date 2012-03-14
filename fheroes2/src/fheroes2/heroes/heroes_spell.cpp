@@ -192,7 +192,7 @@ void DialogSpellFailed(const Spell & spell)
 
 void DialogNotAvailable(void)
 {
-    Dialog::Message("", "Not availble for current version", Font::BIG, Dialog::OK);
+    Dialog::Message("", "Not available for current version", Font::BIG, Dialog::OK);
 }
 
 bool ActionSpellViewMines(Heroes & hero)

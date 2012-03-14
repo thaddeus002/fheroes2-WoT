@@ -877,8 +877,12 @@ void Maps::Tiles::QuantityUpdate(void)
         case MP2::OBJ_AIRALTAR:
         case MP2::OBJ_FIREALTAR:
         case MP2::OBJ_EARTHALTAR:
-        case MP2::OBJ_BARROWMOUNDS:
 	    UpdateDwellingPopulation(*this);
+	break;
+
+        case MP2::OBJ_BARROWMOUNDS:
+	    if(! Settings::Get().ExtWorldDisableBarrowMounds())
+		UpdateDwellingPopulation(*this);
         break;
 
         default: break;
