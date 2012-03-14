@@ -41,7 +41,7 @@
 #define ICONS_CURSOR_HEIGHT     32
 #define ICONS_CURSOR_COLOR      0x98
 
-void RedrawCastleIcon(const Castle & castle, s16 sx, s16 sy)
+void Interface::RedrawCastleIcon(const Castle & castle, s16 sx, s16 sy)
 {
     const bool evil = Settings::Get().ExtGameEvilInterface();
     u8 index_sprite = 1;
@@ -64,7 +64,7 @@ void RedrawCastleIcon(const Castle & castle, s16 sx, s16 sy)
         AGG::GetICN(evil ? ICN::LOCATORE : ICN::LOCATORS, 24).Blit(sx + 39, sy + 1);
 }
 
-void RedrawHeroesIcon(const Heroes & hero, s16 sx, s16 sy)
+void Interface::RedrawHeroesIcon(const Heroes & hero, s16 sx, s16 sy)
 {
     Display & display = Display::Get();
     const Sprite & mobility = AGG::GetICN(ICN::MOBILITY, hero.GetMobilityIndexSprite());

@@ -72,6 +72,8 @@ public:
     void Init(u8 color);
     void clear(void);
 
+    void OverviewDialog(void);
+
     void UpdateStartingResource(void);
     bool isPlay(void) const;
     bool isLoss(void) const;

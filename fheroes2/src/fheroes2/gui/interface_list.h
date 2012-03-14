@@ -34,8 +34,15 @@
 
 namespace Interface
 {
+    struct ListBasic
+    {
+	virtual ~ListBasic(){}
+	virtual void Redraw(void) = 0;
+	virtual bool QueueEventProcessing(void) = 0;
+    };
+
     template<class Item> 
-    class ListBox
+    class ListBox : public ListBasic
     {
     public:
 	typedef std::vector<Item> Items;

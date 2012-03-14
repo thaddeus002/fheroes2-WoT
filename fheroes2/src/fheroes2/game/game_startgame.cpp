@@ -46,6 +46,7 @@
 #include "route.h"
 #include "game_focus.h"
 #include "kingdom.h"
+#include "pocketpc.h"
 #include "localclient.h"
 #include "ai.h"
 
@@ -1242,7 +1243,12 @@ void Game::EventContinueMovement(void)
 
 void Game::EventKingdomInfo(void)
 {
-    VERBOSE("income: " << world.GetKingdom(Settings::Get().CurrentColor()).GetIncome().String());
+    Kingdom & myKingdom = world.GetKingdom(Settings::Get().CurrentColor());
+
+    if(Settings::Get().QVGA())
+	PocketPC::KingdomOverviewDialog(myKingdom);
+    else
+	myKingdom.OverviewDialog();
 }
 
 void Game::EventCastSpell(void)

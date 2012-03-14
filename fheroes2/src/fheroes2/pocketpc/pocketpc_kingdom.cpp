@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *   Copyright (C) 2012 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
@@ -20,30 +20,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2POCKETPC_H
-#define H2POCKETPC_H
+#include "agg.h"
+#include "cursor.h"
+#include "text.h"
+#include "button.h"
+#include "heroes.h"
+#include "kingdom.h"
+#include "pocketpc.h"
 
-#include "game.h"
-#include "dialog.h"
-#include "maps_fileinfo.h"
-#include "gamedefs.h"
-
-namespace PocketPC
+void PocketPC::KingdomOverviewDialog(const Kingdom & myKingdom)
 {
-    Game::menu_t	MainMenu(void);
-    Game::menu_t	NewGame(void);
-    Game::menu_t	NewMulti(void);
-    Game::menu_t	SelectScenario(void);
-    Game::menu_t	ScenarioInfo(void);
-    Game::menu_t	LoadGame(void);
-    Dialog::answer_t	HeroesOpenDialog(Heroes &, bool);
-    Dialog::answer_t	CastleOpenDialog(Castle &, bool);
-    Dialog::answer_t	DialogArmyInfo(const Army::Troop &, u16);
-    void		HeroesMeeting(Heroes &, Heroes &);
-    void		KeyboardDialog(std::string &);
-    u16			GetCursorAttackDialog(const Point &, u8);
-    void		ThievesGuild(bool oracle);
-    void		KingdomOverviewDialog(const Kingdom &);
 }
-
-#endif

@@ -50,6 +50,9 @@ namespace Interface
 	bool show;
     };
 
+    void RedrawHeroesIcon(const Heroes &, s16, s16);
+    void RedrawCastleIcon(const Castle &, s16, s16);
+
     class HeroesIcons : public Interface::ListBox<HEROES>, public IconsBar
     {
     public:
