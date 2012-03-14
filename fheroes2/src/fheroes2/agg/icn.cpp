@@ -924,7 +924,7 @@ namespace ICN
 	{ BOAT12,       "MANUAL.ICN" },
 	{ BTNGIFT,      "MANUAL.ICN" },
 
-	{ UNKNOWN,	"UNKNOWN.ICN" },
+	{ UNKNOWN,	"UNKNOWN" },
     };
 
     u8 missile9(float, float);

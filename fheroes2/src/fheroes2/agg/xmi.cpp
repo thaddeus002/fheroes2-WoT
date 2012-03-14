@@ -29,7 +29,7 @@ namespace XMI
 	xmi_t type;
 	const char* string;
    } xmimap[] = {
-        { UNKNOWN,      "???"          },
+        { UNKNOWN,      "UNKNOWN"      },
 	{ MIDI0002,	"MIDI0002.XMI" },
 	{ MIDI0003,	"MIDI0003.XMI" },
 	{ MIDI0004,	"MIDI0004.XMI" },

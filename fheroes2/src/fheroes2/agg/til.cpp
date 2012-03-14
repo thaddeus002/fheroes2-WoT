@@ -30,9 +30,10 @@ namespace TIL
 	til_t type;
 	const char* string;
     } tilmap[] = {
-	{ CLOF32,	"CLOF32.TIL" },
+	{ CLOF32,	"CLOF32.TIL"   },
 	{ GROUND32,	"GROUND32.TIL" },
-	{ STON,		"STON.TIL" },
+	{ STON,		"STON.TIL"     },
+	{ UNKNOWN,	"UNKNOWN"      }
     };
 }
 

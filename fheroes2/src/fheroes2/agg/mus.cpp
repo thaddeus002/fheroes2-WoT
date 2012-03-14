@@ -80,7 +80,7 @@ namespace MUS
         { NEWS,         "41"                  },
         { MAINMENU,     "Main Menu"           },
         { VICTORY,      "Scenario Victory"    },
-        { UNKNOWN,      "???"                 }
+        { UNKNOWN,      "UNKNOWN"             }
     };
     
     const std::string GetString(const mus_t mus, bool shortname)

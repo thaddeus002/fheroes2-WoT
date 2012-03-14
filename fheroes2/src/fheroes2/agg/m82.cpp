@@ -340,7 +340,7 @@ namespace M82
 	{ ZOMBKILL,	"ZOMBKILL.82M" },
 	{ ZOMBMOVE,	"ZOMBMOVE.82M" },
 	{ ZOMBWNCE,	"ZOMBWNCE.82M" },
-
+	{ UNKNOWN,	"UNKNOWN" }
     };
 }
 
