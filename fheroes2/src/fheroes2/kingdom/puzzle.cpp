@@ -195,24 +195,27 @@ void ShowExtendedDialog(const Puzzle & pzl, const Surface & sf)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
-    bool evil_interface = Settings::Get().ExtGameEvilInterface();
+    const Settings & conf = Settings::Get();
+    const Rect & gameArea = Interface::Basic::Get().gameArea.GetArea();
 
     Dialog::FrameBorder frameborder;
-    frameborder.SetPosition((display.w() - BORDERWIDTH * 2 - sf.w()) / 2,
-	    (display.h() - sf.h() - BORDERWIDTH * 2 - 32) / 2,
-	    sf.w(),
-	    sf.h() + (Settings::Get().QVGA() ? 25 : 32));
+
+
+    frameborder.SetPosition(gameArea.x + (gameArea.w - sf.w() - BORDERWIDTH * 2) / 2,
+	    gameArea.y + (gameArea.h - sf.h() - BORDERWIDTH * 2) / 2,
+            sf.w(), sf.h() + (Settings::Get().QVGA() ? 25 : 32));
+
     frameborder.Redraw();
 
-    if(evil_interface)
+    if(conf.ExtGameEvilInterface())
 	display.FillRect(80, 80, 80, frameborder.GetArea());
     else
 	display.FillRect(128, 64, 32, frameborder.GetArea());
     sf.Blit(frameborder.GetArea(), display);
 
     Button buttonExit(frameborder.GetArea().x + sf.w() / 2 - 40,
-	frameborder.GetArea().y + sf.h() + (Settings::Get().QVGA() ? 0 : 5),
-	(evil_interface ? ICN::LGNDXTRE : ICN::LGNDXTRA), 4, 5);
+	frameborder.GetArea().y + sf.h() + (conf.QVGA() ? 0 : 5),
+	(conf.ExtGameEvilInterface() ? ICN::LGNDXTRE : ICN::LGNDXTRA), 4, 5);
 
     buttonExit.Draw();
     PuzzlesDraw(pzl, sf, frameborder.GetArea().x, frameborder.GetArea().y);
@@ -226,7 +229,7 @@ void ShowExtendedDialog(const Puzzle & pzl, const Surface & sf)
     {
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
         if(le.MouseClickLeft(buttonExit) || HotKeyCloseWindow) break;
-        if(Settings::Get().QVGA() && le.MouseClickLeft(frameborder.GetArea())) break;
+        if(conf.QVGA() && le.MouseClickLeft(frameborder.GetArea())) break;
     }
 }
 
