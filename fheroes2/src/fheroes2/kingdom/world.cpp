@@ -1574,7 +1574,8 @@ bool World::KingdomIsWins(const Kingdom & kingdom, u16 wins) const
 	case GameOver::WINS_GOLD:
 	    // check comp also wins
 	    return (((CONTROL_HUMAN & kingdom.GetControl()) || conf.WinsCompAlsoWins()) &&
-		    (kingdom.GetFundsGold() >= conf.WinsAccumulateGold()));
+		    0 < kingdom.GetFunds().Get(Resource::GOLD) &&
+		    static_cast<u32>(kingdom.GetFunds().Get(Resource::GOLD)) >= conf.WinsAccumulateGold());
 
 	default: break;
     }

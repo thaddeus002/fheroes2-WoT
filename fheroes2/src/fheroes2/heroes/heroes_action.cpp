@@ -2543,7 +2543,7 @@ void ActionToUpgradeArmyObject(Heroes & hero, const u8 & obj, const s32 & dst_in
 
 void ActionToMagellanMaps(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
-    if(1000 > world.GetKingdom(hero.GetColor()).GetFundsGold())
+    if(1000 > world.GetKingdom(hero.GetColor()).GetFunds().Get(Resource::GOLD))
     {
 	PlaySoundFailure;
 	Dialog::Message(MP2::StringObject(obj), _("The captain sighs. \"You don't have enough money, eh?  You can't expect me to give my maps away for free!\""), Font::BIG, Dialog::OK);
@@ -2759,12 +2759,12 @@ void ActionToDaemonCave(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    {
 		bool remove = true;
 
-		msg = gold <= world.GetKingdom(hero.GetColor()).GetFundsGold() ?
+		msg = gold <= world.GetKingdom(hero.GetColor()).GetFunds().Get(Resource::GOLD) ?
 			    _("The Demon leaps upon you and has its claws at your throat before you can even draw your sword. \"Your life is mine,\" it says. \"I will sell it back to you for %{count} gold.\"") :
 			    _("Seeing that you do not have %{count} gold, the demon slashes you with its claws, and the last thing you see is a red haze.");
 		String::Replace(msg, "%{count}", gold);
 
-		if(gold <= world.GetKingdom(hero.GetColor()).GetFundsGold())
+		if(gold <= world.GetKingdom(hero.GetColor()).GetFunds().Get(Resource::GOLD))
 		{
 		    if(Dialog::YES == Dialog::Message("", msg, Font::BIG, Dialog::YES|Dialog::NO))
 		    {

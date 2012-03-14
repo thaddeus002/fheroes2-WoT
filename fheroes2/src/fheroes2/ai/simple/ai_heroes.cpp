@@ -813,7 +813,7 @@ void AIToObservationTower(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 void AIToMagellanMaps(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
-    if(1000 <= world.GetKingdom(hero.GetColor()).GetFundsGold())
+    if(1000 <= world.GetKingdom(hero.GetColor()).GetFunds().Get(Resource::GOLD))
     {
 	hero.SetVisited(dst_index, Visit::GLOBAL);
 	world.ActionForMagellanMaps(hero.GetColor());

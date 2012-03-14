@@ -4058,10 +4058,10 @@ void Battle2::Interface::ProcessingHeroDialogResult(u8 res, Actions & a)
 	{
 	    const Army::army_t & army = arena.army1.GetColor() == arena.current_color ? arena.army1 : arena.army2;
 	    const HeroBase* enemy = arena.army1.GetColor() == arena.current_color ? arena.army2.GetCommander() : arena.army1.GetCommander();
-	    const u32 cost = army.GetSurrenderCost();
+	    const s32 cost = army.GetSurrenderCost();
 	    if(enemy && DialogBattleSurrender(*enemy, cost))
 	    {
-		if(world.GetKingdom(arena.current_color).GetFundsGold() < cost)
+		if(world.GetKingdom(arena.current_color).GetFunds().Get(Resource::GOLD) < cost)
 		    Dialog::Message("", _("You don't have enough gold!"), Font::BIG, Dialog::OK);
 		else
 		{

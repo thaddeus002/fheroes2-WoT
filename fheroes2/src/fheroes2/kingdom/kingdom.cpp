@@ -162,31 +162,8 @@ void Kingdom::ActionNewDay(void)
 	// heroes New Day
 	std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::ActionNewDay));
 
-	// captured object
-	const u8 resources[] = { Resource::WOOD, Resource::ORE, Resource::MERCURY, Resource::SULFUR,
-				    Resource::CRYSTAL, Resource::GEMS, Resource::GOLD, Resource::UNKNOWN };
-
-	for(u8 index = 0; resources[index] != Resource::UNKNOWN; ++index)
-	    resource += ProfitConditions::FromMine(resources[index]) *
-				world.CountCapturedMines(resources[index], GetColor());
-
-	// funds
-	for(KingdomCastles::const_iterator
-	    it = castles.begin(); it != castles.end(); ++it)
-	{
-	    const Castle & castle = **it;
-
-	    // castle or town profit
-	    resource += ProfitConditions::FromBuilding((castle.isCastle() ? BUILD_CASTLE : BUILD_TENT), 0);
-
-	    // statue
-	    if(castle.isBuild(BUILD_STATUE))
-		resource += ProfitConditions::FromBuilding(BUILD_STATUE, 0);
-
-	    // dungeon for warlock
-	    if(castle.isBuild(BUILD_SPEC) && Race::WRLK == castle.GetRace())
-		resource += ProfitConditions::FromBuilding(BUILD_SPEC, Race::WRLK);
-	}
+	// income
+	AddFundsResource(GetIncome());
     }
 
     // check event day AI
@@ -393,27 +370,11 @@ u8 Kingdom::GetCountCapital(void) const
 void Kingdom::AddFundsResource(const Funds & funds)
 {
     resource = resource + funds;
-
-    if(0 > resource.wood) resource.wood = 0;
-    if(0 > resource.mercury) resource.mercury = 0;
-    if(0 > resource.ore) resource.ore = 0;
-    if(0 > resource.sulfur) resource.sulfur = 0;
-    if(0 > resource.crystal) resource.crystal = 0;
-    if(0 > resource.gems) resource.gems = 0;
-    if(0 > resource.gold) resource.gold = 0;
 }
 
 void Kingdom::OddFundsResource(const Funds & funds)
 {
     resource = resource - funds;
-
-    if(0 > resource.wood) resource.wood = 0;
-    if(0 > resource.mercury) resource.mercury = 0;
-    if(0 > resource.ore) resource.ore = 0;
-    if(0 > resource.sulfur) resource.sulfur = 0;
-    if(0 > resource.crystal) resource.crystal = 0;
-    if(0 > resource.gems) resource.gems = 0;
-    if(0 > resource.gold) resource.gold = 0;
 }
 
 u8 Kingdom::GetLostTownDays(void) const
@@ -515,12 +476,17 @@ void Kingdom::HeroesActionNewPosition(void)
     std::for_each(heroes2.begin(), heroes2.end(), std::mem_fun(&Heroes::ActionNewPosition));
 }
 
-u32 Kingdom::GetIncome(void)
+Funds Kingdom::GetIncome(void)
 {
     Funds resource;
 
     // captured object
-    resource += ProfitConditions::FromMine(Resource::GOLD) * world.CountCapturedMines(Resource::GOLD, GetColor());
+    const u8 resources[] = { Resource::WOOD, Resource::ORE, Resource::MERCURY, Resource::SULFUR,
+                                    Resource::CRYSTAL, Resource::GEMS, Resource::GOLD, Resource::UNKNOWN };
+
+    for(u8 index = 0; resources[index] != Resource::UNKNOWN; ++index)
+        resource += ProfitConditions::FromMine(resources[index]) *
+                            	    world.CountCapturedMines(resources[index], GetColor());
 
     // castles
     for(KingdomCastles::const_iterator
@@ -542,7 +508,9 @@ u32 Kingdom::GetIncome(void)
 
     // find artifacts                                                                                            
     const u8 artifacts[] = { Artifact::GOLDEN_GOOSE, Artifact::ENDLESS_SACK_GOLD, Artifact::ENDLESS_BAG_GOLD,
-                Artifact::ENDLESS_PURSE_GOLD, Artifact::UNKNOWN };
+                Artifact::ENDLESS_PURSE_GOLD, Artifact::ENDLESS_POUCH_SULFUR, Artifact::ENDLESS_VIAL_MERCURY,
+                Artifact::ENDLESS_POUCH_GEMS, Artifact::ENDLESS_CORD_WOOD, Artifact::ENDLESS_CART_ORE,
+                Artifact::ENDLESS_POUCH_CRYSTAL, Artifact::UNKNOWN };
 
     for(u8 index = 0; artifacts[index] != Artifact::UNKNOWN; ++index)
 	for(KingdomHeroes::const_iterator
@@ -561,7 +529,7 @@ u32 Kingdom::GetIncome(void)
 	ith = heroes.begin(); ith != heroes.end(); ++ith)
 	resource.gold += (**ith).GetSecondaryValues(Skill::Secondary::ESTATES);
 
-    return resource.gold;
+    return resource;
 }
 
 const Heroes* Kingdom::GetBestHero(void) const

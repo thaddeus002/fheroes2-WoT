@@ -91,15 +91,8 @@ public:
     u8 GetRace(void) const;
 
     const Funds & GetFunds(void) const{ return resource; }
-    u16 GetFundsWood(void) const{ return resource.wood; }
-    u16 GetFundsMercury(void) const{ return resource.mercury; }
-    u16 GetFundsOre(void) const{ return resource.ore; }
-    u16 GetFundsSulfur(void) const{ return resource.sulfur; }
-    u16 GetFundsCrystal(void) const{ return resource.crystal; }
-    u16 GetFundsGems(void) const{ return resource.gems; }
-    u32 GetFundsGold(void) const{ return resource.gold; }
 
-    u32 GetIncome(void);
+    Funds GetIncome(void);
     const Heroes* GetBestHero(void) const;
     u32 GetArmiesStrength(void) const;
 

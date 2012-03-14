@@ -66,7 +66,7 @@ void AICastleDevelopment(Castle & c)
     if(c.isCastle())
     {
 	// build for capital or large golds
-	if(c.isCapital() || kingdom.GetFundsGold() > 8000)
+	if(c.isCapital() || kingdom.GetFunds().Get(Resource::GOLD) > 8000)
 	{
 	    if(!c.isBuild(BUILD_STATUE))
 		c.BuyBuilding(BUILD_STATUE);

@@ -105,7 +105,7 @@ void GetGoldsInfo(std::vector<ValueColors> & v, const Colors & colors)
     for(Colors::const_iterator
 	color = colors.begin(); color != colors.end(); ++color)
     {
-	    int value = world.GetKingdom(*color).GetFundsGold();
+	    int value = world.GetKingdom(*color).GetFunds().Get(Resource::GOLD);
 	    UpdateValuesColors(v, value, *color);
     }
 
@@ -119,8 +119,8 @@ void GetWoodOreInfo(std::vector<ValueColors> & v, const Colors & colors)
     for(Colors::const_iterator
 	color = colors.begin(); color != colors.end(); ++color)
     {
-	    const Kingdom & kingdom = world.GetKingdom(*color);
-	    int value = kingdom.GetFundsWood() + kingdom.GetFundsOre();
+	    const Funds & funds = world.GetKingdom(*color).GetFunds();
+	    int value = funds.Get(Resource::WOOD) + funds.Get(Resource::ORE);
 	    UpdateValuesColors(v, value, *color);
     }
 
@@ -134,11 +134,9 @@ void GetGemsCrSlfMerInfo(std::vector<ValueColors> & v, const Colors & colors)
     for(Colors::const_iterator
 	color = colors.begin(); color != colors.end(); ++color)
     {
-	    const Kingdom & kingdom = world.GetKingdom(*color);
-	    int value = kingdom.GetFundsGems() +
-			kingdom.GetFundsCrystal() +
-			kingdom.GetFundsSulfur() +
-			kingdom.GetFundsMercury();
+	    const Funds & funds = world.GetKingdom(*color).GetFunds();
+	    int value = funds.Get(Resource::GEMS) + funds.Get(Resource::CRYSTAL) +
+			funds.Get(Resource::SULFUR) + funds.Get(Resource::MERCURY);
 	    UpdateValuesColors(v, value, *color);
     }
 
@@ -180,7 +178,7 @@ void GetIncomesInfo(std::vector<ValueColors> & v, const Colors & colors)
     for(Colors::const_iterator
 	color = colors.begin(); color != colors.end(); ++color)
     {
-	    int value = world.GetKingdom(*color).GetIncome();
+	    int value = world.GetKingdom(*color).GetIncome().gold;
 	    UpdateValuesColors(v, value, *color);
     }
 

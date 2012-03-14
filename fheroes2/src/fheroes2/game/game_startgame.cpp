@@ -1242,6 +1242,7 @@ void Game::EventContinueMovement(void)
 
 void Game::EventKingdomInfo(void)
 {
+    VERBOSE("income: " << world.GetKingdom(Settings::Get().CurrentColor()).GetIncome().String());
 }
 
 void Game::EventCastSpell(void)
