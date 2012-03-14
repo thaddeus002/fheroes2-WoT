@@ -1799,6 +1799,15 @@ s8 Castle::GetLuckModificator(std::string *strs) const
 
 void Castle::RecruitAllMonster(void)
 {
+    bool skip_recruit = false;
+
+    // skip recruit: AI with customization of empty army
+    if(Modes(CUSTOMARMY) &&
+	CONTROL_AI == GetControl() &&
+	! army.isValid() && ! army.HasMonster(Monster(Monster::UNKNOWN)))
+	skip_recruit = true;
+
+    if(! skip_recruit)
     for(u32 dw = DWELLING_MONSTER6; dw >= DWELLING_MONSTER1; dw >>= 1)
 	if(isBuild(dw)) RecruitMaxMonster(dw);
 }
