@@ -50,6 +50,7 @@ public:
     void 	SetBackgroundSprite(const Surface &);
     void	SetCursorSprite(const Surface &);
     void 	SetInterval(u8);
+    void 	SetVerticalSpace(u8);
 
     void        SetChangeMode(void);
     void	SetReadOnly(void);
@@ -66,6 +67,7 @@ private:
     Heroes &		hero;
     Rect		pos;
     u8			interval;
+    u8			vspace;
     s8			selected;
     u8			flags;
     Point		offset;

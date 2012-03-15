@@ -29,6 +29,9 @@
 #include "heroes.h"
 #include "world.h"
 #include "kingdom.h"
+#include "skill.h"
+#include "army.h"
+#include "selectartifactbar.h"
 #include "interface_icons.h"
 #include "interface_list.h"
 
@@ -75,6 +78,7 @@ void StatsHeroesList::RedrawItem(const HEROESPTR & hero, s16 dstx, s16 dsty, boo
 	const Sprite & back = AGG::GetICN(ICN::OVERVIEW, 10);
 	back.Blit(dstx, dsty);
 
+	// base info
 	Interface::RedrawHeroesIcon(*hero, dstx + 5, dsty + 4);
 
 	text.Set(GetString(hero->GetAttack()));
@@ -88,6 +92,30 @@ void StatsHeroesList::RedrawItem(const HEROESPTR & hero, s16 dstx, s16 dsty, boo
 
 	text.Set(GetString(hero->GetKnowledge()));
 	text.Blit(dstx + 195 - text.w(), dsty + 20);
+
+	// secondary skills info
+/*
+	SecondarySkillBar secskillsInfo;
+	secskillsInfo.SetPos(dstx + 203, dsty + 3);
+	secskillsInfo.SetInterval(1);
+	secskillsInfo.SetUseMiniSprite();
+	secskillsInfo.SetSkills(hero->GetSecondarySkills());
+	secskillsInfo.Redraw();
+*/
+	// artifacts info
+	SelectArtifactsBar artifactsInfo(*hero);
+
+	artifactsInfo.SetPos(Point(dstx + 348, dsty + 3));
+	artifactsInfo.SetInterval(1);
+	artifactsInfo.SetVerticalSpace(8);
+	artifactsInfo.SetReadOnly();
+
+	artifactsInfo.SetBackgroundSprite(AGG::GetICN(ICN::OVERVIEW, 12));
+	artifactsInfo.SetUseArts32Sprite();
+	artifactsInfo.Redraw();
+
+	// army info
+	Army::DrawMons32Line(hero->GetArmy(), dstx + 5, dsty + 42, 192);
     }
 }
 
@@ -158,6 +186,7 @@ void StatsCastlesList::RedrawItem(const CASTLEPTR & cstl, s16 dstx, s16 dsty, bo
 	const Sprite & back = AGG::GetICN(ICN::OVERVIEW, 11);
 	back.Blit(dstx, dsty);
 
+	// base info
 	Interface::RedrawCastleIcon(*cstl, dstx + 17, dsty + 19);
 
 	const Heroes* hero = cstl->GetHeroes().GuardFirst();
@@ -167,6 +196,21 @@ void StatsCastlesList::RedrawItem(const CASTLEPTR & cstl, s16 dstx, s16 dsty, bo
 
 	text.Set(cstl->GetName());
 	text.Blit(dstx + 72 - text.w() / 2, dsty + 62);
+
+	// army info
+	Army::DrawMons32Line(cstl->GetArmy(), dstx + 155, dsty + 30, 180);
+
+	// available
+	Army::army_t army(NULL);
+	const u32 dwellings[] = { DWELLING_MONSTER1, DWELLING_MONSTER2, DWELLING_MONSTER3, DWELLING_MONSTER4, DWELLING_MONSTER5, DWELLING_MONSTER6 };
+
+	for(u8 ii = 0; ii < ARRAY_COUNT(dwellings); ++ii)
+	{
+    	    u16 count = cstl->GetDwellingLivedCount(dwellings[ii]);
+    	    if(count) army.JoinTroop(Monster(cstl->GetRace(), cstl->GetActualDwelling(dwellings[ii])), count);
+	}
+
+	Army::DrawMons32Line(army, dstx + 360, dsty + 30, 220);
     }
 }
 

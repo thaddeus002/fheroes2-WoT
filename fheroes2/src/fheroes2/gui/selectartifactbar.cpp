@@ -44,7 +44,7 @@ enum
     FLAGS_CHANGEMODE	= 0x04
 };
 
-SelectArtifactsBar::SelectArtifactsBar(Heroes &h) : hero(h), interval(0), selected(-1), flags(0), background(NULL)
+SelectArtifactsBar::SelectArtifactsBar(Heroes &h) : hero(h), interval(0), vspace(0), selected(-1), flags(0), background(NULL)
 {
 }
 
@@ -95,7 +95,6 @@ void SelectArtifactsBar::SetPos(const Point & pt)
 }
 
 void SelectArtifactsBar::SetPos(s16 cx, s16 cy)
-    
 {
     pos.x = cx;
     pos.y = cy;
@@ -121,6 +120,11 @@ void SelectArtifactsBar::SetCursorSprite(const Surface & sf)
 	offset.x = (background->w() - sf.w()) / 2;
 	offset.y = (background->h() - sf.h()) / 2;
     }
+}
+
+void SelectArtifactsBar::SetVerticalSpace(const u8 val)
+{
+    vspace = val;
 }
 
 void SelectArtifactsBar::SetInterval(const u8 it)
@@ -183,7 +187,7 @@ void SelectArtifactsBar::Redraw(Surface & dst)
     }
 
     pt.x = pos.x;
-    pt.y += background->h() + interval;
+    pt.y += background->h() + (vspace ? vspace : interval);
 
     for(u8 ii = 0; ii < MAXARTIFACTLINE; ++ii)
     {
