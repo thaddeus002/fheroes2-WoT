@@ -73,4 +73,7 @@ char*	sdl_getenv(const char* env);
 bool	IsFile(const std::string &, bool writable = false);
 bool	IsDirectory(const std::string &, bool writable = false);
 
+Points GetLinePoints(const Point & pt1, const Point & pt2, u16 step);
+Points GetArcPoints(const Point & from, const Point & to, const Point & max, u16 step);
+
 #endif

@@ -47,14 +47,15 @@ void Background::Save(void)
     // resize background
     if(Surface::isValid() && (Size::w != Surface::w() || Size::h != Surface::h())) FreeSurface(*this);
 
-    if(0 == Rect::w || 0 == Rect::h) return;
-
-    if(! Surface::isValid())
+    if(0 < Rect::w && 0 < Rect::h)
     {
-	Set(Rect::w, Rect::h, false);
-	SetDisplayFormat();
+	if(! Surface::isValid())
+	{
+	    Set(Rect::w, Rect::h, false);
+	    SetDisplayFormat();
+	}
+	display.Blit(*this, 0, 0, *this);
     }
-    display.Blit(*this, 0, 0, *this);
 }
 
 void Background::Save(s16 ax, s16 ay)

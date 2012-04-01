@@ -81,11 +81,11 @@ void SpriteCursor::Move(s16 ax, s16 ay)
 
 void SpriteCursor::Hide(void)
 {
-    if(!visible) return;
-
-    Restore();
-
-    visible = false;
+    if(visible)
+    {
+	Restore();
+	visible = false;
+    }
 }
 
 void SpriteCursor::Redraw(void)

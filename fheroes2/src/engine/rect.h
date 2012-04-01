@@ -35,6 +35,8 @@ struct Point
     bool operator== (const Point & pt) const;
     bool operator!= (const Point & pt) const;
 
+    bool inABC(const Point &, const Point &, const Point &) const;
+
     Point & operator+=(const Point & pt);
     Point & operator-=(const Point & pt);
 };

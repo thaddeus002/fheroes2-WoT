@@ -88,6 +88,11 @@ size_t QueueMessage::Size(void) const
     return itd2 - data;
 }
 
+bool QueueMessage::isID(u16 id) const
+{
+    return type == id;
+}
+
 u16 QueueMessage::GetID(void) const
 {
     return type;
@@ -195,9 +200,21 @@ QueueMessage & QueueMessage::operator<< (u8 v)
     return *this;
 }
 
+QueueMessage & QueueMessage::operator>> (u8 & v)
+{
+    Pop(v);
+    return *this;
+}
+
 QueueMessage & QueueMessage::operator<< (s8 v)
 {
     Push(v);
+    return *this;
+}
+
+QueueMessage & QueueMessage::operator>> (s8 & v)
+{
+    Pop(v);
     return *this;
 }
 
@@ -207,9 +224,21 @@ QueueMessage & QueueMessage::operator<< (u16 v)
     return *this;
 }
 
+QueueMessage & QueueMessage::operator>> (u16 & v)
+{
+    Pop(v);
+    return *this;
+}
+
 QueueMessage & QueueMessage::operator<< (s16 v)
 {
     Push(v);
+    return *this;
+}
+
+QueueMessage & QueueMessage::operator>> (s16 & v)
+{
+    Pop(v);
     return *this;
 }
 
@@ -219,9 +248,21 @@ QueueMessage & QueueMessage::operator<< (u32 v)
     return *this;
 }
 
+QueueMessage & QueueMessage::operator>> (u32 & v)
+{
+    Pop(v);
+    return *this;
+}
+
 QueueMessage & QueueMessage::operator<< (s32 v)
 {
     Push(v);
+    return *this;
+}
+
+QueueMessage & QueueMessage::operator>> (s32 & v)
+{
+    Pop(v);
     return *this;
 }
 
@@ -231,9 +272,21 @@ QueueMessage & QueueMessage::operator<< (bool v)
     return *this;
 }
 
+QueueMessage & QueueMessage::operator>> (bool & v)
+{
+    Pop(v);
+    return *this;
+}
+
 QueueMessage & QueueMessage::operator<< (const std::string & v)
 {
     Push(v);
+    return *this;
+}
+
+QueueMessage & QueueMessage::operator>> (std::string & v)
+{
+    Pop(v);
     return *this;
 }
 

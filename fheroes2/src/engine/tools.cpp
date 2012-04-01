@@ -777,3 +777,75 @@ bool IsDirectory(const std::string & name, bool writable)
 
     return writable ? 0 == access(name.c_str(), W_OK) : S_IRUSR & fs.st_mode;
 }
+
+Points GetLinePoints(const Point & pt1, const Point & pt2, u16 step)
+{
+    Points res;
+    res.reserve(10);
+
+    const u16 dx = std::abs(pt2.x - pt1.x);
+    const u16 dy = std::abs(pt2.y - pt1.y);
+
+    s16 ns = std::div((dx > dy ? dx : dy), 2).quot;
+    Point pt(pt1);
+
+    for(u16 i = 0; i <= (dx > dy ? dx : dy); ++i)
+    {
+        if(dx > dy)
+        {
+            pt.x < pt2.x ? ++pt.x : --pt.x;
+            ns -= dy;
+        }
+        else
+        {
+            pt.y < pt2.y ? ++pt.y : --pt.y;
+            ns -= dx;
+        }
+
+        if(ns < 0)
+        {
+            if(dx > dy)
+            {
+                pt.y < pt2.y ? ++pt.y : --pt.y;
+                ns += dx;
+            }
+            else
+            {
+                pt.x < pt2.x ? ++pt.x : --pt.x;
+                ns += dy;
+            }
+        }
+
+        if(0 == (i % step)) res.push_back(pt);
+    }
+
+    return res;
+}
+
+Points GetArcPoints(const Point & from, const Point & to, const Point & max, u16 step)
+{
+    Points res;
+    Point pt1, pt2;
+
+    pt1 = from;
+    pt2 = Point(from.x + std::abs(max.x - from.x) / 2, from.y - std::abs(max.y - from.y) * 3 / 4);
+    const Points & pts1 = GetLinePoints(pt1, pt2, step);
+    res.insert(res.end(), pts1.begin(), pts1.end());
+
+    pt1 = pt2;
+    pt2 = max;
+    const Points & pts2 = GetLinePoints(pt1, pt2, step);
+    res.insert(res.end(), pts2.begin(), pts2.end());
+
+    pt1 = max;
+    pt2 = Point(max.x + std::abs(to.x - max.x)  / 2, to.y - std::abs(to.y - max.y) * 3 / 4);
+    const Points & pts3 = GetLinePoints(pt1, pt2, step);
+    res.insert(res.end(), pts3.begin(), pts3.end());
+
+    pt1 = pt2;
+    pt2 = to;
+    const Points & pts4 = GetLinePoints(pt1, pt2, step);
+    res.insert(res.end(), pts4.begin(), pts4.end());
+
+    return res;
+}
