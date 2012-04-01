@@ -36,7 +36,7 @@
 struct BattleOnly;
 #endif
 
-namespace Army { class army_t; }
+class Army;
 
 enum { MDF_NONE, MDF_ATTACK, MDF_DEFENSE, MDF_POWER, MDF_KNOWLEDGE, MDF_MORALE, MDF_LUCK };
 
@@ -51,8 +51,8 @@ public:
     virtual u8 GetControl(void) const = 0;
     virtual bool isValid(void) const = 0;
 
-    virtual const Army::army_t & GetArmy(void) const = 0;
-    virtual Army::army_t & GetArmy(void) = 0;
+    virtual const Army & GetArmy(void) const = 0;
+    virtual Army & GetArmy(void) = 0;
 
     virtual u16 GetMaxSpellPoints(void) const = 0;
 

@@ -133,12 +133,12 @@ u16 Captain::GetSecondaryValues(u8) const
     return 0;
 }
 
-const Army::army_t & Captain::GetArmy(void) const
+const Army & Captain::GetArmy(void) const
 {
     return home.GetArmy();
 }
 
-Army::army_t & Captain::GetArmy(void)
+Army & Captain::GetArmy(void)
 {
     return home.GetArmy();
 }

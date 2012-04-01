@@ -31,8 +31,8 @@
 #include "client.h"
 #include "kingdom.h"
 #include "race.h"
-#include "battle2.h"
-#include "battle_stats.h"
+#include "battle.h"
+#include "battle_troop.h"
 #include "remoteclient.h"
 #include "zzlib.h"
 

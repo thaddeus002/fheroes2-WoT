@@ -24,7 +24,7 @@
 #include "cursor.h"
 #include "settings.h"
 #include "gamedefs.h"
-#include "battle2.h"
+#include "battle.h"
 #include "world.h"
 #include "army.h"
 #include "castle.h"
@@ -50,7 +50,7 @@ void RedrawPrimarySkillInfo(const Point &, const Skill::Primary*, const Skill::P
 struct ControlInfo
 {
     ControlInfo(const Point & pt, u8 & ctrl) : result(ctrl),
-	rtLocal(pt.x, pt.y, 24, 24), rtAI(pt.x + 60, pt.y, 24, 24) {};
+	rtLocal(pt.x, pt.y, 24, 24), rtAI(pt.x + 75, pt.y, 24, 24) {};
 
     void Redraw(void);
     
@@ -84,9 +84,9 @@ struct BattleOnly
     Player	player1;
     Player	player2;
 
-    Army::army_t* army1;
-    Army::army_t* army2;
-    Army::army_t monsters;
+    Army* army1;
+    Army* army2;
+    Army monsters;
 
     MoraleIndicator* moraleIndicator1;
     MoraleIndicator* moraleIndicator2;
@@ -233,7 +233,7 @@ bool BattleOnly::ChangeSettings(void)
 	selectArmy2.Redraw();
     }
 
-    monsters.At(0) = Army::Troop(Monster::PEASANT, 100);
+    monsters.GetTroop(0)->Set(Monster::PEASANT, 100);
     army2 = hero2 ? &hero2->GetArmy() : &monsters;
 
     selectArmy2.SetArmy(*army2);
@@ -329,7 +329,7 @@ bool BattleOnly::ChangeSettings(void)
 		hero2 = world.GetHeroes(hid);
 		UpdateHero2(cur_pt);
 		if(player2.isLocal() && NULL == cinfo2)
-		    cinfo2 = new ControlInfo(Point(cur_pt.x + 510, cur_pt.y + 425), player2.control);
+		    cinfo2 = new ControlInfo(Point(cur_pt.x + 500, cur_pt.y + 425), player2.control);
 		redraw = true;
 	    }
 	}
@@ -808,7 +808,7 @@ void BattleOnly::StartBattle(void)
       hero2->Recruit(player2.color, Point(5, 6));
     }
 
-    Battle2::Loader(hero1->GetArmy(), (hero2 ? hero2->GetArmy() : monsters), hero1->GetIndex() + 1);
+    Battle::Loader(hero1->GetArmy(), (hero2 ? hero2->GetArmy() : monsters), hero1->GetIndex() + 1);
 }
 
 Game::menu_t Game::StartBattleOnly(void)

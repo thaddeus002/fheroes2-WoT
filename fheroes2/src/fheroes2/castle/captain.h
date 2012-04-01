@@ -51,8 +51,8 @@ class Captain : public HeroBase
     u8  GetLevelSkill(u8) const;
     u16 GetSecondaryValues(u8) const;
 
-    const Army::army_t & GetArmy(void) const;
-    Army::army_t & GetArmy(void);
+    const Army & GetArmy(void) const;
+    Army & GetArmy(void);
 
     u16 GetMaxSpellPoints(void) const;
 

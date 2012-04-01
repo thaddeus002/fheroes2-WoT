@@ -24,8 +24,7 @@
 #include "castle.h"
 #include "heroes.h"
 #include "dialog.h"
-#include "battle2.h"
-#include "battle_arena.h"
+#include "battle.h"
 #include "ai.h"
 
 const char* AI::Type(void)
@@ -58,6 +57,10 @@ void AI::HeroesPreBattle(HeroBase &)
 {
 }
 
+void AI::HeroesAfterBattle(HeroBase &)
+{
+}
+
 void AI::HeroesAction(Heroes &, s32)
 {
 }
@@ -75,12 +78,12 @@ void AI::KingdomTurn(Kingdom &)
 {
 }
 
-void AI::BattleTurn(Battle2::Arena &, const Battle2::Stats & b, Battle2::Actions & a)
+void AI::BattleTurn(Battle::Arena &, const Battle::Unit & b, Battle::Actions & a)
 {
-    a.AddedEndAction(b);
+//    a.AddedEndAction(b);
 }
 
-void AI::BattleMagicTurn(Battle2::Arena &, const Battle2::Stats &, Battle2::Actions &, const Battle2::Stats*)
+bool AI::BattleMagicTurn(Battle::Arena &, const Battle::Unit &, Battle::Actions &, const Battle::Unit*)
 {
 }
 

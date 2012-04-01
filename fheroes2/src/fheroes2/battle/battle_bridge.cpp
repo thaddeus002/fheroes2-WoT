@@ -21,111 +21,100 @@
  ***************************************************************************/
 
 #include "castle.h"
-#include "battle_stats.h"
 #include "battle_cell.h"
+#include "battle_troop.h"
 #include "battle_interface.h"
 #include "battle_bridge.h"
 
-Battle2::Bridge::Bridge(Arena & a) : arena(a), destroy(false), down(false)
+Battle::Bridge::Bridge() : destroy(false), down(false)
 {
 }
 
-bool Battle2::Bridge::isIndex(u16 index)
-{
-    switch(index)
-    {
-	case 49:
-	case 50: return true;
-	default: break;
-    }
-    return false;
-}
-
-bool Battle2::Bridge::isValid(void) const
+bool Battle::Bridge::isValid(void) const
 {
     return !isDestroy();
 }
 
-bool Battle2::Bridge::isDestroy(void) const
+bool Battle::Bridge::isDestroy(void) const
 {
     return destroy;
 }
 
-bool Battle2::Bridge::isDown(void) const
+bool Battle::Bridge::isDown(void) const
 {
     return down || isDestroy();
 }
 
-void Battle2::Bridge::SetDown(bool f)
+void Battle::Bridge::SetDown(bool f)
 {
     down = f;
 }
 
-bool Battle2::Bridge::AllowUp(void) const
+bool Battle::Bridge::AllowUp(void) const
 {
-    return NULL == arena.GetTroopBoard(49) && NULL == arena.GetTroopBoard(50);
+    return NULL == Board::GetCell(49)->GetUnit() && NULL == Board::GetCell(50)->GetUnit();
 }
 
-bool Battle2::Bridge::NeedDown(const Stats & b, u16 pos2) const
+bool Battle::Bridge::NeedDown(const Unit & b, s16 pos2) const
 {
-    const u16 pos1 = b.GetPosition();
+    const s16 pos1 = b.GetHeadIndex();
 
     if(pos2 == 50)
     {
 	if(pos1 == 51) return true;
-	if((pos1 == 61 || pos1 == 39) && b.GetColor() == arena.castle->GetColor()) return true;
+	if((pos1 == 61 || pos1 == 39) && b.GetColor() == Arena::GetCastle()->GetColor()) return true;
     }
     else
     if(pos2 == 49)
     {
-	if(pos1 != 50 && b.GetColor() == arena.castle->GetColor()) return true;
+	if(pos1 != 50 && b.GetColor() == Arena::GetCastle()->GetColor()) return true;
     }
 
     return false;
 }
 
-bool Battle2::Bridge::isPassable(u8 color) const
+bool Battle::Bridge::isPassable(u8 color) const
 {
-    return color == arena.castle->GetColor() || isDown();
+    return color == Arena::GetCastle()->GetColor() || isDown();
 }
 
-void Battle2::Bridge::SetDestroy(void)
+void Battle::Bridge::SetDestroy(void)
 {
     destroy = true;
-    arena.board[49].object = 0;
-    arena.board[50].object = 0;
+    Board::GetCell(49)->SetObject(0);
+    Board::GetCell(50)->SetObject(0);
 }
 
-void Battle2::Bridge::SetPassable(const Stats & b)
+void Battle::Bridge::SetPassable(const Unit & b)
 {
-    if(Board::inCastle(b.GetPosition()) || b.GetColor() == arena.castle->GetColor())
+    if(Board::isCastleIndex(b.GetHeadIndex()) || b.GetColor() == Arena::GetCastle()->GetColor())
     {
-	arena.board[49].object = 0;
-	arena.board[50].object = 0;
+	Board::GetCell(49)->SetObject(0);
+	Board::GetCell(50)->SetObject(0);
     }
     else
     {
-	arena.board[49].object = 1;
-	arena.board[50].object = 1;
+	Board::GetCell(49)->SetObject(1);
+	Board::GetCell(50)->SetObject(1);
     }
 }
 
 
-bool Battle2::Bridge::NeedAction(const Stats & b, u16 dst) const
+bool Battle::Bridge::NeedAction(const Unit & b, s16 dst) const
 {
     return (!isDown() && NeedDown(b, dst)) ||
 	    (isValid() && isDown() && AllowUp());
 }
 
-void Battle2::Bridge::Action(const Stats & b, u16 dst)
+void Battle::Bridge::Action(const Unit & b, s16 dst)
 {
     bool action_down = false;
 
     if(!isDown() && NeedDown(b, dst))
 	action_down = true;
 
-    if(arena.interface)
-	arena.interface->RedrawBridgeAnimation(action_down);
+    if(Arena::GetInterface())
+	Arena::GetInterface()->RedrawBridgeAnimation(action_down);
 
     SetDown(action_down);
 }

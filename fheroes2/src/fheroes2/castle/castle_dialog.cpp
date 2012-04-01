@@ -459,7 +459,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	// move hero to guardian
 	if(conf.ExtCastleAllowGuardians() && !readonly && heroes.Guest() && !heroes.Guard() && le.MouseClickLeft(rectSign1))
 	{
-	    if(! heroes.Guest()->GetArmy().CanJoinArmy(army))
+	    if(! heroes.Guest()->GetArmy().CanJoinTroops(army))
 	    {
 		// FIXME: correct message
 		Dialog::Message("Join Error", "Army is full", Font::BIG, Dialog::OK);
@@ -469,7 +469,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 		heroes.Guest()->SetModes(Heroes::GUARDIAN);
 		heroes.Guest()->ResetModes(Heroes::SLEEPER);
 		heroes.Swap();
-		heroes.Guard()->GetArmy().JoinArmy(army);
+		heroes.Guard()->GetArmy().JoinTroops(army);
 
 		world.GetTiles(center).SetHeroes(NULL);
 

@@ -31,7 +31,7 @@
 #include "world.h"
 #include "visit.h"
 #include "race.h"
-#include "battle2.h"
+#include "battle.h"
 #include "kingdom.h"
 #include "players.h"
 #include "game_static.h"
@@ -39,7 +39,7 @@
 
 bool HeroesStrongestArmy(const Heroes* h1, const Heroes* h2)
 {
-    return h1 && h2 && h2->GetArmy().StrongerEnemyArmy(h1->GetArmy());
+    return h1 && h2 && Army::TroopsStrongerEnemyTroops(h2->GetArmy(), h1->GetArmy());
 }
 
 Kingdom::Kingdom() : color(Color::NONE), lost_town_days(0), visited_tents_colors(0)
@@ -121,7 +121,7 @@ void Kingdom::LossPostActions(void)
 	if(heroes.size())
 	{
 	    std::for_each(heroes.begin(), heroes.end(),
-		std::bind2nd(std::mem_fun(&Heroes::SetFreeman), static_cast<u8>(Battle2::RESULT_LOSS)));
+		std::bind2nd(std::mem_fun(&Heroes::SetFreeman), static_cast<u8>(Battle::RESULT_LOSS)));
 	    heroes.clear();
 	}
 	if(castles.size())

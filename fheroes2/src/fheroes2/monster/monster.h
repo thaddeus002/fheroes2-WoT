@@ -120,6 +120,7 @@ public:
     Monster(u8 = UNKNOWN);
     Monster(const Spell &);
     Monster(u8 race, u32 dw);
+    virtual ~Monster(){}
 
     bool operator< (const Monster &) const;
     bool operator== (const Monster &) const;
@@ -131,9 +132,12 @@ public:
     void Upgrade(void);
     Monster GetUpgrade(void) const;
 
-    u8 GetAttack(void) const;
-    u8 GetDefense(void) const;
-    u8 GetRace(void) const;
+    virtual u16 GetAttack(void) const;
+    virtual u16 GetDefense(void) const;
+    virtual u8 GetColor(void) const;
+    virtual s8 GetMorale(void) const;
+    virtual s8 GetLuck(void) const;
+    virtual u8 GetRace(void) const;
 
     u8  GetDamageMin(void) const;
     u8  GetDamageMax(void) const;
@@ -156,8 +160,14 @@ public:
     bool isArchers(void) const;
     bool isAllowUpgrade(void) const;
     bool isTwiceAttack(void) const;
+    bool isResurectLife(void) const;
+    bool isDoubleCellAttack(void) const;
+    bool isMultiCellAttack(void) const;
+    bool isAlwayResponse(void) const;
     bool isHideAttack(void) const;
     bool isDragons(void) const;
+    bool isAffectedByMorale(void) const;
+    bool isAlive(void) const;
 
     ICN::icn_t ICNMonh(void) const;
 

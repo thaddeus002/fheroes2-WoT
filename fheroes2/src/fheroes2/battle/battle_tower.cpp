@@ -23,10 +23,11 @@
 #include "castle.h"
 #include "settings.h"
 #include "battle_cell.h"
-#include "battle_stats.h"
+#include "battle_troop.h"
 #include "battle_tower.h"
 
-Battle2::Tower::Tower(const Castle & castle, u8 twr, Arena & a) : Army::Troop(Monster(Monster::ARCHER)), arena(a), type(twr), valid(true)
+Battle::Tower::Tower(const Castle & castle, u8 twr) : Unit(Troop(Monster::ARCHER, 0), -1, -1, false),
+    type(twr), color(castle.GetColor()), valid(true)
 {
     count += castle.CountBuildings();
     count += castle.GetLevelMageGuild() - 1;
@@ -35,22 +36,25 @@ Battle2::Tower::Tower(const Castle & castle, u8 twr, Arena & a) : Army::Troop(Mo
     if(TWR_CENTER != type) count /= 2;
     if(count == 0) count = 1;
 
-    BattleInit();
-    Stats* b = GetBattleStats();
-    b->SetModes(CAP_TOWER);
+    SetModes(CAP_TOWER);
 }
 
-bool Battle2::Tower::isValid(void) const
+bool Battle::Tower::isValid(void) const
 {
     return valid;
 }
 
-u8 Battle2::Tower::GetColor(void) const
+u8 Battle::Tower::GetType(void) const
 {
-    return arena.castle ? arena.castle->GetColor() : 0;
+    return type;
 }
 
-Point Battle2::Tower::GetPortPosition(void) const
+u8 Battle::Tower::GetColor(void) const
+{
+    return color;
+}
+
+Point Battle::Tower::GetPortPosition(void) const
 {
     Point res;
 
@@ -71,31 +75,12 @@ Point Battle2::Tower::GetPortPosition(void) const
     return res;
 }
 
-void Battle2::Tower::Action(void)
-{
-    Stats* b = GetBattleStats();
-
-    arena.ResetBoard();
-    arena.board.SetEnemyQuality(*b);
-
-    const Stats* enemy = arena.GetEnemyMaxQuality(GetColor());
-
-    if(enemy)
-    {
-	Battle2::Action action;
-	action.SetID(MSG_BATTLE_TOWER);
-	action.Push(type);
-	action.Push(enemy->id);
-	arena.ApplyAction(action);
-    }
-}
-
-void Battle2::Tower::SetDestroy(void)
+void Battle::Tower::SetDestroy(void)
 {
     switch(type)
     {
-	case TWR_LEFT:	arena.board[19].object = 1; break;
-	case TWR_RIGHT:	arena.board[85].object = 1; break;
+	case TWR_LEFT:	Board::GetCell(19)->SetObject(1); break;
+	case TWR_RIGHT:	Board::GetCell(85)->SetObject(1); break;
 	default: break;
     }
     valid = false;

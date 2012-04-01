@@ -27,42 +27,45 @@
 #include "artifact.h"
 #include "settings.h"
 #include "heroes_base.h"
-#include "battle_arena.h"
 #include "skill.h"
 #include "agg.h"
 #include "world.h"
 #include "kingdom.h"
 #include "server.h"
+#include "game.h"
 #include "ai.h"
+#include "battle_arena.h"
+#include "battle_army.h"
 #include "localclient.h"
-#include "battle2.h"
 
-void PlayPickupSound(void);
-
-namespace Battle2
+namespace Battle
 {
     void PickupArtifactsAction(HeroBase &, HeroBase &, bool);
     void EagleEyeSkillAction(HeroBase &, const SpellStorage &, bool);
-    void NecromancySkillAction(Army::army_t &, u32, bool);
+    void NecromancySkillAction(HeroBase &, u32, bool);
 }
 
-Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 mapsindex)
+Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
 {
     const Settings & conf = Settings::Get();
 
-    // AI:: PreBattle
-    if((CONTROL_AI & army1.GetControl()) && army1.GetCommander())
-	AI::HeroesPreBattle(*army1.GetCommander());
+    // pre battle army1
+    if(army1.GetCommander())
+    {
+	if(CONTROL_AI & army1.GetControl())
+    	    AI::HeroesPreBattle(*army1.GetCommander());
+        else
+	    army1.GetCommander()->ActionPreBattle();
+    }
 
-    if((CONTROL_AI & army2.GetControl()) && army2.GetCommander())
-	AI::HeroesPreBattle(*army2.GetCommander());
-
-    army1.BattleInit();
-    army2.BattleInit();
-
-    DEBUG(DBG_BATTLE, DBG_INFO, "start");
-    DEBUG(DBG_BATTLE, DBG_INFO, "army1 " << army1.String());
-    DEBUG(DBG_BATTLE, DBG_INFO, "army2 " << army2.String());
+    // pre battle army2
+    if(army2.GetCommander())
+    {
+	if(CONTROL_AI & army2.GetControl())
+    	    AI::HeroesPreBattle(*army2.GetCommander());
+        else
+	    army2.GetCommander()->ActionPreBattle();
+    }
 
     if(conf.ExtPocketLowMemory())
         AGG::ICNRegistryEnable(true);
@@ -75,26 +78,18 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
 
     Arena arena(army1, army2, mapsindex, local);
 
-    u16 turn = 1;
-
-    Result result;
+    DEBUG(DBG_BATTLE, DBG_INFO, "army1 " << army1.String());
+    DEBUG(DBG_BATTLE, DBG_INFO, "army2 " << army2.String());
 
 #ifdef WITH_NET
     if(Network::isLocalClient())
-	arena.NetworkTurn(result);
+	arena.NetworkTurn();
     else
 #endif
-    while(1)
-    {
-	if(local && conf.Music() && !Music::isPlaying())
-	    AGG::PlayMusic(MUS::GetBattleRandom(), false);
+    while(arena.BattleValid())
+	arena.Turns();
 
-	arena.Turns(turn, result);
-
-	if(result.army1 || result.army2) break;
-
-	++turn;
-    }
+    const Result & result = arena.GetResult();
 
 #ifdef WITH_NET
     if(Network::isRemoteClient())
@@ -106,52 +101,59 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
 
     AGG::ResetMixer();
 
-    Army::army_t *army_wins = (result.army1 & RESULT_WINS ? &army1 : (result.army2 & RESULT_WINS ? &army2 : NULL));
-    Army::army_t *army_loss = (result.army1 & RESULT_LOSS ? &army1 : (result.army2 & RESULT_LOSS ? &army2 : NULL));
+    HeroBase* hero_wins = (result.army1 & RESULT_WINS ? army1.GetCommander() : (result.army2 & RESULT_WINS ? army2.GetCommander() : NULL));
+    HeroBase* hero_loss = (result.army1 & RESULT_LOSS ? army1.GetCommander() : (result.army2 & RESULT_LOSS ? army2.GetCommander() : NULL));
     const u8 loss_result =  result.army1 & RESULT_LOSS ? result.army1 : result.army2;
 
-    // fix experience
-    if(army_wins && army_loss)
+    if(local)
     {
-	Army::army_t killed1, killed2;
-	army1.BattleExportKilled(killed1);
-	army2.BattleExportKilled(killed2);
-	result.exp1 = killed2.CalculateExperience();
-	result.exp2 = killed1.CalculateExperience();
+	// fade arena
+	arena.FadeArena();
+
+	// dialog summary
+	arena.DialogBattleSummary(result);
     }
 
-    // fade arena
-    if(local) arena.FadeArena();
+    // save count troop
+    arena.GetForce1().SyncArmyCount();
+    arena.GetForce2().SyncArmyCount();
 
-    // dialog summary
-    if(local) arena.DialogBattleSummary(result);
+    // after battle army1
+    if(army1.GetCommander())
+    {
+	if(CONTROL_AI & army1.GetControl())
+    	    AI::HeroesAfterBattle(*army1.GetCommander());
+        else
+	    army1.GetCommander()->ActionAfterBattle();
+    }
 
-    const u32 killed2 = army_loss ? army_loss->BattleKilled() : 0;
-
-    army1.BattleQuit();
-    army2.BattleQuit();
+    // after battle army2
+    if(army2.GetCommander())
+    {
+	if(CONTROL_AI & army2.GetControl())
+    	    AI::HeroesAfterBattle(*army2.GetCommander());
+        else
+	    army2.GetCommander()->ActionAfterBattle();
+    }
 
     // pickup artifact
-    if(army_wins && army_wins->GetCommander() &&
-	army_loss && army_loss->GetCommander() &&
+    if(hero_wins && hero_loss &&
 	!((RESULT_RETREAT | RESULT_SURRENDER) & loss_result) &&
-	Skill::Primary::HEROES == army_wins->GetCommander()->GetType() &&
-	Skill::Primary::HEROES == army_loss->GetCommander()->GetType())
-	PickupArtifactsAction(*army_wins->GetCommander(), *army_loss->GetCommander(), (CONTROL_HUMAN & army_wins->GetControl()));
+	Skill::Primary::HEROES == hero_wins->GetType() &&
+	Skill::Primary::HEROES == hero_loss->GetType())
+	PickupArtifactsAction(*hero_wins, *hero_loss, (CONTROL_HUMAN & hero_wins->GetControl()));
 
     // eagle eye capability
-    if(army_wins && army_wins->GetCommander() &&
-	army_loss && army_loss->GetCommander() &&
-	army_wins->GetCommander()->GetLevelSkill(Skill::Secondary::EAGLEEYE) &&
-	Skill::Primary::HEROES == army_loss->GetCommander()->GetType())
-	    EagleEyeSkillAction(*army_wins->GetCommander(), arena.GetUsageSpells(), (CONTROL_HUMAN & army_wins->GetControl()));
+    if(hero_wins && hero_loss &&
+	hero_wins->GetLevelSkill(Skill::Secondary::EAGLEEYE) &&
+	Skill::Primary::HEROES == hero_loss->GetType())
+	    EagleEyeSkillAction(*hero_wins, arena.GetUsageSpells(), (CONTROL_HUMAN & hero_wins->GetControl()));
 
     // necromancy capability
-    if(army_wins && army_wins->GetCommander() &&
-	army_wins->GetCommander()->GetLevelSkill(Skill::Secondary::NECROMANCY))
-	    NecromancySkillAction(*army_wins, killed2, (CONTROL_HUMAN & army_wins->GetControl()));
+    if(hero_wins &&
+	hero_wins->GetLevelSkill(Skill::Secondary::NECROMANCY))
+	    NecromancySkillAction(*hero_wins, result.killed, (CONTROL_HUMAN & hero_wins->GetControl()));
 
-    DEBUG(DBG_BATTLE, DBG_INFO, "end");
     DEBUG(DBG_BATTLE, DBG_INFO, "army1 " << army1.String());
     DEBUG(DBG_BATTLE, DBG_INFO, "army2 " << army1.String());
 
@@ -180,7 +182,7 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
     return result;
 }
 
-void Battle2::PickupArtifactsAction(HeroBase & hero1, HeroBase & hero2, bool local)
+void Battle::PickupArtifactsAction(HeroBase & hero1, HeroBase & hero2, bool local)
 {
     BagArtifacts & bag1 = hero1.GetBagArtifacts();
     BagArtifacts & bag2 = hero2.GetBagArtifacts();
@@ -202,7 +204,7 @@ void Battle2::PickupArtifactsAction(HeroBase & hero1, HeroBase & hero2, bool loc
         	*it = art;
         	if(local)
 		{
-		    PlayPickupSound();
+		    Game::PlayPickupSound();
 		    Dialog::ArtifactInfo(_("You have captured an enemy artifact!"), "", art);
 		}
     	    }
@@ -211,7 +213,7 @@ void Battle2::PickupArtifactsAction(HeroBase & hero1, HeroBase & hero2, bool loc
     }
 }
 
-void Battle2::EagleEyeSkillAction(HeroBase & hero, const SpellStorage & spells, bool local)
+void Battle::EagleEyeSkillAction(HeroBase & hero, const SpellStorage & spells, bool local)
 {
     if(spells.empty() ||
 	!hero.HaveSpellBook()) return;
@@ -257,7 +259,7 @@ void Battle2::EagleEyeSkillAction(HeroBase & hero, const SpellStorage & spells, 
 	    std::string msg = _("Through eagle-eyed observation, %{name} is able to learn the magic spell %{spell}.");
 	    String::Replace(msg, "%{name}", hero.GetName());
 	    String::Replace(msg, "%{spell}", sp.GetName());
-	    PlayPickupSound();
+	    Game::PlayPickupSound();
 	    Dialog::SpellInfo("", msg, sp);
 	}
     }
@@ -265,31 +267,31 @@ void Battle2::EagleEyeSkillAction(HeroBase & hero, const SpellStorage & spells, 
     hero.AppendSpellsToBook(new_spells, true);
 }
 
-void Battle2::NecromancySkillAction(Army::army_t & army1, u32 killed, bool local)
+void Battle::NecromancySkillAction(HeroBase & hero, u32 killed, bool local)
 {
-    if(0 == killed ||
-	(army1.GetCount() == army1.Size() && !army1.HasMonster(Monster::SKELETON))) return;
+    Army & army = hero.GetArmy();
 
-    const HeroBase* hero = army1.GetCommander();
+    if(0 == killed ||
+	(army.isFullHouse() && !army.HasMonster(Monster::SKELETON))) return;
 
     // check necromancy shrine build
-    u16 percent = 10 * world.GetKingdom(army1.GetColor()).GetCountNecromancyShrineBuild();
+    u16 percent = 10 * world.GetKingdom(army.GetColor()).GetCountNecromancyShrineBuild();
 
     // check artifact
-    u8 acount = hero->HasArtifact(Artifact::SPADE_NECROMANCY);
+    u8 acount = hero.HasArtifact(Artifact::SPADE_NECROMANCY);
     if(acount) percent += acount * 10;
 
     // fix over 60%
     if(percent > 60) percent = 60;
 
-    percent += hero->GetSecondaryValues(Skill::Secondary::NECROMANCY);
-    
+    percent += hero.GetSecondaryValues(Skill::Secondary::NECROMANCY);
+
     // hard fix overflow
     if(percent > 90) percent = 90;
 
     const Monster mons(Monster::SKELETON);
     const u32 count = Monster::GetCountFromHitPoints(Monster::SKELETON, mons.GetHitPoints() * killed * percent / 100);
-    army1.JoinTroop(mons, count);
+    army.JoinTroop(mons, count);
 
     if(local)
     {
@@ -301,7 +303,7 @@ void Battle2::NecromancySkillAction(Army::army_t & army1, u32 killed, bool local
 	sf2.Blit((sf1.w() - sf2.w()) / 2, 0, sf1);
 	Text text(GetString(count), Font::SMALL);
 	text.Blit((sf1.w() - text.w()) / 2, sf2.h() + 3, sf1);
-	PlayPickupSound();
+	Game::PlayPickupSound();
 
 	Dialog::SpriteInfo("", msg, sf1);
     }
@@ -309,7 +311,7 @@ void Battle2::NecromancySkillAction(Army::army_t & army1, u32 killed, bool local
     DEBUG(DBG_BATTLE, DBG_TRACE, "raise: " << count << mons.GetMultiName());
 }
 
-u8 Battle2::Result::AttackerResult(void) const
+u8 Battle::Result::AttackerResult(void) const
 {
     if(RESULT_SURRENDER & army1) return RESULT_SURRENDER;
     else
@@ -322,7 +324,7 @@ u8 Battle2::Result::AttackerResult(void) const
     return 0;
 }
 
-u8 Battle2::Result::DefenderResult(void) const
+u8 Battle::Result::DefenderResult(void) const
 {
     if(RESULT_SURRENDER & army2) return RESULT_SURRENDER;
     else
@@ -335,22 +337,32 @@ u8 Battle2::Result::DefenderResult(void) const
     return 0;
 }
 
-u32 Battle2::Result::GetExperienceAttacker(void) const
+u32 Battle::Result::GetExperienceAttacker(void) const
 {
     return exp1;
 }
 
-u32 Battle2::Result::GetExperienceDefender(void) const
+u32 Battle::Result::GetExperienceDefender(void) const
 {
     return exp2;
 }
 
-bool Battle2::Result::AttackerWins(void) const
+bool Battle::Result::AttackerWins(void) const
 {
     return army1 & RESULT_WINS;
 }
 
-bool Battle2::Result::DefenderWins(void) const
+bool Battle::Result::DefenderWins(void) const
 {
     return army2 & RESULT_WINS;
+}
+
+QueueMessage & Battle::operator<< (QueueMessage & msg, const Result & res)
+{
+    return msg << res.army1 << res.army2 << res.exp1 << res.exp2 << res.killed;
+}
+
+QueueMessage & Battle::operator>> (QueueMessage & msg, Result & res)
+{
+    return msg >> res.army1 >> res.army2 >> res.exp1 >> res.exp2 >> res.killed;
 }

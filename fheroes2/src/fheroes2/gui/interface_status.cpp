@@ -268,7 +268,7 @@ void Interface::StatusWindow::DrawResourceInfo(const u8 oh) const
 
 void Interface::StatusWindow::DrawArmyInfo(const u8 oh) const
 {
-    const Army::army_t* armies = NULL;
+    const Army* armies = NULL;
 
     if(GameFocus::GetHeroes())
 	armies = &GameFocus::GetHeroes()->GetArmy();

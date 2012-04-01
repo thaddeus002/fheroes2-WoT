@@ -32,8 +32,8 @@
 class heroes;
 class Castle;
 class Kingdom;
-namespace Army { class army_t; }
-namespace Battle2 { class Arena; class Result; }
+class Army;
+namespace Battle { class Arena; class Result; }
 
 class FH2LocalClient : public FH2Client
 {
@@ -59,12 +59,12 @@ public:
     static void SendHeroesBuyMagicBook(const Heroes &);
     static void SendHeroesSwapArtifacts(const Heroes &, u8, const Heroes &, u8);
 
-    static void SendArmyUpgradeTroop(const Army::army_t &, u8);
-    static void SendArmyDismissTroop(const Army::army_t &, u8);
-    static void SendArmySwapTroops(const Army::army_t &, u8, const Army::army_t &, u8);
-    static void SendArmySplitTroop(const Army::army_t &, u8, const Army::army_t &, u8, u16);
-    static void SendArmyJoinTroops(const Army::army_t &, u8, const Army::army_t &, u8);
-    static void SendArmyCombatFormation(const Army::army_t &);
+    static void SendArmyUpgradeTroop(const Army &, u8);
+    static void SendArmyDismissTroop(const Army &, u8);
+    static void SendArmySwapTroops(const Army &, u8, const Army &, u8);
+    static void SendArmySplitTroop(const Army &, u8, const Army &, u8, u16);
+    static void SendArmyJoinTroops(const Army &, u8, const Army &, u8);
+    static void SendArmyCombatFormation(const Army &);
 
     static void SendUpdateBattleOnlySettings(const BattleOnly &);
 

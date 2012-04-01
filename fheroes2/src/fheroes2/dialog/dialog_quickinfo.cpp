@@ -40,7 +40,7 @@
 std::string ShowGuardiansInfo(const Maps::Tiles & tile, u8 scoute)
 {
     std::string str;
-    const Army::Troop & troop = tile.QuantityTroop();
+    const Troop & troop = tile.QuantityTroop();
 
     if(MP2::OBJ_MINES == tile.GetObject())
         str = Maps::GetMinesName(tile.QuantityResourceCount().first);
@@ -62,7 +62,7 @@ std::string ShowGuardiansInfo(const Maps::Tiles & tile, u8 scoute)
 std::string ShowMonsterInfo(const Maps::Tiles & tile, u8 scoute)
 {
     std::string str;
-    const Army::Troop & troop = tile.QuantityTroop();
+    const Troop & troop = tile.QuantityTroop();
 
     if(scoute)
     {
@@ -119,7 +119,7 @@ std::string ShowDwellingInfo(const Maps::Tiles & tile, u8 scoute)
     if(scoute)
     {
 	str.append("\n");
-	const Army::Troop & troop = tile.QuantityTroop();
+	const Troop & troop = tile.QuantityTroop();
 	if(troop.isValid())
 	{
 	    str.append(_("(available: %{count})"));

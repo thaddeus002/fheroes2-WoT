@@ -31,7 +31,7 @@
 #include "network.h"
 
 class FH2Server;
-namespace Battle2
+namespace Battle
 {
     class Actions;
     class Arena;

@@ -288,7 +288,7 @@ u32 Castle::OpenTown(void)
     const std::string descriptionGroupedArmyFormat(_("'Grouped' combat formation bunches your army toget her in the center of your side of the battlefield."));
     const Point pointSpreadArmyFormat(rectSpreadArmyFormat.x - 1, rectSpreadArmyFormat.y - 1);
     const Point pointGroupedArmyFormat(rectGroupedArmyFormat.x - 1, rectGroupedArmyFormat.y - 1);
-    SpriteCursor cursorFormat(AGG::GetICN(ICN::HSICONS, 11), Army::FORMAT_SPREAD == army.GetCombatFormat() ? pointSpreadArmyFormat : pointGroupedArmyFormat);
+    SpriteCursor cursorFormat(AGG::GetICN(ICN::HSICONS, 11), army.isSpreadFormat() ? pointSpreadArmyFormat : pointGroupedArmyFormat);
     if(isBuild(BUILD_CAPTAIN))
     {
 	Text text(_("Attack Skill") + std::string(" "), Font::SMALL);
@@ -330,7 +330,7 @@ u32 Castle::OpenTown(void)
 	spriteSpreadArmyFormat.Blit(rectSpreadArmyFormat.x, rectSpreadArmyFormat.y);
 	spriteGroupedArmyFormat.Blit(rectGroupedArmyFormat.x, rectGroupedArmyFormat.y);
 
-	cursorFormat.Show(Army::FORMAT_SPREAD == army.GetCombatFormat() ? pointSpreadArmyFormat : pointGroupedArmyFormat);
+	cursorFormat.Show(army.isSpreadFormat() ? pointSpreadArmyFormat : pointGroupedArmyFormat);
     }
 
     Kingdom & kingdom = world.GetKingdom(GetColor());
@@ -467,25 +467,25 @@ u32 Castle::OpenTown(void)
 	else
 	if(isBuild(BUILD_CAPTAIN))
 	{
-	    if(le.MouseClickLeft(rectSpreadArmyFormat) && Army::FORMAT_SPREAD != army.GetCombatFormat())
+	    if(le.MouseClickLeft(rectSpreadArmyFormat) && ! army.isSpreadFormat())
     	    {
         	cursor.Hide();
         	cursorFormat.Move(pointSpreadArmyFormat);
         	cursor.Show();
         	display.Flip();
-        	army.SetCombatFormat(Army::FORMAT_SPREAD);
+        	army.SetSpreadFormat(true);
 #ifdef WITH_NET
         	FH2LocalClient::SendArmyCombatFormation(army);
 #endif
     	    }
 	    else
-    	    if(le.MouseClickLeft(rectGroupedArmyFormat) && Army::FORMAT_SPREAD == army.GetCombatFormat())
+    	    if(le.MouseClickLeft(rectGroupedArmyFormat) && army.isSpreadFormat())
     	    {
         	cursor.Hide();
         	cursorFormat.Move(pointGroupedArmyFormat);
         	cursor.Show();
         	display.Flip();
-        	army.SetCombatFormat(Army::FORMAT_GROUPED);
+        	army.SetSpreadFormat(false);
 #ifdef WITH_NET
         	FH2LocalClient::SendArmyCombatFormation(army);
 #endif

@@ -24,82 +24,76 @@
 #define H2ARMYTROOP_H
 
 #include <string>
-#include "bitmodes.h"
-#include "color.h"
 #include "monster.h"
 
-namespace Battle2 { class Stats; }
-namespace Skill { class Primary; }
+class Army;
 
-namespace Army
+class Troop : public Monster
 {
-    class army_t;
-    class Troop;
+public:
+    Troop();
+    Troop(const Monster &, u32);
 
-    bool isValidTroop(const Troop & troop);
-    bool WeakestTroop(const Troop & t1, const Troop & t2);
-    bool StrongestTroop(const Troop & t1, const Troop & t2);
-    bool SlowestTroop(const Troop & t1, const Troop & t2);
-    void SwapTroops(Troop & t1, Troop & t2);
+    bool		operator== (const Monster &) const;
+    Monster		operator() (void) const;
 
-    class Troop : public Monster
-    {
-      public:
-        Troop();
-        Troop(const Monster &, u32 c = 0);
-        Troop(const Troop &);
-	~Troop();
+    void		Set(const Troop &);
+    void		Set(const Monster &, u32);
+    void		SetMonster(const Monster &);
+    void		SetCount(u32);
+    void		Reset(void);
 
-	bool	operator== (const Monster &) const;
-        Troop & operator= (const Troop &);
-	Monster operator() (void) const;
+    bool		isMonster(u8) const;
+    const char*		GetName(void) const;
+    virtual u32		GetCount(void) const;
+    u32			GetHitPoints(void) const;
+    Monster		GetMonster(void) const;
 
-        void	Set(const Monster &, u32);
-        void	SetMonster(const Monster &);
-        void	SetCount(u32);
-        void	Reset(void);
-        
-        void		SetArmy(army_t*);
-        army_t*         GetArmy(void);
-        const army_t*   GetArmy(void) const;
-	const char*     GetName(u32 amount = 0) const;
+    u32			GetDamageMin(void) const;
+    u32			GetDamageMax(void) const;
+    u32			GetStrength(void) const;
 
-        u32 		Count(void) const { return GetCount(); }
-        u32 		GetCount(void) const;
-        
-	u8		GetAttack(bool = true) const;
-	u8		GetDefense(bool = true) const;
-	u32		GetHitPoints(void) const;
 
-	u8		GetColor(void) const;
-        u8		GetSpeed(void) const;
+    payment_t		GetCost(void) const;
+    payment_t		GetUpgradeCost(void) const;
 
-	const Battle2::Stats*	GetBattleStats(void) const;
-	Battle2::Stats*		GetBattleStats(void);
+    virtual bool	isValid(void) const;
+    virtual bool	isBattle(void) const;
+    virtual bool	isModes(u32) const;
+    virtual std::string	GetAttackString(void) const;
+    virtual std::string	GetDefenseString(void) const;
+    virtual std::string	GetShotString(void) const;
+    virtual std::string	GetSpeedString(void) const;
+    virtual u32		GetHitPointsLeft(void) const;
+    virtual u8		GetSpeed(void) const;
+    virtual u16		GetAffectedDuration(u32) const;
 
-        u32		GetDamageMin(void) const;
-	u32		GetDamageMax(void) const;
-	u32		GetStrength(void) const;
+protected:
+    u32			count;
+};
 
-        s8		GetMorale(void) const;
-	s8		GetLuck(void) const;
+class ArmyTroop : public Troop
+{
+public:
+    ArmyTroop(Army*);
+    ArmyTroop(Army*, const Troop &);
 
-        bool		isValid(void) const;
-        bool    	isAffectedByMorale(void) const;
+    ArmyTroop &		operator= (const Troop &);
 
-	bool		BattleInit(void);
-	void		BattleQuit(void);
-	u32		BattleKilled(void) const;
-	s8		GetArmyIndex(void) const;
+    u16			GetAttack(void) const;
+    u16			GetDefense(void) const;
+    u8			GetColor(void) const;
+    s8			GetMorale(void) const;
+    s8			GetLuck(void) const;
 
-	payment_t	GetCost(void) const;
-	payment_t	GetUpgradeCost(void) const;
+    void		SetArmy(const Army &);
+    const Army*		GetArmy(void) const;
 
-      protected:
-        u32		count;
-	army_t*		army;
-	Battle2::Stats*	battle;
-    };
-}
+    std::string		GetAttackString(void) const;
+    std::string		GetDefenseString(void) const;
+
+protected:
+    const Army*		army;
+};
 
 #endif

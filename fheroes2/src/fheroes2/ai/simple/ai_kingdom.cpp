@@ -133,7 +133,7 @@ void AI::KingdomTurn(Kingdom & kingdom)
 	kingdom.LossPostActions();
 	return;
     }
-    
+
     if(! Settings::Get().MusicMIDI()) AGG::PlayMusic(MUS::COMPUTER);
 
     Interface::StatusWindow *status = Interface::NoGUI() ? NULL : &Interface::StatusWindow::Get();
@@ -214,7 +214,7 @@ void AI::KingdomTurn(Kingdom & kingdom)
     // set hunters
     if(ai.capital)
     {
-	const size_t hunters = 
+	const size_t hunters =
 		std::count_if(heroes.begin(), heroes.end(),
 			std::bind2nd(std::mem_fun(&Heroes::Modes), Heroes::HUNTER));
 
@@ -233,7 +233,7 @@ void AI::KingdomTurn(Kingdom & kingdom)
 	// each month
 	if(world.BeginMonth() && 1 < world.CountDay())
 	{
-	    KingdomHeroes::iterator it = 
+	    KingdomHeroes::iterator it =
 		    std::find_if(heroes.begin(), heroes.end(),
 			std::bind2nd(std::mem_fun(&Heroes::Modes), Heroes::HUNTER));
 

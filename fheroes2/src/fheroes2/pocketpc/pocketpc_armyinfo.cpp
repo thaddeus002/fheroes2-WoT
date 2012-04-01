@@ -27,14 +27,13 @@
 #include "button.h"
 #include "army.h"
 #include "selectarmybar.h"
-#include "army.h"
-#include "battle_stats.h"
+#include "army_troop.h"
 #include "pocketpc.h"
 
-void DrawMonsterStats(const Point &, const Army::Troop &);
-void DrawBattleStats(const Point &, const Battle2::Stats &);
+void DrawMonsterStats(const Point &, const Troop &);
+void DrawBattleStats(const Point &, const Troop &);
 
-Dialog::answer_t PocketPC::DialogArmyInfo(const Army::Troop & troop, u16 flags)
+Dialog::answer_t PocketPC::DialogArmyInfo(const Troop & troop, u16 flags)
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
@@ -50,29 +49,26 @@ Dialog::answer_t PocketPC::DialogArmyInfo(const Army::Troop & troop, u16 flags)
     frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH, (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
     frameborder.Redraw();
 
-    const Monster & mons = troop;
-    const Battle2::Stats* battle = troop.GetBattleStats();
-
     const Rect & dst_rt = frameborder.GetArea();
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
     background.Blit(Rect(0, 0, window_w, window_h), dst_rt);
 
     // name
     Text text;
-    text.Set(mons.GetName(), Font::BIG);
+    text.Set(troop.GetName(), Font::BIG);
     text.Blit(dst_rt.x + (dst_rt.w - text.w()) / 2, dst_rt.y + 10);
 
     const Sprite & frame = AGG::GetICN(troop.ICNMonh(), 0);
     frame.Blit(dst_rt.x + 50 - frame.w() / 2, dst_rt.y + 145 - frame.h());
 
-    text.Set(GetString(battle ? battle->GetCount() : troop.GetCount()));
+    text.Set(GetString(troop.GetCount()));
     text.Blit(dst_rt.x + 50 - text.w() / 2, dst_rt.y + 150);
 
     // stats
     DrawMonsterStats(Point(dst_rt.x + 200, dst_rt.y + 40), troop);
 
-    if(battle)
-        DrawBattleStats(Point(dst_rt.x + 160, dst_rt.y + 160), *battle);
+    if(troop.isBattle())
+        DrawBattleStats(Point(dst_rt.x + 160, dst_rt.y + 160), troop);
 
     Button buttonDismiss(dst_rt.x + dst_rt.w / 2 - 160, dst_rt.y + dst_rt.h - 30, ICN::VIEWARMY, 1, 2);
     Button buttonUpgrade(dst_rt.x + dst_rt.w / 2 - 60, dst_rt.y + dst_rt.h - 30, ICN::VIEWARMY, 5, 6);
@@ -84,7 +80,7 @@ Dialog::answer_t PocketPC::DialogArmyInfo(const Army::Troop & troop, u16 flags)
         buttonDismiss.SetDisable(true);
     }
 
-    if(!(Dialog::BATTLE & flags) && mons.isAllowUpgrade())
+    if(!(Dialog::BATTLE & flags) && troop.isAllowUpgrade())
     {
 	if(Dialog::UPGRADE & flags)
         {

@@ -20,33 +20,34 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2BATTLE2_TOWER_H
-#define H2BATTLE2_TOWER_H
+#ifndef H2BATTLE_TOWER_H
+#define H2BATTLE_TOWER_H
 
-#include "army_troop.h"
 #include "gamedefs.h"
-#include "battle_arena.h"
+#include "battle_troop.h"
 
 class Castle;
 
-namespace Battle2
+namespace Battle
 {
-    class Tower : public Army::Troop
+    enum { TWR_LEFT, TWR_CENTER, TWR_RIGHT };
+
+    class Tower : public Unit
     {
     public:
-	Tower(const Castle &, u8, Arena &);
+	Tower(const Castle &, u8);
 
-	bool isValid(void) const;
-	u8   GetColor(void) const;
+	bool	isValid(void) const;
+	u8	GetColor(void) const;
+	u8	GetType(void) const;
 
-	void SetDestroy(void);
-	void Action(void);
-	Point GetPortPosition(void) const;
+	void	SetDestroy(void);
+	Point	GetPortPosition(void) const;
 
     private:
-	Arena & arena;
-	const u8 type;
-	bool valid;
+	u8	type;
+	u8	color;
+	bool	valid;
     };
 }
 

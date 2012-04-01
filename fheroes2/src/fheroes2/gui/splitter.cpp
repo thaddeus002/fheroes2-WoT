@@ -65,39 +65,43 @@ void Splitter::SetRange(u16 smin, u16 smax)
 
     // recalculate step
     if(max) step = (Splitter::VERTICAL == position ? 100 * (area.h - h()) / (max - min) : 100 * (area.w - w()) / (max - min));
-    
+
     Splitter::Move(min);
 }
 
 /* move splitter to pos */
 void Splitter::Move(u16 pos)
 {
-    if(pos && cur == pos) return;
-
-    if(pos > max || pos < min){ DEBUG(DBG_ENGINE, DBG_WARN, "out of range" << ", min: " << min << ", max: " << max << ", cur: " << cur << ", step: " << step); return; }
-
-    Point pt(GetRect().x, GetRect().y);
-
-    cur = pos;
-
-    if(Splitter::VERTICAL == position)
-        pt.y = area.y + cur * step / 100;
-    else
-        pt.x = area.x + cur * step / 100;
-
-    // move center
-    if(!max) Splitter::VERTICAL == position ? pt.y = area.y + (area.h - h()) / 2 : pt.x = area.x + (area.w - w());
-
-    if(Cursor::Get().isVisible()) Cursor::Get().Hide();
-
-    if(isVisible())
+    if(pos > max || pos < min)
     {
-	SpriteCursor::Hide();
-	SpriteCursor::Move(pt);
-	SpriteCursor::Show();
+	DEBUG(DBG_ENGINE, DBG_WARN, "out of range" << ", min: " << min << ", max: " << max << ", cur: " << cur << ", step: " << step);
     }
     else
-	SpriteCursor::Save(pt);
+    if(cur != pos)
+    {
+	Point pt(GetRect().x, GetRect().y);
+
+	cur = pos;
+
+	if(Splitter::VERTICAL == position)
+    	    pt.y = area.y + cur * step / 100;
+	else
+    	    pt.x = area.x + cur * step / 100;
+
+	// move center
+	if(!max) Splitter::VERTICAL == position ? pt.y = area.y + (area.h - h()) / 2 : pt.x = area.x + (area.w - w());
+
+	Cursor::Get().Hide();
+
+	if(isVisible())
+	{
+	    SpriteCursor::Hide();
+	    SpriteCursor::Move(pt);
+	    SpriteCursor::Show();
+	}
+	else
+	    SpriteCursor::Save(pt);
+    }
 }
 
 /* forward spliter */

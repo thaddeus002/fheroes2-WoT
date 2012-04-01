@@ -34,9 +34,16 @@
 #include "heroes.h"
 #include "battle_interface.h"
 #include "battle_arena.h"
-#include "battle2.h"
+#include "battle_army.h"
+#include "battle.h"
 
-void BattleSpeedRedraw(const Point & dst)
+namespace Battle
+{
+    void GetSummaryParams(u8 res1, u8 res2, const std::string &, u32 exp, ICN::icn_t &, std::string &);
+    void SpeedRedraw(const Point &);
+}
+
+void Battle::SpeedRedraw(const Point & dst)
 {
     u8 speed = Settings::Get().BattleSpeed();
     std::string str = _("speed: %{speed}");
@@ -49,7 +56,7 @@ void BattleSpeedRedraw(const Point & dst)
     text.Blit(dst.x + (sprite.w() - text.w()) / 2, dst.y + sprite.h() - 15);
 }
 
-void Battle2::DialogBattleSettings(void)
+void Battle::DialogBattleSettings(void)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
@@ -71,7 +78,7 @@ void Battle2::DialogBattleSettings(void)
 
     display.FillRect(0x00, 0x00, 0x00, back.GetRect());
     dialog.Blit(pos_rt.x, pos_rt.y);
-    
+
     Button btn_ok(pos_rt.x + 113, pos_rt.y + 252, (conf.ExtGameEvilInterface() ? ICN::CSPANBTE : ICN::CSPANBTN), 0, 1);
 
     Rect   opt_speed(pos_rt.x + 36, pos_rt.y + 47, AGG::GetICN(ICN::CSPANEL, 0).w(), AGG::GetICN(ICN::CSPANEL, 0).h());
@@ -85,7 +92,7 @@ void Battle2::DialogBattleSettings(void)
     if(conf.ExtBattleShowMoveShadow()) opt_shadow_movement.Press();
     if(conf.ExtBattleShowMouseShadow()) opt_shadow_cursor.Press();
 
-    BattleSpeedRedraw(opt_speed);
+    SpeedRedraw(opt_speed);
 
     opt_grid.Draw();
     opt_shadow_movement.Draw();
@@ -104,7 +111,7 @@ void Battle2::DialogBattleSettings(void)
 	    conf.SetBattleSpeed((conf.BattleSpeed() + 1) % 11);
 	    Game::UpdateBattleSpeed();
 	    cursor.Hide();
-	    BattleSpeedRedraw(opt_speed);
+	    SpeedRedraw(opt_speed);
 	    cursor.Show();
 	    display.Flip();
 	}
@@ -138,7 +145,7 @@ void Battle2::DialogBattleSettings(void)
 	    cursor.Show();
 	    display.Flip();
 	}
-	
+
         // exit
 	if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(btn_ok)) break;
     }
@@ -150,15 +157,15 @@ void Battle2::DialogBattleSettings(void)
     display.Flip();
 }
 
-void GetSummaryParams(u8 res1, u8 res2, const std::string & name, u32 exp, ICN::icn_t & icn_anim, std::string & msg)
+void Battle::GetSummaryParams(u8 res1, u8 res2, const std::string & name, u32 exp, ICN::icn_t & icn_anim, std::string & msg)
 {
-    if(res1 & Battle2::RESULT_WINS)
+    if(res1 & RESULT_WINS)
     {
 	icn_anim = ICN::WINCMBT;
-	if(res2 & Battle2::RESULT_SURRENDER)
+	if(res2 & RESULT_SURRENDER)
     	    msg.append(_("The enemy has surrendered!"));
     	else
-	if(res2 & Battle2::RESULT_RETREAT)
+	if(res2 & RESULT_RETREAT)
     	    msg.append(_("The enemy has fled!"));
 	else
 	    msg.append(_("A glorious victory!"));
@@ -168,14 +175,14 @@ void GetSummaryParams(u8 res1, u8 res2, const std::string & name, u32 exp, ICN::
     	String::Replace(msg, "%{exp}", exp);
     }
     else
-    if(res1 & Battle2::RESULT_RETREAT)
+    if(res1 & RESULT_RETREAT)
     {
 	icn_anim = ICN::CMBTFLE3;
 	msg.append(_("The cowardly %{name} flees from battle."));
     	String::Replace(msg, "%{name}", name);
     }
     else
-    if(res1 & Battle2::RESULT_SURRENDER)
+    if(res1 & RESULT_SURRENDER)
     {
 	icn_anim = ICN::CMBTSURR;
 	msg.append(_("%{name} surrenders to the enemy, and departs in shame."));
@@ -189,18 +196,15 @@ void GetSummaryParams(u8 res1, u8 res2, const std::string & name, u32 exp, ICN::
     }
 }
 
-void Battle2::Arena::DialogBattleSummary(const Result & res) const
+void Battle::Arena::DialogBattleSummary(const Result & res) const
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
     LocalEvent & le = LocalEvent::Get();
     Settings & conf = Settings::Get();
 
-    Army::army_t killed1;
-    army1.BattleExportKilled(killed1);
-    Army::army_t killed2;
-    army2.BattleExportKilled(killed2);
-
+    const Troops killed1 = army1->GetKilledTroops();
+    const Troops killed2 = army2->GetKilledTroops();
 
     cursor.Hide();
     cursor.SetThemes(Cursor::POINTER);
@@ -208,32 +212,32 @@ void Battle2::Arena::DialogBattleSummary(const Result & res) const
     std::string msg;
     ICN::icn_t icn_anim = ICN::UNKNOWN;
 
-    if((res.army1 & RESULT_WINS) && army1.GetCommander() && (CONTROL_HUMAN & army1.GetCommander()->GetControl()))
+    if((res.army1 & RESULT_WINS) && army1->GetCommander() && (CONTROL_HUMAN & army1->GetCommander()->GetControl()))
     {
-    	GetSummaryParams(res.army1, res.army2, army1.GetCommander()->GetName(), res.exp1, icn_anim, msg);
+    	GetSummaryParams(res.army1, res.army2, army1->GetCommander()->GetName(), res.exp1, icn_anim, msg);
 	if(conf.Music()) AGG::PlayMusic(MUS::BATTLEWIN, false);
     }
     else
-    if((res.army2 & RESULT_WINS) && army2.GetCommander() && (CONTROL_HUMAN & army2.GetCommander()->GetControl()))
+    if((res.army2 & RESULT_WINS) && army2->GetCommander() && (CONTROL_HUMAN & army2->GetCommander()->GetControl()))
     {
-    	GetSummaryParams(res.army2, res.army1, army2.GetCommander()->GetName(), res.exp2, icn_anim, msg);
+    	GetSummaryParams(res.army2, res.army1, army2->GetCommander()->GetName(), res.exp2, icn_anim, msg);
 	if(conf.Music()) AGG::PlayMusic(MUS::BATTLEWIN, false);
     }
     else
-    if(army1.GetCommander() && (CONTROL_HUMAN & army1.GetCommander()->GetControl()))
+    if(army1->GetCommander() && (CONTROL_HUMAN & army1->GetCommander()->GetControl()))
     {
-    	GetSummaryParams(res.army1, res.army2, army1.GetCommander()->GetName(), res.exp1, icn_anim, msg);
+    	GetSummaryParams(res.army1, res.army2, army1->GetCommander()->GetName(), res.exp1, icn_anim, msg);
 	if(conf.Music()) AGG::PlayMusic(MUS::BATTLELOSE, false);
     }
     else
-    if(army2.GetCommander() && (CONTROL_HUMAN & army2.GetCommander()->GetControl()))
+    if(army2->GetCommander() && (CONTROL_HUMAN & army2->GetCommander()->GetControl()))
     {
-    	GetSummaryParams(res.army2, res.army1, army2.GetCommander()->GetName(), res.exp2, icn_anim, msg);
+    	GetSummaryParams(res.army2, res.army1, army2->GetCommander()->GetName(), res.exp2, icn_anim, msg);
 	if(conf.Music()) AGG::PlayMusic(MUS::BATTLELOSE, false);
     }
     else
     // AI move
-    if(army1.GetCommander() && (CONTROL_AI & army1.GetCommander()->GetControl()))
+    if(army1->GetCommander() && (CONTROL_AI & army1->GetCommander()->GetControl()))
     {
 	// AI wins
 	if(res.army1 & RESULT_WINS)
@@ -315,7 +319,7 @@ void Battle2::Arena::DialogBattleSummary(const Result & res) const
     }
 
     btn_ok.Draw();
-    
+
     cursor.Show();
     display.Flip();
 
@@ -353,7 +357,7 @@ void Battle2::Arena::DialogBattleSummary(const Result & res) const
     display.Flip();
 }
 
-u8 Battle2::Arena::DialogBattleHero(const HeroBase & hero) const
+u8 Battle::Arena::DialogBattleHero(const HeroBase & hero) const
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
@@ -498,7 +502,7 @@ u8 Battle2::Arena::DialogBattleHero(const HeroBase & hero) const
     return result;
 }
 
-bool Battle2::DialogBattleSurrender(const HeroBase & hero, u32 cost)
+bool Battle::DialogBattleSurrender(const HeroBase & hero, u32 cost)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();

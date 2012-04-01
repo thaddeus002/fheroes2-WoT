@@ -201,7 +201,7 @@ void StatsCastlesList::RedrawItem(const CASTLEPTR & cstl, s16 dstx, s16 dsty, bo
 	Army::DrawMons32Line(cstl->GetArmy(), dstx + 155, dsty + 30, 180);
 
 	// available
-	Army::army_t army(NULL);
+	Army army;
 	const u32 dwellings[] = { DWELLING_MONSTER1, DWELLING_MONSTER2, DWELLING_MONSTER3, DWELLING_MONSTER4, DWELLING_MONSTER5, DWELLING_MONSTER6 };
 
 	for(u8 ii = 0; ii < ARRAY_COUNT(dwellings); ++ii)

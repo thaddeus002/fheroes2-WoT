@@ -259,6 +259,8 @@ namespace Game
     void EventSwitchShowIcons(void);
     void EventSwitchShowControlPanel(void);
 
+    void PlayPickupSound(void);
+
     void DisableChangeMusic(bool);
     bool ChangeMusicDisabled(void);
 

@@ -96,7 +96,7 @@ const char* Game::EventsName(events_t evnt)
 	case EVENT_BATTLE_SURRENDER:	return "battle surrender";
 	case EVENT_BATTLE_AUTOSWITCH:	return "battle auto switch";
 	case EVENT_BATTLE_OPTIONS:	return "battle options";
-	case EVENT_BATTLE_HARDSKIP:	return "battle hard skip";
+	case EVENT_BATTLE_HARDSKIP:	return "battle.hard skip";
 	case EVENT_BATTLE_SOFTSKIP:	return "battle soft skip";
 
 	case EVENT_MOVELEFT:		return "move left";

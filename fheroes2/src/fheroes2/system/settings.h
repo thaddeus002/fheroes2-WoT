@@ -199,7 +199,7 @@ public:
 
 	BATTLE_ARCHMAGE_RESIST_BAD_SPELL= 0x40001000,
 	BATTLE_MAGIC_TROOP_RESIST	= 0x40002000,
-	BATTLE_TROOP_DIRECTION		= 0x40008000,
+	//UNUSED			= 0x40008000,
 	BATTLE_SOFT_WAITING		= 0x40010000,
 	BATTLE_REVERSE_WAIT_ORDER	= 0x40020000,
         BATTLE_MERGE_ARMIES		= 0x40100000,
@@ -321,7 +321,6 @@ public:
     bool ExtCastleGuildRestorePointsTurn(void) const;
     bool ExtCastleAllowRecruitSpecialHeroes(void) const;
     bool ExtBattleShowDamage(void) const;
-    bool ExtBattleTroopDirection(void) const;
     bool ExtBattleSoftWait(void) const;
     bool ExtBattleMagicTroopCanResist(void) const;
     bool ExtBattleArchmageCanResistBadMagic(void) const;

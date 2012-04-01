@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2010 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *   Copyright (C) 2012 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
@@ -20,42 +20,54 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2BATTLE2_BRIDGE_H
-#define H2BATTLE2_BRIDGE_H
+#include <algorithm>
+#include "battle_troop.h"
+#include "battle_board.h"
+#include "battle_grave.h"
 
-#include "gamedefs.h"
-#include "battle_arena.h"
-
-namespace Battle2
+Battle::Indexes Battle::Graveyard::GetClosedCells(void) const
 {
-    class Stats;
+    Indexes res;
+    res.reserve(size());
 
-    class Bridge
-    {
-    public:
-	Bridge(Arena & a);
+    for(const_iterator it = begin(); it != end(); ++it)
+        res.push_back((*it).first);
 
-	bool NeedAction(const Stats &, u16) const;
-	void Action(const Stats &, u16);
-
-	void SetDestroy(void);
-	void SetDown(bool);
-	void SetPassable(const Stats &);
-
-	bool AllowUp(void) const;
-	bool NeedDown(const Stats &, u16) const;
-	bool isPassable(u8) const;
-	bool isValid(void) const;
-	bool isDestroy(void) const;
-	bool isDown(void) const;
-
-	static bool isIndex(u16);
-
-    private:
-	Arena & arena;
-	bool destroy;
-	bool down;
-    };
+    return res;
 }
 
-#endif
+void Battle::Graveyard::AddTroop(const Unit & b)
+{
+    Graveyard & map = *this;
+
+    map[b.GetHeadIndex()].push_back(b.GetUID());
+
+    if(b.isWide())
+        map[b.GetTailIndex()].push_back(b.GetUID());
+}
+
+void Battle::Graveyard::RemoveTroop(const Unit & b)
+{
+    Graveyard & map = *this;
+    TroopUIDs & ids = map[b.GetHeadIndex()];
+
+    TroopUIDs::iterator it = std::find(ids.begin(), ids.end(), b.GetUID());
+    if(it != ids.end()) ids.erase(it);
+
+    if(b.isWide())
+    {
+        TroopUIDs & ids2 = map[b.GetTailIndex()];
+
+        it = std::find(ids2.begin(), ids2.end(), b.GetUID());
+        if(it != ids2.end()) ids2.erase(it);
+    }
+}
+
+u32 Battle::Graveyard::GetLastTroopUID(s16 index) const
+{
+    for(const_iterator it = begin(); it != end(); ++it)
+        if(index == (*it).first && (*it).second.size())
+        return (*it).second.back();
+
+    return 0;
+}

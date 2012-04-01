@@ -34,10 +34,10 @@
 #include "heroes.h"
 #include "kingdom.h"
 #include "army.h"
-#include "battle2.h"
+#include "battle.h"
 #include "battle_arena.h"
 #include "battle_cell.h"
-#include "battle_stats.h"
+#include "battle_troop.h"
 #include "battle_tower.h"
 #include "battle_interface.h"
 #include "game_interface.h"
@@ -162,7 +162,7 @@ bool FH2LocalClient::StartGame(void)
 
 			if(hero1 && hero2)
 			{
-			    Battle2::Loader(hero1->GetArmy(), hero2->GetArmy(), dst);
+			    Battle::Loader(hero1->GetArmy(), hero2->GetArmy(), dst);
 			}
 			else
 			    DEBUG(DBG_NETWORK, DBG_WARN, "MSG_BATTLE" << ", " << "unknown param");
@@ -402,7 +402,7 @@ void FH2LocalClient::SendHeroesSwapArtifacts(const Heroes & hero1, u8 index1, co
     client.Send(packet);
 }
 
-void FH2LocalClient::SendArmyUpgradeTroop(const Army::army_t & army, u8 index)
+void FH2LocalClient::SendArmyUpgradeTroop(const Army & army, u8 index)
 {
     const HeroBase* commander = army.GetCommander();
     if(!Network::isLocalClient() || !commander) return;
@@ -419,7 +419,7 @@ void FH2LocalClient::SendArmyUpgradeTroop(const Army::army_t & army, u8 index)
     client.Send(packet);
 }
 
-void FH2LocalClient::SendArmyDismissTroop(const Army::army_t & army, u8 index)
+void FH2LocalClient::SendArmyDismissTroop(const Army & army, u8 index)
 {
     const HeroBase* commander = army.GetCommander();
     if(!Network::isLocalClient() || !commander) return;
@@ -436,7 +436,7 @@ void FH2LocalClient::SendArmyDismissTroop(const Army::army_t & army, u8 index)
     client.Send(packet);
 }
 
-void FH2LocalClient::SendArmySwapTroops(const Army::army_t & army1, u8 index1, const Army::army_t & army2, u8 index2)
+void FH2LocalClient::SendArmySwapTroops(const Army & army1, u8 index1, const Army & army2, u8 index2)
 {
     const HeroBase* commander1 = army1.GetCommander();
     const HeroBase* commander2 = army2.GetCommander();
@@ -457,7 +457,7 @@ void FH2LocalClient::SendArmySwapTroops(const Army::army_t & army1, u8 index1, c
     client.Send(packet);
 }
 
-void FH2LocalClient::SendArmySplitTroop(const Army::army_t & army1, u8 index1, const Army::army_t & army2, u8 index2, u16 count)
+void FH2LocalClient::SendArmySplitTroop(const Army & army1, u8 index1, const Army & army2, u8 index2, u16 count)
 {
     const HeroBase* commander1 = army1.GetCommander();
     const HeroBase* commander2 = army2.GetCommander();
@@ -479,7 +479,7 @@ void FH2LocalClient::SendArmySplitTroop(const Army::army_t & army1, u8 index1, c
     client.Send(packet);
 }
 
-void FH2LocalClient::SendArmyJoinTroops(const Army::army_t & army1, u8 index1, const Army::army_t & army2, u8 index2)
+void FH2LocalClient::SendArmyJoinTroops(const Army & army1, u8 index1, const Army & army2, u8 index2)
 {
     const HeroBase* commander1 = army1.GetCommander();
     const HeroBase* commander2 = army2.GetCommander();
@@ -500,7 +500,7 @@ void FH2LocalClient::SendArmyJoinTroops(const Army::army_t & army1, u8 index1, c
     client.Send(packet);
 }
 
-void FH2LocalClient::SendArmyCombatFormation(const Army::army_t & army)
+void FH2LocalClient::SendArmyCombatFormation(const Army & army)
 {
     const HeroBase* commander = army.GetCommander();
     if(!Network::isLocalClient() || !commander) return;
@@ -511,7 +511,7 @@ void FH2LocalClient::SendArmyCombatFormation(const Army::army_t & army)
     packet.SetID(MSG_ARMY_COMBAT_FORMATION);
     packet.Push(static_cast<u8>(commander->GetType()));
     packet.Push(commander->GetIndex());
-    packet.Push(army.GetCombatFormat());
+    packet.Push(army.isSpreadFormat());
 
     DEBUG(DBG_NETWORK, DBG_INFO, "");
     client.Send(packet);

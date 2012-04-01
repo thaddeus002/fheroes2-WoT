@@ -210,8 +210,8 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     const Point army2_pt(dst_pt.x - 1, dst_pt.y - 1);
 
     // cursor format
-    SpriteCursor cursorFormat(AGG::GetICN(ICN::HSICONS, 11), Army::FORMAT_SPREAD == army.GetCombatFormat() ? army1_pt : army2_pt);
-    cursorFormat.Show(Army::FORMAT_SPREAD == army.GetCombatFormat() ? army1_pt : army2_pt);
+    SpriteCursor cursorFormat(AGG::GetICN(ICN::HSICONS, 11), army.isSpreadFormat() ? army1_pt : army2_pt);
+    cursorFormat.Show(army.isSpreadFormat() ? army1_pt : army2_pt);
 
     // experience
     ExperienceIndicator experienceInfo(*this);
@@ -396,25 +396,25 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
         else
         if(le.MouseClickLeft(rectKnowledgeSkill)) Dialog::Message(_("Knowledge"), knowledgeDescription, Font::BIG, Dialog::OK);
 	else
-        if(!readonly && le.MouseClickLeft(rectSpreadArmyFormat) && Army::FORMAT_SPREAD != army.GetCombatFormat())
+        if(!readonly && le.MouseClickLeft(rectSpreadArmyFormat) && !army.isSpreadFormat())
         {
 	    cursor.Hide();
 	    cursorFormat.Move(army1_pt);
 	    cursor.Show();
 	    display.Flip();
-    	    army.SetCombatFormat(Army::FORMAT_SPREAD);
+    	    army.SetSpreadFormat(true);
 #ifdef WITH_NET
             FH2LocalClient::SendArmyCombatFormation(army);
 #endif
         }
 	else
-        if(!readonly && le.MouseClickLeft(rectGroupedArmyFormat) && Army::FORMAT_SPREAD == army.GetCombatFormat())
+        if(!readonly && le.MouseClickLeft(rectGroupedArmyFormat) && army.isSpreadFormat())
         {
 	    cursor.Hide();
 	    cursorFormat.Move(army2_pt);
 	    cursor.Show();
 	    display.Flip();
-    	    army.SetCombatFormat(Army::FORMAT_GROUPED);
+    	    army.SetSpreadFormat(false);
 #ifdef WITH_NET
             FH2LocalClient::SendArmyCombatFormation(army);
 #endif
@@ -510,16 +510,17 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
         if(le.MouseCursor(selectArmy.GetArea()))
         {
             const s8 index1 = selectArmy.GetIndexFromCoord(le.GetMouseCursor());
-            if(0 <= index1)
+            const Troop* troop1 = army.GetTroop(index1);
+
+            if(troop1)
             {
-                const Army::Troop & troop1 = army.At(index1);
-                const std::string & monster1 = troop1.GetName();
+                const std::string & monster1 = troop1->GetName();
 
                 if(selectArmy.isSelected())
                 {
                     const u8 index2 = selectArmy.Selected();
-                    const Army::Troop & troop2 = army.At(index2);
-                    const std::string & monster2 = troop2.GetName();
+                    const Troop* troop2 = army.GetTroop(index2);
+                    const std::string & monster2 = troop2->GetName();
 
                     if(index1 == index2)
             	    {
@@ -527,9 +528,9 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
                 	String::Replace(message, "%{monster}", monster1);
             	    }
                     else
-                    if(troop1.isValid() && troop2.isValid())
+                    if(troop1->isValid() && troop2->isValid())
                     {
-                        message = troop1() == troop2() ? _("Combine %{monster1} armies") : _("Exchange %{monster2} with %{monster1}");
+                        message = troop1->GetID() == troop2->GetID() ? _("Combine %{monster1} armies") : _("Exchange %{monster2} with %{monster1}");
                 	String::Replace(message, "%{monster1}", monster1);
                 	String::Replace(message, "%{monster2}", monster2);
                     }
@@ -540,7 +541,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
                     }
                 }
                 else
-                if(troop1.isValid())
+                if(troop1->isValid())
                 {
                     message = _("Select %{monster}");
                     String::Replace(message, "%{monster}", monster1);

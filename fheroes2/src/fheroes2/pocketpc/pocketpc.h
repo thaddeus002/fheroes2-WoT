@@ -38,7 +38,7 @@ namespace PocketPC
     Game::menu_t	LoadGame(void);
     Dialog::answer_t	HeroesOpenDialog(Heroes &, bool);
     Dialog::answer_t	CastleOpenDialog(Castle &, bool);
-    Dialog::answer_t	DialogArmyInfo(const Army::Troop &, u16);
+    Dialog::answer_t	DialogArmyInfo(const Troop &, u16);
     void		HeroesMeeting(Heroes &, Heroes &);
     void		KeyboardDialog(std::string &);
     u16			GetCursorAttackDialog(const Point &, u8);

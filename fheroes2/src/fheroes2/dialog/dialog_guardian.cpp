@@ -34,7 +34,7 @@
 class ArmyCell : public Rect
 {
 public:
-    ArmyCell(const Army::Troop & t, const Surface & bg, const Surface & cr, const Point & pt, const bool & ro)
+    ArmyCell(const Troop & t, const Surface & bg, const Surface & cr, const Point & pt, const bool & ro)
 	: Rect(pt.x, pt.y, bg.w(), bg.h()), select(false), troop(t), back(bg), curs(cr), readonly(ro) {};
 
     void Redraw(void)
@@ -59,13 +59,13 @@ public:
     };
 
     bool select;
-    const Army::Troop & troop;
+    const Troop & troop;
     const Surface & back;
     const Surface & curs;
     const bool & readonly;
 };
 
-bool Dialog::SetGuardian(Heroes & hero, Army::Troop & troop, bool readonly)
+bool Dialog::SetGuardian(Heroes & hero, Troop & troop, bool readonly)
 {
     Display & display = Display::Get();
     //const Settings & conf = Settings::Get();
@@ -142,7 +142,7 @@ bool Dialog::SetGuardian(Heroes & hero, Army::Troop & troop, bool readonly)
     ButtonGroups btnGroups(area, Dialog::OK);
     btnGroups.Draw();
 
-    const Army::Troop shadow(troop);
+    const Troop shadow(troop);
 
     cursor.Show();
     display.Flip();
@@ -158,21 +158,24 @@ bool Dialog::SetGuardian(Heroes & hero, Army::Troop & troop, bool readonly)
 	{
     	    if(guardian.select && le.MouseClickLeft(selectArmy.GetArea()))
 	    {
-		Army::Troop & troop1 = hero.GetArmy().At(selectArmy.GetIndexFromCoord(le.GetMouseCursor()));
+		Troop* troop1 = hero.GetArmy().GetTroop(selectArmy.GetIndexFromCoord(le.GetMouseCursor()));
 
-        	// combine
-        	if(troop1() == troop())
-        	{
-            	    troop1.SetCount(troop.GetCount() + troop1.GetCount());
-            	    troop.Reset();
-		}
-		else
-		if(troop1.GetCount() >= MAXU16)
-		    Dialog::Message("", _("Your army too big!"), Font::BIG, Dialog::OK);
-		// swap
-		else
+		if(troop1)
 		{
-		    Army::SwapTroops(troop1, troop);
+        	    // combine
+        	    if(troop() == troop1->GetID())
+        	    {
+            		troop1->SetCount(troop.GetCount() + troop1->GetCount());
+            		troop.Reset();
+		    }
+		    else
+		    if(troop1->GetCount() >= MAXU16)
+			Dialog::Message("", _("Your army too big!"), Font::BIG, Dialog::OK);
+		    // swap
+		    else
+		    {
+			Army::SwapTroops(*troop1, troop);
+		    }
 		}
 
 		guardian.select = false;
@@ -202,29 +205,32 @@ bool Dialog::SetGuardian(Heroes & hero, Army::Troop & troop, bool readonly)
 	    else
 	    if(selectArmy.isSelected() && !readonly && !selectArmy.SaveLastTroop())
 	    {
-		Army::Troop & troop1 = hero.GetArmy().At(selectArmy.Selected());
+		Troop* troop1 = hero.GetArmy().GetTroop(selectArmy.Selected());
 
-        	// combine
-        	if(troop1() == troop())
-        	{
-		    if(troop1.GetCount() + troop.GetCount() < MAXU16)
-		    {
-            		troop.SetCount(troop1.GetCount() + troop.GetCount());
-            		troop1.Reset();
-		    }
+		if(troop1)
+		{
+        	    // combine
+        	    if(troop() == troop1->GetID())
+        	    {
+			if(troop1->GetCount() + troop.GetCount() < MAXU16)
+			{
+            		    troop.SetCount(troop1->GetCount() + troop.GetCount());
+            		    troop1->Reset();
+			}
+			else
+			{
+			    troop1->SetCount(troop1->GetCount() + troop.GetCount() - MAXU16);
+            		    troop.SetCount(MAXU16);
+			}
+    		    }
+		    else
+		    if(troop1->GetCount() >= MAXU16)
+			Dialog::Message("", _("Your army too big!"), Font::BIG, Dialog::OK);
+		    // swap
 		    else
 		    {
-			troop1.SetCount(troop1.GetCount() + troop.GetCount() - MAXU16);
-            		troop.SetCount(MAXU16);
+			Army::SwapTroops(*troop1, troop);
 		    }
-		}
-		else
-		if(troop1.GetCount() >= MAXU16)
-		    Dialog::Message("", _("Your army too big!"), Font::BIG, Dialog::OK);
-		// swap
-		else
-		{
-		    Army::SwapTroops(troop1, troop);
 		}
 
 		selectArmy.Reset();

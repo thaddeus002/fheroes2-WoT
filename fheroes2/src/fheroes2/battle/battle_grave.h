@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2010 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *   Copyright (C) 2012 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
@@ -20,40 +20,32 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2BATTLE2_CELL_H
-#define H2BATTLE2_CELL_H
+#ifndef H2BATTLE_GRAVEYARD_H
+#define H2BATTLE_GRAVEYARD_H
+
+#include <vector>
+#include <map>
 
 #include "gamedefs.h"
-#include "battle_arena.h"
 
-namespace Army { class Troop; }
-
-namespace Battle2
+namespace Battle
 {
-    class Cell
+    class Unit;
+
+    struct TroopUIDs : public std::vector<u32>
+    {
+	TroopUIDs(){ reserve(4); }
+    };
+
+    class Graveyard : public std::map<s16, TroopUIDs>
     {
     public:
-	Cell(u16, const Rect*, Arena &);
-	void ResetQuality(void);
-	void ResetDirection(void);
-	void SetEnemyQuality(const Stats &);
-	void SetPositionQuality(const Stats &);
-	bool isPassable(const Stats &, const Cell &) const;
-	bool isPassable(const Stats &, bool check_reflect) const;
-	bool isPassable(bool check = true) const;
-	bool isPositionIncludePoint(const Point &) const;
-	const u16 &  GetIndex(void) const;
-	const u8 &   GetDirection(void) const;
-	const Rect & GetPos(void) const;
+	Graveyard() {}
 
-	void SetPassabilityAbroad(const Stats & b, std::vector<u16> &);
-
-	u16 index;
-	Rect pos;
-	u8 object;
-	u8 direction;
-	s32 quality;
-	Arena* arena;
+	Indexes		GetClosedCells(void) const;
+	void		AddTroop(const Unit &);
+	void		RemoveTroop(const Unit &);
+	u32		GetLastTroopUID(s16) const;
     };
 }
 

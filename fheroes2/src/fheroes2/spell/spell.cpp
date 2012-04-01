@@ -66,7 +66,6 @@ spellstats_t spells[] = {
 	{ _("Mass Cure"),              15, 0,  2,     5, 0, COST_NONE,  _("Removes all negative spells cast upon your forces, and restores up to %{count} HP per level of spell power, per creature.") }, 
 	{ _("Resurrect"),              12, 0, 13,    50, 0, COST_NONE,  _("Resurrects creatures from a damaged or dead unit until end of combat.") }, 
 	{ _("Resurrect True"),         15, 0, 12,    50, 0, COST_NONE,  _("Resurrects creatures from a damaged or dead unit permanently.") }, 
-	// extra: 0, because also used Speed:GetOriginal (see Battle2::Stats::GetSpeed)
 	{ _("Haste"),                   3, 0, 14,     0, 0, COST_NONE,  _("Increases the speed of any creature by %{count}.") }, 
 	{ _("Mass Haste"),             10, 0, 14,     0, 0, COST_NONE,  _("Increases the speed of all of your creatures by %{count}.") }, 
 	{ _("spell|Slow"),              3, 0,  1,     0, 0, COST_NONE,  _("Slows target to half movement rate.") }, 

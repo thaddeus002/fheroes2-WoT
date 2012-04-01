@@ -70,22 +70,23 @@ public:
 
     enum flags_t
     {
-	SHIPMASTER	= 0x0001,
-	AIWAITING	= 0x0002,
-	SPELLCASTED	= 0x0004,
-	ENABLEMOVE	= 0x0008,
-	HUNTER		= 0x0010,
-	SCOUTER		= 0x0020,
-	STUPID		= 0x0040,
-	JAIL		= 0x0080,
-	ACTION		= 0x0100,
-	SAVEPOINTS	= 0x0200,
-	SLEEPER		= 0x0400,
-	GUARDIAN	= 0x0800,
-	NOTDEFAULTS	= 0x1000,
-	NOTDISMISS	= 0x2000,
-	VISIONS		= 0x4000,
-	PATROL		= 0x8000
+	SHIPMASTER	= 0x00000001,
+	AIWAITING	= 0x00000002,
+	SPELLCASTED	= 0x00000004,
+	ENABLEMOVE	= 0x00000008,
+	HUNTER		= 0x00000010,
+	SCOUTER		= 0x00000020,
+	STUPID		= 0x00000040,
+	JAIL		= 0x00000080,
+	ACTION		= 0x00000100,
+	SAVEPOINTS	= 0x00000200,
+	SLEEPER		= 0x00000400,
+	GUARDIAN	= 0x00000800,
+	NOTDEFAULTS	= 0x00001000,
+	NOTDISMISS	= 0x00002000,
+	VISIONS		= 0x00004000,
+	PATROL		= 0x00008000,
+	CUSTOMARMY	= 0x00010000
     };
 
     Heroes();
@@ -120,8 +121,8 @@ public:
     static const Surface & GetPortrait50x46(heroes_t);
     static const Surface & GetPortrait101x93(heroes_t);
 
-    const Army::army_t & GetArmy(void) const{ return army; }
-    Army::army_t & GetArmy(void) { return army; }
+    const Army & GetArmy(void) const{ return army; }
+    Army & GetArmy(void) { return army; }
 
     heroes_t GetID(void) const;
 
@@ -261,7 +262,7 @@ private:
 
     Skill::SecSkills	secondary_skills;
 
-    Army::army_t        army;
+    Army        army;
 
     heroes_t		hid;
     heroes_t		portrait;

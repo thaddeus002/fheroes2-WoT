@@ -20,40 +20,38 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2AI_H
-#define H2AI_H
+#ifndef H2BATTLE_BRIDGE_H
+#define H2BATTLE_BRIDGE_H
 
 #include "gamedefs.h"
 
-class Castle;
-class HeroBase;
-class Heroes;
-class Kingdom;
-namespace Battle { class Arena; class Unit; class Actions; }
-
-struct AI
+namespace Battle
 {
-    static void AddCastle(const Castle &);
-    static void RemoveCastle(const Castle &);
-    static void AddHeroes(const Heroes &);
-    static void RemoveHeroes(const Heroes &);
+    class Unit;
 
-    static void Init(void);
+    class Bridge
+    {
+    public:
+	Bridge();
 
-    static void KingdomTurn(Kingdom &);
-    static void BattleTurn(Battle::Arena &, const Battle::Unit &, Battle::Actions &);
-    static bool BattleMagicTurn(Battle::Arena &, const Battle::Unit &, Battle::Actions &, const Battle::Unit*);
-    static void HeroesPreBattle(HeroBase &);
-    static void HeroesAfterBattle(HeroBase &);
-    static void HeroesAction(Heroes &, s32);
-    static void HeroesLevelUp(Heroes &);
-    static std::string HeroesString(const Heroes &);
+	bool NeedAction(const Unit &, s16) const;
+	void Action(const Unit &, s16);
 
-    static void CastlePreBattle(Castle &);
-    static void CastleAfterBattle(Castle &, bool attacker_wins);
+	void SetDestroy(void);
+	void SetDown(bool);
+	void SetPassable(const Unit &);
 
-    static const char* Type(void);
-    static const char* License(void);
-};
+	bool AllowUp(void) const;
+	bool NeedDown(const Unit &, s16) const;
+	bool isPassable(u8) const;
+	bool isValid(void) const;
+	bool isDestroy(void) const;
+	bool isDown(void) const;
+
+    private:
+	bool	destroy;
+	bool	down;
+    };
+}
 
 #endif

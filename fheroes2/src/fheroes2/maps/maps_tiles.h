@@ -224,7 +224,7 @@ namespace Maps
 	ResourceCount	QuantityResourceCount(void) const;
 	Funds         	QuantityFunds(void) const;
 	Monster		QuantityMonster(void) const;
-	Army::Troop	QuantityTroop(void) const;
+	Troop		QuantityTroop(void) const;
 
 	void SetObjectPassable(bool);
 

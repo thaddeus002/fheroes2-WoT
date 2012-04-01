@@ -20,32 +20,33 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2BATTLE2_CATAPULT_H
-#define H2BATTLE2_CATAPULT_H
+#ifndef H2BATTLE_CATAPULT_H
+#define H2BATTLE_CATAPULT_H
 
 #include "gamedefs.h"
 
 class HeroBase;
 
-namespace Battle2
+namespace Battle
 {
+    enum { CAT_WALL1 = 1, CAT_WALL2 = 2, CAT_WALL3 = 3, CAT_WALL4 = 4, CAT_TOWER1 = 5, CAT_TOWER2 = 6, CAT_BRIDGE = 7, CAT_TOWER3 = 8, CAT_MISS = 9 };
+
     class Catapult
     {
     public:
-	Catapult(const HeroBase &, bool, Arena &);
+	Catapult(const HeroBase &, bool);
 
-	Point GetTargetPosition(u8) const;
-	u8 GetShots(void) const;
-	u8 GetTarget(const std::vector<u8> &) const;
-	u8 GetDamage(u8);
-	void Action(void);
+	static Point	GetTargetPosition(u8);
+
+	u8		GetShots(void) const;
+	u8		GetTarget(const std::vector<u8> &) const;
+	u8		GetDamage(u8, u8);
 
     private:
-	Arena & arena;
-	u8 cat_shots;
-	u8 cat_first;
-	bool cat_miss;
-	bool cat_fort;
+	u8	cat_shots;
+	u8	cat_first;
+	bool	cat_miss;
+	bool	cat_fort;
     };
 }
 

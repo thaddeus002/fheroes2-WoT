@@ -20,18 +20,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "castle.h"
 #include "artifact.h"
 #include "skill.h"
 #include "settings.h"
 #include "heroes_base.h"
-#include "battle_arena.h"
-#include "battle_cell.h"
-#include "battle_tower.h"
-#include "battle_bridge.h"
 #include "battle_catapult.h"
 
-Battle2::Catapult::Catapult(const HeroBase & hero, bool fortification, Arena & a) : arena(a), cat_shots(1), cat_first(20), cat_miss(true), cat_fort(fortification)
+Battle::Catapult::Catapult(const HeroBase & hero, bool fortification) : cat_shots(1), cat_first(20), cat_miss(true), cat_fort(fortification)
 {
     switch(hero.GetLevelSkill(Skill::Secondary::BALLISTICS))
     {
@@ -59,15 +54,13 @@ Battle2::Catapult::Catapult(const HeroBase & hero, bool fortification, Arena & a
     if(acount) cat_shots += acount * Artifact(Artifact::BALLISTA).ExtraValue();
 }
 
-u8 Battle2::Catapult::GetShots(void) const
+u8 Battle::Catapult::GetShots(void) const
 {
     return cat_shots;
 }
 
-u8 Battle2::Catapult::GetDamage(u8 target)
+u8 Battle::Catapult::GetDamage(u8 target, u8 value)
 {
-    u8 value = arena.GetCastleTargetValue(target);
-
     switch(target)
     {
 	case CAT_WALL1:
@@ -94,7 +87,7 @@ u8 Battle2::Catapult::GetDamage(u8 target)
     return value;
 }
 
-Point Battle2::Catapult::GetTargetPosition(u8 target) const
+Point Battle::Catapult::GetTargetPosition(u8 target)
 {
     Point res;
 
@@ -116,7 +109,7 @@ Point Battle2::Catapult::GetTargetPosition(u8 target) const
     return res;
 }
 
-u8 Battle2::Catapult::GetTarget(const std::vector<u8> & values) const
+u8 Battle::Catapult::GetTarget(const std::vector<u8> & values) const
 {
     std::vector<u8> targets;
     targets.reserve(4);
@@ -155,35 +148,4 @@ u8 Battle2::Catapult::GetTarget(const std::vector<u8> & values) const
     DEBUG(DBG_BATTLE, DBG_TRACE, "target not found..");
 
     return 0;
-}
-
-void Battle2::Catapult::Action(void)
-{
-    Battle2::Action action;
-    action.SetID(MSG_BATTLE_CATAPULT);
-
-    u8 shots = GetShots();
-    std::vector<u8> values;
-    values.resize(CAT_MISS, 0);
-
-    values[CAT_WALL1] = arena.GetCastleTargetValue(CAT_WALL1);
-    values[CAT_WALL2] = arena.GetCastleTargetValue(CAT_WALL2);
-    values[CAT_WALL3] = arena.GetCastleTargetValue(CAT_WALL3);
-    values[CAT_WALL4] = arena.GetCastleTargetValue(CAT_WALL4);
-    values[CAT_TOWER1] = arena.GetCastleTargetValue(CAT_TOWER1);
-    values[CAT_TOWER2] = arena.GetCastleTargetValue(CAT_TOWER2);
-    values[CAT_TOWER3] = arena.GetCastleTargetValue(CAT_TOWER3);
-    values[CAT_BRIDGE] = arena.GetCastleTargetValue(CAT_BRIDGE);
-
-    action.Push(shots);
-    while(shots--)
-    {
-	const u8 target = GetTarget(values);
-	const u8 damage = GetDamage(target);
-	action.Push(target);
-	action.Push(damage);
-	values[target] -= damage;
-    }
-
-    arena.ApplyAction(action);
 }

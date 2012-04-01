@@ -38,7 +38,7 @@ void AICastleDefense(Castle & c)
 {
     if(c.isCastle())
     {
-        if(!c.isBuild(BUILD_LEFTTURRET)) 
+        if(!c.isBuild(BUILD_LEFTTURRET))
 		c.BuyBuilding(BUILD_LEFTTURRET);
 
         if(!c.isBuild(BUILD_RIGHTTURRET))
@@ -197,12 +197,12 @@ void AICastleTurn(Castle* castle)
 	// part II
 	if(enemy &&
 	    castle->GetArmy().isValid() &&
-	    castle->GetArmy().StrongerEnemyArmy(enemy->GetArmy()))
+	    Army::TroopsStrongerEnemyTroops(castle->GetArmy(), enemy->GetArmy()))
 	{
     	    if(!castle->GetHeroes().Guest() && can_recruit)
     	    {
         	Recruits & rec = kingdom.GetRecruits();
-                                                                                                                              
+
         	if(rec.GetHero1()) castle->RecruitHero(rec.GetHero1());
         	else
         	if(rec.GetHero2()) castle->RecruitHero(rec.GetHero2());
@@ -222,7 +222,7 @@ void AICastleTurn(Castle* castle)
 	    can_recruit)
 	{
     	    Recruits & rec = kingdom.GetRecruits();
-                                                                                                                              
+
     	    if(rec.GetHero1()) castle->RecruitHero(rec.GetHero1());
     	    else
     	    if(rec.GetHero2()) castle->RecruitHero(rec.GetHero2());

@@ -93,7 +93,7 @@ public:
 
     void ActionListPressRight(int & index)
     {
-      Army::Troop troop(Monster(index), 1);
+      Troop troop(Monster(index), 1);
       Dialog::ArmyInfo(troop, 0);
     };
 };

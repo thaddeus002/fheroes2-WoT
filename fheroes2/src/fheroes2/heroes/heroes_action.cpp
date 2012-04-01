@@ -28,7 +28,7 @@
 #include "monster.h"
 #include "heroes.h"
 #include "race.h"
-#include "battle2.h"
+#include "battle.h"
 #include "game_focus.h"
 #include "game_interface.h"
 #include "kingdom.h"
@@ -233,12 +233,12 @@ u16 DialogLuck(const std::string & hdr, const std::string & msg, const bool good
     return Dialog::SpriteInfo(hdr, msg, image);
 }
 
-void BattleLose(Heroes &hero, const Battle2::Result & res, bool attacker, Color::color_t color = Color::NONE)
+void BattleLose(Heroes &hero, const Battle::Result & res, bool attacker, Color::color_t color = Color::NONE)
 {
     u8 reason = attacker ? res.AttackerResult() : res.DefenderResult();
 
     if(Settings::Get().ExtHeroSurrenderingGiveExp() &&
-	Battle2::RESULT_SURRENDER == reason)
+	Battle::RESULT_SURRENDER == reason)
     {
 	const u32 & exp = attacker ? res.GetExperienceAttacker() : res.GetExperienceDefender();
 
@@ -258,26 +258,6 @@ void BattleLose(Heroes &hero, const Battle2::Result & res, bool attacker, Color:
     hero.SetFreeman(reason);
     GameFocus::Reset(GameFocus::HEROES);
     GameFocus::SetRedraw();
-}
-
-void PlayPickupSound(void)
-{
-    M82::m82_t wav = M82::UNKNOWN;
-
-    switch(Rand::Get(1, 7))
-    {
-        case 1: wav = M82::PICKUP01; break;
-        case 2: wav = M82::PICKUP02; break;
-        case 3: wav = M82::PICKUP03; break;
-        case 4: wav = M82::PICKUP04; break;
-        case 5: wav = M82::PICKUP05; break;
-        case 6: wav = M82::PICKUP06; break;
-        case 7: wav = M82::PICKUP07; break;
-
-        default: return;
-    }
-
-    AGG::PlaySound(wav);
 }
 
 void AnimationRemoveObject(Maps::Tiles & tile)
@@ -341,7 +321,7 @@ void AnimationRemoveObject(Maps::Tiles & tile)
     }
 }
 
-void RecruitMonsterFromTile(Heroes & hero, Maps::Tiles & tile, const std::string & msg, const Army::Troop & troop, bool remove)
+void RecruitMonsterFromTile(Heroes & hero, Maps::Tiles & tile, const std::string & msg, const Troop & troop, bool remove)
 {
     if(! hero.GetArmy().CanJoinTroop(troop))
 	Dialog::Message(msg, _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
@@ -353,7 +333,7 @@ void RecruitMonsterFromTile(Heroes & hero, Maps::Tiles & tile, const std::string
 	{
 	    if(remove && recruit == troop.GetCount())
 	    {
-		PlayPickupSound();
+		Game::PlayPickupSound();
 		AnimationRemoveObject(tile);
 		tile.MonsterSetCount(0);
 		tile.RemoveObjectSprite();
@@ -549,7 +529,7 @@ void ActionToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
     bool destroy = false;
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const Army::Troop & troop = tile.QuantityTroop();
+    const Troop & troop = tile.QuantityTroop();
     //const Settings & conf = Settings::Get();
 
 
@@ -632,11 +612,13 @@ void ActionToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
     {
 	DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " attack monster " << troop.GetName());
 
-	Army::army_t army;
+	Army army;
 	army.JoinTroop(troop);
-	army.ArrangeForBattle();
 
-	Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
+	if(army.GetControl() & CONTROL_AI)
+	    army.ArrangeForBattle();
+
+	Battle::Result res = Battle::Loader(hero.GetArmy(), army, dst_index);
 
 	if(res.AttackerWins())
 	{
@@ -649,7 +631,7 @@ void ActionToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
     	    BattleLose(hero, res, true);
     	    if(Settings::Get().ExtWorldSaveMonsterBattle())
     	    {
-        	tile.MonsterSetCount(army.MonsterCounts(troop()));
+        	tile.MonsterSetCount(army.GetCountMonsters(troop()));
         	// reset "can join"
 		if(tile.MonsterJoinConditionFree()) tile.MonsterSetJoinCondition(Monster::JOIN_CONDITION_MONEY);
     	    }
@@ -728,8 +710,8 @@ void ActionToHeroes(Heroes & hero, const u8 & obj, const s32 & dst_index)
 			    other_hero_castle || world.GetTiles(hero.GetIndex()).GetObject(false) == MP2::OBJ_STONELIGHTS;
         DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " attack enemy hero " << other_hero->GetName());
 
-	// new battle2
-	Battle2::Result res = Battle2::Loader(hero.GetArmy(), other_hero->GetArmy(), dst_index);
+	// new battle
+	Battle::Result res = Battle::Loader(hero.GetArmy(), other_hero->GetArmy(), dst_index);
 
 	// loss defender
 	if(!res.DefenderWins())
@@ -791,7 +773,7 @@ void ActionToCastle(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    return;
 	}
 
-        Army::army_t & army = castle->GetActualArmy();
+        Army & army = castle->GetActualArmy();
 	bool allow_enter = false;
 
 	if(army.isValid())
@@ -801,8 +783,8 @@ void ActionToCastle(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    Heroes* defender = heroes.GuardFirst();
     	    castle->ActionPreBattle();
 
-	    // new battle2
-	    Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
+	    // new battle
+	    Battle::Result res = Battle::Loader(hero.GetArmy(), army, dst_index);
 
     	    castle->ActionAfterBattle(res.AttackerWins());
 
@@ -892,7 +874,7 @@ void ActionToPickupResource(Heroes & hero, const u8 & obj, const s32 & dst_index
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
-    PlayPickupSound();
+    Game::PlayPickupSound();
     AnimationRemoveObject(tile);
     tile.RemoveObjectSprite();
 
@@ -1002,7 +984,7 @@ void ActionToSkeleton(Heroes & hero, const u8 & obj, const s32 & dst_index)
     // artifact
     if(tile.QuantityIsValid())
     {
-	PlayPickupSound();
+	Game::PlayPickupSound();
 
 	if(hero.IsFullBagArtifacts())
 	{
@@ -1054,7 +1036,7 @@ void ActionToWagon(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    }
 	    else
 	    {
-		PlayPickupSound();
+		Game::PlayPickupSound();
 		message.append("\n");
 		message.append(_("Searching inside, you find the %{artifact}."));
 		String::Replace(message, "%{artifact}", art.GetName());
@@ -1065,7 +1047,7 @@ void ActionToWagon(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	else
 	{
 	    const Funds & funds = tile.QuantityFunds();
-	    PlayPickupSound();
+	    Game::PlayPickupSound();
 	    message.append("\n");
 	    message.append(_("Inside, you find some of the wagon's cargo still intact."));
 	    Dialog::ResourceInfo("", message, funds);
@@ -1092,7 +1074,7 @@ void ActionToFlotSam(Heroes & hero, const u8 & obj, const s32 & dst_index)
     std::string msg;
     const Funds & funds = tile.QuantityFunds();
 
-    PlayPickupSound();
+    Game::PlayPickupSound();
     AnimationRemoveObject(tile);
 
     if(0 < funds.GetValidItems())
@@ -1291,9 +1273,9 @@ void ActionToPoorLuckObject(Heroes & hero, const u8 & obj, const s32 & dst_index
 	    PlaySoundWarning;
 
 	    // battle
-	    Army::army_t army(tile);
+	    Army army(tile);
 
-	    Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
+	    Battle::Result res = Battle::Loader(hero.GetArmy(), army, dst_index);
     	    if(res.AttackerWins())
 	    {
 		PlaySoundSuccess;
@@ -1476,9 +1458,9 @@ void ActionToPoorMoraleObject(Heroes & hero, const u8 & obj, const s32 & dst_ind
 	{
 	    PlaySoundWarning;
 
-	    Army::army_t army(tile);
+	    Army army(tile);
 
-	    Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
+	    Battle::Result res = Battle::Loader(hero.GetArmy(), army, dst_index);
     	    if(res.AttackerWins())
     	    {
 		hero.IncreaseExperience(res.GetExperienceAttacker());
@@ -1744,8 +1726,8 @@ void ActionToArtifact(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	if(5 < cond && cond < 14)
         {
 	    bool battle = true;
-	    Army::army_t army(tile);
-	    Army::Troop & troop = army.FirstValid();
+	    Army army(tile);
+	    const Troop & troop = tile.QuantityTroop();
 
 	    PlaySoundWarning;
 
@@ -1760,8 +1742,8 @@ void ActionToArtifact(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 	    if(battle)
 	    {
-		// new battle2
-		Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
+		// new battle
+		Battle::Result res = Battle::Loader(hero.GetArmy(), army, dst_index);
     		if(res.AttackerWins())
     		{
 		    hero.IncreaseExperience(res.GetExperienceAttacker());
@@ -1801,7 +1783,7 @@ void ActionToArtifact(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 	if(result && hero.PickupArtifact(art))
 	{
-	    PlayPickupSound();
+	    Game::PlayPickupSound();
 	    AnimationRemoveObject(tile);
 
 	    tile.RemoveObjectSprite();
@@ -1820,7 +1802,7 @@ void ActionToTreasureChest(Heroes & hero, const u8 & obj, const s32 & dst_index)
     std::string msg;
     u16 gold = tile.QuantityGold();
 
-    PlayPickupSound();
+    Game::PlayPickupSound();
     AnimationRemoveObject(tile);
 
     // dialog
@@ -1907,7 +1889,7 @@ void ActionToTreasureChest(Heroes & hero, const u8 & obj, const s32 & dst_index)
 void ActionToAncientLamp(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const Army::Troop & troop = tile.QuantityTroop();
+    const Troop & troop = tile.QuantityTroop();
 
     PlaySoundSuccess;
     if(troop.isValid() &&
@@ -1994,7 +1976,7 @@ void ActionToWhirlpools(Heroes & hero, const u8 & obj, const s32 & index_from)
     hero.GetPath().Hide();
     hero.FadeIn();
 
-    Army::Troop & troops = hero.GetArmy().GetWeakestTroop();
+    Troop & troops = hero.GetArmy().GetWeakestTroop();
 
     if(Rand::Get(1) && 1 < troops.GetCount())
     {
@@ -2087,10 +2069,10 @@ void ActionToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	// check guardians
 	if(tile.CaptureObjectIsProtection())
 	{
-	    Army::army_t army(tile);
+	    Army army(tile);
 	    const Monster & mons =  tile.QuantityMonster();
 
-    	    Battle2::Result result = Battle2::Loader(hero.GetArmy(), army, dst_index);
+    	    Battle::Result result = Battle::Loader(hero.GetArmy(), army, dst_index);
 
     	    if(result.AttackerWins())
     	    {
@@ -2101,7 +2083,7 @@ void ActionToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
 		capture = false;
         	BattleLose(hero, result, true);
 		if(Settings::Get().ExtWorldSaveMonsterBattle())
-            	    tile.MonsterSetCount(army.MonsterCounts(mons));
+            	    tile.MonsterSetCount(army.GetCountMonsters(mons));
     	    }
 	}
 
@@ -2133,8 +2115,8 @@ void ActionToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
     // set guardians
     if(Settings::Get().ExtWorldAllowSetGuardian())
     {
-	Army::Troop & troop1 = world.GetCapturedObject(dst_index).GetTroop();
-	Army::Troop   troop2 = troop1;
+	Troop & troop1 = world.GetCapturedObject(dst_index).GetTroop();
+	Troop   troop2 = troop1;
 
 	// check set with spell ?
 	Maps::TilesAddon* addon = tile.FindObject(MP2::OBJ_MINES);
@@ -2150,7 +2132,7 @@ void ActionToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
 void ActionToDwellingJoinMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const Army::Troop & troop = tile.QuantityTroop();
+    const Troop & troop = tile.QuantityTroop();
 
     if(troop.isValid())
     {
@@ -2251,7 +2233,7 @@ void ActionToDwellingRecruitMonster(Heroes & hero, const u8 & obj, const s32 & d
 	default: return;
     }
 
-    const Army::Troop & troop = tile.QuantityTroop();
+    const Troop & troop = tile.QuantityTroop();
 
     if(! troop.isValid())
 	Dialog::Message(MP2::StringObject(obj), msg_void, Font::BIG, Dialog::OK);
@@ -2270,7 +2252,7 @@ void ActionToDwellingBattleMonster(Heroes & hero, const u8 & obj, const s32 & ds
 
     // yet no one captured.
     const bool & battle = Color::NONE == tile.QuantityColor();
-    const Army::Troop & troop = tile.QuantityTroop();
+    const Troop & troop = tile.QuantityTroop();
 
     const char* str_empty = NULL;
     const char* str_recr  = NULL;
@@ -2319,13 +2301,13 @@ void ActionToDwellingBattleMonster(Heroes & hero, const u8 & obj, const s32 & ds
     }
     else
     {
-	Army::army_t army(tile);
+	Army army(tile);
 
 	PlaySoundWarning;
 	if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), str_warn, Font::BIG, Dialog::YES | Dialog::NO))
 	{
-	    // new battle2
-	    Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
+	    // new battle
+	    Battle::Result res = Battle::Loader(hero.GetArmy(), army, dst_index);
 	    if(res.AttackerWins())
 	    {
 		hero.IncreaseExperience(res.GetExperienceAttacker());
@@ -2442,7 +2424,7 @@ void ActionToXanadu(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_GAME, DBG_INFO, hero.GetName());
 }
 
-bool ActionToUpgradeArmy(Army::army_t & army, const Monster & mons, std::string & str1, std::string & str2)
+bool ActionToUpgradeArmy(Army & army, const Monster & mons, std::string & str1, std::string & str2)
 {
     if(army.HasMonster(mons))
     {
@@ -2585,7 +2567,7 @@ void ActionToEvent(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	{
 	    if(hero.PickupArtifact(art))
 	    {
-		PlayPickupSound();
+		Game::PlayPickupSound();
 		std::string message(_("You find %{artifact}."));
 		String::Replace(message, "%{artifact}", art.GetName());
 		Dialog::ArtifactInfo("", message, art);
@@ -2706,9 +2688,9 @@ void ActionToDaemonCave(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    if(Dialog::YES == Dialog::Message("", _("You find a powerful and grotesque Demon in the cave. \"Today,\" it rasps, \"you will fight and surely die. But I will give you a choice of deaths. You may fight me, or you may fight my servants. Do you prefer to fight my servants?\""), Font::BIG, Dialog::YES|Dialog::NO))
 	    {
 		// battle with earth elements
-		Army::army_t army(tile);
+		Army army(tile);
 
-		Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
+		Battle::Result res = Battle::Loader(hero.GetArmy(), army, dst_index);
     		if(res.AttackerWins())
     		{
 		    hero.IncreaseExperience(res.GetExperienceAttacker());
@@ -2776,8 +2758,8 @@ void ActionToDaemonCave(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 		if(remove)
 		{
-		    Battle2::Result res;
-		    res.army1 = Battle2::RESULT_LOSS;
+		    Battle::Result res;
+		    res.army1 = Battle::RESULT_LOSS;
 		    BattleLose(hero, res, true);
 		}
 	    }
@@ -2983,8 +2965,8 @@ void ActionToSphinx(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    else
 	    {
 		Dialog::Message("", _("\"You guessed incorrectly,\" the Sphinx says, smiling. The Sphinx swipes at you with a paw, knocking you to the ground. Another blow makes the world go black, and you know no more."), Font::BIG, Dialog::OK);
-		Battle2::Result res;
-		res.army1 = Battle2::RESULT_LOSS;
+		Battle::Result res;
+		res.army1 = Battle::RESULT_LOSS;
 		BattleLose(hero, res, true);
 	    }
 	}

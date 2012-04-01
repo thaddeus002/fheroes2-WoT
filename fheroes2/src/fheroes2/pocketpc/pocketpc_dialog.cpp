@@ -21,7 +21,8 @@
 #include "agg.h"
 #include "engine.h"
 #include "cursor.h"
-#include "battle2.h"
+#include "battle.h"
+#include "battle_board.h"
 #include "text.h"
 #include "settings.h"
 #include "pocketpc.h"
@@ -63,39 +64,39 @@ u16 PocketPC::GetCursorAttackDialog(const Point & dst, u8 allow)
     sp_info.Blit(rt_info.x, rt_info.y);
 
     const Rect rt_tright(rt.x + 1, rt.y + rt.h - 1 - sp_tright.h(), sp_tright.w(), sp_tright.h());
-    if(allow & Battle2::BOTTOM_LEFT) sp_tright.Blit(rt_tright.x, rt_tright.y);
+    if(allow & Battle::BOTTOM_LEFT) sp_tright.Blit(rt_tright.x, rt_tright.y);
 
     const Rect rt_right(rt.x + 1, rt.y + (rt.h - sp_right.h()) / 2, sp_right.w(), sp_right.h());
-    if(allow & Battle2::LEFT) sp_right.Blit(rt_right.x, rt_right.y);
+    if(allow & Battle::LEFT) sp_right.Blit(rt_right.x, rt_right.y);
 
     const Rect rt_bright(rt.x + 1, rt.y + 1, sp_bright.w(), sp_bright.h());
-    if(allow & Battle2::TOP_LEFT) sp_bright.Blit(rt_bright.x, rt_bright.y);
+    if(allow & Battle::TOP_LEFT) sp_bright.Blit(rt_bright.x, rt_bright.y);
 
     const Rect rt_tleft(rt.x + rt.w - 1 - sp_tleft.w(), rt.y + rt.h - 1 - sp_tleft.h(), sp_tleft.w(), sp_tleft.h());
-    if(allow & Battle2::BOTTOM_RIGHT) sp_tleft.Blit(rt_tleft.x, rt_tleft.y);
+    if(allow & Battle::BOTTOM_RIGHT) sp_tleft.Blit(rt_tleft.x, rt_tleft.y);
 
     const Rect rt_left(rt.x + rt.w - 1 - sp_left.w(), rt.y + (rt.h - sp_left.h()) / 2, sp_left.w(), sp_left.h());
-    if(allow & Battle2::RIGHT) sp_left.Blit(rt_left.x, rt_left.y);
+    if(allow & Battle::RIGHT) sp_left.Blit(rt_left.x, rt_left.y);
 
     const Rect rt_bleft(rt.x + rt.w - 1 - sp_bleft.w(), rt.y + 1, sp_bleft.w(), sp_bleft.h());
-    if(allow & Battle2::TOP_RIGHT) sp_bleft.Blit(rt_bleft.x, rt_bleft.y);
+    if(allow & Battle::TOP_RIGHT) sp_bleft.Blit(rt_bleft.x, rt_bleft.y);
 
     cursor.Show();
     display.Flip();
 
     while(le.HandleEvents() && !le.MouseClickLeft());
 
-    if((allow & Battle2::BOTTOM_LEFT) && (rt_tright & le.GetMouseCursor()))	return Cursor::SWORD_TOPRIGHT;
+    if((allow & Battle::BOTTOM_LEFT) && (rt_tright & le.GetMouseCursor()))	return Cursor::SWORD_TOPRIGHT;
     else
-    if((allow & Battle2::LEFT) && (rt_right & le.GetMouseCursor()))		return Cursor::SWORD_RIGHT;
+    if((allow & Battle::LEFT) && (rt_right & le.GetMouseCursor()))		return Cursor::SWORD_RIGHT;
     else
-    if((allow & Battle2::TOP_LEFT) && (rt_bright & le.GetMouseCursor()))	return Cursor::SWORD_BOTTOMRIGHT;
+    if((allow & Battle::TOP_LEFT) && (rt_bright & le.GetMouseCursor()))	return Cursor::SWORD_BOTTOMRIGHT;
     else
-    if((allow & Battle2::BOTTOM_RIGHT) && (rt_tleft & le.GetMouseCursor()))	return Cursor::SWORD_TOPLEFT;
+    if((allow & Battle::BOTTOM_RIGHT) && (rt_tleft & le.GetMouseCursor()))	return Cursor::SWORD_TOPLEFT;
     else
-    if((allow & Battle2::RIGHT) && (rt_left & le.GetMouseCursor()))		return Cursor::SWORD_LEFT;
+    if((allow & Battle::RIGHT) && (rt_left & le.GetMouseCursor()))		return Cursor::SWORD_LEFT;
     else
-    if((allow & Battle2::TOP_RIGHT) && (rt_bleft & le.GetMouseCursor()))	return Cursor::SWORD_BOTTOMLEFT;
+    if((allow & Battle::TOP_RIGHT) && (rt_bleft & le.GetMouseCursor()))	return Cursor::SWORD_BOTTOMLEFT;
 
     return Cursor::WAR_INFO;
 }

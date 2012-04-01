@@ -28,8 +28,8 @@
 #include "dialog.h"
 #include "monster.h"
 #include "button.h"
+#include "battle_troop.h"
 #include "army_troop.h"
-#include "battle_stats.h"
 
 #ifndef BUILD_RELEASE
 
@@ -41,9 +41,7 @@ void TestMonsterSprite(void)
     cursor.SetThemes(Cursor::POINTER);
 
     //Monster monster(Monster::PEASANT);
-    Army::Troop troop(Monster::PEASANT, 1);
-    troop.BattleInit();
-    const Battle2::Stats & b = *troop.GetBattleStats();
+    Battle::Unit troop(Troop(Monster::PEASANT, 1), 0, -1, false);
     Background back;
     Rect pos;
 
@@ -67,7 +65,7 @@ void TestMonsterSprite(void)
     u32 ticket = 0;
 
     u8 start = 0;
-    u8 count = AGG::GetICNCount(b.ICNFile());
+    u8 count = AGG::GetICNCount(troop.ICNFile());
     u8 frame = 0;
     u8 speed = 100;
 
@@ -86,13 +84,13 @@ void TestMonsterSprite(void)
 
 	if(le.MouseClickLeft(pos))
 	{
-            u32 mons = troop().GetID();
+            u32 mons = troop.GetID();
             if(Dialog::SelectCount("Monster", Monster::PEASANT, Monster::WATER_ELEMENT, mons))
 	    {
         	cursor.Hide();
 		troop.SetMonster(Monster(mons));
 		start = 0;
-		count = AGG::GetICNCount(b.ICNFile());
+		count = AGG::GetICNCount(troop.ICNFile());
 		frame = 0;
         	cursor.Show();
         	display.Flip();
@@ -102,11 +100,11 @@ void TestMonsterSprite(void)
 	if(le.MouseClickLeft(start_bar.GetRect()))
 	{
 	    u32 start2 = start;
-	    if(Dialog::SelectCount("Start", 0, AGG::GetICNCount(b.ICNFile()) - 1, start2))
+	    if(Dialog::SelectCount("Start", 0, AGG::GetICNCount(troop.ICNFile()) - 1, start2))
 	    {
         	cursor.Hide();
 		start = start2;
-		if(start + count > AGG::GetICNCount(b.ICNFile())) count = AGG::GetICNCount(b.ICNFile()) - start;
+		if(start + count > AGG::GetICNCount(troop.ICNFile())) count = AGG::GetICNCount(troop.ICNFile()) - start;
 		start_bar.ShowMessage("start: " + GetString(start));
         	cursor.Show();
         	display.Flip();
@@ -116,7 +114,7 @@ void TestMonsterSprite(void)
 	if(le.MouseClickLeft(count_bar.GetRect()))
 	{
 	    u32 count2 = count;
-	    if(Dialog::SelectCount("Count", 1, AGG::GetICNCount(b.ICNFile()), count2))
+	    if(Dialog::SelectCount("Count", 1, AGG::GetICNCount(troop.ICNFile()), count2))
 	    {
         	cursor.Hide();
 		count = count2;
@@ -144,7 +142,7 @@ void TestMonsterSprite(void)
         if(0 == (ticket % speed))
         {
             cursor.Hide();
-            const Sprite & sprite = AGG::GetICN(b.ICNFile(), frame);
+            const Sprite & sprite = AGG::GetICN(troop.ICNFile(), frame);
 	    pos.x = 320 + sprite.x();
 	    pos.y = 240 + sprite.y();
 	    pos.w = sprite.w();

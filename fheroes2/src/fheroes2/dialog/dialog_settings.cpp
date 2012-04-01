@@ -197,7 +197,6 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::UNIONS_ALLOW_CASTLE_VISITING);
 
     states.push_back(Settings::BATTLE_SOFT_WAITING);
-    states.push_back(Settings::BATTLE_TROOP_DIRECTION);
     states.push_back(Settings::BATTLE_OBJECTS_ARCHERS_PENALTY);
     states.push_back(Settings::BATTLE_MERGE_ARMIES);
     states.push_back(Settings::BATTLE_ARCHMAGE_RESIST_BAD_SPELL);

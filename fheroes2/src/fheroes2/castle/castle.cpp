@@ -136,56 +136,25 @@ void Castle::LoadFromMP2(const void *ptr)
     if(custom_troops)
     {
 	++ptr8;
-	
-	// monster1
-	army.At(0).SetMonster(Monster(*ptr8 + 1));
-	++ptr8;
 
-	// monster2
-	army.At(1).SetMonster(Monster(*ptr8 + 1));
-	++ptr8;
+	Troop troops[5];
+	// set monster id
+	for(u8 ii = 0; ii < ARRAY_COUNT(troops); ++ii)
+	{
+	    troops[ii].SetMonster(*ptr8 + 1);
+	    ++ptr8;
+	}
 
-	// monster3
-	army.At(2).SetMonster(Monster(*ptr8 + 1));
-	++ptr8;
+	// set count
+	for(u8 ii = 0; ii < ARRAY_COUNT(troops); ++ii)
+	{
+	    byte16 = ReadLE16(ptr8);
+	    troops[ii].SetCount(byte16);
+	    ++ptr8;
+	    ++ptr8;
+	}
 
-	// monster4
-	army.At(3).SetMonster(Monster(*ptr8 + 1));
-	++ptr8;
-
-	// monster5
-	army.At(4).SetMonster(Monster(*ptr8 + 1));
-	++ptr8;
-
-	// count1
-	byte16 = ReadLE16(ptr8);
-	army.At(0).SetCount(byte16);
-	++ptr8;
-	++ptr8;
-
-	// count2
-	byte16 = ReadLE16(ptr8);
-	army.At(1).SetCount(byte16);
-	++ptr8;
-	++ptr8;
-
-	// count3
-	byte16 = ReadLE16(ptr8);
-	army.At(2).SetCount(byte16);
-	++ptr8;
-	++ptr8;
-
-	// count4
-	byte16 = ReadLE16(ptr8);
-	army.At(3).SetCount(byte16);
-	++ptr8;
-	++ptr8;
-
-	// count5
-	byte16 = ReadLE16(ptr8);
-	army.At(4).SetCount(byte16);
-	++ptr8;
-	++ptr8;
+	army.Assign(troops, ARRAY_COUNT_END(troops));
 
 	SetModes(CUSTOMARMY);
     }
@@ -710,7 +679,7 @@ bool Castle::RecruitMonster(u32 dw, u16 count)
     Kingdom & kingdom = world.GetKingdom(color);
 
     // may be guardian present
-    Army::army_t & army2 = GetArmy();
+    Army & army2 = GetArmy();
 
     if(! kingdom.AllowPayment(paymentCosts) || !army2.JoinTroop(ms, count)) return false;
 
@@ -745,7 +714,7 @@ u16 Castle::RecruitMaxMonster(u32 dw)
     u16 count = 0;
 
     // may be guardian present
-    Army::army_t & army2 = GetArmy();
+    Army & army2 = GetArmy();
 
     if(army2.CanJoinTroop(ms))
     {
@@ -1812,26 +1781,26 @@ void Castle::RecruitAllMonster(void)
 	if(isBuild(dw)) RecruitMaxMonster(dw);
 }
 
-const Army::army_t & Castle::GetArmy(void) const
+const Army & Castle::GetArmy(void) const
 {
     const CastleHeroes heroes = world.GetHeroes(*this);
     return heroes.Guard() ? heroes.Guard()->GetArmy() : army;
 }
 
-Army::army_t & Castle::GetArmy(void)
+Army & Castle::GetArmy(void)
 {
     CastleHeroes heroes = world.GetHeroes(*this);
     return heroes.Guard() ? heroes.Guard()->GetArmy() : army;
 }
 
-const Army::army_t & Castle::GetActualArmy(void) const
+const Army & Castle::GetActualArmy(void) const
 {
     CastleHeroes heroes = world.GetHeroes(*this);
     const Heroes *hero = heroes.GuardFirst();
     return hero ? hero->GetArmy() : army;
 }
 
-Army::army_t & Castle::GetActualArmy(void)
+Army & Castle::GetActualArmy(void)
 {
     CastleHeroes heroes = world.GetHeroes(*this);
     Heroes *hero = heroes.GuardFirst();
@@ -1975,7 +1944,7 @@ void Castle::ActionAfterBattle(bool attacker_wins)
 {
     if(attacker_wins)
     {
-	army.Clear();
+	army.Clean();
     }
 
     if(CONTROL_AI & GetControl())

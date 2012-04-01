@@ -43,7 +43,7 @@
 #include "profit.h"
 #include "buildinginfo.h"
 #include "skill.h"
-#include "battle2.h"
+#include "battle.h"
 #include "tools.h"
 #include "difficulty.h"
 #include "game_static.h"
@@ -361,13 +361,13 @@ void Game::LoadExternalResource(const Settings & conf)
     spec = Settings::GetLastFile(prefix_stats, "animations.xml");
 
     if(IsFile(spec))
-	Battle2::UpdateMonsterInfoAnimation(spec);
+	Battle::UpdateMonsterSpriteAnimation(spec);
 
     // battle.xml
     spec = Settings::GetLastFile(prefix_stats, "battle.xml");
 
     if(IsFile(spec))
-	Battle2::UpdateMonsterAttributes(spec);
+	Battle::UpdateMonsterAttributes(spec);
 
     // monsters.xml
     spec = Settings::GetLastFile(prefix_stats, "monsters.xml");
@@ -484,4 +484,24 @@ std::string Game::CountScoute(u32 count, u8 scoute)
     }
 
     return res;
+}
+
+void Game::PlayPickupSound(void)
+{
+    M82::m82_t wav = M82::UNKNOWN;
+
+    switch(Rand::Get(1, 7))
+    {
+        case 1: wav = M82::PICKUP01; break;
+        case 2: wav = M82::PICKUP02; break;
+        case 3: wav = M82::PICKUP03; break;
+        case 4: wav = M82::PICKUP04; break;
+        case 5: wav = M82::PICKUP05; break;
+        case 6: wav = M82::PICKUP06; break;
+        case 7: wav = M82::PICKUP07; break;
+
+        default: return;
+    }
+
+    AGG::PlaySound(wav);
 }

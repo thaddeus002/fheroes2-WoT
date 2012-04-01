@@ -527,9 +527,12 @@ void Game::IO::PackCastle(QueueMessage & msg, const Castle & castle)
     msg.Push(static_cast<u32>(castle.army.Size()));
     for(u32 jj = 0; jj < castle.army.Size(); ++jj)
     {
-	const Army::Troop & troop = castle.army.At(jj);
-	msg.Push(troop().GetID());
-	msg.Push(troop.GetCount());
+	const Troop* troop = castle.army.GetTroop(jj);
+	if(troop)
+	{
+	    msg.Push(troop->GetID());
+	    msg.Push(troop->GetCount());
+	}
     }
 
     // dwelling
@@ -606,9 +609,12 @@ void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
     msg.Push(static_cast<u32>(hero.army.Size()));
     for(u32 jj = 0; jj < hero.army.Size(); ++jj)
     {
-	const Army::Troop & troop = hero.army.At(jj);
-	msg.Push(troop().GetID());
-	msg.Push(troop.GetCount());
+	const Troop* troop = hero.army.GetTroop(jj);
+	if(troop)
+	{
+	    msg.Push(troop->GetID());
+	    msg.Push(troop->GetCount());
+	}
     }
 	
     // visit objects
@@ -1227,9 +1233,9 @@ void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle, u16 check_versi
     for(u32 jj = 0; jj < castle.army.Size(); ++jj)
     {
 	msg.Pop(byte8);
-	castle.army.At(jj).SetMonster(Monster(byte8));
         msg.Pop(byte32);
-        castle.army.At(jj).SetCount(byte32);
+	Troop* troop = castle.army.GetTroop(jj);
+	if(troop) troop->Set(Monster(byte8), byte32);
     }
     castle.army.SetColor(castle.color);
 
@@ -1333,10 +1339,10 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     msg.Pop(byte32);
     for(u32 jj = 0; jj < hero.army.Size(); ++jj)
     {
-	    msg.Pop(byte8);
-	    hero.army.At(jj).SetMonster(Monster(byte8));
-    	    msg.Pop(byte32);
-	    hero.army.At(jj).SetCount(byte32);
+	msg.Pop(byte8);
+    	msg.Pop(byte32);
+	Troop* troop = hero.army.GetTroop(jj);
+	if(troop) troop->Set(Monster(byte8), byte32);
     }
 
     // visit objects

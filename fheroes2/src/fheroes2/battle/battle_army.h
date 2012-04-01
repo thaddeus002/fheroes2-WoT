@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2010 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *   Copyright (C) 2012 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
@@ -20,40 +20,65 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2AI_H
-#define H2AI_H
+#ifndef H2BATTLE_ARMY_H
+#define H2BATTLE_ARMY_H
 
-#include "gamedefs.h"
+#include "army.h"
 
-class Castle;
-class HeroBase;
-class Heroes;
-class Kingdom;
-namespace Battle { class Arena; class Unit; class Actions; }
-
-struct AI
+namespace Battle
 {
-    static void AddCastle(const Castle &);
-    static void RemoveCastle(const Castle &);
-    static void AddHeroes(const Heroes &);
-    static void RemoveHeroes(const Heroes &);
+    class Unit;
 
-    static void Init(void);
+    class Units : public std::vector<Unit*>
+    {
+    public:
+	Units();
+	Units(const Units &);
+	Units(const Units &, const Units &);
+	virtual ~Units();
 
-    static void KingdomTurn(Kingdom &);
-    static void BattleTurn(Battle::Arena &, const Battle::Unit &, Battle::Actions &);
-    static bool BattleMagicTurn(Battle::Arena &, const Battle::Unit &, Battle::Actions &, const Battle::Unit*);
-    static void HeroesPreBattle(HeroBase &);
-    static void HeroesAfterBattle(HeroBase &);
-    static void HeroesAction(Heroes &, s32);
-    static void HeroesLevelUp(Heroes &);
-    static std::string HeroesString(const Heroes &);
+	Units &		operator= (const Units &);
 
-    static void CastlePreBattle(Castle &);
-    static void CastleAfterBattle(Castle &, bool attacker_wins);
+	Unit*		FindMode(u32);
+        Unit*		FindUID(u32);
 
-    static const char* Type(void);
-    static const char* License(void);
-};
+        void		SortSlowest(void);
+        void		SortFastest(void);
+        void		SortStrongest(void);
+        void		SortWeakest(void);
+    };
+
+    class Force : public Units
+    {
+    public:
+	Force(Army &, bool);
+	~Force();
+
+    HeroBase*		GetCommander(void);
+    const HeroBase*	GetCommander(void) const;
+
+    bool		isValid(void) const;
+    bool		HasMonster(const Monster &) const;
+    u32			GetDeadHitPoints(void) const;
+    u32			GetDeadCounts(void) const;
+    u8			GetColor(void) const;
+    u8			GetControl(void) const;
+    u32                 GetSurrenderCost(void) const;
+    Troops		GetKilledTroops(void) const;
+    bool		SetIdleAnimation(void);
+    bool		NextIdleAnimation(void);
+
+    void		NewTurn(void);
+    void		SyncArmyCount(void);
+
+    static Unit*	GetCurrentUnit(const Force &, const Force &, Unit* last, Units* all, bool part1);
+
+    private:
+	Army &		army;
+    };
+
+    QueueMessage & operator<< (QueueMessage &, const Force &);
+    QueueMessage & operator>> (QueueMessage &, Force &);
+}
 
 #endif

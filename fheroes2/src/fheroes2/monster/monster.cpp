@@ -278,14 +278,29 @@ void Monster::Upgrade(void)
     id = GetUpgrade().id;
 }
 
-u8 Monster::GetAttack(void) const
+u16 Monster::GetAttack(void) const
 {
     return monsters[id].attack;
 }
 
-u8 Monster::GetDefense(void) const
+u16 Monster::GetDefense(void) const
 {
     return monsters[id].defense;
+}
+
+u8 Monster::GetColor(void) const
+{
+    return Color::NONE;
+}
+
+s8 Monster::GetMorale(void) const
+{
+    return Morale::NORMAL;
+}
+
+s8 Monster::GetLuck(void) const
+{
+    return Luck::NORMAL;
 }
 
 u8 Monster::GetRace(void) const
@@ -401,6 +416,11 @@ bool Monster::isElemental(void) const
     return false;
 }
 
+bool Monster::isAlive(void) const
+{
+    return !isUndead() && !isElemental();
+}
+
 bool Monster::isDragons(void) const
 {
     switch(id)
@@ -508,6 +528,52 @@ bool Monster::isTwiceAttack(void) const
     }
 
     return false;
+}
+
+bool Monster::isResurectLife(void) const
+{
+    switch(id)
+    {
+        case TROLL:
+        case WAR_TROLL:
+            return true;
+
+        default: break;
+    }
+
+    return false;
+}
+
+bool Monster::isDoubleCellAttack(void) const
+{
+    switch(id)
+    {
+        case CYCLOPS:
+        case PHOENIX:
+        case GREEN_DRAGON:
+        case RED_DRAGON:
+        case BLACK_DRAGON:
+            return true;
+
+        default: break;
+    }
+
+    return false;
+}
+
+bool Monster::isMultiCellAttack(void) const
+{
+    return id == HYDRA;
+}
+
+bool Monster::isAlwayResponse(void) const
+{
+    return id == GRIFFIN;
+}
+
+bool Monster::isAffectedByMorale(void) const
+{
+    return !(isUndead() || isElemental());
 }
 
 Monster Monster::GetUpgrade(void) const

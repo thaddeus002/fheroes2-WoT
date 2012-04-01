@@ -27,14 +27,14 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                           *
  *******************************************************************************/
 
-#include <functional>                                                                                                         
-#include <algorithm>                                                                                                          
+#include <functional>
+#include <algorithm>
 
 #include "settings.h"
 #include "kingdom.h"
 #include "castle.h"
 #include "army.h"
-#include "battle2.h"
+#include "battle.h"
 #include "luck.h"
 #include "morale.h"
 #include "race.h"
@@ -159,7 +159,7 @@ Skill::Primary::skill_t AISelectPrimarySkill(Heroes &hero)
 	    if(3 > hero.GetDefense())	return Skill::Primary::DEFENSE;
 	    break;
 	}
-	
+
 	default: break;
     }
 
@@ -175,12 +175,12 @@ Skill::Primary::skill_t AISelectPrimarySkill(Heroes &hero)
     return Skill::Primary::UNKNOWN;
 }
 
-void AIBattleLose(Heroes &hero, const Battle2::Result & res, bool attacker, Color::color_t color = Color::NONE)
+void AIBattleLose(Heroes &hero, const Battle::Result & res, bool attacker, Color::color_t color = Color::NONE)
 {
     u8 reason = attacker ? res.AttackerResult() : res.DefenderResult();
 
     if(Settings::Get().ExtHeroSurrenderingGiveExp() &&
-	Battle2::RESULT_SURRENDER == reason)
+	Battle::RESULT_SURRENDER == reason)
     {
         const u32 & exp = attacker ? res.GetExperienceAttacker() : res.GetExperienceDefender();
 
@@ -389,8 +389,8 @@ void AIToHeroes(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
         DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " attack enemy hero " << other_hero->GetName());
 
-            // new battle2
-            Battle2::Result res = Battle2::Loader(hero.GetArmy(), other_hero->GetArmy(), dst_index);
+            // new battle
+            Battle::Result res = Battle::Loader(hero.GetArmy(), other_hero->GetArmy(), dst_index);
 
             // loss defender
             if(!res.DefenderWins())
@@ -451,7 +451,7 @@ void AIToCastle(Heroes & hero, const u8 & obj, const s32 & dst_index)
             return;
         }
 
-        Army::army_t & army = castle->GetActualArmy();
+        Army & army = castle->GetActualArmy();
 	//bool allow_enter = false;
 
 	if(army.isValid())
@@ -461,8 +461,8 @@ void AIToCastle(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    Heroes* defender = heroes.GuardFirst();
 	    castle->ActionPreBattle();
 
-            // new battle2
-            Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
+            // new battle
+            Battle::Result res = Battle::Loader(hero.GetArmy(), army, dst_index);
 
 	    castle->ActionAfterBattle(res.AttackerWins());
 
@@ -518,7 +518,7 @@ void AIToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
     bool destroy = false;
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const Army::Troop & troop = tile.QuantityTroop();
+    const Troop & troop = tile.QuantityTroop();
     //const Settings & conf = Settings::Get();
 
     u32 join = 0;
@@ -562,11 +562,11 @@ void AIToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
     {
 	DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " attack monster " << troop.GetName());
 
-	Army::army_t army;
+	Army army;
 	army.JoinTroop(troop);
 	army.ArrangeForBattle();
 
-    	Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
+    	Battle::Result res = Battle::Loader(hero.GetArmy(), army, dst_index);
 
     	if(res.AttackerWins())
     	{
@@ -579,7 +579,7 @@ void AIToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
     	    AIBattleLose(hero, res, true);
     	    if(Settings::Get().ExtWorldSaveMonsterBattle())
     	    {
-            	tile.MonsterSetCount(army.MonsterCounts(troop()));
+            	tile.MonsterSetCount(army.GetCountMonsters(troop()));
             	if(tile.MonsterJoinConditionFree()) tile.MonsterSetJoinCondition(Monster::JOIN_CONDITION_MONEY);
     	    }
     	}
@@ -746,10 +746,12 @@ void AIToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 	if(tile.CaptureObjectIsProtection())
 	{
-	    Army::army_t army(tile);
-            const Monster & mons =  tile.QuantityMonster();
+	    const Troop & troop = tile.QuantityTroop();
+	    Army army;
+            army.JoinTroop(troop);
+            army.SetColor(tile.QuantityColor());
 
-	    Battle2::Result result = Battle2::Loader(hero.GetArmy(), army, dst_index);
+	    Battle::Result result = Battle::Loader(hero.GetArmy(), army, dst_index);
 
 	    if(result.AttackerWins())
 	    {
@@ -760,7 +762,7 @@ void AIToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
 		capture = false;
 	        AIBattleLose(hero, result, true);
 		if(Settings::Get().ExtWorldSaveMonsterBattle())
-		    tile.MonsterSetCount(army.MonsterCounts(mons));
+		    tile.MonsterSetCount(army.GetCountMonsters(troop.GetMonster()));
 	    }
 	}
 
@@ -869,7 +871,7 @@ void AIToWhirlpools(Heroes & hero, const s32 & index_from)
 
     hero.Move2Dest(index_to, true);
 
-    Army::Troop & troops = hero.GetArmy().GetWeakestTroop();
+    Troop & troops = hero.GetArmy().GetWeakestTroop();
 
     if(Rand::Get(1) && 1 < troops.GetCount())
 	troops.SetCount(Monster::GetCountFromHitPoints(troops(), troops.GetHitPoints() - troops.GetHitPoints() * Game::GetWhirlpoolPercent() / 100));
@@ -955,7 +957,7 @@ void AIToWitchsHut(Heroes & hero, const u8 & obj, const s32 & dst_index)
     const Skill::Secondary & skill = world.GetTiles(dst_index).QuantitySkill();
 
     // check full
-    if(skill.isValid() && 
+    if(skill.isValid() &&
 	!hero.HasMaxSecondarySkill() && !hero.HasSecondarySkill(skill.Skill()))
 	hero.LearnSkill(skill);
 
@@ -1125,9 +1127,9 @@ void AIToPoorMoraleObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
     if(gold)
     {
-	Army::army_t army(tile);
+	Army army(tile);
 
-        Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
+        Battle::Result res = Battle::Loader(hero.GetArmy(), army, dst_index);
         if(res.AttackerWins())
         {
     	    hero.IncreaseExperience(res.GetExperienceAttacker());
@@ -1167,9 +1169,9 @@ void AIToPoorLuckObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
     if(spell.isValid())
     {
         // battle
-        Army::army_t army(tile);
+        Army army(tile);
 
-	Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
+	Battle::Result res = Battle::Loader(hero.GetArmy(), army, dst_index);
 
     	if(res.AttackerWins())
 	{
@@ -1240,9 +1242,9 @@ void AIToDaemonCave(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
     if(tile.QuantityIsValid())
     {
-        Army::army_t army(tile);
+        Army army(tile);
 
-        Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
+        Battle::Result res = Battle::Loader(hero.GetArmy(), army, dst_index);
         if(res.AttackerWins())
 	{
             hero.IncreaseExperience(res.GetExperienceAttacker());
@@ -1262,7 +1264,7 @@ void AIToDaemonCave(Heroes & hero, const u8 & obj, const s32 & dst_index)
 void AIToDwellingJoinMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const Army::Troop & troop = tile.QuantityTroop();
+    const Troop & troop = tile.QuantityTroop();
 
     if(troop.isValid() && hero.GetArmy().JoinTroop(troop)) tile.MonsterSetCount(0);
 
@@ -1272,7 +1274,7 @@ void AIToDwellingJoinMonster(Heroes & hero, const u8 & obj, const s32 & dst_inde
 void AIToDwellingRecruitMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const Army::Troop & troop = tile.QuantityTroop();
+    const Troop & troop = tile.QuantityTroop();
 
     if(troop.isValid())
     {
@@ -1307,7 +1309,7 @@ void AIToStables(Heroes & hero, const u8 & obj, const s32 & dst_index)
     }
 
     if(hero.GetArmy().HasMonster(Monster::CAVALRY)) hero.GetArmy().UpgradeMonsters(Monster::CAVALRY);
-                                                                
+
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
@@ -1388,10 +1390,10 @@ void AIToArtifact(Heroes & hero, const u8 & obj, const s32 & dst_index)
         // 6 - 50 rogues, 7 - 1 gin, 8,9,10,11,12,13 - 1 monster level4
 	if(5 < cond && cond < 14)
         {
-    	    Army::army_t army(tile);
+    	    Army army(tile);
 
-	    // new battle2
-            Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
+	    // new battle
+            Battle::Result res = Battle::Loader(hero.GetArmy(), army, dst_index);
             if(res.AttackerWins())
             {
         	hero.IncreaseExperience(res.GetExperienceAttacker());
@@ -1510,14 +1512,18 @@ void AI::HeroesPreBattle(HeroBase & hero)
 {
     Castle* castle = world.GetCastle(hero.GetIndex());
     if(castle && hero.GetType() != Skill::Primary::CAPTAIN)
-	hero.GetArmy().JoinArmy(castle->GetArmy());
+	hero.GetArmy().JoinTroops(castle->GetArmy());
+}
+
+void AI::HeroesAfterBattle(HeroBase & hero)
+{
 }
 
 bool AIHeroesValidObject(const Heroes & hero, s32 index)
 {
     Maps::Tiles & tile = world.GetTiles(index);
     const u8 obj = tile.GetObject();
-    const Army::army_t & army = hero.GetArmy();
+    const Army & army = hero.GetArmy();
     const Kingdom & kingdom = world.GetKingdom(hero.GetColor());
 
     // check other
@@ -1558,8 +1564,8 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 	    {
 		if(tile.CaptureObjectIsProtection())
 		{
-		    Army::army_t enemy(tile);
-		    return !enemy.isValid() || army.StrongerEnemyArmy(enemy);
+		    Army enemy(tile);
+		    return !enemy.isValid() || Army::TroopsStrongerEnemyTroops(army, enemy);
 		}
 		else
 		return true;
@@ -1582,8 +1588,8 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 		{
 		    if(tile.CaptureObjectIsProtection())
 		    {
-			Army::army_t enemy(tile);
-			return !enemy.isValid() || army.StrongerEnemyArmy(enemy);
+			Army enemy(tile);
+			return !enemy.isValid() || Army::TroopsStrongerEnemyTroops(army, enemy);
 		    }
 		    else
 		    return true;
@@ -1623,8 +1629,8 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 	    // 6 - 50 rogues, 7 - 1 gin, 8,9,10,11,12,13 - 1 monster level4
 	    if(5 < variants && 14 > variants)
 	    {
-                Army::army_t enemy(tile);
-		return !enemy.isValid() || army.StrongerEnemyArmy(enemy);
+                Army enemy(tile);
+		return !enemy.isValid() || Army::TroopsStrongerEnemyTroops(army, enemy);
 	    }
 	    else
 	    // other
@@ -1653,7 +1659,7 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 	case MP2::OBJ_SHRINE3:
 	{
 	    const Spell & spell = tile.QuantitySpell();
-	    if(spell.isValid() && 
+	    if(spell.isValid() &&
 		 // check spell book
 		hero.HaveSpellBook() &&
 		!hero.HaveSpell(spell) &&
@@ -1734,10 +1740,10 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
         case MP2::OBJ_PEASANTHUT:
         case MP2::OBJ_THATCHEDHUT:
         {
-    	    const Army::Troop & troop = tile.QuantityTroop();
+    	    const Troop & troop = tile.QuantityTroop();
 	    if(troop.isValid() &&
 		(army.HasMonster(troop()) ||
-		(army.GetCount() < army.Size() && (troop.isArchers() || troop.isFly())))) return true;
+		(! army.isFullHouse() && (troop.isArchers() || troop.isFly())))) return true;
 	    break;
 	}
 
@@ -1752,13 +1758,13 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
         case MP2::OBJ_EARTHALTAR:
         case MP2::OBJ_BARROWMOUNDS:
 	{
-	    const Army::Troop & troop = tile.QuantityTroop();
+	    const Troop & troop = tile.QuantityTroop();
 	    const payment_t paymentCosts = troop.GetCost();
 	    const Funds & kingdomResource = kingdom.GetFunds();
 
 	    if(troop.isValid() && paymentCosts <= kingdomResource &&
 		(army.HasMonster(troop()) ||
-		(army.GetCount() < army.Size() && (troop.isArchers() || troop.isFly())))) return true;
+		(! army.isFullHouse() && (troop.isArchers() || troop.isFly())))) return true;
 	    break;
 	}
 
@@ -1770,13 +1776,13 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
     	    const bool battle = (Color::NONE == tile.QuantityColor());
 	    if(!battle)
 	    {
-		const Army::Troop & troop = tile.QuantityTroop();
+		const Troop & troop = tile.QuantityTroop();
 		const payment_t paymentCosts = troop.GetCost();
 		const Funds & kingdomResource = kingdom.GetFunds();
 
 		if(troop.isValid() && paymentCosts <= kingdomResource &&
 		(army.HasMonster(troop()) ||
-		(army.GetCount() < army.Size()))) return true;
+		(! army.isFullHouse()))) return true;
 	    }
 	    break;
         }
@@ -1784,13 +1790,13 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 	// recruit genie
 	case MP2::OBJ_ANCIENTLAMP:
 	{
-	    const Army::Troop & troop = tile.QuantityTroop();
+	    const Troop & troop = tile.QuantityTroop();
 	    const payment_t paymentCosts = troop.GetCost();
 	    const Funds & kingdomResource = kingdom.GetFunds();
 
 	    if(troop.isValid() && paymentCosts <= kingdomResource &&
 		(army.HasMonster(troop()) ||
-		(army.GetCount() < army.Size()))) return true;
+		(! army.isFullHouse()))) return true;
 	    break;
 	}
 
@@ -1825,8 +1831,8 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 	    if(! hero.isVisited(tile, Visit::GLOBAL) &&
 		tile.QuantityIsValid())
 	    {
-		Army::army_t enemy(tile);
-		return enemy.isValid() && army.StrongerEnemyArmy(enemy);
+		Army enemy(tile);
+		return enemy.isValid() && Army::TroopsStrongerEnemyTroops(army, enemy);
 	    }
 	    break;
 
@@ -1838,8 +1844,8 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 
 	case MP2::OBJ_MONSTER:
 	{
-	    Army::army_t enemy(tile);
-	    return !enemy.isValid() || army.StrongerEnemyArmy(enemy);
+	    Army enemy(tile);
+	    return !enemy.isValid() || Army::TroopsStrongerEnemyTroops(army, enemy);
 	}
 	break;
 
@@ -1859,7 +1865,7 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 		// FIXME: AI skip visiting alliance
 		if(Players::isFriends(hero.GetColor(), castle->GetColor())) return false;
 		else
-		if(army.StrongerEnemyArmy(castle->GetActualArmy())) return true;
+		if(Army::TroopsStrongerEnemyTroops(army, castle->GetActualArmy())) return true;
 	    }
 	    break;
 	}
@@ -1875,7 +1881,7 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 		if(Players::isFriends(hero.GetColor(), hero2->GetColor())) return false;
 		else
 		if(hero2->AllowBattle(false) &&
-		    army.StrongerEnemyArmy(hero2->GetArmy())) return true;
+		    Army::TroopsStrongerEnemyTroops(army, hero2->GetArmy())) return true;
 	    }
 	    break;
 	}
@@ -1978,7 +1984,7 @@ s32  FindUncharteredTerritory(Heroes & hero, const u8 & scoute)
     }
 
     const s32 result = res.size() ? *Rand::Get(res) : -1;
-    
+
     if(0 <= result)
     {
 	DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
@@ -2012,7 +2018,7 @@ s32  GetRandomHeroesPosition(Heroes & hero, const u8 & scoute)
     }
 
     const s32 result = res.size() ? *Rand::Get(res) : -1;
-    
+
     if(0 <= result)
     {
 	DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
@@ -2111,7 +2117,7 @@ void AIHeroesAddedTask(Heroes & hero)
 	    hero.GetPath().Calculate((*it).first))
 	{
 	    DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
-		    ", hero: " << hero.GetName() << ", added tasks: " << 
+		    ", hero: " << hero.GetName() << ", added tasks: " <<
 		    MP2::StringObject(ai_objects[(*it).first]) << ", index: " << (*it).first <<
 		    ", distance: " << (*it).second);
 
@@ -2121,7 +2127,7 @@ void AIHeroesAddedTask(Heroes & hero)
 	else
 	{
 	    DEBUG(DBG_AI, DBG_TRACE, Color::String(hero.GetColor()) <<
-		    ", hero: " << hero.GetName() << (!validobj ? ", invalid: " : ", impossible: ") << 
+		    ", hero: " << hero.GetName() << (!validobj ? ", invalid: " : ", impossible: ") <<
 		    MP2::StringObject(ai_objects[(*it).first]) << ", index: " << (*it).first <<
 		    ", distance: " << (*it).second);
 	}
@@ -2650,7 +2656,7 @@ void AIHeroesCaptureNearestTown(Heroes* hero)
 		    DEBUG(DBG_AI, DBG_TRACE, hero->GetName() << ", to castle: " << castle->GetName());
 
 		if(castle &&
-		    hero->GetArmy().StrongerEnemyArmy(castle->GetArmy()))
+		    Army::TroopsStrongerEnemyTroops(hero->GetArmy(), castle->GetArmy()))
 		{
 		    ai_hero.primary_target = *it;
 

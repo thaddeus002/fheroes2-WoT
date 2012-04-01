@@ -133,10 +133,10 @@ public:
     bool isLibraryBuild(void) const;
     void MageGuildEducateHero(HeroBase &) const;
 
-    const Army::army_t & GetArmy(void) const;
-    Army::army_t & GetArmy(void);
-    const Army::army_t & GetActualArmy(void) const;
-    Army::army_t & GetActualArmy(void);
+    const Army & GetArmy(void) const;
+    Army & GetArmy(void);
+    const Army & GetActualArmy(void) const;
+    Army & GetActualArmy(void);
     u16 GetDwellingLivedCount(u32) const;
     u32 GetActualDwelling(u32) const;
 
@@ -221,7 +221,7 @@ private:
 
     MageGuild		mageguild;
     u16			dwelling[CASTLEMAXMONSTER];
-    Army::army_t        army;
+    Army        army;
 };
 
 namespace CastleDialog

@@ -30,10 +30,10 @@
 #include "localclient.h"
 #include "world.h"
 #include "kingdom.h"
-#include "battle2.h"
+#include "battle.h"
 #include "spell.h"
-#include "battle_stats.h"
 #include "heroes_recruits.h"
+#include "battle_troop.h"
 #include "server.h"
 
 #ifdef WITH_NET
@@ -71,7 +71,9 @@ FH2Server::FH2Server()
     }
 
     if(!PrepareMapsFileInfoList(finfoList, true))
-	    DEBUG(DBG_NETWORK, DBG_WARN, "maps not found");
+    {
+	DEBUG(DBG_NETWORK, DBG_WARN, "maps not found");
+    }
     else
 	Settings::Get().SetCurrentFileInfo(finfoList.front());
 
@@ -234,7 +236,7 @@ int FH2Server::Main(void* ptr)
 				hero2->SetSpellPoints(hero2->GetMaxSpellPoints());
 				hero2->Recruit(color2, Point(5, 6));
 
-				Battle2::Loader(hero1->GetArmy(), hero2->GetArmy(), hero1->GetIndex() + 1);
+				Battle::Loader(hero1->GetArmy(), hero2->GetArmy(), hero1->GetIndex() + 1);
 			    }
 			    server.MsgShutdown(msg);
 			}
@@ -267,7 +269,7 @@ int FH2Server::Main(void* ptr)
     return 1;
 }
 
-bool FH2Server::BattleRecvTurn(u8 color, const Battle2::Stats & b, const Battle2::Arena & arena, Battle2::Actions & a)
+bool FH2Server::BattleRecvTurn(u8 color, const Battle::Unit & b, const Battle::Arena & arena, Battle::Actions & a)
 {
     DEBUG(DBG_NETWORK, DBG_INFO, "color: " << static_cast<int>(color));
 
@@ -732,16 +734,13 @@ bool FH2Server::BattleSendAction(u8 color, QueueMessage & msg)
     return false;
 }
 
-bool FH2Server::BattleSendResult(u8 color, const Battle2::Result & res)
+bool FH2Server::BattleSendResult(u8 color, const Battle::Result & res)
 {
     FH2RemoteClient* client = clients.GetClient(color);
     if(client)
     {
 	QueueMessage msg(MSG_BATTLE_RESULT);
-	msg.Push(res.army1);
-	msg.Push(res.army2);
-	msg.Push(res.exp1);
-	msg.Push(res.exp2);
+	msg << res;
 
 	DEBUG(DBG_NETWORK, DBG_INFO, "size: " << std::dec << msg.DtSz() << " bytes");
 	return client->Send(msg);
@@ -749,18 +748,17 @@ bool FH2Server::BattleSendResult(u8 color, const Battle2::Result & res)
     return false;
 }
 
-bool FH2Server::BattleSendAttack(u8 color, const Battle2::Stats & attacker, const Battle2::Stats & defender, u16 dst, const Battle2::TargetsInfo & targets)
+bool FH2Server::BattleSendAttack(u8 color, const Battle::Unit & attacker, const Battle::Unit & defender, u16 dst, const Battle::TargetsInfo & targets)
 {
     FH2RemoteClient* client = clients.GetClient(color);
     if(client)
     {
 	QueueMessage msg(MSG_BATTLE_ATTACK);
-	msg.Push(attacker.GetID());
-	attacker.Pack(msg);
-	msg.Push(defender.GetID());
-	defender.Pack(msg);
-	msg.Push(dst);
-	targets.Pack(msg);
+
+	msg <<
+	    attacker.GetID() << attacker <<
+	    defender.GetID() << defender <<
+	    dst << targets;
 
 	DEBUG(DBG_NETWORK, DBG_INFO, "size: " << std::dec << msg.DtSz() << " bytes");
 	return client->Send(msg);
@@ -768,13 +766,13 @@ bool FH2Server::BattleSendAttack(u8 color, const Battle2::Stats & attacker, cons
     return false;
 }
 
-bool FH2Server::BattleSendBoard(u8 color, const Battle2::Arena & a)
+bool FH2Server::BattleSendBoard(u8 color, const Battle::Arena & a)
 {
     FH2RemoteClient* client = clients.GetClient(color);
     if(client)
     {
 	QueueMessage msg(MSG_BATTLE_BOARD);
-	a.PackBoard(msg);
+	msg << a;
 
 	DEBUG(DBG_NETWORK, DBG_INFO, "size: " << std::dec << msg.DtSz() << " bytes");
 	return client->Send(msg);
@@ -782,17 +780,13 @@ bool FH2Server::BattleSendBoard(u8 color, const Battle2::Arena & a)
     return false;
 }
 
-bool FH2Server::BattleSendSpell(u8 color, u16 who, u16 dst, const Spell & spell, const Battle2::TargetsInfo & targets)
+bool FH2Server::BattleSendSpell(u8 color, u32 who, s16 dst, const Spell & spell, const Battle::TargetsInfo & targets)
 {
     FH2RemoteClient* client = clients.GetClient(color);
     if(client)
     {
 	QueueMessage msg(MSG_BATTLE_CAST);
-	msg.Push(spell());
-	msg.Push(who);
-	msg.Push(dst);
-	msg.Push(color);
-	targets.Pack(msg);
+	msg << spell() << who << dst << color << targets;
 
 	DEBUG(DBG_NETWORK, DBG_INFO, spell.GetName() << " " << "size: " << std::dec << msg.DtSz() << " bytes");
 	return client->Send(msg);
@@ -808,9 +802,7 @@ bool FH2Server::BattleSendTeleportSpell(u8 color, u16 src, u16 dst)
     if(client)
     {
 	QueueMessage msg(MSG_BATTLE_CAST);
-	msg.Push(spell());
-	msg.Push(src);
-	msg.Push(dst);
+	msg << spell() << src << dst;
 
 	DEBUG(DBG_NETWORK, DBG_INFO, spell.GetName() << " " << "size: " << std::dec << msg.DtSz() << " bytes");
 	return client->Send(msg);
@@ -818,7 +810,7 @@ bool FH2Server::BattleSendTeleportSpell(u8 color, u16 src, u16 dst)
     return false;
 }
 
-bool FH2Server::BattleSendMirrorImageSpell(u8 color, u16 src, u16 dst, const Battle2::Stats & image)
+bool FH2Server::BattleSendMirrorImageSpell(u8 color, u16 src, u16 dst, const Battle::Unit & image)
 {
     Spell spell(Spell::MIRRORIMAGE);
 
@@ -826,11 +818,7 @@ bool FH2Server::BattleSendMirrorImageSpell(u8 color, u16 src, u16 dst, const Bat
     if(client)
     {
 	QueueMessage msg(MSG_BATTLE_CAST);
-	msg.Push(spell());
-	msg.Push(src);
-	msg.Push(dst);
-	msg.Push(image.GetID());
-	image.Pack(msg);
+	msg << spell() << src << dst << image.GetID() << image;
 
 	DEBUG(DBG_NETWORK, DBG_INFO, spell.GetName() << " " << "size: " << std::dec << msg.DtSz() << " bytes");
 	return client->Send(msg);
@@ -838,15 +826,13 @@ bool FH2Server::BattleSendMirrorImageSpell(u8 color, u16 src, u16 dst, const Bat
     return false;
 }
 
-bool FH2Server::BattleSendSummonElementalSpell(u8 color, const Spell & spell, const Battle2::Stats & elem)
+bool FH2Server::BattleSendSummonElementalSpell(u8 color, const Spell & spell, const Battle::Unit & elem)
 {
     FH2RemoteClient* client = clients.GetClient(color);
     if(client)
     {
 	QueueMessage msg(MSG_BATTLE_CAST);
-	msg.Push(spell());
-	msg.Push(elem.GetID());
-	elem.Pack(msg);
+	msg << spell() << elem.GetID() << elem;
 
 	DEBUG(DBG_NETWORK, DBG_INFO, spell.GetName() << " " << "size: " << std::dec << msg.DtSz() << " bytes");
 	return client->Send(msg);
@@ -861,12 +847,11 @@ bool FH2Server::BattleSendEarthQuakeSpell(u8 color, const std::vector<u8> & targ
     {
 	Spell spell(Spell::EARTHQUAKE);
 	QueueMessage msg(MSG_BATTLE_CAST);
-	msg.Push(spell());
-	msg.Push(static_cast<u32>(targets.size()));
+	msg << spell() << static_cast<u32>(targets.size()); // FIXME: serialize
 
 	for(std::vector<u8>::const_iterator
 	    it = targets.begin(); it != targets.end(); ++it)
-	    msg.Push(*it);
+	    msg << *it;
 
 	DEBUG(DBG_NETWORK, DBG_INFO, spell.GetName() << " " << "size: " << std::dec << msg.DtSz() << " bytes");
 	return client->Send(msg);

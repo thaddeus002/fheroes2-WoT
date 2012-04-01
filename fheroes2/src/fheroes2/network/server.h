@@ -32,6 +32,7 @@
 #include "maps_fileinfo.h"
 
 class Spell;
+namespace Battle { class Unit; }
 
 struct RemoteMessage
 {
@@ -80,15 +81,15 @@ public:
     static int RunServerProcess(void*);
 
     bool BattleSendAction(u8, QueueMessage &);
-    bool BattleSendAttack(u8, const Battle2::Stats &, const Battle2::Stats &, u16, const Battle2::TargetsInfo &);
-    bool BattleSendSpell(u8, u16, u16, const Spell &, const Battle2::TargetsInfo &);
+    bool BattleSendAttack(u8, const Battle::Unit &, const Battle::Unit &, u16, const Battle::TargetsInfo &);
+    bool BattleSendSpell(u8, u32, s16, const Spell &, const Battle::TargetsInfo &);
     bool BattleSendTeleportSpell(u8, u16, u16);
-    bool BattleSendMirrorImageSpell(u8, u16, u16, const Battle2::Stats &);
-    bool BattleSendSummonElementalSpell(u8, const Spell &, const Battle2::Stats &);
+    bool BattleSendMirrorImageSpell(u8, u16, u16, const Battle::Unit &);
+    bool BattleSendSummonElementalSpell(u8, const Spell &, const Battle::Unit &);
     bool BattleSendEarthQuakeSpell(u8, const std::vector<u8> &);
-    bool BattleSendBoard(u8, const Battle2::Arena &);
-    bool BattleSendResult(u8, const Battle2::Result &);
-    bool BattleRecvTurn(u8, const Battle2::Stats &, const Battle2::Arena &, Battle2::Actions &);
+    bool BattleSendBoard(u8, const Battle::Arena &);
+    bool BattleSendResult(u8, const Battle::Result &);
+    bool BattleRecvTurn(u8, const Battle::Unit &, const Battle::Arena &, Battle::Actions &);
 
 protected:
     FH2Server();

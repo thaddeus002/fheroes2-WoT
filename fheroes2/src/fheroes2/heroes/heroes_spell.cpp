@@ -452,7 +452,7 @@ bool ActionSpellVisions(Heroes & hero)
 	    it = monsters.begin(); it != monsters.end(); ++it)
 	{
 	    const Maps::Tiles & tile = world.GetTiles(*it);
-	    const Army::Troop & troop = tile.QuantityTroop();
+	    const Troop & troop = tile.QuantityTroop();
 
     	    u32 join = troop.GetCount();
     	    Funds cost;
@@ -532,7 +532,7 @@ bool ActionSpellSetGuardian(Heroes & hero, const Spell & spell, u8 id)
 	    tile.SetObject(MP2::OBJ_ABANDONEDMINE);
 	}
 
-	Army::Troop troop = world.GetCapturedObject(tile.GetIndex()).GetTroop();
+	Troop troop = world.GetCapturedObject(tile.GetIndex()).GetTroop();
 	troop.Set(Monster(spell), count);
     }
 

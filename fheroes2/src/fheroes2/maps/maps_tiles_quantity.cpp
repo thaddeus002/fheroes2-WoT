@@ -407,10 +407,10 @@ Monster Maps::Tiles::QuantityMonster(void) const
 	world.GetCapturedObject(GetIndex()).GetTroop() : Monster(Monster::UNKNOWN);
 }
 
-Army::Troop Maps::Tiles::QuantityTroop(void) const
+Troop Maps::Tiles::QuantityTroop(void) const
 {
     return MP2::isCaptureObject(GetObject(false)) ?
-	world.GetCapturedObject(GetIndex()).GetTroop() : Army::Troop(QuantityMonster(), MonsterCount());
+	world.GetCapturedObject(GetIndex()).GetTroop() : Troop(QuantityMonster(), MonsterCount());
 }
 
 void Maps::Tiles::QuantityReset(void)
@@ -776,7 +776,7 @@ void Maps::Tiles::QuantityUpdate(void)
 
         case MP2::OBJ_ABANDONEDMINE:
 	{
-            Army::Troop & troop = world.GetCapturedObject(GetIndex()).GetTroop();
+            Troop & troop = world.GetCapturedObject(GetIndex()).GetTroop();
 
             // I checked in Heroes II: min 3 x 13, and max 3 x 15
 	    troop.Set(Monster::GHOST, 3 * Rand::Get(13, 15));
@@ -1062,7 +1062,7 @@ void Maps::Tiles::UpdateDwellingPopulation(Tiles & tile)
 {
     u16 count = 0;
     const MP2::object_t & obj = tile.GetObject(false);
-    const Army::Troop & troop = tile.QuantityTroop();
+    const Troop & troop = tile.QuantityTroop();
 
     switch(obj)
     {
@@ -1124,7 +1124,7 @@ void Maps::Tiles::UpdateDwellingPopulation(Tiles & tile)
 
 void Maps::Tiles::UpdateMonsterPopulation(Tiles & tile)
 {
-    const Army::Troop & troop = tile.QuantityTroop();
+    const Troop & troop = tile.QuantityTroop();
 
     if(0 == troop.GetCount())
         tile.MonsterSetCount(troop.GetRNDSize(false));

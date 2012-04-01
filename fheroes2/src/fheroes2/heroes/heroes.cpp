@@ -38,16 +38,13 @@
 #include "cursor.h"
 #include "kingdom.h"
 #include "visit.h"
-#include "battle2.h"
+#include "battle.h"
 #include "heroes.h"
 #include "localclient.h"
 #include "game_focus.h"
 #include "game_interface.h"
 #include "game_static.h"
 #include "ai.h"
-
-// heroes_action.cpp
-void PlayPickupSound(void);
 
 const char* Heroes::GetName(heroes_t id)
 {
@@ -242,7 +239,7 @@ Heroes::Heroes(heroes_t ht, u8 rc) : HeroBase(Skill::Primary::HEROES, rc), kille
 	    break;
 
     	case SANDYSANDY:
-	    army.Clear();
+	    army.Clean();
 	    army.JoinTroop(Monster::BLACK_DRAGON, 2);
 	    army.JoinTroop(Monster::RED_DRAGON, 3);
 
@@ -291,61 +288,30 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
     ++ptr8;
 
     // custom troops
-    //bool custom_troop = false;
     if(*ptr8)
     {
         ++ptr8;
-	//custom_troop = true;
 
-        // monster1
-        army.At(0).SetMonster(Monster(*ptr8 + 1));
-        ++ptr8;
+        Troop troops[5];
+        // set monster id
+        for(u8 ii = 0; ii < ARRAY_COUNT(troops); ++ii)
+        {
+            troops[ii].SetMonster(*ptr8 + 1);
+            ++ptr8;
+        }
 
-        // monster2
-        army.At(1).SetMonster(Monster(*ptr8 + 1));
-        ++ptr8;
+        // set count
+        for(u8 ii = 0; ii < ARRAY_COUNT(troops); ++ii)
+        {
+            byte16 = ReadLE16(ptr8);
+            troops[ii].SetCount(byte16);
+            ++ptr8;
+            ++ptr8;
+        }
 
-        // monster3
-        army.At(2).SetMonster(Monster(*ptr8 + 1));
-        ++ptr8;
+        army.Assign(troops, ARRAY_COUNT_END(troops));
 
-        // monster4
-        army.At(3).SetMonster(Monster(*ptr8 + 1));
-        ++ptr8;
-
-        // monster5
-        army.At(4).SetMonster(Monster(*ptr8 + 1));
-        ++ptr8;
-
-        // count1
-        byte16 = ReadLE16(ptr8);
-        army.At(0).SetCount(byte16);
-        ++ptr8;
-        ++ptr8;
-
-        // count2
-        byte16 = ReadLE16(ptr8);
-        army.At(1).SetCount(byte16);
-        ++ptr8;
-        ++ptr8;
-
-        // count3
-        byte16 = ReadLE16(ptr8);
-        army.At(2).SetCount(byte16);
-        ++ptr8;
-        ++ptr8;
-
-        // count4
-        byte16 = ReadLE16(ptr8);
-        army.At(3).SetCount(byte16);
-        ++ptr8;
-        ++ptr8;
-
-        // count5
-        byte16 = ReadLE16(ptr8);
-        army.At(4).SetCount(byte16);
-        ++ptr8;
-        ++ptr8;
+        SetModes(CUSTOMARMY);
     }
     else
     {
@@ -593,7 +559,7 @@ u16 Heroes::GetMaxMovePoints(void) const
     }
     else
     {
-    	switch(army.GetSlowestTroop().GetSpeed())
+    	switch(const_cast<Army &>(army).GetSlowestTroop().GetSpeed())
 	{
 	    default: break;
 	    case Speed::CRAWLING:
@@ -1336,15 +1302,15 @@ void Heroes::SetFreeman(const u8 reason)
     bool savepoints = false;
     Kingdom & kingdom = world.GetKingdom(color);
 
-    if((Battle2::RESULT_RETREAT | Battle2::RESULT_SURRENDER) & reason)
+    if((Battle::RESULT_RETREAT | Battle::RESULT_SURRENDER) & reason)
     {
 	if(Settings::Get().ExtHeroRememberPointsForRetreating()) savepoints = true;
 	kingdom.SetLastLostHero(*this);
     }
 
-    if(!army.isValid() || (Battle2::RESULT_RETREAT & reason)) army.Reset(false);
+    if(!army.isValid() || (Battle::RESULT_RETREAT & reason)) army.Reset(false);
     else
-    if((Battle2::RESULT_LOSS & reason) && !(Battle2::RESULT_SURRENDER & reason)) army.Reset(true);
+    if((Battle::RESULT_LOSS & reason) && !(Battle::RESULT_SURRENDER & reason)) army.Reset(true);
 
     if(color != Color::NONE) kingdom.RemoveHeroes(this);
 

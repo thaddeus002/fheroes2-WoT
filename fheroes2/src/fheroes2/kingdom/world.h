@@ -52,11 +52,11 @@ typedef std::vector<Maps::Tiles>	MapsTiles;
 struct CapturedObject
 {
     ObjectColor		objcol;
-    Army::Troop		guardians;
+    Troop		guardians;
 
     const u8 & GetObject(void) const { return objcol.first; }
     const u8 & GetColor(void) const { return objcol.second; }
-    Army::Troop & GetTroop(void) { return guardians; }
+    Troop & GetTroop(void) { return guardians; }
 
     void Set(u8 obj, u8 col) { objcol = ObjectColor(obj, col); }
     void SetColor(u8 col) { objcol.second = col; }
