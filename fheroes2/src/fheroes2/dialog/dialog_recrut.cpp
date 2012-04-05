@@ -83,7 +83,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     const Cursor::themes_t oldcursor = cursor.Themes();
     cursor.Hide();
     cursor.SetThemes(Cursor::POINTER);
-    
+
     // calculate max count
     u32 max = 0;
     const payment_t paymentMonster = monster.GetCost();
@@ -304,7 +304,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 	}
 
 	if(le.MouseClickLeft(buttonOk) || Game::HotKeyPress(Game::EVENT_DEFAULT_READY)) break;
-	
+
 	if(le.MouseClickLeft(buttonCancel) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)){ result = 0; break; }
     }
 
@@ -328,7 +328,7 @@ void Dialog::DwellingInfo(const Monster & monster, u16 available)
     const Cursor::themes_t oldcursor = cursor.Themes();
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
-    
+
     const payment_t paymentMonster = monster.GetCost();
     const Sprite & box = AGG::GetICN(ICN::RECR2BKG, 0);
     const Rect pos((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h());
@@ -337,7 +337,7 @@ void Dialog::DwellingInfo(const Monster & monster, u16 available)
     back.Save();
 
     box.Blit(pos.x, pos.y);
-    
+
     LocalEvent & le = LocalEvent::Get();
 
     Point dst_pt;

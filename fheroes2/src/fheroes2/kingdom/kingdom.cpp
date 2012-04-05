@@ -220,7 +220,7 @@ void Kingdom::ActionNewMonth(void)
     visit_object.remove_if(Visit::isMonthLife);
 }
 
-void Kingdom::AddHeroes(Heroes *hero)
+void Kingdom::AddHeroes(Heroes* hero)
 {
     if(hero)
     {
@@ -258,7 +258,7 @@ std::string Kingdom::GetNamesHeroStartCondLoss(void) const
     return result;
 }
 
-void Kingdom::RemoveHeroes(const Heroes *hero)
+void Kingdom::RemoveHeroes(const Heroes* hero)
 {
     if(hero)
     {
@@ -271,12 +271,12 @@ void Kingdom::RemoveHeroes(const Heroes *hero)
     if(isLoss()) LossPostActions();
 }
 
-void Kingdom::AddCastle(const Castle *castle)
+void Kingdom::AddCastle(const Castle* castle)
 {
     if(castle)
     {
 	if(castles.end() == std::find(castles.begin(), castles.end(), castle))
-	    castles.push_back(const_cast<Castle *>(castle));
+	    castles.push_back(const_cast<Castle*>(castle));
 
 	AI::AddCastle(*castle);
     }
@@ -284,7 +284,7 @@ void Kingdom::AddCastle(const Castle *castle)
     lost_town_days = Game::GetLostTownDays() + 1;
 }
 
-void Kingdom::RemoveCastle(const Castle *castle)
+void Kingdom::RemoveCastle(const Castle* castle)
 {
     if(castle)
     {
@@ -440,7 +440,7 @@ void Kingdom::ApplyPlayWithStartingHero(void)
 
 	// check manual set hero (castle position + point(0, 1))?
 	const Point & cp = (first)->GetCenter();
-	Heroes *hero = world.GetTiles(cp.x, cp.y + 1).GetHeroes();
+	Heroes* hero = world.GetTiles(cp.x, cp.y + 1).GetHeroes();
 
     	// and move manual set hero to castle
 	if(hero && hero->GetColor() == GetColor())
@@ -458,7 +458,7 @@ void Kingdom::ApplyPlayWithStartingHero(void)
 	else
 	if(Settings::Get().GameStartWithHeroes())
 	{
-    	    Heroes *hero = world.GetFreemanHeroes(first->GetRace());
+    	    Heroes* hero = world.GetFreemanHeroes(first->GetRace());
 	    if(hero && AllowRecruitHero(false, 0)) hero->Recruit(*first);
 	}
     }
@@ -736,4 +736,59 @@ void Kingdoms::AddTributeEvents(CapturedObjects & captureobj, u16 day, u8 obj)
 	    world.AddEventDate(event);
 	}
     }
+}
+
+StreamBase & operator<< (StreamBase & msg, const Kingdom & kingdom)
+{
+    return msg <<
+	kingdom.modes <<
+	kingdom.color <<
+	kingdom.resource <<
+	kingdom.lost_town_days <<
+	kingdom.castles <<
+	kingdom.heroes <<
+	kingdom.recruits <<
+	kingdom.lost_hero <<
+	kingdom.visit_object <<
+	kingdom.puzzle_maps <<
+	kingdom.visited_tents_colors <<
+	kingdom.heroes_cond_loss;
+}
+
+StreamBase & operator>> (StreamBase & msg, Kingdom & kingdom)
+{
+    return msg >>
+	kingdom.modes >>
+	kingdom.color >>
+	kingdom.resource >>
+	kingdom.lost_town_days >>
+	kingdom.castles >>
+	kingdom.heroes >>
+	kingdom.recruits >>
+	kingdom.lost_hero >>
+	kingdom.visit_object >>
+	kingdom.puzzle_maps >>
+	kingdom.visited_tents_colors >>
+	kingdom.heroes_cond_loss;
+}
+
+StreamBase & operator<< (StreamBase & msg, const Kingdoms & obj)
+{
+    msg << static_cast<u8>(obj.size());
+    for(u8 ii = 0; ii < obj.size(); ++ii)
+	msg << obj.kingdoms[ii];
+
+    return msg;
+}
+
+StreamBase & operator>> (StreamBase & msg, Kingdoms & obj)
+{
+    u8 	kingdomscount;
+
+    msg >> kingdomscount; // FIXME: check kingdomscount
+
+    for(u8 ii = 0; ii < kingdomscount; ++ii)
+	msg >> obj.kingdoms[ii];
+
+    return msg;
 }

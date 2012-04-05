@@ -39,8 +39,8 @@
 #include "battle_tower.h"
 #include "battle_bridge.h"
 #include "battle_catapult.h"
+#include "battle_command.h"
 #include "battle_interface.h"
-#include "localclient.h"
 
 #define  ARMYORDERW	40
 
@@ -846,6 +846,18 @@ void Battle::Interface::RedrawOpponentsFlags(void) const
     }
 }
 
+Point GetTroopPosition(const Battle::Unit & b, const Sprite & sprite)
+{
+    const Rect & rt = b.GetRectPosition();
+
+    const s16 & sx = b.isReflect() ?
+                    rt.x + (b.isWide() ? rt.w / 2 + rt.w / 4 : rt.w / 2) - sprite.w() - sprite.x() :
+                    rt.x + (b.isWide() ? rt.w / 4 : rt.w / 2) + sprite.x();
+    const s16 & sy = rt.y + rt.h + sprite.y() - 10;
+
+    return Point(sx, sy);
+}
+
 void Battle::Interface::RedrawTroopSprite(const Unit & b) const
 {
     const  monstersprite_t & msi = b.GetMonsterSprite();
@@ -878,12 +890,7 @@ void Battle::Interface::RedrawTroopSprite(const Unit & b) const
     if(spmon1)
     {
 	const Rect & rt = b.GetRectPosition();
-
-	// offset
-	s16 sx = b.isReflect() ?
-		rt.x + (b.isWide() ? rt.w / 2 + rt.w / 4 : rt.w / 2) - spmon1->w() - spmon1->x() :
-		rt.x + (b.isWide() ? rt.w / 4 : rt.w / 2) + spmon1->x();
-	s16 sy = rt.y + rt.h + spmon1->y() - 10;
+	Point sp = GetTroopPosition(b, *spmon1);
 
 	// move offset
 	if(b_move == &b)
@@ -897,8 +904,8 @@ void Battle::Interface::RedrawTroopSprite(const Unit & b) const
 		const s16 cx = p_move.x - rt.x;
 		const s16 cy = p_move.y - rt.y;
 
-	        sy += ((b_move->GetFrame() - frm.start) * cy) / frm.count;
-		if(0 != Sign(cy)) sx -= Sign(cx) * ox / 2;
+	        sp.y += ((b_move->GetFrame() - frm.start) * cy) / frm.count;
+		if(0 != Sign(cy)) sp.x -= Sign(cx) * ox / 2;
 	    }
 	}
 	else
@@ -910,18 +917,18 @@ void Battle::Interface::RedrawTroopSprite(const Unit & b) const
 		const s16 cx = p_fly.x - rt.x;
 		const s16 cy = p_fly.y - rt.y;
 
-		sx += cx + Sign(cx) * b_fly->GetFrameOffset() * std::abs((p_fly.x - p_move.x) / b_fly->GetFrameCount());
-		sy += cy + Sign(cy) * b_fly->GetFrameOffset() * std::abs((p_fly.y - p_move.y) / b_fly->GetFrameCount());
+		sp.x += cx + Sign(cx) * b_fly->GetFrameOffset() * std::abs((p_fly.x - p_move.x) / b_fly->GetFrameCount());
+		sp.y += cy + Sign(cy) * b_fly->GetFrameOffset() * std::abs((p_fly.y - p_move.y) / b_fly->GetFrameCount());
 	    }
 	}
 
 	// sprite monster
 	if(255 > b_current_alpha && b_current_sprite == spmon1)
-	    spmon1->Blit(b_current_alpha, sx, sy);
+	    spmon1->Blit(b_current_alpha, sp);
 	else
-	    spmon1->Blit(sx, sy);
+	    spmon1->Blit(sp);
 	// contour
-	if(spmon2) spmon2->Blit(sx - 1, sy - 1);
+	if(spmon2) spmon2->Blit(sp.x - 1, sp.y - 1);
     }
 }
 
@@ -1549,14 +1556,14 @@ void Battle::Interface::HumanBattleTurn(const Unit & b, Actions & a, std::string
         // skip
 	if(Game::HotKeyPress(Game::EVENT_BATTLE_HARDSKIP))
 	{
-	    a.AddedSkipAction(b, true);
+	    a.push_back(Command(MSG_BATTLE_SKIP, b.GetUID(), true));
 	    humanturn_exit = true;
 	}
 	else
 	// soft skip
 	if(Game::HotKeyPress(Game::EVENT_BATTLE_SOFTSKIP))
 	{
-	    a.AddedSkipAction(b, !conf.ExtBattleSoftWait());
+	    a.push_back(Command(MSG_BATTLE_SKIP, b.GetUID(), !conf.ExtBattleSoftWait()));
 	    humanturn_exit = true;
 	}
 	else
@@ -1589,14 +1596,14 @@ void Battle::Interface::HumanBattleTurn(const Unit & b, Actions & a, std::string
 		// fast wins game
 		arena.GetResult().army1 = RESULT_WINS;
 		humanturn_exit = true;
-		a.AddedEndAction(b);
+		a.push_back(Command(MSG_BATTLE_END_TURN, b.GetUID()));
 		break;
 
 	    case KEY_l:
 		// fast loss game
 		arena.GetResult().army1 = RESULT_LOSS;
 		humanturn_exit = true;
-		a.AddedEndAction(b);
+		a.push_back(Command(MSG_BATTLE_END_TURN, b.GetUID()));
 		break;
 
     	    default: break;
@@ -1789,7 +1796,7 @@ void Battle::Interface::HumanCastSpellTurn(const Unit & b, Actions & a, std::str
 		    teleport_src = index_pos;
 		else
 		{
-		    a.AddedCastTeleportAction(teleport_src, index_pos);
+		    a.push_back(Command(MSG_BATTLE_CAST, Spell::TELEPORT, teleport_src, index_pos));
 		    humanturn_spell = Spell::NONE;
 		    humanturn_exit = true;
 		    teleport_src = -1;
@@ -1798,13 +1805,13 @@ void Battle::Interface::HumanCastSpellTurn(const Unit & b, Actions & a, std::str
 	    else
 	    if(Cursor::SP_MIRRORIMAGE == cursor.Themes())
 	    {
-		a.AddedCastMirrorImageAction(index_pos);
+		a.push_back(Command(MSG_BATTLE_CAST, Spell::MIRRORIMAGE, index_pos));
 		humanturn_spell = Spell::NONE;
 		humanturn_exit = true;
 	    }
 	    else
 	    {
-		a.AddedCastAction(humanturn_spell, index_pos);
+		a.push_back(Command(MSG_BATTLE_CAST, humanturn_spell(), index_pos));
 		humanturn_spell = Spell::NONE;
 		humanturn_exit = true;
 	    }
@@ -1872,7 +1879,8 @@ void Battle::Interface::EventAutoSwitch(const Unit & b, Actions & a)
 {
     btn_auto.PressDraw();
 
-    a.AddedAutoBattleAction(b.GetColor());
+    a.push_back(Command(MSG_BATTLE_AUTO, b.GetColor()));
+
     Cursor::Get().SetThemes(Cursor::WAIT);
     humanturn_redraw = true;
     humanturn_exit = true;
@@ -1911,7 +1919,7 @@ void Battle::Interface::ButtonWaitAction(Actions & a)
 
     if(le.MouseClickLeft(btn_wait) && b_current)
     {
-	a.AddedSkipAction(*b_current, false);
+	a.push_back(Command(MSG_BATTLE_SKIP, b_current->GetUID(), false));
 	humanturn_exit = true;
     }
 }
@@ -1924,7 +1932,7 @@ void Battle::Interface::ButtonSkipAction(Actions & a)
 
     if(le.MouseClickLeft(btn_skip) && b_current)
     {
-	a.AddedSkipAction(*b_current, true);
+	a.push_back(Command(MSG_BATTLE_SKIP, b_current->GetUID(), true));
 	humanturn_exit = true;
     }
 }
@@ -1991,8 +1999,8 @@ void Battle::Interface::MouseLeftClickBoardAction(u16 themes, const Cell & cell,
     {
 	case Cursor::WAR_FLY:
 	case Cursor::WAR_MOVE:
-	    a.AddedMoveAction(*b_current, index);
-	    a.AddedEndAction(*b_current);
+	    a.push_back(Command(MSG_BATTLE_MOVE, b_current->GetUID(), index));
+	    a.push_back(Command(MSG_BATTLE_END_TURN, b_current->GetUID()));
 	    humanturn_exit = true;
 	    break;
 
@@ -2011,9 +2019,9 @@ void Battle::Interface::MouseLeftClickBoardAction(u16 themes, const Cell & cell,
 		const s16 move = Board::GetIndexDirection(index, dir);
 
 		if(b_current->GetHeadIndex() != move)
-		    a.AddedMoveAction(*b_current, move);
-		a.AddedAttackAction(*b_current, *enemy, index, Board::GetReflectDirection(dir));
-		a.AddedEndAction(*b_current);
+		    a.push_back(Command(MSG_BATTLE_MOVE, b_current->GetUID(), move));
+		a.push_back(Command(MSG_BATTLE_ATTACK, b_current->GetUID(), enemy->GetUID(), index, Board::GetReflectDirection(dir)));
+		a.push_back(Command(MSG_BATTLE_END_TURN, b_current->GetUID()));
 		humanturn_exit = true;
 	    }
 	    break;
@@ -2026,8 +2034,8 @@ void Battle::Interface::MouseLeftClickBoardAction(u16 themes, const Cell & cell,
 
 	    if(enemy)
 	    {
-		a.AddedAttackAction(*b_current, *enemy, index, 0);
-		a.AddedEndAction(*b_current);
+		a.push_back(Command(MSG_BATTLE_ATTACK, b_current->GetUID(), enemy->GetUID(), index, 0));
+		a.push_back(Command(MSG_BATTLE_END_TURN, b_current->GetUID()));
 		humanturn_exit = true;
 	    }
 	    break;
@@ -3094,7 +3102,7 @@ void Battle::Interface::RedrawActionSummonElementalSpell(const Unit & target)
     b_current_sprite = NULL;
 }
 
-void Battle::Interface::RedrawActionMirrorImageSpell(const Unit & target, s16 dst)
+void Battle::Interface::RedrawActionMirrorImageSpell(const Unit & target, const Position & pos)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
@@ -3102,10 +3110,10 @@ void Battle::Interface::RedrawActionMirrorImageSpell(const Unit & target, s16 ds
 
     const monstersprite_t & msi = target.GetMonsterSprite();
     const Sprite & sprite = AGG::GetICN(msi.icn_file, msi.frm_idle.start, target.isReflect());
-    const Rect  & rt1 = target.GetRectPosition();
-    const Point & pt2 = Board::GetCell(dst)->GetPos();
+    const Rect & rt1 = target.GetRectPosition();
+    const Rect & rt2 = pos.GetRect();
 
-    const Points points = GetLinePoints(rt1, pt2, 5);
+    const Points points = GetLinePoints(rt1, rt2, 5);
     Points::const_iterator pnt = points.begin();
 
     cursor.SetThemes(Cursor::WAR_NONE);
@@ -3120,13 +3128,11 @@ void Battle::Interface::RedrawActionMirrorImageSpell(const Unit & target, s16 ds
     	{
 	    cursor.Hide();
 
-    	    const s16 sx = target.isReflect() ?
-                (*pnt).x + (target.isWide() ? rt1.w + rt1.w / 2 : rt1.w / 2) - sprite.w() - sprite.x() :
-                (*pnt).x + (target.isWide() ? -rt1.w / 2 : rt1.w / 2) + sprite.x();
-    	    const s16 sy = (*pnt).y + rt1.h + sprite.y() - 10;
+	    const Point & sp = GetTroopPosition(target, sprite);
 
 	    Redraw();
-	    sprite.Blit(sx, sy);
+	    sprite.Blit(sp.x - rt1.x + (*pnt).x, sp.y - rt1.y + (*pnt).y);
+
 	    cursor.Show();
 	    display.Flip();
 
@@ -3995,7 +4001,7 @@ void Battle::Interface::ProcessingHeroDialogResult(u8 res, Actions & a)
 			    {
 				if(spell.isApplyWithoutFocusObject())
 				{
-				    a.AddedCastAction(spell, -1);
+				    a.push_back(Command(MSG_BATTLE_CAST, spell(), -1));
 				    humanturn_redraw = true;
 				    humanturn_exit = true;
 				}
@@ -4019,8 +4025,8 @@ void Battle::Interface::ProcessingHeroDialogResult(u8 res, Actions & a)
 	    if(b_current->GetCommander() && arena.CanRetreatOpponent(b_current->GetColor()) &&
 		Dialog::YES == Dialog::Message("", _("Are you sure you want to retreat?"), Font::BIG, Dialog::YES | Dialog::NO))
 	    {
-		a.AddedRetreatAction();
-		a.AddedEndAction(*b_current);
+		a.push_back(Command(MSG_BATTLE_RETREAT));
+		a.push_back(Command(MSG_BATTLE_END_TURN, b_current->GetUID()));
 		humanturn_exit = true;
 	    }
 	    break;
@@ -4036,8 +4042,8 @@ void Battle::Interface::ProcessingHeroDialogResult(u8 res, Actions & a)
 		    Dialog::Message("", _("You don't have enough gold!"), Font::BIG, Dialog::OK);
 		else
 		{
-		    a.AddedSurrenderAction();
-		    a.AddedEndAction(*b_current);
+		    a.push_back(Command(MSG_BATTLE_SURRENDER));
+		    a.push_back(Command(MSG_BATTLE_END_TURN, b_current->GetUID()));
 		    humanturn_exit = true;
 		}
 	    }
@@ -4149,165 +4155,5 @@ void Battle::PopupDamageInfo::Redraw(u16 maxw, u16 maxh)
 
 bool Battle::Interface::NetworkTurn(Result & result)
 {
-#ifndef WITH_NET
     return false;
-#else
-    Cursor & cursor = Cursor::Get();
-    Display & display = Display::Get();
-    LocalEvent & le = LocalEvent::Get();
-    //Settings & conf = Settings::Get();
-    FH2LocalClient & client = FH2LocalClient::Get();
-
-    cursor.SetThemes(Cursor::WAIT);
-
-    bool exit = false;
-    bool redraw = false;
-    QueueMessage msg;
-
-    cursor.Hide();
-    Redraw();
-    cursor.Show();
-    display.Flip();
-
-    while(!exit && le.HandleEvents())
-    {
-	if(client.Ready())
-        {
-	    if(!client.Recv(msg))
-	    {
-		Dialog::Message("NetworkTurn: ", "socket: error", Font::BIG, Dialog::OK);
-		return false;
-            }
-	    DEBUG(DBG_NETWORK, DBG_INFO, "recv: " << Network::GetMsgString(msg.GetID()));
-
-            switch(msg.GetID())
-            {
-		case MSG_PING:
-		    if(!client.Send(msg)) return false;
-		    break;
-
-    		case MSG_BATTLE_BOARD:
-		    msg >> arena;
-		    redraw = true;
-		    break;
-
-    		case MSG_BATTLE_CAST:
-		{
-		    u8 spell;
-		    msg >> spell;
-
-		    switch(spell)
-		    {
-			case Spell::TELEPORT:
-			    arena.SpellActionTeleport(msg);
-            		    break;
-
-        		case Spell::EARTHQUAKE:
-			    arena.SpellActionEarthQuake(msg);
-			    break;
-
-			case Spell::MIRRORIMAGE:
-			    arena.SpellActionMirrorImage(msg);
-			    break;
-
-        		case Spell::SUMMONEELEMENT:
-        		case Spell::SUMMONAELEMENT:
-        		case Spell::SUMMONFELEMENT:
-        		case Spell::SUMMONWELEMENT:
-			    arena.SpellActionSummonElemental(msg, spell);
-			    break;
-
-			default:
-			    arena.SpellActionDefaults(msg, spell);
-			    break;
-		    }
-		    redraw = true;
-		    break;
-		}
-
-    		case MSG_BATTLE_ATTACK:
-		{
-		    TargetsInfo targets;
-		    u32 uid = 0;
-		    s16 dst = -1;
-
-		    msg >> uid;
-		    Unit* attacker = arena.GetTroopUID(uid);
-		    if(attacker) msg >> *attacker;
-
-		    msg >> uid;
-		    Unit* defender = arena.GetTroopUID(uid);
-		    if(defender) msg >> *defender;
-
-		    msg >> dst >> targets;
-
-		    if(attacker && defender)
-		    {
-			RedrawActionAttackPart1(*attacker, *defender, targets);
-			arena.TargetsApplyDamage(*attacker, *defender, targets);
-			RedrawActionAttackPart2(*attacker, targets);
-		    }
-		    else
-			DEBUG(DBG_NETWORK, DBG_WARN, "incorrect attack");
-		    break;
-		}
-
-    		case MSG_BATTLE_END_TURN:
-    		case MSG_BATTLE_SKIP:
-		    arena.ApplyAction(msg);
-		    cursor.SetThemes(Cursor::WAIT);
-		    redraw = true;
-		    break;
-
-    		case MSG_BATTLE_MOVE:
-    		case MSG_BATTLE_MORALE:
-    		case MSG_BATTLE_TOWER:
-    		case MSG_BATTLE_CATAPULT:
-		    arena.ApplyAction(msg);
-		    redraw = true;
-		    break;
-
-		case MSG_BATTLE_RESULT:
-		    msg >> result;
-		    exit = true;
-		    break;
-
-		case MSG_BATTLE_TURN:
-		{
-		    u32 uid = 0;
-		    msg >> uid;
-		    const Unit* b = arena.GetTroopUID(uid);
-
-		    if(b)
-		    {
-    			Actions a;
-    			HumanTurn(*b, a);
-
-    			while(a.size())
-    			{
-			    DEBUG(DBG_NETWORK, DBG_INFO, "send: " <<
-							Network::GetMsgString(a.front().GetID()));
-			    if(!client.Send(a.front())) return false;
-        		    a.pop_front();
-    			}
-		    }
-		    break;
-		}
-
-		default: break;
-	    }
-	}
-
-	if(redraw)
-	{
-	    cursor.Hide();
-	    Redraw();
-	    cursor.Show();
-	    display.Flip();
-	    redraw = false;
-	}
-    }
-
-    return true;
-#endif
 }

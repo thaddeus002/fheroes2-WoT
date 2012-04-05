@@ -645,15 +645,15 @@ Army::Army(const Maps::Tiles & t) : commander(NULL), combat_format(true), color(
 	case MP2::OBJ_ARTIFACT:
 	    switch(t.QuantityVariant())
 	    {
-		case 6:	at(0)->Set(Monster::ROGUE, 50); break;	
-		case 7:	at(0)->Set(Monster::GENIE, 1); break;	
-		case 8:	at(0)->Set(Monster::PALADIN, 1); break;	
-		case 9:	at(0)->Set(Monster::CYCLOPS, 1); break;	
-		case 10:at(0)->Set(Monster::PHOENIX, 1); break;	
-		case 11:at(0)->Set(Monster::GREEN_DRAGON, 1); break;	
-		case 12:at(0)->Set(Monster::TITAN, 1); break;	
+		case 6:	at(0)->Set(Monster::ROGUE, 50); break;
+		case 7:	at(0)->Set(Monster::GENIE, 1); break;
+		case 8:	at(0)->Set(Monster::PALADIN, 1); break;
+		case 9:	at(0)->Set(Monster::CYCLOPS, 1); break;
+		case 10:at(0)->Set(Monster::PHOENIX, 1); break;
+		case 11:at(0)->Set(Monster::GREEN_DRAGON, 1); break;
+		case 12:at(0)->Set(Monster::TITAN, 1); break;
 		case 13:at(0)->Set(Monster::BONE_DRAGON, 1); break;
-		default: break;	
+		default: break;
 	    }
 	    ArrangeForBattle();
 	    break;
@@ -1128,4 +1128,60 @@ bool Army::FastestTroop(const Troop* t1, const Troop* t2)
 void Army::SwapTroops(Troop & t1, Troop & t2)
 {
     std::swap(t1, t2);
+}
+
+StreamBase & operator<< (StreamBase & msg, const Army & army)
+{
+    // Army: fixed size
+    for(Army::const_iterator it = army.begin(); it != army.end(); ++it)
+	msg << **it;
+
+    // commander
+    if(army.commander)
+    {
+	msg << army.combat_format << army.color <<
+	    army.commander->GetType() << army.commander->GetIndex();
+    }
+    else
+    {
+	msg << army.combat_format << army.color <<
+	    static_cast<u8>(Skill::Primary::UNDEFINED) << static_cast<s32>(-1);
+    }
+
+    return msg;
+}
+
+StreamBase & operator>> (StreamBase & msg, Army & army)
+{
+    // Army: fixed size
+    for(Army::iterator it = army.begin(); it != army.end(); ++it)
+	msg >> **it;
+
+    msg >> army.combat_format >> army.color;
+
+    u8 type; s32 index;
+    msg >> type >> index;
+
+    // set army
+    for(Army::iterator it = army.begin(); it != army.end(); ++it)
+    {
+	ArmyTroop* troop = dynamic_cast<ArmyTroop*>(*it);
+	if(troop) troop->SetArmy(army);
+    }
+
+    // commander
+    if(type != Skill::Primary::UNDEFINED)
+    {
+	if(type == Skill::Primary::HEROES)
+	    army.commander = world.GetHeroes(index);
+	else
+	{
+	    Castle* castle = world.GetCastle(index);
+	    army.commander = castle ? &castle->GetCaptain() : NULL;
+	}
+    }
+    else
+	army.commander = NULL;
+
+    return msg;
 }

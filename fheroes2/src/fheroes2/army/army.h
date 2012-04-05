@@ -148,6 +148,9 @@ public:
     bool		isFullHouse(void) const;
 
 protected:
+    friend StreamBase & operator<< (StreamBase &, const Army &);
+    friend StreamBase & operator>> (StreamBase &, Army &);
+
     HeroBase*		commander;
     bool		combat_format;
     u8			color;
@@ -155,5 +158,8 @@ protected:
 private:
     Army &		operator= (const Army &) { return *this; }
 };
+
+StreamBase & operator<< (StreamBase &, const Army &);
+StreamBase & operator>> (StreamBase &, Army &);
 
 #endif

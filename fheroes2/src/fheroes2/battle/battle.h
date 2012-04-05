@@ -25,15 +25,10 @@
 
 #include <vector>
 #include <utility>
-#include "network.h"
 #include "icn.h"
 #include "m82.h"
 #include "gamedefs.h"
 #include "army.h"
-
-#ifdef WITH_NET
-#include "localclient.h"
-#endif
 
 namespace Battle
 {
@@ -65,8 +60,8 @@ namespace Battle
 	u32	GetExperienceDefender(void) const;
     };
 
-    QueueMessage & operator<< (QueueMessage &, const Result &);
-    QueueMessage & operator>> (QueueMessage &, Result &);
+    StreamBase & operator<< (StreamBase &, const Result &);
+    StreamBase & operator>> (StreamBase &, Result &);
 
     Result	Loader(Army &, Army &, s32);
     void	UpdateMonsterSpriteAnimation(const std::string &);
@@ -117,16 +112,16 @@ namespace Battle
         bool	isFinishAnimFrame(void) const;
     };
 
-    QueueMessage & operator<< (QueueMessage &, const TargetInfo &);
-    QueueMessage & operator>> (QueueMessage &, TargetInfo &);
+    StreamBase & operator<< (StreamBase &, const TargetInfo &);
+    StreamBase & operator>> (StreamBase &, TargetInfo &);
 
     struct TargetsInfo : public std::vector<TargetInfo>
     {
 	TargetsInfo() {}
     };
 
-    QueueMessage & operator<< (QueueMessage &, const TargetsInfo &);
-    QueueMessage & operator>> (QueueMessage &, TargetsInfo &);
+    StreamBase & operator<< (StreamBase &, const TargetsInfo &);
+    StreamBase & operator>> (StreamBase &, TargetsInfo &);
 
     enum stats_t
     {

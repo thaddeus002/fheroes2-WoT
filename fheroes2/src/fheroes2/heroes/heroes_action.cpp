@@ -3,21 +3,21 @@
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
- *                                                                         * 
- *   This program is free software; you can redistribute it and/or modify  * 
- *   it under the terms of the GNU General Public License as published by  * 
- *   the Free Software Foundation; either version 2 of the License, or     * 
- *   (at your option) any later version.                                   * 
- *                                                                         * 
- *   This program is distributed in the hope that it will be useful,       * 
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        * 
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         * 
- *   GNU General Public License for more details.                          * 
- *                                                                         * 
- *   You should have received a copy of the GNU General Public License     * 
- *   along with this program; if not, write to the                         * 
- *   Free Software Foundation, Inc.,                                       * 
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
 #include "agg.h"
@@ -494,7 +494,7 @@ void Heroes::Action(const s32 dst_index)
         case MP2::OBJ_FREEMANFOUNDRY:	ActionToUpgradeArmyObject(*this, object, dst_index); break;
 
         case MP2::OBJ_EVENT:		ActionToEvent(*this, object, dst_index); break;
-        
+
         case MP2::OBJ_OBELISK:          ActionToObelisk(*this, object, dst_index); break;
 
         case MP2::OBJ_TREEKNOWLEDGE:	ActionToTreeKnowledge(*this, object, dst_index); break;
@@ -671,9 +671,9 @@ void ActionToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 void ActionToHeroes(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
-    Heroes *other_hero = world.GetTiles(dst_index).GetHeroes();
+    Heroes* other_hero = world.GetTiles(dst_index).GetHeroes();
     const Settings & conf = Settings::Get();
-    
+
     if(! other_hero) return;
 
     if(hero.GetColor() == other_hero->GetColor() ||
@@ -699,7 +699,7 @@ void ActionToHeroes(Heroes & hero, const u8 & obj, const s32 & dst_index)
     }
     else
     {
-	Castle *other_hero_castle = other_hero->inCastle();
+	Castle* other_hero_castle = other_hero->inCastle();
 	if(other_hero_castle && other_hero == other_hero_castle->GetHeroes().GuardFirst())
 	{
 	    ActionToCastle(hero, MP2::OBJ_CASTLE, dst_index);
@@ -743,7 +743,7 @@ void ActionToHeroes(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 void ActionToCastle(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
-    Castle *castle = world.GetCastle(dst_index);
+    Castle* castle = world.GetCastle(dst_index);
     const Settings & conf = Settings::Get();
 
     if(! castle) return;
@@ -921,26 +921,26 @@ void ActionToResource(Heroes & hero, const u8 & obj, const s32 & dst_index)
     switch(obj)
     {
 	case MP2::OBJ_WINDMILL:
-	    msg = rc.isValid() ? 
+	    msg = rc.isValid() ?
 		    _("The keeper of the mill announces:\n\"Milord, I have been working very hard to provide you with these resources, come back next week for more.\"") :
 		    _("The keeper of the mill announces:\n\"Milord, I am sorry, there are no resources currently available. Please try again next week.\"");
 	    break;
 
 	case MP2::OBJ_WATERWHEEL:
-	    msg = rc.isValid() ? 
+	    msg = rc.isValid() ?
 		    _("The keeper of the mill announces:\n\"Milord, I have been working very hard to provide you with this gold, come back next week for more.\"") :
 		    _("The keeper of the mill announces:\n\"Milord, I am sorry, there is no gold currently available. Please try again next week.\"");
 	    break;
-	    
+
 	case MP2::OBJ_LEANTO:
 	    cancapture = false;
-	    msg = rc.isValid() ? 
+	    msg = rc.isValid() ?
 		    _("You've found an abandoned lean-to.\nPoking about, you discover some resources hidden nearby.") :
 		    _("The lean-to is long abandoned. There is nothing of value here.");
 	    break;
 
     	case MP2::OBJ_MAGICGARDEN:
-	    msg = rc.isValid() ? 
+	    msg = rc.isValid() ?
 		    _("You catch a leprechaun foolishly sleeping amidst a cluster of magic mushrooms.\nIn exchange for his freedom, he guides you to a small pot filled with precious things.") :
 		    _("You've found a magic garden, the kind of place that leprechauns and faeries like to cavort in, but there is no one here today.\nPerhaps you should try again next week.");
     	    break;
@@ -1570,7 +1570,7 @@ void ActionToExperienceObject(Heroes & hero, const u8 & obj, const s32 & dst_ind
 
     bool visited = hero.isVisited(tile);
     std::string msg;
-    
+
     u32 exp = 0;
 
     switch(obj)
@@ -2018,7 +2018,7 @@ void ActionToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    body = _("You have taken control of the local Alchemist shop. It will provide you with %{count} unit of Mercury per day.");
 	    break;
 
-        case MP2::OBJ_SAWMILL:    
+        case MP2::OBJ_SAWMILL:
 	    resource = Resource::WOOD;
 	    header = MP2::StringObject(obj);
 	    body = _("You gain control of a sawmill. It will provide you with %{count} units of wood per day.");
@@ -2176,7 +2176,7 @@ void ActionToDwellingJoinMonster(Heroes & hero, const u8 & obj, const s32 & dst_
 void ActionToDwellingRecruitMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    
+
     std::string msg_full, msg_void;
 
     switch(obj)
@@ -2192,7 +2192,7 @@ void ActionToDwellingRecruitMonster(Heroes & hero, const u8 & obj, const s32 & d
     	    msg_full = _("Some of the Sprites living in the tree city are willing to join your army for a price. Do you want to recruit Sprites?");
 	    AGG::PlayMusic(MUS::TREEHOUSE, false);
     	    break;
-  
+
         case MP2::OBJ_WAGONCAMP:
     	    msg_void = _("A colorful Rogues' wagon stands empty here. Perhaps more Rogues will be here later.");
     	    msg_full = _("Distant sounds of music and laughter draw you to a colorful wagon housing Rogues. Do you wish to have any Rogues join your army?");
@@ -2355,7 +2355,7 @@ void ActionToArtesianSpring(Heroes & hero, const u8 & obj, const s32 & dst_index
     }
     else
     if(hero.GetSpellPoints() == max * 2)
-    {	
+    {
 	PlaySoundFailure;
 	Dialog::Message(name, _("A drink at the spring is supposed to give you twice your normal spell points, but you are already at that level."), Font::BIG, Dialog::OK);
     }
@@ -2444,7 +2444,7 @@ void ActionToUpgradeArmyObject(Heroes & hero, const u8 & obj, const s32 & dst_in
     std::string monsters_upgrade;
     std::string msg1;
     std::string msg2;
-    
+
     std::vector<Monster> mons;
     mons.reserve(3);
 
@@ -2881,7 +2881,7 @@ void ActionToJail(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	tile.RemoveObjectSprite();
 	tile.SetObject(MP2::OBJ_ZERO);
 
-	Heroes *prisoner = world.FromJail(dst_index);
+	Heroes* prisoner = world.FromJail(dst_index);
 
 	if(prisoner)
 	{

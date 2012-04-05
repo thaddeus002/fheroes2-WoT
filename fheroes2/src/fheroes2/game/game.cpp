@@ -70,6 +70,28 @@ namespace Game
     u8		current_music = MUS::UNKNOWN;
     u32		castle_animation_frame = 0;
     u32		maps_animation_frame = 0;
+    std::string last_name;
+    u16		save_version = CURRENT_FORMAT_VERSION;
+}
+
+void Game::SetSaveVersion(u16 ver)
+{
+    save_version = ver;
+}
+
+u16 Game::GetSaveVersion(void)
+{
+    return save_version;
+}
+
+const std::string & Game::GetLastSavename(void)
+{
+    return last_name;
+}
+
+void Game::SetLastSavename(const std::string & name)
+{
+    last_name = name;
 }
 
 Game::menu_t Game::Testing(u8 t)
@@ -331,7 +353,7 @@ void Game::UpdateGlobalDefines(const std::string & spec)
 	WhirlpoolUpdateStatic(xml_globals->FirstChildElement("whirlpool"));
 	// heroes
 	HeroesUpdateStatic(xml_globals->FirstChildElement("heroes"));
-	// castle_extra_growth 
+	// castle_extra_growth
 	CastleUpdateGrowth(xml_globals->FirstChildElement("castle_extra_growth"));
 	// monster upgrade ratio
 	MonsterUpdateStatic(xml_globals->FirstChildElement("monster_upgrade"));

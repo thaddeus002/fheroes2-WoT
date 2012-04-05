@@ -173,23 +173,23 @@ public:
     Heroes* GetFreemanHeroes(u8 rc = 0) const;
     void UpdateRecruits(Recruits &) const;
 
-    static u32 GetUniq(void){ return ++uniq0; };
-
-protected:
-    void MonthOfMonstersAction(const Monster &);
+    static u32 GetUniq(void);
 
 private:
     World() : Size(0, 0), width(Size::w), height(Size::h) {};
     void Defaults(void);
     void Reset(void);
+    void MonthOfMonstersAction(const Monster &);
 
 private:
     friend class Radar;
-    friend class Game::IO;
+    friend class Game::IOld;
+    friend StreamBase & operator<< (StreamBase &, const World &);
+    friend StreamBase & operator>> (StreamBase &, World &);
 
     MapsTiles				vec_tiles;
-    AllCastles                          vec_castles;
     AllHeroes				vec_heroes;
+    AllCastles                          vec_castles;
     Kingdoms				vec_kingdoms;
     Rumors				vec_rumors;
     EventsDate                          vec_eventsday;
@@ -215,9 +215,12 @@ private:
 
     Heroes::heroes_t heroes_cond_wins;
     Heroes::heroes_t heroes_cond_loss;
-
-    static u32 uniq0;
 };
+
+StreamBase & operator<< (StreamBase &, const CapturedObject &);
+StreamBase & operator>> (StreamBase &, CapturedObject &);
+StreamBase & operator<< (StreamBase &, const World &);
+StreamBase & operator>> (StreamBase &, World &);
 
 extern World & world;
 

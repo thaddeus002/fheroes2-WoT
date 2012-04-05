@@ -41,11 +41,16 @@ class MageGuild
 	SpellStorage GetSpells(u8 lvlmage, bool islibrary, u8) const;
 
     private:
-	friend class Game::IO;
+	friend class Game::IOld;
+        friend StreamBase & operator<< (StreamBase &, const MageGuild &);
+        friend StreamBase & operator>> (StreamBase &, MageGuild &);
 
 	SpellStorage general;
 	SpellStorage library;
 };
+
+StreamBase & operator<< (StreamBase &, const MageGuild &);
+StreamBase & operator>> (StreamBase &, MageGuild &);
 
 class RowSpells
 {

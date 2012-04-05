@@ -32,7 +32,7 @@
 
 const char* GameOver::GetString(conditions_t cond)
 {
-    const char* cond_str[] = { "None", 
+    const char* cond_str[] = { "None",
 	_("Defeat all enemy heroes and towns."), _("Capture a specific town."), _("Defeat a specific hero."), _("Find a specific artifact."), _("Your side defeats the opposing side."), _("Accumulate a large amount of gold."),
 	_("Lose all your heroes and towns."), _("Lose a specific town."), _("Lose a specific hero."), _("Run out of time. (Fail to win by a certain point.)") };
 
@@ -66,7 +66,7 @@ std::string GameOver::GetActualDescription(u16 cond)
     else
     if(WINS_TOWN & cond)
     {
-	const Castle *town = world.GetCastle(conf.WinsMapsIndexObject());
+	const Castle* town = world.GetCastle(conf.WinsMapsIndexObject());
 	if(town)
 	{
     	    msg = town->isCastle() ? _("Capture the castle '%{name}'") : _("Capture the town '%{name}'");;
@@ -76,7 +76,7 @@ std::string GameOver::GetActualDescription(u16 cond)
     else
     if(WINS_HERO & cond)
     {
-	const Heroes *hero = world.GetHeroesCondWins();
+	const Heroes* hero = world.GetHeroesCondWins();
 	if(hero)
 	{
 	    msg = _("Defeat the hero '%{name}'");
@@ -109,7 +109,7 @@ std::string GameOver::GetActualDescription(u16 cond)
     else
     if(LOSS_TOWN & cond)
     {
-	const Castle *town = world.GetCastle(conf.LossMapsIndexObject());
+	const Castle* town = world.GetCastle(conf.LossMapsIndexObject());
 	if(town)
 	{
     	    msg = town->isCastle() ? _("Lose the castle '%{name}'.") : _("Lose the town '%{name}'.");
@@ -119,7 +119,7 @@ std::string GameOver::GetActualDescription(u16 cond)
     else
     if(LOSS_HERO & cond)
     {
-    	const Heroes *hero = world.GetHeroesCondLoss();
+    	const Heroes* hero = world.GetHeroesCondLoss();
 	if(hero)
 	{
 	    msg = _("Lose the hero: %{name}.");
@@ -160,7 +160,7 @@ void GameOver::DialogWins(u16 cond)
 	case WINS_TOWN:
 	{
 	    body = _("You captured %{name}!\nYou are victorious.");
-	    const Castle *town = world.GetCastle(conf.WinsMapsIndexObject());
+	    const Castle* town = world.GetCastle(conf.WinsMapsIndexObject());
 	    if(town) String::Replace(body, "%{name}", town->GetName());
 	}
 	break;
@@ -168,7 +168,7 @@ void GameOver::DialogWins(u16 cond)
 	case WINS_HERO:
 	{
 	    body = _("You have captured the enemy hero %{name}!\nYour quest is complete.");
-	    const Heroes *hero = world.GetHeroesCondWins();
+	    const Heroes* hero = world.GetHeroesCondWins();
 	    if(hero) String::Replace(body, "%{name}", hero->GetName());
 	    break;
 	}
@@ -241,13 +241,13 @@ void GameOver::DialogLoss(u16 cond)
 	case LOSS_TOWN:
 	{
 	    body = _("The enemy has captured %{name}!\nThey are triumphant.");
-	    const Castle *town = world.GetCastle(conf.WinsMapsIndexObject());
+	    const Castle* town = world.GetCastle(conf.WinsMapsIndexObject());
 	    if(town) String::Replace(body, "%{name}", town->GetName());
 	}
 
 	case LOSS_STARTHERO:
 	{
-	    const Heroes *hero = world.GetKingdom(conf.CurrentColor()).GetFirstHeroStartCondLoss();
+	    const Heroes* hero = world.GetKingdom(conf.CurrentColor()).GetFirstHeroStartCondLoss();
 	    body = _("You have lost the hero %{name}.\nYour quest is over.");
 	    if(hero) String::Replace(body, "%{name}", hero->GetName());
 	    break;
@@ -256,7 +256,7 @@ void GameOver::DialogLoss(u16 cond)
 	case LOSS_HERO:
 	{
 	    body = _("You have lost the hero %{name}.\nYour quest is over.");
-	    const Heroes *hero = world.GetHeroesCondLoss();
+	    const Heroes* hero = world.GetHeroesCondLoss();
 	    if(hero) String::Replace(body, "%{name}", hero->GetName());
 	    break;
 	}
@@ -364,4 +364,14 @@ bool GameOver::Result::LocalCheckGameOver(Game::menu_t & res)
     }
 
     return game_over;
+}
+
+StreamBase & GameOver::operator<< (StreamBase & msg, const Result & res)
+{
+    return msg << res.colors << res.result << res.continue_game;
+}
+
+StreamBase & GameOver::operator>> (StreamBase & msg, Result & res)
+{
+    return msg >> res.colors >> res.result >> res.continue_game;
 }

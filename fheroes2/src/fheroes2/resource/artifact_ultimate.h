@@ -43,11 +43,17 @@ public:
     const Artifact & GetArtifact(void) const;
 
 private:
-    friend class Game::IO;
+    friend class Game::IOld;
+    friend StreamBase & operator<< (StreamBase &, const UltimateArtifact &);
+    friend StreamBase & operator>> (StreamBase &, UltimateArtifact &);
+    void MakeSurface(void);
 
     s32 index;
     Surface puzzlemap;
     bool isfound;
 };
+
+StreamBase & operator<< (StreamBase &, const UltimateArtifact &);
+StreamBase & operator>> (StreamBase &, UltimateArtifact &);
 
 #endif

@@ -240,7 +240,7 @@ const Rect* GetMageGuildCoord(const Castle & castle, const CastleDialog::CacheBu
 Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 {
     Settings & conf = Settings::Get();
-    
+
     if(conf.QVGA()) return PocketPC::CastleOpenDialog(*this, readonly);
 
     const bool interface = conf.ExtGameEvilInterface();
@@ -253,7 +253,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 
     // cursor
     Cursor & cursor = Cursor::Get();
-    
+
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
@@ -273,7 +273,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 
     // fade
     if(conf.ExtGameUseFade()) display.Fade();
-        
+
     const Point cur_pt(background.GetArea().x, background.GetArea().y);
     Point dst_pt(cur_pt);
 
@@ -325,7 +325,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     // portrait heroes or captain or sign
     dst_pt.x = cur_pt.x + 5;
     dst_pt.y = cur_pt.y + 361;
-    
+
     const Rect rectSign2(dst_pt.x, dst_pt.y, 100, 92);
 
     // castle_heroes troops background
@@ -346,7 +346,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
         selectArmy2.SetArmy(heroes.Guest()->GetArmy());
         selectArmy2.Redraw();
     }
-    
+
     // resource
     RedrawResourcePanel(cur_pt);
 
@@ -412,7 +412,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     buttonExit.Draw();
 
     AGG::PlayMusic(MUS::FromRace(race));
-    
+
     LocalEvent & le = LocalEvent::Get();
 
     cursor.Show();
@@ -949,7 +949,7 @@ void Castle::RedrawResourcePanel(const Point & pt)
     dst_pt.y = src_rt.y + 10;
     const Sprite & wood = AGG::GetICN(ICN::RESOURCE, 0);
     wood.Blit(dst_pt);
-    
+
     // count wood
     text.Set(GetString(resource.wood), Font::SMALL);
     dst_pt.y += 22;
@@ -960,7 +960,7 @@ void Castle::RedrawResourcePanel(const Point & pt)
     dst_pt.y = src_rt.y + 6;
     const Sprite & sulfur = AGG::GetICN(ICN::RESOURCE, 3);
     sulfur.Blit(dst_pt);
-    
+
     // count sulfur
     text.Set(GetString(resource.sulfur));
     dst_pt.y += 26;
@@ -971,7 +971,7 @@ void Castle::RedrawResourcePanel(const Point & pt)
     dst_pt.y = src_rt.y + 45;
     const Sprite & crystal = AGG::GetICN(ICN::RESOURCE, 4);
     crystal.Blit(dst_pt);
-    
+
     // count crystal
     text.Set(GetString(resource.crystal));
     dst_pt.y += 33;
@@ -982,7 +982,7 @@ void Castle::RedrawResourcePanel(const Point & pt)
     dst_pt.y = src_rt.y + 47;
     const Sprite & mercury = AGG::GetICN(ICN::RESOURCE, 1);
     mercury.Blit(dst_pt);
-    
+
     // count mercury
     text.Set(GetString(resource.mercury));
     dst_pt.y += 34;
@@ -993,7 +993,7 @@ void Castle::RedrawResourcePanel(const Point & pt)
     dst_pt.y = src_rt.y + 92;
     const Sprite & ore = AGG::GetICN(ICN::RESOURCE, 2);
     ore.Blit(dst_pt);
-    
+
     // count ore
     text.Set(GetString(resource.ore));
     dst_pt.y += 26;
@@ -1004,7 +1004,7 @@ void Castle::RedrawResourcePanel(const Point & pt)
     dst_pt.y = src_rt.y + 92;
     const Sprite & gems = AGG::GetICN(ICN::RESOURCE, 5);
     gems.Blit(dst_pt);
-    
+
     // count gems
     text.Set(GetString(resource.gems));
     dst_pt.y += 26;
@@ -1015,12 +1015,12 @@ void Castle::RedrawResourcePanel(const Point & pt)
     dst_pt.y = src_rt.y + 130;
     const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
     gold.Blit(dst_pt);
-    
+
     // count gold
     text.Set(GetString(resource.gold));
     dst_pt.y += 24;
     text.Blit(dst_pt.x + (gold.w() - text.w()) / 2, dst_pt.y);
-    
+
     // sprite button exit
     dst_pt.x = src_rt.x + 1;
     dst_pt.y = src_rt.y + 166;

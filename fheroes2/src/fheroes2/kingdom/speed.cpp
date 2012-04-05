@@ -82,3 +82,16 @@ Speed::speed_t Speed::GetOriginalFast(u8 speed)
 
     return STANDING;
 }
+
+StreamBase & operator<< (StreamBase & msg, const Speed::speed_t & s)
+{
+    return msg << static_cast<u8>(s);
+}
+
+StreamBase & operator>> (StreamBase & msg, Speed::speed_t & s)
+{
+    u8 speed;
+    msg >> speed;
+    s = speed < Speed::INSTANT ? static_cast<Speed::speed_t>(speed) : Speed::STANDING;
+    return msg;
+}

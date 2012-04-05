@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *   Copyright (C) 2012 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
@@ -20,40 +20,59 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2CLIENT_H
-#define H2CLIENT_H
+#ifndef H2BATTLE_COMMAND_H
+#define H2BATTLE_COMMAND_H
 
+#include "serialize.h"
 #include "gamedefs.h"
-#include "players.h"
+#include "battle_board.h"
 
-#ifdef WITH_NET
-
-#include <vector>
-#include "bitmodes.h"
-#include "sdlnet.h"
-
-enum status_t
+namespace Battle
 {
-    ST_CONNECT          = 0x0001,
-    ST_INGAME           = 0x0002,
-    ST_ADMIN            = 0x0008,
-    ST_SHUTDOWN         = 0x0010,
-    ST_ALLOWPLAYERS     = 0x0020,
-    ST_TURN		= 0x0080
-};
+    enum
+    {
+	MSG_BATTLE_RAW,
 
-struct FH2Client : public Network::Socket, public BitModes, public Player
-{
-    FH2Client();
+	MSG_BATTLE_BOARD,
+	MSG_BATTLE_MOVE, 
+	MSG_BATTLE_ATTACK,
+	MSG_BATTLE_DEFENSE,
+	MSG_BATTLE_DAMAGE,
+	MSG_BATTLE_CAST,
+	MSG_BATTLE_MORALE,
+	MSG_BATTLE_LUCK,
+	MSG_BATTLE_CATAPULT,
+	MSG_BATTLE_TOWER,
+	MSG_BATTLE_RETREAT,
+	MSG_BATTLE_SURRENDER,
+	MSG_BATTLE_SKIP,
+	MSG_BATTLE_END_TURN,
+	MSG_BATTLE_TURN,
+	MSG_BATTLE_RESULT,
+	MSG_BATTLE_AUTO,
 
-    virtual ~FH2Client(){};
+	MSG_UNKNOWN
+    };
 
-    bool IsConnected(void) const;
+    class Command : protected StreamBuf
+    {
+    public:
+        Command(u16);
+        Command(const Command &);
+        explicit Command(const StreamBuf &);
 
-    bool Wait(QueueMessage &, u16);
-    bool Send(QueueMessage &);
-    bool Recv(QueueMessage &);
-};
+        Command(u16 cmd, s32 param1, s32 param2, const Indexes &);
+        Command(u16 type, s32 param1, s32 param2 = -1, s32 param3 = -1, s32 param4 = -1);
 
-#endif
+        Command & 	operator= (const Command &);
+
+        u16		GetType(void) const { return type; }
+        bool		isType(u16 msg) const { return type == msg; }
+	StreamBuf &	GetStream(void) { return *this; }
+
+    protected:
+        u16     	type;
+    };
+}
+
 #endif

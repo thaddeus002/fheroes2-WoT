@@ -155,7 +155,7 @@ struct ResourceBar
 	    u32 cur = resource.Get(rs);
 	    u32 sel = cur;
 	    u32 max = mul > 1 ? (funds.Get(rs) + resource.Get(rs)) / mul : funds.Get(rs) + resource.Get(rs);
-	    
+
 	    if(0 == mul)
 	    {
 		Dialog::Message("", "First select recipients!", Font::BIG, Dialog::OK);

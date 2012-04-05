@@ -31,12 +31,10 @@
 #include "agg.h"
 #include "world.h"
 #include "kingdom.h"
-#include "server.h"
 #include "game.h"
 #include "ai.h"
 #include "battle_arena.h"
 #include "battle_army.h"
-#include "localclient.h"
 
 namespace Battle
 {
@@ -72,33 +70,15 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
 
     AGG::ResetMixer();
     bool local = (CONTROL_HUMAN & army1.GetControl()) || (CONTROL_HUMAN & army2.GetControl());
-#ifdef WITH_NET
-    if(Network::isLocalClient()) local = true;
-#endif
-
     Arena arena(army1, army2, mapsindex, local);
 
     DEBUG(DBG_BATTLE, DBG_INFO, "army1 " << army1.String());
     DEBUG(DBG_BATTLE, DBG_INFO, "army2 " << army2.String());
 
-#ifdef WITH_NET
-    if(Network::isLocalClient())
-	arena.NetworkTurn();
-    else
-#endif
     while(arena.BattleValid())
 	arena.Turns();
 
     const Result & result = arena.GetResult();
-
-#ifdef WITH_NET
-    if(Network::isRemoteClient())
-    {
-        if(CONTROL_REMOTE & army1.GetControl()) FH2Server::Get().BattleSendResult(army1.GetColor(), result);
-        if(CONTROL_REMOTE & army2.GetControl()) FH2Server::Get().BattleSendResult(army2.GetColor(), result);
-    }
-#endif
-
     AGG::ResetMixer();
 
     HeroBase* hero_wins = (result.army1 & RESULT_WINS ? army1.GetCommander() : (result.army2 & RESULT_WINS ? army2.GetCommander() : NULL));
@@ -357,12 +337,12 @@ bool Battle::Result::DefenderWins(void) const
     return army2 & RESULT_WINS;
 }
 
-QueueMessage & Battle::operator<< (QueueMessage & msg, const Result & res)
+StreamBase & Battle::operator<< (StreamBase & msg, const Result & res)
 {
     return msg << res.army1 << res.army2 << res.exp1 << res.exp2 << res.killed;
 }
 
-QueueMessage & Battle::operator>> (QueueMessage & msg, Result & res)
+StreamBase & Battle::operator>> (StreamBase & msg, Result & res)
 {
     return msg >> res.army1 >> res.army2 >> res.exp1 >> res.exp2 >> res.killed;
 }

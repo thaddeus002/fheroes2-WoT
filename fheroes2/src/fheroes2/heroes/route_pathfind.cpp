@@ -215,7 +215,7 @@ bool Route::PathFind(std::list<Route::Step>* result, const s32 from, const s32 t
 	tmp = MAXU16;
 
 	DEBUG(DBG_OTHER, DBG_TRACE, "route, from: " << cur);
-	
+
 	// find minimal cost
 	for(; it1 != it2; ++it1) if((*it1).second.open)
 	{

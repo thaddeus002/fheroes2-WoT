@@ -126,7 +126,7 @@ void ScenarioListBox::RedrawBackground(const Point & dst)
 
 	    text.Set(Difficulty::String(info.difficulty));
 	    text.Blit(dst.x + 275 - text.w() / 2, dst.y + 290);
-    
+
 	    TextBox box(info.description, Font::BIG, 290);
 	    box.Blit(dst.x + 45, dst.y + 320);
 	}

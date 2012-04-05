@@ -47,7 +47,7 @@
 #include "game_focus.h"
 #include "kingdom.h"
 #include "pocketpc.h"
-#include "localclient.h"
+#include "battle_only.h"
 #include "ai.h"
 
 namespace Game
@@ -57,7 +57,7 @@ namespace Game
     Cursor::themes_t GetCursorFocusHeroes(const Heroes &, const Maps::Tiles &);
     Cursor::themes_t GetCursorFocusShipmaster(const Heroes &, const Maps::Tiles &);
 
-    void ShowPathOrStartMoveHero(Heroes *hero, const s32 dst_index);
+    void ShowPathOrStartMoveHero(Heroes* hero, const s32 dst_index);
     menu_t HumanTurn(bool);
     bool DiggingForArtifacts(Heroes & hero);
     void MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct);
@@ -74,6 +74,17 @@ namespace Game
     void ShowWarningLostTowns(menu_t &);
 }
 
+
+Game::menu_t Game::StartBattleOnly(void)
+{
+    Battle::Only main;
+
+    if(main.ChangeSettings())
+        main.StartBattle();
+
+    return Game::MAINMENU;
+}
+
 void Game::MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct)
 {
     if(Maps::isValidDirection(hero.GetIndex(), direct))
@@ -86,7 +97,7 @@ void Game::MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct)
 	{
     	    case MP2::OBJN_CASTLE:
     	    {
-    		const Castle *to_castle = world.GetCastle(dst);
+    		const Castle* to_castle = world.GetCastle(dst);
 		if(to_castle)
 		{
 		    dst = to_castle->GetIndex();
@@ -111,7 +122,7 @@ void Game::MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct)
 	if(allow) ShowPathOrStartMoveHero(&hero, dst);
     }
 }
-                                   
+
 void Game::DialogPlayers(u8 color, std::string str)
 {
     const Player* player = Settings::Get().GetPlayers().Get(color);
@@ -263,7 +274,7 @@ Game::menu_t Game::StartGame(void)
 }
 
 /* open castle wrapper */
-void Game::OpenCastleDialog(Castle *castle)
+void Game::OpenCastleDialog(Castle* castle)
 {
     if(! castle) return;
 
@@ -344,7 +355,7 @@ void Game::OpenCastleDialog(Castle *castle)
 }
 
 /* open heroes wrapper */
-void Game::OpenHeroesDialog(Heroes *hero)
+void Game::OpenHeroesDialog(Heroes* hero)
 {
     if(! hero) return;
 
@@ -421,7 +432,7 @@ Cursor::themes_t Game::GetCursorFocusCastle(const Castle & from_castle, const Ma
     	case MP2::OBJN_CASTLE:
     	case MP2::OBJ_CASTLE:
     	{
-    	    const Castle *to_castle = world.GetCastle(tile.GetIndex());
+    	    const Castle* to_castle = world.GetCastle(tile.GetIndex());
 
     	    if(NULL != to_castle)
     		return to_castle->GetColor() == from_castle.GetColor() ? Cursor::CASTLE : Cursor::POINTER;
@@ -430,7 +441,7 @@ Cursor::themes_t Game::GetCursorFocusCastle(const Castle & from_castle, const Ma
 
 	case MP2::OBJ_HEROES:
     	{
-    	    const Heroes *heroes = tile.GetHeroes();
+    	    const Heroes* heroes = tile.GetHeroes();
 
 	    if(NULL != heroes)
     		return heroes->GetColor() == from_castle.GetColor() ? Cursor::HEROES : Cursor::POINTER;
@@ -532,7 +543,7 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 
 	case MP2::OBJN_CASTLE:
     	{
-    	    const Castle *castle = world.GetCastle(tile.GetIndex());
+    	    const Castle* castle = world.GetCastle(tile.GetIndex());
     	    if(NULL != castle)
 	    {
 		if(from_hero.GetColor() == castle->GetColor())
@@ -554,7 +565,7 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 
     	case MP2::OBJ_CASTLE:
     	{
-    	    const Castle *castle = world.GetCastle(tile.GetIndex());
+    	    const Castle* castle = world.GetCastle(tile.GetIndex());
 
     	    if(NULL != castle)
 	    {
@@ -655,7 +666,7 @@ Cursor::themes_t Game::GetCursor(const s32 dst_index)
     return Cursor::POINTER;
 }
 
-void Game::ShowPathOrStartMoveHero(Heroes *hero, const s32 dst_index)
+void Game::ShowPathOrStartMoveHero(Heroes* hero, const s32 dst_index)
 {
     if(!hero || hero->Modes(Heroes::GUARDIAN)) return;
 
@@ -693,7 +704,7 @@ Game::menu_t Game::HumanTurn(bool isload)
     Settings & conf = Settings::Get();
 
     LocalEvent & le = LocalEvent::Get();
-    
+
     Game::menu_t res = CANCEL;
 
     cursor.Hide();
@@ -1192,14 +1203,14 @@ void Game::MouseCursorAreaPressRight(s32 index_maps)
 	    case MP2::OBJN_CASTLE:
 	    case MP2::OBJ_CASTLE:
 	    {
-    		const Castle *castle = world.GetCastle(tile.GetIndex());
+    		const Castle* castle = world.GetCastle(tile.GetIndex());
 		if(castle) Dialog::QuickInfo(*castle);
 	    }
 	    break;
 
 	    case MP2::OBJ_HEROES:
     	    {
-		const Heroes *heroes = tile.GetHeroes();
+		const Heroes* heroes = tile.GetHeroes();
 		if(heroes) Dialog::QuickInfo(*heroes);
 	    }
 	    break;
@@ -1288,7 +1299,7 @@ void Game::EventAdventureDialog(Game::menu_t & ret)
 	case Dialog::WORLD:
 	    break;
 
-	case Dialog::PUZZLE: 
+	case Dialog::PUZZLE:
 	    EventPuzzleMaps();
 	    break;
 

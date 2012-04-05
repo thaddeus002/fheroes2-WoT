@@ -98,7 +98,7 @@ void Dialog::SpellInfo(const std::string &header, const std::string &message, co
 
     Button *button = NULL;
     Point pt;
-    
+
     if(ok_button)
     {
         pt.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 1).w()) / 2;

@@ -20,12 +20,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <ctime>
 #include <algorithm>
 #include <fstream>
 #include "maps.h"
 #include "race.h"
 #include "tinyconfig.h"
 #include "difficulty.h"
+#include "dialog.h"
 #include "settings.h"
 
 #define DEFAULT_PORT	5154
@@ -231,7 +233,7 @@ Settings::~Settings()
 Settings & Settings::Get(void)
 {
     static Settings conf;
-    
+
     return conf;
 }
 
@@ -308,7 +310,7 @@ bool Settings::Read(const std::string & filename)
 
 	entry = config.Find("fonts small");
 	if(entry) font_small = entry->StrParams();
-    
+
 	entry = config.Find("fonts normal size");
 	if(entry) size_normal = entry->IntParams();
 
@@ -1535,35 +1537,21 @@ void Settings::SetPosStatus(const Point & pt) { pos_stat = pt; }
 void Settings::BinarySave(void) const
 {
     const std::string binary = GetSaveDir() + SEPARATOR + "fheroes2.bin";
-    QueueMessage msg;
+    std::ofstream fs(binary.c_str(), std::ios::binary);
 
-    // version
-    msg.Push(static_cast<u16>(CURRENT_FORMAT_VERSION));
+    if(fs.is_open())
+    {
+	StreamBuf msg(64);
 
-    // options
-    msg.Push(opt_game());
-    msg.Push(opt_world());
-    msg.Push(opt_battle());
-    msg.Push(opt_addons());
+	msg << static_cast<u16>(CURRENT_FORMAT_VERSION) <<
+	    opt_game << opt_world << opt_battle << opt_addons <<
+	    pos_radr << pos_bttn << pos_icon << pos_stat;
 
-    // radar position
-    msg.Push(pos_radr.x);
-    msg.Push(pos_radr.y);
-
-    // buttons position
-    msg.Push(pos_bttn.x);
-    msg.Push(pos_bttn.y);
-
-    // icons position
-    msg.Push(pos_icon.x);
-    msg.Push(pos_icon.y);
-
-    // status position
-    msg.Push(pos_stat.x);
-    msg.Push(pos_stat.y);
-
-    msg.Save(binary.c_str());
+	fs << msg;
+    }
 }
+
+#include "dialog.h"
 
 void Settings::BinaryLoad(void)
 {
@@ -1572,52 +1560,72 @@ void Settings::BinaryLoad(void)
     if(! IsFile(binary))
 	binary = GetLastFile("", "fheroes2.bin");
 
-    if(IsFile(binary))
+    std::ifstream fs(binary.c_str(), std::ios::binary);
+
+    if(fs.is_open())
     {
-	QueueMessage msg;
-	u32 byte32;
-	u16 byte16, version;
+	StreamBuf msg(64);
+	fs >> msg;
 
-	msg.Load(binary.c_str());
+	if(! msg.fail())
+	{
+	    u16 version = 0;
 
-	opt_game.ResetModes(MODES_ALL);
-	opt_world.ResetModes(MODES_ALL);
-	opt_battle.ResetModes(MODES_ALL);
-	opt_addons.ResetModes(MODES_ALL);
+	    msg >> version >>
+		opt_game >> opt_world >> opt_battle >> opt_addons >>
+		pos_radr >> pos_bttn >> pos_icon >> pos_stat;
+	}
+	else
+	// deprecated: old format
+	if(FORMAT_VERSION_2777)
+	{
+	    VERBOSE("converted: " << "fheroes2.bin");
 
-	msg.Pop(version);
+	    QueueMessage msg2;
+	    u32 byte32;
+	    u16 byte16, version;
 
-	msg.Pop(byte32);
-	opt_game.SetModes(byte32);
+	    msg2.Load(binary.c_str());
 
-	msg.Pop(byte32);
-	opt_world.SetModes(byte32);
+	    opt_game.ResetModes(MODES_ALL);
+	    opt_world.ResetModes(MODES_ALL);
+	    opt_battle.ResetModes(MODES_ALL);
+	    opt_addons.ResetModes(MODES_ALL);
 
-	msg.Pop(byte32);
-	opt_battle.SetModes(byte32);
+	    msg2.Pop(version);
 
-	msg.Pop(byte32);
-	opt_addons.SetModes(byte32);
+	    msg2.Pop(byte32);
+	    opt_game.SetModes(byte32);
 
-	msg.Pop(byte16);
-	pos_radr.x = byte16;
-        msg.Pop(byte16);
-	pos_radr.y = byte16;
+	    msg2.Pop(byte32);
+	    opt_world.SetModes(byte32);
 
-	msg.Pop(byte16);
-	pos_bttn.x = byte16;
-	msg.Pop(byte16);
-	pos_bttn.y = byte16;
+	    msg2.Pop(byte32);
+	    opt_battle.SetModes(byte32);
 
-	msg.Pop(byte16);
-	pos_icon.x = byte16;
-        msg.Pop(byte16);
-	pos_icon.y = byte16;
+	    msg2.Pop(byte32);
+	    opt_addons.SetModes(byte32);
 
-	msg.Pop(byte16);
-	pos_stat.x = byte16;
-	msg.Pop(byte16);
-	pos_stat.y = byte16;
+	    msg2.Pop(byte16);
+	    pos_radr.x = byte16;
+	    msg2.Pop(byte16);
+	    pos_radr.y = byte16;
+
+	    msg2.Pop(byte16);
+	    pos_bttn.x = byte16;
+	    msg2.Pop(byte16);
+	    pos_bttn.y = byte16;
+
+	    msg2.Pop(byte16);
+	    pos_icon.x = byte16;
+	    msg2.Pop(byte16);
+	    pos_icon.y = byte16;
+
+	    msg2.Pop(byte16);
+	    pos_stat.x = byte16;
+	    msg2.Pop(byte16);
+	    pos_stat.y = byte16;
+	}
     }
 }
 
@@ -1641,4 +1649,55 @@ u32 Settings::DisplayFlags(void) const
 #endif
 
     return flags;
+}
+
+StreamBase & operator<< (StreamBase & msg, const Settings & conf)
+{
+    return msg <<
+       // lang
+       conf.force_lang <<
+       // current maps
+       conf.current_maps_file <<
+       // game config
+       conf.game_difficulty <<
+       conf.game_type <<
+       conf.preferably_count_players <<
+       conf.debug <<
+       conf.opt_game << conf.opt_world << conf.opt_battle << conf.opt_addons <<
+       conf.players;
+}
+
+StreamBase & operator>> (StreamBase & msg, Settings & conf)
+{
+    std::string lang;
+
+    msg >> lang;
+
+    if(lang != "en" && lang != conf.force_lang && !conf.Unicode())
+    {
+        std::string msg("This is an saved game is localized for lang = ");
+        msg.append(lang);
+        msg.append(", and most of the messages will be displayed incorrectly.\n \n");
+        msg.append("(tip: set unicode = on)");
+        Dialog::Message("Warning!", msg, Font::BIG, Dialog::OK);
+    }
+
+    u16 debug;
+    u32 opt_game = 0; // skip: settings
+
+    // map file
+    msg >> conf.current_maps_file >>
+       // game config
+       conf.game_difficulty >>
+       conf.game_type >>
+       conf.preferably_count_players >>
+       debug >>
+       opt_game >> conf.opt_world >> conf.opt_battle >> conf.opt_addons >>
+       conf.players;
+
+#ifndef WITH_DEBUG
+    conf.debug = debug;
+#endif
+
+    return msg;
 }

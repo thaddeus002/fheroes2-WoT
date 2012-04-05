@@ -735,7 +735,7 @@ screen_t CastleOpenDialog5(Castle & castle, bool readonly)
         // exit
         if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
 	else
-	if(need_buy_book && le.MouseClickLeft(book_pos)) { const_cast<Heroes *>(hero)->BuySpellBook(&castle); return SCREEN1; }
+	if(need_buy_book && le.MouseClickLeft(book_pos)) { const_cast<Heroes*>(hero)->BuySpellBook(&castle); return SCREEN1; }
 
         spells1.QueueEventProcessing();
         spells2.QueueEventProcessing();

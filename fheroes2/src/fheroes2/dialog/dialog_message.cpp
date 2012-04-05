@@ -53,7 +53,7 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
 
     ButtonGroups btnGroups(box.GetArea(), buttons);
     btnGroups.Draw();
-    
+
     cursor.Show();
     display.Flip();
 

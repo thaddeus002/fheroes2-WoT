@@ -75,4 +75,7 @@ public:
     std::string String(void) const;
 };
 
+StreamBase & operator<< (StreamBase &, const Color::color_t &);
+StreamBase & operator>> (StreamBase &, Color::color_t &);
+
 #endif

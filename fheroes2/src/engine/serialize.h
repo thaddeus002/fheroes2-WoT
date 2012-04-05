@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2011 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *   Copyright (C) 2012 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
@@ -23,232 +23,214 @@
 #ifndef H2IO_H
 #define H2IO_H
 
-#include <iostream>
-#include <streambuf>
-#include <algorithm>
-#include <functional>
-#include <iterator>
 #include <list>
-#include <cstdlib>
 #include <vector>
+#include <map>
+#include <string>
 
 #include "types.h"
 
-#define DEFAULT_PAGE_SIZE 64
+#ifdef WITH_NET
+namespace Network { class Socket; }
+#endif
 
 struct Point;
 struct Rect;
 struct Size;
 
-class PageBuffer : public std::streambuf
+class StreamBase
 {
-    private:
-	size_t pagesz;
-	std::list<char*> listbuf;
-	std::list<char*>::iterator isp, osp;
+public:
+    StreamBase() {}
+    virtual ~StreamBase() {}
 
-	std::list<char*>::iterator AddPage(void)
+    virtual bool	get(char &) = 0;
+    virtual size_t	sizeg(void) const = 0;
+
+    virtual bool	put(const char &) = 0;
+    virtual size_t	sizep(void) const = 0;
+
+    char		get(void);
+    void		get16(u16 &);
+    u16			get16(void);
+    void		get32(u32 &);
+    u32			get32(void);
+
+    void		put16(const u16 &);
+    void		put32(const u32 &);
+
+    StreamBase &	operator>> (bool &);
+    StreamBase &	operator>> (u8 &);
+    StreamBase &	operator>> (s8 &);
+    StreamBase &	operator>> (u16 &);
+    StreamBase &	operator>> (s16 &);
+    StreamBase &	operator>> (u32 &);
+    StreamBase &	operator>> (s32 &);
+    StreamBase &	operator>> (float &);
+    StreamBase &	operator>> (std::string &);
+
+    StreamBase &	operator>> (Rect &);
+    StreamBase &	operator>> (Point &);
+    StreamBase &	operator>> (Size &);
+
+    StreamBase &	operator<< (const bool &);
+    StreamBase &	operator<< (const char &);
+    StreamBase &	operator<< (const u8 &);
+    StreamBase &	operator<< (const s8 &);
+    StreamBase &	operator<< (const u16 &);
+    StreamBase &	operator<< (const s16 &);
+    StreamBase &	operator<< (const u32 &);
+    StreamBase &	operator<< (const s32 &);
+    StreamBase &	operator<< (const float &);
+    StreamBase &	operator<< (const std::string &);
+
+    StreamBase &	operator<< (const Rect &);
+    StreamBase &	operator<< (const Point &);
+    StreamBase &	operator<< (const Size &);
+
+    template<class Type1, class Type2>
+    StreamBase & operator>> (std::pair<Type1, Type2> & p)
+    {
+	return *this >> p.first >> p.second;
+    }
+
+    template<class Type>
+    StreamBase & operator>> (std::vector<Type> & v)
+    {
+	const u32 size = get32();
+	v.resize(size);
+	for(typename std::vector<Type>::iterator
+    	    it = v.begin(); it != v.end(); ++it) *this >> *it;
+	return *this;
+    }
+
+    template<class Type>
+    StreamBase & operator>> (std::list<Type> & v)
+    {
+	const u32 size = get32();
+	v.resize(size);
+	for(typename std::list<Type>::iterator
+    	    it = v.begin(); it != v.end(); ++it) *this >> *it;
+	return *this;
+    }
+
+    template<class Type1, class Type2>
+    StreamBase & operator>> (std::map<Type1, Type2> & v)
+    {
+	const u32 size = get32();
+	v.clear();
+	for(u32 ii = 0; ii < size; ++ii)
 	{
-	    char* ptr = new char [pagesz];
-	    listbuf.push_back(ptr);
-	    return --listbuf.end();
+	    std::pair<Type1, Type2> pr;
+	    *this >> pr;
+	    v.insert(pr);
 	}
+	return *this;
+    }
 
-	static void DelPage(char* ptr)
-	{
-	    delete [] ptr;
-	}
+    template<class Type1, class Type2>
+    StreamBase & operator<< (const std::pair<Type1, Type2> & p)
+    {
+	return *this << p.first << p.second;
+    }
 
-    public:
-        PageBuffer(size_t sz) : pagesz(sz)
-	{
-	    isp = osp = AddPage();
-	    setp(*osp, *osp + pagesz);
-	    setg(*isp, *isp, *isp);
-	}
+    template<class Type>
+    StreamBase & operator<< (const std::vector<Type> & v)
+    {
+	put32(static_cast<u32>(v.size()));
+	for(typename std::vector<Type>::const_iterator
+	    it = v.begin(); it != v.end(); ++it) *this << *it;
+	return *this;
+    }
 
-	virtual ~PageBuffer()
-	{
-	    std::for_each(listbuf.begin(), listbuf.end(), DelPage);
-	}
+    template<class Type>
+    StreamBase & operator<< (const std::list<Type> & v)
+    {
+	put32(static_cast<u32>(v.size()));
+	for(typename std::list<Type>::const_iterator
+	    it = v.begin(); it != v.end(); ++it) *this << *it;
+	return *this;
+    }
 
-    private:
-	size_t psize(void)
-	{
-	    return pptr() - pbase();
-	}
+    template<class Type1, class Type2>
+    StreamBase & operator<< (const std::map<Type1, Type2> & v)
+    {
+	put32(static_cast<u32>(v.size()));
+	for(typename std::map<Type1, Type2>::const_iterator
+	    it = v.begin(); it != v.end(); ++it) *this << *it;
+	return *this;
+    }
 
-	size_t gsize(void)
-	{
-	    return gptr() - eback();
-	}
+    static void		put32(std::ostream &, const u32 &);
+    static void		put16(std::ostream &, const u16 &);
 
-	size_t obufpos(void)
-	{
-	    return std::distance(listbuf.begin(), osp) * pagesz + psize();
-	}
-
-	size_t ibufpos(void)
-	{
-	    return std::distance(listbuf.begin(), isp) * pagesz + gsize();
-	}
-
-    private:
-	int overflow(int c)
-        {
-	    osp = AddPage();
-	    if(*osp)
-	    {
-		setp(*osp, *osp + pagesz);
-		sputc(c);
-		return traits_type::to_int_type(*pptr());
-	    }
-	    return traits_type::eof();
-        }
-
-	int underflow(void)
-        {
-	    if(pagesz > gsize())
-	    {
-		if(eback() != pbase())
-		{
-		    setg(eback(), gptr(), eback() + pagesz);
-	    	    return traits_type::to_int_type(*gptr());
-		}
-		else
-		if(gsize() < psize())
-		{
-		    setg(eback(), gptr(), eback() + psize());
-	    	    return traits_type::to_int_type(*gptr());
-		}
-	    }
-	    else
-	    if(++isp != listbuf.end())
-	    {
-		setg(*isp, *isp, (*isp != pbase() ? *isp + pagesz : *isp + psize()));
-		return traits_type::to_int_type(*gptr());
-    	    }
-	    return traits_type::eof();
-        }
-
-	std::streamsize showmanyc(void)
-	{
-	    return obufpos() - ibufpos();
-	}
-
-	std::streampos seekpos(std::streampos sp, std::ios_base::openmode which)
-	{
-	    if((which & std::ios_base::in) &&
-		sp >= 0 &&
-		static_cast<size_t>(sp) < obufpos())
-	    {
-		isp = listbuf.begin();
-		std::advance(isp, sp / pagesz);
-		setg(*isp, *isp + (sp % pagesz), (*isp != pbase() ? *isp + pagesz : *isp + psize()));
-		return sp;
-	    }
-	    return std::streampos(-1);
-	}
-
-	std::streampos seekoff(std::streamoff off, std::ios_base::seekdir way, std::ios_base::openmode which)
-	{
-	    if(which & std::ios_base::in)
-	    {
-		switch(way)
-		{
-		    case std::ios_base::beg: return seekpos(off, which);
-		    case std::ios_base::cur: return seekpos(ibufpos() + off, which);
-		    case std::ios_base::end: return seekpos(obufpos() - std::abs(static_cast<int>(off)), which);
-		    default: break;
-		}
-	    }
-	    return std::streampos(-1);
-	}
-
-    private:
-        PageBuffer(const PageBuffer &);
-        PageBuffer& operator= (const PageBuffer &);
+    static u32		get32(std::istream &);
+    static u16		get16(std::istream &);
 };
 
-class Serialize : protected std::iostream
+#ifdef WITH_ZLIB
+class ZStreamBuf;
+#endif
+
+class StreamBuf : public StreamBase
 {
-    private:
-	PageBuffer buf;
+public:
+    StreamBuf(size_t);
+    StreamBuf(const StreamBuf &);
 
-	Serialize & put16(const u16 &);
-	Serialize & put32(const u32 &);
+    ~StreamBuf();
 
-	Serialize & get16(u16 &);
-	Serialize & get32(u32 &);
+    StreamBuf &	operator= (const StreamBuf &);
 
-    public:
-	Serialize(size_t sizedef = DEFAULT_PAGE_SIZE) : std::iostream(&buf), buf(sizedef ? sizedef : DEFAULT_PAGE_SIZE) {}
+    size_t	capacity(void) const;
+    void	reset(void);
+    std::string	dump(void) const;
 
-	Serialize & operator<< (const bool &);
-	Serialize & operator<< (const u8 &);
-	Serialize & operator<< (const s8 &);
-	Serialize & operator<< (const u16 &);
-	Serialize & operator<< (const s16 &);
-	Serialize & operator<< (const u32 &);
-	Serialize & operator<< (const s32 &);
-	Serialize & operator<< (const std::string &);
+    char*	data(void);
+    size_t	size(void) const;
+    void	setlimit(size_t);
 
-	Serialize & operator<< (const Rect &);
-	Serialize & operator<< (const Point&);
-	Serialize & operator<< (const Size &);
+    bool	fail(void) const;
 
-	Serialize & operator>> (bool &);
-	Serialize & operator>> (u8 &);
-	Serialize & operator>> (s8 &);
-	Serialize & operator>> (u16 &);
-	Serialize & operator>> (s16 &);
-	Serialize & operator>> (u32 &);
-	Serialize & operator>> (s32 &);
-	Serialize & operator>> (std::string &);
+protected:
+    size_t	tellg(void) const;
+    size_t	tellp(void) const;
 
-	Serialize & operator>> (Rect &);
-	Serialize & operator>> (Point&);
-	Serialize & operator>> (Size &);
+    void	copy(const StreamBuf &);
+    void	realloc(size_t);
+    void	setfail(void);
 
-	template<class Type>
-	Serialize & operator<< (const std::vector<Type> & v)
-	{
-	    put32(v.size());
-	    for(typename std::vector<Type>::const_iterator
-    		it = v.begin(); it != v.end(); ++it) *this << *it;
-	    return *this;
-	}
+    bool	get(char &);
+    bool	put(const char &);
 
-	template<class Type>
-	Serialize & operator<< (const std::list<Type> & v)
-	{
-	    put32(v.size());
-	    for(typename std::list<Type>::const_iterator
-    		it = v.begin(); it != v.end(); ++it) *this << *it;
-	    return *this;
-	}
+    size_t	sizeg(void) const;
+    size_t	sizep(void) const;
 
-	template<class Type>
-	Serialize & operator>> (std::vector<Type> & v)
-	{
-	    u32 size;
-	    get32(size);
-	    v.resize(size);
-	    for(typename std::vector<Type>::iterator
-    		it = v.begin(); it != v.end(); ++it) *this >> *it;
-	    return *this;
-	}
+    friend std::ostream & operator<< (std::ostream &, StreamBuf &);
+    friend std::istream & operator>> (std::istream &, StreamBuf &);
 
-	template<class Type>
-	Serialize & operator>> (std::list<Type> & v)
-	{
-	    u32 size;
-	    get32(size);
-	    v.resize(size);
-	    for(typename std::list<Type>::iterator
-    		it = v.begin(); it != v.end(); ++it) *this >> *it;
-	    return *this;
-	}
+#ifdef WITH_NET
+    friend Network::Socket & operator<< (Network::Socket &, StreamBuf &);
+    friend Network::Socket & operator>> (Network::Socket &, StreamBuf &);
+#endif
+
+#ifdef WITH_ZLIB
+    friend class ZStreamBuf;
+#endif
+
+    char*	itbeg;
+    char*	itget;
+    char*	itput;
+    char*	itend;
+    size_t	flags;
 };
+
+std::ostream & operator<< (std::ostream &, StreamBuf &);
+std::istream & operator>> (std::istream &, StreamBuf &);
+
+#ifdef WITH_NET
+Network::Socket & operator<< (Network::Socket &, StreamBuf &);
+Network::Socket & operator>> (Network::Socket &, StreamBuf &);
+#endif
 
 #endif

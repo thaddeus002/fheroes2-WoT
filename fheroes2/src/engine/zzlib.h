@@ -25,20 +25,16 @@
 
 #ifdef WITH_ZLIB
 
-#include <string>
 #include <vector>
+#include <iostream>
 #include "types.h"
 #include "surface.h"
+#include "serialize.h"
 
 namespace ZLib
 {
-    bool	UnCompress(std::vector<char> &, const char*, size_t, bool debug = false);
-    bool	UnCompress(std::vector<char> &, const std::vector<char> &, bool debug = false);
-    bool	UnCompress(std::vector<char> &, const std::string &, bool debug = false);
-
-    bool	Compress(std::vector<char> &, const char*, size_t);
-    bool	Compress(std::vector<char> &, const std::vector<char> &);
-    bool	Compress(std::vector<char> &, const std::string &);
+    bool UnCompress(std::vector<char> &, const char*, size_t, bool debug = false);
+    bool Compress(std::vector<char> &, const char*, size_t);
 }
 
 class ZSurface : public Surface
@@ -51,6 +47,25 @@ public:
 private:
     std::vector<char> buf;
 };
+
+class ZStreamBuf : protected StreamBuf
+{
+public:
+    ZStreamBuf() : StreamBuf(0) {}
+
+    ZStreamBuf & operator<< (StreamBuf &);
+    ZStreamBuf & operator>> (StreamBuf &);
+
+    bool        fail(void) const { return StreamBuf::fail(); }
+    void        setlimit(size_t v) { return StreamBuf::setlimit(v); }
+
+protected:
+    friend std::ostream & operator<< (std::ostream &, ZStreamBuf &);
+    friend std::istream & operator>> (std::istream &, ZStreamBuf &);
+};
+
+std::ostream & operator<< (std::ostream &, ZStreamBuf &);
+std::istream & operator>> (std::istream &, ZStreamBuf &);
 
 #endif
 #endif

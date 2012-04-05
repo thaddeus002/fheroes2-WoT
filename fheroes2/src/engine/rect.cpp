@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <sstream>
 #include "rect.h"
 
 Point::Point(s16 px, s16 py) : x(px), y(py)
@@ -73,6 +74,13 @@ bool Point::inABC(const Point & pt1, const Point & pt2, const Point & pt3) const
     return ((a >= 0 && b >= 0 && c >= 0) || (a < 0 && b < 0 && c < 0));
 }
 
+std::string Point::String(void) const
+{
+    std::ostringstream os;
+    os << "point: x(" << x << "), y(" << y << ")";
+    return os.str();
+}
+
 Size::Size(u16 sw, u16 sh) : w(sw), h(sh)
 {
 }
@@ -90,6 +98,13 @@ bool Size::operator!= (const Size & sz) const
 bool Size::isEmpty(void) const
 {
     return 0 == w && 0 == h;
+}
+
+std::string Size::String(void) const
+{
+    std::ostringstream os;
+    os << "size: w(" << w << "), h(" << h << ")";
+    return os.str();
 }
 
 Rect::Rect(s16 rx, s16 ry, u16 rw, u16 rh) : Point(rx, ry), Size(rw, rh)
@@ -187,4 +202,11 @@ s32 Rects::GetIndex(const Point & pt) const
 	it = begin(); it != end(); ++it)
 	if(*it & pt) return std::distance(begin(), it);
     return -1;
+}
+
+std::string Rect::String(void) const
+{
+    std::ostringstream os;
+    os << "rect: x(" << x << "), y(" << y << "), w(" << w << "), h(" << h << ")";
+    return os.str();
 }

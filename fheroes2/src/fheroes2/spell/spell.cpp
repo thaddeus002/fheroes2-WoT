@@ -753,3 +753,13 @@ u8 Spell::CalculateDimensionDoorDistance(u8 current_sp, u32 total_hp)
     // original h2 variant
     return 14;
 }
+
+StreamBase & operator<< (StreamBase & msg, const Spell & spell)
+{
+    return msg << spell.id;
+}
+
+StreamBase & operator>> (StreamBase & msg, Spell & spell)
+{
+    return msg >> spell.id;
+}

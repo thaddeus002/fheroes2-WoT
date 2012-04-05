@@ -26,12 +26,13 @@
 #include <string>
 #include "rect.h"
 #include "types.h"
+#include "gamedefs.h"
 
-class Heroes;
-class Castle;
 class Surface;
 class Kingdom;
 class Player;
+class Heroes;
+class Castle;
 
 namespace Game
 {
@@ -67,6 +68,12 @@ namespace Game
     };
 
     void Init(void);
+
+    const std::string & GetLastSavename(void);
+    void SetLastSavename(const std::string &);
+
+    void SetSaveVersion(u16);
+    u16  GetSaveVersion(void);
 
     // type_t
     enum { TYPE_MENU = 0, TYPE_STANDARD = 0x01, TYPE_CAMPAIGN = 0x02, TYPE_HOTSEAT = 0x04, TYPE_NETWORK = 0x08, TYPE_BATTLEONLY = 0x10, TYPE_LOADFILE = 0x80, TYPE_MULTI = TYPE_HOTSEAT | TYPE_NETWORK };
@@ -211,9 +218,9 @@ namespace Game
     menu_t Testing(u8);
 
     void DrawInterface(void);
-    
+
     void SetFixVideoMode(void);
-    
+
     void EnvironmentSoundMixer(void);
 
     u8  GetKingdomColors(void);

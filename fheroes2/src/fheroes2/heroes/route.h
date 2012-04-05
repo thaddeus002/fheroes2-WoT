@@ -76,13 +76,21 @@ namespace Route
     	    static u16	GetIndexSprite(u16 from, u16 to, u8 mod);
 
 	private:
-	    friend class Game::IO;
+	    friend StreamBase & operator<< (StreamBase &, const Path &);
+	    friend StreamBase & operator>> (StreamBase &, Path &);
+	    friend class Game::IOld;
+
 	    const Heroes & hero;
 	    s32		dst;
 	    bool	hide;
     };
 
     bool PathFind(std::list<Route::Step>* result, const s32 from, const s32 to, const u16 limit = MAXU16, const Heroes* = NULL);
+
+    StreamBase & operator<< (StreamBase &, const Step &);
+    StreamBase & operator<< (StreamBase &, const Path &);
+    StreamBase & operator>> (StreamBase &, Step &);
+    StreamBase & operator>> (StreamBase &, Path &);
 }
 
 #endif

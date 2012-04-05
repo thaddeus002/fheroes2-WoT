@@ -32,10 +32,7 @@
 #include "cursor.h"
 #include "game.h"
 #include "test.h"
-#include "sdlnet.h"
 #include "images_pack.h"
-#include "localclient.h"
-
 #include "zzlib.h"
 
 void LoadZLogo(void);
@@ -54,9 +51,6 @@ int PrintHelp(const char *basename)
 #endif
 #ifndef BUILD_RELEASE
     VERBOSE("  -d\tdebug mode");
-#endif
-#ifdef WITH_NET
-    VERBOSE("  -s\tdedicated server");
 #endif
     VERBOSE("  -h\tprint this help and exit");
 
@@ -100,7 +94,7 @@ int main(int argc, char **argv)
                     case 'e':
 			conf.SetEditor();
 			break;
-#endif			
+#endif
 #ifndef BUILD_RELEASE
                     case 't':
 			test = String::ToInt(optarg);
@@ -109,11 +103,6 @@ int main(int argc, char **argv)
                     case 'd':
                 	conf.SetDebug(optarg ? String::ToInt(optarg) : 0);
                 	break;
-#endif
-
-#ifdef WITH_NET
-                    case 's':
-                	      return Network::RunDedicatedServer();
 #endif
                     case '?':
                     case 'h': return PrintHelp(argv[0]);
@@ -136,10 +125,6 @@ int main(int argc, char **argv)
         if(conf.MusicCD())
             subsystem |= INIT_CDROM | INIT_AUDIO;
 #endif
-#ifdef WITH_NET
-        Network::SetProtocolVersion(static_cast<u16>(MAJOR_VERSION << 8) | MINOR_VERSION);
-#endif
-
 	if(SDL::Init(subsystem))
 #ifndef ANDROID
 	try
@@ -257,9 +242,6 @@ int main(int argc, char **argv)
 	catch(Error::Exception)
 	{
     	    AGG::Cache::Get().Dump();
-#ifdef WITH_NET
-            if(conf.GameType(Game::TYPE_NETWORK)) FH2LocalClient::Get().Logout("internal error");
-#endif
 	    VERBOSE(std::endl << conf.String());
 	}
 #endif
@@ -303,7 +285,7 @@ void LoadZLogo(void)
 		display.Fill(black);
 		ii += 10;
 	    }
-		
+
 	    DELAY(500);
 
 	    while(ii > 0)

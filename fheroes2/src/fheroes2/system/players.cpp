@@ -30,12 +30,12 @@
 #include "settings.h"
 #include "players.h"
 
-enum { PLAYER_INGAME = 0x01 };
-
 namespace
 {
     Player* _players[KINGDOMMAX + 1] = { NULL };
     u8 human_colors = 0;
+
+    enum { ST_INGAME = 0x2000 };
 }
 
 void PlayerFocusReset(Player* player)
@@ -53,7 +53,7 @@ void PlayerFixRandomRace(Player* player)
     if(player && player->race == Race::RAND) player->race = Race::Rand();
 }
 
-Player::Player(u8 col) : control(CONTROL_NONE), color(col), race(Race::NONE), friends(col), mode(0), id(World::GetUniq())
+Player::Player(u8 col) : control(CONTROL_NONE), color(col), race(Race::NONE), friends(col), id(World::GetUniq())
 {
     name  = Color::String(color);
 }
@@ -95,7 +95,7 @@ bool Player::isName(const std::string & str) const
 
 bool Player::isPlay(void) const
 {
-    return mode & PLAYER_INGAME;
+    return Modes(ST_INGAME);
 }
 
 void Player::SetControl(u8 ctl)
@@ -105,7 +105,66 @@ void Player::SetControl(u8 ctl)
 
 void Player::SetPlay(bool f)
 {
-    if(f) mode |= PLAYER_INGAME; else mode &= ~PLAYER_INGAME;
+    if(f) SetModes(ST_INGAME); else ResetModes(ST_INGAME);
+}
+
+StreamBase & operator<< (StreamBase & msg, const Focus & focus)
+{
+    msg << focus.first;
+
+    switch(focus.first)
+    {
+	case FOCUS_HEROES: msg << reinterpret_cast<Heroes*>(focus.second)->GetIndex(); break;
+	case FOCUS_CASTLE: msg << reinterpret_cast<Castle*>(focus.second)->GetIndex(); break;
+	default: msg << static_cast<s32>(-1); break;
+    }
+
+    return msg;
+}
+
+StreamBase & operator>> (StreamBase & msg, Focus & focus)
+{
+    s32 index;
+    msg >> focus.first >> index;
+
+    switch(focus.first)
+    {
+	case FOCUS_HEROES: focus.second = world.GetHeroes(index); break;
+	case FOCUS_CASTLE: focus.second = world.GetCastle(index); break;
+	default: focus.second = NULL; break;
+    }
+
+    return msg;
+}
+
+StreamBase & operator<< (StreamBase & msg, const Player & player)
+{
+    const BitModes & modes = player;
+
+    return msg <<
+	modes <<
+	player.id <<
+	player.control <<
+	player.color <<
+	player.race <<
+	player.friends <<
+	player.name <<
+	player.focus;
+}
+
+StreamBase & operator>> (StreamBase & msg, Player & player)
+{
+    BitModes & modes = player;
+
+    return msg >>
+	modes >>
+	player.id >>
+	player.control >>
+	player.color >>
+	player.race >>
+	player.friends >>
+	player.name >>
+	player.focus;
 }
 
 Players::Players() : current_color(0)
@@ -173,13 +232,6 @@ void Players::Init(const Maps::FileInfo & fi)
 
 	    if(!first && (player->control & CONTROL_HUMAN))
 		first = player;
-
-//#ifdef WITH_NET
-	    // FIX ME: network control
-//	    player->control |= CONTROL_REMOTE;
-//#else
-	    //player->control |= CONTROL_LOCAL;
-//#endif
 
 	    push_back(player);
 	    _players[Color::GetIndex(*it)] = back();
@@ -367,6 +419,33 @@ std::string Players::String(void) const
     return os.str();
 }
 
+StreamBase & operator<< (StreamBase & msg, const Players & players)
+{
+    msg << players.GetColors() << players.current_color;
+
+    for(Players::const_iterator
+	it = players.begin(); it != players.end(); ++it)
+        msg << (**it);
+
+    return msg;
+}
+
+StreamBase & operator>> (StreamBase & msg, Players & players)
+{
+    u8 colors, current;
+
+    msg >> colors >> current;
+
+    players.Init(colors);
+    players.current_color = current;
+
+    for(Players::const_iterator
+	it = players.begin(); it != players.end(); ++it)
+	msg >> (**it);
+
+    return msg;
+}
+
 bool Interface::PlayerInfo::operator== (const Player* p) const
 {
     return player == p;
@@ -527,7 +606,7 @@ void Interface::PlayersInfo::RedrawInfo(bool show_play_info) const /* show_play_
             Text text(name, Font::SMALL);
             text.Blit(rect2.x + (rect2.w - text.w()) / 2, rect2.y + rect2.h + 2);
         }
-	
+
 	// "swap" sprite
 
 	if(show_swap &&

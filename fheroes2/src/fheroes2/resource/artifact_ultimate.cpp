@@ -35,10 +35,7 @@ void UltimateArtifact::Set(s32 pos, const Artifact & a)
     index = pos;
     isfound = false;
 
-    if(Maps::isValidAbsIndex(index))
-	Interface::GameArea::GenerateUltimateArtifactAreaSurface(index, puzzlemap);
-    else
-	Surface::FreeSurface(puzzlemap);
+    MakeSurface();
 }
 
 const Surface & UltimateArtifact::GetPuzzleMapSurface(void) const
@@ -72,4 +69,27 @@ void UltimateArtifact::Reset(void)
     Surface::FreeSurface(puzzlemap);
     index = -1;
     isfound = false;
+}
+
+void UltimateArtifact::MakeSurface(void)
+{
+    if(Maps::isValidAbsIndex(index))
+	Interface::GameArea::GenerateUltimateArtifactAreaSurface(index, puzzlemap);
+    else
+	Surface::FreeSurface(puzzlemap);
+}
+
+StreamBase & operator<< (StreamBase & msg, const UltimateArtifact & ultimate)
+{
+    return msg << static_cast<Artifact>(ultimate) << ultimate.index << ultimate.isfound;
+}
+
+StreamBase & operator>> (StreamBase & msg, UltimateArtifact & ultimate)
+{
+    Artifact & artifact = ultimate;
+    msg >> artifact >> ultimate.index >> ultimate.isfound;
+
+    ultimate.MakeSurface();
+
+    return msg;
 }

@@ -31,7 +31,6 @@
 #include "speed.h"
 #include "race.h"
 #include "army_troop.h"
-#include "server.h"
 #include "spell_storage.h"
 #include "battle_arena.h"
 #include "battle_cell.h"
@@ -40,6 +39,7 @@
 #include "battle_tower.h"
 #include "battle_catapult.h"
 #include "battle_bridge.h"
+#include "battle_command.h"
 #include "battle_interface.h"
 
 namespace Battle
@@ -95,15 +95,14 @@ ICN::icn_t GetCovr(u16 ground)
     return covrs.empty() ? ICN::UNKNOWN : *Rand::Get(covrs);
 }
 
-
-QueueMessage & Battle::operator<< (QueueMessage & msg, const TargetInfo & t)
+StreamBase & Battle::operator<< (StreamBase & msg, const TargetInfo & t)
 {
     return msg <<
 	(t.defender ? t.defender->GetUID() : static_cast<u32>(0)) <<
 	t.damage << t.killed << t.resist;
 }
 
-QueueMessage & Battle::operator>> (QueueMessage & msg, TargetInfo & t)
+StreamBase & Battle::operator>> (StreamBase & msg, TargetInfo & t)
 {
     u32 uid = 0;
 
@@ -115,7 +114,7 @@ QueueMessage & Battle::operator>> (QueueMessage & msg, TargetInfo & t)
     return msg;
 }
 
-QueueMessage & Battle::operator<< (QueueMessage & msg, const TargetsInfo & ts)
+StreamBase & Battle::operator<< (StreamBase & msg, const TargetsInfo & ts)
 {
     msg << static_cast<u32>(ts.size());
 
@@ -126,7 +125,7 @@ QueueMessage & Battle::operator<< (QueueMessage & msg, const TargetsInfo & ts)
     return msg;
 }
 
-QueueMessage & Battle::operator>> (QueueMessage & msg, TargetsInfo & ts)
+StreamBase & Battle::operator>> (StreamBase & msg, TargetsInfo & ts)
 {
     u32 size = 0;
 
@@ -189,7 +188,7 @@ Battle::Tower* Battle::Arena::GetTower(u8 type)
 
 Battle::Arena::Arena(Army & a1, Army & a2, s32 index, bool local) :
 	army1(NULL), army2(NULL), armies(NULL), castle(NULL), current_color(0), catapult(NULL),
-	bridge(NULL), interface(NULL), icn_covr(ICN::UNKNOWN), current_turn(0), auto_battle(0)
+	bridge(NULL), interface(NULL), icn_covr(ICN::UNKNOWN), current_turn(0), auto_battle(0), end_turn(false)
 {
     const Settings & conf = Settings::Get();
     usage_spells.reserve(20);
@@ -273,19 +272,6 @@ Battle::Arena::Arena(Army & a1, Army & a2, s32 index, bool local) :
 	    board.SetCobjObjects(world.GetTiles(index));
     }
 
-#ifdef WITH_NET
-    if(Network::isRemoteClient())
-    {
-	FH2Server & server = FH2Server::Get();
-
-	// sync clients ~10 sec
-	server.WaitReadyClients(10000);
-
-    	if(CONTROL_REMOTE & army1->GetControl()) server.BattleSendBoard(army1->GetColor(), *this);
-	if(CONTROL_REMOTE & army2->GetControl()) server.BattleSendBoard(army2->GetColor(), *this);
-    }
-#endif
-
     // set guardian objects mode (+2 defense)
     if(conf.ExtWorldGuardianObjectsTwoDefense() &&
 	!castle &&
@@ -333,7 +319,7 @@ Battle::Arena::~Arena()
 void Battle::Arena::TurnTroop(Unit* current_troop)
 {
     Actions actions;
-    bool end_turn = false;
+    end_turn = false;
 
     DEBUG(DBG_BATTLE, DBG_TRACE, current_troop->String(true));
 
@@ -342,7 +328,7 @@ void Battle::Arena::TurnTroop(Unit* current_troop)
 	// bad morale
 	if(current_troop->Modes(MORALE_BAD))
 	{
-    	    actions.AddedMoraleAction(*current_troop, false);
+    	    actions.push_back(Command(MSG_BATTLE_MORALE, current_troop->GetUID(), false));
 	    end_turn = true;
 	}
 	else
@@ -364,10 +350,8 @@ void Battle::Arena::TurnTroop(Unit* current_troop)
 	// apply task
 	while(actions.size())
 	{
-	    if(MSG_BATTLE_END_TURN == actions.front().GetID())
-		    end_turn = true;
-
-	    ApplyAction(actions.front());
+	    // apply action
+	    ApplyAction(actions.front().GetStream());
 	    actions.pop_front();
 
     	    // check end battle
@@ -381,7 +365,7 @@ void Battle::Arena::TurnTroop(Unit* current_troop)
 		    current_troop->Modes(MORALE_GOOD) &&
 		    BattleValid())
 	    {
-		actions.AddedMoraleAction(*current_troop, true);
+		actions.push_back(Command(MSG_BATTLE_MORALE, current_troop->GetUID(), true));
 		end_turn = false;
 	    }
 	}
@@ -413,14 +397,6 @@ void Battle::Arena::Turns(void)
 
     army1->NewTurn();
     army2->NewTurn();
-
-#ifdef WITH_NET
-    if(Network::isRemoteClient())
-    {
-    	if(CONTROL_REMOTE & army1->GetControl()) FH2Server::Get().BattleSendBoard(army1->GetColor(), *this);
-	if(CONTROL_REMOTE & army2->GetControl()) FH2Server::Get().BattleSendBoard(army2->GetColor(), *this);
-    }
-#endif
 
     bool tower_moved = false;
     bool catapult_moved = false;
@@ -505,15 +481,8 @@ void Battle::Arena::Turns(void)
 
 void Battle::Arena::RemoteTurn(const Unit & b, Actions & a)
 {
-#ifdef WITH_NET
-    if(Network::isRemoteClient())
-	FH2Server::Get().BattleRecvTurn(current_color, b, *this, a);
-    else
-#endif
-    {
-	DEBUG(DBG_BATTLE, DBG_WARN, "switch to AI turn");
-	AI::BattleTurn(*this, b, a);
-    }
+    DEBUG(DBG_BATTLE, DBG_WARN, "switch to AI turn");
+    AI::BattleTurn(*this, b, a);
 }
 
 void Battle::Arena::HumanTurn(const Unit & b, Actions & a)
@@ -530,42 +499,19 @@ void Battle::Arena::TowerAction(const Tower & twr)
 
     if(enemy)
     {
-        QueueMessage action;
-        action.SetID(MSG_BATTLE_TOWER);
-        action << twr.GetType() << enemy->GetUID();
-        ApplyAction(action);
+	Command cmd(MSG_BATTLE_TOWER);
+	cmd.GetStream() << twr.GetType() << enemy->GetUID();
+
+	ApplyAction(cmd.GetStream());
     }
 }
 
 void Battle::Arena::CatapultAction(void)
 {
-    QueueMessage action;
-    action.SetID(MSG_BATTLE_CATAPULT);
-
-    u8 shots = catapult->GetShots();
-    std::vector<u8> values;
-    values.resize(CAT_MISS, 0);
-
-    values[CAT_WALL1] = GetCastleTargetValue(CAT_WALL1);
-    values[CAT_WALL2] = GetCastleTargetValue(CAT_WALL2);
-    values[CAT_WALL3] = GetCastleTargetValue(CAT_WALL3);
-    values[CAT_WALL4] = GetCastleTargetValue(CAT_WALL4);
-    values[CAT_TOWER1] = GetCastleTargetValue(CAT_TOWER1);
-    values[CAT_TOWER2] = GetCastleTargetValue(CAT_TOWER2);
-    values[CAT_TOWER3] = GetCastleTargetValue(CAT_TOWER3);
-    values[CAT_BRIDGE] = GetCastleTargetValue(CAT_BRIDGE);
-
-    action << shots;
-
-    while(shots--)
+    if(catapult)
     {
-        const u8 target = catapult->GetTarget(values);
-        const u8 damage = catapult->GetDamage(target, GetCastleTargetValue(target));
-        action << target << damage;
-        values[target] -= damage;
+	ApplyAction(catapult->GetAction(*this).GetStream());
     }
-
-    ApplyAction(action);
 }
 
 Battle::Indexes Battle::Arena::GetPath(const Unit & b, const Position & dst)
@@ -882,63 +828,42 @@ std::vector<u8> Battle::Arena::GetCastleTargets(void) const
     return targets;
 }
 
-QueueMessage & Battle::operator<< (QueueMessage & msg, const Arena & a)
+StreamBase & Battle::operator<< (StreamBase & msg, const Arena & a)
 {
     msg <<
-	a.current_turn <<
-	static_cast<u32>(a.board.size());
-
-    for(Board::const_iterator // FIXME: serialize
-	it = a.board.begin(); it != a.board.end(); ++it)
-	msg << (*it);
-
-    msg << *a.army1 << *a.army2;
+	a.current_turn << a.board <<
+	*a.army1 << *a.army2;
 
     const HeroBase* hero1 = a.army1->GetCommander();
     const HeroBase* hero2 = a.army2->GetCommander();
 
     if(hero1)
-    {
-	msg << hero1->GetType();
-	Game::IO::PackHeroBase(msg, *hero1); // FIXME: serialize
-    }
+	msg << hero1->GetType() << *hero1;
     else
 	msg << static_cast<u8>(Skill::Primary::UNDEFINED);
 
     if(hero2)
-    {
-	msg << hero1->GetType();
-	Game::IO::PackHeroBase(msg, *hero2); // FIXME: serialize
-    }
+	msg << hero1->GetType() << *hero2;
     else
 	msg << static_cast<u8>(Skill::Primary::UNDEFINED);
 
     return msg;
 }
 
-QueueMessage & Battle::operator>> (QueueMessage & msg, Arena & a)
+StreamBase & Battle::operator>> (StreamBase & msg, Arena & a)
 {
-    u32 size;
-
-    msg >> a.current_turn >> size;
-
-    for(Board::iterator
-	it = a.board.begin(); it != a.board.end(); ++it)
-	msg >> (*it);
-
-    msg >> *a.army1 >> *a.army2;
+    msg >> a.current_turn >> a.board >>
+	*a.army1 >> *a.army2;
 
     u8 type;
     HeroBase* hero1 = a.army1->GetCommander();
     HeroBase* hero2 = a.army2->GetCommander();
 
     msg >> type;
-    if(hero1 && type == hero1->GetType())
-	Game::IO::UnpackHeroBase(msg, *hero1, CURRENT_FORMAT_VERSION);
+    if(hero1 && type == hero1->GetType()) msg >> *hero1;
 
     msg >> type;
-    if(hero2 && type == hero2->GetType())
-	Game::IO::UnpackHeroBase(msg, *hero2, CURRENT_FORMAT_VERSION);
+    if(hero2 && type == hero2->GetType()) msg >> *hero2;
 
     return msg;
 }

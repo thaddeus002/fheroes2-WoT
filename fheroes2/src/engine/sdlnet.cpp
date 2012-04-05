@@ -28,6 +28,8 @@
 
 #define BUFSIZE 16
 
+enum { ERROR_SEND = 0x8000, ERROR_RECV = 0x4000 };
+
 QueueMessage::QueueMessage() : type(0), data(NULL), itd1(NULL), itd2(NULL), dtsz(BUFSIZE)
 {
     data = new char [dtsz + 1];
@@ -36,39 +38,14 @@ QueueMessage::QueueMessage() : type(0), data(NULL), itd1(NULL), itd2(NULL), dtsz
     itd2 = itd1;
 }
 
-QueueMessage::QueueMessage(u16 id) : type(id), data(NULL), itd1(NULL), itd2(NULL), dtsz(BUFSIZE)
-{
-    data = new char [dtsz + 1];
-
-    itd1 = data;
-    itd2 = itd1;
-}
-
-QueueMessage::QueueMessage(const QueueMessage & msg) : type(msg.type), data(NULL), itd1(NULL), itd2(NULL), dtsz(msg.dtsz)
-{
-    data = new char [dtsz + 1];
-
-    std::memcpy(data, msg.data, dtsz);
-    itd1 = msg.itd1 > msg.data ? &data[msg.itd1 - msg.data] : data;
-    itd2 = msg.itd2 > msg.data ? &data[msg.itd2 - msg.data] : itd1;
-}
-
-QueueMessage & QueueMessage::operator= (const QueueMessage & msg)
-{
-    type = msg.type;
-    dtsz = msg.dtsz;
-    data = new char [dtsz + 1];
-
-    std::memcpy(data, msg.data, dtsz);
-    itd1 = msg.itd1 > msg.data ? &data[msg.itd1 - msg.data] : data;
-    itd2 = msg.itd2 > msg.data ? &data[msg.itd2 - msg.data] : itd1;
-
-    return *this;
-}
-
 QueueMessage::~QueueMessage()
 {
     if(data) delete [] data;
+}
+
+size_t QueueMessage::Size(void) const
+{
+    return itd2 - data;
 }
 
 void QueueMessage::Resize(size_t lack)
@@ -83,228 +60,11 @@ void QueueMessage::Resize(size_t lack)
     data = dat2;
 }
 
-size_t QueueMessage::Size(void) const
-{
-    return itd2 - data;
-}
-
-bool QueueMessage::isID(u16 id) const
-{
-    return type == id;
-}
-
-u16 QueueMessage::GetID(void) const
-{
-    return type;
-}
-
-void QueueMessage::SetID(u16 id)
-{
-    type = id;
-}
-
-void QueueMessage::Reserve(size_t size)
-{
-    delete [] data;
-    dtsz = size;
-    data = new char [dtsz + 1];
-    
-    itd1 = data;
-    itd2 = itd1;
-}
-
-void QueueMessage::Reset(void)
-{
-    type = 0;
-
-    if(BUFSIZE != dtsz)
-    {
-	delete [] data;
-	dtsz = BUFSIZE;
-	data = new char [dtsz + 1];
-    }
-
-    itd1 = data;
-    itd2 = itd1;
-}
-
-void QueueMessage::SoftReset(void)
-{
-    itd1 = data;
-}
-
-void QueueMessage::Push(s8 byte8)
-{
-    Push(static_cast<u8>(byte8));
-}
-
 void QueueMessage::Push(u8 byte8)
 {
     if(data + dtsz < itd2 + 1) Resize(1);
 
     *itd2 = byte8;
-    ++itd2;
-}
-
-void QueueMessage::Push(s16 byte16)
-{
-    Push(static_cast<u16>(byte16));
-}
-
-void QueueMessage::Push(u16 byte16)
-{
-    if(data + dtsz < itd2 + 2) Resize(2);
-
-    *itd2 = 0x00FF & (byte16 >> 8);
-    ++itd2;
-
-    *itd2 = 0x00FF & byte16;
-    ++itd2;
-}
-
-void QueueMessage::Push(s32 byte32)
-{
-    Push(static_cast<u32>(byte32));
-}
-
-void QueueMessage::Push(u32 byte32)
-{
-    if(data + dtsz < itd2 + 4) Resize(4);
-
-    *itd2 = 0x000000FF & (byte32 >> 24);
-    ++itd2;
-
-    *itd2 = 0x000000FF & (byte32 >> 16);
-    ++itd2;
-
-    *itd2 = 0x000000FF & (byte32 >> 8);
-    ++itd2;
-
-    *itd2 = 0x000000FF & byte32;
-    ++itd2;
-}
-
-void QueueMessage::Push(bool f)
-{
-    Push(static_cast<u8>(f));
-}
-
-void QueueMessage::Push(const std::string & str)
-{
-    Push(str.c_str());
-}
-
-QueueMessage & QueueMessage::operator<< (u8 v)
-{
-    Push(v);
-    return *this;
-}
-
-QueueMessage & QueueMessage::operator>> (u8 & v)
-{
-    Pop(v);
-    return *this;
-}
-
-QueueMessage & QueueMessage::operator<< (s8 v)
-{
-    Push(v);
-    return *this;
-}
-
-QueueMessage & QueueMessage::operator>> (s8 & v)
-{
-    Pop(v);
-    return *this;
-}
-
-QueueMessage & QueueMessage::operator<< (u16 v)
-{
-    Push(v);
-    return *this;
-}
-
-QueueMessage & QueueMessage::operator>> (u16 & v)
-{
-    Pop(v);
-    return *this;
-}
-
-QueueMessage & QueueMessage::operator<< (s16 v)
-{
-    Push(v);
-    return *this;
-}
-
-QueueMessage & QueueMessage::operator>> (s16 & v)
-{
-    Pop(v);
-    return *this;
-}
-
-QueueMessage & QueueMessage::operator<< (u32 v)
-{
-    Push(v);
-    return *this;
-}
-
-QueueMessage & QueueMessage::operator>> (u32 & v)
-{
-    Pop(v);
-    return *this;
-}
-
-QueueMessage & QueueMessage::operator<< (s32 v)
-{
-    Push(v);
-    return *this;
-}
-
-QueueMessage & QueueMessage::operator>> (s32 & v)
-{
-    Pop(v);
-    return *this;
-}
-
-QueueMessage & QueueMessage::operator<< (bool v)
-{
-    Push(v);
-    return *this;
-}
-
-QueueMessage & QueueMessage::operator>> (bool & v)
-{
-    Pop(v);
-    return *this;
-}
-
-QueueMessage & QueueMessage::operator<< (const std::string & v)
-{
-    Push(v);
-    return *this;
-}
-
-QueueMessage & QueueMessage::operator>> (std::string & v)
-{
-    Pop(v);
-    return *this;
-}
-
-QueueMessage & QueueMessage::operator<< (const char* v)
-{
-    Push(v);
-    return *this;
-}
-
-void QueueMessage::Push(const char* str)
-{
-    const size_t len = std::strlen(str);
-    if(data + dtsz < itd2 + len + 1) Resize(len + 1);
-
-    while(*str) *itd2++ = *str++;
-
-    // end string
-    *itd2 = 0;
     ++itd2;
 }
 
@@ -413,39 +173,6 @@ bool QueueMessage::Pop(std::string & str)
     return true;
 }
 
-void QueueMessage::Dump(std::ostream & stream) const
-{
-    stream << "network packet: " << "type: 0x" << std::hex << type << ", size: " << std::dec << DtSz();
-
-    stream << ", data:";
-    const char* cur = itd1;
-    u8 cast;
-    while(cur < itd2){ cast = *cur; stream << " 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(cast); ++cur; }
-
-    stream  << std::endl;
-}
-
-const char* QueueMessage::DtPt(void) const
-{
-    return itd1;
-}
-
-size_t QueueMessage::DtSz(void) const
-{
-    return itd2 > itd1 ? itd2 - itd1 : 0;
-}
-
-void QueueMessage::Save(const char* fn) const
-{
-    std::ofstream fs(fn, std::ios::binary);
-
-    if(fs.is_open())
-    {
-	fs.write(DtPt(), DtSz());
-	fs.close();
-    }
-}
-
 void QueueMessage::Load(const char* fn)
 {
     std::ifstream fs(fn, std::ios::binary);
@@ -469,16 +196,7 @@ void QueueMessage::Load(const char* fn)
 
 #ifdef WITH_NET
 
-namespace Network
-{
-    static u16 proto = 0xFF01;
-}
-
-void Network::SetProtocolVersion(u16 v)
-{
-    proto = v;
-}
-
+/*
 bool Network::RecvMessage(const Network::Socket & csd, QueueMessage & msg, bool debug)
 {
     u16 head;
@@ -545,17 +263,18 @@ bool Network::SendMessage(const Network::Socket & csd, const QueueMessage & msg)
            csd.Send(reinterpret_cast<const char *>(&size), sizeof(size)) &&
            (size ? csd.Send(msg.data, msg.Size()) : true);
 }
+*/
 
-Network::Socket::Socket() : sd(NULL), sdset(NULL)
+Network::Socket::Socket() : sd(NULL), sdset(NULL), status(0)
 {
 }
 
-Network::Socket::Socket(const TCPsocket csd) : sd(NULL), sdset(NULL)
+Network::Socket::Socket(const TCPsocket csd) : sd(NULL), sdset(NULL), status(0)
 {
     Assign(csd);
 }
 
-Network::Socket::Socket(const Socket &) : sd(NULL), sdset(NULL)
+Network::Socket::Socket(const Socket &) : sd(NULL), sdset(NULL), status(0)
 {
 }
 
@@ -605,25 +324,49 @@ bool Network::Socket::Ready(void) const
     return 0 < SDLNet_CheckSockets(sdset, 1) && 0 < SDLNet_SocketReady(sd);
 }
 
-bool Network::Socket::Recv(char *buf, size_t len) const
+bool Network::Socket::Recv(char *buf, int len)
 {
     if(sd && buf && len)
     {
 	int rcv = 0;
-	while((rcv = SDLNet_TCP_Recv(sd, buf, len)) > 0 && rcv < static_cast<int>(len))
+
+	while((rcv = SDLNet_TCP_Recv(sd, buf, len)) > 0 && rcv < len)
 	{
 	    buf += rcv;
 	    len -= rcv;
 	}
-	if(rcv == static_cast<int>(len)) return true;
-	std::cerr << "Network::Socket::Recv: " << "size: " << std::dec << len << ", receive: " << rcv << ", error: " << GetError() << std::endl;
+
+	if(rcv != len)
+	    status |= ERROR_RECV;
+    }
+
+    return ! (status & ERROR_RECV);
+}
+
+bool Network::Socket::Send(const char* buf, int len)
+{
+    if(sd && len != SDLNet_TCP_Send(sd, (void*) buf, len))
+	status |= ERROR_SEND;
+
+    return ! (status & ERROR_SEND);
+}
+
+bool Network::Socket::Recv(u32 & v)
+{
+    if(Recv(reinterpret_cast<char*>(&v), sizeof(v)))
+    {
+        SwapBE32(v);
+        return true;
     }
     return false;
 }
 
-bool Network::Socket::Send(const char* buf, size_t len) const
+bool Network::Socket::Send(const u32 & v0)
 {
-    return sd && static_cast<int>(len) == SDLNet_TCP_Send(sd, const_cast<void*>(reinterpret_cast<const void*>(buf)), len);
+    u32 v = v0;
+    SwapBE32(v);
+
+    return Send(reinterpret_cast<char*>(&v), sizeof(v));
 }
 
 bool Network::Socket::Open(IPaddress & ip)
@@ -636,9 +379,9 @@ bool Network::Socket::Open(IPaddress & ip)
     return sd;
 }
 
-bool Network::Socket::IsValid(void) const
+bool Network::Socket::isValid(void) const
 {
-    return sd;
+    return sd && 0 == status;
 }
 
 void Network::Socket::Close(void)

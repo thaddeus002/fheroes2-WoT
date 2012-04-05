@@ -143,7 +143,7 @@ void Castle::OpenMageGuild(void)
     Dialog::FrameBorder frameborder;
     frameborder.SetPosition((display.w() - 640 - BORDERWIDTH * 2) / 2, (display.h() - 480 - BORDERWIDTH * 2) / 2, 640, 480);
     frameborder.Redraw();
-    
+
     const Point cur_pt(frameborder.GetArea().x, frameborder.GetArea().y);
     Point dst_pt(cur_pt);
 
@@ -192,7 +192,7 @@ void Castle::OpenMageGuild(void)
     spells3.Redraw();
     spells4.Redraw();
     spells5.Redraw();
-    
+
     // button exit
     dst_pt.x = cur_pt.x + 578;
     dst_pt.y = cur_pt.y + 461;
@@ -204,7 +204,7 @@ void Castle::OpenMageGuild(void)
     display.Flip();
 
     LocalEvent & le = LocalEvent::Get();
-   
+
     // message loop
     while(le.HandleEvents())
     {

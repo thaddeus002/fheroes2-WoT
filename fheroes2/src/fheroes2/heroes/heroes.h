@@ -1,23 +1,23 @@
-/*************************************************************************** 
+/***************************************************************************
  *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
- *                                                                         * 
- *   This program is free software; you can redistribute it and/or modify  * 
- *   it under the terms of the GNU General Public License as published by  * 
- *   the Free Software Foundation; either version 2 of the License, or     * 
- *   (at your option) any later version.                                   * 
- *                                                                         * 
- *   This program is distributed in the hope that it will be useful,       * 
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        * 
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         * 
- *   GNU General Public License for more details.                          * 
- *                                                                         * 
- *   You should have received a copy of the GNU General Public License     * 
- *   along with this program; if not, write to the                         * 
- *   Free Software Foundation, Inc.,                                       * 
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
 #ifndef H2HEROES_H
@@ -40,6 +40,7 @@
 class Recruits;
 class Surface;
 class MageGuild;
+namespace Battle { class Only; }
 
 class Heroes : public HeroBase
 {
@@ -195,6 +196,7 @@ public:
     u8 GetRangeRouteDays(const s32 dst) const;
     void ShowPath(bool f){ f ? path.Show() : path.Hide(); }
     void RescanPath(void);
+    void RescanPathPassable(void);
 
     u16 GetDirection(void) const{ return direction; }
 
@@ -241,11 +243,11 @@ public:
     static void ScholarAction(Heroes &, Heroes &);
 
 private:
+    friend StreamBase & operator<< (StreamBase &, const Heroes &);
+    friend StreamBase & operator>> (StreamBase &, Heroes &);
     friend class Recruits;
-    friend class Game::IO;
-#ifdef BUILD_BATTLEONLY
-    friend struct BattleOnly;
-#endif
+    friend class Game::IOld;
+    friend class Battle::Only;
 
     void LevelUp(bool skipsecondary, bool autoselect = false);
     u8   LevelUpPrimarySkill(void);
@@ -262,7 +264,7 @@ private:
 
     Skill::SecSkills	secondary_skills;
 
-    Army        army;
+    Army        	army;
 
     heroes_t		hid;
     heroes_t		portrait;
@@ -281,7 +283,7 @@ private:
     std::list<IndexObject> visit_object;
 };
 
-struct VecHeroes : public std::vector<Heroes *>
+struct VecHeroes : public std::vector<Heroes*>
 {
     Heroes* Get(Heroes::heroes_t) const;
     Heroes* Get(s32) const;
@@ -304,5 +306,17 @@ struct AllHeroes : public VecHeroes
 
     bool HaveTwoFreemans(void) const;
 };
+
+StreamBase & operator<< (StreamBase &, const VecHeroes &);
+StreamBase & operator>> (StreamBase &, VecHeroes &);
+
+StreamBase & operator<< (StreamBase &, const Heroes::heroes_t &);
+StreamBase & operator>> (StreamBase &, Heroes::heroes_t &);
+
+StreamBase & operator<< (StreamBase &, const Heroes &);
+StreamBase & operator>> (StreamBase &, Heroes &);
+
+StreamBase & operator<< (StreamBase &, const AllHeroes &);
+StreamBase & operator>> (StreamBase &, AllHeroes &);
 
 #endif

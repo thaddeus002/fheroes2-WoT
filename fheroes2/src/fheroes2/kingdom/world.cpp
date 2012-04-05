@@ -31,6 +31,7 @@
 #include "kingdom.h" 
 #include "heroes.h" 
 #include "castle.h" 
+#include "game_static.h"
 #include "gameevent.h"
 #include "mp2.h"
 #include "text.h"
@@ -180,7 +181,10 @@ Funds CapturedObjects::TributeCapturedObject(u8 color, u8 obj)
 
 World & world = World::Get();
 
-u32 World::uniq0 = 0;
+namespace GameStatic
+{
+    extern u32 uniq;
+}
 
 World & World::Get(void)
 {
@@ -269,8 +273,8 @@ void World::LoadMaps(const std::string &filename)
 
     // read uniq
     fd.seekg(endof_mp2 - sizeof(u32), std::ios_base::beg);
-    fd.read(reinterpret_cast<char *>(&uniq0), sizeof(u32));
-    SwapLE32(uniq0);
+    fd.read(reinterpret_cast<char *>(&GameStatic::uniq), sizeof(u32));
+    SwapLE32(GameStatic::uniq);
 
     // offset data
     fd.seekg(MP2OFFSETDATA - 2 * sizeof(u32), std::ios_base::beg);
@@ -622,7 +626,7 @@ void World::LoadMaps(const std::string &filename)
 		    }
 		    else
 		    {
-			Castle *castle = GetCastle(findobject);
+			Castle* castle = GetCastle(findobject);
 			if(castle)
 			{
 			    castle->LoadFromMP2(pblock);
@@ -644,7 +648,7 @@ void World::LoadMaps(const std::string &filename)
 		    }
 		    else
 		    {
-			Castle *castle = GetCastle(findobject);
+			Castle* castle = GetCastle(findobject);
 			if(castle)
 			{
 			    castle->LoadFromMP2(pblock);
@@ -1356,7 +1360,7 @@ void World::CaptureObject(const s32 & index, u8 color)
 
     if(MP2::OBJ_CASTLE == obj)
     {
-	Castle *castle = GetCastle(index);
+	Castle* castle = GetCastle(index);
 	if(castle) castle->ChangeColor(Color::Get(color));
     }
 
@@ -1535,7 +1539,7 @@ bool World::KingdomIsWins(const Kingdom & kingdom, u16 wins) const
 
 	case GameOver::WINS_TOWN:
 	{
-	    const Castle *town = GetCastle(conf.WinsMapsIndexObject());
+	    const Castle* town = GetCastle(conf.WinsMapsIndexObject());
 	    // check comp also wins
 	    return (((CONTROL_HUMAN & kingdom.GetControl()) || conf.WinsCompAlsoWins()) &&
     	       (town && town->GetColor() == kingdom.GetColor()));
@@ -1543,7 +1547,7 @@ bool World::KingdomIsWins(const Kingdom & kingdom, u16 wins) const
 
 	case GameOver::WINS_HERO:
 	{
-    	    const Heroes *hero = GetHeroesCondWins();
+    	    const Heroes* hero = GetHeroesCondWins();
     	    return (hero && Heroes::UNKNOWN != heroes_cond_wins &&
     		    hero->isFreeman() &&
     		    hero->GetKillerColor() == kingdom.GetColor());
@@ -1593,13 +1597,13 @@ bool World::KingdomIsLoss(const Kingdom & kingdom, u16 loss) const
 
 	case GameOver::LOSS_TOWN:
 	{
-    	    const Castle *town = GetCastle(conf.LossMapsIndexObject());
+    	    const Castle* town = GetCastle(conf.LossMapsIndexObject());
     	    return (town && town->GetColor() != kingdom.GetColor());
 	}
 
 	case GameOver::LOSS_HERO:
 	{
-    	    const Heroes *hero = GetHeroesCondLoss();
+    	    const Heroes* hero = GetHeroesCondLoss();
             return (hero && Heroes::UNKNOWN != heroes_cond_loss &&
     		    hero->isFreeman() &&
     		    hero->GetKillerColor() != kingdom.GetColor());
@@ -1658,4 +1662,79 @@ u16 World::CheckKingdomLoss(const Kingdom & kingdom) const
     }
 
     return GameOver::COND_NONE;
+}
+
+u32 World::GetUniq(void)
+{
+    return ++GameStatic::uniq;
+}
+
+StreamBase & operator<< (StreamBase & msg, const CapturedObject & obj)
+{
+    return msg << obj.objcol << obj.guardians;
+}
+
+StreamBase & operator>> (StreamBase & msg, CapturedObject & obj)
+{
+    return msg >> obj.objcol >> obj.guardians;
+}
+
+StreamBase & operator<< (StreamBase & msg, const World & w)
+{
+    const Size & sz = w;
+
+    return msg << sz <<
+	w.vec_tiles <<
+	w.vec_heroes <<
+	w.vec_castles <<
+	w.vec_kingdoms <<
+	w.vec_rumors <<
+	w.vec_eventsday <<
+	w.vec_eventsmap <<
+	w.vec_riddles <<
+	w.map_sign <<
+	w.map_captureobj <<
+	w.ultimate_artifact <<
+	w.day <<
+	w.week <<
+	w.month <<
+	w.week_current <<
+	w.week_next <<
+	w.heroes_cond_wins <<
+	w.heroes_cond_loss;
+}
+
+StreamBase & operator>> (StreamBase & msg, World & w)
+{
+    Size & sz = w;
+
+    msg >> sz >>
+	w.vec_tiles >>
+	w.vec_heroes >>
+	w.vec_castles >>
+	w.vec_kingdoms >>
+	w.vec_rumors >>
+	w.vec_eventsday >>
+	w.vec_eventsmap >>
+	w.vec_riddles >>
+	w.map_sign >>
+	w.map_captureobj >>
+	w.ultimate_artifact >>
+	w.day >>
+	w.week >>
+	w.month >>
+	w.week_current >>
+	w.week_next >>
+	w.heroes_cond_wins >>
+	w.heroes_cond_loss;
+
+    // update tile passable
+    std::for_each(w.vec_tiles.begin(), w.vec_tiles.end(),
+        std::mem_fun_ref(&Maps::Tiles::UpdatePassable));
+
+    // heroes postfix
+    std::for_each(w.vec_heroes.begin(), w.vec_heroes.end(),
+	std::mem_fun(&Heroes::RescanPathPassable));
+
+    return msg;
 }

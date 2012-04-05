@@ -1,23 +1,23 @@
-/*************************************************************************** 
+/***************************************************************************
  *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
- *                                                                         * 
- *   This program is free software; you can redistribute it and/or modify  * 
- *   it under the terms of the GNU General Public License as published by  * 
- *   the Free Software Foundation; either version 2 of the License, or     * 
- *   (at your option) any later version.                                   * 
- *                                                                         * 
- *   This program is distributed in the hope that it will be useful,       * 
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        * 
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         * 
- *   GNU General Public License for more details.                          * 
- *                                                                         * 
- *   You should have received a copy of the GNU General Public License     * 
- *   along with this program; if not, write to the                         * 
- *   Free Software Foundation, Inc.,                                       * 
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
 #include <cmath>
@@ -40,7 +40,6 @@
 #include "visit.h"
 #include "battle.h"
 #include "heroes.h"
-#include "localclient.h"
 #include "game_focus.h"
 #include "game_interface.h"
 #include "game_static.h"
@@ -143,7 +142,7 @@ Heroes::Heroes(heroes_t ht, u8 rc) : HeroBase(Skill::Primary::HEROES, rc), kille
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::LEADERSHIP, Skill::Level::BASIC));
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::PATHFINDING, Skill::Level::BASIC));
     	    break;
-        
+
         case ELIZA:
             attack    = 0;
             defense   = 1;
@@ -180,7 +179,7 @@ Heroes::Heroes(heroes_t ht, u8 rc) : HeroBase(Skill::Primary::HEROES, rc), kille
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::LEADERSHIP, Skill::Level::ADVANCED));
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::DIPLOMACY, Skill::Level::BASIC));
     	    break;
-    	
+
     	case BAX:
             attack    = 1;
             defense   = 1;
@@ -213,25 +212,25 @@ Heroes::Heroes(heroes_t ht, u8 rc) : HeroBase(Skill::Primary::HEROES, rc), kille
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::WISDOM, Skill::Level::BASIC));
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::NECROMANCY, Skill::Level::ADVANCED));
 	    break;
-	
+
 	case UNCLEIVAN:
 	    secondary_skills.clear();
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::PATHFINDING, Skill::Level::ADVANCED));
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::LEADERSHIP, Skill::Level::BASIC));
 	    break;
-	
+
 	case JOSEPH:
 	    secondary_skills.clear();
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::LEADERSHIP, Skill::Level::BASIC));
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::SCOUTING, Skill::Level::BASIC));
 	    break;
-	
+
 	case GALLAVANT:
 	    break;
-	
+
 	case CEALLACH:
 	    break;
-	
+
 	case MARTINE:
 	    break;
 
@@ -376,7 +375,7 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
 
         ptr8 += 16;
     }
-    
+
     // unknown
     ++ptr8;
 
@@ -759,7 +758,7 @@ void Heroes::ActionNewDay(void)
 
     // remove day visit object
     visit_object.remove_if(Visit::isDayLife);
-    
+
 
     // new day, new capacities
     ResetModes(SAVEPOINTS);
@@ -769,7 +768,7 @@ void Heroes::ActionNewWeek(void)
 {
     // remove week visit object
     visit_object.remove_if(Visit::isWeekLife);
-    
+
     // fix artesian spring effect
     if(GetSpellPoints() > GetMaxSpellPoints()) SetSpellPoints(GetMaxSpellPoints());
 }
@@ -786,6 +785,11 @@ void Heroes::ActionAfterBattle(void)
     visit_object.remove_if(Visit::isBattleLife);
     //
     SetModes(ACTION);
+}
+
+void Heroes::RescanPathPassable(void)
+{
+    if(path.isValid()) path.RescanPassable();
 }
 
 void Heroes::RescanPath(void)
@@ -1043,9 +1047,7 @@ bool Heroes::BuySpellBook(const Castle* castle, u8 shrine)
 
 	// add all spell to book
 	if(castle) castle->MageGuildEducateHero(*this);
-#ifdef WITH_NET
-	FH2LocalClient::SendHeroesBuyMagicBook(*this);
-#endif
+
 	return true;
     }
 
@@ -1246,7 +1248,7 @@ void Heroes::LevelUpSecondarySkill(u8 primary, bool autoselect)
 
 	std::vector<Skill::Secondary>::iterator it;
 
-	it = std::find_if(secondary_skills.begin(), secondary_skills.end(), 
+	it = std::find_if(secondary_skills.begin(), secondary_skills.end(),
 			std::bind2nd(std::mem_fun_ref(&Skill::Secondary::isSkill), selected->Skill()));
 
 	if(it != secondary_skills.end())
@@ -1671,7 +1673,7 @@ void AllHeroes::Init(void)
     for(u8 hid = Heroes::MYRA; hid <= Heroes::MANDIGAL; ++hid)
         push_back(new Heroes(static_cast<Heroes::heroes_t>(hid), Race::WZRD));
 
-    // necromancer: ZOM, DARLANA, ZAM, RANLOO, CHARITY, RIALDO, ROXANA, SANDRO, CELIA                            
+    // necromancer: ZOM, DARLANA, ZAM, RANLOO, CHARITY, RIALDO, ROXANA, SANDRO, CELIA
     for(u8 hid = Heroes::ZOM; hid <= Heroes::CELIA; ++hid)
         push_back(new Heroes(static_cast<Heroes::heroes_t>(hid), Race::NECR));
 
@@ -1705,7 +1707,7 @@ void AllHeroes::clear(void)
 {
     for(iterator
 	it = begin(); it != end(); ++it) delete *it;
-    std::vector<Heroes *>::clear();
+    std::vector<Heroes*>::clear();
 }
 
 Heroes* VecHeroes::Get(Heroes::heroes_t hid) const
@@ -1730,7 +1732,7 @@ Heroes* AllHeroes::GetGuest(const Castle & castle) const
 
 Heroes* AllHeroes::GetGuard(const Castle & castle) const
 {
-    const_iterator it = Settings::Get().ExtCastleAllowGuardians() ?                                                          
+    const_iterator it = Settings::Get().ExtCastleAllowGuardians() ?
         std::find_if(begin(), end(), std::bind1st(InCastleAndGuardian(), &castle)) : end();
     return end() != it ? *it : NULL;
 }
@@ -1748,32 +1750,32 @@ Heroes* AllHeroes::GetFreeman(u8 race) const
 	    min = Heroes::LORDKILBURN;
 	    max = Heroes::DIMITRY;
 	    break;
-	
+
 	case Race::BARB:
 	    min = Heroes::THUNDAX;
 	    max = Heroes::ATLAS;
 	    break;
-	
+
 	case Race::SORC:
 	    min = Heroes::ASTRA;
 	    max = Heroes::LUNA;
 	    break;
-	    
+
 	case Race::WRLK:
 	    min = Heroes::ARIE;
 	    max = Heroes::WRATHMONT;
 	    break;
-	
+
 	case Race::WZRD:
 	    min = Heroes::MYRA;
 	    max = Heroes::MANDIGAL;
 	    break;
-	
+
 	case Race::NECR:
 	    min = Heroes::ZOM;
 	    max = Heroes::CELIA;
 	    break;
-	
+
 	default:
 	    min = Heroes::LORDKILBURN;
 	    max = conf.ExtCastleAllowRecruitSpecialHeroes() ? (conf.PriceLoyaltyVersion() ? Heroes::JARKONAS : Heroes::BAX) : Heroes::CELIA;
@@ -1810,7 +1812,7 @@ Heroes* AllHeroes::GetFreeman(u8 race) const
 void AllHeroes::Scoute(u8 colors) const
 {
     for(const_iterator it = begin(); it != end(); ++it)
-	if(colors & (*it)->GetColor()) (*it)->Scoute();                        
+	if(colors & (*it)->GetColor()) (*it)->Scoute();
 }
 
 Heroes* AllHeroes::FromJail(s32 index) const
@@ -1824,4 +1826,127 @@ bool AllHeroes::HaveTwoFreemans(void) const
 {
     return 2 <= std::count_if(begin(), end(),
 			    std::mem_fun(&Heroes::isFreeman));
+}
+
+StreamBase & operator<< (StreamBase & msg, const Heroes::heroes_t & hid)
+{
+    return msg << static_cast<u8>(hid);
+}
+
+StreamBase & operator>> (StreamBase & msg, Heroes::heroes_t & hid)
+{
+    u8 byte;
+    msg >> byte;
+    hid = Heroes::ConvertID(byte);
+    return msg;
+}
+
+StreamBase & operator<< (StreamBase & msg, const VecHeroes & heroes)
+{
+    msg << static_cast<u32>(heroes.size());
+
+    for(AllHeroes::const_iterator
+        it = heroes.begin(); it != heroes.end(); ++it)
+        msg << (*it ? (*it)->GetID() : Heroes::UNKNOWN);
+
+    return msg;
+}
+
+StreamBase & operator>> (StreamBase & msg, VecHeroes & heroes)
+{
+    Heroes::heroes_t hid;
+    u32 size;
+    msg >> size;
+
+    heroes.resize(size, NULL);
+
+    for(AllHeroes::iterator
+        it = heroes.begin(); it != heroes.end(); ++it)
+    {
+    	msg >> hid;
+        *it = (hid != Heroes::UNKNOWN ? world.GetHeroes(hid) : NULL);
+    }
+
+    return msg;
+}
+
+StreamBase & operator<< (StreamBase & msg, const Heroes & hero)
+{
+    const HeroBase & base = hero;
+
+    return msg <<
+	base <<
+	// heroes
+	hero.name <<
+	hero.color <<
+	hero.killer_color <<
+	hero.experience <<
+	hero.move_point_scale <<
+	hero.secondary_skills <<
+	hero.army <<
+	hero.hid <<
+	hero.portrait <<
+	hero.race <<
+	hero.save_maps_object <<
+	hero.path <<
+	hero.direction <<
+	hero.sprite_index <<
+	hero.patrol_center <<
+	hero.patrol_square <<
+	hero.visit_object;
+}
+
+StreamBase & operator>> (StreamBase & msg, Heroes & hero)
+{
+    HeroBase & base = hero;
+
+    return msg >>
+	base >>
+	// heroes
+	hero.name >>
+	hero.color >>
+	hero.killer_color >>
+	hero.experience >>
+	hero.move_point_scale >>
+	hero.secondary_skills >>
+	hero.army >>
+	hero.hid >>
+	hero.portrait >>
+	hero.race >>
+	hero.save_maps_object >>
+	hero.path >>
+	hero.direction >>
+	hero.sprite_index >>
+	hero.patrol_center >>
+	hero.patrol_square >>
+	hero.visit_object;
+}
+
+StreamBase & operator<< (StreamBase & msg, const AllHeroes & heroes)
+{
+    msg << static_cast<u32>(heroes.size());
+
+    for(AllHeroes::const_iterator
+        it = heroes.begin(); it != heroes.end(); ++it)
+        msg << **it;
+
+    return msg;
+}
+
+StreamBase & operator>> (StreamBase & msg, AllHeroes & heroes)
+{
+    u32 size;
+    msg >> size;
+
+    heroes.clear();
+    heroes.resize(size, NULL);
+
+    for(AllHeroes::iterator
+	it = heroes.begin(); it != heroes.end(); ++it)
+    {
+	*it = new Heroes();
+        msg >> **it;
+    }
+
+    return msg;
 }

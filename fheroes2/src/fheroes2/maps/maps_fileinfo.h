@@ -22,7 +22,6 @@
 #ifndef H2MAPSFILEINFO_H
 #define H2MAPSFILEINFO_H
 
-#include <ctime>
 #include <vector>
 #include "gamedefs.h"
 #include "game_over.h"
@@ -89,10 +88,12 @@ namespace Maps
     u16 loss1;
     u16 loss2;
 
-    time_t localtime;
+    u32 localtime;
 
     bool with_heroes;
     };
+    StreamBase & operator<< (StreamBase &, const FileInfo &);
+    StreamBase & operator>> (StreamBase &, FileInfo &);
 }
 
 typedef std::vector<Maps::FileInfo> MapsFileInfoList;

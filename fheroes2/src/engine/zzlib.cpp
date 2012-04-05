@@ -20,11 +20,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "zzlib.h"
 
 #ifdef WITH_ZLIB
 #include <zlib.h>
-#include <iostream>
+#include "zzlib.h"
 
 bool ZLib::UnCompress(std::vector<char> & dst, const char* src, size_t srcsz, bool debug)
 {
@@ -51,16 +50,6 @@ bool ZLib::UnCompress(std::vector<char> & dst, const char* src, size_t srcsz, bo
     return false;
 }
 
-bool ZLib::UnCompress(std::vector<char> & dst, const std::vector<char> & src, bool debug)
-{
-    return src.size() && UnCompress(dst, &src[0], src.size(), debug);
-}
-
-bool ZLib::UnCompress(std::vector<char> & dst, const std::string & src, bool debug)
-{
-    return src.size() && UnCompress(dst, src.c_str(), src.size(), debug);
-}
-
 bool ZLib::Compress(std::vector<char> & dst, const char* src, size_t srcsz)
 {
     if(src && srcsz)
@@ -74,21 +63,75 @@ bool ZLib::Compress(std::vector<char> & dst, const char* src, size_t srcsz)
     return false;
 }
 
-bool ZLib::Compress(std::vector<char> & dst, const std::vector<char> & src)
-{
-    return src.size() && Compress(dst, &src[0], src.size());
-}
-
-bool ZLib::Compress(std::vector<char> & dst, const std::string & src)
-{
-    return src.size() && Compress(dst, src.c_str(), src.size());
-}
-
 bool ZSurface::Load(u16 w, u16 h, u8 bpp, u16 pitch, u32 rmask, u32 gmask, u32 bmask, u32 amask, const u8* p, size_t s)
 {
     if(!ZLib::UnCompress(buf, reinterpret_cast<const char*>(p), s)) return false;
     Set(SDL_CreateRGBSurfaceFrom(&buf[0], w, h, bpp, pitch, rmask, gmask, bmask, amask));
     return true;
+}
+
+std::ostream & operator<< (std::ostream & os, ZStreamBuf & zb)
+{
+    return os << static_cast<StreamBuf &>(zb);
+}
+
+std::istream & operator>> (std::istream & is, ZStreamBuf & zb)
+{
+    return is >> static_cast<StreamBuf &>(zb);
+}
+
+ZStreamBuf & ZStreamBuf::operator<< (StreamBuf & sb)
+{
+    std::vector<char> v;
+    const u32 size0 = sb.sizeg();
+
+    if(size0 &&
+        ZLib::Compress(v, sb.itget, size0))
+    {
+        const u32 size1 = v.size();
+        sb.itget += size0;
+
+        if(sizep() < size1 + 8)
+            realloc(size1 + 8);
+
+        put32(size0);
+        put32(size1);
+        std::copy(v.begin(), v.end(), itput);
+        itput += size1;
+    }
+    else
+        setfail();
+
+    return *this;
+}
+
+ZStreamBuf & ZStreamBuf::operator>> (StreamBuf & sb)
+{
+    if(sizeg() > 8)
+    {
+        std::vector<char> v;
+        const u32 size0 = get32();
+        const u32 size1 = get32();
+        v.reserve(size0);
+
+        if(size1 <= sizeg() &&
+            ZLib::UnCompress(v, itget, size1))
+        {
+            itget += size1;
+
+            if(sb.sizep() < v.size())
+                sb.realloc(v.size());
+
+            std::copy(v.begin(), v.end(), sb.itput);
+            sb.itput += v.size();
+        }
+        else
+            sb.setfail();
+    }
+    else
+        sb.setfail();
+
+    return *this;
 }
 
 #endif

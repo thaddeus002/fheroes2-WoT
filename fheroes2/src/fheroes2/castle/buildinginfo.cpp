@@ -207,7 +207,7 @@ u8 GetIndexBuildingSprite(u32 build)
 	case DWELLING_MONSTER2: return 20;
 	case DWELLING_MONSTER3: return 21;
 	case DWELLING_MONSTER4: return 22;
-	case DWELLING_MONSTER5: return 23; 
+	case DWELLING_MONSTER5: return 23;
 	case DWELLING_MONSTER6: return 24;
 	case DWELLING_UPGRADE2: return 25;
 	case DWELLING_UPGRADE3: return 26;
@@ -478,7 +478,7 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
 	    {
 		u32 value = 1;
 		value <<= pos;
-		    
+
 		++count;
 
 		if(! castle.isBuild(value))

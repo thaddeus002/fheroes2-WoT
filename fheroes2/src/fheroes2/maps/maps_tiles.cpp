@@ -985,6 +985,9 @@ u16 PackTileSpriteIndex(u16 index, u16 shape) /* index max: 0x3FFF, shape value:
 /* Maps::Tiles */
 Maps::Tiles::Tiles() : pack_maps_index(0), pack_sprite_index(0), tile_passable(DIRECTION_ALL),
     mp2_object(0), fog_colors(Color::ALL), quantity1(0), quantity2(0)
+#ifdef WITH_DEBUG
+    , passable_disable(0)
+#endif
 {
 }
 
@@ -1802,7 +1805,7 @@ std::string Maps::Tiles::String(void) const
 
 	case MP2::OBJ_HEROES:
 	    {
-		const Heroes *hero = GetHeroes();
+		const Heroes* hero = GetHeroes();
 		if(hero) os << hero->String();
 	    }
 	    break;
@@ -1810,7 +1813,7 @@ std::string Maps::Tiles::String(void) const
 	case MP2::OBJN_CASTLE:
 	case MP2::OBJ_CASTLE:
 	    {
-		const Castle *castle = world.GetCastle(GetIndex());
+		const Castle* castle = world.GetCastle(GetIndex());
 		if(castle) os << castle->String();
 	    }
 	    break;
@@ -2719,4 +2722,46 @@ void Maps::Tiles::RedrawFogs(Surface & dst, u8 color) const
 	const Sprite & sprite = AGG::GetICN(ICN::CLOP32, index, revert);
 	area.BlitOnTile(dst, sprite, (revert ? sprite.x() + TILEWIDTH - sprite.w() : sprite.x()), sprite.y(), mp);
     }
+}
+
+StreamBase & Maps::operator<< (StreamBase & msg, const TilesAddon & ta)
+{
+    return msg << ta.level << ta.uniq << ta.object << ta.index << ta.tmp;
+}
+
+StreamBase & Maps::operator>> (StreamBase & msg, TilesAddon & ta)
+{
+    return msg >> ta.level >> ta.uniq >> ta.object >> ta.index >> ta.tmp;
+}
+
+StreamBase & Maps::operator<< (StreamBase & msg, const Tiles & tile)
+{
+    return msg <<
+	tile.pack_maps_index <<
+	tile.pack_sprite_index <<
+	tile.tile_passable <<
+	tile.mp2_object <<
+	tile.fog_colors <<
+	tile.quantity1 <<
+	tile.quantity2 <<
+        // addons 1
+	tile.addons_level1 <<
+        // addons 2
+	tile.addons_level2;
+}
+
+StreamBase & Maps::operator>> (StreamBase & msg, Tiles & tile)
+{
+    return msg >>
+	tile.pack_maps_index >>
+	tile.pack_sprite_index >>
+	tile.tile_passable >>
+	tile.mp2_object >>
+	tile.fog_colors >>
+	tile.quantity1 >>
+	tile.quantity2 >>
+        // addons 1
+	tile.addons_level1 >>
+        // addons 2
+	tile.addons_level2;
 }

@@ -27,6 +27,8 @@
 #include "gamedefs.h"
 
 class Spell;
+class StreamBase;
+class StreamBase;
 
 class Artifact
 {
@@ -43,7 +45,7 @@ public:
 	ART_NORANDOM	= 0x20
     };
 
-    enum
+    enum type_t
     {
 	ULTIMATE_BOOK,
 	ULTIMATE_SWORD,
@@ -192,12 +194,16 @@ public:
     static void UpdateStats(const std::string &);
 
 private:
-    friend class Game::IO;
+    friend StreamBase & operator<< (StreamBase &, const Artifact &);
+    friend StreamBase & operator>> (StreamBase &, Artifact &);
+    friend class Game::IOld;
 
     u8 id;
     u8 ext;
 };
 
+StreamBase & operator<< (StreamBase &, const Artifact &);
+StreamBase & operator>> (StreamBase &, Artifact &);
 u16 GoldInsteadArtifact(u8);
 
 struct BagArtifacts : std::vector<Artifact>

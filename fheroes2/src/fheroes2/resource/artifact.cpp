@@ -627,6 +627,16 @@ const char* Artifact::GetScenario(const Artifact & art)
     return NULL;
 }
 
+StreamBase & operator<< (StreamBase & msg, const Artifact & art)
+{
+    return msg << art.id << art.ext;
+}
+
+StreamBase & operator>> (StreamBase & msg, Artifact & art)
+{
+    return msg >> art.id >> art.ext;
+}
+
 BagArtifacts::BagArtifacts() : std::vector<Artifact>(HEROESMAXARTIFACT, Artifact::UNKNOWN)
 {
 }

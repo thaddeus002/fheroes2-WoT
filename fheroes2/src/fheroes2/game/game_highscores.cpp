@@ -47,12 +47,22 @@ struct hgs_t
 
     bool operator== (const hgs_t &) const;
 
-    std::string player;
-    std::string land;
-    u32 localtime;
-    u16 days;
-    u16 rating;
+    std::string	player;
+    std::string	land;
+    u32		localtime;
+    u16		days;
+    u16		rating;
 };
+
+StreamBase & operator<< (StreamBase & msg, const hgs_t & hgs)
+{
+    return msg << hgs.player << hgs.land << hgs.localtime << hgs.days << hgs.rating;
+}
+
+StreamBase & operator>> (StreamBase & msg, hgs_t & hgs)
+{
+    return msg >> hgs.player >> hgs.land >> hgs.localtime >> hgs.days >> hgs.rating;
+}
 
 bool hgs_t::operator== (const hgs_t & h) const
 {
@@ -64,11 +74,12 @@ bool RatingSort(const hgs_t & h1, const hgs_t & h2)
     return h1.rating > h2.rating;
 }
 
-class HGSData : public QueueMessage
+class HGSData
 {
 public:
-    HGSData(){};
+    HGSData() {}
 
+    bool LoadOld(const char*);
     bool Load(const char*);
     bool Save(const char*);
     void ScoreRegistry(const std::string &, const std::string &, u16, u16);
@@ -77,59 +88,101 @@ private:
     std::vector<hgs_t> list;
 };
 
+bool HGSData::LoadOld(const char* fn)
+{
+    std::vector<u8> v1;
+
+    if(FORMAT_VERSION_2777 && LoadFileToMem(v1, std::string(fn))) // deprecated func
+    {
+        QueueMessage buf;
+
+#ifdef WITH_ZLIB
+        std::vector<char> v2;
+
+        if(! ZLib::UnCompress(v2, reinterpret_cast<const char*>(&v1[0]), v1.size()))
+            return false;
+
+	for(std::vector<char>::const_iterator
+	    it = v2.begin(); it != v2.end(); ++it)
+	    buf.Push(static_cast<u8>(*it));
+#else
+        for(std::vector<u8>::const_iterator
+            it = v1.begin(); it != v1.end(); ++it)
+            buf.Push(*it);
+#endif
+
+        v1.clear();
+        v2.clear();
+
+        u16 byte16;
+
+        // check id
+        buf.Pop(byte16);
+        if(byte16 != HGS_ID) return false;
+
+        // size
+        buf.Pop(byte16);
+        list.resize(byte16);
+
+        for(std::vector<hgs_t>::iterator
+            it = list.begin(); it != list.end(); ++it)
+        {
+            hgs_t & hgs = *it;
+
+            buf.Pop(hgs.player);
+	    buf.Pop(hgs.land);
+            buf.Pop(hgs.localtime);
+	    buf.Pop(hgs.days);
+	    buf.Pop(hgs.rating);
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
 bool HGSData::Load(const char* fn)
 {
     std::ifstream fs(fn, std::ios::binary);
-
     if(!fs.is_open()) return false;
 
-    fs.seekg(0, std::ios_base::end);
-    dtsz = fs.tellg();
-    fs.seekg(0, std::ios_base::beg);
-
-    if(data) delete [] data;
-    data = new char [dtsz];
-    fs.read(data, dtsz);
-    fs.close();
+    StreamBuf hdata(512);
 
 #ifdef WITH_ZLIB
-    std::vector<char> v;
-    if(ZLib::UnCompress(v, data, dtsz))
+    ZStreamBuf zdata;
+    fs >> zdata;
+
+    if(zdata.fail())
     {
-    	dtsz = v.size();
-    	delete [] data;
-    	data = new char [dtsz];
-    	std::memcpy(data, &v[0], dtsz);
-	v.clear();
+	if(! LoadOld(fn))
+	{
+	    DEBUG(DBG_GAME, DBG_INFO, ", zdata" << " read: error");
+    	    return false;
+	}
+	else
+	{
+	    Save(fn);
+	}
+    }
+
+    zdata >> hdata;
+
+    if(hdata.fail())
+    {
+        DEBUG(DBG_GAME, DBG_INFO, ", uncompress: error");
+        return false;
+    }
+
+#else
+    fs >> hdata;
+
+    if(hdata.fail())
+    {
+	DEBUG(DBG_GAME, DBG_INFO, ", gdata" << " read: error");
+        return false;
     }
 #endif
-
-    itd1 = data;
-    itd2 = data + dtsz;
-
-    u16 byte16;
-
-    // check id
-    Pop(byte16);
-    if(byte16 != HGS_ID) return false;
-
-    // size
-    Pop(byte16);
-    list.resize(byte16);
-
-    std::vector<hgs_t>::iterator it1 = list.begin();
-    std::vector<hgs_t>::const_iterator it2 = list.end();
-
-    for(; it1 != it2; ++it1)
-    {
-	hgs_t & hgs = *it1;
-
-	Pop(hgs.player);
-	Pop(hgs.land);
-	Pop(hgs.localtime);
-	Pop(hgs.days);
-	Pop(hgs.rating);
-    }
 
     return true;
 }
@@ -137,40 +190,24 @@ bool HGSData::Load(const char* fn)
 bool HGSData::Save(const char* fn)
 {
     std::ofstream fs(fn, std::ios::binary);
-
     if(!fs.is_open()) return false;
 
-    Reset();
-
-    // set id
-    Push(static_cast<u16>(HGS_ID));
-    // set size
-    Push(static_cast<u16>(list.size()));
-
-    std::vector<hgs_t>::const_iterator it1 = list.begin();
-    std::vector<hgs_t>::const_iterator it2 = list.end();
-
-    for(; it1 != it2; ++it1)
-    {
-	const hgs_t & hgs = *it1;
-
-	Push(hgs.player);
-	Push(hgs.land);
-	Push(hgs.localtime);
-	Push(hgs.days);
-	Push(hgs.rating);
-    }
+    StreamBuf hdata(512);
+    hdata << static_cast<u16>(HGS_ID) << list;
 
 #ifdef WITH_ZLIB
-    std::vector<char> v;
-    if(!ZLib::Compress(v, data, DtSz())) return false;
-    fs.write(&v[0], v.size());
-#else
-    fs.write(data, DtSz());
-#endif
-    fs.close();
+    ZStreamBuf zdata;
+    zdata << hdata;
 
-    return true;
+    if(! zdata.fail())
+        fs << zdata;
+    else
+	fs << hdata;
+#else
+    fs << hdata;
+#endif
+
+    return fs.good();;
 }
 
 void HGSData::ScoreRegistry(const std::string & p, const std::string & m, u16 r, u16 s)

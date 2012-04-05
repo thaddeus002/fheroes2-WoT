@@ -236,7 +236,7 @@ void Interface::Radar::RedrawArea(const u8 color)
 	    {
 		case MP2::OBJ_HEROES:
 		{
-		    const Heroes *hero = tile.GetHeroes();
+		    const Heroes* hero = tile.GetHeroes();
 		    if(hero) tile_surface = GetSurfaceFromColor(hero->GetColor());
 		}
 		break;
@@ -244,7 +244,7 @@ void Interface::Radar::RedrawArea(const u8 color)
 		case MP2::OBJ_CASTLE:
 		case MP2::OBJN_CASTLE:
 		{
-		    const Castle *castle = world.GetCastle(index);
+		    const Castle* castle = world.GetCastle(index);
 		    if(castle) tile_surface = GetSurfaceFromColor(castle->GetColor());
 		}
 		break;

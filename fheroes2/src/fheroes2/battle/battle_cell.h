@@ -54,6 +54,7 @@ namespace Battle
     class Cell
     {
     public:
+	Cell();
 	Cell(const s16 &);
 
 	void		ResetQuality(void);
@@ -82,8 +83,8 @@ namespace Battle
 	void		SetUnit(Unit*);
 
     private:
-	friend QueueMessage & operator<< (QueueMessage &, const Cell &);
-	friend QueueMessage & operator>> (QueueMessage &, Cell &);
+	friend StreamBase & operator<< (StreamBase &, const Cell &);
+	friend StreamBase & operator>> (StreamBase &, Cell &);
 
 	s16		index;
 	Rect		pos;
@@ -94,8 +95,8 @@ namespace Battle
 	Point		coord[7];
     };
 
-    QueueMessage & operator<< (QueueMessage &, const Cell &);
-    QueueMessage & operator>> (QueueMessage &, Cell &);
+    StreamBase & operator<< (StreamBase &, const Cell &);
+    StreamBase & operator>> (StreamBase &, Cell &);
 
     class Position : protected std::pair<Cell*, Cell*>
     {

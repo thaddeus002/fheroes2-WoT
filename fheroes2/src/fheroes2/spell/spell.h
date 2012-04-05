@@ -26,11 +26,13 @@
 #include "gamedefs.h"
 
 class HeroBase;
+class StreamBase;
+class StreamBase;
 
 class Spell
 {
 public:
-    enum
+    enum type_t
     {
 	NONE		= 0,
 	FIREBALL,
@@ -155,8 +157,14 @@ public:
     static u8 CalculateDimensionDoorDistance(u8 current_sp, u32 total_hp);
 
 private:
+    friend StreamBase & operator<< (StreamBase &, const Spell &);
+    friend StreamBase & operator>> (StreamBase &, Spell &);
+
     u8 id;
 };
+
+StreamBase & operator<< (StreamBase &, const Spell &);
+StreamBase & operator>> (StreamBase &, Spell &);
 
 #endif
 

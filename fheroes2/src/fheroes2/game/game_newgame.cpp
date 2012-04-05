@@ -26,7 +26,6 @@
 #include "cursor.h"
 #include "settings.h"
 #include "button.h"
-#include "network.h"
 #include "pocketpc.h"
 #include "world.h"
 #include "game.h"
@@ -118,8 +117,8 @@ Game::menu_t Game::NewNetwork(void)
 	le.MousePressLeft(buttonGuest) ? buttonGuest.PressDraw() : buttonGuest.ReleaseDraw();
 	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.PressDraw() : buttonCancelGame.ReleaseDraw();
 
-	if(le.MouseClickLeft(buttonHost) || HotKeyPress(EVENT_BUTTON_HOST)) return NetworkHost();
-	if(le.MouseClickLeft(buttonGuest) || HotKeyPress(EVENT_BUTTON_GUEST)) return NetworkGuest();
+	//if(le.MouseClickLeft(buttonHost) || HotKeyPress(EVENT_BUTTON_HOST)) return NetworkHost();
+	//if(le.MouseClickLeft(buttonGuest) || HotKeyPress(EVENT_BUTTON_GUEST)) return NetworkGuest();
 	if(HotKeyPress(EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonCancelGame)) return MAINMENU;
 
         // right info
@@ -137,9 +136,10 @@ Game::menu_t Game::NewGame(void)
     AGG::PlayMusic(MUS::MAINMENU);
     Settings & conf = Settings::Get();
 
-    Game::IO::last_name.clear();
+    // reset last save name
+    Game::SetLastSavename("");
 
-    if(Settings::Get().QVGA()) return PocketPC::NewGame();
+    if(conf.QVGA()) return PocketPC::NewGame();
 
     // preload
     AGG::PreloadObject(ICN::HEROES);
@@ -185,11 +185,10 @@ Game::menu_t Game::NewGame(void)
     buttonCancelGame.Draw();
     buttonSettings.Draw();
 
-#ifdef BUILD_BATTLEONLY
-    buttonBattleGame.Draw();
-#else
-    buttonBattleGame.SetDisable(true);
-#endif
+    if(conf.QVGA())
+	buttonBattleGame.SetDisable(true);
+    else
+	buttonBattleGame.Draw();
 
     cursor.Show();
     display.Flip();
@@ -261,11 +260,7 @@ Game::menu_t Game::NewMulti(void)
 
     buttonHotSeat.Draw();
     buttonCancelGame.Draw();
-#ifdef WITH_NET
-    buttonNetwork.Draw();
-#else
     buttonNetwork.SetDisable(true);
-#endif
 
     cursor.Show();
     display.Flip();

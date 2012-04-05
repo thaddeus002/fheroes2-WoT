@@ -26,7 +26,7 @@
 #include "splitter.h"
 
 /* splitter constructor */
-Splitter::Splitter() : position(HORIZONTAL)
+Splitter::Splitter() : step(0), min(0), max(0), cur(0), position(HORIZONTAL)
 {
 }
 

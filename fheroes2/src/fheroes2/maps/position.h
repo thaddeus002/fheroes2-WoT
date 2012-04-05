@@ -27,9 +27,8 @@
 
 namespace Maps
 {
-    class Position
+    struct Position
     {
-    public:
 	Position() {};
 	Position(const Point &);
 
@@ -43,7 +42,6 @@ namespace Maps
 
 	bool isPosition(s32) const;
 
-    protected:
 	Point center;
     };
 }

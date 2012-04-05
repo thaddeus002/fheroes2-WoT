@@ -156,3 +156,16 @@ std::string Colors::String(void) const
 
     return os.str();
 }
+
+StreamBase & operator<< (StreamBase & msg, const Color::color_t & col)
+{
+    return msg << static_cast<u8>(col);
+}
+
+StreamBase & operator>> (StreamBase & msg, Color::color_t & col)
+{
+    u8 color;
+    msg >> color;
+    col = Color::Get(color);
+    return msg;
+}

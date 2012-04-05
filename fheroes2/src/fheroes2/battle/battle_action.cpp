@@ -31,106 +31,8 @@
 #include "battle_tower.h"
 #include "battle_bridge.h"
 #include "battle_catapult.h"
+#include "battle_command.h"
 #include "battle_interface.h"
-#include "server.h"
-
-void Battle::Actions::AddedAutoBattleAction(u8 color)
-{
-    QueueMessage action;
-    action.SetID(MSG_BATTLE_AUTO);
-    action << color;
-
-    push_back(action);
-}
-
-void Battle::Actions::AddedSurrenderAction(void)
-{
-    QueueMessage action;
-    action.SetID(MSG_BATTLE_SURRENDER);
-
-    push_back(action);
-}
-
-void Battle::Actions::AddedRetreatAction(void)
-{
-    QueueMessage action;
-    action.SetID(MSG_BATTLE_RETREAT);
-
-    push_back(action);
-}
-
-void Battle::Actions::AddedCastAction(const Spell & spell, s16 dst)
-{
-    QueueMessage action;
-    action.SetID(MSG_BATTLE_CAST);
-    // id, hero or monster
-    action << spell() << static_cast<u16>(0) << dst;
-
-    push_back(action);
-}
-
-void Battle::Actions::AddedCastMirrorImageAction(s16 who)
-{
-    QueueMessage action;
-    action.SetID(MSG_BATTLE_CAST);
-    action << static_cast<u8>(Spell::MIRRORIMAGE) << who;
-
-    push_back(action);
-}
-
-void Battle::Actions::AddedCastTeleportAction(s16 src, s16 dst)
-{
-    QueueMessage action;
-    action.SetID(MSG_BATTLE_CAST);
-    action << static_cast<u8>(Spell::TELEPORT) << src << dst;
-
-    push_back(action);
-}
-
-void Battle::Actions::AddedEndAction(const Unit & b)
-{
-    QueueMessage action;
-    action.SetID(MSG_BATTLE_END_TURN);
-    action << b.GetUID();
-
-    push_back(action);
-}
-
-void Battle::Actions::AddedSkipAction(const Unit & b, bool hard)
-{
-    QueueMessage action;
-    action.SetID(MSG_BATTLE_SKIP);
-    action << b.GetUID() << static_cast<u8>(hard);
-
-    push_back(action);
-}
-
-void Battle::Actions::AddedMoveAction(const Unit & b, s16 dst)
-{
-    QueueMessage action;
-    action.SetID(MSG_BATTLE_MOVE);
-    action << b.GetUID() << dst << static_cast<u16>(0);
-
-    push_back(action);
-}
-
-void Battle::Actions::AddedAttackAction(const Unit & a, const Unit & d, s16 dst, u8 dir)
-{
-    QueueMessage action;
-    action.SetID(MSG_BATTLE_ATTACK);
-    action << a.GetUID() << d.GetUID() <<  dst << dir;
-
-    push_back(action);
-}
-
-void Battle::Actions::AddedMoraleAction(const Unit & b, u8 state)
-{
-    QueueMessage action;
-    action.SetID(MSG_BATTLE_MORALE);
-    action << b.GetUID() << state;
-
-    push_back(action);
-}
 
 void Battle::Arena::BattleProcess(Unit & attacker, Unit & defender, s16 dst, u8 dir)
 {
@@ -157,14 +59,6 @@ void Battle::Arena::BattleProcess(Unit & attacker, Unit & defender, s16 dst, u8 
 
     TargetsInfo targets = GetTargetsForDamage(attacker, defender, dst);
 
-#ifdef WITH_NET
-    if(Network::isRemoteClient())
-    {
-	if(CONTROL_REMOTE & army1->GetControl()) FH2Server::Get().BattleSendAttack(army1->GetColor(), attacker, defender, dst, targets);
-	if(CONTROL_REMOTE & army2->GetControl()) FH2Server::Get().BattleSendAttack(army2->GetColor(), attacker, defender, dst, targets);
-    }
-#endif
-
     if(Board::isReflectDirection(dir) != attacker.isReflect())
 	attacker.UpdateDirection(board[dst].GetPos());
 
@@ -189,67 +83,42 @@ void Battle::Arena::BattleProcess(Unit & attacker, Unit & defender, s16 dst, u8 
 	    TargetsApplySpell(NULL, spell, targets);
 	    if(interface) interface->RedrawActionSpellCastPart2(spell, targets);
 	    if(interface) interface->RedrawActionMonsterSpellCastStatus(attacker, targets.front());
-
-#ifdef WITH_NET
-	    if(Network::isRemoteClient())
-    	    {
-		if(CONTROL_REMOTE & army1->GetControl()) FH2Server::Get().BattleSendSpell(army1->GetColor(), attacker.GetUID(), defender.GetHeadIndex(), spell, targets);
-		if(CONTROL_REMOTE & army2->GetControl()) FH2Server::Get().BattleSendSpell(army2->GetColor(), attacker.GetUID(), defender.GetHeadIndex(), spell, targets);
-	    }
-#endif
 	}
     }
 
     attacker.PostAttackAction(defender);
 }
 
-void Battle::Arena::ApplyAction(QueueMessage & action)
+void Battle::Arena::ApplyAction(StreamBuf & sb)
 {
-    switch(action.GetID())
+    Command cmd(sb);
+    StreamBuf & stream = cmd.GetStream();
+
+    switch(cmd.GetType())
     {
-	case MSG_BATTLE_CAST:		ApplyActionSpellCast(action); break;
-	case MSG_BATTLE_ATTACK:		ApplyActionAttack(action); break;
-	case MSG_BATTLE_MOVE:		ApplyActionMove(action);   break;
-	case MSG_BATTLE_SKIP:		ApplyActionSkip(action);   break;
-	case MSG_BATTLE_END_TURN:	ApplyActionEnd(action);    break;
-	case MSG_BATTLE_MORALE:		ApplyActionMorale(action); break;
+	case MSG_BATTLE_CAST:		ApplyActionSpellCast(stream); break;
+	case MSG_BATTLE_ATTACK:		ApplyActionAttack(stream); break;
+	case MSG_BATTLE_MOVE:		ApplyActionMove(cmd);   break;
+	case MSG_BATTLE_SKIP:		ApplyActionSkip(stream);   break;
+	case MSG_BATTLE_END_TURN:	ApplyActionEnd(stream); break;
+	case MSG_BATTLE_MORALE:		ApplyActionMorale(stream); break;
 
-	case MSG_BATTLE_TOWER:		ApplyActionTower(action); break;
-	case MSG_BATTLE_CATAPULT:	ApplyActionCatapult(action); break;
+	case MSG_BATTLE_TOWER:		ApplyActionTower(stream); break;
+	case MSG_BATTLE_CATAPULT:	ApplyActionCatapult(stream); break;
 
-	case MSG_BATTLE_RETREAT:	ApplyActionRetreat(action); break;
-	case MSG_BATTLE_SURRENDER:	ApplyActionSurrender(action); break;
+	case MSG_BATTLE_RETREAT:	ApplyActionRetreat(stream); break;
+	case MSG_BATTLE_SURRENDER:	ApplyActionSurrender(stream); break;
 
-	case MSG_BATTLE_AUTO:		ApplyActionAutoBattle(action); break;
+	case MSG_BATTLE_AUTO:		ApplyActionAutoBattle(stream); break;
 
 	default: break;
     }
-
-#ifdef WITH_NET
-    switch(action.GetID())
-    {
-	case MSG_BATTLE_MOVE:
-	case MSG_BATTLE_SKIP:
-	case MSG_BATTLE_END_TURN:
-	case MSG_BATTLE_MORALE:
-	case MSG_BATTLE_TOWER:
-	case MSG_BATTLE_CATAPULT:
-	    if(Network::isRemoteClient())
-    	    {
-		if(CONTROL_REMOTE & army1->GetControl()) FH2Server::Get().BattleSendAction(army1->GetColor(), action);
-    		if(CONTROL_REMOTE & army2->GetControl()) FH2Server::Get().BattleSendAction(army2->GetColor(), action);
-	    }
-	    break;
-
-	default: break;
-    }
-#endif
 }
 
-void Battle::Arena::ApplyActionSpellCast(QueueMessage & action)
+void Battle::Arena::ApplyActionSpellCast(StreamBuf & stream)
 {
     u8 byte8;
-    action >> byte8;
+    stream >> byte8;
 
     const Spell spell(byte8);
     HeroBase* current_commander = GetCurrentForce().GetCommander();
@@ -265,26 +134,26 @@ void Battle::Arena::ApplyActionSpellCast(QueueMessage & action)
 	switch(spell())
 	{
 	    case Spell::TELEPORT:
-		SpellActionTeleport(action);
+		ApplyActionSpellTeleport(stream);
 		break;
 
 	    case Spell::EARTHQUAKE:
-		SpellActionEarthQuake(action);
+		ApplyActionSpellEarthQuake(stream);
 		break;
 
 	    case Spell::MIRRORIMAGE:
-		SpellActionMirrorImage(action);
+		ApplyActionSpellMirrorImage(stream);
 		break;
 
 	    case Spell::SUMMONEELEMENT:
 	    case Spell::SUMMONAELEMENT:
 	    case Spell::SUMMONFELEMENT:
 	    case Spell::SUMMONWELEMENT:
-		SpellActionSummonElemental(action, spell);
+		ApplyActionSpellSummonElemental(stream, spell);
 		break;
 
 	    default:
-		SpellActionDefaults(action, spell);
+		ApplyActionSpellDefaults(stream, spell);
 		break;
 	}
 
@@ -293,14 +162,6 @@ void Battle::Arena::ApplyActionSpellCast(QueueMessage & action)
 
 	// save spell for "eagle eye" capability
 	usage_spells.Append(spell);
-
-#ifdef WITH_NET
-	if(Network::isRemoteClient())
-	{
-	    if(CONTROL_REMOTE & army1->GetControl()) FH2Server::Get().BattleSendBoard(army1->GetColor(), *this);
-	    if(CONTROL_REMOTE & army2->GetControl()) FH2Server::Get().BattleSendBoard(army2->GetColor(), *this);
-	}
-#endif
     }
     else
     {
@@ -308,13 +169,13 @@ void Battle::Arena::ApplyActionSpellCast(QueueMessage & action)
     }
 }
 
-void Battle::Arena::ApplyActionAttack(QueueMessage & action)
+void Battle::Arena::ApplyActionAttack(StreamBuf & stream)
 {
     u32 uid1, uid2;
     s16 dst;
     u8 dir;
 
-    action >> uid1 >> uid2 >> dst >> dir;
+    stream >> uid1 >> uid2 >> dst >> dir;
 
     Battle::Unit* b1 = GetTroopUID(uid1);
     Battle::Unit* b2 = GetTroopUID(uid2);
@@ -360,26 +221,18 @@ void Battle::Arena::ApplyActionAttack(QueueMessage & action)
 	    DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param: " << \
 		b1->String(true) << " and " << b2->String(true));
 	}
-
-#ifdef WITH_NET
-	if(Network::isRemoteClient())
-	{
-	    if(CONTROL_REMOTE & army1->GetControl()) FH2Server::Get().BattleSendBoard(army1->GetColor(), *this);
-	    if(CONTROL_REMOTE & army2->GetControl()) FH2Server::Get().BattleSendBoard(army2->GetColor(), *this);
-	}
-#endif
     }
     else
     	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param: " << uid1 << ", " << uid2);
 }
 
-void Battle::Arena::ApplyActionMove(QueueMessage & action)
+void Battle::Arena::ApplyActionMove(Command & cmd)
 {
     u32 uid = 0;
     s16 dst = -1;
-    u16 size = 0;
+    u8 with_path = 0;
 
-    action >> uid >> dst >> size;
+    cmd.GetStream() >> uid >> dst >> with_path;
 
     Battle::Unit* b = GetTroopUID(uid);
     Cell* cell = Board::GetCell(dst);
@@ -407,22 +260,14 @@ void Battle::Arena::ApplyActionMove(QueueMessage & action)
 	    Indexes path;
 
 	    // check path
-	    if(0 == size)
+	    if(with_path)
 	    {
-		path = GetPath(*b, pos1);
-		size = path.size();
-
-		action.Reset();
-		action.SetID(MSG_BATTLE_MOVE);
-		action << b->GetUID() << dst;
-
-		action << size;	// FIXME: serialize
-		for(u16 ii = 0; ii < size; ++ii) action << path[ii];
+		cmd.GetStream() >> path;
 	    }
 	    else
 	    {
-		path.resize(size, 0);
-		for(u16 ii = 0; ii < size; ++ii) action >> path[ii];
+		path = GetPath(*b, pos1);
+		cmd = Command(MSG_BATTLE_MOVE, b->GetUID(), dst, path);
 	    }
 
 	    if(path.empty())
@@ -460,11 +305,11 @@ void Battle::Arena::ApplyActionMove(QueueMessage & action)
     }
 }
 
-void Battle::Arena::ApplyActionSkip(QueueMessage & action)
+void Battle::Arena::ApplyActionSkip(StreamBuf & stream)
 {
     u32 uid;
     u8 hard;
-    action >> uid >> hard;
+    stream >> uid >> hard;
 
     Battle::Unit* battle = GetTroopUID(uid);
     if(battle && battle->isValid())
@@ -493,10 +338,10 @@ void Battle::Arena::ApplyActionSkip(QueueMessage & action)
 	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param: " << "uid: " << uid);
 }
 
-void Battle::Arena::ApplyActionEnd(QueueMessage & action)
+void Battle::Arena::ApplyActionEnd(StreamBuf & stream)
 {
     u32 uid;
-    action >> uid;
+    stream >> uid;
 
     Battle::Unit* battle = GetTroopUID(uid);
 
@@ -519,11 +364,11 @@ void Battle::Arena::ApplyActionEnd(QueueMessage & action)
 	DEBUG(DBG_BATTLE, DBG_INFO, "incorrect param: " << "uid: " << uid);
 }
 
-void Battle::Arena::ApplyActionMorale(QueueMessage & action)
+void Battle::Arena::ApplyActionMorale(StreamBuf & stream)
 {
     u32 uid;
     u8  morale;
-    action >> uid >> morale;
+    stream >> uid >> morale;
 
     Battle::Unit* b = GetTroopUID(uid);
 
@@ -549,9 +394,11 @@ void Battle::Arena::ApplyActionMorale(QueueMessage & action)
     }
     else
 	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param: " << "uid: " << uid);
+
+    end_turn = true;
 }
 
-void Battle::Arena::ApplyActionRetreat(QueueMessage & action)
+void Battle::Arena::ApplyActionRetreat(StreamBuf & stream)
 {
     if(CanRetreatOpponent(current_color))
     {
@@ -570,7 +417,7 @@ void Battle::Arena::ApplyActionRetreat(QueueMessage & action)
 	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param");
 }
 
-void Battle::Arena::ApplyActionSurrender(QueueMessage & action)
+void Battle::Arena::ApplyActionSurrender(StreamBuf & stream)
 {
     if(CanSurrenderOpponent(current_color))
     {
@@ -849,12 +696,12 @@ Battle::TargetsInfo Battle::Arena::GetTargetsForSpells(const HeroBase* hero, con
     return targets;
 }
 
-void Battle::Arena::ApplyActionTower(QueueMessage & action)
+void Battle::Arena::ApplyActionTower(StreamBuf & stream)
 {
     u8 type;
     u32 uid;
 
-    action >> type >> uid;
+    stream >> type >> uid;
 
     Battle::Unit* b2 = GetTroopUID(uid);
     Tower* tower = GetTower(type);
@@ -878,17 +725,17 @@ void Battle::Arena::ApplyActionTower(QueueMessage & action)
 	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param: " << "tower: " << static_cast<int>(type) << ", uid: " << uid);
 }
 
-void Battle::Arena::ApplyActionCatapult(QueueMessage & action)
+void Battle::Arena::ApplyActionCatapult(StreamBuf & stream)
 {
     if(catapult)
     {
 	u8 shots, target, damage;
 
-	action >> shots;
+	stream >> shots;
 
 	while(shots--)
 	{
-	    action >> target >> damage;
+	    stream >> target >> damage;
 
 	    if(target)
 	    {
@@ -902,10 +749,10 @@ void Battle::Arena::ApplyActionCatapult(QueueMessage & action)
 	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param");
 }
 
-void Battle::Arena::ApplyActionAutoBattle(QueueMessage & action)
+void Battle::Arena::ApplyActionAutoBattle(StreamBuf & stream)
 {
     u8 color;
-    action >> color;
+    stream >> color;
 
     if(current_color == color)
     {
@@ -924,102 +771,32 @@ void Battle::Arena::ApplyActionAutoBattle(QueueMessage & action)
 	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param");
 }
 
-void Battle::Arena::SpellActionSummonElemental(QueueMessage & a, const Spell & spell)
+void Battle::Arena::ApplyActionSpellSummonElemental(StreamBuf & stream, const Spell & spell)
 {
-#ifdef WITH_NET
-    if(! (Settings::Get().GameType(Game::TYPE_NETWORK)) || Network::isRemoteClient())
-    {
-#endif
-	Unit* elem = CreateElemental(spell);
-	if(interface) interface->RedrawActionSummonElementalSpell(*elem);
-
-#ifdef WITH_NET
-	if(CONTROL_REMOTE & army1->GetControl()) FH2Server::Get().BattleSendSummonElementalSpell(army1->GetColor(), spell, *elem);
-	if(CONTROL_REMOTE & army2->GetControl()) FH2Server::Get().BattleSendSummonElementalSpell(army2->GetColor(), spell, *elem);
-    }
-    else
-    if(Network::isLocalClient())
-    {
-	u32 uid = 0;
-	a >> uid;
-
-	Unit* elem = CreateElemental(spell);
-	if(elem)
-	{
-	    a >> *elem;
-
-	    if(uid != elem->GetUID())
-    		    DEBUG(DBG_BATTLE, DBG_WARN, "internal error");
-
-	    if(interface) interface->RedrawActionSummonElementalSpell(*elem);
-	}
-	else
-	{
-    	    DEBUG(DBG_BATTLE, DBG_WARN, "is NULL");
-	}
-    }
-#endif
+    Unit* elem = CreateElemental(spell);
+    if(interface) interface->RedrawActionSummonElementalSpell(*elem);
 }
 
-void Battle::Arena::SpellActionDefaults(QueueMessage & a, const Spell & spell)
+void Battle::Arena::ApplyActionSpellDefaults(StreamBuf & stream, const Spell & spell)
 {
-#ifdef WITH_NET
-    if(! (Settings::Get().GameType(Game::TYPE_NETWORK)) || Network::isRemoteClient())
-    {
-#endif
-        const HeroBase* current_commander = GetCurrentCommander();
-	if(!current_commander) return;
+    const HeroBase* current_commander = GetCurrentCommander();
+    if(!current_commander) return;
 
-	s16 nop, dst;
-	a >> nop >> dst;
+    s16 dst;
+    stream >> dst;
 
-	TargetsInfo targets = GetTargetsForSpells(current_commander, spell, dst);
-	if(interface) interface->RedrawActionSpellCastPart1(spell, dst, current_commander, current_commander->GetName(), targets);
+    TargetsInfo targets = GetTargetsForSpells(current_commander, spell, dst);
+    if(interface) interface->RedrawActionSpellCastPart1(spell, dst, current_commander, current_commander->GetName(), targets);
 
-    	TargetsApplySpell(current_commander, spell, targets);
-	if(interface) interface->RedrawActionSpellCastPart2(spell, targets);
-
-#ifdef WITH_NET
-	if(CONTROL_REMOTE & army1->GetControl()) FH2Server::Get().BattleSendSpell(army1->GetColor(), 0, dst, spell, targets);
-	if(CONTROL_REMOTE & army2->GetControl()) FH2Server::Get().BattleSendSpell(army2->GetColor(), 0, dst, spell, targets);
-    }
-    else
-    if(Network::isLocalClient())
-    {
-        TargetsInfo targets;
-	u32 uid = 0;
-	s16 dst = -1;
-	u8 color;
-	std::string name;
-
-	a >> uid >> dst >> color >> targets;
-
-        Unit* monster = uid ? GetTroopUID(uid) : NULL;
-        const HeroBase* hero = uid == 0 && color ? GetCommander(color) : NULL;
-
-        if(monster)
-            name = monster->GetName();
-        else
-        if(hero)
-            name = hero->GetName();
-
-	if(interface)
-	{
-	    interface->RedrawActionSpellCastPart1(spell, dst, (monster ? NULL : hero), name, targets);
-    	    if(monster && targets.size())
-        	interface->RedrawActionMonsterSpellCastStatus(*monster, targets.front());
-        }
-	TargetsApplySpell(hero, spell, targets);
-        if(interface) interface->RedrawActionSpellCastPart2(spell, targets);
-    }
-#endif
+    TargetsApplySpell(current_commander, spell, targets);
+    if(interface) interface->RedrawActionSpellCastPart2(spell, targets);
 }
 
-void Battle::Arena::SpellActionTeleport(QueueMessage & a)
+void Battle::Arena::ApplyActionSpellTeleport(StreamBuf & stream)
 {
     s16 src, dst;
 
-    a >> src >> dst;
+    stream >> src >> dst;
 
     Unit* b = GetTroopBoard(src);
     Cell* cell = Board::GetCell(dst);
@@ -1039,140 +816,68 @@ void Battle::Arena::SpellActionTeleport(QueueMessage & a)
     {
 	DEBUG(DBG_BATTLE, DBG_WARN, "spell: " << spell.GetName() << " false");
     }
-
-#ifdef WITH_NET
-    if(Network::isRemoteClient())
-    {
-	if(CONTROL_REMOTE & army1->GetControl()) FH2Server::Get().BattleSendTeleportSpell(army1->GetColor(), src, dst);
-	if(CONTROL_REMOTE & army2->GetControl()) FH2Server::Get().BattleSendTeleportSpell(army2->GetColor(), src, dst);
-    }
-#endif
 }
 
-void Battle::Arena::SpellActionEarthQuake(QueueMessage & a)
+void Battle::Arena::ApplyActionSpellEarthQuake(StreamBuf & stream)
 {
-#ifdef WITH_NET
-    if(! (Settings::Get().GameType(Game::TYPE_NETWORK)) || Network::isRemoteClient())
-    {
-#endif
-	std::vector<u8> targets = GetCastleTargets();
+    std::vector<u8> targets = GetCastleTargets();
 
-	if(interface) interface->RedrawActionEarthQuakeSpell(targets);
+    if(interface) interface->RedrawActionEarthQuakeSpell(targets);
 
-	// FIXME: Arena::SpellActionEarthQuake: check hero spell power
+    // FIXME: Arena::ApplyActionSpellEarthQuake: check hero spell power
 
-	// apply random damage
-	if(0 != board[8].GetObject())  board[8].SetObject(Rand::Get(board[8].GetObject()));
-	if(0 != board[29].GetObject()) board[29].SetObject(Rand::Get(board[29].GetObject()));
-	if(0 != board[73].GetObject()) board[73].SetObject(Rand::Get(board[73].GetObject()));
-	if(0 != board[96].GetObject()) board[96].SetObject(Rand::Get(board[96].GetObject()));
+    // apply random damage
+    if(0 != board[8].GetObject())  board[8].SetObject(Rand::Get(board[8].GetObject()));
+    if(0 != board[29].GetObject()) board[29].SetObject(Rand::Get(board[29].GetObject()));
+    if(0 != board[73].GetObject()) board[73].SetObject(Rand::Get(board[73].GetObject()));
+    if(0 != board[96].GetObject()) board[96].SetObject(Rand::Get(board[96].GetObject()));
 
-	if(towers[0] && towers[0]->isValid() && Rand::Get(1)) towers[0]->SetDestroy();
-	if(towers[2] && towers[2]->isValid() && Rand::Get(1)) towers[2]->SetDestroy();
+    if(towers[0] && towers[0]->isValid() && Rand::Get(1)) towers[0]->SetDestroy();
+    if(towers[2] && towers[2]->isValid() && Rand::Get(1)) towers[2]->SetDestroy();
 
-	DEBUG(DBG_BATTLE, DBG_TRACE, "spell: " << Spell(Spell::EARTHQUAKE).GetName() << ", targets: " << targets.size());
-
-#ifdef WITH_NET
-	if(CONTROL_REMOTE & army1->GetControl()) FH2Server::Get().BattleSendEarthQuakeSpell(army1->GetColor(), targets);
-	if(CONTROL_REMOTE & army2->GetControl()) FH2Server::Get().BattleSendEarthQuakeSpell(army2->GetColor(), targets);
-    }
-    else
-    if(Network::isLocalClient())
-    {
-        u32 size;
-        a >> size;
-
-	std::vector<u8> targets(size);
-	for(std::vector<u8>::iterator
-	    it = targets.begin(); it != targets.end(); ++it)
-            a >> *it;
-
-	if(interface) interface->RedrawActionEarthQuakeSpell(targets);
-    }
-#endif
+    DEBUG(DBG_BATTLE, DBG_TRACE, "spell: " << Spell(Spell::EARTHQUAKE).GetName() << ", targets: " << targets.size());
 }
 
-void Battle::Arena::SpellActionMirrorImage(QueueMessage & a)
+void Battle::Arena::ApplyActionSpellMirrorImage(StreamBuf & stream)
 {
     s16 who;
-    a >> who;
+    stream >> who;
     Unit* b = GetTroopBoard(who);
 
     if(b)
     {
-#ifdef WITH_NET
-	if(! (Settings::Get().GameType(Game::TYPE_NETWORK)) || Network::isRemoteClient())
-	{
-#endif
-	    const Indexes distances = Board::GetDistanceIndexes(b->GetHeadIndex(), 4);
+	Indexes distances = Board::GetDistanceIndexes(b->GetHeadIndex(), 4);
 
-	    Indexes::const_iterator it = std::find_if(distances.begin(), distances.end(),
+	ShortestDistance SortingDistance(b->GetHeadIndex());
+	std::sort(distances.begin(), distances.end(), SortingDistance);
+
+        Indexes::const_iterator it = std::find_if(distances.begin(), distances.end(),
 						std::bind2nd(std::ptr_fun(&Board::isValidMirrorImageIndex), b));
 
-	    for(Indexes::const_iterator
+        for(Indexes::const_iterator
 		it = distances.begin(); it != distances.end(); ++it)
-	    {
+        {
     		const Cell* cell = Board::GetCell(*it);
     		if(cell && cell->isPassable3(*b, true)) break;
-	    }
+        }
 
-	    if(it != distances.end())
-	    {
+        if(it != distances.end())
+        {
 		const Position pos = Position::GetCorrect(*b, *it);
 		const s16 & dst = pos.GetHead()->GetIndex();
     		DEBUG(DBG_BATTLE, DBG_TRACE, "set position: " << dst);
-		if(interface) interface->RedrawActionMirrorImageSpell(*b, dst);
-
-		Unit* image = CreateMirrorImage(*b, dst);
-
-		if(image)
-		{
-#ifdef WITH_NET
-		    if(CONTROL_REMOTE & army1->GetControl())
-			FH2Server::Get().BattleSendMirrorImageSpell(army1->GetColor(), who, dst, *image);
-		    if(CONTROL_REMOTE & army2->GetControl())
-			FH2Server::Get().BattleSendMirrorImageSpell(army2->GetColor(), who, dst, *image);
-#endif
-		}
-		else
-		{
-    		    DEBUG(DBG_BATTLE, DBG_WARN, "is NULL");
-		}
-	    }
-	    else
-	    {
+		if(interface) interface->RedrawActionMirrorImageSpell(*b, pos);
+		Unit* mirror = CreateMirrorImage(*b, dst);
+		if(mirror) mirror->SetPosition(pos);
+        }
+        else
+        {
     		if(interface) interface->SetStatus(_("spell failed!"), true);
     		DEBUG(DBG_BATTLE, DBG_WARN, "new position not found!");
-	    }
-#ifdef WITH_NET
-	}
-	else
-	if(Network::isLocalClient())
-	{
-	    u32 uid = 0;
-	    s16 dst = -1;
-
-	    a >> dst >> uid;
-
-	    Unit* image = CreateMirrorImage(*b, dst);
-	    if(image)
-	    {
-		a >> *image;
-
-		if(uid != image->GetUID())
-    		    DEBUG(DBG_BATTLE, DBG_WARN, "internal error");
-
-		if(interface) interface->RedrawActionMirrorImageSpell(*b, dst);
-	    }
-	    else
-	    {
-    		DEBUG(DBG_BATTLE, DBG_WARN, "is NULL");
-	    }
-	}
-#endif
+        }
     }
     else
     {
-	DEBUG(DBG_BATTLE, DBG_WARN, "false");
+	DEBUG(DBG_BATTLE, DBG_WARN, "spell: " << Spell(Spell::MIRRORIMAGE).GetName() << " false");
     }
 }

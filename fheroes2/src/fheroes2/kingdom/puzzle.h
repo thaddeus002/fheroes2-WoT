@@ -43,4 +43,7 @@ public:
     u8 zone4_order[4];
 };
 
+StreamBase & operator<< (StreamBase &, const Puzzle &);
+StreamBase & operator>> (StreamBase &, Puzzle &);
+
 #endif

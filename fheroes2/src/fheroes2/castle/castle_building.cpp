@@ -176,14 +176,14 @@ void CastleRedrawCurrentBuilding(const Castle & castle, const Point & dst_pt,
 
 		if(flash == (*it).id)
 		{
-		    CastleDialog::RedrawBuildingSpriteToArea((*it).contour, 
+		    CastleDialog::RedrawBuildingSpriteToArea((*it).contour,
 			dst_pt.x + (*it).contour.x(), dst_pt.y + (*it).contour.y(), max);
 		}
 		CastleRedrawBuildingExtended(castle, dst_pt, (*it).id, frame);
 	    }
 	}
     }
-    // redraw build with alpha 
+    // redraw build with alpha
     else
     if(orders.end() != std::find(orders.begin(), orders.end(), build))
     {
@@ -247,7 +247,7 @@ void CastleRedrawBuilding(const Castle & castle, const Point & dst_pt, u32 build
 
     const ICN::icn_t icn = Castle::GetICNBuilding(build, castle.GetRace());
     u8 index = 0;
-    	    
+
     // correct index (mage guild)
     switch(build)
     {

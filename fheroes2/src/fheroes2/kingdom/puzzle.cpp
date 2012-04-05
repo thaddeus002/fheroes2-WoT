@@ -275,3 +275,47 @@ void PuzzlesDraw(const Puzzle & pzl, const Surface & sf, s16 dstx, s16 dsty)
     }
     cursor.Hide();
 }
+
+StreamBase & operator<< (StreamBase & msg, const Puzzle & pzl)
+{
+    msg << pzl.to_string< char, std::char_traits<char>, std::allocator<char> >();
+
+    // orders
+    msg << static_cast<u8>(ARRAY_COUNT(pzl.zone1_order));
+    for(u8 ii = 0; ii < ARRAY_COUNT(pzl.zone1_order); ++ii) msg << pzl.zone1_order[ii];
+
+    msg << static_cast<u8>(ARRAY_COUNT(pzl.zone2_order));
+    for(u8 ii = 0; ii < ARRAY_COUNT(pzl.zone2_order); ++ii) msg << pzl.zone2_order[ii];
+
+    msg << static_cast<u8>(ARRAY_COUNT(pzl.zone3_order));
+    for(u8 ii = 0; ii < ARRAY_COUNT(pzl.zone3_order); ++ii) msg << pzl.zone3_order[ii];
+
+    msg << static_cast<u8>(ARRAY_COUNT(pzl.zone4_order));
+    for(u8 ii = 0; ii < ARRAY_COUNT(pzl.zone4_order); ++ii) msg << pzl.zone4_order[ii];
+
+    return msg;
+}
+
+StreamBase & operator>> (StreamBase & msg, Puzzle & pzl)
+{
+    std::string str;
+
+    msg >> str;
+    pzl = str.c_str();
+
+    u8 size;
+
+    msg >> size;
+    for(u8 ii = 0; ii < size; ++ii) msg >> pzl.zone1_order[ii];
+
+    msg >> size;
+    for(u8 ii = 0; ii < size; ++ii) msg >> pzl.zone2_order[ii];
+
+    msg >> size;
+    for(u8 ii = 0; ii < size; ++ii) msg >> pzl.zone3_order[ii];
+
+    msg >> size;
+    for(u8 ii = 0; ii < size; ++ii) msg >> pzl.zone4_order[ii];
+
+    return msg;
+}

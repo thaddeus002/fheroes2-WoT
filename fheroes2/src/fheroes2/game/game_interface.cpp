@@ -88,7 +88,7 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
     scrollRight = Rect(display.w() - scroll_width, 0, scroll_width, display.h());
     scrollTop = conf.QVGA() ? Rect(0, 0, controlPanel.GetArea().x, scroll_width) : Rect(0, 0, display.w() - radar.GetArea().w, scroll_width);
     scrollBottom = Rect(0, display.h() - scroll_width, display.w(), scroll_width);
-    
+
     system_info.Set(Font::YELLOW_SMALL);
 }
 
@@ -171,7 +171,7 @@ void Interface::Basic::Redraw(u8 force)
 
 	    display.FillRect(0, 0, 0, rect);
 	    text.Blit(rect.x, rect.y);
-	    
+
 	    display.Flip();
 
 	    AGG::Cache & cache = AGG::Cache::Get();

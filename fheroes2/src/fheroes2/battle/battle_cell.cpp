@@ -102,13 +102,9 @@ bool Battle::Position::isValid(void) const
 }
 
 
-
-
-
-
-
-
-
+Battle::Cell::Cell() : index(0), object(0), direction(UNKNOWN), quality(0), troop(NULL)
+{
+}
 
 Battle::Cell::Cell(const s16 & ii) : index(ii), object(0), direction(UNKNOWN), quality(0), troop(NULL)
 {
@@ -301,13 +297,13 @@ void Battle::Cell::ResetDirection(void)
     direction = UNKNOWN;
 }
 
-QueueMessage & Battle::operator<< (QueueMessage & msg, const Cell & c)
+StreamBase & Battle::operator<< (StreamBase & msg, const Cell & c)
 {
     return msg << c.index << c.object << c.direction << c.quality <<
 	(c.troop ? c.troop->GetUID() : static_cast<u32>(0));
 }
 
-QueueMessage & Battle::operator>> (QueueMessage & msg, Cell & c)
+StreamBase & Battle::operator>> (StreamBase & msg, Cell & c)
 {
     u32 uid = 0;
     msg >> c.index >> c.object >> c.direction >> c.quality >> uid;

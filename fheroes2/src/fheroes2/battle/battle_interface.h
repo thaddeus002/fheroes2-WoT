@@ -142,7 +142,7 @@ namespace Battle
 	void	RedrawActionTeleportSpell(Unit &, s16);
 	void	RedrawActionEarthQuakeSpell(const std::vector<u8> &);
 	void	RedrawActionSummonElementalSpell(const Unit &);
-	void	RedrawActionMirrorImageSpell(const Unit &, s16);
+	void	RedrawActionMirrorImageSpell(const Unit &, const Position &);
 	void	RedrawActionSkipStatus(const Unit &);
 	void	RedrawActionRemoveMirrorImage(const Unit &);
 	void	RedrawBridgeAnimation(bool down);

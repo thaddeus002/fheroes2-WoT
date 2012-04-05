@@ -338,7 +338,7 @@ void Route::Path::RescanObstacle(void)
 {
     // scan obstacle
     iterator it = std::find_if(begin(), end(), StepIsObstacle);
- 
+
     if(it != end() && (*it).GetIndex() != GetLastIndex())
     {
 	size_t size1 = size();
@@ -373,4 +373,25 @@ void Route::Path::RescanPassable(void)
 	    erase(it, end());
 	}
     }
+}
+
+StreamBase & Route::operator<< (StreamBase & msg, const Step & step)
+{
+    return msg << step.from << step.direction << step.penalty;
+}
+
+StreamBase & Route::operator<< (StreamBase & msg, const Path & path)
+{
+    return msg << path.dst << path.hide << static_cast< std::list<Step> >(path);
+}
+
+StreamBase & Route::operator>> (StreamBase & msg, Step & step)
+{
+    return msg >> step.from >> step.direction >> step.penalty;
+}
+
+StreamBase & Route::operator>> (StreamBase & msg, Path & path)
+{
+    std::list<Step> & base = path;
+    return msg >> path.dst >> path.hide >> base;
 }

@@ -188,7 +188,7 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
 
 	if(tile.GetObject() == MP2::OBJ_HEROES && (flag & LEVEL_HEROES))
 	{
-	    const Heroes *hero = tile.GetHeroes();
+	    const Heroes* hero = tile.GetHeroes();
 	    if(hero) hero->Redraw(dst, rectMapsPosition.x + TILEWIDTH * ox, rectMapsPosition.y + TILEWIDTH * oy, true);
 	}
     }

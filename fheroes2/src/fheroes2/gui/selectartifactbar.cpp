@@ -32,7 +32,6 @@
 #include "artifact.h"
 #include "editor_dialogs.h"
 #include "settings.h"
-#include "localclient.h"
 #include "selectartifactbar.h"
 
 #define MAXARTIFACTLINE		7
@@ -310,9 +309,6 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 	    {
 	    	std::swap(art1, art2);
 		change = true;
-#ifdef WITH_NET
-	    	FH2LocalClient::SendHeroesSwapArtifacts(bar.hero, index1, bar.hero, index2);
-#endif
 	    }
 
 	    bar.Reset();
@@ -392,10 +388,6 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar1, SelectA
 		std::swap(art1, art2);
 		change = true;
 
-#ifdef WITH_NET
-	    	FH2LocalClient::SendHeroesSwapArtifacts(bar1.hero, index2, bar2.hero, index1);
-#endif
-
 		bar1.Reset();
 		bar2.Reset();
 
@@ -436,10 +428,6 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar1, SelectA
 	    {
 		std::swap(art1, art2);
 		change = true;
-
-#ifdef WITH_NET
-	    	FH2LocalClient::SendHeroesSwapArtifacts(bar1.hero, index1, bar2.hero, index2);
-#endif
 
 		bar1.Reset();
 		bar2.Reset();

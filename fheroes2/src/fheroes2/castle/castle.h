@@ -174,17 +174,17 @@ public:
     u32 GetBuildingRequires(u32) const;
 
     void Scoute(void) const;
-    
+
     static const char* GetStringBuilding(u32, u8 race = 0);
     static const char* GetDescriptionBuilding(u32, u8 race = 0);
     static ICN::icn_t GetICNBuilding(u32, u8);
     static ICN::icn_t GetICNBoat(const u8 & race);
     u32 GetUpgradeBuilding(u32) const;
-    
-    static bool PredicateIsCastle(const Castle *castle);
-    static bool PredicateIsTown(const Castle *castle);
-    static bool PredicateIsBuildMarketplace(const Castle *castle);
-    static bool PredicateIsCapital(const Castle *castle);
+
+    static bool PredicateIsCastle(const Castle*);
+    static bool PredicateIsTown(const Castle*);
+    static bool PredicateIsBuildMarketplace(const Castle*);
+    static bool PredicateIsCapital(const Castle*);
 
     static u8 GetGrownWell(void);
     static u8 GetGrownWel2(void);
@@ -210,7 +210,9 @@ private:
     void JoinRNDArmy(void);
 
 private:
-    friend class Game::IO;
+    friend class Game::IOld;
+    friend StreamBase & operator<< (StreamBase &, const Castle &);
+    friend StreamBase & operator>> (StreamBase &, Castle &);
 
     u8			race;
     u32			building;
@@ -221,7 +223,7 @@ private:
 
     MageGuild		mageguild;
     u16			dwelling[CASTLEMAXMONSTER];
-    Army        army;
+    Army        	army;
 };
 
 namespace CastleDialog
@@ -248,7 +250,7 @@ namespace CastleDialog
     void RedrawBuildingSpriteToArea(const Sprite &, s16, s16, const Rect &);
 }
 
-struct VecCastles : public std::vector<Castle *>
+struct VecCastles : public std::vector<Castle*>
 {
     Castle* Get(s32) const;
     Castle* Get(const Point &) const;
@@ -267,5 +269,14 @@ struct AllCastles : public VecCastles
 
     void Scoute(u8) const;
 };
+
+StreamBase & operator<< (StreamBase &, const VecCastles &);
+StreamBase & operator>> (StreamBase &, VecCastles &);
+
+StreamBase & operator<< (StreamBase &, const AllCastles &);
+StreamBase & operator>> (StreamBase &, AllCastles &);
+
+StreamBase & operator<< (StreamBase &, const Castle &);
+StreamBase & operator>> (StreamBase &, Castle &);
 
 #endif

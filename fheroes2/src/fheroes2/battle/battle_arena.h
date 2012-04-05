@@ -43,20 +43,11 @@ namespace Battle
     class Force;
     class Units;
     class Unit;
+    class Command;
 
-    struct Actions : public std::list<QueueMessage>
+    struct Actions : public std::list<Command>
     {
-        void AddedAutoBattleAction(u8);
-        void AddedRetreatAction(void);
-        void AddedSurrenderAction(void);
-        void AddedCastAction(const Spell &, s16);
-        void AddedCastTeleportAction(s16, s16);
-	void AddedCastMirrorImageAction(s16);
-        void AddedEndAction(const Unit &);
-        void AddedSkipAction(const Unit &, bool);
-        void AddedMoveAction(const Unit &, s16);
-        void AddedAttackAction(const Unit &, const Unit &, s16, u8);
-        void AddedMoraleAction(const Unit &, u8);
+	bool		HaveCommand(u16) const;
     };
 
     class Arena
@@ -107,7 +98,7 @@ namespace Battle
 	void		FadeArena(void) const;
 
 	Indexes		GetPath(const Unit &, const Position &);
-	void		ApplyAction(QueueMessage &);
+	void		ApplyAction(StreamBuf &);
 
 	TargetsInfo	GetTargetsForDamage(Unit &, Unit &, s16);
 	void		TargetsApplyDamage(Unit &, Unit &, TargetsInfo &);
@@ -123,16 +114,16 @@ namespace Battle
 	bool		CanSurrenderOpponent(u8 color) const;
 	bool		CanRetreatOpponent(u8 color) const;
 
-	// uniq spells
-	void		SpellActionSummonElemental(QueueMessage &, const Spell &);
-	void		SpellActionMirrorImage(QueueMessage &);
-	void		SpellActionTeleport(QueueMessage &);
-	void		SpellActionEarthQuake(QueueMessage &);
-	void		SpellActionDefaults(QueueMessage &, const Spell &);
-
+	void		ApplyActionSpellSummonElemental(StreamBuf &, const Spell &);
+	void		ApplyActionSpellMirrorImage(StreamBuf &);
+	void		ApplyActionSpellTeleport(StreamBuf &);
+	void		ApplyActionSpellEarthQuake(StreamBuf &);
+	void		ApplyActionSpellDefaults(StreamBuf &, const Spell &);
 
 	u8		GetObstaclesPenalty(const Unit &, const Unit &) const;
 	ICN::icn_t	GetICNCovr(void) const;
+
+        u8		GetCastleTargetValue(u8) const;
 
 	static Board*		GetBoard(void);
 	static Tower*		GetTower(u8);
@@ -142,8 +133,8 @@ namespace Battle
 	static Graveyard*	GetGraveyard(void);
 
     private:
-	friend QueueMessage & operator<< (QueueMessage &, const Arena &);
-	friend QueueMessage & operator>> (QueueMessage &, Arena &);
+	friend StreamBase & operator<< (StreamBase &, const Arena &);
+	friend StreamBase & operator>> (StreamBase &, Arena &);
 
     	void		RemoteTurn(const Unit &, Actions &);
 	void		HumanTurn(const Unit &, Actions &);
@@ -151,25 +142,24 @@ namespace Battle
 	void		TurnTroop(Unit*);
 	void		TowerAction(const Tower &);
 
-        u8		GetCastleTargetValue(u8) const;
         void		SetCastleTargetValue(u8, u8);
 	void		CatapultAction(void);
 
 	s16		GetFreePositionNearHero(u8) const;
 	std::vector<u8>	GetCastleTargets(void) const;
 
-	void		ApplyActionRetreat(QueueMessage &);
-	void		ApplyActionSurrender(QueueMessage &);
-	void		ApplyActionAttack(QueueMessage &);
-	void		ApplyActionMove(QueueMessage &);
-	void		ApplyActionEnd(QueueMessage &);
-	void		ApplyActionSkip(QueueMessage &);
-	void		ApplyActionMorale(QueueMessage &);
-	void		ApplyActionLuck(QueueMessage &);
-	void		ApplyActionSpellCast(QueueMessage &);
-	void		ApplyActionTower(QueueMessage &);
-	void		ApplyActionCatapult(QueueMessage &);
-	void		ApplyActionAutoBattle(QueueMessage &);
+	void		ApplyActionRetreat(StreamBuf &);
+	void		ApplyActionSurrender(StreamBuf &);
+	void		ApplyActionAttack(StreamBuf &);
+	void		ApplyActionMove(Command &);
+	void		ApplyActionEnd(StreamBuf &);
+	void		ApplyActionSkip(StreamBuf &);
+	void		ApplyActionMorale(StreamBuf &);
+	void		ApplyActionLuck(StreamBuf &);
+	void		ApplyActionSpellCast(StreamBuf &);
+	void		ApplyActionTower(StreamBuf &);
+	void		ApplyActionCatapult(StreamBuf &);
+	void		ApplyActionAutoBattle(StreamBuf &);
 
 	void		BattleProcess(Unit &, Unit & b2, s16 = -1, u8 = 0);
 
@@ -198,11 +188,13 @@ namespace Battle
 
 	u16		current_turn;
 	u8		auto_battle;
+
+	bool		end_turn;
     };
 
     Arena*	GetArena(void);
-    QueueMessage &	operator<< (QueueMessage &, const Arena &);
-    QueueMessage &	operator>> (QueueMessage &, Arena &);
+    StreamBase &	operator<< (StreamBase &, const Arena &);
+    StreamBase &	operator>> (StreamBase &, Arena &);
 }
 
 #endif

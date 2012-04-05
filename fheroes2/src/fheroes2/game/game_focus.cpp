@@ -31,7 +31,7 @@
 #include "kingdom.h"
 #include "game_focus.h"
 
-void GameFocus::Set(Heroes *hero)
+void GameFocus::Set(Heroes* hero)
 {
     Player* player = Settings::Get().GetPlayers().GetCurrent();
 
@@ -58,12 +58,12 @@ void GameFocus::Set(Heroes *hero)
 	if(! Game::ChangeMusicDisabled())
 	{
 	    AGG::PlayMusic(MUS::FromGround(world.GetTiles(hero->GetCenter()).GetGround()));
-	    Game::EnvironmentSoundMixer();    
+	    Game::EnvironmentSoundMixer();
 	}
     }
 }
 
-void GameFocus::Set(Castle *castle)
+void GameFocus::Set(Castle* castle)
 {
     Player* player = Settings::Get().GetPlayers().GetCurrent();
 

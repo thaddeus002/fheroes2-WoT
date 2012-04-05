@@ -31,7 +31,6 @@
 #include "kingdom.h"
 #include "maps_tiles.h"
 #include "castle.h"
-#include "localclient.h"
 #include "game_static.h"
 #include "ai.h"
 
@@ -64,12 +63,12 @@ void Castle::LoadFromMP2(const void *ptr)
         default:   color = Color::NONE;   break;
     }
     ++ptr8;
-    
+
     // custom building
     if(*ptr8)
     {
 	++ptr8;
-	
+
 	// building
 	byte16 = ReadLE16(ptr8);
         if(0x0002 & byte16) building |= BUILD_THIEVESGUILD;
@@ -102,7 +101,7 @@ void Castle::LoadFromMP2(const void *ptr)
 	++ptr8;
 	++ptr8;
 
-	
+
 	// magic tower
 	if(0 < *ptr8) building |= BUILD_MAGEGUILD1;
 	if(1 < *ptr8) building |= BUILD_MAGEGUILD2;
@@ -162,11 +161,11 @@ void Castle::LoadFromMP2(const void *ptr)
     {
 	ptr8 += 16;
     }
-    
+
     // captain
     if(*ptr8) building |= BUILD_CAPTAIN;
     ++ptr8;
-    
+
     // custom name
     ++ptr8;
     name = Game::GetEncodeString(reinterpret_cast<const char*>(ptr8));
@@ -175,13 +174,13 @@ void Castle::LoadFromMP2(const void *ptr)
     // race
     const u8 kingdom_race = Players::GetPlayerRace(color);
     switch(*ptr8)
-    { 	 
-	case 0x00: race = Race::KNGT; break; 	 
-	case 0x01: race = Race::BARB; break; 	 
-        case 0x02: race = Race::SORC; break; 	 
-	case 0x03: race = Race::WRLK; break; 	 
-	case 0x04: race = Race::WZRD; break; 	 
-        case 0x05: race = Race::NECR; break; 	 
+    {
+	case 0x00: race = Race::KNGT; break;
+	case 0x01: race = Race::BARB; break;
+        case 0x02: race = Race::SORC; break;
+	case 0x03: race = Race::WRLK; break;
+	case 0x04: race = Race::WZRD; break;
+        case 0x05: race = Race::NECR; break;
         default: race = (Color::NONE != color && (Race::ALL & kingdom_race) ? kingdom_race : Race::Rand()); break;
     }
     ++ptr8;
@@ -450,7 +449,7 @@ bool Castle::isLibraryBuild(void) const
     return race == Race::WZRD && isBuild(BUILD_SPEC);
 }
 
-void Castle::MageGuildEducateHero(HeroBase & hero) const 
+void Castle::MageGuildEducateHero(HeroBase & hero) const
 {
     mageguild.EducateHero(hero, GetLevelMageGuild(), isLibraryBuild());
 }
@@ -458,7 +457,7 @@ void Castle::MageGuildEducateHero(HeroBase & hero) const
 const char* Castle::GetStringBuilding(u32 build, u8 race)
 {
     const char* str_build[] = { _("Thieves' Guild"), _("Tavern"), _("Shipyard"), _("Well"), _("Statue"), _("Left Turret"),
-	_("Right Turret"), _("Marketplace"), _("Moat"), _("Castle"), _("Tent"), _("Captain's Quarters"), _("Mage Guild, Level 1"), 
+	_("Right Turret"), _("Marketplace"), _("Moat"), _("Castle"), _("Tent"), _("Captain's Quarters"), _("Mage Guild, Level 1"),
 	 _("Mage Guild, Level 2"), _("Mage Guild, Level 3"), _("Mage Guild, Level 4"), _("Mage Guild, Level 5"), "Unknown" };
 
     const char* str_wel2[] = { _("Farm"), _("Garbage Heap"), _("Crystal Garden"), _("Waterfall"), _("Orchard"), _("Skull Pile") };
@@ -536,7 +535,7 @@ const char* Castle::GetStringBuilding(u32 build, u8 race)
 
 	default: break;
     }
-    
+
     return str_build[17];
 }
 
@@ -647,9 +646,6 @@ Heroes* Castle::RecruitHero(Heroes* hero)
 
     DEBUG(DBG_GAME , DBG_INFO, name << ", recruit: " << hero->GetName());
 
-#ifdef WITH_NET
-    FH2LocalClient::SendCastleRecruitHero(*this, *hero);
-#endif
     return hero;
 }
 
@@ -665,7 +661,7 @@ bool Castle::RecruitMonster(u32 dw, u16 count)
 	case DWELLING_MONSTER3: dw_index = 2; break;
 	case DWELLING_MONSTER4: dw_index = 3; break;
 	case DWELLING_MONSTER5: dw_index = 4; break;
-	case DWELLING_MONSTER6: dw_index = 5; break;	
+	case DWELLING_MONSTER6: dw_index = 5; break;
 	default: return false;
     }
 
@@ -688,10 +684,6 @@ bool Castle::RecruitMonster(u32 dw, u16 count)
 
     DEBUG(DBG_GAME, DBG_INFO, name << " recruit: " << ms.GetMultiName() << "(" << count << ")");
 
-#ifdef WITH_NET
-    FH2LocalClient::SendCastleRecruitMonster(*this, dw, count);
-#endif
-
     return true;
 }
 
@@ -706,7 +698,7 @@ u16 Castle::RecruitMaxMonster(u32 dw)
 	case DWELLING_MONSTER3: dw_index = 2; break;
 	case DWELLING_MONSTER4: dw_index = 3; break;
 	case DWELLING_MONSTER5: dw_index = 4; break;
-	case DWELLING_MONSTER6: dw_index = 5; break;	
+	case DWELLING_MONSTER6: dw_index = 5; break;
 	default: return false;
     }
 
@@ -732,9 +724,6 @@ u16 Castle::RecruitMaxMonster(u32 dw)
 	    army2.JoinTroop(ms, count);
 	    dwelling[dw_index] -= count;
 
-#ifdef WITH_NET
-	    FH2LocalClient::SendCastleRecruitMonster(*this, dw, count);
-#endif
 	    DEBUG(DBG_GAME, DBG_INFO, name << " recruit: " << ms.GetMultiName() << "(" << count << ")");
 	}
     }
@@ -759,11 +748,11 @@ u16 Castle::GetDwellingLivedCount(u32 dw) const
       case DWELLING_MONSTER6:
       case DWELLING_UPGRADE6:
       case DWELLING_UPGRADE7: return dwelling[5];
-      
+
       default: break;
     }
 
-    return 0;                                                                 
+    return 0;
 }
 
 /* return requires for building */
@@ -936,7 +925,7 @@ u32 Castle::GetBuildingRequires(u32 build) const
 		case Race::NECR:
 		    requires |= DWELLING_MONSTER2;
 		    break;
-		
+
 		default:
 		    break;
 	    }
@@ -1000,7 +989,7 @@ u32 Castle::GetBuildingRequires(u32 build) const
 		    requires |= DWELLING_MONSTER4;
 		    requires |= DWELLING_MONSTER5;
 		    break;
-		
+
 		case Race::BARB:
 		    requires |= DWELLING_MONSTER5;
 		    break;
@@ -1034,7 +1023,7 @@ u32 Castle::GetBuildingRequires(u32 build) const
 		case Race::WZRD:
 		    requires |= DWELLING_MONSTER6;
 		    break;
-		
+
 		default:
 		    break;
 	    }
@@ -1042,7 +1031,7 @@ u32 Castle::GetBuildingRequires(u32 build) const
 
 	default: break;
     }
-    
+
     return requires;
 }
 
@@ -1090,7 +1079,7 @@ buildcond_t Castle::CheckBuyBuilding(u32 build) const
 
     // check build requirements
     std::bitset<32> requires(Castle::GetBuildingRequires(build));
-    
+
     if(requires.any())
     {
         for(u8 pos = 0; pos < requires.size(); ++pos)
@@ -1120,10 +1109,6 @@ bool Castle::AllowBuyBuilding(u32 build) const
 bool Castle::BuyBuilding(u32 build)
 {
     if(! AllowBuyBuilding(build)) return false;
-
-#ifdef WITH_NET
-    FH2LocalClient::SendCastleBuyBuilding(*this, build);
-#endif
 
     world.GetKingdom(color).OddFundsResource(PaymentConditions::BuyBuilding(race, build));
 
@@ -1211,7 +1196,7 @@ void Castle::DrawImageCastle(const Point & pt)
 	dst_pt.y = pt.y + 4 * 32 + sprite.y();
 	sprite.Blit(dst_pt);
     }
-    
+
     // draw castle
     switch(race)
     {
@@ -1634,7 +1619,7 @@ u32 Castle::GetUpgradeBuilding(u32 build) const
     return build;
 }
 
-bool Castle::PredicateIsCapital(const Castle *castle)
+bool Castle::PredicateIsCapital(const Castle* castle)
 {
     return castle && castle->Modes(CAPITAL);
 }
@@ -1668,7 +1653,7 @@ std::string Castle::String(void) const
           "nearly sea      : " << (HaveNearlySea() ? "yes" : "no") << std::endl <<
           "is castle       : " << (isCastle() ? "yes" : "no") << std::endl <<
           "army            : " << army.String() << std::endl;
-    
+
     if(NULL != (hero = heroes.Guard()))
     {
 	os <<
@@ -1796,14 +1781,14 @@ Army & Castle::GetArmy(void)
 const Army & Castle::GetActualArmy(void) const
 {
     CastleHeroes heroes = world.GetHeroes(*this);
-    const Heroes *hero = heroes.GuardFirst();
+    const Heroes* hero = heroes.GuardFirst();
     return hero ? hero->GetArmy() : army;
 }
 
 Army & Castle::GetActualArmy(void)
 {
     CastleHeroes heroes = world.GetHeroes(*this);
-    Heroes *hero = heroes.GuardFirst();
+    Heroes* hero = heroes.GuardFirst();
     return hero ? hero->GetArmy() : army;
 }
 
@@ -1829,9 +1814,6 @@ bool Castle::BuyBoat(void)
 	kingdom.OddFundsResource(PaymentConditions::BuyBoat());
 
     	left.SetObject(MP2::OBJ_BOAT);
-#ifdef WITH_NET
-	FH2LocalClient::SendCastleBuyBoat(*this, left.GetIndex());
-#endif
     }
     else
     if(MP2::OBJ_ZERO == right.GetObject() && right.isWater())
@@ -1839,9 +1821,6 @@ bool Castle::BuyBoat(void)
 	kingdom.OddFundsResource(PaymentConditions::BuyBoat());
 
     	right.SetObject(MP2::OBJ_BOAT);
-#ifdef WITH_NET
-	FH2LocalClient::SendCastleBuyBoat(*this, right.GetIndex());
-#endif
     }
     else
     if(MP2::OBJ_ZERO == center.GetObject() && center.isWater())
@@ -1849,11 +1828,8 @@ bool Castle::BuyBoat(void)
 	kingdom.OddFundsResource(PaymentConditions::BuyBoat());
 
     	center.SetObject(MP2::OBJ_BOAT);
-#ifdef WITH_NET
-	FH2LocalClient::SendCastleBuyBoat(*this, center.GetIndex());
-#endif
     }
-    
+
     return true;
 }
 
@@ -1934,7 +1910,7 @@ void Castle::ActionPreBattle(void)
     if(Settings::Get().ExtBattleMergeArmies())
     {
         CastleHeroes heroes = world.GetHeroes(*this);
-	Heroes *hero = heroes.GuardFirst();
+	Heroes* hero = heroes.GuardFirst();
 	if(hero && army.isValid())
 	    hero->GetArmy().JoinStrongestFromArmy(army);
     }
@@ -1986,7 +1962,7 @@ void VecCastles::ChangeColors(Color::color_t col1, Color::color_t col2)
 
 AllCastles::AllCastles()
 {
-    // reserve memory                                                                                            
+    // reserve memory
     reserve(MAXCASTLES);
 }
 
@@ -2005,11 +1981,121 @@ void AllCastles::clear(void)
 {
     for(iterator
         it = begin(); it != end(); ++it) delete *it;
-    std::vector<Castle *>::clear();
+    std::vector<Castle*>::clear();
 }
 
 void AllCastles::Scoute(u8 colors) const
 {
     for(const_iterator it = begin(); it != end(); ++it)
         if(colors & (*it)->GetColor()) (*it)->Scoute();
+}
+
+/* pack castle */
+StreamBase & operator<< (StreamBase & msg, const Castle & castle)
+{
+    msg <<
+	castle.center <<
+	castle.modes;
+
+    msg <<
+	castle.race <<
+	castle.building <<
+	castle.captain <<
+	castle.color <<
+	castle.name <<
+	castle.mageguild <<
+	static_cast<u8>(CASTLEMAXMONSTER);
+
+    for(u8 ii = 0; ii < CASTLEMAXMONSTER; ++ii)
+	msg << castle.dwelling[ii];
+
+    msg <<
+	castle.army;
+
+    return msg;
+}
+
+/* unpack castle */
+StreamBase & operator>> (StreamBase & msg, Castle & castle)
+{
+    u8 dwellingcount;
+
+    msg >>
+	castle.center >>
+	castle.modes;
+
+    msg >>
+	castle.race >>
+	castle.building >>
+	castle.captain >>
+	castle.color >>
+	castle.name >>
+	castle.mageguild >>
+	dwellingcount;
+
+    for(u8 ii = 0; ii < dwellingcount; ++ii)
+	msg >> castle.dwelling[ii];
+
+    msg >>
+	castle.army;
+
+    return msg;
+}
+
+StreamBase & operator<< (StreamBase & msg, const VecCastles & castles)
+{
+    msg << static_cast<u32>(castles.size());
+
+    for(AllCastles::const_iterator
+        it = castles.begin(); it != castles.end(); ++it)
+        msg << (*it ? (*it)->GetIndex() : static_cast<s32>(-1));
+
+    return msg;
+}
+
+StreamBase & operator>> (StreamBase & msg, VecCastles & castles)
+{
+    s32 index;
+    u32 size;
+    msg >> size;
+
+    castles.resize(size, NULL);
+
+    for(AllCastles::iterator
+	it = castles.begin(); it != castles.end(); ++it)
+    {
+        msg >> index;
+	*it = (index < 0 ? NULL : world.GetCastle(index));
+    }
+
+    return msg;
+}
+
+StreamBase & operator<< (StreamBase & msg, const AllCastles & castles)
+{
+    msg << static_cast<u32>(castles.size());
+
+    for(AllCastles::const_iterator
+        it = castles.begin(); it != castles.end(); ++it)
+        msg << **it;
+
+    return msg;
+}
+
+StreamBase & operator>> (StreamBase & msg, AllCastles & castles)
+{
+    u32 size;
+    msg >> size;
+
+    castles.clear();
+    castles.resize(size, NULL);
+
+    for(AllCastles::iterator
+	it = castles.begin(); it != castles.end(); ++it)
+    {
+	*it = new Castle();
+        msg >> **it;
+    }
+
+    return msg;
 }

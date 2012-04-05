@@ -24,8 +24,8 @@
 #define SDLNET_H
 
 #include <string>
-#include "types.h"
 #include <iostream>
+#include "types.h"
 
 #ifdef WITH_NET
 #include "SDL_net.h"
@@ -38,7 +38,6 @@ namespace Network
     void		Quit(void);
     bool		ResolveHost(IPaddress &, const char*, u16);
     const char*		GetError(void);
-    void		SetProtocolVersion(u16);
 
     class Socket
     {
@@ -51,22 +50,26 @@ namespace Network
 
 	bool		Ready(void) const;
 
-	bool		Recv(char *, size_t) const;
-	bool		Send(const char*, size_t) const;
+        bool            Recv(char*, int);
+        bool            Send(const char*, int);
+
+        bool            Recv(u32 &);
+        bool            Send(const u32 &);
 
 	u32		Host(void) const;
 	u16		Port(void) const;
 
 	bool		Open(IPaddress &);
-	bool		IsValid(void) const;
+	bool		isValid(void) const;
 	void		Close(void);
 
     protected:
 	Socket(const Socket &);
 	Socket &	operator= (const Socket &);
 
-	TCPsocket	sd;
+	TCPsocket	 sd;
 	SDLNet_SocketSet sdset;
+	size_t		 status;
     };
 
     class Server : public Socket
@@ -76,54 +79,16 @@ namespace Network
 
 	TCPsocket	Accept(void);
     };
-
-    bool		RecvMessage(const Network::Socket &, QueueMessage &, bool = false);
-    bool		SendMessage(const Network::Socket &, const QueueMessage &);
 }
 #endif
 
-class QueueMessage
+class QueueMessage	// DEPRECATED
 {
 public:
     QueueMessage();
-    QueueMessage(u16);
-    QueueMessage(const QueueMessage &);
     ~QueueMessage();
 
-    QueueMessage & operator= (const QueueMessage &);
-
-    u16		GetID(void) const;
-    void	SetID(u16);
-    bool	isID(u16) const;
-
-    QueueMessage & operator<< (u8);
-    QueueMessage & operator<< (s8);
-    QueueMessage & operator<< (u16);
-    QueueMessage & operator<< (s16);
-    QueueMessage & operator<< (u32);
-    QueueMessage & operator<< (s32);
-    QueueMessage & operator<< (bool);
-    QueueMessage & operator<< (const std::string &);
-    QueueMessage & operator<< (const char*);
-
-    QueueMessage & operator>> (u8 &);
-    QueueMessage & operator>> (s8 &);
-    QueueMessage & operator>> (u16 &);
-    QueueMessage & operator>> (s16 &);
-    QueueMessage & operator>> (u32 &);
-    QueueMessage & operator>> (s32 &);
-    QueueMessage & operator>> (bool &);
-    QueueMessage & operator>> (std::string &);
-
     void	Push(u8);
-    void	Push(s8);
-    void	Push(u16);
-    void	Push(s16);
-    void	Push(u32);
-    void	Push(s32);
-    void	Push(bool);
-    void	Push(const std::string &);
-    void	Push(const char*);
 
     bool	Pop(u8 &);
     bool	Pop(s8 &);
@@ -134,23 +99,9 @@ public:
     bool	Pop(bool &);
     bool	Pop(std::string &);
 
-    void	SoftReset(void);
-    void	Reset(void);
-    void	Reserve(size_t);
-    void	Dump(std::ostream & = std::cerr) const;
-
-    const char*	DtPt(void) const;
-    size_t      DtSz(void) const;
-
-    void	Save(const char*) const;
     void	Load(const char*);
 
 protected:
-#ifdef WITH_NET
-    friend bool Network::RecvMessage(const Network::Socket &, QueueMessage &, bool);
-    friend bool Network::SendMessage(const Network::Socket &, const QueueMessage &);
-#endif
-
     void	Resize(size_t);
     size_t	Size(void) const;
 
@@ -160,4 +111,5 @@ protected:
     char*	itd2;
     size_t	dtsz;
 };
+
 #endif

@@ -44,7 +44,7 @@ public:
 
     bool IsDwelling(void) const;
     bool IsDisable(void) const;
-    
+
     void Redraw(void);
     bool QueueEventProcessing(void);
     bool DialogBuyBuilding(bool buttons) const;

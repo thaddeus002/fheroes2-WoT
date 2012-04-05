@@ -40,10 +40,11 @@
 #include <android/log.h>
 #endif
 
+#define FORMAT_VERSION_2792 0x0AE8
 #define FORMAT_VERSION_2777 0x0AD9
 #define FORMAT_VERSION_2707 0x0A93
 #define FORMAT_VERSION_2689 0x0A81
-#define CURRENT_FORMAT_VERSION FORMAT_VERSION_2777
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_2792
 #define LAST_FORMAT_VERSION FORMAT_VERSION_2689
 
 enum
@@ -385,7 +386,7 @@ public:
     void SetMusicVolume(const u8 v);
     void ResetSound(void);
     void ResetMusic(void);
-    
+
     bool GameType(u8) const;
     u8   GameType(void) const;
     void SetGameType(u8);
@@ -441,7 +442,9 @@ protected:
     void PostLoad(void);
 
 private:
-    friend class Game::IO;
+    friend class Game::IOld;
+    friend StreamBase & operator<< (StreamBase &, const Settings &);
+    friend StreamBase & operator>> (StreamBase &, Settings &);
 
     Settings();
     ~Settings();
@@ -486,7 +489,7 @@ private:
     std::string video_driver;
 
     u16 port;
-    
+
     u32 memory_limit;
 
     Point pos_radr;
@@ -496,5 +499,8 @@ private:
 
     Players players;
 };
+
+StreamBase & operator<< (StreamBase &, const Settings &);
+StreamBase & operator>> (StreamBase &, Settings &);
 
 #endif

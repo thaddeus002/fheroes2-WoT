@@ -1,23 +1,23 @@
-/*************************************************************************** 
+/***************************************************************************
  *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
- *                                                                         * 
- *   This program is free software; you can redistribute it and/or modify  * 
- *   it under the terms of the GNU General Public License as published by  * 
- *   the Free Software Foundation; either version 2 of the License, or     * 
- *   (at your option) any later version.                                   * 
- *                                                                         * 
- *   This program is distributed in the hope that it will be useful,       * 
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        * 
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         * 
- *   GNU General Public License for more details.                          * 
- *                                                                         * 
- *   You should have received a copy of the GNU General Public License     * 
- *   along with this program; if not, write to the                         * 
- *   Free Software Foundation, Inc.,                                       * 
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
 #include <cstdlib>
@@ -151,13 +151,13 @@ void MoraleIndicator::Redraw(void)
     std::string modificators;
     modificators.reserve(256);
     morale = hero.GetMoraleWithModificators(&modificators);
-    
+
     descriptions.clear();
     descriptions.append(Morale::Description(morale));
     descriptions.append("\n \n");
     descriptions.append(_("Current Modifiers:"));
     descriptions.append("\n \n");
-    
+
     const Sprite & sprite = AGG::GetICN(ICN::HSICONS, (0 > morale ? 5 : (0 < morale ? 4 : 7)));
     const u8 inter = 6;
     u8 count = (0 == morale ? 1 : static_cast<u8>(std::abs(morale)));

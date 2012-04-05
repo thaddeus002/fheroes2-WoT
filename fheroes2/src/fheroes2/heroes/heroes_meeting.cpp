@@ -48,7 +48,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
-    
+
     const Sprite &backSprite = AGG::GetICN(ICN::SWAPWIN, 0);
     const Point cur_pt((display.w() - backSprite.w()) / 2, (display.h() - backSprite.h()) / 2);
     Background background(cur_pt, backSprite.w(), backSprite.h());
@@ -132,7 +132,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     backSprite.Blit(rt1, 0, 0, sfb1);
     Surface sfc1(rt1.w, rt1.h - 10);
     Cursor::DrawCursor(sfc1, 0x10, true);
-    
+
     SelectArmyBar selectArmy1;
     selectArmy1.SetArmy(army);
     selectArmy1.SetPos(dst_pt);
@@ -207,7 +207,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     {
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
         if(le.MouseClickLeft(buttonExit) || HotKeyCloseWindow) break;
-        
+
 	// selector troops event
 	if(le.MouseCursor(selectArmy1.GetArea()) || le.MouseCursor(selectArmy2.GetArea()))
 	{

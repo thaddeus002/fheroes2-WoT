@@ -37,42 +37,225 @@
 #include "tools.h"
 #include "game_over.h"
 #include "game_io.h"
+#include "game_static.h"
+#include "game_focus.h"
+#include "monster.h"
 
-std::string Game::IO::last_name;
+static u16 SAV1ID = 0xFF01;
+static u16 SAV2ID = 0xFF02;
+
+namespace Game
+{
+    bool LoadSAV2FileInfoOld(const std::string & fn,  Maps::FileInfo & maps_file);
+    bool LoadOld(const std::string & fn);
+
+    struct HeaderSAV
+    {
+	enum { IS_COMPRESS = 0x8000, IS_LOYALTY = 0x4000 };
+
+	HeaderSAV() : status(0)
+	{
+	}
+
+	HeaderSAV(const Maps::FileInfo & fi, bool loyalty) : status(0), info(fi)
+	{
+	    time_t rawtime;
+	    std::time(&rawtime);
+	    info.localtime = rawtime;
+
+	    if(loyalty)
+		status |= IS_LOYALTY;
+
+#ifdef WITH_ZLIB
+	    status |= IS_COMPRESS;
+#endif
+	}
+
+	u16		status;
+	Maps::FileInfo	info;
+    };
+
+    StreamBase & operator<< (StreamBase & msg, const HeaderSAV & hdr)
+    {
+	return msg << hdr.status << hdr.info;
+    }
+
+    StreamBase & operator>> (StreamBase & msg, HeaderSAV & hdr)
+    {
+	return msg >> hdr.status >> hdr.info;
+    }
+}
 
 bool Game::Save(const std::string &fn)
 {
     DEBUG(DBG_GAME, DBG_INFO, fn);
-    const bool autosave = std::string::npos != fn.find("autosave.sav");
+    const bool autosave = (fn == "autosave.sav");
+    const Settings & conf = Settings::Get();
 
-    if(Settings::Get().ExtGameRewriteConfirm() && IsFile(fn) &&
+    // ask overwrite?
+    if(conf.ExtGameRewriteConfirm() && IsFile(fn) &&
 	(!autosave || Settings::Get().ExtGameAutosaveConfirm()) &&
 	Dialog::NO == Dialog::Message("", _("Are you sure you want to overwrite the save with this name?"), Font::BIG, Dialog::YES|Dialog::NO))
     {
 	return false;
     }
 
-    Game::IO msg;
+    std::ofstream fs(fn.c_str(), std::ios::binary);
 
-    if(! Game::IO::SaveBIN(msg)) return false;
+    if(fs.is_open())
+    {
+	StreamBuf info(1024);
+	StreamBuf gdata((Maps::MEDIUM < conf.MapsWidth() ? 1024 :512) * 1024);
+	if(! autosave) Game::SetLastSavename(fn);
+
+	info << GetString(GetSaveVersion()) << GetSaveVersion() <<
+		HeaderSAV(conf.CurrentFileInfo(), conf.PriceLoyaltyVersion());
+	gdata << GetSaveVersion() << Settings::Get() << World::Get() <<
+	    GameOver::Result::Get() << GameStatic::Data::Get() << MonsterStaticData::Get() << SAV2ID; // eof marker
+
+	fs << static_cast<char>(SAV2ID >> 8) << static_cast<char>(SAV2ID) << info;
 
 #ifdef WITH_ZLIB
-    std::ofstream fs(fn.c_str(), std::ios::binary);
-    if(!fs.is_open()) return false;
-    std::vector<char> v;
-    if(!ZLib::Compress(v, msg.DtPt(), msg.DtSz())) return false;
-    fs.write(&v[0], v.size());
-    fs.close();
+	ZStreamBuf zdata;
+	zdata << gdata;
+
+	if(! zdata.fail())
+	    fs << zdata;
+	else
+	    fs << gdata;
 #else
-    msg.Save(fn.c_str());
+	fs << gdata;
 #endif
 
-    if(! autosave) Game::IO::last_name = fn;
+	return fs.good();
+    }
 
-    return true;
+    return false;
 }
 
-bool Game::IO::LoadSAV(const std::string & fn)
+bool Game::Load(const std::string & fn)
+{
+    DEBUG(DBG_GAME, DBG_INFO, fn);
+    bool result = false;
+    const Settings & conf = Settings::Get();
+    // loading info
+    Game::ShowLoadMapsText();
+
+    std::ifstream fs(fn.c_str(), std::ios::binary);
+
+    if(fs.is_open())
+    {
+	char major, minor;
+	fs >> std::noskipws >> major >> minor;
+	const u16 savid = (static_cast<u16>(major) << 8) | static_cast<u16>(minor);
+
+	// check version sav file
+	if(savid == SAV2ID)
+	{
+	    std::string strver;
+	    u16 binver = 0;
+	    StreamBuf hinfo(1024);
+	    StreamBuf gdata((Maps::MEDIUM < conf.MapsWidth() ? 1024 :512) * 1024);
+	    HeaderSAV header;
+
+	    fs >> hinfo;
+
+	    if(hinfo.fail())
+	    {
+		DEBUG(DBG_GAME, DBG_INFO, fn << ", hinfo" << " read: error");
+		return false;
+	    }
+
+	    hinfo >> strver >> binver >> header;
+
+#ifndef WITH_ZLIB
+	    if(header.status & HeaderSAV::IS_COMPRESS)
+	    {
+		DEBUG(DBG_GAME, DBG_INFO, fn << ", zlib: unsupported");
+		return false;
+	    }
+	    else
+#else
+	    if(header.status & HeaderSAV::IS_COMPRESS)
+	    {
+		ZStreamBuf zdata;
+		fs >> zdata;
+
+		if(zdata.fail())
+		{
+		    DEBUG(DBG_GAME, DBG_INFO, fn << ", zdata" << " read: error");
+		    return false;
+		}
+
+		zdata >> gdata;
+
+		if(gdata.fail())
+		{
+		    DEBUG(DBG_GAME, DBG_INFO, ", uncompress: error");
+		    return false;
+		}
+	    }
+	    else
+#endif
+	    {
+		fs >> gdata;
+
+		if(gdata.fail())
+		{
+		    DEBUG(DBG_GAME, DBG_INFO, fn << ", gdata" << " read: error");
+		    return false;
+		}
+	    }
+
+	    if((header.status & HeaderSAV::IS_LOYALTY) &&
+		!conf.PriceLoyaltyVersion())
+	    {
+		Dialog::Message("Warning", _("This file is saved in the \"Price Loyalty\" version.\nSome items may be unavailable."), Font::BIG, Dialog::OK);
+	    }
+
+	    gdata >> binver;
+
+	    // check version: false
+	    if(binver > CURRENT_FORMAT_VERSION || binver < LAST_FORMAT_VERSION)
+	    {
+		std::ostringstream os;
+		os << "usupported save format: " << binver << std::endl <<
+     		"game version: " << CURRENT_FORMAT_VERSION << std::endl <<
+     		"last version: " << LAST_FORMAT_VERSION;
+ 		Dialog::Message("Error", os.str(), Font::BIG, Dialog::OK);
+ 		return false;
+	    }
+
+	    u16 end_check = 0;
+
+	    gdata >> Settings::Get() >> World::Get() >> GameOver::Result::Get() >>
+		    GameStatic::Data::Get() >> MonsterStaticData::Get() >> end_check;
+
+	    if(end_check == SAV2ID)
+	    {
+		SetSaveVersion(binver);
+		result = true;
+	    }
+	    else
+	    {
+		DEBUG(DBG_GAME, DBG_WARN, "invalid load file: " << fn);
+	    }
+	}
+	else
+	    result = LoadOld(fn);
+    }
+
+    if(result)
+    {
+	Settings & conf = Settings::Get();
+	Game::SetLastSavename(fn);
+	conf.SetGameType(conf.GameType() | Game::TYPE_LOADFILE);
+    }
+
+    return result;
+}
+
+bool Game::IOld::LoadSAV(const std::string & fn)
 {
     if(fn.empty()) return false;
 
@@ -96,50 +279,92 @@ bool Game::IO::LoadSAV(const std::string & fn)
     return true;
 }
 
-bool Game::Load(const std::string & fn)
+bool Game::LoadOld(const std::string & fn)
 {
-    DEBUG(DBG_GAME, DBG_INFO, fn);
-
-    // loading info
-    Game::ShowLoadMapsText();
-
-    Game::IO msg;
-    if(!msg.LoadSAV(fn) || !Game::IO::LoadBIN(msg)) return false;
-
-    Game::IO::last_name = fn;
-    Settings & conf = Settings::Get();
-
-    conf.SetGameType(conf.GameType() | Game::TYPE_LOADFILE);
-
-    return true;
+    Game::IOld msg;
+    return !msg.LoadSAV(fn) || !Game::IOld::LoadBIN(msg) ? false : true;
 }
 
-bool Game::LoadSAV2FileInfo(const std::string & fn,  Maps::FileInfo & maps_file)
+bool Game::LoadSAV2FileInfo(const std::string & fn,  Maps::FileInfo & finfo)
 {
-    Game::IO msg;
+    std::ifstream fs(fn.c_str(), std::ios::binary);
+
+    if(fs.is_open())
+    {
+	char major, minor;
+	fs >> std::noskipws >> major >> minor;
+	const u16 savid = (static_cast<u16>(major) << 8) | static_cast<u16>(minor);
+
+	// check version sav file
+	if(savid == SAV2ID)
+	{
+	    HeaderSAV header;
+	    StreamBuf hinfo(1024);
+	    std::string strver;
+	    u16 binver;
+
+	    fs >> hinfo;
+
+	    if(hinfo.fail())
+	    {
+		DEBUG(DBG_GAME, DBG_INFO, fn << ", hinfo" << " read: error");
+		return false;
+	    }
+
+	    hinfo >> strver >> binver >> header;
+
+	    // hide: unsupported version
+	    if(binver > CURRENT_FORMAT_VERSION || binver < LAST_FORMAT_VERSION)
+		return false;
+
+#ifndef WITH_ZLIB
+	    // check: compress game data
+	    if(header.status & IS_COMPRESS)
+	    {
+		DEBUG(DBG_GAME, DBG_INFO, fn << ", zlib: unsupported");
+		return false;
+	    }
+#endif
+
+	    finfo = header.info;
+	    finfo.file = fn;
+
+	    return true;
+	}
+
+	return LoadSAV2FileInfoOld(fn, finfo);
+    }
+
+    return false;
+}
+
+bool Game::LoadSAV2FileInfoOld(const std::string & fn,  Maps::FileInfo & maps_file)
+{
+    Game::IOld msg;
 
     if(!msg.LoadSAV(fn)) return false;
 
     u8 byte8;
     u16 byte16, version;
-    u32 byte32;
+    //u32 byte32;
     std::string str;
 
     maps_file.file = fn;
 
     msg.Pop(byte16);
-    if(byte16 != 0xFF01) return false;
+    if(byte16 != SAV1ID) return false;
     // format version
     msg.Pop(version);
+
     // major version
     msg.Pop(byte8);
     // minor version
     msg.Pop(byte8);
     // svn
     msg.Pop(str);
+
     // time
-    msg.Pop(byte32);
-    maps_file.localtime = byte32;
+    msg.Pop(maps_file.localtime);
 
     // maps
     msg.Pop(byte16);
@@ -175,493 +400,7 @@ bool Game::LoadSAV2FileInfo(const std::string & fn,  Maps::FileInfo & maps_file)
     return true;
 }
 
-bool Game::IO::SaveBIN(QueueMessage & msg)
-{
-    const Settings & conf = Settings::Get();
-
-    msg.Reserve(world.w() > Maps::MEDIUM ? 600 * 1024 : 200 * 1024);
-
-    msg.Push(static_cast<u16>(0xFF01));
-    // format version
-    msg.Push(static_cast<u16>(CURRENT_FORMAT_VERSION));
-    // version
-    msg.Push(conf.GetVersion());
-    // time
-    msg.Push(static_cast<u32>(std::time(NULL)));
-    // lang
-    msg.Push(conf.force_lang);
-
-    // maps
-    msg.Push(static_cast<u16>(0xFF02));
-    msg.Push(conf.current_maps_file.size_w);
-    msg.Push(conf.current_maps_file.size_h);
-    msg.Push(GetBasename(conf.current_maps_file.file));
-    msg.Push(conf.current_maps_file.difficulty);
-    msg.Push(conf.current_maps_file.kingdom_colors);
-    msg.Push(conf.current_maps_file.allow_human_colors);
-    msg.Push(conf.current_maps_file.allow_comp_colors);
-    msg.Push(conf.current_maps_file.rnd_races);
-    msg.Push(conf.current_maps_file.conditions_wins);
-    msg.Push(conf.current_maps_file.wins1);
-    msg.Push(conf.current_maps_file.wins2);
-    msg.Push(conf.current_maps_file.wins3);
-    msg.Push(conf.current_maps_file.wins4);
-    msg.Push(conf.current_maps_file.conditions_loss);
-    msg.Push(conf.current_maps_file.loss1);
-    msg.Push(conf.current_maps_file.loss2);
-    // races
-    msg.Push(static_cast<u16>(0xFF03));
-    msg.Push(static_cast<u32>(KINGDOMMAX));
-    for(u32 ii = 0; ii < KINGDOMMAX; ++ii)
-	msg.Push(conf.current_maps_file.races[ii]);
-    // unions
-    msg.Push(static_cast<u32>(KINGDOMMAX));
-    for(u32 ii = 0; ii < KINGDOMMAX; ++ii)
-	msg.Push(conf.current_maps_file.unions[ii]);
-    // maps name
-    msg.Push(conf.current_maps_file.name);
-    // maps description
-    msg.Push(conf.current_maps_file.description);
-    // game
-    msg.Push(static_cast<u16>(0xFF04));
-    msg.Push(conf.game_difficulty);
-    msg.Push(conf.game_type);
-    msg.Push(conf.preferably_count_players);
-    msg.Push(conf.debug);
-
-    msg.Push(conf.opt_game());
-    msg.Push(conf.opt_world());
-    msg.Push(conf.opt_battle());
-
-    PackPlayers(msg, conf.players);
-
-    // world
-    msg.Push(static_cast<u16>(0xFF05));
-    msg.Push(world.width);
-    msg.Push(world.height);
-    msg.Push(world.uniq0);
-    msg.Push(world.week_current.first);
-    msg.Push(world.week_current.second);
-    msg.Push(world.week_next.first);
-    msg.Push(world.week_next.second);
-    msg.Push(static_cast<u8>(world.heroes_cond_wins));
-    msg.Push(static_cast<u8>(world.heroes_cond_loss));
-    msg.Push(world.month);
-    msg.Push(world.week);
-    msg.Push(world.day);
-
-    // tiles
-    msg.Push(static_cast<u16>(0xFF06));
-    msg.Push(static_cast<u32>(world.vec_tiles.size()));
-    for(u32 ii = 0; ii < world.vec_tiles.size(); ++ii)
-    {
-	//if(NULL == world.vec_tiles[ii]){ DEBUG(DBG_GAME, DBG_WARN, "tiles: " << "is NULL"); return false; }
-	PackTile(msg, world.vec_tiles[ii]);
-    }
-
-    // heroes
-    msg.Push(static_cast<u16>(0xFF07));
-    msg.Push(static_cast<u32>(world.vec_heroes.size()));
-    for(u32 ii = 0; ii < world.vec_heroes.size(); ++ii)
-    {
-	//if(NULL == world.vec_heroes[ii]){ DEBUG(DBG_GAME, DBG_WARN, "heroes: " << "is NULL"); return false; }
-	PackHeroes(msg, *world.vec_heroes[ii]);
-    }
-
-    // castles
-    msg.Push(static_cast<u16>(0xFF08));
-    msg.Push(static_cast<u32>(world.vec_castles.size()));
-    for(u32 ii = 0; ii < world.vec_castles.size(); ++ii)
-    {
-	//if(NULL == world.vec_castles[ii]){ DEBUG(DBG_GAME, DBG_WARN, "castles: " << "is NULL"); return false; }
-	PackCastle(msg, *world.vec_castles[ii]);
-    }
-
-    // kingdoms
-    msg.Push(static_cast<u16>(0xFF09));
-    msg.Push(static_cast<u32>(world.vec_kingdoms.size()));
-    for(u32 ii = 0; ii < world.vec_kingdoms.size(); ++ii)
-    {
-	//if(NULL == world.vec_kingdoms[ii]){ DEBUG(DBG_GAME, DBG_WARN, "kingdoms: " << "is NULL"); return false; }
-	PackKingdom(msg, world.vec_kingdoms.kingdoms[ii]);
-    }
-
-    // signs
-    msg.Push(static_cast<u16>(0xFF0A));
-    msg.Push(static_cast<u32>(world.map_sign.size()));
-    {
-        for(std::map<s32, std::string>::const_iterator
-	    it = world.map_sign.begin(); it != world.map_sign.end(); ++it)
-	{
-	    msg.Push((*it).first);
-	    msg.Push((*it).second);
-	}
-    }
-
-    // captured object
-    msg.Push(static_cast<u16>(0xFF0B));
-    msg.Push(static_cast<u32>(world.map_captureobj.size()));
-    {
-	for(CapturedObjects::const_iterator
-	    it = world.map_captureobj.begin(); it != world.map_captureobj.end(); ++it)
-	{
-	    msg.Push((*it).first);
-	    msg.Push(static_cast<u8>((*it).second.objcol.first));
-	    msg.Push(static_cast<u8>((*it).second.objcol.second));
-	    msg.Push(static_cast<u8>((*it).second.guardians.GetID()));
-	    msg.Push(static_cast<u32>((*it).second.guardians.GetCount()));
-	}
-    }
-
-    // rumors
-    msg.Push(static_cast<u16>(0xFF0C));
-    msg.Push(static_cast<u32>(world.vec_rumors.size()));
-    {
-	for(Rumors::const_iterator
-	    it = world.vec_rumors.begin(); it != world.vec_rumors.end(); ++it)
-	    msg.Push(*it);
-    }
-
-    // day events
-    msg.Push(static_cast<u16>(0xFF0D));
-    msg.Push(static_cast<u32>(world.vec_eventsday.size()));
-    {
-	for(EventsDate::const_iterator
-	    it = world.vec_eventsday.begin(); it != world.vec_eventsday.end(); ++it)
-	{
-	    msg.Push((*it).resource.wood);
-	    msg.Push((*it).resource.mercury);
-	    msg.Push((*it).resource.ore);
-	    msg.Push((*it).resource.sulfur);
-	    msg.Push((*it).resource.crystal);
-	    msg.Push((*it).resource.gems);
-	    msg.Push((*it).resource.gold);
-	    msg.Push((*it).computer);
-	    msg.Push((*it).first);
-	    msg.Push((*it).subsequent);
-	    msg.Push((*it).colors);
-	    msg.Push((*it).message);
-	}
-    }
-
-    // coord events
-    msg.Push(static_cast<u16>(0xFF0E));
-    msg.Push(static_cast<u32>(world.vec_eventsmap.size()));
-    {
-	for(EventsMaps::const_iterator
-	    it = world.vec_eventsmap.begin(); it != world.vec_eventsmap.end(); ++it)
-	{
-	    msg.Push((*it).GetIndex());
-	    msg.Push((*it).resource.wood);
-	    msg.Push((*it).resource.mercury);
-	    msg.Push((*it).resource.ore);
-	    msg.Push((*it).resource.sulfur);
-	    msg.Push((*it).resource.crystal);
-	    msg.Push((*it).resource.gems);
-	    msg.Push((*it).resource.gold);
-	    msg.Push((*it).artifact());
-	    msg.Push((*it).computer);
-	    msg.Push((*it).cancel);
-	    msg.Push((*it).colors);
-	    msg.Push((*it).message);
-	}
-    }
-
-    // sphinx riddles
-    msg.Push(static_cast<u16>(0xFF0F));
-    msg.Push(static_cast<u32>(world.vec_riddles.size()));
-    {
-	for(Riddles::const_iterator
-	    it = world.vec_riddles.begin(); it != world.vec_riddles.end(); ++it)
-	{
-	    msg.Push((*it).GetIndex());
-	    msg.Push((*it).resource.wood);
-	    msg.Push((*it).resource.mercury);
-	    msg.Push((*it).resource.ore);
-	    msg.Push((*it).resource.sulfur);
-	    msg.Push((*it).resource.crystal);
-	    msg.Push((*it).resource.gems);
-	    msg.Push((*it).resource.gold);
-	    msg.Push((*it).artifact());
-	    msg.Push((*it).valid);
-
-	    msg.Push(static_cast<u32>((*it).answers.size()));
-	    for(RiddleAnswers::const_iterator
-		ita = (*it).answers.begin(); ita != (*it).answers.end(); ++ita)
-		msg.Push(*ita);
-
-	    msg.Push((*it).message);
-	}
-    }
-
-    // ultimate
-    msg.Push(static_cast<u16>(0xFF10));
-    msg.Push(world.ultimate_artifact.id);
-    msg.Push(world.ultimate_artifact.isfound);
-    msg.Push(world.ultimate_artifact.index);
-
-    // game over
-    const GameOver::Result & gameover = GameOver::Result::Get();
-    msg.Push(gameover.colors);
-    msg.Push(gameover.result);
-    msg.Push(gameover.continue_game);
-
-    msg.Push(static_cast<u16>(0xFFFF));
-    return true;
-}
-
-void Game::IO::PackTile(QueueMessage & msg, const Maps::Tiles & tile)
-{
-    msg.Push(tile.pack_maps_index);
-    msg.Push(tile.pack_sprite_index);
-    msg.Push(tile.mp2_object);
-    msg.Push(tile.quantity1);
-    msg.Push(tile.quantity2);
-    msg.Push(tile.fog_colors);
-    msg.Push(tile.tile_passable);
-
-    // addons 1
-    PackTileAddons(msg, tile.addons_level1);
-    // addons 2
-    PackTileAddons(msg, tile.addons_level2);
-}
-
-void Game::IO::PackTileAddons(QueueMessage & msg, const Maps::Addons & addons)
-{
-    msg.Push(static_cast<u8>(addons.size()));
-    for(Maps::Addons::const_iterator
-	it = addons.begin(); it != addons.end(); ++it)
-    {
-	msg.Push((*it).level);
-	msg.Push((*it).uniq);
-	msg.Push((*it).object);
-	msg.Push((*it).index);
-	msg.Push((*it).tmp);
-    }
-}
-
-void Game::IO::PackKingdom(QueueMessage & msg, const Kingdom & kingdom)
-{
-    msg.Push(kingdom.color);
-    msg.Push(kingdom.modes);
-    msg.Push(kingdom.lost_town_days);
-    // unused
-    msg.Push(static_cast<u16>(0));
-
-    // funds
-    msg.Push(kingdom.resource.wood);
-    msg.Push(kingdom.resource.mercury);
-    msg.Push(kingdom.resource.ore);
-    msg.Push(kingdom.resource.sulfur);
-    msg.Push(kingdom.resource.crystal);
-    msg.Push(kingdom.resource.gems);
-    msg.Push(kingdom.resource.gold);
-
-    // visit objects
-    msg.Push(static_cast<u32>(kingdom.visit_object.size()));
-    for(std::list<IndexObject>::const_iterator
-	it = kingdom.visit_object.begin(); it != kingdom.visit_object.end(); ++it)
-    {
-	msg.Push((*it).first);
-	msg.Push(static_cast<u8>((*it).second));
-    }
-
-    // recruits
-    msg.Push(static_cast<u8>(kingdom.recruits.GetID1()));
-    msg.Push(static_cast<u8>(kingdom.recruits.GetID2()));
-    // lost_hero
-    msg.Push(static_cast<u8>(kingdom.lost_hero.first));
-    msg.Push(kingdom.lost_hero.second);
-
-    const Puzzle & pzl = kingdom.puzzle_maps;
-
-    // puzzle
-    msg.Push(pzl.to_string<char,std::char_traits<char>,std::allocator<char> >());
-
-    // puzzle orders
-    msg.Push(static_cast<u32>(ARRAY_COUNT(pzl.zone1_order)));
-    for(size_t ii = 0; ii < ARRAY_COUNT(pzl.zone1_order); ++ii) msg.Push(pzl.zone1_order[ii]);
-    msg.Push(static_cast<u32>(ARRAY_COUNT(pzl.zone2_order)));
-    for(size_t ii = 0; ii < ARRAY_COUNT(pzl.zone2_order); ++ii) msg.Push(pzl.zone2_order[ii]);
-    msg.Push(static_cast<u32>(ARRAY_COUNT(pzl.zone3_order)));
-    for(size_t ii = 0; ii < ARRAY_COUNT(pzl.zone3_order); ++ii) msg.Push(pzl.zone3_order[ii]);
-    msg.Push(static_cast<u32>(ARRAY_COUNT(pzl.zone4_order)));
-    for(size_t ii = 0; ii < ARRAY_COUNT(pzl.zone4_order); ++ii) msg.Push(pzl.zone4_order[ii]);
-
-    // tents colors
-    msg.Push(kingdom.visited_tents_colors);
-
-    msg.Push(static_cast<u32>(kingdom.heroes_cond_loss.size()));
-    for(KingdomHeroes::const_iterator
-	it = kingdom.heroes_cond_loss.begin(); it != kingdom.heroes_cond_loss.end(); ++it)
-	msg.Push(static_cast<u8>((*it)->GetID()));
-}
-
-void Game::IO::PackCastle(QueueMessage & msg, const Castle & castle)
-{
-    msg.Push(castle.GetCenter().x);
-    msg.Push(castle.GetCenter().y);
-    msg.Push(castle.race);
-
-    msg.Push(castle.modes);
-    msg.Push(static_cast<u8>(castle.color));
-    msg.Push(castle.name);
-    msg.Push(castle.building);
-	
-    // mageguild
-    {
-	msg.Push(static_cast<u32>(castle.mageguild.general.size()));
-
-	for(SpellStorage::const_iterator
-	    it = castle.mageguild.general.begin(); it != castle.mageguild.general.end(); ++it)
-	    msg.Push((*it)());
-
-	msg.Push(static_cast<u32>(castle.mageguild.library.size()));
-
-	for(SpellStorage::const_iterator
-	    it = castle.mageguild.library.begin(); it != castle.mageguild.library.end(); ++it)
-	    msg.Push((*it)());
-    }
-
-    // armies
-    msg.Push(static_cast<u32>(castle.army.Size()));
-    for(u32 jj = 0; jj < castle.army.Size(); ++jj)
-    {
-	const Troop* troop = castle.army.GetTroop(jj);
-	if(troop)
-	{
-	    msg.Push(troop->GetID());
-	    msg.Push(troop->GetCount());
-	}
-    }
-
-    // dwelling
-    msg.Push(static_cast<u32>(CASTLEMAXMONSTER));
-    for(u32 jj = 0; jj < CASTLEMAXMONSTER; ++jj) msg.Push(castle.dwelling[jj]);
-
-    // captain
-    PackHeroBase(msg, castle.captain);
-}
-
-void Game::IO::PackHeroBase(QueueMessage & msg, const HeroBase & hero)
-{
-    // primary
-    msg.Push(hero.attack);
-    msg.Push(hero.defense);
-    msg.Push(hero.knowledge);
-    msg.Push(hero.power);
-
-    // position
-    msg.Push(hero.center.x);
-    msg.Push(hero.center.y);
-
-    // modes
-    msg.Push(hero.modes);
-
-    // hero base
-    msg.Push(hero.magic_point);
-    msg.Push(hero.move_point);
-
-    // spell book
-    msg.Push(static_cast<u32>(hero.spell_book.size()));
-
-    for(SpellBook::const_iterator
-	it = hero.spell_book.begin(); it != hero.spell_book.end(); ++it)
-	msg.Push((*it)());
-
-    // artifacts
-    msg.Push(static_cast<u32>(hero.bag_artifacts.size()));
-    for(u32 jj = 0; jj < hero.bag_artifacts.size(); ++jj)
-    {
-	msg.Push(hero.bag_artifacts[jj].id);
-	msg.Push(hero.bag_artifacts[jj].ext);
-    }
-}
-
-void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
-{
-    PackHeroBase(msg, hero);
-
-    msg.Push(static_cast<u8>(hero.hid));
-    msg.Push(static_cast<u8>(hero.portrait));
-    msg.Push(hero.race);
-
-    msg.Push(static_cast<u8>(hero.color));
-    msg.Push(hero.name);
-    msg.Push(hero.experience);
-    msg.Push(hero.direction);
-    msg.Push(hero.sprite_index);
-    msg.Push(hero.save_maps_object);
-    msg.Push(hero.patrol_center.x);
-    msg.Push(hero.patrol_center.y);
-    msg.Push(hero.patrol_square);
-
-    // sec skills
-    msg.Push(static_cast<u32>(hero.secondary_skills.size()));
-    for(u32 jj = 0; jj < hero.secondary_skills.size(); ++jj)
-    {
-	const Skill::Secondary & sec = hero.secondary_skills[jj];
-	msg.Push(static_cast<u8>(sec.Skill()));
-	msg.Push(static_cast<u8>(sec.Level()));
-    }
-
-    // armies
-    msg.Push(static_cast<u32>(hero.army.Size()));
-    for(u32 jj = 0; jj < hero.army.Size(); ++jj)
-    {
-	const Troop* troop = hero.army.GetTroop(jj);
-	if(troop)
-	{
-	    msg.Push(troop->GetID());
-	    msg.Push(troop->GetCount());
-	}
-    }
-	
-    // visit objects
-    msg.Push(static_cast<u32>(hero.visit_object.size()));
-    for(std::list<IndexObject>::const_iterator
-	it = hero.visit_object.begin(); it != hero.visit_object.end(); ++it)
-    {
-	msg.Push((*it).first);
-	msg.Push(static_cast<u8>((*it).second));
-    }
-
-    // route path
-    msg.Push(hero.path.dst);
-    msg.Push(static_cast<u8>(hero.path.hide));
-    msg.Push(static_cast<u32>(hero.path.size()));
-    for(Route::Path::const_iterator
-	ip = hero.path.begin(); ip != hero.path.end(); ++ip)
-    {
-	msg.Push((*ip).from);
-	msg.Push((*ip).direction);
-	msg.Push((*ip).penalty);
-    }
-}
-
-void Game::IO::PackPlayers(QueueMessage & msg, const Players & players)
-{
-    msg.Push(players.GetColors());
-    msg.Push(static_cast<u32>(players.size()));
-
-    for(Players::const_iterator
-	it = players.begin(); it != players.end(); ++it)
-    {
-	const Player & player = **it;
-
-	msg.Push(player.color);
-	msg.Push(player.id);
-	msg.Push(player.control);
-	msg.Push(player.race);
-	msg.Push(player.friends);
-	msg.Push(player.mode);
-	msg.Push(player.name);
-    }
-
-    msg.Push(players.current_color);
-}
-
-void Game::IO::UnpackPlayers(QueueMessage & msg, Players & players, u16 version)
+void Game::IOld::UnpackPlayers(QueueMessage & msg, Players & players, u16 version)
 {
     // players
     u8 byte8;
@@ -674,15 +413,17 @@ void Game::IO::UnpackPlayers(QueueMessage & msg, Players & players, u16 version)
     msg.Pop(byte32);
     for(u32 ii = 0; ii < byte32; ++ii)
     {
-	Player player;
+	Player player; u8 mode;
 
 	msg.Pop(player.color);
 	msg.Pop(player.id);
 	msg.Pop(player.control);
 	msg.Pop(player.race);
 	msg.Pop(player.friends);
-	msg.Pop(player.mode);
+	msg.Pop(mode);
 	msg.Pop(player.name);
+
+	if(mode) player.SetPlay(true);
 
 	Player* ptr = players.Get(player.color);
 	if(ptr) *ptr = player;
@@ -695,7 +436,7 @@ void Game::IO::UnpackPlayers(QueueMessage & msg, Players & players, u16 version)
     std::swap(vec1, vec2);
 }
 
-bool Game::IO::LoadBIN(QueueMessage & msg)
+bool Game::IOld::LoadBIN(QueueMessage & msg)
 {
     Settings & conf = Settings::Get();
 
@@ -709,7 +450,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     world.Reset();
 
     msg.Pop(byte16);
-    if(byte16 != 0xFF01){ DEBUG(DBG_GAME, DBG_WARN, "0xFF01"); return false; }
+    if(byte16 != SAV1ID){ DEBUG(DBG_GAME, DBG_WARN, "0xFF01"); return false; }
 
     // format version
     msg.Pop(format);
@@ -827,7 +568,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(world.width);
     msg.Pop(world.height);
 
-    msg.Pop(world.uniq0);
+    msg.Pop(byte32); // world.uniq0
 
     msg.Pop(world.week_current.first);
     msg.Pop(world.week_current.second);
@@ -986,7 +727,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
 	world.vec_eventsmap.push_back(event);
     }
-    
+
     // sphinx riddles
     msg.Pop(byte16);
     if(byte16 != 0xFF0F) DEBUG(DBG_GAME, DBG_WARN, "0xFF0F");
@@ -1080,7 +821,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
 extern u16 PackTileSpriteIndex(u16, u16);
 
-void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u32 maps_index, u16 check_version)
+void Game::IOld::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u32 maps_index, u16 check_version)
 {
     msg.Pop(tile.pack_maps_index);
     msg.Pop(tile.pack_sprite_index);
@@ -1103,7 +844,7 @@ void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u32 maps_index
     tile.FixObject();
 }
 
-void Game::IO::UnpackTileAddons(QueueMessage & msg, Maps::Addons & addons, u16 check_version)
+void Game::IOld::UnpackTileAddons(QueueMessage & msg, Maps::Addons & addons, u16 check_version)
 {
     addons.clear();
     u8 size;
@@ -1120,7 +861,7 @@ void Game::IO::UnpackTileAddons(QueueMessage & msg, Maps::Addons & addons, u16 c
     }
 }
 
-void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_version)
+void Game::IOld::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_version)
 {
     u8 byte8;
     u16 byte16;
@@ -1193,7 +934,7 @@ void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_ve
     }
 }
 
-void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle, u16 check_version)
+void Game::IOld::UnpackCastle(QueueMessage & msg, Castle & castle, u16 check_version)
 {
     u8 byte8;
     //u16 byte16;
@@ -1250,7 +991,7 @@ void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle, u16 check_versi
 	castle.army.SetCommander(&castle.captain);
 }
 
-void Game::IO::UnpackHeroBase(QueueMessage & msg, HeroBase & hero, u16 check_version)
+void Game::IOld::UnpackHeroBase(QueueMessage & msg, HeroBase & hero, u16 check_version)
 {
     u8 byte8;
     u16 byte16;
@@ -1297,7 +1038,7 @@ void Game::IO::UnpackHeroBase(QueueMessage & msg, HeroBase & hero, u16 check_ver
     }
 }
 
-void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version)
+void Game::IOld::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version)
 {
     u8 byte8;
     //u16 byte16;

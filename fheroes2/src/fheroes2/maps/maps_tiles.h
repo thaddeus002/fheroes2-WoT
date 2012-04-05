@@ -266,7 +266,9 @@ namespace Maps
 	static void UpdateTreasureChestSprite(Tiles &);
 
     private:
-	friend class Game::IO;
+	friend class Game::IOld;
+	friend StreamBase & operator<< (StreamBase &, const Tiles &);
+	friend StreamBase & operator>> (StreamBase &, Tiles &);
 
         Addons addons_level1;
         Addons addons_level2; // 16
@@ -285,6 +287,11 @@ namespace Maps
 	u8	passable_disable;
 #endif
     };
+
+    StreamBase & operator<< (StreamBase &, const TilesAddon &);
+    StreamBase & operator<< (StreamBase &, const Tiles &);
+    StreamBase & operator>> (StreamBase &, TilesAddon &);
+    StreamBase & operator>> (StreamBase &, Tiles &);
 }
 
 #endif

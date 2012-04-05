@@ -32,7 +32,7 @@ namespace GameStatic
     u8		whirlpool_lost_percent	= 50;
 
     /* town, castle, heroes, artifact_telescope, object_observation_tower, object_magi_eyes */
-    u8		overview_distance[]	= { 4, 5, 4, 1, 10, 9, 8 }; 
+    u8		overview_distance[]	= { 4, 5, 4, 1, 10, 9, 8 };
 
     u8		gameover_lost_days	= 7;
 
@@ -69,6 +69,87 @@ namespace GameStatic
     // visit objects mod:	OBJ_BUOY, OBJ_OASIS, OBJ_WATERINGHOLE, OBJ_TEMPLE, OBJ_GRAVEYARD, OBJ_DERELICTSHIP,
     //			        OBJ_SHIPWRECK, OBJ_MERMAID, OBJ_FAERIERING, OBJ_FOUNTAIN, OBJ_IDOL, OBJ_PYRAMID
     s8		objects_mod[] = { 1, 1, 1, 2, -1, -1, -1, 1, 1, 1, 1, -2 };
+
+    // world
+    u32		uniq			= 0;
+}
+
+StreamBase & GameStatic::operator<< (StreamBase & msg, const Data & obj)
+{
+    msg <<
+	whirlpool_lost_percent <<
+	kingdom_max_heroes <<
+	castle_grown_well <<
+	castle_grown_wel2 <<
+	castle_grown_week_of <<
+	castle_grown_month_of <<
+	heroes_spell_points_day <<
+	gameover_lost_days <<
+	spell_dd_distance <<
+	spell_dd_sp <<
+	spell_dd_hp;
+
+    u8 array_size = ARRAY_COUNT(overview_distance);
+    msg << array_size;
+    for(u8 ii = 0; ii < array_size; ++ii)
+	msg << overview_distance[ii];
+
+    array_size = ARRAY_COUNT(kingdom_starting_resource);
+    msg << array_size;
+    for(u8 ii = 0; ii < array_size; ++ii)
+	msg << kingdom_starting_resource[ii];
+
+    array_size = ARRAY_COUNT(mageguild_restore_spell_points_day);
+    msg << array_size;
+    for(u8 ii = 0; ii < array_size; ++ii)
+	msg << mageguild_restore_spell_points_day[ii];
+
+    array_size = ARRAY_COUNT(objects_mod);
+    msg << array_size;
+    for(u8 ii = 0; ii < array_size; ++ii)
+	msg << objects_mod[ii];
+
+    msg << monster_upgrade_ratio << uniq;
+
+    return msg;
+}
+
+StreamBase & GameStatic::operator>> (StreamBase & msg, Data & obj)
+{
+    msg >>
+	whirlpool_lost_percent >>
+	kingdom_max_heroes >>
+	castle_grown_well >>
+	castle_grown_wel2 >>
+	castle_grown_week_of >>
+	castle_grown_month_of >>
+	heroes_spell_points_day >>
+	gameover_lost_days >>
+	spell_dd_distance >>
+	spell_dd_sp >>
+	spell_dd_hp;
+
+    u8 array_size = 0;
+
+    msg >> array_size;
+    for(u8 ii = 0; ii < array_size; ++ii)
+	msg >> overview_distance[ii];
+
+    msg >> array_size;
+    for(u8 ii = 0; ii < array_size; ++ii)
+	msg >> kingdom_starting_resource[ii];
+
+    msg >> array_size;
+    for(u8 ii = 0; ii < array_size; ++ii)
+	msg >> mageguild_restore_spell_points_day[ii];
+
+    msg >> array_size;
+    for(u8 ii = 0; ii < array_size; ++ii)
+	msg >> objects_mod[ii];
+
+    msg >> monster_upgrade_ratio >> uniq;
+
+    return msg;
 }
 
 float GameStatic::GetMonsterUpgradeRatio(void)
@@ -284,3 +365,9 @@ void Game::MonsterUpdateStatic(const TiXmlElement* xml)
 }
 
 #endif
+
+GameStatic::Data & GameStatic::Data::Get(void)
+{
+    static Data gds;
+    return gds;
+}

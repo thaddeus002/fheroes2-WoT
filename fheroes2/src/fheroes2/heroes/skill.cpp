@@ -1,23 +1,23 @@
-/*************************************************************************** 
+/***************************************************************************
  *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
- *                                                                         * 
- *   This program is free software; you can redistribute it and/or modify  * 
- *   it under the terms of the GNU General Public License as published by  * 
- *   the Free Software Foundation; either version 2 of the License, or     * 
- *   (at your option) any later version.                                   * 
- *                                                                         * 
- *   This program is distributed in the hope that it will be useful,       * 
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        * 
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         * 
- *   GNU General Public License for more details.                          * 
- *                                                                         * 
- *   You should have received a copy of the GNU General Public License     * 
- *   along with this program; if not, write to the                         * 
- *   Free Software Foundation, Inc.,                                       * 
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
 #include <cstring>
@@ -207,7 +207,7 @@ void Skill::UpdateStats(const std::string & spec)
     // parse skills.xml
     TiXmlDocument doc;
     const TiXmlElement* xml_skills = NULL;
-                
+
     if(doc.LoadFile(spec.c_str()) &&
 	NULL != (xml_skills = doc.FirstChildElement("skills")))
     {
@@ -395,7 +395,7 @@ const char* Skill::Level::String(u8 level)
 	case EXPERT:	return str_level[3];
 	default: break;
     }
-    
+
     return str_level[0];
 }
 
@@ -504,7 +504,7 @@ u8 Skill::Secondary::GetIndexSprite2(void) const
 
 const char* Skill::Secondary::String(u8 skill)
 {
-    const char* str_skill[] = { _("Pathfinding"), _("Archery"), _("Logistics"), _("Scouting"), _("Diplomacy"), _("Navigation"), 
+    const char* str_skill[] = { _("Pathfinding"), _("Archery"), _("Logistics"), _("Scouting"), _("Diplomacy"), _("Navigation"),
 	_("Leadership"), _("Wisdom"), _("Mysticism"), _("Luck"), _("Ballistics"), _("Eagle Eye"), _("Necromancy"), _("Estates"), "Unknown"  };
 
     switch(skill)
@@ -523,7 +523,7 @@ const char* Skill::Secondary::String(u8 skill)
         case EAGLEEYE:		return str_skill[11];
         case NECROMANCY:	return str_skill[12];
 	case ESTATES:		return str_skill[13];
-	
+
 	default: break;
     }
 
@@ -561,18 +561,18 @@ std::string Skill::Secondary::GetDescription(void) const
     switch(Skill())
     {
 	case PATHFINDING:
-	    str = ngettext("Reduces the movement penalty for rough terrain by %{count} percent.", 
+	    str = ngettext("Reduces the movement penalty for rough terrain by %{count} percent.",
 			"Reduces the movement penalty for rough terrain by %{count} percent.", count); break;
-        case ARCHERY:	
+        case ARCHERY:
 	    str = ngettext("Increases the damage done by range attacking creatures by %{count} percent.",
 			"Increases the damage done by range attacking creatures by %{count} percent.", count); break;
-        case LOGISTICS:	
+        case LOGISTICS:
 	    str = ngettext("Increases your hero's movement points by %{count} percent.",
 			"Increases your hero's movement points by %{count} percent.", count); break;
-        case SCOUTING:	
+        case SCOUTING:
 	    str = ngettext("Increases your hero's viewable area by %{count} square.",
 			"Increases your hero's viewable area by %{count} squares.", count); break;
-        case DIPLOMACY:	
+        case DIPLOMACY:
 	    str = _("Allows you to negotiate with monsters who are weaker than your group.");
 	    str.append(" ");
 	    str.append(ngettext("Approximately %{count} percent of the creatures may offer to join you.",
@@ -583,7 +583,7 @@ std::string Skill::Secondary::GetDescription(void) const
         case LEADERSHIP:
 	    str = ngettext("Increases your hero's troops' morale by %{count}.",
 		    "Increases your hero's troops' morale by %{count}.", count); break;
-        case WISDOM:	
+        case WISDOM:
 	{
 	    switch(Level())
 	    {
@@ -597,10 +597,10 @@ std::string Skill::Secondary::GetDescription(void) const
 	    }
 	    break;
 	}
-        case MYSTICISM:	
+        case MYSTICISM:
 	    str = ngettext("Regenerates %{count} of your hero's spell point per day.",
 		    "Regenerates %{count} of your hero's spell points per day.", count); break;
-        case LUCK:	
+        case LUCK:
 	    str = ngettext("Increases your hero's luck by %{count}.",
 		    "Increases your hero's luck by %{count}.", count); break;
         case BALLISTICS:
@@ -615,7 +615,7 @@ std::string Skill::Secondary::GetDescription(void) const
 		default: break;
 	    }
 	    break;
-        case EAGLEEYE:	
+        case EAGLEEYE:
 	    switch(Level())
 	    {
 		case Level::BASIC:
@@ -633,7 +633,7 @@ std::string Skill::Secondary::GetDescription(void) const
         case NECROMANCY:
 	    str = ngettext("Allows %{count} percent of the creatures killed in combat to be brought back from the dead as Skeletons.",
 		    "Allows %{count} percent of the creatures killed in combat to be brought back from the dead as Skeletons.", count); break;
-	case ESTATES:	
+	case ESTATES:
 	    str = ngettext("Your hero produce %{count} gold pieces per turn as tax revenue from estates.",
 		    "Your hero produces %{count} gold pieces per turn as tax revenue from estates.", count); break;
 	default: break;
@@ -1047,4 +1047,14 @@ s8 Skill::GetLuckModifiers(u8 level, std::string* strs = NULL)
     }
 
     return skill.GetValues();
+}
+
+StreamBase & Skill::operator<< (StreamBase & msg, const Primary & skill)
+{
+    return msg << skill.attack << skill.defense << skill.knowledge << skill.power;
+}
+
+StreamBase & Skill::operator>> (StreamBase & msg, Primary & skill)
+{
+    return msg >> skill.attack >> skill.defense >> skill.knowledge >> skill.power;
 }

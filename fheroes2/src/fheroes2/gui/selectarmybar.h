@@ -83,7 +83,7 @@ private:
     const Surface *	background;
     SpriteCursor	spritecursor;
 
-    const Castle *	castle;
+    const Castle* 	castle;
 };
 
 #endif

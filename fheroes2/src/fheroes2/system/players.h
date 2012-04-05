@@ -25,8 +25,8 @@
 
 #include <string>
 #include <vector>
-#include "sdlnet.h"
 #include "color.h"
+#include "bitmodes.h"
 #include "gamedefs.h"
 
 namespace Maps { struct FileInfo; }
@@ -52,7 +52,7 @@ struct Focus : std::pair<u8, void*>
     Heroes*	GetHeroes(void) { return first == FOCUS_HEROES && second ? reinterpret_cast<Heroes*>(second) : NULL; }
 };
 
-struct Player
+struct Player : public BitModes
 {
     Player(u8 col = Color::NONE);
 
@@ -73,11 +73,13 @@ struct Player
     u8		color;
     u8		race;
     u8		friends;
-    u8		mode;
     std::string	name;
     u32		id;
     Focus	focus;
 };
+
+StreamBase & operator<< (StreamBase &, const Player &);
+StreamBase & operator>> (StreamBase &, Player &);
 
 class Players : public std::vector<Player*>
 {
@@ -113,6 +115,9 @@ public:
     u8		current_color;
 };
 
+StreamBase & operator<< (StreamBase &, const Players &);
+StreamBase & operator>> (StreamBase &, Players &);
+
 namespace Interface
 {
     struct PlayerInfo
@@ -126,7 +131,7 @@ namespace Interface
 	Rect        rect2; // class
 	Rect        rect3; // change
     };
-    
+
     struct PlayersInfo : std::vector<PlayerInfo>
     {
 	PlayersInfo(bool, bool, bool);

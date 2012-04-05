@@ -21,6 +21,8 @@
  ***************************************************************************/
 
 #include "gamedefs.h"
+#include "bitmodes.h"
+#include "serialize.h"
 
 const char* strip_context(const char* c)
 {
@@ -29,4 +31,14 @@ const char* strip_context(const char* c)
     while(p && *p && *p++ != '|');
 
     return p && *p ? p : c;
+}
+
+StreamBase & operator<< (StreamBase & msg, const BitModes & b)
+{
+    return msg << b.modes;
+}
+
+StreamBase & operator>> (StreamBase & msg, BitModes & b)
+{
+    return msg >> b.modes;
 }

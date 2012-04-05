@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2011 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *   Copyright (C) 2012 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
@@ -21,99 +21,282 @@
  ***************************************************************************/
 
 #include <string>
+#include <sstream>
+#include <iomanip>
+#include <iostream>
 #include "rect.h"
+#include "zzlib.h"
 #include "serialize.h"
 
-Serialize & Serialize::put16(const u16 & v)
+#define MINCAPACITY 12
+
+char StreamBase::get(void)
 {
-    put((v >> 8) & 0x00FF);
-    put(v & 0x00FF);
-    return *this;
+    char res = 0;
+    get(res);
+    return res;
 }
 
-Serialize & Serialize::put32(const u32 & v)
+void StreamBase::get16(u16 & v)
 {
-    put((v >> 24) & 0x000000FF);
-    put((v >> 16) & 0x000000FF);
-    put((v >> 8) & 0x000000FF);
-    put(v & 0x000000FF);
-    return *this;
+    if(sizeg() > 1)
+    {
+	char ch;
+
+	get(ch);
+	v = ch;
+	v <<= 8;
+
+	get(ch);
+	v |= 0x00FF & ch;
+    }
 }
 
-Serialize & Serialize::get16(u16 & v)
+u16 StreamBase::get16(void)
 {
+    u16 res = 0;
+    get16(res);
+    return res;
+}
+
+void StreamBase::get32(u32 & v)
+{
+    if(sizeg() > 3)
+    {
+	char ch;
+
+	get(ch);
+	v = ch;
+	v <<= 8;
+
+	get(ch);
+	v |= 0x000000FF & ch;
+	v <<= 8;
+
+	get(ch);
+	v |= 0x000000FF & ch;
+	v <<= 8;
+
+	get(ch);
+	v |= 0x000000FF & ch;
+    }
+}
+
+u32 StreamBase::get32(void)
+{
+    u32 res = 0;
+    get32(res);
+    return res;
+}
+
+u32 StreamBase::get32(std::istream & is)
+{
+    u32 res;
     char ch;
 
-    get(ch);
-    v = ch;
-    v <<= 8;
+    is.get(ch);
+    res = ch;
+    res <<= 8;
 
-    get(ch);
-    v |= 0x00FF & ch;
+    is.get(ch);
+    res |= 0x000000FF & ch;
+    res <<= 8;
 
-    return *this;
+    is.get(ch);
+    res |= 0x000000FF & ch;
+    res <<= 8;
+
+    is.get(ch);
+    res |= 0x000000FF & ch;
+
+    return res;
 }
 
-Serialize & Serialize::get32(u32 & v)
+u16 StreamBase::get16(std::istream & is)
 {
+    u16 res;
     char ch;
 
-    get(ch);
-    v = ch;
-    v <<= 8;
+    is.get(ch);
+    res = ch;
+    res <<= 8;
 
-    get(ch);
-    v |= 0x000000FF & ch;
-    v <<= 8;
+    is.get(ch);
+    res |= 0x00FF & ch;
 
-    get(ch);
-    v |= 0x000000FF & ch;
-    v <<= 8;
+    return res;
+}
 
-    get(ch);
-    v |= 0x000000FF & ch;
+StreamBase & StreamBase::operator>> (bool & v)
+{
+    v = get();
+    return *this;
+}
+
+StreamBase & StreamBase::operator>> (u8 & v)
+{
+    v = get();
+    return *this;
+}
+
+StreamBase & StreamBase::operator>> (s8 & v)
+{
+    v = get();
+    return *this;
+}
+
+StreamBase & StreamBase::operator>> (u16 & v)
+{
+    v = get16();
+    return *this;
+}
+
+StreamBase & StreamBase::operator>> (s16 & v)
+{
+    v = get16();
+    return *this;
+}
+
+StreamBase & StreamBase::operator>> (u32 & v)
+{
+    v = get32();
+    return *this;
+}
+
+StreamBase & StreamBase::operator>> (s32 & v)
+{
+    v = get32();
+    return *this;
+}
+
+StreamBase & StreamBase::operator>> (float & v)
+{
+    s32 intpart;
+    s32 decpart;
+    *this >> intpart >> decpart;
+    v = intpart + decpart / 100000000;
+    return *this;
+}
+
+StreamBase & StreamBase::operator>> (std::string & v)
+{
+    u32 size = get32();
+    v.resize(size);
+
+    for(std::string::iterator
+        it = v.begin(); it != v.end(); ++it) get(*it);
 
     return *this;
 }
 
-Serialize & Serialize::operator<< (const bool & v)
+StreamBase & StreamBase::operator>> (Rect & v)
+{
+    Point & p = v;
+    Size  & s = v;
+
+    return *this >> p >> s;
+}
+
+StreamBase & StreamBase::operator>> (Point& v)
+{
+    return *this >> v.x >> v.y;
+}
+
+StreamBase & StreamBase::operator>> (Size & v)
+{
+    return *this >> v.w >> v.h;
+}
+
+void StreamBase::put16(const u16 & v)
+{
+    if(sizep() > 1)
+    {
+	put((v >> 8) & 0x00FF);
+	put(v & 0x00FF);
+    }
+}
+
+void StreamBase::put32(const u32 & v)
+{
+    if(sizep() > 3)
+    {
+	put((v >> 24) & 0x000000FF);
+	put((v >> 16) & 0x000000FF);
+        put((v >> 8) & 0x000000FF);
+	put(v & 0x000000FF);
+    }
+}
+
+void StreamBase::put32(std::ostream & os, const u32 & v)
+{
+    os.put((v >> 24) & 0x000000FF);
+    os.put((v >> 16) & 0x000000FF);
+    os.put((v >> 8) & 0x000000FF);
+    os.put(v & 0x000000FF);
+}
+
+void StreamBase::put16(std::ostream & os, const u16 & v)
+{
+    os.put((v >> 8) & 0x00FF);
+    os.put(v & 0x00FF);
+}
+
+StreamBase & StreamBase::operator<< (const bool & v)
 {
     put(v);
     return *this;
 }
 
-Serialize & Serialize::operator<< (const u8 & v)
+StreamBase & StreamBase::operator<< (const char & v)
 {
     put(v);
     return *this;
 }
 
-Serialize & Serialize::operator<< (const s8 & v)
+StreamBase & StreamBase::operator<< (const u8 & v)
 {
     put(v);
     return *this;
 }
 
-Serialize & Serialize::operator<< (const u16 & v)
+StreamBase & StreamBase::operator<< (const s8 & v)
 {
-    return put16(v);
-}
-Serialize & Serialize::operator<< (const s16 & v)
-{
-    return put16(v);
+    put(v);
+    return *this;
 }
 
-Serialize & Serialize::operator<< (const s32 & v)
+StreamBase & StreamBase::operator<< (const u16 & v)
 {
-    return put32(v);
+    put16(v);
+    return *this;
 }
 
-Serialize & Serialize::operator<< (const u32 & v)
+StreamBase & StreamBase::operator<< (const s16 & v)
 {
-    return put32(v);
+    put16(v);
+    return *this;
 }
 
-Serialize & Serialize::operator<< (const std::string & v)
+StreamBase & StreamBase::operator<< (const s32 & v)
+{
+    put32(v);
+    return *this;
+}
+
+StreamBase & StreamBase::operator<< (const u32 & v)
+{
+    put32(v);
+    return *this;
+}
+
+StreamBase & StreamBase::operator<< (const float & v)
+{
+    s32 intpart = static_cast<s32>(v);
+    float decpart = (v - intpart) * 100000000;
+    return *this << intpart << static_cast<s32>(decpart);
+}
+
+StreamBase & StreamBase::operator<< (const std::string & v)
 {
     put32(v.size());
 
@@ -123,12 +306,12 @@ Serialize & Serialize::operator<< (const std::string & v)
     return *this;
 }
 
-Serialize & Serialize::operator<< (const Point & v)
+StreamBase & StreamBase::operator<< (const Point & v)
 {
     return *this << v.x << v.y;
 }
 
-Serialize & Serialize::operator<< (const Rect & v)
+StreamBase & StreamBase::operator<< (const Rect & v)
 {
     const Point & p = v;
     const Size  & s = v;
@@ -136,87 +319,244 @@ Serialize & Serialize::operator<< (const Rect & v)
     return *this << p << s;
 }
 
-Serialize & Serialize::operator<< (const Size & v)
+StreamBase & StreamBase::operator<< (const Size & v)
 {
     return *this << v.w << v.h;
 }
 
-Serialize & Serialize::operator>> (bool & v)
+StreamBuf::StreamBuf(size_t sz) : itbeg(NULL), itget(NULL), itput(NULL), itend(NULL), flags(0)
 {
-    char ch;
-    get(ch);
-    v = ch;
+    realloc(sz);
+}
+
+StreamBuf::~StreamBuf()
+{
+    if(itbeg) delete [] itbeg;
+}
+
+StreamBuf::StreamBuf(const StreamBuf & st) : itbeg(NULL), itget(NULL), itput(NULL), itend(NULL), flags(0)
+{
+    copy(st);
+}
+
+StreamBuf & StreamBuf::operator= (const StreamBuf & st)
+{
+    if(&st != this) copy(st);
     return *this;
 }
 
-Serialize & Serialize::operator>> (u8 & v)
+size_t StreamBuf::capacity(void) const
 {
-    char ch;
-    get(ch);
-    v = ch;
-    return *this;
+    return itend - itbeg;
 }
 
-Serialize & Serialize::operator>> (s8 & v)
+char* StreamBuf::data(void)
 {
-    char ch;
-    get(ch);
-    v = ch;
-    return *this;
+    return itget;
 }
 
-Serialize & Serialize::operator>> (u16 & v)
+size_t StreamBuf::size(void) const
 {
-    return get16(v);
+    return sizeg();
 }
 
-Serialize & Serialize::operator>> (s16 & v)
+void StreamBuf::reset(void)
 {
-    u16 rs;
-    get16(rs);
-    v = rs;
-    return *this;
+    itput = itbeg;
+    itget = itbeg;
 }
 
-Serialize & Serialize::operator>> (u32 & v)
+std::string StreamBuf::dump(void) const
 {
-    return get32(v);
+    std::ostringstream os;
+
+    for(const char* it = itget; it != itput; ++it)
+	os << " 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(*it);
+
+    return os.str();
 }
 
-Serialize & Serialize::operator>> (s32 & v)
+size_t StreamBuf::tellg(void) const
 {
-    u32 rs;
-    get32(rs);
-    v = rs;
-    return *this;
+    return itget - itbeg;
 }
 
-Serialize & Serialize::operator>> (std::string & v)
+size_t StreamBuf::tellp(void) const
 {
-    u32 size;
-    get32(size);
-    v.resize(size);
-
-    for(std::string::iterator
-        it = v.begin(); it != v.end(); ++it) get(*it);
-
-    return *this;
+    return itput - itbeg;
 }
 
-Serialize & Serialize::operator>> (Rect & v)
+void StreamBuf::realloc(size_t sz)
 {
-    Point & p = v;
-    Size  & s = v;
+    if(! itbeg)
+    {
+	if(sz < MINCAPACITY) sz = MINCAPACITY;
 
-    return *this >> p >> s;
+	itbeg = new char [sz];
+	itend = itbeg + sz;
+    	std::fill(itbeg, itend, 0);
+
+	reset();
+    }
+    else
+    if(sizep() < sz)
+    {
+	sz = tellp() + sz;
+	if(sz < MINCAPACITY) sz = MINCAPACITY;
+
+	char* ptr = new char [sz];
+
+	std::fill(ptr, ptr + sz, 0);
+	std::copy(itbeg, itput, ptr);
+
+	itput = ptr + tellp();
+	itget = ptr + tellg();
+
+	delete [] itbeg;
+
+	itbeg = ptr;
+	itend = itbeg + sz;
+    }
 }
 
-Serialize & Serialize::operator>> (Point& v)
+bool StreamBuf::fail(void) const
 {
-    return *this >> v.x >> v.y;
+    return flags;
 }
 
-Serialize & Serialize::operator>> (Size & v)
+void StreamBuf::setfail(void)
 {
-    return *this >> v.w >> v.h;
+    flags |= 0x01;
 }
+
+void StreamBuf::copy(const StreamBuf & sb)
+{
+    if(capacity() < sb.size())
+	realloc(sb.size());
+
+    std::copy(sb.itget, sb.itput, itbeg);
+
+    itput = itbeg + sb.tellp();
+    itget = itbeg + sb.tellg();
+    flags = 0;
+}
+
+bool StreamBuf::put(const char & ch)
+{
+    if(0 == sizep())
+    {
+	realloc(capacity() + capacity() / 2);
+    }
+
+    if(sizep())
+    {
+        *itput++ = ch;
+        return true;
+    }
+    return false;
+}
+
+bool StreamBuf::get(char & ch)
+{
+    if(sizeg())
+    {
+	ch = *itget++;
+	return true;
+    }
+    return false;
+}
+
+size_t StreamBuf::sizeg(void) const
+{
+    return itput - itget;
+}
+
+size_t StreamBuf::sizep(void) const
+{
+    return itend - itput;
+}
+
+std::ostream & operator<< (std::ostream & os, StreamBuf & sb)
+{
+    const u32 count = sb.sizeg();
+
+    os.unsetf(std::ios::skipws);
+    StreamBase::put32(os, count);
+
+    if(os.write(sb.itget, count))
+	sb.itget += count;
+
+    return os;
+}
+
+size_t available_count(std::istream & is)
+{
+    const size_t curpos = is.tellg();
+    is.seekg(0, std::ios_base::end);
+    const size_t sizeis = is.tellg();
+    is.seekg(curpos, std::ios_base::beg);
+    return sizeis  > curpos ? sizeis - curpos : 0;
+}
+
+std::istream & operator>> (std::istream & is, StreamBuf & sb)
+{
+    is.unsetf(std::ios::skipws);
+    const u32 count = StreamBase::get32(is);
+
+    if(count > available_count(is))
+    {
+	sb.setfail();
+	return is;
+    }
+
+    if(sb.sizep() < count)
+	sb.realloc(count);
+
+    if(is.read(sb.itput, count))
+	sb.itput += count;
+    else
+	sb.setfail();
+
+    return is;
+}
+
+#ifdef WITH_NET
+#include "sdlnet.h"
+
+Network::Socket & operator<< (Network::Socket & sc, StreamBuf & sb)
+{
+    const u32 count = sb.sizeg();
+
+    if(sc.Send(count) && sc.Send(sb.itget, count))
+	sb.itget += count;
+
+    return sc;
+}
+
+Network::Socket & operator>> (Network::Socket & sc, StreamBuf & sb)
+{
+    u32 count = 0;
+
+    if(sc.Recv(count))
+    {
+	// limit network: 5Mb
+	if(count > 5 * 1024 * 1024)
+	{
+	    sb.setfail();
+	    return sc;
+	}
+
+	if(sb.sizep() < count)
+	    sb.realloc(count);
+
+	if(sc.Recv(sb.itput, count))
+	    sb.itput += count;
+	else
+	    sb.setfail();
+    }
+    else
+	sb.setfail();
+
+    return sc;
+}
+#endif                                                                                                           

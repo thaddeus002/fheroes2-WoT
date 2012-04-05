@@ -1008,7 +1008,7 @@ std::string Battle::Unit::String(bool more) const
     return ss.str();
 }
 
-QueueMessage & Battle::operator<< (QueueMessage & msg, const ModesAffected & v)
+StreamBase & Battle::operator<< (StreamBase & msg, const ModesAffected & v)
 {
     msg << static_cast<u32>(v.size());
 
@@ -1018,7 +1018,7 @@ QueueMessage & Battle::operator<< (QueueMessage & msg, const ModesAffected & v)
     return msg;
 }
 
-QueueMessage & Battle::operator>> (QueueMessage & msg, ModesAffected & v)
+StreamBase & Battle::operator>> (StreamBase & msg, ModesAffected & v)
 {
     u32 size = 0;
     msg >> size;
@@ -1034,7 +1034,7 @@ QueueMessage & Battle::operator>> (QueueMessage & msg, ModesAffected & v)
     return msg;
 }
 
-QueueMessage & Battle::operator<< (QueueMessage & msg, const Unit & b)
+StreamBase & Battle::operator<< (StreamBase & msg, const Unit & b)
 {
     return msg <<
 	b.modes <<
@@ -1052,7 +1052,7 @@ QueueMessage & Battle::operator<< (QueueMessage & msg, const Unit & b)
 	b.affected;
 }
 
-QueueMessage & Battle::operator>> (QueueMessage & msg, Unit & b)
+StreamBase & Battle::operator>> (StreamBase & msg, Unit & b)
 {
     s16 head = -1;
     u32 uid = 0;

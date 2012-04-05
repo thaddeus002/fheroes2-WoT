@@ -32,7 +32,6 @@
 #include "splitter.h"
 #include "marketplace.h"
 #include "dialog.h"
-#include "localclient.h"
 
 void RedrawFromResource(const Point & pt, const Funds & rs);
 void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from_resource = 0);
@@ -42,7 +41,7 @@ u16 GetTradeCosts(u8 rs_from, u8 rs_to, bool tradingPost);
 class TradeWindowGUI
 {
 public:
-    TradeWindowGUI(const Rect & rt) : 
+    TradeWindowGUI(const Rect & rt) :
 	pos_rt(rt), back(rt.x - 5, rt.y + 15, rt.w + 10, 160),
 	tradpost(Settings::Get().ExtGameEvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST)
     {
@@ -265,7 +264,7 @@ void Dialog::Marketplace(bool fromTradingPost)
 
     u32 count_sell = 0;
     u32 count_buy = 0;
-    
+
     u32 max_sell = 0;
     u32 max_buy = 0;
 
@@ -288,7 +287,7 @@ void Dialog::Marketplace(bool fromTradingPost)
     display.Flip();
 
     LocalEvent & le = LocalEvent::Get();
-   
+
     // message loop
     while(le.HandleEvents())
     {
@@ -304,19 +303,19 @@ void Dialog::Marketplace(bool fromTradingPost)
 	if(buttonGift.isEnable() &&
 	    le.MouseClickLeft(buttonGift))
 	{
-            cursor.Hide();                                                                                       
+            cursor.Hide();
 	    Dialog::MakeGiftResource();
 	    fundsFrom = kingdom.GetFunds();
 	    RedrawFromResource(pt1, fundsFrom);
-            cursor.Show();                                                                                       
-            display.Flip();                                                                                      
+            cursor.Show();
+            display.Flip();
 	}
 
         // click from
         for(u8 ii = 0; ii < rectsFrom.size(); ++ii)
         {
             const Rect & rect_from = rectsFrom[ii];
-            
+
             if(le.MouseClickLeft(rect_from))
             {
 		resourceFrom = Resource::FromIndexSprite2(ii);
@@ -324,50 +323,50 @@ void Dialog::Marketplace(bool fromTradingPost)
 
                 if(GetTradeCosts(resourceFrom, resourceTo, fromTradingPost))
                 {
-                    max_buy = Resource::GOLD == resourceTo ? 
+                    max_buy = Resource::GOLD == resourceTo ?
                         max_sell * GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) :
                         max_sell / GetTradeCosts(resourceFrom, resourceTo, fromTradingPost);
                 }
-                
+
                 count_sell = 0;
                 count_buy = 0;
-                
+
                 cursor.Hide();
                 cursorFrom.Move(rect_from.x - 2, rect_from.y - 2);
                 cursorFrom.Show();
-                
+
                 if(resourceTo) cursorTo.Hide();
                 RedrawToResource(pt2, true, fromTradingPost, resourceFrom);
                 if(resourceTo) cursorTo.Show();
                 if(resourceTo) gui.ShowTradeArea(resourceFrom, resourceTo, max_buy, max_sell, count_buy, count_sell, fromTradingPost);
-                
+
                 cursor.Show();
                 display.Flip();
             }
         }
-        
+
         // click to
         for(u8 ii = 0; ii < rectsTo.size(); ++ii)
         {
             const Rect & rect_to = rectsTo[ii];
-            
+
             if(le.MouseClickLeft(rect_to))
             {
 		resourceTo = Resource::FromIndexSprite2(ii);
-                
+
                 if(GetTradeCosts(resourceFrom, resourceTo, fromTradingPost))
                 {
-                    max_buy = Resource::GOLD == resourceTo ? 
+                    max_buy = Resource::GOLD == resourceTo ?
                         max_sell * GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) :
                         max_sell / GetTradeCosts(resourceFrom, resourceTo, fromTradingPost);
                 }
-                
+
                 count_sell = 0;
                 count_buy = 0;
-                
+
                 cursor.Hide();
                 cursorTo.Move(rect_to.x - 2, rect_to.y - 2);
-                
+
                 if(resourceFrom)
                 {
                     cursorTo.Hide();
@@ -379,19 +378,19 @@ void Dialog::Marketplace(bool fromTradingPost)
                 display.Flip();
             }
         }
-        
+
         // move splitter
         if(buttonLeft.isEnable() && buttonRight.isEnable() && max_buy && le.MousePressLeft(splitter.GetRect()))
         {
             u32 seek = (le.GetMouseCursor().x - splitter.GetRect().x) * 100 / splitter.GetStep();
-            
+
             if(seek < splitter.Min()) seek = splitter.Min();
             else
             if(seek > splitter.Max()) seek = splitter.Max();
-            
+
             count_buy = seek * (Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) : 1);
             count_sell = seek * (Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo, fromTradingPost));
-            
+
             cursor.Hide();
             splitter.Move(seek);
             gui.RedrawInfoBuySell(count_sell, count_buy);
@@ -419,10 +418,7 @@ void Dialog::Marketplace(bool fromTradingPost)
         {
             kingdom.OddFundsResource(Funds(resourceFrom, count_sell));
             kingdom.AddFundsResource(Funds(resourceTo, count_buy));
-#ifdef WITH_NET
-	    FH2LocalClient::SendMarketSellResource(kingdom, resourceFrom, count_sell, fromTradingPost);
-	    FH2LocalClient::SendMarketBuyResource(kingdom, resourceTo, count_buy, fromTradingPost);
-#endif            
+
             resourceTo = resourceFrom = Resource::UNKNOWN;
             gui.ShowTradeArea(resourceFrom, resourceTo, 0, 0, 0, 0, fromTradingPost);
 
@@ -433,37 +429,37 @@ void Dialog::Marketplace(bool fromTradingPost)
             RedrawToResource(pt2, false, fromTradingPost, resourceFrom);
             display.Flip();
         }
-        
+
         // decrease trade resource
         if(count_buy &&
            ((buttonLeft.isEnable() && le.MouseClickLeft(gui.buttonLeft)) ||
             le.MouseWheelDn(splitter.GetRect())))
         {
             count_buy -= Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) : 1;
-            
+
             count_sell -= Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo, fromTradingPost);
-            
+
             cursor.Hide();
             splitter.Backward();
             gui.RedrawInfoBuySell(count_sell, count_buy);
             cursor.Show();
             display.Flip();
         }
-        
+
         // increase trade resource
         if( count_buy < max_buy &&
             ((buttonRight.isEnable() && le.MouseClickLeft(buttonRight)) ||
              le.MouseWheelUp(splitter.GetRect())))
         {
             count_buy += Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) : 1;
-            
+
             count_sell += Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo, fromTradingPost);
-            
+
             cursor.Hide();
             splitter.Forward();
             gui.RedrawInfoBuySell(count_sell, count_buy);
             cursor.Show();
-            display.Flip();            
+            display.Flip();
         }
     }
 }
@@ -558,7 +554,7 @@ std::string GetStringTradeCosts(u8 rs_from, u8 rs_to, bool tradingPost)
 u16 GetTradeCosts(u8 rs_from, u8 rs_to, bool tradingPost)
 {
     const u8 markets = tradingPost ? 3 : world.GetKingdom(Settings::Get().CurrentColor()).GetCountMarketplace();
-    
+
     if(rs_from == rs_to) return 0;
 
     switch(rs_from)
@@ -643,7 +639,7 @@ u16 GetTradeCosts(u8 rs_from, u8 rs_to, bool tradingPost)
 	case Resource::SULFUR:
 	case Resource::CRYSTAL:
 	case Resource::GEMS:
-    	    
+
     	    switch(rs_to)
     	    {
     		// sale costly
@@ -666,7 +662,7 @@ u16 GetTradeCosts(u8 rs_from, u8 rs_to, bool tradingPost)
         	    else
         	    if(8 <  markets) return SALE_COSTLY9;
         	    break;
-        	
+
 		// change costly to costly
 		case Resource::MERCURY:
 		case Resource::SULFUR:
@@ -717,11 +713,11 @@ u16 GetTradeCosts(u8 rs_from, u8 rs_to, bool tradingPost)
 
 	// gold
 	case Resource::GOLD:
-    	    
+
     	    switch(rs_to)
     	    {
     		default: break;
-        	
+
 		// buy costly
 		case Resource::MERCURY:
 		case Resource::SULFUR:

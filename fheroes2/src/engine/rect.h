@@ -23,6 +23,7 @@
 #define H2RECT_H
 
 #include <vector>
+#include <string>
 #include <functional>
 #include "types.h"
 
@@ -39,6 +40,8 @@ struct Point
 
     Point & operator+=(const Point & pt);
     Point & operator-=(const Point & pt);
+
+    std::string String(void) const;
 };
 
 Point operator+(const Point& pt1, const Point& pt2);
@@ -54,6 +57,8 @@ struct Size
 
     bool operator== (const Size & sz) const;
     bool operator!= (const Size & sz) const;
+
+    std::string String(void) const;
 };
 
 struct Rect : Point, Size
@@ -69,9 +74,10 @@ struct Rect : Point, Size
 
     // rect include point
     bool operator& (const Point & pt) const;
-
     // rect intersects rect
     bool operator& (const Rect & rt) const;
+    //
+    std::string String(void) const;
 
     static Rect Get(const Rect & rt1, const Rect & rt2, bool intersect);
 };

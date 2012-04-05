@@ -82,7 +82,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Troop & troop, u16 flags)
     dst_pt.x = pos_rt.x + 140 - text.w() / 2;
     dst_pt.y = pos_rt.y + 40;
     text.Blit(dst_pt);
-    
+
     // count
     text.Set(GetString(troop.GetCount()));
     dst_pt.x = pos_rt.x + 140 - text.w() / 2;
@@ -141,7 +141,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Troop & troop, u16 flags)
 
     cursor.Show();
     display.Flip();
-    
+
     // dialog menu loop
     while(le.HandleEvents())
     {
@@ -150,7 +150,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Troop & troop, u16 flags)
             if(buttonUpgrade.isEnable()) le.MousePressLeft(buttonUpgrade) ? (buttonUpgrade).PressDraw() : (buttonUpgrade).ReleaseDraw();
     	    if(buttonDismiss.isEnable()) le.MousePressLeft(buttonDismiss) ? (buttonDismiss).PressDraw() : (buttonDismiss).ReleaseDraw();
     	    le.MousePressLeft(buttonExit) ? (buttonExit).PressDraw() : (buttonExit).ReleaseDraw();
-            
+
             // upgrade
             if(buttonUpgrade.isEnable() && le.MouseClickLeft(buttonUpgrade))
             {
@@ -257,7 +257,7 @@ void DrawMonsterStats(const Point & dst, const Troop & troop)
 	dst_pt.x = dst.x - text.w();
 	dst_pt.y += (pda ? 14 : 18);
 	text.Blit(dst_pt);
-	
+
 	text.Set(GetString(troop.GetHitPointsLeft()));
 	dst_pt.x = dst.x + ox;
 	text.Blit(dst_pt);

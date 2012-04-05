@@ -235,7 +235,7 @@ void AICastleTurn(Castle* castle)
 
 void AI::CastlePreBattle(Castle & castle)
 {
-    Heroes *hero = castle.GetHeroes().GuardFirst();
+    Heroes* hero = castle.GetHeroes().GuardFirst();
     if(hero && castle.GetArmy().isValid())
 	hero->GetArmy().JoinStrongestFromArmy(castle.GetArmy());
 }

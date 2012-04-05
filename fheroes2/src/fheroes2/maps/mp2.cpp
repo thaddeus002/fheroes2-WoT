@@ -1116,3 +1116,16 @@ u16 MP2::GetObjectDirect(const u8 obj)
 
     return DIRECTION_ALL;
 }
+
+StreamBase & operator<< (StreamBase & msg, const MP2::object_t & obj)
+{
+    return msg << static_cast<u8>(obj);
+}
+
+StreamBase & operator>> (StreamBase & msg, MP2::object_t & obj)
+{
+    u8 obj8;
+    msg >> obj8;
+    obj = static_cast<MP2::object_t>(obj8);
+    return msg;
+}

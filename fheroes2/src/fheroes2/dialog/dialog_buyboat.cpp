@@ -83,7 +83,7 @@ Dialog::answer_t Dialog::BuyBoat(bool enable)
 
     button1.Draw();
     button2.Draw();
-	
+
     cursor.Show();
     display.Flip();
 

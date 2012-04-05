@@ -351,7 +351,7 @@ void AI::HeroesAction(Heroes & hero, s32 dst_index)
 void AIToHeroes(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
     const Settings & conf = Settings::Get();
-    Heroes *other_hero = world.GetTiles(dst_index).GetHeroes();
+    Heroes* other_hero = world.GetTiles(dst_index).GetHeroes();
     if(! other_hero) return;
 
     if(hero.GetColor() == other_hero->GetColor() ||
@@ -377,7 +377,7 @@ void AIToHeroes(Heroes & hero, const u8 & obj, const s32 & dst_index)
     }
     else
     {
-        Castle *other_hero_castle = other_hero->inCastle();
+        Castle* other_hero_castle = other_hero->inCastle();
         if(other_hero_castle && other_hero == other_hero_castle->GetHeroes().GuardFirst())
         {
             AIToCastle(hero, MP2::OBJ_CASTLE, dst_index);
@@ -425,7 +425,7 @@ void AIToHeroes(Heroes & hero, const u8 & obj, const s32 & dst_index)
 void AIToCastle(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
     const Settings & conf = Settings::Get();
-    Castle *castle = world.GetCastle(dst_index);
+    Castle* castle = world.GetCastle(dst_index);
 
     if(! castle) return;
 
@@ -1856,7 +1856,7 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 
 	case MP2::OBJ_CASTLE:
 	{
-	    const Castle *castle = world.GetCastle(index);
+	    const Castle* castle = world.GetCastle(index);
 	    if(castle)
 	    {
 		if(hero.GetColor() == castle->GetColor())
@@ -1872,7 +1872,7 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 
 	case MP2::OBJ_HEROES:
 	{
-	    const Heroes *hero2 = tile.GetHeroes();
+	    const Heroes* hero2 = tile.GetHeroes();
 	    if(hero2)
 	    {
 		if(hero.GetColor() == hero2->GetColor()) return true;
@@ -1912,7 +1912,7 @@ bool AIHeroesPriorityObject(const Heroes & hero, s32 index)
 
     if(MP2::OBJ_CASTLE == tile.GetObject())
     {
-	const Castle *castle = world.GetCastle(index);
+	const Castle* castle = world.GetCastle(index);
 	if(castle)
 	{
 	    if(hero.GetColor() == castle->GetColor())
@@ -1931,7 +1931,7 @@ bool AIHeroesPriorityObject(const Heroes & hero, s32 index)
     if(MP2::OBJ_HEROES == tile.GetObject())
     {
 	// kill enemy hero
-	const Heroes *hero2 = tile.GetHeroes();
+	const Heroes* hero2 = tile.GetHeroes();
 	return hero2 &&
 		!Players::isFriends(hero.GetColor(), hero2->GetColor()) &&
 		AIHeroesValidObject(hero, index);
@@ -2156,7 +2156,7 @@ void AIHeroesGetTask(Heroes & hero)
     // rescan path
     hero.RescanPath();
 
-    Castle *castle = hero.inCastle();
+    Castle* castle = hero.inCastle();
     // if hero in castle
     if(castle)
     {

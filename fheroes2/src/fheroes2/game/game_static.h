@@ -29,6 +29,15 @@ struct cost_t;
 
 namespace GameStatic
 {
+    struct Data
+    {
+	static Data & Get(void);
+	// wrapper for stream
+    };
+
+    StreamBase & operator<< (StreamBase &, const Data &);
+    StreamBase & operator>> (StreamBase &, Data &);
+
     u8		GetLostOnWhirlpoolPercent(void);
     u8		GetGameOverLostDays(void);
     u8		GetOverViewDistance(u8);

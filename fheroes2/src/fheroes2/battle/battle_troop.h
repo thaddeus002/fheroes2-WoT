@@ -58,8 +58,8 @@ namespace Battle
 	u32  FindZeroDuration(void) const;
     };
 
-    QueueMessage & operator<< (QueueMessage &, const ModesAffected &);
-    QueueMessage & operator>> (QueueMessage &, ModesAffected &);
+    StreamBase & operator<< (StreamBase &, const ModesAffected &);
+    StreamBase & operator>> (StreamBase &, ModesAffected &);
 
     enum { CONTOUR_MAIN = 0, CONTOUR_BLACK = 0x01, CONTOUR_REFLECT = 0x02 };
 
@@ -182,8 +182,8 @@ namespace Battle
 	static bool isHandFighting(const Unit &, const Unit &);
 
     private:
-	friend QueueMessage & operator<< (QueueMessage &, const Unit &);
-	friend QueueMessage & operator>> (QueueMessage &, Unit &);
+	friend StreamBase & operator<< (StreamBase &, const Unit &);
+	friend StreamBase & operator>> (StreamBase &, Unit &);
 
 	u32		uid;
 	u32		hp;
@@ -203,8 +203,8 @@ namespace Battle
 	Sprite*		contours[4];
     };
 
-    QueueMessage & operator<< (QueueMessage &, const Unit &);
-    QueueMessage & operator>> (QueueMessage &, Unit &);
+    StreamBase & operator<< (StreamBase &, const Unit &);
+    StreamBase & operator>> (StreamBase &, Unit &);
 }
 
 #endif

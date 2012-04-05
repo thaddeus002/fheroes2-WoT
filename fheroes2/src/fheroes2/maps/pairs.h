@@ -20,10 +20,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2PAIRS_H
-#define H2PAIRS_H
+#ifndef H2PAIRS_H_
+#define H2PAIRS_H_
 
-#include <list>
 #include <utility>
 #include "mp2.h"
 #include "color.h"

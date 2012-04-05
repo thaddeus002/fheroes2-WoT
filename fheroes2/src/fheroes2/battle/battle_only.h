@@ -20,65 +20,96 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2BATTLE_ARMY_H
-#define H2BATTLE_ARMY_H
+#ifndef H2BATTLE_ONLY_H
+#define H2BATTLE_ONLY_H
 
 #include "army.h"
+#include "players.h"
+#include "heroes_recruits.h"
+#include "selectarmybar.h"
+
+class MoraleIndicator;
+class LuckIndicator;
+class SelectArtifactsBar;
 
 namespace Battle
 {
-    class Unit;
-
-    class Units : public std::vector<Unit*>
+    struct ControlInfo
     {
-    public:
-	Units();
-	Units(const Units &);
-	Units(const Units &, const Units &);
-	virtual ~Units();
+	ControlInfo(const Point & pt, u8 & ctrl) : result(ctrl),
+    	    rtLocal(pt.x, pt.y, 24, 24), rtAI(pt.x + 75, pt.y, 24, 24) {};
 
-	Units &		operator= (const Units &);
+	void Redraw(void);
 
-	Unit*		FindMode(u32);
-        Unit*		FindUID(u32);
+	const u8 & result;
 
-        void		SortSlowest(void);
-        void		SortFastest(void);
-        void		SortStrongest(void);
-        void		SortWeakest(void);
+	const Rect rtLocal;
+	const Rect rtAI;
     };
 
-    class Force : public Units
+    struct Only
     {
-    public:
-	Force(Army &, bool);
-	~Force();
+	Heroes*		hero1;
+	Heroes*		hero2;
 
-    HeroBase*		GetCommander(void);
-    const HeroBase*	GetCommander(void) const;
+	Player		player1;
+	Player		player2;
 
-    bool		isValid(void) const;
-    bool		HasMonster(const Monster &) const;
-    u32			GetDeadHitPoints(void) const;
-    u32			GetDeadCounts(void) const;
-    u8			GetColor(void) const;
-    u8			GetControl(void) const;
-    u32                 GetSurrenderCost(void) const;
-    Troops		GetKilledTroops(void) const;
-    bool		SetIdleAnimation(void);
-    bool		NextIdleAnimation(void);
+	Army*		army1;
+	Army*		army2;
+	Army		monsters;
 
-    void		NewTurn(void);
-    void		SyncArmyCount(void);
+	MoraleIndicator* moraleIndicator1;
+	MoraleIndicator* moraleIndicator2;
 
-    static Unit*	GetCurrentUnit(const Force &, const Force &, Unit* last, Units* all, bool part1);
+	LuckIndicator* luckIndicator1;
+	LuckIndicator* luckIndicator2;
 
-    private:
-	Army &		army;
+	SecondarySkillBar* secskill_bar1;
+	SecondarySkillBar* secskill_bar2;
+
+	SelectArmyBar selectArmy1;
+	SelectArmyBar selectArmy2;
+
+	SelectArtifactsBar* selectArtifacts1;
+	SelectArtifactsBar* selectArtifacts2;
+
+	ControlInfo*	cinfo2;
+
+	Rect		rtPortrait1;
+	Rect		rtPortrait2;
+
+	Rect		rtAttack1;
+	Rect		rtAttack2;
+	Rect		rtDefense1;
+	Rect		rtDefense2;
+	Rect		rtPower1;
+	Rect		rtPower2;
+	Rect		rtKnowledge1;
+	Rect		rtKnowledge2;
+
+	const Rect	rt1;
+	Surface		sfb1;
+	Surface		sfc1;
+
+	const Rect	rt2;
+	Surface		sfb2;
+	Surface		sfc2;
+
+	bool		ChangeSettings(void);
+	void		RedrawBaseInfo(const Point &);
+	void		StartBattle(void);
+	void		UpdateHero1(const Point &);
+	void		UpdateHero2(const Point &);
+
+	static Only &	Get(void);
+	static Recruits GetHeroesFromStreamBuf(StreamBuf &);
+
+	Only();
     };
-
-    StreamBase & operator<< (StreamBase &, const Force &);
-    StreamBase & operator>> (StreamBase &, Force &);
 }
+
+StreamBase & operator<< (StreamBase &, const Battle::Only &);
+StreamBase & operator>> (StreamBase &, Battle::Only &);
 
 #endif

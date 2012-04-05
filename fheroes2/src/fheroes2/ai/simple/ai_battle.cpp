@@ -37,6 +37,7 @@
 #include "battle_cell.h"
 #include "battle_troop.h"
 #include "battle_interface.h"
+#include "battle_command.h"
 #include "ai_simple.h"
 
 namespace Battle
@@ -255,7 +256,7 @@ void AI::BattleTurn(Arena & arena, const Unit & b, Actions & a)
 	    {
 		enemy = AIGetEnemyAbroadMaxQuality(move, b.GetColor());
 		BattleMagicTurn(arena, b, a, enemy);
-	    	a.AddedMoveAction(b, move);
+	    	a.push_back(Battle::Command(MSG_BATTLE_MOVE, b.GetUID(), move));
 		attack = true;
 	    }
 	    else
@@ -300,7 +301,7 @@ void AI::BattleTurn(Arena & arena, const Unit & b, Actions & a)
 			enemy = AIGetEnemyAbroadMaxQuality(path.back(), b.GetColor());
 
 		    BattleMagicTurn(arena, b, a, enemy);
-	    	    a.AddedMoveAction(b, path.back());
+	    	    a.push_back(Battle::Command(MSG_BATTLE_MOVE, b.GetUID(), path.back()));
 
 		    // archers move and short attack only
 		    attack = b.isArchers() ? false : true;
@@ -313,7 +314,7 @@ void AI::BattleTurn(Arena & arena, const Unit & b, Actions & a)
 
     if(enemy)
     {
-	if(attack) a.AddedAttackAction(b, *enemy, enemy->GetHeadIndex(), 0);
+	if(attack) a.push_back(Battle::Command(MSG_BATTLE_ATTACK, b.GetUID(), enemy->GetUID(), enemy->GetHeadIndex(), 0));
     }
     else
     {
@@ -321,7 +322,7 @@ void AI::BattleTurn(Arena & arena, const Unit & b, Actions & a)
     }
 
     // end action
-    a.AddedEndAction(b);
+    a.push_back(Battle::Command(MSG_BATTLE_END_TURN, b.GetUID()));
 }
 
 
@@ -330,8 +331,7 @@ bool AI::BattleMagicTurn(Arena & arena, const Unit & b, Actions & a, const Unit*
     const HeroBase* hero = b.GetCommander();
 
     if(b.Modes(SP_BERSERKER) || !hero || hero->Modes(Heroes::SPELLCASTED) || !hero->HaveSpellBook() ||
-	arena.isDisableCastSpell(Spell(), NULL) ||
-	a.end() != std::find_if(a.begin(), a.end(), std::bind2nd(std::mem_fun_ref(&QueueMessage::isID), MSG_BATTLE_CAST)))
+	arena.isDisableCastSpell(Spell(), NULL) || a.HaveCommand(Battle::MSG_BATTLE_CAST))
 	return false;
 
     const Force & my_army = arena.GetCurrentForce(true);
@@ -503,7 +503,7 @@ bool Battle::AIApplySpell(const Spell & spell, const Unit* b, const HeroBase & h
 
     if(hero.CanCastSpell(spell) && (!b || b->AllowApplySpell(spell, &hero)))
     {
-	a.AddedCastAction(spell, (b ? b->GetHeadIndex() : MAXU16));
+	a.push_back(Battle::Command(MSG_BATTLE_CAST, spell(), (b ? b->GetHeadIndex() : -1)));
 	return true;
     }
 

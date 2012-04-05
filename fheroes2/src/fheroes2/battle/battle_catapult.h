@@ -24,6 +24,7 @@
 #define H2BATTLE_CATAPULT_H
 
 #include "gamedefs.h"
+#include "battle_arena.h"
 
 class HeroBase;
 
@@ -37,12 +38,12 @@ namespace Battle
 	Catapult(const HeroBase &, bool);
 
 	static Point	GetTargetPosition(u8);
-
-	u8		GetShots(void) const;
-	u8		GetTarget(const std::vector<u8> &) const;
-	u8		GetDamage(u8, u8);
+	Command		GetAction(Arena &) const;
 
     private:
+	u8		GetTarget(const std::vector<u8> &) const;
+	u8		GetDamage(u8, u8) const;
+
 	u8	cat_shots;
 	u8	cat_first;
 	bool	cat_miss;

@@ -252,7 +252,7 @@ bool Dialog::SetGuardian(Heroes & hero, Troop & troop, bool readonly)
 	    Dialog::ArmyInfo(troop, 0);
 	    cursor.Hide();
 	}
-	
+
 	if(!cursor.isVisible())
 	{
 	    guardian.Redraw();

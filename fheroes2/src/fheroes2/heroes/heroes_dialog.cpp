@@ -40,7 +40,6 @@
 #include "statusbar.h"
 #include "selectartifactbar.h"
 #include "pocketpc.h"
-#include "localclient.h"
 
 /* readonly: false, fade: false */
 Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
@@ -90,7 +89,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     text.Set(GetString(GetAttack()), Font::BIG);
     dst_pt.y += 70;
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
-    
+
     const Rect rectAttackSkill(cur_pt.x + 156, cur_pt.y + 30, 80, 92);
     std::string attackDescription(_("Your attack skill is a bonus added to each creature's attack skill."));
 
@@ -109,7 +108,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     dst_pt.y = cur_pt.y + 34;
     text.Set(_("Defense Skill"), Font::SMALL);
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
-    
+
     dst_pt.y += 70;
     text.Set(GetString(GetDefense()), Font::BIG);
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
@@ -126,13 +125,13 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	defenseDescription.append("\n \n");
 	defenseDescription.append(message);
     }
-    
+
     // spell
     dst_pt.x = cur_pt.x + 372;
     dst_pt.y = cur_pt.y + 34;
     text.Set(_("Spell Power"), Font::SMALL);
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
-    
+
     dst_pt.y += 70;
     text.Set(GetString(GetPower()), Font::BIG);
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
@@ -155,7 +154,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     dst_pt.y = cur_pt.y + 34;
     text.Set(_("Knowledge"), Font::SMALL);
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
-    
+
     dst_pt.y += 70;
     text.Set(GetString(GetKnowledge()), Font::BIG);
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
@@ -198,14 +197,14 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     const Rect rectSpreadArmyFormat(dst_pt, sprite1.w(), sprite1.h());
     const std::string descriptionSpreadArmyFormat = _("'Spread' combat formation spreads your armies from the top to the bottom of the battlefield, with at least one empty space between each army.");
     const Point army1_pt(dst_pt.x - 1, dst_pt.y - 1);
-    
+
     // army format grouped
     dst_pt.x = cur_pt.x + 552;
     dst_pt.y = cur_pt.y + 63;
     const Sprite & sprite2 = AGG::GetICN(ICN::HSICONS, 10);
     sprite2.Blit(dst_pt);
 
-    const Rect rectGroupedArmyFormat(dst_pt, sprite2.w(), sprite2.h());    
+    const Rect rectGroupedArmyFormat(dst_pt, sprite2.w(), sprite2.h());
     const std::string descriptionGroupedArmyFormat = _("'Grouped' combat formation bunches your army together in the center of your side of the battlefield.");
     const Point army2_pt(dst_pt.x - 1, dst_pt.y - 1);
 
@@ -228,7 +227,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     dst_pt.y = cur_pt.y + 130;
 
     AGG::GetICN(ICN::CREST, Color::NONE == color ? Color::GetIndex(Settings::Get().CurrentColor()) : Color::GetIndex(color)).Blit(dst_pt);
-    
+
     // monster
     dst_pt.x = cur_pt.x + 156;
     dst_pt.y = cur_pt.y + 130;
@@ -281,7 +280,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     dst_pt.x = cur_pt.x + 640 - 23;
     dst_pt.y = cur_pt.y + 480 - 20;
     Button buttonNextHero(dst_pt, ICN::HSBTNS, 6, 7);
-    
+
     // button dismiss
     dst_pt.x = cur_pt.x + 5;
     dst_pt.y = cur_pt.y + 318;
@@ -373,7 +372,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 
     	// next hero
     	if(buttonNextHero.isEnable() && le.MouseClickLeft(buttonNextHero)){ return Dialog::NEXT; }
-    	    
+
     	// dismiss
     	if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss) &&
     	      Dialog::YES == Dialog::Message(GetName(), _("Are you sure you want to dismiss this Hero?"), Font::BIG, Dialog::YES | Dialog::NO))
@@ -403,9 +402,6 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	    cursor.Show();
 	    display.Flip();
     	    army.SetSpreadFormat(true);
-#ifdef WITH_NET
-            FH2LocalClient::SendArmyCombatFormation(army);
-#endif
         }
 	else
         if(!readonly && le.MouseClickLeft(rectGroupedArmyFormat) && army.isSpreadFormat())
@@ -415,9 +411,6 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	    cursor.Show();
 	    display.Flip();
     	    army.SetSpreadFormat(false);
-#ifdef WITH_NET
-            FH2LocalClient::SendArmyCombatFormation(army);
-#endif
         }
 
 	if(le.MouseCursor(secskill_bar.GetArea())) secskill_bar.QueueEventProcessing();

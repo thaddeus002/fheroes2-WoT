@@ -27,6 +27,9 @@
 
 #define MODES_ALL 0xFFFFFFFF
 
+class StreamBase;
+class StreamBase;
+
 class BitModes
 {
 public:
@@ -40,7 +43,13 @@ public:
     bool        Modes(u32 f) const { return (modes & f); }
 
 protected:
+    friend StreamBase & operator<< (StreamBase &, const BitModes &);
+    friend StreamBase & operator>> (StreamBase &, BitModes &);
+
     u32		modes;
 };
+
+StreamBase & operator<< (StreamBase &, const BitModes &);
+StreamBase & operator>> (StreamBase &, BitModes &);
 
 #endif

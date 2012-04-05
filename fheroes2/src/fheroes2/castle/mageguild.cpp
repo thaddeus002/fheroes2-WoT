@@ -108,3 +108,13 @@ Spell GetCombatSpellCompatibility(u8 race, u8 lvl)
     while(!spell.isRaceCompatible(race)) spell = Spell::RandCombat(lvl);
     return spell;
 }
+
+StreamBase & operator<< (StreamBase & msg, const MageGuild & guild)
+{
+    return msg << guild.general << guild.library;
+}
+
+StreamBase & operator>> (StreamBase & msg, MageGuild & guild)
+{
+    return msg >> guild.general >> guild.library;
+}

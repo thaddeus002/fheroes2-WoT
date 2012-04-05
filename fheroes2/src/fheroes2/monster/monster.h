@@ -191,4 +191,13 @@ protected:
     u8 id;
 };
 
+struct MonsterStaticData
+{
+    // wrapper for stream
+    static MonsterStaticData & Get(void);
+};
+
+StreamBase & operator<< (StreamBase &, const MonsterStaticData &);
+StreamBase & operator>> (StreamBase &, MonsterStaticData &);
+
 #endif

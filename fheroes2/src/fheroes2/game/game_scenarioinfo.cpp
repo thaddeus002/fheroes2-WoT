@@ -354,7 +354,7 @@ void RedrawScenarioStaticInfo(const Rect & rt)
 	// maps name
 	text.Set(conf.MapsName());
 	text.Blit(rt.x + (rt.w - text.w()) / 2, rt.y + 46);
-    
+
 	// text game difficulty
 	text.Set(_("Game Difficulty:"));
 	text.Blit(rt.x + (rt.w - text.w()) / 2, rt.y + 75);

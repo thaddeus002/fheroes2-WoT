@@ -561,4 +561,7 @@ namespace MP2
     u16  GetObjectDirect(const u8 obj);
 }
 
+StreamBase & operator<< (StreamBase &, const MP2::object_t &);
+StreamBase & operator>> (StreamBase &, MP2::object_t &);
+
 #endif

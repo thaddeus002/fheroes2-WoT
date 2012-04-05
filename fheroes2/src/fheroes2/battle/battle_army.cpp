@@ -276,7 +276,7 @@ Battle::Unit* Battle::Force::GetCurrentUnit(const Force & army1, const Force & a
         result->GetSpeed() > Speed::STANDING ? result : NULL;
 }
 
-QueueMessage & Battle::operator<< (QueueMessage & msg, const Force & f)
+StreamBase & Battle::operator<< (StreamBase & msg, const Force & f)
 {
     msg << static_cast<u32>(f.size());
 
@@ -287,7 +287,7 @@ QueueMessage & Battle::operator<< (QueueMessage & msg, const Force & f)
     return msg;
 }
 
-QueueMessage & Battle::operator>> (QueueMessage & msg, Force & f)
+StreamBase & Battle::operator>> (StreamBase & msg, Force & f)
 {
     u32 size = 0;
     u32 uid  = 0;

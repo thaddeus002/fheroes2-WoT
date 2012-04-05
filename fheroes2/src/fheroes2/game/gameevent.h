@@ -45,11 +45,14 @@ struct EventDate
     std::string message;
 };
 
+StreamBase & operator<< (StreamBase &, const EventDate &);
+StreamBase & operator>> (StreamBase &, EventDate &);
+
 struct EventMaps : public Maps::Position
 {
     EventMaps() : computer(false), cancel(false), colors(0) {}
     EventMaps(s32 index, const void *ptr);
-    
+
     bool isAllow(u8 color, s32 index) const;
     void SetVisited(u8 color);
 
@@ -60,6 +63,9 @@ struct EventMaps : public Maps::Position
     u8 colors;
     std::string message;
 };
+
+StreamBase & operator<< (StreamBase &, const EventMaps &);
+StreamBase & operator>> (StreamBase &, EventMaps &);
 
 typedef std::list<std::string>    RiddleAnswers;
 
@@ -77,5 +83,8 @@ struct Riddle : public Maps::Position
     std::string message;
     bool valid;
 };
+
+StreamBase & operator<< (StreamBase &, const Riddle &);
+StreamBase & operator>> (StreamBase &, Riddle &);
 
 #endif

@@ -261,3 +261,15 @@ std::string ArmyTroop::GetDefenseString(void) const
     os << Troop::GetDefense() << " (" << GetDefense() << ")";
     return os.str();
 }
+
+StreamBase & operator<< (StreamBase & msg, const Troop & troop)
+{
+    msg << troop.id << troop.count;
+    return msg;
+}
+
+StreamBase & operator>> (StreamBase & msg, Troop & troop)
+{
+    msg >> troop.id >> troop.count;
+    return msg;
+}

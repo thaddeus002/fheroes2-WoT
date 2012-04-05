@@ -280,7 +280,7 @@ std::string ShowGroundInfo(const Maps::Tiles & tile, bool show, const Heroes* he
 
 void Dialog::QuickInfo(const Maps::Tiles & tile)
 {
-    // check 
+    // check
     switch(tile.GetObject())
     {
 	case MP2::OBJN_MINES:
@@ -324,8 +324,8 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 
     LocalEvent & le = LocalEvent::Get();
     const Point & mp = le.GetMouseCursor();
-    
-    Rect pos; 
+
+    Rect pos;
     s16 mx = (mp.x - BORDERWIDTH) / TILEWIDTH;
     mx *= TILEWIDTH;
     s16 my = (mp.y - BORDERWIDTH) / TILEWIDTH;
@@ -345,7 +345,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     else
     // bottom right
 	pos = Rect(mx - box.w(), my - box.h(), box.w(), box.h());
-    
+
     Background back(pos);
     back.Save();
 
@@ -394,7 +394,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	case MP2::OBJ_WINDMILL:
 	case MP2::OBJ_WATERWHEEL:
 	case MP2::OBJ_MAGICGARDEN:
-	    name_object = Settings::Get().ExtWorldExtObjectsCaptured() ? 
+	    name_object = Settings::Get().ExtWorldExtObjectsCaptured() ?
 		    MP2::StringObject(tile.GetObject()) : ShowGlobalVisitInfo(tile, kingdom, show);
 	    break;
 
@@ -484,7 +484,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	    name_object = ShowBarrierTentInfo(tile, kingdom);
 	    break;
 
-        default: 
+        default:
 	    name_object = MP2::StringObject(tile.GetObject());
 	    break;
     }
@@ -522,8 +522,8 @@ void Dialog::QuickInfo(const Castle & castle)
 
     LocalEvent & le = LocalEvent::Get();
     const Point & mp = le.GetMouseCursor();
-    
-    Rect cur_rt; 
+
+    Rect cur_rt;
     s16 mx = (mp.x - BORDERWIDTH) / TILEWIDTH;
     mx *= TILEWIDTH;
     s16 my = (mp.y - BORDERWIDTH) / TILEWIDTH;
@@ -575,7 +575,7 @@ void Dialog::QuickInfo(const Castle & castle)
 	case Race::NECR: index = (castle.isCastle() ? 14 : 20); break;
 	default: DEBUG(DBG_GAME, DBG_WARN, "unknown race"); return;
     }
-    
+
     // castle icon
     const Sprite & sprite = AGG::GetICN(ICN::LOCATORS, index);
 
@@ -688,8 +688,8 @@ void Dialog::QuickInfo(const Heroes & hero)
 
     LocalEvent & le = LocalEvent::Get();
     const Point & mp = le.GetMouseCursor();
-    
-    Rect cur_rt; 
+
+    Rect cur_rt;
     s16 mx = (mp.x - BORDERWIDTH) / TILEWIDTH;
     mx *= TILEWIDTH;
     s16 my = (mp.y - BORDERWIDTH) / TILEWIDTH;
@@ -714,7 +714,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     {
 	cur_rt = Rect((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h());
     }
-    
+
     Background back(cur_rt);
     back.Save();
 
@@ -844,7 +844,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     text.Set(GetString(hero.GetKnowledge()));
     dst_pt.x += 75;
     text.Blit(dst_pt);
-    
+
     // spell point
     text.Set(std::string(_("Spell Points")) + ":");
     dst_pt.x = cur_rt.x + 10;

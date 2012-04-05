@@ -23,6 +23,8 @@
 #ifndef H2BATTLE_BOARD_H
 #define H2BATTLE_BOARD_H
 
+#include <functional>
+
 #include "battle.h"
 #include "battle_cell.h"
 
@@ -80,6 +82,18 @@ namespace Battle
 	static Indexes		GetMoveWideIndexes(s16, bool reflect);
 	static Indexes		GetUnitsIndexes(u8 col);
 	static bool		isValidMirrorImageIndex(s16, const Unit*);
+    };
+
+    struct ShortestDistance : public std::binary_function <s16, s16, bool>
+    {
+	ShortestDistance(s16 index) : center(index) {}
+
+	bool operator() (s16 index1, s16 index2) const
+	{
+	    return Board::GetDistance(center, index1) < Board::GetDistance(center, index2);
+	}
+
+	s16 center;
     };
 }
 

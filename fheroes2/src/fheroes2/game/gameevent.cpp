@@ -97,7 +97,7 @@ EventDate::EventDate(const void *ptr)
     ptr8 += 6;
 
     colors = 0;
-    
+
     // blue
     if(*ptr8) colors |= Color::BLUE;
     ++ptr8;
@@ -202,7 +202,7 @@ EventMaps::EventMaps(s32 index, const void *ptr)
     ptr8 += 11;
 
     colors = 0;
-    
+
     // blue
     if(*ptr8) colors |= Color::BLUE;
     ++ptr8;
@@ -332,4 +332,73 @@ void Riddle::SetQuiet(void)
     valid = false;
     artifact = Artifact::UNKNOWN;
     resource.Reset();
+}
+
+StreamBase & operator<< (StreamBase & msg, const EventDate & obj)
+{
+    return msg <<
+	obj.resource <<
+	obj.computer <<
+	obj.first <<
+	obj.subsequent <<
+	obj.colors <<
+	obj.message;
+}
+
+StreamBase & operator>> (StreamBase & msg, EventDate & obj)
+{
+    return msg >>
+	obj.resource >>
+	obj.computer >>
+	obj.first >>
+	obj.subsequent >>
+	obj.colors >>
+	obj.message;
+}
+
+
+StreamBase & operator<< (StreamBase & msg, const EventMaps & obj)
+{
+    return msg <<
+	obj.center <<
+	obj.resource <<
+	obj.artifact <<
+	obj.computer <<
+	obj.cancel <<
+	obj.colors <<
+	obj.message;
+}
+
+StreamBase & operator>> (StreamBase & msg, EventMaps & obj)
+{
+    return msg >>
+	obj.center >>
+	obj.resource >>
+	obj.artifact >>
+	obj.computer >>
+	obj.cancel >>
+	obj.colors >>
+	obj.message;
+}
+
+StreamBase & operator<< (StreamBase & msg, const Riddle & obj)
+{
+    return msg <<
+	obj.center <<
+	obj.resource <<
+	obj.artifact <<
+	obj.answers <<
+	obj.message <<
+	obj.valid;
+}
+
+StreamBase & operator>> (StreamBase & msg, Riddle & obj)
+{
+    return msg >>
+	obj.center >>
+	obj.resource >>
+	obj.artifact >>
+	obj.answers >>
+	obj.message >>
+	obj.valid;
 }

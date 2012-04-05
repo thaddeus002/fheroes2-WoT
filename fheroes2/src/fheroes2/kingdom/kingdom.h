@@ -150,7 +150,9 @@ public:
     static u8 GetMaxHeroes(void);
 
 private:
-    friend class Game::IO;
+    friend class Game::IOld;
+    friend StreamBase & operator<< (StreamBase &, const Kingdom &);
+    friend StreamBase & operator>> (StreamBase &, Kingdom &);
 
     u8 color;
     Funds resource;
@@ -201,9 +203,17 @@ public:
     u8 size(void) const;
 
 private:
-    friend class Game::IO;
+    friend class Game::IOld;
+    friend StreamBase & operator<< (StreamBase &, const Kingdoms &);
+    friend StreamBase & operator>> (StreamBase &, Kingdoms &);
 
     Kingdom kingdoms[KINGDOMMAX + 1];
 };
+
+StreamBase & operator<< (StreamBase &, const Kingdom &);
+StreamBase & operator>> (StreamBase &, Kingdom &);
+
+StreamBase & operator<< (StreamBase &, const Kingdoms &);
+StreamBase & operator>> (StreamBase &, Kingdoms &);
 
 #endif

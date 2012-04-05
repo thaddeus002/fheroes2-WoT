@@ -1,23 +1,23 @@
-/*************************************************************************** 
+/***************************************************************************
  *   Copyright (C) 2010 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
- *                                                                         * 
- *   This program is free software; you can redistribute it and/or modify  * 
- *   it under the terms of the GNU General Public License as published by  * 
- *   the Free Software Foundation; either version 2 of the License, or     * 
- *   (at your option) any later version.                                   * 
- *                                                                         * 
- *   This program is distributed in the hope that it will be useful,       * 
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        * 
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         * 
- *   GNU General Public License for more details.                          * 
- *                                                                         * 
- *   You should have received a copy of the GNU General Public License     * 
- *   along with this program; if not, write to the                         * 
- *   Free Software Foundation, Inc.,                                       * 
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
 #include <algorithm>
@@ -226,7 +226,7 @@ void HeroBase::AppendSpellsToBook(const SpellStorage & spells, bool without_wisd
 
 bool HeroBase::SpellBookActivate(void)
 {
-    return ! HaveSpellBook() &&	
+    return ! HaveSpellBook() &&
 	    bag_artifacts.PushArtifact(Artifact::MAGIC_BOOK);
 }
 
@@ -449,4 +449,38 @@ void HeroBase::TranscribeScroll(const Artifact & art)
 	// reduce mp and resource
 	SpellCasted(spell);
     }
+}
+
+/* pack hero base */
+StreamBase & operator<< (StreamBase & msg, const HeroBase & hero)
+{
+    const Skill::Primary & base = hero;
+
+    return
+	// primary
+	msg << base <<
+	// position
+	hero.center <<
+	// modes
+	hero.modes <<
+	// hero base
+	hero.magic_point << hero.move_point <<
+	hero.spell_book << hero.bag_artifacts;
+}
+
+/* unpack hero base */
+StreamBase & operator>> (StreamBase & msg, HeroBase & hero)
+{
+    Skill::Primary & base = hero;
+
+    return
+	// primary
+	msg >> base >>
+	// position
+	hero.center >>
+	// modes
+	hero.modes >>
+	// hero base
+	hero.magic_point >> hero.move_point >>
+	hero.spell_book >> hero.bag_artifacts;
 }

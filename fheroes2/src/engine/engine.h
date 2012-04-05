@@ -37,6 +37,7 @@
 #include "audio_music.h"
 #include "audio_cdrom.h"
 #include "types.h"
+#include "serialize.h"
 
 #define INIT_VIDEO	SDL_INIT_VIDEO
 #define INIT_AUDIO	SDL_INIT_AUDIO

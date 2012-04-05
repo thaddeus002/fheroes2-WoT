@@ -87,7 +87,7 @@ namespace Dialog
     void QuickInfo(const Maps::Tiles & tile);
     void QuickInfo(const Castle & castle);
     void QuickInfo(const Heroes & heroes);
-    
+
     // buttons: OK : CANCEL : OK|CANCEL : YES|NO
     u16 Message(const std::string &header, const std::string &message, Font::type_t ft, u16 buttons = 0);
 
@@ -126,7 +126,7 @@ namespace Dialog
 
     // dialog buy boat
     answer_t BuyBoat(bool enable);
-    
+
     // puzzle
     void PuzzleMaps(void);
 

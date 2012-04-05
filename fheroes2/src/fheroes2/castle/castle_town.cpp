@@ -37,7 +37,6 @@
 #include "payment.h"
 #include "buildinginfo.h"
 #include "kingdom.h"
-#include "localclient.h"
 
 Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
 {
@@ -155,7 +154,7 @@ u32 Castle::OpenTown(void)
     Dialog::FrameBorder background;
     background.SetPosition((display.w() - 640 - BORDERWIDTH * 2) / 2, (display.h() - 480 - BORDERWIDTH * 2) / 2, 640, 480);
     background.Redraw();
-    
+
     const Point cur_pt(background.GetArea().x, background.GetArea().y);
     Point dst_pt(cur_pt);
 
@@ -171,7 +170,7 @@ u32 Castle::OpenTown(void)
 	const Rect rect(dst_pt, 110, 84);
 	dst_pt.x += cur_pt.x;
 	dst_pt.y += cur_pt.y;
-		
+
 	AGG::GetICN(ICN::STONEBAK, 0).Blit(rect, dst_pt);
     }
 
@@ -299,7 +298,7 @@ u32 Castle::OpenTown(void)
 	text.Set(GetString(captain.GetAttack()));
 	dst_pt.x += 90;
 	text.Blit(dst_pt);
-	
+
 	text.Set(_("Defense Skill") + std::string(" "));
 	dst_pt.x = cur_pt.x + 535;
 	dst_pt.y += 12;
@@ -326,7 +325,7 @@ u32 Castle::OpenTown(void)
 	text.Set(GetString(captain.GetKnowledge()));
 	dst_pt.x += 90;
 	text.Blit(dst_pt);
-	
+
 	spriteSpreadArmyFormat.Blit(rectSpreadArmyFormat.x, rectSpreadArmyFormat.y);
 	spriteGroupedArmyFormat.Blit(rectGroupedArmyFormat.x, rectGroupedArmyFormat.y);
 
@@ -474,9 +473,6 @@ u32 Castle::OpenTown(void)
         	cursor.Show();
         	display.Flip();
         	army.SetSpreadFormat(true);
-#ifdef WITH_NET
-        	FH2LocalClient::SendArmyCombatFormation(army);
-#endif
     	    }
 	    else
     	    if(le.MouseClickLeft(rectGroupedArmyFormat) && army.isSpreadFormat())
@@ -486,9 +482,6 @@ u32 Castle::OpenTown(void)
         	cursor.Show();
         	display.Flip();
         	army.SetSpreadFormat(false);
-#ifdef WITH_NET
-        	FH2LocalClient::SendArmyCombatFormation(army);
-#endif
     	    }
 	}
 

@@ -145,6 +145,40 @@ namespace
     };
 }
 
+StreamBase & operator<< (StreamBase & msg, const monstats_t & obj)
+{
+    return msg << obj.attack << obj.defense <<
+	    obj.damageMin << obj.damageMax <<
+	    obj.hp << obj.speed << obj.grown <<
+	    obj.shots << obj.cost;
+}
+
+StreamBase & operator>> (StreamBase & msg, monstats_t & obj)
+{
+    return msg >> obj.attack >> obj.defense >>
+	    obj.damageMin >> obj.damageMax >>
+	    obj.hp >> obj.speed >> obj.grown >>
+	    obj.shots >> obj.cost;
+}
+
+StreamBase & operator<< (StreamBase & msg, const MonsterStaticData & obj)
+{
+    const u16 monsters_size = ARRAY_COUNT(monsters);
+    msg << monsters_size;
+    for(u16 ii = 0; ii < monsters_size; ++ii)
+	msg << monsters[ii];
+    return msg;
+}
+
+StreamBase & operator>> (StreamBase & msg, MonsterStaticData & obj)
+{
+    u16 monsters_size;
+    msg >> monsters_size;
+    for(u16 ii = 0; ii < monsters_size; ++ii)
+	msg >> monsters[ii];
+    return msg;
+}
+
 float Monster::GetUpgradeRatio(void)
 {
     return GameStatic::GetMonsterUpgradeRatio();
@@ -1202,4 +1236,10 @@ u32 Monster::GetCountFromHitPoints(const Monster & mons, u32 hp)
     }
 
     return 0;
+}
+
+MonsterStaticData & MonsterStaticData::Get(void)
+{
+    static MonsterStaticData mgds;
+    return mgds;
 }

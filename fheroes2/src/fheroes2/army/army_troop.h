@@ -69,8 +69,14 @@ public:
     virtual u16		GetAffectedDuration(u32) const;
 
 protected:
+    friend StreamBase & operator<< (StreamBase &, const Troop &);
+    friend StreamBase & operator>> (StreamBase &, Troop &);
+
     u32			count;
 };
+
+StreamBase & operator<< (StreamBase &, const Troop &);
+StreamBase & operator>> (StreamBase &, Troop &);
 
 class ArmyTroop : public Troop
 {

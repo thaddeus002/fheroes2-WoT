@@ -62,9 +62,10 @@ public:
 void FileInfoListBox::RedrawItem(const Maps::FileInfo & info, s16 dstx, s16 dsty, bool current)
 {
     char short_date[20];
+    time_t timeval = info.localtime;
 
     std::fill(short_date, ARRAY_COUNT_END(short_date), 0);
-    std::strftime(short_date, ARRAY_COUNT(short_date) - 1, "%b %d, %H:%M", std::localtime(&info.localtime));
+    std::strftime(short_date, ARRAY_COUNT(short_date) - 1, "%b %d, %H:%M", std::localtime(&timeval));
     std::string savname(GetBasename(info.file));
 
     if(savname.size())
@@ -165,8 +166,8 @@ bool Dialog::SelectFileSave(std::string & file)
 	const Settings & conf = Settings::Get();
 	file = Settings::GetSaveDir() + SEPARATOR;
 
-	if(conf.ExtGameRememberLastFilename() && Game::IO::last_name.size())
-	    file = Game::IO::last_name;
+	if(conf.ExtGameRememberLastFilename() && Game::GetLastSavename().size())
+	    file = Game::GetLastSavename();
 	else
 	if(conf.PocketPC())
 	{
@@ -184,7 +185,8 @@ bool Dialog::SelectFileSave(std::string & file)
 bool Dialog::SelectFileLoad(std::string & file)
 {
     // set default
-    if(file.empty() && Settings::Get().ExtGameRememberLastFilename() && Game::IO::last_name.size()) file = Game::IO::last_name;
+    if(file.empty() && Settings::Get().ExtGameRememberLastFilename() && Game::GetLastSavename().size())
+	file = Game::GetLastSavename();
     return SelectFileListSimple(_("File to Load:"), file, false);
 }
 

@@ -48,7 +48,7 @@ u16 HowManyRecruitMonster(const Castle & castle, u32 dw, const Funds & add, Fund
     const Kingdom & kingdom = world.GetKingdom(castle.GetColor());
 
     if(! castle.GetArmy().CanJoinTroop(ms)) return 0;
-                                                                                                                         
+
     u16 count = castle.GetDwellingLivedCount(dw);
     payment_t payment;
 
@@ -76,7 +76,7 @@ void Castle::OpenWell(void)
     Dialog::FrameBorder frameborder;
     frameborder.SetPosition((display.w() - 640 - BORDERWIDTH * 2) / 2, (display.h() - 480 - BORDERWIDTH * 2) / 2, 640, 480);
     frameborder.Redraw();
-    
+
     const Point cur_pt(frameborder.GetArea().x, frameborder.GetArea().y);
 
     Point dst_pt(cur_pt);
@@ -89,14 +89,14 @@ void Castle::OpenWell(void)
     dst_pt.x = cur_pt.x;
     dst_pt.y = cur_pt.y + 461;
     Button buttonMax(dst_pt, ICN::BUYMAX, 0, 1);
-    
+
     const Rect rectMonster1(cur_pt.x + 20, cur_pt.y + 18, 288, 124);
     const Rect rectMonster2(cur_pt.x + 20, cur_pt.y + 168, 288, 124);
     const Rect rectMonster3(cur_pt.x + 20, cur_pt.y + 318, 288, 124);
     const Rect rectMonster4(cur_pt.x + 334, cur_pt.y + 18, 288, 124);
     const Rect rectMonster5(cur_pt.x + 334, cur_pt.y + 168, 288, 124);
     const Rect rectMonster6(cur_pt.x + 334, cur_pt.y + 318, 288, 124);
-    
+
     buttonExit.Draw();
 
     WellRedrawInfoArea(cur_pt);
@@ -345,7 +345,7 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 	dst_pt.x = pt.x + 268 - text.w() / 2;
         dst_pt.y = pt.y + 90;
 	text.Blit(dst_pt);
-	
+
 	if(present)
 	{
 	    u8 grown = monster.GetGrown();
@@ -372,7 +372,7 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
     	    dst_pt.y = pt.y + 119;
 	    text.Blit(dst_pt);
 	}
-	
+
 	dw <<= 1;
     }
 }
