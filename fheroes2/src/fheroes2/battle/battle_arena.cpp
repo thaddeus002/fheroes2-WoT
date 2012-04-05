@@ -644,15 +644,17 @@ s16 Battle::Arena::GetFreePositionNearHero(u8 color) const
 
 bool Battle::Arena::CanSurrenderOpponent(u8 color) const
 {
-    const HeroBase* hero1 = GetCommander(color, false);
+    const HeroBase* hero1 = GetCommander(color, false); // enemy
     const HeroBase* hero2 = GetCommander(color, true);
-    return hero1 && hero1->GetType() == Skill::Primary::HEROES && hero2;
+    return hero1 && hero1->GetType() == Skill::Primary::HEROES && hero2 &&
+	world.GetKingdom(hero2->GetColor()).GetCastles().size();
 }
 
 bool Battle::Arena::CanRetreatOpponent(u8 color) const
 {
     const HeroBase* hero = army1->GetColor() == color ? army1->GetCommander() : army2->GetCommander();
-    return hero && hero->GetType() == Skill::Primary::HEROES && NULL == hero->inCastle();
+    return hero && hero->GetType() == Skill::Primary::HEROES && NULL == hero->inCastle() &&
+	world.GetKingdom(hero->GetColor()).GetCastles().size();
 }
 
 bool Battle::Arena::isDisableCastSpell(const Spell & spell, std::string* msg)
