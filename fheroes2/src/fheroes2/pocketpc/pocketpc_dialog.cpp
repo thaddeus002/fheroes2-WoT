@@ -36,7 +36,7 @@ u16 PocketPC::GetCursorAttackDialog(const Point & dst, u8 allow)
     Display & display = Display::Get();
     LocalEvent & le = LocalEvent::Get();
 
-    const Rect rt(dst.x - 24, dst.y - 24, 70, 70);
+    const Rect rt(dst.x - 32, dst.y - 32, 86, 86);
 
     const Sprite & sp_info = AGG::GetICN(ICN::CMSECO, 5);
     const Sprite & sp_bleft = AGG::GetICN(ICN::CMSECO, 10);
@@ -58,7 +58,7 @@ u16 PocketPC::GetCursorAttackDialog(const Point & dst, u8 allow)
     cursor.SetThemes(Cursor::POINTER);
 
     // blit alpha
-    shadow.Blit(170, rt.x, rt.y, display);
+    shadow.Blit(120, rt.x, rt.y, display);
 
     const Rect rt_info(rt.x + (rt.w - sp_info.w()) / 2, rt.y + (rt.h - sp_info.h()) / 2, sp_info.w(), sp_info.h());
     sp_info.Blit(rt_info.x, rt_info.y);

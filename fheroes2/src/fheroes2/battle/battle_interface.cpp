@@ -620,19 +620,42 @@ Battle::Interface::Interface(Arena & a, s32 center) : arena(a), icn_cbkg(ICN::UN
     // buttons
     const Rect & area = border.GetArea();
 
-    btn_auto.SetSprite(ICN::TEXTBAR, 4, 5);
-    btn_settings.SetSprite(ICN::TEXTBAR, 6, 7);
 
-    btn_auto.SetPos(area.x, area.y + area.h - btn_settings.h - btn_auto.h);
-    btn_settings.SetPos(area.x, area.y + area.h - btn_settings.h);
+    if(conf.PocketPC())
+    {
+	btn_auto.SetSprite(ICN::BATTLEAUTO, 0, 1);
+	btn_settings.SetSprite(ICN::BATTLESETS, 0, 1);
+
+	btn_auto.SetPos(area.x, area.y);
+	btn_settings.SetPos(area.x, area.y + area.h - btn_settings.h);
+    }
+    else
+    {
+	btn_auto.SetSprite(ICN::TEXTBAR, 4, 5);
+	btn_settings.SetSprite(ICN::TEXTBAR, 6, 7);
+
+	btn_auto.SetPos(area.x, area.y + area.h - btn_settings.h - btn_auto.h);
+	btn_settings.SetPos(area.x, area.y + area.h - btn_settings.h);
+    }
 
     if(conf.ExtBattleSoftWait())
     {
-	btn_wait.SetSprite(ICN::BATTLEWAIT, 0, 1);
-	btn_skip.SetSprite(ICN::BATTLESKIP, 0, 1);
+	if(conf.PocketPC())
+	{
+	    btn_wait.SetSprite(ICN::ADVBTNS, 8, 9);
+	    btn_skip.SetSprite(ICN::TEXTBAR, 0, 1);
 
-	btn_wait.SetPos(area.x + area.w - btn_wait.w, area.y + area.h - btn_skip.h - btn_wait.h);
-	btn_skip.SetPos(area.x + area.w - btn_skip.w, area.y + area.h - btn_skip.h);
+	    btn_wait.SetPos(area.x + area.w - btn_wait.w, area.y);
+	    btn_skip.SetPos(area.x + area.w - btn_skip.w, area.y + area.h - btn_skip.h);
+	}
+	else
+	{
+	    btn_wait.SetSprite(ICN::BATTLEWAIT, 0, 1);
+	    btn_skip.SetSprite(ICN::BATTLESKIP, 0, 1);
+
+	    btn_wait.SetPos(area.x + area.w - btn_wait.w, area.y + area.h - btn_skip.h - btn_wait.h);
+	    btn_skip.SetPos(area.x + area.w - btn_skip.w, area.y + area.h - btn_skip.h);
+	}
     }
     else
     {
@@ -640,7 +663,7 @@ Battle::Interface::Interface(Arena & a, s32 center) : arena(a), icn_cbkg(ICN::UN
 	btn_skip.SetPos(area.x + area.w - btn_skip.w, area.y + area.h - btn_skip.h);
     }
 
-    status.SetPosition(area.x + btn_auto.w, btn_auto.y);
+    status.SetPosition(area.x + btn_settings.w, area.y + area.h - 36);
 
     if(!conf.QVGA() && !conf.ExtPocketLowMemory())
 	listlog = new StatusListBox();

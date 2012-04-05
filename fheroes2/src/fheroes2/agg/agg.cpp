@@ -296,6 +296,8 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 	case ICN::YELLOW_SMALFONT: count = 96; break;
 	case ICN::BATTLESKIP:
 	case ICN::BATTLEWAIT:
+	case ICN::BATTLEAUTO:
+	case ICN::BATTLESETS:
 	case ICN::BUYMAX:
 	case ICN::BTNBATTLEONLY:
 	case ICN::BTNGIFT:
@@ -391,6 +393,30 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(3, 8, 43, 14), 3, 1, sprite);
 	    // skip
 	    GetICN(ICN::TEXTBAR, index).Blit(Rect(3, 8, 43, 14), 3, 0, sprite);
+	}
+	break;
+
+	case ICN::BATTLEAUTO:
+	if(index < count)
+	{
+	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
+	    LoadOrgICN(sprite, ICN::TEXTBAR, 0 + index, false);
+	    // clean
+	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(4, 8, 43, 13), 3, 10, sprite);
+	    //
+	    GetICN(ICN::TEXTBAR, 4 + index).Blit(Rect(5, 2, 40, 12), 4, 11, sprite);
+	}
+	break;
+
+	case ICN::BATTLESETS:
+	if(index < count)
+	{
+	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
+	    LoadOrgICN(sprite, ICN::TEXTBAR, 0 + index, false);
+	    // clean
+	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(4, 8, 43, 13), 3, 10, sprite);
+	    //
+	    GetICN(ICN::ADVBTNS, 14 + index).Blit(Rect(5, 5, 26, 26), 10, 6, sprite);
 	}
 	break;
 
