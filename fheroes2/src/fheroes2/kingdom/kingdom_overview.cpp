@@ -201,16 +201,16 @@ void StatsCastlesList::RedrawItem(const CASTLEPTR & cstl, s16 dstx, s16 dsty, bo
 	Army::DrawMons32Line(cstl->GetArmy(), dstx + 155, dsty + 30, 180);
 
 	// available
-	Army army;
+	Troops troops;
 	const u32 dwellings[] = { DWELLING_MONSTER1, DWELLING_MONSTER2, DWELLING_MONSTER3, DWELLING_MONSTER4, DWELLING_MONSTER5, DWELLING_MONSTER6 };
 
 	for(u8 ii = 0; ii < ARRAY_COUNT(dwellings); ++ii)
 	{
     	    u16 count = cstl->GetDwellingLivedCount(dwellings[ii]);
-    	    if(count) army.JoinTroop(Monster(cstl->GetRace(), cstl->GetActualDwelling(dwellings[ii])), count);
+    	    if(count) troops.PushBack(Monster(cstl->GetRace(), cstl->GetActualDwelling(dwellings[ii])), count);
 	}
 
-	Army::DrawMons32Line(army, dstx + 360, dsty + 30, 220);
+	Army::DrawMons32Line(troops, dstx + 360, dsty + 30, 220);
     }
 }
 
