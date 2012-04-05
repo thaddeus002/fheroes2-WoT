@@ -53,13 +53,18 @@ struct CapturedObject
 {
     ObjectColor		objcol;
     Troop		guardians;
+    u8			split;
 
+    CapturedObject() : split(1) {}
+
+    const u8 & GetSplit(void) const { return split; }
     const u8 & GetObject(void) const { return objcol.first; }
     const u8 & GetColor(void) const { return objcol.second; }
     Troop & GetTroop(void) { return guardians; }
 
     void Set(u8 obj, u8 col) { objcol = ObjectColor(obj, col); }
     void SetColor(u8 col) { objcol.second = col; }
+    void SetSplit(u8 spl) { split = spl; }
 
     bool GuardiansProtected(void) const { return guardians.isValid(); }
 };

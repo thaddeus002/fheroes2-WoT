@@ -2115,14 +2115,15 @@ void ActionToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
     // set guardians
     if(Settings::Get().ExtWorldAllowSetGuardian())
     {
-	Troop & troop1 = world.GetCapturedObject(dst_index).GetTroop();
+	CapturedObject & co = world.GetCapturedObject(dst_index);
+	Troop & troop1 = co.GetTroop();
 	Troop   troop2 = troop1;
 
 	// check set with spell ?
 	Maps::TilesAddon* addon = tile.FindObject(MP2::OBJ_MINES);
 	bool readonly = addon ? addon->tmp : false;
 
-	if(Dialog::SetGuardian(hero, troop2, readonly))
+	if(Dialog::SetGuardian(hero, troop2, co, readonly))
 	    troop1.Set(troop2(), troop2.GetCount());
     }
 

@@ -42,6 +42,7 @@ class SpriteCursor;
 class Monster;
 class Funds;
 class Troop;
+class CapturedObject;
 
 namespace Maps
 {
@@ -115,7 +116,7 @@ namespace Dialog
     // recruit monster
     u16 RecruitMonster(const Monster & monster, u16 available);
     void DwellingInfo(const Monster & monster, u16 available);
-    bool SetGuardian(Heroes &, Troop &, bool readonly);
+    bool SetGuardian(Heroes &, Troop &, CapturedObject &, bool readonly);
 
     // army info
     answer_t ArmyInfo(const Troop & troop, u16 flags);

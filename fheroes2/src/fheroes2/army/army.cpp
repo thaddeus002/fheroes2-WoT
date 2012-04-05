@@ -693,8 +693,47 @@ Army::Army(const Maps::Tiles & t) : commander(NULL), combat_format(true), color(
 	    break;
 
 	default:
-	    at(0)->Set(t.QuantityTroop());
-	    ArrangeForBattle();
+	    if(MP2::isCaptureObject(t.GetObject()))
+	    {
+    		CapturedObject & co = world.GetCapturedObject(t.GetIndex());
+		Troop & troop = co.GetTroop();
+
+		switch(co.GetSplit())
+		{
+		    case 3:
+			if(3 > troop.GetCount())
+			    at(0)->Set(co.GetTroop());
+			else
+			{
+			    at(0)->Set(troop(), troop.GetCount() / 3);
+			    at(4)->Set(troop(), troop.GetCount() / 3);
+			    at(2)->Set(troop(), troop.GetCount() - at(4)->GetCount() - at(0)->GetCount());
+			}
+			break;
+
+		    case 5:
+			if(5 > troop.GetCount())
+			    at(0)->Set(co.GetTroop());
+			else
+			{
+			    at(0)->Set(troop(), troop.GetCount() / 5);
+			    at(1)->Set(troop(), troop.GetCount() / 5);
+			    at(3)->Set(troop(), troop.GetCount() / 5);
+			    at(4)->Set(troop(), troop.GetCount() / 5);
+			    at(2)->Set(troop(), troop.GetCount() - at(0)->GetCount() - at(1)->GetCount() - at(3)->GetCount() - at(4)->GetCount());
+			}
+			break;
+
+		    default:
+			at(0)->Set(co.GetTroop());
+			break;
+		}
+	    }
+	    else
+	    {
+		at(0)->Set(t.QuantityTroop());
+		ArrangeForBattle();
+	    }
 	    break;
     }
 }

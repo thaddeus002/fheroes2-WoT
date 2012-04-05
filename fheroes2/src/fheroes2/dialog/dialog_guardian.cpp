@@ -29,6 +29,7 @@
 #include "selectarmybar.h"
 #include "heroes_indicator.h"
 #include "army_troop.h"
+#include "world.h"
 #include "dialog.h"
 
 class ArmyCell : public Rect
@@ -65,7 +66,75 @@ public:
     const bool & readonly;
 };
 
-bool Dialog::SetGuardian(Heroes & hero, Troop & troop, bool readonly)
+class ArmySplit
+{
+public:
+    ArmySplit(const Point & pt, CapturedObject & co) : cobj(co),
+	rt1(pt.x + 140, pt.y + 19, 20, 10), rt2(pt.x + 140, pt.y + 33, 20, 10), rt3(pt.x + 140, pt.y + 47, 20, 10)
+    {
+    }
+
+    void Redraw(const Troop & troop)
+    {
+	Text txt1("/1", Font::SMALL);
+	Text txt2("/3", Font::SMALL);
+	Text txt3("/5", Font::SMALL);
+
+	const Sprite & sp = AGG::GetICN(ICN::CAMPXTRG, 8);
+	const Sprite & cr = AGG::GetICN(ICN::CELLWIN, 5);
+
+	sp.Blit(rt1);
+	sp.Blit(rt2);
+	sp.Blit(rt3);
+
+	if(troop.isValid())
+	{
+	    switch(cobj.GetSplit())
+	    {
+		case 3:		cr.Blit(rt2.x + 1, rt2.y + 1); break;
+		case 5:		cr.Blit(rt3.x + 1, rt3.y + 1); break;
+		default:	cr.Blit(rt1.x + 1, rt1.y + 1); break;
+	    }
+	}
+	else
+	if(1 != cobj.GetSplit())
+	    cobj.SetSplit(1);
+
+	txt1.Blit(rt1.x + 14, rt1.y + 1);
+	txt2.Blit(rt2.x + 14, rt2.y + 1);
+	txt3.Blit(rt3.x + 14, rt3.y + 1);
+    }
+
+    bool QueueProcessing(LocalEvent & le, const Troop & troop)
+    {
+        if(le.MouseClickLeft(rt1) && 1 != cobj.GetSplit())
+	{
+	    cobj.SetSplit(1);
+	    return true;
+	}
+	else
+        if(le.MouseClickLeft(rt2) && 3 != cobj.GetSplit() && troop.GetCount() > 3)
+	{
+	    cobj.SetSplit(3);
+	    return true;
+	}
+	else
+        if(le.MouseClickLeft(rt3) && 5 != cobj.GetSplit() && troop.GetCount() > 5)
+	{
+	    cobj.SetSplit(5);
+	    return true;
+	}
+	return false;
+    }
+
+    CapturedObject & cobj;
+
+    const Rect rt1;
+    const Rect rt2;
+    const Rect rt3;
+};
+
+bool Dialog::SetGuardian(Heroes & hero, Troop & troop, CapturedObject & co, bool readonly)
 {
     Display & display = Display::Get();
     //const Settings & conf = Settings::Get();
@@ -138,6 +207,9 @@ bool Dialog::SetGuardian(Heroes & hero, Troop & troop, bool readonly)
     // label
     Text text(_("Set Guardian"), Font::SMALL);
     text.Blit(area.x + (area.w - text.w()) / 2, area.y + 3);
+
+    ArmySplit armySplit(area, co);
+    armySplit.Redraw(troop);
 
     ButtonGroups btnGroups(area, Dialog::OK);
     btnGroups.Draw();
@@ -252,6 +324,10 @@ bool Dialog::SetGuardian(Heroes & hero, Troop & troop, bool readonly)
 	    Dialog::ArmyInfo(troop, 0);
 	    cursor.Hide();
 	}
+	else
+	if(armySplit.QueueProcessing(le, troop))
+	    cursor.Hide();
+	
 
 	if(!cursor.isVisible())
 	{
@@ -259,6 +335,7 @@ bool Dialog::SetGuardian(Heroes & hero, Troop & troop, bool readonly)
 	    moraleIndicator.Redraw();
 	    luckIndicator.Redraw();
 	    selectArmy.Redraw();
+	    armySplit.Redraw(troop);
 	    cursor.Show();
 	    display.Flip();
 	}
