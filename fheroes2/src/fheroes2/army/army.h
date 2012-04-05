@@ -79,6 +79,7 @@ public:
     void		Clean(void);
     void		UpgradeTroops(const Castle &);
 
+    Troop &		GetFirstValid(void);
     Troop &		GetWeakestTroop(void);
     Troop &		GetSlowestTroop(void);
 

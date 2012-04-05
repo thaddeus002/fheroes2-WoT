@@ -372,6 +372,13 @@ void Troops::UpgradeTroops(const Castle & castle)
     }
 }
 
+Troop & Troops::GetFirstValid(void)
+{
+    iterator it = std::find_if(begin(), end(), std::mem_fun(&Troop::isValid));
+    if(it == end()) it = begin();
+    return **it;
+}
+
 Troop & Troops::GetWeakestTroop(void)
 {
     iterator first, last, lowest;

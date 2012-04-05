@@ -1727,7 +1727,7 @@ void ActionToArtifact(Heroes & hero, const u8 & obj, const s32 & dst_index)
         {
 	    bool battle = true;
 	    Army army(tile);
-	    const Troop & troop = tile.QuantityTroop();
+	    const Troop & troop = army.GetFirstValid();
 
 	    PlaySoundWarning;
 
