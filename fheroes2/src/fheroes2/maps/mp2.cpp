@@ -1019,6 +1019,7 @@ u16 MP2::GetObjectDirect(const u8 obj)
 {
     switch(obj)
     {
+        case OBJ_JAIL:
         case OBJ_BARRIER:
 	    return DIRECTION_ALL;
 
@@ -1060,7 +1061,6 @@ u16 MP2::GetObjectDirect(const u8 obj)
         case OBJ_MAGICGARDEN:
         case OBJ_WAGON:
         case OBJ_TRAVELLERTENT:
-        case OBJ_JAIL:
         case OBJ_ALCHEMYTOWER:
         case OBJ_HUTMAGI:
         case OBJ_EYEMAGI:
