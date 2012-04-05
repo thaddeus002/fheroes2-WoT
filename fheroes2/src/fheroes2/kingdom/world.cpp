@@ -1671,16 +1671,15 @@ u32 World::GetUniq(void)
 
 StreamBase & operator<< (StreamBase & msg, const CapturedObject & obj)
 {
-    if(FORMAT_VERSION_2798 > Game::GetSaveVersion())
-    {
-	return msg << obj.objcol << obj.guardians;
-    }
-
     return msg << obj.objcol << obj.guardians << obj.split;
 }
 
 StreamBase & operator>> (StreamBase & msg, CapturedObject & obj)
 {
+    if(FORMAT_VERSION_2798 > Game::GetSaveVersion())
+    {
+	return msg >> obj.objcol >> obj.guardians;
+    }
     return msg >> obj.objcol >> obj.guardians >> obj.split;
 }
 
