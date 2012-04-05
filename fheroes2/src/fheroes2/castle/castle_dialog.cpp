@@ -237,6 +237,18 @@ const Rect* GetMageGuildCoord(const Castle & castle, const CastleDialog::CacheBu
     return NULL;
 }
 
+void RedrawSwapButton(const Rect & rt)
+{
+    const Sprite & sprite = AGG::GetICN(ICN::ADVMCO, 8);
+    Surface sf(sprite.w() + 4, sprite.h() + 4);
+    Display & display = Display::Get();
+
+    Cursor::DrawCursor(sf, 0xDB, true);
+    display.FillRect(0, Rect(rt.x, rt.y, sf.w(), sf.h()));
+    sf.Blit(rt, display);
+    sprite.Blit(rt.x + 2, rt.y + 2, display);
+}
+
 Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 {
     Settings & conf = Settings::Get();
@@ -350,6 +362,17 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     // resource
     RedrawResourcePanel(cur_pt);
 
+    // button swap
+    Rect buttonSwap;
+    if(heroes.Guest() && heroes.Guard() && !readonly)
+    {
+	const Sprite & sprite = AGG::GetICN(ICN::ADVMCO, 8);
+	Surface sf(sprite.w() + 4, sprite.h() + 4);
+	buttonSwap = Rect(cur_pt.x + 4, cur_pt.y + 345, sf.w(), sf.h());
+
+	RedrawSwapButton(buttonSwap);
+    }
+
     // button exit
     dst_pt.x = cur_pt.x + 553;
     dst_pt.y = cur_pt.y + 428;
@@ -456,71 +479,82 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	    }
 	}
 
-	// move hero to guardian
-	if(conf.ExtCastleAllowGuardians() && !readonly && heroes.Guest() && !heroes.Guard() && le.MouseClickLeft(rectSign1))
+	if(conf.ExtCastleAllowGuardians() && !readonly)
 	{
-	    if(! heroes.Guest()->GetArmy().CanJoinTroops(army))
+	    Army* army1 = NULL;
+	    Army* army2 = NULL;
+
+	    // swap guest <-> guardian
+	    if(heroes.Guest() && heroes.Guard() && le.MouseClickLeft(buttonSwap))
 	    {
-		// FIXME: correct message
-		Dialog::Message("Join Error", "Army is full", Font::BIG, Dialog::OK);
+		SwapCastleHeroes(heroes);
+		army1 = &heroes.Guard()->GetArmy();
+		army2 = &heroes.Guest()->GetArmy();
 	    }
 	    else
+	    // move hero to guardian
+	    if(heroes.Guest() && !heroes.Guard() && le.MouseClickLeft(rectSign1))
 	    {
-		heroes.Guest()->SetModes(Heroes::GUARDIAN);
-		heroes.Guest()->ResetModes(Heroes::SLEEPER);
-		heroes.Swap();
-		heroes.Guard()->GetArmy().JoinTroops(army);
+		if(! heroes.Guest()->GetArmy().CanJoinTroops(army))
+		{
+		    // FIXME: correct message
+		    Dialog::Message("Join Error", "Army is full", Font::BIG, Dialog::OK);
+		}
+		else
+		{
+		    SwapCastleHeroes(heroes);
+		    army1 = &heroes.Guard()->GetArmy();
+		}
+	    }
+	    else
+	    // move guardian to hero
+	    if(!heroes.Guest() && heroes.Guard() && le.MouseClickLeft(rectSign2))
+	    {
+		SwapCastleHeroes(heroes);
+		army2 = &heroes.Guest()->GetArmy();
+	    }
 
-		world.GetTiles(center).SetHeroes(NULL);
-
-		// free position
-		Point position(heroes.Guard()->GetCenter());
-		position.y -= 1;
-		heroes.Guard()->SetCenter(position);
-		heroes.Guard()->GetPath().Reset();
-
+	    if(army1 || army2)
+	    {
 		cursor.Hide();
         	if(selectArmy1.isSelected()) selectArmy1.Reset();
         	if(selectArmy2.isSelected()) selectArmy2.Reset();
-		selectArmy2.ResetArmy();
-		selectArmy1.SetArmy(heroes.Guard()->GetArmy());
-		selectArmy1.SetSaveLastTroop();
+
+		if(army1 && army2)
+		{
+		    selectArmy1.ResetArmy();
+		    selectArmy2.ResetArmy();
+
+		    selectArmy1.SetArmy(*army1);
+		    selectArmy1.SetSaveLastTroop();
+
+		    selectArmy2.SetArmy(*army2);
+		    selectArmy2.SetSaveLastTroop();
+		}
+		else
+		if(army1)
+		{
+		    selectArmy2.ResetArmy();
+		    selectArmy1.SetArmy(*army1);
+		    selectArmy1.SetSaveLastTroop();
+		}
+		else
+		if(army2)
+		{
+		    selectArmy1.ResetArmy();
+		    selectArmy1.SetArmy(army);
+		    selectArmy2.SetArmy(*army2);
+		    selectArmy2.SetSaveLastTroop();
+		}
+
 		RedrawIcons(*this, heroes, cur_pt);
-        	selectArmy2.Redraw();
         	selectArmy1.Redraw();
+        	selectArmy2.Redraw();
 		CastleRedrawTownName(*this, cur_pt);
+		if(army1 && army2) RedrawSwapButton(buttonSwap);
 		cursor.Show();
 		display.Flip();
 	    }
-	}
-	else
-	// move guardian to hero
-	if(conf.ExtCastleAllowGuardians() && !readonly && !heroes.Guest() && heroes.Guard() && le.MouseClickLeft(rectSign2))
-	{
-	    heroes.Guard()->ResetModes(Heroes::GUARDIAN);
-	    heroes.Swap();
-
-	    // restore position
-	    Point position(heroes.Guest()->GetCenter());
-	    position.y += 1;
-	    heroes.Guest()->SetCenter(position);
-	    heroes.Guest()->GetPath().Reset();
-
-	    world.GetTiles(center).SetHeroes(heroes.Guest());
-
-	    cursor.Hide();
-    	    if(selectArmy1.isSelected()) selectArmy1.Reset();
-    	    if(selectArmy2.isSelected()) selectArmy2.Reset();
-	    selectArmy1.ResetArmy();
-	    selectArmy1.SetArmy(army);
-	    selectArmy2.SetArmy(heroes.Guest()->GetArmy());
-	    selectArmy2.SetSaveLastTroop();
-	    RedrawIcons(*this, heroes, cur_pt);
-    	    selectArmy1.Redraw();
-    	    selectArmy2.Redraw();
-	    CastleRedrawTownName(*this, cur_pt);
-	    cursor.Show();
-	    display.Flip();
 	}
 
 	// view guardian
@@ -855,6 +889,8 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	else
 	// status message next castle
 	if(le.MouseCursor(buttonNextCastle)) statusBar.ShowMessage(_("Show next town"));
+	else
+	if(heroes.Guest() && heroes.Guard() && le.MouseCursor(buttonSwap)) statusBar.ShowMessage(_("Swap Heroes"));
 	else
 	// status message over sign
 	if(heroes.Guard() && le.MouseCursor(rectSign1)) statusBar.ShowMessage(_("View Hero"));

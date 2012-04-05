@@ -20,6 +20,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <algorithm>
 #include "agg.h"
 #include "difficulty.h"
 #include "settings.h"
@@ -2098,4 +2099,57 @@ StreamBase & operator>> (StreamBase & msg, AllCastles & castles)
     }
 
     return msg;
+}
+
+void Castle::SwapCastleHeroes(CastleHeroes & heroes)
+{
+    if(heroes.Guest() && heroes.Guard())
+    {
+	heroes.Guest()->SetModes(Heroes::GUARDIAN);
+	heroes.Guest()->ResetModes(Heroes::SLEEPER);
+	heroes.Guard()->ResetModes(Heroes::GUARDIAN);
+	heroes.Swap();
+
+	world.GetTiles(center).SetHeroes(NULL);
+
+	Point position(heroes.Guard()->GetCenter());
+	position.y -= 1;
+        heroes.Guard()->SetCenter(position);
+	heroes.Guard()->GetPath().Reset();
+
+	position = heroes.Guest()->GetCenter();
+        position.y += 1;
+        heroes.Guest()->SetCenter(position);
+        heroes.Guest()->GetPath().Reset();
+
+	world.GetTiles(center).SetHeroes(heroes.Guest());
+    }
+    else
+    if(heroes.Guest() && !heroes.Guard())
+    {
+	heroes.Guest()->SetModes(Heroes::GUARDIAN);
+	heroes.Guest()->ResetModes(Heroes::SLEEPER);
+	heroes.Swap();
+	heroes.Guard()->GetArmy().JoinTroops(army);
+
+	world.GetTiles(center).SetHeroes(NULL);
+
+	Point position(heroes.Guard()->GetCenter());
+	position.y -= 1;
+        heroes.Guard()->SetCenter(position);
+	heroes.Guard()->GetPath().Reset();
+    }
+    else
+    if(!heroes.Guest() && heroes.Guard())
+    {
+	heroes.Guard()->ResetModes(Heroes::GUARDIAN);
+	heroes.Swap();
+
+	Point position(heroes.Guest()->GetCenter());
+        position.y += 1;
+        heroes.Guest()->SetCenter(position);
+        heroes.Guest()->GetPath().Reset();
+
+	world.GetTiles(center).SetHeroes(heroes.Guest());
+    }
 }

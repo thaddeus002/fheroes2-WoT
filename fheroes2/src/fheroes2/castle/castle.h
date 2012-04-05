@@ -197,6 +197,8 @@ public:
     Dialog::answer_t DialogBuyCaptain(bool fixed = true) const;
     Dialog::answer_t DialogBuyCastle(bool fixed = true) const;
 
+    void SwapCastleHeroes(CastleHeroes &);
+
 private:
     u16* GetDwelling(u32 dw);
     void EducateHeroes(void);
