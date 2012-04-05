@@ -278,7 +278,7 @@ Battle::Unit* Battle::Force::GetCurrentUnit(const Force & army1, const Force & a
 
 StreamBase & Battle::operator<< (StreamBase & msg, const Force & f)
 {
-    msg << static_cast<u32>(f.size());
+    msg << static_cast<const BitModes &>(f) << static_cast<u32>(f.size());
 
     for(Force::const_iterator
 	it = f.begin(); it != f.end(); ++it)
@@ -292,7 +292,7 @@ StreamBase & Battle::operator>> (StreamBase & msg, Force & f)
     u32 size = 0;
     u32 uid  = 0;
 
-    msg >> size;
+    msg >> static_cast<BitModes &>(f) >> size;
 
     for(u32 ii = 0; ii < size; ++ii)
     {

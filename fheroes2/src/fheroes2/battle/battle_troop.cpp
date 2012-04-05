@@ -602,6 +602,7 @@ void Battle::Unit::NewTurn(void)
     ResetModes(TR_MOVED);
     ResetModes(TR_SKIPMOVE);
     ResetModes(TR_HARDSKIP);
+    ResetModes(TR_DEFENSED);
     ResetModes(MORALE_BAD);
     ResetModes(MORALE_GOOD);
     ResetModes(LUCK_BAD);
@@ -1157,14 +1158,15 @@ u16 Battle::Unit::GetDefense(void) const
 {
     u16 res = ArmyTroop::GetDefense();
 
-    if(Modes(TR_GUARDIAN)) res += 2;
+    if(GetArena()->GetArmyColor2() == GetColor() &&
+	GetArena()->GetForce2().Modes(ARMY_GUARDIANS_OBJECT)) res += 2;
 
     if(Modes(SP_STONESKIN)) res += Spell(Spell::STONESKIN).ExtraValue();
     else
     if(Modes(SP_STEELSKIN)) res += Spell(Spell::STEELSKIN).ExtraValue();
 
     // extra
-    if(Modes(TR_HARDSKIP) && Settings::Get().ExtBattleSkipIncreaseDefense()) res += 2;
+    if(Modes(TR_DEFENSED)) res += 2;
 
     // disrupting ray accumulate effect
     if(disruptingray)

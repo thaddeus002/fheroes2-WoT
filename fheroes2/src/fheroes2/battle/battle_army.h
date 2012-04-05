@@ -24,6 +24,7 @@
 #define H2BATTLE_ARMY_H
 
 #include "army.h"
+#include "bitmodes.h"
 
 namespace Battle
 {
@@ -48,7 +49,9 @@ namespace Battle
         void		SortWeakest(void);
     };
 
-    class Force : public Units
+    enum { ARMY_GUARDIANS_OBJECT = 0x10000 };
+
+    class Force : public Units, public BitModes
     {
     public:
 	Force(Army &, bool);
