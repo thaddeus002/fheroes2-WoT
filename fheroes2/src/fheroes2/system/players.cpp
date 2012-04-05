@@ -436,12 +436,17 @@ StreamBase & operator>> (StreamBase & msg, Players & players)
 
     msg >> colors >> current;
 
-    players.Init(colors);
+    players.clear();
     players.current_color = current;
+    const Colors vcolors(colors);
 
-    for(Players::const_iterator
-	it = players.begin(); it != players.end(); ++it)
-	msg >> (**it);
+    for(u8 ii = 0; ii < vcolors.size(); ++ii)
+    {
+	Player* player = new Player();
+	msg >> *player;
+	_players[Color::GetIndex(player->color)] = player;
+	players.push_back(player);
+    }
 
     return msg;
 }
