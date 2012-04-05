@@ -226,6 +226,9 @@ bool Game::Load(const std::string & fn)
  		return false;
 	    }
 
+	    u16 oldver = GetSaveVersion();
+	    SetSaveVersion(binver);
+
 	    u16 end_check = 0;
 
 	    gdata >> Settings::Get() >> World::Get() >> GameOver::Result::Get() >>
@@ -238,6 +241,7 @@ bool Game::Load(const std::string & fn)
 	    }
 	    else
 	    {
+		SetSaveVersion(oldver);
 		DEBUG(DBG_GAME, DBG_WARN, "invalid load file: " << fn);
 	    }
 	}
