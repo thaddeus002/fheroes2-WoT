@@ -1900,8 +1900,7 @@ StreamBase & operator>> (StreamBase & msg, Heroes & hero)
 {
     HeroBase & base = hero;
 
-    return msg >>
-	base >>
+    msg >> base >>
 	// heroes
 	hero.name >>
 	hero.color >>
@@ -1920,6 +1919,10 @@ StreamBase & operator>> (StreamBase & msg, Heroes & hero)
 	hero.patrol_center >>
 	hero.patrol_square >>
 	hero.visit_object;
+
+    hero.army.SetCommander(&hero);
+
+    return msg;
 }
 
 StreamBase & operator<< (StreamBase & msg, const AllHeroes & heroes)

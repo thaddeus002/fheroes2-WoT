@@ -2040,6 +2040,8 @@ StreamBase & operator>> (StreamBase & msg, Castle & castle)
     msg >>
 	castle.army;
 
+    castle.army.SetCommander(& castle.captain);
+
     return msg;
 }
 

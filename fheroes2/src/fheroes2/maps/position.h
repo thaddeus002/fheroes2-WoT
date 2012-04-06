@@ -29,8 +29,7 @@ namespace Maps
 {
     struct Position
     {
-	Position() {};
-	Position(const Point &);
+	Position(const Point & = Point(-1, -1));
 
 	bool operator== (s32) const;
 
