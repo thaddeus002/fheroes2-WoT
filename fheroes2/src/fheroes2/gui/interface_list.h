@@ -135,6 +135,7 @@ namespace Interface
 	    {
 		cur = content->end();
 		top = content->begin();
+		UpdateSplitterRange();
 		splitter.Move(0);
 	    }
 	}
@@ -187,6 +188,7 @@ namespace Interface
 	    {
 		top = cur + maxItems > content->end() ? content->end() - maxItems : cur;
 		if(top < content->begin()) top = content->begin();
+		UpdateSplitterRange();
     		splitter.Move(top - content->begin());
 	    }
 	}
@@ -227,6 +229,7 @@ namespace Interface
 	    {
 		cursor.Hide();
 		top = (top - content->begin() > maxItems ? top - maxItems : content->begin());
+		UpdateSplitterRange();
     		splitter.Move(top - content->begin());
 		return true;
 	    }
@@ -237,6 +240,7 @@ namespace Interface
 		cursor.Hide();
 		top += maxItems;
 		if(top + maxItems > content->end()) top = content->end() - maxItems;
+		UpdateSplitterRange();
 		splitter.Move(top - content->begin());
 		return true;
 	    }
@@ -278,6 +282,7 @@ namespace Interface
 	    if(le.MousePressLeft(splitter.GetRect()) && (content->size() > maxItems))
 	    {
 		cursor.Hide();
+		UpdateSplitterRange();
 		s16 seek = (le.GetMouseCursor().y - splitter.GetRect().y) * 100 / splitter.GetStep();
 		if(seek < splitter.Min()) seek = splitter.Min();
 		else
@@ -335,6 +340,14 @@ namespace Interface
 	}
 
     protected:
+	void UpdateSplitterRange(void)
+	{
+	    const u16 max = content && maxItems < content->size() ? content->size() - maxItems : 0;
+
+	    if(splitter.Max() != max)
+		splitter.SetRange(0, max);
+	}
+
 	Point ptRedraw;
 	Rect rtAreaItems;
 
