@@ -43,6 +43,7 @@ public:
     void		Assign(const Troops &);
     void		Insert(const Troops &);
     void		PushBack(const Monster &, u32);
+    void		PopBack(void);
 
     size_t		Size(void) const;
 

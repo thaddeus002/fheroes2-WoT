@@ -169,6 +169,15 @@ void Troops::PushBack(const Monster & mons, u32 count)
     push_back(new Troop(mons, count));
 }
 
+void Troops::PopBack(void)
+{
+    if(size())
+    {
+	delete back();
+	pop_back();
+    }
+}
+
 Troop* Troops::GetTroop(size_t pos)
 {
     return pos < size() ? at(pos) : NULL;
@@ -513,7 +522,7 @@ void Troops::JoinStrongest(Troops & troops2, bool save_last)
     while(size() < priority.size())
     {
 	troops2.JoinTroop(*priority.back());
-	priority.pop_back();
+	priority.PopBack();
     }
 
     // save half weak of strongest to army2
@@ -529,7 +538,7 @@ void Troops::JoinStrongest(Troops & troops2, bool save_last)
     while(priority.size())
     {
 	JoinTroop(*priority.back());
-	priority.pop_back();
+	priority.PopBack();
     }
 }
 
@@ -551,7 +560,7 @@ void Troops::KeepOnlyWeakest(Troops & troops2, bool save_last)
     while(size() < priority.size())
     {
 	JoinTroop(*priority.back());
-	priority.pop_back();
+	priority.PopBack();
     }
 
     // save half weak of strongest to army
@@ -567,7 +576,7 @@ void Troops::KeepOnlyWeakest(Troops & troops2, bool save_last)
     while(priority.size())
     {
 	troops2.JoinTroop(*priority.back());
-	priority.pop_back();
+	priority.PopBack();
     }
 }
 
