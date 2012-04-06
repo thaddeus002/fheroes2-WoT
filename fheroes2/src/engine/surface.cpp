@@ -913,6 +913,7 @@ void Surface::GrayScale(void)
     if(!surface) return;
 
     u8 a, r, g, b, z;
+    a = r = g = b = z = 0;
 
     const u32 colkey = GetColorKey();
     u32 color = 0;
@@ -937,12 +938,14 @@ void Surface::Sepia(void)
 {
     if(!surface) return;
 
+    u8 r, g, b;
+    r = g = b = 0;
+
     Lock();
     for(u16 x = 0; x < surface->w; x++)
         for(u16 y = 0; y < surface->h; y++)
         {
             u32 pixel = GetPixel(x, y);
-            u8 r, g, b;
             GetRGB(pixel, &r, &g, &b);
     
             //Numbers derived from http://blogs.techrepublic.com.com/howdoi/?p=120
