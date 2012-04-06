@@ -1224,19 +1224,8 @@ StreamBase & operator>> (StreamBase & msg, Army & army)
 	if(troop) troop->SetArmy(army);
     }
 
-    // commander
-    if(type != Skill::Primary::UNDEFINED)
-    {
-	if(type == Skill::Primary::HEROES)
-	    army.commander = world.GetHeroes(index);
-	else
-	{
-	    Castle* castle = world.GetCastle(index);
-	    army.commander = castle ? &castle->GetCaptain() : NULL;
-	}
-    }
-    else
-	army.commander = NULL;
+    // set later from owner
+    army.commander = NULL;
 
     return msg;
 }

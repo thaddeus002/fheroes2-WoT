@@ -336,8 +336,10 @@ void Battle::Arena::TurnTroop(Unit* current_troop)
 	    else
 	    {
 		if((CONTROL_AI & current_troop->GetControl()) ||
-		    (current_troop->GetColor() & auto_battle))
-		    AI::BattleTurn(*this, *current_troop, actions);
+		    (current_color & auto_battle))
+		    {
+			AI::BattleTurn(*this, *current_troop, actions);
+		    }
     		else
 		if(CONTROL_HUMAN & current_troop->GetControl())
 		    HumanTurn(*current_troop, actions);
