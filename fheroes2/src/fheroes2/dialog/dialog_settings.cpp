@@ -87,9 +87,10 @@ void SettingsListBox::ActionListDoubleClick(u32 & item)
 
 void SettingsListBox::ActionListSingleClick(u32 & item)
 {
-    if(!readonly)
+    Settings & conf = Settings::Get();
+
+    if(!readonly || conf.CanChangeInGame(item))
     {
-	Settings & conf = Settings::Get();
 	conf.ExtModes(item) ? conf.ExtResetModes(item) : conf.ExtSetModes(item);
     }
 }

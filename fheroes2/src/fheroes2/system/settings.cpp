@@ -1116,6 +1116,11 @@ void Settings::SetNetworkDedicatedServer(bool f)
     f ? opt_global.SetModes(GLOBAL_DEDICATEDSERVER) : opt_global.ResetModes(GLOBAL_DEDICATEDSERVER);
 }
 
+bool Settings::CanChangeInGame(u32 f) const
+{
+    return static_cast<u8>(f >> 28) == 0x01; // GAME_ and POCKETPC_
+}
+
 bool Settings::ExtModes(u32 f) const
 {
     const u32 mask = 0x0FFFFFFF;

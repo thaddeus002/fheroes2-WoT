@@ -276,6 +276,7 @@ public:
     void BinarySave(void) const;
     void BinaryLoad(void);
 
+    bool CanChangeInGame(u32) const;
     bool ExtModes(u32) const;
     void ExtSetModes(u32);
     void ExtResetModes(u32);
