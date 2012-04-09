@@ -669,7 +669,7 @@ Battle::Interface::Interface(Arena & a, s32 center) : arena(a), icn_cbkg(ICN::UN
 	listlog = new StatusListBox();
 
     if(listlog)
-	listlog->SetPosition(area.x, btn_auto.y);
+	listlog->SetPosition(area.x, area.y + area.h - 36);
     status.SetLogs(listlog);
 
     // opponents
@@ -1766,7 +1766,7 @@ void Battle::Interface::HumanBattleTurn(const Unit & b, Actions & a, std::string
 	if(listlog)
 	{
 	    msg = (listlog->isOpenLog() ? _("Hide logs") : _("Show logs"));
-	    if(le.MouseClickLeft())
+	    if(le.MouseClickLeft(status))
 		listlog->SetOpenLog(! listlog->isOpenLog());
 	}
 	cursor.SetThemes(Cursor::WAR_POINTER);
