@@ -527,7 +527,7 @@ void Battle::Unit::SetRandomLuck(void)
     s8 f = GetLuck();
 
     //check enemy: have bone dragon
-    if(GetArena()->GetCurrentForce(false).HasMonster(Monster::BONE_DRAGON)) --f;
+    if(GetArena()->GetForce(GetArmyColor(), true).HasMonster(Monster::BONE_DRAGON)) --f;
 
     switch(f)
     {

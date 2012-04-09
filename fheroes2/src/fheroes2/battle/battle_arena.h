@@ -73,7 +73,8 @@ namespace Battle
 
 	Force &		GetForce1(void);
 	Force &		GetForce2(void);
-	Force &		GetCurrentForce(bool = true);
+	Force &		GetForce(u8 color, bool invert = false);
+	Force &		GetCurrentForce(void);
 	const Units*	GetOrderArmies(void) const;
 
 	u8		GetArmyColor1(void) const;

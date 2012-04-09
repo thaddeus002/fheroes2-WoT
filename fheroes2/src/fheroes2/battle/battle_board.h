@@ -80,7 +80,6 @@ namespace Battle
         static Indexes		GetAroundIndexes(s16);
 	static Indexes		GetAroundIndexes(const Unit &);
 	static Indexes		GetMoveWideIndexes(s16, bool reflect);
-	static Indexes		GetUnitsIndexes(u8 col);
 	static bool		isValidMirrorImageIndex(s16, const Unit*);
     };
 

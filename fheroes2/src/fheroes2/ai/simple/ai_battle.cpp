@@ -48,6 +48,32 @@ namespace Battle
     s16		AIMaxQualityPosition(const Indexes &);
     const Unit* AIGetEnemyAbroadMaxQuality(s16, u8 color);
     const Unit* AIGetEnemyAbroadMaxQuality(const Unit &);
+    s16		AIAreaSpellDst(const HeroBase &);
+
+    bool MaxDstCount(const std::pair<s16, u8> & p1, const std::pair<s16, u8> & p2) { return p1.second < p2.second; }
+}
+
+s16 Battle::AIAreaSpellDst(const HeroBase & hero)
+{
+    std::map<s16, u8> dstcount;
+
+    Arena* arena = GetArena();
+    Units enemies(arena->GetForce(hero.GetColor(), true), true);
+
+    for(Units::const_iterator
+	it1 = enemies.begin(); it1 != enemies.end(); ++it1)
+    {
+	const Indexes around = Board::GetAroundIndexes(**it1);
+
+	for(Indexes::const_iterator
+	    it2 = around.begin(); it2 != around.end(); ++it2)
+	    dstcount[*it2] += 1;
+    }
+
+    // find max
+    std::map<s16, u8>::const_iterator max = std::max_element(dstcount.begin(), dstcount.end(), MaxDstCount);
+
+    return max != dstcount.end() ? (*max).first : -1;
 }
 
 s16 Battle::AIMaxQualityPosition(const Indexes & positions)
@@ -148,52 +174,46 @@ s16 Battle::AIAttackPosition(Arena & arena, const Unit & b, const Indexes & posi
     else
     if(b.isDoubleCellAttack())
     {
-
-	const u8 opp_color = GetArena()->GetOppositeColor(b.GetColor());
-	Indexes enemies = Board::GetUnitsIndexes(opp_color);
         Indexes results;
         results.reserve(12);
 
-        // get actual coord if enemy troop near placed
-        while(1 < enemies.size())
-        {
-            const s16 cur = enemies.back();
-            enemies.pop_back();
+	const Units enemies(arena.GetForce(b.GetColor(), true), true);
 
-            for(Indexes::const_iterator
-		it = enemies.begin(); it != enemies.end(); ++it)
-            {
-                // get near placed enemies
-                const direction_t dir = Board::GetDirection(cur, *it);
+	if(1 < enemies.size())
+	{
+	    for(Units::const_iterator
+		it1 = enemies.begin(); it1 != enemies.end(); ++it1)
+	    {
+		const Indexes around = Board::GetAroundIndexes(**it1);
 
-                if(UNKNOWN != dir)
-                {
-                    if(Board::isValidDirection(cur, Board::GetReflectDirection(dir)))
-                        results.push_back(Board::GetIndexDirection(cur, Board::GetReflectDirection(dir)));
-                    if(Board::isValidDirection(*it, dir))
-                        results.push_back(Board::GetIndexDirection(*it, dir));
-                }
-            }
-        }
+		for(Indexes::const_iterator
+		    it2 = around.begin(); it2 != around.end(); ++it2)
+		{
+		    const Unit* unit = Board::GetCell(*it2)->GetUnit();
+		    if(unit && enemies.end() != std::find(enemies.begin(), enemies.end(), unit))
+			results.push_back(*it2);
+		}
+	    }
 
-        if(results.size())
-        {
-            // find passable results
-            Indexes passable = Arena::GetBoard()->GetPassableQualityPositions(b);
-            Indexes::iterator it2 = results.begin();
+    	    if(results.size())
+    	    {
+        	// find passable results
+        	Indexes passable = Arena::GetBoard()->GetPassableQualityPositions(b);
+        	Indexes::iterator it2 = results.begin();
 
-            for(Indexes::const_iterator
-		it = results.begin(); it != results.end(); ++it)
-                if(passable.end() != std::find(passable.begin(), passable.end(), *it))
-                    *it2++ = *it;
+        	for(Indexes::const_iterator
+		    it = results.begin(); it != results.end(); ++it)
+            	    if(passable.end() != std::find(passable.begin(), passable.end(), *it))
+                	*it2++ = *it;
 
-            if(it2 != results.end())
-                results.resize(std::distance(results.begin(), it2));
+        	if(it2 != results.end())
+            	    results.resize(std::distance(results.begin(), it2));
 
-            // get max quality
-            if(results.size())
-                res = AIMaxQualityPosition(results);
-        }
+        	// get max quality
+        	if(results.size())
+            	    res = AIMaxQualityPosition(results);
+    	    }
+	}
     }
 
     return 0 > res ? AIShortDistance(b.GetHeadIndex(), positions) : res;
@@ -334,11 +354,11 @@ bool AI::BattleMagicTurn(Arena & arena, const Unit & b, Actions & a, const Unit*
 	arena.isDisableCastSpell(Spell(), NULL) || a.HaveCommand(Battle::MSG_BATTLE_CAST))
 	return false;
 
-    const Force & my_army = arena.GetCurrentForce(true);
-    const Force & enemy_army = arena.GetCurrentForce(false);
+    const Force & my_army = arena.GetForce(b.GetArmyColor(), false);
+    const Force & enemy_army = arena.GetForce(b.GetArmyColor(), true);
 
-    Units friends(my_army);
-    Units enemies(enemy_army);
+    Units friends(my_army, true);
+    Units enemies(enemy_army, true);
 
     // sort strongest
     friends.SortStrongest();
@@ -352,6 +372,22 @@ bool AI::BattleMagicTurn(Arena & arena, const Unit & b, Actions & a, const Unit*
 	{
 	    if(AIApplySpell(Spell::DISPEL, *it, *hero, a)) return true;
 	    if(AIApplySpell(Spell::CURE, *it, *hero, a)) return true;
+	}
+    }
+
+    // area damage spell
+    {
+	const u8 areasp[] = { Spell::METEORSHOWER, Spell::FIREBLAST, Spell::CHAINLIGHTNING, Spell::FIREBALL, Spell::COLDRING };
+	s16 dst = AIAreaSpellDst(*hero);
+
+	if(Board::isValidIndex(dst))
+	for(u8 ii = 0; ii < ARRAY_COUNT(areasp); ++ii)
+	{
+	    if(hero->CanCastSpell(areasp[ii]))
+	    {
+		a.push_back(Battle::Command(MSG_BATTLE_CAST, areasp[ii], dst));
+		return true;
+	    }
 	}
     }
 
@@ -415,6 +451,7 @@ bool AI::BattleMagicTurn(Arena & arena, const Unit & b, Actions & a, const Unit*
 	}
     }
 
+
     // enemy army spell
     {
 	// find mirror image or summon elem
@@ -424,8 +461,6 @@ bool AI::BattleMagicTurn(Arena & arena, const Unit & b, Actions & a, const Unit*
 	if(it != enemies.end())
 	{
 	    if(AIApplySpell(Spell::ARROW, *it, *hero, a)) return true;
-	    if(AIApplySpell(Spell::COLDRAY, *it, *hero, a)) return true;
-	    if(AIApplySpell(Spell::FIREBALL, *it, *hero, a)) return true;
 	    if(AIApplySpell(Spell::LIGHTNINGBOLT, *it, *hero, a)) return true;
 	}
 
@@ -462,17 +497,11 @@ bool AI::BattleMagicTurn(Arena & arena, const Unit & b, Actions & a, const Unit*
 	Unit* stats = *Rand::Get(enemies);
 
 	if(AIApplySpell(Spell::LIGHTNINGBOLT, stats, *hero, a)) return true;
-	if(AIApplySpell(Spell::FIREBALL, stats, *hero, a)) return true;
-	if(AIApplySpell(Spell::COLDRAY, stats, *hero, a)) return true;
 	if(AIApplySpell(Spell::ARROW, stats, *hero, a)) return true;
     }
 
 /*
     FIX: Damage Spell:
-    Spell::FIREBLAST
-    Spell::COLDRING
-    Spell::CHAINLIGHTNING
-    Spell::METEORSHOWER
 */
 
     if(AIApplySpell(Spell::ARMAGEDDON, NULL, *hero, a)) return true;

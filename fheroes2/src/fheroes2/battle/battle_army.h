@@ -34,7 +34,7 @@ namespace Battle
     {
     public:
 	Units();
-	Units(const Units &);
+	Units(const Units &, bool filter = false);
 	Units(const Units &, const Units &);
 	virtual ~Units();
 

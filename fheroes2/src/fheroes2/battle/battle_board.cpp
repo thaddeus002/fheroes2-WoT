@@ -98,17 +98,17 @@ void Battle::Board::Reset(void)
 
 void Battle::Board::SetPositionQuality(const Unit & b)
 {
-    const Indexes enemies = GetUnitsIndexes(GetArena()->GetOppositeColor(b.GetColor()));
+    Arena* arena = GetArena();
+    Units enemies(arena->GetForce(b.GetColor(), true), true);
 
-    for(Indexes::const_iterator
+    for(Units::const_iterator
 	it1 = enemies.begin(); it1 != enemies.end(); ++it1)
     {
-	const Cell* cell1 = GetCell(*it1);
-	const Unit* unit = cell1 ? cell1->GetUnit() :  NULL;
+	const Unit* unit = *it1;
 
-	if(unit && unit->isValid() &&
-	    (!unit->isWide() || *it1 != unit->GetTailIndex()))
+	if(unit && unit->isValid())
 	{
+	    const Cell* cell1 = GetCell(unit->GetHeadIndex());
 	    const Indexes around = GetAroundIndexes(*unit);
 
 	    for(Indexes::const_iterator
@@ -124,26 +124,23 @@ void Battle::Board::SetPositionQuality(const Unit & b)
 
 void Battle::Board::SetEnemyQuality(const Unit & b)
 {
-    const Indexes enemies = GetUnitsIndexes(GetArena()->GetOppositeColor(b.GetColor()));
+    Arena* arena = GetArena();
+    Units enemies(arena->GetForce(b.GetColor(), true), true);
 
-    for(Indexes::const_iterator
-	it = enemies.begin(); it != enemies.end(); ++it)
+    for(Units::const_iterator
+        it = enemies.begin(); it != enemies.end(); ++it)
     {
-	Cell* cell = GetCell(*it);
-	Unit* unit = cell ? cell->GetUnit() :  NULL;
+	Unit* unit = *it;
 
-	if(unit && unit->isValid() &&
-	    (!unit->isWide() || *it != unit->GetTailIndex()))
+	if(unit && unit->isValid())
 	{
 	    const s32 & score = b.GetScoreQuality(*unit);
+	    Cell* cell = GetCell(unit->GetHeadIndex());
+
 	    cell->SetQuality(score);
 
 	    if(unit->isWide())
-    	    {
-        	Cell* tail = GetCell(unit->GetHeadIndex() == *it ?
-            			    unit->GetTailIndex() : unit->GetHeadIndex());
-        	if(tail) tail->SetQuality(score);
-    	    }
+        	GetCell(unit->GetTailIndex())->SetQuality(score);
 
 	    DEBUG(DBG_BATTLE, DBG_TRACE, score << " for " << unit->String());
 	}
@@ -968,21 +965,4 @@ bool Battle::Board::isValidMirrorImageIndex(s16 index, const Unit* b)
     return b && GetCell(index) &&
 	index != b->GetHeadIndex() && (!b->isWide() || index != b->GetTailIndex()) &&
 	GetCell(index)->isPassable3(*b, true);
-}
-
-Battle::Indexes Battle::Board::GetUnitsIndexes(u8 col)
-{
-    Indexes result;
-    result.reserve(12);
-
-    for(u16 index = 0; index < ARENASIZE; ++index)
-    {
-	const Cell* cell = GetCell(index);
-	const Unit* unit = cell ? cell->GetUnit() : NULL;
-
-	if(unit && unit->isValid() && col == unit->GetColor())
-	    result.push_back(index);
-    }
-
-    return result;
 }

@@ -1091,9 +1091,17 @@ Battle::Force & Battle::Arena::GetForce2(void)
     return *army2;
 }
 
-Battle::Force & Battle::Arena::GetCurrentForce(bool invert)
+Battle::Force & Battle::Arena::GetForce(u8 color, bool invert)
 {
-    return current_color == army1->GetColor() ? *army1 : *army2;
+    if(army1->GetColor() == color)
+        return invert ? *army2 : *army1;
+
+    return invert ? *army1 : *army2;
+}
+
+Battle::Force & Battle::Arena::GetCurrentForce(void)
+{
+    return GetForce(current_color, false);
 }
 
 ICN::icn_t Battle::Arena::GetICNCovr(void) const

@@ -48,10 +48,13 @@ Battle::Units::Units()
     reserve(CAPACITY);
 }
 
-Battle::Units::Units(const Units & units)
+Battle::Units::Units(const Units & units, bool filter)
 {
     reserve(CAPACITY < units.size() ? units.size() : CAPACITY);
     assign(units.begin(), units.end());
+    if(filter)
+	resize(std::distance(begin(),
+	    std::remove_if(begin(), end(), std::not1(std::mem_fun(&Unit::isValid)))));
 }
 
 Battle::Units::Units(const Units & units1, const Units & units2)
@@ -211,8 +214,8 @@ void Battle::Force::NewTurn(void)
 
 Battle::Unit* Battle::Force::GetCurrentUnit(const Force & army1, const Force & army2, Unit* last, Units* all, bool part1)
 {
-    Units units1(army1);
-    Units units2(army2);
+    Units units1(army1, true);
+    Units units2(army2, true);
 
     if(all)
 	*all = Units(army1, army2);
