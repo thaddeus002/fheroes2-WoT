@@ -128,7 +128,7 @@ Battle::Force::Force(Army & parent, bool opposite) : army(parent)
 
 	if(troop && troop->isValid())
 	{
-	    push_back(new Unit(*troop, World::GetUniq(), (opposite ? position + 10 : position), opposite));
+	    push_back(new Unit(*troop, reinterpret_cast<u32>(troop), (opposite ? position + 10 : position), opposite));
 	    back()->SetArmy(army);
 	}
     }
@@ -397,8 +397,12 @@ void Battle::Force::SyncArmyCount(void)
     for(u8 index = 0; index < army.Size(); ++index)
     {
 	Troop* troop = army.GetTroop(index);
+	const Unit* unit = FindUID(reinterpret_cast<u32>(troop));
 
-	if(troop && troop->isValid() && index < size())
-	    troop->SetCount(at(index)->GetCount());
+	if(troop && troop->isValid())
+	{
+	    if(unit->GetDead())
+		troop->SetCount(unit->GetDead() > troop->GetCount() ? 0 : troop->GetCount() - unit->GetDead());
+	}
     }
 }
