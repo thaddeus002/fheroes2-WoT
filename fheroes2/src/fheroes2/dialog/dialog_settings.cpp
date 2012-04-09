@@ -124,7 +124,6 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::GAME_SAVE_REWRITE_CONFIRM);
     states.push_back(Settings::GAME_ALSO_CONFIRM_AUTOSAVE);
     states.push_back(Settings::GAME_REMEMBER_LAST_FOCUS);
-    states.push_back(Settings::GAME_REMEMBER_LAST_FILENAME);
     states.push_back(Settings::GAME_SHOW_SYSTEM_INFO);
     states.push_back(Settings::GAME_EVIL_INTERFACE);
     states.push_back(Settings::GAME_BATTLE_SHOW_GRID);

@@ -164,19 +164,17 @@ bool Dialog::SelectFileSave(std::string & file)
     if(file.empty())
     {
 	const Settings & conf = Settings::Get();
-	file = Settings::GetSaveDir() + SEPARATOR;
 
-	if(conf.ExtGameRememberLastFilename() && Game::GetLastSavename().size())
+	if(Game::GetLastSavename().size())
 	    file = Game::GetLastSavename();
 	else
-	if(conf.PocketPC())
 	{
-    	    std::ostringstream ss;
-	    ss << std::time(0);
-	    file += ss.str() + ".sav";
+	    std::string mapfile = String::Lower(GetBasename(conf.CurrentFileInfo().file));
+	    size_t pos = mapfile.rfind('.');
+	    file = mapfile.substr(0, std::string::npos != pos ? pos : mapfile.size());
 	}
-	else
-	    file += "newgame.sav";
+
+	file = Settings::GetSaveDir() + SEPARATOR + file + ".sav";
     }
 
     return SelectFileListSimple(_("File to Save:"), file, true);
@@ -185,7 +183,7 @@ bool Dialog::SelectFileSave(std::string & file)
 bool Dialog::SelectFileLoad(std::string & file)
 {
     // set default
-    if(file.empty() && Settings::Get().ExtGameRememberLastFilename() && Game::GetLastSavename().size())
+    if(file.empty() && Game::GetLastSavename().size())
 	file = Game::GetLastSavename();
     return SelectFileListSimple(_("File to Load:"), file, false);
 }

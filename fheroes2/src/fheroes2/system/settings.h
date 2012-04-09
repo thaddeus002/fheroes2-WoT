@@ -142,7 +142,7 @@ public:
 	GAME_EVIL_INTERFACE		= 0x10001000,
 	GAME_HIDE_INTERFACE		= 0x10002000,
 	GAME_ALSO_CONFIRM_AUTOSAVE	= 0x10004000,
-	GAME_REMEMBER_LAST_FILENAME	= 0x10008000,
+	//UNUSED			= 0x10008000,
 	GAME_DYNAMIC_INTERFACE		= 0x10010000,
         GAME_BATTLE_SHOW_GRID		= 0x10020000,
         GAME_BATTLE_SHOW_MOUSE_SHADOW	= 0x10040000,
@@ -336,7 +336,6 @@ public:
     bool ExtBattleShowMouseShadow(void) const;
     bool ExtBattleShowMoveShadow(void) const;
     bool ExtGameRememberLastFocus(void) const;
-    bool ExtGameRememberLastFilename(void) const;
     bool ExtGameContinueAfterVictory(void) const;
     bool ExtGameRewriteConfirm(void) const;
     bool ExtGameAutosaveConfirm(void) const;

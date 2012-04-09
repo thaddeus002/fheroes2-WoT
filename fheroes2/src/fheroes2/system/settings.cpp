@@ -124,7 +124,6 @@ const settings_t settingsFHeroes2[] =
     { Settings::GAME_SAVE_REWRITE_CONFIRM,	_("game: always confirm for rewrite savefile"),		},
     { Settings::GAME_ALSO_CONFIRM_AUTOSAVE,	_("game: also confirm autosave"),			},
     { Settings::GAME_REMEMBER_LAST_FOCUS,	_("game: remember last focus"),				},
-    { Settings::GAME_REMEMBER_LAST_FILENAME,	_("game: remember last filename"),			},
     { Settings::GAME_BATTLE_SHOW_GRID,		_("game: battle show grid"),				},
     { Settings::GAME_BATTLE_SHOW_MOUSE_SHADOW,	_("game: battle mouse shadow")				},
     { Settings::GAME_BATTLE_SHOW_MOVE_SHADOW,	_("game: battle move shadow"),				},
@@ -1377,11 +1376,6 @@ bool Settings::ExtGameAutosaveBeginOfDay(void) const
 bool Settings::ExtGameAutosaveOn(void) const
 {
     return ExtModes(GAME_AUTOSAVE_ON);
-}
-
-bool Settings::ExtGameRememberLastFilename(void) const
-{
-    return ExtModes(GAME_REMEMBER_LAST_FILENAME);
 }
 
 bool Settings::ExtGameUseFade(void) const
