@@ -1888,6 +1888,9 @@ bool Maps::Tiles::isPassable(const Heroes* hero, u16 direct, bool skipfog) const
 	{
 	    if(! isWater())
 		return false;
+
+	    if(MP2::OBJ_BOAT == GetObject())
+		return false;
 	}
 	else
 	// if(! hero->isShipMaster() &&
