@@ -32,6 +32,7 @@
 #include "maps_fileinfo.h"
 #include "interface_list.h"
 #include "pocketpc.h"
+#include "world.h"
 #include "dialog.h"
 
 #if defined __SYMBIAN32__ || defined(ANDROID)
@@ -164,17 +165,25 @@ bool Dialog::SelectFileSave(std::string & file)
     if(file.empty())
     {
 	const Settings & conf = Settings::Get();
+//	const std::string & last = Game::GetLastSavename();
+	std::ostringstream os;
 
-	if(Game::GetLastSavename().size())
-	    file = Game::GetLastSavename();
-	else
+	os << Settings::GetSaveDir() << SEPARATOR;
+
+//	if(last.size())
+//	    os << last;
+//	else
 	{
-	    std::string mapfile = String::Lower(GetBasename(conf.CurrentFileInfo().file));
-	    size_t pos = mapfile.rfind('.');
-	    file = mapfile.substr(0, std::string::npos != pos ? pos : mapfile.size());
+	    const std::string & name = conf.CurrentFileInfo().file;
+	    const std::string base = name.size() ? GetBasename(name) : "newgame.sav";
+	    size_t pos = base.rfind('.');
+
+	    os << std::skipws << std::nouppercase << base.substr(0, std::string::npos != pos ? pos : base.size()) <<
+		// add postfix:
+		'_' << std::setw(4) << std::setfill('0') << world.GetDay() << ".sav";
 	}
 
-	file = Settings::GetSaveDir() + SEPARATOR + file + ".sav";
+	file = os.str();
     }
 
     return SelectFileListSimple(_("File to Save:"), file, true);

@@ -106,7 +106,7 @@ bool Game::Save(const std::string &fn)
     {
 	StreamBuf info(1024);
 	StreamBuf gdata((Maps::MEDIUM < conf.MapsWidth() ? 1024 :512) * 1024);
-	if(! autosave) Game::SetLastSavename(GetBasename(fn));
+	if(! autosave) Game::SetLastSavename(fn);
 
 	info << GetString(GetSaveVersion()) << GetSaveVersion() <<
 		HeaderSAV(conf.CurrentFileInfo(), conf.PriceLoyaltyVersion());
@@ -252,7 +252,7 @@ bool Game::Load(const std::string & fn)
     if(result)
     {
 	Settings & conf = Settings::Get();
-	Game::SetLastSavename(GetBasename(fn));
+	Game::SetLastSavename(fn);
 	conf.SetGameType(conf.GameType() | Game::TYPE_LOADFILE);
     }
 
