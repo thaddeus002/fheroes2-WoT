@@ -138,6 +138,36 @@ bool PassableFromToTile(const Heroes* hero, const s32 & from, const s32 & to, co
 	}
     }
 
+    if(fromTile.isWater() && !toTile.isWater())
+    {
+	switch(toTile.GetObject())
+	{
+	    case MP2::OBJ_BOAT:
+            case MP2::OBJ_MONSTER:
+            case MP2::OBJ_HEROES:
+                return false;
+
+	    case MP2::OBJ_COAST:
+		return toTile.GetIndex() == dst;
+
+	    default: break;
+	}
+    }
+    else
+    if(!fromTile.isWater() && toTile.isWater())
+    {
+	switch(toTile.GetObject())
+	{
+	    case MP2::OBJ_BOAT:
+                return true;
+
+            case MP2::OBJ_HEROES:
+		return toTile.GetIndex() == dst;
+
+	    default: break;
+	}
+    }
+
     return PassableToTile(hero, toTile, direct, dst);
 }
 
