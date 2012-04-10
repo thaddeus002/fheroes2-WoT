@@ -441,7 +441,7 @@ Troops Troops::GetOptimized(void) const
     return result;
 }
 
-void Troops::ArrangeForBattle(void)
+void Troops::ArrangeForBattle(bool upgrade)
 {
     Troops priority = GetOptimized();
 
@@ -462,6 +462,9 @@ void Troops::ArrangeForBattle(void)
 		    at(2)->Set(m, c + count - (c * 5));
 		    at(3)->Set(m, c);
 		    at(4)->Set(m, c);
+
+		    if(upgrade && at(2)->isAllowUpgrade())
+			at(2)->Upgrade();
 		}
 		else
 		if(20 < count)
@@ -470,6 +473,9 @@ void Troops::ArrangeForBattle(void)
 		    at(1)->Set(m, c);
 		    at(2)->Set(m, c + count - (c * 3));
 		    at(3)->Set(m, c);
+
+		    if(upgrade && at(2)->isAllowUpgrade())
+			at(2)->Upgrade();
 		}
 		else
 	    	    at(2)->Set(m, count);
@@ -645,17 +651,17 @@ Army::Army(const Maps::Tiles & t) : commander(NULL), combat_format(true), color(
 
 	case MP2::OBJ_GRAVEYARD:
 	    at(0)->Set(Monster::MUTANT_ZOMBIE, 100);
-	    ArrangeForBattle();
+	    ArrangeForBattle(false);
 	    break;
 
 	case MP2::OBJ_SHIPWRECK:
 	    at(0)->Set(Monster::GHOST, t.GetQuantity2());
-	    ArrangeForBattle();
+	    ArrangeForBattle(false);
 	    break;
 
 	case MP2::OBJ_DERELICTSHIP:
 	    at(0)->Set(Monster::SKELETON, 200);
-	    ArrangeForBattle();
+	    ArrangeForBattle(false);
 	    break;
 
 	case MP2::OBJ_ARTIFACT:
@@ -671,12 +677,12 @@ Army::Army(const Maps::Tiles & t) : commander(NULL), combat_format(true), color(
 		case 13:at(0)->Set(Monster::BONE_DRAGON, 1); break;
 		default: break;
 	    }
-	    ArrangeForBattle();
+	    ArrangeForBattle(false);
 	    break;
 
 	//case MP2::OBJ_ABANDONEDMINE:
 	//    at(0) = Troop(t);
-	//    ArrangeForBattle();
+	//    ArrangeForBattle(false);
 	//    break;
 
 	case MP2::OBJ_CITYDEAD:
@@ -748,7 +754,7 @@ Army::Army(const Maps::Tiles & t) : commander(NULL), combat_format(true), color(
 	    else
 	    {
 		at(0)->Set(t.QuantityTroop());
-		ArrangeForBattle();
+		ArrangeForBattle(! Settings::Get().ExtWorldSaveMonsterBattle());
 	    }
 	    break;
     }

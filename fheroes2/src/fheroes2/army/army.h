@@ -84,7 +84,7 @@ public:
     Troop &		GetWeakestTroop(void);
     Troop &		GetSlowestTroop(void);
 
-    void		ArrangeForBattle(void);
+    void		ArrangeForBattle(bool = false);
 
     void		JoinStrongest(Troops &, bool);
     void		KeepOnlyWeakest(Troops &, bool);
