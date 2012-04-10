@@ -14,4 +14,6 @@
  <!-- recruit hero: level price -->
  <recruit_level gold="500" />
 
+ <alchemist_payment gold="750" />
+
 </payments>
