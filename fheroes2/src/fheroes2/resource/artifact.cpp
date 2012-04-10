@@ -341,6 +341,24 @@ u16 Artifact::ExtraValue(void) const
     return artifacts[id].extra;
 }
 
+bool Artifact::isAlchemistRemove(void) const
+{
+    switch(id)
+    {
+	case TAX_LIEN:
+	case FIZBIN_MISFORTUNE:
+	case HIDEOUS_MASK:
+	case ARM_MARTYR:
+	case HEART_FIRE:
+	case HEART_ICE:
+	case BROACH_SHIELDING:
+	case SPHERE_NEGATION:
+	return true;
+    }
+
+    return false;
+}
+
 bool Artifact::isUltimate(void) const
 {
     switch(id)

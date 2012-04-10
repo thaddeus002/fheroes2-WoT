@@ -166,6 +166,7 @@ public:
     u8 GetID(void) const;
 
     bool isUltimate(void) const;
+    bool isAlchemistRemove(void) const;
     bool isValid(void) const;
 
     void Reset(void);

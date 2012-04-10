@@ -2778,15 +2778,36 @@ void ActionToDaemonCave(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 void ActionToAlchemistsTower(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
-/*
-As you enter the Alchemist's Tower, a hobbled, graying man in a brown cloak makes his way towards you. e checks your pack, and sees
-that you have 1 cursed item. For 750 gold, the alchemist will remove it for you. Do you pay?
-As you enter the Alchemist's Tower, a hobbled, graying man in a brown cloak makes his way towards you. He checks your pack, and sees
-that you have %d cursed items. For 750 gold, the alchemist will remove them for you. Do you pay?
-You hear a voice from behind the locked door, "You don't have enough gold to pay for my services."
-You hear a voice from high above in the tower, "Go away! I can't help you!"
-*/
-    Dialog::Message("", _("You hear a voice from high above in the tower, \"Go away! I can't help you!\""), Font::BIG, Dialog::OK);
+    BagArtifacts & bag = hero.GetBagArtifacts();
+    u8 cursed = std::count_if(bag.begin(), bag.end(), std::mem_fun_ref(&Artifact::isAlchemistRemove));
+
+    if(cursed)
+    {
+	payment_t payment = PaymentConditions::ForAlchemist(cursed);
+
+        if(world.GetKingdom(hero.GetColor()).AllowPayment(payment))
+        {
+	    std::string msg = "As you enter the Alchemist's Tower, a hobbled, graying man in a brown cloak makes his way towards you.";
+	    msg.append("\n");
+	    msg.append(ngettext("He checks your pack, and sees that you have 1 cursed item.",
+				    "He checks your pack, and sees that you have %{count} cursed items.", cursed));
+	    String::Replace(msg, "%{count}", cursed);
+	    msg.append("\n");
+	    msg.append(_("For %{gold} gold, the alchemist will remove it for you. Do you pay?"));
+	    String::Replace(msg, "%{gold}", payment.gold);
+
+	    if(Dialog::YES == Dialog::Message("", msg, Font::BIG, Dialog::YES | Dialog::NO))
+	    {
+        	world.GetKingdom(hero.GetColor()).OddFundsResource(payment);
+		bag.resize(std::distance(bag.begin(),
+			std::remove_if(bag.begin(), bag.end(), std::mem_fun_ref(&Artifact::isAlchemistRemove))));
+	    }
+        }
+	else
+	    Dialog::Message("", _("You hear a voice from behind the locked door, \"You don't have enough gold to pay for my services.\""), Font::BIG, Dialog::OK);
+    }
+    else
+	Dialog::Message("", _("You hear a voice from high above in the tower, \"Go away! I can't help you!\""), Font::BIG, Dialog::OK);
 
     DEBUG(DBG_GAME, DBG_INFO, hero.GetName());
 }

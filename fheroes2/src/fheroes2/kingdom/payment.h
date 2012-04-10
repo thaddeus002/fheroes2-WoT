@@ -33,6 +33,7 @@ namespace PaymentConditions
     payment_t BuyBoat(void);
     payment_t BuySpellBook(u8 shrine = 0);
     payment_t RecruitHero(u8 level);
+    payment_t ForAlchemist(u8 arts);
 
     void UpdateCosts(const std::string &);
 }

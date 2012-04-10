@@ -45,6 +45,7 @@ paymentstats_t _payments[] = {
     { "buy_spell_book_from_shrine3", {   750, 0, 0, 0, 0, 0, 0 } },
     { "recruit_hero",   { 2500, 0, 0, 0, 0, 0, 0 } },
     { "recruit_level",   { 500, 0, 0, 0, 0, 0, 0 } },
+    { "alchemist_payment", { 750, 0, 0, 0, 0, 0, 0 } },
 
     { NULL, { 0, 0, 0, 0, 0, 0, 0 } },
 };
@@ -150,6 +151,16 @@ payment_t PaymentConditions::RecruitHero(u8 level)
 	    if(ptr->cost.gems) result.gems += (level - 1) * ptr->cost.gems;
 	}
     }
+
+    return result;
+}
+
+payment_t PaymentConditions::ForAlchemist(u8 arts)
+{
+    payment_t result;
+    paymentstats_t* ptr = &_payments[0];
+    while(ptr->id && std::strcmp("alchemist_payment", ptr->id)) ++ptr;
+    if(ptr->id) result = ptr->cost;
 
     return result;
 }
