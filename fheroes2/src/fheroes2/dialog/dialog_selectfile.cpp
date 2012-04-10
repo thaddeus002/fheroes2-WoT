@@ -166,22 +166,19 @@ bool Dialog::SelectFileSave(std::string & file)
     {
 	const Settings & conf = Settings::Get();
 //	const std::string & last = Game::GetLastSavename();
-	std::ostringstream os;
-
-	os << Settings::GetSaveDir() << SEPARATOR;
 
 //	if(last.size())
 //	    os << last;
 //	else
-	{
-	    const std::string & name = conf.CurrentFileInfo().file;
-	    const std::string base = name.size() ? GetBasename(name) : "newgame.sav";
-	    size_t pos = base.rfind('.');
 
-	    os << std::skipws << std::nouppercase << base.substr(0, std::string::npos != pos ? pos : base.size()) <<
-		// add postfix:
-		'_' << std::setw(4) << std::setfill('0') << world.GetDay() << ".sav";
-	}
+	const std::string & name = conf.CurrentFileInfo().name;
+	std::string base = name.size() ? name : "newgame";
+	std::replace_if(base.begin(), base.end(), ::isspace, '_');
+	std::ostringstream os;
+
+	os << Settings::GetSaveDir() << SEPARATOR << base <<
+	    // add postfix:
+	    '_' << std::setw(4) << std::setfill('0') << world.GetDay() << ".sav";
 
 	file = os.str();
     }
