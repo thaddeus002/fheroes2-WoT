@@ -46,25 +46,6 @@ namespace Battle
 	((BOTTOM_LEFT == where) && (whereto & (LEFT | BOTTOM_RIGHT))) ||
 	((BOTTOM_RIGHT == where) && (whereto & (RIGHT | BOTTOM_LEFT))) ? 150 : 100;
     }
-
-
-    bool CheckExtConditionPassable(const Unit & b, s16 center, s16 from)
-    {
-	const Castle* castle = Arena::GetCastle();
-	const Bridge* bridge = Arena::GetBridge();
-
-	// skip moat position
-	if(castle && castle->isBuild(BUILD_MOAT) &&
-	    Board::isMoatIndex(from) && b.GetHeadIndex() != from)
-	    return false;
-
-	// skip bridge position
-	if(bridge && ! bridge->isPassable(b.GetColor()) &&
-	    Board::isBridgeIndex(center))
-	    return false;
-
-	return true;
-    }
 }
 
 Battle::Board::Board()
@@ -195,12 +176,15 @@ struct bcell_t
 
 Battle::Indexes Battle::Board::GetAStarPath(const Unit & b, const Position & dst, bool debug)
 {
+    const Castle* castle = Arena::GetCastle();
+    const Bridge* bridge = Arena::GetBridge();
     std::map<s16, bcell_t> list;
     s16 cur = b.GetHeadIndex();
 
     list[cur].prnt = -1;
     list[cur].cost = 0;
     list[cur].open = false;
+
 
     while(cur != dst.GetHead()->GetIndex())
     {
@@ -215,7 +199,8 @@ Battle::Indexes Battle::Board::GetAStarPath(const Unit & b, const Position & dst
     	    Cell & cell = at(*it);
 
 	    if(list[*it].open && cell.isPassable4(b, center) &&
-		CheckExtConditionPassable(b, *it, center.GetIndex()))
+		// check bridge
+	        (!bridge || !Board::isBridgeIndex(*it) || bridge->isPassable(b.GetColor())))
 	    {
 		const s16 cost = b.isWide() ?
 		    WideCost(center.GetDirection(), GetDirection(*it, cur)) : 100;
@@ -293,6 +278,13 @@ Battle::Indexes Battle::Board::GetAStarPath(const Unit & b, const Position & dst
 	if(result.size() > b.GetSpeed())
 	    result.resize(b.GetSpeed());
 
+	// skip moat position
+	if(castle && castle->isBuild(BUILD_MOAT) && Board::isMoatIndex(b.GetHeadIndex()))
+	{
+	    result.resize(std::distance(result.begin(),
+		    std::find_if(result.begin(), result.end(), Board::isMoatIndex)));
+	}
+
 	// set passable info
 	for(Indexes::iterator
 	    it = result.begin(); it != result.end(); ++it)
@@ -312,11 +304,11 @@ Battle::Indexes Battle::Board::GetAStarPath(const Unit & b, const Position & dst
 	    }
 	}
     }
-    else
-    if(debug)
+
+    if(debug && result.empty())
     {
 	DEBUG(DBG_BATTLE, DBG_WARN, "path not found: " << b.String() << ", dst: " <<
-	    ", (head: " << dst.GetHead()->GetIndex() << ", tail: " << (b.isWide() ? dst.GetTail()->GetIndex() : -1) << ")");
+	    "(head: " << dst.GetHead()->GetIndex() << ", tail: " << (dst.GetTail() ? dst.GetTail()->GetIndex() : -1) << ")");
     }
 
     return result;
