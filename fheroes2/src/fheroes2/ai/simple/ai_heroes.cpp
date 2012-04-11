@@ -562,9 +562,7 @@ void AIToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
     {
 	DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " attack monster " << troop.GetName());
 
-	Army army;
-	army.JoinTroop(troop);
-	army.ArrangeForBattle();
+	Army army(tile);
 
     	Battle::Result res = Battle::Loader(hero.GetArmy(), army, dst_index);
 
