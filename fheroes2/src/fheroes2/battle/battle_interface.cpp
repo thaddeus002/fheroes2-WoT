@@ -797,6 +797,11 @@ void Battle::Interface::RedrawArmies(void) const
     {
 	RedrawHighObjects(ii);
 
+	if(castle)
+	if(8 == ii || 19 == ii || 29 == ii || 40 == ii ||
+	    50 == ii ||  62 == ii || 85 == ii || 73 == ii || 77 == ii)
+	    RedrawCastle2(*castle, ii);
+
 	const Cell* cell = Board::GetCell(ii);
 	const Unit* b = cell->GetUnit();
 
@@ -810,8 +815,11 @@ void Battle::Interface::RedrawArmies(void) const
     }
 
     if(castle)
-	for(s16 ii = 0; ii < ARENASIZE; ++ii)
-	    RedrawCastle2(*castle, ii);
+    {
+	RedrawCastle2(*castle, 96);
+	const Unit* b = Board::GetCell(96)->GetUnit();
+	if(b) RedrawTroopSprite(*b);
+    }
 
     if(b_fly)
     {
@@ -1109,7 +1117,6 @@ void Battle::Interface::RedrawCastle2(const Castle & castle, s16 cell_index) con
     const Settings & conf = Settings::Get();
     const Point & topleft = border.GetArea();
     const ICN::icn_t icn_castle  = ICN::Get4Castle(castle.GetRace());
-    std::vector<s16> brocken_unit;
 
     // catapult
     if(77 == cell_index)
@@ -1117,8 +1124,6 @@ void Battle::Interface::RedrawCastle2(const Castle & castle, s16 cell_index) con
         const Sprite & sprite = AGG::GetICN(ICN::CATAPULT, catapult_frame);
 	const Rect & pos = Board::GetCell(cell_index)->GetPos();
         sprite.Blit(sprite.x() + pos.x - pos.w, sprite.y() + pos.y + pos.h - 10);
-
-	brocken_unit.push_back(88);
     }
     else
     // castle gate
@@ -1167,42 +1172,6 @@ void Battle::Interface::RedrawCastle2(const Castle & castle, s16 cell_index) con
 
         const Sprite & sprite = AGG::GetICN(icn_castle, index);
         sprite.Blit(sprite.x() + topleft.x, sprite.y() + topleft.y);
-
-	// broken unit sprite
-	if(29 == cell_index)
-	{
-	    brocken_unit.push_back(20);
-	    brocken_unit.push_back(29);
-	    brocken_unit.push_back(30);
-	    brocken_unit.push_back(31);
-	    brocken_unit.push_back(41);
-	    brocken_unit.push_back(42);
-	    brocken_unit.push_back(43);
-	    brocken_unit.push_back(51);
-	    brocken_unit.push_back(52);
-	    brocken_unit.push_back(53);
-	    brocken_unit.push_back(54);
-	}
-	else
-	if(73 == cell_index)
-	{
-	    brocken_unit.push_back(72);
-	    brocken_unit.push_back(73);
-	    brocken_unit.push_back(83);
-	    brocken_unit.push_back(84);
-	    brocken_unit.push_back(86);
-	    brocken_unit.push_back(93);
-	    brocken_unit.push_back(94);
-	    brocken_unit.push_back(95);
-	    brocken_unit.push_back(96);
-	    brocken_unit.push_back(97);
-	}
-	else
-	if(96 == cell_index)
-	{
-	    brocken_unit.push_back(95);
-	    brocken_unit.push_back(96);
-	}
     }
     else
     // castle archer towers
@@ -1235,13 +1204,6 @@ void Battle::Interface::RedrawCastle2(const Castle & castle, s16 cell_index) con
     // castle towers
     if(62 == cell_index)
 	AGG::GetICN(icn_castle, 17).Blit(topleft.x + (conf.QVGA() ? 187 : 375), topleft.y + (conf.QVGA() ? 102 : 205));
-
-    for(std::vector<s16>::const_iterator
-	it = brocken_unit.begin(); it != brocken_unit.end(); ++it)
-    {
-	const Unit* b = Board::GetCell(*it)->GetUnit();
-	if(b) RedrawTroopSprite(*b);
-    }
 }
 
 void Battle::Interface::RedrawCastle3(const Castle & castle) const
