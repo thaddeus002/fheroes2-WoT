@@ -38,13 +38,13 @@ namespace Battle
 	return Rand::Get(3, 6) + (11 * Rand::Get(1, 7));
     }
 
-    u16 WideCost(u8 where, u8 whereto)
+    bool WideDifficultDirection(u8 where, u8 whereto)
     {
 	return
 	((TOP_LEFT == where) && (whereto & (LEFT | TOP_RIGHT))) ||
 	((TOP_RIGHT == where) && (whereto & (RIGHT | TOP_LEFT))) ||
 	((BOTTOM_LEFT == where) && (whereto & (LEFT | BOTTOM_RIGHT))) ||
-	((BOTTOM_RIGHT == where) && (whereto & (RIGHT | BOTTOM_LEFT))) ? 50 : 0;
+	((BOTTOM_RIGHT == where) && (whereto & (RIGHT | BOTTOM_LEFT)));
     }
 }
 
@@ -202,9 +202,9 @@ Battle::Indexes Battle::Board::GetAStarPath(const Unit & b, const Position & dst
 		// check bridge
 	        (!bridge || !Board::isBridgeIndex(*it) || bridge->isPassable(b.GetColor())))
 	    {
-		const s16 cost = 100 +
-		    (b.isWide() ? WideCost(center.GetDirection(), GetDirection(*it, cur)) : 0) +
-		    (castle && castle->isBuild(BUILD_MOAT) && Board::isMoatIndex(*it) ? 200 : 0);
+		const s16 cost = 100 * Board::GetDistance(*it, dst.GetHead()->GetIndex()) +
+		    (b.isWide() && WideDifficultDirection(center.GetDirection(), GetDirection(*it, cur)) ? 100 : 0) +
+		    (castle && castle->isBuild(BUILD_MOAT) && Board::isMoatIndex(*it) ? 100 : 0);
 
 		// new cell
 		if(0 > list[*it].prnt)
