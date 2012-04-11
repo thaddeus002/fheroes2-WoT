@@ -92,6 +92,41 @@ void SettingsListBox::ActionListSingleClick(u32 & item)
     if(!readonly || conf.CanChangeInGame(item))
     {
 	conf.ExtModes(item) ? conf.ExtResetModes(item) : conf.ExtSetModes(item);
+
+	// depends
+	switch(item)
+	{
+	    case Settings::WORLD_1HERO_HIRED_EVERY_WEEK:
+		conf.ExtResetModes(Settings::CASTLE_1HERO_HIRED_EVERY_WEEK);
+		break;
+
+	    case Settings::CASTLE_1HERO_HIRED_EVERY_WEEK:
+		conf.ExtResetModes(Settings::WORLD_1HERO_HIRED_EVERY_WEEK);
+		break;
+
+	    case Settings::GAME_AUTOSAVE_BEGIN_DAY:
+		if(conf.ExtModes(Settings::GAME_AUTOSAVE_BEGIN_DAY))
+		    conf.ExtSetModes(Settings::GAME_AUTOSAVE_ON);
+		else
+		    conf.ExtResetModes(Settings::GAME_AUTOSAVE_ON);
+		break;
+
+	    case Settings::WORLD_GUARDIAN_TWO_DEFENSE:
+		if(conf.ExtModes(Settings::WORLD_GUARDIAN_TWO_DEFENSE))
+		    conf.ExtSetModes(Settings::WORLD_ALLOW_SET_GUARDIAN);
+		else
+		    conf.ExtResetModes(Settings::WORLD_ALLOW_SET_GUARDIAN);
+		break;
+
+	    case Settings::WORLD_NEW_VERSION_WEEKOF:
+		if(conf.ExtModes(Settings::WORLD_NEW_VERSION_WEEKOF))
+		    conf.ExtSetModes(Settings::WORLD_BAN_WEEKOF);
+		else
+		    conf.ExtResetModes(Settings::WORLD_BAN_WEEKOF);
+		break;
+
+	    default: break;
+	}
     }
 }
 
@@ -120,6 +155,7 @@ void Dialog::ExtSettings(bool readonly)
     text.Blit(area.x + (area.w - text.w()) / 2, area.y + 6);
 
     std::vector<u32> states;
+    states.reserve(64);
 
     states.push_back(Settings::GAME_SAVE_REWRITE_CONFIRM);
     states.push_back(Settings::GAME_ALSO_CONFIRM_AUTOSAVE);
@@ -130,18 +166,22 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::GAME_BATTLE_SHOW_MOUSE_SHADOW);
     states.push_back(Settings::GAME_BATTLE_SHOW_MOVE_SHADOW);
     states.push_back(Settings::GAME_BATTLE_SHOW_DAMAGE);
+
     if(! conf.QVGA())
     {
 	states.push_back(Settings::GAME_CASTLE_FLASH_BUILDING);
 	states.push_back(Settings::GAME_HIDE_INTERFACE);
     }
+
     if(!conf.PocketPC())
 	states.push_back(Settings::GAME_DYNAMIC_INTERFACE);
+
     states.push_back(Settings::GAME_AUTOSAVE_ON);
-    if(conf.ExtGameAutosaveOn())
-	states.push_back(Settings::GAME_AUTOSAVE_BEGIN_DAY);
+    states.push_back(Settings::GAME_AUTOSAVE_BEGIN_DAY);
+
     if(conf.VideoMode().w == 640 && conf.VideoMode().h == 480)
 	states.push_back(Settings::GAME_USE_FADE);
+
 #ifdef BUILD_RELEASE
     states.push_back(Settings::GAME_SHOW_SDL_LOGO);
 #endif
@@ -150,8 +190,7 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::WORLD_ABANDONED_MINE_RANDOM);
     states.push_back(Settings::WORLD_SAVE_MONSTER_BATTLE);
     states.push_back(Settings::WORLD_ALLOW_SET_GUARDIAN);
-    if(conf.ExtWorldAllowSetGuardian())
-	states.push_back(Settings::WORLD_GUARDIAN_TWO_DEFENSE);
+    states.push_back(Settings::WORLD_GUARDIAN_TWO_DEFENSE);
     states.push_back(Settings::WORLD_EXT_OBJECTS_CAPTURED);
     states.push_back(Settings::WORLD_NOREQ_FOR_ARTIFACTS);
     states.push_back(Settings::WORLD_SCOUTING_EXTENDED);
@@ -160,12 +199,12 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::WORLD_ONLY_FIRST_MONSTER_ATTACK);
     states.push_back(Settings::WORLD_EYE_EAGLE_AS_SCHOLAR);
     states.push_back(Settings::WORLD_BAN_WEEKOF);
-    if(! conf.ExtWorldBanWeekOf())
-	states.push_back(Settings::WORLD_NEW_VERSION_WEEKOF);
+    states.push_back(Settings::WORLD_NEW_VERSION_WEEKOF);
     states.push_back(Settings::WORLD_BAN_PLAGUES);
     states.push_back(Settings::WORLD_BAN_MONTHOF_MONSTERS);
     states.push_back(Settings::WORLD_STARTHERO_LOSSCOND4HUMANS);
     states.push_back(Settings::WORLD_1HERO_HIRED_EVERY_WEEK);
+    states.push_back(Settings::CASTLE_1HERO_HIRED_EVERY_WEEK);
     states.push_back(Settings::WORLD_DWELLING_ACCUMULATE_UNITS);
     states.push_back(Settings::WORLD_USE_UNIQUE_ARTIFACTS_ML);
     states.push_back(Settings::WORLD_USE_UNIQUE_ARTIFACTS_RS);
@@ -185,11 +224,9 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::HEROES_ARENA_ANY_SKILLS);
 
     if(! conf.QVGA())
-    {
-	states.push_back(Settings::CASTLE_ALLOW_GUARDIANS);
 	states.push_back(Settings::CASTLE_ALLOW_BUY_FROM_WELL);
-    }
 
+    states.push_back(Settings::CASTLE_ALLOW_GUARDIANS);
     states.push_back(Settings::CASTLE_MAGEGUILD_POINTS_TURN);
     states.push_back(Settings::CASTLE_ALLOW_RECRUITS_SPECIAL);
 

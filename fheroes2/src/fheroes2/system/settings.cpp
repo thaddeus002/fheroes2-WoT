@@ -146,6 +146,7 @@ const settings_t settingsFHeroes2[] =
     { Settings::WORLD_ARTSPRING_SEPARATELY_VISIT,_("world: Artesian Springs have two separately visitable squares (h3 ver)"), },
     { Settings::WORLD_STARTHERO_LOSSCOND4HUMANS,_("world: Starting heroes as Loss Conditions for Human Players"), },
     { Settings::WORLD_1HERO_HIRED_EVERY_WEEK,	_("world: Only 1 hero can be hired by the one player every week"), },
+    { Settings::CASTLE_1HERO_HIRED_EVERY_WEEK,	_("world: each castle allows one hero to be recruited every week"), },
     { Settings::WORLD_DWELLING_ACCUMULATE_UNITS,_("world: Outer creature dwellings should accumulate units"), },
     { Settings::WORLD_USE_UNIQUE_ARTIFACTS_ML,	_("world: use unique artifacts for morale/luck"),       },
     { Settings::WORLD_USE_UNIQUE_ARTIFACTS_RS,	_("world: use unique artifacts for resource affecting"),},
@@ -1471,6 +1472,11 @@ bool Settings::ExtHeroAllowBannedSecSkillsUpgrade(void) const
 bool Settings::ExtWorldOneHeroHiredEveryWeek(void) const
 {
     return ExtModes(WORLD_1HERO_HIRED_EVERY_WEEK);
+}
+
+bool Settings::ExtCastleOneHeroHiredEveryWeek(void) const
+{
+    return ExtModes(CASTLE_1HERO_HIRED_EVERY_WEEK);
 }
 
 bool Settings::ExtWorldDwellingsAccumulateUnits(void) const

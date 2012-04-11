@@ -199,6 +199,7 @@ public:
 	WORLD_USE_UNIQUE_ARTIFACTS_SS	= 0x30000800,
 	WORLD_DISABLE_BARROW_MOUNDS	= 0x30001000,
 	WORLD_EXT_OBJECTS_CAPTURED 	= 0x30004000,
+	CASTLE_1HERO_HIRED_EVERY_WEEK	= 0x30008000,
 
 	BATTLE_ARCHMAGE_RESIST_BAD_SPELL= 0x40001000,
 	BATTLE_MAGIC_TROOP_RESIST	= 0x40002000,
@@ -324,6 +325,7 @@ public:
     bool ExtCastleAllowFlash(void) const;
     bool ExtCastleGuildRestorePointsTurn(void) const;
     bool ExtCastleAllowRecruitSpecialHeroes(void) const;
+    bool ExtCastleOneHeroHiredEveryWeek(void) const;
     bool ExtBattleShowDamage(void) const;
     bool ExtBattleSoftWait(void) const;
     bool ExtBattleMagicTroopCanResist(void) const;

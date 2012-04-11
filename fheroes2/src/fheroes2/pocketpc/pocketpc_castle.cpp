@@ -360,71 +360,86 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
 	    }
 	}
 
-	// move hero to guardian
-        if(conf.ExtCastleAllowGuardians() && !readonly && heroes.Guest() && !heroes.Guard() && le.MouseClickLeft(rectSign1))
+        if(conf.ExtCastleAllowGuardians() && !readonly)
         {
-            if(! heroes.Guest()->GetArmy().CanJoinTroops(castle.GetArmy()))
-            {
-                // FIXME: correct message
-                Dialog::Message("Join Error", "Army is full", Font::BIG, Dialog::OK);
-            }
-            else
-            {
-                heroes.Guest()->SetModes(Heroes::GUARDIAN);
-                heroes.Guest()->ResetModes(Heroes::SLEEPER);
-		heroes.Swap();
-                heroes.Guard()->GetPath().Reset();
-                heroes.Guard()->GetArmy().JoinTroops(castle.GetArmy());
+            Army* army1 = NULL;
+            Army* army2 = NULL;
 
-                world.GetTiles(castle.GetCenter()).SetHeroes(NULL);
+/*
+	    // swap guest <-> guardian
+    	    if(heroes.Guest() && heroes.Guard() && le.MouseClickLeft(buttonSwap))
+    	    {
+        	SwapCastleHeroes(heroes);
+        	army1 = &heroes.Guard()->GetArmy();
+        	army2 = &heroes.Guest()->GetArmy();
+    	    }
+    	    else
+*/
+    	    // move hero to guardian
+    	    if(heroes.Guest() && !heroes.Guard() && le.MouseClickLeft(rectSign1))
+    	    {
+        	if(! heroes.Guest()->GetArmy().CanJoinTroops(castle.GetArmy()))
+        	{
+            	    // FIXME: correct message
+            	    Dialog::Message("Join Error", "Army is full", Font::BIG, Dialog::OK);
+        	}
+        	else
+        	{
+            	    castle.SwapCastleHeroes(heroes);
+            	    army1 = &heroes.Guard()->GetArmy();
+        	}
+    	    }
+    	    else
+    	    // move guardian to hero
+    	    if(!heroes.Guest() && heroes.Guard() && le.MouseClickLeft(rectSign2))
+    	    {
+        	castle.SwapCastleHeroes(heroes);
+        	army2 = &heroes.Guest()->GetArmy();
+    	    }
 
-                // free position
-                Point position(heroes.Guard()->GetCenter());
-                position.y -= 1;
-                heroes.Guard()->SetCenter(position);
+    	    if(army1 || army2)
+    	    {
+        	cursor.Hide();
+        	if(selectArmy1.isSelected()) selectArmy1.Reset();
+        	if(selectArmy2.isSelected()) selectArmy2.Reset();
 
-                cursor.Hide();
-                if(selectArmy1.isSelected()) selectArmy1.Reset();
-                if(selectArmy2.isSelected()) selectArmy2.Reset();
-                selectArmy2.ResetArmy();
-                selectArmy1.SetArmy(heroes.Guard()->GetArmy());
-                selectArmy1.SetSaveLastTroop();
-                RedrawIcons(castle, heroes, dst_rt);
-                selectArmy2.Redraw();
-                selectArmy1.Redraw();
+        	if(army1 && army2)
+        	{
+            	    selectArmy1.ResetArmy();
+            	    selectArmy2.ResetArmy();
+
+            	    selectArmy1.SetArmy(*army1);
+            	    selectArmy1.SetSaveLastTroop();
+
+            	    selectArmy2.SetArmy(*army2);
+            	    selectArmy2.SetSaveLastTroop();
+        	}
+        	else
+        	if(army1)
+        	{
+            	    selectArmy2.ResetArmy();
+            	    selectArmy1.SetArmy(*army1);
+            	    selectArmy1.SetSaveLastTroop();
+        	}
+        	else
+        	if(army2)
+        	{
+            	    selectArmy1.ResetArmy();
+            	    selectArmy1.SetArmy(castle.GetArmy());
+            	    selectArmy2.SetArmy(*army2);
+            	    selectArmy2.SetSaveLastTroop();
+        	}
+
+            	RedrawIcons(castle, heroes, dst_rt);
+            	selectArmy1.Redraw();
+            	selectArmy2.Redraw();
+//                if(army1 && army2) RedrawSwapButton(buttonSwap);
                 cursor.Show();
                 display.Flip();
-            }
+    	    }
         }
-	else
-	// move guardian to hero
-        if(conf.ExtCastleAllowGuardians() && !readonly && !heroes.Guest() && heroes.Guard() && le.MouseClickLeft(rectSign2))
-        {
-            heroes.Guard()->ResetModes(Heroes::GUARDIAN);
-	    heroes.Swap();
-
-            // restore position
-            Point position(heroes.Guest()->GetCenter());
-            position.y += 1;
-            heroes.Guest()->SetCenter(position);
-
-            world.GetTiles(castle.GetCenter()).SetHeroes(heroes.Guest());
-
-            cursor.Hide();
-            if(selectArmy1.isSelected()) selectArmy1.Reset();
-            if(selectArmy2.isSelected()) selectArmy2.Reset();
-            selectArmy1.ResetArmy();
-            selectArmy1.SetArmy(castle.GetArmy());
-            selectArmy2.SetArmy(heroes.Guest()->GetArmy());
-            selectArmy2.SetSaveLastTroop();
-            RedrawIcons(castle, heroes, dst_rt);
-            selectArmy1.Redraw();
-            selectArmy2.Redraw();
-            cursor.Show();
-            display.Flip();
-        }
-
     }
+
     return SCREENOUT;
 }
 

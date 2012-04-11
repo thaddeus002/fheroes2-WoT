@@ -334,6 +334,8 @@ u16* Castle::GetDwelling(u32 dw)
 
 void Castle::ActionNewWeek(void)
 {
+    ResetModes(DISABLEHIRES);
+
     // increase population
     if(world.GetWeekType().GetType() != Week::PLAGUE)
     {
@@ -620,8 +622,7 @@ const char* Castle::GetDescriptionBuilding(u32 build, u8 race)
 
 bool Castle::AllowBuyHero(const Heroes & hero)
 {
-    if(Settings::Get().ExtWorldOneHeroHiredEveryWeek() &&
-	world.GetKingdom(GetColor()).Modes(Kingdom::DISABLEHIRES))
+    if(Modes(DISABLEHIRES) || world.GetKingdom(GetColor()).Modes(Kingdom::DISABLEHIRES))
 	return false;
 
     CastleHeroes heroes = world.GetHeroes(*this);
@@ -644,6 +645,9 @@ Heroes* Castle::RecruitHero(Heroes* hero)
 
     if(Settings::Get().ExtWorldOneHeroHiredEveryWeek())
         kingdom.SetModes(Kingdom::DISABLEHIRES);
+
+    if(Settings::Get().ExtCastleOneHeroHiredEveryWeek())
+	SetModes(DISABLEHIRES);
 
     DEBUG(DBG_GAME , DBG_INFO, name << ", recruit: " << hero->GetName());
 
