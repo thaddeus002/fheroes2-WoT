@@ -216,6 +216,6 @@ void Castle::OpenMageGuild(void)
     	    spells2.QueueEventProcessing() ||
     	    spells3.QueueEventProcessing() ||
     	    spells4.QueueEventProcessing() ||
-    	    spells5.QueueEventProcessing());
+    	    spells5.QueueEventProcessing()){}
     }
 }

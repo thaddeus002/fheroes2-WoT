@@ -47,8 +47,9 @@ namespace Battle
 	const Rect rtAI;
     };
 
-    struct Only
+    class Only
     {
+    public:
 	Heroes*		hero1;
 	Heroes*		hero2;
 

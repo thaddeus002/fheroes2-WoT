@@ -26,8 +26,8 @@
 #include "rect.h"
 #include "types.h"
 
-class Point;
-class Rect;
+struct Point;
+struct Rect;
 struct SDL_Surface;
 
 class Surface

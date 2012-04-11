@@ -39,8 +39,9 @@ namespace Battle
 
     typedef std::vector<s16> Indexes;
 
-    struct Board : public std::vector<Cell>
+    class Board : public std::vector<Cell>
     {
+    public:
 	Board();
 
 	void		Reset(void);

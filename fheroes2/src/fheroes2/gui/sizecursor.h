@@ -25,7 +25,6 @@
 #include "gamedefs.h"
 
 class Surface;
-class Size;
 
 class SizeCursor : public SpriteCursor
 {

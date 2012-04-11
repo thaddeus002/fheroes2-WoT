@@ -26,7 +26,7 @@
 #include "sdlnet.h"
 #include "game.h"
 
-namespace Maps {class Tiles; class FileInfo; class Addons; }
+namespace Maps {class Tiles; class FileInfo; struct Addons; }
 class Kingdom;
 class Castle;
 class Heroes;

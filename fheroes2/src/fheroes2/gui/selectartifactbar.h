@@ -25,7 +25,6 @@
 
 #include "gamedefs.h"
 
-class Rect;
 class Surface;
 class Heroes;
 class SpriteCursor;

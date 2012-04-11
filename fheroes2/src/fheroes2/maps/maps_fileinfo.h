@@ -28,8 +28,9 @@
 
 namespace Maps
 {
-    struct FileInfo
-    {
+  class FileInfo
+  {
+  public:
     FileInfo();
 
     bool ReadMP2(const std::string &);
@@ -91,9 +92,10 @@ namespace Maps
     u32 localtime;
 
     bool with_heroes;
-    };
-    StreamBase & operator<< (StreamBase &, const FileInfo &);
-    StreamBase & operator>> (StreamBase &, FileInfo &);
+  };
+
+  StreamBase & operator<< (StreamBase &, const FileInfo &);
+  StreamBase & operator>> (StreamBase &, FileInfo &);
 }
 
 typedef std::vector<Maps::FileInfo> MapsFileInfoList;

@@ -40,7 +40,7 @@ struct cost_t
 class ResourceCount;
 
 #ifdef WITH_XML
-struct TiXmlElement;                                                                                                     
+class TiXmlElement;                                                                                                     
 void   LoadCostFromXMLElement(cost_t &, const TiXmlElement &);
 #endif
 
@@ -60,8 +60,9 @@ namespace Resource
     };
 }
 
-struct Funds
+class Funds
 {
+public:
 	Funds();
 	Funds(s32 _ore, s32 _wood, s32 _mercury, s32 _sulfur, s32 _crystal, s32 _gems, s32 _gold);
 	Funds(u8 rs, u32 count);

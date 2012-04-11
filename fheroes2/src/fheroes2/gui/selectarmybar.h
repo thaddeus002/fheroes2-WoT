@@ -26,7 +26,6 @@
 #include "gamedefs.h"
 #include "army.h"
 
-class Rect;
 class Surface;
 class SpriteCursor;
 class LocalEvent;

@@ -207,8 +207,9 @@ StreamBase & operator<< (StreamBase &, const Artifact &);
 StreamBase & operator>> (StreamBase &, Artifact &);
 u16 GoldInsteadArtifact(u8);
 
-struct BagArtifacts : std::vector<Artifact>
+class BagArtifacts : public std::vector<Artifact>
 {
+public:
     BagArtifacts();
 
     bool ContainSpell(const Spell &) const;

@@ -37,10 +37,10 @@ namespace Battle
     class Arena;
     class Unit;
     class Units;
-    class Actions;
     class Tower;
     class StatusListBox;
     class Cell;
+    class Actions;
     struct TargetInfo;
     struct TargetsInfo;
     struct Result;

@@ -42,7 +42,7 @@ class SpriteCursor;
 class Monster;
 class Funds;
 class Troop;
-class CapturedObject;
+struct CapturedObject;
 
 namespace Maps
 {

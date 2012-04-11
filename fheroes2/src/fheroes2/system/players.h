@@ -29,7 +29,7 @@
 #include "bitmodes.h"
 #include "gamedefs.h"
 
-namespace Maps { struct FileInfo; }
+namespace Maps { class FileInfo; }
 
 class Castle;
 class Heroes;
@@ -52,8 +52,9 @@ struct Focus : std::pair<u8, void*>
     Heroes*	GetHeroes(void) { return first == FOCUS_HEROES && second ? reinterpret_cast<Heroes*>(second) : NULL; }
 };
 
-struct Player : public BitModes
+class Player : public BitModes
 {
+public:
     Player(u8 col = Color::NONE);
 
     bool isID(u32) const;

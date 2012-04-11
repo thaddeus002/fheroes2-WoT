@@ -45,8 +45,9 @@ namespace Battle
     class Unit;
     class Command;
 
-    struct Actions : public std::list<Command>
+    class Actions : public std::list<Command>
     {
+    public:
 	bool		HaveCommand(u16) const;
     };
 
