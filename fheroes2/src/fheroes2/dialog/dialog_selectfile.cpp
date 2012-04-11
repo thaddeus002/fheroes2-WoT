@@ -178,7 +178,7 @@ bool Dialog::SelectFileSave(std::string & file)
 
 	os << Settings::GetSaveDir() << SEPARATOR << base <<
 	    // add postfix:
-	    '_' << std::setw(4) << std::setfill('0') << world.GetDay() << ".sav";
+	    '_' << std::setw(4) << std::setfill('0') << world.CountDay() << ".sav";
 
 	file = os.str();
     }
