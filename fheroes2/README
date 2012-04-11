@@ -27,20 +27,11 @@ All possibilities of fheroes2:
 - game: always confirm for rewrite savefile
 - game: also confirm autosave
 - game: remember last focus
-- game: remember last filename
 - game: battle show grid
 - game: battle mouse shadow
 - game: battle move shadow
 - game: battle show damage info
 - game: castle flash building
-- game: show system info
-- game: autosave on
-- game: autosave will be made at the beginning of the day
-- game: use fade
-- game: show SDL logo
-- game: use evil interface
-- game: also use dynamic interface for castles
-- game: hide interface
 - world: show visited content from objects
 - world: scouting skill show extended content info
 - world: abandoned mine random resource
@@ -50,7 +41,6 @@ All possibilities of fheroes2:
 - world: no in-built requirements or guardians for placed artifacts
 - world: only the first monster will attack (H2 bug).
 - world: Eagle Eye also works like Scholar in H3.
-- world: allow buy a spellbook from Shrines
 - world: ban for WeekOf/MonthOf Monsters
 - world: new version WeekOf (+growth)
 - world: ban plagues months
@@ -59,16 +49,19 @@ All possibilities of fheroes2:
 - world: Artesian Springs have two separately visitable squares (h3 ver)
 - world: Starting heroes as Loss Conditions for Human Players
 - world: Only 1 hero can be hired by the one player every week
+- world: each castle allows one hero to be recruited every week
 - world: Outer creature dwellings should accumulate units
 - world: use unique artifacts for morale/luck
 - world: use unique artifacts for resource affecting
 - world: use unique artifacts for for primary skills
 - world: use unique artifacts for secondary skills
 - world: Wind/Water Mills and Magic Garden can be captured
+- world: disable Barrow Mounds
 - castle: allow buy from well
 - castle: allow guardians
 - castle: higher mage guilds regenerate more spell points/turn (20/40/60/80/100%)
 - castle: allow recruits special/expansion heroes
+- heroes: allow buy a spellbook from Shrines
 - heroes: learn new spells with day
 - heroes: recruit cost to be dependent on hero level
 - heroes: remember MP/SP for retreat/surrender result
@@ -81,7 +74,6 @@ All possibilities of fheroes2:
 - heroes: in Arena can choose any of primary skills
 - unions: allow meeting heroes
 - unions: allow castle visiting
-- battle: troop direction to move
 - battle: soft wait troop
 - battle: high objects are an obstacle for archers
 - battle: merge armies for hero from castle
@@ -89,6 +81,15 @@ All possibilities of fheroes2:
 - battle: magical creature resists (20%) the same magic
 - battle: skip increase +2 defense
 - battle: reverse wait order (fast, average, slow)
+- game: show system info
+- game: autosave on
+- game: autosave will be made at the beginning of the day
+- game: use fade
+- game: show SDL logo
+- game: use evil interface
+- game: also use dynamic interface for castles
+- game: hide interface
+- game: offer to continue the game afer victory condition
 - pocketpc: hide cursor
 - pocketpc: tap mode
 - pocketpc: drag&drop gamearea as scroll

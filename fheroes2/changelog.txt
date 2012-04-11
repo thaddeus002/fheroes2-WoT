@@ -1,3 +1,18 @@
+Apr, 11, 2012 (2824 rev.)
+
++ Fixed: castle: marketplace max button
++ Fixed: world: kingdom incomes, added a negative balance
++ Fixed: world: open a Jail from any direction
++ Fixed: world: monsters stacks have 1 level upg. stack in middle stack
++ Fixed: pocketpc: allow castle guardians
++ Fixed: pocketpc: add large buttons for battle
++ Added: world: Alhemist action
++ Added: world: Kingdom::Overview dialog
++ Added: castle: swap button for guardians
++ Added: option: "game: offer to continue the game afer victory condition"
++ Added: option: "world: disable Barrow Mounds"
++ Added: option: "world: each castle allows one hero to be recruited every week"
+
 Mar, 01, 2012 (2764 rev.)
 
 + Fixed: world: maps passable new version algorithm.
