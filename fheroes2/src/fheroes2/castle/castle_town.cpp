@@ -160,8 +160,6 @@ u32 Castle::OpenTown(void)
 
     AGG::GetICN(ICN::CASLWIND, 0).Blit(dst_pt);
 
-    const Heroes* castle_heroes = GetHeroes().Guest();
-
     // hide captain options
     if(! (building & BUILD_CAPTAIN))
     {
@@ -337,10 +335,9 @@ u32 Castle::OpenTown(void)
     Heroes* hero1 = kingdom.GetRecruits().GetHero1();
     Heroes* hero2 = kingdom.GetLastLostHero() && kingdom.GetLastLostHero() != hero1 ? kingdom.GetLastLostHero() : kingdom.GetRecruits().GetHero2();
 
-    const bool many_hero1 = hero1 ? !kingdom.AllowRecruitHero(false, hero1->GetLevel()) : false;
-    const bool many_hero2 = hero2 ? !kingdom.AllowRecruitHero(false, hero2->GetLevel()) : false;
-    const bool allow_buy_hero1 = hero1 ? AllowBuyHero(*hero1) : false;
-    const bool allow_buy_hero2 = hero2 ? AllowBuyHero(*hero2) : false;
+    std::string not_allow1_msg, not_allow2_msg;
+    const bool allow_buy_hero1 = hero1 ? AllowBuyHero(*hero1, &not_allow1_msg) : false;
+    const bool allow_buy_hero2 = hero2 ? AllowBuyHero(*hero2, &not_allow2_msg) : false;
 
     // first hero
     dst_pt.x = cur_pt.x + 443;
@@ -353,7 +350,7 @@ u32 Castle::OpenTown(void)
     else
 	display.FillRect(0, 0, 0, rectHero1);
     // indicator
-    if(many_hero1 || !allow_buy_hero1)
+    if(!allow_buy_hero1)
     {
 	dst_pt.x += 83;
 	dst_pt.y += 75;
@@ -371,7 +368,7 @@ u32 Castle::OpenTown(void)
     else
 	display.FillRect(0, 0, 0, rectHero2);
     // indicator
-    if(many_hero2 || !allow_buy_hero2)
+    if(!allow_buy_hero2)
     {
 	dst_pt.x += 83;
 	dst_pt.y += 75;
@@ -536,14 +533,8 @@ u32 Castle::OpenTown(void)
 	else
 	if(hero1 && le.MouseCursor(rectHero1))
 	{
-	    if(many_hero1)
-		statusBar.ShowMessage(_("Cannot recruit - you have too many Heroes."));
-	    else
-	    if(castle_heroes)
-		statusBar.ShowMessage(_("Cannot recruit - you already have a Hero in this town."));
-	    else
 	    if(! allow_buy_hero1)
-		statusBar.ShowMessage(_("Cannot afford a Hero"));
+		statusBar.ShowMessage(not_allow1_msg);
 	    else
 	    {
 		std::string str = _("Recruit %{name} the %{race}");
@@ -555,14 +546,8 @@ u32 Castle::OpenTown(void)
 	else
 	if(hero2 && le.MouseCursor(rectHero2))
 	{
-	    if(many_hero2)
-		statusBar.ShowMessage(_("Cannot recruit - you have too many Heroes."));
-	    else
-	    if(castle_heroes)
-		statusBar.ShowMessage(_("Cannot recruit - you already have a Hero in this town."));
-	    else
 	    if(! allow_buy_hero2)
-		statusBar.ShowMessage(_("Cannot afford a Hero"));
+		statusBar.ShowMessage(not_allow2_msg);
 	    else
 	    {
 		std::string str = _("Recruit %{name} the %{race}");

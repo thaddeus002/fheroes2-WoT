@@ -113,7 +113,7 @@ public:
     bool isCapital(void) const{ return Modes(CAPITAL); }
     bool HaveNearlySea(void) const;
     bool PresentBoat(void) const;
-    bool AllowBuyHero(const Heroes &);
+    bool AllowBuyHero(const Heroes &, std::string* = NULL);
     bool isPosition(const Point &) const;
     bool isNecromancyShrineBuild(void) const;
 

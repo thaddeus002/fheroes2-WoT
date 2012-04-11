@@ -108,9 +108,9 @@ bool Game::Save(const std::string &fn)
 	StreamBuf gdata((Maps::MEDIUM < conf.MapsWidth() ? 1024 :512) * 1024);
 	if(! autosave) Game::SetLastSavename(fn);
 
-	info << GetString(GetSaveVersion()) << GetSaveVersion() <<
+	info << GetString(GetLoadVersion()) << GetLoadVersion() <<
 		HeaderSAV(conf.CurrentFileInfo(), conf.PriceLoyaltyVersion());
-	gdata << GetSaveVersion() << Settings::Get() << World::Get() <<
+	gdata << GetLoadVersion() << World::Get() << Settings::Get() <<
 	    GameOver::Result::Get() << GameStatic::Data::Get() << MonsterStaticData::Get() << SAV2ID; // eof marker
 
 	fs << static_cast<char>(SAV2ID >> 8) << static_cast<char>(SAV2ID) << info;
@@ -226,22 +226,27 @@ bool Game::Load(const std::string & fn)
  		return false;
 	    }
 
-	    u16 oldver = GetSaveVersion();
-	    SetSaveVersion(binver);
-
+	    SetLoadVersion(binver);
 	    u16 end_check = 0;
 
-	    gdata >> Settings::Get() >> World::Get() >> GameOver::Result::Get() >>
+	    if(GetLoadVersion() < FORMAT_VERSION_2830)
+	    {
+		gdata >> Settings::Get() >> World::Get() >> GameOver::Result::Get() >>
 		    GameStatic::Data::Get() >> MonsterStaticData::Get() >> end_check;
+	    }
+	    else
+	    {
+		gdata >> World::Get() >> Settings::Get() >> GameOver::Result::Get() >>
+		    GameStatic::Data::Get() >> MonsterStaticData::Get() >> end_check;
+	    }
 
 	    if(end_check == SAV2ID)
 	    {
-		SetSaveVersion(binver);
+		SetLoadVersion(CURRENT_FORMAT_VERSION);
 		result = true;
 	    }
 	    else
 	    {
-		SetSaveVersion(oldver);
 		DEBUG(DBG_GAME, DBG_WARN, "invalid load file: " << fn);
 	    }
 	}

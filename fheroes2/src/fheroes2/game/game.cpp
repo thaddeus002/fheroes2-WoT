@@ -74,12 +74,12 @@ namespace Game
     u16		save_version = CURRENT_FORMAT_VERSION;
 }
 
-void Game::SetSaveVersion(u16 ver)
+void Game::SetLoadVersion(u16 ver)
 {
     save_version = ver;
 }
 
-u16 Game::GetSaveVersion(void)
+u16 Game::GetLoadVersion(void)
 {
     return save_version;
 }

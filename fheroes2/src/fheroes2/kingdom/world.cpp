@@ -1676,7 +1676,7 @@ StreamBase & operator<< (StreamBase & msg, const CapturedObject & obj)
 
 StreamBase & operator>> (StreamBase & msg, CapturedObject & obj)
 {
-    if(FORMAT_VERSION_2798 > Game::GetSaveVersion())
+    if(FORMAT_VERSION_2798 > Game::GetLoadVersion())
     {
 	return msg >> obj.objcol >> obj.guardians;
     }

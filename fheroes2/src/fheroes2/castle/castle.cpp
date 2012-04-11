@@ -620,13 +620,36 @@ const char* Castle::GetDescriptionBuilding(u32 build, u8 race)
     return desc_build[13];
 }
 
-bool Castle::AllowBuyHero(const Heroes & hero)
+bool Castle::AllowBuyHero(const Heroes & hero, std::string* msg)
 {
-    if(Modes(DISABLEHIRES) || world.GetKingdom(GetColor()).Modes(Kingdom::DISABLEHIRES))
+    const Kingdom & myKingdom = world.GetKingdom(GetColor());
+    if(Modes(DISABLEHIRES) || myKingdom.Modes(Kingdom::DISABLEHIRES))
+    {
+	if(msg) *msg = _("Cannot recruit - you already recruit hero in current week.");
 	return false;
+    }
 
     CastleHeroes heroes = world.GetHeroes(*this);
-    return !heroes.Guest() && world.GetKingdom(color).AllowRecruitHero(true, hero.GetLevel());
+
+    if(heroes.Guest())
+    {
+	if(msg) *msg = _("Cannot recruit - you already have a Hero in this town.");
+	return false;
+    }
+
+    if(!myKingdom.AllowRecruitHero(false, hero.GetLevel()))
+    {
+	if(msg) *msg = _("Cannot recruit - you have too many Heroes.");
+	return false;
+    }
+
+    if(!myKingdom.AllowRecruitHero(true, hero.GetLevel()))
+    {
+	if(msg) *msg = _("Cannot afford a Hero");
+	return false;
+    }
+
+    return true;
 }
 
 Heroes* Castle::RecruitHero(Heroes* hero)
@@ -1942,6 +1965,9 @@ struct CastleHavePoint : public std::binary_function <const Castle*, const Point
 
 Castle* VecCastles::Get(s32 index) const
 {
+    if(FORMAT_VERSION_2830)
+	return world.h() ? Get(Point(index % world.w(), index / world.h())) : NULL;
+
     return Get(Point(index % world.w(), index / world.h()));
 }
 
