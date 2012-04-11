@@ -44,7 +44,7 @@ namespace Battle
 	((TOP_LEFT == where) && (whereto & (LEFT | TOP_RIGHT))) ||
 	((TOP_RIGHT == where) && (whereto & (RIGHT | TOP_LEFT))) ||
 	((BOTTOM_LEFT == where) && (whereto & (LEFT | BOTTOM_RIGHT))) ||
-	((BOTTOM_RIGHT == where) && (whereto & (RIGHT | BOTTOM_LEFT))) ? 150 : 100;
+	((BOTTOM_RIGHT == where) && (whereto & (RIGHT | BOTTOM_LEFT))) ? 50 : 0;
     }
 }
 
@@ -202,8 +202,9 @@ Battle::Indexes Battle::Board::GetAStarPath(const Unit & b, const Position & dst
 		// check bridge
 	        (!bridge || !Board::isBridgeIndex(*it) || bridge->isPassable(b.GetColor())))
 	    {
-		const s16 cost = b.isWide() ?
-		    WideCost(center.GetDirection(), GetDirection(*it, cur)) : 100;
+		const s16 cost = 100 +
+		    (b.isWide() ? WideCost(center.GetDirection(), GetDirection(*it, cur)) : 0) +
+		    (castle && castle->isBuild(BUILD_MOAT) && Board::isMoatIndex(*it) ? 200 : 0);
 
 		// new cell
 		if(0 > list[*it].prnt)
@@ -279,10 +280,11 @@ Battle::Indexes Battle::Board::GetAStarPath(const Unit & b, const Position & dst
 	    result.resize(b.GetSpeed());
 
 	// skip moat position
-	if(castle && castle->isBuild(BUILD_MOAT) && Board::isMoatIndex(b.GetHeadIndex()))
+	if(castle && castle->isBuild(BUILD_MOAT) && ! Board::isMoatIndex(b.GetHeadIndex()))
 	{
-	    result.resize(std::distance(result.begin(),
-		    std::find_if(result.begin(), result.end(), Board::isMoatIndex)));
+	    Indexes::iterator moat = std::find_if(result.begin(), result.end(), Board::isMoatIndex);
+	    if(moat != result.end())
+		result.resize(std::distance(result.begin(), ++moat));
 	}
 
 	// set passable info
