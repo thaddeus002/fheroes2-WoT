@@ -177,15 +177,21 @@ void RunTest3(void)
     Army & army1 = hero1.GetArmy();
 
     Castle* castle = kingdom2.GetCastles().at(0);
-    castle->BuyBuilding(BUILD_CAPTAIN);
     castle->ActionNewDay();
     castle->BuyBuilding(BUILD_MAGEGUILD1);
+    castle->ActionNewDay();
+    castle->BuyBuilding(BUILD_CAPTAIN);
     castle->ActionNewDay();
     castle->BuyBuilding(BUILD_MOAT);
 
     //Army army2;
     //Army & army2 = hero2.GetArmy();
     Army & army2 = castle->GetArmy();
+    if(army2.GetCommander())
+    {
+	army2.GetCommander()->SpellBookActivate();
+	army2.GetCommander()->AppendSpellToBook(Spell::SHIELD, true);
+    }
 
     army1.Clean();
     //army1.JoinTroop(Monster::PHOENIX, 10);

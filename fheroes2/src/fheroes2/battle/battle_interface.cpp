@@ -1174,14 +1174,28 @@ void Battle::Interface::RedrawCastle2(const Castle & castle, s16 cell_index) con
 	    brocken_unit.push_back(20);
 	    brocken_unit.push_back(29);
 	    brocken_unit.push_back(30);
+	    brocken_unit.push_back(31);
 	    brocken_unit.push_back(41);
+	    brocken_unit.push_back(42);
+	    brocken_unit.push_back(43);
+	    brocken_unit.push_back(51);
+	    brocken_unit.push_back(52);
+	    brocken_unit.push_back(53);
+	    brocken_unit.push_back(54);
 	}
 	else
 	if(73 == cell_index)
 	{
 	    brocken_unit.push_back(72);
 	    brocken_unit.push_back(73);
+	    brocken_unit.push_back(83);
 	    brocken_unit.push_back(84);
+	    brocken_unit.push_back(86);
+	    brocken_unit.push_back(93);
+	    brocken_unit.push_back(94);
+	    brocken_unit.push_back(95);
+	    brocken_unit.push_back(96);
+	    brocken_unit.push_back(97);
 	}
 	else
 	if(96 == cell_index)
@@ -3872,7 +3886,7 @@ void Battle::Interface::RedrawTroopWithFrameAnimation(Unit & b, ICN::icn_t icn, 
 	    Redraw();
 
 	    const Sprite & sprite = AGG::GetICN(icn, frame, reflect);
-	    const Point sprite_pos(pos.x + sprite.x() + pos.w / 2,
+	    const Point sprite_pos(pos.x + (reflect ? 0 : pos.w / 2) + sprite.x(),
 				pos.y + sprite.y() + (Settings::Get().QVGA() ? pos.h / 2 : 0));
 
 	    if(icn == ICN::SPARKS)

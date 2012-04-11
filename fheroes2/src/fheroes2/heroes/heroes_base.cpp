@@ -144,11 +144,15 @@ HeroBase::HeroBase(u8 type, u8 race)
     : magic_point(0), move_point(0), spell_book()
 {
     bag_artifacts.assign(HEROESMAXARTIFACT, Artifact::UNKNOWN);
+    LoadDefaults(type, race);
+}
 
+void HeroBase::LoadDefaults(u8 type, u8 race)
+{
     if(Race::ALL & race)
     {
 	// fixed default primary skills
-	Skill::Primary::LoadDefaults(type, race, *this);
+	Skill::Primary::LoadDefaults(type, race);
 
 	// fixed default spell
 	switch(type)

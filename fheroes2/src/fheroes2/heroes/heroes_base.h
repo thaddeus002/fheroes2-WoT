@@ -90,6 +90,8 @@ public:
     u8   HasArtifact(const Artifact &) const;
     bool PickupArtifact(const Artifact &);
 
+    void LoadDefaults(u8 type, u8 race);
+
 protected:
     friend class Game::IOld;
     friend StreamBase & operator<< (StreamBase &, const HeroBase &);

@@ -299,7 +299,7 @@ Skill::Primary::Primary() : attack(0), defense(0), power(0), knowledge(0)
 {
 }
 
-void Skill::Primary::LoadDefaults(u8 type, u8 race, Primary & skill)
+void Skill::Primary::LoadDefaults(u8 type, u8 race)
 {
     const skillstats_t* ptr = GetSkillStats(race);
 
@@ -307,17 +307,17 @@ void Skill::Primary::LoadDefaults(u8 type, u8 race, Primary & skill)
     switch(type)
     {
 	case CAPTAIN:
-	    skill.attack = ptr->captain_primary.attack;
-	    skill.defense = ptr->captain_primary.defense;
-	    skill.power = ptr->captain_primary.power;
-	    skill.knowledge = ptr->captain_primary.knowledge;
+	    attack = ptr->captain_primary.attack;
+	    defense = ptr->captain_primary.defense;
+	    power = ptr->captain_primary.power;
+	    knowledge = ptr->captain_primary.knowledge;
 	    break;
 
 	case HEROES:
-	    skill.attack = ptr->initial_primary.attack;
-	    skill.defense = ptr->initial_primary.defense;
-	    skill.power = ptr->initial_primary.power;
-	    skill.knowledge = ptr->initial_primary.knowledge;
+	    attack = ptr->initial_primary.attack;
+	    defense = ptr->initial_primary.defense;
+	    power = ptr->initial_primary.power;
+	    knowledge = ptr->initial_primary.knowledge;
 	    break;
 
 	default:

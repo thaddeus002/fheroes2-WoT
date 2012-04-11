@@ -148,10 +148,11 @@ namespace Skill
 	u8 LevelUp(u8 race, u8 level);
 
         static const char* String(u8);
-	static void LoadDefaults(u8 type, u8 race, Primary &);
 	static u8 GetInitialSpell(u8 race);
 
 	protected:
+	void LoadDefaults(u8 type, u8 race);
+
 	friend StreamBase & operator<< (StreamBase &, const Primary &);
 	friend StreamBase & operator>> (StreamBase &, Primary &);
 
