@@ -184,7 +184,16 @@ bool HGSData::Load(const char* fn)
     }
 #endif
 
-    return true;
+    u16 hgs_id = 0;
+    hdata >> hgs_id;
+
+    if(hgs_id == HGS_ID)
+    {
+	hdata >> list;
+	return true;
+    }
+
+    return false;
 }
 
 bool HGSData::Save(const char* fn)
@@ -207,7 +216,7 @@ bool HGSData::Save(const char* fn)
     fs << hdata;
 #endif
 
-    return fs.good();;
+    return fs.good();
 }
 
 void HGSData::ScoreRegistry(const std::string & p, const std::string & m, u16 r, u16 s)

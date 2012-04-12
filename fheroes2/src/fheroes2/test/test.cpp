@@ -196,7 +196,7 @@ void RunTest3(void)
     army1.Clean();
     //army1.JoinTroop(Monster::PHOENIX, 10);
     //army1.GetTroop(0)->Set(Monster::ARCHER, 30);
-    army1.GetTroop(1)->Set(Monster::ROC, 20);
+    army1.GetTroop(1)->Set(Monster::BOAR, 20);
     army1.GetTroop(2)->Set(Monster::OGRE_LORD, 20);
 
     //army1.JoinTroop(Monster::Rand(Monster::LEVEL1), 30);
@@ -204,7 +204,7 @@ void RunTest3(void)
     //army1.JoinTroop(Monster::Rand(Monster::LEVEL3), 10);
 
     army2.Clean();
-    army2.GetTroop(0)->Set(Monster::ROC, 20);
+    army2.GetTroop(0)->Set(Monster::BOAR, 20);
     army2.GetTroop(2)->Set(Monster::OGRE_LORD, 20);
 //    army2.at(0) = Troop(Monster::OGRE, 1);
 //    army2.at(1) = Troop(Monster::DWARF, 2);

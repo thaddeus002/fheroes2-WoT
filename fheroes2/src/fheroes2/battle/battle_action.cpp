@@ -218,12 +218,14 @@ void Battle::Arena::ApplyActionAttack(StreamBuf & stream)
 	}
 	else
 	{
-	    DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param: " << \
+	    DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param" << ": " << \
 		b1->String(true) << " and " << b2->String(true));
 	}
     }
     else
-    	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param: " << uid1 << ", " << uid2);
+    	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param" << ": " << "uid: " <<
+	    "0x" << std::setw(8) << std::setfill('0') << std::hex << uid1 << ", " << "uid: " <<
+	    "0x" << std::setw(8) << std::setfill('0') << std::hex << uid2);
 }
 
 void Battle::Arena::ApplyActionMove(Command & cmd)
@@ -301,7 +303,9 @@ void Battle::Arena::ApplyActionMove(Command & cmd)
     }
     else
     {
-    	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param: " << "uid: " << uid << ", dst: " << dst);
+    	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param" << ": " << "uid: "
+	    "0x" << std::setw(8) << std::setfill('0') << std::hex << uid <<
+	    ", dst: " << dst);
     }
 }
 
@@ -336,7 +340,7 @@ void Battle::Arena::ApplyActionSkip(StreamBuf & stream)
 	}
     }
     else
-	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param: " << "uid: " << uid);
+	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param" << ": " << "uid: " << uid);
 }
 
 void Battle::Arena::ApplyActionEnd(StreamBuf & stream)
@@ -362,7 +366,8 @@ void Battle::Arena::ApplyActionEnd(StreamBuf & stream)
 	}
     }
     else
-	DEBUG(DBG_BATTLE, DBG_INFO, "incorrect param: " << "uid: " << uid);
+	DEBUG(DBG_BATTLE, DBG_INFO, "incorrect param" << ": " << "uid: " <<
+	    "0x" << std::setw(8) << std::setfill('0') << std::hex <<  uid);
 }
 
 void Battle::Arena::ApplyActionMorale(StreamBuf & stream)
@@ -394,7 +399,8 @@ void Battle::Arena::ApplyActionMorale(StreamBuf & stream)
 	DEBUG(DBG_BATTLE, DBG_TRACE, (morale ? "good" : "bad") << " to " << b->String());
     }
     else
-	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param: " << "uid: " << uid);
+	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param" << ": " << "uid: " <<
+	    "0x" << std::setw(8) << std::setfill('0') << std::hex << uid);
 
     end_turn = true;
 }
@@ -723,7 +729,8 @@ void Battle::Arena::ApplyActionTower(StreamBuf & stream)
 	if(b2->Modes(SP_BLIND)) b2->ResetBlind();
     }
     else
-	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param: " << "tower: " << static_cast<int>(type) << ", uid: " << uid);
+	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param" << ": " << "tower: " << static_cast<int>(type) << ", uid: " <<
+	    "0x" << std::setw(8) << std::setfill('0') << std::hex << uid);
 }
 
 void Battle::Arena::ApplyActionCatapult(StreamBuf & stream)
