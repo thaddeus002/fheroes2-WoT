@@ -1122,6 +1122,10 @@ void World::NewWeek(void)
 	vec_kingdoms.AddTributeEvents(map_captureobj, day, MP2::OBJ_WINDMILL);
 	vec_kingdoms.AddTributeEvents(map_captureobj, day, MP2::OBJ_MAGICGARDEN);
     }
+
+    // new day - reset option: "heroes: remember MP/SP for retreat/surrender result"
+    std::for_each(vec_heroes.begin(), vec_heroes.end(),
+	std::bind2nd(std::mem_fun(&Heroes::ResetModes), Heroes::SAVEPOINTS));
 }
 
 void World::NewMonth(void)
