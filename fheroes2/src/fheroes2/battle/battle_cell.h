@@ -104,7 +104,8 @@ namespace Battle
 	Position() : std::pair<Cell*, Cell*>(NULL, NULL) {}
 
 	void		Set(s16 head, bool wide, bool reflect);
-	void		SetReflection(void);
+	void		Swap(void);
+	bool		isReflect(void) const;
 	bool		isValid(void) const;
 
 	static Position	GetCorrect(const Unit &, s16);

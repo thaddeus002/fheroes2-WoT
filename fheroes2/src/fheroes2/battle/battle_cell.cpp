@@ -36,7 +36,7 @@ void Battle::Position::Set(s16 head, bool wide, bool reflect)
 	second = Board::GetCell(first->GetIndex(), reflect ? RIGHT : LEFT);
 }
 
-void Battle::Position::SetReflection(void)
+void Battle::Position::Swap(void)
 {
     if(first && second)
 	std::swap(first, second);
@@ -96,6 +96,11 @@ Battle::Position Battle::Position::GetCorrect(const Unit & b, s16 head)
     }
 
     return result;
+}
+
+bool Battle::Position::isReflect(void) const
+{
+    return first && second && first->GetIndex() < second->GetIndex();
 }
 
 bool Battle::Position::isValid(void) const

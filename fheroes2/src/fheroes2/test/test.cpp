@@ -185,8 +185,8 @@ void RunTest3(void)
     castle->BuyBuilding(BUILD_MOAT);
 
     //Army army2;
-    //Army & army2 = hero2.GetArmy();
-    Army & army2 = castle->GetArmy();
+    Army & army2 = hero2.GetArmy();
+    //Army & army2 = castle->GetArmy();
     if(army2.GetCommander())
     {
 	army2.GetCommander()->SpellBookActivate();
@@ -195,17 +195,17 @@ void RunTest3(void)
 
     army1.Clean();
     //army1.JoinTroop(Monster::PHOENIX, 10);
-    army1.GetTroop(0)->Set(Monster::ARCHER, 30);
-    army1.GetTroop(2)->Set(Monster::CAVALRY, 20);
-    army1.GetTroop(3)->Set(Monster::GARGOYLE, 10);
+    //army1.GetTroop(0)->Set(Monster::ARCHER, 30);
+    army1.GetTroop(1)->Set(Monster::ROC, 20);
+    army1.GetTroop(2)->Set(Monster::OGRE_LORD, 20);
 
     //army1.JoinTroop(Monster::Rand(Monster::LEVEL1), 30);
     //army1.JoinTroop(Monster::Rand(Monster::LEVEL2), 20);
     //army1.JoinTroop(Monster::Rand(Monster::LEVEL3), 10);
 
     army2.Clean();
-    army2.GetTroop(0)->Set(Monster::ARCHER, 30);
-    army2.GetTroop(2)->Set(Monster::ROC, 20);
+    army2.GetTroop(0)->Set(Monster::ROC, 20);
+    army2.GetTroop(2)->Set(Monster::OGRE_LORD, 20);
 //    army2.at(0) = Troop(Monster::OGRE, 1);
 //    army2.at(1) = Troop(Monster::DWARF, 2);
 //    army2.at(2) = Troop(Monster::DWARF, 2);
@@ -216,7 +216,7 @@ void RunTest3(void)
 //    army2.JoinTroop(static_cast<Monster::monster_t>(6), 10);
 //    army2.JoinTroop(static_cast<Monster::monster_t>(8), 10);
 
-    Battle::Loader(army1, army2, castle->GetIndex());
+    Battle::Loader(army1, army2, army2.GetCommander()->GetIndex());
 }
 
 #endif

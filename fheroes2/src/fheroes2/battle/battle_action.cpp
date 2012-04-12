@@ -250,8 +250,8 @@ void Battle::Arena::ApplyActionMove(Command & cmd)
 	// force check fly
 	if(static_cast<ArmyTroop*>(b)->isFly())
 	{
-	    if(b->UpdateDirection(pos1.GetRect()))
-		pos1.SetReflection();
+	    b->UpdateDirection(pos1.GetRect());
+	    if(b->isReflect() != pos1.isReflect()) pos1.Swap();
 	    if(interface) interface->RedrawActionFly(*b, pos1);
 	    pos2 = pos1;
 	}

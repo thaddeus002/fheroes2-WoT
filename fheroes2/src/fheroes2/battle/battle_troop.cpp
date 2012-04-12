@@ -360,7 +360,7 @@ void Battle::Unit::SetPosition(const Position & pos)
 void Battle::Unit::SetReflection(bool r)
 {
     if(reflect != r)
-	position.SetReflection();
+	position.Swap();
 
     reflect = r;
 }
