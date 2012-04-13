@@ -142,9 +142,9 @@ Game::menu_t Game::NewGame(void)
     if(conf.QVGA()) return PocketPC::NewGame();
 
     // preload
-    AGG::PreloadObject(ICN::HEROES);
-    AGG::PreloadObject(ICN::BTNNEWGM);
-    AGG::PreloadObject(ICN::REDBACK);
+    AGG::Cache::PreloadObject(ICN::HEROES);
+    AGG::Cache::PreloadObject(ICN::BTNNEWGM);
+    AGG::Cache::PreloadObject(ICN::REDBACK);
 
     // cursor
     Cursor & cursor = Cursor::Get();
@@ -233,9 +233,9 @@ Game::menu_t Game::NewMulti(void)
     if(conf.QVGA()) return PocketPC::NewMulti();
 
     // preload
-    AGG::PreloadObject(ICN::HEROES);
-    AGG::PreloadObject(ICN::BTNHOTST);
-    AGG::PreloadObject(ICN::REDBACK);
+    AGG::Cache::PreloadObject(ICN::HEROES);
+    AGG::Cache::PreloadObject(ICN::BTNHOTST);
+    AGG::Cache::PreloadObject(ICN::REDBACK);
 
     // cursor
     Cursor & cursor = Cursor::Get();

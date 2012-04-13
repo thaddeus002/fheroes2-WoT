@@ -49,9 +49,9 @@ u8 Dialog::SystemOptions(void)
     const ICN::icn_t spanbkg = conf.ExtGameEvilInterface() ? ICN::SPANBKGE : ICN::SPANBKG;
     const ICN::icn_t spanbtn = conf.ExtGameEvilInterface() ? ICN::SPANBTNE : ICN::SPANBTN;
 
-    AGG::PreloadObject(spanbkg);
-    AGG::PreloadObject(spanbtn);
-    AGG::PreloadObject(ICN::SPANEL);
+    AGG::Cache::PreloadObject(spanbkg);
+    AGG::Cache::PreloadObject(spanbtn);
+    AGG::Cache::PreloadObject(ICN::SPANEL);
 
     // cursor
     Cursor & cursor = Cursor::Get();

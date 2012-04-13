@@ -32,7 +32,7 @@ bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &messa
     const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     // preload
-    AGG::PreloadObject(system);
+    AGG::Cache::PreloadObject(system);
 
     // cursor
     Cursor & cursor = Cursor::Get();

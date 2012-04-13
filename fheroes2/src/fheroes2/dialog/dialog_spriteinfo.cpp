@@ -50,7 +50,7 @@ u16 Dialog::SpriteInfo(const std::string &header, const std::string &message, co
     const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     // preload
-    AGG::PreloadObject(system);
+    AGG::Cache::PreloadObject(system);
 
     // cursor
     Cursor & cursor = Cursor::Get();

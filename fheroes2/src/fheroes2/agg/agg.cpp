@@ -940,9 +940,6 @@ void AGG::Cache::LoadFNT(void)
     else
 #endif
     {
-	PreloadObject(ICN::SMALFONT);
-	PreloadObject(ICN::FONT);
-
 	DEBUG(DBG_ENGINE, DBG_INFO, "use bitmap fonts");
     }
 }
@@ -1253,16 +1250,36 @@ void AGG::Cache::Dump(void) const
 #endif
 }
 
-// wrapper AGG::PreloadObject
-void AGG::PreloadObject(const ICN::icn_t icn, bool reflect)
+// wrapper AGG::Cache::PreloadObject
+void AGG::Cache::PreloadObject(const ICN::icn_t icn, bool reflect)
 {
     // deprecated
     // or loading all sprites? AGG::Cache::Get().LoadICN(icn, index, reflect);
 }
 
-void AGG::PreloadObject(const TIL::til_t til)
+void AGG::Cache::PreloadObject(const TIL::til_t til)
 {
-    return AGG::Cache::Get().LoadTIL(til);
+    return Get().LoadTIL(til);
+}
+
+void AGG::Cache::PreloadPalette(void)
+{
+    return Get().LoadPAL();
+}
+
+void AGG::Cache::PreloadFonts(void)
+{
+    return Get().LoadFNT();
+}
+
+void AGG::Cache::FreeObject(const ICN::icn_t icn)
+{
+    return Get().FreeICN(icn);
+}
+
+void AGG::Cache::FreeObject(const TIL::til_t til)
+{
+    return Get().FreeTIL(til);
 }
 
 void AGG::ICNRegistryEnable(bool f)
@@ -1275,16 +1292,6 @@ void AGG::ICNRegistryFreeObjects(void)
     AGG::Cache::Get().ICNRegistryFreeObjects();
 }
 
-// wrapper AGG::FreeObject
-void AGG::FreeObject(const ICN::icn_t icn)
-{
-    return AGG::Cache::Get().FreeICN(icn);
-}
-
-void AGG::FreeObject(const TIL::til_t til)
-{
-    return AGG::Cache::Get().FreeTIL(til);
-}
 
 // wrapper AGG::GetXXX
 int AGG::GetICNCount(const ICN::icn_t icn)

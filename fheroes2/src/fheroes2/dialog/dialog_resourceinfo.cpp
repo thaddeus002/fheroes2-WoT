@@ -33,7 +33,7 @@ u16 Dialog::ResourceInfo(const std::string &header, const std::string &message, 
     const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     // preload
-    AGG::PreloadObject(system);
+    AGG::Cache::PreloadObject(system);
 
     // cursor
     Cursor & cursor = Cursor::Get();

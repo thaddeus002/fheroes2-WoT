@@ -35,9 +35,9 @@ Game::menu_t Game::Editor::MainMenu(void)
     Display & display = Display::Get();
 
     // preload
-    AGG::PreloadObject(ICN::EDITOR);
-    AGG::PreloadObject(ICN::BTNEMAIN);
-    AGG::PreloadObject(ICN::REDBACK);
+    AGG::Cache::PreloadObject(ICN::EDITOR);
+    AGG::Cache::PreloadObject(ICN::BTNEMAIN);
+    AGG::Cache::PreloadObject(ICN::REDBACK);
 
     // cursor
     Cursor & cursor = Cursor::Get();

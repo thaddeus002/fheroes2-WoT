@@ -182,10 +182,10 @@ int main(int argc, char **argv)
 	    }
 
             // load palette
-	    cache.LoadPAL();
+	    cache.PreloadPalette();
 
 	    // load font
-	    cache.LoadFNT();
+	    cache.PreloadFonts();
 
 #ifdef WITH_ZLIB
 	    LoadZLogo();

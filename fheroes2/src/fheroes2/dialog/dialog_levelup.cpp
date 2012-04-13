@@ -78,7 +78,7 @@ u8 DialogSelectSecondary(const std::string & name, const std::string & primary, 
     const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     // preload
-    AGG::PreloadObject(system);
+    AGG::Cache::PreloadObject(system);
 
     // cursor
     Cursor & cursor = Cursor::Get();

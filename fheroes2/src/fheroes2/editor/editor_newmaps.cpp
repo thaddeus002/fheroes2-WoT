@@ -39,8 +39,8 @@ Game::menu_t Game::Editor::NewMaps(void)
     Display & display = Display::Get();
 
     // preload
-    AGG::PreloadObject(ICN::BTNESIZE);
-    AGG::PreloadObject(ICN::REDBACK);
+    AGG::Cache::PreloadObject(ICN::BTNESIZE);
+    AGG::Cache::PreloadObject(ICN::REDBACK);
 
     // cursor
     Cursor & cursor = Cursor::Get();

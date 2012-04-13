@@ -37,7 +37,7 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur,
     const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     // preload
-    AGG::PreloadObject(system);
+    AGG::Cache::PreloadObject(system);
 
     // cursor
     Cursor & cursor = Cursor::Get();

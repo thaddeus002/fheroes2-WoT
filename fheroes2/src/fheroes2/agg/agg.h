@@ -115,7 +115,6 @@ namespace AGG
 	static Cache & Get(void);
 
 	bool ReadDataDir(void);
-	bool ReadChunk(const std::string & key, std::vector<u8> & body);
 
 	int GetICNCount(const ICN::icn_t icn);
 	const Sprite & GetICN(const ICN::icn_t icn, u16 index, bool reflect = false);
@@ -126,8 +125,33 @@ namespace AGG
 	const Surface & GetFNT(u16, u8);
 	const SDL::Font & GetMediumFont(void) const;
 	const SDL::Font & GetSmallFont(void) const;
-	void LoadFNT(u16);
 #endif
+	void LoadLOOPXXSounds(const u16*);
+	void ResetMixer(void);
+
+	bool isValidFonts(void) const;
+
+	void ClearAllICN(void);
+	void ClearAllWAV(void);
+	void ClearAllMID(void);
+
+	void ICNRegistryEnable(bool);
+	void ICNRegistryFreeObjects(void);
+
+	void Dump(void) const;
+
+	static void PreloadObject(const ICN::icn_t, bool reflect = false);
+	static void PreloadObject(const TIL::til_t);
+	static void PreloadPalette(void);
+	static void PreloadFonts(void);
+
+	static void FreeObject(const ICN::icn_t);
+	static void FreeObject(const TIL::til_t);
+
+    private:
+	Cache();
+
+	bool ReadChunk(const std::string & key, std::vector<u8> & body);
 
 	bool LoadExtICN(icn_cache_t &, const ICN::icn_t, const u16, bool);
 	bool LoadAltICN(icn_cache_t &, const ICN::icn_t, const u16, bool);
@@ -140,29 +164,14 @@ namespace AGG
 	void LoadWAV(const M82::m82_t m82);
 	void LoadMID(const XMI::xmi_t xmi);
 
-	void LoadLOOPXXSounds(const u16*);
-	void ResetMixer(void);
-	
-	void LoadPAL(void);
-	void LoadFNT(void);
-	bool isValidFonts(void) const;
-
 	void FreeICN(const ICN::icn_t icn);
 	void FreeTIL(const TIL::til_t til);
 	void FreeWAV(const M82::m82_t m82);
 	void FreeMID(const XMI::xmi_t xmi);
 
-	void ClearAllICN(void);
-	void ClearAllWAV(void);
-	void ClearAllMID(void);
-
-	void ICNRegistryEnable(bool);
-	void ICNRegistryFreeObjects(void);
-
-	void Dump(void) const;
-
-    private:
-	Cache();
+	void LoadPAL(void);
+	void LoadFNT(void);
+	
 
 	File heroes2_agg;
 	File heroes2x_agg;
@@ -175,6 +184,8 @@ namespace AGG
 	std::map<XMI::xmi_t, std::vector<u8> > mid_cache;
 
 #ifdef WITH_TTF
+	void LoadFNT(u16);
+
 	std::map<u16, fnt_cache_t> fnt_cache;
 	SDL::Font font_medium;
 	SDL::Font font_small;
@@ -183,25 +194,17 @@ namespace AGG
 	bool icn_registry_enable;
     };
 
-    // wrapper AGG::PreloadObject
-    void PreloadObject(const ICN::icn_t icn, bool reflect = false);
-    void PreloadObject(const TIL::til_t til);
-
-    // wrapper AGG::FreeObject
-    void FreeObject(const ICN::icn_t icn);
-    void FreeObject(const TIL::til_t til);
-
-    // wrapper AGG::GetXXX
     void ICNRegistryEnable(bool);
     void ICNRegistryFreeObjects(void);
     int GetICNCount(const ICN::icn_t icn);
+
     const Sprite & GetICN(const ICN::icn_t icn, const u16 index, bool reflect = false);
     const Surface & GetTIL(const TIL::til_t til, const u16 index, const u8 shape);
-
     const Surface & GetLetter(char ch, u8 ft);
 #ifdef WITH_TTF
     const Surface & GetUnicodeLetter(u16 ch, u8 ft);
 #endif
+
     // wrapper Audio
     void PlaySound(const M82::m82_t m82);
     void PlayMusic(const MUS::mus_t mus, bool loop = true);

@@ -46,9 +46,9 @@ Game::menu_t Game::MainMenu(void)
     if(conf.QVGA()) return PocketPC::MainMenu();
 
     // preload
-    AGG::PreloadObject(ICN::HEROES);
-    AGG::PreloadObject(ICN::BTNSHNGL);
-    AGG::PreloadObject(ICN::SHNGANIM);
+    AGG::Cache::PreloadObject(ICN::HEROES);
+    AGG::Cache::PreloadObject(ICN::BTNSHNGL);
+    AGG::Cache::PreloadObject(ICN::SHNGANIM);
 
     // cursor
     Cursor & cursor = Cursor::Get();

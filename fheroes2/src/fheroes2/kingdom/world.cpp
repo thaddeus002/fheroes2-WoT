@@ -213,7 +213,7 @@ void World::NewMaps(const u16 sw, const u16 sh)
     width = sw;
     height = sh;
 
-    AGG::PreloadObject(TIL::GROUND32);
+    AGG::Cache::PreloadObject(TIL::GROUND32);
 
     vec_tiles.resize(width * height);
 
@@ -259,7 +259,7 @@ void World::LoadMaps(const std::string &filename)
 	 Error::Except(__FUNCTION__, "load maps");
     }
 
-    AGG::PreloadObject(TIL::GROUND32);
+    AGG::Cache::PreloadObject(TIL::GROUND32);
 
     u8   byte8;
     u16  byte16;
