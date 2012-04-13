@@ -278,22 +278,14 @@ bool AGG::Cache::ReadChunk(const std::string & key, std::vector<u8> & body)
 }
 
 /* load manual ICN object */
-void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 index, bool reflect)
+bool AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 index, bool reflect)
 {
-    DEBUG(DBG_ENGINE, DBG_TRACE, ICN::GetString(icn) << ", " << index);
-
-    u8 count = 0;		// for animation sprite need update count for ICN::AnimationFrame
+    // for animation sprite need update count for ICN::AnimationFrame
+    u8 count = 0;
 
     switch(icn)
     {
-	case ICN::TELEPORT1:
-	case ICN::TELEPORT2:
-	case ICN::TELEPORT3: count = 8; break;
-	case ICN::FOUNTAIN:  count = 2; break;
-	case ICN::TREASURE:  count = 2; break;
-	case ICN::ROUTERED:  count = 145; break;
-	case ICN::YELLOW_FONT:
-	case ICN::YELLOW_SMALFONT: count = 96; break;
+	case ICN::BOAT12:		count = 1; break;
 	case ICN::BATTLESKIP:
 	case ICN::BATTLEWAIT:
 	case ICN::BATTLEAUTO:
@@ -301,11 +293,21 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 	case ICN::BUYMAX:
 	case ICN::BTNBATTLEONLY:
 	case ICN::BTNGIFT:
-	case ICN::BTNCONFIG:  count = 2; break;
-	case ICN::BOAT12:  count = 1; break;
+	case ICN::BTNCONFIG:		count = 2; break;
+	case ICN::FOUNTAIN:		count = 2; break;
+	case ICN::TREASURE:		count = 2; break;
+	case ICN::TELEPORT1:
+	case ICN::TELEPORT2:
+	case ICN::TELEPORT3:		count = 8; break;
+	case ICN::YELLOW_FONT:
+	case ICN::YELLOW_SMALFONT:	count = 96; break;
+	case ICN::ROUTERED:		count = 145; break;
 
-	default: break;
+	default: break;;
     }
+
+    if(0 == count) return false;
+    DEBUG(DBG_ENGINE, DBG_TRACE, ICN::GetString(icn) << ", " << index);
 
     if(NULL == v.sprites)
     {
@@ -530,6 +532,8 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 	    default: break;
 	}
     }
+
+    return true;
 }
 
 bool AGG::Cache::LoadAltICN(icn_cache_t & v, const std::string & spec, const u16 index, bool reflect)
@@ -654,13 +658,6 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
     const Settings & conf = Settings::Get();
     bool skip_origin = false;
 
-    // load modify sprite
-    if(ICN::isModifiedSprite(icn))
-    {
-	LoadExtICN(v, icn, index, reflect);
-	skip_origin = true;
-    }
-    else
     // load from images dir
     if(conf.UseAltResource())
     {
@@ -669,6 +666,12 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
 
 	if(IsFile(xml_spec) &&
 	    LoadAltICN(v, xml_spec, index, reflect)) skip_origin = true;
+    }
+    else
+    // load modify sprite
+    if(LoadExtICN(v, icn, index, reflect))
+    {
+	skip_origin = true;
     }
 
     //load origin sprite

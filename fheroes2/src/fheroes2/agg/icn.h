@@ -943,7 +943,6 @@ namespace ICN
     const char* GetString(const icn_t &);
     icn_t FromString(const char*);
     u16 AnimationFrame(const icn_t &, const u8 &, const u32 &, bool = false);
-    bool isModifiedSprite(const icn_t &);
     bool NeedMinify4PocketPC(const icn_t & , const u16 &);
     bool HighlyObjectSprite(const icn_t &, const u8 &);
     icn_t PORTxxxx(u8);

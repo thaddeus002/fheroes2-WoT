@@ -921,9 +921,9 @@ namespace ICN
 	{ BATTLEAUTO,   "MANUAL.ICN" },
 	{ BATTLESETS,   "MANUAL.ICN" },
 	{ BTNCONFIG,    "MANUAL.ICN" },
-	{ BTNBATTLEONLY,"MANUAL.ICN" },
+	{ BTNBATTLEONLY,"BTNBONLY.ICN" },
 	{ BOAT12,       "MANUAL.ICN" },
-	{ BTNGIFT,      "MANUAL.ICN" },
+	{ BTNGIFT,      "BTNGIFT.ICN" },
 
 	{ UNKNOWN,	"UNKNOWN" },
     };
@@ -1846,34 +1846,6 @@ u8 ICN::GetMissIndex(const icn_t & icn, const s16 & dx, const s16 & dy)
     }
 
     return 0;
-}
-
-bool ICN::isModifiedSprite(const ICN::icn_t & icn)
-{
-    switch(icn)
-    {
-	case YELLOW_FONT:
-        case YELLOW_SMALFONT:
-        case ROUTERED:
-        case TELEPORT1:
-        case TELEPORT2:
-        case TELEPORT3:
-        case FOUNTAIN:
-        case TREASURE:
-	case BATTLESKIP:
-	case BATTLEWAIT:
-	case BATTLESETS:
-	case BATTLEAUTO:
-	case BUYMAX:
-	case BTNCONFIG:
-	case BTNGIFT:
-	case BTNBATTLEONLY:
-	case BOAT12:
-	    return true;
-
-	default: break;
-    }
-    return false;
 }
 
 bool ICN::isBattleMonsterICN(u16 icn)
