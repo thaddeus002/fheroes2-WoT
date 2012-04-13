@@ -29,7 +29,6 @@
 #include "spell_book.h"
 #include "artifact.h"
 #include "color.h"
-#include "game_io.h"
 #include "position.h"
 
 class Army;
@@ -93,7 +92,6 @@ public:
     void LoadDefaults(u8 type, u8 race);
 
 protected:
-    friend class Game::IOld;
     friend StreamBase & operator<< (StreamBase &, const HeroBase &);
     friend StreamBase & operator>> (StreamBase &, HeroBase &);
 

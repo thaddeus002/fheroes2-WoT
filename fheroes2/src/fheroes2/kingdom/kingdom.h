@@ -30,7 +30,6 @@
 #include "game.h"
 #include "mp2.h"
 #include "pairs.h"
-#include "game_io.h"
 #include "heroes.h"
 #include "castle.h"
 #include "heroes_recruits.h"
@@ -150,7 +149,6 @@ public:
     static u8 GetMaxHeroes(void);
 
 private:
-    friend class Game::IOld;
     friend StreamBase & operator<< (StreamBase &, const Kingdom &);
     friend StreamBase & operator>> (StreamBase &, Kingdom &);
 
@@ -203,7 +201,6 @@ public:
     u8 size(void) const;
 
 private:
-    friend class Game::IOld;
     friend StreamBase & operator<< (StreamBase &, const Kingdoms &);
     friend StreamBase & operator>> (StreamBase &, Kingdoms &);
 

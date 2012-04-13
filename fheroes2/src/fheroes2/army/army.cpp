@@ -370,12 +370,13 @@ void Troops::UpgradeTroops(const Castle & castle)
     for(iterator it = begin(); it != end(); ++it) if((*it)->isValid())
     {
         payment_t payment = (*it)->GetUpgradeCost();
+	Kingdom & kingdom  = world.GetKingdom(castle.GetColor());
 
 	if(castle.GetRace() == (*it)->GetRace() &&
 	   castle.isBuild((*it)->GetUpgrade().GetDwelling()) &&
-	   payment <= world.GetKingdom(castle.GetColor()).GetFunds())
+	   kingdom.AllowPayment(payment))
 	{
-    	    world.GetKingdom(castle.GetColor()).OddFundsResource(payment);
+    	    kingdom.OddFundsResource(payment);
             (*it)->Upgrade();
 	}
     }

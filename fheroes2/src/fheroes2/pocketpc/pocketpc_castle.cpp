@@ -244,8 +244,10 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
         selectArmy2.Redraw();
     }
 
+    const Kingdom & kingdom = world.GetKingdom(castle.GetColor());
+
     // resource bar
-    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetKingdom(castle.GetColor()).GetFunds());
+    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), kingdom.GetFunds());
 
     const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
     AGG::GetICN(ICN::TOWNWIND, 12).Blit(rectExit.x, rectExit.y);
@@ -262,7 +264,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
 
     Button buttonPrev(dst_rt.x + 64, dst_rt.y + 5, ICN::TRADPOST, 3, 4);
     Button buttonNext(dst_rt.x + 245, dst_rt.y + 5, ICN::TRADPOST, 5, 6);
-    if(2 > world.GetKingdom(castle.GetColor()).GetCastles().size())
+    if(2 > kingdom.GetCastles().size())
     {
 	buttonNext.Press();
         buttonPrev.Press();
@@ -315,7 +317,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
 	    cursor.Hide();
 	    dwbar.Redraw();
 	    selectArmy1.Redraw();
-	    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetKingdom(castle.GetColor()).GetFunds());
+	    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), kingdom.GetFunds());
 	    cursor.Show();
 	    display.Flip();
 	}
@@ -348,7 +350,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     	    if(le.MouseCursor(selectArmy1.GetArea()) || le.MouseCursor(selectArmy2.GetArea()))
     	    {
 		if(SelectArmyBar::QueueEventProcessing(selectArmy1, selectArmy2))
-		    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetKingdom(castle.GetColor()).GetFunds());
+		    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), kingdom.GetFunds());
 	    }
 	}
         else
@@ -356,7 +358,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     	    if(le.MouseCursor(selectArmy1.GetArea()))
 	    {
     		if(SelectArmyBar::QueueEventProcessing(selectArmy1))
-		    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetKingdom(castle.GetColor()).GetFunds());
+		    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), kingdom.GetFunds());
 	    }
 	}
 

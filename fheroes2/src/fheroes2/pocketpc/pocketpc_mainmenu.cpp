@@ -24,6 +24,7 @@
 #include "cursor.h"
 #include "settings.h"
 #include "text.h"
+#include "game_io.h"
 #include "pocketpc.h"
 
 Game::menu_t PocketPC::LoadGame(void)

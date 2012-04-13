@@ -87,10 +87,11 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     // calculate max count
     u32 max = 0;
     const payment_t paymentMonster = monster.GetCost();
-    const Funds & kingdomResource = world.GetKingdom(Settings::Get().CurrentColor()).GetFunds();
-    while(Funds(paymentMonster * max) <= kingdomResource && max <= available) ++max;
+    const Kingdom & kingdom = world.GetKingdom(Settings::Get().CurrentColor());
 
-    u32 result = --max;
+    while(kingdom.AllowPayment(paymentMonster * max) && max < available) ++max;
+
+    u32 result = max;
 
     payment_t paymentCosts(paymentMonster * result);
 

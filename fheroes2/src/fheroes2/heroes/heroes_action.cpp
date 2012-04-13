@@ -985,7 +985,7 @@ void ActionToSkeleton(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	if(hero.IsFullBagArtifacts())
 	{
 	    u16 gold = GoldInsteadArtifact(obj);
-	    Funds funds(Resource::GOLD, gold);
+	    const Funds funds(Resource::GOLD, gold);
 	    Dialog::ResourceInfo("", _("Treasure"), funds, Dialog::OK);
 	    world.GetKingdom(hero.GetColor()).AddFundsResource(funds);
 	}
@@ -2521,18 +2521,30 @@ void ActionToUpgradeArmyObject(Heroes & hero, const u8 & obj, const s32 & dst_in
 
 void ActionToMagellanMaps(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
-    if(1000 > world.GetKingdom(hero.GetColor()).GetFunds().Get(Resource::GOLD))
+    const Funds payment(Resource::GOLD, 1000);
+    Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+
+    if(hero.isVisited(obj, Visit::GLOBAL))
     {
-	PlaySoundFailure;
-	Dialog::Message(MP2::StringObject(obj), _("The captain sighs. \"You don't have enough money, eh?  You can't expect me to give my maps away for free!\""), Font::BIG, Dialog::OK);
+	Dialog::Message(MP2::StringObject(obj), "empty", Font::BIG, Dialog::OK);
     }
     else
+    if(kingdom.AllowPayment(payment))
     {
 	PlaySoundWarning;
 	if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("A retired captain living on this refurbished fishing platform offers to sell you maps of the sea he made in his younger days for 1,000 gold. Do you wish to buy the maps?"), Font::BIG, Dialog::YES | Dialog::NO))
+	{
 	    world.ActionForMagellanMaps(hero.GetColor());
+	    kingdom.OddFundsResource(payment);
+	    hero.SetVisited(dst_index, Visit::GLOBAL);
+	}
 
 	GameFocus::SetRedraw();
+    }
+    else
+    {
+	PlaySoundFailure;
+	Dialog::Message(MP2::StringObject(obj), _("The captain sighs. \"You don't have enough money, eh?  You can't expect me to give my maps away for free!\""), Font::BIG, Dialog::OK);
     }
 
     DEBUG(DBG_GAME, DBG_INFO, hero.GetName());
@@ -2736,18 +2748,21 @@ void ActionToDaemonCave(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    else
 	    {
 		bool remove = true;
+		Funds payment(Resource::GOLD, gold);
+		Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+		bool allow = kingdom.AllowPayment(payment);
 
-		msg = gold <= world.GetKingdom(hero.GetColor()).GetFunds().Get(Resource::GOLD) ?
+		msg = allow ?
 			    _("The Demon leaps upon you and has its claws at your throat before you can even draw your sword. \"Your life is mine,\" it says. \"I will sell it back to you for %{count} gold.\"") :
 			    _("Seeing that you do not have %{count} gold, the demon slashes you with its claws, and the last thing you see is a red haze.");
 		String::Replace(msg, "%{count}", gold);
 
-		if(gold <= world.GetKingdom(hero.GetColor()).GetFunds().Get(Resource::GOLD))
+		if(allow)
 		{
 		    if(Dialog::YES == Dialog::Message("", msg, Font::BIG, Dialog::YES|Dialog::NO))
 		    {
 			remove = false;
-			world.GetKingdom(hero.GetColor()).OddFundsResource(Funds(Resource::GOLD, gold));
+			kingdom.OddFundsResource(payment);
 		    }
 		}
 		else

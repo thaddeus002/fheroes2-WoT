@@ -30,8 +30,6 @@
 #ifdef WITH_NET
 #include "SDL_net.h"
 
-class QueueMessage;
-
 namespace Network
 {
     bool		Init(void);
@@ -53,8 +51,11 @@ namespace Network
         bool            Recv(char*, int);
         bool            Send(const char*, int);
 
-        bool            Recv(u32 &);
-        bool            Send(const u32 &);
+        bool            Recv32(u32 &);
+        bool            Send32(const u32 &);
+
+        bool            Recv16(u16 &);
+        bool            Send16(const u16 &);
 
 	u32		Host(void) const;
 	u16		Port(void) const;
@@ -81,35 +82,5 @@ namespace Network
     };
 }
 #endif
-
-class QueueMessage	// DEPRECATED
-{
-public:
-    QueueMessage();
-    ~QueueMessage();
-
-    void	Push(u8);
-
-    bool	Pop(u8 &);
-    bool	Pop(s8 &);
-    bool	Pop(u16 &);
-    bool	Pop(s16 &);
-    bool	Pop(u32 &);
-    bool	Pop(s32 &);
-    bool	Pop(bool &);
-    bool	Pop(std::string &);
-
-    void	Load(const char*);
-
-protected:
-    void	Resize(size_t);
-    size_t	Size(void) const;
-
-    u16		type;
-    char*	data;
-    char*	itd1;
-    char*	itd2;
-    size_t	dtsz;
-};
 
 #endif

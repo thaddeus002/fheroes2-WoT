@@ -26,7 +26,6 @@
 #include <string>
 #include "game.h"
 
-namespace Game { class IOld; }
 namespace GameOver
 {
     enum conditions_t
@@ -66,7 +65,6 @@ namespace GameOver
 	bool LocalCheckGameOver(Game::menu_t &);
 
     private:
-	friend class Game::IOld;
 	friend StreamBase & operator<< (StreamBase &, const Result &);
 	friend StreamBase & operator>> (StreamBase &, Result &);
 

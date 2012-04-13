@@ -336,7 +336,7 @@ bool Surface::isValid(void) const
 
 bool Surface::isDisplay(void) const
 {
-    return surface && Display::Get().surface == surface;
+    return false;
 }
 
 bool Surface::Load(const char* fn)

@@ -28,7 +28,6 @@
 #include "mp2.h"
 #include "direction.h"
 #include "gamedefs.h"
-#include "game_io.h"
 #include "color.h"
 #include "skill.h"
 #include "artifact.h"
@@ -266,7 +265,6 @@ namespace Maps
 	static void UpdateTreasureChestSprite(Tiles &);
 
     private:
-	friend class Game::IOld;
 	friend StreamBase & operator<< (StreamBase &, const Tiles &);
 	friend StreamBase & operator>> (StreamBase &, Tiles &);
 

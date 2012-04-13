@@ -55,6 +55,7 @@ class Display : public Surface
 public:
     ~Display();
 
+    bool		isDisplay(void) const;
     static Display &	Get(void);
 
     static void		SetVideoMode(const u16 w, const u16 h, u32 flags);
@@ -63,8 +64,8 @@ public:
 
     static void		HideCursor(void);
     static void		ShowCursor(void);
-    static void		SetCaption(const std::string & caption);
-    static void		SetIcons(const Surface & icons);
+    static void		SetCaption(const char*);
+    static void		SetIcons(Surface &);
 
     void		AddUpdateRect(s16, s16, u16, u16);
 

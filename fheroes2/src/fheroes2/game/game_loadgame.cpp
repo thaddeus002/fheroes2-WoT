@@ -27,6 +27,7 @@
 #include "dialog.h"
 #include "settings.h"
 #include "pocketpc.h"
+#include "game_io.h"
 #include "game.h"
 
 Game::menu_t Game::LoadCampain(void)

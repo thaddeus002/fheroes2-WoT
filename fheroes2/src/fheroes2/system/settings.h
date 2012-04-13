@@ -32,7 +32,6 @@
 #include "maps_fileinfo.h"
 #include "game.h"
 #include "players.h"
-#include "game_io.h"
 #include "dir.h"
 #include "bitmodes.h"
 
@@ -41,14 +40,8 @@
 #endif
 
 #define FORMAT_VERSION_2830 0x0B0E
-#define FORMAT_VERSION_2804 0x0AF4
-#define FORMAT_VERSION_2798 0x0AEE
-#define FORMAT_VERSION_2792 0x0AE8
-#define FORMAT_VERSION_2777 0x0AD9
-#define FORMAT_VERSION_2707 0x0A93
-#define FORMAT_VERSION_2689 0x0A81
 #define CURRENT_FORMAT_VERSION FORMAT_VERSION_2830
-#define LAST_FORMAT_VERSION FORMAT_VERSION_2689
+#define LAST_FORMAT_VERSION FORMAT_VERSION_2830
 
 enum
 {
@@ -447,7 +440,6 @@ protected:
     void PostLoad(void);
 
 private:
-    friend class Game::IOld;
     friend StreamBase & operator<< (StreamBase &, const Settings &);
     friend StreamBase & operator>> (StreamBase &, Settings &);
 

@@ -741,9 +741,8 @@ u16 Castle::RecruitMaxMonster(u32 dw)
 	Kingdom & kingdom = world.GetKingdom(color);
 	count = dwelling[dw_index];
 	const payment_t paymentCosts = ms.GetCost();
-	const Funds & kingdomResource = kingdom.GetFunds();
 
-	while(count && Funds(paymentCosts * count) > kingdomResource) --count;
+	while(count && kingdom.AllowPayment(paymentCosts * count)) --count;
 
 	// buy
 	if(count)

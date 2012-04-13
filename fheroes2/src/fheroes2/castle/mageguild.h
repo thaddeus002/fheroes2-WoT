@@ -24,7 +24,6 @@
 #define H2MAGEGUILD_H
 
 #include "gamedefs.h"
-#include "game_io.h"
 #include "spell_storage.h"
 
 class Castle;
@@ -41,7 +40,6 @@ class MageGuild
 	SpellStorage GetSpells(u8 lvlmage, bool islibrary, u8) const;
 
     private:
-	friend class Game::IOld;
         friend StreamBase & operator<< (StreamBase &, const MageGuild &);
         friend StreamBase & operator>> (StreamBase &, MageGuild &);
 

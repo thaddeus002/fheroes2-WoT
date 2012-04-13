@@ -370,25 +370,25 @@ u8 Resource::FromIndexSprite2(u8 index)
 
 s32 Funds::GetFirstValidItems(u8 rs) const
 {
-    if(0 < wood && (rs & Resource::WOOD))
+    if(wood && (rs & Resource::WOOD))
 	return wood;
     else
-    if(0 < ore && (rs & Resource::ORE))
+    if(ore && (rs & Resource::ORE))
 	return ore;
     else
-    if(0 < mercury && (rs & Resource::MERCURY))
+    if(mercury && (rs & Resource::MERCURY))
 	return mercury;
     else
-    if(0 < sulfur && (rs & Resource::SULFUR))
+    if(sulfur && (rs & Resource::SULFUR))
 	return sulfur;
     else
-    if(0 < crystal && (rs & Resource::CRYSTAL))
+    if(crystal && (rs & Resource::CRYSTAL))
 	return crystal;
     else
-    if(0 < gems && (rs & Resource::GEMS))
+    if(gems && (rs & Resource::GEMS))
 	return gems;
     else
-    if(0 < gold && (rs & Resource::GOLD))
+    if(gold && (rs & Resource::GOLD))
 	return gold;
 
     return 0;
@@ -398,13 +398,13 @@ u8 Funds::GetValidItems(void) const
 {
     u8 result = 0;
 
-    if(0 < wood) ++result;
-    if(0 < ore) ++result;
-    if(0 < mercury) ++result;
-    if(0 < sulfur) ++result;
-    if(0 < crystal) ++result;
-    if(0 < gems) ++result;
-    if(0 < gold) ++result;
+    if(wood) ++result;
+    if(ore) ++result;
+    if(mercury) ++result;
+    if(sulfur) ++result;
+    if(crystal) ++result;
+    if(gems) ++result;
+    if(gold) ++result;
 
     return result;
 }

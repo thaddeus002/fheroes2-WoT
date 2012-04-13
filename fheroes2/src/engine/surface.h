@@ -29,6 +29,7 @@
 struct Point;
 struct Rect;
 struct SDL_Surface;
+class Display;
 
 class Surface
 {
@@ -37,13 +38,13 @@ public:
     Surface(const void* pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool amask);
     Surface(u16 sw, u16 sh, bool amask = false);
     Surface(const Surface & bs);
-    Surface(SDL_Surface * sf);
+    Surface(SDL_Surface* sf);
 
-    ~Surface();
+    virtual ~Surface();
 
     Surface & operator= (const Surface & bs);
     void Set(const Surface &);
-    void Set(SDL_Surface * sf);
+    void Set(SDL_Surface* sf);
     void Set(u16 sw, u16 sh, bool amask = false);
     void Set(u16 sw, u16 sh, u8 bpp, bool amask); /* bpp: 8, 16, 24, 32 */
     void Set(const void* pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool amask); /* bytes_per_pixel: 1, 2, 3, 4 */
@@ -51,7 +52,7 @@ public:
     bool Load(const char*);
     bool Load(const std::string &);
 
-    bool Save(const char *) const;
+    bool Save(const char*) const;
     bool Save(const std::string &) const;
 
     u16 w(void) const;
@@ -61,7 +62,7 @@ public:
     u8  alpha(void) const;
 
     bool isValid(void) const;
-    bool isDisplay(void) const;
+    virtual bool isDisplay(void) const;
     u32 MapRGB(u8 r, u8 g, u8 b, u8 a = 0) const;
     void GetRGB(u32 pixel, u8 *r, u8 *g, u8 *b, u8 *a = NULL) const;
 
@@ -73,7 +74,7 @@ public:
     void Blit(u8 alpha, s16, s16, Surface &) const;
     void Blit(u8 alpha, const Rect & srt, const Point &, Surface &) const;
 
-    const SDL_Surface *GetSurface(void) const{ return surface; };
+    //const SDL_Surface* GetSurface(void) const{ return surface; };
 
     void Fill(u32 color);
     void Fill(u8 r, u8 g, u8 b);
@@ -132,7 +133,9 @@ protected:
     void CreateSurface(u16 sw, u16 sh, u8 bpp, bool amask);
     static void BlitSurface(const Surface &, SDL_Rect*, Surface &, SDL_Rect*);
 
-    SDL_Surface *surface;
+    friend class Display;
+
+    SDL_Surface* surface;
 };
 
 #endif

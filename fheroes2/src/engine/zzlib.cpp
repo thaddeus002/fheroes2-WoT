@@ -25,49 +25,64 @@
 #include <zlib.h>
 #include "zzlib.h"
 
-bool ZLib::UnCompress(std::vector<char> & dst, const char* src, size_t srcsz, bool debug)
+bool ZLibUnCompress(const char* src, size_t srcsz, std::vector<char> & dst)
 {
+    int res = Z_BUF_ERROR;
+
     if(src && srcsz)
     {
-	uLong dstsz = srcsz * 20;
-	dst.resize(dstsz);
-	int res = 0;
-	while(Z_BUF_ERROR == (res = uncompress(reinterpret_cast<Bytef*>(&dst[0]), &dstsz, reinterpret_cast<const Bytef*>(src), srcsz)))
-	{ dstsz = dst.size() * 2; dst.resize(dstsz); }
-	dst.resize(dstsz);
-	
-	switch(res)
+	uLong dstsz = dst.size();
+
+	if(dstsz == 0)
 	{
-	    case Z_OK:  return true;
-	    case Z_MEM_ERROR: if(debug) std::cerr << "ZLib::UnCompress: " << "Z_MEM_ERROR" << std::endl; return false;
-	    case Z_BUF_ERROR: if(debug) std::cerr << "ZLib::UnCompress: " << "Z_BUF_ERROR" << std::endl; return false;
-	    case Z_DATA_ERROR:if(debug) std::cerr << "ZLib::UnCompress: " << "Z_DATA_ERROR"<< std::endl; return false;
-	    default: break;
+	    dstsz = srcsz * 7;
+	    dst.resize(dstsz, 0);
 	}
 
-        return Z_OK == res;
+	while(Z_BUF_ERROR ==
+		(res = uncompress(reinterpret_cast<Bytef*>(&dst[0]), &dstsz, reinterpret_cast<const Bytef*>(src), srcsz)))
+	{
+	    dstsz = dst.size() * 2;
+	    dst.resize(dstsz);
+	}
+
+	if(res == Z_OK)
+	    dst.resize(dstsz);
+	else
+	    dst.clear();
     }
-    return false;
+
+    return res == Z_OK;
 }
 
-bool ZLib::Compress(std::vector<char> & dst, const char* src, size_t srcsz)
+bool ZLibCompress(const char* src, size_t srcsz, std::vector<char> & dst)
 {
+    int res = Z_BUF_ERROR;
+
     if(src && srcsz)
     {
 	dst.resize(compressBound(srcsz));
         uLong dstsz = dst.size();
-        int res = compress(reinterpret_cast<Bytef*>(&dst[0]), &dstsz, reinterpret_cast<const Bytef*>(src), srcsz);
-        dst.resize(dstsz);
-        return Z_OK == res;
+        res = compress(reinterpret_cast<Bytef*>(&dst[0]), &dstsz, reinterpret_cast<const Bytef*>(src), srcsz);
+
+	if(res == Z_OK)
+	    dst.resize(dstsz);
+	else
+	    dst.clear();
     }
-    return false;
+
+    return Z_OK == res;
 }
 
 bool ZSurface::Load(u16 w, u16 h, u8 bpp, u16 pitch, u32 rmask, u32 gmask, u32 bmask, u32 amask, const u8* p, size_t s)
 {
-    if(!ZLib::UnCompress(buf, reinterpret_cast<const char*>(p), s)) return false;
-    Set(SDL_CreateRGBSurfaceFrom(&buf[0], w, h, bpp, pitch, rmask, gmask, bmask, amask));
-    return true;
+    if(ZLibUnCompress(reinterpret_cast<const char*>(p), s, buf))
+    {
+	Set(SDL_CreateRGBSurfaceFrom(&buf[0], w, h, bpp, pitch, rmask, gmask, bmask, amask));
+	return true;
+    }
+
+    return false;
 }
 
 std::ostream & operator<< (std::ostream & os, ZStreamBuf & zb)
@@ -86,7 +101,7 @@ ZStreamBuf & ZStreamBuf::operator<< (StreamBuf & sb)
     const u32 size0 = sb.sizeg();
 
     if(size0 &&
-        ZLib::Compress(v, sb.itget, size0))
+        ZLibCompress(sb.itget, size0, v))
     {
         const u32 size1 = v.size();
         sb.itget += size0;
@@ -109,13 +124,12 @@ ZStreamBuf & ZStreamBuf::operator>> (StreamBuf & sb)
 {
     if(sizeg() > 8)
     {
-        std::vector<char> v;
         const u32 size0 = get32();
         const u32 size1 = get32();
-        v.reserve(size0);
+        std::vector<char> v(size0, 0);
 
         if(size1 <= sizeg() &&
-            ZLib::UnCompress(v, itget, size1))
+            ZLibUnCompress(itget, size1, v))
         {
             itget += size1;
 

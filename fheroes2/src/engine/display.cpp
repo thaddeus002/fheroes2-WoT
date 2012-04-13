@@ -210,6 +210,11 @@ Display::~Display()
 {
 }
 
+bool Display::isDisplay(void) const
+{
+    return true;
+}
+
 void Display::SetVideoMode(const u16 w, const u16 h, u32 flags)
 {
     Display & display = Display::Get();
@@ -248,15 +253,15 @@ void Display::FullScreen(void)
 }
 
 /* set caption main window */
-void Display::SetCaption(const std::string & caption)
+void Display::SetCaption(const char* str)
 {
-    SDL_WM_SetCaption(caption.c_str(), NULL);
+    SDL_WM_SetCaption(str, NULL);
 }
 
 /* set icons window */
-void Display::SetIcons(const Surface & icons)
+void Display::SetIcons(Surface & icons)
 {
-    SDL_WM_SetIcon(const_cast<SDL_Surface *>(icons.GetSurface()), NULL);
+    SDL_WM_SetIcon(icons.surface, NULL);
 }
 
 /* hide system cursor */

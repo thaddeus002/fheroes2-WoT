@@ -34,7 +34,6 @@
 #include "dialog.h"
 #include "settings.h"
 #include "world.h"
-#include "sdlnet.h"
 #include "zzlib.h"
 #include "game.h"
 
@@ -88,60 +87,6 @@ private:
     std::vector<hgs_t> list;
 };
 
-bool HGSData::LoadOld(const char* fn)
-{
-    std::vector<u8> v1;
-
-    if(FORMAT_VERSION_2777 && LoadFileToMem(v1, std::string(fn))) // deprecated func
-    {
-        QueueMessage buf;
-
-#ifdef WITH_ZLIB
-        std::vector<char> v2;
-
-        if(! ZLib::UnCompress(v2, reinterpret_cast<const char*>(&v1[0]), v1.size()))
-            return false;
-
-	for(std::vector<char>::const_iterator
-	    it = v2.begin(); it != v2.end(); ++it)
-	    buf.Push(static_cast<u8>(*it));
-#else
-        for(std::vector<u8>::const_iterator
-            it = v1.begin(); it != v1.end(); ++it)
-            buf.Push(*it);
-#endif
-
-        v1.clear();
-        v2.clear();
-
-        u16 byte16;
-
-        // check id
-        buf.Pop(byte16);
-        if(byte16 != HGS_ID) return false;
-
-        // size
-        buf.Pop(byte16);
-        list.resize(byte16);
-
-        for(std::vector<hgs_t>::iterator
-            it = list.begin(); it != list.end(); ++it)
-        {
-            hgs_t & hgs = *it;
-
-            buf.Pop(hgs.player);
-	    buf.Pop(hgs.land);
-            buf.Pop(hgs.localtime);
-	    buf.Pop(hgs.days);
-	    buf.Pop(hgs.rating);
-        }
-
-        return true;
-    }
-
-    return false;
-}
-
 bool HGSData::Load(const char* fn)
 {
     std::ifstream fs(fn, std::ios::binary);
@@ -155,15 +100,8 @@ bool HGSData::Load(const char* fn)
 
     if(zdata.fail())
     {
-	if(! LoadOld(fn))
-	{
-	    DEBUG(DBG_GAME, DBG_INFO, ", zdata" << " read: error");
-    	    return false;
-	}
-	else
-	{
-	    Save(fn);
-	}
+	DEBUG(DBG_GAME, DBG_INFO, ", zdata" << " read: error");
+    	return false;
     }
 
     zdata >> hdata;

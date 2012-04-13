@@ -20,250 +20,12 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <fstream>
-#include <iomanip>
+#ifdef WITH_NET
+
 #include <algorithm>
 #include <cstring>
 #include "sdlnet.h"
 
-#define BUFSIZE 16
-
-enum { ERROR_SEND = 0x8000, ERROR_RECV = 0x4000 };
-
-QueueMessage::QueueMessage() : type(0), data(NULL), itd1(NULL), itd2(NULL), dtsz(BUFSIZE)
-{
-    data = new char [dtsz + 1];
-
-    itd1 = data;
-    itd2 = itd1;
-}
-
-QueueMessage::~QueueMessage()
-{
-    if(data) delete [] data;
-}
-
-size_t QueueMessage::Size(void) const
-{
-    return itd2 - data;
-}
-
-void QueueMessage::Resize(size_t lack)
-{
-    const size_t newsize = lack > dtsz ? dtsz + lack + 1 : 2 * dtsz + 1;
-    char* dat2 = new char [newsize];
-    std::memcpy(dat2, data, dtsz);
-    itd1 = &dat2[itd1 - data];
-    itd2 = &dat2[itd2 - data];
-    dtsz = newsize - 1;
-    delete [] data;
-    data = dat2;
-}
-
-void QueueMessage::Push(u8 byte8)
-{
-    if(data + dtsz < itd2 + 1) Resize(1);
-
-    *itd2 = byte8;
-    ++itd2;
-}
-
-bool QueueMessage::Pop(s8 & byte8)
-{
-    u8 tmp;
-    if(Pop(tmp))
-    {
-	byte8 = tmp;
-	return true;
-    }
-    return false;
-}
-
-bool QueueMessage::Pop(u8 & byte8)
-{
-    if(itd1 + 1 > itd2) return false;
-
-    byte8 = *itd1;
-    ++itd1;
-
-    return true;
-}
-
-bool QueueMessage::Pop(s16 & byte16)
-{
-    u16 tmp;
-    if(Pop(tmp))
-    {
-	byte16 = tmp;
-	return true;
-    }
-    return false;
-}
-
-bool QueueMessage::Pop(u16 & byte16)
-{
-    if(itd1 + 2 > itd2) return false;
-
-    byte16 = *itd1;
-    byte16 <<= 8;
-    ++itd1;
-
-    byte16 |= (0x00FF & *itd1);
-    ++itd1;
-
-    return true;
-}
-
-bool QueueMessage::Pop(s32 & byte32)
-{
-    u32 tmp;
-    if(Pop(tmp))
-    {
-	byte32 = tmp;
-	return true;
-    }
-    return false;
-}
-
-bool QueueMessage::Pop(u32 & byte32)
-{
-    if(itd1 + 4 > itd2) return false;
-
-    byte32 = *itd1;
-    byte32 <<= 8;
-    ++itd1;
-
-    byte32 |= (0x000000FF & *itd1);
-    byte32 <<= 8;
-    ++itd1;
-
-    byte32 |= (0x000000FF & *itd1);
-    byte32 <<= 8;
-    ++itd1;
-
-    byte32 |= (0x000000FF & *itd1);
-    ++itd1;
-
-    return true;
-}
-
-bool QueueMessage::Pop(bool & f)
-{
-    u8 tmp;
-    if(Pop(tmp))
-    {
-	f = tmp;
-	return true;
-    }
-    return false;
-}
-
-bool QueueMessage::Pop(std::string & str)
-{
-    if(itd1 >= itd2) return false;
-
-    // find end string
-    char* end = itd1;
-    while(*end && end < itd2) ++end;
-    if(end == itd2) return false;
-
-    str = itd1;
-    itd1 = end + 1;
-
-    return true;
-}
-
-void QueueMessage::Load(const char* fn)
-{
-    std::ifstream fs(fn, std::ios::binary);
-
-    if(fs.is_open())
-    {
-	fs.seekg(0, std::ios_base::end);
-	dtsz = fs.tellg();
-	fs.seekg(0, std::ios_base::beg);
-
-	delete [] data;
-	data = new char [dtsz + 1];
-
-	fs.read(data, dtsz);
-	fs.close();
-
-	itd1 = data;
-	itd2 = itd1 + dtsz;
-    }
-}
-
-#ifdef WITH_NET
-
-/*
-bool Network::RecvMessage(const Network::Socket & csd, QueueMessage & msg, bool debug)
-{
-    u16 head;
-    msg.type = 0;
-
-    if(csd.Recv(reinterpret_cast<char *>(&head), sizeof(head)))
-    {
-	SwapBE16(head);
-
-	// check id
-	if((0xFF00 & Network::proto) != (0xFF00 & head))
-	{
-	    if(debug) std::cerr << "Network::QueueMessage::Recv: " << "unknown packet id: 0x" << std::hex << head << std::endl;
-	    return false;
-	}
-
-	// check ver
-	if((0x00FF & Network::proto) > (0x00FF & head))
-	{
-	    if(debug) std::cerr << "Network::QueueMessage::Recv: " << "obsolete protocol ver: 0x" << std::hex << (0x00FF & head) << std::endl;
-	    return false;
-	}
-
-	u32 size;
-
-	if(csd.Recv(reinterpret_cast<char *>(&msg.type), sizeof(msg.type)) &&
-	   csd.Recv(reinterpret_cast<char *>(&size), sizeof(size)))
-	{
-	    msg.type = SDL_SwapBE16(msg.type);
-	    size = SDL_SwapBE32(size);
-
-	    if(size > msg.dtsz)
-	    {
-		delete [] msg.data;
-		msg.data = new char [size + 1];
-        	msg.dtsz = size;
-	    }
-
-	    msg.itd1 = msg.data;
-	    msg.itd2 = msg.itd1 + size;
-
-	    return size ? csd.Recv(msg.data, size) : true;
-	}
-    }
-    return false;
-}
-
-bool Network::SendMessage(const Network::Socket & csd, const QueueMessage & msg)
-{
-    // raw data
-    if(0 == msg.type)
-	return msg.Size() ? csd.Send(reinterpret_cast<const char *>(msg.data), msg.Size()) : false;
-
-    u16 head = Network::proto;
-    u16 sign = msg.type;
-    u32 size = msg.Size();
-
-    SwapBE16(head);
-    SwapBE16(sign);
-    SwapBE32(size);
-
-    return csd.Send(reinterpret_cast<const char *>(&head), sizeof(head)) &&
-           csd.Send(reinterpret_cast<const char *>(&sign), sizeof(sign)) &&
-           csd.Send(reinterpret_cast<const char *>(&size), sizeof(size)) &&
-           (size ? csd.Send(msg.data, msg.Size()) : true);
-}
-*/
 
 Network::Socket::Socket() : sd(NULL), sdset(NULL), status(0)
 {
@@ -351,7 +113,7 @@ bool Network::Socket::Send(const char* buf, int len)
     return ! (status & ERROR_SEND);
 }
 
-bool Network::Socket::Recv(u32 & v)
+bool Network::Socket::Recv32(u32 & v)
 {
     if(Recv(reinterpret_cast<char*>(&v), sizeof(v)))
     {
@@ -361,10 +123,28 @@ bool Network::Socket::Recv(u32 & v)
     return false;
 }
 
-bool Network::Socket::Send(const u32 & v0)
+bool Network::Socket::Recv16(u16 & v)
+{
+    if(Recv(reinterpret_cast<char*>(&v), sizeof(v)))
+    {
+        SwapBE16(v);
+        return true;
+    }
+    return false;
+}
+
+bool Network::Socket::Send32(const u32 & v0)
 {
     u32 v = v0;
     SwapBE32(v);
+
+    return Send(reinterpret_cast<char*>(&v), sizeof(v));
+}
+
+bool Network::Socket::Send16(const u16 & v0)
+{
+    u16 v = v0;
+    SwapBE16(v);
 
     return Send(reinterpret_cast<char*>(&v), sizeof(v));
 }

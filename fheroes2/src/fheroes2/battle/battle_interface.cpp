@@ -4037,7 +4037,7 @@ void Battle::Interface::ProcessingHeroDialogResult(u8 res, Actions & a)
 	    const s32 cost = arena.GetCurrentForce().GetSurrenderCost();
 	    if(enemy && DialogBattleSurrender(*enemy, cost))
 	    {
-		if(world.GetKingdom(arena.GetCurrentColor()).GetFunds().Get(Resource::GOLD) < cost)
+		if(world.GetKingdom(arena.GetCurrentColor()).AllowPayment(Funds(Resource::GOLD, cost)))
 		    Dialog::Message("", _("You don't have enough gold!"), Font::BIG, Dialog::OK);
 		else
 		{

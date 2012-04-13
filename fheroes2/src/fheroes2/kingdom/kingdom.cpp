@@ -325,7 +325,14 @@ u8 Kingdom::GetCountBuilding(u32 build) const
 
 bool Kingdom::AllowPayment(const Funds & funds) const
 {
-    return funds <= resource;
+    return
+	(resource.wood >= funds.wood || 0 == funds.wood) &&
+	(resource.mercury >= funds.mercury || 0 == funds.mercury) &&
+	(resource.ore >= funds.ore || 0 == funds.ore) &&
+	(resource.sulfur >= funds.sulfur || 0 == funds.sulfur) &&
+	(resource.crystal >= funds.crystal || 0 == funds.crystal) &&
+	(resource.gems >= funds.gems || 0 == funds.gems) &&
+	(resource.gold >= funds.gold || 0 == funds.gold);
 }
 
 /* is visited cell */

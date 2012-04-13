@@ -31,12 +31,6 @@
 #include "surface.h"
 #include "serialize.h"
 
-namespace ZLib
-{
-    bool UnCompress(std::vector<char> &, const char*, size_t, bool debug = false);
-    bool Compress(std::vector<char> &, const char*, size_t);
-}
-
 class ZSurface : public Surface
 {
 public:

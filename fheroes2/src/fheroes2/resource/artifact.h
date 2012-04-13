@@ -23,7 +23,6 @@
 #define H2ARTIFACT_H
 
 #include <vector>
-#include "game_io.h"
 #include "gamedefs.h"
 
 class Spell;
@@ -197,7 +196,6 @@ public:
 private:
     friend StreamBase & operator<< (StreamBase &, const Artifact &);
     friend StreamBase & operator>> (StreamBase &, Artifact &);
-    friend class Game::IOld;
 
     u8 id;
     u8 ext;

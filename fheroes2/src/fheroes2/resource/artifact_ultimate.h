@@ -43,7 +43,6 @@ public:
     const Artifact & GetArtifact(void) const;
 
 private:
-    friend class Game::IOld;
     friend StreamBase & operator<< (StreamBase &, const UltimateArtifact &);
     friend StreamBase & operator>> (StreamBase &, UltimateArtifact &);
     void MakeSurface(void);

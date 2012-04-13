@@ -35,11 +35,11 @@ namespace String
     int  ToInt(const std::string &str);
     std::string Double(double, u8);
 
-    void Replace(std::string &, const char*, const char *);
+    void Replace(std::string &, const char*, const char*);
     void Replace(std::string &, const char*, const std::string &);
     void Replace(std::string &, const char*, int);
 
-    std::string InsertString(const std::string &, size_t, const char *);
+    std::string InsertString(const std::string &, size_t, const char*);
     size_t InsertKeySym(std::string &, size_t, KeySym, u16 mod = 0);
 
     // from SDL_ttf
@@ -49,10 +49,10 @@ namespace String
     std::string GetTime(void);
 }
 
-int Sign(int);
-KeySym KeySymFromChar(char);
-char   CharFromKeySym(KeySym, u16 mod = 0);
-bool PressIntKey(u32 min, u32 max, u32 & result);
+int	Sign(int);
+KeySym	KeySymFromChar(char);
+char	CharFromKeySym(KeySym, u16 mod = 0);
+bool	PressIntKey(u32 min, u32 max, u32 & result);
 
 std::string GetString(int);
 std::string GetDirname(const std::string &);
@@ -67,7 +67,7 @@ std::string EncodeString(const std::string & str, const char* charset);
 
 void ToolsSrcRectFixed(Rect &, s16 &, s16 &, const u16, const u16, const Rect &);
 
-int	sdl_putenv(const char *name, const char *value, int overwrite);
+int	sdl_putenv(const char* name, const char* value, int overwrite);
 char*	sdl_getenv(const char* env);
 
 bool	IsFile(const std::string &, bool writable = false);

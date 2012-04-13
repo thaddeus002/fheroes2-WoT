@@ -25,7 +25,6 @@
 #include <list>
 #include "gamedefs.h"
 #include "direction.h"
-#include "game_io.h"
 
 class Heroes;
 
@@ -78,7 +77,6 @@ namespace Route
 	private:
 	    friend StreamBase & operator<< (StreamBase &, const Path &);
 	    friend StreamBase & operator>> (StreamBase &, Path &);
-	    friend class Game::IOld;
 
 	    const Heroes & hero;
 	    s32		dst;

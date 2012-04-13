@@ -32,7 +32,6 @@
 #include "pairs.h"
 #include "visit.h"
 #include "direction.h"
-#include "game_io.h"
 #include "heroes_base.h"
 #include "army.h"
 #include "gamedefs.h"
@@ -246,7 +245,6 @@ private:
     friend StreamBase & operator<< (StreamBase &, const Heroes &);
     friend StreamBase & operator>> (StreamBase &, Heroes &);
     friend class Recruits;
-    friend class Game::IOld;
     friend class Battle::Only;
 
     void LevelUp(bool skipsecondary, bool autoselect = false);

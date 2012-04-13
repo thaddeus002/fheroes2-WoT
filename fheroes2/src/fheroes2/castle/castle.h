@@ -32,7 +32,6 @@
 #include "army.h"
 #include "bitmodes.h"
 #include "heroes.h"
-#include "game_io.h"
 #include "sprite.h"
 #include "castle_heroes.h"
 #include "position.h"
@@ -212,7 +211,6 @@ private:
     void JoinRNDArmy(void);
 
 private:
-    friend class Game::IOld;
     friend StreamBase & operator<< (StreamBase &, const Castle &);
     friend StreamBase & operator>> (StreamBase &, Castle &);
 

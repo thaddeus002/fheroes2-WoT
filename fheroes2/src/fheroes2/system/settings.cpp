@@ -1580,57 +1580,6 @@ void Settings::BinaryLoad(void)
 		opt_game >> opt_world >> opt_battle >> opt_addons >>
 		pos_radr >> pos_bttn >> pos_icon >> pos_stat;
 	}
-	else
-	// deprecated: old format
-	if(FORMAT_VERSION_2777)
-	{
-	    VERBOSE("converted: " << "fheroes2.bin");
-
-	    QueueMessage msg2;
-	    u32 byte32;
-	    u16 byte16, version;
-
-	    msg2.Load(binary.c_str());
-
-	    opt_game.ResetModes(MODES_ALL);
-	    opt_world.ResetModes(MODES_ALL);
-	    opt_battle.ResetModes(MODES_ALL);
-	    opt_addons.ResetModes(MODES_ALL);
-
-	    msg2.Pop(version);
-
-	    msg2.Pop(byte32);
-	    opt_game.SetModes(byte32);
-
-	    msg2.Pop(byte32);
-	    opt_world.SetModes(byte32);
-
-	    msg2.Pop(byte32);
-	    opt_battle.SetModes(byte32);
-
-	    msg2.Pop(byte32);
-	    opt_addons.SetModes(byte32);
-
-	    msg2.Pop(byte16);
-	    pos_radr.x = byte16;
-	    msg2.Pop(byte16);
-	    pos_radr.y = byte16;
-
-	    msg2.Pop(byte16);
-	    pos_bttn.x = byte16;
-	    msg2.Pop(byte16);
-	    pos_bttn.y = byte16;
-
-	    msg2.Pop(byte16);
-	    pos_icon.x = byte16;
-	    msg2.Pop(byte16);
-	    pos_icon.y = byte16;
-
-	    msg2.Pop(byte16);
-	    pos_stat.x = byte16;
-	    msg2.Pop(byte16);
-	    pos_stat.y = byte16;
-	}
     }
 }
 

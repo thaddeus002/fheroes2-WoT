@@ -35,7 +35,6 @@
 #include "castle_heroes.h"
 #include "gameevent.h"
 #include "artifact_ultimate.h"
-#include "game_io.h"
 
 class Heroes;
 class Castle;
@@ -188,7 +187,6 @@ private:
 
 private:
     friend class Radar;
-    friend class Game::IOld;
     friend StreamBase & operator<< (StreamBase &, const World &);
     friend StreamBase & operator>> (StreamBase &, World &);
 

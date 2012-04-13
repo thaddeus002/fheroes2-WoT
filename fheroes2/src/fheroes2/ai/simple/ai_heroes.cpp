@@ -813,10 +813,15 @@ void AIToObservationTower(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 void AIToMagellanMaps(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
-    if(1000 <= world.GetKingdom(hero.GetColor()).GetFunds().Get(Resource::GOLD))
+    const Funds payment(Resource::GOLD, 1000);
+    Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+
+    if(! hero.isVisited(dst_index, Visit::GLOBAL) &&
+	kingdom.AllowPayment(payment))
     {
 	hero.SetVisited(dst_index, Visit::GLOBAL);
 	world.ActionForMagellanMaps(hero.GetColor());
+	kingdom.OddFundsResource(payment);
     }
 
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
@@ -1278,9 +1283,8 @@ void AIToDwellingRecruitMonster(Heroes & hero, const u8 & obj, const s32 & dst_i
     {
         Kingdom & kingdom = world.GetKingdom(hero.GetColor());
 	const payment_t paymentCosts = troop.GetCost();
-	const Funds & kingdomResource = kingdom.GetFunds();
 
-        if(paymentCosts <= kingdomResource && hero.GetArmy().JoinTroop(troop))
+        if(kingdom.AllowPayment(paymentCosts) && hero.GetArmy().JoinTroop(troop))
         {
     	    tile.MonsterSetCount(0);
 	    kingdom.OddFundsResource(paymentCosts);
@@ -1758,9 +1762,8 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 	{
 	    const Troop & troop = tile.QuantityTroop();
 	    const payment_t paymentCosts = troop.GetCost();
-	    const Funds & kingdomResource = kingdom.GetFunds();
 
-	    if(troop.isValid() && paymentCosts <= kingdomResource &&
+	    if(troop.isValid() && kingdom.AllowPayment(paymentCosts) &&
 		(army.HasMonster(troop()) ||
 		(! army.isFullHouse() && (troop.isArchers() || troop.isFly())))) return true;
 	    break;
@@ -1776,9 +1779,8 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 	    {
 		const Troop & troop = tile.QuantityTroop();
 		const payment_t paymentCosts = troop.GetCost();
-		const Funds & kingdomResource = kingdom.GetFunds();
 
-		if(troop.isValid() && paymentCosts <= kingdomResource &&
+		if(troop.isValid() && kingdom.AllowPayment(paymentCosts) &&
 		(army.HasMonster(troop()) ||
 		(! army.isFullHouse()))) return true;
 	    }
@@ -1790,9 +1792,8 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 	{
 	    const Troop & troop = tile.QuantityTroop();
 	    const payment_t paymentCosts = troop.GetCost();
-	    const Funds & kingdomResource = kingdom.GetFunds();
 
-	    if(troop.isValid() && paymentCosts <= kingdomResource &&
+	    if(troop.isValid() && kingdom.AllowPayment(paymentCosts) &&
 		(army.HasMonster(troop()) ||
 		(! army.isFullHouse()))) return true;
 	    break;
