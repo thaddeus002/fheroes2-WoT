@@ -130,7 +130,7 @@ namespace AGG
 #endif
 
 	bool LoadExtICN(icn_cache_t &, const ICN::icn_t, const u16, bool);
-	bool LoadAltICN(icn_cache_t &, const std::string &, const u16, bool);
+	bool LoadAltICN(icn_cache_t &, const ICN::icn_t, const u16, bool);
 	void LoadOrgICN(Sprite &, const ICN::icn_t, const u16, bool);
 	void LoadOrgICN(icn_cache_t &, const ICN::icn_t, const u16, bool);
 	void LoadICN(const ICN::icn_t icn, u16 index, bool reflect = false);

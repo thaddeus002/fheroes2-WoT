@@ -536,14 +536,17 @@ bool AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
     return true;
 }
 
-bool AGG::Cache::LoadAltICN(icn_cache_t & v, const std::string & spec, const u16 index, bool reflect)
+bool AGG::Cache::LoadAltICN(icn_cache_t & v, const ICN::icn_t icn, const u16 index, bool reflect)
 {
 #ifdef WITH_XML
+    const std::string prefix_images_icn = std::string("files") + SEPARATOR + std::string("images") + SEPARATOR + String::Lower(ICN::GetString(icn));
+    const std::string xml_spec = Settings::GetLastFile(prefix_images_icn, "spec.xml");
+
     // parse spec.xml
     TiXmlDocument doc;
     const TiXmlElement* xml_icn = NULL;
 
-    if(doc.LoadFile(spec.c_str()) &&
+    if(doc.LoadFile(xml_spec.c_str()) &&
 	NULL != (xml_icn = doc.FirstChildElement("icn")))
     {
 	int count, ox, oy;
@@ -565,19 +568,19 @@ bool AGG::Cache::LoadAltICN(icn_cache_t & v, const std::string & spec, const u16
 	{
 	    xml_sprite->Attribute("ox", &ox);
 	    xml_sprite->Attribute("oy", &oy);
-	    std::string name(spec);
+	    std::string name(xml_spec);
 	    String::Replace(name, "spec.xml", xml_sprite->Attribute("name"));
 	    Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
 	    // good load
 	    if(sp.Load(name.c_str()) && sp.isValid())
 	    {
 		sp.SetOffset(ox, oy);
-		DEBUG(DBG_ENGINE, DBG_TRACE, spec << ", " << index);
+		DEBUG(DBG_ENGINE, DBG_TRACE, xml_spec << ", " << index);
 
 		return true;
 	    }
 	}
-	DEBUG(DBG_ENGINE, DBG_WARN, "broken xml file: " <<  spec);
+	DEBUG(DBG_ENGINE, DBG_WARN, "broken xml file: " <<  xml_spec);
     }
 #endif
 
@@ -659,20 +662,13 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
     bool skip_origin = false;
 
     // load from images dir
-    if(conf.UseAltResource())
-    {
-	const std::string prefix_images_icn = std::string("files") + SEPARATOR + std::string("images") + SEPARATOR + String::Lower(ICN::GetString(icn));
-	const std::string xml_spec = Settings::GetLastFile(prefix_images_icn, "spec.xml");
-
-	if(IsFile(xml_spec) &&
-	    LoadAltICN(v, xml_spec, index, reflect)) skip_origin = true;
-    }
+    if(conf.UseAltResource() &&
+	LoadAltICN(v, icn, index, reflect))
+	skip_origin = true;
     else
     // load modify sprite
     if(LoadExtICN(v, icn, index, reflect))
-    {
 	skip_origin = true;
-    }
 
     //load origin sprite
     if(!skip_origin) LoadOrgICN(v, icn, index, reflect);
