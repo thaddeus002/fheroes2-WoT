@@ -96,7 +96,7 @@ Battle::Command::Command(u16 cmd, s32 param1, s32 param2, s32 param3, s32 param4
                     break;
 
                 case Spell::TELEPORT:
-                    base << static_cast<u8>(param1) << static_cast<s16>(param2) << static_cast<s32>(param3); // spell, src, dst
+                    base << static_cast<u8>(param1) << static_cast<s16>(param2) << static_cast<s16>(param3); // spell, src, dst
                     break;
 
                 default:

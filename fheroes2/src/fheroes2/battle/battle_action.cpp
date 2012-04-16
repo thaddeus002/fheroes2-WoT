@@ -807,16 +807,17 @@ void Battle::Arena::ApplyActionSpellTeleport(StreamBuf & stream)
     stream >> src >> dst;
 
     Unit* b = GetTroopBoard(src);
-    Cell* cell = Board::GetCell(dst);
     const Spell spell(Spell::TELEPORT);
 
     if(b)
     {
-        if(b->isWide() && !cell->isPassable3(*b, true))
-	    dst = Board::GetIndexDirection(dst, b->isReflect() ? LEFT : RIGHT);
+	Position pos = Position::GetCorrect(*b, dst);
+	if(b->isReflect() != pos.isReflect()) pos.Swap();
 
-	if(interface) interface->RedrawActionTeleportSpell(*b, dst);
-	b->SetPosition(dst);
+	if(interface) interface->RedrawActionTeleportSpell(*b, pos.GetHead()->GetIndex());
+
+	b->SetPosition(pos);
+        b->UpdateDirection();
 
 	DEBUG(DBG_BATTLE, DBG_TRACE, "spell: " << spell.GetName() << ", src: " << src << ", dst: " << dst);
     }

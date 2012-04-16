@@ -955,7 +955,7 @@ void Battle::Interface::RedrawTroopSprite(const Unit & b) const
 
 	// sprite monster
 	if(255 > b_current_alpha && b_current_sprite == spmon1)
-	    spmon1->Blit(b_current_alpha, sp);
+	    spmon1->Blit(b_current_alpha, sp.x, sp.y);
 	else
 	    spmon1->Blit(sp);
 	// contour
