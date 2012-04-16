@@ -774,7 +774,7 @@ std::string Settings::GetLangDir(void)
     return "";
 }
 
-std::string Settings::GetSaveDir(void)
+std::string Settings::GetWriteableDir(const char* subdir)
 {
     std::string res;
     const ListDirs dirs = GetRootDirs();
@@ -782,13 +782,18 @@ std::string Settings::GetSaveDir(void)
     for(ListDirs::const_iterator
 	it = dirs.begin(); it != dirs.end(); ++it)
     {
-	res = *it + SEPARATOR + "files" + SEPARATOR + "save";
+	res = *it + SEPARATOR + "files" + SEPARATOR + subdir;
         if(IsDirectory(res, true)) return res;
     }
 
     DEBUG(DBG_GAME, DBG_WARN, "writable directory not found");
 
     return "";
+}
+
+std::string Settings::GetSaveDir(void)
+{
+    return GetWriteableDir("save");
 }
 
 /* return path to locales directory */

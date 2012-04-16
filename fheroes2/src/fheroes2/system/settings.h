@@ -427,6 +427,7 @@ public:
     static ListFiles GetListFiles(const std::string & prefix, const std::string & filter);
     static ListDirs GetRootDirs(void);
     static std::string GetLastFile(const std::string & prefix, const std::string & name);
+    static std::string GetWriteableDir(const char*);
     static std::string GetSaveDir(void);
     static std::string GetLangDir(void);
     static std::string GetHomeDir(void);

@@ -536,11 +536,12 @@ Network::Socket & operator<< (Network::Socket & sc, StreamBuf & sb)
 Network::Socket & operator>> (Network::Socket & sc, StreamBuf & sb)
 {
     u32 count = 0;
+    const u32 limit = 5 * 1024 * 1024;
 
     if(sc.Recv(count))
     {
 	// limit network: 5Mb
-	if(count > 5 * 1024 * 1024)
+	if(count > limit)
 	{
 	    sb.setfail();
 	    return sc;

@@ -185,17 +185,12 @@ AGG::Cache::~Cache()
 {
     if(icn_cache)
     {
-	for(u16 ii = 0; ii < ICN::UNKNOWN + 1; ++ii)
-	{
-	    if(icn_cache[ii].sprites) delete [] icn_cache[ii].sprites;
-	    if(icn_cache[ii].reflect) delete [] icn_cache[ii].reflect;
-	}
-	delete [] icn_cache;
+	ClearAllICN();
     }
 
     if(til_cache)
     {
-	for(u16 ii = 0; ii < TIL::UNKNOWN + 1; ++ii)
+	for(u32 ii = 0; ii < TIL::UNKNOWN + 1; ++ii)
 	{
 	    if(til_cache[ii].sprites) delete [] til_cache[ii].sprites;
 	}
@@ -207,9 +202,13 @@ void AGG::Cache::ClearAllICN(void)
 {
     if(icn_cache)
     {
-	for(u16 ii = 0; ii < ICN::UNKNOWN; ++ii)
+	for(u32 ii = 0; ii < ICN::UNKNOWN; ++ii)
 	{
-	    if(icn_cache[ii].sprites) delete [] icn_cache[ii].sprites;
+	    if(icn_cache[ii].sprites)
+	    {
+		SaveICN(static_cast<ICN::icn_t>(ii));
+		delete [] icn_cache[ii].sprites;
+	    }
 	    icn_cache[ii].sprites = NULL;
 	    if(icn_cache[ii].reflect) delete [] icn_cache[ii].reflect;
 	    icn_cache[ii].reflect = NULL;
@@ -221,18 +220,16 @@ void AGG::Cache::ClearAllWAV(void)
 {
     loop_sounds.clear();
 
-    std::map<M82::m82_t, std::vector<u8> >::iterator it1 = wav_cache.begin();
-    std::map<M82::m82_t, std::vector<u8> >::iterator it2 = wav_cache.end();
-
-    for(; it1 != it2; ++it1) if((*it1).second.size()) (*it1).second.clear();
+    for(std::map<M82::m82_t, std::vector<u8> >::iterator
+	it = wav_cache.begin(); it != wav_cache.end(); ++it)
+	if((*it).second.size()) (*it).second.clear();
 }
 
 void AGG::Cache::ClearAllMID(void)
 {
-    std::map<XMI::xmi_t, std::vector<u8> >::iterator it1 = mid_cache.begin();
-    std::map<XMI::xmi_t, std::vector<u8> >::iterator it2 = mid_cache.end();
-
-    for(; it1 != it2; ++it1) if((*it1).second.size()) (*it1).second.clear();
+    for(std::map<XMI::xmi_t, std::vector<u8> >::iterator
+	it = mid_cache.begin(); it != mid_cache.end(); ++it)
+	if((*it).second.size()) (*it).second.clear();
 }
 
 /* get AGG::Cache object */
@@ -278,7 +275,7 @@ bool AGG::Cache::ReadChunk(const std::string & key, std::vector<u8> & body)
 }
 
 /* load manual ICN object */
-bool AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 index, bool reflect)
+bool AGG::Cache::LoadExtICN(const ICN::icn_t icn, const u32 index, bool reflect)
 {
     // for animation sprite need update count for ICN::AnimationFrame
     u8 count = 0;
@@ -303,10 +300,13 @@ bool AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 	case ICN::YELLOW_SMALFONT:	count = 96; break;
 	case ICN::ROUTERED:		count = 145; break;
 
-	default: break;;
+	default: break;
     }
 
+    // not modify sprite
     if(0 == count) return false;
+
+    icn_cache_t & v = icn_cache[icn];
     DEBUG(DBG_ENGINE, DBG_TRACE, ICN::GetString(icn) << ", " << index);
 
     if(NULL == v.sprites)
@@ -536,7 +536,7 @@ bool AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
     return true;
 }
 
-bool AGG::Cache::LoadAltICN(icn_cache_t & v, const ICN::icn_t icn, const u16 index, bool reflect)
+bool AGG::Cache::LoadAltICN(const ICN::icn_t icn, const u32 index, bool reflect)
 {
 #ifdef WITH_XML
     const std::string prefix_images_icn = std::string("files") + SEPARATOR + std::string("images") + SEPARATOR + String::Lower(ICN::GetString(icn));
@@ -551,6 +551,7 @@ bool AGG::Cache::LoadAltICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
     {
 	int count, ox, oy;
 	xml_icn->Attribute("count", &count);
+	icn_cache_t & v = icn_cache[icn];
 
 	if(NULL == v.sprites)
 	{
@@ -561,7 +562,7 @@ bool AGG::Cache::LoadAltICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 
 	// find current image
 	const TiXmlElement *xml_sprite = xml_icn->FirstChildElement("sprite");
-	u16 ii = 0;
+	u32 ii = 0;
 	for(; ii != index && xml_sprite; xml_sprite = xml_sprite->NextSiblingElement("sprite"), ++ii);
 
 	if(xml_sprite && ii == index)
@@ -570,16 +571,24 @@ bool AGG::Cache::LoadAltICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 	    xml_sprite->Attribute("oy", &oy);
 	    std::string name(xml_spec);
 	    String::Replace(name, "spec.xml", xml_sprite->Attribute("name"));
-	    Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
-	    // good load
-	    if(sp.Load(name.c_str()) && sp.isValid())
-	    {
-		sp.SetOffset(ox, oy);
-		DEBUG(DBG_ENGINE, DBG_TRACE, xml_spec << ", " << index);
 
-		return true;
+	    Sprite & sp1 = v.sprites[index];
+	    Sprite & sp2 = v.reflect[index];
+
+	    if(! sp1.isValid() && sp1.Load(name.c_str()))
+	    {
+		sp1.SetOffset(ox, oy);
+		DEBUG(DBG_ENGINE, DBG_TRACE, xml_spec << ", " << index);
+		if(!reflect) return sp1.isValid();
+	    }
+
+	    if(reflect && sp1.isValid() && ! sp2.isValid())
+	    {
+		Surface::Reflect(sp2, sp1, 2);
+		return sp2.isValid();
 	    }
 	}
+
 	DEBUG(DBG_ENGINE, DBG_WARN, "broken xml file: " <<  xml_spec);
     }
 #endif
@@ -587,7 +596,67 @@ bool AGG::Cache::LoadAltICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
     return false;
 }
 
-void AGG::Cache::LoadOrgICN(Sprite & sp, const ICN::icn_t icn, const u16 index, bool reflect)
+void AGG::Cache::SaveICN(const ICN::icn_t icn)
+{
+#ifdef WITH_DEBUG
+    const std::string images_dir = Settings::GetWriteableDir("images");
+
+    if(images_dir.size())
+    {
+	icn_cache_t & v = icn_cache[icn];
+
+        const std::string icn_lower = String::Lower(ICN::GetString(icn));
+	const std::string icn_dir = images_dir + SEPARATOR + icn_lower;
+
+	if(! IsDirectory(icn_dir))
+		MKDIR(icn_dir.c_str());
+
+	if(IsDirectory(icn_dir, true))
+	{
+	    const std::string stats_file = icn_dir + SEPARATOR + "stats.xml";
+	    std::ofstream fs(stats_file.c_str());
+
+	    if(fs.good())
+	    {
+		fs << "<?xml version=\"1.0\" ?>" << std::endl <<
+		    "<icn name=\"" << icn_lower << "\" count=\"" << v.count <<"\">" << std::endl;
+	    }
+
+	    for(u32 index = 0; index < v.count; ++index)
+	    {
+
+		const Sprite & sp = v.sprites[index];
+
+		if(sp.isValid())
+		{
+		    std::ostringstream sp_name;
+		    sp_name << std::setw(3) << std::setfill('0') << index;
+#ifndef WITH_IMAGE
+    		    sp_name << ".bmp";
+#else
+    		    sp_name << ".png";
+#endif
+		    const std::string image_full = icn_dir + SEPARATOR + sp_name.str();
+
+		    if(! IsFile(image_full))
+			sp.Save(image_full);
+
+		    if(fs.good())
+			fs << "<sprite name=\"" << sp_name.str() << "\" ox=\"" << sp.x() << "\" oy=\"" << sp.y() << "\"/>" << std::endl;
+		}
+	    }
+
+	    if(fs.good())
+	    {
+		fs << "</icn>" << std::endl;
+		fs.close();
+	    }
+	}
+    }
+#endif
+}
+
+bool AGG::Cache::LoadOrgICN(Sprite & sp, const ICN::icn_t icn, const u32 index, bool reflect)
 {
     std::vector<u8> body;
 
@@ -619,16 +688,19 @@ void AGG::Cache::LoadOrgICN(Sprite & sp, const ICN::icn_t icn, const u16 index, 
 	sp.SetOffset(header1.OffsetX(), header1.OffsetY());
 	Sprite::DrawICN(icn, sp, &body[6 + header1.OffsetData()], size_data, reflect);
 	Sprite::AddonExtensionModify(sp, icn, index);
+
+	return true;
     }
-    else
-    {
-	DEBUG(DBG_ENGINE, DBG_WARN, "error: " << ICN::GetString(icn));
-	Error::Except(__FUNCTION__, "load icn");
-    }
+
+    DEBUG(DBG_ENGINE, DBG_WARN, "error: " << ICN::GetString(icn));
+
+    return false;
 }
 
-void AGG::Cache::LoadOrgICN(icn_cache_t & v, const ICN::icn_t icn, const u16 index, bool reflect)
+bool AGG::Cache::LoadOrgICN(const ICN::icn_t icn, const u32 index, bool reflect)
 {
+    icn_cache_t & v = icn_cache[icn];
+
     if(NULL == v.sprites)
     {
 	std::vector<u8> body;
@@ -641,63 +713,63 @@ void AGG::Cache::LoadOrgICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 
     Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
 
-    LoadOrgICN(sp, icn, index, reflect);
+    return LoadOrgICN(sp, icn, index, reflect);
 }
 
 /* load ICN object to AGG::Cache */
-void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
+void AGG::Cache::LoadICN(const ICN::icn_t icn, u32 index, bool reflect)
 {
     icn_cache_t & v = icn_cache[icn];
 
-    if(reflect)
+    // need load
+    if(reflect && (!v.reflect || (index < v.count && !v.reflect[index].isValid())) ||
+	(!reflect && (!v.sprites || (index < v.count && !v.sprites[index].isValid()))))
     {
-	if(v.reflect && (index >= v.count || v.reflect[index].isValid())) return;
+	const Settings & conf = Settings::Get();
+
+	// load from images dir
+	if(! conf.UseAltResource() ||
+	    ! LoadAltICN(icn, index, reflect))
+	{
+	    // load modify sprite
+	    if(! LoadExtICN(icn, index, reflect))
+	    {
+		//load origin sprite
+		if(! LoadOrgICN(icn, index, reflect))
+		    Error::Except(__FUNCTION__, "load icn");
+	    }
+	}
+
+	// pocketpc: scale sprites
+	if(Settings::Get().QVGA() && ICN::NeedMinify4PocketPC(icn, index))
+	{
+	    Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
+	    sp.ScaleMinifyByTwo();
+	}
+
+	// registry icn
+	if(icn_registry_enable &&
+	    icn_registry.end() == std::find(icn_registry.begin(), icn_registry.end(), icn))
+	    icn_registry.push_back(icn);
     }
-    else
-    {
-	if(v.sprites && (index >= v.count || v.sprites[index].isValid())) return;
-    }
-
-    const Settings & conf = Settings::Get();
-    bool skip_origin = false;
-
-    // load from images dir
-    if(conf.UseAltResource() &&
-	LoadAltICN(v, icn, index, reflect))
-	skip_origin = true;
-    else
-    // load modify sprite
-    if(LoadExtICN(v, icn, index, reflect))
-	skip_origin = true;
-
-    //load origin sprite
-    if(!skip_origin) LoadOrgICN(v, icn, index, reflect);
-
-    // pocketpc: scale sprites
-    if(Settings::Get().QVGA() && ICN::NeedMinify4PocketPC(icn, index))
-    {
-	Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
-	sp.ScaleMinifyByTwo();
-    }
-
-    // registry icn
-    if(icn_registry_enable &&
-	icn_registry.end() == std::find(icn_registry.begin(), icn_registry.end(), icn))
-	icn_registry.push_back(icn);
 }
 
-bool AGG::Cache::LoadAltTIL(til_cache_t & v, const std::string & spec, u16 max)
+bool AGG::Cache::LoadAltTIL(const TIL::til_t til, u32 max)
 {
 #ifdef WITH_XML
+    const std::string prefix_images_til = std::string("files") + SEPARATOR + std::string("images") + SEPARATOR + String::Lower(TIL::GetString(til));
+    const std::string xml_spec = Settings::GetLastFile(prefix_images_til, "spec.xml");
+
     // parse spec.xml
     TiXmlDocument doc;
     const TiXmlElement* xml_til = NULL;
 
-    if(doc.LoadFile(spec.c_str()) &&
+    if(doc.LoadFile(xml_spec.c_str()) &&
 	NULL != (xml_til = doc.FirstChildElement("til")))
     {
 	int count, index;
 	xml_til->Attribute("count", &count);
+	til_cache_t & v = til_cache[til];
 
 	if(NULL == v.sprites)
 	{
@@ -710,24 +782,25 @@ bool AGG::Cache::LoadAltTIL(til_cache_t & v, const std::string & spec, u16 max)
 	    xml_sprite = xml_til->FirstChildElement("sprite"); index < count && xml_sprite; ++index, xml_sprite = xml_sprite->NextSiblingElement("sprite"))
 	{
 	    Surface & sf = v.sprites[index];
-	    std::string name(spec);
+	    std::string name(xml_spec);
 	    String::Replace(name, "spec.xml", xml_sprite->Attribute("name"));
 
-	    if(sf.Load(name.c_str()) && sf.isValid())
+	    if(! sf.isValid() && sf.Load(name.c_str()))
 	    {
-		DEBUG(DBG_ENGINE, DBG_TRACE, spec << ", " << index);
+		DEBUG(DBG_ENGINE, DBG_TRACE, xml_spec << ", " << index);
 	    }
 	}
+
 	return true;
     }
     else
-    DEBUG(DBG_ENGINE, DBG_WARN, "broken xml file: " <<  spec);
+    DEBUG(DBG_ENGINE, DBG_WARN, "broken xml file: " << xml_spec);
 #endif
 
     return false;
 }
 
-void AGG::Cache::LoadOrgTIL(til_cache_t & v, const TIL::til_t til, u16 max)
+bool AGG::Cache::LoadOrgTIL(const TIL::til_t til, u32 max)
 {
     std::vector<u8> body;
 
@@ -740,15 +813,23 @@ void AGG::Cache::LoadOrgTIL(til_cache_t & v, const TIL::til_t til, u16 max)
 	const u32 tile_size = width * height;
 	const u32 body_size = 6 + count * tile_size;
 
+	til_cache_t & v = til_cache[til];
+
 	// check size
 	if(body.size() == body_size && count <= max)
 	{
 	    for(u16 ii = 0; ii < count; ++ii)
 		v.sprites[ii].Set(&body[6 + ii * tile_size], width, height, 1, false);
+
+	    return true;
 	}
 	else
+	{
 	    DEBUG(DBG_ENGINE, DBG_WARN, "size mismach" << ", skipping...");
+	}
     }
+
+    return false;
 }
 
 /* load TIL object to AGG::Cache */
@@ -756,37 +837,31 @@ void AGG::Cache::LoadTIL(const TIL::til_t til)
 {
     til_cache_t & v = til_cache[til];
 
-    if(v.sprites) return;
-
-    DEBUG(DBG_ENGINE, DBG_INFO, TIL::GetString(til));
-    u16 max = 0;
-
-    switch(til)
+    if(! v.sprites)
     {
-	case TIL::CLOF32:	max = 4;   break;
-        case TIL::GROUND32:	max = 432; break;
-        case TIL::STON:		max = 36;  break;
-	default: break;
+	DEBUG(DBG_ENGINE, DBG_INFO, TIL::GetString(til));
+	u32 max = 0;
+
+	switch(til)
+	{
+	    case TIL::CLOF32:	max = 4;   break;
+    	    case TIL::GROUND32:	max = 432; break;
+    	    case TIL::STON:	max = 36;  break;
+	    default: break;
+	}
+
+	v.count = max * 4;  // rezerve for rotate sprites
+	v.sprites = new Surface [v.count];
+
+	const Settings & conf = Settings::Get();
+
+	// load from images dir
+	if(! conf.UseAltResource() || ! LoadAltTIL(til, max))
+	{
+	    if(! LoadOrgTIL(til, max))
+		Error::Except(__FUNCTION__, "load til");
+	}
     }
-
-    v.count = max * 4;  // rezerve for rotate sprites
-    v.sprites = new Surface [v.count];
-
-    const Settings & conf = Settings::Get();
-    bool skip_orig = false;
-
-    // load from images dir
-    if(conf.UseAltResource())
-    {
-	const std::string prefix_images_til = std::string("files") + SEPARATOR + std::string("images") + SEPARATOR + String::Lower(TIL::GetString(til));
-	const std::string xml_spec = Settings::GetLastFile(prefix_images_til, "spec.xml");
-
-	if(IsFile(xml_spec) &&
-	    LoadAltTIL(v, xml_spec, max)) skip_orig = true;
-    }
-
-    if(!skip_orig)
-	LoadOrgTIL(v, til, max);
 }
 
 /* load 82M object to AGG::Cache in Audio::CVT */
@@ -1003,7 +1078,7 @@ void AGG::Cache::FreeMID(const XMI::xmi_t xmi)
 }
 
 /* return ICN sprite from AGG::Cache */
-const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
+const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u32 index, bool reflect)
 {
     icn_cache_t & v = icn_cache[icn];
 
@@ -1035,13 +1110,13 @@ int AGG::Cache::GetICNCount(const ICN::icn_t icn)
 }
 
 /* return TIL surface from AGG::Cache */
-const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u16 index, u8 shape)
+const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u32 index, u8 shape)
 {
     til_cache_t & v = til_cache[til];
 
     if(0 == v.count) LoadTIL(til);
 
-    u16 index2 = index;
+    u32 index2 = index;
 
     if(shape)
     {
@@ -1159,7 +1234,7 @@ void AGG::Cache::Dump(void) const
     {
 	std::ostringstream os;
 	total1 = 0;
-        for(u16 ii = 0; ii < ICN::UNKNOWN; ++ii)
+        for(u32 ii = 0; ii < ICN::UNKNOWN; ++ii)
         {
 	    total2 = 0;
             if(icn_cache[ii].sprites)
@@ -1180,7 +1255,7 @@ void AGG::Cache::Dump(void) const
     {
 	std::ostringstream os;
 	total1 = 0;
-        for(u16 ii = 0; ii < TIL::UNKNOWN; ++ii)
+        for(u32 ii = 0; ii < TIL::UNKNOWN; ++ii)
         {
 	    total2 = 0;
 	    if(til_cache[ii].sprites)
@@ -1299,12 +1374,12 @@ int AGG::GetICNCount(const ICN::icn_t icn)
     return AGG::Cache::Get().GetICNCount(icn);
 }
 
-const Sprite & AGG::GetICN(const ICN::icn_t icn, const u16 index, bool reflect)
+const Sprite & AGG::GetICN(const ICN::icn_t icn, const u32 index, bool reflect)
 {
     return AGG::Cache::Get().GetICN(icn, index, reflect);
 }
 
-const Surface & AGG::GetTIL(const TIL::til_t til, const u16 index, const u8 shape)
+const Surface & AGG::GetTIL(const TIL::til_t til, const u32 index, const u8 shape)
 {
     return AGG::Cache::Get().GetTIL(til, index, shape);
 }

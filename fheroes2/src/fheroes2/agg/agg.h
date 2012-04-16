@@ -77,16 +77,18 @@ namespace AGG
     struct icn_cache_t
     {
 	icn_cache_t() : sprites(NULL), reflect(NULL), count(0) {}
-	Sprite *sprites;
-	Sprite *reflect;
-	u16 count;
+
+	Sprite*	sprites;
+	Sprite*	reflect;
+	u32	count;
     };
 
     struct til_cache_t
     {
 	til_cache_t() : sprites(NULL),  count(0) {}
-	Surface *sprites;
-	u16 count;
+
+	Surface* sprites;
+	u32	 count;
     };
 
     struct fnt_cache_t
@@ -117,8 +119,8 @@ namespace AGG
 	bool ReadDataDir(void);
 
 	int GetICNCount(const ICN::icn_t icn);
-	const Sprite & GetICN(const ICN::icn_t icn, u16 index, bool reflect = false);
-	const Surface & GetTIL(const TIL::til_t til, u16 index, u8 shape);
+	const Sprite & GetICN(const ICN::icn_t icn, u32, bool reflect = false);
+	const Surface & GetTIL(const TIL::til_t til, u32, u8 shape);
 	const std::vector<u8> & GetWAV(const M82::m82_t m82);
 	const std::vector<u8> & GetMID(const XMI::xmi_t xmi);
 #ifdef WITH_TTF
@@ -153,16 +155,18 @@ namespace AGG
 
 	bool ReadChunk(const std::string & key, std::vector<u8> & body);
 
-	bool LoadExtICN(icn_cache_t &, const ICN::icn_t, const u16, bool);
-	bool LoadAltICN(icn_cache_t &, const ICN::icn_t, const u16, bool);
-	void LoadOrgICN(Sprite &, const ICN::icn_t, const u16, bool);
-	void LoadOrgICN(icn_cache_t &, const ICN::icn_t, const u16, bool);
-	void LoadICN(const ICN::icn_t icn, u16 index, bool reflect = false);
-	bool LoadAltTIL(til_cache_t &, const std::string &, u16 max);
-	void LoadOrgTIL(til_cache_t &, const TIL::til_t, u16 max);
+	bool LoadExtICN(const ICN::icn_t, const u32, bool);
+	bool LoadAltICN(const ICN::icn_t, const u32, bool);
+	bool LoadOrgICN(Sprite &, const ICN::icn_t, const u32, bool);
+	bool LoadOrgICN(const ICN::icn_t, const u32, bool);
+	void LoadICN(const ICN::icn_t icn, u32, bool reflect = false);
+	bool LoadAltTIL(const TIL::til_t, u32 max);
+	bool LoadOrgTIL(const TIL::til_t, u32 max);
 	void LoadTIL(const TIL::til_t);
 	void LoadWAV(const M82::m82_t m82);
 	void LoadMID(const XMI::xmi_t xmi);
+
+	void SaveICN(const ICN::icn_t);
 
 	void FreeICN(const ICN::icn_t icn);
 	void FreeTIL(const TIL::til_t til);
@@ -198,8 +202,8 @@ namespace AGG
     void ICNRegistryFreeObjects(void);
     int GetICNCount(const ICN::icn_t icn);
 
-    const Sprite & GetICN(const ICN::icn_t icn, const u16 index, bool reflect = false);
-    const Surface & GetTIL(const TIL::til_t til, const u16 index, const u8 shape);
+    const Sprite & GetICN(const ICN::icn_t icn, const u32 index, bool reflect = false);
+    const Surface & GetTIL(const TIL::til_t til, const u32 index, const u8 shape);
     const Surface & GetLetter(char ch, u8 ft);
 #ifdef WITH_TTF
     const Surface & GetUnicodeLetter(u16 ch, u8 ft);
