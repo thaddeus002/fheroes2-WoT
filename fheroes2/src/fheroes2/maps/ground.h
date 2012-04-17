@@ -48,8 +48,7 @@ namespace Maps
         };
 
         const char* String(u16);
-        u16 GetBasePenalty(const s32 index, const u8 pathfinding);
-        u16 GetPenalty(const s32 index, const Direction::vector_t direct, const u8 pathfinding);
+        u16 GetPenalty(const s32 &, Direction::vector_t, u8 pathfinding);
     }
 }
 

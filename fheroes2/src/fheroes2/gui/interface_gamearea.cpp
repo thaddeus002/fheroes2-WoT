@@ -220,7 +220,7 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
 
 	    const u16 index = (it3 == it2 ? 0 :
 		    Route::Path::GetIndexSprite((*it1).direction, (*it3).direction, 
-			Maps::Ground::GetBasePenalty(from, hero->GetLevelSkill(Skill::Secondary::PATHFINDING))));
+			Maps::Ground::GetPenalty(from, Direction::CENTER, hero->GetLevelSkill(Skill::Secondary::PATHFINDING))));
 
 	    const Sprite & sprite = AGG::GetICN(0 > green ? ICN::ROUTERED : ICN::ROUTE, index);
 	    BlitOnTile(dst, sprite, sprite.x() - 14, sprite.y(), mp);

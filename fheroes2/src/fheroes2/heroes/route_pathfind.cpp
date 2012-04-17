@@ -31,14 +31,19 @@
 
 struct cell_t
 {
-    cell_t() : cost_g(MAXU16), cost_t(MAXU16), cost_d(MAXU16), passbl(0), parent(-1), open(true){};
+#ifdef WITH_DEBUG
+    cell_t() : cost_f(MAXU16), cost_g(MAXU16), cost_t(MAXU16), cost_d(MAXU16), passbl(0), open(1), parent(-1){};
 
-    u16		cost_g;
-    u16		cost_t;
-    u16		cost_d;
+    u16		cost_f;	// ground out
+    u16		cost_g;	// ground in
+#else
+    cell_t() : cost_t(MAXU16), cost_d(MAXU16), passbl(0), open(1), parent(-1){};
+#endif
+    u16		cost_t; // total
+    u16		cost_d; // distance
     u16		passbl;
+    u16		open;
     s32		parent;
-    bool	open;
 };
 
 
@@ -183,10 +188,13 @@ bool Route::PathFind(std::list<Route::Step>* result, const s32 from, const s32 t
     std::map<s32, cell_t>::iterator it2 = list.end();
     Direction::vector_t direct = Direction::CENTER;
 
+#ifdef WITH_DEBUG
+    list[cur].cost_f = 0;
     list[cur].cost_g = 0;
+#endif
     list[cur].cost_t = 0;
     list[cur].parent = -1;
-    list[cur].open   = false;
+    list[cur].open   = 0;
 
     while(cur != to)
     {
@@ -200,45 +208,48 @@ bool Route::PathFind(std::list<Route::Step>* result, const s32 from, const s32 t
 
 		if(list[tmp].open)
 		{
+	    	    const u16 costf = Maps::Ground::GetPenalty(cur, direct, pathfinding); // penalty: for [cur] out
+		    const u16 costg = Maps::Ground::GetPenalty(tmp, Direction::Reflect(direct), pathfinding); // penalty: for [tmp] in
+
 		    // new
 		    if(-1 == list[tmp].parent)
 		    {
-	    		const u16 costg = Maps::Ground::GetPenalty(tmp, direct, pathfinding);
-			if(MAXU16 == costg) continue;
-
 			if((list[cur].passbl & direct) ||
 			   PassableFromToTile(hero, cur, tmp, direct, to))
 			{
 			    list[cur].passbl |= direct;
 
-			    cell_t & cell = list[tmp];
-	    		    cell.cost_g = costg;
-			    cell.parent = cur;
-			    cell.open = true;
-	    		    cell.cost_t = cell.cost_g + list[cur].cost_t;
-			    cell.cost_d = 50 * Maps::GetApproximateDistance(tmp, to);
+#ifdef WITH_DEBUG
+	    		    list[tmp].cost_f = costf;
+	    		    list[tmp].cost_g = costg;
+#endif
+			    list[tmp].parent = cur;
+			    list[tmp].open   = 1;
+			    list[tmp].cost_d = 50 * Maps::GetApproximateDistance(tmp, to);
+	    		    list[tmp].cost_t = list[cur].cost_t + costf + costg;
 			}
 		    }
 		    // check alt
 		    else
 		    {
-			alt = Maps::Ground::GetPenalty(cur, direct, pathfinding);
-			if(list[tmp].cost_t > list[cur].cost_t + alt &&
-			   ((list[cur].passbl & direct) ||
-			     PassableFromToTile(hero, cur, tmp, direct, to)))
+			if(list[tmp].cost_t > list[cur].cost_t + costf + costg &&
+			   ((list[cur].passbl & direct) || PassableFromToTile(hero, cur, tmp, direct, to)))
 			{
 			    list[cur].passbl |= direct;
 
 			    list[tmp].parent = cur;
-			    list[tmp].cost_g = alt;
-			    list[tmp].cost_t = list[cur].cost_t + alt;
+#ifdef WITH_DEBUG
+	    		    list[tmp].cost_f = costf;
+			    list[tmp].cost_g = costg;
+#endif
+			    list[tmp].cost_t = list[cur].cost_t + costf + costg;
 			}
 		    }
     		}
 	    }
 	}
 
-	list[cur].open = false;
+	list[cur].open = 0;
 
 	it1 = list.begin();
 	alt = -1;
@@ -258,6 +269,7 @@ bool Route::PathFind(std::list<Route::Step>* result, const s32 from, const s32 t
 		{
 		    VERBOSE("\t\tdirect: " << Direction::String(direct) <<
 			    ", index: " << (*it1).first <<
+			    ", cost f: " << cell2.cost_f <<
 			    ", cost g: " << cell2.cost_g <<
 			    ", cost t: " << cell2.cost_t <<
 			    ", cost d: " << cell2.cost_d);
@@ -289,7 +301,13 @@ bool Route::PathFind(std::list<Route::Step>* result, const s32 from, const s32 t
 	    if(-1 == list[cur].parent) break;
 	    alt = cur;
     	    cur = list[alt].parent;
+#ifdef WITH_DEBUG
 	    if(result) result->push_front(Route::Step(cur, Direction::Get(cur, alt), list[alt].cost_g));
+#else
+	    Direction::vector_t direct = Direction::Get(cur, alt);
+	    if(result) result->push_front(Route::Step(cur, direct,
+			    Maps::Ground::GetPenalty(alt, Direction::Reflect(direct), pathfinding))); 
+#endif
 	}
         return true;
     }

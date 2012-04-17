@@ -47,10 +47,9 @@ const char* Maps::Ground::String(u16 ground)
     return str_ground[8];
 }
 
-u16 Maps::Ground::GetBasePenalty(const s32 index, const u8 level)
+u16 Maps::Ground::GetPenalty(const s32 & index, Direction::vector_t direct, u8 level)
 {
     const Maps::Tiles & tile = world.GetTiles(index);
-    const Skill::Secondary pathfinding(Skill::Secondary::PATHFINDING, level);
 
     //            none   basc   advd   expr
     //    Desert  2.00   1.75   1.50   1.00
@@ -64,54 +63,45 @@ u16 Maps::Ground::GetBasePenalty(const s32 index, const u8 level)
     //    Water   1.00   1.00   1.00   1.00
     //    Road    0.75   0.75   0.75   0.75
 
-    // if(tile.isRoad(direct)) need fix isRoad(Direction::vector_t)
+    if(tile.isRoad(direct))
+	// road priority: need small value
+	return 59;
 
+    u16 result = 100;
 
-    if(tile.isRoad())
-        return 75;
-    else
     switch(tile.GetGround())
     {
         case DESERT:
-	{
-	    const u16 & fee = pathfinding.GetValues();
-	    const u8 extra = 100;
-	    return 100 + extra - (extra * (fee > 100 ? 100 : fee) / 100);
-	}
+	    switch(level)
+	    {
+		case Skill::Level::EXPERT:	break;
+		case Skill::Level::ADVANCED:	result += 50; break;
+		case Skill::Level::BASIC:	result += 75; break;
+		default:			result += 100; break;
+	    }
+	    break;
 
         case SNOW:
         case SWAMP:
-	{
-	    const u16 & fee = pathfinding.GetValues();
-	    const u8 extra = 75;
-	    return 100 + extra - (extra * (fee > 100 ? 100 : fee) / 100);
-	}
+	    switch(level)
+	    {
+		case Skill::Level::EXPERT:	break;
+		case Skill::Level::ADVANCED:	result += 25; break;
+		case Skill::Level::BASIC:	result += 50; break;
+		default:			result += 75; break;
+	    }
+	    break;
 
         case WASTELAND:
         case BEACH:
-            return (Skill::Level::NONE == pathfinding.Level() ? 125 : 100);
+            result += (Skill::Level::NONE == level ? 25 : 0);
+	    break;
 
-        default: break;
+	default: break;
     }
 
-    return 100;
-}
-
-u16 Maps::Ground::GetPenalty(const s32 index, const Direction::vector_t direct, const u8 pathfinding)
-{
-    if(Direction::UNKNOWN == direct) return MAXU16;
-
-    u16 result = GetBasePenalty(index, pathfinding);
-
-    switch(direct)
-    {
-        case Direction::TOP_RIGHT:
-        case Direction::BOTTOM_RIGHT:
-        case Direction::BOTTOM_LEFT:
-        case Direction::TOP_LEFT:	result = static_cast<u16>(1.44 * result); break;
-	
-	default: break;
-     }
+    if(direct & (Direction::TOP_RIGHT | Direction::BOTTOM_RIGHT | Direction::BOTTOM_LEFT | Direction::TOP_LEFT))
+	result += result * 55 / 100;
 
     return result;
 }

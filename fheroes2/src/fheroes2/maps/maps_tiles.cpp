@@ -359,6 +359,42 @@ bool Maps::TilesAddon::isRoad(u16 direct) const
 {
     switch(MP2::GetICNObject(object))
     {
+	// from sprite road
+	case ICN::ROAD:
+	    if(0 == index ||
+		4 == index ||
+		5 == index ||
+		13 == index ||
+		26 == index) return direct & (Direction::TOP | Direction::BOTTOM);
+	    else
+	    if(2 == index ||
+		21 == index ||
+		28 == index) return direct & (Direction::LEFT | Direction::RIGHT);
+	    else
+	    if(17 == index ||
+		29 == index) return direct & (Direction::TOP_LEFT | Direction::BOTTOM_RIGHT);
+	    else
+	    if(18 == index ||
+		30 == index) return direct & (Direction::TOP_RIGHT | Direction::BOTTOM_LEFT);
+	    else
+	    if(3 == index) return direct & (Direction::TOP | Direction::BOTTOM | Direction::LEFT | Direction::RIGHT);
+	    else
+	    if(6 == index) return direct & (Direction::TOP | Direction::BOTTOM | Direction::RIGHT);
+	    else
+	    if(7 == index) return direct & (Direction::TOP | Direction::RIGHT);
+	    else
+	    if(9 == index) return direct & (Direction::BOTTOM | Direction::RIGHT);
+	    else
+	    if(12 == index) return direct & (Direction::BOTTOM | Direction::LEFT);
+	    else
+	    if(14 == index) return direct & (Direction::TOP | Direction::BOTTOM | Direction::LEFT);
+	    else
+	    if(16 == index) return direct & (Direction::TOP | Direction::LEFT);
+	    else
+	    if(19 == index) return direct & (Direction::TOP_LEFT | Direction::BOTTOM_RIGHT);
+	    else
+	    if(20 == index) return direct & (Direction::TOP_RIGHT | Direction::BOTTOM_LEFT);
+
 	// castle and tower (gate)
 	case ICN::OBJNTOWN:
 	    if(13 == index ||
@@ -385,34 +421,6 @@ bool Maps::TilesAddon::isRoad(u16 direct) const
 		67 == index ||
 		77 == index) return direct & (Direction::TOP | Direction::BOTTOM);
 
-	// from sprite road
-	case ICN::ROAD:
-	    if(0  == index ||
-	       4  == index ||
-	       5  == index ||
-	       7  == index ||
-	       9  == index ||
-	       12 == index ||
-	       13 == index ||
-	       16 == index ||
-	       19 == index ||
-	       20 == index ||
-	       26 == index) return direct & (Direction::TOP | Direction::BOTTOM);
-	    else
-	    if(2  == index ||
-	       21 == index ||
-	       28 == index) return direct & (Direction::RIGHT | Direction::LEFT);
-	    else
-	    if(3  == index ||
-	       6  == index ||
-	       14 == index) return direct & (Direction::TOP | Direction::BOTTOM | Direction::RIGHT | Direction::LEFT);
-	    else
-	    if(17 == index ||
-	       29 == index) return direct & (Direction::TOP_LEFT | Direction::BOTTOM_RIGHT);
-	    else
-	    if(18 == index ||
-	       30 == index) return direct & (Direction::TOP_RIGHT | Direction::BOTTOM_LEFT);
-	
 	default:
 	    break;
     }
@@ -1751,7 +1759,17 @@ std::string Maps::Tiles::String(void) const
 	"----------------:--------" << std::endl <<
 	"maps index      : " << GetIndex() << std::endl <<
 	"tile index      : " << TileSpriteIndex() << std::endl <<
-	"ground          : " << Ground::String(GetGround()) << (isRoad() ? ", (road)" : "") << std::endl <<
+	"ground          : " << Ground::String(GetGround());
+    if(isRoad())
+    {
+	Addons::const_iterator it = std::find_if(addons_level1.begin(), addons_level1.end(),
+				std::bind2nd(std::mem_fun_ref(&TilesAddon::isRoad), DIRECTION_ALL));
+	os << ", (" << "road";
+	if(ICN::ROAD == MP2::GetICNObject((*it).object))
+	    os << ", " << "index: " << static_cast<int>((*it).index);
+	os << ")";
+    }
+    os << std::endl <<
 	"passable        : " << (tile_passable ? Direction::String(tile_passable) : "false");
 #ifdef WITH_DEBUG
 	if(passable_disable)
