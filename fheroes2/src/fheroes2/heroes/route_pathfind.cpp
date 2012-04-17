@@ -32,10 +32,9 @@
 struct cell_t
 {
 #ifdef WITH_DEBUG
-    cell_t() : cost_f(MAXU16), cost_g(MAXU16), cost_t(MAXU16), cost_d(MAXU16), passbl(0), open(1), parent(-1){};
+    cell_t() : cost_g(MAXU16), cost_t(MAXU16), cost_d(MAXU16), passbl(0), open(1), parent(-1){};
 
-    u16		cost_f;	// ground out
-    u16		cost_g;	// ground in
+    u16		cost_g;	// ground
 #else
     cell_t() : cost_t(MAXU16), cost_d(MAXU16), passbl(0), open(1), parent(-1){};
 #endif
@@ -176,6 +175,13 @@ bool PassableFromToTile(const Heroes* hero, const s32 & from, const s32 & to, co
     return PassableToTile(hero, toTile, direct, dst);
 }
 
+u16 GetPenaltyFromTo(const s32 & from, const s32 & to, const Direction::vector_t & direct, const u8 & pathfinding)
+{
+    const u16 & cost1 = Maps::Ground::GetPenalty(from, direct, pathfinding); // penalty: for [cur] out
+    const u16 & cost2 = Maps::Ground::GetPenalty(to, Direction::Reflect(direct), pathfinding); // penalty: for [tmp] in
+    return (cost1 + cost2) >> 1;
+}
+
 bool Route::PathFind(std::list<Route::Step>* result, const s32 from, const s32 to, const u16 limit, const Heroes* hero)
 {
     const u8 pathfinding = (hero ? hero->GetLevelSkill(Skill::Secondary::PATHFINDING) : Skill::Level::NONE);
@@ -189,7 +195,6 @@ bool Route::PathFind(std::list<Route::Step>* result, const s32 from, const s32 t
     Direction::vector_t direct = Direction::CENTER;
 
 #ifdef WITH_DEBUG
-    list[cur].cost_f = 0;
     list[cur].cost_g = 0;
 #endif
     list[cur].cost_t = 0;
@@ -208,8 +213,7 @@ bool Route::PathFind(std::list<Route::Step>* result, const s32 from, const s32 t
 
 		if(list[tmp].open)
 		{
-	    	    const u16 costf = Maps::Ground::GetPenalty(cur, direct, pathfinding); // penalty: for [cur] out
-		    const u16 costg = Maps::Ground::GetPenalty(tmp, Direction::Reflect(direct), pathfinding); // penalty: for [tmp] in
+		    const u16 costg = GetPenaltyFromTo(cur, tmp, direct, pathfinding);
 
 		    // new
 		    if(-1 == list[tmp].parent)
@@ -220,29 +224,27 @@ bool Route::PathFind(std::list<Route::Step>* result, const s32 from, const s32 t
 			    list[cur].passbl |= direct;
 
 #ifdef WITH_DEBUG
-	    		    list[tmp].cost_f = costf;
 	    		    list[tmp].cost_g = costg;
 #endif
 			    list[tmp].parent = cur;
 			    list[tmp].open   = 1;
 			    list[tmp].cost_d = 50 * Maps::GetApproximateDistance(tmp, to);
-	    		    list[tmp].cost_t = list[cur].cost_t + costf + costg;
+	    		    list[tmp].cost_t = list[cur].cost_t + costg;
 			}
 		    }
 		    // check alt
 		    else
 		    {
-			if(list[tmp].cost_t > list[cur].cost_t + costf + costg &&
+			if(list[tmp].cost_t > list[cur].cost_t + costg &&
 			   ((list[cur].passbl & direct) || PassableFromToTile(hero, cur, tmp, direct, to)))
 			{
 			    list[cur].passbl |= direct;
 
 			    list[tmp].parent = cur;
 #ifdef WITH_DEBUG
-	    		    list[tmp].cost_f = costf;
 			    list[tmp].cost_g = costg;
 #endif
-			    list[tmp].cost_t = list[cur].cost_t + costf + costg;
+			    list[tmp].cost_t = list[cur].cost_t + costg;
 			}
 		    }
     		}
@@ -269,7 +271,6 @@ bool Route::PathFind(std::list<Route::Step>* result, const s32 from, const s32 t
 		{
 		    VERBOSE("\t\tdirect: " << Direction::String(direct) <<
 			    ", index: " << (*it1).first <<
-			    ", cost f: " << cell2.cost_f <<
 			    ", cost g: " << cell2.cost_g <<
 			    ", cost t: " << cell2.cost_t <<
 			    ", cost d: " << cell2.cost_d);
@@ -301,13 +302,8 @@ bool Route::PathFind(std::list<Route::Step>* result, const s32 from, const s32 t
 	    if(-1 == list[cur].parent) break;
 	    alt = cur;
     	    cur = list[alt].parent;
-#ifdef WITH_DEBUG
-	    if(result) result->push_front(Route::Step(cur, Direction::Get(cur, alt), list[alt].cost_g));
-#else
-	    Direction::vector_t direct = Direction::Get(cur, alt);
-	    if(result) result->push_front(Route::Step(cur, direct,
-			    Maps::Ground::GetPenalty(alt, Direction::Reflect(direct), pathfinding))); 
-#endif
+	    const Direction::vector_t direct = Direction::Get(cur, alt);
+	    if(result) result->push_front(Route::Step(cur, direct, GetPenaltyFromTo(cur, alt, direct, pathfinding)));
 	}
         return true;
     }
