@@ -35,8 +35,9 @@ namespace Route
 	Step() : from(-1), direction(Direction::CENTER), penalty(0) {}
 	Step(s32 index, u16 dir, u16 cost) : from(index), direction(dir), penalty(cost) {}
 
-	s32	GetIndex(void) const;
-	bool	isBad(void) const;
+	s32		GetIndex(void) const;
+	const u16 &	GetPenalty(void) const;
+	bool		isBad(void) const;
 
 	s32	from;
 	u16	direction;
@@ -53,6 +54,7 @@ namespace Route
 	    s32		GetDestinedIndex(void) const;
 	    u16		GetFrontDirection(void) const;
 	    u16		GetFrontPenalty(void) const;
+	    u32		GetTotalPenalty(void) const;
 	    bool	Calculate(const s32 dst_index, const u16 limit = MAXU16);
 
 	    void	Show(void){ hide = false; }
@@ -70,7 +72,6 @@ namespace Route
 	    std::string	String(void) const;
 
 	    u16		GetAllowStep(void) const;
-	    u32		TotalPenalty(void) const;
 
     	    static u16	GetIndexSprite(u16 from, u16 to, u8 mod);
 

@@ -35,6 +35,11 @@ s32 Route::Step::GetIndex(void) const
     return from < 0 ? -1 : Maps::GetDirectionIndex(from, direction);
 }
 
+const u16 & Route::Step::GetPenalty(void) const
+{
+    return penalty;
+}
+
 bool Route::Step::isBad(void) const
 {
     return from < 0 || (direction == Direction::UNKNOWN || direction == Direction::CENTER);
@@ -55,7 +60,7 @@ u16 Route::Path::GetFrontDirection(void) const
 
 u16 Route::Path::GetFrontPenalty(void) const
 {
-    return empty() ? 0 : front().penalty;
+    return empty() ? 0 : front().GetPenalty();
 }
 
 void Route::Path::PopFront(void)
@@ -265,13 +270,13 @@ u16 Route::Path::GetIndexSprite(u16 from, u16 to, u8 mod)
 }
 
 /* total penalty cast */
-u32 Route::Path::TotalPenalty(void) const
+u32 Route::Path::GetTotalPenalty(void) const
 {
     u32 result = 0;
 
     for(const_iterator
 	it = begin(); it != end(); ++it)
-	result += (*it).penalty;
+	result += (*it).GetPenalty();
 
     return result;
 }
@@ -282,9 +287,9 @@ u16 Route::Path::GetAllowStep(void) const
     u16 move_point = hero.GetMovePoints();
 
     for(const_iterator
-	it = begin(); it != end() && move_point >= (*it).penalty; ++it)
+	it = begin(); it != end() && move_point >= (*it).GetPenalty(); ++it)
     {
-	move_point -= (*it).penalty;
+	move_point -= (*it).GetPenalty();
 	++green;
     }
 
@@ -300,7 +305,7 @@ std::string Route::Path::String(void) const
 
     for(const_iterator
 	it = begin(); it != end(); ++it)
-	os << Direction::String((*it).direction) << "(" << (*it).penalty << ")" << ", ";
+	os << Direction::String((*it).direction) << "(" << (*it).GetPenalty() << ")" << ", ";
 
     os << "end";
     return os.str();

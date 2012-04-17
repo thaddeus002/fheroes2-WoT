@@ -264,7 +264,7 @@ std::string ShowGroundInfo(const Maps::Tiles & tile, bool show, const Heroes* he
 	Direction::vector_t dir = Direction::Get(hero->GetIndex(), tile.GetIndex());
 	if(dir != Direction::UNKNOWN)
 	{
-	    u16 cost = Maps::Ground::GetPenalty(tile.GetIndex(), dir,
+	    u16 cost = Maps::Ground::GetPenalty(tile.GetIndex(), Direction::Reflect(dir),
 				    hero->GetLevelSkill(Skill::Secondary::PATHFINDING));
 	    if(cost)
 	    {
