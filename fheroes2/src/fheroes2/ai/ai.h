@@ -48,6 +48,7 @@ struct AI
     static void HeroesAction(Heroes &, s32);
     static void HeroesActionNewPosition(Heroes &);
     static void HeroesLevelUp(Heroes &);
+    static void HeroesClearTask(void);
     static std::string HeroesString(const Heroes &);
 
     static void CastlePreBattle(Castle &);

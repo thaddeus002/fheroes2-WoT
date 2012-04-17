@@ -65,6 +65,10 @@ void AI::HeroesActionNewPosition(Heroes &)
 {
 }
 
+void AI::HeroesClearTask(void)
+{
+}
+
 std::string AI::HeroesString(const Heroes &)
 {
     return "";
@@ -85,6 +89,7 @@ void AI::BattleTurn(Battle::Arena &, const Battle::Unit & b, Battle::Actions & a
 
 bool AI::BattleMagicTurn(Battle::Arena &, const Battle::Unit &, Battle::Actions &, const Battle::Unit*)
 {
+    return false;
 }
 
 void AI::Init(void)

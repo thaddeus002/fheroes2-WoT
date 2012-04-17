@@ -40,7 +40,7 @@
 #include "game_interface.h"
 #include "interface_gamearea.h"
 #include "maps_tiles.h"
-#include "ai_simple.h"
+#include "ai.h"
 
 void AIToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index);
 void AIToPickupResource(Heroes & hero, const u8 & obj, const s32 & dst_index);
@@ -1405,8 +1405,9 @@ void AIToBoat(Heroes & hero, const u8 & obj, const s32 & dst_index)
     hero.Move2Dest(dst_index);
     hero.SetMapsObject(MP2::OBJ_ZERO);
     hero.SetShipMaster(true);
-    AIHeroes::Get(hero).ClearTasks();
     hero.GetPath().Reset();
+
+    AI::HeroesClearTask();
 
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
@@ -1421,8 +1422,9 @@ void AIToCoast(Heroes & hero, const u8 & obj, const s32 & dst_index)
     hero.Move2Dest(dst_index);
     from.SetObject(MP2::OBJ_BOAT);
     hero.SetShipMaster(false);
-    AIHeroes::Get(hero).ClearTasks();
     hero.GetPath().Reset();
+
+    AI::HeroesClearTask();
 
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }

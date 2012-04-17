@@ -112,6 +112,11 @@ void AI::HeroesAfterBattle(HeroBase & hero)
 {
 }
 
+void AI::HeroesClearTask(void)
+{
+    AIHeroes::Get(hero).ClearTasks();
+}
+
 bool AIHeroesValidObject(const Heroes & hero, s32 index)
 {
     Maps::Tiles & tile = world.GetTiles(index);
