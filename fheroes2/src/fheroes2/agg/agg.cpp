@@ -206,7 +206,7 @@ void AGG::Cache::ClearAllICN(void)
 	{
 	    if(icn_cache[ii].sprites)
 	    {
-		SaveICN(static_cast<ICN::icn_t>(ii));
+		if(Settings::Get().UseAltResource()) SaveICN(static_cast<ICN::icn_t>(ii));
 		delete [] icn_cache[ii].sprites;
 	    }
 	    icn_cache[ii].sprites = NULL;
@@ -562,10 +562,13 @@ bool AGG::Cache::LoadAltICN(const ICN::icn_t icn, const u32 index, bool reflect)
 
 	// find current image
 	const TiXmlElement *xml_sprite = xml_icn->FirstChildElement("sprite");
-	u32 ii = 0;
-	for(; ii != index && xml_sprite; xml_sprite = xml_sprite->NextSiblingElement("sprite"), ++ii);
+	int index1 = index;
+	int index2 = 0;
 
-	if(xml_sprite && ii == index)
+	for(; xml_sprite && index2 != index1; xml_sprite = xml_sprite->NextSiblingElement("sprite"))
+	    xml_sprite->Attribute("index", &index2);
+
+	if(xml_sprite && index2 == index1)
 	{
 	    xml_sprite->Attribute("ox", &ox);
 	    xml_sprite->Attribute("oy", &oy);
@@ -575,7 +578,7 @@ bool AGG::Cache::LoadAltICN(const ICN::icn_t icn, const u32 index, bool reflect)
 	    Sprite & sp1 = v.sprites[index];
 	    Sprite & sp2 = v.reflect[index];
 
-	    if(! sp1.isValid() && sp1.Load(name.c_str()))
+	    if(! sp1.isValid() && IsFile(name) && sp1.Load(name.c_str()))
 	    {
 		sp1.SetOffset(ox, oy);
 		DEBUG(DBG_ENGINE, DBG_TRACE, xml_spec << ", " << index);
@@ -598,6 +601,7 @@ bool AGG::Cache::LoadAltICN(const ICN::icn_t icn, const u32 index, bool reflect)
 
 void AGG::Cache::SaveICN(const ICN::icn_t icn)
 {
+#ifdef WITH_XML
 #ifdef WITH_DEBUG
     const std::string images_dir = Settings::GetWriteableDir("images");
 
@@ -614,12 +618,24 @@ void AGG::Cache::SaveICN(const ICN::icn_t icn)
 	if(IsDirectory(icn_dir, true))
 	{
 	    const std::string stats_file = icn_dir + SEPARATOR + "stats.xml";
-	    std::ofstream fs(stats_file.c_str());
+	    bool need_save = false;
+	    TiXmlDocument doc;
+	    TiXmlElement* icn_element = NULL;
 
-	    if(fs.good())
+	    if(doc.LoadFile(stats_file.c_str()))
+		icn_element = doc.FirstChildElement("icn");
+
+	    if(! icn_element)
 	    {
-		fs << "<?xml version=\"1.0\" ?>" << std::endl <<
-		    "<icn name=\"" << icn_lower << "\" count=\"" << v.count <<"\">" << std::endl;
+		TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );
+		doc.LinkEndChild(decl);
+    
+		icn_element = new TiXmlElement("icn");
+		icn_element->SetAttribute("name", icn_lower.c_str());
+		icn_element->SetAttribute("count", v.count);
+
+		doc.LinkEndChild(icn_element);
+		need_save = true;
 	    }
 
 	    for(u32 index = 0; index < v.count; ++index)
@@ -639,20 +655,27 @@ void AGG::Cache::SaveICN(const ICN::icn_t icn)
 		    const std::string image_full = icn_dir + SEPARATOR + sp_name.str();
 
 		    if(! IsFile(image_full))
+		    {
 			sp.Save(image_full);
 
-		    if(fs.good())
-			fs << "<sprite name=\"" << sp_name.str() << "\" ox=\"" << sp.x() << "\" oy=\"" << sp.y() << "\"/>" << std::endl;
+			TiXmlElement* sprite_element = new TiXmlElement("sprite");
+			sprite_element->SetAttribute("index", index);
+			sprite_element->SetAttribute("name", sp_name.str().c_str());
+			sprite_element->SetAttribute("ox", sp.x());
+			sprite_element->SetAttribute("oy", sp.y());
+
+			icn_element->LinkEndChild(sprite_element);
+
+			need_save = true;
+		    }
 		}
 	    }
 
-	    if(fs.good())
-	    {
-		fs << "</icn>" << std::endl;
-		fs.close();
-	    }
+	    if(need_save)
+		doc.SaveFile(stats_file.c_str());
 	}
     }
+#endif
 #endif
 }
 
@@ -779,15 +802,18 @@ bool AGG::Cache::LoadAltTIL(const TIL::til_t til, u32 max)
 
 	index = 0;
 	for(const TiXmlElement*
-	    xml_sprite = xml_til->FirstChildElement("sprite"); index < count && xml_sprite; ++index, xml_sprite = xml_sprite->NextSiblingElement("sprite"))
+	    xml_sprite = xml_til->FirstChildElement("sprite"); xml_sprite; ++index, xml_sprite = xml_sprite->NextSiblingElement("sprite"))
 	{
-	    Surface & sf = v.sprites[index];
-	    std::string name(xml_spec);
-	    String::Replace(name, "spec.xml", xml_sprite->Attribute("name"));
+	    xml_sprite->Attribute("index", &index);
 
-	    if(! sf.isValid() && sf.Load(name.c_str()))
+	    if(index < count)
 	    {
-		DEBUG(DBG_ENGINE, DBG_TRACE, xml_spec << ", " << index);
+		Surface & sf = v.sprites[index];
+		std::string name(xml_spec);
+		String::Replace(name, "spec.xml", xml_sprite->Attribute("name"));
+
+		if(! sf.isValid() && IsFile(name) && sf.Load(name.c_str()))
+		    DEBUG(DBG_ENGINE, DBG_TRACE, xml_spec << ", " << index);
 	    }
 	}
 
