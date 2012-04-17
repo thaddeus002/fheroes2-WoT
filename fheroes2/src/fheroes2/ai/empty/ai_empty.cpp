@@ -61,10 +61,6 @@ void AI::HeroesAfterBattle(HeroBase &)
 {
 }
 
-void AI::HeroesAction(Heroes &, s32)
-{
-}
-
 void AI::HeroesActionNewPosition(Heroes &)
 {
 }
