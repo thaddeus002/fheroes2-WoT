@@ -65,6 +65,10 @@ void AI::HeroesAction(Heroes &, s32)
 {
 }
 
+void AI::HeroesActionNewPosition(Heroes &)
+{
+}
+
 std::string AI::HeroesString(const Heroes &)
 {
     return "";

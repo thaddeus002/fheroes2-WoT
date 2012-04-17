@@ -1464,6 +1464,9 @@ void Heroes::ActionNewPosition(void)
 	SetMove(false);
     }
 
+    if(CONTROL_AI == GetControl())
+	AI::HeroesActionNewPosition(*this);
+
     ResetModes(VISIONS);
 }
 

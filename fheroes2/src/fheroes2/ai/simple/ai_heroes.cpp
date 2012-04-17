@@ -2136,6 +2136,25 @@ void AIHeroesAddedTask(Heroes & hero)
 	AIHeroesAddedRescueTask(hero);
 }
 
+void AI::HeroesActionNewPosition(Heroes & hero)
+{
+    AIHero & ai_hero = AIHeroes::Get(hero);
+    //AIKingdom & ai_kingdom = AIKingdoms::Get(hero.GetColor());
+    Queue & task = ai_hero.sheduled_visit;
+
+    const u8 objs[] = { MP2::OBJ_ARTIFACT, MP2::OBJ_RESOURCE, MP2::OBJ_CAMPFIRE, MP2::OBJ_TREASURECHEST, 0 };
+    MapsIndexes pickups = Maps::ScanAroundObjects(hero.GetIndex(), objs);
+
+    if(pickups.size() && hero.GetPath().isValid() &&
+	pickups.end() == std::find(pickups.begin(), pickups.end(), hero.GetPath().GetDestinationIndex()))
+	hero.GetPath().Reset();
+
+    for(MapsIndexes::const_iterator
+	it = pickups.begin(); it != pickups.end(); ++it)
+	if(*it != hero.GetPath().GetDestinationIndex())
+	    task.push_front(*it);
+}
+
 void AIHeroesGetTask(Heroes & hero)
 {
     std::vector<s32> results;
@@ -2326,16 +2345,16 @@ void AIHeroesGetTask(Heroes & hero)
 
     if(pickups.size())
     {
+	hero.GetPath().Reset();
+
 	for(MapsIndexes::const_iterator
 	    it = pickups.begin(); it != pickups.end(); ++it)
-    	    if(AIHeroesValidObject(hero, *it) &&
-			hero.GetPath().Calculate(*it))
+    	    if(AIHeroesValidObject(hero, *it))
 	{
-	    ai_objects.erase(*it);
+	    task.push_front(*it);
 
 	    DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", find object: " <<
 		MP2::StringObject(world.GetTiles(*it).GetObject()) << "(" << *it << ")");
-	    return;
 	}
     }
 
