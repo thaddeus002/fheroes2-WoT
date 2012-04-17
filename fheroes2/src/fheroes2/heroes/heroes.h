@@ -71,12 +71,12 @@ public:
     enum flags_t
     {
 	SHIPMASTER	= 0x00000001,
-	AIWAITING	= 0x00000002,
+	//UNUSED	= 0x00000002,
 	SPELLCASTED	= 0x00000004,
 	ENABLEMOVE	= 0x00000008,
-	HUNTER		= 0x00000010,
-	SCOUTER		= 0x00000020,
-	STUPID		= 0x00000040,
+	//UNUSED	= 0x00000010,
+	//UNUSED	= 0x00000020,
+	//UNUSED	= 0x00000040,
 	JAIL		= 0x00000080,
 	ACTION		= 0x00000100,
 	SAVEPOINTS	= 0x00000200,
@@ -100,8 +100,6 @@ public:
     Castle* inCastle(void);
 
     void LoadFromMP2(s32 map_index, const void *ptr,  const Color::color_t cl, const u8 rc);
-
-    void ResetStupidFlag(void) { ResetModes(STUPID); }
 
     Color::color_t GetColor(void) const{ return color; }
     u8 GetRace(void) const{ return race; }

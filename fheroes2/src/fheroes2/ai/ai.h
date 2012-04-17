@@ -31,31 +31,40 @@ class Heroes;
 class Kingdom;
 namespace Battle { class Arena; class Unit; class Actions; }
 
-struct AI
+namespace AI
 {
-    static void AddCastle(const Castle &);
-    static void RemoveCastle(const Castle &);
-    static void AddHeroes(const Heroes &);
-    static void RemoveHeroes(const Heroes &);
+    enum
+    {
+	HEROES_SCOUTER	= 0x10000000,
+	HEROES_HUNTER	= 0x20000000,
+	HEROES_WAITING	= 0x40000000,
+	HEROES_STUPID	= 0x80000000
+    };
 
-    static void Init(void);
+    void AddCastle(const Castle &);
+    void RemoveCastle(const Castle &);
+    void AddHeroes(const Heroes &);
+    void RemoveHeroes(const Heroes &);
 
-    static void KingdomTurn(Kingdom &);
-    static void BattleTurn(Battle::Arena &, const Battle::Unit &, Battle::Actions &);
-    static bool BattleMagicTurn(Battle::Arena &, const Battle::Unit &, Battle::Actions &, const Battle::Unit*);
-    static void HeroesPreBattle(HeroBase &);
-    static void HeroesAfterBattle(HeroBase &);
-    static void HeroesAction(Heroes &, s32);
-    static void HeroesActionNewPosition(Heroes &);
-    static void HeroesLevelUp(Heroes &);
-    static void HeroesClearTask(void);
-    static std::string HeroesString(const Heroes &);
+    void Init(void);
 
-    static void CastlePreBattle(Castle &);
-    static void CastleAfterBattle(Castle &, bool attacker_wins);
+    void KingdomTurn(Kingdom &);
+    void BattleTurn(Battle::Arena &, const Battle::Unit &, Battle::Actions &);
+    bool BattleMagicTurn(Battle::Arena &, const Battle::Unit &, Battle::Actions &, const Battle::Unit*);
+    void HeroesPreBattle(HeroBase &);
+    void HeroesAfterBattle(HeroBase &);
+    void HeroesPostLoad(Heroes &);
+    void HeroesAction(Heroes &, s32);
+    void HeroesActionNewPosition(Heroes &);
+    void HeroesLevelUp(Heroes &);
+    void HeroesClearTask(void);
+    std::string HeroesString(const Heroes &);
 
-    static const char* Type(void);
-    static const char* License(void);
-};
+    void CastlePreBattle(Castle &);
+    void CastleAfterBattle(Castle &, bool attacker_wins);
+
+    const char* Type(void);
+    const char* License(void);
+}
 
 #endif

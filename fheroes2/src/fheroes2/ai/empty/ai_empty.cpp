@@ -78,6 +78,10 @@ void AI::HeroesLevelUp(Heroes &)
 {
 }
 
+void AI::HeroesPostLoad(Heroes &)
+{
+}
+
 void AI::KingdomTurn(Kingdom &)
 {
 }

@@ -82,6 +82,12 @@ std::string AI::HeroesString(const Heroes & hero)
     AIHero & ai_hero = AIHeroes::Get(hero);
     Queue & task = ai_hero.sheduled_visit;
 
+    os << "flags           : " << 
+	(hero.Modes(SCOUTER) ? "SCOUTER," : "") <<
+        (hero.Modes(HUNTER) ? "HUNTER," : "") <<
+        (hero.Modes(WAITING) ? "WAITING," : "") <<
+	(hero.Modes(STUPID) ? "STUPID" : "") << std::endl;
+
     os << "ai primary target: " << ai_hero.primary_target << std::endl <<
           "ai sheduled visit: ";
     for(Queue::const_iterator
@@ -92,13 +98,18 @@ std::string AI::HeroesString(const Heroes & hero)
     return os.str();
 }
 
+void AI::HeroesPostLoad(Heroes & hero)
+{
+    hero.SetModes(AI::HEROES_HUNTER);
+}
+
 void AI::HeroesLevelUp(Heroes & hero)
 {
-    if(4 < hero.GetLevel() && !hero.Modes(Heroes::HUNTER))
-	hero.SetModes(Heroes::HUNTER);
+    if(4 < hero.GetLevel() && !hero.Modes(AI::HEROES_HUNTER))
+	hero.SetModes(AI::HEROES_HUNTER);
 
-    if(9 < hero.GetLevel() && hero.Modes(Heroes::SCOUTER))
-	hero.ResetModes(Heroes::SCOUTER);
+    if(9 < hero.GetLevel() && hero.Modes(AI::HEROES_SCOUTER))
+	hero.ResetModes(AI::HEROES_SCOUTER);
 }
 
 void AI::HeroesPreBattle(HeroBase & hero)
@@ -513,7 +524,7 @@ bool AIHeroesPriorityObject(const Heroes & hero, s32 index)
 	    if(hero.GetColor() == castle->GetColor())
 	    {
 		// maybe need join army
-		return hero.Modes(Heroes::HUNTER) &&
+		return hero.Modes(AI::HEROES_HUNTER) &&
 		    castle->GetArmy().isValid() &&
 		    ! hero.isVisited(world.GetTiles(castle->GetIndex()));
 	    }
@@ -780,10 +791,10 @@ void AIHeroesGetTask(Heroes & hero)
 	hero.GetArmy().UpgradeTroops(*castle);
 
 	// recruit army
-	if(hero.Modes(Heroes::HUNTER))
+	if(hero.Modes(AI::HEROES_HUNTER))
 		hero.GetArmy().JoinStrongestFromArmy(castle->GetArmy());
 	else
-	if(hero.Modes(Heroes::SCOUTER))
+	if(hero.Modes(AI::HEROES_SCOUTER))
 		hero.GetArmy().KeepOnlyWeakestTroops(castle->GetArmy());
 
 	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", " << hero.GetArmy().String());
@@ -858,14 +869,14 @@ void AIHeroesGetTask(Heroes & hero)
 	}
 	*/
 
-	hero.SetModes(Heroes::STUPID);
+	hero.SetModes(AI::HEROES_STUPID);
 	return;
     }
 
     if(ai_hero.fix_loop > 3)
     {
 	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ": loop");
-	hero.SetModes(hero.Modes(Heroes::AIWAITING) ? Heroes::STUPID : Heroes::AIWAITING);
+	hero.SetModes(hero.Modes(AI::HEROES_WAITING) ? AI::HEROES_STUPID : AI::HEROES_WAITING);
 	return;
     }
 
@@ -888,7 +899,7 @@ void AIHeroesGetTask(Heroes & hero)
 	    if(NULL != (castle = world.GetCastle(ai_hero.primary_target)) &&
 		NULL != castle->GetHeroes().Guest() && Players::isFriends(castle->GetColor(), hero.GetColor()))
 	    {
-		hero.SetModes(Heroes::AIWAITING);
+		hero.SetModes(AI::HEROES_WAITING);
 		DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", castle busy..");
 	    }
 
@@ -1005,18 +1016,18 @@ void AIHeroesGetTask(Heroes & hero)
 	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", route: " << hero.GetPath().String());
     }
     else
-    if(hero.Modes(Heroes::AIWAITING))
+    if(hero.Modes(AI::HEROES_WAITING))
     {
 	hero.GetPath().Reset();
 	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << " say: unknown task., help my please..");
 
-	hero.ResetModes(Heroes::AIWAITING);
-	hero.SetModes(Heroes::STUPID);
+	hero.ResetModes(AI::HEROES_WAITING);
+	hero.SetModes(AI::HEROES_STUPID);
     }
     else
     {
 	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << " say: waiting...");
-	hero.SetModes(Heroes::AIWAITING);
+	hero.SetModes(AI::HEROES_WAITING);
     }
 }
 
@@ -1148,16 +1159,16 @@ void AIHeroesTurn(Heroes* hero)
     {
 	DEBUG(DBG_AI, DBG_TRACE, hero->GetName() << ", start: " <<
 	    (hero->Modes(Heroes::SHIPMASTER) ? "SHIPMASTER," : "") <<
-            (hero->Modes(Heroes::SCOUTER) ? "SCOUTER," : "") <<
-            (hero->Modes(Heroes::HUNTER) ? "HUNTER," : "") <<
+            (hero->Modes(AI::HEROES_SCOUTER) ? "SCOUTER," : "") <<
+            (hero->Modes(AI::HEROES_HUNTER) ? "HUNTER," : "") <<
             (hero->Modes(Heroes::PATROL) ? "PATROL," : "") <<
-            (hero->Modes(Heroes::AIWAITING) ? "WAITING," : "") <<
-            (hero->Modes(Heroes::STUPID) ? "STUPID," : ""));
+            (hero->Modes(AI::HEROES_WAITING) ? "WAITING," : "") <<
+            (hero->Modes(AI::HEROES_STUPID) ? "STUPID" : ""));
 
 	Interface::StatusWindow *status = Interface::NoGUI() ? NULL : &Interface::StatusWindow::Get();
 
         while(hero->MayStillMove() &&
-	    !hero->Modes(Heroes::AIWAITING|Heroes::STUPID))
+	    !hero->Modes(AI::HEROES_WAITING|AI::HEROES_STUPID))
         {
             // turn indicator
             if(status) status->RedrawTurnProgress(3);
@@ -1216,10 +1227,10 @@ void AIHeroesEnd(Heroes* hero)
 	Queue & task = ai_hero.sheduled_visit;
 	IndexObjectMap & ai_objects = ai_kingdom.scans;
 
-	if(hero->Modes(Heroes::AIWAITING|Heroes::STUPID))
+	if(hero->Modes(AI::HEROES_WAITING|AI::HEROES_STUPID))
 	{
 	    ai_hero.Reset();
-	    hero->ResetModes(Heroes::AIWAITING|Heroes::STUPID);
+	    hero->ResetModes(AI::HEROES_WAITING|AI::HEROES_STUPID);
 	}
 
 	IndexObjectMap::iterator it;
@@ -1242,7 +1253,7 @@ void AIHeroesSetHunterWithTarget(Heroes* hero, s32 dst)
     {
 	AIHero & ai_hero = AIHeroes::Get(*hero);
 
-	hero->SetModes(Heroes::HUNTER);
+	hero->SetModes(AI::HEROES_HUNTER);
 
 	if(0 > ai_hero.primary_target)
 	{

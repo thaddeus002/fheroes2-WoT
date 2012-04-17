@@ -434,6 +434,11 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
     SetSpellPoints(GetMaxSpellPoints());
     move_point = GetMaxMovePoints();
 
+    if(CONTROL_AI == GetControl())
+    {
+	AI::HeroesPostLoad(*this);
+    }
+
     DEBUG(DBG_GAME , DBG_INFO, name << ", color: " << Color::String(color) << ", race: " << Race::String(race));
 }
 
@@ -1580,11 +1585,8 @@ std::string Heroes::String(void) const
 	"in castle       : " << (inCastle() ? "true" : "false") << std::endl <<
 	"save object     : " << MP2::StringObject(world.GetTiles(GetIndex()).GetObject(false)) << std::endl <<
 	"flags           : " << (Modes(SHIPMASTER) ? "SHIPMASTER," : "") <<
-                                         (Modes(SCOUTER) ? "SCOUTER," : "") <<
-                                         (Modes(HUNTER) ? "HUNTER," : "") <<
-                                         (Modes(PATROL) ? "PATROL," : "") <<
-                                         (Modes(AIWAITING) ? "WAITING," : "") <<
-                                         (Modes(STUPID) ? "STUPID," : "") << std::endl;
+                                         (Modes(PATROL) ? "PATROL" : "") << std::endl;
+
     if(Modes(PATROL))
     {
 	os << "patrol square   : " << static_cast<u16>(patrol_square) << std::endl;
@@ -1899,6 +1901,14 @@ StreamBase & operator<< (StreamBase & msg, const Heroes & hero)
 	hero.visit_object;
 }
 
+enum deprecated_t
+{
+    AIWAITING     = 0x00000002,
+    HUNTER        = 0x00000010,
+    SCOUTER       = 0x00000020,
+    STUPID        = 0x00000040
+};
+
 StreamBase & operator>> (StreamBase & msg, Heroes & hero)
 {
     HeroBase & base = hero;
@@ -1922,6 +1932,30 @@ StreamBase & operator>> (StreamBase & msg, Heroes & hero)
 	hero.patrol_center >>
 	hero.patrol_square >>
 	hero.visit_object;
+
+    if(FORMAT_VERSION_2850 > Game::GetLoadVersion())
+    {
+	if(hero.Modes(AIWAITING))
+	{
+	    hero.ResetModes(AIWAITING);
+	    hero.SetModes(AI::HEROES_WAITING);
+	}
+	if(hero.Modes(HUNTER))
+	{
+	    hero.ResetModes(HUNTER);
+	    hero.SetModes(AI::HEROES_HUNTER);
+	}
+	if(hero.Modes(SCOUTER))
+	{
+	    hero.ResetModes(SCOUTER);
+	    hero.SetModes(AI::HEROES_SCOUTER);
+	}
+	if(hero.Modes(STUPID))
+	{
+	    hero.ResetModes(STUPID);
+	    hero.SetModes(AI::HEROES_STUPID);
+	}
+    }
 
     hero.army.SetCommander(&hero);
 

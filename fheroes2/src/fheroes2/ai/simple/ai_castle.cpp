@@ -209,7 +209,7 @@ void AICastleTurn(Castle* castle)
     	    }
 
     	    if(castle->GetHeroes().Guest())
-		castle->GetHeroes().Guest()->SetModes(Heroes::HUNTER);
+		castle->GetHeroes().Guest()->SetModes(AI::HEROES_HUNTER);
 	}
 
 	// part III
@@ -228,7 +228,7 @@ void AICastleTurn(Castle* castle)
     	    if(rec.GetHero2()) castle->RecruitHero(rec.GetHero2());
 
     	    if(castle->GetHeroes().Guest())
-		castle->GetHeroes().Guest()->SetModes(Heroes::HUNTER|Heroes::SCOUTER);
+		castle->GetHeroes().Guest()->SetModes(AI::HEROES_HUNTER|AI::HEROES_SCOUTER);
 	}
     }
 }
