@@ -153,6 +153,11 @@ bool Maps::isValidDirection(const s32 & from, u16 vector)
     return false;
 }
 
+Point Maps::GetPoint(const s32 & index)
+{
+    return Point(index % world.w(), index / world.h());
+}
+
 bool Maps::isValidAbsPoint(const Point & pt)
 {
     return isValidAbsPoint(pt.x, pt.y);
@@ -215,13 +220,12 @@ MapsIndexes Maps::GetDistanceIndexes(const s32 & center, u16 dist, bool sort)
     MapsIndexes results;
     results.reserve(dist * 12);
 
-    const s16 cx = center % world.w();
-    const s16 cy = center / world.w();
+    const Point cp = GetPoint(center);
 
-    for(s16 xx = cx - dist; xx <= cx + dist; ++xx)
-	for(s16 yy = cy - dist; yy <= cy + dist; ++yy)
+    for(s16 xx = cp.x - dist; xx <= cp.x + dist; ++xx)
+	for(s16 yy = cp.y - dist; yy <= cp.y + dist; ++yy)
     {
-	if(isValidAbsPoint(xx, yy) && (xx != cx || yy != cy))
+	if(isValidAbsPoint(xx, yy) && (xx != cp.x || yy != cp.y))
 	    results.push_back(GetIndexFromAbsPoint(xx, yy));
     }
 
@@ -235,7 +239,7 @@ void Maps::ClearFog(const s32 & index, u8 scoute, u8 color)
 {
     if(0 != scoute && isValidAbsIndex(index))
     {
-	const Point center(index % world.w(), index / world.w());
+	const Point center = GetPoint(index);
 	const Settings & conf = Settings::Get();
 
 	// AI advantage
@@ -369,10 +373,9 @@ MapsIndexes Maps::GetTilesUnderProtection(const s32 & center)
 
 u16 Maps::GetApproximateDistance(const s32 & index1, const s32 & index2)
 {
-    return std::max(std::abs((index1 % world.w()) - (index2 % world.w())), 
-	            std::abs((index1 / world.w()) - (index2 / world.w())));
+    const Size sz(GetPoint(index1) - GetPoint(index2));
+    return std::max(sz.w, sz.h);
 }
-
 
 void Maps::MinimizeAreaForCastle(const Point & center)
 {

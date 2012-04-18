@@ -55,14 +55,14 @@ Point & Point::operator-=(const Point & pt)
     return *this;
 }
 
-Point operator+(const Point& pt1, const Point& pt2)
+Point Point::operator+(const Point & pt)
 {
-    return Point(pt1.x + pt2.x, pt1.y + pt2.y);
+    return Point(x + pt.x, y + pt.y);
 }
 
-Point operator-(const Point& pt1, const Point& pt2)
+Point Point::operator-(const Point & pt)
 {
-    return Point(pt1.x - pt2.x, pt1.y - pt2.y);
+    return Point(x - pt.x, y - pt.y);
 }
 
 bool Point::inABC(const Point & pt1, const Point & pt2, const Point & pt3) const
@@ -82,6 +82,10 @@ std::string Point::String(void) const
 }
 
 Size::Size(u16 sw, u16 sh) : w(sw), h(sh)
+{
+}
+
+Size::Size(const Point & pt) : w(std::abs(pt.x)), h(std::abs(pt.y))
 {
 }
 

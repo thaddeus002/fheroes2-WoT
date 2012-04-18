@@ -38,20 +38,22 @@ struct Point
 
     bool inABC(const Point &, const Point &, const Point &) const;
 
-    Point & operator+=(const Point & pt);
-    Point & operator-=(const Point & pt);
+    Point & operator+= (const Point & pt);
+    Point & operator-= (const Point & pt);
+
+    Point operator+ (const Point &);
+    Point operator- (const Point &);
 
     std::string String(void) const;
 };
 
-Point operator+(const Point& pt1, const Point& pt2);
-Point operator-(const Point& pt1, const Point& pt2);
 
 struct Size
 {
     u16 w, h;
 
     Size(u16 sw = 0, u16 sh = 0);
+    Size(const Point &);
 
     bool isEmpty(void) const;
 

@@ -210,7 +210,7 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
 	for(; it1 != it2; ++it1)
 	{
 	    from = (*it1).GetIndex();
-    	    const Point mp(from % world.w(), from / world.h());
+    	    const Point mp = Maps::GetPoint(from);
 
  	    ++it3;
 	    --green;
@@ -444,7 +444,7 @@ void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const s32 index, S
 
 	const Rect & rectMaps = gamearea.GetRectMaps();
 	const Rect & areaPosition = gamearea.GetArea();
-	Point pt(index % world.w(), index / world.h());
+	Point pt = Maps::GetPoint(index);
 
         gamearea.SetCenter(pt);
 	gamearea.Redraw(sf, LEVEL_BOTTOM | LEVEL_TOP);

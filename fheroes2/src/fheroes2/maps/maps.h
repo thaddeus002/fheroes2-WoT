@@ -55,6 +55,8 @@ namespace Maps
     bool isValidAbsPoint(const Point & pt);
     bool isValidAbsPoint(s16 x, s16 y);
 
+    Point GetPoint(const s32 &);
+
     s32 GetIndexFromAbsPoint(const Point & mp);
     s32 GetIndexFromAbsPoint(s16 px, s16 py);
 

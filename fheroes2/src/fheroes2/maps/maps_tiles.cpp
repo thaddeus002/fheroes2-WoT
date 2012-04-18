@@ -1402,7 +1402,7 @@ void Maps::Tiles::Remove(u32 uniq)
 void Maps::Tiles::RedrawTile(Surface & dst) const
 {
     const Interface::GameArea & area = Interface::GameArea::Get();
-    const Point mp(GetIndex() % world.w(), GetIndex() / world.w());
+    const Point mp = Maps::GetPoint(GetIndex());
 
     if(area.GetRectMaps() & mp)
 	area.BlitOnTile(dst, GetTileSurface(), 0, 0, mp);
@@ -1411,7 +1411,7 @@ void Maps::Tiles::RedrawTile(Surface & dst) const
 void Maps::Tiles::RedrawBottom(Surface & dst, bool skip_objs) const
 {
     const Interface::GameArea & area = Interface::GameArea::Get();
-    const Point mp(GetIndex() % world.w(), GetIndex() / world.w());
+    const Point mp = Maps::GetPoint(GetIndex());
 
     if((area.GetRectMaps() & mp) &&
 	!addons_level1.empty())
@@ -1448,7 +1448,7 @@ void Maps::Tiles::RedrawPassable(Surface & dst) const
 {
 #ifdef WITH_DEBUG
     const Interface::GameArea & area = Interface::GameArea::Get();
-    const Point mp(GetIndex() % world.w(), GetIndex() / world.w());
+    const Point mp = Maps::GetPoint(GetIndex());
 
     if(area.GetRectMaps() & mp)
     {
@@ -1485,7 +1485,7 @@ void Maps::Tiles::RedrawObjects(Surface & dst) const
 void Maps::Tiles::RedrawMonster(Surface & dst) const
 {
     const Settings & conf = Settings::Get();
-    const Point mp(GetIndex() % world.w(), GetIndex() / world.w());
+    const Point mp = Maps::GetPoint(GetIndex());
     const Interface::GameArea & area = Interface::GameArea::Get();
     s32 dst_index = -1;
 
@@ -1543,7 +1543,7 @@ void Maps::Tiles::RedrawMonster(Surface & dst) const
 
 void Maps::Tiles::RedrawBoat(Surface & dst) const
 {
-    const Point mp(GetIndex() % world.w(), GetIndex() / world.w());
+    const Point mp = Maps::GetPoint(GetIndex());
     const Interface::GameArea & area = Interface::GameArea::Get();
 
     if(!(area.GetRectMaps() & mp)) return;
@@ -1599,7 +1599,7 @@ bool SkipRedrawTileBottom4Hero(const Maps::TilesAddon & ta, const u16 & passable
 void Maps::Tiles::RedrawBottom4Hero(Surface & dst) const
 {
     const Interface::GameArea & area = Interface::GameArea::Get();
-    const Point mp(GetIndex() % world.w(), GetIndex() / world.w());
+    const Point mp = Maps::GetPoint(GetIndex());
 
     if((area.GetRectMaps() & mp) &&
 	!addons_level1.empty())
@@ -1630,7 +1630,7 @@ void Maps::Tiles::RedrawBottom4Hero(Surface & dst) const
 void Maps::Tiles::RedrawTop(Surface & dst, const TilesAddon* skip) const
 {
     const Interface::GameArea & area = Interface::GameArea::Get();
-    const Point mp(GetIndex() % world.w(), GetIndex() / world.w());
+    const Point mp = Maps::GetPoint(GetIndex());
 
     if(!(area.GetRectMaps() & mp)) return;
 
@@ -1687,7 +1687,7 @@ void Maps::Tiles::RedrawTop(Surface & dst, const TilesAddon* skip) const
 void Maps::Tiles::RedrawTop4Hero(Surface & dst, bool skip_ground) const
 {
     const Interface::GameArea & area = Interface::GameArea::Get();
-    const Point mp(GetIndex() % world.w(), GetIndex() / world.w());
+    const Point mp = Maps::GetPoint(GetIndex());
 
     if(!(area.GetRectMaps() & mp)) return;
 
@@ -2517,7 +2517,7 @@ void Maps::Tiles::ClearFog(u8 colors)
 void Maps::Tiles::RedrawFogs(Surface & dst, u8 color) const
 {
     const Interface::GameArea & area = Interface::GameArea::Get();
-    const Point mp(GetIndex() % world.w(), GetIndex() / world.w());
+    const Point mp = Maps::GetPoint(GetIndex());
 
     // get direction around foga
     u16 around = 0;

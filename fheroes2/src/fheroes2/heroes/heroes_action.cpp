@@ -269,7 +269,7 @@ void AnimationRemoveObject(Maps::Tiles & tile)
     const Interface::GameArea & gamearea = Interface::GameArea::Get();
     const Point & area = gamearea.GetMapsPos();
     const Rect & rect = gamearea.GetRectMaps();
-    const Point pos(tile.GetIndex() % world.w() - rect.x, tile.GetIndex() / world.w() - rect.y);
+    const Point pos = Maps::GetPoint(tile.GetIndex()) - rect;
 
     const s16 dstx = area.x + TILEWIDTH * pos.x;
     const s16 dsty = area.y + TILEWIDTH * pos.y;
@@ -2918,8 +2918,7 @@ void ActionToJail(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 	if(prisoner)
 	{
-	    const Point center(dst_index % world.w(), dst_index / world.w());
-	    if(prisoner->Recruit(hero.GetColor(), center))
+	    if(prisoner->Recruit(hero.GetColor(), Maps::GetPoint(dst_index)))
 		prisoner->ResetModes(Heroes::JAIL);
 	}
     }
