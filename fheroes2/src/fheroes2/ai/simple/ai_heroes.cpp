@@ -385,7 +385,7 @@ void AI::HeroesActionNewPosition(Heroes & hero)
 	    task.push_front(*it);
 }
 
-void AIHeroesGetTask(Heroes & hero)
+void AI::HeroesGetTask(Heroes & hero)
 {
     std::vector<s32> results;
     results.reserve(5);
@@ -654,169 +654,46 @@ void AIHeroesGetTask(Heroes & hero)
     }
 }
 
-void AIHeroesNoGUITurns(Heroes &hero)
-{
-    if(hero.GetPath().isValid()) hero.SetMove(true);
-    else return;
-
-    while(1)
-    {
-        if(hero.isFreeman() || !hero.isEnableMove()) break;
-
-        hero.Move(true);
-
-        DELAY(10);
-    }
-}
-
-bool AIHeroesShowAnimation(const Heroes & hero)
-{
-    const Settings & conf = Settings::Get();
-
-    // accumulate colors
-    u8 colors = 0;
-
-    if(conf.GameType() & Game::TYPE_HOTSEAT)
-    {
-	const Colors vcolors(Players::HumanColors());
-
-        for(Colors::const_iterator
-	    it = vcolors.begin(); it != vcolors.end(); ++it)
-	{
-    	    const Player* player = conf.GetPlayers().Get(*it);
-    	    if(player) colors |= player->friends;
-	}
-    }
-    else
-    {
-        const Player* player = conf.GetPlayers().Get(Players::HumanColors());
-        if(player) colors = player->friends;
-    }
-
-    // get result
-    const s32 index_from = hero.GetIndex();
-
-    if(colors && Maps::isValidAbsIndex(index_from))
-    {
-	const Maps::Tiles & tile_from = world.GetTiles(index_from);
-
-	if(hero.GetPath().isValid())
-	{
-    	    const s32 index_to = Maps::GetDirectionIndex(index_from, hero.GetPath().GetFrontDirection());
-    	    const Maps::Tiles & tile_to = world.GetTiles(index_to);
-
-    	    return !tile_from.isFog(colors) && !tile_to.isFog(colors);
-	}
-
-	return !tile_from.isFog(colors);
-    }
-
-    return false;
-}
-
-void AIHeroesTurns(Heroes & hero)
-{
-    if(hero.GetPath().isValid()) hero.SetMove(true);
-    else return;
-
-    const Settings & conf = Settings::Get();
-    Display & display = Display::Get();
-    Cursor & cursor = Cursor::Get();
-    Interface::Basic & I = Interface::Basic::Get();
-
-    cursor.Hide();
-
-    if(0 != conf.AIMoveSpeed() && AIHeroesShowAnimation(hero))
-    {
-	    cursor.Hide();
-	    I.gameArea.SetCenter(hero.GetCenter());
-	    I.Redraw(REDRAW_GAMEAREA);
-	    cursor.Show();
-	    display.Flip();
-    }
-
-    while(LocalEvent::Get().HandleEvents())
-    {
-	if(hero.isFreeman() || !hero.isEnableMove()) break;
-
-	bool hide_move = (0 == conf.AIMoveSpeed()) ||
-	    (! IS_DEVEL() && !AIHeroesShowAnimation(hero));
-
-	if(hide_move)
-	{
-	    hero.Move(true);
-	}
-	else
-	if(Game::AnimateInfrequent(Game::CURRENT_AI_DELAY))
-	{
-	    cursor.Hide();
-	    hero.Move();
-
-	    I.gameArea.SetCenter(hero.GetCenter());
-	    I.Redraw(REDRAW_GAMEAREA);
-	    cursor.Show();
-	    display.Flip();
-	}
-
-    	if(Game::AnimateInfrequent(Game::MAPS_DELAY))
-	{
-	    u32 & frame = Game::MapsAnimationFrame();
-	    ++frame;
-	    cursor.Hide();
-	    I.Redraw(REDRAW_GAMEAREA);
-	    cursor.Show();
-	    display.Flip();
-	}
-    }
-
-    bool hide_move = (0 == conf.AIMoveSpeed()) ||
-	    (! IS_DEVEL() && !AIHeroesShowAnimation(hero));
-
-    // 0.2 sec delay for show enemy hero position
-    if(!hero.isFreeman() && !hide_move) DELAY(200);
-}
-
 void AIHeroesTurn(Heroes* hero)
 {
-    if(hero)
+    if(hero) AI::HeroesTurn(*hero);
+}
+
+void AI::HeroesTurn(Heroes & hero)
+{
+    DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", start: " <<
+	    (hero.Modes(Heroes::SHIPMASTER) ? "SHIPMASTER," : "") <<
+            (hero.Modes(AI::HEROES_SCOUTER) ? "SCOUTER," : "") <<
+            (hero.Modes(AI::HEROES_HUNTER) ? "HUNTER," : "") <<
+            (hero.Modes(Heroes::PATROL) ? "PATROL," : "") <<
+            (hero.Modes(AI::HEROES_WAITING) ? "WAITING," : "") <<
+            (hero.Modes(AI::HEROES_STUPID) ? "STUPID" : ""));
+
+    Interface::StatusWindow *status = Interface::NoGUI() ? NULL : &Interface::StatusWindow::Get();
+
+    while(hero.MayStillMove() &&
+	    !hero.Modes(AI::HEROES_WAITING|AI::HEROES_STUPID))
     {
-	DEBUG(DBG_AI, DBG_TRACE, hero->GetName() << ", start: " <<
-	    (hero->Modes(Heroes::SHIPMASTER) ? "SHIPMASTER," : "") <<
-            (hero->Modes(AI::HEROES_SCOUTER) ? "SCOUTER," : "") <<
-            (hero->Modes(AI::HEROES_HUNTER) ? "HUNTER," : "") <<
-            (hero->Modes(Heroes::PATROL) ? "PATROL," : "") <<
-            (hero->Modes(AI::HEROES_WAITING) ? "WAITING," : "") <<
-            (hero->Modes(AI::HEROES_STUPID) ? "STUPID" : ""));
+        // turn indicator
+        if(status) status->RedrawTurnProgress(3);
+        //if(status) status->RedrawTurnProgress(4);
 
-	Interface::StatusWindow *status = Interface::NoGUI() ? NULL : &Interface::StatusWindow::Get();
+        // get task for heroes
+        AI::HeroesGetTask(hero);
 
-        while(hero->MayStillMove() &&
-	    !hero->Modes(AI::HEROES_WAITING|AI::HEROES_STUPID))
-        {
-            // turn indicator
-            if(status) status->RedrawTurnProgress(3);
-            //if(status) status->RedrawTurnProgress(4);
+        // turn indicator
+        if(status) status->RedrawTurnProgress(5);
+        //if(status) status->RedrawTurnProgress(6);
 
-            // get task for heroes
-            AIHeroesGetTask(*hero);
+        // heroes AI turn
+        AI::HeroesMove(hero);
 
-            // turn indicator
-            if(status) status->RedrawTurnProgress(5);
-            //if(status) status->RedrawTurnProgress(6);
-
-            // heroes AI turn
-            if(Interface::NoGUI())
-                AIHeroesNoGUITurns(*hero);
-            else
-                AIHeroesTurns(*hero);
-
-            // turn indicator
-            if(status) status->RedrawTurnProgress(7);
-            //if(status) status->RedrawTurnProgress(8);
-        }
-
-	DEBUG(DBG_AI, DBG_TRACE, hero->GetName() << ", end");
+	// turn indicator
+        if(status) status->RedrawTurnProgress(7);
+        //if(status) status->RedrawTurnProgress(8);
     }
+
+    DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", end");
 }
 
 bool AIHeroesScheduledVisit(const Kingdom & kingdom, s32 index)

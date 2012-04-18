@@ -26,6 +26,9 @@
 #include "dialog.h"
 #include "battle.h"
 #include "ai.h"
+#include "settings.h"
+#include "agg.h"
+#include "game_interface.h"
 
 const char* AI::Type(void)
 {
@@ -82,8 +85,80 @@ void AI::HeroesPostLoad(Heroes &)
 {
 }
 
-void AI::KingdomTurn(Kingdom &)
+void AI::HeroesGetTask(Heroes & hero)
 {
+    // stop hero
+    hero.GetPath().Reset();
+}
+
+void AI::HeroesTurn(Heroes & hero)
+{
+   Interface::StatusWindow *status = Interface::NoGUI() ? NULL : &Interface::StatusWindow::Get();
+
+    while(hero.MayStillMove())
+    {
+	// turn indicator
+        if(status) status->RedrawTurnProgress(3);
+        if(status) status->RedrawTurnProgress(4);
+
+        // get task for heroes
+        AI::HeroesGetTask(hero);
+
+        // turn indicator
+        if(status) status->RedrawTurnProgress(5);
+        if(status) status->RedrawTurnProgress(6);
+
+        // heroes AI turn
+        AI::HeroesMove(hero);
+
+        // turn indicator
+        if(status) status->RedrawTurnProgress(7);
+        if(status) status->RedrawTurnProgress(8);
+    }
+
+    DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", end");
+}
+
+void AI::KingdomTurn(Kingdom & kingdom)
+{
+    KingdomHeroes & heroes = kingdom.GetHeroes();
+    KingdomCastles & castles = kingdom.GetCastles();
+
+    const Color::color_t & color = kingdom.GetColor();
+
+    if(kingdom.isLoss() || color == Color::NONE)
+    {
+        kingdom.LossPostActions();
+        return;
+    }
+
+    if(! Settings::Get().MusicMIDI()) AGG::PlayMusic(MUS::COMPUTER);
+
+    Interface::StatusWindow *status = Interface::NoGUI() ? NULL : &Interface::StatusWindow::Get();
+
+    // indicator
+    if(status) status->RedrawTurnProgress(0);
+
+    if(status) status->RedrawTurnProgress(1);
+
+    // castles AI turn
+    for(KingdomCastles::iterator
+	it = castles.begin(); it != castles.end(); ++it)
+	if(*it) CastleTurn(**it);
+
+    if(status) status->RedrawTurnProgress(3);
+
+    // heroes turns
+    for(KingdomHeroes::iterator
+	it = heroes.begin(); it != heroes.end(); ++it)
+	if(*it) HeroesTurn(**it);
+
+    if(status) status->RedrawTurnProgress(6);
+    if(status) status->RedrawTurnProgress(7);
+    if(status) status->RedrawTurnProgress(8);
+    if(status) status->RedrawTurnProgress(9);
+
+    DEBUG(DBG_AI, DBG_INFO, Color::String(color) << " moved");
 }
 
 void AI::BattleTurn(Battle::Arena &, const Battle::Unit & b, Battle::Actions & a)
@@ -105,5 +180,9 @@ void AI::CastlePreBattle(Castle &)
 }
 
 void AI::CastleAfterBattle(Castle &, bool attacker_wins)
+{
+}
+
+void AI::CastleTurn(Castle &)
 {
 }

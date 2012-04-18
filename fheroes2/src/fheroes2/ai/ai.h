@@ -51,6 +51,9 @@ namespace AI
     void KingdomTurn(Kingdom &);
     void BattleTurn(Battle::Arena &, const Battle::Unit &, Battle::Actions &);
     bool BattleMagicTurn(Battle::Arena &, const Battle::Unit &, Battle::Actions &, const Battle::Unit*);
+    void HeroesTurn(Heroes &);
+    void HeroesMove(Heroes &);
+    void HeroesGetTask(Heroes &);
     void HeroesPreBattle(HeroBase &);
     void HeroesAfterBattle(HeroBase &);
     void HeroesPostLoad(Heroes &);
@@ -61,6 +64,7 @@ namespace AI
     void HeroesClearTask(const Heroes &);
     std::string HeroesString(const Heroes &);
 
+    void CastleTurn(Castle &);
     void CastlePreBattle(Castle &);
     void CastleAfterBattle(Castle &, bool attacker_wins);
 

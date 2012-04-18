@@ -1825,3 +1825,125 @@ bool AI::HeroesValidObject(const Heroes & hero, s32 index)
 
     return false;
 }
+
+bool AIHeroesShowAnimation(const Heroes & hero)
+{
+    const Settings & conf = Settings::Get();
+
+    // accumulate colors
+    u8 colors = 0;
+
+    if(conf.GameType() & Game::TYPE_HOTSEAT)
+    {
+        const Colors vcolors(Players::HumanColors());
+
+        for(Colors::const_iterator
+            it = vcolors.begin(); it != vcolors.end(); ++it)
+        {
+            const Player* player = conf.GetPlayers().Get(*it);
+            if(player) colors |= player->friends;
+        }
+    }
+    else
+    {
+        const Player* player = conf.GetPlayers().Get(Players::HumanColors());
+        if(player) colors = player->friends;
+    }
+
+    // get result
+    const s32 index_from = hero.GetIndex();
+
+    if(colors && Maps::isValidAbsIndex(index_from))
+    {
+        const Maps::Tiles & tile_from = world.GetTiles(index_from);
+
+        if(hero.GetPath().isValid())
+        {
+            const s32 index_to = Maps::GetDirectionIndex(index_from, hero.GetPath().GetFrontDirection());
+            const Maps::Tiles & tile_to = world.GetTiles(index_to);
+
+            return !tile_from.isFog(colors) && !tile_to.isFog(colors);
+        }
+
+        return !tile_from.isFog(colors);
+    }
+
+    return false;
+}
+
+void AI::HeroesMove(Heroes & hero)
+{
+    if(hero.GetPath().isValid())
+    {
+	hero.SetMove(true);
+
+	if(Interface::NoGUI())
+	{
+	    while(1)
+	    {
+    		if(hero.isFreeman() || !hero.isEnableMove()) break;
+
+	        hero.Move(true);
+	        DELAY(10);
+	    }
+	}
+	else
+	{
+	    const Settings & conf = Settings::Get();
+	    Display & display = Display::Get();
+	    Cursor & cursor = Cursor::Get();
+	    Interface::Basic & I = Interface::Basic::Get();
+
+	    cursor.Hide();
+
+	    if(0 != conf.AIMoveSpeed() && AIHeroesShowAnimation(hero))
+	    {
+		cursor.Hide();
+		I.gameArea.SetCenter(hero.GetCenter());
+		I.Redraw(REDRAW_GAMEAREA);
+		cursor.Show();
+		display.Flip();
+	    }
+
+	    while(LocalEvent::Get().HandleEvents())
+	    {
+		if(hero.isFreeman() || !hero.isEnableMove()) break;
+
+		bool hide_move = (0 == conf.AIMoveSpeed()) ||
+		    (! IS_DEVEL() && !AIHeroesShowAnimation(hero));
+
+		if(hide_move)
+		{
+		    hero.Move(true);
+		}
+		else
+		if(Game::AnimateInfrequent(Game::CURRENT_AI_DELAY))
+		{
+		    cursor.Hide();
+		    hero.Move();
+
+		    I.gameArea.SetCenter(hero.GetCenter());
+		    I.Redraw(REDRAW_GAMEAREA);
+		    cursor.Show();
+		    display.Flip();
+		}
+
+    		if(Game::AnimateInfrequent(Game::MAPS_DELAY))
+		{
+		    u32 & frame = Game::MapsAnimationFrame();
+		    ++frame;
+		    cursor.Hide();
+		    I.Redraw(REDRAW_GAMEAREA);
+		    cursor.Show();
+		    display.Flip();
+		}
+	    }
+
+	    bool hide_move = (0 == conf.AIMoveSpeed()) ||
+		(! IS_DEVEL() && !AIHeroesShowAnimation(hero));
+
+	    // 0.2 sec delay for show enemy hero position
+	    if(!hero.isFreeman() && !hide_move) DELAY(200);
+	}
+    }
+}
