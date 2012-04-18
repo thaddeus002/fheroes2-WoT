@@ -227,7 +227,7 @@ void Kingdom::AddHeroes(Heroes* hero)
 	if(heroes.end() == std::find(heroes.begin(), heroes.end(), hero))
 	    heroes.push_back(hero);
 
-	AI::AddHeroes(*hero);
+	AI::HeroesAdd(*hero);
     }
 }
 
@@ -265,7 +265,7 @@ void Kingdom::RemoveHeroes(const Heroes* hero)
 	if(heroes.size())
 	    heroes.erase(std::find(heroes.begin(), heroes.end(), hero));
 
-	AI::RemoveHeroes(*hero);
+	AI::HeroesRemove(*hero);
     }
 
     if(isLoss()) LossPostActions();
@@ -278,7 +278,7 @@ void Kingdom::AddCastle(const Castle* castle)
 	if(castles.end() == std::find(castles.begin(), castles.end(), castle))
 	    castles.push_back(const_cast<Castle*>(castle));
 
-	AI::AddCastle(*castle);
+	AI::CastleAdd(*castle);
     }
 
     lost_town_days = Game::GetLostTownDays() + 1;
@@ -291,7 +291,7 @@ void Kingdom::RemoveCastle(const Castle* castle)
 	if(castles.size())
 	    castles.erase(std::find(castles.begin(), castles.end(), castle));
 
-	AI::RemoveCastle(*castle);
+	AI::CastleRemove(*castle);
     }
 
     if(isLoss()) LossPostActions();

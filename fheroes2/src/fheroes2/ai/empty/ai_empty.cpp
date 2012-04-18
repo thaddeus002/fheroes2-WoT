@@ -25,6 +25,9 @@
 #include "heroes.h"
 #include "dialog.h"
 #include "battle.h"
+#include "battle_arena.h"
+#include "battle_command.h"
+#include "battle_troop.h"
 #include "ai.h"
 #include "settings.h"
 #include "agg.h"
@@ -40,19 +43,35 @@ const char* AI::License(void)
     return "GPL";
 }
 
-void AI::AddCastle(const Castle &)
+void AI::Init(void)
 {
 }
 
-void AI::RemoveCastle(const Castle &)
+void AI::CastlePreBattle(Castle &)
 {
 }
 
-void AI::AddHeroes(const Heroes &)
+void AI::CastleAfterBattle(Castle &, bool attacker_wins)
 {
 }
 
-void AI::RemoveHeroes(const Heroes &)
+void AI::CastleTurn(Castle &)
+{
+}
+
+void AI::CastleAdd(const Castle &)
+{
+}
+
+void AI::CastleRemove(const Castle &)
+{
+}
+
+void AI::HeroesAdd(const Heroes &)
+{
+}
+
+void AI::HeroesRemove(const Heroes &)
 {
 }
 
@@ -95,7 +114,8 @@ void AI::HeroesTurn(Heroes & hero)
 {
    Interface::StatusWindow *status = Interface::NoGUI() ? NULL : &Interface::StatusWindow::Get();
 
-    while(hero.MayStillMove())
+    while(hero.MayStillMove() &&
+	hero.GetPath().isValid())
     {
 	// turn indicator
         if(status) status->RedrawTurnProgress(3);
@@ -163,26 +183,11 @@ void AI::KingdomTurn(Kingdom & kingdom)
 
 void AI::BattleTurn(Battle::Arena &, const Battle::Unit & b, Battle::Actions & a)
 {
-//    a.AddedEndAction(b);
+    // end action
+    a.push_back(Battle::Command(Battle::MSG_BATTLE_END_TURN, b.GetUID()));
 }
 
 bool AI::BattleMagicTurn(Battle::Arena &, const Battle::Unit &, Battle::Actions &, const Battle::Unit*)
 {
     return false;
-}
-
-void AI::Init(void)
-{
-}
-
-void AI::CastlePreBattle(Castle &)
-{
-}
-
-void AI::CastleAfterBattle(Castle &, bool attacker_wins)
-{
-}
-
-void AI::CastleTurn(Castle &)
-{
 }

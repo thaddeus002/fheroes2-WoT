@@ -41,16 +41,14 @@ namespace AI
 	HEROES_STUPID	= 0x80000000
     };
 
-    void AddCastle(const Castle &);
-    void RemoveCastle(const Castle &);
-    void AddHeroes(const Heroes &);
-    void RemoveHeroes(const Heroes &);
-
     void Init(void);
 
     void KingdomTurn(Kingdom &);
     void BattleTurn(Battle::Arena &, const Battle::Unit &, Battle::Actions &);
     bool BattleMagicTurn(Battle::Arena &, const Battle::Unit &, Battle::Actions &, const Battle::Unit*);
+
+    void HeroesAdd(const Heroes &);
+    void HeroesRemove(const Heroes &);
     void HeroesTurn(Heroes &);
     void HeroesMove(Heroes &);
     void HeroesGetTask(Heroes &);
@@ -64,6 +62,8 @@ namespace AI
     void HeroesClearTask(const Heroes &);
     std::string HeroesString(const Heroes &);
 
+    void CastleAdd(const Castle &);
+    void CastleRemove(const Castle &);
     void CastleTurn(Castle &);
     void CastlePreBattle(Castle &);
     void CastleAfterBattle(Castle &, bool attacker_wins);

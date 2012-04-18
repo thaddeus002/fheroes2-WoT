@@ -42,19 +42,19 @@ const char* AI::License(void)
     return "Non-Commercial";
 }
 
-void AI::AddHeroes(const Heroes &)
+void AI::HeroesAdd(const Heroes &)
 {
 }
 
-void AI::RemoveHeroes(const Heroes &)
+void AI::HeroesRemove(const Heroes &)
 {
 }
 
-void AI::AddCastle(const Castle &)
+void AI::CastleAdd(const Castle &)
 {
 }
 
-void AI::RemoveCastle(const Castle & castle)
+void AI::CastleRemove(const Castle & castle)
 {
     AIKingdom & ai = AIKingdoms::Get(castle.GetColor());
 
