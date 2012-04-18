@@ -745,7 +745,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u32 index, bool reflect)
     icn_cache_t & v = icn_cache[icn];
 
     // need load
-    if(reflect && (!v.reflect || (index < v.count && !v.reflect[index].isValid())) ||
+    if((reflect && (!v.reflect || (index < v.count && !v.reflect[index].isValid()))) ||
 	(!reflect && (!v.sprites || (index < v.count && !v.sprites[index].isValid()))))
     {
 	const Settings & conf = Settings::Get();

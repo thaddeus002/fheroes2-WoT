@@ -33,7 +33,7 @@ namespace Battle { class Arena; class Unit; class Actions; }
 
 namespace AI
 {
-    enum
+    enum modes_t
     {
 	HEROES_SCOUTER	= 0x10000000,
 	HEROES_HUNTER	= 0x20000000,
@@ -54,10 +54,11 @@ namespace AI
     void HeroesPreBattle(HeroBase &);
     void HeroesAfterBattle(HeroBase &);
     void HeroesPostLoad(Heroes &);
+    bool HeroesValidObject(const Heroes &, s32);
     void HeroesAction(Heroes &, s32);
     void HeroesActionNewPosition(Heroes &);
     void HeroesLevelUp(Heroes &);
-    void HeroesClearTask(void);
+    void HeroesClearTask(const Heroes &);
     std::string HeroesString(const Heroes &);
 
     void CastlePreBattle(Castle &);

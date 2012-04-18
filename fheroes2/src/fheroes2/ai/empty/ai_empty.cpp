@@ -65,7 +65,7 @@ void AI::HeroesActionNewPosition(Heroes &)
 {
 }
 
-void AI::HeroesClearTask(void)
+void AI::HeroesClearTask(const Heroes &)
 {
 }
 

@@ -88,10 +88,10 @@ Battle::Position Battle::Position::GetCorrect(const Unit & b, s16 head)
 	    if(! result.second)
 		result.second = Board::GetCell(head, b.isReflect() ? RIGHT : LEFT);
 
-	    if(! result.second)
-		DEBUG(DBG_BATTLE, DBG_WARN, "NULL pointer, " << b.String() << ", dst: " << head);
-	    else
+	    if(result.second)
 		std::swap(result.first, result.second);
+	    else
+		DEBUG(DBG_BATTLE, DBG_WARN, "NULL pointer, " << b.String() << ", dst: " << head);
 	}
     }
 

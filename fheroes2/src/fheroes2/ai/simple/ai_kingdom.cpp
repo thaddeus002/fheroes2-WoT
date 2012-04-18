@@ -40,6 +40,7 @@
 #include "settings.h"
 #include "kingdom.h"
 #include "agg.h"
+#include "ai.h"
 #include "ai_simple.h"
 
 void AICastleTurn(Castle*);

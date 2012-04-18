@@ -1407,7 +1407,7 @@ void AIToBoat(Heroes & hero, const u8 & obj, const s32 & dst_index)
     hero.SetShipMaster(true);
     hero.GetPath().Reset();
 
-    AI::HeroesClearTask();
+    AI::HeroesClearTask(hero);
 
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
@@ -1424,7 +1424,7 @@ void AIToCoast(Heroes & hero, const u8 & obj, const s32 & dst_index)
     hero.SetShipMaster(false);
     hero.GetPath().Reset();
 
-    AI::HeroesClearTask();
+    AI::HeroesClearTask(hero);
 
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
@@ -1447,4 +1447,381 @@ void AIMeeting(Heroes & hero1, Heroes & hero2)
 	hero2.GetArmy().KeepOnlyWeakestTroops(hero1.GetArmy());
 
     // artifacts change
+}
+
+bool AI::HeroesValidObject(const Heroes & hero, s32 index)
+{
+    Maps::Tiles & tile = world.GetTiles(index);
+    const u8 obj = tile.GetObject();
+    const Army & army = hero.GetArmy();
+    const Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+
+    // check other
+    switch(obj)
+    {
+	// water object
+	case MP2::OBJ_SHIPWRECKSURVIROR:
+	case MP2::OBJ_WATERCHEST:
+	case MP2::OBJ_FLOTSAM:
+	case MP2::OBJ_BOTTLE:
+	    if(hero.isShipMaster()) return true;
+            break;
+
+	case MP2::OBJ_BUOY:
+	    if(! hero.isVisited(obj) &&
+		Morale::BLOOD > hero.GetMorale()) return true;
+	    break;
+
+	case MP2::OBJ_MERMAID:
+	    if(! hero.isVisited(obj) &&
+		Luck::IRISH > hero.GetLuck()) return true;
+	    break;
+
+	case MP2::OBJ_SIRENS:
+		return false;
+
+	case MP2::OBJ_MAGELLANMAPS:
+	case MP2::OBJ_WHIRLPOOL:
+	case MP2::OBJ_COAST:
+	    if(hero.isShipMaster()) return true;
+            break;
+
+	// capture objects
+	case MP2::OBJ_SAWMILL:
+	case MP2::OBJ_MINES:
+	case MP2::OBJ_ALCHEMYLAB:
+	    if(! Players::isFriends(hero.GetColor(), tile.QuantityColor()))
+	    {
+		if(tile.CaptureObjectIsProtection())
+		{
+		    Army enemy(tile);
+		    return !enemy.isValid() || Army::TroopsStrongerEnemyTroops(army, enemy);
+		}
+		else
+		return true;
+	    }
+	    break;
+
+	// pickup object
+	case MP2::OBJ_WAGON:
+	case MP2::OBJ_LEANTO:
+	case MP2::OBJ_MAGICGARDEN:
+	case MP2::OBJ_SKELETON:
+	    if(tile.QuantityIsValid()) return true;
+	    break;
+
+	case MP2::OBJ_WATERWHEEL:
+	case MP2::OBJ_WINDMILL:
+	    if(Settings::Get().ExtWorldExtObjectsCaptured())
+	    {
+		if(! Players::isFriends(hero.GetColor(), tile.QuantityColor()))
+		{
+		    if(tile.CaptureObjectIsProtection())
+		    {
+			Army enemy(tile);
+			return !enemy.isValid() || Army::TroopsStrongerEnemyTroops(army, enemy);
+		    }
+		    else
+		    return true;
+		}
+	    }
+	    else
+	    if(tile.QuantityIsValid()) return true;
+	    break;
+
+	// pickup resource
+	case MP2::OBJ_RESOURCE:
+	case MP2::OBJ_CAMPFIRE:
+	case MP2::OBJ_TREASURECHEST:
+	    if(! hero.isShipMaster()) return true;
+	    break;
+
+	case MP2::OBJ_ARTIFACT:
+	{
+	    const u8 variants = tile.QuantityVariant();
+
+	    if(hero.IsFullBagArtifacts()) return false;
+
+	    if(hero.isShipMaster()) return false;
+	    else
+	    // 1,2,3 - 2000g, 2500g+3res, 3000g+5res
+	    if(1 <= variants && 3 >= variants)
+	    {
+		return kingdom.AllowPayment(tile.QuantityFunds());
+	    }
+	    else
+	    // 4,5 - need have skill wisard or leadership,
+	    if(3 < variants && 6 > variants)
+	    {
+		return hero.HasSecondarySkill(tile.QuantitySkill().Skill());
+	    }
+	    else
+	    // 6 - 50 rogues, 7 - 1 gin, 8,9,10,11,12,13 - 1 monster level4
+	    if(5 < variants && 14 > variants)
+	    {
+                Army enemy(tile);
+		return !enemy.isValid() || Army::TroopsStrongerEnemyTroops(army, enemy);
+	    }
+	    else
+	    // other
+	    return true;
+	}
+	break;
+
+	// increase view
+	case MP2::OBJ_OBSERVATIONTOWER:
+	// obelisk
+	case MP2::OBJ_OBELISK:
+	    if(! hero.isVisited(tile, Visit::GLOBAL)) return true;
+	    break;
+
+        case MP2::OBJ_BARRIER:
+	    if(kingdom.IsVisitTravelersTent(tile.QuantityColor())) return true;
+	    break;
+
+        case MP2::OBJ_TRAVELLERTENT:
+	    if(! kingdom.IsVisitTravelersTent(tile.QuantityColor())) return true;
+	    break;
+
+	// new spell
+        case MP2::OBJ_SHRINE1:
+	case MP2::OBJ_SHRINE2:
+	case MP2::OBJ_SHRINE3:
+	{
+	    const Spell & spell = tile.QuantitySpell();
+	    if(spell.isValid() &&
+		 // check spell book
+		hero.HaveSpellBook() &&
+		!hero.HaveSpell(spell) &&
+                // check valid level spell and wisdom skill
+                !(3 == spell.Level() &&
+                Skill::Level::NONE == hero.GetLevelSkill(Skill::Secondary::WISDOM))) return true;
+	}
+	    break;
+
+    	// primary skill
+	case MP2::OBJ_FORT:
+    	case MP2::OBJ_MERCENARYCAMP:
+    	case MP2::OBJ_DOCTORHUT:
+    	case MP2::OBJ_STANDINGSTONES:
+	// sec skill
+	case MP2::OBJ_WITCHSHUT:
+	// exp
+	case MP2::OBJ_GAZEBO:
+	    if(! hero.isVisited(tile)) return true;
+	    break;
+
+	case MP2::OBJ_TREEKNOWLEDGE:
+	    if(! hero.isVisited(tile))
+	    {
+		const ResourceCount & rc = tile.QuantityResourceCount();
+    		if(! rc.isValid() || kingdom.AllowPayment(Funds(rc)))
+		    return true;
+	    }
+	    break;
+
+    	// good luck
+        case MP2::OBJ_FOUNTAIN:
+    	case MP2::OBJ_FAERIERING:
+    	case MP2::OBJ_IDOL:
+	    if(! hero.isVisited(obj) &&
+		Luck::IRISH > hero.GetLuck()) return true;
+	    break;
+
+	// good morale
+	case MP2::OBJ_OASIS:
+    	case MP2::OBJ_TEMPLE:
+    	case MP2::OBJ_WATERINGHOLE:
+	    if(! hero.isVisited(obj) &&
+		Morale::BLOOD > hero.GetMorale()) return true;
+	    break;
+
+	case MP2::OBJ_MAGICWELL:
+	    if(! hero.isVisited(tile) &&
+		hero.GetMaxSpellPoints() != hero.GetSpellPoints()) return true;
+	    break;
+
+	case MP2::OBJ_ARTESIANSPRING:
+	    if(! hero.isVisited(tile) &&
+		2 * hero.GetMaxSpellPoints() > hero.GetSpellPoints()) return true;
+	    break;
+
+	case MP2::OBJ_XANADU:
+	{
+	    const u8 level1 = hero.GetLevelSkill(Skill::Secondary::DIPLOMACY);
+	    const u8 level2 = hero.GetLevel();
+
+	    if(!hero.isVisited(tile) &&
+		((level1 == Skill::Level::BASIC && 7 < level2) ||
+		(level1 == Skill::Level::ADVANCED && 5 < level2) ||
+		(level1 == Skill::Level::EXPERT && 3 < level2) || (9 < level2))) return true;
+	    break;
+	}
+
+        // accept army
+        case MP2::OBJ_WATCHTOWER:
+        case MP2::OBJ_EXCAVATION:
+        case MP2::OBJ_CAVE:
+        case MP2::OBJ_TREEHOUSE:
+        case MP2::OBJ_ARCHERHOUSE:
+        case MP2::OBJ_GOBLINHUT:
+        case MP2::OBJ_DWARFCOTT:
+	case MP2::OBJ_HALFLINGHOLE:
+        case MP2::OBJ_PEASANTHUT:
+        case MP2::OBJ_THATCHEDHUT:
+        {
+    	    const Troop & troop = tile.QuantityTroop();
+	    if(troop.isValid() &&
+		(army.HasMonster(troop()) ||
+		(! army.isFullHouse() && (troop.isArchers() || troop.isFly())))) return true;
+	    break;
+	}
+
+        // recruit army
+        case MP2::OBJ_RUINS:
+        case MP2::OBJ_TREECITY:
+        case MP2::OBJ_WAGONCAMP:
+	case MP2::OBJ_DESERTTENT:
+        case MP2::OBJ_WATERALTAR:
+        case MP2::OBJ_AIRALTAR:
+        case MP2::OBJ_FIREALTAR:
+        case MP2::OBJ_EARTHALTAR:
+        case MP2::OBJ_BARROWMOUNDS:
+	{
+	    const Troop & troop = tile.QuantityTroop();
+	    const payment_t paymentCosts = troop.GetCost();
+
+	    if(troop.isValid() && kingdom.AllowPayment(paymentCosts) &&
+		(army.HasMonster(troop()) ||
+		(! army.isFullHouse() && (troop.isArchers() || troop.isFly())))) return true;
+	    break;
+	}
+
+        // recruit army (battle)
+        case MP2::OBJ_DRAGONCITY:
+        case MP2::OBJ_CITYDEAD:
+        case MP2::OBJ_TROLLBRIDGE:
+        {
+    	    const bool battle = (Color::NONE == tile.QuantityColor());
+	    if(!battle)
+	    {
+		const Troop & troop = tile.QuantityTroop();
+		const payment_t paymentCosts = troop.GetCost();
+
+		if(troop.isValid() && kingdom.AllowPayment(paymentCosts) &&
+		(army.HasMonster(troop()) ||
+		(! army.isFullHouse()))) return true;
+	    }
+	    break;
+        }
+
+	// recruit genie
+	case MP2::OBJ_ANCIENTLAMP:
+	{
+	    const Troop & troop = tile.QuantityTroop();
+	    const payment_t paymentCosts = troop.GetCost();
+
+	    if(troop.isValid() && kingdom.AllowPayment(paymentCosts) &&
+		(army.HasMonster(troop()) ||
+		(! army.isFullHouse()))) return true;
+	    break;
+	}
+
+	// upgrade army
+	case MP2::OBJ_HILLFORT:
+            if(army.HasMonster(Monster::DWARF) ||
+               army.HasMonster(Monster::ORC) ||
+               army.HasMonster(Monster::OGRE)) return true;
+            break;
+
+	// upgrade army
+        case MP2::OBJ_FREEMANFOUNDRY:
+            if(army.HasMonster(Monster::PIKEMAN) ||
+               army.HasMonster(Monster::SWORDSMAN) ||
+               army.HasMonster(Monster::IRON_GOLEM)) return true;
+            break;
+
+	// loyalty obj
+	case MP2::OBJ_STABLES:
+	    if(army.HasMonster(Monster::CAVALRY) ||
+		! hero.isVisited(tile)) return true;
+	    break;
+
+	case MP2::OBJ_ARENA:
+	    if(! hero.isVisited(tile)) return true;
+	    break;
+
+	// poor morale obj
+	case MP2::OBJ_SHIPWRECK:
+        case MP2::OBJ_GRAVEYARD:
+	case MP2::OBJ_DERELICTSHIP:
+	    if(! hero.isVisited(tile, Visit::GLOBAL) &&
+		tile.QuantityIsValid())
+	    {
+		Army enemy(tile);
+		return enemy.isValid() && Army::TroopsStrongerEnemyTroops(army, enemy);
+	    }
+	    break;
+
+	//case MP2::OBJ_PYRAMID:
+
+	case MP2::OBJ_DAEMONCAVE:
+	    if(tile.QuantityIsValid() && 4 != tile.QuantityVariant()) return true;
+	    break;
+
+	case MP2::OBJ_MONSTER:
+	{
+	    Army enemy(tile);
+	    return !enemy.isValid() || Army::TroopsStrongerEnemyTroops(army, enemy);
+	}
+	break;
+
+	// sign
+	case MP2::OBJ_SIGN:
+	    if(!hero.isVisited(tile)) return true;
+	    break;
+
+	case MP2::OBJ_CASTLE:
+	{
+	    const Castle* castle = world.GetCastle(index);
+	    if(castle)
+	    {
+		if(hero.GetColor() == castle->GetColor())
+		    return NULL == castle->GetHeroes().Guest() && ! hero.isVisited(tile);
+		else
+		// FIXME: AI skip visiting alliance
+		if(Players::isFriends(hero.GetColor(), castle->GetColor())) return false;
+		else
+		if(Army::TroopsStrongerEnemyTroops(army, castle->GetActualArmy())) return true;
+	    }
+	    break;
+	}
+
+	case MP2::OBJ_HEROES:
+	{
+	    const Heroes* hero2 = tile.GetHeroes();
+	    if(hero2)
+	    {
+		if(hero.GetColor() == hero2->GetColor()) return true;
+		// FIXME: AI skip visiting alliance
+		else
+		if(Players::isFriends(hero.GetColor(), hero2->GetColor())) return false;
+		else
+		if(hero2->AllowBattle(false) &&
+		    Army::TroopsStrongerEnemyTroops(army, hero2->GetArmy())) return true;
+	    }
+	    break;
+	}
+
+	case MP2::OBJ_BOAT:
+	case MP2::OBJ_STONELIGHTS:
+	    // check later
+	    return true;
+
+	// or add later
+
+	default: break;
+    }
+
+    return false;
 }
