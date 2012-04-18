@@ -370,7 +370,7 @@ void Troops::UpgradeTroops(const Castle & castle)
     for(iterator it = begin(); it != end(); ++it) if((*it)->isValid())
     {
         payment_t payment = (*it)->GetUpgradeCost();
-	Kingdom & kingdom  = world.GetKingdom(castle.GetColor());
+	Kingdom & kingdom = castle.GetKingdom();
 
 	if(castle.GetRace() == (*it)->GetRace() &&
 	   castle.isBuild((*it)->GetUpgrade().GetDwelling()) &&
@@ -1137,7 +1137,7 @@ u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & jo
         else
         if(hero.HasSecondarySkill(Skill::Secondary::DIPLOMACY))
         {
-            const Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+            const Kingdom & kingdom = hero.GetKingdom();
             payment_t payment = troop.GetCost();
             cost = payment.gold;
             payment.Reset();

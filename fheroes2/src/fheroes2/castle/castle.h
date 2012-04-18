@@ -90,7 +90,7 @@ enum buildcond_t
     ALLOW_BUILD		= 1
 };
 
-class Castle : public Maps::Position, public BitModes
+class Castle : public Maps::Position, public BitModes, public ColorBase
 {
 public:
     enum flags_t
@@ -122,7 +122,6 @@ public:
     CastleHeroes GetHeroes(void) const;
 
     u8 GetRace(void) const{ return race; }
-    Color::color_t GetColor(void) const{ return color; }
     const std::string & GetName(void) const{ return name; }
     u8 GetControl(void) const;
 
@@ -218,7 +217,6 @@ private:
     u32			building;
     Captain		captain;
 
-    Color::color_t	color;
     std::string		name;
 
     MageGuild		mageguild;

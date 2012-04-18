@@ -595,7 +595,7 @@ void BuildingInfo::SetStatusMessage(StatusBar & bar) const
             str = _("Cannot build. Already built here this turn.");
         }
         else
-        if(castle.AllowBuild() && ! world.GetKingdom(castle.GetColor()).AllowPayment(GetCost(castle.GetRace(), building)))
+        if(castle.AllowBuild() && ! castle.GetKingdom().AllowPayment(GetCost(castle.GetRace(), building)))
         {
             str = _("Cannot afford %{name}");
             String::Replace(str, "%{name}", name);

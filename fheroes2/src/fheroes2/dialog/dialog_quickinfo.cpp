@@ -620,8 +620,7 @@ void Dialog::QuickInfo(const Castle & castle)
     // draw guardian portrait
     if(guardian &&
 	// my  colors
-	(conf.CurrentColor() == castle.GetColor() ||
-		    Players::isFriends(conf.CurrentColor(), castle.GetColor()) ||
+	(castle.isFriends(conf.CurrentColor()) ||
 	// show guardians (scouting: advanced)
 	(from_hero &&
 	    Skill::Level::ADVANCED <= from_hero->GetSecondaryValues(Skill::Secondary::SCOUTING))))
@@ -648,8 +647,7 @@ void Dialog::QuickInfo(const Castle & castle)
 	text.Blit(dst_pt);
     }
     else
-    if(conf.CurrentColor() == castle.GetColor() ||
-		    Players::isFriends(conf.CurrentColor(), castle.GetColor()))
+    if(castle.isFriends(conf.CurrentColor()))
 	// show all
 	Army::DrawMons32Line(castle.GetArmy(), cur_rt.x - 5, cur_rt.y + 100, 192);
     else
@@ -726,8 +724,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     std::string message;
 
     // heroes name
-    if(conf.CurrentColor() == hero.GetColor() ||
-	Players::isFriends(conf.CurrentColor(), hero.GetColor()))
+    if(hero.isFriends(conf.CurrentColor()))
     {
 	message = _("%{name} ( Level %{level} )");
 	String::Replace(message, "%{name}", hero.GetName());
@@ -747,8 +744,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     port.Blit(dst_pt, display);
 
     // luck
-    if(conf.CurrentColor() == hero.GetColor() ||
-	Players::isFriends(conf.CurrentColor(), hero.GetColor()))
+    if(hero.isFriends(conf.CurrentColor()))
     {
 	const s8 luck = hero.GetLuckWithModificators(NULL);
 	const Sprite & sprite = AGG::GetICN(ICN::MINILKMR, (0 > luck ? 0 : (0 < luck ? 1 : 2)));
@@ -764,8 +760,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     }
 
     // morale
-    if(conf.CurrentColor() == hero.GetColor() ||
-	Players::isFriends(conf.CurrentColor(), hero.GetColor()))
+    if(hero.isFriends(conf.CurrentColor()))
     {
 	const s8 morale = hero.GetMoraleWithModificators(NULL);
 	const Sprite & sprite = AGG::GetICN(ICN::MINILKMR, (0 > morale ? 3 : (0 < morale ? 4 : 5)));
@@ -868,8 +863,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     // draw monster sprite in one string
     const Heroes* from_hero = GameFocus::GetHeroes();
 
-    if(conf.CurrentColor() == hero.GetColor() ||
-	Players::isFriends(conf.CurrentColor(), hero.GetColor()))
+    if(hero.isFriends(conf.CurrentColor()))
 	// show all
 	Army::DrawMons32Line(hero.GetArmy(), cur_rt.x - 5, cur_rt.y + 114, 160);
     else

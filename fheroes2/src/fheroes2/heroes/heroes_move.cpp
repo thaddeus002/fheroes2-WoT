@@ -202,8 +202,7 @@ bool isNeedStayFrontObject(const Heroes & hero, const Maps::Tiles & next)
 	const Castle* castle = world.GetCastle(next.GetIndex());
 
 	return (castle &&
-		hero.GetColor() != castle->GetColor() &&
-		    !Players::isFriends(hero.GetColor(), castle->GetColor()));
+		! hero.isFriends(castle->GetColor()));
     }
     else
     // to coast action
@@ -392,7 +391,7 @@ bool Heroes::MoveStep(bool fast)
 	else
 	{
 	    // play sound
-	    if(CONTROL_HUMAN & world.GetKingdom(GetColor()).GetControl())
+	    if(CONTROL_HUMAN & GetKingdom().GetControl())
 		PlayWalkSound(world.GetTiles(mp).GetGround());
 	}
     }

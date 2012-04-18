@@ -110,12 +110,18 @@ void AI::HeroesGetTask(Heroes & hero)
     hero.GetPath().Reset();
 }
 
+bool AI::HeroesCanMove(const Heroes & hero)
+{
+    return hero.MayStillMove() && ! hero.Modes(HEROES_MOVED);
+}
+
 void AI::HeroesTurn(Heroes & hero)
 {
    Interface::StatusWindow *status = Interface::NoGUI() ? NULL : &Interface::StatusWindow::Get();
 
-    while(hero.MayStillMove() &&
-	hero.GetPath().isValid())
+    hero.ResetModes(HEROES_MOVED);
+
+    while(AI::HeroesCanMove(hero))
     {
 	// turn indicator
         if(status) status->RedrawTurnProgress(3);
@@ -130,6 +136,7 @@ void AI::HeroesTurn(Heroes & hero)
 
         // heroes AI turn
         AI::HeroesMove(hero);
+	hero.SetModes(HEROES_MOVED);
 
         // turn indicator
         if(status) status->RedrawTurnProgress(7);

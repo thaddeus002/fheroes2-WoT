@@ -35,6 +35,7 @@ namespace AI
 {
     enum modes_t
     {
+	HEROES_MOVED	= 0x08000000,
 	HEROES_SCOUTER	= 0x10000000,
 	HEROES_HUNTER	= 0x20000000,
 	HEROES_WAITING	= 0x40000000,
@@ -56,6 +57,7 @@ namespace AI
     void HeroesAfterBattle(HeroBase &);
     void HeroesPostLoad(Heroes &);
     bool HeroesValidObject(const Heroes &, s32);
+    bool HeroesCanMove(const Heroes &);
     void HeroesAction(Heroes &, s32);
     void HeroesActionNewPosition(Heroes &);
     void HeroesLevelUp(Heroes &);

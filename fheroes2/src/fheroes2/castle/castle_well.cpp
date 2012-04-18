@@ -45,7 +45,7 @@ struct dwellings_t : public std::vector<dwelling_t>
 u16 HowManyRecruitMonster(const Castle & castle, u32 dw, const Funds & add, Funds & res)
 {
     const Monster ms(castle.GetRace(), castle.GetActualDwelling(dw));
-    const Kingdom & kingdom = world.GetKingdom(castle.GetColor());
+    const Kingdom & kingdom = castle.GetKingdom();
 
     if(! castle.GetArmy().CanJoinTroop(ms)) return 0;
 

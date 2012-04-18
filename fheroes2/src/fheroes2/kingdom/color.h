@@ -65,6 +65,7 @@ namespace Color
     u8 GetIndex(u8);
     color_t GetFirst(u8);
     color_t Get(u8);
+
 }
 
 class Colors : public std::vector<Color::color_t>
@@ -75,7 +76,28 @@ public:
     std::string String(void) const;
 };
 
-StreamBase & operator<< (StreamBase &, const Color::color_t &);
-StreamBase & operator>> (StreamBase &, Color::color_t &);
+class Kingdom;
+
+class ColorBase
+{
+    Color::color_t color;
+
+    friend StreamBase & operator<< (StreamBase &, const ColorBase &);
+    friend StreamBase & operator>> (StreamBase &, ColorBase &);
+
+public:
+    ColorBase(Color::color_t col = Color::NONE): color(col){}
+
+    bool	operator== (u8) const;
+    bool	isFriends(u8) const;
+    void	SetColor(u8);
+
+    Kingdom &		GetKingdom(void) const;
+
+    const Color::color_t & GetColor(void) const { return color; }
+};
+
+StreamBase & operator<< (StreamBase &, const ColorBase &);
+StreamBase & operator>> (StreamBase &, ColorBase &);
 
 #endif

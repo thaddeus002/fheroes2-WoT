@@ -289,7 +289,7 @@ void Game::OpenCastleDialog(Castle* castle)
     Interface::StatusWindow::ResetTimer();
     bool need_fade = conf.ExtGameUseFade() && 640 == display.w() && 480 == display.h();
 
-    if(it != myCastles.end() || Players::isFriends(conf.CurrentColor(), castle->GetColor()))
+    if(it != myCastles.end() || castle->isFriends(conf.CurrentColor()))
     {
 	Dialog::answer_t result = Dialog::ZERO;
 
@@ -361,7 +361,7 @@ void Game::OpenHeroesDialog(Heroes* hero)
 
     //Cursor & cursor = Cursor::Get();
     const Settings & conf = Settings::Get();
-    Kingdom & myKingdom = world.GetKingdom(hero->GetColor());
+    Kingdom & myKingdom = hero->GetKingdom();
     const KingdomHeroes & myHeroes = myKingdom.GetHeroes();
     Display & display = Display::Get();
     KingdomHeroes::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), hero);
@@ -492,7 +492,7 @@ Cursor::themes_t Game::GetCursorFocusShipmaster(const Heroes & from_hero, const 
 		if(from_hero.GetColor() == to_hero->GetColor())
 		    return Cursor::DistanceThemes(Cursor::CHANGE, from_hero.GetRangeRouteDays(tile.GetIndex()));
 		else
-		if(Players::isFriends(from_hero.GetColor(), to_hero->GetColor()))
+		if(from_hero.isFriends(to_hero->GetColor()))
 		    return conf.ExtUnionsAllowHeroesMeetings() ? Cursor::CHANGE : Cursor::POINTER;
 		else
 		if(to_hero->AllowBattle(false))
@@ -552,7 +552,7 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 		if(from_hero.Modes(Heroes::GUARDIAN))
 		    return Cursor::POINTER;
 		else
-		if(Players::isFriends(from_hero.GetColor(), castle->GetColor()))
+		if(from_hero.isFriends(castle->GetColor()))
 		    return conf.ExtUnionsAllowCastleVisiting() ? Cursor::ACTION : Cursor::POINTER;
 		else
 		if(castle->GetActualArmy().isValid())
@@ -575,7 +575,7 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 		if(from_hero.GetColor() == castle->GetColor())
 		    return Cursor::DistanceThemes(Cursor::ACTION, from_hero.GetRangeRouteDays(tile.GetIndex()));
 		else
-		if(Players::isFriends(from_hero.GetColor(), castle->GetColor()))
+		if(from_hero.isFriends(castle->GetColor()))
 		    return conf.ExtUnionsAllowCastleVisiting() ? Cursor::ACTION : Cursor::POINTER;
 		else
 		if(castle->GetActualArmy().isValid())
@@ -604,7 +604,7 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 		    return newcur != Cursor::POINTER ? newcur : Cursor::HEROES;
 		}
 		else
-		if(Players::isFriends(from_hero.GetColor(), to_hero->GetColor()))
+		if(from_hero.isFriends(to_hero->GetColor()))
 		{
 		    Cursor::themes_t newcur = Cursor::DistanceThemes(Cursor::CHANGE, from_hero.GetRangeRouteDays(tile.GetIndex()));
 		    return conf.ExtUnionsAllowHeroesMeetings() ? newcur: Cursor::POINTER;
@@ -627,7 +627,7 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 	    {
 		bool protection = (MP2::isPickupObject(tile.GetObject()) ? false :
 				(Maps::TileIsUnderProtection(tile.GetIndex()) ||
-					(! Players::isFriends(from_hero.GetColor(), tile.QuantityColor()) &&
+					(! from_hero.isFriends(tile.QuantityColor()) &&
 					    tile.CaptureObjectIsProtection())));
 
 		return Cursor::DistanceThemes((protection ? Cursor::FIGHT : Cursor::ACTION),

@@ -22,6 +22,8 @@
 
 #include <bitset>
 #include <sstream>
+#include "players.h"
+#include "world.h"
 #include "color.h"
 
 const char* Color::String(u8 color)
@@ -157,15 +159,35 @@ std::string Colors::String(void) const
     return os.str();
 }
 
-StreamBase & operator<< (StreamBase & msg, const Color::color_t & col)
+bool ColorBase::operator== (u8 col) const
 {
-    return msg << static_cast<u8>(col);
+    return color == col;
 }
 
-StreamBase & operator>> (StreamBase & msg, Color::color_t & col)
+bool ColorBase::isFriends(u8 col) const
+{
+    return (col & Color::ALL) && (color == col || Players::isFriends(color, col));
+}
+
+void ColorBase::SetColor(u8 col)
+{
+    color = Color::Get(col);
+}
+
+Kingdom & ColorBase::GetKingdom(void) const
+{
+    return world.GetKingdom(color);
+}
+
+StreamBase & operator<< (StreamBase & msg, const ColorBase & col)
+{
+    return msg << static_cast<u8>(col.color);
+}
+
+StreamBase & operator>> (StreamBase & msg, ColorBase & col)
 {
     u8 color;
     msg >> color;
-    col = Color::Get(color);
+    col.SetColor(color);
     return msg;
 }

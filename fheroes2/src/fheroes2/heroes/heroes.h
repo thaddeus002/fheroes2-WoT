@@ -41,7 +41,7 @@ class Surface;
 class MageGuild;
 namespace Battle { class Only; }
 
-class Heroes : public HeroBase
+class Heroes : public HeroBase, public ColorBase
 {
 public:
     enum heroes_t
@@ -101,15 +101,15 @@ public:
 
     void LoadFromMP2(s32 map_index, const void *ptr,  const Color::color_t cl, const u8 rc);
 
-    Color::color_t GetColor(void) const{ return color; }
     u8 GetRace(void) const{ return race; }
     const std::string & GetName(void) const{ return name; }
+    Color::color_t GetColor(void) const{ return ColorBase::GetColor(); }
     static const char* GetName(Heroes::heroes_t);
     u8 GetType(void) const { return Skill::Primary::HEROES; }
     u8 GetControl(void) const;
 
-    Color::color_t GetKillerColor(void) const;
-    void SetKillerColor(Color::color_t);
+    const Color::color_t & GetKillerColor(void) const;
+    void SetKillerColor(u8);
 
     const Surface & GetPortrait30x22(void) const;
     const Surface & GetPortrait50x46(void) const;
@@ -253,8 +253,7 @@ private:
     static void MoveStep(Heroes &, s32 from, s32 to, bool newpos);
 
     std::string		name;
-    Color::color_t	color;
-    Color::color_t	killer_color;
+    ColorBase		killer_color;
     u32			experience;
     s32			move_point_scale;
 

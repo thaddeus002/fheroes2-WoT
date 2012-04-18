@@ -330,7 +330,7 @@ u32 Castle::OpenTown(void)
 	cursorFormat.Show(army.isSpreadFormat() ? pointSpreadArmyFormat : pointGroupedArmyFormat);
     }
 
-    Kingdom & kingdom = world.GetKingdom(GetColor());
+    Kingdom & kingdom = GetKingdom();
 
     Heroes* hero1 = kingdom.GetRecruits().GetHero1();
     Heroes* hero2 = kingdom.GetLastLostHero() && kingdom.GetLastLostHero() != hero1 ? kingdom.GetLastLostHero() : kingdom.GetRecruits().GetHero2();

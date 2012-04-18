@@ -35,12 +35,12 @@
 #include "game_static.h"
 #include "ai.h"
 
-Castle::Castle() : race(Race::NONE), building(0), captain(*this), color(Color::NONE), army(NULL)
+Castle::Castle() : race(Race::NONE), building(0), captain(*this), army(NULL)
 {
 }
 
 Castle::Castle(s16 cx, s16 cy, const u8 rc) : Position(Point(cx, cy)), race(rc), building(0), captain(*this),
-    color(Color::NONE), army(NULL)
+    army(NULL)
 {
     std::fill(dwelling, dwelling + CASTLEMAXMONSTER, 0);
     SetModes(ALLOWBUILD);
@@ -55,13 +55,13 @@ void Castle::LoadFromMP2(const void *ptr)
 
     switch(*ptr8)
     {
-	case 0x00: color = Color::BLUE;   break;
-	case 0x01: color = Color::GREEN;  break;
-        case 0x02: color = Color::RED;    break;
-        case 0x03: color = Color::YELLOW; break;
-        case 0x04: color = Color::ORANGE; break;
-        case 0x05: color = Color::PURPLE; break;
-        default:   color = Color::NONE;   break;
+	case 0x00: SetColor(Color::BLUE);   break;
+	case 0x01: SetColor(Color::GREEN);  break;
+        case 0x02: SetColor(Color::RED);    break;
+        case 0x03: SetColor(Color::YELLOW); break;
+        case 0x04: SetColor(Color::ORANGE); break;
+        case 0x05: SetColor(Color::PURPLE); break;
+        default:   SetColor(Color::NONE);   break;
     }
     ++ptr8;
 
@@ -129,7 +129,7 @@ void Castle::LoadFromMP2(const void *ptr)
 	if(dwelling2 && dwelling2 >= Rand::Get(1, 100)) building |= DWELLING_MONSTER2;
     }
 
-    army.SetColor(color);
+    army.SetColor(GetColor());
 
     // custom troops
     bool custom_troops = *ptr8;
@@ -173,7 +173,7 @@ void Castle::LoadFromMP2(const void *ptr)
     ptr8 += 13;
 
     // race
-    const u8 kingdom_race = Players::GetPlayerRace(color);
+    const u8 kingdom_race = Players::GetPlayerRace(GetColor());
     switch(*ptr8)
     {
 	case 0x00: race = Race::KNGT; break;
@@ -182,7 +182,7 @@ void Castle::LoadFromMP2(const void *ptr)
 	case 0x03: race = Race::WRLK; break;
 	case 0x04: race = Race::WZRD; break;
         case 0x05: race = Race::NECR; break;
-        default: race = (Color::NONE != color && (Race::ALL & kingdom_race) ? kingdom_race : Race::Rand()); break;
+        default: race = (Color::NONE != GetColor() && (Race::ALL & kingdom_race) ? kingdom_race : Race::Rand()); break;
     }
     ++ptr8;
 
@@ -250,7 +250,7 @@ void Castle::LoadFromMP2(const void *ptr)
     }
 
     // end
-    DEBUG(DBG_GAME , DBG_INFO, (building & BUILD_CASTLE ? "castle" : "town") << ": " << name << ", color: " << Color::String(color) << ", race: " << Race::String(race));
+    DEBUG(DBG_GAME , DBG_INFO, (building & BUILD_CASTLE ? "castle" : "town") << ": " << name << ", color: " << Color::String(GetColor()) << ", race: " << Race::String(race));
 }
 
 u32 Castle::CountBuildings(void) const
@@ -417,8 +417,8 @@ void Castle::ActionNewMonth(void)
 // change castle color
 void Castle::ChangeColor(Color::color_t cl)
 {
-    color = cl;
-    army.SetColor(color);
+    SetColor(cl);
+    army.SetColor(cl);
 }
 
 // return mage guild level
@@ -622,7 +622,7 @@ const char* Castle::GetDescriptionBuilding(u32 build, u8 race)
 
 bool Castle::AllowBuyHero(const Heroes & hero, std::string* msg)
 {
-    const Kingdom & myKingdom = world.GetKingdom(GetColor());
+    const Kingdom & myKingdom = GetKingdom();
     if(Modes(DISABLEHIRES) || myKingdom.Modes(Kingdom::DISABLEHIRES))
     {
 	if(msg) *msg = _("Cannot recruit - you already recruit hero in current week.");
@@ -656,7 +656,7 @@ Heroes* Castle::RecruitHero(Heroes* hero)
 {
     if(!hero || !AllowBuyHero(*hero) || !hero->Recruit(*this)) return NULL;
 
-    Kingdom & kingdom = world.GetKingdom(color);
+    Kingdom & kingdom = GetKingdom();
 
     if(kingdom.GetLastLostHero() == hero)
 	kingdom.ResetLastLostHero();
@@ -700,7 +700,7 @@ bool Castle::RecruitMonster(u32 dw, u16 count)
 
     // buy
     const payment_t paymentCosts = ms.GetCost() * count;
-    Kingdom & kingdom = world.GetKingdom(color);
+    Kingdom & kingdom = GetKingdom();
 
     // may be guardian present
     Army & army2 = GetArmy();
@@ -738,7 +738,7 @@ u16 Castle::RecruitMaxMonster(u32 dw)
 
     if(army2.CanJoinTroop(ms))
     {
-	Kingdom & kingdom = world.GetKingdom(color);
+	Kingdom & kingdom = GetKingdom();
 	count = dwelling[dw_index];
 	const payment_t paymentCosts = ms.GetCost();
 
@@ -1122,7 +1122,7 @@ buildcond_t Castle::CheckBuyBuilding(u32 build) const
     }
 
     // check valid payment
-    if(! world.GetKingdom(color).AllowPayment(PaymentConditions::BuyBuilding(race, build))) return LACK_RESOURCES;
+    if(! GetKingdom().AllowPayment(PaymentConditions::BuyBuilding(race, build))) return LACK_RESOURCES;
 
     return ALLOW_BUILD;
 }
@@ -1137,7 +1137,7 @@ bool Castle::BuyBuilding(u32 build)
 {
     if(! AllowBuyBuilding(build)) return false;
 
-    world.GetKingdom(color).OddFundsResource(PaymentConditions::BuyBuilding(race, build));
+    GetKingdom().OddFundsResource(PaymentConditions::BuyBuilding(race, build));
 
     // add build
     building |= build;
@@ -1674,7 +1674,7 @@ std::string Castle::String(void) const
 
     os << "name            : " << name << std::endl <<
           "race            : " << Race::String(race) << std::endl <<
-          "color           : " << Color::String(color) << std::endl <<
+          "color           : " << Color::String(GetColor()) << std::endl <<
           "build           : " << "0x" << std::hex << building << std::dec << std::endl <<
           "present boat    : " << (PresentBoat() ? "yes" : "no") << std::endl <<
           "nearly sea      : " << (HaveNearlySea() ? "yes" : "no") << std::endl <<
@@ -1822,7 +1822,7 @@ Army & Castle::GetActualArmy(void)
 bool Castle::AllowBuyBoat(void) const
 {
     // check payment and present other boat
-    return (HaveNearlySea() && world.GetKingdom(color).AllowPayment(PaymentConditions::BuyBoat()) && !PresentBoat());
+    return (HaveNearlySea() && GetKingdom().AllowPayment(PaymentConditions::BuyBoat()) && !PresentBoat());
 }
 
 bool Castle::BuyBoat(void)
@@ -1834,7 +1834,7 @@ bool Castle::BuyBoat(void)
     Maps::Tiles & left = world.GetTiles(index - 1);
     Maps::Tiles & right = world.GetTiles(index + 1);
     Maps::Tiles & center = world.GetTiles(index);
-    Kingdom & kingdom = world.GetKingdom(color);
+    Kingdom & kingdom = GetKingdom();
 
     if(MP2::OBJ_ZERO == left.GetObject() && left.isWater())
     {
@@ -1863,7 +1863,7 @@ bool Castle::BuyBoat(void)
 u8 Castle::GetControl(void) const
 {
     /* gray towns: ai control */
-    return GetColor() & Color::ALL ? world.GetKingdom(color).GetControl() : CONTROL_AI;
+    return GetColor() & Color::ALL ? GetKingdom().GetControl() : CONTROL_AI;
 }
 
 bool Castle::isNecromancyShrineBuild(void) const
@@ -2023,6 +2023,8 @@ void AllCastles::Scoute(u8 colors) const
 /* pack castle */
 StreamBase & operator<< (StreamBase & msg, const Castle & castle)
 {
+    const ColorBase & color = castle;
+
     msg <<
 	castle.center <<
 	castle.modes;
@@ -2031,7 +2033,7 @@ StreamBase & operator<< (StreamBase & msg, const Castle & castle)
 	castle.race <<
 	castle.building <<
 	castle.captain <<
-	castle.color <<
+	color <<
 	castle.name <<
 	castle.mageguild <<
 	static_cast<u8>(CASTLEMAXMONSTER);
@@ -2048,6 +2050,8 @@ StreamBase & operator<< (StreamBase & msg, const Castle & castle)
 /* unpack castle */
 StreamBase & operator>> (StreamBase & msg, Castle & castle)
 {
+    ColorBase & color = castle;
+
     u8 dwellingcount;
 
     msg >>
@@ -2058,7 +2062,7 @@ StreamBase & operator>> (StreamBase & msg, Castle & castle)
 	castle.race >>
 	castle.building >>
 	castle.captain >>
-	castle.color >>
+	color >>
 	castle.name >>
 	castle.mageguild >>
 	dwellingcount;

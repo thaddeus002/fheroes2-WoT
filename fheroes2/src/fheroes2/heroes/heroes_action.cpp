@@ -343,7 +343,7 @@ void RecruitMonsterFromTile(Heroes & hero, Maps::Tiles & tile, const std::string
 		tile.MonsterSetCount(troop.GetCount() - recruit);
 
 	    const payment_t paymentCosts = troop().GetCost() * recruit;
-	    world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
+	    hero.GetKingdom().OddFundsResource(paymentCosts);
 
 	    hero.GetArmy().JoinTroop(troop(), recruit);
 	    hero.MovePointsScaleFixed();
@@ -359,7 +359,7 @@ void RecruitMonsterFromTile(Heroes & hero, Maps::Tiles & tile, const std::string
 // action to next cell
 void Heroes::Action(const s32 dst_index)
 {
-    if(CONTROL_AI == world.GetKingdom(GetColor()).GetControl())
+    if(CONTROL_AI == GetKingdom().GetControl())
 	return AI::HeroesAction(*this, dst_index);
 
     const Maps::Tiles & tile = world.GetTiles(dst_index);
@@ -583,7 +583,7 @@ void ActionToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " join monster " << troop.GetName() <<
 						    ", count: " << join << ", cost: " << cost.gold);
             hero.GetArmy().JoinTroop(troop(), join);
-            world.GetKingdom(hero.GetColor()).OddFundsResource(cost);
+            hero.GetKingdom().OddFundsResource(cost);
             Interface::Basic::Get().SetRedraw(REDRAW_STATUS);
         }
         else
@@ -679,7 +679,7 @@ void ActionToHeroes(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	hero.MeetingDialog(*other_hero);
     }
     else
-    if(Players::isFriends(hero.GetColor(), other_hero->GetColor()))
+    if(hero.isFriends(other_hero->GetColor()))
     {
     	DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " disable meeting");
     }
@@ -754,7 +754,7 @@ void ActionToCastle(Heroes & hero, const u8 & obj, const s32 & dst_index)
     	Mixer::Enhance();
     }
     else
-    if(Players::isFriends(hero.GetColor(), castle->GetColor()))
+    if(hero.isFriends(castle->GetColor()))
     {
     	DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " disable visiting");
     }
@@ -795,8 +795,8 @@ void ActionToCastle(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    // wins attacker
 	    if(res.AttackerWins())
 	    {
-                world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
-                world.GetKingdom(hero.GetColor()).AddCastle(castle);
+                castle->GetKingdom().RemoveCastle(castle);
+                hero.GetKingdom().AddCastle(castle);
                 world.CaptureObject(dst_index, hero.GetColor());
         	castle->Scoute();
 		Interface::Basic::Get().SetRedraw(REDRAW_CASTLES);
@@ -815,8 +815,8 @@ void ActionToCastle(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	{
     	    DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " capture enemy castle " << castle->GetName());
 
-    	    world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
-            world.GetKingdom(hero.GetColor()).AddCastle(castle);
+    	    castle->GetKingdom().RemoveCastle(castle);
+            hero.GetKingdom().AddCastle(castle);
             world.CaptureObject(dst_index, hero.GetColor());
             castle->Scoute();
 	    Interface::Basic::Get().SetRedraw(REDRAW_CASTLES);
@@ -896,7 +896,7 @@ void ActionToPickupResource(Heroes & hero, const u8 & obj, const s32 & dst_index
             I.SetRedraw(REDRAW_STATUS);
 	}
 
-	world.GetKingdom(hero.GetColor()).AddFundsResource(funds);
+	hero.GetKingdom().AddFundsResource(funds);
     }
 
     tile.QuantityReset();
@@ -951,7 +951,7 @@ void ActionToResource(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	const Funds funds(rc);
 	PlaySoundSuccess;
 	Dialog::ResourceInfo("", msg, funds);
-	world.GetKingdom(hero.GetColor()).AddFundsResource(funds);
+	hero.GetKingdom().AddFundsResource(funds);
 
 	if(cancapture)
     	    ActionToCaptureObject(hero, obj, dst_index);
@@ -987,7 +987,7 @@ void ActionToSkeleton(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    u16 gold = GoldInsteadArtifact(obj);
 	    const Funds funds(Resource::GOLD, gold);
 	    Dialog::ResourceInfo("", _("Treasure"), funds, Dialog::OK);
-	    world.GetKingdom(hero.GetColor()).AddFundsResource(funds);
+	    hero.GetKingdom().AddFundsResource(funds);
 	}
 	else
 	{
@@ -1047,7 +1047,7 @@ void ActionToWagon(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    message.append("\n");
 	    message.append(_("Inside, you find some of the wagon's cargo still intact."));
 	    Dialog::ResourceInfo("", message, funds);
-	    world.GetKingdom(hero.GetColor()).AddFundsResource(funds);
+	    hero.GetKingdom().AddFundsResource(funds);
 	}
 
 	tile.QuantityReset();
@@ -1078,7 +1078,7 @@ void ActionToFlotSam(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	msg = funds.wood && funds.gold ? _("You search through the flotsam, and find some wood and some gold.") :
 					_("You search through the flotsam, and find some wood.");
 	Dialog::ResourceInfo(MP2::StringObject(obj), msg, funds);
-	world.GetKingdom(hero.GetColor()).AddFundsResource(funds);
+	hero.GetKingdom().AddFundsResource(funds);
     }
     else
     {
@@ -1481,7 +1481,7 @@ void ActionToPoorMoraleObject(Heroes & hero, const u8 & obj, const s32 & dst_ind
 		else
 		    DialogWithGold(MP2::StringObject(obj), win, gold);
 
-		world.GetKingdom(hero.GetColor()).AddFundsResource(Funds(Resource::GOLD, gold));
+		hero.GetKingdom().AddFundsResource(Funds(Resource::GOLD, gold));
 	    }
 	    else
 	    {
@@ -1614,7 +1614,7 @@ void ActionToShipwreckSurvivor(Heroes & hero, const u8 & obj, const s32 & dst_in
     	DialogWithGold(MP2::StringObject(obj),
 	    _("You've pulled a shipwreck survivor from certain death in an unforgiving ocean. Grateful, he says, \"I would give you an artifact as a reward, but you're all full.\""),
 	    gold, Dialog::OK);
-	world.GetKingdom(hero.GetColor()).AddFundsResource(Funds(Resource::GOLD, gold));
+	hero.GetKingdom().AddFundsResource(Funds(Resource::GOLD, gold));
     }
     else
     {
@@ -1673,10 +1673,10 @@ void ActionToArtifact(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    PlaySoundWarning;
 	    if(Dialog::YES == Dialog::ArtifactInfo("", msg, art, Dialog::YES | Dialog::NO))
 	    {
-		if(world.GetKingdom(hero.GetColor()).AllowPayment(payment))
+		if(hero.GetKingdom().AllowPayment(payment))
 		{
 		    result = true;
-		    world.GetKingdom(hero.GetColor()).OddFundsResource(payment);
+		    hero.GetKingdom().OddFundsResource(payment);
 		}
 		else
 		{
@@ -1874,7 +1874,7 @@ void ActionToTreasureChest(Heroes & hero, const u8 & obj, const s32 & dst_index)
     }
 
     if(gold)
-	world.GetKingdom(hero.GetColor()).AddFundsResource(Funds(Resource::GOLD, gold));
+	hero.GetKingdom().AddFundsResource(Funds(Resource::GOLD, gold));
 
     tile.RemoveObjectSprite();
     tile.QuantityReset();
@@ -2058,7 +2058,7 @@ void ActionToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
     }
 
     // capture object
-    if(! Players::isFriends(hero.GetColor(), tile.QuantityColor()))
+    if(! hero.isFriends(tile.QuantityColor()))
     {
 	bool capture = true;
 
@@ -2522,7 +2522,7 @@ void ActionToUpgradeArmyObject(Heroes & hero, const u8 & obj, const s32 & dst_in
 void ActionToMagellanMaps(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
     const Funds payment(Resource::GOLD, 1000);
-    Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+    Kingdom & kingdom = hero.GetKingdom();
 
     if(hero.isVisited(obj, Visit::GLOBAL))
     {
@@ -2563,7 +2563,7 @@ void ActionToEvent(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 	if(event_maps.resource.GetValidItems())
 	{
-    	    world.GetKingdom(hero.GetColor()).AddFundsResource(event_maps.resource);
+    	    hero.GetKingdom().AddFundsResource(event_maps.resource);
 	    PlaySoundSuccess;
     	    Dialog::ResourceInfo("", event_maps.message, event_maps.resource);
 	}
@@ -2594,7 +2594,7 @@ void ActionToEvent(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 void ActionToObelisk(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
-    Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+    Kingdom & kingdom = hero.GetKingdom();
     if(!hero.isVisited(world.GetTiles(dst_index), Visit::GLOBAL))
     {
         hero.SetVisited(dst_index, Visit::GLOBAL);
@@ -2635,7 +2635,7 @@ void ActionToTreeKnowledge(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	{
 	    const ResourceCount & rc = tile.QuantityResourceCount();
 
-	    if(world.GetKingdom(hero.GetColor()).AllowPayment(funds))
+	    if(hero.GetKingdom().AllowPayment(funds))
             {
 		msg = _("Upon your approach, the tree opens its eyes in delight.");
 		msg.append("\n");
@@ -2661,7 +2661,7 @@ void ActionToTreeKnowledge(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 	if(conditions)
 	{
-    	    world.GetKingdom(hero.GetColor()).OddFundsResource(funds);
+    	    hero.GetKingdom().OddFundsResource(funds);
 	    hero.SetVisited(dst_index);
 	    hero.IncreaseExperience(hero.GetExperienceFromLevel(hero.GetLevel()) - hero.GetExperience());
 	}
@@ -2706,7 +2706,7 @@ void ActionToDaemonCave(Heroes & hero, const u8 & obj, const s32 & dst_index)
 		    msg = _("Upon defeating the daemon's servants, you find a hidden cache with %{count} gold.");
 		    String::Replace(msg, "%{count}", gold);
 		    DialogWithGold("", msg, gold);
-		    world.GetKingdom(hero.GetColor()).AddFundsResource(Funds(Resource::GOLD, gold));
+		    hero.GetKingdom().AddFundsResource(Funds(Resource::GOLD, gold));
 		}
     		else
 		{
@@ -2743,13 +2743,13 @@ void ActionToDaemonCave(Heroes & hero, const u8 & obj, const s32 & dst_index)
 		String::Replace(msg, "%{count}", gold);
 		DialogGoldWithExp("", msg, gold, exp);
     		hero.IncreaseExperience(exp);
-		world.GetKingdom(hero.GetColor()).AddFundsResource(Funds(Resource::GOLD, gold));
+		hero.GetKingdom().AddFundsResource(Funds(Resource::GOLD, gold));
 	    }
 	    else
 	    {
 		bool remove = true;
 		Funds payment(Resource::GOLD, gold);
-		Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+		Kingdom & kingdom = hero.GetKingdom();
 		bool allow = kingdom.AllowPayment(payment);
 
 		msg = allow ?
@@ -2796,7 +2796,7 @@ void ActionToAlchemistsTower(Heroes & hero, const u8 & obj, const s32 & dst_inde
     {
 	payment_t payment = PaymentConditions::ForAlchemist(cursed);
 
-        if(world.GetKingdom(hero.GetColor()).AllowPayment(payment))
+        if(hero.GetKingdom().AllowPayment(payment))
         {
 	    std::string msg = "As you enter the Alchemist's Tower, a hobbled, graying man in a brown cloak makes his way towards you.";
 	    msg.append("\n");
@@ -2809,7 +2809,7 @@ void ActionToAlchemistsTower(Heroes & hero, const u8 & obj, const s32 & dst_inde
 
 	    if(Dialog::YES == Dialog::Message("", msg, Font::BIG, Dialog::YES | Dialog::NO))
 	    {
-        	world.GetKingdom(hero.GetColor()).OddFundsResource(payment);
+        	hero.GetKingdom().OddFundsResource(payment);
 		bag.resize(std::distance(bag.begin(),
 			std::remove_if(bag.begin(), bag.end(), std::mem_fun_ref(&Artifact::isAlchemistRemove))));
 	    }
@@ -2902,7 +2902,7 @@ void ActionToSirens(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 void ActionToJail(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
-    Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+    Kingdom & kingdom = hero.GetKingdom();
 
     if(kingdom.AllowRecruitHero(false, 0))
     {
@@ -2993,7 +2993,7 @@ void ActionToSphinx(Heroes & hero, const u8 & obj, const s32 & dst_index)
     		    hero.PickupArtifact(art);
 
 		if(count)
-		    world.GetKingdom(hero.GetColor()).AddFundsResource(res);
+		    hero.GetKingdom().AddFundsResource(res);
 	    }
 	    else
 	    {
@@ -3013,7 +3013,7 @@ void ActionToSphinx(Heroes & hero, const u8 & obj, const s32 & dst_index)
 void ActionToBarrier(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+    Kingdom & kingdom = hero.GetKingdom();
 
     if(kingdom.IsVisitTravelersTent(tile.QuantityColor()))
     {
@@ -3042,7 +3042,7 @@ void ActionToTravellersTent(Heroes & hero, const u8 & obj, const s32 & dst_index
 	    Font::BIG, Dialog::OK);
 
     const Maps::Tiles & tile = world.GetTiles(dst_index);
-    Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+    Kingdom & kingdom = hero.GetKingdom();
 
     kingdom.SetVisitTravelersTent(tile.QuantityColor());
 

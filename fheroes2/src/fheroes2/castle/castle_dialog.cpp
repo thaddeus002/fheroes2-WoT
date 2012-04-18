@@ -307,7 +307,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     Button buttonNextCastle(dst_pt, ICN::SMALLBAR, 3, 4);
 
     // color crest
-    const Sprite & crest = AGG::GetICN(ICN::CREST, Color::GetIndex(color));
+    const Sprite & crest = AGG::GetICN(ICN::CREST, Color::GetIndex(GetColor()));
     dst_pt.x = cur_pt.x + 5;
     dst_pt.y = cur_pt.y + 262;
     const Rect rectSign1(dst_pt, crest.w(), crest.h());

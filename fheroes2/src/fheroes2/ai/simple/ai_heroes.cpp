@@ -152,7 +152,7 @@ bool AIHeroesPriorityObject(const Heroes & hero, s32 index)
 		    ! hero.isVisited(world.GetTiles(castle->GetIndex()));
 	    }
 	    else
-	    if(!Players::isFriends(hero.GetColor(), castle->GetColor()))
+	    if(! hero.isFriends(castle->GetColor()))
 		return AI::HeroesValidObject(hero, index);
 	}
     }
@@ -162,7 +162,7 @@ bool AIHeroesPriorityObject(const Heroes & hero, s32 index)
 	// kill enemy hero
 	const Heroes* hero2 = tile.GetHeroes();
 	return hero2 &&
-		!Players::isFriends(hero.GetColor(), hero2->GetColor()) &&
+		! hero.isFriends(hero2->GetColor()) &&
 		AI::HeroesValidObject(hero, index);
     }
 
@@ -442,7 +442,7 @@ void AI::HeroesGetTask(Heroes & hero)
 		it = results.begin(); it != results.end(); ++it)
 	    {
 		const Heroes* enemy = world.GetTiles(*it).GetHeroes();
-		if(enemy && !Players::isFriends(enemy->GetColor(), hero.GetColor()))
+		if(enemy && ! enemy->isFriends(hero.GetColor()))
 		{
 		    if(hero.GetPath().Calculate(enemy->GetIndex()))
 		    {
@@ -520,7 +520,7 @@ void AI::HeroesGetTask(Heroes & hero)
 		    ai_hero.primary_target << ", " << MP2::StringObject(world.GetTiles(ai_hero.primary_target).GetObject()));
 
 	    if(NULL != (castle = world.GetCastle(ai_hero.primary_target)) &&
-		NULL != castle->GetHeroes().Guest() && Players::isFriends(castle->GetColor(), hero.GetColor()))
+		NULL != castle->GetHeroes().Guest() && castle->isFriends(hero.GetColor()))
 	    {
 		hero.SetModes(AI::HEROES_WAITING);
 		DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", castle busy..");
@@ -714,7 +714,7 @@ bool IsPriorityAndNotVisitAndNotPresent(const std::pair<s32, MP2::object_t> inde
     Queue & task = ai_hero.sheduled_visit;
 
     return AIHeroesPriorityObject(*hero, indexObj.first) &&
-	    ! AIHeroesScheduledVisit(world.GetKingdom(hero->GetColor()), indexObj.first) &&
+	    ! AIHeroesScheduledVisit(hero->GetKingdom(), indexObj.first) &&
 	    ! task.isPresent(indexObj.first);
 }
 

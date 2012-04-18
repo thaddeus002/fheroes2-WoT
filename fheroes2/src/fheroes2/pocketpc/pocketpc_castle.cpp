@@ -244,7 +244,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
         selectArmy2.Redraw();
     }
 
-    const Kingdom & kingdom = world.GetKingdom(castle.GetColor());
+    const Kingdom & kingdom = castle.GetKingdom();
 
     // resource bar
     RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), kingdom.GetFunds());
@@ -818,8 +818,8 @@ screen_t CastleOpenDialog6(Castle & castle, bool readonly)
 	rectRecruit2 = Rect(dst_rt.x + 4, dst_rt.y + 77, crest.w(), crest.h());
 	rectCaptain = Rect(dst_rt.x + 4, dst_rt.y + 136, crest.w(), crest.h());
 
-	hero1 = world.GetKingdom(castle.GetColor()).GetRecruits().GetHero1();
-	hero2 = world.GetKingdom(castle.GetColor()).GetRecruits().GetHero2();
+	hero1 = castle.GetKingdom().GetRecruits().GetHero1();
+	hero2 = castle.GetKingdom().GetRecruits().GetHero2();
 
 	crest.Blit(rectRecruit1);
 	if(hero1) hero1->GetPortrait50x46().Blit(rectRecruit1.x + 4, rectRecruit1.y + 4, display);

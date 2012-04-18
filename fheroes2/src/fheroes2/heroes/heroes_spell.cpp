@@ -233,7 +233,7 @@ bool ActionSpellViewAll(Heroes & hero)
 
 bool ActionSpellIdentifyHero(Heroes & hero)
 {
-    world.GetKingdom(hero.GetColor()).SetModes(Kingdom::IDENTIFYHERO);
+    hero.GetKingdom().SetModes(Kingdom::IDENTIFYHERO);
     Message("", _("Enemy heroes are now fully identifiable."), Font::BIG, Dialog::OK);
 
     return true;
@@ -330,7 +330,7 @@ bool ActionSpellDimensionDoor(Heroes & hero)
 
 bool ActionSpellTownGate(Heroes & hero)
 {
-    const Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+    const Kingdom & kingdom = hero.GetKingdom();
     const KingdomCastles & castles = kingdom.GetCastles();
     KingdomCastles::const_iterator it;
 
@@ -369,7 +369,7 @@ bool ActionSpellTownGate(Heroes & hero)
 
 bool ActionSpellTownPortal(Heroes & hero)
 {
-    const Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+    const Kingdom & kingdom = hero.GetKingdom();
     std::vector<s32> castles;
 
     Display & display = Display::Get();

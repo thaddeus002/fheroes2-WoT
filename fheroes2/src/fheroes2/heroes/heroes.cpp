@@ -102,14 +102,11 @@ Heroes::Heroes() : move_point_scale(-1), army(this), portrait(UNKNOWN), race(UNK
 {
 }
 
-Heroes::Heroes(heroes_t ht, u8 rc) : HeroBase(Skill::Primary::HEROES, rc), killer_color(Color::NONE), experience(0),
+Heroes::Heroes(heroes_t ht, u8 rc) : HeroBase(Skill::Primary::HEROES, rc), ColorBase(Color::NONE), experience(0),
     move_point_scale(-1), secondary_skills(rc), army(this), hid(ht), portrait(ht), race(rc),
     save_maps_object(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18), patrol_square(0)
 {
     name = _(Heroes::GetName(ht));
-
-    // hero is freeman
-    color = Color::NONE;
 
     // set default army
     army.Reset(true);
@@ -276,8 +273,8 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
 
     SetIndex(map_index);
 
-    color = cl;
-    killer_color = Color::NONE;
+    SetColor(cl);
+    killer_color.SetColor(Color::NONE);
 
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
     u16 byte16 = 0;
@@ -439,7 +436,7 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
 	AI::HeroesPostLoad(*this);
     }
 
-    DEBUG(DBG_GAME , DBG_INFO, name << ", color: " << Color::String(color) << ", race: " << Race::String(race));
+    DEBUG(DBG_GAME , DBG_INFO, name << ", color: " << Color::String(GetColor()) << ", race: " << Race::String(race));
 }
 
 Heroes::heroes_t Heroes::GetID(void) const
@@ -671,7 +668,7 @@ s8 Heroes::GetLuckWithModificators(std::string *strs) const
 /* recrut hero */
 bool Heroes::Recruit(u8 cl, const Point & pt)
 {
-    if(color != Color::NONE)
+    if(GetColor() != Color::NONE)
     {
 	DEBUG(DBG_GAME, DBG_WARN, "not freeman");
 	return false;
@@ -682,8 +679,8 @@ bool Heroes::Recruit(u8 cl, const Point & pt)
     if(kingdom.AllowRecruitHero(false, 0))
     {
 	Maps::Tiles & tiles = world.GetTiles(pt);
-	color = Color::Get(cl);
-	killer_color = Color::NONE;
+	SetColor(cl);
+	killer_color.SetColor(Color::NONE);
 	SetCenter(pt);
 	if(!Modes(SAVEPOINTS)) move_point = GetMaxMovePoints();
 	MovePointsScaleFixed();
@@ -824,13 +821,13 @@ void Heroes::RescanPath(void)
 /* if hero in castle */
 const Castle* Heroes::inCastle(void) const
 {
-    const Castle* castle = Color::NONE != color ? world.GetCastle(GetIndex()) : NULL;
+    const Castle* castle = Color::NONE != GetColor() ? world.GetCastle(GetIndex()) : NULL;
     return castle && castle->GetHeroes() == this ? castle : NULL;
 }
 
 Castle* Heroes::inCastle(void)
 {
-    Castle* castle = Color::NONE != color ? world.GetCastle(GetIndex()) : NULL;
+    Castle* castle = Color::NONE != GetColor() ? world.GetCastle(GetIndex()) : NULL;
     return castle && castle->GetHeroes() == this ? castle : NULL;
 }
 
@@ -840,7 +837,7 @@ bool Heroes::isVisited(const Maps::Tiles & tile, const Visit::type_t type) const
     const s32 & index = tile.GetIndex();
     const MP2::object_t object = tile.GetObject(false);
 
-    if(Visit::GLOBAL == type) return world.GetKingdom(color).isVisited(index, object);
+    if(Visit::GLOBAL == type) return GetKingdom().isVisited(index, object);
 
     return visit_object.end() != std::find(visit_object.begin(), visit_object.end(), IndexObject(index, object));
 }
@@ -848,7 +845,7 @@ bool Heroes::isVisited(const Maps::Tiles & tile, const Visit::type_t type) const
 /* return true if object visited */
 bool Heroes::isVisited(const u8 object, const Visit::type_t type) const
 {
-    if(Visit::GLOBAL == type) return world.GetKingdom(color).isVisited(object);
+    if(Visit::GLOBAL == type) return GetKingdom().isVisited(object);
 
     return visit_object.end() != std::find_if(visit_object.begin(), visit_object.end(),
 				std::bind2nd(std::mem_fun_ref(&IndexObject::isObject), object));
@@ -861,7 +858,7 @@ void Heroes::SetVisited(const s32 index, const Visit::type_t type)
     const MP2::object_t object = tile.GetObject(false);
 
     if(Visit::GLOBAL == type)
-	world.GetKingdom(color).SetVisited(index, object);
+	GetKingdom().SetVisited(index, object);
     else
     if(! isVisited(tile) && MP2::OBJ_ZERO != object)
 	visit_object.push_front(IndexObject(index, object));
@@ -1013,10 +1010,10 @@ u32 Heroes::GetExperienceFromLevel(u8 lvl)
 /* buy book */
 bool Heroes::BuySpellBook(const Castle* castle, u8 shrine)
 {
-    if(HaveSpellBook() || Color::NONE == color) return false;
+    if(HaveSpellBook() || Color::NONE == GetColor()) return false;
 
     const payment_t payment = PaymentConditions::BuySpellBook(shrine);
-    Kingdom & kingdom = world.GetKingdom(color);
+    Kingdom & kingdom = GetKingdom();
 
     std::string header = _("To cast spells, you must first buy a spell book for %{gold} gold.");
     String::Replace(header, "%{gold}", payment.gold);
@@ -1299,7 +1296,7 @@ bool Heroes::isValid(void) const
 
 bool Heroes::isFreeman(void) const
 {
-    return isValid() && Color::NONE == color && !Modes(JAIL);
+    return isValid() && Color::NONE == GetColor() && !Modes(JAIL);
 }
 
 void Heroes::SetFreeman(const u8 reason)
@@ -1307,7 +1304,7 @@ void Heroes::SetFreeman(const u8 reason)
     if(isFreeman()) return;
 
     bool savepoints = false;
-    Kingdom & kingdom = world.GetKingdom(color);
+    Kingdom & kingdom = GetKingdom();
 
     if((Battle::RESULT_RETREAT | Battle::RESULT_SURRENDER) & reason)
     {
@@ -1319,9 +1316,9 @@ void Heroes::SetFreeman(const u8 reason)
     else
     if((Battle::RESULT_LOSS & reason) && !(Battle::RESULT_SURRENDER & reason)) army.Reset(true);
 
-    if(color != Color::NONE) kingdom.RemoveHeroes(this);
+    if(GetColor() != Color::NONE) kingdom.RemoveHeroes(this);
 
-    color = Color::NONE;
+    SetColor(Color::NONE);
     world.GetTiles(GetIndex()).SetHeroes(NULL);
     modes = 0;
     SetIndex(-1);
@@ -1372,19 +1369,19 @@ const Surface & Heroes::GetPortrait101x93(void) const
     return GetPortrait101x93(portrait);
 }
 
-void Heroes::SetKillerColor(Color::color_t c)
+void Heroes::SetKillerColor(u8 col)
 {
-    killer_color = c;
+    killer_color.SetColor(col);
 }
 
-Color::color_t Heroes::GetKillerColor(void) const
+const Color::color_t & Heroes::GetKillerColor(void) const
 {
-    return killer_color;
+    return killer_color.GetColor();
 }
 
 u8 Heroes::GetControl(void) const
 {
-    return world.GetKingdom(color).GetControl();
+    return GetKingdom().GetControl();
 }
 
 u8 Heroes::GetMapsObject(void) const
@@ -1517,7 +1514,7 @@ u8 Heroes::CanScouteTile(s32 dst) const
 	else
 	{
 	    // check spell identify hero
-	    if(world.GetKingdom(GetColor()).Modes(Kingdom::IDENTIFYHERO) &&
+	    if(GetKingdom().Modes(Kingdom::IDENTIFYHERO) &&
 		MP2::OBJ_HEROES == world.GetTiles(dst).GetObject())
 		return Skill::Level::EXPERT;
 	}
@@ -1571,7 +1568,7 @@ std::string Heroes::String(void) const
     os <<
 	"name            : " << name << std::endl <<
 	"race            : " << Race::String(race) << std::endl <<
-	"color           : " << Color::String(color) << std::endl <<
+	"color           : " << Color::String(GetColor()) << std::endl <<
 	"experience      : " << experience << std::endl <<
 	"level           : " << static_cast<int>(GetLevel()) << std::endl <<
 	"magic point     : " << GetSpellPoints() << std::endl <<
@@ -1878,12 +1875,13 @@ StreamBase & operator>> (StreamBase & msg, VecHeroes & heroes)
 StreamBase & operator<< (StreamBase & msg, const Heroes & hero)
 {
     const HeroBase & base = hero;
+    const ColorBase & col = hero;
 
     return msg <<
 	base <<
 	// heroes
 	hero.name <<
-	hero.color <<
+	col <<
 	hero.killer_color <<
 	hero.experience <<
 	hero.move_point_scale <<
@@ -1912,11 +1910,12 @@ enum deprecated_t
 StreamBase & operator>> (StreamBase & msg, Heroes & hero)
 {
     HeroBase & base = hero;
+    ColorBase & col = hero;
 
     msg >> base >>
 	// heroes
 	hero.name >>
-	hero.color >>
+	col >>
 	hero.killer_color >>
 	hero.experience >>
 	hero.move_point_scale >>

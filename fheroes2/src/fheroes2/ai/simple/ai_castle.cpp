@@ -61,7 +61,7 @@ void AICastleDefense(Castle & c)
 
 void AICastleDevelopment(Castle & c)
 {
-    const Kingdom & kingdom = world.GetKingdom(c.GetColor());
+    const Kingdom & kingdom = c.GetKingdom();
 
     if(c.isCastle())
     {
@@ -196,7 +196,7 @@ void AI::CastleTurn(Castle & castle)
 
 	enemy ? AICastleDefense(castle) : AICastleDevelopment(castle);
 
-	Kingdom & kingdom = world.GetKingdom(castle.GetColor());
+	Kingdom & kingdom = castle.GetKingdom();
 	bool can_recruit = castle.isCastle() && kingdom.GetHeroes().size() < Kingdom::GetMaxHeroes();
 
 	// part II
