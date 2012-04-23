@@ -201,21 +201,20 @@ MapsIndexes Maps::GetAllIndexes(void)
     return result;
 }
 
-MapsIndexes Maps::GetAroundIndexes(const s32 & center, u16 filter)
+MapsIndexes Maps::GetAroundIndexes(const s32 & center)
 {
     MapsIndexes result;
     result.reserve(8);
 
     if(isValidAbsIndex(center))
 	for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
-	    if((filter & direct) && 
-	    isValidDirection(center, direct))
+	    if(isValidDirection(center, direct))
 		result.push_back(GetDirectionIndex(center, direct));
 
     return result;
 }
 
-MapsIndexes Maps::GetDistanceIndexes(const s32 & center, u16 dist, bool sort)
+MapsIndexes Maps::GetAroundIndexes(const s32 & center, u16 dist, bool sort)
 {
     MapsIndexes results;
     results.reserve(dist * 12);
@@ -231,6 +230,32 @@ MapsIndexes Maps::GetDistanceIndexes(const s32 & center, u16 dist, bool sort)
 
     if(sort)
 	std::sort(results.begin(), results.end(), ComparsionDistance(center));
+
+    return results;
+}
+
+MapsIndexes Maps::GetDistanceIndexes(const s32 & center, u16 dist)
+{
+    MapsIndexes results;
+    results.reserve(dist * 6);
+
+    const Point cp = GetPoint(center);
+
+    for(s16 xx = cp.x - dist; xx <= cp.x + dist; ++xx)
+    {
+       if(isValidAbsPoint(xx, cp.y - dist))
+           results.push_back(GetIndexFromAbsPoint(xx, cp.y - dist));
+       if(isValidAbsPoint(xx, cp.y + dist))
+           results.push_back(GetIndexFromAbsPoint(xx, cp.y + dist));
+    }
+
+    for(s16 yy = cp.y - dist + 1; yy < cp.y + dist; ++yy)
+    {
+       if(isValidAbsPoint(cp.x - dist, yy))
+           results.push_back(GetIndexFromAbsPoint(cp.x - dist, yy));
+       if(isValidAbsPoint(cp.x + dist, yy))
+           results.push_back(GetIndexFromAbsPoint(cp.x + dist, yy));
+    }
 
     return results;
 }
@@ -277,15 +302,15 @@ MapsIndexes Maps::ScanAroundObject(const s32 & center, u8 obj)
     return MapsIndexesFilteredObject(results, obj);
 }
 
-MapsIndexes Maps::ScanDistanceObject(const s32 & center, u8 obj, u16 dist)
+MapsIndexes Maps::ScanAroundObject(const s32 & center, u16 dist, u8 obj)
 {
-    MapsIndexes results = Maps::GetDistanceIndexes(center, dist, true);
+    MapsIndexes results = Maps::GetAroundIndexes(center, dist, true);
     return MapsIndexesFilteredObject(results, obj);
 }
 
-MapsIndexes Maps::ScanDistanceObjects(const s32 & center, const u8* objs, u16 dist)
+MapsIndexes Maps::ScanAroundObjects(const s32 & center, u16 dist, const u8* objs)
 {
-    MapsIndexes results = Maps::GetDistanceIndexes(center, dist, true);
+    MapsIndexes results = Maps::GetAroundIndexes(center, dist, true);
     return MapsIndexesFilteredObjects(results, objs);
 }
 
@@ -349,6 +374,11 @@ bool MapsTileIsUnderProtection(const s32 from, const s32 index) /* from: center,
     }
 
     return result;
+}
+
+bool Maps::IsNearTiles(const s32 & index1, const s32 & index2)
+{
+    return DIRECTION_ALL & Direction::Get(index1, index2);
 }
 
 bool Maps::TileIsUnderProtection(const s32 & center)
@@ -529,12 +559,11 @@ void Maps::UpdateSpritesFromTownToCastle(const Point & center)
     }
 }
 
-u16  Maps::TileIsCoast(const s32 & index, u16 direct)
+u16  Maps::TileIsCoast(const s32 & center, u16 filter)
 {
     u16 result = 0;
-    const MapsIndexes & v = GetAroundIndexes(index, direct);
-    for(MapsIndexes::const_iterator
-        it = v.begin(); it != v.end(); ++it)
-        if(world.GetTiles(*it).isWater()) result |= Direction::Get(index, *it);
+    for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
+    if((direct & filter) && isValidDirection(center, direct) &&
+        world.GetTiles(GetDirectionIndex(center, direct)).isWater()) result |= direct;
     return result;
 }

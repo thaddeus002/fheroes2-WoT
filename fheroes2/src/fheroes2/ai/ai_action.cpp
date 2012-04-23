@@ -1395,7 +1395,7 @@ void AIToBoat(Heroes & hero, const u8 & obj, const s32 & dst_index)
     const s32 from_index = hero.GetIndex();
 
     // disabled nearest coasts (on week MP2::isWeekLife)
-    MapsIndexes coasts = Maps::ScanDistanceObject(from_index, MP2::OBJ_COAST, 4);
+    MapsIndexes coasts = Maps::ScanAroundObject(from_index, 4, MP2::OBJ_COAST);
     coasts.push_back(from_index);
 
     for(MapsIndexes::const_iterator

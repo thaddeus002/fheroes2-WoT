@@ -1155,7 +1155,7 @@ void World::MonthOfMonstersAction(const Monster & mons)
 	    for(MapsIndexes::const_iterator
 		it = objv.begin(); it != objv.end(); ++it)
 	    {
-		const MapsIndexes & obja = Maps::GetDistanceIndexes(*it, dist);
+		const MapsIndexes & obja = Maps::GetAroundIndexes(*it, dist);
 		excld.insert(excld.end(), obja.begin(), obja.end());
 	    }
 	}
@@ -1172,7 +1172,7 @@ void World::MonthOfMonstersAction(const Monster & mons)
 		excld.end() == std::find(excld.begin(), excld.end(), tile.GetIndex()))
 	    {
 		tiles.push_back(tile.GetIndex());
-		const MapsIndexes & obja = Maps::GetDistanceIndexes(tile.GetIndex(), dist);
+		const MapsIndexes & obja = Maps::GetAroundIndexes(tile.GetIndex(), dist);
 		excld.insert(excld.end(), obja.begin(), obja.end());
 	    }
 	}

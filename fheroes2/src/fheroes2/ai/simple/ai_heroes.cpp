@@ -188,7 +188,7 @@ bool AIHeroesPriorityObject(const Heroes & hero, s32 index)
 
 s32  FindUncharteredTerritory(Heroes & hero, const u8 & scoute)
 {
-    MapsIndexes v = Maps::GetDistanceIndexes(hero.GetIndex(), scoute, true);
+    MapsIndexes v = Maps::GetAroundIndexes(hero.GetIndex(), scoute, true);
     MapsIndexes res;
 
     v.resize(std::distance(v.begin(),
@@ -225,7 +225,7 @@ s32  FindUncharteredTerritory(Heroes & hero, const u8 & scoute)
 
 s32  GetRandomHeroesPosition(Heroes & hero, const u8 & scoute)
 {
-    MapsIndexes v = Maps::GetDistanceIndexes(hero.GetIndex(), scoute, true);
+    MapsIndexes v = Maps::GetAroundIndexes(hero.GetIndex(), scoute, true);
     MapsIndexes res;
 
     v.resize(std::distance(v.begin(),
@@ -436,8 +436,8 @@ void AI::HeroesGetTask(Heroes & hero)
 	// scan enemy hero
 	if(hero.GetSquarePatrol())
 	{
-	    const MapsIndexes & results = Maps::ScanDistanceObject(Maps::GetIndexFromAbsPoint(hero.GetCenterPatrol()),
-									MP2::OBJ_HEROES, hero.GetSquarePatrol());
+	    const MapsIndexes & results = Maps::ScanAroundObject(Maps::GetIndexFromAbsPoint(hero.GetCenterPatrol()),
+									hero.GetSquarePatrol(), MP2::OBJ_HEROES);
 	    for(MapsIndexes::const_iterator
 		it = results.begin(); it != results.end(); ++it)
 	    {
@@ -456,8 +456,8 @@ void AI::HeroesGetTask(Heroes & hero)
 	// can pickup objects
 	if(conf.ExtHeroPatrolAllowPickup())
 	{
-	    const MapsIndexes & results = Maps::ScanDistanceObjects(hero.GetIndex(),
-								    objs1, hero.GetSquarePatrol());
+	    const MapsIndexes & results = Maps::ScanAroundObjects(hero.GetIndex(),
+								    hero.GetSquarePatrol(), objs1);
 	    for(MapsIndexes::const_iterator
 		it = results.begin(); it != results.end(); ++it)
     		if(AI::HeroesValidObject(hero, *it) &&
@@ -475,7 +475,7 @@ void AI::HeroesGetTask(Heroes & hero)
 	/*
 	// disable move: https://sourceforge.net/tracker/?func=detail&aid=3157397&group_id=96859&atid=616180
 	{
-	    Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_ZERO, hero.GetSquarePatrol(), results);
+	    Maps::ScanAroundObject(hero.GetIndex(), hero.GetSquarePatrol(), MP2::OBJ_ZERO);
 	    if(results.size())
 	    {
 		std::random_shuffle(results.begin(), results.end());
@@ -539,7 +539,7 @@ void AI::HeroesGetTask(Heroes & hero)
     }
 
     // scan heroes and castle
-    const MapsIndexes & enemies = Maps::ScanDistanceObjects(hero.GetIndex(), objs3, hero.GetScoute());
+    const MapsIndexes & enemies = Maps::ScanAroundObjects(hero.GetIndex(), hero.GetScoute(), objs3);
 
     for(MapsIndexes::const_iterator
 	it = enemies.begin(); it != enemies.end(); ++it)
@@ -568,9 +568,9 @@ void AI::HeroesGetTask(Heroes & hero)
     }
 
     // scan 2x2 pickup objects
-    MapsIndexes pickups = Maps::ScanDistanceObjects(hero.GetIndex(), objs1, 2);
+    MapsIndexes pickups = Maps::ScanAroundObjects(hero.GetIndex(), 2, objs1);
     // scan 3x3 capture objects
-    const MapsIndexes & captures = Maps::ScanDistanceObjects(hero.GetIndex(), objs2, 3);
+    const MapsIndexes & captures = Maps::ScanAroundObjects(hero.GetIndex(), 3, objs2);
     if(captures.size()) pickups.insert(pickups.end(), captures.begin(), captures.end());
 
     if(pickups.size())

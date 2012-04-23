@@ -444,7 +444,7 @@ bool ActionSpellTownPortal(Heroes & hero)
 bool ActionSpellVisions(Heroes & hero)
 {
     const u16 dist = hero.GetVisionsDistance();
-    const MapsIndexes & monsters = Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_MONSTER, dist);
+    const MapsIndexes & monsters = Maps::ScanAroundObject(hero.GetIndex(), dist, MP2::OBJ_MONSTER);
 
     if(monsters.size())
     {

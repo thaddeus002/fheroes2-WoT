@@ -61,16 +61,21 @@ namespace Maps
     s32 GetIndexFromAbsPoint(s16 px, s16 py);
 
     MapsIndexes GetAllIndexes(void);
-    MapsIndexes GetAroundIndexes(const s32 &, u16 filter = DIRECTION_ALL);
-    MapsIndexes GetDistanceIndexes(const s32 &, u16 dist, bool sort = false);
+    MapsIndexes GetAroundIndexes(const s32 &);
+    MapsIndexes GetAroundIndexes(const s32 &, u16 dist, bool sort = false); // sorting distance
+    MapsIndexes GetDistanceIndexes(const s32 & center, u16 dist);
+
     MapsIndexes ScanAroundObject(const s32 &, u8 obj);
     MapsIndexes ScanAroundObjects(const s32 &, const u8* objs);
+    MapsIndexes ScanAroundObject(const s32 &, u16 dist, u8 obj);
+    MapsIndexes ScanAroundObjects(const s32 &, u16 dist, const u8* objs);
+
     MapsIndexes GetTilesUnderProtection(const s32 &);
     bool	TileIsUnderProtection(const s32 &);
-    MapsIndexes ScanDistanceObject(const s32 &, u8 obj, u16 dist);
-    MapsIndexes ScanDistanceObjects(const s32 &, const u8* objs, u16 dist);
+    bool	IsNearTiles(const s32 &, const s32 &);
+
     MapsIndexes GetObjectPositions(u8 obj, bool check_hero);
-    MapsIndexes GetObjectPositions(const s32 &, u8 obj, bool check_hero); // sorting distance
+    MapsIndexes GetObjectPositions(const s32 &, u8 obj, bool check_hero);
     MapsIndexes GetObjectsPositions(const u8* objs);
 
     u16 TileIsCoast(const s32 &, u16 direct = DIRECTION_ALL);
