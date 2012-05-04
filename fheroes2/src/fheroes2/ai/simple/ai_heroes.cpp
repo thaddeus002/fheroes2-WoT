@@ -75,6 +75,10 @@ void AIHero::Reset(void)
     fix_loop = 0;
 }
 
+void AI::HeroesActionComplete(Heroes &, s32)
+{
+}
+
 std::string AI::HeroesString(const Heroes & hero)
 {
     std::ostringstream os;
@@ -188,8 +192,8 @@ bool AIHeroesPriorityObject(const Heroes & hero, s32 index)
 
 s32  FindUncharteredTerritory(Heroes & hero, const u8 & scoute)
 {
-    MapsIndexes v = Maps::GetAroundIndexes(hero.GetIndex(), scoute, true);
-    MapsIndexes res;
+    Maps::Indexes v = Maps::GetAroundIndexes(hero.GetIndex(), scoute, true);
+    Maps::Indexes res;
 
     v.resize(std::distance(v.begin(),
 	std::remove_if(v.begin(), v.end(), std::ptr_fun(&Maps::TileIsUnderProtection))));
@@ -225,8 +229,8 @@ s32  FindUncharteredTerritory(Heroes & hero, const u8 & scoute)
 
 s32  GetRandomHeroesPosition(Heroes & hero, const u8 & scoute)
 {
-    MapsIndexes v = Maps::GetAroundIndexes(hero.GetIndex(), scoute, true);
-    MapsIndexes res;
+    Maps::Indexes v = Maps::GetAroundIndexes(hero.GetIndex(), scoute, true);
+    Maps::Indexes res;
 
     v.resize(std::distance(v.begin(),
 	std::remove_if(v.begin(), v.end(), std::ptr_fun(&Maps::TileIsUnderProtection))));
@@ -373,7 +377,7 @@ void AI::HeroesActionNewPosition(Heroes & hero)
     Queue & task = ai_hero.sheduled_visit;
 
     const u8 objs[] = { MP2::OBJ_ARTIFACT, MP2::OBJ_RESOURCE, MP2::OBJ_CAMPFIRE, MP2::OBJ_TREASURECHEST, 0 };
-    MapsIndexes pickups = Maps::ScanAroundObjects(hero.GetIndex(), objs);
+    Maps::Indexes pickups = Maps::ScanAroundObjects(hero.GetIndex(), objs);
 
     if(pickups.size() && hero.GetPath().isValid() &&
 	pickups.end() == std::find(pickups.begin(), pickups.end(), hero.GetPath().GetDestinationIndex()))
@@ -436,7 +440,7 @@ void AI::HeroesGetTask(Heroes & hero)
 	// scan enemy hero
 	if(hero.GetSquarePatrol())
 	{
-	    const MapsIndexes & results = Maps::ScanAroundObject(Maps::GetIndexFromAbsPoint(hero.GetCenterPatrol()),
+	    const Maps::Indexes & results = Maps::ScanAroundObject(Maps::GetIndexFromAbsPoint(hero.GetCenterPatrol()),
 									hero.GetSquarePatrol(), MP2::OBJ_HEROES);
 	    for(MapsIndexes::const_iterator
 		it = results.begin(); it != results.end(); ++it)
@@ -456,7 +460,7 @@ void AI::HeroesGetTask(Heroes & hero)
 	// can pickup objects
 	if(conf.ExtHeroPatrolAllowPickup())
 	{
-	    const MapsIndexes & results = Maps::ScanAroundObjects(hero.GetIndex(),
+	    const Maps::Indexes & results = Maps::ScanAroundObjects(hero.GetIndex(),
 								    hero.GetSquarePatrol(), objs1);
 	    for(MapsIndexes::const_iterator
 		it = results.begin(); it != results.end(); ++it)
@@ -539,7 +543,7 @@ void AI::HeroesGetTask(Heroes & hero)
     }
 
     // scan heroes and castle
-    const MapsIndexes & enemies = Maps::ScanAroundObjects(hero.GetIndex(), hero.GetScoute(), objs3);
+    const Maps::Indexes & enemies = Maps::ScanAroundObjects(hero.GetIndex(), hero.GetScoute(), objs3);
 
     for(MapsIndexes::const_iterator
 	it = enemies.begin(); it != enemies.end(); ++it)
@@ -568,9 +572,9 @@ void AI::HeroesGetTask(Heroes & hero)
     }
 
     // scan 2x2 pickup objects
-    MapsIndexes pickups = Maps::ScanAroundObjects(hero.GetIndex(), 2, objs1);
+    Maps::Indexes pickups = Maps::ScanAroundObjects(hero.GetIndex(), 2, objs1);
     // scan 3x3 capture objects
-    const MapsIndexes & captures = Maps::ScanAroundObjects(hero.GetIndex(), 3, objs2);
+    const Maps::Indexes & captures = Maps::ScanAroundObjects(hero.GetIndex(), 3, objs2);
     if(captures.size()) pickups.insert(pickups.end(), captures.begin(), captures.end());
 
     if(pickups.size())
@@ -770,7 +774,7 @@ void AIHeroesCaptureNearestTown(Heroes* hero)
 
 	if(0 > ai_hero.primary_target)
 	{
-	    const MapsIndexes & castles = Maps::GetObjectPositions(hero->GetIndex(), MP2::OBJ_CASTLE, true);
+	    const Maps::Indexes & castles = Maps::GetObjectPositions(hero->GetIndex(), MP2::OBJ_CASTLE, true);
 
 	    for(MapsIndexes::const_iterator
 		it = castles.begin(); it != castles.end(); ++it)

@@ -59,6 +59,7 @@ namespace Direction
 #define DIRECTION_CENTER_COL	(Direction::TOP | Direction::CENTER | Direction::BOTTOM)
 #define DIRECTION_RIGHT_COL	(Direction::TOP_RIGHT | Direction::RIGHT | Direction::BOTTOM_RIGHT)
 #define DIRECTION_ALL		(DIRECTION_TOP_ROW | DIRECTION_BOTTOM_ROW | DIRECTION_CENTER_ROW)
+#define DIRECTION_AROUND	(DIRECTION_TOP_ROW | DIRECTION_BOTTOM_ROW | Direction::LEFT | Direction::RIGHT)
 
 #define DIRECTION_TOP_RIGHT_CORNER	(Direction::TOP | Direction::TOP_RIGHT | Direction::RIGHT)
 #define DIRECTION_TOP_LEFT_CORNER	(Direction::TOP | Direction::TOP_LEFT | Direction::LEFT)

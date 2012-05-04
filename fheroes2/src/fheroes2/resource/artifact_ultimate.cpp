@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 201 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *   Copyright (C) 2011 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *

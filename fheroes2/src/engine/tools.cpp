@@ -684,9 +684,9 @@ std::string EncodeString(const std::string & str, const char* charset)
     return res;
 }
 #else
-void cp1251_to_utf8(char *out, const char *in)
+std::string cp1251_to_utf8(const std::string & in)
 {
-    static const int table[128] = {
+    const u32 table_1251[] = {
         0x82D0,0x83D0,0x9A80E2,0x93D1,0x9E80E2,0xA680E2,0xA080E2,0xA180E2,
         0xAC82E2,0xB080E2,0x89D0,0xB980E2,0x8AD0,0x8CD0,0x8BD0,0x8FD0,
         0x92D1,0x9880E2,0x9980E2,0x9C80E2,0x9D80E2,0xA280E2,0x9380E2,0x9480E2,
@@ -705,40 +705,40 @@ void cp1251_to_utf8(char *out, const char *in)
         0x88D1,0x89D1,0x8AD1,0x8BD1,0x8CD1,0x8DD1,0x8ED1,0x8FD1
     };
 
-    while(*in)
-    if(*in & 0x80)
+    std::string res;
+    res.reserve(in.size() * 2 + 1);
+
+    for(std::string::const_iterator
+	it = in.begin(); it != in.end(); ++it)
     {
-	int v = table[(int) (0x7f & *in++)];
-        if(!v) continue;
-	*out++ = (char) v;
-        *out++ = (char) (v >> 8);
-	if(v >>= 16) *out++ = (char) v;
+	if(*it & 0x80)
+	{
+	    const size_t index = *it & 0x7f;
+
+	    if(index < ARRAY_COUNT(table_1251))
+	    {
+		const u32 & v = table_1251[index];
+		res.append(1, v);
+		res.append(1, v >> 8);
+		if(v & 0xFFFF0000) res.append(1, v >> 16);
+	    }
+	}
+	else
+	    res.append(1, *it);
     }
-    else
-	*out++ = *in++;
-    *out = 0;
+
+    return res;
 }
 
 std::string EncodeString(const std::string & str, const char* charset)
 {
-    std::string res(str);
-
     if(charset)
     {
 	if(0 == std::strcmp(charset, "cp1251"))
-	{
-	    size_t inbytes = str.size();
-	    size_t outbytes = inbytes * 2 + 1;
-	    char* outbuf= new char [outbytes];
-
-	    cp1251_to_utf8(outbuf, str.c_str());
-	    res = std::string(outbuf);
-
-	    delete [] outbuf;
-	}
+	    return cp1251_to_utf8(str);
     }
 
-    return res;
+    return str;
 }
 #endif
 

@@ -313,6 +313,8 @@ void AI::HeroesAction(Heroes & hero, s32 dst_index)
 
     	default: break;
     }
+
+    HeroesActionComplete(hero, dst_index);
 }
 
 void AIToHeroes(Heroes & hero, const u8 & obj, const s32 & dst_index)

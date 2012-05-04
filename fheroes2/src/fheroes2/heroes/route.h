@@ -65,6 +65,7 @@ namespace Route
 	    void	RescanObstacle(void);
 	    void	RescanPassable(void);
 
+	    bool	isComplete(void) const;
 	    bool	isValid(void) const;
 	    bool	isShow(void) const { return !hide; }
 	    bool	hasObstacle(void) const;
@@ -76,6 +77,8 @@ namespace Route
     	    static u16	GetIndexSprite(u16 from, u16 to, u8 mod);
 
 	private:
+	    bool	Find(const s32 &, const u16 limit = MAXU16);
+
 	    friend StreamBase & operator<< (StreamBase &, const Path &);
 	    friend StreamBase & operator>> (StreamBase &, Path &);
 
@@ -83,8 +86,6 @@ namespace Route
 	    s32		dst;
 	    bool	hide;
     };
-
-    bool PathFind(std::list<Route::Step>* result, const s32 from, const s32 to, const u16 limit = MAXU16, const Heroes* = NULL);
 
     StreamBase & operator<< (StreamBase &, const Step &);
     StreamBase & operator<< (StreamBase &, const Path &);

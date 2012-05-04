@@ -29,8 +29,12 @@
 
 struct Point;
 class Castle;
+class IndexDistance;
 
-typedef std::vector<s32> MapsIndexes;
+class MapsIndexes : public std::vector<s32>
+{
+};
+
 
 namespace Maps
 {
@@ -43,6 +47,17 @@ namespace Maps
         XLARGE	= 144,
 	XLARGE2 = 252,
 	XLARGE3	= 324
+    };
+
+    typedef MapsIndexes Indexes;
+
+    class IndexesDistance : public std::vector<IndexDistance>
+    {
+	void Assign(const s32 & from, const Indexes &, u8 sort /* 0: none, 1: short first, 2: long first */);
+
+    public:
+	IndexesDistance(const s32 &, const Indexes &, u8 sort = 0);
+	IndexesDistance(const s32 &, const s32 &, u16 dist, u8 sort = 0);
     };
 
     const char* SizeString(u16);
@@ -60,23 +75,23 @@ namespace Maps
     s32 GetIndexFromAbsPoint(const Point & mp);
     s32 GetIndexFromAbsPoint(s16 px, s16 py);
 
-    MapsIndexes GetAllIndexes(void);
-    MapsIndexes GetAroundIndexes(const s32 &);
-    MapsIndexes GetAroundIndexes(const s32 &, u16 dist, bool sort = false); // sorting distance
-    MapsIndexes GetDistanceIndexes(const s32 & center, u16 dist);
+    Indexes GetAllIndexes(void);
+    Indexes GetAroundIndexes(const s32 &);
+    Indexes GetAroundIndexes(const s32 &, u16 dist, bool sort = false); // sorting distance
+    Indexes GetDistanceIndexes(const s32 & center, u16 dist);
 
-    MapsIndexes ScanAroundObject(const s32 &, u8 obj);
-    MapsIndexes ScanAroundObjects(const s32 &, const u8* objs);
-    MapsIndexes ScanAroundObject(const s32 &, u16 dist, u8 obj);
-    MapsIndexes ScanAroundObjects(const s32 &, u16 dist, const u8* objs);
+    Indexes ScanAroundObject(const s32 &, u8 obj);
+    Indexes ScanAroundObjects(const s32 &, const u8* objs);
+    Indexes ScanAroundObject(const s32 &, u16 dist, u8 obj);
+    Indexes ScanAroundObjects(const s32 &, u16 dist, const u8* objs);
 
-    MapsIndexes GetTilesUnderProtection(const s32 &);
+    Indexes	GetTilesUnderProtection(const s32 &);
     bool	TileIsUnderProtection(const s32 &);
     bool	IsNearTiles(const s32 &, const s32 &);
 
-    MapsIndexes GetObjectPositions(u8 obj, bool check_hero);
-    MapsIndexes GetObjectPositions(const s32 &, u8 obj, bool check_hero);
-    MapsIndexes GetObjectsPositions(const u8* objs);
+    Indexes GetObjectPositions(u8 obj, bool check_hero);
+    Indexes GetObjectPositions(const s32 &, u8 obj, bool check_hero);
+    Indexes GetObjectsPositions(const u8* objs);
 
     u16 TileIsCoast(const s32 &, u16 direct = DIRECTION_ALL);
 

@@ -96,6 +96,10 @@ std::string AI::HeroesString(const Heroes &)
     return "";
 }
 
+void AI::HeroesActionComplete(Heroes &, s32)
+{
+}
+
 void AI::HeroesLevelUp(Heroes &)
 {
 }

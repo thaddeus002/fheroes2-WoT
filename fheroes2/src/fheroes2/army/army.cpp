@@ -1093,7 +1093,7 @@ bool Army::TroopsStrongerEnemyTroops(const Troops & troops1, const Troops & troo
     const float h1 = troops1.GetHitPoints();
     const float h2 = troops2.GetHitPoints();
 
-    DEBUG(DBG_AI, DBG_INFO, "r1: " << r1 << ", s1: " << s1 << ", h1: " << h1 \
+    DEBUG(DBG_AI, DBG_TRACE, "r1: " << r1 << ", s1: " << s1 << ", h1: " << h1 \
 			<< ", r2: " << r2 << ", s2: " << s2 << ", h2: " << h2);
 
     r1 *= s1 / h2;

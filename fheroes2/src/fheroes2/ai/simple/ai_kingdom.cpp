@@ -135,6 +135,8 @@ void AI::KingdomTurn(Kingdom & kingdom)
 	return;
     }
 
+    DEBUG(DBG_AI, DBG_INFO, Color::String(kingdom.GetColor()) << " funds: " << kingdom.GetFunds().String());
+
     if(! Settings::Get().MusicMIDI()) AGG::PlayMusic(MUS::COMPUTER);
 
     Interface::StatusWindow *status = Interface::NoGUI() ? NULL : &Interface::StatusWindow::Get();
@@ -275,7 +277,7 @@ void AI::KingdomTurn(Kingdom & kingdom)
 
     // heroes turns
     std::for_each(heroes.begin(), heroes.end(), std::ptr_fun(&AIHeroesTurn));
-    std::for_each(heroes.begin(), heroes.end(), std::bind2nd(std::mem_fun(&Heroes::ResetModes), AI::HEROES_STUPID|AI::HEROES_WAITING));
+    //std::for_each(heroes.begin(), heroes.end(), std::bind2nd(std::mem_fun(&Heroes::ResetModes), AI::HEROES_STUPID|AI::HEROES_WAITING));
     std::for_each(heroes.begin(), heroes.end(), std::ptr_fun(&AIHeroesTurn));
     std::for_each(heroes.begin(), heroes.end(), std::ptr_fun(&AIHeroesEnd));
 

@@ -95,16 +95,15 @@ s32 Route::Path::GetDestinedIndex(void) const
 /* return length path */
 bool Route::Path::Calculate(const s32 dst_index, const u16 limit)
 {
-    clear();
-    Route::PathFind(this, hero.GetIndex(), dst_index, limit, &hero);
-
-    // check monster dst
-    if(!empty() &&
-	Maps::isValidAbsIndex(dst_index) &&
-	MP2::OBJ_MONSTER == world.GetTiles(dst_index).GetObject())
-	pop_back();
-
     dst = dst_index;
+
+    if(Find(dst_index, limit))
+    {
+	// check monster dst
+	if(Maps::isValidAbsIndex(dst_index) &&
+	    MP2::OBJ_MONSTER == world.GetTiles(dst_index).GetObject())
+	    pop_back();
+    }
 
     return !empty();
 }
@@ -119,13 +118,24 @@ void Route::Path::Reset(void)
     }
 }
 
+bool Route::Path::isComplete(void) const
+{
+    return dst == hero.GetIndex() ||
+	(empty() && Direction::UNKNOWN != Direction::Get(hero.GetIndex(), dst));
+}
+
 bool Route::Path::isValid(void) const
+{
+    return !empty();
+}
+
+/*
+bool Route::Path::isValid0(void) const
 {
     return !empty() || (dst != hero.GetIndex() &&
 			Direction::UNKNOWN != Direction::Get(hero.GetIndex(), dst));
 }
 
-/*
 bool Route::Path::isBroken(void) const
 {
     return end() != std::find_if(begin(), end(), std::mem_fun_ref(&Route::Step::isBad));

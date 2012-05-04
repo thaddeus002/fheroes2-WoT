@@ -31,26 +31,25 @@
 
 struct cell_t
 {
-#ifdef WITH_DEBUG
-    cell_t() : cost_g(MAXU16), cost_t(MAXU16), cost_d(MAXU16), passbl(0), open(1), parent(-1){};
+    cell_t() : cost_g(MAXU16), cost_t(MAXU16), cost_d(MAXU16), passbl(0), open(1), direct(Direction::CENTER), parent(-1) {}
 
     u16		cost_g;	// ground
-#else
-    cell_t() : cost_t(MAXU16), cost_d(MAXU16), passbl(0), open(1), parent(-1){};
-#endif
     u16		cost_t; // total
     u16		cost_d; // distance
     u16		passbl;
-    u16		open;
+    u16		open;	// bool
+    u16		direct;
     s32		parent;
 };
 
-
-u32 GetCurrentLength(std::map<s32, cell_t> & list, s32 cur)
+u16 GetCurrentLength(std::map<s32, cell_t> & list, s32 from)
 {
-    u32 res = 0;
-    const cell_t* cell = &list[cur];
-    while(-1 != cell->parent){ cell = &list[cell->parent]; ++res; };
+    u16 res = 0;
+    while(0 <= list[from].parent)
+    {
+	from = list[from].parent;
+	++res;
+    }
     return res;
 }
 
@@ -60,17 +59,17 @@ bool CheckMonsterProtectionAndNotDst(const s32 & to, const s32 & dst)
     return monsters.size() && monsters.end() == std::find(monsters.begin(), monsters.end(), dst);
 }
 
-bool PassableToTile(const Heroes* hero, const Maps::Tiles & toTile, const Direction::vector_t & direct, const s32 & dst)
+bool PassableToTile(const Heroes & hero, const Maps::Tiles & toTile, const Direction::vector_t & direct, const s32 & dst)
 {
     // check end point
     if(toTile.GetIndex() == dst)
     {
 	// fix toTilePassable with action object
-	if(hero && MP2::isPickupObject(toTile.GetObject()))
+	if(MP2::isPickupObject(toTile.GetObject()))
 	    return true;
 
 	// check direct to object
-	if(MP2::isActionObject(toTile.GetObject(false), (hero ? hero->isShipMaster() : false)))
+	if(MP2::isActionObject(toTile.GetObject(false), hero.isShipMaster()))
 	    return Direction::Reflect(direct) & toTile.GetPassable();
 
 	if(MP2::OBJ_HEROES == toTile.GetObject())
@@ -78,13 +77,13 @@ bool PassableToTile(const Heroes* hero, const Maps::Tiles & toTile, const Direct
     }
 
     // check to tile direct
-    if(! toTile.isPassable(hero, Direction::Reflect(direct), false))
+    if(! toTile.isPassable(&hero, Direction::Reflect(direct), false))
 	return false;
 
     if(toTile.GetIndex() != dst)
     {
 	if(MP2::isPickupObject(toTile.GetObject()) ||
-	    MP2::isActionObject(toTile.GetObject(false), (hero ? hero->isShipMaster() : false)))
+	    MP2::isActionObject(toTile.GetObject(false), hero.isShipMaster()))
 	    return false;
 
 	// check hero/monster on route
@@ -105,15 +104,15 @@ bool PassableToTile(const Heroes* hero, const Maps::Tiles & toTile, const Direct
     return true;
 }
 
-bool PassableFromToTile(const Heroes* hero, const s32 & from, const s32 & to, const Direction::vector_t & direct, const s32 & dst)
+bool PassableFromToTile(const Heroes & hero, const s32 & from, const s32 & to, const Direction::vector_t & direct, const s32 & dst)
 {
     const Maps::Tiles & fromTile = world.GetTiles(from);
     const Maps::Tiles & toTile = world.GetTiles(to);
 
     // check start point
-    if(hero && hero->GetIndex() == from)
+    if(hero.GetIndex() == from)
     {
-	if(MP2::isActionObject(fromTile.GetObject(false), hero->isShipMaster()))
+	if(MP2::isActionObject(fromTile.GetObject(false), hero.isShipMaster()))
 	{
 	    // check direct from object
 	    if(! (direct & fromTile.GetPassable()))
@@ -122,13 +121,13 @@ bool PassableFromToTile(const Heroes* hero, const s32 & from, const s32 & to, co
 	else
 	{
 	    // check from tile direct
-	    if(! fromTile.isPassable(hero, direct, false))
+	    if(! fromTile.isPassable(&hero, direct, false))
 		return false;
 	}
     }
     else
     {
-	if(MP2::isActionObject(fromTile.GetObject(), (hero ? hero->isShipMaster() : false)))
+	if(MP2::isActionObject(fromTile.GetObject(), hero.isShipMaster()))
 	{
 	    // check direct from object
 	    if(! (direct & fromTile.GetPassable()))
@@ -137,7 +136,7 @@ bool PassableFromToTile(const Heroes* hero, const s32 & from, const s32 & to, co
 	else
 	{
 	    // check from tile direct
-	    if(! fromTile.isPassable(hero, direct, false))
+	    if(! fromTile.isPassable(&hero, direct, false))
 		return false;
 	}
     }
@@ -182,9 +181,10 @@ u16 GetPenaltyFromTo(const s32 & from, const s32 & to, const Direction::vector_t
     return (cost1 + cost2) >> 1;
 }
 
-bool Route::PathFind(std::list<Route::Step>* result, const s32 from, const s32 to, const u16 limit, const Heroes* hero)
+bool Route::Path::Find(const s32 & to, const u16 limit)
 {
-    const u8 pathfinding = (hero ? hero->GetLevelSkill(Skill::Secondary::PATHFINDING) : Skill::Level::NONE);
+    const u8 pathfinding = hero.GetLevelSkill(Skill::Secondary::PATHFINDING);
+    const s32 & from = hero.GetIndex();
 
     s32 cur = from;
     s32 alt = 0;
@@ -192,20 +192,20 @@ bool Route::PathFind(std::list<Route::Step>* result, const s32 from, const s32 t
     std::map<s32, cell_t> list;
     std::map<s32, cell_t>::iterator it1 = list.begin();
     std::map<s32, cell_t>::iterator it2 = list.end();
-    Direction::vector_t direct = Direction::CENTER;
 
-#ifdef WITH_DEBUG
     list[cur].cost_g = 0;
-#endif
     list[cur].cost_t = 0;
     list[cur].parent = -1;
     list[cur].open   = 0;
+
+    clear();
 
     while(cur != to)
     {
 	LocalEvent::Get().HandleEvents(false);
 
-	for(direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
+	for(Direction::vector_t
+	    direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
 	{
     	    if(Maps::isValidDirection(cur, direct))
 	    {
@@ -223,9 +223,8 @@ bool Route::PathFind(std::list<Route::Step>* result, const s32 from, const s32 t
 			{
 			    list[cur].passbl |= direct;
 
-#ifdef WITH_DEBUG
+			    list[tmp].direct = direct;
 	    		    list[tmp].cost_g = costg;
-#endif
 			    list[tmp].parent = cur;
 			    list[tmp].open   = 1;
 			    list[tmp].cost_d = 50 * Maps::GetApproximateDistance(tmp, to);
@@ -240,10 +239,9 @@ bool Route::PathFind(std::list<Route::Step>* result, const s32 from, const s32 t
 			{
 			    list[cur].passbl |= direct;
 
+			    list[tmp].direct = direct;
 			    list[tmp].parent = cur;
-#ifdef WITH_DEBUG
 			    list[tmp].cost_g = costg;
-#endif
 			    list[tmp].cost_t = list[cur].cost_t + costg;
 			}
 		    }
@@ -266,7 +264,8 @@ bool Route::PathFind(std::list<Route::Step>* result, const s32 from, const s32 t
 #ifdef WITH_DEBUG
 	    if(IS_DEBUG(DBG_OTHER, DBG_TRACE) && cell2.cost_g != MAXU16)
 	    {
-		direct = Direction::Get(cur, (*it1).first);
+		const u16 direct = Direction::Get(cur, (*it1).first);
+
 		if(Direction::UNKNOWN != direct)
 		{
 		    VERBOSE("\t\tdirect: " << Direction::String(direct) <<
@@ -286,12 +285,14 @@ bool Route::PathFind(std::list<Route::Step>* result, const s32 from, const s32 t
 	}
 
 	// not found, and exception
-	if(MAXU16 == tmp || -1 == alt || (limit && GetCurrentLength(list, cur) > limit)) break;
+	if(MAXU16 == tmp || -1 == alt) break;
 #ifdef WITH_DEBUG
 	else
 	DEBUG(DBG_OTHER, DBG_TRACE, "select: " << alt);
 #endif
 	cur = alt;
+
+	if(GetCurrentLength(list, cur) > limit) break;
     }
 
     // save path
@@ -299,17 +300,14 @@ bool Route::PathFind(std::list<Route::Step>* result, const s32 from, const s32 t
     {
 	while(cur != from)
 	{
-	    if(-1 == list[cur].parent) break;
-	    alt = cur;
-    	    cur = list[alt].parent;
-	    const Direction::vector_t direct = Direction::Get(cur, alt);
-	    if(result) result->push_front(Route::Step(cur, direct, GetPenaltyFromTo(cur, alt, direct, pathfinding)));
+	    push_front(Route::Step(list[cur].parent, list[cur].direct, list[cur].cost_g));
+    	    cur = list[cur].parent;
 	}
-        return true;
+    }
+    else
+    {
+	DEBUG(DBG_OTHER, DBG_TRACE, "not found" << ", from:" << from << ", to: " << to);
     }
 
-    DEBUG(DBG_OTHER, DBG_TRACE, "not found" << ", from:" << from << ", to: " << to);
-    list.clear();
-
-    return false;
+    return !empty();
 }
