@@ -467,11 +467,11 @@ void Battle::Arena::Turns(void)
     // fix experience and killed
     if(result_game.army1 || result_game.army2)
     {
-        result_game.exp1 = army1->GetDeadHitPoints();
-        result_game.exp2 = army2->GetDeadHitPoints();
+        result_game.exp1 = army2->GetDeadHitPoints();
+        result_game.exp2 = army1->GetDeadHitPoints();
 
-        if(army1->GetCommander()) result_game.exp1 += 500;
-        if(army2->GetCommander()) result_game.exp2 += 500;
+        if(army1->GetCommander()) result_game.exp2 += 500;
+        if(army2->GetCommander()) result_game.exp1 += 500;
 
 	Force *army_loss = (result_game.army1 & RESULT_LOSS ? army1 : (result_game.army2 & RESULT_LOSS ? army2 : NULL));
 	result_game.killed = army_loss ? army_loss->GetDeadCounts() : 0;
