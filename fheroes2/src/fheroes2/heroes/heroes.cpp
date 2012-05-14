@@ -1548,17 +1548,17 @@ void Heroes::RecalculateMovePoints(void)
 
 void Heroes::Move2Dest(const s32 & dst_index, bool skip_action /* false */)
 {
-    Maps::Tiles & tiles_from = world.GetTiles(GetIndex());
-    Maps::Tiles & tiles_to = world.GetTiles(dst_index);
+    if(dst_index != GetIndex())
+    {
+	world.GetTiles(GetIndex()).SetHeroes(NULL);
+	SetIndex(dst_index);
+	Scoute();
+	ApplyPenaltyMovement();
+	world.GetTiles(dst_index).SetHeroes(this);
 
-    tiles_from.SetHeroes(NULL);
-    SetIndex(dst_index);
-    Scoute();
-    ApplyPenaltyMovement();
-    tiles_to.SetHeroes(this);
-
-    if(!skip_action)
-	ActionNewPosition();
+	if(!skip_action)
+	    ActionNewPosition();
+    }
 }
 
 std::string Heroes::String(void) const

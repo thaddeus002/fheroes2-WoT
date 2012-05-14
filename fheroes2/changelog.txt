@@ -1,3 +1,20 @@
+May, 14, 2012 (2860 rev.)
+
++ Fixed: battle: redraw castle interface
++ Fixed: battle: path with moat stop
++ Fixed: battle: redraw shield spell, captain init spell
++ Fixed: battle: option "heroes: remember MP/SP for retreat/surrender result"
++ Fixed: battle: wide fly animation
++ Fixed: battle: teleport spell
++ Fixed: battle: experience calculation
++ Fixed: world: add more info for recruit heroes
++ Fixed: world: allow payment with negative resource
++ Fixed: world: road direction, update pathfinding, update route penalty
++ Fixed: game: update save filename
++ Fixed: game: AI priority pickup objects
++ Added: game: origin (non-free) tilesets
++ Update: load alt resource (add index position), add store icn cache
+
 Apr, 11, 2012 (2824 rev.)
 
 + Fixed: castle: marketplace max button

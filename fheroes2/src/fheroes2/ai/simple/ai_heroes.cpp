@@ -75,7 +75,12 @@ void AIHero::Reset(void)
     fix_loop = 0;
 }
 
-void AI::HeroesActionComplete(Heroes &, s32)
+bool AI::HeroesSkipFog(void)
+{
+    return false;
+}
+
+void AI::HeroesActionComplete(Heroes &, const s32 &)
 {
 }
 
@@ -389,7 +394,7 @@ void AI::HeroesActionNewPosition(Heroes & hero)
 	    task.push_front(*it);
 }
 
-void AI::HeroesGetTask(Heroes & hero)
+bool AI::HeroesGetTask(Heroes & hero)
 {
     std::vector<s32> results;
     results.reserve(5);
@@ -435,7 +440,7 @@ void AI::HeroesGetTask(Heroes & hero)
 	// goto patrol center
 	if(hero.GetCenterPatrol() != hero.GetCenter() &&
 	   hero.GetPath().Calculate(Maps::GetIndexFromAbsPoint(hero.GetCenterPatrol())))
-		return;
+		return true;
 
 	// scan enemy hero
 	if(hero.GetSquarePatrol())
@@ -451,7 +456,7 @@ void AI::HeroesGetTask(Heroes & hero)
 		    if(hero.GetPath().Calculate(enemy->GetIndex()))
 		    {
 			DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", find enemy");
-			return;
+			return true;
 		    }
 		}
 	    }
@@ -471,7 +476,7 @@ void AI::HeroesGetTask(Heroes & hero)
 
 		DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ": find object: " <<
 			MP2::StringObject(world.GetTiles(*it).GetObject()) << "(" << *it << ")");
-		return;
+		return true;
 	    }
 	}
 
@@ -497,14 +502,14 @@ void AI::HeroesGetTask(Heroes & hero)
 	*/
 
 	hero.SetModes(AI::HEROES_STUPID);
-	return;
+	return false;
     }
 
     if(ai_hero.fix_loop > 3)
     {
 	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ": loop");
 	hero.SetModes(hero.Modes(AI::HEROES_WAITING) ? AI::HEROES_STUPID : AI::HEROES_WAITING);
-	return;
+	return false;
     }
 
     // primary target
@@ -539,7 +544,7 @@ void AI::HeroesGetTask(Heroes & hero)
 	    }
 	}
 
-	if(hero.GetPath().isValid()) return;
+	if(hero.GetPath().isValid()) return true;
     }
 
     // scan heroes and castle
@@ -554,7 +559,7 @@ void AI::HeroesGetTask(Heroes & hero)
 	MP2::StringObject(world.GetTiles(*it).GetObject()) << "(" << *it << ")");
 
 	ai_hero.primary_target = *it;
-	return;
+	return true;
     }
 
     // check destination
@@ -567,7 +572,7 @@ void AI::HeroesGetTask(Heroes & hero)
 	{
 	    DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", continue short");
 	    ai_hero.fix_loop++;
-	    return;
+	    return true;
 	}
     }
 
@@ -596,7 +601,7 @@ void AI::HeroesGetTask(Heroes & hero)
     {
 	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", continue");
         ai_hero.fix_loop++;
-	return;
+	return true;
     }
 
     if(task.empty())
@@ -641,6 +646,7 @@ void AI::HeroesGetTask(Heroes & hero)
 	task.pop_front();
 
 	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", route: " << hero.GetPath().String());
+	return true;
     }
     else
     if(hero.Modes(AI::HEROES_WAITING))
@@ -656,6 +662,8 @@ void AI::HeroesGetTask(Heroes & hero)
 	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << " say: waiting...");
 	hero.SetModes(AI::HEROES_WAITING);
     }
+
+    return false;
 }
 
 void AIHeroesTurn(Heroes* hero)

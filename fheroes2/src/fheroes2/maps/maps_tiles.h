@@ -145,6 +145,7 @@ namespace Maps
 
 	const Surface & GetTileSurface(void) const;
 
+	bool isPassable(const Heroes &) const;
 	bool isPassable(const Heroes*, u16 direct, bool skipfog) const;
 	bool isRoad(u16 = DIRECTION_ALL) const;
 	bool isObject(MP2::object_t obj) const { return obj == mp2_object; };

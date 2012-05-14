@@ -52,17 +52,18 @@ namespace AI
     void HeroesRemove(const Heroes &);
     void HeroesTurn(Heroes &);
     void HeroesMove(Heroes &);
-    void HeroesGetTask(Heroes &);
+    bool HeroesGetTask(Heroes &);
     void HeroesPreBattle(HeroBase &);
     void HeroesAfterBattle(HeroBase &);
     void HeroesPostLoad(Heroes &);
     bool HeroesValidObject(const Heroes &, s32);
     bool HeroesCanMove(const Heroes &);
     void HeroesAction(Heroes &, s32);
-    void HeroesActionComplete(Heroes &, s32);
+    void HeroesActionComplete(Heroes &, const s32 &);
     void HeroesActionNewPosition(Heroes &);
     void HeroesLevelUp(Heroes &);
     void HeroesClearTask(const Heroes &);
+    bool HeroesSkipFog(void);
     std::string HeroesString(const Heroes &);
 
     void CastleAdd(const Castle &);

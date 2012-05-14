@@ -96,7 +96,7 @@ std::string AI::HeroesString(const Heroes &)
     return "";
 }
 
-void AI::HeroesActionComplete(Heroes &, s32)
+void AI::HeroesActionComplete(Heroes &, const s32 &)
 {
 }
 
@@ -108,10 +108,16 @@ void AI::HeroesPostLoad(Heroes &)
 {
 }
 
-void AI::HeroesGetTask(Heroes & hero)
+bool AI::HeroesSkipFog(void)
+{
+    return false;
+}
+
+bool AI::HeroesGetTask(Heroes & hero)
 {
     // stop hero
     hero.GetPath().Reset();
+    return false;
 }
 
 bool AI::HeroesCanMove(const Heroes & hero)

@@ -314,6 +314,9 @@ void AI::HeroesAction(Heroes & hero, s32 dst_index)
     	default: break;
     }
 
+    if(MP2::isNeedStayFront(object))
+        hero.GetPath().Reset();
+
     HeroesActionComplete(hero, dst_index);
 }
 

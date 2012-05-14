@@ -23,6 +23,7 @@
 #include <cstdlib>
 #include <map>
 #include "maps.h"
+#include "ai.h"
 #include "world.h"
 #include "direction.h"
 #include "settings.h"
@@ -73,11 +74,11 @@ bool PassableToTile(const Heroes & hero, const Maps::Tiles & toTile, const Direc
 	    return Direction::Reflect(direct) & toTile.GetPassable();
 
 	if(MP2::OBJ_HEROES == toTile.GetObject())
-	    return toTile.isPassable(NULL, Direction::Reflect(direct), false);
+	    return toTile.isPassable(NULL, Direction::Reflect(direct), (CONTROL_AI == hero.GetControl() ? AI::HeroesSkipFog() : false));
     }
 
     // check to tile direct
-    if(! toTile.isPassable(&hero, Direction::Reflect(direct), false))
+    if(! toTile.isPassable(&hero, Direction::Reflect(direct), (CONTROL_AI == hero.GetControl() ? AI::HeroesSkipFog() : false)))
 	return false;
 
     if(toTile.GetIndex() != dst)
@@ -121,7 +122,7 @@ bool PassableFromToTile(const Heroes & hero, const s32 & from, const s32 & to, c
 	else
 	{
 	    // check from tile direct
-	    if(! fromTile.isPassable(&hero, direct, false))
+	    if(! fromTile.isPassable(&hero, direct, (CONTROL_AI == hero.GetControl() ? AI::HeroesSkipFog() : false)))
 		return false;
 	}
     }
@@ -136,7 +137,7 @@ bool PassableFromToTile(const Heroes & hero, const s32 & from, const s32 & to, c
 	else
 	{
 	    // check from tile direct
-	    if(! fromTile.isPassable(&hero, direct, false))
+	    if(! fromTile.isPassable(&hero, direct, (CONTROL_AI == hero.GetControl() ? AI::HeroesSkipFog() : false)))
 		return false;
 	}
     }

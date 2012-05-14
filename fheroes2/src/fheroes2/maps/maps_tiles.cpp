@@ -1895,31 +1895,29 @@ bool TileIsGround(s32 index, u16 ground)
 }
 
 /* accept move */
-bool Maps::Tiles::isPassable(const Heroes* hero, u16 direct, bool skipfog) const
+bool Maps::Tiles::isPassable(const Heroes & hero) const
 {
-    if(!skipfog && isFog(Settings::Get().CurrentColor()))
-	return false;
-
-    if(hero)
+    if(hero.isShipMaster())
     {
-	if(hero->isShipMaster())
-	{
-	    if(! isWater())
-		return false;
+	if(! isWater())
+	    return false;
 
-	    if(MP2::OBJ_BOAT == GetObject())
-		return false;
-	}
-	else
-	// if(! hero->isShipMaster() &&
-	if(isWater())
+	if(MP2::OBJ_BOAT == GetObject())
+	    return false;
+    }
+    else
+    // if(! hero->isShipMaster() &&
+    if(isWater())
+    {
+	switch(GetObject())
 	{
 	    // fix shipwreck: place on water
-	    if(MP2::OBJ_SHIPWRECK == GetObject())
-		return direct & tile_passable;
-	    else
+	    case MP2::OBJ_SHIPWRECK:
+		// check later
+		break;
+
 	    // for: meetings/attack hero
-	    if(MP2::OBJ_HEROES == GetObject())
+	    case MP2::OBJ_HEROES:
 	    {
 		// scan ground
 		const MapsIndexes & v = Maps::GetAroundIndexes(GetIndex());
@@ -1927,10 +1925,24 @@ bool Maps::Tiles::isPassable(const Heroes* hero, u16 direct, bool skipfog) const
 		    std::not1(std::bind2nd(std::ptr_fun(&TileIsGround), Ground::WATER))))
 		    return false;
 	    }
-	    else
+	    break;
+
+	    default:
+		// ! hero->isShipMaster() && isWater()
 		return false;
 	}
     }
+
+    return true;
+}
+
+bool Maps::Tiles::isPassable(const Heroes* hero, u16 direct, bool skipfog) const
+{
+    if(!skipfog && isFog(Settings::Get().CurrentColor()))
+	return false;
+
+    if(hero && ! isPassable(*hero))
+	return false;
 
     return direct & tile_passable;
 }
