@@ -101,316 +101,234 @@ u16 PocketPC::GetCursorAttackDialog(const Point & dst, u8 allow)
     return Cursor::WAR_INFO;
 }
 
-void DrawWideCell(const Rect & dst)
+#ifdef ANDROID
+void PocketPC::KeyboardDialog(std::string & str)
 {
-    const Sprite & sp = AGG::GetICN(ICN::EDITBTNS, 32);
+    char inputbuf[256];
+    strncpy(inputbuf, str.c_str(), sizeof(inputbuf));
+    inputbuf[sizeof(inputbuf) - 1] = 0;
+    SDL_ANDROID_GetScreenKeyboardTextInput(inputbuf, sizeof(inputbuf));
+    str = inputbuf;
+}
+#else
+Surface CreateTouchButton(void)
+{
+    Surface sf(24, 24);
 
-    Rect rt = Rect(0, 0, 4, 16);
-    sp.Blit(rt, dst.x, dst.y);
+    const u8 ww = sf.w() / 2;
+    const u8 hh = sf.h() / 2;
 
+    const Sprite & sp0 = AGG::GetICN(ICN::LOCATORS, 22);
 
-    if(dst.w > 8)
+    sp0.Blit(Rect(0, 0, ww, hh), Point(0, 0), sf);
+    sp0.Blit(Rect(sp0.w() - ww, 0, ww, hh), Point(ww, 0), sf);
+    sp0.Blit(Rect(0, sp0.h() - hh, ww, hh), Point(0, hh), sf);
+    sp0.Blit(Rect(sp0.w() - ww, sp0.h() - hh, ww, hh), Point(ww, hh), sf);
+
+    return sf;
+}
+
+void RedrawTouchButton(const Surface & sf, const Rect & rt, const char* lb)
+{
+    Display & display = Display::Get();
+
+    if(sf.w() != rt.w)
     {
-	rt = Rect(4, 0, 4, 16);
-	const u16 count = (dst.w - 4) / rt.w;
-	for(u16 ii = 0; ii < count; ++ii)
-	{
-	    sp.Blit(rt, dst.x + 4 + rt.w * ii, dst.y);
-	}
-    }
+	const u8 ww = 4;
+	sf.Blit(Rect(0, 0, ww, sf.h()), rt.x, rt.y, display);
 
-    rt = Rect(12, 0, 4, 16);
-    sp.Blit(rt, dst.x + dst.w - rt.w, dst.y);
+	if(rt.w > 8)
+	{
+	    const u16 count = (rt.w - ww) / ww;
+	    for(u16 ii = 0; ii < count; ++ii)
+		sf.Blit(Rect(ww, 0, ww, sf.h()), rt.x + ww * (ii + 1), rt.y, display);
+	}
+
+	sf.Blit(Rect(sf.w() - ww, 0, ww, sf.h()), rt.x + rt.w - ww, rt.y, display);
+    }
+    else
+	sf.Blit(rt.x, rt.y, display);
+
+    if(lb)
+    {
+	Text tx(lb, Font::BIG);
+	tx.Blit(rt.x + (rt.w - tx.w()) / 2, rt.y + (rt.h - tx.h()) / 2);
+    }
 }
 
 void PocketPC::KeyboardDialog(std::string & str)
 {
-#ifdef ANDROID
-	char inputbuf[256];
-	strncpy(inputbuf, str.c_str(), sizeof(inputbuf));
-	inputbuf[sizeof(inputbuf) - 1] = 0;
-	SDL_ANDROID_GetScreenKeyboardTextInput(inputbuf, sizeof(inputbuf));
-	str = inputbuf;
-	return;
-#endif
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
     LocalEvent & le = LocalEvent::Get();
     cursor.Hide();
 
-    const u16 width = 240;
-    const u16 height = 88;
+    const u16 width = 337;
+    const u16 height = 118;
 
     Background back;
     back.Save((display.w() - width) / 2, 0, width, height);
     const Rect & top = back.GetRect();
     display.FillRect(0, 0, 0, top);
 
-    const Sprite & sp = AGG::GetICN(ICN::EDITBTNS, 32);
+    const Surface sp = CreateTouchButton();
 
-    Text tx;
-    tx.Set(Font::SMALL);
-
-    // 1
+    // 1 row
     const Rect rt_1(top.x + 2, top.y + 2, sp.w(), sp.h());
-    sp.Blit(rt_1);
-    tx.Set("1");
-    tx.Blit(rt_1.x + (rt_1.w - tx.w()) / 2, rt_1.y + 2);
+    RedrawTouchButton(sp, rt_1, "1");
 
-    const Rect rt_2(top.x + 19, top.y + 2, sp.w(), sp.h());
-    sp.Blit(rt_2);
-    tx.Set("2");
-    tx.Blit(rt_2.x + (rt_2.w - tx.w()) / 2, rt_2.y + 2);
+    const Rect rt_2(rt_1.x + rt_1.w + 1, top.y + 2, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_2, "2");
 
-    const Rect rt_3(top.x + 36, top.y + 2, sp.w(), sp.h());
-    sp.Blit(rt_3);
-    tx.Set("3");
-    tx.Blit(rt_3.x + (rt_3.w - tx.w()) / 2, rt_3.y + 2);
+    const Rect rt_3(rt_2.x + rt_2.w + 1, top.y + 2, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_3, "3");
 
-    const Rect rt_4(top.x + 53, top.y + 2, sp.w(), sp.h());
-    sp.Blit(rt_4);
-    tx.Set("4");
-    tx.Blit(rt_4.x + (rt_4.w - tx.w()) / 2, rt_4.y + 2);
+    const Rect rt_4(rt_3.x + rt_3.w + 1, top.y + 2, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_4, "4");
 
-    const Rect rt_5(top.x + 70, top.y + 2, sp.w(), sp.h());
-    sp.Blit(rt_5);
-    tx.Set("5");
-    tx.Blit(rt_5.x + (rt_5.w - tx.w()) / 2, rt_5.y + 2);
+    const Rect rt_5(rt_4.x + rt_4.w + 1, top.y + 2, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_5, "5");
 
-    const Rect rt_6(top.x + 87, top.y + 2, sp.w(), sp.h());
-    sp.Blit(rt_6);
-    tx.Set("6");
-    tx.Blit(rt_6.x + (rt_6.w - tx.w()) / 2, rt_6.y + 2);
+    const Rect rt_6(rt_5.x + rt_5.w + 1, top.y + 2, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_6, "6");
 
-    const Rect rt_7(top.x + 104, top.y + 2, sp.w(), sp.h());
-    sp.Blit(rt_7);
-    tx.Set("7");
-    tx.Blit(rt_7.x + (rt_7.w - tx.w()) / 2, rt_7.y + 2);
+    const Rect rt_7(rt_6.x + rt_6.w + 1, top.y + 2, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_7, "7");
 
-    const Rect rt_8(top.x + 121, top.y + 2, sp.w(), sp.h());
-    sp.Blit(rt_8);
-    tx.Set("8");
-    tx.Blit(rt_8.x + (rt_8.w - tx.w()) / 2, rt_8.y + 2);
+    const Rect rt_8(rt_7.x + rt_7.w + 1, top.y + 2, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_8, "8");
 
-    const Rect rt_9(top.x + 138, top.y + 2, sp.w(), sp.h());
-    sp.Blit(rt_9);
-    tx.Set("9");
-    tx.Blit(rt_9.x + (rt_9.w - tx.w()) / 2, rt_9.y + 2);
+    const Rect rt_9(rt_8.x + rt_8.w + 1, top.y + 2, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_9, "9");
 
-    const Rect rt_0(top.x + 155, top.y + 2, sp.w(), sp.h());
-    sp.Blit(rt_0);
-    tx.Set("0");
-    tx.Blit(rt_0.x + (rt_0.w - tx.w()) / 2, rt_0.y + 2);
+    const Rect rt_0(rt_9.x + rt_9.w + 1, top.y + 2, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_0, "0");
 
-    const Rect rt_MINUS(top.x + 172, top.y + 2, sp.w(), sp.h());
-    sp.Blit(rt_MINUS);
-    tx.Set("-");
-    tx.Blit(rt_MINUS.x + (rt_MINUS.w - tx.w()) / 2, rt_MINUS.y + 2);
+    const Rect rt_MINUS(rt_0.x + rt_0.w + 1, top.y + 2, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_MINUS, "-");
 
-    const Rect rt_EQUAL(top.x + 189, top.y + 2, sp.w(), sp.h());
-    sp.Blit(rt_EQUAL);
-    tx.Set("=");
-    tx.Blit(rt_EQUAL.x + (rt_EQUAL.w - tx.w()) / 2, rt_EQUAL.y + 1);
+    const Rect rt_BACKSPACE(rt_MINUS.x + rt_MINUS.w + 1, top.y + 2, 58, sp.h());
+    RedrawTouchButton(sp, rt_BACKSPACE, "back");
 
-    const Rect rt_BACKSPACE(top.x + 206, top.y + 2, 32, sp.h());
-    DrawWideCell(rt_BACKSPACE);
+    // 2 row
+    const Rect rt_EMPTY1(top.x + 2, top.y + 27, 8, sp.h());
+    RedrawTouchButton(sp, rt_EMPTY1, NULL);
 
-    tx.Set("back");
-    tx.Blit(rt_BACKSPACE.x + 2, rt_BACKSPACE.y + 1);
+    const Rect rt_Q(rt_EMPTY1.x + rt_EMPTY1.w + 1, top.y + 27, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_Q, "q");
 
-    // 2
-    const Rect rt_EMPTY1(top.x + 2, top.y + 19, 7, sp.h());
-    DrawWideCell(rt_EMPTY1);
+    const Rect rt_W(rt_Q.x + rt_Q.w + 1, top.y + 27, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_W, "w");
 
-    const Rect rt_Q(top.x + 10, top.y + 19, sp.w(), sp.h());
-    sp.Blit(rt_Q);
-    tx.Set("q");
-    tx.Blit(rt_Q.x + (rt_Q.w - tx.w()) / 2, rt_Q.y + 2);
+    const Rect rt_E(rt_W.x + rt_W.w + 1, top.y + 27, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_E, "e");
 
-    const Rect rt_W(top.x + 27, top.y + 19, sp.w(), sp.h());
-    sp.Blit(rt_W);
-    tx.Set("w");
-    tx.Blit(rt_W.x + (rt_W.w - tx.w()) / 2, rt_W.y + 2);
+    const Rect rt_R(rt_E.x + rt_E.w + 1, top.y + 27, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_R, "r");
 
-    const Rect rt_E(top.x + 44, top.y + 19, sp.w(), sp.h());
-    sp.Blit(rt_E);
-    tx.Set("e");
-    tx.Blit(rt_E.x + (rt_E.w - tx.w()) / 2, rt_E.y + 2);
+    const Rect rt_T(rt_R.x + rt_R.w + 1, top.y + 27, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_T, "t");
 
-    const Rect rt_R(top.x + 61, top.y + 19, sp.w(), sp.h());
-    sp.Blit(rt_R);
-    tx.Set("r");
-    tx.Blit(rt_R.x + (rt_R.w - tx.w()) / 2, rt_R.y + 2);
+    const Rect rt_Y(rt_T.x + rt_T.w + 1, top.y + 27, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_Y, "y");
 
-    const Rect rt_T(top.x + 78, top.y + 19, sp.w(), sp.h());
-    sp.Blit(rt_T);
-    tx.Set("t");
-    tx.Blit(rt_T.x + (rt_T.w - tx.w()) / 2, rt_T.y + 2);
+    const Rect rt_U(rt_Y.x + rt_Y.w + 1, top.y + 27, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_U, "u");
 
-    const Rect rt_Y(top.x + 95, top.y + 19, sp.w(), sp.h());
-    sp.Blit(rt_Y);
-    tx.Set("y");
-    tx.Blit(rt_Y.x + (rt_Y.w - tx.w()) / 2, rt_Y.y + 2);
+    const Rect rt_I(rt_U.x + rt_U.w + 1, top.y + 27, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_I, "i");
 
-    const Rect rt_U(top.x + 112, top.y + 19, sp.w(), sp.h());
-    sp.Blit(rt_U);
-    tx.Set("u");
-    tx.Blit(rt_U.x + (rt_U.w - tx.w()) / 2, rt_U.y + 2);
+    const Rect rt_O(rt_I.x + rt_I.w + 1, top.y + 27, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_O, "o");
 
-    const Rect rt_I(top.x + 129, top.y + 19, sp.w(), sp.h());
-    sp.Blit(rt_I);
-    tx.Set("i");
-    tx.Blit(rt_I.x + (rt_I.w - tx.w()) / 2, rt_I.y + 2);
+    const Rect rt_P(rt_O.x + rt_O.w + 1, top.y + 27, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_P, "p");
 
-    const Rect rt_O(top.x + 146, top.y + 19, sp.w(), sp.h());
-    sp.Blit(rt_O);
-    tx.Set("o");
-    tx.Blit(rt_O.x + (rt_O.w - tx.w()) / 2, rt_O.y + 2);
+    const Rect rt_LB(rt_P.x + rt_P.w + 1, top.y + 27, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_LB, "[");
 
-    const Rect rt_P(top.x + 163, top.y + 19, sp.w(), sp.h());
-    sp.Blit(rt_P);
-    tx.Set("p");
-    tx.Blit(rt_P.x + (rt_P.w - tx.w()) / 2, rt_P.y + 2);
+    const Rect rt_RB(rt_LB.x + rt_LB.w + 1, top.y + 27, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_RB, "]");
 
-    const Rect rt_LB(top.x + 180, top.y + 19, sp.w(), sp.h());
-    sp.Blit(rt_LB);
-    tx.Set("[");
-    tx.Blit(rt_LB.x + (rt_LB.w - tx.w()) / 2, rt_LB.y + 2);
+    const Rect rt_EQUAL(rt_RB.x + rt_RB.w + 1, top.y + 27, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_EQUAL, "=");
 
-    const Rect rt_RB(top.x + 197, top.y + 19, sp.w(), sp.h());
-    sp.Blit(rt_RB);
-    tx.Set("]");
-    tx.Blit(rt_RB.x + (rt_RB.w - tx.w()) / 2, rt_RB.y + 2);
+    // 3 row
+    const Rect rt_EMPTY3(top.x + 2, top.y + 52, 15, sp.h());
+    RedrawTouchButton(sp, rt_EMPTY3, NULL);
 
-    const Rect rt_EMPTY2(top.x + 214, top.y + 19, 24, sp.h());
-    DrawWideCell(rt_EMPTY2);
+    const Rect rt_A(rt_EMPTY3.x + rt_EMPTY3.w + 1, top.y + 52, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_A, "a");
 
-    // 3
-    const Rect rt_EMPTY3(top.x + 2, top.y + 36, 15, sp.h());
-    DrawWideCell(rt_EMPTY3);
+    const Rect rt_S(rt_A.x + rt_A.w + 1, top.y + 52, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_S, "s");
 
-    const Rect rt_A(top.x + 18, top.y + 36, sp.w(), sp.h());
-    sp.Blit(rt_A);
-    tx.Set("a");
-    tx.Blit(rt_A.x + (rt_A.w - tx.w()) / 2, rt_A.y + 2);
+    const Rect rt_D(rt_S.x + rt_S.w + 1, top.y + 52, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_D, "d");
 
-    const Rect rt_S(top.x + 35, top.y + 36, sp.w(), sp.h());
-    sp.Blit(rt_S);
-    tx.Set("s");
-    tx.Blit(rt_S.x + (rt_S.w - tx.w()) / 2, rt_S.y + 2);
+    const Rect rt_F(rt_D.x + rt_D.w + 1, top.y + 52, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_F, "f");
 
-    const Rect rt_D(top.x + 52, top.y + 36, sp.w(), sp.h());
-    sp.Blit(rt_D);
-    tx.Set("d");
-    tx.Blit(rt_D.x + (rt_D.w - tx.w()) / 2, rt_D.y + 2);
+    const Rect rt_G(rt_F.x + rt_F.w + 1, top.y + 52, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_G, "g");
 
-    const Rect rt_F(top.x + 69, top.y + 36, sp.w(), sp.h());
-    sp.Blit(rt_F);
-    tx.Set("f");
-    tx.Blit(rt_F.x + (rt_F.w - tx.w()) / 2, rt_F.y + 2);
+    const Rect rt_H(rt_G.x + rt_G.w + 1, top.y + 52, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_H, "h");
 
-    const Rect rt_G(top.x + 86, top.y + 36, sp.w(), sp.h());
-    sp.Blit(rt_G);
-    tx.Set("g");
-    tx.Blit(rt_G.x + (rt_G.w - tx.w()) / 2, rt_G.y + 2);
+    const Rect rt_J(rt_H.x + rt_H.w + 1, top.y + 52, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_J, "j");
 
-    const Rect rt_H(top.x + 103, top.y + 36, sp.w(), sp.h());
-    sp.Blit(rt_H);
-    tx.Set("h");
-    tx.Blit(rt_H.x + (rt_H.w - tx.w()) / 2, rt_H.y + 2);
+    const Rect rt_K(rt_J.x + rt_J.w + 1, top.y + 52, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_K, "k");
 
-    const Rect rt_J(top.x + 120, top.y + 36, sp.w(), sp.h());
-    sp.Blit(rt_J);
-    tx.Set("j");
-    tx.Blit(rt_J.x + (rt_J.w - tx.w()) / 2, rt_J.y + 2);
+    const Rect rt_L(rt_K.x + rt_K.w + 1, top.y + 52, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_L, "l");
 
-    const Rect rt_K(top.x + 137, top.y + 36, sp.w(), sp.h());
-    sp.Blit(rt_K);
-    tx.Set("k");
-    tx.Blit(rt_K.x + (rt_K.w - tx.w()) / 2, rt_K.y + 2);
+    const Rect rt_SP(rt_L.x + rt_L.w + 1, top.y + 52, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_SP, ";");
 
-    const Rect rt_L(top.x + 154, top.y + 36, sp.w(), sp.h());
-    sp.Blit(rt_L);
-    tx.Set("l");
-    tx.Blit(rt_L.x + (rt_L.w - tx.w()) / 2, rt_L.y + 2);
+    const Rect rt_CM(rt_SP.x + rt_SP.w + 1, top.y + 52, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_CM, "'");
 
-    const Rect rt_SP(top.x + 171, top.y + 36, sp.w(), sp.h());
-    sp.Blit(rt_SP);
-    tx.Set(";");
-    tx.Blit(rt_SP.x + (rt_SP.w - tx.w()) / 2, rt_SP.y + 2);
+    const Rect rt_RETURN(rt_CM.x + rt_CM.w + 1, top.y + 52, 42, sp.h());
+    RedrawTouchButton(sp, rt_RETURN, "rtrn");
 
-    const Rect rt_CM(top.x + 188, top.y + 36, sp.w(), sp.h());
-    sp.Blit(rt_CM);
-    tx.Set("'");
-    tx.Blit(rt_CM.x + (rt_CM.w - tx.w()) / 2, rt_CM.y + 2);
+    // 4 row
+    const Rect rt_EMPTY5(top.x + 2, top.y + 77, 26, sp.h());
+    RedrawTouchButton(sp, rt_EMPTY5, NULL);
 
-    const Rect rt_RETURN(top.x + 205, top.y + 36, 33, sp.h());
-    DrawWideCell(rt_RETURN);
+    const Rect rt_Z(rt_EMPTY5.x + rt_EMPTY5.w + 1, top.y + 77, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_Z, "z");
 
-    tx.Set("rtrn");
-    tx.Blit(rt_RETURN.x + (rt_RETURN.w - tx.w()) / 2, rt_RETURN.y + 2);
+    const Rect rt_X(rt_Z.x + rt_Z.w + 1, top.y + 77, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_X, "x");
 
-    // 4
-    const Rect rt_EMPTY5(top.x + 2, top.y + 53, 23, sp.h());
-    DrawWideCell(rt_EMPTY5);
+    const Rect rt_C(rt_X.x + rt_X.w + 1, top.y + 77, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_C, "c");
 
-    const Rect rt_Z(top.x + 26, top.y + 53, sp.w(), sp.h());
-    sp.Blit(rt_Z);
-    tx.Set("z");
-    tx.Blit(rt_Z.x + (rt_Z.w - tx.w()) / 2, rt_Z.y + 2);
+    const Rect rt_V(rt_C.x + rt_C.w + 1, top.y + 77, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_V, "v");
 
-    const Rect rt_X(top.x + 43, top.y + 53, sp.w(), sp.h());
-    sp.Blit(rt_X);
-    tx.Set("x");
-    tx.Blit(rt_X.x + (rt_X.w - tx.w()) / 2, rt_X.y + 2);
+    const Rect rt_B(rt_V.x + rt_V.w + 1, top.y + 77, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_B, "b");
 
-    const Rect rt_C(top.x + 60, top.y + 53, sp.w(), sp.h());
-    sp.Blit(rt_C);
-    tx.Set("c");
-    tx.Blit(rt_C.x + (rt_C.w - tx.w()) / 2, rt_C.y + 2);
+    const Rect rt_N(rt_B.x + rt_B.w + 1, top.y + 77, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_N, "n");
 
-    const Rect rt_V(top.x + 77, top.y + 53, sp.w(), sp.h());
-    sp.Blit(rt_V);
-    tx.Set("v");
-    tx.Blit(rt_V.x + (rt_V.w - tx.w()) / 2, rt_V.y + 2);
+    const Rect rt_M(rt_N.x + rt_N.w + 1, top.y + 77, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_M, "m");
 
-    const Rect rt_B(top.x + 94, top.y + 53, sp.w(), sp.h());
-    sp.Blit(rt_B);
-    tx.Set("b");
-    tx.Blit(rt_B.x + (rt_B.w - tx.w()) / 2, rt_B.y + 2);
+    const Rect rt_CS(rt_M.x + rt_M.w + 1, top.y + 77, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_CS, ",");
 
-    const Rect rt_N(top.x + 111, top.y + 53, sp.w(), sp.h());
-    sp.Blit(rt_N);
-    tx.Set("n");
-    tx.Blit(rt_N.x + (rt_N.w - tx.w()) / 2, rt_N.y + 2);
+    const Rect rt_DT(rt_CS.x + rt_CS.w + 1, top.y + 77, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_DT, ".");
 
-    const Rect rt_M(top.x + 128, top.y + 53, sp.w(), sp.h());
-    sp.Blit(rt_M);
-    tx.Set("m");
-    tx.Blit(rt_M.x + (rt_M.w - tx.w()) / 2, rt_M.y + 2);
+    const Rect rt_SL(rt_DT.x + rt_DT.w + 1, top.y + 77, sp.w(), sp.h());
+    RedrawTouchButton(sp, rt_SL, "/");
 
-    const Rect rt_CS(top.x + 145, top.y + 53, sp.w(), sp.h());
-    sp.Blit(rt_CS);
-    tx.Set(",");
-    tx.Blit(rt_CS.x + (rt_CS.w - tx.w()) / 2, rt_CS.y + 2);
-
-    const Rect rt_DT(top.x + 162, top.y + 53, sp.w(), sp.h());
-    sp.Blit(rt_DT);
-    tx.Set(".");
-    tx.Blit(rt_DT.x + (rt_DT.w - tx.w()) / 2, rt_DT.y + 2);
-
-    const Rect rt_SL(top.x + 179, top.y + 53, sp.w(), sp.h());
-    sp.Blit(rt_SL);
-    tx.Set("/");
-    tx.Blit(rt_SL.x + (rt_SL.w - tx.w()) / 2, rt_SL.y + 2);
-
-    const Rect rt_SPACE(top.x + 196, top.y + 53, 42, sp.h());
-    DrawWideCell(rt_SPACE);
-
-    tx.Set("space");
-    tx.Blit(rt_SPACE.x + (rt_SPACE.w - tx.w()) / 2, rt_SPACE.y + 2);
-
-    Rect rectClose;
+    const Rect rt_SPACE(rt_SL.x + rt_SL.w + 1, top.y + 77, 56, sp.h());
+    RedrawTouchButton(sp, rt_SPACE, "space");
 
     cursor.Show();
     display.Flip();
@@ -421,7 +339,7 @@ void PocketPC::KeyboardDialog(std::string & str)
     // mainmenu loop
     while(le.HandleEvents())
     {
-        if(le.MouseClickLeft(rectClose) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT))
+        if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT))
 	{
 	    str.clear();
 	    break;
@@ -538,7 +456,7 @@ void PocketPC::KeyboardDialog(std::string & str)
 
 	if(redraw)
 	{
-	    tx.Set(str);
+	    Text tx(str, Font::SMALL);
 	    if(tx.w() < top.w) 
 	    {
 		cursor.Hide();
@@ -556,3 +474,4 @@ void PocketPC::KeyboardDialog(std::string & str)
     cursor.Show();
     display.Flip();
 }
+#endif
