@@ -20,6 +20,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <unistd.h> /* unlink usage */
+
 #include <algorithm>
 #include <ctime>
 #include <sstream>
@@ -34,10 +36,6 @@
 #include "pocketpc.h"
 #include "world.h"
 #include "dialog.h"
-
-#if defined __SYMBIAN32__ || defined(ANDROID)
-#include <unistd.h>
-#endif
 
 bool SelectFileListSimple(const std::string &, std::string &, bool);
 void RedrawExtraInfo(const Point &, const std::string &, const std::string &);
