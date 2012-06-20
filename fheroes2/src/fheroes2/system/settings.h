@@ -111,12 +111,7 @@ namespace std
  #define VERBOSE(x) std::cout << x << std::endl
 #endif
 
-#ifdef WITH_DEBUG
- #define DEBUG(x, y, z) if(IS_DEBUG(x, y)) VERBOSE(String::GetTime() << ": [" << StringDebug(x) << "]\t" << __FUNCTION__ << ":  " << z)
-#else
- #define DEBUG(x, y, z)
-#endif
-
+#define DEBUG(x, y, z) if(IS_DEBUG(x, y)) VERBOSE(String::GetTime() << ": [" << StringDebug(x) << "]\t" << __FUNCTION__ << ":  " << z)
 #define IS_DEVEL() IS_DEBUG(DBG_DEVEL, DBG_INFO)
 
 bool IS_DEBUG(int name, int level);
