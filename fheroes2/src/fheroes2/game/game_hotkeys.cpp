@@ -230,11 +230,9 @@ bool Game::HotKeyPress(events_t evnt)
 
 void Game::HotKeysLoad(const std::string & hotkeys)
 {
-    Tiny::Config config;
-    const Tiny::Entry* entry = NULL;
-
-    config.SetSeparator('=');
-    config.SetComment('#');
+    TinyConfig config('=', '#');
+    int ival;
+    //const Tiny::Entry* entry = NULL;
 
     if(config.Load(hotkeys.c_str()))
     {
@@ -243,10 +241,10 @@ void Game::HotKeysLoad(const std::string & hotkeys)
 	    const char* name = EventsName(evnt);
 	    if(name)
 	    {
-		entry = config.Find(name);
-		if(entry)
+		ival = config.IntParams(name);
+		if(ival)
 		{
-		    const KeySym sym = GetKeySym(entry->IntParams());
+		    const KeySym sym = GetKeySym(ival);
 		    key_events[evnt] = sym;
 		    DEBUG(DBG_GAME, DBG_INFO, "events: " << EventsName(evnt) << ", key: " << KeySymGetName(sym));
 		}
@@ -256,23 +254,23 @@ void Game::HotKeysLoad(const std::string & hotkeys)
 #ifdef WITHOUT_MOUSE
 	LocalEvent & le = LocalEvent::Get();
 
-	entry = config.Find("emulate mouse up");
-        if(entry) le.SetEmulateMouseUpKey(GetKeySym(entry->IntParams()));
+	ival = config.IntParams("emulate mouse up");
+        if(ival) le.SetEmulateMouseUpKey(GetKeySym(ival));
 
-        entry = config.Find("emulate mouse down");
-        if(entry) le.SetEmulateMouseDownKey(GetKeySym(entry->IntParams()));
+        ival = config.IntParams("emulate mouse down");
+        if(ival) le.SetEmulateMouseDownKey(GetKeySym(ival));
 
-        entry = config.Find("emulate mouse left");
-        if(entry) le.SetEmulateMouseLeftKey(GetKeySym(entry->IntParams()));
+        ival = config.IntParams("emulate mouse left");
+        if(ival) le.SetEmulateMouseLeftKey(GetKeySym(ival));
 
-        entry = config.Find("emulate mouse right");
-        if(entry) le.SetEmulateMouseRightKey(GetKeySym(entry->IntParams()));
+        ival = config.IntParams("emulate mouse right");
+        if(ival) le.SetEmulateMouseRightKey(GetKeySym(ival));
 
-        entry = config.Find("emulate press left");
-        if(entry) le.SetEmulatePressLeftKey(GetKeySym(entry->IntParams()));
+        ival = config.IntParams("emulate press left");
+        if(ival) le.SetEmulatePressLeftKey(GetKeySym(ival));
 
-        entry = config.Find("emulate press right");
-        if(entry) le.SetEmulatePressRightKey(GetKeySym(entry->IntParams()));
+        ival = config.IntParams("emulate press right");
+        if(ival) le.SetEmulatePressRightKey(GetKeySym(ival));
 #endif
     }
 }

@@ -146,8 +146,11 @@ public:
 
     const std::string & GetRumors(void);
     
-    s32 NextTeleport(const s32 index, bool onwater) const;
-    s32 NextWhirlpool(const s32 index);
+    s32 NextTeleport(const s32 &) const;
+    MapsIndexes GetTeleportEndPoints(const s32 &) const;
+
+    s32 NextWhirlpool(const s32 &) const;
+    MapsIndexes GetWhirlpoolEndPoints(const s32 &) const;
 
     const std::string & MessageSign(const s32 index);
 

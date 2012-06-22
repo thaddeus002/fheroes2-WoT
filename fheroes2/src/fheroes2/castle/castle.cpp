@@ -1964,7 +1964,7 @@ struct CastleHavePoint : public std::binary_function <const Castle*, const Point
 
 Castle* VecCastles::Get(s32 index) const
 {
-    if(FORMAT_VERSION_2830)
+    if(Game::GetLoadVersion() < FORMAT_VERSION_2830)
 	return world.h() ? Get(Maps::GetPoint(index)) : NULL;
 
     return Get(Maps::GetPoint(index));

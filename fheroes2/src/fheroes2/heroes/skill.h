@@ -32,6 +32,7 @@
 void StringAppendModifiers(std::string &, s8);
 class Spell;
 
+
 namespace Skill
 {
     s8 GetLeadershipModifiers(u8 level, std::string* strs);

@@ -1252,79 +1252,99 @@ bool TeleportCheckGround(s32 index, bool water)
     return world.GetTiles(index).isWater() == water;
 }
 
-/* return random teleport destination */
-s32 World::NextTeleport(const s32 index, bool onwater) const
-{
-    MapsIndexes vec_teleports = Maps::GetObjectPositions(MP2::OBJ_STONELIGHTS, true);
+MapsIndexes World::GetTeleportEndPoints(const s32 & center) const
+{	
+    MapsIndexes result;
 
-    if(2 > vec_teleports.size())
+    if(MP2::OBJ_STONELIGHTS == GetTiles(center).GetObject(false))
     {
-	DEBUG(DBG_GAME, DBG_WARN, "is empty");
-	return index;
-    }
+	result = Maps::GetObjectPositions(MP2::OBJ_STONELIGHTS, true);
 
-    MapsIndexes::iterator itend = vec_teleports.end();
-
-    // remove if not type
-    itend = std::remove_if(vec_teleports.begin(), itend,
-		    std::not1(std::bind2nd(std::ptr_fun(&TeleportCheckType), GetTiles(index).QuantityTeleportType())));
-
-    // remove if index
-    itend = std::remove(vec_teleports.begin(), itend, index);
-
-    // remove if not ground
-    itend = std::remove_if(vec_teleports.begin(), itend,
-		    std::not1(std::bind2nd(std::ptr_fun(&TeleportCheckGround), onwater)));
-
-    vec_teleports.resize(std::distance(vec_teleports.begin(), itend));
-
-    if(vec_teleports.empty()) DEBUG(DBG_GAME , DBG_WARN, "not found");
-
-    return vec_teleports.size() ? *Rand::Get(vec_teleports) : index;
-}
-
-/* return random whirlpools destination */
-s32 World::NextWhirlpool(const s32 index)
-{
-    MapsIndexes whilrpools = Maps::GetObjectPositions(MP2::OBJ_WHIRLPOOL, false);
-
-    std::map<s32, MapsIndexes> uniq_whirlpools;
-
-    for(MapsIndexes::const_iterator
-	it = whilrpools.begin(); it != whilrpools.end(); ++it)
-    {
-    	const Maps::TilesAddon* addon = GetTiles(*it).FindObjectConst(MP2::OBJ_WHIRLPOOL);
-	if(addon) uniq_whirlpools[addon->uniq].push_back(*it);
-    }
-    whilrpools.clear();
-
-    if(2 > uniq_whirlpools.size())
-    {
-	DEBUG(DBG_GAME , DBG_WARN, "is empty");
-	return index;
-    }
-
-    const Maps::TilesAddon* addon = GetTiles(index).FindObjectConst(MP2::OBJ_WHIRLPOOL);
-    MapsIndexes uniqs;
-    uniqs.reserve(uniq_whirlpools.size());
-
-    if(addon)
-    {
-	for(std::map<s32, MapsIndexes>::const_iterator
-	    it = uniq_whirlpools.begin(); it != uniq_whirlpools.end(); ++it)
+	if(2 > result.size())
 	{
-	    const u32 & uniq = (*it).first;
-	    if(uniq == addon->uniq) continue;
-	    uniqs.push_back(uniq);
+	    DEBUG(DBG_GAME, DBG_WARN, "is empty");
+	    result.clear();
+	}
+	else
+	{
+	    MapsIndexes::iterator itend = result.end();
+
+	    // remove if not type
+	    itend = std::remove_if(result.begin(), itend,
+		    std::not1(std::bind2nd(std::ptr_fun(&TeleportCheckType), GetTiles(center).QuantityTeleportType())));
+
+	    // remove if index
+	    itend = std::remove(result.begin(), itend, center);
+
+	    // remove if not ground
+	    itend = std::remove_if(result.begin(), itend,
+		    std::not1(std::bind2nd(std::ptr_fun(&TeleportCheckGround), GetTiles(center).isWater())));
+
+	    result.resize(std::distance(result.begin(), itend));
 	}
     }
 
-    MapsIndexes & dest = uniq_whirlpools[*Rand::Get(uniqs)];
-    uniqs.clear();
+    return result;
+}
 
-    if(dest.empty()) DEBUG(DBG_GAME, DBG_WARN, "is full");
+/* return random teleport destination */
+s32 World::NextTeleport(const s32 & index) const
+{
+    const MapsIndexes teleports = GetTeleportEndPoints(index);
+    if(teleports.empty()) DEBUG(DBG_GAME , DBG_WARN, "not found");
 
-    return dest.size() ? *Rand::Get(dest) : index;
+    return teleports.size() ? *Rand::Get(teleports) : index;
+}
+
+MapsIndexes World::GetWhirlpoolEndPoints(const s32 & center) const
+{	
+    if(MP2::OBJ_WHIRLPOOL == GetTiles(center).GetObject(false))
+    {
+	MapsIndexes whilrpools = Maps::GetObjectPositions(MP2::OBJ_WHIRLPOOL, false);
+	std::map<s32, MapsIndexes> uniq_whirlpools;
+
+	for(MapsIndexes::const_iterator
+	    it = whilrpools.begin(); it != whilrpools.end(); ++it)
+	{
+    	    const Maps::TilesAddon* addon = GetTiles(*it).FindObjectConst(MP2::OBJ_WHIRLPOOL);
+	    if(addon) uniq_whirlpools[addon->uniq].push_back(*it);
+	}
+	whilrpools.clear();
+
+	if(2 > uniq_whirlpools.size())
+	{
+	    DEBUG(DBG_GAME , DBG_WARN, "is empty");
+	    return MapsIndexes();
+	}
+
+	const Maps::TilesAddon* addon = GetTiles(center).FindObjectConst(MP2::OBJ_WHIRLPOOL);
+	MapsIndexes uniqs;
+	uniqs.reserve(uniq_whirlpools.size());
+
+	if(addon)
+	{
+	    for(std::map<s32, MapsIndexes>::const_iterator
+		it = uniq_whirlpools.begin(); it != uniq_whirlpools.end(); ++it)
+	    {
+		const u32 & uniq = (*it).first;
+	        if(uniq == addon->uniq) continue;
+		uniqs.push_back(uniq);
+	    }
+	}
+
+	return uniq_whirlpools[*Rand::Get(uniqs)];
+    }
+
+    return MapsIndexes();
+}
+
+/* return random whirlpools destination */
+s32 World::NextWhirlpool(const s32 & index) const
+{
+    const MapsIndexes whilrpools = GetWhirlpoolEndPoints(index);
+    if(whilrpools.empty()) DEBUG(DBG_GAME, DBG_WARN, "is full");
+
+    return whilrpools.size() ? *Rand::Get(whilrpools) : index;
 }
 
 /* return message from sign */

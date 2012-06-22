@@ -35,6 +35,16 @@ s32 Route::Step::GetIndex(void) const
     return from < 0 ? -1 : Maps::GetDirectionIndex(from, direction);
 }
 
+const s32 & Route::Step::GetFrom(void) const
+{
+    return from;
+}
+
+const u16 & Route::Step::GetDirection(void) const
+{
+    return direction;
+}
+
 const u16 & Route::Step::GetPenalty(void) const
 {
     return penalty;
@@ -47,15 +57,30 @@ bool Route::Step::isBad(void) const
 
 /* construct */
 Route::Path::Path(const Heroes & h)
-    : hero(h), dst(h.GetIndex()), hide(true)
+    : hero(& h), dst(h.GetIndex()), hide(true)
 {
+}
+
+Route::Path::Path(const Path & p) : std::list<Step>(p), hero(p.hero), dst(p.dst), hide(p.hide)
+{
+}
+
+Route::Path & Route::Path::operator= (const Path & p)
+{
+    assign(p.begin(), p.end());
+
+    hero = p.hero;
+    dst = p.dst;
+    hide = p.hide;
+
+    return *this;
 }
 
 u16 Route::Path::GetFrontDirection(void) const
 {
     return empty() ?
-	(dst != hero.GetIndex() ? Direction::Get(hero.GetIndex(), dst)
-					    : Direction::CENTER) : front().direction;
+	(dst != hero->GetIndex() ? Direction::Get(hero->GetIndex(), dst)
+					    : Direction::CENTER) : front().GetDirection();
 }
 
 u16 Route::Path::GetFrontPenalty(void) const
@@ -93,15 +118,15 @@ s32 Route::Path::GetDestinedIndex(void) const
 }
 
 /* return length path */
-bool Route::Path::Calculate(const s32 dst_index, const u16 limit)
+bool Route::Path::Calculate(const s32 & dst_index, u16 limit /* MAXU16 */)
 {
     dst = dst_index;
 
-    if(Find(dst_index, limit))
+    if(Find(dst, limit))
     {
 	// check monster dst
-	if(Maps::isValidAbsIndex(dst_index) &&
-	    MP2::OBJ_MONSTER == world.GetTiles(dst_index).GetObject())
+	if(Maps::isValidAbsIndex(dst) &&
+	    MP2::OBJ_MONSTER == world.GetTiles(dst).GetObject())
 	    pop_back();
     }
 
@@ -110,7 +135,8 @@ bool Route::Path::Calculate(const s32 dst_index, const u16 limit)
 
 void Route::Path::Reset(void)
 {
-    dst = hero.GetIndex();
+    dst = hero->GetIndex();
+
     if(!empty())
     {
 	clear();
@@ -120,8 +146,8 @@ void Route::Path::Reset(void)
 
 bool Route::Path::isComplete(void) const
 {
-    return dst == hero.GetIndex() ||
-	(empty() && Direction::UNKNOWN != Direction::Get(hero.GetIndex(), dst));
+    return dst == hero->GetIndex() ||
+	(empty() && Direction::UNKNOWN != Direction::Get(hero->GetIndex(), dst));
 }
 
 bool Route::Path::isValid(void) const
@@ -132,8 +158,8 @@ bool Route::Path::isValid(void) const
 /*
 bool Route::Path::isValid0(void) const
 {
-    return !empty() || (dst != hero.GetIndex() &&
-			Direction::UNKNOWN != Direction::Get(hero.GetIndex(), dst));
+    return !empty() || (dst != hero->GetIndex() &&
+			Direction::UNKNOWN != Direction::Get(hero->GetIndex(), dst));
 }
 
 bool Route::Path::isBroken(void) const
@@ -294,7 +320,7 @@ u32 Route::Path::GetTotalPenalty(void) const
 u16 Route::Path::GetAllowStep(void) const
 {
     u16 green = 0;
-    u16 move_point = hero.GetMovePoints();
+    u16 move_point = hero->GetMovePoints();
 
     for(const_iterator
 	it = begin(); it != end() && move_point >= (*it).GetPenalty(); ++it)
@@ -310,12 +336,12 @@ std::string Route::Path::String(void) const
 {
     std::ostringstream os;
 
-    os << "from: " << hero.GetIndex() << ", to: " << GetLastIndex() <<
+    os << "from: " << hero->GetIndex() << ", to: " << GetLastIndex() <<
 	", obj: " << MP2::StringObject(world.GetTiles(dst).GetObject()) << ", dump: ";
 
     for(const_iterator
 	it = begin(); it != end(); ++it)
-	os << Direction::String((*it).direction) << "(" << (*it).GetPenalty() << ")" << ", ";
+	os << Direction::String((*it).GetDirection()) << "(" << (*it).GetPenalty() << ")" << ", ";
 
     os << "end";
     return os.str();
@@ -340,7 +366,7 @@ bool StepIsObstacle(const Route::Step & s)
 
 bool StepIsPassable(const Route::Step & s, const Heroes* h)
 {
-    return world.GetTiles(s.from).isPassable(h, s.direction, false);
+    return world.GetTiles(s.GetFrom()).isPassable(h, s.GetDirection(), false);
 }
 
 bool Route::Path::hasObstacle(void) const
@@ -357,7 +383,7 @@ void Route::Path::RescanObstacle(void)
     if(it != end() && (*it).GetIndex() != GetLastIndex())
     {
 	size_t size1 = size();
-	s32 reduce = (*it).from;
+	s32 reduce = (*it).GetFrom();
 	Calculate(dst);
 	// reduce
 	if(size() > size1 * 2) Calculate(reduce);
@@ -370,10 +396,10 @@ void Route::Path::RescanPassable(void)
     iterator it = begin();
 
     for(; it != end(); ++it)
-	if(! world.GetTiles((*it).from).isPassable(NULL, (*it).direction, false))
+	if(! world.GetTiles((*it).GetFrom()).isPassable(NULL, (*it).GetDirection(), false))
 	break;
 
-    if(hero.GetControl() == CONTROL_AI)
+    if(hero->GetControl() == CONTROL_AI)
     {
 	Reset();
     }
@@ -384,7 +410,7 @@ void Route::Path::RescanPassable(void)
 	    Reset();
 	else
 	{
-	    dst = (*it).from;
+	    dst = (*it).GetFrom();
 	    erase(it, end());
 	}
     }

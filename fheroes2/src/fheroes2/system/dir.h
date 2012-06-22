@@ -33,6 +33,7 @@ struct ListFiles : public std::list<std::string>
 
 struct ListDirs : public std::list<std::string>
 {
+    void Append(const std::list<std::string> &);
 };
 
 #endif

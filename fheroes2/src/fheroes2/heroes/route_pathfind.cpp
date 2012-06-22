@@ -184,8 +184,8 @@ u16 GetPenaltyFromTo(const s32 & from, const s32 & to, const Direction::vector_t
 
 bool Route::Path::Find(const s32 & to, const u16 limit)
 {
-    const u8 pathfinding = hero.GetLevelSkill(Skill::Secondary::PATHFINDING);
-    const s32 & from = hero.GetIndex();
+    const u8 pathfinding = hero->GetLevelSkill(Skill::Secondary::PATHFINDING);
+    const s32 & from = hero->GetIndex();
 
     s32 cur = from;
     s32 alt = 0;
@@ -220,7 +220,7 @@ bool Route::Path::Find(const s32 & to, const u16 limit)
 		    if(-1 == list[tmp].parent)
 		    {
 			if((list[cur].passbl & direct) ||
-			   PassableFromToTile(hero, cur, tmp, direct, to))
+			   PassableFromToTile(*hero, cur, tmp, direct, to))
 			{
 			    list[cur].passbl |= direct;
 
@@ -236,7 +236,7 @@ bool Route::Path::Find(const s32 & to, const u16 limit)
 		    else
 		    {
 			if(list[tmp].cost_t > list[cur].cost_t + costg &&
-			   ((list[cur].passbl & direct) || PassableFromToTile(hero, cur, tmp, direct, to)))
+			   ((list[cur].passbl & direct) || PassableFromToTile(*hero, cur, tmp, direct, to)))
 			{
 			    list[cur].passbl |= direct;
 

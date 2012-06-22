@@ -24,8 +24,141 @@
 
 #include "resource.h"
 #include "mp2.h"
+#include "race.h"
+#include "game.h"
+#include "settings.h"
 #include "difficulty.h"
+#include "skill_static.h"
+#include "skill.h"
 #include "game_static.h"
+
+namespace Skill
+{
+    stats_t _stats[] = {
+	{ "knight",      { 1, 1, 1, 1 }, { 2, 2, 1, 1 }, 0, 0, { 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 }, 10, {35,45,10,10 }, {25,25,25,25 }, { 2, 4, 3, 1, 3, 5, 3, 1, 1, 2, 0, 3, 2, 2 } },
+	{ "barbarian",   { 1, 1, 1, 1 }, { 3, 1, 1, 1 }, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0 }, 10, {55,35, 5, 5 }, {30,30,20,20 }, { 3, 3, 2, 1, 2, 3, 3, 2, 1, 3, 0, 4, 4, 1 } },
+	{ "sorceress",   { 0, 0, 2, 2 }, { 0, 0, 2, 3 }, 1,15, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1 }, 10, {10,10,30,50 }, {20,20,30,30 }, { 3, 3, 2, 2, 2, 1, 2, 3, 3, 4, 0, 2, 1, 4 } },
+	{ "warlock",     { 0, 0, 2, 2 }, { 0, 0, 3, 2 }, 1,19, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1 }, 10, {10,10,50,30 }, {20,20,30,30 }, { 1, 3, 2, 3, 2, 1, 2, 1, 3, 2, 1, 2, 4, 5 } },
+	{ "wizard",      { 0, 0, 2, 2 }, { 0, 1, 2, 2 }, 1,17, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 }, 10, {10,10,40,40 }, {20,20,30,30 }, { 1, 3, 2, 3, 2, 2, 2, 2, 4, 2, 0, 2, 2, 5 } },
+	{ "necromancer", { 0, 0, 2, 2 }, { 1, 0, 2, 2 }, 1,10, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1 }, 10, {15,15,35,35 }, {25,25,25,25 }, { 1, 3, 2, 3, 2, 0, 2, 1, 3, 2, 5, 3, 1, 4 } },
+	{ NULL,          { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, 10, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }
+    };
+
+    values_t _values[] = {
+	{ "pathfinding", { 25, 50,100} },
+	{ "archery",     { 10, 25, 50} },
+	{ "logistics",   { 10, 20, 30} },
+	{ "scouting",    {  1,  2,  3} },
+	{ "diplomacy",   { 25, 50,100} },
+	{ "navigation",  { 33, 66,100} },
+	{ "leadership",  {  1,  2,  3} },
+	{ "wisdom",      {  3,  4,  5} },
+	{ "mysticism",   {  2,  3,  4} },
+	{ "luck",        {  1,  2,  3} },
+	{ "ballistics",  {  0,  0,  0} },
+	{ "eagleeye",    { 20, 30, 40} },
+	{ "necromancy",  { 10, 20, 30} },
+	{ "estates",     {100,250,500} },
+	{ NULL,          {  0,  0,  0} },
+    };
+
+    secondary_t _from_witchs_hut = {
+	/* archery */   1, /* ballistics */ 1, /* diplomacy */ 1, /* eagleeye */    1,
+	/* estates */   1, /* leadership */ 0, /* logistics */ 1, /* luck */        1,
+	/* mysticism */ 1, /* navigation */ 1, /* necromancy*/ 0, /* pathfinding */ 1,
+	/* scouting */  1, /* wisdom */ 1
+    };
+
+    StreamBase & operator<< (StreamBase & msg, const level_t & obj)
+    {
+	return msg << obj.basic << obj.advanced << obj.expert;
+    }
+
+    StreamBase & operator>> (StreamBase & msg, level_t & obj)
+    {
+	return msg >> obj.basic >> obj.advanced >> obj.expert;
+    }
+
+    StreamBase & operator<< (StreamBase & msg, const primary_t & obj)
+    {
+	return msg << obj.attack << obj.defense << obj.power << obj.knowledge;
+    }
+
+    StreamBase & operator>> (StreamBase & msg, primary_t & obj)
+    {
+	return msg >> obj.attack >> obj.defense >> obj.power >> obj.knowledge;
+    }
+
+    StreamBase & operator<< (StreamBase & msg, const secondary_t & obj)
+    {
+	return msg << obj.archery << obj.ballistics << obj.diplomacy << obj.eagleeye << obj.estates << obj.leadership <<
+	    obj.logistics << obj.luck << obj.mysticism << obj.navigation << obj.necromancy << obj.pathfinding << obj.scouting << obj.wisdom;
+    }
+
+    StreamBase & operator>> (StreamBase & msg, secondary_t & obj)
+    {
+	return msg >> obj.archery >> obj.ballistics >> obj.diplomacy >> obj.eagleeye >> obj.estates >> obj.leadership >>
+    	    obj.logistics >> obj.luck >> obj.mysticism >> obj.navigation >> obj.necromancy >> obj.pathfinding >> obj.scouting >> obj.wisdom;
+    }
+
+    StreamBase & operator<< (StreamBase & msg, const stats_t & obj)
+    {
+	return msg << obj.captain_primary << obj.initial_primary << obj.initial_book << obj.initial_spell <<
+    	    obj.initial_secondary << obj.over_level << obj.mature_primary_under << obj.mature_primary_over << obj.mature_secondary;
+    }
+
+    StreamBase & operator>> (StreamBase & msg, stats_t & obj)
+    {
+	return msg >> obj.captain_primary >> obj.initial_primary >> obj.initial_book >> obj.initial_spell >>
+    	    obj.initial_secondary >> obj.over_level >> obj.mature_primary_under >> obj.mature_primary_over >> obj.mature_secondary;
+    }
+
+    StreamBase & operator<< (StreamBase & msg, const values_t & obj)
+    {
+	return msg << obj.values;
+    }
+
+    StreamBase & operator>> (StreamBase & msg, values_t & obj)
+    {
+	return msg >> obj.values;
+    }
+
+#ifdef WITH_XML
+    void LoadPrimarySection(const TiXmlElement* xml, primary_t & skill)
+    {
+	if(xml)
+	{
+	    int value;
+	    xml->Attribute("attack", &value);    skill.attack = value;
+	    xml->Attribute("defense", &value);   skill.defense = value;
+	    xml->Attribute("power", &value);     skill.power = value;
+	    xml->Attribute("knowledge", &value); skill.knowledge = value;
+	}
+    }
+
+    void LoadSecondarySection(const TiXmlElement* xml, secondary_t & sec)
+    {
+	if(xml)
+	{
+	    int value;
+	    xml->Attribute("archery", &value);     sec.archery = value;
+	    xml->Attribute("ballistics", &value);  sec.ballistics = value;
+	    xml->Attribute("diplomacy", &value);   sec.diplomacy = value;
+	    xml->Attribute("eagleeye", &value);    sec.eagleeye = value;
+	    xml->Attribute("estates", &value);     sec.estates = value;
+	    xml->Attribute("leadership", &value);  sec.leadership = value;
+	    xml->Attribute("logistics", &value);   sec.logistics = value;
+	    xml->Attribute("luck", &value);        sec.luck = value;
+	    xml->Attribute("mysticism", &value);   sec.mysticism = value;
+	    xml->Attribute("navigation", &value);  sec.navigation = value;
+	    xml->Attribute("necromancy", &value);  sec.necromancy = value;
+	    xml->Attribute("pathfinding", &value); sec.pathfinding = value;
+	    xml->Attribute("scouting", &value);    sec.scouting = value;
+	    xml->Attribute("wisdom", &value);      sec.wisdom = value;
+	}
+    }
+#endif
+}
 
 namespace GameStatic
 {
@@ -111,6 +244,19 @@ StreamBase & GameStatic::operator<< (StreamBase & msg, const Data & obj)
 
     msg << monster_upgrade_ratio << uniq;
 
+    // skill statics
+    array_size = ARRAY_COUNT(Skill::_stats);
+    msg << array_size;
+    for(u8 ii = 0; ii < array_size; ++ii)
+        msg << Skill::_stats[ii];
+
+    array_size = ARRAY_COUNT(Skill::_values);
+    msg << array_size;
+    for(u8 ii = 0; ii < array_size; ++ii)
+        msg << Skill::_values[ii];
+
+    msg << Skill::_from_witchs_hut;
+
     return msg;
 }
 
@@ -148,6 +294,20 @@ StreamBase & GameStatic::operator>> (StreamBase & msg, Data & obj)
 	msg >> objects_mod[ii];
 
     msg >> monster_upgrade_ratio >> uniq;
+
+    // skill static
+    if(Game::GetLoadVersion() < FORMAT_VERSION_2864)
+        return msg;
+
+    msg >> array_size;
+    for(u8 ii = 0; ii < array_size; ++ii)
+        msg >> Skill::_stats[ii];
+
+    msg >> array_size;
+    for(u8 ii = 0; ii < array_size; ++ii)
+        msg >> Skill::_values[ii];
+
+    msg >> Skill::_from_witchs_hut;
 
     return msg;
 }
@@ -242,6 +402,51 @@ s8 GameStatic::ObjectVisitedModifiers(u8 obj)
     }
 
     return 0;
+}
+
+const Skill::stats_t* GameStatic::GetSkillStats(u8 race)
+{
+    switch(race)
+    {
+        case Race::KNGT: return & Skill::_stats[0];
+        case Race::BARB: return & Skill::_stats[1];
+        case Race::SORC: return & Skill::_stats[2];
+        case Race::WRLK: return & Skill::_stats[3];
+        case Race::WZRD: return & Skill::_stats[4];
+        case Race::NECR: return & Skill::_stats[5];
+        default: break;
+    }
+
+    return NULL;
+}
+
+const Skill::values_t* GameStatic::GetSkillValues(u8 type)
+{
+    switch(type)
+    {
+	case Skill::Secondary::PATHFINDING:	return & Skill::_values[0];
+	case Skill::Secondary::ARCHERY:		return & Skill::_values[1];
+	case Skill::Secondary::LOGISTICS:	return & Skill::_values[2];
+	case Skill::Secondary::SCOUTING:	return & Skill::_values[3];
+	case Skill::Secondary::DIPLOMACY:	return & Skill::_values[4];
+	case Skill::Secondary::NAVIGATION:	return & Skill::_values[5];
+	case Skill::Secondary::LEADERSHIP:	return & Skill::_values[6];
+	case Skill::Secondary::WISDOM:		return & Skill::_values[7];
+	case Skill::Secondary::MYSTICISM:	return & Skill::_values[8];
+	case Skill::Secondary::LUCK:		return & Skill::_values[9];
+	case Skill::Secondary::BALLISTICS:	return & Skill::_values[10];
+	case Skill::Secondary::EAGLEEYE:	return & Skill::_values[11];
+	case Skill::Secondary::NECROMANCY:	return & Skill::_values[12];
+	case Skill::Secondary::ESTATES:		return & Skill::_values[13];
+        default: break;
+    }
+
+    return NULL;
+}
+
+const Skill::secondary_t* GameStatic::GetSkillForWitchsHut(void)
+{
+    return & Skill::_from_witchs_hut;
 }
 
 /*
@@ -364,6 +569,92 @@ void Game::MonsterUpdateStatic(const TiXmlElement* xml)
     }
 }
 
+void Game::SkillUpdateStatic(const TiXmlElement* xml)
+{
+    if(xml)
+    {
+        const TiXmlElement* xml_captain = xml->FirstChildElement("captain");
+        const TiXmlElement* xml_initial = xml->FirstChildElement("initial");
+        const TiXmlElement* xml_maturity = xml->FirstChildElement("maturity");
+        const TiXmlElement* xml_secondary = xml_maturity ? xml_maturity->FirstChildElement("secondary") : NULL;
+        const TiXmlElement* xml_primary = xml_maturity ? xml_maturity->FirstChildElement("primary") : NULL;
+        const TiXmlElement* xml_under = xml_primary ? xml_primary->FirstChildElement("under") : NULL;
+        const TiXmlElement* xml_over = xml_primary ? xml_primary->FirstChildElement("over") : NULL;
+        Skill::stats_t *ptr = &Skill::_stats[0];
+        int value;
+
+        while(ptr->id)
+        {
+            const TiXmlElement* initial_race = xml_initial ? xml_initial->FirstChildElement(ptr->id) : NULL;
+
+            if(initial_race)
+            {
+                LoadPrimarySection(initial_race, ptr->initial_primary);
+                LoadSecondarySection(initial_race, ptr->initial_secondary);
+
+                initial_race->Attribute("book", &value);  ptr->initial_book = value;
+                initial_race->Attribute("spell", &value); ptr->initial_spell = value;
+            }
+
+            const TiXmlElement* captain_race = xml_captain ? xml_captain->FirstChildElement(ptr->id) : NULL;
+            if(captain_race) LoadPrimarySection(captain_race, ptr->captain_primary);
+
+            const TiXmlElement* under_race = xml_under ? xml_under->FirstChildElement(ptr->id) : NULL;
+            if(under_race) LoadPrimarySection(under_race, ptr->mature_primary_under);
+
+            const TiXmlElement* over_race = xml_over ? xml_over->FirstChildElement(ptr->id) : NULL;
+            if(over_race)
+            {
+                LoadPrimarySection(over_race, ptr->mature_primary_over);
+                over_race->Attribute("level", &value);
+                if(value) ptr->over_level = value;
+            }
+
+            const TiXmlElement* secondary_race = xml_secondary ? xml_secondary->FirstChildElement(ptr->id) : NULL;
+            if(secondary_race) LoadSecondarySection(secondary_race, ptr->mature_secondary);
+
+            ++ptr;
+        }
+
+        xml_secondary = xml->FirstChildElement("secondary");
+        if(xml_secondary)
+        {
+            Skill::values_t* ptr2 = & Skill::_values[0];
+
+            while(ptr2->id)
+            {
+                const TiXmlElement* xml_sec = xml_secondary->FirstChildElement(ptr2->id);
+
+                if(xml_sec)
+                {
+                    xml_sec->Attribute("basic", &value); ptr2->values.basic = value;
+                    xml_sec->Attribute("advanced", &value); ptr2->values.advanced = value;
+                    xml_sec->Attribute("expert", &value); ptr2->values.expert = value;
+                }
+
+                ++ptr2;
+            }
+        }
+
+        const TiXmlElement* xml_witchs_hut = xml->FirstChildElement("witchs_hut");
+
+        if(xml_witchs_hut)
+            LoadSecondarySection(xml_witchs_hut, Skill::_from_witchs_hut);
+    }
+}
+
+void Skill::UpdateStats(const std::string & spec)
+{
+    TiXmlDocument doc;
+
+    if(doc.LoadFile(spec.c_str()))
+	Game::SkillUpdateStatic(doc.FirstChildElement("skills"));
+}
+
+#else
+Skill::UpdateStats(const std::string & stats)
+{
+}
 #endif
 
 GameStatic::Data & GameStatic::Data::Get(void)
@@ -371,3 +662,4 @@ GameStatic::Data & GameStatic::Data::Get(void)
     static Data gds;
     return gds;
 }
+

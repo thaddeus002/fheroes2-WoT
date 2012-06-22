@@ -34,10 +34,9 @@ bool SpaceCompare(char a, char b)
     return std::isspace(a) && std::isspace(b);
 }
 
-void ModifyKey(std::string & key)
+std::string ModifyKey(const std::string & str)
 {
-    key = String::Lower(key);
-    key = String::Trim(key);
+    std::string key = String::Trim(String::Lower(str));
 
     // remove multiple space
     std::string::iterator it = std::unique(key.begin(), key.end(), SpaceCompare);
@@ -45,107 +44,15 @@ void ModifyKey(std::string & key)
     
     // change space
     std::replace_if(key.begin(), key.end(), ::isspace, 0x20);
+
+    return key;
 }
 
-Tiny::Value::Value() : ival(0)
+TinyConfig::TinyConfig(char sep, char com) : separator(sep), comment(com)
 {
 }
 
-Tiny::Value::Value(int val)
-{
-    ival = val;
-    sval = val;
-}
-
-Tiny::Value::Value(const char* val)
-{
-    sval = val;
-    ival = String::ToInt(sval);
-}
-
-Tiny::Value & Tiny::Value::operator= (int val)
-{
-    ival = val;
-    sval.clear();
-    String::AddInt(sval, val);
-
-    return *this;
-}
-
-Tiny::Value & Tiny::Value::operator= (const char* val)
-{
-    sval = val;
-    ival = String::ToInt(sval);
-
-    return *this;
-}
-
-std::ostream & Tiny::operator<< (std::ostream & os, const Tiny::Entry & en)
-{
-    os << en.first << " = " << en.second.sval << std::endl;
-    return os;
-}
-
-Tiny::Entry::Entry()
-{
-}
-
-Tiny::Entry::Entry(const char* key, const char* val) :
-    std::pair<std::string, Value>(key, val)
-{
-    ModifyKey(first);
-}
-
-Tiny::Entry::Entry(const char* key, int val) :
-    std::pair<std::string, Value>(key, val)
-{
-    ModifyKey(first);
-}
-
-const std::string & Tiny::Entry::StrParams(void) const
-{
-    return second.sval;
-}
-
-int Tiny::Entry::IntParams(void) const
-{
-    return second.ival;
-}
-                
-bool Tiny::Entry::IsKey(const char* key) const
-{
-    return key && key == first;
-}
-
-bool Tiny::Entry::IsValue(const char* val) const
-{
-    return val && val == second.sval;
-}
-
-bool Tiny::Entry::IsValue(int val) const
-{
-    return val == second.ival;
-}
-
-Tiny::Config::Config() : separator('='), comment(';')
-{
-}
-
-Tiny::Config::~Config()
-{
-}
-
-void Tiny::Config::SetSeparator(char c)
-{
-    separator = c;
-}
-
-void Tiny::Config::SetComment(char c)
-{
-    comment = c;
-}
-
-bool Tiny::Config::Load(const char* cfile)
+bool TinyConfig::Load(const char* cfile)
 {
     if(!cfile) return false;
 
@@ -167,15 +74,16 @@ bool Tiny::Config::Load(const char* cfile)
 	    left = String::Trim(left);
     	    right = String::Trim(right);
 
-	    AddEntry(left.c_str(), right.c_str(), false);
+	    AddEntry(left, right, false);
         }
     }
+
     fs.close();
 
     return true;
 }
 
-bool Tiny::Config::Save(const char* cfile)
+bool TinyConfig::Save(const char* cfile) const
 {
     if(!cfile) return false;
 
@@ -188,86 +96,77 @@ bool Tiny::Config::Save(const char* cfile)
     return true;
 }
 
-void Tiny::Config::Dump(std::ostream & os)
+void TinyConfig::Dump(std::ostream & os) const
 {
-    std::copy(entries.begin(), entries.end(), std::ostream_iterator<Entry>(os, ""));
+    for(const_iterator
+	it = begin(); it != end(); ++it)
+	os << it->first << " " << separator << " " << it->second << std::endl;
 }
 
-Tiny::EntryIterator Tiny::Config::FindEntry(std::string key)
+void TinyConfig::Clear(void)
 {
-    ModifyKey(key);
-    return std::find_if(entries.begin(), entries.end(), std::bind2nd(std::mem_fun_ref(&Entry::IsKey), key.c_str()));
+    clear();
 }
 
-Tiny::EntryConstIterator Tiny::Config::FindEntry(std::string key) const
+void TinyConfig::AddEntry(const std::string & key, const std::string & val, bool uniq)
 {
-    ModifyKey(key);
-    return std::find_if(entries.begin(), entries.end(), std::bind2nd(std::mem_fun_ref(&Entry::IsKey), key.c_str()));
-}
+    iterator it = end();
 
-int Tiny::Config::IntParams(const char* key) const
-{
-    EntryConstIterator it = FindEntry(key);
-    return it != entries.end() ? (*it).second.ival : 0;
-}
-
-const char* Tiny::Config::StrParams(const char* key) const
-{
-    EntryConstIterator it = FindEntry(key);
-    return it != entries.end() ? (*it).second.sval.c_str() : NULL;
-}
-
-void Tiny::Config::GetParams(const char* ckey, std::list<std::string> & res) const
-{
-    std::string key(ckey);
-    ModifyKey(key);
-
-    for(EntryConstIterator it = entries.begin(); it != entries.end(); ++it)
-	if((*it).IsKey(ckey)) res.push_back((*it).second.sval);
-}
-
-const Tiny::Entry* Tiny::Config::Find(const char* key) const
-{
-    EntryConstIterator it = FindEntry(key);
-    return it != entries.end() ? &(*it) : NULL;
-}
-
-void Tiny::Config::AddEntry(const char* key, const char* val, bool uniq)
-{
-    if(uniq)
-    {
-	EntryIterator it = FindEntry(key);
-
-	if(it != entries.end())
-	    (*it).second = val;
-	else
-	    entries.push_back(Entry(key, val));
-    }
+    if(uniq &&
+	(end() != (it = find(ModifyKey(key)))))
+	it->second = val;
     else
-	entries.push_back(Entry(key, val));
+	insert(std::pair<std::string, std::string>(ModifyKey(key), val));
 }
 
-void Tiny::Config::AddEntry(const char* key, int val, bool uniq)
+void TinyConfig::AddEntry(const std::string & key, int val, bool uniq)
 {
-    if(uniq)
-    {
-	EntryIterator it = FindEntry(key);
+    iterator it = end();
 
-	if(it != entries.end())
-	    (*it).second = val;
-	else
-	    entries.push_back(Entry(key, val));
-    }
+    if(uniq &&
+	(end() != (it = find(ModifyKey(key)))))
+	it->second = GetString(val);
     else
-	entries.push_back(Entry(key, val));
+	insert(std::pair<std::string, std::string>(ModifyKey(key), GetString(val)));
 }
 
-void Tiny::Config::Clear(void)
+int TinyConfig::IntParams(const std::string & key) const
 {
-    entries.clear();
+    const_iterator it = find(ModifyKey(key));
+    return it != end() ? String::ToInt(it->second) : 0;
 }
 
-const Tiny::Entries & Tiny::Config::GetEntries(void) const
+std::string TinyConfig::StrParams(const std::string & key) const
 {
-    return entries;
+    const_iterator it = find(ModifyKey(key));
+    return it != end() ? it->second : "";
+}
+
+std::list<std::string> TinyConfig::ListStr(const std::string & key) const
+{
+    std::pair<const_iterator, const_iterator> ret = equal_range(ModifyKey(key));
+    std::list<std::string> res;
+
+    for(const_iterator
+	it = ret.first; it != ret.second; ++it)
+	res.push_back(it->second);
+
+    return res;
+}
+
+std::list<int> TinyConfig::ListInt(const std::string & key) const
+{
+    std::pair<const_iterator, const_iterator> ret = equal_range(ModifyKey(key));
+    std::list<int> res;
+
+    for(const_iterator
+	it = ret.first; it != ret.second; ++it)
+	res.push_back(String::ToInt(it->second));
+
+    return res;
+}
+
+bool TinyConfig::Exists(const std::string & key) const
+{
+    return end() != find(ModifyKey(key));
 }

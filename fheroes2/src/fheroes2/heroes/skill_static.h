@@ -1,7 +1,7 @@
 /***************************************************************************
- *   Copyright (C) 2010 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *   Copyright (C) 2012 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
- *   Part of SDL++ Engine:                                                 *
+ *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,38 +20,65 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef TINYCONFIG_H
-#define TINYCONFIG_H
+#ifndef H2SKILL_STATIC_H
+#define H2SKILL_STATIC_H
 
-#include <ostream>
-#include <string>
-#include <list>
-#include <map>
+#include "gamedefs.h"
 
-class TinyConfig : protected std::multimap<std::string, std::string>
+namespace Skill
 {
-public:
-    TinyConfig(char sep = '=', char com = ';');
+    struct level_t
+    {
+	u16 basic;
+	u16 advanced;
+	u16 expert;
+    };
 
-    bool	Load(const char*);
-    bool	Save(const char*) const;
-    void	Dump(std::ostream &) const;
-    void	Clear(void);
+    struct primary_t
+    {
+	u8 attack;
+	u8 defense;
+	u8 power;
+	u8 knowledge;
+    };
 
-    void	AddEntry(const std::string &, const std::string &, bool uniq = true);
-    void	AddEntry(const std::string &, int, bool uniq = true);
+    struct secondary_t
+    {
+	u8 archery;
+	u8 ballistics;
+	u8 diplomacy;
+	u8 eagleeye;
+	u8 estates;
+	u8 leadership;
+	u8 logistics;
+	u8 luck;
+	u8 mysticism;
+	u8 navigation;
+	u8 necromancy;
+	u8 pathfinding;
+	u8 scouting;
+	u8 wisdom;
+    };
 
-    bool	Exists(const std::string &) const;
+    struct stats_t
+    {
+	const char* id;
+	primary_t   captain_primary;
+	primary_t   initial_primary;
+	u8          initial_book;
+	u8          initial_spell;
+	secondary_t initial_secondary;
+	u8          over_level;
+	primary_t   mature_primary_under;
+	primary_t   mature_primary_over;
+	secondary_t mature_secondary;
+    };
 
-    int		IntParams(const std::string &) const;
-    std::string StrParams(const std::string &) const;
-
-    std::list<std::string> ListStr(const std::string &) const;
-    std::list<int>         ListInt(const std::string &) const;
-
-protected:
-    char	separator;
-    char	comment;
-};
+    struct values_t
+    {
+	const char *id;
+	level_t values;
+    };
+}
 
 #endif

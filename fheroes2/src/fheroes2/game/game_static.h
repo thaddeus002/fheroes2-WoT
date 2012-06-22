@@ -26,6 +26,7 @@
 #include "gamedefs.h"
 
 struct cost_t;
+namespace Skill { struct stats_t; struct values_t; struct secondary_t; }
 
 namespace GameStatic
 {
@@ -55,6 +56,10 @@ namespace GameStatic
 
     float	GetMonsterUpgradeRatio(void);
     s8		ObjectVisitedModifiers(u8);
+
+    const Skill::stats_t*     GetSkillStats(u8);
+    const Skill::values_t*    GetSkillValues(u8);
+    const Skill::secondary_t* GetSkillForWitchsHut(void);
 }
 
 #ifdef WITH_XML
@@ -69,6 +74,7 @@ namespace Game
     void	OverViewUpdateStatic(const TiXmlElement*);
     void	WhirlpoolUpdateStatic(const TiXmlElement*);
     void	MonsterUpdateStatic(const TiXmlElement*);
+    void	SkillUpdateStatic(const TiXmlElement*);
 }
 #endif
 

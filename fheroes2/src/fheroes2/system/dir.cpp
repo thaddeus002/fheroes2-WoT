@@ -70,3 +70,8 @@ void ListFiles::ReadDir(const std::string &path, const std::string &filter, bool
 	closedir(dp);
     }
 }
+
+void ListDirs::Append(const std::list<std::string> & dirs)
+{
+    insert(end(), dirs.begin(), dirs.end());
+}

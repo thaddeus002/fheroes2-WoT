@@ -239,111 +239,96 @@ Settings & Settings::Get(void)
 
 bool Settings::Read(const std::string & filename)
 {
-    Tiny::Config config;
-    const Tiny::Entry* entry = NULL;
-    config.SetSeparator('=');
-    config.SetComment('#');
-    if(! config.Load(filename.c_str())) return false;
-
+    TinyConfig config('=', '#');
+    std::string sval; int ival;
     LocalEvent & le = LocalEvent::Get();
 
-    // debug
-    entry = config.Find("debug");
-    if(entry)
-    {
-	debug = entry->IntParams();
+    if(! config.Load(filename.c_str())) return false;
 
-	switch(debug)
-	{
-	    case 0:	debug = DBG_ALL_WARN; break;
-	    case 1:	debug = DBG_ENGINE_INFO; break;
-	    case 2:	debug = DBG_ENGINE_INFO | DBG_GAME_INFO; break;
-	    case 3:	debug = DBG_ENGINE_INFO | DBG_BATTLE_INFO; break;
-	    case 4:	debug = DBG_ENGINE_INFO | DBG_BATTLE_INFO | DBG_AI_INFO; break;
-	    case 5:	debug = DBG_ALL_INFO; break;
-	    case 6:	debug = DBG_GAME_TRACE; break;
-	    case 7:	debug = DBG_GAME_TRACE | DBG_AI_TRACE; break;
-	    case 8:	debug = DBG_ENGINE_TRACE | DBG_GAME_TRACE | DBG_AI_TRACE; break;
-	    case 9:	debug = DBG_ALL_TRACE; break;
-	    default: break;
-	}
+    // debug
+    ival = config.IntParams("debug");
+
+    switch(ival)
+    {
+	case 0:	debug = DBG_ALL_WARN; break;
+	case 1:	debug = DBG_ENGINE_INFO; break;
+	case 2:	debug = DBG_ENGINE_INFO | DBG_GAME_INFO; break;
+	case 3:	debug = DBG_ENGINE_INFO | DBG_BATTLE_INFO; break;
+	case 4:	debug = DBG_ENGINE_INFO | DBG_BATTLE_INFO | DBG_AI_INFO; break;
+	case 5:	debug = DBG_ALL_INFO; break;
+	case 6:	debug = DBG_GAME_TRACE; break;
+	case 7:	debug = DBG_GAME_TRACE | DBG_AI_TRACE; break;
+	case 8:	debug = DBG_ENGINE_TRACE | DBG_GAME_TRACE | DBG_AI_TRACE; break;
+	case 9:	debug = DBG_ALL_TRACE; break;
+	default: break;
     }
 
     // opt_globals
     const settings_t* ptr = settingsGeneral;
     while(ptr->id)
     {
-	entry = config.Find(ptr->str);
-	if(entry)
+	if(config.Exists(ptr->str))
 	{
-	    if(0 == entry->IntParams())
+	    if(0 == config.IntParams(ptr->str))
 		opt_global.ResetModes(ptr->id);
 	    else
 		opt_global.SetModes(ptr->id);
 	}
+
 	++ptr;
     }
 
     // maps directories
-    config.GetParams("maps", maps_params);
+    maps_params.Append(config.ListStr("maps"));
     maps_params.sort();
     maps_params.unique();
 
-    // data directory
-    entry = config.Find("data");
-    if(entry) data_params = entry->StrParams();
+    // data
+    sval = config.StrParams("data");
+    if(! sval.empty()) data_params = sval;
 
-    // unicode
     if(Unicode())
     {
-	entry = config.Find("maps charset");
-	if(entry)
-	{
-	    maps_charset = String::Lower(entry->StrParams());
-	}
+	sval = config.StrParams("maps charset");
+	if(! sval.empty()) maps_charset = sval;
 
-	entry = config.Find("lang");
-	if(entry) force_lang = entry->StrParams();
+	sval = config.StrParams("lang");
+	if(! sval.empty()) force_lang = sval;
 
-	entry = config.Find("fonts normal");
-	if(entry) font_normal = entry->StrParams();
+	sval = config.StrParams("fonts normal");
+	if(! sval.empty()) font_normal = sval;
 
-	entry = config.Find("fonts small");
-	if(entry) font_small = entry->StrParams();
+	sval = config.StrParams("fonts small");
+	if(! sval.empty()) font_small = sval;
 
-	entry = config.Find("fonts normal size");
-	if(entry) size_normal = entry->IntParams();
+	ival = config.IntParams("fonts normal size");
+	if(0 < ival) size_normal = ival;
 
-	entry = config.Find("fonts small size");
-	if(entry) size_small = entry->IntParams();
+	ival = config.IntParams("fonts small size");
+	if(0 < ival) size_small = ival;
 
-	entry = config.Find("fonts render"); // compat only
-	if(entry && entry->StrParams() == "blended") opt_global.SetModes(GLOBAL_FONTRENDERBLENDED1|GLOBAL_FONTRENDERBLENDED2);
-
-	entry = config.Find("fonts small render");
-	if(entry && entry->StrParams() == "blended") opt_global.SetModes(GLOBAL_FONTRENDERBLENDED1);
-
-	entry = config.Find("fonts normal render");
-	if(entry && entry->StrParams() == "blended") opt_global.SetModes(GLOBAL_FONTRENDERBLENDED2);
+	if(config.StrParams("fonts small render") == "blended") opt_global.SetModes(GLOBAL_FONTRENDERBLENDED1);
+	if(config.StrParams("fonts normal render") == "blended") opt_global.SetModes(GLOBAL_FONTRENDERBLENDED2);
     }
 
     // music
-    entry = config.Find("music");
-    if(entry)
+    sval = config.StrParams("music");
+
+    if(! sval.empty())
     {
-	if(entry->StrParams() == "midi")
+	if(sval == "midi")
 	{
 	    opt_global.ResetModes(GLOBAL_MUSIC);
 	    opt_global.SetModes(GLOBAL_MUSIC_MIDI);
 	}
 	else
-	if(entry->StrParams() == "cd")
+	if(sval == "cd")
         {
 	    opt_global.ResetModes(GLOBAL_MUSIC);
 	    opt_global.SetModes(GLOBAL_MUSIC_CD);
 	}
 	else
-	if(entry->StrParams() == "ext")
+	if(sval == "ext")
 	{
 	    opt_global.ResetModes(GLOBAL_MUSIC);
 	    opt_global.SetModes(GLOBAL_MUSIC_EXT);
@@ -351,106 +336,92 @@ bool Settings::Read(const std::string & filename)
     }
 
     // sound volume
-    entry = config.Find("sound volume");
-    if(entry)
+    if(config.Exists("sound volume"))
     {
-	sound_volume = entry->IntParams();
+	sound_volume = config.IntParams("sound volume");
 	if(sound_volume > 10) sound_volume = 10;
     }
 
     // music volume
-    entry = config.Find("music volume");
-    if(entry)
+    if(config.Exists("music volume"))
     {
-	music_volume = entry->IntParams();
+	music_volume = config.IntParams("music volume");
 	if(music_volume > 10) music_volume = 10;
     }
 
-    // playmus command
-    entry = config.Find("playmus command");
-    if(entry) playmus_command = entry->StrParams();
-
     // memory limit
-    entry = config.Find("memory limit");
-    if(entry) memory_limit = entry->IntParams();
+    memory_limit = config.IntParams("memory limit");
 
     // default depth
-    entry = config.Find("default depth");
-    if(entry) Surface::SetDefaultDepth(entry->IntParams());
+    ival = config.IntParams("default depth");
+    if(ival) Surface::SetDefaultDepth(ival);
 
     // move speed
-    entry = config.Find("ai speed");
-    if(entry)
+    if(config.Exists("ai speed"))
     {
-	ai_speed = entry->IntParams();
+	ai_speed = config.IntParams("ai speed");
 	if(10 < ai_speed) ai_speed = 10;
     }
 
-    entry = config.Find("heroes speed");
-    if(entry)
+    if(config.Exists("heroes speed"))
     {
-	heroes_speed = entry->IntParams();
+	heroes_speed = config.IntParams("heroes speed");
 	if(10 < heroes_speed) heroes_speed = 10;
     }
 
     // scroll speed
-    entry = config.Find("scroll speed");
-    if(entry)
+    switch(config.IntParams("scroll speed"))
     {
-	switch(entry->IntParams())
-	{
-	    case 1:	scroll_speed = SCROLL_SLOW; break;
-	    case 2:	scroll_speed = SCROLL_NORMAL; break;
-	    case 3:	scroll_speed = SCROLL_FAST1; break;
-	    case 4:	scroll_speed = SCROLL_FAST2; break;
-	    default:	scroll_speed = SCROLL_NORMAL; break;
-	}
+	case 1:		scroll_speed = SCROLL_SLOW; break;
+	case 2:		scroll_speed = SCROLL_NORMAL; break;
+	case 3:		scroll_speed = SCROLL_FAST1; break;
+	case 4:		scroll_speed = SCROLL_FAST2; break;
+	default:	scroll_speed = SCROLL_NORMAL; break;
     }
 
-    entry = config.Find("battle speed");
-    if(entry)
+    if(config.Exists("battle speed"))
     {
-	battle_speed = entry->IntParams();
+	battle_speed = config.IntParams("battle speed");
 	if(10 < battle_speed) battle_speed = 10;
     }
 
     // network port
-    port = DEFAULT_PORT;
-    entry = config.Find("port");
-    if(entry) port = entry->IntParams();
+    port = config.Exists("port") ? config.IntParams("port") : DEFAULT_PORT;
+
+    // playmus command
+    sval = config.StrParams("playmus command");
+    if(! sval.empty()) playmus_command = sval;
 
     // videodriver
-    entry = config.Find("videodriver");
-    if(entry) video_driver = entry->StrParams();
+    sval = config.StrParams("videodriver");
+    if(! sval.empty()) video_driver = sval;
 
     // pocketpc
     if(PocketPC())
     {
-	entry = config.Find("pointer offset x");
-	if(entry) le.SetMouseOffsetX(entry->IntParams());
+	ival = config.IntParams("pointer offset x");
+	if(ival) le.SetMouseOffsetX(ival);
 
-	entry = config.Find("pointer offset y");
-	if(entry) le.SetMouseOffsetY(entry->IntParams());
+	ival = config.IntParams("pointer offset y");
+	if(ival) le.SetMouseOffsetY(ival);
 
-	entry = config.Find("tap delay");
-	if(entry) le.SetTapDelayForRightClickEmulation(entry->IntParams());
+	ival = config.IntParams("tap delay");
+	if(ival) le.SetTapDelayForRightClickEmulation(ival);
 
-	entry = config.Find("pointer rotate fix");
-	if(entry)
-	{
-    	    setenv("GAPI_POINTER_FIX", entry->StrParams().c_str(), 1);
-	}
+	sval = config.StrParams("pointer rotate fix");
+	if(! sval.empty())
+    	    setenv("GAPI_POINTER_FIX", sval.c_str(), 1);
     }
 
     // videomode
-    entry = config.Find("videomode");
-    if(entry)
+    sval = config.StrParams("videomode");
+    if(! sval.empty())
     {
         // default
 	video_mode.w = 640;
         video_mode.h = 480;
 
-        std::string value = String::Lower(entry->StrParams());
+        std::string value = String::Lower(sval);
         const size_t pos = value.find('x');
 
         if(std::string::npos != pos)
@@ -471,13 +442,13 @@ bool Settings::Read(const std::string & filename)
     }
 
 #ifdef WITHOUT_MOUSE
-    entry = config.Find("emulate mouse");
-    if(entry)
+    ival = config.IntParams("emulate mouse");
+    if(ival)
     {
-	le.SetEmulateMouse(entry->IntParams());
+	le.SetEmulateMouse(ival);
 
-	entry = config.Find("emulate mouse step");
-        if(entry) le.SetEmulateMouseStep(entry->IntParams());
+	ival = config.IntParams("emulate mouse step");
+        if(ival) le.SetEmulateMouseStep(ival);
     }
 #endif
 
@@ -501,8 +472,8 @@ bool Settings::Read(const std::string & filename)
 
     if(opt_global.Modes(GLOBAL_POCKETPC))
     {
-	entry = config.Find("fullscreen");
-	if(!entry || entry->StrParams() != "off")
+	sval = config.StrParams("fullscreen");
+	if(sval.empty() || sval != "off")
 	    opt_global.SetModes(GLOBAL_FULLSCREEN);
 	if(ExtPocketLowResolution())
 	{

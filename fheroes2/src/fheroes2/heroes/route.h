@@ -30,24 +30,34 @@ class Heroes;
 
 namespace Route
 {
-    struct Step
+    class Step
     {
-	Step() : from(-1), direction(Direction::CENTER), penalty(0) {}
-	Step(s32 index, u16 dir, u16 cost) : from(index), direction(dir), penalty(cost) {}
+	public:
+	    Step() : from(-1), direction(Direction::CENTER), penalty(0) {}
+	    Step(s32 index, u16 dir, u16 cost) : from(index), direction(dir), penalty(cost) {}
 
-	s32		GetIndex(void) const;
-	const u16 &	GetPenalty(void) const;
-	bool		isBad(void) const;
+	    s32		GetIndex(void) const;
+	    const u16 &	GetPenalty(void) const;
+	    const s32 &	GetFrom(void) const;
+	    const u16 &	GetDirection(void) const;
+	    bool	isBad(void) const;
 
-	s32	from;
-	u16	direction;
-	u16	penalty;
+	protected:
+    	    friend StreamBase & operator<< (StreamBase &, const Step &);
+    	    friend StreamBase & operator>> (StreamBase &, Step &);
+
+	    s32		from;
+	    u16		direction;
+	    u16		penalty;
     };
 
     class Path : public std::list<Step>
     {
 	public:
-	    Path(const Heroes & h);
+	    Path(const Heroes &);
+	    Path(const Path &);
+
+	    Path &	operator= (const Path &);
 
 	    s32		GetDestinationIndex(void) const;
 	    s32		GetLastIndex(void) const;
@@ -55,7 +65,7 @@ namespace Route
 	    u16		GetFrontDirection(void) const;
 	    u16		GetFrontPenalty(void) const;
 	    u32		GetTotalPenalty(void) const;
-	    bool	Calculate(const s32 dst_index, const u16 limit = MAXU16);
+	    bool	Calculate(const s32 &, u16 limit = MAXU16);
 
 	    void	Show(void){ hide = false; }
 	    void	Hide(void){ hide = true; }
@@ -82,7 +92,7 @@ namespace Route
 	    friend StreamBase & operator<< (StreamBase &, const Path &);
 	    friend StreamBase & operator>> (StreamBase &, Path &);
 
-	    const Heroes & hero;
+	    const Heroes* hero;
 	    s32		dst;
 	    bool	hide;
     };
