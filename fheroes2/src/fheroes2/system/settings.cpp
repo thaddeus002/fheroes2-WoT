@@ -260,7 +260,7 @@ bool Settings::Read(const std::string & filename)
 	case 7:	debug = DBG_GAME_TRACE | DBG_AI_TRACE; break;
 	case 8:	debug = DBG_ENGINE_TRACE | DBG_GAME_TRACE | DBG_AI_TRACE; break;
 	case 9:	debug = DBG_ALL_TRACE; break;
-	default: break;
+	default: debug = ival; break;
     }
 
     // opt_globals
