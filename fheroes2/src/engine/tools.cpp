@@ -89,6 +89,12 @@ int String::ToInt(const std::string & str)
         ss >> res;
     }
     else
+    if(str.size() > 2 && (str.at(0) == '+' || str.at(0) == '-') && str.end() == std::find_if(str.begin() + 1, str.end(), std::not1(std::ptr_fun<int, int>(std::isdigit))))
+    {
+        std::istringstream ss(str);
+        ss >> res;
+    }
+    else
     // hex
     if(str.size() > 3 && str.at(0) == '0' && std::tolower(str.at(1)) == 'x' &&
         str.end() == std::find_if(str.begin() + 2, str.end(), std::not1(std::ptr_fun<int, int>(std::isxdigit))))
