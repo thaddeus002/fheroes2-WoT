@@ -89,7 +89,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     const payment_t paymentMonster = monster.GetCost();
     const Kingdom & kingdom = world.GetKingdom(Settings::Get().CurrentColor());
 
-    while(kingdom.AllowPayment(paymentMonster * max) && max < available) ++max;
+    while(kingdom.AllowPayment(paymentMonster * (max + 1)) && (max + 1) < available) ++max;
 
     u32 result = max;
 
@@ -227,6 +227,8 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 
     RedrawCurrentInfo(pos, available, result, paymentMonster, paymentCosts);
 
+    const Rect rtWheel(pos.x + 130, pos.y +155, 100, 30);
+
     // buttons
     dst_pt.x = pos.x + 34;
     dst_pt.y = pos.y + 249;
@@ -273,14 +275,14 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 	    redraw = true;
 	}
 
-	if(le.MouseClickLeft(buttonUp) && result < max)
+	if((le.MouseWheelUp(rtWheel) || le.MouseClickLeft(buttonUp)) && result < max)
 	{
 	    ++result;
 	    paymentCosts += paymentMonster;
 	    redraw = true;
 	}
 	else
-	if(le.MouseClickLeft(buttonDn) && result)
+	if((le.MouseWheelDn(rtWheel) || le.MouseClickLeft(buttonDn)) && result)
 	{
 	    --result;
 	    paymentCosts -= paymentMonster;
