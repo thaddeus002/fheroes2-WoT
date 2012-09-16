@@ -37,6 +37,7 @@
 Game::menu_t Game::Editor::NewMaps(void)
 {
     Display & display = Display::Get();
+    display.Fill(0);
 
     // preload
     AGG::Cache::PreloadObject(ICN::BTNESIZE);
@@ -47,22 +48,21 @@ Game::menu_t Game::Editor::NewMaps(void)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    Display::SetVideoMode(640, 480, Settings::Get().DisplayFlags());
-
     // image background
     const Sprite &back = AGG::GetICN(ICN::EDITOR, 0);
-    back.Blit();
+    const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
+    back.Blit(top);
 
     const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
-    panel.Blit(405, 5);
+    panel.Blit(top.x + 405, top.y + 5);
 
     LocalEvent & le = LocalEvent::Get();
 
-    Button buttonSmall(455, 45, ICN::BTNESIZE, 0, 1);
-    Button buttonMedium(455, 110, ICN::BTNESIZE, 2, 3);
-    Button buttonLarge(455, 175, ICN::BTNESIZE, 4, 5);
-    Button buttonXLarge(455, 240, ICN::BTNESIZE, 6, 7);
-    Button buttonCancel(455, 375, ICN::BTNESIZE, 8, 9);
+    Button buttonSmall(top.x + 455, top.y + 45, ICN::BTNESIZE, 0, 1);
+    Button buttonMedium(top.x + 455, top.y + 110, ICN::BTNESIZE, 2, 3);
+    Button buttonLarge(top.x + 455, top.y + 175, ICN::BTNESIZE, 4, 5);
+    Button buttonXLarge(top.x + 455, top.y + 240, ICN::BTNESIZE, 6, 7);
+    Button buttonCancel(top.x + 455, top.y + 375, ICN::BTNESIZE, 8, 9);
 
     buttonSmall.Draw();
     buttonMedium.Draw();

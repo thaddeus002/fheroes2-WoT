@@ -161,7 +161,7 @@ namespace Maps
 	TilesAddon* FindObject(u8);
 	const TilesAddon* FindObjectConst(u8) const;
 
-	void SetTile(const u16 sprite_index, const u8 shape);
+	void SetTile(const u16 sprite_index, const u8 shape /* 0: none, 1 : vert, 2: horz, 3: both */);
 	void SetObject(u8 object);
 
 	void FixObject(void);

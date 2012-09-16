@@ -22,7 +22,6 @@
 
 #include <string>
 #include <vector>
-#include <bitset>
 #include "agg.h"
 #include "world.h"
 #include "button.h"

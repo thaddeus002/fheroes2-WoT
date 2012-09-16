@@ -1265,7 +1265,7 @@ void AGG::Cache::Dump(void) const
 	    total2 = 0;
             if(icn_cache[ii].sprites)
         	for(u16 jj = 0; jj < icn_cache[ii].count; ++jj)
-		    total2 += (icn_cache[ii].sprites[jj].GetSize() + icn_cache[ii].reflect[jj].GetSize());
+		    total2 += (icn_cache[ii].sprites[jj].GetMemoryUsage() + icn_cache[ii].reflect[jj].GetMemoryUsage());
 	    if(icn_cache[ii].count)
 		os << ICN::GetString((ICN::icn_t) ii) << "(" << icn_cache[ii].count << ", " << total2 << "), ";
 	    total1 += total2;
@@ -1286,7 +1286,7 @@ void AGG::Cache::Dump(void) const
 	    total2 = 0;
 	    if(til_cache[ii].sprites)
         	for(u16 jj = 0; jj < til_cache[ii].count; ++jj)
-        	    total2 += til_cache[ii].sprites[jj].GetSize();
+        	    total2 += til_cache[ii].sprites[jj].GetMemoryUsage();
 	    if(til_cache[ii].count)
 		os << TIL::GetString((TIL::til_t) ii) << "(" << til_cache[ii].count << ", " << total2 << "), ";
 	    total1 += total2;
@@ -1341,8 +1341,8 @@ void AGG::Cache::Dump(void) const
 	total1 = 0;
 	for(std::map<u16, fnt_cache_t>::const_iterator
 	    it = fnt_cache.begin(); it != fnt_cache.end(); ++it)
-	    total1 += ((*it).second.medium_white.GetSize() + (*it).second.medium_yellow.GetSize() +
-				(*it).second.small_white.GetSize() + (*it).second.small_yellow.GetSize());
+	    total1 += ((*it).second.medium_white.GetMemoryUsage() + (*it).second.medium_yellow.GetMemoryUsage() +
+				(*it).second.small_white.GetMemoryUsage() + (*it).second.small_yellow.GetMemoryUsage());
 	if(total1)
 	{
 	    DEBUG(DBG_ENGINE, DBG_INFO, "FNT" << " total: " << total1 << " bytes");

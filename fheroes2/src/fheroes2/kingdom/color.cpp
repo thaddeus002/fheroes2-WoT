@@ -20,7 +20,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <bitset>
 #include <sstream>
 #include "players.h"
 #include "world.h"
@@ -63,8 +62,12 @@ u8 Color::GetIndex(u8 color)
 
 u8 Color::Count(u8 colors)
 {
-    const std::bitset<8> bset(colors);
-    return bset.count();
+    u8 res = 0;
+
+    for(u8 col = BLUE; col < UNUSED; col <<= 1)
+	if(col & colors) ++res;
+
+    return res;
 }
 
 Color::color_t Color::Get(u8 index)

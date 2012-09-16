@@ -33,6 +33,7 @@
 Game::menu_t Game::Editor::MainMenu(void)
 {
     Display & display = Display::Get();
+    display.Fill(0);
 
     // preload
     AGG::Cache::PreloadObject(ICN::EDITOR);
@@ -44,20 +45,20 @@ Game::menu_t Game::Editor::MainMenu(void)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    Display::SetVideoMode(640, 480, Settings::Get().DisplayFlags());
 
     // image background
     const Sprite &back = AGG::GetICN(ICN::EDITOR, 0);
-    back.Blit();
+    const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
+    back.Blit(top);
 
     const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
-    panel.Blit(405, 5);
+    panel.Blit(top.x + 405, top.y + 5);
 
     LocalEvent & le = LocalEvent::Get();
 
-    Button buttonNewMap(455, 45, ICN::BTNEMAIN, 0, 1);
-    Button buttonLoadMap(455, 110, ICN::BTNEMAIN, 2, 3);
-    Button buttonCancelGame(455, 375, ICN::BTNEMAIN, 4, 5);
+    Button buttonNewMap(top.x + 455, top.y + 45, ICN::BTNEMAIN, 0, 1);
+    Button buttonLoadMap(top.x + 455, top.y + 110, ICN::BTNEMAIN, 2, 3);
+    Button buttonCancelGame(top.x + 455, top.y + 375, ICN::BTNEMAIN, 4, 5);
 
     buttonNewMap.Draw();
     buttonLoadMap.Draw();

@@ -73,6 +73,8 @@ void WriteBE16(u8 *p, u16 x);
 void WriteLE32(u8 *p, u32 x);
 void WriteLE16(u8 *p, u16 x);
 
+u8 CountBits(u32);
+
 #if defined __SYMBIAN32__
 #define PATH_MAX FILENAME_MAX
 namespace std

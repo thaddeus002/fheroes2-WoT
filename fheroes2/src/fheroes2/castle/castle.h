@@ -23,7 +23,6 @@
 #define H2CASTLE_H
 
 #include <vector>
-#include <bitset>
 #include <string>
 #include "mageguild.h"
 #include "color.h"

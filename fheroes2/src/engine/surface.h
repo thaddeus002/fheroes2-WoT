@@ -60,6 +60,7 @@ public:
     u8  depth(void) const;
     u32 amask(void) const;
     u8  alpha(void) const;
+    Size GetSize(void) const;
 
     bool isValid(void) const;
     virtual bool isDisplay(void) const;
@@ -106,10 +107,10 @@ public:
     void Lock(void) const;
     void Unlock(void) const;
 
-    u32  GetSize(void) const;
+    u32  GetMemoryUsage(void) const;
     std::string Info(void) const;
 
-    static void Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape);
+    static void Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape /* 0: none, 1 : vert, 2: horz, 3: both */);
 
     static void MakeStencil(Surface &, const Surface &, u32);
     static void MakeContour(Surface &, const Surface &, u32);

@@ -25,9 +25,6 @@
 #include "background.h"
 #include "types.h"
 
-struct Point;
-class Surface;
-
 class SpriteCursor : public Background
 {
 public:

@@ -28,6 +28,7 @@
 #include "gamedefs.h"
 #include "button.h"
 #include "splitter.h"
+#include "sizecursor.h"
 #include "interface_radar.h"
 #include "interface_gamearea.h"
 
@@ -78,6 +79,12 @@ public:
 
 	Interface::GameArea & gameArea;
 	Interface::Radar & radar;
+
+	SizeCursor sizeCursor;
+
+	Maps::Ground::ground_t selectTerrain;
+	u8  selectObject;
+	bool needRedraw;
 
 private:
 	EditorInterface();

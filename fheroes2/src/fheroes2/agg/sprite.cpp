@@ -172,9 +172,9 @@ void Sprite::DrawICN(u16 icn, Surface & sf, const u8* cur, const u32 size, bool 
     }
 }
 
-u32 Sprite::GetSize(void) const
+u32 Sprite::GetMemoryUsage(void) const
 {
-    return Surface::GetSize() + sizeof(offsetX) + sizeof(offsetY);
+    return Surface::GetMemoryUsage() + sizeof(offsetX) + sizeof(offsetY);
 }
 
 void Sprite::ScaleMinifyByTwo(void)

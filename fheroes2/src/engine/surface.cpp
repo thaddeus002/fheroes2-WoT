@@ -251,6 +251,11 @@ void Surface::SetDefaultDepth(u8 depth)
     }
 }
 
+Size Surface::GetSize(void) const
+{
+    return Size(w(), h());
+}
+
 u8 Surface::GetDefaultDepth(void)
 {
     return default_depth;
@@ -1123,7 +1128,7 @@ void Surface::Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape)
 	std::cerr << "Surface::TILReflect: " << "incorrect param" << std::endl;
 }
 
-u32 Surface::GetSize(void) const
+u32 Surface::GetMemoryUsage(void) const
 {
     u32 res = sizeof(surface);
 
@@ -1152,7 +1157,7 @@ std::string Surface::Info(void) const
 	    "flags" << "(" << surface->flags << ", " << (surface->flags & SDL_SRCALPHA ? "SRCALPHA" : "") << (surface->flags & SDL_SRCCOLORKEY ? "SRCCOLORKEY" : "") << "), " <<
 	    "w"<< "(" << surface->w << "), " <<
 	    "h"<< "(" << surface->h << "), " <<
-	    "size" << "(" << GetSize() << "), " <<
+	    "size" << "(" << GetMemoryUsage() << "), " <<
 	    "bpp" << "(" << static_cast<int>(surface->format->BitsPerPixel) << "), " <<
 	    "Amask" << "(" << "0x" << std::setw(8) << std::setfill('0') << std::hex << surface->format->Amask << "), " <<
 	    "colorkey" << "(" << "0x" << std::setw(8) << std::setfill('0') << surface->format->colorkey << "), " << std::dec <<

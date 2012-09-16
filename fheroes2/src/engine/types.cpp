@@ -69,3 +69,13 @@ void WriteLE16(u8 *p, u16 x)
     *(p + 1) = static_cast<u8>(x >> 8);
     *p = static_cast<u8>(x & 0x00FF);
 }
+
+u8 CountBits(u32 val)
+{
+    u8 res = 0;
+
+    for(u32 itr = 0x00000001; itr; itr <<= 1)
+        if(val & itr) ++res;
+
+    return res;
+}

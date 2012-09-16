@@ -76,6 +76,13 @@ void EditorInterface::Build(void)
 
     split_h.SetSprite(AGG::GetICN(ICN::ESCROLL, 2));
     split_v.SetSprite(AGG::GetICN(ICN::ESCROLL, 3));
+
+    sizeCursor.ModifySize(2, 2);
+    sizeCursor.Hide();
+
+    selectTerrain = Maps::Ground::WATER;
+    selectObject = 0;
+    needRedraw = true;
 }
 
 EditorInterface & EditorInterface::Get(void)

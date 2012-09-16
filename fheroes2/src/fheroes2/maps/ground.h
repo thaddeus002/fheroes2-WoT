@@ -44,7 +44,8 @@ namespace Maps
     	    LAVA	= 0x0020,
     	    DIRT	= 0x0040,
     	    GRASS	= 0x0080,
-    	    WATER	= 0x0100
+    	    WATER	= 0x0100,
+	    ALL		= DESERT | SNOW | SWAMP | WASTELAND | BEACH | LAVA | DIRT | GRASS
         };
 
         const char* String(u16);

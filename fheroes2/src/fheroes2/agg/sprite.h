@@ -44,7 +44,7 @@ public:
     void Blit(u8 alpha, s16, s16, Surface & = Display::Get()) const;
     void Blit(u8 alpha, const Rect & srt, const Point &, Surface & = Display::Get()) const;
 
-    u32 GetSize(void) const;
+    u32 GetMemoryUsage(void) const;
     void ScaleMinifyByTwo(void);
 
     static void DrawICN(u16 icn, Surface & sf, const u8* buf, const u32 size, bool reflect);
