@@ -74,7 +74,7 @@ u8 Dialog::SystemOptions(void)
     const Rect rect5(rb.x + 128, rb.y + 157, 64, 64);
     const Rect rect6(rb.x + 220, rb.y + 157, 64, 64);
     const Rect rect7(rb.x + 36,  rb.y + 267, 64, 64);
-    //const Rect rect8(rb.x + 128, rb.y + 267, 64, 64);
+    const Rect rect8(rb.x + 128, rb.y + 267, 64, 64);
     //const Rect rect9(rb.x + 220, rb.y + 267, 64, 64);
 
     Surface back2(rb.w, rb.h);
@@ -144,11 +144,19 @@ u8 Dialog::SystemOptions(void)
 	    redraw = true;
     	}
 
-        // set interface
+        // set interface theme
         if(le.MouseClickLeft(rect7))
         {
-    	    conf.SetExtGameEvilInterface(!conf.ExtGameEvilInterface());
+    	    conf.SetEvilInterface(!conf.ExtGameEvilInterface());
     	    result |= 0x08;
+	    redraw = true;
+    	}
+
+        // set interface hide/show
+        if(le.MouseClickLeft(rect8) && !conf.QVGA())
+        {
+    	    conf.SetHideInterface(!conf.ExtGameHideInterface());
+    	    result |= 0x04;
 	    redraw = true;
     	}
 
@@ -258,7 +266,7 @@ void Dialog::DrawSystemInfo(const Point & dst)
     text.Set(str);
     text.Blit(rect6.x + (rect6.w - text.w()) / 2, rect6.y + rect6.h + 5);
 
-    // interface
+    // interface themes
     const Sprite & sprite7 = AGG::GetICN(ICN::SPANEL, (conf.ExtGameEvilInterface() ? 17 : 16));
     const Rect rect7(dst.x + 36, dst.y + 267, sprite7.w(), sprite7.h());
     sprite7.Blit(rect7);
@@ -272,12 +280,24 @@ void Dialog::DrawSystemInfo(const Point & dst)
     text.Set(str);
     text.Blit(rect7.x + (rect7.w - text.w()) / 2, rect7.y + rect7.h + 5);
 
-    // unused
-    const Sprite & sprite8 = AGG::GetICN(ICN::SPANEL, 17);
+    // interface show/hide
+    const Sprite & sprite8 = AGG::GetICN(ICN::SPANEL, 16);
+    const Sprite & sprite81 = AGG::GetICN(ICN::ESPANEL, 4);
     const Rect rect8(dst.x + 128, dst.y + 267, sprite8.w(), sprite8.h());
-    black.Blit(rect8, display);
     str.clear();
-    str = "unused";
+    str = _("Interface");
+    str += ": ";
+    if(conf.ExtGameHideInterface())
+    {
+	sprite81.Blit(rect8, display);
+	str += _("Hide");
+    }
+    else
+    {
+	sprite8.Blit(rect8, display);
+	sprite81.Blit(Rect(13, 13, 38, 38), rect8.x + 13, rect8.y + 13);
+	str += _("Show");
+    }
     text.Set(str);
     text.Blit(rect8.x + (rect8.w - text.w()) / 2, rect8.y + rect8.h + 5);
 

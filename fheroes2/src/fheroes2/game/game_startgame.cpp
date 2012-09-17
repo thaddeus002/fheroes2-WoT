@@ -1349,6 +1349,8 @@ void Game::EventFileDialog(Game::menu_t & ret)
 
 void Game::EventSystemDialog(void)
 {
+    const Settings & conf = Settings::Get();
+
     // Change and save system settings
     const u8 changes = Dialog::SystemOptions();
     Interface::Basic & I = Interface::Basic::Get();
@@ -1362,12 +1364,24 @@ void Game::EventSystemDialog(void)
 	    I.gameArea.SetCenter(GameFocus::GetCenter());
         I.SetRedraw(REDRAW_GAMEAREA);
 
-	if(Settings::Get().ExtGameHideInterface())
+	if(conf.ExtGameHideInterface())
 	    I.controlPanel.ResetTheme();
     }
 
+    // interface themes
     if(0x08 & changes)
+    {
         I.SetRedraw(REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_STATUS | REDRAW_BORDER);
+    }
+
+    // interface hide/show
+    if(0x04 & changes)
+    {
+	I.SetHideInterface(conf.ExtGameHideInterface());
+        I.SetRedraw(REDRAW_ALL);
+	I.Redraw();
+	GameFocus::Reset(GameFocus::HEROES);
+    }
 }
 
 void Game::EventExit(menu_t & ret)

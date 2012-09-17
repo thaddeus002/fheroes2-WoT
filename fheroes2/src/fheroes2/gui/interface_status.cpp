@@ -86,10 +86,12 @@ void Interface::StatusWindow::SetPos(s16 ox, s16 oy)
 {
     if(Settings::Get().ExtGameHideInterface())
     {
+	const Sprite & ston = AGG::GetICN(Settings::Get().ExtGameEvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
 	FixOutOfDisplay(*this, ox, oy); 
 
 	Rect::x = ox + BORDERWIDTH;
 	Rect::y = oy + BORDERWIDTH;
+	Rect::h = ston.h();
 
 	border.SetPosition(ox, oy, Rect::w, Rect::h);
 	Settings::Get().SetPosStatus(Point(ox, oy));

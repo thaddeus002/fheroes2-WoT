@@ -1027,9 +1027,14 @@ void Settings::SetPriceLoyaltyVersion(void)
     opt_global.SetModes(GLOBAL_PRICELOYALTY);
 }
 
-void Settings::SetExtGameEvilInterface(bool f)
+void Settings::SetEvilInterface(bool f)
 {
     f ? ExtSetModes(GAME_EVIL_INTERFACE) : ExtResetModes(GAME_EVIL_INTERFACE);
+}
+
+void Settings::SetHideInterface(bool f)
+{
+    f ? ExtSetModes(GAME_HIDE_INTERFACE) : ExtResetModes(GAME_HIDE_INTERFACE);
 }
 
 void Settings::SetBattleGrid(bool f)

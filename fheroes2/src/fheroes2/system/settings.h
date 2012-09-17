@@ -360,7 +360,8 @@ public:
     void SetUnicode(bool);
     void SetPriceLoyaltyVersion(void);
     void SetGameDifficulty(u8);
-    void SetExtGameEvilInterface(bool);
+    void SetEvilInterface(bool);
+    void SetHideInterface(bool);
     void SetBattleGrid(bool);
     void SetBattleMovementShaded(bool);
     void SetBattleMouseShaded(bool);

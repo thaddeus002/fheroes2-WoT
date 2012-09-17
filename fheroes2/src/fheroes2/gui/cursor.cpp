@@ -261,13 +261,13 @@ void Cursor::DrawCursor(Surface &surface, const u8 indexcolor, bool solid)
     surface.Lock();
     if(solid)
     {
-	for(u8 i = 0; i < width; ++i)
+	for(u16 i = 0; i < width; ++i)
         {
     	    surface.SetPixel(i, 0, color);
             surface.SetPixel(i, height - 1, color);
         }
 
-        for(u8 i = 0; i < height; ++i)
+        for(u16 i = 0; i < height; ++i)
         {
             surface.SetPixel(0, i, color);
     	    surface.SetPixel(width - 1, i, color);
@@ -275,25 +275,25 @@ void Cursor::DrawCursor(Surface &surface, const u8 indexcolor, bool solid)
     }
     else
     {
-	for(u8 i = 0; i < width; ++i)
+	for(u16 i = 0; i < width; ++i)
 	{
     	    surface.SetPixel(i, 0, color);
     	    if(i + 1 < width) surface.SetPixel(i + 1, 0, color);
     	    i += 3;
 	}
-	for(u8 i = 0; i < width; ++i)
+	for(u16 i = 0; i < width; ++i)
 	{
     	    surface.SetPixel(i, height - 1, color);
     	    if(i + 1 < width) surface.SetPixel(i + 1, height - 1, color);
     	    i += 3;
 	}
-	for(u8 i = 0; i < height; ++i)
+	for(u16 i = 0; i < height; ++i)
 	{
     	    surface.SetPixel(0, i, color);
     	    if(i + 1 < height) surface.SetPixel(0, i + 1, color);
     	    i += 3;
 	}
-	for(u8 i = 0; i < height; ++i)
+	for(u16 i = 0; i < height; ++i)
 	{
     	    surface.SetPixel(width - 1, i, color);
     	    if(i + 1 < height) surface.SetPixel(width - 1, i + 1, color);

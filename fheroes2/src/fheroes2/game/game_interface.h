@@ -77,6 +77,8 @@ namespace Interface
 	BorderWindow & borderWindow;
 	ControlPanel & controlPanel;
 
+	void	SetHideInterface(bool);
+
     private:
 	Basic();
 	void RedrawSystemInfo(s16, s16, u32);

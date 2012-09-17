@@ -257,7 +257,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 
     const bool interface = conf.ExtGameEvilInterface();
     if(conf.ExtGameDynamicInterface())
-    	conf.SetExtGameEvilInterface(GetRace() & (Race::BARB | Race::WRLK | Race::NECR));
+    	conf.SetEvilInterface(GetRace() & (Race::BARB | Race::WRLK | Race::NECR));
 
     Display & display = Display::Get();
 
@@ -960,7 +960,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	heroes.Guest()->RecalculateMovePoints();
 
     if(conf.ExtGameDynamicInterface())
-	conf.SetExtGameEvilInterface(interface);
+	conf.SetEvilInterface(interface);
 
     Game::DisableChangeMusic(false);
 
