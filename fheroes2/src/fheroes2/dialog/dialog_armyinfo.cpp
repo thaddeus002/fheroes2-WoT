@@ -431,14 +431,20 @@ u16 Dialog::ArmyJoinWithCost(const Troop & troop, u32 join, u32 gold, Heroes & h
 
     Button btnMarket(pos.x + pos.w / 2 - 60 - 36, posy, (conf.ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS), 4, 5);
     Button btnHeroes(pos.x + pos.w / 2 + 60, posy, (conf.ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS), 0, 1);
+    const Kingdom & kingdom = hero.GetKingdom();
 
-    if(hero.GetKingdom().AllowPayment(payment_t(Resource::GOLD, gold)))
+    if(kingdom.GetCountMarketplace() &&
+	kingdom.AllowPayment(payment_t(Resource::GOLD, gold)))
 	btnMarket.SetDisable(true);
     else
     {
-	TextBox textbox2(_("Not enough\ngold"), Font::SMALL, 100);
+	std::string msg = _("Not enough\ngold (%{gold})");
+	String::Replace(msg, "%{gold}", gold - kingdom.GetFunds().Get(Resource::GOLD));
+	TextBox textbox2(msg, Font::SMALL, 100);
 	textbox2.Blit(btnMarket.x - 35, btnMarket.y - 30);
 	btnMarket.Draw();
+
+	btnGroups.DisableButton1(true);
     }
 
     if(hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(troop))
@@ -448,6 +454,8 @@ u16 Dialog::ArmyJoinWithCost(const Troop & troop, u32 join, u32 gold, Heroes & h
 	TextBox textbox2(_("Not room in\nthe garrison"), Font::SMALL, 100);
 	textbox2.Blit(btnHeroes.x - 35, btnHeroes.y - 30);
 	btnHeroes.Draw();
+
+	btnGroups.DisableButton1(true);
     }
 
     cursor.Show();
@@ -469,10 +477,24 @@ u16 Dialog::ArmyJoinWithCost(const Troop & troop, u32 join, u32 gold, Heroes & h
         result = btnGroups.QueueEventProcessing();
 
 	if(le.MouseClickLeft(btnMarket))
+	{
 	    Marketplace(false);
+
+	    if(kingdom.GetCountMarketplace() &&
+		kingdom.AllowPayment(payment_t(Resource::GOLD, gold)))
+    		btnGroups.DisableButton1(false);
+	}
 	else
 	if(le.MouseClickLeft(btnHeroes))
-	{ hero.OpenDialog(false, false); cursor.Show(); display.Flip(); }
+	{
+	    hero.OpenDialog(false, false);
+	    cursor.Show();
+	    display.Flip();
+
+	    if(hero.GetArmy().GetCount() < hero.GetArmy().Size() ||
+		hero.GetArmy().HasMonster(troop))
+    		btnGroups.DisableButton1(false);
+	}
     }
 
     cursor.Hide();
