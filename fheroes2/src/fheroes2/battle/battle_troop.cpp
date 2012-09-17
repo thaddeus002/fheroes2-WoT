@@ -34,6 +34,7 @@
 #include "battle_cell.h"
 #include "battle_interface.h"
 #include "battle_troop.h"
+#include "game_static.h"
 
 #ifdef WITH_XML
 #include "xmlccwrap.h"
@@ -1177,6 +1178,10 @@ u16 Battle::Unit::GetDefense(void) const
 	else
 	    res -= step;
     }
+
+    // check moat
+    if(Board::isMoatIndex(GetHeadIndex()))
+	res -= GameStatic::GetBattleMoatReduceDefense();
 
     return res;
 }

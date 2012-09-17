@@ -663,3 +663,7 @@ GameStatic::Data & GameStatic::Data::Get(void)
     return gds;
 }
 
+u8 GameStatic::GetBattleMoatReduceDefense(void)
+{
+    return 2;
+}

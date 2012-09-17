@@ -63,6 +63,8 @@ namespace Battle
 	void		SetCobjObject(u16 icn, s16);
 	void		SetCovrObjects(u16 icn);
 
+	static std::string	GetMoatInfo(void);
+
 	static Cell*		GetCell(s16, direction_t = CENTER);
 	static bool		isNearIndexes(s16, s16);
 	static bool		isValidIndex(s16);

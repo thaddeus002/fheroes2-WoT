@@ -197,6 +197,20 @@ Battle::Arena::Arena(Army & a1, Army & a2, s32 index, bool local) :
     army1 = new Force(a1, false);
     army2 = new Force(a2, true);
 
+    // init castle (interface ahead)
+    castle = world.GetCastle(index);
+
+    if(castle)
+    {
+	CastleHeroes heroes = world.GetHeroes(*castle);
+
+	// skip if present guard and guest
+	if(heroes.FullHouse()) castle = NULL;
+
+	// skip for town
+	if(castle && !castle->isCastle()) castle = NULL;
+    }
+
     // init interface
     if(local)
     {
@@ -212,18 +226,6 @@ Battle::Arena::Arena(Army & a1, Army & a2, s32 index, bool local) :
 	armies = new Units();
     }
 
-    castle = world.GetCastle(index);
-
-    if(castle)
-    {
-	CastleHeroes heroes = world.GetHeroes(*castle);
-
-	// skip if present guard and guest
-	if(heroes.FullHouse()) castle = NULL;
-
-	// skip for town
-	if(castle && !castle->isCastle()) castle = NULL;
-    }
 
     towers[0] = NULL;
     towers[1] = NULL;

@@ -30,6 +30,7 @@
 #include "battle_arena.h"
 #include "battle_bridge.h"
 #include "battle_troop.h"
+#include "game_static.h"
 
 namespace Battle
 {
@@ -959,4 +960,12 @@ bool Battle::Board::isValidMirrorImageIndex(s16 index, const Unit* b)
     return b && GetCell(index) &&
 	index != b->GetHeadIndex() && (!b->isWide() || index != b->GetTailIndex()) &&
 	GetCell(index)->isPassable3(*b, true);
+}
+
+std::string Battle::Board::GetMoatInfo(void)
+{
+    std::string msg = _("The Moat reduces by -%{count} the defense skill of any unit and slows to half movement rate.");
+    String::Replace(msg, "%{count}", GameStatic::GetBattleMoatReduceDefense());
+
+    return msg;
 }

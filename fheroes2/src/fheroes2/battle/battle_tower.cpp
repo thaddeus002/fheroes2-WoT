@@ -27,7 +27,7 @@
 #include "battle_tower.h"
 
 Battle::Tower::Tower(const Castle & castle, u8 twr) : Unit(Troop(Monster::ARCHER, 0), -1, -1, false),
-    type(twr), color(castle.GetColor()), valid(true)
+    type(twr), color(castle.GetColor()), bonus(0), valid(true)
 {
     count += castle.CountBuildings();
     count += castle.GetLevelMageGuild() - 1;
@@ -35,8 +35,22 @@ Battle::Tower::Tower(const Castle & castle, u8 twr) : Unit(Troop(Monster::ARCHER
     if(count > 20) count = 20;
     if(TWR_CENTER != type) count /= 2;
     if(count == 0) count = 1;
+    bonus = castle.GetLevelMageGuild();
 
     SetModes(CAP_TOWER);
+}
+
+const char* Battle::Tower::GetName(void) const
+{
+    switch(type)
+    {
+	case TWR_LEFT:	return _("Left Turret");
+	case TWR_RIGHT:	return _("Right Turret");
+
+	default: break;
+    }
+
+    return _("Ballista");
 }
 
 bool Battle::Tower::isValid(void) const
@@ -47,6 +61,16 @@ bool Battle::Tower::isValid(void) const
 u8 Battle::Tower::GetType(void) const
 {
     return type;
+}
+
+u8 Battle::Tower::GetBonus(void) const
+{
+    return bonus;
+}
+
+u16 Battle::Tower::GetAttack(void) const
+{
+    return Unit::GetAttack() + bonus;
 }
 
 u8 Battle::Tower::GetColor(void) const
@@ -84,4 +108,44 @@ void Battle::Tower::SetDestroy(void)
 	default: break;
     }
     valid = false;
+}
+
+std::string Battle::Tower::GetInfo(const Castle & cstl)
+{
+    const char* tmpl = _("The %{name} fires with the strength of %{count} Archers");
+    const char* addn = _("each with a +%{attack} bonus to their attack skill.");
+
+    std::vector<u8> towers;
+    std::string msg;
+
+    if(cstl.isBuild(BUILD_CASTLE))
+    {
+	towers.push_back(TWR_CENTER);
+
+	if(cstl.isBuild(BUILD_LEFTTURRET)) towers.push_back(TWR_LEFT);
+	if(cstl.isBuild(BUILD_RIGHTTURRET)) towers.push_back(TWR_RIGHT);
+
+	for(std::vector<u8>::const_iterator
+	    it = towers.begin(); it != towers.end(); ++it)
+	{
+    	    Tower twr = Tower(cstl, *it);
+
+    	    msg.append(tmpl);
+    	    String::Replace(msg, "%{name}", twr.GetName());
+    	    String::Replace(msg, "%{count}", twr.GetCount());
+
+	    if(twr.GetBonus())
+	    {
+		msg.append(", ");
+		msg.append(addn);
+    		String::Replace(msg, "%{attack}", twr.GetBonus());
+	    }
+	    else
+		msg.append(".");
+
+    	    msg.append("\n \n");
+	}
+    }
+
+    return msg;
 }

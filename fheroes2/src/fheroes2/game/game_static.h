@@ -57,6 +57,8 @@ namespace GameStatic
     float	GetMonsterUpgradeRatio(void);
     s8		ObjectVisitedModifiers(u8);
 
+    u8		GetBattleMoatReduceDefense(void);
+
     const Skill::stats_t*     GetSkillStats(u8);
     const Skill::values_t*    GetSkillValues(u8);
     const Skill::secondary_t* GetSkillForWitchsHut(void);

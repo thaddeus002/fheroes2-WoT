@@ -683,6 +683,9 @@ Battle::Interface::Interface(Arena & a, s32 center) : arena(a), icn_cbkg(ICN::UN
     Cursor::DrawCursor(sf_color[0], 0xDA, true); // yellow
     Cursor::DrawCursor(sf_color[1], 0xD6, true); // orange
     Cursor::DrawCursor(sf_color[2], 0xDE, true); // green
+
+    if(Arena::GetCastle())
+        main_tower = Rect(area.x + 570, area.y + 145, 70, 70);
 }
 
 Battle::Interface::~Interface()
@@ -1619,6 +1622,26 @@ void Battle::Interface::HumanBattleTurn(const Unit & b, Actions & a, std::string
 	{
 	    ProcessingHeroDialogResult(1, a);
 	    humanturn_redraw = true;
+	}
+    }
+    else
+    if(Arena::GetTower(TWR_CENTER) && le.MouseCursor(main_tower))
+    {
+	cursor.SetThemes(Cursor::WAR_INFO);
+	msg = _("View Ballista Info");
+
+	if(le.MouseClickLeft(main_tower) || le.MousePressRight(main_tower))
+	{
+	    const Castle* cstl = Arena::GetCastle();
+	    std::string msg = Tower::GetInfo(*cstl);
+
+	    if(cstl->isBuild(BUILD_MOAT))
+	    {
+		msg.append("\n \n");
+		msg.append(Battle::Board::GetMoatInfo());
+	    }
+
+	    Dialog::Message(_("Ballista"), msg, Font::BIG, le.MousePressRight() ? 0 : Dialog::OK);
 	}
     }
     else

@@ -240,6 +240,7 @@ namespace Battle
 	s16		index_pos;
 	s16		teleport_src;
 	Rect		pocket_book;
+	Rect		main_tower;
 
 	StatusListBox*	listlog;
 	u16		turn;

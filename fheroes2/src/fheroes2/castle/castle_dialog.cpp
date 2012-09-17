@@ -41,6 +41,8 @@
 #include "dialog.h"
 #include "statusbar.h"
 #include "selectarmybar.h"
+#include "battle_tower.h"
+#include "battle_board.h"
 #include "pocketpc.h"
 
 void CastleRedrawTownName(const Castle & castle, const Point & dst);
@@ -406,7 +408,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     payment_t profit;
     std::string description_well = GetDescriptionBuilding(BUILD_WELL, race);
     std::string description_wel2 = GetDescriptionBuilding(BUILD_WEL2, race);
-    std::string description_castle = GetDescriptionBuilding(BUILD_CASTLE, race);
+    std::string description_castle = std::string(GetDescriptionBuilding(BUILD_CASTLE, race));
     std::string description_statue = GetDescriptionBuilding(BUILD_STATUE, race);
     std::string description_spec = GetDescriptionBuilding(BUILD_SPEC, race);
     String::Replace(description_well, "%{count}", GetGrownWell());
@@ -417,6 +419,18 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     String::Replace(description_statue, "%{count}", profit.gold);
     profit = ProfitConditions::FromBuilding(BUILD_SPEC, race);
     String::Replace(description_spec, "%{count}", profit.gold);
+
+    if(isBuild(BUILD_CASTLE))
+    {
+	description_castle.append("\n \n");
+	description_castle.append(Battle::Tower::GetInfo(*this));
+    }
+
+    if(isBuild(BUILD_MOAT))
+    {
+	description_castle.append("\n \n");
+	description_castle.append(Battle::Board::GetMoatInfo());
+    }
 
     // draw building
     CastleDialog::RedrawAllBuilding(*this, cur_pt, cacheBuildings);
