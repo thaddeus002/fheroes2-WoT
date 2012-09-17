@@ -1113,14 +1113,14 @@ void Army::DrawMons32Line(const Troops & troops, s16 cx, s16 cy, u16 width, u8 f
     troops.DrawMons32LineWithScoute(cx, cy, width, first, count, Skill::Level::EXPERT);
 }
 
-u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & join, s32 & cost)
+u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & join)
 {
     const Troop & troop = tile.QuantityTroop();
 
     if(! troop.isValid()) return 0xFF;
 
     const u32  ratios = troop.isValid() ? hero.GetArmy().GetHitPoints() / troop.GetHitPoints() : 0;
-    const bool check_free_stack = (hero.GetArmy().GetCount() < hero.GetArmy().size() || hero.GetArmy().HasMonster(troop));
+    const bool check_free_stack = true; // (hero.GetArmy().GetCount() < hero.GetArmy().size() || hero.GetArmy().HasMonster(troop)); // set force, see Dialog::ArmyJoinWithCost, http://sourceforge.net/tracker/?func=detail&aid=3567985&group_id=96859&atid=616183
     const bool check_extra_condition = (!hero.HasArtifact(Artifact::HIDEOUS_MASK) && Morale::NORMAL <= hero.GetMorale());
 
     // force join for campain and others...
@@ -1137,17 +1137,11 @@ u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & jo
         else
         if(hero.HasSecondarySkill(Skill::Secondary::DIPLOMACY))
         {
-            const Kingdom & kingdom = hero.GetKingdom();
-            payment_t payment = troop.GetCost();
-            cost = payment.gold;
-            payment.Reset();
-            payment.gold = cost;
-
             // skill diplomacy
             const u32 to_join = Monster::GetCountFromHitPoints(troop,
                             troop.GetHitPoints() * hero.GetSecondaryValues(Skill::Secondary::DIPLOMACY) / 100);
 
-            if(to_join && kingdom.AllowPayment(payment))
+            if(to_join)
             {
                 join = to_join;
                 return 2;

@@ -35,11 +35,12 @@
 #include "payment.h"
 #include "pocketpc.h"
 #include "battle.h"
+#include "world.h"
 
 void DrawMonsterStats(const Point &, const Troop &);
 void DrawBattleStats(const Point &, const Troop &);
 
-Dialog::answer_t Dialog::ArmyInfo(const Troop & troop, u16 flags)
+u16 Dialog::ArmyInfo(const Troop & troop, u16 flags)
 {
     if(Settings::Get().QVGA()) return PocketPC::DialogArmyInfo(troop, flags);
     Display & display = Display::Get();
@@ -361,4 +362,122 @@ void DrawBattleStats(const Point & dst, const Troop & b)
 		ow += sprite->w() + 4;
 	    }
 	}
+}
+
+u16 Dialog::ArmyJoinWithCost(const Troop & troop, u32 join, u32 gold, Heroes & hero)
+{
+    Display & display = Display::Get();
+    const Settings & conf = Settings::Get();
+    const ICN::icn_t system = conf.ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+
+    // preload
+    AGG::Cache::PreloadObject(system);
+
+    // cursor
+    Cursor & cursor = Cursor::Get();
+    Cursor::themes_t oldthemes = cursor.Themes();
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
+
+    std::string message;
+
+    if(troop.GetCount() == 1)
+	message = _("The creature is swayed by your diplomatic tongue, and offers to join your army for the sum of %{gold} gold.\nDo you accept?");
+    else
+    {
+        message = _("The creatures are swayed by your diplomatic\ntongue, and make you an offer:\n \n");
+
+        if(join != troop.GetCount())
+    	    message += _("%{offer} of the %{total} %{monster} will join your army, and the rest will leave you alone, for the sum of %{gold} gold.\nDo you accept?");
+        else
+    	    message += _("All %{offer} of the %{monster} will join your army for the sum of %{gold} gold.\nDo you accept?");
+    }
+
+    String::Replace(message, "%{offer}", join);
+    String::Replace(message, "%{total}", troop.GetCount());
+    String::Replace(message, "%{monster}", String::Lower(troop.GetPluralName(join)));
+    String::Replace(message, "%{gold}", gold);
+
+    TextBox textbox(message, Font::BIG, BOXAREA_WIDTH);
+    const u16 buttons = Dialog::YES | Dialog::NO;
+    const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 6);
+    u16 posy = 0;
+    Text text;
+
+    message = _("(Rate: %{percent})");
+    String::Replace(message, "%{percent}", troop.GetMonster().GetCost().gold * join * 100 / gold);
+    text.Set(message, Font::BIG);
+
+    Box box(10 + textbox.h() + 10 + text.h() + 40 + sprite.h() + 10, buttons);
+    const Rect & pos = box.GetArea();
+
+    posy = pos.y + 10;
+    textbox.Blit(pos.x, posy);
+
+    posy += textbox.h() + 10;
+    text.Blit(pos.x + (pos.w - text.w()) / 2, posy);
+
+
+    posy += text.h() + 40;
+    sprite.Blit(pos.x + (pos.w - sprite.w()) / 2, posy);
+
+    text.Set(GetString(gold) + " " + "(" + "total: " + GetString(world.GetKingdom(hero.GetColor()).GetFunds().Get(Resource::GOLD)) + ")", Font::SMALL);
+    text.Blit(pos.x + (pos.w - text.w()) / 2, posy + sprite.h() + 5);
+
+    LocalEvent & le = LocalEvent::Get();
+
+    ButtonGroups btnGroups(pos, buttons);
+    btnGroups.Draw();
+
+    Button btnMarket(pos.x + pos.w / 2 - 60 - 36, posy, (conf.ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS), 4, 5);
+    Button btnHeroes(pos.x + pos.w / 2 + 60, posy, (conf.ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS), 0, 1);
+
+    if(hero.GetKingdom().AllowPayment(payment_t(Resource::GOLD, gold)))
+	btnMarket.SetDisable(true);
+    else
+    {
+	TextBox textbox2(_("Not enough\ngold"), Font::SMALL, 100);
+	textbox2.Blit(btnMarket.x - 35, btnMarket.y - 30);
+	btnMarket.Draw();
+    }
+
+    if(hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(troop))
+	btnHeroes.SetDisable(true);
+    else
+    {
+	TextBox textbox2(_("Not room in\nthe garrison"), Font::SMALL, 100);
+	textbox2.Blit(btnHeroes.x - 35, btnHeroes.y - 30);
+	btnHeroes.Draw();
+    }
+
+    cursor.Show();
+    display.Flip();
+
+    // message loop
+    u16 result = Dialog::ZERO;
+
+    while(result == Dialog::ZERO && le.HandleEvents())
+    {
+	if(btnMarket.isEnable())
+    	    le.MousePressLeft(btnMarket) ? btnMarket.PressDraw() : btnMarket.ReleaseDraw();
+
+	if(btnHeroes.isEnable())
+    	    le.MousePressLeft(btnHeroes) ? btnHeroes.PressDraw() : btnHeroes.ReleaseDraw();
+
+        if(!buttons && !le.MousePressRight()) break;
+
+        result = btnGroups.QueueEventProcessing();
+
+	if(le.MouseClickLeft(btnMarket))
+	    Marketplace(false);
+	else
+	if(le.MouseClickLeft(btnHeroes))
+	{ hero.OpenDialog(false, false); cursor.Show(); display.Flip(); }
+    }
+
+    cursor.Hide();
+    cursor.SetThemes(oldthemes);
+    cursor.Show();
+
+    return result;
 }

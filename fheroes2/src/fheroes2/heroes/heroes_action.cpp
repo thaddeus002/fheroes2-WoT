@@ -532,11 +532,8 @@ void ActionToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
     const Troop & troop = tile.QuantityTroop();
     //const Settings & conf = Settings::Get();
 
-
     u32 join = 0;
-    Funds cost;
-
-    u8 reason = Army::GetJoinSolution(hero, tile, join, cost.gold);
+    u8 reason = Army::GetJoinSolution(hero, tile, join);
 
     // free join
     if(1 == reason)
@@ -561,29 +558,15 @@ void ActionToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
     // join with cost
     if(2 == reason)
     {
-        std::string message;
-        if(troop.GetCount() == 1)
-            message = _("The creature is swayed by your diplomatic tongue, and offers to join your army for the sum of %{gold} gold.\nDo you accept?");
-        else
-        {
-            message = _("The creatures are swayed by your diplomatic\ntongue, and make you an offer:\n \n");
-            if(join != troop.GetCount())
-        	message += _("%{offer} of the %{total} %{monster} will join your army, and the rest will leave you alone, for the sum of %{gold} gold.\nDo you accept?");
-            else
-            	message += _("All %{offer} of the %{monster} will join your army for the sum of %{gold} gold.\nDo you accept?");
-        }
+	u32 gold = troop.GetCost().gold;
 
-        String::Replace(message, "%{offer}", join);
-        String::Replace(message, "%{total}", troop.GetCount());
-        String::Replace(message, "%{monster}", String::Lower(troop.GetPluralName(join)));
-        String::Replace(message, "%{gold}", cost.gold);
-
-        if(Dialog::YES == Dialog::ResourceInfo("", message, cost, Dialog::YES | Dialog::NO))
+        if(Dialog::YES == Dialog::ArmyJoinWithCost(troop, join, gold, hero))
         {
 	    DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " join monster " << troop.GetName() <<
-						    ", count: " << join << ", cost: " << cost.gold);
+						    ", count: " << join << ", cost: " << gold);
+
             hero.GetArmy().JoinTroop(troop(), join);
-            hero.GetKingdom().OddFundsResource(cost);
+            hero.GetKingdom().OddFundsResource(Funds(Resource::GOLD, gold));
             Interface::Basic::Get().SetRedraw(REDRAW_STATUS);
         }
         else

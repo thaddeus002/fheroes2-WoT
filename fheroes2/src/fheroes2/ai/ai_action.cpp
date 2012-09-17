@@ -494,9 +494,7 @@ void AIToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
     //const Settings & conf = Settings::Get();
 
     u32 join = 0;
-    Funds cost;
-
-    u8 reason = Army::GetJoinSolution(hero, tile, join, cost.gold);
+    u8 reason = Army::GetJoinSolution(hero, tile, join);
 
     // free join
     if(1 == reason)
@@ -518,9 +516,10 @@ void AIToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
     	// join if archers or fly or present
     	if(hero.GetArmy().HasMonster(troop()) || troop.isArchers() || troop.isFly())
     	{
-    	    DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " join monster " << troop.GetName() << ", count: " << join << ", cost: " << cost.gold);
+	    u32 gold = troop.GetCost().gold;
+    	    DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " join monster " << troop.GetName() << ", count: " << join << ", cost: " << gold);
     	    hero.GetArmy().JoinTroop(troop(), join);
-	    hero.GetKingdom().OddFundsResource(cost);
+	    hero.GetKingdom().OddFundsResource(Funds(Resource::GOLD, gold));
 	    destroy = true;
     	}
 	else

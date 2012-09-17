@@ -107,7 +107,7 @@ public:
     static u8		UniqueCount(const Army &);
 
     // 0: fight, 1: free join, 2: join with gold, 3: flee
-    static u8		GetJoinSolution(const Heroes &, const Maps::Tiles &, u32 &, s32 &);
+    static u8		GetJoinSolution(const Heroes &, const Maps::Tiles &, u32 &);
     static bool		TroopsStrongerEnemyTroops(const Troops &, const Troops &);
 
     static void		DrawMons32Line(const Troops &, s16, s16, u16, u8 = 0, u8 = 0);

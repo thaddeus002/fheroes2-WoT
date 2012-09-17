@@ -119,7 +119,9 @@ namespace Dialog
     bool SetGuardian(Heroes &, Troop &, CapturedObject &, bool readonly);
 
     // army info
-    answer_t ArmyInfo(const Troop & troop, u16 flags);
+    u16 ArmyInfo(const Troop & troop, u16 flags);
+    u16 ArmyJoinWithCost(const Troop &, u32 join, u32 gold, Heroes &);
+
     // dialog marketplace
     void Marketplace(bool fromTradingPost = false);
     void MakeGiftResource(void);

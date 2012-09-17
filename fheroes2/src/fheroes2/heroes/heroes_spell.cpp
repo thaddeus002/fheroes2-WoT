@@ -457,7 +457,7 @@ bool ActionSpellVisions(Heroes & hero)
     	    u32 join = troop.GetCount();
     	    Funds cost;
 
-	    const u8 reason = Army::GetJoinSolution(hero, tile, join, cost.gold);
+	    const u8 reason = Army::GetJoinSolution(hero, tile, join);
 	    std::string hdr, msg;
 
 	    hdr = std::string("%{count} ") + String::Lower(troop.GetPluralName(join));
@@ -483,7 +483,7 @@ bool ActionSpellVisions(Heroes & hero)
 		    }
 		    msg.append("\n");
 		    msg.append("\n for a fee of %{gold} gold.");
-		    String::Replace(msg, "%{gold}", cost.gold);
+		    String::Replace(msg, "%{gold}", troop.GetCost().gold);
 		    break;
 
 		default:
