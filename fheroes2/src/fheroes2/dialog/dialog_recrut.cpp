@@ -89,7 +89,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     const payment_t paymentMonster = monster.GetCost();
     const Kingdom & kingdom = world.GetKingdom(Settings::Get().CurrentColor());
 
-    while(kingdom.AllowPayment(paymentMonster * (max + 1)) && (max + 1) < available) ++max;
+    while(kingdom.AllowPayment(paymentMonster * (max + 1)) && (max + 1) <= available) ++max;
 
     u32 result = max;
 
@@ -249,6 +249,12 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     dst_pt.y = pos.y + 171;
     Button buttonDn(dst_pt, ICN::RECRUIT, 2, 3);
 
+    if(0 == result)
+    {
+	buttonOk.Press();
+	buttonOk.SetDisable(true);
+    }
+
     buttonOk.Draw();
     buttonCancel.Draw();
     buttonMax.Draw();
@@ -263,7 +269,8 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     // str loop
     while(le.HandleEvents())
     {
-	le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
+	if(buttonOk.isEnable())
+	    le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
 	le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
 	le.MousePressLeft(buttonMax) ? buttonMax.PressDraw() : buttonMax.ReleaseDraw();
 	le.MousePressLeft(buttonUp) ? buttonUp.PressDraw() : buttonUp.ReleaseDraw();
@@ -280,6 +287,13 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 	    ++result;
 	    paymentCosts += paymentMonster;
 	    redraw = true;
+
+	    if(buttonOk.isDisable())
+	    {
+		buttonOk.Release();
+		buttonOk.SetDisable(false);
+		buttonOk.Draw();
+	    }
 	}
 	else
 	if((le.MouseWheelDn(rtWheel) || le.MouseClickLeft(buttonDn)) && result)
@@ -287,6 +301,13 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 	    --result;
 	    paymentCosts -= paymentMonster;
 	    redraw = true;
+
+	    if(0 == result)
+	    {
+		buttonOk.Press();
+		buttonOk.SetDisable(true);
+		buttonOk.Draw();
+	    }
 	}
 	else
 	if(le.MouseClickLeft(buttonMax) && result != max)
