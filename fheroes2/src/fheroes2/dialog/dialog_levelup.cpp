@@ -24,6 +24,7 @@
 #include "settings.h"
 #include "cursor.h"
 #include "button.h"
+#include "heroes.h"
 #include "dialog.h"
 
 void DialogPrimaryOnly(const std::string & name, const std::string & primary)
@@ -66,7 +67,7 @@ u8 DialogOneSecondary(const std::string & name, const std::string & primary, con
     return sec.Skill();
 }
 
-u8 DialogSelectSecondary(const std::string & name, const std::string & primary, const Skill::Secondary & sec1, const Skill::Secondary & sec2)
+u8 DialogSelectSecondary(const std::string & name, const std::string & primary, const Skill::Secondary & sec1, const Skill::Secondary & sec2, Heroes & hero)
 {
     std::string header = _("%{name} has gained a level.");
     header.append("\n \n");
@@ -148,8 +149,16 @@ u8 DialogSelectSecondary(const std::string & name, const std::string & primary, 
     Text name_level2(Skill::Level::String(sec2.Level()), Font::SMALL);
     name_level2.Blit(pos.x + (sprite_skill2.w() - name_level2.w()) / 2, pos.y + sprite_skill2.h() - 12);
 
+    // hero button
+    pt.x = box.GetArea().x + box.GetArea().w / 2 - 18;
+    pt.y = box.GetArea().y + box.GetArea().h - 36;
+    Button button_hero(pt, (Settings::Get().ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS), 0, 1);
+    text.Set(GetString(HEROESMAXSKILL) +"/" + GetString(hero.GetSecondarySkills().size()), Font::BIG);
+    text.Blit(box.GetArea().x + (box.GetArea().w - text.w()) / 2, pt.y - 15);
+
     button_learn1.Draw();
     button_learn2.Draw();
+    button_hero.Draw();
 
     cursor.Show();
     display.Flip();
@@ -160,10 +169,14 @@ u8 DialogSelectSecondary(const std::string & name, const std::string & primary, 
     {
 	le.MousePressLeft(button_learn1) ? button_learn1.PressDraw() : button_learn1.ReleaseDraw();
 	le.MousePressLeft(button_learn2) ? button_learn2.PressDraw() : button_learn2.ReleaseDraw();
+	le.MousePressLeft(button_hero) ? button_hero.PressDraw() : button_hero.ReleaseDraw();
 
         if(le.MouseClickLeft(button_learn1) || Game::HotKeyPress(Game::EVENT_DEFAULT_LEFT)) return sec1.Skill();
         else
 	if(le.MouseClickLeft(button_learn2) || Game::HotKeyPress(Game::EVENT_DEFAULT_RIGHT)) return sec2.Skill();
+	else
+	if(le.MouseClickLeft(button_hero) || Game::HotKeyPress(Game::EVENT_DEFAULT_READY))
+	    { hero.OpenDialog(false, false); cursor.Show(); display.Flip(); }
 
 	if(le.MouseClickLeft(rect_image1))
 	    { cursor.Hide(); Dialog::SecondarySkillInfo(sec1); cursor.Show(); display.Flip(); }
@@ -183,7 +196,7 @@ u8 DialogSelectSecondary(const std::string & name, const std::string & primary, 
     return Skill::Secondary::UNKNOWN;
 }
 
-u8 Dialog::LevelUpSelectSkill(const std::string & name, const std::string & primary, const Skill::Secondary & sec1, const Skill::Secondary & sec2)
+u8 Dialog::LevelUpSelectSkill(const std::string & name, const std::string & primary, const Skill::Secondary & sec1, const Skill::Secondary & sec2, Heroes & hero)
 {
     u8 result = Skill::Secondary::UNKNOWN;
 
@@ -193,7 +206,7 @@ u8 Dialog::LevelUpSelectSkill(const std::string & name, const std::string & prim
     if(Skill::Secondary::UNKNOWN == sec1.Skill() || Skill::Secondary::UNKNOWN == sec2.Skill())
 	result = DialogOneSecondary(name, primary, (Skill::Secondary::UNKNOWN == sec2.Skill() ? sec1 : sec2));
     else
-	result = DialogSelectSecondary(name, primary, sec1, sec2);
+	result = DialogSelectSecondary(name, primary, sec1, sec2, hero);
 
     return result;
 }

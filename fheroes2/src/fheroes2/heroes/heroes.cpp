@@ -1237,7 +1237,7 @@ void Heroes::LevelUpSecondarySkill(u8 primary, bool autoselect)
     else
     {
 	AGG::PlaySound(M82::NWHEROLV);
-	u8 result = Dialog::LevelUpSelectSkill(name, Skill::Primary::String(primary), sec1, sec2);
+	u8 result = Dialog::LevelUpSelectSkill(name, Skill::Primary::String(primary), sec1, sec2, *this);
 
 	if(Skill::Secondary::UNKNOWN != result)
 	    selected = result == sec2.Skill() ? & sec2 : &sec1;

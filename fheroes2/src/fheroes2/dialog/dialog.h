@@ -95,8 +95,8 @@ namespace Dialog
     void ExtSettings(bool);
 
     // other info
-    u8   LevelUpSelectSkill(const std::string &, const std::string &, const Skill::Secondary &, const Skill::Secondary &);
-    bool SelectGoldOrExp(const std::string &header, const std::string &message, const u16 gold, const u16 expr);
+    u8   LevelUpSelectSkill(const std::string &, const std::string &, const Skill::Secondary &, const Skill::Secondary &, Heroes &);
+    bool SelectGoldOrExp(const std::string &header, const std::string &message, const u16 gold, const u16 expr, const Heroes &);
 
     void SpellInfo(const Spell &, const bool ok_button = true);
     void SpellInfo(const std::string &, const std::string &, const Spell &, const bool ok_button = true);

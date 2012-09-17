@@ -24,9 +24,10 @@
 #include "settings.h"
 #include "cursor.h"
 #include "button.h"
+#include "world.h"
 #include "dialog.h"
 
-bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &message, const u16 gold, const u16 expr)
+bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &message, const u16 gold, const u16 expr, const  Heroes & hero)
 {
     Display & display = Display::Get();
     const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
@@ -48,7 +49,7 @@ bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &messa
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
 
     Text text;
-    text.Set(GetString(gold), Font::SMALL);
+    text.Set(GetString(gold) + " " + "(" + "total: " + GetString(world.GetKingdom(hero.GetColor()).GetFunds().Get(Resource::GOLD)) + ")", Font::SMALL);
 
     const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
@@ -81,7 +82,7 @@ bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &messa
     pos.x = box.GetArea().x + box.GetArea().w / 2 + 30;
     sprite_expr.Blit(pos.x, pos.y - sprite_expr.h());
     // text
-    text.Set(GetString(expr), Font::SMALL);
+    text.Set(GetString(expr) + " " + "(" + "need: " + GetString(Heroes::GetExperienceFromLevel(hero.GetLevel()) - hero.GetExperience()) + ")", Font::SMALL);
     text.Blit(pos.x + (sprite_expr.w() - text.w()) / 2, pos.y + 2);
 
     button_yes.Draw();

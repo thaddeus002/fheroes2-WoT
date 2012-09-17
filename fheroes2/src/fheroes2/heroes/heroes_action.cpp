@@ -149,7 +149,7 @@ u16 DialogGoldWithExp(const std::string & hdr, const std::string & msg, const u1
     Surface image(sprite.w() + gold.w() + 50, sprite.h() + 12);
     gold.Blit(0, image.h() - gold.h() - 12, image);
     sprite.Blit(gold.w() + 50, 0, image);
-    Text text(GetString(count), Font::SMALL);
+    Text text(GetString(count));
     text.Blit((gold.w() - text.w()) / 2, image.h() - 12, image);
     text.Set(GetString(exp));
     text.Blit(gold.w() + 50 + (sprite.w() - text.w()) / 2, image.h() - 12, image);
@@ -1847,7 +1847,7 @@ void ActionToTreasureChest(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    const u16 expr = gold > 500 ? gold - 500 : 500;
 	    msg = _("After scouring the area, you fall upon a hidden treasure cache. You may take the gold or distribute the gold to the peasants for experience. Do you wish to keep the gold?");
 
-	    if(! Dialog::SelectGoldOrExp(hdr, msg, gold, expr))
+	    if(! Dialog::SelectGoldOrExp(hdr, msg, gold, expr, hero))
 	    {
 		gold = 0;
 		hero.IncreaseExperience(expr);
