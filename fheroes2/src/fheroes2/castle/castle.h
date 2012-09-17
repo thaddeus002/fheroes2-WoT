@@ -172,6 +172,8 @@ public:
 
     void Scoute(void) const;
 
+    std::string GetDescription(void);
+
     static const char* GetStringBuilding(u32, u8 race = 0);
     static const char* GetDescriptionBuilding(u32, u8 race = 0);
     static ICN::icn_t GetICNBuilding(u32, u8);

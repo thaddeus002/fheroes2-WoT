@@ -34,6 +34,9 @@
 #include "castle.h"
 #include "game_static.h"
 #include "ai.h"
+#include "battle_tower.h"
+#include "battle_board.h"
+#include "profit.h"
 
 Castle::Castle() : race(Race::NONE), building(0), captain(*this), army(NULL)
 {
@@ -2187,4 +2190,24 @@ void Castle::SwapCastleHeroes(CastleHeroes & heroes)
 
 	world.GetTiles(center).SetHeroes(heroes.Guest());
     }
+}
+
+std::string Castle::GetDescription(void)
+{
+    std::string msg = GetDescriptionBuilding(BUILD_CASTLE, race);
+    String::Replace(msg, "%{count}", ProfitConditions::FromBuilding(BUILD_CASTLE, race).gold);
+
+    if(isBuild(BUILD_CASTLE))
+    {
+        msg.append("\n \n");
+        msg.append(Battle::Tower::GetInfo(*this));
+    }
+
+    if(isBuild(BUILD_MOAT))
+    {
+        msg.append("\n \n");
+        msg.append(Battle::Board::GetMoatInfo());
+    }
+
+    return msg;
 }

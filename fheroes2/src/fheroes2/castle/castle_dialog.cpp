@@ -41,8 +41,6 @@
 #include "dialog.h"
 #include "statusbar.h"
 #include "selectarmybar.h"
-#include "battle_tower.h"
-#include "battle_board.h"
 #include "pocketpc.h"
 
 void CastleRedrawTownName(const Castle & castle, const Point & dst);
@@ -405,32 +403,19 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     const Rect*	coordMageGuild = GetMageGuildCoord(*this, cacheBuildings);
 
     // update extra description
-    payment_t profit;
+    
     std::string description_well = GetDescriptionBuilding(BUILD_WELL, race);
     std::string description_wel2 = GetDescriptionBuilding(BUILD_WEL2, race);
-    std::string description_castle = std::string(GetDescriptionBuilding(BUILD_CASTLE, race));
     std::string description_statue = GetDescriptionBuilding(BUILD_STATUE, race);
     std::string description_spec = GetDescriptionBuilding(BUILD_SPEC, race);
     String::Replace(description_well, "%{count}", GetGrownWell());
     String::Replace(description_wel2, "%{count}", GetGrownWel2());
-    profit = ProfitConditions::FromBuilding(BUILD_CASTLE, race);
-    String::Replace(description_castle, "%{count}", profit.gold);
+
+    payment_t profit = ProfitConditions::FromBuilding(BUILD_CASTLE, race);
     profit = ProfitConditions::FromBuilding(BUILD_STATUE, race);
     String::Replace(description_statue, "%{count}", profit.gold);
     profit = ProfitConditions::FromBuilding(BUILD_SPEC, race);
     String::Replace(description_spec, "%{count}", profit.gold);
-
-    if(isBuild(BUILD_CASTLE))
-    {
-	description_castle.append("\n \n");
-	description_castle.append(Battle::Tower::GetInfo(*this));
-    }
-
-    if(isBuild(BUILD_MOAT))
-    {
-	description_castle.append("\n \n");
-	description_castle.append(Battle::Board::GetMoatInfo());
-    }
 
     // draw building
     CastleDialog::RedrawAllBuilding(*this, cur_pt, cacheBuildings);
@@ -672,7 +657,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	if(readonly &&
 	    (((building & BUILD_CASTLE) && le.MouseClickLeft(coordBuildingCastle)) ||
 	     (!(building & BUILD_CASTLE) && le.MouseClickLeft(coordBuildingTent))))
-		Dialog::Message(GetStringBuilding(BUILD_CASTLE, race), description_castle, Font::BIG, Dialog::OK);
+		Dialog::Message(GetStringBuilding(BUILD_CASTLE, race), GetDescription(), Font::BIG, Dialog::OK);
 	else
 	if(building & BUILD_CASTLE && le.MouseClickLeft(coordBuildingCastle))
 	{
@@ -853,7 +838,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	else
 	if(building & BUILD_SPEC && le.MousePressRight(coordBuildingSpec)) Dialog::Message(GetStringBuilding(BUILD_SPEC, race), description_spec, Font::BIG);
 	else
-	if(building & BUILD_CASTLE && le.MousePressRight(coordBuildingCastle)) Dialog::Message(GetStringBuilding(BUILD_CASTLE), description_castle, Font::BIG);
+	if(building & BUILD_CASTLE && le.MousePressRight(coordBuildingCastle)) Dialog::Message(GetStringBuilding(BUILD_CASTLE), GetDescription(), Font::BIG);
 	else
 	if(!(building & BUILD_CASTLE) && le.MousePressRight(coordBuildingTent)) Dialog::Message(GetStringBuilding(BUILD_TENT), GetDescriptionBuilding(BUILD_TENT), Font::BIG);
 	else

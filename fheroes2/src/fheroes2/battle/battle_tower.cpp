@@ -143,7 +143,8 @@ std::string Battle::Tower::GetInfo(const Castle & cstl)
 	    else
 		msg.append(".");
 
-    	    msg.append("\n \n");
+	    if((it + 1) != towers.end())
+    		msg.append("\n \n");
 	}
     }
 
