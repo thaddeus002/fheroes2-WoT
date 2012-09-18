@@ -1,4 +1,4 @@
-/***************************************************************************
+/*********[6~******************************************************************
  *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
@@ -68,7 +68,7 @@ public:
         textBuy.SetFont(Font::SMALL);
     };
 
-    void RedrawInfoBuySell(u32 count_sell, u32 count_buy);
+    void RedrawInfoBuySell(u32 count_sell, u32 count_buy, u32 max_sell, u32 orig_buy);
     void ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, u32 max_sell, u32 count_buy, u32 count_sell, bool fromTradingPost);
 
     Rect   buttonMax;
@@ -173,26 +173,26 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
         buttonLeft.Draw();
         buttonRight.Draw();
 
-        RedrawInfoBuySell(count_sell, count_buy);
+        RedrawInfoBuySell(count_sell, count_buy, max_sell, world.GetKingdom(Settings::Get().CurrentColor()).GetFunds().Get(resourceTo));
 	splitter.Show();
         cursor.Show();
         display.Flip();
     }
 }
 
-void TradeWindowGUI::RedrawInfoBuySell(u32 count_sell, u32 count_buy)
+void TradeWindowGUI::RedrawInfoBuySell(u32 count_sell, u32 count_buy, u32 max_sell, u32 orig_buy)
 {
     Point dst_pt;
 
     textSell.Hide();
-    textSell.SetText(GetString(count_sell));
+    textSell.SetText(std::string("-") + GetString(count_sell) + " " + "(" + GetString(max_sell - count_sell) + ")");
     dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - textSell.w() / 2;
     dst_pt.y = pos_rt.y + 116;
     textSell.SetPos(dst_pt);
     textSell.Show();
 
     textBuy.Hide();
-    textBuy.SetText(GetString(count_buy));
+    textBuy.SetText(std::string("+") + GetString(count_buy) + " " + "(" + GetString(orig_buy + count_buy) + ")");
     dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - textBuy.w() / 2;
     dst_pt.y = pos_rt.y + 116;
     textBuy.SetPos(dst_pt);
@@ -401,7 +401,7 @@ void Dialog::Marketplace(bool fromTradingPost)
 
             cursor.Hide();
             splitter.Move(seek);
-            gui.RedrawInfoBuySell(count_sell, count_buy);
+            gui.RedrawInfoBuySell(count_sell, count_buy, max_sell, fundsFrom.Get(resourceTo));
             cursor.Show();
             display.Flip();
         }
@@ -416,7 +416,7 @@ void Dialog::Marketplace(bool fromTradingPost)
 
             cursor.Hide();
             splitter.Move(max);
-            gui.RedrawInfoBuySell(count_sell, count_buy);
+            gui.RedrawInfoBuySell(count_sell, count_buy, max_sell, fundsFrom.Get(resourceTo));
             cursor.Show();
             display.Flip();
 	}
@@ -430,7 +430,7 @@ void Dialog::Marketplace(bool fromTradingPost)
 
             cursor.Hide();
             splitter.Move(min);
-            gui.RedrawInfoBuySell(count_sell, count_buy);
+            gui.RedrawInfoBuySell(count_sell, count_buy, max_sell, fundsFrom.Get(resourceTo));
             cursor.Show();
             display.Flip();
 	}
@@ -463,7 +463,7 @@ void Dialog::Marketplace(bool fromTradingPost)
 
             cursor.Hide();
             splitter.Backward();
-            gui.RedrawInfoBuySell(count_sell, count_buy);
+            gui.RedrawInfoBuySell(count_sell, count_buy, max_sell, fundsFrom.Get(resourceTo));
             cursor.Show();
             display.Flip();
         }
@@ -479,7 +479,7 @@ void Dialog::Marketplace(bool fromTradingPost)
 
             cursor.Hide();
             splitter.Forward();
-            gui.RedrawInfoBuySell(count_sell, count_buy);
+            gui.RedrawInfoBuySell(count_sell, count_buy, max_sell, fundsFrom.Get(resourceTo));
             cursor.Show();
             display.Flip();
         }
