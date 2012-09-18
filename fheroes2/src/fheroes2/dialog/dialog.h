@@ -121,6 +121,7 @@ namespace Dialog
     // army info
     u16 ArmyInfo(const Troop & troop, u16 flags);
     u16 ArmyJoinWithCost(const Troop &, u32 join, u32 gold, Heroes &);
+    u8  ArmySplitTroop(u8 free_slots, u32 max, u32 &);
 
     // dialog marketplace
     void Marketplace(bool fromTradingPost = false);

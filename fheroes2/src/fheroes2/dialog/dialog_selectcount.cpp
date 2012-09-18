@@ -27,17 +27,101 @@
 #include "pocketpc.h"
 #include "dialog.h"
 
+class SelectValue : public Rect
+{
+public:
+    SelectValue(u32 min, u32 max, u32 cur, u32 st) : vmin(min), vmax(max), vcur(cur), step(st)
+    {
+	if(vmin >= vmax) min = 0;
+	if(vcur > vmax || vcur < vmin) vcur = vmin;
+
+	btnUp.SetSprite(ICN::TOWNWIND, 5, 6);
+	btnDn.SetSprite(ICN::TOWNWIND, 7, 8);
+
+	pos.w = 90;
+	pos.h = 30;
+    }
+
+    u32 Min(void)
+    {
+	return vmin;
+    }
+
+    u32 Max(void)
+    {
+	return vmax;
+    }
+
+    void SetCur(u32 v)
+    {
+	vcur = v;
+    }
+
+    void SetPos(const Point & pt)
+    {
+	pos = pt;
+
+	btnUp.SetPos(pt.x + 70, pt.y);
+	btnDn.SetPos(pt.x + 70, pt.y + 16);
+    }
+
+    u32 operator() (void) const
+    {
+	return vcur;
+    }
+
+    void Redraw(void)
+    {
+	const Sprite & sprite_edit = AGG::GetICN(ICN::TOWNWIND, 4);
+	sprite_edit.Blit(pos.x, pos.y + 4);
+
+	Text text(GetString(vcur), Font::BIG);
+	text.Blit(pos.x + (sprite_edit.w() - text.w()) / 2, pos.y + 5);
+
+	btnUp.Draw();
+	btnDn.Draw();
+    }
+
+    bool QueueEventProcessing(void)
+    {
+	LocalEvent & le = LocalEvent::Get();
+
+	le.MousePressLeft(btnUp) ? btnUp.PressDraw() : btnUp.ReleaseDraw();
+	le.MousePressLeft(btnDn) ? btnDn.PressDraw() : btnDn.ReleaseDraw();
+
+	if((le.MouseWheelUp(pos) ||
+            le.MouseClickLeft(btnUp)) && vcur < vmax)
+	{
+	    vcur += vcur + step <= vmax ? step : vmax - vcur;
+    	    return true;
+	}
+	else
+	// down
+	if((le.MouseWheelDn(pos) ||
+            le.MouseClickLeft(btnDn)) && vmin < vcur)
+	{
+	    vcur -= vmin + vcur >= step ? step : vcur;
+    	    return true;
+	}
+
+	return false;
+    }
+
+protected:
+    u32		vmin;
+    u32		vmax;
+    u32		vcur;
+    u32		step;
+
+    Rect	pos;
+
+    Button	btnUp;
+    Button	btnDn;
+};
+
 bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur, u8 step)
 {
     Display & display = Display::Get();
-
-    if(min >= max) min = 0;
-    if(cur > max || cur < min) cur = min;
-
-    const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
-
-    // preload
-    AGG::Cache::PreloadObject(system);
 
     // cursor
     Cursor & cursor = Cursor::Get();
@@ -47,42 +131,17 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur,
     const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
     Box box(text.h() + spacer + 30, true);
+    SelectValue sel(min, max, cur, step);
 
     const Rect & pos = box.GetArea();
-    Point pt;
 
-    // text
-    pt.x = pos.x + (pos.w - text.w()) / 2;
-    pt.y = pos.y;
-    text.Blit(pt);
+    text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y);
 
-    // sprite edit
-    const Surface & sprite_edit = AGG::GetICN(ICN::TOWNWIND, 4);
-    pt.x = pos.x + 80;
-    pt.y = pos.y + 35;
-    sprite_edit.Blit(pt, display);
+    sel.SetPos(Point(pos.x + 80, pos.y + 30));
+    sel.Redraw();
 
-    text.Set(GetString(cur));
-    pt.x = pos.x + 80 + (sprite_edit.w() - text.w()) / 2;
-    pt.y = pos.y + 36;
-    text.Blit(pt);
-
-    // buttons
-    pt.x = pos.x + 150;
-    pt.y = pos.y + 31;
-    Button buttonUp(pt, ICN::TOWNWIND, 5, 6);
-
-    pt.x = pos.x + 150;
-    pt.y = pos.y + 47;
-    Button buttonDn(pt, ICN::TOWNWIND, 7, 8);
-
-    pt.x = pos.x;
-    pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 1).h();
-    Button buttonOk(pt, system, 1, 2);
-
-    pt.x = pos.x + pos.w - AGG::GetICN(system, 3).w();
-    pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 3).h();
-    Button buttonCancel(pt, system, 3, 4);
+    ButtonGroups btnGroups(box.GetArea(), Dialog::OK | Dialog::CANCEL);
+    btnGroups.Draw();
 
     text.Set("MAX", Font::SMALL);
     const Rect rectMax(pos.x + 173, pos.y + 38, text.w(), text.h());
@@ -90,72 +149,46 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur,
 
     LocalEvent & le = LocalEvent::Get();
 
-    buttonUp.Draw();
-    buttonDn.Draw();
-    buttonOk.Draw();
-    buttonCancel.Draw();
-
     bool redraw_count = false;
     cursor.Show();
     display.Flip();
 
     // message loop
-    while(le.HandleEvents())
-    {
-	le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
-        le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
-	le.MousePressLeft(buttonUp) ? buttonUp.PressDraw() : buttonUp.ReleaseDraw();
-	le.MousePressLeft(buttonDn) ? buttonDn.PressDraw() : buttonDn.ReleaseDraw();
+    u16 result = Dialog::ZERO;
 
+    while(result == Dialog::ZERO && le.HandleEvents())
+    {
 	if(PressIntKey(min, max, cur))
+	{
+	    sel.SetCur(cur);
 	    redraw_count = true;
+	}
 
         // max
         if(le.MouseClickLeft(rectMax))
         {
-    	    cur = max;
+	    sel.SetCur(max);
     	    redraw_count = true;
         }
-	else
-	// up
-	if((le.MouseWheelUp(pos) ||
-            le.MouseClickLeft(buttonUp)) && cur < max)
-	{
-	    cur += cur + step <= max ? step : max - cur;
+	if(sel.QueueEventProcessing())
     	    redraw_count = true;
-	}
-	else
-	// down
-	if((le.MouseWheelDn(pos) ||
-            le.MouseClickLeft(buttonDn)) && min < cur)
-	{
-	    cur -= min + cur >= step ? step : cur;
-    	    redraw_count = true;
-	}
 
 	if(redraw_count)
 	{
 	    cursor.Hide();
-	    pt.x = pos.x + 80;
-	    pt.y = pos.y + 35;
-	    sprite_edit.Blit(pt, display);
-
-	    text.Set(GetString(cur), Font::BIG);
-	    pt.x = pos.x + 80 + (sprite_edit.w() - text.w()) / 2;
-	    pt.y = pos.y + 36;
-	    text.Blit(pt);
+	    sel.Redraw();
 	    cursor.Show();
 	    display.Flip();
 
 	    redraw_count = false;
 	}
 
-        if(Game::HotKeyPress(Game::EVENT_DEFAULT_READY) || le.MouseClickLeft(buttonOk)){ return true; }
-	else
-	if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonCancel)){ cur = 0;  break; }
+        result = btnGroups.QueueEventProcessing();
     }
 
-    return false;
+    cur = result == Dialog::OK ? sel() : 0;
+
+    return result == Dialog::OK;
 }
 
 bool Dialog::InputString(const std::string &header, std::string &res)
@@ -257,4 +290,181 @@ bool Dialog::InputString(const std::string &header, std::string &res)
     cursor.Hide();
 
     return res.size();
+}
+
+u8 Dialog::ArmySplitTroop(u8 free_slots, u32 max, u32 & cur)
+{
+    Display & display = Display::Get();
+
+    // cursor
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
+
+    const u32 min = 1;
+    const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
+
+    Box box(free_slots > 2 ? 90 + spacer : 45, true);
+    SelectValue sel(min, max, cur, 1);
+    Text text;
+
+    const Rect & pos = box.GetArea();
+    const u16 center = pos.x + pos.w / 2;
+
+    text.Set(_("Move how many troops?"), Font::BIG);
+    text.Blit(center - text.w() / 2, pos.y);
+
+    sel.SetPos(Point(pos.x + 70, pos.y + 30));
+    sel.Redraw();
+
+    Surface ssf;
+    SpriteCursor* ssp = NULL;
+    const Sprite* sp3 = NULL;
+    const Sprite* sp4 = NULL;
+    const Sprite* sp5 = NULL;
+
+    std::vector<Rect> vrts(3);
+
+    Rect & rt3 = vrts[0];
+    Rect & rt4 = vrts[1];
+    Rect & rt5 = vrts[2];
+
+    switch(free_slots)
+    {
+	case 0:
+	    break;
+
+	case 3:	
+	    sp3 = &AGG::GetICN(ICN::REQUESTS, 22);
+	    rt3 = Rect(center - sp3->w() / 2, pos.y + 95, sp3->w(), sp3->h());
+	    break;
+
+	case 4:
+	    sp3 = &AGG::GetICN(ICN::REQUESTS, 22);
+	    sp4 = &AGG::GetICN(ICN::REQUESTS, 23);
+	    rt3 = Rect(center - 5 - sp3->w(), pos.y + 95, sp3->w(), sp3->h());
+	    rt4 = Rect(center + 5, pos.y + 95, sp4->w(), sp4->h());
+	    break;
+
+	case 5:
+	    sp3 = &AGG::GetICN(ICN::REQUESTS, 22);
+	    sp4 = &AGG::GetICN(ICN::REQUESTS, 23);
+	    sp5 = &AGG::GetICN(ICN::REQUESTS, 24);
+	    rt3 = Rect(center - sp3->w() / 2 - 10 - sp3->w(), pos.y + 95, sp3->w(), sp3->h());
+	    rt4 = Rect(center - sp4->w() / 2, pos.y + 95, sp4->w(), sp4->h());
+	    rt5 = Rect(center + sp5->w() / 2 + 10, pos.y + 95, sp5->w(), sp5->h());
+	    break;
+    }
+
+    if(sp3)
+    {
+	text.Set(_("Fast separation into slots:"), Font::BIG);
+	text.Blit(center - text.w() / 2, pos.y + 65);
+
+	sp3->Blit(rt3);
+	if(sp4) sp4->Blit(rt4);
+	if(sp5) sp5->Blit(rt5);
+
+	ssf.Set(sp3->w(), sp3->h());
+	Cursor::DrawCursor(ssf, 0xD7, true);
+
+	ssp = new SpriteCursor(ssf, rt3.x, rt3.y);
+	ssp->Hide();
+    }
+
+    ButtonGroups btnGroups(box.GetArea(), Dialog::OK | Dialog::CANCEL);
+    btnGroups.Draw();
+
+    text.Set(std::string("MAX") + " " + "(" + GetString(max) + ")" + " " + "-" + " " + "1", Font::SMALL);
+    const Rect rectMax(pos.x + 163, pos.y + 30, text.w(), text.h());
+    text.Blit(rectMax.x, rectMax.y);
+
+    text.Set(std::string("MIN") + " " + "(" + GetString(min) + ")", Font::SMALL);
+    const Rect rectMin(pos.x + 163, pos.y + 45, text.w(), text.h());
+    text.Blit(rectMin.x, rectMin.y);
+
+    LocalEvent & le = LocalEvent::Get();
+
+    bool redraw_count = false;
+    cursor.Show();
+    display.Flip();
+
+    // message loop
+    u16 bres = Dialog::ZERO;
+
+    while(bres == Dialog::ZERO && le.HandleEvents())
+    {
+	if(PressIntKey(min, max, cur))
+	{
+	    sel.SetCur(cur);
+	    redraw_count = true;
+	}
+	else
+        if(le.MouseClickLeft(rectMax))
+        {
+	    sel.SetCur(max - 1);
+    	    redraw_count = true;
+        }
+	else
+        if(le.MouseClickLeft(rectMin))
+        {
+	    sel.SetCur(min);
+    	    redraw_count = true;
+        }
+	else
+	if(sel.QueueEventProcessing())
+    	    redraw_count = true;
+
+	if(ssp)
+	for(std::vector<Rect>::const_iterator
+	    it = vrts.begin(); it != vrts.end(); ++it)
+	{
+	    if(le.MouseClickLeft(*it))
+	    {
+		cursor.Hide();
+		ssp->Move(*it);
+		cursor.Show();
+		display.Flip();
+	    }
+	}
+
+	if(redraw_count)
+	{
+	    cursor.Hide();
+	    if(ssp) ssp->Hide();
+	    sel.Redraw();
+	    cursor.Show();
+	    display.Flip();
+
+	    redraw_count = false;
+	}
+
+        bres = btnGroups.QueueEventProcessing();
+    }
+
+    u8 result = 0;
+
+    if(bres == Dialog::OK)
+    {
+	cur = sel();
+
+	if(ssp && ssp->isVisible())
+	{
+	    const Rect & rt = ssp->GetRect();
+
+	    if(rt == rt3)
+		result = 3;
+	    else
+	    if(rt == rt4)
+		result = 4;
+	    else
+	    if(rt == rt5)
+		result = 5;
+	}
+	else
+	    result = 2;
+    }
+
+    if(ssp) delete ssp;
+
+    return result;
 }
