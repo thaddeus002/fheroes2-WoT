@@ -72,6 +72,7 @@ public:
     void ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, u32 max_sell, u32 count_buy, u32 count_sell, bool fromTradingPost);
 
     Rect   buttonMax;
+    Rect   buttonMin;
     Button buttonTrade;
     Button buttonLeft;
     Button buttonRight;
@@ -105,6 +106,7 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
         buttonRight.SetDisable(true);
         buttonGift.Draw();
 	buttonMax = Rect();
+	buttonMin = Rect();
         cursor.Show();
         display.Flip();
     }
@@ -136,25 +138,30 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
         }
         TextBox(message, Font::BIG, Rect(pos_rt.x, pos_rt.y + 30, pos_rt.w, 100));
         const Sprite & sprite_from = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(resourceFrom));
-        dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - sprite_from.w() / 2;
+        dst_pt.x = pos_rt.x + (pos_rt.w - sprite_from.w()) / 2 - 70;
         dst_pt.y = pos_rt.y + 115 - sprite_from.h();
         sprite_from.Blit(dst_pt);
         const Sprite & sprite_to = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(resourceTo));
-        dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - sprite_to.w() / 2;
+        dst_pt.x = pos_rt.x + (pos_rt.w - sprite_to.w()) / 2 + 70;
         dst_pt.y = pos_rt.y + 115 - sprite_to.h();
         sprite_to.Blit(dst_pt);
         const Sprite & sprite_fromto = AGG::GetICN(tradpost, 0);
-        dst_pt.x = pos_rt.x + pos_rt.w / 2 - sprite_fromto.w() / 2;
+        dst_pt.x = pos_rt.x + (pos_rt.w - sprite_fromto.w()) / 2;
         dst_pt.y = pos_rt.y + 90;
         sprite_fromto.Blit(dst_pt);
-	buttonMax = Rect(dst_pt.x, dst_pt.y, sprite_fromto.w(), sprite_fromto.h());
-        Text text("max", Font::SMALL);
-        dst_pt.x = buttonMax.x + (buttonMax.w - text.w()) / 2;
-        dst_pt.y = buttonMax.y + 2;
+        Text text("max", Font::YELLOW_SMALL);
+        dst_pt.x = pos_rt.x + (pos_rt.w - text.w()) / 2 - 5;
+        dst_pt.y = pos_rt.y + 80;
+	buttonMax = Rect(dst_pt.x, dst_pt.y, text.w(), text.h());
+        text.Blit(dst_pt);
+	text.Set("min", Font::YELLOW_SMALL);
+        dst_pt.x = pos_rt.x + (pos_rt.w - text.w()) / 2 - 5;
+        dst_pt.y = pos_rt.y + 103;
+	buttonMin = Rect(dst_pt.x, dst_pt.y, text.w(), text.h());
         text.Blit(dst_pt);
 	text.Set(_("Qty to trade"), Font::SMALL);
         dst_pt.x = pos_rt.x + (pos_rt.w - text.w()) / 2;
-        dst_pt.y = pos_rt.y + 110;
+        dst_pt.y = pos_rt.y + 115;
         text.Blit(dst_pt);
 
         buttonGift.SetDisable(true);
@@ -269,6 +276,7 @@ void Dialog::Marketplace(bool fromTradingPost)
     u32 max_buy = 0;
 
     Rect & buttonMax = gui.buttonMax;
+    Rect & buttonMin = gui.buttonMin;
     Button & buttonGift = gui.buttonGift;
     Button & buttonTrade = gui.buttonTrade;
     Button & buttonLeft = gui.buttonLeft;
@@ -408,6 +416,20 @@ void Dialog::Marketplace(bool fromTradingPost)
 
             cursor.Hide();
             splitter.Move(max);
+            gui.RedrawInfoBuySell(count_sell, count_buy);
+            cursor.Show();
+            display.Flip();
+	}
+	// click min
+	if(buttonMin.w && max_buy && le.MouseClickLeft(buttonMin))
+	{
+	    const u32 min = 1;
+
+            count_buy  = min * (Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) : 1);
+            count_sell = min * (Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo, fromTradingPost));
+
+            cursor.Hide();
+            splitter.Move(min);
             gui.RedrawInfoBuySell(count_sell, count_buy);
             cursor.Show();
             display.Flip();
