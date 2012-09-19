@@ -201,6 +201,8 @@ namespace Battle
 	ModesAffected	affected;
 	Unit*		mirror;
 	Sprite*		contours[4];
+
+	bool		blindanswer;
     };
 
     StreamBase & operator<< (StreamBase &, const Unit &);

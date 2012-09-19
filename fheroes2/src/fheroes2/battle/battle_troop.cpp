@@ -304,7 +304,7 @@ u32 Battle::ModesAffected::FindZeroDuration(void) const
 
 Battle::Unit::Unit(const Troop & t, u32 _uid, s16 pos, bool ref) : ArmyTroop(NULL, t),
     uid(_uid), hp(t.GetHitPoints()), count0(t.GetCount()), dead(0), shots(t.GetShots()),
-    disruptingray(0), reflect(ref), animstate(0), animframe(0), animstep(1), mirror(NULL)
+    disruptingray(0), reflect(ref), animstate(0), animframe(0), animstep(1), mirror(NULL), blindanswer(false)
 {
     // set position
     if(Board::isValidIndex(pos))
@@ -915,6 +915,12 @@ u32 Battle::Unit::ApplyDamage(Unit & enemy, u32 dmg)
         affected.RemoveMode(IS_PARALYZE_MAGIC);
     }
 
+    // blind
+    if(Modes(SP_BLIND))
+    {
+	blindanswer = true;
+    }
+
     return killed;
 }
 
@@ -1051,7 +1057,8 @@ StreamBase & Battle::operator<< (StreamBase & msg, const Unit & b)
 	b.reflect <<
 	b.GetHeadIndex() <<
 	(b.mirror ? b.mirror->GetUID() : static_cast<u32>(0)) <<
-	b.affected;
+	b.affected <<
+	b.blindanswer;
 }
 
 StreamBase & Battle::operator>> (StreamBase & msg, Unit & b)
@@ -1072,7 +1079,8 @@ StreamBase & Battle::operator>> (StreamBase & msg, Unit & b)
 	b.reflect >>
 	head >>
 	uid >>
-	b.affected;
+	b.affected >>
+	b.blindanswer;
 
 	b.position.Set(head, b.isWide(), b.isReflect());
 	b.mirror = GetArena()->GetTroopUID(uid);
@@ -1082,7 +1090,18 @@ StreamBase & Battle::operator>> (StreamBase & msg, Unit & b)
 
 bool Battle::Unit::AllowResponse(void) const
 {
-    return (isAlwayResponse() || (!Modes(TR_RESPONSED) && !Modes(IS_PARALYZE_MAGIC)));
+    if(isAlwayResponse())
+	return true;
+
+    if(! Modes(TR_RESPONSED))
+    {
+	if(Modes(SP_BLIND))
+	    return blindanswer;
+	else
+	    return ! Modes(IS_PARALYZE_MAGIC);
+    }
+
+    return false;
 }
 
 void Battle::Unit::SetResponse(void)
@@ -1349,6 +1368,7 @@ void Battle::Unit::SpellModesAction(const Spell & spell, u8 duration, const Hero
 
 	case Spell::BLIND:
 	    SetModes(SP_BLIND);
+	    blindanswer = false;
 	    affected.AddMode(SP_BLIND, duration);
 	    break;
 
