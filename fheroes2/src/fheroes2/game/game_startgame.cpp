@@ -1734,3 +1734,12 @@ void Game::EventSwitchShowControlPanel(void)
 	Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
     }
 }
+
+void Game::EventDebug1(void)
+{
+    AGG::Cache::Get().Dump();
+}
+
+void Game::EventDebug2(void)
+{
+}

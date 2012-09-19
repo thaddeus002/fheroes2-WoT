@@ -636,10 +636,28 @@ void DialogRedistributeArmy(Army & army1, u8 index1, Army & army2, u8 index2)
     else
     {
 	u32 redistr_count = troop1->GetCount() / 2;
-	if(Dialog::SelectCount(_("Move how many troops?"), 1, (last ? troop1->GetCount() - 1 : troop1->GetCount()), redistr_count))
+	u8 slots = Dialog::ArmySplitTroop((army2.GetTroop(index1) == troop1 ? 1 : 0) + army2.Size() - army2.GetCount(),
+							(last ? troop1->GetCount() - 1 : troop1->GetCount()), redistr_count);
+
+	switch(slots)
 	{
-	    troop2->Set(*troop1, redistr_count);
-	    troop1->SetCount(troop1->GetCount() - redistr_count);
+	    case 3:
+	    case 4:
+	    case 5:
+	    {
+		const Troop troop(*troop1);
+		troop1->Reset();
+		army2.SplitTroopIntoFreeSlots(troop, slots);
+	    }
+		break;
+
+	    case 2:
+		troop2->Set(*troop1, redistr_count);
+		troop1->SetCount(troop1->GetCount() - redistr_count);
+		break;
+
+	    default:
+		break;
 	}
     }
 }

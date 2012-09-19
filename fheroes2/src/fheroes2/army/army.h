@@ -90,6 +90,7 @@ public:
     void		KeepOnlyWeakest(Troops &, bool);
 
     void		DrawMons32LineWithScoute(s16, s16, u16, u8, u8, u8) const;
+    void		SplitTroopIntoFreeSlots(const Troop &, u8 slots);
 };
 
 class Army : public Troops

@@ -222,10 +222,34 @@ u16 ButtonGroups::QueueEventProcessing(void)
 
 void ButtonGroups::DisableButton1(bool f)
 {
-    if(button1) button1->SetDisable(f);
+    if(button1)
+    {
+	if(f)
+	{
+	    button1->Press();
+	    button1->SetDisable(true);
+	}
+	else
+	{
+	    button1->Release();
+	    button1->SetDisable(false);
+	}
+    }
 }
 
 void ButtonGroups::DisableButton2(bool f)
 {
-    if(button1) button2->SetDisable(f);
+    if(button2)
+    {
+	if(f)
+	{
+	    button2->Press();
+	    button2->SetDisable(true);
+	}
+	else
+	{
+	    button2->Release();
+	    button2->SetDisable(false);
+	}
+    }
 }

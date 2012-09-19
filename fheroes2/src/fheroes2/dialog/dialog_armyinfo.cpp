@@ -433,18 +433,21 @@ u16 Dialog::ArmyJoinWithCost(const Troop & troop, u32 join, u32 gold, Heroes & h
     Button btnHeroes(pos.x + pos.w / 2 + 60, posy, (conf.ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS), 0, 1);
     const Kingdom & kingdom = hero.GetKingdom();
 
-    if(kingdom.GetCountMarketplace() &&
-	kingdom.AllowPayment(payment_t(Resource::GOLD, gold)))
-	btnMarket.SetDisable(true);
-    else
-    {
-	std::string msg = _("Not enough\ngold (%{gold})");
-	String::Replace(msg, "%{gold}", gold - kingdom.GetFunds().Get(Resource::GOLD));
-	TextBox textbox2(msg, Font::SMALL, 100);
-	textbox2.Blit(btnMarket.x - 35, btnMarket.y - 30);
-	btnMarket.Draw();
-
+    if(! kingdom.AllowPayment(payment_t(Resource::GOLD, gold)))
 	btnGroups.DisableButton1(true);
+
+    if(kingdom.GetCountMarketplace())
+    {
+	if(kingdom.AllowPayment(payment_t(Resource::GOLD, gold)))
+	    btnMarket.SetDisable(true);
+	else
+	{
+	    std::string msg = _("Not enough\ngold (%{gold})");
+	    String::Replace(msg, "%{gold}", gold - kingdom.GetFunds().Get(Resource::GOLD));
+	    TextBox textbox2(msg, Font::SMALL, 100);
+	    textbox2.Blit(btnMarket.x - 35, btnMarket.y - 30);
+	    btnMarket.Draw();
+	}
     }
 
     if(hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(troop))
@@ -476,23 +479,21 @@ u16 Dialog::ArmyJoinWithCost(const Troop & troop, u32 join, u32 gold, Heroes & h
 
         result = btnGroups.QueueEventProcessing();
 
-	if(le.MouseClickLeft(btnMarket))
+	if(btnMarket.isEnable() && le.MouseClickLeft(btnMarket))
 	{
 	    Marketplace(false);
 
-	    if(kingdom.GetCountMarketplace() &&
-		kingdom.AllowPayment(payment_t(Resource::GOLD, gold)))
+	    if(kingdom.AllowPayment(payment_t(Resource::GOLD, gold)))
     		btnGroups.DisableButton1(false);
 	}
 	else
-	if(le.MouseClickLeft(btnHeroes))
+	if(btnHeroes.isEnable() && le.MouseClickLeft(btnHeroes))
 	{
 	    hero.OpenDialog(false, false);
 	    cursor.Show();
 	    display.Flip();
 
-	    if(hero.GetArmy().GetCount() < hero.GetArmy().Size() ||
-		hero.GetArmy().HasMonster(troop))
+	    if(hero.GetArmy().GetCount() < hero.GetArmy().Size())
     		btnGroups.DisableButton1(false);
 	}
     }

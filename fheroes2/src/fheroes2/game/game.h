@@ -265,6 +265,8 @@ namespace Game
     void EventSwitchShowButtons(void);
     void EventSwitchShowIcons(void);
     void EventSwitchShowControlPanel(void);
+    void EventDebug1(void);
+    void EventDebug2(void);
 
     void PlayPickupSound(void);
 

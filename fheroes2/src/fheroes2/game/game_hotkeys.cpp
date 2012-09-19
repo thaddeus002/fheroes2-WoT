@@ -307,10 +307,11 @@ void Game::KeyboardGlobalFilter(int sym, u16 mod)
     else
     if(sym == key_events[EVENT_SYSTEM_DEBUG1])
     {
-	AGG::Cache::Get().Dump();
+	Game::EventDebug1();
     }
     else
     if(sym == key_events[EVENT_SYSTEM_DEBUG2])
     {
+	Game::EventDebug2();
     }
 }

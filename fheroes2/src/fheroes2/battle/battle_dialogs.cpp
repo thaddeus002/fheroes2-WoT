@@ -35,6 +35,7 @@
 #include "battle_interface.h"
 #include "battle_arena.h"
 #include "battle_army.h"
+#include "world.h"
 #include "battle.h"
 
 namespace Battle
@@ -529,6 +530,28 @@ bool Battle::DialogBattleSurrender(const HeroBase & hero, u32 cost)
 
     Button btnAccept(pos_rt.x + 90, pos_rt.y + 150, icn, 0, 1);
     Button btnDecline(pos_rt.x + 295, pos_rt.y + 150, icn, 2, 3);
+    Button btnMarket(pos_rt.x + (pos_rt.w - 16) / 2, pos_rt.y + 145, (conf.ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS), 4, 5);
+    const Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+
+    if(! kingdom.AllowPayment(payment_t(Resource::GOLD, cost)))
+    {
+	btnAccept.Press();
+    	btnAccept.SetDisable(true);
+    }
+
+    if(kingdom.GetCountMarketplace())
+    {
+	if(kingdom.AllowPayment(payment_t(Resource::GOLD, cost)))
+    	    btnMarket.SetDisable(true);
+	else
+	{
+    	    std::string msg = _("Not enough gold (%{gold})");
+    	    String::Replace(msg, "%{gold}", cost - kingdom.GetFunds().Get(Resource::GOLD));
+	    Text text(msg, Font::SMALL);
+	    text.Blit(btnMarket.x + (btnMarket.w - text.w()) / 2, btnMarket.y - 15);
+    	    btnMarket.Draw();
+	}
+    }
 
     btnAccept.Draw();
     btnDecline.Draw();
@@ -546,18 +569,33 @@ bool Battle::DialogBattleSurrender(const HeroBase & hero, u32 cost)
     String::Replace(str, "%{price}", cost);
 
     TextBox box(str, Font::BIG, 275);
-    box.Blit(pos_rt.x + 175, pos_rt.y + 65);
-    u8 result = 0;
+    box.Blit(pos_rt.x + 175, pos_rt.y + 50);
+    bool result = false;
 
     cursor.Show();
     display.Flip();
 
     while(le.HandleEvents() && !result)
     {
+	if(btnAccept.isEnable())
 	le.MousePressLeft(btnAccept) ? btnAccept.PressDraw() : btnAccept.ReleaseDraw();
 	le.MousePressLeft(btnDecline) ? btnDecline.PressDraw() : btnDecline.ReleaseDraw();
 
-	if(le.MouseClickLeft(btnAccept)) result = 1;
+	if(btnMarket.isEnable())
+	le.MousePressLeft(btnMarket) ? btnMarket.PressDraw() : btnMarket.ReleaseDraw();
+
+	if(btnAccept.isEnable() && le.MouseClickLeft(btnAccept)) result = true;
+
+        if(btnMarket.isEnable() && le.MouseClickLeft(btnMarket))
+        {
+            Dialog::Marketplace(false);
+
+            if(kingdom.AllowPayment(payment_t(Resource::GOLD, cost)))
+	    {
+		btnAccept.Release();
+    		btnAccept.SetDisable(false);
+	    }
+        }
 
         // exit
 	if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(btnDecline)) break;

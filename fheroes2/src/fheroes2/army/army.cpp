@@ -619,9 +619,26 @@ void Troops::DrawMons32LineWithScoute(s16 cx, s16 cy, u16 width, u8 first, u8 co
     }
 }
 
+void Troops::SplitTroopIntoFreeSlots(const Troop & troop, u8 slots)
+{
+    if(slots && slots <= (Size() - GetCount()))
+    {
+	u32 chunk = troop.GetCount() / slots;
+	u8 limits = slots;
+	Troop* first = NULL;
 
+	for(iterator it = begin(); it != end(); ++it)
+	    if(! (*it)->isValid() && limits)
+	{
+	    if(! first) first = *it;
+	    (*it)->Set(troop.GetMonster(), chunk);
+	    --limits;
+	}
 
-
+	if(first && chunk * slots < troop.GetCount())
+	    first->SetCount(chunk + troop.GetCount() - chunk * slots);
+    }
+}
 
 
 
