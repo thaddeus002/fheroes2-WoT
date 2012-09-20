@@ -925,6 +925,7 @@ namespace ICN
 	{ BTNBATTLEONLY,"BTNBONLY.ICN" },
 	{ BOAT12,       "MANUAL.ICN" },
 	{ BTNGIFT,      "BTNGIFT.ICN" },
+	{ BTNMIN,       "MANUAL.ICN" },
 
 	{ UNKNOWN,	"UNKNOWN" },
     };

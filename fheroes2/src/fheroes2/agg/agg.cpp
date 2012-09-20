@@ -290,6 +290,7 @@ bool AGG::Cache::LoadExtICN(const ICN::icn_t icn, const u32 index, bool reflect)
 	case ICN::BUYMAX:
 	case ICN::BTNBATTLEONLY:
 	case ICN::BTNGIFT:
+	case ICN::BTNMIN:
 	case ICN::BTNCONFIG:		count = 2; break;
 	case ICN::FOUNTAIN:		count = 2; break;
 	case ICN::TREASURE:		count = 2; break;
@@ -371,6 +372,18 @@ bool AGG::Cache::LoadExtICN(const ICN::icn_t icn, const u32 index, bool reflect)
 	    GetICN(ICN::BTNDCCFG, 4 + index).Blit(Rect(74, 20, 13, 15), 46, 4, sprite);
 	    // T
 	    GetICN(ICN::BTNNEWGM, index).Blit(Rect(25, 13, 13, 14), 60, 5, sprite);
+	}
+	break;
+
+	case ICN::BTNMIN:
+	{
+	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
+	    // max
+	    LoadOrgICN(sprite, ICN::RECRUIT, index + 4, false);
+	    // clean
+	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(10, 6, 33, 15), 30, 4, sprite);
+	    // add: IN
+	    GetICN(ICN::APANEL, 4 + index).Blit(Rect(23, 20, 25, 15), 30, 4, sprite);
 	}
 	break;
 

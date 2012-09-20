@@ -79,7 +79,6 @@ public:
 
 	s32  Get(u8 rs) const;
 	s32* GetPtr(u8 rs);
-	s32  GetFirstValidItems(u8 rs = Resource::ALL) const;
 
 	bool operator< (const Funds &) const;
 	bool operator<= (const Funds &) const;
@@ -87,6 +86,8 @@ public:
 	bool operator>= (const Funds &) const;
 
 	u8 GetValidItems(void) const;
+	u8 GetValidItemsCount(void) const;
+
 	void Reset(void);
 	std::string String(void) const;
 

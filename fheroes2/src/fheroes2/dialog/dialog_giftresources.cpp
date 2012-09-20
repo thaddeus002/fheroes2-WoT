@@ -259,7 +259,7 @@ void Dialog::MakeGiftResource(void)
 	{
 	    u8 new_count = Color::Count(selector.recipients);
 	    cursor.Hide();
-	    btnGroups.DisableButton1(0 == new_count || 0 == funds2.GetValidItems());
+	    btnGroups.DisableButton1(0 == new_count || 0 == funds2.GetValidItemsCount());
 	    if(count != new_count)
 	    {
 		funds1 = myKingdom.GetFunds();
@@ -277,7 +277,7 @@ void Dialog::MakeGiftResource(void)
 	if(info2.QueueEventProcessing(funds1, count))
 	{
 	    cursor.Hide();
-	    btnGroups.DisableButton1(0 == Color::Count(selector.recipients) || 0 == funds2.GetValidItems());
+	    btnGroups.DisableButton1(0 == Color::Count(selector.recipients) || 0 == funds2.GetValidItemsCount());
 	    info1.Redraw();
 	    info2.Redraw();
 	    btnGroups.Draw();

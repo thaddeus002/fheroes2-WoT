@@ -1586,7 +1586,7 @@ void Game::ShowEventDay(void)
 	it = events.begin(); it != events.end(); ++it)
     {
     	AGG::PlayMusic(MUS::NEWS, false);
-	if((*it).resource.GetValidItems())
+	if((*it).resource.GetValidItemsCount())
 	    Dialog::ResourceInfo("", (*it).message, (*it).resource);
 	else
 	if((*it).message.size())

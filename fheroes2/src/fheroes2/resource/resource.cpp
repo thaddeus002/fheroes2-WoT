@@ -368,33 +368,22 @@ u8 Resource::FromIndexSprite2(u8 index)
     return UNKNOWN;
 }
 
-s32 Funds::GetFirstValidItems(u8 rs) const
+u8 Funds::GetValidItems(void) const
 {
-    if(wood && (rs & Resource::WOOD))
-	return wood;
-    else
-    if(ore && (rs & Resource::ORE))
-	return ore;
-    else
-    if(mercury && (rs & Resource::MERCURY))
-	return mercury;
-    else
-    if(sulfur && (rs & Resource::SULFUR))
-	return sulfur;
-    else
-    if(crystal && (rs & Resource::CRYSTAL))
-	return crystal;
-    else
-    if(gems && (rs & Resource::GEMS))
-	return gems;
-    else
-    if(gold && (rs & Resource::GOLD))
-	return gold;
+    u8 rs = 0;
 
-    return 0;
+    if(wood)	rs |= Resource::WOOD;
+    if(ore)	rs |= Resource::ORE;
+    if(mercury)	rs |= Resource::MERCURY;
+    if(sulfur)	rs |= Resource::SULFUR;
+    if(crystal)	rs |= Resource::CRYSTAL;
+    if(gems)	rs |= Resource::GEMS;
+    if(gold)	rs |= Resource::GOLD;
+
+    return rs;
 }
 
-u8 Funds::GetValidItems(void) const
+u8 Funds::GetValidItemsCount(void) const
 {
     u8 result = 0;
 
@@ -422,7 +411,7 @@ void Funds::Reset(void)
 
 Resource::BoxSprite::BoxSprite(const Funds & f, u16 w) : Rect(0, 0, w, 0), rs(f)
 {
-    const u8 count = rs.GetValidItems();
+    const u8 count = rs.GetValidItemsCount();
     h = 4 > count ? 45 : (7 > count ? 90 : 135);
 }
 
@@ -455,7 +444,7 @@ void RedrawResourceSprite(const Surface & sf, const Point & pos,
 
 void Resource::BoxSprite::Redraw(void) const
 {
-    const u8 valid_resource = rs.GetValidItems();
+    const u8 valid_resource = rs.GetValidItemsCount();
     if(0 == valid_resource) return;
 
     u16 width = 2 < valid_resource ? w / 3 : w / valid_resource;

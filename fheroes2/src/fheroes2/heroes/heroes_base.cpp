@@ -394,7 +394,7 @@ void HeroBase::SpellCasted(const Spell & spell)
     // resource cost
     Kingdom & kingdom = world.GetKingdom(GetColor());
     const payment_t & cost = spell.GetCost();
-    if(cost.GetValidItems()) kingdom.OddFundsResource(cost);
+    if(cost.GetValidItemsCount()) kingdom.OddFundsResource(cost);
 
     // spell point cost
     magic_point -= (spell.SpellPoint(this) < magic_point ? spell.SpellPoint(this) : magic_point);

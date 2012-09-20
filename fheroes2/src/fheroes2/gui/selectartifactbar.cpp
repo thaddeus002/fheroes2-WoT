@@ -290,7 +290,7 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 			    String::Replace(msg, "%{mp}", spell.MovePoint());
 			}
 
-			if(cost.GetValidItems())
+			if(cost.GetValidItemsCount())
 			    answer = Dialog::ResourceInfo("", msg, cost, Dialog::YES|Dialog::NO);
 			else
 			    answer = Dialog::Message("", msg, Font::BIG, Dialog::YES|Dialog::NO);

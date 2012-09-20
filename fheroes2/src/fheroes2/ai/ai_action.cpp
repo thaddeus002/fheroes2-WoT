@@ -1052,7 +1052,7 @@ void AIToEvent(Heroes & hero, const u8 & obj, const s32 & dst_index)
     EventMaps* event_maps = world.GetEventMaps(hero.GetColor(), dst_index);
     if(event_maps && event_maps->computer)
     {
-        if(event_maps->resource.GetValidItems())
+        if(event_maps->resource.GetValidItemsCount())
     	    hero.GetKingdom().AddFundsResource(event_maps->resource);
 	if(event_maps->artifact.isValid())
 	    hero.PickupArtifact(event_maps->artifact);
@@ -1196,10 +1196,10 @@ void AIToTreeKnowledge(Heroes & hero, const u8 & obj, const s32 & dst_index)
     {
 	const Funds & funds = tile.QuantityFunds();
 
-    	if(0 == funds.GetValidItems() ||
+    	if(0 == funds.GetValidItemsCount() ||
 	    hero.GetKingdom().AllowPayment(funds))
     	{
-	    if(funds.GetValidItems())
+	    if(funds.GetValidItemsCount())
 		hero.GetKingdom().OddFundsResource(funds);
 	    hero.SetVisited(dst_index);
 	    hero.IncreaseExperience(hero.GetExperienceFromLevel(hero.GetLevel()) - hero.GetExperience());

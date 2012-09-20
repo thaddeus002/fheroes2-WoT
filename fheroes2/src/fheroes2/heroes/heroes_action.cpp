@@ -1056,7 +1056,7 @@ void ActionToFlotSam(Heroes & hero, const u8 & obj, const s32 & dst_index)
     Game::PlayPickupSound();
     AnimationRemoveObject(tile);
 
-    if(0 < funds.GetValidItems())
+    if(0 < funds.GetValidItemsCount())
     {
 	msg = funds.wood && funds.gold ? _("You search through the flotsam, and find some wood and some gold.") :
 					_("You search through the flotsam, and find some wood.");
@@ -2544,7 +2544,7 @@ void ActionToEvent(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 	hero.SetMove(false);
 
-	if(event_maps.resource.GetValidItems())
+	if(event_maps.resource.GetValidItemsCount())
 	{
     	    hero.GetKingdom().AddFundsResource(event_maps.resource);
 	    PlaySoundSuccess;
@@ -2604,7 +2604,7 @@ void ActionToTreeKnowledge(Heroes & hero, const u8 & obj, const s32 & dst_index)
     else
     {
 	const Funds & funds = tile.QuantityFunds();
-	bool conditions = 0 == funds.GetValidItems();
+	bool conditions = 0 == funds.GetValidItemsCount();
 	std::string msg;
 
         // free
@@ -2953,7 +2953,7 @@ void ActionToSphinx(Heroes & hero, const u8 & obj, const s32 & dst_index)
 		const Funds & res = riddle->resource;
 		const Artifact art = riddle->artifact;
 		const std::string say = _("Looking somewhat disappointed, the Sphinx sighs. You've answered my riddle so here's your reward. Now begone.");
-		const u8 count = res.GetValidItems();
+		const u8 count = res.GetValidItemsCount();
 
 		if(count)
 		{
