@@ -131,6 +131,7 @@ public:
 
     void Upgrade(void);
     Monster GetUpgrade(void) const;
+    Monster GetDowngrade(void) const;
 
     virtual u16 GetAttack(void) const;
     virtual u16 GetDefense(void) const;

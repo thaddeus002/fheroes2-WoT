@@ -78,40 +78,17 @@ void RedrawResourceInfo(const Surface & sres, const Point & pos, s32 value,
     text.Blit(dst_pt);
 }
 
-u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
+void RedrawStaticInfo(const Rect & pos, const Monster & monster, bool label)
 {
-    Display & display = Display::Get();
-    LocalEvent & le = LocalEvent::Get();
-
-    // cursor
-    Cursor & cursor = Cursor::Get();
-    const Cursor::themes_t oldcursor = cursor.Themes();
-    cursor.Hide();
-    cursor.SetThemes(Cursor::POINTER);
-
-    // calculate max count
-    u32 max = 0;
-    const payment_t paymentMonster = monster.GetCost();
-    const Kingdom & kingdom = world.GetKingdom(Settings::Get().CurrentColor());
-    const Funds & funds = kingdom.GetFunds();
-
-    while(kingdom.AllowPayment(paymentMonster * (max + 1)) && (max + 1) <= available) ++max;
-
-    u32 result = max;
-
-    payment_t paymentCosts(paymentMonster * result);
-
-    const Sprite & box = AGG::GetICN(ICN::RECRBKG, 0);
-    const Rect pos((display.w() - box.w()) / 2, Settings::Get().QVGA() ? (display.h() - box.h()) / 2 - 15 : 0, box.w(), box.h());
-
-    Background back(pos);
-    back.Save();
-
-    box.Blit(pos.x, pos.y);
-
+    Text text;
     Point dst_pt;
     std::string str;
-    Text text;
+
+    const Sprite & box = AGG::GetICN(ICN::RECRBKG, 0);
+    box.Blit(pos.x, pos.y);
+
+    payment_t paymentMonster = monster.GetCost();
+    bool extres = 2 == paymentMonster.GetValidItemsCount();
 
     // smear hardcore text "Cost per troop:"
     const Sprite & smear = AGG::GetICN(ICN::TOWNNAME, 0);
@@ -138,7 +115,12 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     dst_pt.y = pos.y + 130 - smon.h();
     smon.Blit(dst_pt);
 
-    bool extres = 2 == paymentMonster.GetValidItemsCount();
+    // change label
+    if(label)
+    {
+	text.Set("( change )", Font::YELLOW_SMALL);
+	text.Blit(pos.x + 68 - text.w() / 2, pos.y + 80);
+    }
 
     // info resource
     // gold
@@ -228,15 +210,65 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     dst_pt.y = pos.y + 163;
     text.Blit(dst_pt);
 
-    Background static_info(Rect(pos.x + 16, pos.y + 125, pos.w - 32, 122));
-    static_info.Save();
+}
 
-    std::string maxmin = "max";
-    RedrawCurrentInfo(pos, available, result, paymentMonster, paymentCosts, funds, maxmin);
+const char* SwitchMaxMinButtons(Button & btnMax, Button & btnMin, bool max)
+{
+    if(max)
+    {
+	btnMax.SetDisable(true);
+	btnMin.SetDisable(false);
+    }
+    else
+    {
+	btnMin.SetDisable(true);
+	btnMax.SetDisable(false);
+    }
 
-    const Rect rtWheel(pos.x + 130, pos.y +155, 100, 30);
+    return max ? "max" : "min";
+}
+
+u32 CalculateMax(const Monster & monster, const Kingdom & kingdom, u32 available)
+{
+    u32 max = 0;
+    while(kingdom.AllowPayment(monster.GetCost() * (max + 1)) && (max + 1) <= available) ++max;
+
+    return max;
+}
+
+u16 Dialog::RecruitMonster(const Monster & monster0, u16 available)
+{
+    Display & display = Display::Get();
+    LocalEvent & le = LocalEvent::Get();
+
+    // cursor
+    Cursor & cursor = Cursor::Get();
+    const Cursor::themes_t oldcursor = cursor.Themes();
+    cursor.Hide();
+    cursor.SetThemes(Cursor::POINTER);
+
+    // calculate max count
+    Monster monster = monster0;
+    payment_t paymentMonster = monster.GetCost();
+    const Kingdom & kingdom = world.GetKingdom(Settings::Get().CurrentColor());
+
+    u32 max = CalculateMax(monster, kingdom, available);
+    u32 result = max;
+
+    payment_t paymentCosts(paymentMonster * result);
+
+    const Sprite & box = AGG::GetICN(ICN::RECRBKG, 0);
+    const Rect pos((display.w() - box.w()) / 2, Settings::Get().QVGA() ? (display.h() - box.h()) / 2 - 15 : 0, box.w(), box.h());
+
+    Background back(pos);
+    back.Save();
+
+    const Rect rtChange(pos.x + 25, pos.y + 35, 85, 95);
+    RedrawStaticInfo(pos, monster, monster0.GetDowngrade() != monster0);
 
     // buttons
+    Point dst_pt;
+
     dst_pt.x = pos.x + 34;
     dst_pt.y = pos.y + 249;
     Button buttonOk(dst_pt, ICN::RECRUIT, 8, 9);
@@ -258,17 +290,22 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     dst_pt.y = pos.y + 171;
     Button buttonDn(dst_pt, ICN::RECRUIT, 2, 3);
 
+    const Rect rtWheel(pos.x + 130, pos.y +155, 100, 30);
+
     if(0 == result)
     {
 	buttonOk.Press();
 	buttonOk.SetDisable(true);
     }
 
-    buttonMax.SetDisable(true);
+    const Funds & funds = kingdom.GetFunds();
+    std::string maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, true);
+    RedrawCurrentInfo(pos, available, result, paymentMonster, paymentCosts, funds, maxmin);
 
     buttonOk.Draw();
     buttonCancel.Draw();
-    buttonMin.Draw();
+    if(buttonMax.isEnable()) buttonMax.Draw();
+    if(buttonMin.isEnable()) buttonMin.Draw();
     buttonUp.Draw();
     buttonDn.Draw();
 
@@ -291,11 +328,44 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 	if(buttonMin.isEnable())
 	    le.MousePressLeft(buttonMin) ? buttonMin.PressDraw() : buttonMin.ReleaseDraw();
 
+	if(le.MouseClickLeft(rtChange))
+	{
+	    if(monster != monster.GetDowngrade())
+	    {
+		monster = monster.GetDowngrade();
+		max = CalculateMax(monster, kingdom, available);
+		result = max;
+		paymentMonster = monster.GetCost();
+		paymentCosts = paymentMonster * result;
+		redraw = true;
+	    }
+	    else
+	    if(monster != monster0)
+	    {
+		monster = monster0;
+		max = CalculateMax(monster, kingdom, available);
+		result = max;
+		paymentMonster = monster.GetCost();
+		paymentCosts = paymentMonster * result;
+		redraw = true;
+	    }
+	}
+
 	if(PressIntKey(0, max, result))
 	{
 	    paymentCosts = paymentMonster * result;
 	    redraw = true;
 	    maxmin.clear();
+
+	    if(result == max)
+	    {
+		maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, true);
+	    }
+	    else
+	    if(result == 1)
+	    {
+		maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, false);
+	    }
 	}
 
 	if((le.MouseWheelUp(rtWheel) || le.MouseClickLeft(buttonUp)) && result < max)
@@ -304,6 +374,16 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 	    paymentCosts += paymentMonster;
 	    redraw = true;
 	    maxmin.clear();
+
+	    if(result == max)
+	    {
+		maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, true);
+	    }
+	    else
+	    if(result == 1)
+	    {
+		maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, false);
+	    }
 
 	    if(buttonOk.isDisable())
 	    {
@@ -320,6 +400,16 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 	    redraw = true;
 	    maxmin.clear();
 
+	    if(result == max)
+	    {
+		maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, true);
+	    }
+	    else
+	    if(result == 1)
+	    {
+		maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, false);
+	    }
+
 	    if(0 == result)
 	    {
 		buttonOk.Press();
@@ -330,10 +420,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 	else
 	if(buttonMax.isEnable() && le.MouseClickLeft(buttonMax) && result != max)
 	{
-	    buttonMax.SetDisable(true);
-	    buttonMin.SetDisable(false);
-
-	    maxmin = "max";
+	    maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, true);
 	    result = max;
 	    paymentCosts = paymentMonster * max;
 	    redraw = true;
@@ -341,10 +428,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 	else
 	if(buttonMin.isEnable() && le.MouseClickLeft(buttonMin) && result != 1)
 	{
-	    buttonMin.SetDisable(true);
-	    buttonMax.SetDisable(false);
-
-	    maxmin = "min";
+	    maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, false);
 	    result = 1;
 	    paymentCosts = paymentMonster;
 	    redraw = true;
@@ -353,7 +437,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 	if(redraw)
 	{
 	    cursor.Hide();
-	    static_info.Restore();
+	    RedrawStaticInfo(pos, monster, monster0.GetDowngrade() != monster0);
 	    RedrawCurrentInfo(pos, available, result, paymentMonster, paymentCosts, funds, maxmin);
 	    if(buttonMax.isEnable()) buttonMax.Draw();
 	    if(buttonMin.isEnable()) buttonMin.Draw();

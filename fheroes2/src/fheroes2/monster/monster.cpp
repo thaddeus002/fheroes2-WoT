@@ -610,6 +610,38 @@ bool Monster::isAffectedByMorale(void) const
     return !(isUndead() || isElemental());
 }
 
+Monster Monster::GetDowngrade(void) const
+{
+    switch(id)
+    {
+        case RANGER:		return Monster(ARCHER);
+        case VETERAN_PIKEMAN:	return Monster(PIKEMAN);
+        case MASTER_SWORDSMAN:	return Monster(SWORDSMAN);
+        case CHAMPION:		return Monster(CAVALRY);
+        case CRUSADER:		return Monster(PALADIN);
+        case ORC_CHIEF:		return Monster(ORC);
+        case OGRE_LORD:		return Monster(OGRE);
+        case WAR_TROLL:		return Monster(TROLL);
+        case BATTLE_DWARF:	return Monster(DWARF);
+        case GRAND_ELF:		return Monster(ELF);
+        case GREATER_DRUID:	return Monster(DRUID);
+        case MUTANT_ZOMBIE:	return Monster(ZOMBIE);
+        case ROYAL_MUMMY:	return Monster(MUMMY);
+        case VAMPIRE_LORD:	return Monster(VAMPIRE);
+        case POWER_LICH:	return Monster(LICH);
+        case MINOTAUR_KING:	return Monster(MINOTAUR);
+        case RED_DRAGON:	return Monster(GREEN_DRAGON);
+        case BLACK_DRAGON:	return Monster(RED_DRAGON);
+        case STEEL_GOLEM:	return Monster(IRON_GOLEM);
+        case ARCHMAGE:		return Monster(MAGE);
+        case TITAN:		return Monster(GIANT);
+
+	default: break;
+    }
+
+    return Monster(id);
+}
+
 Monster Monster::GetUpgrade(void) const
 {
     switch(id)
