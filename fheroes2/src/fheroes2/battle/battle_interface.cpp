@@ -642,8 +642,8 @@ Battle::Interface::Interface(Arena & a, s32 center) : arena(a), icn_cbkg(ICN::UN
     {
 	if(conf.PocketPC())
 	{
-	    btn_wait.SetSprite(ICN::ADVBTNS, 8, 9);
-	    btn_skip.SetSprite(ICN::TEXTBAR, 0, 1);
+	    btn_wait.SetSprite(ICN::BATTLEWAIT, 0, 1);
+	    btn_skip.SetSprite(ICN::BATTLESKIP, 0, 1);
 
 	    btn_wait.SetPos(area.x + area.w - btn_wait.w, area.y);
 	    btn_skip.SetPos(area.x + area.w - btn_skip.w, area.y + area.h - btn_skip.h);
@@ -663,7 +663,7 @@ Battle::Interface::Interface(Arena & a, s32 center) : arena(a), icn_cbkg(ICN::UN
 	btn_skip.SetPos(area.x + area.w - btn_skip.w, area.y + area.h - btn_skip.h);
     }
 
-    status.SetPosition(area.x + btn_settings.w, area.y + area.h - 36);
+    status.SetPosition(area.x + btn_settings.w, (conf.PocketPC() ? btn_settings.y : btn_auto.y));
 
     if(!conf.QVGA() && !conf.ExtPocketLowMemory())
 	listlog = new StatusListBox();

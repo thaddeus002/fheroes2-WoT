@@ -1785,7 +1785,7 @@ bool ICN::NeedMinify4PocketPC(const icn_t & icn, const u16 & index)
 	    return true;
 
 	case TEXTBAR:
-	    if(index < 10) return true;
+	    if(0 == index || 1 == index || 8 == index || 9 == index) return true;
 	    break;
 
 	default: break;

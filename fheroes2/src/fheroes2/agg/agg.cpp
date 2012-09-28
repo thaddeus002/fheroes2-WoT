@@ -279,6 +279,7 @@ bool AGG::Cache::LoadExtICN(const ICN::icn_t icn, const u32 index, bool reflect)
 {
     // for animation sprite need update count for ICN::AnimationFrame
     u8 count = 0;
+    const Settings & conf = Settings::Get();
 
     switch(icn)
     {
@@ -403,11 +404,16 @@ bool AGG::Cache::LoadExtICN(const ICN::icn_t icn, const u32 index, bool reflect)
 	if(index < count)
 	{
 	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
-	    LoadOrgICN(sprite, ICN::TEXTBAR, 4 + index, false);
-	    // clean
-	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(3, 8, 43, 14), 3, 1, sprite);
-	    // skip
-	    GetICN(ICN::TEXTBAR, index).Blit(Rect(3, 8, 43, 14), 3, 0, sprite);
+	    if(conf.PocketPC())
+		LoadOrgICN(sprite, ICN::TEXTBAR, index, false);
+	    else
+	    {
+		LoadOrgICN(sprite, ICN::TEXTBAR, 4 + index, false);
+		// clean
+		GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(3, 8, 43, 14), 3, 1, sprite);
+		// skip
+		GetICN(ICN::TEXTBAR, index).Blit(Rect(3, 8, 43, 14), 3, 0, sprite);
+	    }
 	}
 	break;
 
@@ -439,15 +445,20 @@ bool AGG::Cache::LoadExtICN(const ICN::icn_t icn, const u32 index, bool reflect)
 	if(index < count)
 	{
 	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
-	    LoadOrgICN(sprite, ICN::TEXTBAR, 4 + index, false);
-	    // clean
-	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(3, 8, 43, 14), 3, 1, sprite);
-	    // wait
-	    Surface src, dst;
-	    src.Set(28, 28);
-	    GetICN(ICN::ADVBTNS, 8 + index).Blit(Rect(5, 4, 28, 28), 0, 0, src);
-	    Surface::ScaleMinifyByTwo(dst, src);
-	    dst.Blit((sprite.w() - dst.w()) / 2, 2, sprite);
+	    if(conf.PocketPC())
+		LoadOrgICN(sprite, ICN::ADVBTNS, 8 + index, false);
+	    else
+	    {
+		LoadOrgICN(sprite, ICN::TEXTBAR, 4 + index, false);
+		// clean
+		GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(3, 8, 43, 14), 3, 1, sprite);
+		// wait
+		Surface src, dst;
+		src.Set(28, 28);
+		GetICN(ICN::ADVBTNS, 8 + index).Blit(Rect(5, 4, 28, 28), 0, 0, src);
+		Surface::ScaleMinifyByTwo(dst, src);
+		dst.Blit((sprite.w() - dst.w()) / 2, 2, sprite);
+	    }
 	}
 	break;
 
