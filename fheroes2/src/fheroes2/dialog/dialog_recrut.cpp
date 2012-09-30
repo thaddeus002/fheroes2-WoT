@@ -236,7 +236,7 @@ u32 CalculateMax(const Monster & monster, const Kingdom & kingdom, u32 available
     return max;
 }
 
-u16 Dialog::RecruitMonster(const Monster & monster0, u16 available)
+Troop Dialog::RecruitMonster(const Monster & monster0, u16 available, bool ext)
 {
     Display & display = Display::Get();
     LocalEvent & le = LocalEvent::Get();
@@ -264,7 +264,7 @@ u16 Dialog::RecruitMonster(const Monster & monster0, u16 available)
     back.Save();
 
     const Rect rtChange(pos.x + 25, pos.y + 35, 85, 95);
-    RedrawStaticInfo(pos, monster, monster0.GetDowngrade() != monster0);
+    RedrawStaticInfo(pos, monster, ext && monster0.GetDowngrade() != monster0);
 
     // buttons
     Point dst_pt;
@@ -328,7 +328,7 @@ u16 Dialog::RecruitMonster(const Monster & monster0, u16 available)
 	if(buttonMin.isEnable())
 	    le.MousePressLeft(buttonMin) ? buttonMin.PressDraw() : buttonMin.ReleaseDraw();
 
-	if(le.MouseClickLeft(rtChange))
+	if(ext && le.MouseClickLeft(rtChange))
 	{
 	    if(monster != monster.GetDowngrade())
 	    {
@@ -348,6 +348,11 @@ u16 Dialog::RecruitMonster(const Monster & monster0, u16 available)
 		paymentMonster = monster.GetCost();
 		paymentCosts = paymentMonster * result;
 		redraw = true;
+	    }
+
+	    if(result == max)
+	    {
+		maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, true);
 	    }
 	}
 
@@ -384,13 +389,6 @@ u16 Dialog::RecruitMonster(const Monster & monster0, u16 available)
 	    {
 		maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, false);
 	    }
-
-	    if(buttonOk.isDisable())
-	    {
-		buttonOk.Release();
-		buttonOk.SetDisable(false);
-		buttonOk.Draw();
-	    }
 	}
 	else
 	if((le.MouseWheelDn(rtWheel) || le.MouseClickLeft(buttonDn)) && result)
@@ -408,13 +406,6 @@ u16 Dialog::RecruitMonster(const Monster & monster0, u16 available)
 	    if(result == 1)
 	    {
 		maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, false);
-	    }
-
-	    if(0 == result)
-	    {
-		buttonOk.Press();
-		buttonOk.SetDisable(true);
-		buttonOk.Draw();
 	    }
 	}
 	else
@@ -437,8 +428,22 @@ u16 Dialog::RecruitMonster(const Monster & monster0, u16 available)
 	if(redraw)
 	{
 	    cursor.Hide();
-	    RedrawStaticInfo(pos, monster, monster0.GetDowngrade() != monster0);
+	    RedrawStaticInfo(pos, monster, ext && monster0.GetDowngrade() != monster0);
 	    RedrawCurrentInfo(pos, available, result, paymentMonster, paymentCosts, funds, maxmin);
+
+	    if(0 == result)
+	    {
+		buttonOk.Press();
+		buttonOk.SetDisable(true);
+		buttonOk.Draw();
+	    }
+	    else
+	    {
+		buttonOk.Release();
+		buttonOk.SetDisable(false);
+		buttonOk.Draw();
+	    }
+
 	    if(buttonMax.isEnable()) buttonMax.Draw();
 	    if(buttonMin.isEnable()) buttonMin.Draw();
 	    cursor.Show();
@@ -459,7 +464,7 @@ u16 Dialog::RecruitMonster(const Monster & monster0, u16 available)
     cursor.Show();
     display.Flip();
 
-    return result;
+    return Troop(monster, result);
 }
 
 void Dialog::DwellingInfo(const Monster & monster, u16 available)

@@ -327,7 +327,7 @@ void RecruitMonsterFromTile(Heroes & hero, Maps::Tiles & tile, const std::string
 	Dialog::Message(msg, _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
     else
     {
-	const u16 recruit = Dialog::RecruitMonster(troop(), troop.GetCount());
+	const u16 recruit = Dialog::RecruitMonster(troop(), troop.GetCount(), false).GetCount();
 
 	if(recruit)
 	{

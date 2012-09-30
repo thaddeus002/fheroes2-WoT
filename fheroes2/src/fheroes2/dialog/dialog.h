@@ -114,7 +114,7 @@ namespace Dialog
     bool InputString(const std::string &, std::string &);
 
     // recruit monster
-    u16 RecruitMonster(const Monster & monster, u16 available);
+    Troop RecruitMonster(const Monster &, u16 available, bool);
     void DwellingInfo(const Monster & monster, u16 available);
     bool SetGuardian(Heroes &, Troop &, CapturedObject &, bool readonly);
 

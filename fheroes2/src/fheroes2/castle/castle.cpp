@@ -681,6 +681,44 @@ Heroes* Castle::RecruitHero(Heroes* hero)
 }
 
 /* recruit monster from building to castle army */
+bool Castle::RecruitMonster(const Troop & troop)
+{
+    u8 dw_index = 0;
+
+    switch(troop.GetDwelling())
+    {
+	case DWELLING_MONSTER1: dw_index = 0; break;
+	case DWELLING_MONSTER2: dw_index = 1; break;
+	case DWELLING_MONSTER3: dw_index = 2; break;
+	case DWELLING_MONSTER4: dw_index = 3; break;
+	case DWELLING_MONSTER5: dw_index = 4; break;
+	case DWELLING_MONSTER6: dw_index = 5; break;
+	default: return false;
+    }
+
+    Monster ms = troop;
+    u16 count = troop.GetCount();
+
+    // fix count
+    if(dwelling[dw_index] < count) count = dwelling[dw_index];
+
+    // buy
+    const payment_t paymentCosts = ms.GetCost() * count;
+    Kingdom & kingdom = GetKingdom();
+
+    // may be guardian present
+    Army & army2 = GetArmy();
+
+    if(! kingdom.AllowPayment(paymentCosts) || !army2.JoinTroop(ms, count)) return false;
+
+    kingdom.OddFundsResource(paymentCosts);
+    dwelling[dw_index] -= count;
+
+    DEBUG(DBG_GAME, DBG_INFO, name << " recruit: " << ms.GetMultiName() << "(" << count << ")");
+
+    return true;
+}
+
 bool Castle::RecruitMonster(u32 dw, u16 count)
 {
     u8 dw_index = 0;

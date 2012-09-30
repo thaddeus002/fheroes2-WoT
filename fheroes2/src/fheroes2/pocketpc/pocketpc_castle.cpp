@@ -41,14 +41,14 @@
 class DwellingBar : protected Rect
 {
 public:
-    DwellingBar(const Point &, const Castle &);
+    DwellingBar(const Point &, Castle &);
     void Redraw(void) const;
     const Rect & GetArea(void) const;
     bool QueueEventProcessing(void);
     static u32 GetDwellingFromIndex(u8);
 
 private:
-    const Castle & castle;
+    Castle & castle;
     Rects dw;
 };
 
@@ -1004,7 +1004,7 @@ const Rect & DwellingBar::GetArea(void) const
     return *this;
 }
 
-DwellingBar::DwellingBar(const Point & dst, const Castle & cst) : Rect(dst.x, dst.y, 0, 0), castle(cst)
+DwellingBar::DwellingBar(const Point & dst, Castle & cst) : Rect(dst.x, dst.y, 0, 0), castle(cst)
 {
     dw.reserve(CASTLEMAXMONSTER);
 
@@ -1076,8 +1076,8 @@ bool DwellingBar::QueueEventProcessing(void)
 	const u32 dwelling = GetDwellingFromIndex(index);
 	if(castle.isBuild(dwelling))
 	{
-	    const u16 recruit = Dialog::RecruitMonster(Monster(castle.GetRace(), castle.GetActualDwelling(dwelling)), castle.GetDwellingLivedCount(dwelling));
-            return const_cast<Castle &>(castle).RecruitMonster(dwelling, recruit);
+            return castle.RecruitMonster(Dialog::RecruitMonster(Monster(castle.GetRace(),
+        				castle.GetActualDwelling(dwelling)), castle.GetDwellingLivedCount(dwelling), true));
 	}
         if(!castle.isBuild(BUILD_CASTLE))
             Dialog::Message("", _("For this action it is necessary first to build a castle."), Font::BIG, Dialog::OK);
@@ -1087,7 +1087,7 @@ bool DwellingBar::QueueEventProcessing(void)
 	    if(dwelling2.DialogBuyBuilding(true))
 	    {
 		AGG::PlaySound(M82::BUILDTWN);
-		const_cast<Castle &>(castle).BuyBuilding(dwelling);
+		castle.BuyBuilding(dwelling);
 		return true;
 	    }
 	}
