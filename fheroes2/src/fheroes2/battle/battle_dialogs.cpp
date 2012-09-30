@@ -40,7 +40,7 @@
 
 namespace Battle
 {
-    void GetSummaryParams(u8 res1, u8 res2, const std::string &, u32 exp, ICN::icn_t &, std::string &);
+    void GetSummaryParams(u8 res1, u8 res2, const HeroBase &, u32 exp, ICN::icn_t &, std::string &);
     void SpeedRedraw(const Point &);
 }
 
@@ -158,7 +158,7 @@ void Battle::DialogBattleSettings(void)
     display.Flip();
 }
 
-void Battle::GetSummaryParams(u8 res1, u8 res2, const std::string & name, u32 exp, ICN::icn_t & icn_anim, std::string & msg)
+void Battle::GetSummaryParams(u8 res1, u8 res2, const HeroBase & hero, u32 exp, ICN::icn_t & icn_anim, std::string & msg)
 {
     if(res1 & RESULT_WINS)
     {
@@ -170,30 +170,34 @@ void Battle::GetSummaryParams(u8 res1, u8 res2, const std::string & name, u32 ex
     	    msg.append(_("The enemy has fled!"));
 	else
 	    msg.append(_("A glorious victory!"));
-    	msg.append("\n");
-    	msg.append(_("For valor in combat, %{name} receives %{exp} experience"));
-    	String::Replace(msg, "%{name}", name);
-    	String::Replace(msg, "%{exp}", exp);
+
+	if(Skill::Primary::HEROES == hero.GetType())
+	{
+    	    msg.append("\n");
+    	    msg.append(_("For valor in combat, %{name} receives %{exp} experience"));
+    	    String::Replace(msg, "%{name}", hero.GetName());
+    	    String::Replace(msg, "%{exp}", exp);
+    	}
     }
     else
     if(res1 & RESULT_RETREAT)
     {
 	icn_anim = ICN::CMBTFLE3;
 	msg.append(_("The cowardly %{name} flees from battle."));
-    	String::Replace(msg, "%{name}", name);
+    	String::Replace(msg, "%{name}", hero.GetName());
     }
     else
     if(res1 & RESULT_SURRENDER)
     {
 	icn_anim = ICN::CMBTSURR;
 	msg.append(_("%{name} surrenders to the enemy, and departs in shame."));
-    	String::Replace(msg, "%{name}", name);
+    	String::Replace(msg, "%{name}", hero.GetName());
     }
     else
     {
 	icn_anim = ICN::CMBTLOS3;
 	msg.append(_("Your force suffer a bitter defeat, and %{name} abandons your cause."));
-    	String::Replace(msg, "%{name}", name);
+    	String::Replace(msg, "%{name}", hero.GetName());
     }
 }
 
@@ -215,25 +219,25 @@ void Battle::Arena::DialogBattleSummary(const Result & res) const
 
     if((res.army1 & RESULT_WINS) && army1->GetCommander() && (CONTROL_HUMAN & army1->GetCommander()->GetControl()))
     {
-    	GetSummaryParams(res.army1, res.army2, army1->GetCommander()->GetName(), res.exp1, icn_anim, msg);
+    	GetSummaryParams(res.army1, res.army2, *army1->GetCommander(), res.exp1, icn_anim, msg);
 	if(conf.Music()) AGG::PlayMusic(MUS::BATTLEWIN, false);
     }
     else
     if((res.army2 & RESULT_WINS) && army2->GetCommander() && (CONTROL_HUMAN & army2->GetCommander()->GetControl()))
     {
-    	GetSummaryParams(res.army2, res.army1, army2->GetCommander()->GetName(), res.exp2, icn_anim, msg);
+    	GetSummaryParams(res.army2, res.army1, *army2->GetCommander(), res.exp2, icn_anim, msg);
 	if(conf.Music()) AGG::PlayMusic(MUS::BATTLEWIN, false);
     }
     else
     if(army1->GetCommander() && (CONTROL_HUMAN & army1->GetCommander()->GetControl()))
     {
-    	GetSummaryParams(res.army1, res.army2, army1->GetCommander()->GetName(), res.exp1, icn_anim, msg);
+    	GetSummaryParams(res.army1, res.army2, *army1->GetCommander(), res.exp1, icn_anim, msg);
 	if(conf.Music()) AGG::PlayMusic(MUS::BATTLELOSE, false);
     }
     else
     if(army2->GetCommander() && (CONTROL_HUMAN & army2->GetCommander()->GetControl()))
     {
-    	GetSummaryParams(res.army2, res.army1, army2->GetCommander()->GetName(), res.exp2, icn_anim, msg);
+    	GetSummaryParams(res.army2, res.army1, *army2->GetCommander(), res.exp2, icn_anim, msg);
 	if(conf.Music()) AGG::PlayMusic(MUS::BATTLELOSE, false);
     }
     else
