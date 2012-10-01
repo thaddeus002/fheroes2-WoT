@@ -240,12 +240,33 @@ u8 GetIndexBuildingSprite(u32 build)
     return 0;
 }
 
-BuildingInfo::BuildingInfo(const Castle & c, building_t b) : castle(c), building(b), area(0, 0, 135, 57), disable(false)
+BuildingInfo::BuildingInfo(const Castle & c, building_t b) : castle(c), building(b), area(0, 0, 135, 57), bcond(ALLOW_BUILD)
 {
     if(IsDwelling()) building = castle.GetActualDwelling(b);
 
     building = castle.isBuild(b) ? castle.GetUpgradeBuilding(b) : b;
 
+    if(BUILD_TAVERN == building && Race::NECR == castle.GetRace())
+	building = Settings::Get().PriceLoyaltyVersion() ? BUILD_SHRINE : BUILD_TAVERN;
+
+    bcond = castle.CheckBuyBuilding(building);
+
+    // generate description
+    if(BUILD_DISABLE == bcond)
+    {
+	switch(building)
+	{
+	    case BUILD_SHIPYARD:
+		description = _("Cannot build %{name} because castle is too far from water.");
+		String::Replace(description, "%{name}", GetName());
+		break;
+
+	    default:
+		description = "disable build.";
+		break;
+	}
+    }
+    else
     if(IsDwelling())
     {
 	description = _("The %{building} produces %{monster}.");
@@ -253,7 +274,7 @@ BuildingInfo::BuildingInfo(const Castle & c, building_t b) : castle(c), building
         String::Replace(description, "%{monster}", String::Lower(Monster(castle.GetRace(), building).GetMultiName()));
     }
     else
-	description = Castle::GetDescriptionBuilding(building, castle.GetRace());
+    	description = Castle::GetDescriptionBuilding(building, castle.GetRace());
 
     switch(building)
     {
@@ -277,10 +298,7 @@ BuildingInfo::BuildingInfo(const Castle & c, building_t b) : castle(c), building
 	default: break;
     }
 
-    // necr and tavern check
-    if(BUILD_SHRINE == building && (Race::NECR != castle.GetRace() || !Settings::Get().PriceLoyaltyVersion()))
-	disable = true;
-
+    // fix area for capratin
     if(b == BUILD_CAPTAIN)
     {
 	const Sprite & sprite = AGG::GetICN(ICN::Get4Captain(castle.GetRace()),
@@ -304,11 +322,6 @@ void BuildingInfo::SetPos(s16 x, s16 y)
 const Rect & BuildingInfo::GetArea(void) const
 {
     return area;
-}
-
-bool BuildingInfo::IsDisable(void) const
-{
-    return disable;
 }
 
 bool BuildingInfo::IsDwelling(void) const
@@ -342,18 +355,16 @@ void BuildingInfo::RedrawCaptain(void)
     const Sprite & sprite_deny  = AGG::GetICN(ICN::TOWNWIND, 12);
     const Sprite & sprite_money = AGG::GetICN(ICN::TOWNWIND, 13);
     Point dst_pt;
-
-    buildcond_t build_condition = castle.CheckBuyBuilding(building);
-    bool allow_buy = build_condition == ALLOW_BUILD;
+    bool allow_buy = bcond == ALLOW_BUILD;
 
     // indicator
     dst_pt.x = area.x + 65;
     dst_pt.y = area.y + 60;
-    if(castle.isBuild(building)) sprite_allow.Blit(dst_pt);
+    if(bcond == ALREADY_BUILT) sprite_allow.Blit(dst_pt);
     else
     if(! allow_buy)
     {
-	if(LACK_RESOURCES == build_condition)
+	if(LACK_RESOURCES == bcond)
 	    sprite_money.Blit(dst_pt);
 	else
 	    sprite_deny.Blit(dst_pt);
@@ -369,46 +380,61 @@ void BuildingInfo::Redraw(void)
     }
 
     u8 index = GetIndexBuildingSprite(building);
-    Display & display = Display::Get();
 
-    AGG::GetICN(ICN::BLDGXTRA, 0).Blit(area.x, area.y);
-
-    if(disable)
+    if(BUILD_DISABLE == bcond)
     {
-	display.FillRect(0, 0, 0, Rect(area.x + 1, area.y + 1, area.w, area.h));
-	return;
-    }
+	Sprite gray1 = AGG::GetICN(ICN::BLDGXTRA, 0);
+	gray1.GrayScale();
+	gray1.Blit(area.x, area.y);
 
-    AGG::GetICN(ICN::Get4Building(castle.GetRace()),
-		index).Blit(area.x + 1, area.y + 1);
+	if(BUILD_TAVERN == building)
+	{
+	    Display::Get().FillRect(0, Rect(area.x + 1, area.y + 1, 135, 57));
+	}
+	else
+	{
+	    Sprite gray2 = AGG::GetICN(ICN::Get4Building(castle.GetRace()), index);
+	    gray2.GrayScale();
+	    gray2.Blit(area.x + 1, area.y + 1);
+	}
+    }
+    else
+    {
+	AGG::GetICN(ICN::BLDGXTRA, 0).Blit(area.x, area.y);
+	AGG::GetICN(ICN::Get4Building(castle.GetRace()), index).Blit(area.x + 1, area.y + 1);
+    }
 
     const Sprite & sprite_allow = AGG::GetICN(ICN::TOWNWIND, 11);
     const Sprite & sprite_deny  = AGG::GetICN(ICN::TOWNWIND, 12);
     const Sprite & sprite_money = AGG::GetICN(ICN::TOWNWIND, 13);
-    Point dst_pt;
 
-    buildcond_t build_condition = castle.CheckBuyBuilding(building);
-    bool allow_buy = build_condition == ALLOW_BUILD;
+    Point dst_pt(area.x + 115, area.y + 40);
 
     // indicator
-    dst_pt.x = area.x + 115;
-    dst_pt.y = area.y + 40;
-    if(castle.isBuild(building)) sprite_allow.Blit(dst_pt);
+    if(bcond == ALREADY_BUILT)
+	sprite_allow.Blit(dst_pt);
     else
-    if(! allow_buy)
+    if(bcond == BUILD_DISABLE)
     {
-	if(LACK_RESOURCES == build_condition)
+	Sprite gray_deny = sprite_deny;
+	gray_deny.GrayScale();
+	gray_deny.Blit(dst_pt);
+    }
+    else
+    if(bcond != ALLOW_BUILD)
+    {
+	if(LACK_RESOURCES == bcond)
 	    sprite_money.Blit(dst_pt);
 	else
 	    sprite_deny.Blit(dst_pt);
     }
 
     // status bar
-    if(!castle.isBuild(building))
+    if(bcond != BUILD_DISABLE && bcond != ALREADY_BUILT)
     {
 	dst_pt.x = area.x;
 	dst_pt.y = area.y + 58;
-	AGG::GetICN(ICN::CASLXTRA, allow_buy ? 1 : 2).Blit(dst_pt);
+	AGG::GetICN(ICN::CASLXTRA, bcond == ALLOW_BUILD ? 1 : 2).Blit(dst_pt);
     }
 
     // name
@@ -431,15 +457,14 @@ const std::string & BuildingInfo::GetDescription(void) const
 
 bool BuildingInfo::QueueEventProcessing(void)
 {
-    if(disable) return false;
-
     LocalEvent & le = LocalEvent::Get();
+
     if(le.MouseClickLeft(area))
     {
-	if(!castle.isBuild(BUILD_CASTLE))
+	if(! castle.isBuild(BUILD_CASTLE))
 	    Dialog::Message("", _("For this action it is necessary first to build a castle."), Font::BIG, Dialog::OK);
 	else
-	if(castle.isBuild(building))
+	if(bcond == ALREADY_BUILT)
 	    Dialog::Message(GetName(), GetDescription(), Font::BIG, Dialog::OK);
 	else
 	    return DialogBuyBuilding(true);
@@ -447,7 +472,7 @@ bool BuildingInfo::QueueEventProcessing(void)
     else
     if(le.MousePressRight(area))
     {
-	if(castle.isBuild(building))
+	if(bcond == ALREADY_BUILT)
 	    Dialog::Message(GetName(), GetDescription(), Font::BIG);
 	else
 	    DialogBuyBuilding(false);
@@ -583,10 +608,15 @@ void BuildingInfo::SetStatusMessage(StatusBar & bar) const
     std::string str;
     const char* name = GetName();
 
-    if(castle.isBuild(building))
+    if(bcond == ALREADY_BUILT)
     {
         str = _("%{name} is already built");
         String::Replace(str, "%{name}", name);
+    }
+    else
+    if(bcond == BUILD_DISABLE)
+    {
+	str = description;
     }
     else
     {
@@ -598,12 +628,6 @@ void BuildingInfo::SetStatusMessage(StatusBar & bar) const
         if(castle.AllowBuild() && ! castle.GetKingdom().AllowPayment(GetCost(castle.GetRace(), building)))
         {
             str = _("Cannot afford %{name}");
-            String::Replace(str, "%{name}", name);
-        }
-        else
-        if(BUILD_SHIPYARD == building && !castle.HaveNearlySea())
-        {
-            str = _("Cannot build %{name} because castle is too far from water.");
             String::Replace(str, "%{name}", name);
         }
         else

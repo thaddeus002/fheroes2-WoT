@@ -43,7 +43,6 @@ public:
     void SetStatusMessage(StatusBar &) const;
 
     bool IsDwelling(void) const;
-    bool IsDisable(void) const;
 
     void Redraw(void);
     bool QueueEventProcessing(void);
@@ -59,7 +58,7 @@ private:
     u32 building;
     std::string description;
     Rect area;
-    bool disable;
+    buildcond_t bcond;
 };
 
 #endif

@@ -216,7 +216,7 @@ u32 Castle::OpenTown(void)
     buildingMageGuild.Redraw();
 
     // tavern
-    BuildingInfo buildingTavern(*this, (race == Race::NECR ? BUILD_SHRINE : BUILD_TAVERN));
+    BuildingInfo buildingTavern(*this, BUILD_TAVERN);
     buildingTavern.SetPos(cur_pt.x + 149, cur_pt.y + 157);
     buildingTavern.Redraw();
 
@@ -506,7 +506,7 @@ u32 Castle::OpenTown(void)
 	else
 	if(le.MouseCursor(buildingMageGuild.GetArea())) buildingMageGuild.SetStatusMessage(statusBar);
 	else
-	if(le.MouseCursor(buildingTavern.GetArea()) && !buildingTavern.IsDisable()) buildingTavern.SetStatusMessage(statusBar);
+	if(le.MouseCursor(buildingTavern.GetArea())) buildingTavern.SetStatusMessage(statusBar);
 	else
 	if(le.MouseCursor(buildingThievesGuild.GetArea())) buildingThievesGuild.SetStatusMessage(statusBar);
 	else

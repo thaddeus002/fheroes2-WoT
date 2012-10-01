@@ -1106,6 +1106,26 @@ u32 Castle::GetBuildingRequires(u32 build) const
 /* check allow buy building */
 buildcond_t Castle::CheckBuyBuilding(u32 build) const
 {
+    switch(build)
+    {
+	// allow build castle
+	case BUILD_CASTLE:
+	    if(! Modes(ALLOWCASTLE)) return BUILD_DISABLE;
+	    break;
+	// buid shipyard only nearly sea
+	case BUILD_SHIPYARD:
+	    if(! HaveNearlySea()) return BUILD_DISABLE;
+	    break;
+	case BUILD_SHRINE:
+	    if(!Race::NECR == GetRace() || !Settings::Get().PriceLoyaltyVersion()) return BUILD_DISABLE;
+	    break;
+	case BUILD_TAVERN:
+	    if(Race::NECR == GetRace()) return BUILD_DISABLE;
+	    break;
+
+	default: break;
+    }
+
     if(! Modes(ALLOWBUILD)) return NOT_TODAY;
 
     if(build & building) return ALREADY_BUILT;
@@ -1114,14 +1134,6 @@ buildcond_t Castle::CheckBuyBuilding(u32 build) const
 
     switch(build)
     {
-	// allow build castle
-	case BUILD_CASTLE:
-	    if(! Modes(ALLOWCASTLE)) return CASTLE_DISABLE;
-	    break;
-	// buid shipyard only nearly sea
-	case BUILD_SHIPYARD:
-	    if(! HaveNearlySea()) return SHIPYARD_DISABLE;
-	    break;
 	// check upgrade dwelling
         case DWELLING_UPGRADE2:
 	    if((Race::WRLK | Race::WZRD) & race) return UNKNOWN_UPGRADE;

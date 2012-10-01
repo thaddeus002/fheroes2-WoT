@@ -81,11 +81,10 @@ enum buildcond_t
     NOT_TODAY		= -1,
     ALREADY_BUILT	= -2,
     NEED_CASTLE		= -3,
-    CASTLE_DISABLE	= -4,
-    SHIPYARD_DISABLE	= -5,
-    UNKNOWN_UPGRADE	= -6,
-    REQUIRES_BUILD	= -7,
-    LACK_RESOURCES	= -8,
+    BUILD_DISABLE	= -4,
+    UNKNOWN_UPGRADE	= -5,
+    REQUIRES_BUILD	= -6,
+    LACK_RESOURCES	= -7,
     ALLOW_BUILD		= 1
 };
 
