@@ -260,14 +260,12 @@ u32 Castle::CountBuildings(void) const
 {
     const u32 tavern = (race == Race::NECR ? (Settings::Get().PriceLoyaltyVersion() ? BUILD_SHRINE : 0) : BUILD_TAVERN);
 
-    std::bitset<32> requires(building & (BUILD_THIEVESGUILD | tavern | BUILD_SHIPYARD | BUILD_WELL |
+    return CountBits(building & (BUILD_THIEVESGUILD | tavern | BUILD_SHIPYARD | BUILD_WELL |
                     BUILD_STATUE | BUILD_LEFTTURRET | BUILD_RIGHTTURRET |
                     BUILD_MARKETPLACE | BUILD_WEL2 | BUILD_MOAT | BUILD_SPEC |
                     BUILD_CAPTAIN | BUILD_CASTLE | BUILD_MAGEGUILD1 | DWELLING_MONSTER1 |
                     DWELLING_MONSTER2 | DWELLING_MONSTER3 | DWELLING_MONSTER4 |
                     DWELLING_MONSTER5 | DWELLING_MONSTER6));
-
-    return requires.count();
 }
 
 bool Castle::isPosition(const Point & pt) const
@@ -1104,7 +1102,7 @@ u32 Castle::GetBuildingRequires(u32 build) const
 }
 
 /* check allow buy building */
-buildcond_t Castle::CheckBuyBuilding(u32 build) const
+s8 Castle::CheckBuyBuilding(u32 build) const
 {
     switch(build)
     {
@@ -1117,7 +1115,7 @@ buildcond_t Castle::CheckBuyBuilding(u32 build) const
 	    if(! HaveNearlySea()) return BUILD_DISABLE;
 	    break;
 	case BUILD_SHRINE:
-	    if(!Race::NECR == GetRace() || !Settings::Get().PriceLoyaltyVersion()) return BUILD_DISABLE;
+	    if(Race::NECR != GetRace() || !Settings::Get().PriceLoyaltyVersion()) return BUILD_DISABLE;
 	    break;
 	case BUILD_TAVERN:
 	    if(Race::NECR == GetRace()) return BUILD_DISABLE;
@@ -1130,7 +1128,14 @@ buildcond_t Castle::CheckBuyBuilding(u32 build) const
 
     if(build & building) return ALREADY_BUILT;
 
-    if(build != BUILD_CASTLE && ! isCastle()) return NEED_CASTLE;
+    if(isCastle())
+    {
+	if(build == BUILD_TENT) return BUILD_DISABLE;
+    }
+    else
+    {
+	if(build != BUILD_CASTLE) return NEED_CASTLE;
+    }
 
     switch(build)
     {
@@ -1158,26 +1163,34 @@ buildcond_t Castle::CheckBuyBuilding(u32 build) const
     }
 
     // check build requirements
-    std::bitset<32> requires(Castle::GetBuildingRequires(build));
+    const u32 requires(Castle::GetBuildingRequires(build));
 
-    if(requires.any())
-    {
-        for(u8 pos = 0; pos < requires.size(); ++pos)
-        {
-            if(requires.test(pos))
-            {
-                u32 value = 1;
-                value <<= pos;
-
-                if(! (building & value)) return REQUIRES_BUILD;
-	    }
-	}
-    }
+    for(u32 itr = 0x00000001; itr; itr <<= 1)
+        if((requires & itr) && ! (building & itr)) return REQUIRES_BUILD;
 
     // check valid payment
     if(! GetKingdom().AllowPayment(PaymentConditions::BuyBuilding(race, build))) return LACK_RESOURCES;
 
     return ALLOW_BUILD;
+}
+
+s8 Castle::GetAllBuildingStatus(const Castle & castle)
+{
+    if(! castle.Modes(ALLOWBUILD)) return NOT_TODAY;
+    if(! castle.isCastle()) return NEED_CASTLE;
+
+    const u32 rest = ~ castle.building;
+
+    for(u32 itr = 0x00000001; itr; itr <<= 1)
+	if((rest & itr) && (ALLOW_BUILD == castle.CheckBuyBuilding(itr))) return ALLOW_BUILD;
+
+    for(u32 itr = 0x00000001; itr; itr <<= 1)
+	if((rest & itr) && (LACK_RESOURCES == castle.CheckBuyBuilding(itr))) return LACK_RESOURCES;
+
+    for(u32 itr = 0x00000001; itr; itr <<= 1)
+	if((rest & itr) && (REQUIRES_BUILD == castle.CheckBuyBuilding(itr))) return REQUIRES_BUILD;
+
+    return UNKNOWN_COND;
 }
 
 bool Castle::AllowBuyBuilding(u32 build) const

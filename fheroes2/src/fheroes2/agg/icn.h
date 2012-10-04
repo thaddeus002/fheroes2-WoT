@@ -911,6 +911,7 @@ namespace ICN
 	BOAT12,
 	BTNGIFT,
 	BTNMIN,
+	CSLMARKER,
 
 	UNKNOWN
 

@@ -20,7 +20,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <bitset>
 #include "agg.h"
 #include "monster.h"
 #include "settings.h"
@@ -376,72 +375,68 @@ void BuildingInfo::Redraw(void)
     if(BUILD_CAPTAIN == building)
     {
 	RedrawCaptain();
-	return;
     }
-
-    u8 index = GetIndexBuildingSprite(building);
-
-    if(BUILD_DISABLE == bcond)
+    else
     {
-	Sprite gray1 = AGG::GetICN(ICN::BLDGXTRA, 0);
-	gray1.GrayScale();
-	gray1.Blit(area.x, area.y);
+	u8 index = GetIndexBuildingSprite(building);
 
-	if(BUILD_TAVERN == building)
+	if(BUILD_DISABLE == bcond)
 	{
+	    Sprite gray1 = AGG::GetICN(ICN::BLDGXTRA, 0);
+	    gray1.GrayScale();
+	    gray1.Blit(area.x, area.y);
+	}
+	else
+	{
+	    AGG::GetICN(ICN::BLDGXTRA, 0).Blit(area.x, area.y);
+	}
+
+	// build image
+        if(BUILD_DISABLE == bcond && BUILD_TAVERN == building)
+	    // skip tavern necr
 	    Display::Get().FillRect(0, Rect(area.x + 1, area.y + 1, 135, 57));
-	}
 	else
+	    AGG::GetICN(ICN::Get4Building(castle.GetRace()), index).Blit(area.x + 1, area.y + 1);
+
+	const Sprite & sprite_allow = AGG::GetICN(ICN::TOWNWIND, 11);
+	const Sprite & sprite_deny  = AGG::GetICN(ICN::TOWNWIND, 12);
+	const Sprite & sprite_money = AGG::GetICN(ICN::TOWNWIND, 13);
+
+	Point dst_pt(area.x + 115, area.y + 40);
+
+	// indicator
+	if(bcond == ALREADY_BUILT)
+	    sprite_allow.Blit(dst_pt);
+	else
+	if(bcond == BUILD_DISABLE)
 	{
-	    Sprite gray2 = AGG::GetICN(ICN::Get4Building(castle.GetRace()), index);
-	    gray2.GrayScale();
-	    gray2.Blit(area.x + 1, area.y + 1);
+	    Sprite gray_deny = sprite_deny;
+	    gray_deny.GrayScale();
+	    gray_deny.Blit(dst_pt);
 	}
-    }
-    else
-    {
-	AGG::GetICN(ICN::BLDGXTRA, 0).Blit(area.x, area.y);
-	AGG::GetICN(ICN::Get4Building(castle.GetRace()), index).Blit(area.x + 1, area.y + 1);
-    }
-
-    const Sprite & sprite_allow = AGG::GetICN(ICN::TOWNWIND, 11);
-    const Sprite & sprite_deny  = AGG::GetICN(ICN::TOWNWIND, 12);
-    const Sprite & sprite_money = AGG::GetICN(ICN::TOWNWIND, 13);
-
-    Point dst_pt(area.x + 115, area.y + 40);
-
-    // indicator
-    if(bcond == ALREADY_BUILT)
-	sprite_allow.Blit(dst_pt);
-    else
-    if(bcond == BUILD_DISABLE)
-    {
-	Sprite gray_deny = sprite_deny;
-	gray_deny.GrayScale();
-	gray_deny.Blit(dst_pt);
-    }
-    else
-    if(bcond != ALLOW_BUILD)
-    {
-	if(LACK_RESOURCES == bcond)
-	    sprite_money.Blit(dst_pt);
 	else
-	    sprite_deny.Blit(dst_pt);
-    }
+	if(bcond != ALLOW_BUILD)
+        {
+	    if(LACK_RESOURCES == bcond)
+		sprite_money.Blit(dst_pt);
+	    else
+		sprite_deny.Blit(dst_pt);
+	}
 
-    // status bar
-    if(bcond != BUILD_DISABLE && bcond != ALREADY_BUILT)
-    {
-	dst_pt.x = area.x;
-	dst_pt.y = area.y + 58;
-	AGG::GetICN(ICN::CASLXTRA, bcond == ALLOW_BUILD ? 1 : 2).Blit(dst_pt);
-    }
+	// status bar
+	if(bcond != BUILD_DISABLE && bcond != ALREADY_BUILT)
+	{
+	    dst_pt.x = area.x;
+	    dst_pt.y = area.y + 58;
+	    AGG::GetICN(ICN::CASLXTRA, bcond == ALLOW_BUILD ? 1 : 2).Blit(dst_pt);
+	}
 
-    // name
-    Text text(Castle::GetStringBuilding(building, castle.GetRace()), Font::SMALL);
-    dst_pt.x = area.x + 68 - text.w() / 2;
-    dst_pt.y = area.y + 59;
-    text.Blit(dst_pt);
+	// name
+	Text text(Castle::GetStringBuilding(building, castle.GetRace()), Font::SMALL);
+	dst_pt.x = area.x + 68 - text.w() / 2;
+        dst_pt.y = area.y + 59;
+	text.Blit(dst_pt);
+    }
 }
 
 
@@ -493,27 +488,19 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
 
     // prepare requires build string
     std::string str;
-    std::bitset<32> requires(castle.GetBuildingRequires(building));
-    if(requires.any())
+    const u32 requires = castle.GetBuildingRequires(building);
+    const char* sep = ", ";
+
+    for(u32 itr = 0x00000001; itr; itr <<= 1)
+        if((requires & itr) && ! castle.isBuild(itr))
     {
-	u8 count = 0;
-	for(u8 pos = 0; pos < requires.size(); ++pos)
-	{
-	    if(requires.test(pos))
-	    {
-		u32 value = 1;
-		value <<= pos;
-
-		++count;
-
-		if(! castle.isBuild(value))
-		{
-		    str += Castle::GetStringBuilding(static_cast<building_t>(value), castle.GetRace());
-		    if(count < requires.count()) str += ", ";
-		}
-	    }
-	}
+	str.append(Castle::GetStringBuilding(itr, castle.GetRace()));
+	str.append(sep);
     }
+
+    // replace end sep
+    if(str.size())
+	str.replace(str.size() - strlen(sep), strlen(sep), ".");
 
     bool requires_true = str.size();
     Text requires_text(_("Requires:"), Font::BIG);

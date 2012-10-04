@@ -85,6 +85,7 @@ enum buildcond_t
     UNKNOWN_UPGRADE	= -5,
     REQUIRES_BUILD	= -6,
     LACK_RESOURCES	= -7,
+    UNKNOWN_COND	= 0,
     ALLOW_BUILD		= 1
 };
 
@@ -163,12 +164,14 @@ public:
 
     bool AllowBuild(void) const{ return Modes(ALLOWBUILD); }
     bool AllowBuyBuilding(u32) const;
-    buildcond_t CheckBuyBuilding(u32) const;
     bool isBuild(u32 bd) const{ return building & bd; }
     bool BuyBuilding(u32);
     bool AllowBuyBoat(void) const;
     bool BuyBoat(void);
     u32 GetBuildingRequires(u32) const;
+
+    s8 CheckBuyBuilding(u32) const;
+    static s8 GetAllBuildingStatus(const Castle &);
 
     void Scoute(void) const;
 

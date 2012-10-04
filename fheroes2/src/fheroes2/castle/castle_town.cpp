@@ -173,8 +173,12 @@ u32 Castle::OpenTown(void)
 
     // draw castle sprite
     dst_pt.x = cur_pt.x + 460;
-    dst_pt.y = cur_pt.y + 0;
+    dst_pt.y = cur_pt.y + 5;
     DrawImageCastle(dst_pt);
+
+    // castle name
+    Text text(GetName(), Font::SMALL);
+    text.Blit(cur_pt.x + 536 - text.w() / 2, cur_pt.y + 1);
 
     //
     BuildingInfo dwelling1(*this, DWELLING_MONSTER1);
@@ -287,7 +291,7 @@ u32 Castle::OpenTown(void)
     SpriteCursor cursorFormat(AGG::GetICN(ICN::HSICONS, 11), army.isSpreadFormat() ? pointSpreadArmyFormat : pointGroupedArmyFormat);
     if(isBuild(BUILD_CAPTAIN))
     {
-	Text text(_("Attack Skill") + std::string(" "), Font::SMALL);
+	text.Set(_("Attack Skill") + std::string(" "), Font::SMALL);
 	dst_pt.x = cur_pt.x + 535;
 	dst_pt.y = cur_pt.y + 168;
 	text.Blit(dst_pt);

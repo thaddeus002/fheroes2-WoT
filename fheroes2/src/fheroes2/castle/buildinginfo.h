@@ -58,7 +58,7 @@ private:
     u32 building;
     std::string description;
     Rect area;
-    buildcond_t bcond;
+    s8 bcond;
 };
 
 #endif

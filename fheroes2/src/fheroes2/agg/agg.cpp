@@ -295,6 +295,7 @@ bool AGG::Cache::LoadExtICN(const ICN::icn_t icn, const u32 index, bool reflect)
 	case ICN::BTNCONFIG:		count = 2; break;
 	case ICN::FOUNTAIN:		count = 2; break;
 	case ICN::TREASURE:		count = 2; break;
+	case ICN::CSLMARKER:		count = 3; break;
 	case ICN::TELEPORT1:
 	case ICN::TELEPORT2:
 	case ICN::TELEPORT3:		count = 8; break;
@@ -471,6 +472,31 @@ bool AGG::Cache::LoadExtICN(const ICN::icn_t icn, const u32 index, bool reflect)
 	    Surface::ScaleMinifyByTwo(dst, sprite);
 	    Surface::Swap(sprite, dst);
 	}
+	break;
+
+
+	case ICN::CSLMARKER:
+	if(index < count)
+	{
+	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
+
+	    // sprite: not allow build: complete, not today, all builds (white)
+	    LoadOrgICN(sprite, ICN::LOCATORS, 24, false);
+
+	    // sprite: not allow build: builds requires
+	    if(1 == index)
+	    {
+		sprite.ChangeColorIndex(0x0A, 0xD6);
+	    }
+	    else
+	    // sprite: not allow build: lack resources (green)
+	    if(2 == index)
+	    {
+		sprite.ChangeColorIndex(0x0A, 0xDE);
+	    }
+	}
+	break;
+
 	default: break;
     }
 

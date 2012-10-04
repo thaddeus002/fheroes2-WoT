@@ -60,8 +60,24 @@ void Interface::RedrawCastleIcon(const Castle & castle, s16 sx, s16 sy)
     AGG::GetICN(evil ? ICN::LOCATORE : ICN::LOCATORS, index_sprite).Blit(sx, sy);
 
     // castle build marker
-    if(! castle.AllowBuild())
-        AGG::GetICN(evil ? ICN::LOCATORE : ICN::LOCATORS, 24).Blit(sx + 39, sy + 1);
+    switch(Castle::GetAllBuildingStatus(castle))
+    {
+	// white marker
+	case UNKNOWN_COND:
+	case NOT_TODAY:		AGG::GetICN(ICN::CSLMARKER, 0).Blit(sx + 39, sy + 1); break;
+
+	// green marker
+	case LACK_RESOURCES:	AGG::GetICN(ICN::CSLMARKER, 2).Blit(sx + 39, sy + 1); break;
+
+	// red marker
+	case NEED_CASTLE:
+	case REQUIRES_BUILD:	AGG::GetICN(ICN::CSLMARKER, 1).Blit(sx + 39, sy + 1); break;
+
+	default: break;
+    }
+//
+//    if(! castle.AllowBuild())
+//        AGG::GetICN(ICN::CSLMARKER, 0).Blit(sx + 39, sy + 1);
 }
 
 void Interface::RedrawHeroesIcon(const Heroes & hero, s16 sx, s16 sy)
