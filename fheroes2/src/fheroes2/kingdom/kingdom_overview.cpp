@@ -192,7 +192,11 @@ void StatsCastlesList::RedrawItem(const CASTLEPTR & cstl, s16 dstx, s16 dsty, bo
 	const Heroes* hero = cstl->GetHeroes().GuardFirst();
 
 	if(hero)
+	{
 	    Interface::RedrawHeroesIcon(*hero, dstx + 82, dsty + 19);
+	    text.Set(hero->StringSkills("-"));
+	    text.Blit(dstx + 104 - text.w() / 2, dsty + 43);
+	}
 
 	text.Set(cstl->GetName());
 	text.Blit(dstx + 72 - text.w() / 2, dsty + 62);
@@ -241,30 +245,48 @@ void StatsCastlesList::RedrawBackground(const Point & dst)
     }
 }
 
+std::string CapturedExtInfoString(u8 res, u8 color, const Funds & funds)
+{
+    std::ostringstream os;
+    os << world.CountCapturedMines(res, color);
+    const s32 vals = funds.Get(res);
+
+    if(vals)
+    {
+	os << " " << "(";
+	if(vals > 0) os << "+";
+	os << vals << ")";
+    }
+
+    return os.str();
+}
+
 void RedrawIncomeInfo(const Point & pt, const Kingdom & myKingdom)
 {
     const Funds & funds = myKingdom.GetFunds();
+    const Funds income = myKingdom.GetIncome(INCOME_ARTIFACTS | INCOME_HEROSKILLS);
+
     Text text("", Font::SMALL);
 
-    text.Set(GetString(world.CountCapturedMines(Resource::WOOD, myKingdom.GetColor())));
+    text.Set(CapturedExtInfoString(Resource::WOOD, myKingdom.GetColor(), income));
     text.Blit(pt.x + 54 - text.w() / 2, pt.y + 408);
 
-    text.Set(GetString(world.CountCapturedMines(Resource::MERCURY, myKingdom.GetColor())));
+    text.Set(CapturedExtInfoString(Resource::MERCURY, myKingdom.GetColor(), income));
     text.Blit(pt.x + 146 - text.w() / 2, pt.y + 408);
 
-    text.Set(GetString(world.CountCapturedMines(Resource::ORE, myKingdom.GetColor())));
+    text.Set(CapturedExtInfoString(Resource::ORE, myKingdom.GetColor(), income));
     text.Blit(pt.x + 228 - text.w() / 2, pt.y + 408);
 
-    text.Set(GetString(world.CountCapturedMines(Resource::SULFUR, myKingdom.GetColor())));
+    text.Set(CapturedExtInfoString(Resource::SULFUR, myKingdom.GetColor(), income));
     text.Blit(pt.x + 294 - text.w() / 2, pt.y + 408);
 
-    text.Set(GetString(world.CountCapturedMines(Resource::CRYSTAL, myKingdom.GetColor())));
+    text.Set(CapturedExtInfoString(Resource::CRYSTAL, myKingdom.GetColor(), income));
     text.Blit(pt.x + 360 - text.w() / 2, pt.y + 408);
 
-    text.Set(GetString(world.CountCapturedMines(Resource::GEMS, myKingdom.GetColor())));
+    text.Set(CapturedExtInfoString(Resource::GEMS, myKingdom.GetColor(), income));
     text.Blit(pt.x + 428 - text.w() / 2, pt.y + 408);
 
-    text.Set(GetString(world.CountCapturedMines(Resource::GOLD, myKingdom.GetColor())));
+    text.Set(CapturedExtInfoString(Resource::GOLD, myKingdom.GetColor(), income));
     text.Blit(pt.x + 494 - text.w() / 2, pt.y + 408);
 
     text.Set(GetString(funds.wood));
@@ -288,11 +310,13 @@ void RedrawIncomeInfo(const Point & pt, const Kingdom & myKingdom)
     text.Set(GetString(funds.gold));
     text.Blit(pt.x + 496 - text.w() / 2, pt.y + 448);
 
-    text.Set(_("Gold Per Day:"));
-    text.Blit(pt.x + 328 - text.w(), pt.y + 462);
+    text.Set(_("Gold Per Day:") + std::string(" ") + GetString(myKingdom.GetIncome().Get(Resource::GOLD)));
+    text.Blit(pt.x + 300 - text.w(), pt.y + 462);
 
-    text.Set(GetString(myKingdom.GetIncome().Get(Resource::GOLD)));
-    text.Blit(pt.x + 340, pt.y + 462);
+    std::string msg = _("Day: %{day}");
+    String::Replace(msg, "%{day}", world.GetDay());
+    text.Set(msg);
+    text.Blit(pt.x + 360, pt.y + 462);
 }
 
 void Kingdom::OverviewDialog(void)

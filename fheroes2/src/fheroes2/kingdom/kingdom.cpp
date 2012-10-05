@@ -483,58 +483,70 @@ void Kingdom::HeroesActionNewPosition(void)
     std::for_each(heroes2.begin(), heroes2.end(), std::mem_fun(&Heroes::ActionNewPosition));
 }
 
-Funds Kingdom::GetIncome(void) const
+Funds Kingdom::GetIncome(u8 type /* INCOME_ALL */) const
 {
     Funds resource;
 
-    // captured object
-    const u8 resources[] = { Resource::WOOD, Resource::ORE, Resource::MERCURY, Resource::SULFUR,
+    if(INCOME_CAPTURED & type)
+    {
+	// captured object
+	const u8 resources[] = { Resource::WOOD, Resource::ORE, Resource::MERCURY, Resource::SULFUR,
                                     Resource::CRYSTAL, Resource::GEMS, Resource::GOLD, Resource::UNKNOWN };
 
-    for(u8 index = 0; resources[index] != Resource::UNKNOWN; ++index)
-        resource += ProfitConditions::FromMine(resources[index]) *
+	for(u8 index = 0; resources[index] != Resource::UNKNOWN; ++index)
+    	    resource += ProfitConditions::FromMine(resources[index]) *
                             	    world.CountCapturedMines(resources[index], GetColor());
-
-    // castles
-    for(KingdomCastles::const_iterator
-	it = castles.begin(); it != castles.end(); ++it)
-    {
-        const Castle & castle = **it;
-
-        // castle or town profit
-        resource += ProfitConditions::FromBuilding((castle.isCastle() ? BUILD_CASTLE : BUILD_TENT), 0);
-
-        // statue
-        if(castle.isBuild(BUILD_STATUE))
-                resource += ProfitConditions::FromBuilding(BUILD_STATUE, 0);
-
-        // dungeon for warlock
-	if(castle.isBuild(BUILD_SPEC) && Race::WRLK == castle.GetRace())
-                resource += ProfitConditions::FromBuilding(BUILD_SPEC, Race::WRLK);
     }
 
-    // find artifacts                                                                                            
-    const u8 artifacts[] = { Artifact::GOLDEN_GOOSE, Artifact::ENDLESS_SACK_GOLD, Artifact::ENDLESS_BAG_GOLD,
+    if(INCOME_CASTLES & type)
+    {
+	// castles
+	for(KingdomCastles::const_iterator
+	    it = castles.begin(); it != castles.end(); ++it)
+	{
+    	    const Castle & castle = **it;
+
+    	    // castle or town profit
+    	    resource += ProfitConditions::FromBuilding((castle.isCastle() ? BUILD_CASTLE : BUILD_TENT), 0);
+
+    	    // statue
+    	    if(castle.isBuild(BUILD_STATUE))
+                resource += ProfitConditions::FromBuilding(BUILD_STATUE, 0);
+
+    	    // dungeon for warlock
+	    if(castle.isBuild(BUILD_SPEC) && Race::WRLK == castle.GetRace())
+                resource += ProfitConditions::FromBuilding(BUILD_SPEC, Race::WRLK);
+	}
+    }
+
+    if(INCOME_ARTIFACTS & type)
+    {
+	// find artifacts                                                                                            
+	const u8 artifacts[] = { Artifact::GOLDEN_GOOSE, Artifact::ENDLESS_SACK_GOLD, Artifact::ENDLESS_BAG_GOLD,
                 Artifact::ENDLESS_PURSE_GOLD, Artifact::ENDLESS_POUCH_SULFUR, Artifact::ENDLESS_VIAL_MERCURY,
                 Artifact::ENDLESS_POUCH_GEMS, Artifact::ENDLESS_CORD_WOOD, Artifact::ENDLESS_CART_ORE,
                 Artifact::ENDLESS_POUCH_CRYSTAL, Artifact::UNKNOWN };
 
-    for(u8 index = 0; artifacts[index] != Artifact::UNKNOWN; ++index)
-	for(KingdomHeroes::const_iterator
-	    ith = heroes.begin(); ith != heroes.end(); ++ith)
-    	    resource += ProfitConditions::FromArtifact(artifacts[index]) * 
+	for(u8 index = 0; artifacts[index] != Artifact::UNKNOWN; ++index)
+	    for(KingdomHeroes::const_iterator
+		ith = heroes.begin(); ith != heroes.end(); ++ith)
+    		resource += ProfitConditions::FromArtifact(artifacts[index]) * 
 		    (**ith).GetBagArtifacts().Count(Artifact(artifacts[index]));
 
-    // TAX_LIEN
-    for(KingdomHeroes::const_iterator
-	ith = heroes.begin(); ith != heroes.end(); ++ith)
-    	resource -= ProfitConditions::FromArtifact(Artifact::TAX_LIEN) * 
+	// TAX_LIEN
+	for(KingdomHeroes::const_iterator
+	    ith = heroes.begin(); ith != heroes.end(); ++ith)
+    	    resource -= ProfitConditions::FromArtifact(Artifact::TAX_LIEN) * 
 		    (**ith).GetBagArtifacts().Count(Artifact(Artifact::TAX_LIEN));
+    }
 
-    // estates skill bonus
-    for(KingdomHeroes::const_iterator
-	ith = heroes.begin(); ith != heroes.end(); ++ith)
-	resource.gold += (**ith).GetSecondaryValues(Skill::Secondary::ESTATES);
+    if(INCOME_HEROSKILLS & type)
+    {
+	// estates skill bonus
+	for(KingdomHeroes::const_iterator
+	    ith = heroes.begin(); ith != heroes.end(); ++ith)
+	    resource.gold += (**ith).GetSecondaryValues(Skill::Secondary::ESTATES);
+    }
 
     return resource;
 }

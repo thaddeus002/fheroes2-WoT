@@ -148,6 +148,8 @@ namespace Skill
 
 	u8 LevelUp(u8 race, u8 level);
 
+	std::string StringSkills(const std::string &) const;
+
         static const char* String(u8);
 	static u8 GetInitialSpell(u8 race);
 

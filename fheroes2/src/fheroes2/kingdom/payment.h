@@ -27,6 +27,8 @@
 
 typedef Funds payment_t;
 
+enum { INCOME_CAPTURED = 0x01, INCOME_CASTLES = 0x02, INCOME_ARTIFACTS = 0x04, INCOME_HEROSKILLS = 0x08, INCOME_ALL = 0xFF };
+
 namespace PaymentConditions
 {
     payment_t BuyBuilding(u8 race, u32 build);

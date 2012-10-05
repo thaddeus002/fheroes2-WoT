@@ -20,6 +20,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <sstream>
 #include <cstring>
 #include <algorithm>
 #include "gamedefs.h"
@@ -160,6 +161,13 @@ const char* Skill::Primary::String(u8 skill)
     }
 
     return str_skill[4];
+}
+
+std::string Skill::Primary::StringSkills(const std::string & sep) const
+{
+    std::ostringstream os;
+    os << GetString(attack) << sep << GetString(defense) << sep << GetString(knowledge) << sep << GetString(power);
+    return os.str();
 }
 
 const char* Skill::Level::String(u8 level)
