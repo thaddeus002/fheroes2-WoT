@@ -214,18 +214,23 @@ void RedrawStaticInfo(const Rect & pos, const Monster & monster, bool label)
 
 const char* SwitchMaxMinButtons(Button & btnMax, Button & btnMin, bool max)
 {
-    if(max)
+    if(btnMax.isEnable() || btnMin.isEnable())
     {
-	btnMax.SetDisable(true);
-	btnMin.SetDisable(false);
-    }
-    else
-    {
-	btnMin.SetDisable(true);
-	btnMax.SetDisable(false);
+	if(max)
+	{
+	    btnMax.SetDisable(true);
+	    btnMin.SetDisable(false);
+	}
+	else
+	{
+	    btnMin.SetDisable(true);
+	    btnMax.SetDisable(false);
+	}
+
+	return max ? "max" : "min";
     }
 
-    return max ? "max" : "min";
+    return "";
 }
 
 u32 CalculateMax(const Monster & monster, const Kingdom & kingdom, u32 available)
@@ -296,6 +301,11 @@ Troop Dialog::RecruitMonster(const Monster & monster0, u16 available, bool ext)
     {
 	buttonOk.Press();
 	buttonOk.SetDisable(true);
+	buttonMax.Press();
+	buttonMin.Press();
+	buttonMax.SetDisable(true);
+	buttonMin.SetDisable(true);
+	buttonMax.Draw();
     }
 
     const Funds & funds = kingdom.GetFunds();
