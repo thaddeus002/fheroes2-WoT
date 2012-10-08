@@ -60,8 +60,7 @@ void Battle::ControlInfo::Redraw(void)
 
 Battle::Only::Only() : hero1(NULL), hero2(NULL), player1(Color::BLUE), player2(Color::NONE),
 	army1(NULL), army2(NULL), moraleIndicator1(NULL), moraleIndicator2(NULL),
-	luckIndicator1(NULL), luckIndicator2(NULL), secskill_bar1(NULL), secskill_bar2(NULL),
-	selectArtifacts1(NULL), selectArtifacts2(NULL), cinfo2(NULL),
+	luckIndicator1(NULL), luckIndicator2(NULL), secskill_bar1(NULL), secskill_bar2(NULL), cinfo2(NULL),
 	rt1(36, 267, 43, 53), sfb1(rt1.w, rt1.h), sfc1(rt1.w, rt1.h - 10),
 	rt2(23, 347, 34, 34), sfb2(rt2.w, rt2.h), sfc2(rt2.w, rt2.h)
 {
@@ -521,7 +520,8 @@ void Battle::Only::UpdateHero1(const Point & cur_pt)
       secskill_bar1->SetSkills(hero1->GetSecondarySkills());
       secskill_bar1->SetChangeMode();
 
-      selectArtifacts1 = new SelectArtifactsBar(*hero1);
+      selectArtifacts1 = new SelectArtifactsBar();
+      selectArtifacts1->SetHero(*hero1);
       selectArtifacts1->SetPos(Point(cur_pt.x + 23, cur_pt.y + 347));
       selectArtifacts1->SetInterval(2);
       selectArtifacts1->SetBackgroundSprite(sfb2);
@@ -578,7 +578,8 @@ void Battle::Only::UpdateHero2(const Point & cur_pt)
       secskill_bar2->SetSkills(hero2->GetSecondarySkills());
       secskill_bar2->SetChangeMode();
 
-      selectArtifacts2 = new SelectArtifactsBar(*hero2);
+      selectArtifacts2 = new SelectArtifactsBar();
+      selectArtifacts2->SetHero(*hero2);
       selectArtifacts2->SetPos(Point(cur_pt.x + 367, cur_pt.y + 347));
       selectArtifacts2->SetInterval(2);
       selectArtifacts2->SetBackgroundSprite(sfb2);

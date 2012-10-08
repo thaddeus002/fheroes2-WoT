@@ -67,7 +67,9 @@ void PocketPC::HeroesMeeting(Heroes & hero1, Heroes & hero2)
     Surface sfc2(rt2.w, rt2.h);
     Cursor::DrawCursor(sfc2, 0xd6, true);
 
-    SelectArtifactsBar selectArtifacts1(hero1);
+    SelectArtifactsBar selectArtifacts1;
+
+    selectArtifacts1.SetHero(hero1);
     selectArtifacts1.SetPos(dst_rt.x + 68, dst_rt.y + 2);
     selectArtifacts1.SetInterval(2);
     selectArtifacts1.SetBackgroundSprite(sfb2);
@@ -75,7 +77,9 @@ void PocketPC::HeroesMeeting(Heroes & hero1, Heroes & hero2)
     selectArtifacts1.SetUseArts32Sprite();
     selectArtifacts1.Redraw();
 
-    SelectArtifactsBar selectArtifacts2(hero2);
+    SelectArtifactsBar selectArtifacts2;
+
+    selectArtifacts2.SetHero(hero2);
     selectArtifacts2.SetPos(dst_rt.x + 68, dst_rt.y + 164);
     selectArtifacts2.SetInterval(2);
     selectArtifacts2.SetBackgroundSprite(sfb2);

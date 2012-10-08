@@ -41,6 +41,16 @@
 #define ICONS_CURSOR_HEIGHT     32
 #define ICONS_CURSOR_COLOR      0x98
 
+u8 Interface::IconsBar::GetItemWidth(void)
+{
+    return ICONS_WIDTH;
+}
+
+u8 Interface::IconsBar::GetItemHeight(void)
+{
+    return ICONS_HEIGHT;
+}
+
 void Interface::RedrawCastleIcon(const Castle & castle, s16 sx, s16 sy)
 {
     const bool evil = Settings::Get().ExtGameEvilInterface();
@@ -87,20 +97,20 @@ void Interface::RedrawHeroesIcon(const Heroes & hero, s16 sx, s16 sy)
     const Sprite & mana = AGG::GetICN(ICN::MANA, hero.GetManaIndexSprite());
     const Surface & port = Portrait::Hero(hero, Portrait::SMALL);
 
-    display.FillRect(0, 0, 0, Rect(sx, sy, ICONS_WIDTH, ICONS_HEIGHT));
+    display.FillRect(0, 0, 0, Rect(sx, sy, IconsBar::GetItemWidth(), IconsBar::GetItemHeight()));
 
     const u8  barw = 7;
     const u32 blue = display.MapRGB(15, 30, 120);
 
     // mobility
-    display.FillRect(blue, Rect(sx, sy, barw, ICONS_HEIGHT));
+    display.FillRect(blue, Rect(sx, sy, barw, IconsBar::GetItemHeight()));
     mobility.Blit(sx, sy + mobility.y());
 
     // portrait
     port.Blit(sx + barw + 1, sy, display);
 
     // mana
-    display.FillRect(blue, Rect(sx + barw + port.w() + 2, sy, barw, ICONS_HEIGHT));
+    display.FillRect(blue, Rect(sx + barw + port.w() + 2, sy, barw, IconsBar::GetItemHeight()));
     mana.Blit(sx + barw + port.w() + 2, sy + mana.y());
 
     u8 oy = 0;
@@ -154,7 +164,7 @@ void Interface::IconsBar::RedrawBackground(const Point & pos)
     icnadv.Blit(srcrt, dstpt);
 
     for(u8 ii = 0; ii < icons; ++ii)
-	back.Blit(pos.x + 5, pos.y + 5 + ii * (ICONS_HEIGHT + 10));
+	back.Blit(pos.x + 5, pos.y + 5 + ii * (IconsBar::GetItemHeight() + 10));
 }
 
 /* Interface::CastleIcons */

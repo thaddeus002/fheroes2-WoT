@@ -254,7 +254,9 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     dst_pt.x = cur_pt.x + 51;
     dst_pt.y = cur_pt.y + 308;
 
-    SelectArtifactsBar selectArtifacts(*this);
+    SelectArtifactsBar selectArtifacts;
+
+    selectArtifacts.SetHero(*this);
     selectArtifacts.SetPos(dst_pt);
     selectArtifacts.SetInterval(15);
     selectArtifacts.SetBackgroundSprite(AGG::GetICN(ICN::ARTIFACT, 0));
@@ -354,7 +356,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 
         if(le.MouseCursor(selectArtifacts.GetArea()))
         {
-            SelectArtifactsBar::QueueEventProcessing(selectArtifacts);
+            if(SelectArtifactsBar::QueueEventProcessing(selectArtifacts))
             {
         	redrawMorale = true;
         	redrawLuck = true;

@@ -43,8 +43,13 @@ enum
     FLAGS_CHANGEMODE	= 0x04
 };
 
-SelectArtifactsBar::SelectArtifactsBar(Heroes &h) : hero(h), interval(0), vspace(0), selected(-1), flags(0), background(NULL)
+SelectArtifactsBar::SelectArtifactsBar() : hero(NULL), interval(0), vspace(0), selected(-1), flags(0), background(NULL)
 {
+}
+
+void SelectArtifactsBar::SetHero(Heroes & h)
+{
+    hero = &h;
 }
 
 const Rect & SelectArtifactsBar::GetArea(void) const
@@ -54,7 +59,7 @@ const Rect & SelectArtifactsBar::GetArea(void) const
 
 bool SelectArtifactsBar::isValid(void) const
 {
-    return background;
+    return background && hero;
 }
 
 bool SelectArtifactsBar::isSelected(void) const
@@ -69,7 +74,7 @@ s8 SelectArtifactsBar::Selected(void) const
 
 s8 SelectArtifactsBar::GetIndexFromCoord(const Point & coord)
 {
-    if(!background) return -1;
+    if(! isValid()) return -1;
 
     if(coord.y < pos.y + background->h())
 	for(u8 ii = 0; ii < MAXARTIFACTLINE; ++ii)
@@ -121,12 +126,12 @@ void SelectArtifactsBar::SetCursorSprite(const Surface & sf)
     }
 }
 
-void SelectArtifactsBar::SetVerticalSpace(const u8 val)
+void SelectArtifactsBar::SetVerticalSpace(const s8 val)
 {
     vspace = val;
 }
 
-void SelectArtifactsBar::SetInterval(const u8 it)
+void SelectArtifactsBar::SetInterval(const s8 it)
 {
     interval = it;
     pos.w = (MAXARTIFACTLINE - 1) * interval;
@@ -164,11 +169,11 @@ bool SelectArtifactsBar::ReadOnly(void) const
 
 void SelectArtifactsBar::Redraw(Surface & dst)
 {
-    if(!background) return;
+    if(! isValid()) return;
 
     spritecursor.Hide();
     Point pt(pos);
-    BagArtifacts & arts = hero.GetBagArtifacts();
+    BagArtifacts & arts = hero->GetBagArtifacts();
 
     for(u8 ii = 0; ii < MAXARTIFACTLINE; ++ii)
     {
@@ -206,9 +211,20 @@ void SelectArtifactsBar::Redraw(Surface & dst)
 
     if(0 <= selected)
     {
-	MAXARTIFACTLINE > selected ? 
-	spritecursor.Show(pos.x + selected * (background->w() + interval) + offset.x, flags & FLAGS_USEART32 ? pos.y : pos.y + offset.y) :
-	spritecursor.Show(pos.x + (selected - MAXARTIFACTLINE) * (background->w() + interval) + offset.x, flags & FLAGS_USEART32 ? pos.y + background->h() + interval : pos.y + background->h() + interval + offset.y);
+	Point pts;
+
+	if(MAXARTIFACTLINE > selected)
+	{
+	    pts.x = pos.x + selected * (background->w() + interval) + offset.x;
+	    pts.y = flags & FLAGS_USEART32 ? pos.y : pos.y + offset.y;
+	}
+	else
+	{
+	    pts.x = pos.x + (selected - MAXARTIFACTLINE) * (background->w() + interval) + offset.x;
+	    pts.y = pos.y + background->h() + (vspace ? vspace : interval) + (flags & FLAGS_USEART32 ? 0 : offset.y);
+	}
+
+	spritecursor.Show(pts);
     }
 }
 
@@ -221,7 +237,7 @@ void SelectArtifactsBar::Reset(void)
 
 void SelectArtifactsBar::Select(u8 index)
 {
-    if(background && index < MAXARTIFACTLINE * 2)
+    if(isValid() && index < MAXARTIFACTLINE * 2)
     {
 	selected = index;
 	spritecursor.Hide();
@@ -239,7 +255,7 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 
     const s8 index1 = bar.GetIndexFromCoord(le.GetMouseCursor());
     if(0 > index1 || HEROESMAXARTIFACT <= index1) return false;
-    BagArtifacts & arts = bar.hero.GetBagArtifacts();
+    BagArtifacts & arts = bar.hero->GetBagArtifacts();
 
     Artifact & art1 = arts[index1];
     bool change = false;
@@ -259,14 +275,14 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 		if(art1() == Artifact::MAGIC_BOOK)
 		{
 		    if(bar.ChangeMode())
-			bar.hero.EditSpellBook();
+			bar.hero->EditSpellBook();
 		    else
-			bar.hero.OpenSpellBook(SpellBook::ALL, false);
+			bar.hero->OpenSpellBook(SpellBook::ALL, false);
 		}
 		else
 		if(art1() == Artifact::SPELL_SCROLL &&
 		    Settings::Get().ExtHeroAllowTranscribingScroll() &&
-		    bar.hero.CanTranscribeScroll(art1))
+		    bar.hero->CanTranscribeScroll(art1))
 		{
 		    Spell spell = art1.GetSpell();
 
@@ -275,7 +291,7 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 			DEBUG(DBG_GAME, DBG_WARN, "invalid spell");
 		    }
 		    else
-		    if(bar.hero.CanLearnSpell(spell))
+		    if(bar.hero->CanLearnSpell(spell))
 		    {
 			payment_t cost = spell.GetCost();
 			u16 answer = 0;
@@ -296,7 +312,7 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 			    answer = Dialog::Message("", msg, Font::BIG, Dialog::YES|Dialog::NO);
 
 			if(answer == Dialog::YES)
-			    bar.hero.TranscribeScroll(art1);
+			    bar.hero->TranscribeScroll(art1);
 
 			change = true;
 		    }
@@ -372,8 +388,8 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar1, SelectA
 	if(0 > index1 || HEROESMAXARTIFACT <= index1) return false;
 	const s8 index2 = bar1.Selected();
 
-	BagArtifacts & arts1 = bar1.hero.GetBagArtifacts();
-	BagArtifacts & arts2 = bar2.hero.GetBagArtifacts();
+	BagArtifacts & arts1 = bar1.hero->GetBagArtifacts();
+	BagArtifacts & arts2 = bar2.hero->GetBagArtifacts();
 
 	Artifact & art1 = arts1[index2];
 	Artifact & art2 = arts2[index1];
@@ -413,8 +429,8 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar1, SelectA
 	if(0 > index1 || HEROESMAXARTIFACT <= index1) return false;
 	const s8 index2 = bar2.Selected();
 
-	BagArtifacts & arts1 = bar1.hero.GetBagArtifacts();
-	BagArtifacts & arts2 = bar2.hero.GetBagArtifacts();
+	BagArtifacts & arts1 = bar1.hero->GetBagArtifacts();
+	BagArtifacts & arts2 = bar2.hero->GetBagArtifacts();
 
 	Artifact & art1 = arts1[index1];
 	Artifact & art2 = arts2[index2];

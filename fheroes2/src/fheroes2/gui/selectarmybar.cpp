@@ -128,7 +128,7 @@ void SelectArmyBar::SetCursorSprite(const Surface & sf)
     }
 }
 
-void SelectArmyBar::SetInterval(const u8 it)
+void SelectArmyBar::SetInterval(const s8 it)
 {
     interval = it;
     pos.w = (ARMYMAXTROOPS - 1) * interval;
@@ -213,10 +213,24 @@ void SelectArmyBar::Redraw(Surface & dst)
 
             if(flags & FLAGS_USEMONS32)
 	    {
+		Rect srcrt(0, 0, mons32.w(), mons32.h());
+
+		if(mons32.w() > background->w())
+		{
+		    srcrt.x = (mons32.w() - background->w()) / 2;
+		    srcrt.w = background->w();
+		}
+
+		if(mons32.h() > background->h())
+		{
+		    srcrt.y = (mons32.h() - background->h()) / 2;
+		    srcrt.h = background->h();
+		}
+
         	if(flags & FLAGS_COUNT2SPRITE)
-	    	    mons32.Blit(pt.x + (background->w() - mons32.w()) / 2, pt.y + background->h() - mons32.h() - 1, dst);
+	    	    mons32.Blit(srcrt, pt.x + (background->w() - mons32.w()) / 2, pt.y + background->h() - mons32.h() - 1, dst);
 	    	else
-	    	    mons32.Blit(pt.x + (background->w() - mons32.w()) / 2, pt.y + background->h() - mons32.h() - 11, dst);
+	    	    mons32.Blit(srcrt, pt.x + (background->w() - mons32.w()) / 2, pt.y + background->h() - mons32.h() - 11, dst);
     
         	// draw count
         	Text text(GetString(troop->GetCount()), Font::SMALL);
@@ -228,7 +242,21 @@ void SelectArmyBar::Redraw(Surface & dst)
             }
             else
 	    {
-	    	spmonh.Blit(pt.x + spmonh.x(), pt.y + spmonh.y(), dst);
+		Rect srcrt(0, 0, spmonh.w(), spmonh.h());
+
+		if(spmonh.w() > background->w())
+		{
+		    srcrt.x = (spmonh.w() - background->w()) / 2;
+		    srcrt.w = background->w();
+		}
+
+		if(spmonh.h() > background->h())
+		{
+		    srcrt.y = (spmonh.h() - background->h()) / 2;
+		    srcrt.h = background->h();
+		}
+
+	    	spmonh.Blit(srcrt, pt.x + spmonh.x(), pt.y + spmonh.y(), dst);
     
         	// draw count
         	Text text(GetString(troop->GetCount()), Font::SMALL);

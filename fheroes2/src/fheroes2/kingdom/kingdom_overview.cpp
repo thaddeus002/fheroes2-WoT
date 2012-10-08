@@ -32,28 +32,77 @@
 #include "skill.h"
 #include "army.h"
 #include "selectartifactbar.h"
+#include "selectarmybar.h"
 #include "interface_icons.h"
 #include "interface_list.h"
 
-typedef Heroes*	HEROESPTR;
+struct HeroRow
+{
+    Heroes* 		hero;
+    SelectArmyBar	armyBar;
+    SelectArtifactsBar	artifactsBar;
+    Surface		sfb;
+    Surface		sfc;
+    Surface		sfd;
+
+    HeroRow() : hero(NULL) {}
+
+    void Init(Heroes* ptr)
+    {
+	hero = ptr;
+
+	const Size cell(41, 53);
+	sfb.Set(cell.w, cell.h);
+	Cursor::DrawCursor(sfb, 0x70, true);
+
+	sfc.Set(cell.w, cell.h);
+	Cursor::DrawCursor(sfc, 0xd7, true);
+
+	armyBar.SetArmy(hero->GetArmy());
+        armyBar.SetSaveLastTroop();
+	armyBar.SetInterval(-1);
+	armyBar.SetBackgroundSprite(sfb);
+	armyBar.SetCursorSprite(sfc);
+	armyBar.SetUseMons32Sprite();
+	if(hero->inCastle()) armyBar.SetCastle(*hero->inCastle());
+
+	sfd.Set(34, 34);
+	Cursor::DrawCursor(sfd, 0xd7, true);
+
+	artifactsBar.SetHero(*hero);
+	artifactsBar.SetInterval(1);
+	artifactsBar.SetVerticalSpace(8);
+	artifactsBar.SetBackgroundSprite(AGG::GetICN(ICN::OVERVIEW, 12));
+	artifactsBar.SetCursorSprite(sfd);
+	artifactsBar.SetUseArts32Sprite();
+    }
+};
+
 typedef Castle* CASTLEPTR;
 
-class StatsHeroesList : public Interface::ListBox<HEROESPTR>
+class StatsHeroesList : public Interface::ListBox<HeroRow>
 {
 public:
+    std::vector<HeroRow> content;
+
     StatsHeroesList(const Point & pt, KingdomHeroes &);
 
-    void RedrawItem(const HEROESPTR &, s16, s16, bool);
+    void RedrawItem(const HeroRow &, s16, s16, bool);
     void RedrawBackground(const Point &);
 
     void ActionCurrentUp(void){};
     void ActionCurrentDn(void){};
-    void ActionListDoubleClick(HEROESPTR &){};
-    void ActionListSingleClick(HEROESPTR &){};
-    void ActionListPressRight(HEROESPTR &){};
+    void ActionListSingleClick(HeroRow &){};
+    void ActionListDoubleClick(HeroRow &){};
+    void ActionListPressRight(HeroRow &){};
+
+    void ActionListSingleClick(HeroRow &, const Point &, s16, s16);
+    void ActionListDoubleClick(HeroRow &, const Point &, s16, s16);
+    void ActionListPressRight(HeroRow &, const Point &, s16, s16);
+    bool ActionListCursor(HeroRow &, const Point &, s16, s16);
 };
 
-StatsHeroesList::StatsHeroesList(const Point & pt, KingdomHeroes & heroes) : Interface::ListBox<HEROESPTR>(pt)
+StatsHeroesList::StatsHeroesList(const Point & pt, KingdomHeroes & heroes) : Interface::ListBox<HeroRow>(pt)
 {
     const Sprite & back = AGG::GetICN(ICN::OVERVIEW, 13);
 
@@ -66,31 +115,75 @@ StatsHeroesList::StatsHeroesList(const Point & pt, KingdomHeroes & heroes) : Int
                         Point(pt.x + 626, pt.y + 20 + back.h()));
     SetAreaMaxItems(4);
     SetAreaItems(Rect(pt.x + 30, pt.y + 17, 594, 344));
-    SetListContent(heroes);
+
+    content.resize(heroes.size());
+
+    for(KingdomHeroes::iterator
+	it = heroes.begin(); it != heroes.end(); ++it)
+	content[std::distance(heroes.begin(), it)].Init(*it);
+
+    SetListContent(content);
 }
 
-
-void StatsHeroesList::RedrawItem(const HEROESPTR & hero, s16 dstx, s16 dsty, bool current)
+void StatsHeroesList::ActionListDoubleClick(HeroRow & row, const Point & cursor, s16 ox, s16 oy)
 {
-    if(hero)
+    ActionListSingleClick(row, cursor, ox, oy);
+}
+
+void StatsHeroesList::ActionListSingleClick(HeroRow & row, const Point & cursor, s16 ox, s16 oy)
+{
+    if(row.hero && (Rect(ox + 5, oy + 4, Interface::IconsBar::GetItemWidth(), Interface::IconsBar::GetItemHeight()) & cursor))
+	Game::OpenHeroesDialog(row.hero);
+}
+
+void StatsHeroesList::ActionListPressRight(HeroRow & row, const Point & cursor, s16 ox, s16 oy)
+{
+    if(row.hero && (Rect(ox + 5, oy + 4, Interface::IconsBar::GetItemWidth(), Interface::IconsBar::GetItemHeight()) & cursor))
+	Dialog::QuickInfo(*row.hero);
+}
+
+bool StatsHeroesList::ActionListCursor(HeroRow & row, const Point & cursor, s16 ox, s16 oy)
+{
+    if((row.armyBar.GetArea() & cursor) &&
+	SelectArmyBar::QueueEventProcessing(row.armyBar))
+    {
+	if(row.artifactsBar.isSelected()) row.artifactsBar.Reset();
+	Cursor::Get().Hide();
+	return true;
+    }
+    else
+    if((row.artifactsBar.GetArea() & cursor) &&
+	SelectArtifactsBar::QueueEventProcessing(row.artifactsBar))
+    {
+	if(row.armyBar.isSelected()) row.armyBar.Reset();
+	Cursor::Get().Hide();
+	return true;
+    }
+
+    return false;
+}
+
+void StatsHeroesList::RedrawItem(const HeroRow & row, s16 dstx, s16 dsty, bool current)
+{
+    if(row.hero)
     {
 	Text text("", Font::SMALL);
 	const Sprite & back = AGG::GetICN(ICN::OVERVIEW, 10);
 	back.Blit(dstx, dsty);
 
 	// base info
-	Interface::RedrawHeroesIcon(*hero, dstx + 5, dsty + 4);
+	Interface::RedrawHeroesIcon(*row.hero, dstx + 5, dsty + 4);
 
-	text.Set(GetString(hero->GetAttack()));
+	text.Set(GetString(row.hero->GetAttack()));
 	text.Blit(dstx + 90 - text.w(), dsty + 20);
 
-	text.Set(GetString(hero->GetDefense()));
+	text.Set(GetString(row.hero->GetDefense()));
 	text.Blit(dstx + 125 - text.w(), dsty + 20);
 
-	text.Set(GetString(hero->GetPower()));
+	text.Set(GetString(row.hero->GetPower()));
 	text.Blit(dstx + 160 - text.w(), dsty + 20);
 
-	text.Set(GetString(hero->GetKnowledge()));
+	text.Set(GetString(row.hero->GetKnowledge()));
 	text.Blit(dstx + 195 - text.w(), dsty + 20);
 
 	// secondary skills info
@@ -103,19 +196,12 @@ void StatsHeroesList::RedrawItem(const HEROESPTR & hero, s16 dstx, s16 dsty, boo
 	secskillsInfo.Redraw();
 */
 	// artifacts info
-	SelectArtifactsBar artifactsInfo(*hero);
-
-	artifactsInfo.SetPos(Point(dstx + 348, dsty + 3));
-	artifactsInfo.SetInterval(1);
-	artifactsInfo.SetVerticalSpace(8);
-	artifactsInfo.SetReadOnly();
-
-	artifactsInfo.SetBackgroundSprite(AGG::GetICN(ICN::OVERVIEW, 12));
-	artifactsInfo.SetUseArts32Sprite();
-	artifactsInfo.Redraw();
+	const_cast<SelectArtifactsBar &>(row.artifactsBar).SetPos(Point(dstx + 348, dsty + 3));
+	const_cast<SelectArtifactsBar &>(row.artifactsBar).Redraw();
 
 	// army info
-	Army::DrawMons32Line(hero->GetArmy(), dstx + 5, dsty + 42, 192);
+	const_cast<SelectArmyBar &>(row.armyBar).SetPos(Point(dstx -1, dsty + 30));
+	const_cast<SelectArmyBar &>(row.armyBar).Redraw();
     }
 }
 
@@ -159,6 +245,9 @@ public:
     void ActionListDoubleClick(CASTLEPTR &){};
     void ActionListSingleClick(CASTLEPTR &){};
     void ActionListPressRight(CASTLEPTR &){};
+
+    void ActionListSingleClick(CASTLEPTR &, const Point &, s16, s16);
+    void ActionListDoubleClick(CASTLEPTR &, const Point &, s16, s16);
 };
 
 StatsCastlesList::StatsCastlesList(const Point & pt, KingdomCastles & castles) : Interface::ListBox<CASTLEPTR>(pt)
@@ -177,6 +266,29 @@ StatsCastlesList::StatsCastlesList(const Point & pt, KingdomCastles & castles) :
     SetListContent(castles);
 }
 
+void StatsCastlesList::ActionListDoubleClick(CASTLEPTR & cstl, const Point & cursor, s16 ox, s16 oy)
+{
+    ActionListSingleClick(cstl, cursor, ox, oy);
+}
+
+void StatsCastlesList::ActionListSingleClick(CASTLEPTR & cstl, const Point & cursor, s16 ox, s16 oy)
+{
+    if(cstl)
+    {
+	// click castle icon
+	if(Rect(ox + 17, oy + 19, Interface::IconsBar::GetItemWidth(), Interface::IconsBar::GetItemHeight()) & cursor)
+	{
+	    Game::OpenCastleDialog(cstl);
+	}
+	else
+	// click hero icon
+	if(Rect(ox + 82, oy + 19, Interface::IconsBar::GetItemWidth(), Interface::IconsBar::GetItemHeight()) & cursor)
+	{
+	    Heroes* hero = cstl->GetHeroes().GuardFirst();
+	    if(hero) Game::OpenHeroesDialog(hero);
+	}
+    }
+}
 
 void StatsCastlesList::RedrawItem(const CASTLEPTR & cstl, s16 dstx, s16 dsty, bool current)
 {
@@ -311,7 +423,7 @@ void RedrawIncomeInfo(const Point & pt, const Kingdom & myKingdom)
     text.Blit(pt.x + 496 - text.w() / 2, pt.y + 448);
 
     text.Set(_("Gold Per Day:") + std::string(" ") + GetString(myKingdom.GetIncome().Get(Resource::GOLD)));
-    text.Blit(pt.x + 300 - text.w(), pt.y + 462);
+    text.Blit(pt.x + 180, pt.y + 462);
 
     std::string msg = _("Day: %{day}");
     String::Replace(msg, "%{day}", world.GetDay());

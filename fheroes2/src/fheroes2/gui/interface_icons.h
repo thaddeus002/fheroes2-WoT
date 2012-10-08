@@ -44,6 +44,9 @@ namespace Interface
 
 	void RedrawBackground(const Point &);
 
+	static u8 GetItemWidth(void);
+	static u8 GetItemHeight(void);
+
     protected:
 	const u8 & icons;
         const Surface & marker;

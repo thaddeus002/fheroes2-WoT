@@ -57,9 +57,15 @@ namespace Interface
 
 	virtual void ActionCurrentUp(void) = 0;
 	virtual void ActionCurrentDn(void) = 0;
+
 	virtual void ActionListDoubleClick(Item &) = 0;
 	virtual void ActionListSingleClick(Item &) = 0;
 	virtual void ActionListPressRight(Item &) = 0;
+
+	virtual void ActionListDoubleClick(Item & item, const Point & cursor, s16 ox, s16 oy){ ActionListDoubleClick(item); };
+	virtual void ActionListSingleClick(Item & item, const Point & cursor, s16 ox, s16 oy){ ActionListSingleClick(item); };
+	virtual void ActionListPressRight(Item & item, const Point & cursor, s16 ox, s16 oy){ ActionListPressRight(item); };
+	virtual bool ActionListCursor(Item & item, const Point & cursor, s16 ox, s16 oy){ return false; };
 
 	/*
 	void SetTopLeft(const Point & top);
@@ -291,34 +297,8 @@ namespace Interface
 		splitter.Move(seek);
 		return true;
 	    }
-	    else
-	    if(le.MouseClickLeft(rtAreaItems) && content->size())
-	    {
-		float offset = (le.GetMouseReleaseLeft().y - rtAreaItems.y) * maxItems / rtAreaItems.h;
 
-		if(offset >= 0)
-		{
-		    cursor.Hide();
-
-		    ItemsIterator click = top + static_cast<size_t>(offset);
-
-		    if(click >= content->begin() && click < content->end())
-		    {
-			if(click == cur)
-			{
-			    ActionListDoubleClick(*cur);
-			}
-			else
-			{
-			    cur = click;
-			    ActionListSingleClick(*cur);
-			}
-			return true;
-		    }
-		}
-	    }
-	    else
-	    if(le.MousePressRight(rtAreaItems) && content->size())
+	    if(content->size())
 	    {
 		float offset = (le.GetMouseCursor().y - rtAreaItems.y) * maxItems / rtAreaItems.h;
 
@@ -326,12 +306,34 @@ namespace Interface
 		{
 		    cursor.Hide();
 
-		    ItemsIterator click = top + static_cast<size_t>(offset);
+		    ItemsIterator pos = top + static_cast<size_t>(offset);
 
-		    if(click >= content->begin() && click < content->end())
+		    if(pos >= content->begin() && pos < content->end())
 		    {
-			ActionListPressRight(*click);
-			return true;
+			const s16 posy = rtAreaItems.y + (pos - top) * rtAreaItems.h / maxItems;
+
+			if(ActionListCursor(*pos, le.GetMouseCursor(), rtAreaItems.x, posy))
+			    return true;
+
+			if(le.MouseClickLeft(rtAreaItems))
+			{
+			    if(pos == cur)
+			    {
+				ActionListDoubleClick(*cur, le.GetMouseCursor(), rtAreaItems.x, posy);
+			    }
+			    else
+			    {
+				cur = pos;
+				ActionListSingleClick(*cur, le.GetMouseCursor(), rtAreaItems.x, posy);
+			    }
+			    return true;
+			}
+			else
+			if(le.MousePressRight(rtAreaItems))
+			{
+			    ActionListPressRight(*pos, le.GetMouseCursor(), rtAreaItems.x, posy);
+			    return true;
+			}
 		    }
 		}
 	    }

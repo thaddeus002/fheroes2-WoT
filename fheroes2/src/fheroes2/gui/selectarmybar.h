@@ -52,7 +52,7 @@ public:
     void 	SetPos(s16, s16);
     void 	SetBackgroundSprite(const Surface &);
     void	SetCursorSprite(const Surface &);
-    void 	SetInterval(u8);
+    void 	SetInterval(s8);
     void	SetCastle(const Castle &);
 
     void	SetChangeMode(void);
@@ -74,7 +74,7 @@ private:
 
     Army *	army;
     Rect		pos;
-    u8			interval;
+    s8			interval;
     s8			selected;
     u8			flags;
     Point		offset;

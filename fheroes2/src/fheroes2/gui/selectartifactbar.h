@@ -33,7 +33,7 @@ class LocalEvent;
 class SelectArtifactsBar
 {
 public:
-    SelectArtifactsBar(Heroes &);
+    SelectArtifactsBar();
 
     const Rect &GetArea(void) const;
     bool	isSelected(void) const;
@@ -44,12 +44,13 @@ public:
     bool	ReadOnly(void) const;
     bool	isValid(void) const;
 
+    void 	SetHero(Heroes &);
     void 	SetPos(const Point &);
     void 	SetPos(s16, s16);
     void 	SetBackgroundSprite(const Surface &);
     void	SetCursorSprite(const Surface &);
-    void 	SetInterval(u8);
-    void 	SetVerticalSpace(u8);
+    void 	SetInterval(s8);
+    void 	SetVerticalSpace(s8);
 
     void        SetChangeMode(void);
     void	SetReadOnly(void);
@@ -63,15 +64,15 @@ public:
     static bool QueueEventProcessing(SelectArtifactsBar &, SelectArtifactsBar &);
 
 private:
-    Heroes &		hero;
+    Heroes*		hero;
     Rect		pos;
-    u8			interval;
-    u8			vspace;
+    s8			interval;
+    s8			vspace;
     s8			selected;
     u8			flags;
     Point		offset;
 
-    const Surface *	background;
+    const Surface*	background;
     SpriteCursor	spritecursor;
 };
 

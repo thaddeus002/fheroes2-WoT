@@ -165,7 +165,9 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     Surface sfc2(rt2.w, rt2.h);
     Cursor::DrawCursor(sfc2, 0x10, true);
 
-    SelectArtifactsBar selectArtifacts1(*this);
+    SelectArtifactsBar selectArtifacts1;
+
+    selectArtifacts1.SetHero(*this);
     selectArtifacts1.SetPos(dst_pt);
     selectArtifacts1.SetInterval(2);
     selectArtifacts1.SetBackgroundSprite(sfb2);
@@ -175,7 +177,10 @@ void Heroes::MeetingDialog(Heroes & heroes2)
 
     dst_pt.x = cur_pt.x + 367;
     dst_pt.y = cur_pt.y + 347;
-    SelectArtifactsBar selectArtifacts2(heroes2);
+
+    SelectArtifactsBar selectArtifacts2;
+
+    selectArtifacts2.SetHero(heroes2);
     selectArtifacts2.SetPos(dst_pt);
     selectArtifacts2.SetInterval(2);
     selectArtifacts2.SetBackgroundSprite(sfb2);

@@ -144,7 +144,9 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
     Surface sfc2(rt2.w, rt2.h);
     Cursor::DrawCursor(sfc2, 0xd6, true);
 
-    SelectArtifactsBar selectArtifacts(hero);
+    SelectArtifactsBar selectArtifacts;
+
+    selectArtifacts.SetHero(hero);
     selectArtifacts.SetPos(dst_rt.x + 37, dst_rt.y + 95);
     selectArtifacts.SetInterval(2);
     selectArtifacts.SetBackgroundSprite(sfb2);
