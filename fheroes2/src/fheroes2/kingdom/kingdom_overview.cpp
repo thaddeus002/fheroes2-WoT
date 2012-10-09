@@ -41,6 +41,7 @@ struct HeroRow
     Heroes* 		hero;
     SelectArmyBar	armyBar;
     SelectArtifactsBar	artifactsBar;
+    SecondarySkillsBar	secskillsBar;
     Surface		sfb;
     Surface		sfc;
     Surface		sfd;
@@ -75,6 +76,11 @@ struct HeroRow
 	artifactsBar.SetBackgroundSprite(AGG::GetICN(ICN::OVERVIEW, 12));
 	artifactsBar.SetCursorSprite(sfd);
 	artifactsBar.SetUseArts32Sprite();
+
+	secskillsBar.SetColRows(4, 2);
+        secskillsBar.SetHSpace(-1);
+        secskillsBar.SetVSpace(8);
+        secskillsBar.SetContent(hero->GetSecondarySkills());
     }
 };
 
@@ -160,6 +166,13 @@ bool StatsHeroesList::ActionListCursor(HeroRow & row, const Point & cursor, s16 
 	return true;
     }
 
+    if((row.secskillsBar.GetArea() & cursor) &&
+	row.secskillsBar.QueueEventProcessing())
+    {
+	Cursor::Get().Hide();
+	return true;
+    }
+
     return false;
 }
 
@@ -187,14 +200,9 @@ void StatsHeroesList::RedrawItem(const HeroRow & row, s16 dstx, s16 dsty, bool c
 	text.Blit(dstx + 195 - text.w(), dsty + 20);
 
 	// secondary skills info
-/*
-	SecondarySkillBar secskillsInfo;
-	secskillsInfo.SetPos(dstx + 203, dsty + 3);
-	secskillsInfo.SetInterval(1);
-	secskillsInfo.SetUseMiniSprite();
-	secskillsInfo.SetSkills(hero->GetSecondarySkills());
-	secskillsInfo.Redraw();
-*/
+	const_cast<SecondarySkillsBar &>(row.secskillsBar).SetPos(dstx + 206, dsty + 3);
+	const_cast<SecondarySkillsBar &>(row.secskillsBar).Redraw();
+
 	// artifacts info
 	const_cast<SelectArtifactsBar &>(row.artifactsBar).SetPos(Point(dstx + 348, dsty + 3));
 	const_cast<SelectArtifactsBar &>(row.artifactsBar).Redraw();

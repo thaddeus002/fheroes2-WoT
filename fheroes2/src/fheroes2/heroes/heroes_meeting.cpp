@@ -109,18 +109,18 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     RedrawPrimarySkillInfo(cur_pt, this, &heroes2);
 
     // secondary skill
-    SecondarySkillBar secskill_bar1;
-    secskill_bar1.SetPos(cur_pt.x + 23, cur_pt.y + 200);
-    secskill_bar1.SetUseMiniSprite();
-    secskill_bar1.SetInterval(1);
-    secskill_bar1.SetSkills(secondary_skills);
+    SecondarySkillsBar secskill_bar1;
+    secskill_bar1.SetColRows(8, 1);
+    secskill_bar1.SetHSpace(-1);
+    secskill_bar1.SetContent(secondary_skills);
+    secskill_bar1.SetPos(cur_pt.x + 22, cur_pt.y + 199);
     secskill_bar1.Redraw();
 
-    SecondarySkillBar secskill_bar2;
-    secskill_bar2.SetPos(cur_pt.x + 354, cur_pt.y + 200);
-    secskill_bar2.SetUseMiniSprite();
-    secskill_bar2.SetInterval(1);
-    secskill_bar2.SetSkills(heroes2.secondary_skills);
+    SecondarySkillsBar secskill_bar2;
+    secskill_bar2.SetColRows(8, 1);
+    secskill_bar2.SetHSpace(-1);
+    secskill_bar2.SetContent(heroes2.GetSecondarySkills());
+    secskill_bar2.SetPos(cur_pt.x + 353, cur_pt.y + 199);
     secskill_bar2.Redraw();
 
     // army
@@ -253,8 +253,17 @@ void Heroes::MeetingDialog(Heroes & heroes2)
 	    }
 	}
 
-        if(le.MouseCursor(secskill_bar1.GetArea())) secskill_bar1.QueueEventProcessing();
-        if(le.MouseCursor(secskill_bar2.GetArea())) secskill_bar2.QueueEventProcessing();
+        if(le.MouseCursor(secskill_bar1.GetArea()) && secskill_bar1.QueueEventProcessing())
+	{
+	    cursor.Show();
+	    display.Flip();
+	}
+	else
+        if(le.MouseCursor(secskill_bar2.GetArea()) && secskill_bar2.QueueEventProcessing())
+	{
+	    cursor.Show();
+	    display.Flip();
+	}
 
         if(le.MouseCursor(moraleIndicator1.GetArea())) MoraleIndicator::QueueEventProcessing(moraleIndicator1);
         else

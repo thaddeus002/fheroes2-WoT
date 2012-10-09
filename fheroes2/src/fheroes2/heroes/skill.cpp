@@ -522,6 +522,12 @@ std::string Skill::SecSkills::String(void) const
     return os.str();
 }
 
+void Skill::SecSkills::FillMax(const Skill::Secondary & skill)
+{
+    if(size() < HEROESMAXSKILL)
+	resize(HEROESMAXSKILL, skill);
+}
+
 u8 Skill::SecondaryGetWeightSkillFromRace(u8 race, u8 skill)
 {
     const stats_t* ptr = GameStatic::GetSkillStats(race);
@@ -633,176 +639,6 @@ void Skill::SecSkills::FindSkillsForLevelUp(u8 race, Secondary & sec1, Secondary
     }
 }
 
-
-
-
-
-
-
-SecondarySkillBar::SecondarySkillBar() : skills(NULL), use_mini_sprite(false), can_change(false)
-{
-}
-
-const Rect & SecondarySkillBar::GetArea(void) const
-{
-    return pos;
-}
-
-void SecondarySkillBar::SetSkills(Skill::SecSkills & v)
-{
-    skills = &v;
-    CalcSize();
-}
-
-void SecondarySkillBar::SetUseMiniSprite(void)
-{
-    use_mini_sprite = true;
-}
-
-void SecondarySkillBar::SetInterval(u8 i)
-{
-    interval = i;
-    CalcSize();
-}
-
-void SecondarySkillBar::SetPos(s16 sx, s16 sy)
-{
-    pos.x = sx;
-    pos.y = sy;
-    CalcSize();
-}
-
-void SecondarySkillBar::SetChangeMode(void)
-{
-    can_change = true;
-}
-
-void SecondarySkillBar::CalcSize(void)
-{
-    pos.w = 0;
-    pos.h = 0;
-
-    if(skills)
-    {
-	const Sprite & sprite = AGG::GetICN((use_mini_sprite ? ICN::MINISS : ICN::SECSKILL), 0);
-	pos.h = sprite.h();
-	pos.w = HEROESMAXSKILL * (sprite.w() + interval);
-    }
-}
-
-void SecondarySkillBar::Redraw(void)
-{
-    Point dst_pt(pos);
-    Text text;
-    text.Set(Font::SMALL);
-
-    for(u8 ii = 0; ii < HEROESMAXSKILL; ++ii)
-    {
-        const Skill::Secondary & skill = ii < skills->size() ? skills->at(ii) : Skill::Secondary();
-
-        if(skill.isValid())
-        {
-            const Sprite & sprite_skill = AGG::GetICN((use_mini_sprite ? ICN::MINISS : ICN::SECSKILL), (use_mini_sprite ? skill.GetIndexSprite2() : skill.GetIndexSprite1()));
-            sprite_skill.Blit(dst_pt);
-
-            if(use_mini_sprite)
-	    {
-        	text.Set(GetString(skill.Level()));
-        	text.Blit(dst_pt.x + (sprite_skill.w() - text.w()) - 3, dst_pt.y + sprite_skill.h() - 12);
-	    }
-	    else
-	    {
-        	text.Set(Skill::Secondary::String(skill.Skill()));
-        	text.Blit(dst_pt.x + (sprite_skill.w() - text.w()) / 2, dst_pt.y + 3);
-
-        	text.Set(Skill::Level::String(skill.Level()));
-        	text.Blit(dst_pt.x + (sprite_skill.w() - text.w()) / 2, dst_pt.y + 50);
-	    }
-
-    	    dst_pt.x += (use_mini_sprite ? 32 : sprite_skill.w()) + interval;
-        }
-	else
-	{
-            const Sprite & sprite_skill = AGG::GetICN((use_mini_sprite ? ICN::HSICONS : ICN::SECSKILL), 0);
-
-	    if(use_mini_sprite)
-        	sprite_skill.Blit(Rect((sprite_skill.w() - 32) / 2, 20, 32, 32), dst_pt);
-	    else
-        	sprite_skill.Blit(dst_pt);
-
-    	    dst_pt.x += (use_mini_sprite ? 32 : sprite_skill.w()) + interval;
-	}
-    }
-}
-
-u8 SecondarySkillBar::GetIndexFromCoord(const Point & cu)
-{
-    const Sprite & sprite_skill = AGG::GetICN((use_mini_sprite ? ICN::MINISS : ICN::SECSKILL), 0);
-    return (pos & cu) ? (cu.x - pos.x) / (sprite_skill.w() + interval) : 0;
-}
-
-bool SecondarySkillBar::QueueEventProcessing(void)
-{
-    Display & display = Display::Get();
-    Cursor & cursor = Cursor::Get();
-    LocalEvent & le = LocalEvent::Get();
-    const Point & cu = le.GetMouseCursor();
-    bool modify = false;
-
-    if(!(pos & cu) || !skills) return false;
-
-    u8 ii = GetIndexFromCoord(cu);
-    const Sprite & sprite_skill = AGG::GetICN((use_mini_sprite ? ICN::MINISS : ICN::SECSKILL), 0);
-    const Rect tile(pos.x + (ii * (sprite_skill.w() + interval)), pos.y, sprite_skill.w(), sprite_skill.h());
-
-    if(ii < skills->size())
-    {
-	Skill::Secondary & skill = skills->at(ii);
-
-	if(skill.isValid())
-	{
-	    if(le.MouseClickLeft(tile))
-    	    {
-        	cursor.Hide();
-        	Dialog::SecondarySkillInfo(skill, true);
-        	cursor.Show();
-        	display.Flip();
-	    }
-	    else
-	    if(le.MousePressRight(tile))
-	    {
-		if(can_change)
-		{
-		    skill.Reset();
-		    modify = true;
-		}
-		else
-		{
-		    cursor.Hide();
-		    Dialog::SecondarySkillInfo(skill, false);
-		    cursor.Show();
-		    display.Flip();
-		}
-	    }
-	}
-    }
-    else
-    if(ii < MAXSECONDARYSKILL)
-    {
-	if(can_change && le.MouseClickLeft(tile))
-	{
-	    Skill::Secondary alt = Dialog::SelectSecondarySkill();
-	    if(alt.isValid() && skills)
-	    {
-		skills->AddSkill(alt);
-		modify = true;
-	    }
-	}
-    }
-
-    return modify;
-}
-
 void StringAppendModifiers(std::string & str, s8 value)
 {
     if(value < 0) str.append(" "); // '-' present
@@ -848,4 +684,78 @@ StreamBase & Skill::operator<< (StreamBase & msg, const Primary & skill)
 StreamBase & Skill::operator>> (StreamBase & msg, Primary & skill)
 {
     return msg >> skill.attack >> skill.defense >> skill.knowledge >> skill.power;
+}
+
+SecondarySkillsBar::SecondarySkillsBar(bool mini, bool change /* false */) : use_mini_sprite(mini), can_change(change)
+{
+    if(use_mini_sprite)
+    {
+	const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 0);
+	SetItemBackground(sprite, Rect(25, 20, 34, 34), 0x70);
+    }
+    else
+    {
+	const Sprite & sprite = AGG::GetICN(ICN::SECSKILL, 0);
+	SetItemBackground(sprite);
+    }
+}
+
+void SecondarySkillsBar::RedrawItem(Skill::Secondary & skill, const Rect & pos, bool selected)
+{
+    if(skill.isValid())
+    {
+        const Sprite & sprite = use_mini_sprite ? 
+		AGG::GetICN(ICN::MINISS, skill.GetIndexSprite2()) : AGG::GetICN(ICN::SECSKILL, skill.GetIndexSprite1());
+        sprite.Blit(pos.x + (pos.w - sprite.w()) / 2, pos.y + (pos.h - sprite.h()) / 2);
+
+	if(use_mini_sprite)
+	{
+    	    Text text(GetString(skill.Level()), Font::SMALL);
+    	    text.Blit(pos.x + (pos.w - text.w()) - 3, pos.y + pos.h - 12);
+	}
+	else
+	{
+    	    Text text(Skill::Secondary::String(skill.Skill()), Font::SMALL);
+    	    text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + 3);
+
+    	    text.Set(Skill::Level::String(skill.Level()));
+	    text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + 50);
+	}
+    }
+}
+
+bool SecondarySkillsBar::ActionBarSingleClick(Skill::Secondary & skill)
+{
+    if(skill.isValid())
+    {
+	Dialog::SecondarySkillInfo(skill, true);
+	return true;
+    }
+    else
+    if(can_change)
+    {
+	Skill::Secondary alt = Dialog::SelectSecondarySkill();
+
+	if(alt.isValid())
+	{
+	    skill = alt;
+	    return true;
+        }
+    }
+
+    return false;
+}
+
+bool SecondarySkillsBar::ActionBarPressRight(Skill::Secondary & skill)
+{
+    if(skill.isValid())
+    {
+	if(can_change)
+	    skill.Reset();
+	else
+	    Dialog::SecondarySkillInfo(skill, false);
+	return true;
+    }
+
+    return false;
 }

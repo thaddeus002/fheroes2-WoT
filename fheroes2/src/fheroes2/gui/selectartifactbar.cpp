@@ -466,3 +466,26 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar1, SelectA
 
     return change;
 }
+
+#include "interface_itemsbar.h"
+
+struct ArtifactItem
+{
+    Artifact art;
+};
+
+class ArtifactsBar : public Interface::ItemsBar<ArtifactItem>
+{
+    ArtifactsBar()
+    {
+    }
+
+    void Redraw(void)
+    {
+    }
+
+    bool QueueEventProcessing(void)
+    {
+	return false;
+    }
+};

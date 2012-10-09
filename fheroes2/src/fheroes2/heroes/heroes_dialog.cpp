@@ -245,10 +245,11 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     selectArmy.Redraw();
 
     // secskill
-    SecondarySkillBar secskill_bar;
+    SecondarySkillsBar secskill_bar(false);
+    secskill_bar.SetColRows(8, 1);
+    secskill_bar.SetHSpace(5);
+    secskill_bar.SetContent(secondary_skills);
     secskill_bar.SetPos(cur_pt.x + 3, cur_pt.y + 233);
-    secskill_bar.SetInterval(5);
-    secskill_bar.SetSkills(secondary_skills);
     secskill_bar.Redraw();
 
     dst_pt.x = cur_pt.x + 51;
@@ -414,8 +415,12 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	    display.Flip();
     	    army.SetSpreadFormat(false);
         }
-
-	if(le.MouseCursor(secskill_bar.GetArea())) secskill_bar.QueueEventProcessing();
+	else
+	if(le.MouseCursor(secskill_bar.GetArea()) && secskill_bar.QueueEventProcessing())
+	{
+	    cursor.Show();
+	    display.Flip();
+	}
 
 	// right info
         if(le.MousePressRight(rectAttackSkill)) Dialog::Message(_("Attack Skill"), attackDescription, Font::BIG);
@@ -480,22 +485,13 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	}
 	else
 	// status message over skill
-	if(le.MouseCursor(secskill_bar.GetArea()))
+	if(const Skill::Secondary* skill = secskill_bar.GetItem(le.GetMouseCursor()))
 	{
-            const u8 ii = secskill_bar.GetIndexFromCoord(le.GetMouseCursor());
-
-	    if(ii < secondary_skills.size())
+	    if(skill->isValid())
 	    {
-		const Skill::Secondary & skill = secondary_skills[ii];
-
-		if(skill.isValid())
-		{
-		    message = _("View %{skill} Info");
-		    String::Replace(message, "%{skill}", skill.GetName());
-		    statusBar.ShowMessage(message);
-		}
-		else
-		    statusBar.ShowMessage(_("Hero Screen"));
+		message = _("View %{skill} Info");
+		String::Replace(message, "%{skill}", skill->GetName());
+		statusBar.ShowMessage(message);
 	    }
 	    else
 		statusBar.ShowMessage(_("Hero Screen"));

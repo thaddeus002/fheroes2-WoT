@@ -60,7 +60,8 @@ void Battle::ControlInfo::Redraw(void)
 
 Battle::Only::Only() : hero1(NULL), hero2(NULL), player1(Color::BLUE), player2(Color::NONE),
 	army1(NULL), army2(NULL), moraleIndicator1(NULL), moraleIndicator2(NULL),
-	luckIndicator1(NULL), luckIndicator2(NULL), secskill_bar1(NULL), secskill_bar2(NULL), cinfo2(NULL),
+	luckIndicator1(NULL), luckIndicator2(NULL), secskill_bar1(NULL), secskill_bar2(NULL),
+        selectArtifacts1(NULL), selectArtifacts2(NULL), cinfo2(NULL),
 	rt1(36, 267, 43, 53), sfb1(rt1.w, rt1.h), sfc1(rt1.w, rt1.h - 10),
 	rt2(23, 347, 34, 34), sfb2(rt2.w, rt2.h), sfc2(rt2.w, rt2.h)
 {
@@ -162,6 +163,7 @@ bool Battle::Only::ChangeSettings(void)
     }
 
     hero1 = world.GetHeroes(Heroes::LORDKILBURN);
+    hero1->GetSecondarySkills().FillMax(Skill::Secondary());
     army1 = &hero1->GetArmy();
 
     RedrawBaseInfo(cur_pt);
@@ -185,6 +187,7 @@ bool Battle::Only::ChangeSettings(void)
 
     if(hero2)
     {
+	hero2->GetSecondarySkills().FillMax(Skill::Secondary());
 	UpdateHero2(cur_pt);
 
 	moraleIndicator2->Redraw();
@@ -245,6 +248,7 @@ bool Battle::Only::ChangeSettings(void)
 	    if(Heroes::UNKNOWN != hid)
 	    {
 		hero1 = world.GetHeroes(hid);
+		if(hero1) hero1->GetSecondarySkills().FillMax(Skill::Secondary());
 		UpdateHero1(cur_pt);
 		redraw = true;
 	    }
@@ -261,6 +265,7 @@ bool Battle::Only::ChangeSettings(void)
 	    if(Heroes::UNKNOWN != hid)
 	    {
 		hero2 = world.GetHeroes(hid);
+		if(hero2) hero2->GetSecondarySkills().FillMax(Skill::Secondary());
 		UpdateHero2(cur_pt);
 		if(player2.isLocal() && NULL == cinfo2)
 		    cinfo2 = new ControlInfo(Point(cur_pt.x + 500, cur_pt.y + 425), player2.control);
@@ -513,12 +518,11 @@ void Battle::Only::UpdateHero1(const Point & cur_pt)
       luckIndicator1 = new LuckIndicator(*hero1);
       luckIndicator1->SetPos(Point(cur_pt.x + 34, cur_pt.y + 115), true);
 
-      secskill_bar1 = new SecondarySkillBar();
-      secskill_bar1->SetPos(cur_pt.x + 23, cur_pt.y + 200);
-      secskill_bar1->SetUseMiniSprite();
-      secskill_bar1->SetInterval(1);
-      secskill_bar1->SetSkills(hero1->GetSecondarySkills());
-      secskill_bar1->SetChangeMode();
+      secskill_bar1 = new SecondarySkillsBar(true, true);
+      secskill_bar1->SetColRows(8, 1);
+      secskill_bar1->SetHSpace(-1);
+      secskill_bar1->SetContent(hero1->GetSecondarySkills());
+      secskill_bar1->SetPos(cur_pt.x + 22, cur_pt.y + 199);
 
       selectArtifacts1 = new SelectArtifactsBar();
       selectArtifacts1->SetHero(*hero1);
@@ -571,12 +575,11 @@ void Battle::Only::UpdateHero2(const Point & cur_pt)
       luckIndicator2 = new LuckIndicator(*hero2);
       luckIndicator2->SetPos(Point(cur_pt.x + 566, cur_pt.y + 115), true);
 
-      secskill_bar2 = new SecondarySkillBar();
-      secskill_bar2->SetPos(cur_pt.x + 354, cur_pt.y + 200);
-      secskill_bar2->SetUseMiniSprite();
-      secskill_bar2->SetInterval(1);
-      secskill_bar2->SetSkills(hero2->GetSecondarySkills());
-      secskill_bar2->SetChangeMode();
+      secskill_bar2 = new SecondarySkillsBar(true, true);
+      secskill_bar2->SetColRows(8, 1);
+      secskill_bar2->SetHSpace(-1);
+      secskill_bar2->SetContent(hero2->GetSecondarySkills());
+      secskill_bar2->SetPos(cur_pt.x + 353, cur_pt.y + 199);
 
       selectArtifacts2 = new SelectArtifactsBar();
       selectArtifacts2->SetHero(*hero2);

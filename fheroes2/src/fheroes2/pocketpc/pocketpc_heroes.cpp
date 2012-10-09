@@ -110,11 +110,11 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
     // sec skill
     backSprite.Blit(Rect(21, 198, 267, 36), dst_rt.x + 7, dst_rt.y + 57);
     // secondary skill
-    SecondarySkillBar secskill_bar;
+    SecondarySkillsBar secskill_bar;
+    secskill_bar.SetColRows(8, 1);
+    secskill_bar.SetHSpace(-1);
+    secskill_bar.SetContent(hero.GetSecondarySkills());
     secskill_bar.SetPos(dst_rt.x + 9, dst_rt.y + 59);
-    secskill_bar.SetUseMiniSprite();
-    secskill_bar.SetInterval(1);
-    secskill_bar.SetSkills(hero.GetSecondarySkills());
     secskill_bar.Redraw();
 
     // army bar
@@ -212,7 +212,11 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
         else
         if(le.MouseClickLeft(rks)) Dialog::Message(_("Knowledge"), _("Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge."), Font::BIG, Dialog::OK);
 
-	if(le.MouseCursor(secskill_bar.GetArea())) secskill_bar.QueueEventProcessing();
+	if(le.MouseCursor(secskill_bar.GetArea()) && secskill_bar.QueueEventProcessing())
+	{
+            cursor.Show();
+    	    display.Flip();
+        }
 
         // selector troops event
         if(le.MouseCursor(selectArmy.GetArea()))

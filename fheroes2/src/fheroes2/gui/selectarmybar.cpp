@@ -359,6 +359,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar, std::string* msg)
 	    DialogRedistributeArmy(*bar.army, index_p, *bar.army, index_r);
 	    bar.Reset();
 	    bar.Redraw();
+	    change = true;
 	}
 	le.ResetPressLeft();
     }

@@ -27,6 +27,7 @@
 #include <vector>
 #include <utility>
 #include "color.h"
+#include "interface_itemsbar.h"
 #include "gamedefs.h"
 
 void StringAppendModifiers(std::string &, s8);
@@ -109,7 +110,7 @@ namespace Skill
 	u16	GetValues(u8 skill) const;
 	void	AddSkill(const Skill::Secondary &);
 	void	FindSkillsForLevelUp(u8 race, Secondary &, Secondary &) const;
-
+	void	FillMax(const Skill::Secondary &);
 	void	ReadFromMP2(const u8*);
 
 	std::string String(void) const;
@@ -169,31 +170,21 @@ namespace Skill
     StreamBase & operator>> (StreamBase &, Primary &);
 }
 
-class SecondarySkillBar
+class SecondarySkillsBar : public Interface::ItemsBar<Skill::Secondary>
 {
 public:
-    SecondarySkillBar();
+    SecondarySkillsBar(bool mini = true, bool change = false);
 
-    const Rect & GetArea(void) const;
-    u8 GetIndexFromCoord(const Point &);
-
-    void SetSkills(Skill::SecSkills &);
     void SetUseMiniSprite(void);
-    void SetPos(s16, s16);
-    void SetInterval(u8);
-    void SetChangeMode(void);
 
-    void Redraw(void);
-    bool QueueEventProcessing(void);
+    void	RedrawItem(Skill::Secondary &, const Rect &, bool);
 
-private:
-    void CalcSize(void);
+    bool	ActionBarSingleClick(Skill::Secondary &);
+    bool	ActionBarPressRight(Skill::Secondary &);
 
-    Rect pos;
-    Skill::SecSkills *skills;
-    u8 interval;
-    bool use_mini_sprite;
-    bool can_change;
+protected:
+    bool	use_mini_sprite;
+    bool	can_change;
 };
 
 #endif
