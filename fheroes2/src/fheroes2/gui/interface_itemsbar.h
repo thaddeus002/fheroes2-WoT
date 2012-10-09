@@ -76,7 +76,7 @@ namespace Interface
 	bool		QueueEventProcessing(void);
 */
 
-	virtual void	RedrawItem(Item &, const Rect &, bool) = 0;
+	virtual void	RedrawItem(Item &, const Rect &, bool, Surface &) = 0;
 
         virtual bool	ActionBarSingleClick(Item & item){ return false; }
         virtual bool	ActionBarDoubleClick(Item & item){ return ActionBarSingleClick(item); }
@@ -206,7 +206,7 @@ namespace Interface
 
 		    if(posItem != items.end())
 		    {
-			RedrawItem(**posItem, Rect(dstpt, backsf.w(), backsf.h()), curItem == posItem);
+			RedrawItem(**posItem, Rect(dstpt, backsf.w(), backsf.h()), curItem == posItem, dstsf);
 
 			if(curItem == posItem)
 			    spcursor.Show(dstpt + curof);

@@ -36,7 +36,7 @@
 #include "pocketpc.h"
 #include "game_interface.h"
 
-void RedrawPrimarySkillInfo(const Point &, const Skill::Primary*, const Skill::Primary*);
+void RedrawPrimarySkillInfo(const Point &, PrimarySkillsBar*, PrimarySkillsBar*);
 
 void Heroes::MeetingDialog(Heroes & heroes2)
 {
@@ -106,7 +106,20 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     // primary skill
     Background backPrimary(cur_pt.x + 255, cur_pt.y + 50, 130, 135);
     backPrimary.Save();
-    RedrawPrimarySkillInfo(cur_pt, this, &heroes2);
+
+    PrimarySkillsBar primskill_bar1(this, true);
+    primskill_bar1.SetColRows(1, 4);
+    primskill_bar1.SetVSpace(-1);
+    primskill_bar1.SetTextOff(70, -25);
+    primskill_bar1.SetPos(cur_pt.x + 216, cur_pt.y + 51);
+
+    PrimarySkillsBar primskill_bar2(&heroes2, true);
+    primskill_bar2.SetColRows(1, 4);
+    primskill_bar2.SetVSpace(-1);
+    primskill_bar2.SetTextOff(-70, -25);
+    primskill_bar2.SetPos(cur_pt.x + 389, cur_pt.y + 51);
+
+    RedrawPrimarySkillInfo(cur_pt, &primskill_bar1, &primskill_bar2);
 
     // secondary skill
     SecondarySkillsBar secskill_bar1;
@@ -243,7 +256,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
 	    {
 		cursor.Hide();
 		backPrimary.Restore();
-		RedrawPrimarySkillInfo(cur_pt, this, &heroes2);
+		RedrawPrimarySkillInfo(cur_pt, &primskill_bar1, &primskill_bar2);
 		moraleIndicator1.Redraw();
 		moraleIndicator2.Redraw();
 		luckIndicator1.Redraw();
@@ -253,6 +266,18 @@ void Heroes::MeetingDialog(Heroes & heroes2)
 	    }
 	}
 
+        if(le.MouseCursor(primskill_bar1.GetArea()) && primskill_bar1.QueueEventProcessing())
+	{
+	    cursor.Show();
+	    display.Flip();
+	}
+	else
+        if(le.MouseCursor(primskill_bar2.GetArea()) && primskill_bar2.QueueEventProcessing())
+	{
+	    cursor.Show();
+	    display.Flip();
+	}
+	else
         if(le.MouseCursor(secskill_bar1.GetArea()) && secskill_bar1.QueueEventProcessing())
 	{
 	    cursor.Show();
@@ -286,7 +311,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     display.Flip();
 }
 
-void RedrawPrimarySkillInfo(const Point & cur_pt, const Skill::Primary* p1, const Skill::Primary* p2)
+void RedrawPrimarySkillInfo(const Point & cur_pt, PrimarySkillsBar* bar1, PrimarySkillsBar* bar2)
 {
     // attack skill
     Text text(_("Attack Skill"), Font::SMALL);
@@ -304,35 +329,8 @@ void RedrawPrimarySkillInfo(const Point & cur_pt, const Skill::Primary* p1, cons
     text.Set(_("Knowledge"));
     text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 160);
 
-    if(p1)
-    {
-	text.Set(GetString(p1->GetAttack()));
-	text.Blit(cur_pt.x + 260 - text.w() / 2, cur_pt.y + 64);
-
-	text.Set(GetString(p1->GetDefense()));
-	text.Blit(cur_pt.x + 260 - text.w() / 2, cur_pt.y + 96);
-
-	text.Set(GetString(p1->GetPower()));
-        text.Blit(cur_pt.x + 260 - text.w() / 2, cur_pt.y + 128);
-
-	text.Set(GetString(p1->GetKnowledge()));
-	text.Blit(cur_pt.x + 260 - text.w() / 2, cur_pt.y + 160);
-    }
-
-    if(p2)
-    {
-	text.Set(GetString(p2->GetAttack()));
-	text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 64);
-
-	text.Set(GetString(p2->GetDefense()));
-	text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 96);
-
-	text.Set(GetString(p2->GetPower()));
-	text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 128);
-
-	text.Set(GetString(p2->GetKnowledge()));
-	text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 160);
-    }
+    if(bar1) bar1->Redraw();
+    if(bar2) bar2->Redraw();
 }
 
 // spell_book.cpp

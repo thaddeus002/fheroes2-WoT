@@ -32,7 +32,7 @@
 
 void StringAppendModifiers(std::string &, s8);
 class Spell;
-
+class Heroes;
 
 namespace Skill
 {
@@ -152,6 +152,7 @@ namespace Skill
 	std::string StringSkills(const std::string &) const;
 
         static const char* String(u8);
+	static std::string StringDescription(u8, const Heroes*);
 	static u8 GetInitialSpell(u8 race);
 
 	protected:
@@ -170,14 +171,30 @@ namespace Skill
     StreamBase & operator>> (StreamBase &, Primary &);
 }
 
+class PrimarySkillsBar : public Interface::ItemsBar<Skill::Primary::skill_t>
+{
+public:
+    PrimarySkillsBar(const Heroes*, bool mini);
+
+    void	SetTextOff(s16, s16);
+    void	RedrawItem(Skill::Primary::skill_t &, const Rect &, bool, Surface &);
+
+    bool	ActionBarSingleClick(Skill::Primary::skill_t &);
+    bool	ActionBarPressRight(Skill::Primary::skill_t &);
+
+protected:
+    const Heroes*                        hero;
+    bool	                         use_mini_sprite;
+    std::vector<Skill::Primary::skill_t> content;
+    Point				 toff;
+};
+
 class SecondarySkillsBar : public Interface::ItemsBar<Skill::Secondary>
 {
 public:
     SecondarySkillsBar(bool mini = true, bool change = false);
 
-    void SetUseMiniSprite(void);
-
-    void	RedrawItem(Skill::Secondary &, const Rect &, bool);
+    void	RedrawItem(Skill::Secondary &, const Rect &, bool, Surface &);
 
     bool	ActionBarSingleClick(Skill::Secondary &);
     bool	ActionBarPressRight(Skill::Secondary &);

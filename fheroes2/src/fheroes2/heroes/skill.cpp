@@ -163,6 +163,46 @@ const char* Skill::Primary::String(u8 skill)
     return str_skill[4];
 }
 
+std::string Skill::Primary::StringDescription(u8 skill, const Heroes* hero)
+{
+    std::string res, ext;
+
+    switch(skill)
+    {
+	case ATTACK:
+	    res = _("Your attack skill is a bonus added to each creature's attack skill.");
+	    if(hero) hero->GetAttack(&ext);
+	    break;
+
+        case DEFENSE:
+	    res = _("Your defense skill is a bonus added to each creature's defense skill.");
+	    if(hero) hero->GetDefense(&ext);
+	    break;
+
+        case POWER:
+	    res = _("Your spell power determines the length or power of a spell.");
+	    if(hero) hero->GetPower(&ext);
+	    break;
+
+        case KNOWLEDGE:
+	    res = _("Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge.");
+	    if(hero) hero->GetKnowledge(&ext);
+	    break;
+
+        default: break;
+    }
+
+    if(ext.size())
+    {
+        res.append("\n \n");
+        res.append(_("Current Modifiers:"));
+        res.append("\n \n");
+        res.append(ext);
+    }
+
+    return res;
+}
+
 std::string Skill::Primary::StringSkills(const std::string & sep) const
 {
     std::ostringstream os;
@@ -686,7 +726,131 @@ StreamBase & Skill::operator>> (StreamBase & msg, Primary & skill)
     return msg >> skill.attack >> skill.defense >> skill.knowledge >> skill.power;
 }
 
-SecondarySkillsBar::SecondarySkillsBar(bool mini, bool change /* false */) : use_mini_sprite(mini), can_change(change)
+PrimarySkillsBar::PrimarySkillsBar(const Heroes* hr, bool mini) : hero(hr), use_mini_sprite(mini), toff(0, 0)
+{
+    content.push_back(Skill::Primary::ATTACK);
+    content.push_back(Skill::Primary::DEFENSE);
+    content.push_back(Skill::Primary::POWER);
+    content.push_back(Skill::Primary::KNOWLEDGE);
+
+    if(use_mini_sprite)
+    {
+	const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 0);
+	SetItemBackground(sprite, Rect(25, 20, 34, 34), 0x70);
+    }
+    else
+    {
+	Surface black(82, 93);
+	black.Fill(0, 0, 0);
+	SetItemBackground(black);
+    }
+
+    SetContent(content);
+}
+
+void PrimarySkillsBar::SetTextOff(s16 ox, s16 oy)
+{
+    toff = Point(ox, oy);
+}
+
+void PrimarySkillsBar::RedrawItem(Skill::Primary::skill_t & skill, const Rect & pos, bool selected, Surface & dstsf)
+{
+    if(Skill::Primary::UNKNOWN != skill)
+    {
+	if(use_mini_sprite)
+	{
+	    const Sprite & backSprite = AGG::GetICN(ICN::SWAPWIN, 0);
+	    const u8 ww = 32;
+	    Text text("", Font::SMALL);
+	    const Point dstpt(pos.x + (pos.w - ww) / 2, pos.y + (pos.h - ww) / 2);
+
+	    switch(skill)
+	    {
+    		case Skill::Primary::ATTACK:
+		    backSprite.Blit(Rect(217, 52, ww, ww), dstpt, dstsf);
+		    if(hero) text.Set(GetString(hero->GetAttack()));
+		    break;
+
+    		case Skill::Primary::DEFENSE:
+		    backSprite.Blit(Rect(217, 85, ww, ww), dstpt, dstsf);
+		    if(hero) text.Set(GetString(hero->GetDefense()));
+		    break;
+
+    		case Skill::Primary::POWER:
+		    backSprite.Blit(Rect(217, 118, ww, ww), dstpt, dstsf);
+		    if(hero) text.Set(GetString(hero->GetPower()));
+		    break;
+
+    		case Skill::Primary::KNOWLEDGE:
+		    backSprite.Blit(Rect(217, 151, ww, ww), dstpt, dstsf);
+		    if(hero) text.Set(GetString(hero->GetKnowledge()));
+		    break;
+
+		    default: break;
+	    }
+
+	    if(hero) text.Blit(pos.x + (pos.w + toff.x - text.w()) / 2, pos.y + pos.h + toff.y, dstsf);
+	}
+	else
+	{
+    	    const Sprite & sprite = AGG::GetICN(ICN::PRIMSKIL, skill - 1);
+	    sprite.Blit(pos.x + (pos.w - sprite.w()) / 2, pos.y + (pos.h - sprite.h()) / 2, dstsf);
+
+    	    Text text(Skill::Primary::String(skill), Font::SMALL);
+    	    text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + 3, dstsf);
+
+	    if(hero)
+	    {
+		switch(skill)
+		{
+    		    case Skill::Primary::ATTACK:
+			text.Set(GetString(hero->GetAttack()), Font::BIG);
+			break;
+
+    		    case Skill::Primary::DEFENSE:
+			text.Set(GetString(hero->GetDefense()), Font::BIG);
+			break;
+
+    		    case Skill::Primary::POWER:
+			text.Set(GetString(hero->GetPower()), Font::BIG);
+			break;
+
+    		    case Skill::Primary::KNOWLEDGE:
+			text.Set(GetString(hero->GetKnowledge()), Font::BIG);
+			break;
+
+		    default: break;
+		}
+
+		text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + pos.h - text.h() - 3, dstsf);
+	    }
+	}
+    }
+}
+
+bool PrimarySkillsBar::ActionBarSingleClick(Skill::Primary::skill_t & skill)
+{
+    if(Skill::Primary::UNKNOWN != skill)
+    {
+        Dialog::Message(Skill::Primary::String(skill), Skill::Primary::StringDescription(skill, hero), Font::BIG, Dialog::OK);
+	return true;
+    }
+
+    return false;
+}
+
+bool PrimarySkillsBar::ActionBarPressRight(Skill::Primary::skill_t & skill)
+{
+    if(Skill::Primary::UNKNOWN != skill)
+    {
+        Dialog::Message(Skill::Primary::String(skill), Skill::Primary::StringDescription(skill, hero), Font::BIG);
+	return true;
+    }
+
+    return false;
+}
+
+SecondarySkillsBar::SecondarySkillsBar(bool mini /* true */, bool change /* false */) : use_mini_sprite(mini), can_change(change)
 {
     if(use_mini_sprite)
     {
@@ -700,26 +864,26 @@ SecondarySkillsBar::SecondarySkillsBar(bool mini, bool change /* false */) : use
     }
 }
 
-void SecondarySkillsBar::RedrawItem(Skill::Secondary & skill, const Rect & pos, bool selected)
+void SecondarySkillsBar::RedrawItem(Skill::Secondary & skill, const Rect & pos, bool selected, Surface & dstsf)
 {
     if(skill.isValid())
     {
         const Sprite & sprite = use_mini_sprite ? 
 		AGG::GetICN(ICN::MINISS, skill.GetIndexSprite2()) : AGG::GetICN(ICN::SECSKILL, skill.GetIndexSprite1());
-        sprite.Blit(pos.x + (pos.w - sprite.w()) / 2, pos.y + (pos.h - sprite.h()) / 2);
+        sprite.Blit(pos.x + (pos.w - sprite.w()) / 2, pos.y + (pos.h - sprite.h()) / 2, dstsf);
 
 	if(use_mini_sprite)
 	{
     	    Text text(GetString(skill.Level()), Font::SMALL);
-    	    text.Blit(pos.x + (pos.w - text.w()) - 3, pos.y + pos.h - 12);
+    	    text.Blit(pos.x + (pos.w - text.w()) - 3, pos.y + pos.h - 12, dstsf);
 	}
 	else
 	{
     	    Text text(Skill::Secondary::String(skill.Skill()), Font::SMALL);
-    	    text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + 3);
+    	    text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + 3, dstsf);
 
     	    text.Set(Skill::Level::String(skill.Level()));
-	    text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + 50);
+	    text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + 50, dstsf);
 	}
     }
 }

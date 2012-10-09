@@ -42,11 +42,13 @@ struct HeroRow
     SelectArmyBar	armyBar;
     SelectArtifactsBar	artifactsBar;
     SecondarySkillsBar	secskillsBar;
+    PrimarySkillsBar*	primskillsBar;
     Surface		sfb;
     Surface		sfc;
     Surface		sfd;
 
-    HeroRow() : hero(NULL) {}
+    HeroRow() : hero(NULL), primskillsBar(NULL) {}
+    ~HeroRow() { delete primskillsBar; }
 
     void Init(Heroes* ptr)
     {
@@ -81,6 +83,12 @@ struct HeroRow
         secskillsBar.SetHSpace(-1);
         secskillsBar.SetVSpace(8);
         secskillsBar.SetContent(hero->GetSecondarySkills());
+
+	if(primskillsBar) delete primskillsBar;
+	primskillsBar = new PrimarySkillsBar(ptr, true);
+	primskillsBar->SetColRows(4, 1);
+	primskillsBar->SetHSpace(2);
+	primskillsBar->SetTextOff(20, -13);
     }
 };
 
@@ -165,7 +173,14 @@ bool StatsHeroesList::ActionListCursor(HeroRow & row, const Point & cursor, s16 
 	Cursor::Get().Hide();
 	return true;
     }
-
+    else
+    if((row.primskillsBar->GetArea() & cursor) &&
+	row.primskillsBar->QueueEventProcessing())
+    {
+	Cursor::Get().Hide();
+	return true;
+    }
+    else
     if((row.secskillsBar.GetArea() & cursor) &&
 	row.secskillsBar.QueueEventProcessing())
     {
@@ -198,6 +213,10 @@ void StatsHeroesList::RedrawItem(const HeroRow & row, s16 dstx, s16 dsty, bool c
 
 	text.Set(GetString(row.hero->GetKnowledge()));
 	text.Blit(dstx + 195 - text.w(), dsty + 20);
+
+	// primary skills info
+	const_cast<PrimarySkillsBar*>(row.primskillsBar)->SetPos(dstx + 56, dsty - 3);
+	const_cast<PrimarySkillsBar*>(row.primskillsBar)->Redraw();
 
 	// secondary skills info
 	const_cast<SecondarySkillsBar &>(row.secskillsBar).SetPos(dstx + 206, dsty + 3);

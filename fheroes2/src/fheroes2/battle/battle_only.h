@@ -66,6 +66,9 @@ namespace Battle
 	LuckIndicator* luckIndicator1;
 	LuckIndicator* luckIndicator2;
 
+	PrimarySkillsBar* primskill_bar1;
+	PrimarySkillsBar* primskill_bar2;
+
 	SecondarySkillsBar* secskill_bar1;
 	SecondarySkillsBar* secskill_bar2;
 

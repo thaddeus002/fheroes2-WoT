@@ -40,7 +40,7 @@
 
 #define PRIMARY_MAX_VALUE	20
 
-void RedrawPrimarySkillInfo(const Point &, const Skill::Primary*, const Skill::Primary*);
+void RedrawPrimarySkillInfo(const Point &, PrimarySkillsBar*, PrimarySkillsBar*); /* heroes_meeting.cpp */
 
 void Battle::ControlInfo::Redraw(void)
 {
@@ -60,8 +60,8 @@ void Battle::ControlInfo::Redraw(void)
 
 Battle::Only::Only() : hero1(NULL), hero2(NULL), player1(Color::BLUE), player2(Color::NONE),
 	army1(NULL), army2(NULL), moraleIndicator1(NULL), moraleIndicator2(NULL),
-	luckIndicator1(NULL), luckIndicator2(NULL), secskill_bar1(NULL), secskill_bar2(NULL),
-        selectArtifacts1(NULL), selectArtifacts2(NULL), cinfo2(NULL),
+	luckIndicator1(NULL), luckIndicator2(NULL), primskill_bar1(NULL), primskill_bar2(NULL),
+	secskill_bar1(NULL), secskill_bar2(NULL), selectArtifacts1(NULL), selectArtifacts2(NULL), cinfo2(NULL),
 	rt1(36, 267, 43, 53), sfb1(rt1.w, rt1.h), sfc1(rt1.w, rt1.h - 10),
 	rt2(23, 347, 34, 34), sfb2(rt2.w, rt2.h), sfc2(rt2.w, rt2.h)
 {
@@ -171,6 +171,7 @@ bool Battle::Only::ChangeSettings(void)
     UpdateHero1(cur_pt);
     moraleIndicator1->Redraw();
     luckIndicator1->Redraw();
+    primskill_bar1->Redraw();
     secskill_bar1->Redraw();
     selectArtifacts1->Redraw();
     selectArmy1.Redraw();
@@ -409,6 +410,9 @@ bool Battle::Only::ChangeSettings(void)
           else
 	  if(le.MouseCursor(luckIndicator1->GetArea())) LuckIndicator::QueueEventProcessing(*luckIndicator1);
           else
+	  if(le.MouseCursor(primskill_bar1->GetArea()) && primskill_bar1->QueueEventProcessing())
+	      redraw = true;
+          else
 	  if(le.MouseCursor(secskill_bar1->GetArea()) && secskill_bar1->QueueEventProcessing())
 	      redraw = true;
 	}
@@ -418,6 +422,9 @@ bool Battle::Only::ChangeSettings(void)
 	  if(le.MouseCursor(moraleIndicator2->GetArea())) MoraleIndicator::QueueEventProcessing(*moraleIndicator2);
 	  else
 	  if(le.MouseCursor(luckIndicator2->GetArea())) LuckIndicator::QueueEventProcessing(*luckIndicator2);
+	  else
+	  if(le.MouseCursor(primskill_bar2->GetArea()) && primskill_bar2->QueueEventProcessing())
+	      redraw = true;
 	  else
 	  if(le.MouseCursor(secskill_bar2->GetArea()) && secskill_bar2->QueueEventProcessing())
 	      redraw = true;
@@ -465,6 +472,7 @@ bool Battle::Only::ChangeSettings(void)
 
     delete moraleIndicator1;
     delete luckIndicator1;
+    delete primskill_bar1;
     delete secskill_bar1;
     delete selectArtifacts1;
 
@@ -472,6 +480,7 @@ bool Battle::Only::ChangeSettings(void)
     {
       delete moraleIndicator2;
       delete luckIndicator2;
+      delete primskill_bar2;
       delete secskill_bar2;
       delete selectArtifacts2;
     }
@@ -493,6 +502,12 @@ void Battle::Only::UpdateHero1(const Point & cur_pt)
     {
       delete luckIndicator1;
       luckIndicator1 = NULL;
+    }
+
+    if(primskill_bar1)
+    {
+      delete primskill_bar1;
+      primskill_bar1 = NULL;
     }
 
     if(secskill_bar1)
@@ -517,6 +532,12 @@ void Battle::Only::UpdateHero1(const Point & cur_pt)
 
       luckIndicator1 = new LuckIndicator(*hero1);
       luckIndicator1->SetPos(Point(cur_pt.x + 34, cur_pt.y + 115), true);
+
+      primskill_bar1 = new PrimarySkillsBar(hero1, true);
+      primskill_bar1->SetColRows(1, 4);
+      primskill_bar1->SetVSpace(-1);
+      primskill_bar1->SetTextOff(70, -25);
+      primskill_bar1->SetPos(cur_pt.x + 216, cur_pt.y + 51);
 
       secskill_bar1 = new SecondarySkillsBar(true, true);
       secskill_bar1->SetColRows(8, 1);
@@ -552,6 +573,12 @@ void Battle::Only::UpdateHero2(const Point & cur_pt)
       luckIndicator2 = NULL;
     }
 
+    if(primskill_bar2)
+    {
+      delete primskill_bar2;
+      primskill_bar2 = NULL;
+    }
+
     if(secskill_bar2)
     {
       delete secskill_bar2;
@@ -574,6 +601,12 @@ void Battle::Only::UpdateHero2(const Point & cur_pt)
 
       luckIndicator2 = new LuckIndicator(*hero2);
       luckIndicator2->SetPos(Point(cur_pt.x + 566, cur_pt.y + 115), true);
+
+      primskill_bar2 = new PrimarySkillsBar(hero2, true);
+      primskill_bar2->SetColRows(1, 4);
+      primskill_bar2->SetVSpace(-1);
+      primskill_bar2->SetTextOff(-70, -25);
+      primskill_bar2->SetPos(cur_pt.x + 389, cur_pt.y + 51);
 
       secskill_bar2 = new SecondarySkillsBar(true, true);
       secskill_bar2->SetColRows(8, 1);
@@ -623,7 +656,7 @@ void Battle::Only::RedrawBaseInfo(const Point & top)
     }
 
     // primary skill
-    RedrawPrimarySkillInfo(top, hero1, hero2);
+    RedrawPrimarySkillInfo(top, primskill_bar1, primskill_bar2);
 }
 
 void Battle::Only::StartBattle(void)

@@ -80,97 +80,11 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     Text text(message, Font::BIG);
     text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 1);
 
-    // attack
-    text.Set(_("Attack Skill"), Font::SMALL);
-    dst_pt.x = cur_pt.x + 196;
-    dst_pt.y = cur_pt.y + 34;
-    text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
-
-    text.Set(GetString(GetAttack()), Font::BIG);
-    dst_pt.y += 70;
-    text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
-
-    const Rect rectAttackSkill(cur_pt.x + 156, cur_pt.y + 30, 80, 92);
-    std::string attackDescription(_("Your attack skill is a bonus added to each creature's attack skill."));
-
-    message.clear();
-    GetAttack(&message);
-    if(message.size())
-    {
-	attackDescription.append("\n \n");
-	attackDescription.append(_("Current Modifiers:"));
-	attackDescription.append("\n \n");
-	attackDescription.append(message);
-    }
-
-    // defense
-    dst_pt.x = cur_pt.x + 284;
-    dst_pt.y = cur_pt.y + 34;
-    text.Set(_("Defense Skill"), Font::SMALL);
-    text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
-
-    dst_pt.y += 70;
-    text.Set(GetString(GetDefense()), Font::BIG);
-    text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
-
-    const Rect rectDefenseSkill(cur_pt.x + 156 + 88, cur_pt.y + 30, 80, 92);
-    std::string defenseDescription(_("Your defense skill is a bonus added to each creature's defense skill."));
-
-    message.clear();
-    GetDefense(&message);
-    if(message.size())
-    {
-	defenseDescription.append("\n \n");
-	defenseDescription.append(_("Current Modifiers:"));
-	defenseDescription.append("\n \n");
-	defenseDescription.append(message);
-    }
-
-    // spell
-    dst_pt.x = cur_pt.x + 372;
-    dst_pt.y = cur_pt.y + 34;
-    text.Set(_("Spell Power"), Font::SMALL);
-    text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
-
-    dst_pt.y += 70;
-    text.Set(GetString(GetPower()), Font::BIG);
-    text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
-
-    const Rect rectSpellSkill(cur_pt.x + 156 + 2 * 88, cur_pt.y + 30, 80, 92);
-    std::string powerDescription(_("Your spell power determines the length or power of a spell."));
-
-    message.clear();
-    GetPower(&message);
-    if(message.size())
-    {
-	powerDescription.append("\n \n");
-	powerDescription.append(_("Current Modifiers:"));
-	powerDescription.append("\n \n");
-	powerDescription.append(message);
-    }
-
-    // knowledge
-    dst_pt.x = cur_pt.x + 460;
-    dst_pt.y = cur_pt.y + 34;
-    text.Set(_("Knowledge"), Font::SMALL);
-    text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
-
-    dst_pt.y += 70;
-    text.Set(GetString(GetKnowledge()), Font::BIG);
-    text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
-
-    const Rect rectKnowledgeSkill(cur_pt.x + 156 + 3 * 88, cur_pt.y + 30, 80, 92);
-    std::string knowledgeDescription(_("Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge."));
-
-    message.clear();
-    GetKnowledge(&message);
-    if(message.size())
-    {
-	knowledgeDescription.append("\n \n");
-	knowledgeDescription.append(_("Current Modifiers:"));
-	knowledgeDescription.append("\n \n");
-	knowledgeDescription.append(message);
-    }
+    PrimarySkillsBar primskill_bar(this, false);
+    primskill_bar.SetColRows(4, 1);
+    primskill_bar.SetHSpace(6);
+    primskill_bar.SetPos(cur_pt.x + 156, cur_pt.y + 31);
+    primskill_bar.Redraw();
 
     // morale
     dst_pt.x = cur_pt.x + 514;
@@ -390,14 +304,6 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	if(le.MouseCursor(spellPointsInfo.GetArea())) spellPointsInfo.QueueEventProcessing();
 
 	// left click info
-        if(le.MouseClickLeft(rectAttackSkill)) Dialog::Message(_("Attack Skill"), attackDescription, Font::BIG, Dialog::OK);
-        else
-        if(le.MouseClickLeft(rectDefenseSkill)) Dialog::Message(_("Defense Skill"), defenseDescription, Font::BIG, Dialog::OK);
-        else
-        if(le.MouseClickLeft(rectSpellSkill)) Dialog::Message(_("Spell Power"), powerDescription, Font::BIG, Dialog::OK);
-        else
-        if(le.MouseClickLeft(rectKnowledgeSkill)) Dialog::Message(_("Knowledge"), knowledgeDescription, Font::BIG, Dialog::OK);
-	else
         if(!readonly && le.MouseClickLeft(rectSpreadArmyFormat) && !army.isSpreadFormat())
         {
 	    cursor.Hide();
@@ -421,29 +327,19 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	    cursor.Show();
 	    display.Flip();
 	}
+	else
+	if(le.MouseCursor(primskill_bar.GetArea()) && primskill_bar.QueueEventProcessing())
+	{
+	    cursor.Show();
+	    display.Flip();
+	}
 
 	// right info
-        if(le.MousePressRight(rectAttackSkill)) Dialog::Message(_("Attack Skill"), attackDescription, Font::BIG);
-        else
-        if(le.MousePressRight(rectDefenseSkill)) Dialog::Message(_("Defense Skill"), defenseDescription, Font::BIG);
-        else
-        if(le.MousePressRight(rectSpellSkill)) Dialog::Message(_("Spell Power"), powerDescription, Font::BIG);
-        else
-        if(le.MousePressRight(rectKnowledgeSkill)) Dialog::Message(_("Knowledge"), knowledgeDescription, Font::BIG);
-	else
         if(le.MousePressRight(rectSpreadArmyFormat)) Dialog::Message(_("Spread Formation"), descriptionSpreadArmyFormat, Font::BIG);
         else
         if(le.MousePressRight(rectGroupedArmyFormat)) Dialog::Message(_("Grouped Formation"), descriptionGroupedArmyFormat, Font::BIG);
 
         // status message
-	if(le.MouseCursor(rectAttackSkill)) statusBar.ShowMessage(_("View Attack Skill Info"));
-	else
-	if(le.MouseCursor(rectDefenseSkill)) statusBar.ShowMessage(_("View Defense Skill Info"));
-	else
-	if(le.MouseCursor(rectSpellSkill)) statusBar.ShowMessage(_("View Spell Power Info"));
-	else
-	if(le.MouseCursor(rectKnowledgeSkill)) statusBar.ShowMessage(_("View Knowledge Info"));
-	else
 	if(le.MouseCursor(moraleIndicator.GetArea())) statusBar.ShowMessage(_("View Morale Info"));
 	else
 	if(le.MouseCursor(luckIndicator.GetArea())) statusBar.ShowMessage(_("View Luck Info"));
@@ -485,6 +381,18 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	}
 	else
 	// status message over skill
+	if(const Skill::Primary::skill_t* skill = primskill_bar.GetItem(le.GetMouseCursor()))
+	{
+	    if(Skill::Primary::UNKNOWN != *skill)
+	    {
+		message = _("View %{skill} Info");
+		String::Replace(message, "%{skill}", Skill::Primary::String(*skill));
+		statusBar.ShowMessage(message);
+	    }
+	    else
+		statusBar.ShowMessage(_("Hero Screen"));
+	}
+	else
 	if(const Skill::Secondary* skill = secskill_bar.GetItem(le.GetMouseCursor()))
 	{
 	    if(skill->isValid())

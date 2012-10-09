@@ -87,25 +87,12 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
     luckIndicator.Redraw();
 
     // prim skill
-    const Rect ras(dst_rt.x + 74, dst_rt.y + 14, 34, 34);
-    backSprite.Blit(Rect(216, 51, ras.w, ras.h),  ras);
-    text.Set(GetString(hero.GetAttack()));
-    text.Blit(dst_rt.x + 74 + (34 - text.w()) / 2, dst_rt.y + 47);
-
-    const Rect rds(dst_rt.x + 107, dst_rt.y + 14, 34, 34);
-    backSprite.Blit(Rect(216, 84, rds.w, rds.h),  rds);
-    text.Set(GetString(hero.GetDefense()));
-    text.Blit(dst_rt.x + 107 + (34 - text.w()) / 2, dst_rt.y + 47);
-
-    const Rect rps(dst_rt.x + 140, dst_rt.y + 14, 34, 34);
-    backSprite.Blit(Rect(216, 117, rps.w, rps.h), rps);
-    text.Set(GetString(hero.GetPower()));
-    text.Blit(dst_rt.x + 140 + (34 - text.w()) / 2, dst_rt.y + 47);
-
-    const Rect rks(dst_rt.x + 173, dst_rt.y + 14, 34, 34);
-    backSprite.Blit(Rect(216, 150, rks.w, rks.h), rks);
-    text.Set(GetString(hero.GetKnowledge()));
-    text.Blit(dst_rt.x + 173 + (34 - text.w()) / 2, dst_rt.y + 47);
+    PrimarySkillsBar primskill_bar(&hero, true);
+    primskill_bar.SetColRows(4, 1);
+    primskill_bar.SetHSpace(-1);
+    primskill_bar.SetTextOff(0, -1);
+    primskill_bar.SetPos(dst_rt.x + 74, dst_rt.y + 14);
+    primskill_bar.Redraw();
 
     // sec skill
     backSprite.Blit(Rect(21, 198, 267, 36), dst_rt.x + 7, dst_rt.y + 57);
@@ -114,7 +101,7 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
     secskill_bar.SetColRows(8, 1);
     secskill_bar.SetHSpace(-1);
     secskill_bar.SetContent(hero.GetSecondarySkills());
-    secskill_bar.SetPos(dst_rt.x + 9, dst_rt.y + 59);
+    secskill_bar.SetPos(dst_rt.x + 8, dst_rt.y + 58);
     secskill_bar.Redraw();
 
     // army bar
@@ -203,15 +190,13 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
 	    Dialog::YES == Dialog::Message(hero.GetName(), _("Are you sure you want to dismiss this Hero?"), Font::BIG, Dialog::YES | Dialog::NO))
         { return Dialog::DISMISS; }
 
-        // primary click info
-        if(le.MouseClickLeft(ras)) Dialog::Message(_("Attack Skill"), _("Your attack skill is a bonus added to each creature's attack skill."), Font::BIG, Dialog::OK);
-        else
-        if(le.MouseClickLeft(rds)) Dialog::Message(_("Defense Skill"), _("Your defense skill is a bonus added to each creature's defense skill."), Font::BIG, Dialog::OK);
-        else
-        if(le.MouseClickLeft(rps)) Dialog::Message(_("Spell Power"), _("Your spell power determines the length or power of a spell."), Font::BIG, Dialog::OK);
-        else
-        if(le.MouseClickLeft(rks)) Dialog::Message(_("Knowledge"), _("Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge."), Font::BIG, Dialog::OK);
-
+	// skills click
+	if(le.MouseCursor(primskill_bar.GetArea()) && primskill_bar.QueueEventProcessing())
+	{
+            cursor.Show();
+    	    display.Flip();
+        }
+	else
 	if(le.MouseCursor(secskill_bar.GetArea()) && secskill_bar.QueueEventProcessing())
 	{
             cursor.Show();
