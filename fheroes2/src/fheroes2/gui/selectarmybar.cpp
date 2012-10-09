@@ -673,11 +673,18 @@ void DialogRedistributeArmy(Army & army1, u8 index1, Army & army2, u8 index2)
 	    case 3:
 	    case 4:
 	    case 5:
-	    {
-		const Troop troop(*troop1);
-		troop1->Reset();
-		army2.SplitTroopIntoFreeSlots(troop, slots);
-	    }
+		if(last)
+		{
+		    const Troop troop(*troop1, troop1->GetCount() - 1);
+		    troop1->SetCount(1);
+		    army2.SplitTroopIntoFreeSlots(troop, slots);
+		}
+		else
+		{
+		    const Troop troop(*troop1);
+		    troop1->Reset();
+		    army2.SplitTroopIntoFreeSlots(troop, slots);
+		}
 		break;
 
 	    case 2:
