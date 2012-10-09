@@ -498,96 +498,89 @@ void Surface::SetColorKey(u32 color)
 /* draw u32 pixel */
 void Surface::SetPixel4(u16 x, u16 y, u32 color)
 {
-    if(x > surface->w || y > surface->h) return;
-    
-    u32 *bufp = static_cast<u32 *>(surface->pixels) + y * surface->pitch / 4 + x;
-
+    u32 *bufp = static_cast<u32 *>(surface->pixels) + y * (surface->pitch >> 2) + x;
     *bufp = color;
 }
 
 /* draw u24 pixel */
 void Surface::SetPixel3(u16 x, u16 y, u32 color)
 {
-    if(x > surface->w || y > surface->h) return;
     u8 *bufp = static_cast<u8 *>(surface->pixels) + y * surface->pitch + x * 3; 
-
     SetPixel24(bufp, color);
 }
 
 /* draw u16 pixel */
 void Surface::SetPixel2(u16 x, u16 y, u32 color)
 {
-    if(x > surface->w || y > surface->h) return;
-    u16 *bufp = static_cast<u16 *>(surface->pixels) + y * surface->pitch / 2 + x;
-
+    u16 *bufp = static_cast<u16 *>(surface->pixels) + y * (surface->pitch >> 1) + x;
     *bufp = static_cast<u16>(color);
 }
 
 /* draw u8 pixel */
 void Surface::SetPixel1(u16 x, u16 y, u32 color)
 {
-    if(x > surface->w || y > surface->h) return;
     u8 *bufp = static_cast<u8 *>(surface->pixels) + y * surface->pitch + x;
-
     *bufp = static_cast<u8>(color);
 }
 
 /* draw pixel */
 void Surface::SetPixel(u16 x, u16 y, u32 color)
 {
-    switch(surface->format->BytesPerPixel)
+    if(x < surface->w && y < surface->h)
     {
-	case 1:	SetPixel1(x, y, color);	break;
-	case 2:	SetPixel2(x, y, color);	break;
-	case 3:	SetPixel3(x, y, color);	break;
-	case 4:	SetPixel4(x, y, color);	break;
-	default: break;
+	switch(surface->format->BytesPerPixel)
+	{
+	    case 1:	SetPixel1(x, y, color);	break;
+	    case 2:	SetPixel2(x, y, color);	break;
+	    case 3:	SetPixel3(x, y, color);	break;
+	    case 4:	SetPixel4(x, y, color);	break;
+	    default: break;
+	}
+	if(isDisplay()) Display::Get().AddUpdateRect(x, y, 1, 1);
     }
-    if(isDisplay()) Display::Get().AddUpdateRect(x, y, 1, 1);
+    else
+	Error::Except(__FUNCTION__, "out of range");
 }
 
 u32 Surface::GetPixel4(u16 x, u16 y) const
 {
-    if(x > surface->w || y > surface->h) return 0;
     u32 *bufp = static_cast<u32 *>(surface->pixels) + y * (surface->pitch >> 2) + x;
-
     return *bufp;
 }
 
 u32 Surface::GetPixel3(u16 x, u16 y) const
 {
-    if(x > surface->w || y > surface->h) return 0;
     u8 *bufp = static_cast<u8 *>(surface->pixels) + y * surface->pitch + x * 3; 
-
     return GetPixel24(bufp);
 }
 
 u32 Surface::GetPixel2(u16 x, u16 y) const
 {
-    if(x > surface->w || y > surface->h) return 0;
     u16 *bufp = static_cast<u16 *>(surface->pixels) + y * (surface->pitch >> 1) + x;
-
     return static_cast<u32>(*bufp);
 }
 
 u32 Surface::GetPixel1(u16 x, u16 y) const
 {
-    if(x > surface->w || y > surface->h) return 0;
     u8 *bufp = static_cast<u8 *>(surface->pixels) + y * surface->pitch + x;
-
     return static_cast<u32>(*bufp);
 }
 
 u32 Surface::GetPixel(u16 x, u16 y) const
 {
-    switch(surface->format->BytesPerPixel)
+    if(x < surface->w && y < surface->h)
     {
-	case 1:	return GetPixel1(x, y);
-	case 2:	return GetPixel2(x, y);
-	case 3:	return GetPixel3(x, y);
-	case 4:	return GetPixel4(x, y);
-	default: break;
+	switch(surface->format->BytesPerPixel)
+	{
+	    case 1:	return GetPixel1(x, y);
+	    case 2:	return GetPixel2(x, y);
+	    case 3:	return GetPixel3(x, y);
+	    case 4:	return GetPixel4(x, y);
+	    default: break;
+	}
     }
+    else
+	Error::Except(__FUNCTION__, "out of range");
     
     return 0;
 }
@@ -1086,42 +1079,39 @@ void Surface::Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape)
     if(sf_src.isValid())
     {
 	sf_dst.Set(sf_src);
-
-	const char* src = static_cast<const char*>(sf_src.surface->pixels);
-	char* dst = static_cast<char*>(sf_dst.surface->pixels);
-	const s32 size = sf_src.surface->h * sf_src.surface->pitch;
-	const u8 bpp = sf_src.surface->format->BytesPerPixel;
-
+	sf_src.Lock();
 	sf_dst.Lock();
 
 	switch(shape % 4)
 	{
     	    // normal
 	    default:
-		std::memcpy(dst, src, size);
+		// skip double copy
         	break;
-
-    	    // vertical reflect
+    
+	    // vertical reflect
     	    case 1:
-		for(s32 offset = 0; offset < size; offset += sf_src.surface->pitch)
-    		    std::memcpy(dst + size - sf_src.surface->pitch - offset,
-			src + offset, sf_src.surface->pitch);
+        	for(u16 yy = 0; yy < sf_src.h(); ++yy)
+            	    for(u16 xx = 0; xx < sf_src.w(); ++xx)
+			sf_dst.SetPixel(xx, sf_src.h() - yy - 1, sf_src.GetPixel(xx, yy));
         	break;
 
     	    // horizontal reflect
     	    case 2:
-        	for(s32 offset = 0; offset < size; offset += bpp)
-		    std::memcpy(dst + (offset % sf_src.surface->pitch) +
-			size - sf_src.surface->pitch - static_cast<s32>(offset / sf_src.surface->pitch) * sf_src.surface->pitch, src + size - offset - bpp, bpp);
+        	for(u16 yy = 0; yy < sf_src.h(); ++yy)
+            	    for(u16 xx = 0; xx < sf_src.w(); ++xx)
+			sf_dst.SetPixel(sf_src.w() - xx - 1, yy, sf_src.GetPixel(xx, yy));
 		break;
 
     	    // both variants
 	    case 3:
-        	for(s32 offset = 0; offset < size; offset += bpp)
-		    std::memcpy(dst + offset, src + size - offset - bpp, bpp);
+        	for(u16 yy = 0; yy < sf_src.h(); ++yy)
+            	    for(u16 xx = 0; xx < sf_src.w(); ++xx)
+			sf_dst.SetPixel(sf_src.w() - xx - 1, sf_src.h() - yy - 1, sf_src.GetPixel(xx, yy));
     		break;
 	}
 
+	sf_src.Unlock();
 	sf_dst.Unlock();
     }
     else
