@@ -2014,6 +2014,7 @@ void Castle::ActionAfterBattle(bool attacker_wins)
     if(attacker_wins)
     {
 	army.Clean();
+	ResetModes(CUSTOMARMY);
     }
 
     if(CONTROL_AI & GetControl())

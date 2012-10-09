@@ -542,27 +542,6 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 	    break;
 
 	case MP2::OBJN_CASTLE:
-    	{
-    	    const Castle* castle = world.GetCastle(tile.GetIndex());
-    	    if(NULL != castle)
-	    {
-		if(from_hero.GetColor() == castle->GetColor())
-		    return Cursor::CASTLE;
-		else
-		if(from_hero.Modes(Heroes::GUARDIAN))
-		    return Cursor::POINTER;
-		else
-		if(from_hero.isFriends(castle->GetColor()))
-		    return conf.ExtUnionsAllowCastleVisiting() ? Cursor::ACTION : Cursor::POINTER;
-		else
-		if(castle->GetActualArmy().isValid())
-		    return Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(castle->GetIndex()));
-		else
-		    return Cursor::DistanceThemes(Cursor::ACTION, from_hero.GetRangeRouteDays(castle->GetIndex()));
-	    }
-    	}
-    	break;
-
     	case MP2::OBJ_CASTLE:
     	{
     	    const Castle* castle = world.GetCastle(tile.GetIndex());
@@ -1120,6 +1099,14 @@ void Game::MouseCursorAreaClickLeft(s32 index_maps)
     Heroes* from_hero = GameFocus::GetHeroes();
     const Maps::Tiles & tile = world.GetTiles(index_maps);
 
+    // correct index for castle
+    if(MP2::OBJN_CASTLE == tile.GetObject() ||
+	MP2::OBJ_CASTLE == tile.GetObject())
+    {
+    	to_castle = world.GetCastle(index_maps);
+	if(to_castle) index_maps = to_castle->GetIndex();
+    }
+
     switch(Cursor::WithoutDistanceThemes(Cursor::Get().Themes()))
     {
 	case Cursor::HEROES:
@@ -1139,7 +1126,7 @@ void Game::MouseCursorAreaClickLeft(s32 index_maps)
 
         case Cursor::CASTLE:
 	    // focus change/open castle
-	    if(NULL != (to_castle = world.GetCastle(index_maps)))
+	    if(to_castle)
 	    {
 		Castle* from_castle = GameFocus::GetCastle();
 
@@ -1155,12 +1142,6 @@ void Game::MouseCursorAreaClickLeft(s32 index_maps)
 	    break;
 
         case Cursor::FIGHT:
-	    if(NULL != (to_castle = world.GetCastle(index_maps)))
-		ShowPathOrStartMoveHero(from_hero, to_castle->GetIndex());
-	    else
-		ShowPathOrStartMoveHero(from_hero, index_maps);
-	    break;
-
         case Cursor::MOVE:
         case Cursor::BOAT:
         case Cursor::ANCHOR:
