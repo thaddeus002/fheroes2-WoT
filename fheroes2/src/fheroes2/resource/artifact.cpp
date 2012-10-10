@@ -23,9 +23,13 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include "agg.h"
 #include "settings.h"
 #include "world.h"
 #include "spell.h"
+#include "heroes.h"
+#include "dialog.h"
+#include "editor_dialogs.h"
 #include "artifact.h"
 
 #ifdef WITH_XML
@@ -754,4 +758,187 @@ u16 GoldInsteadArtifact(u8 obj)
 	default: break;
     }
     return 0;
+}
+
+ArtifactsBar::ArtifactsBar(const Heroes* ptr, bool mini, bool ro, bool change /* false */)
+	: hero(ptr), use_mini_sprite(mini), read_only(ro), can_change(change)
+{
+    if(use_mini_sprite)
+    {
+        const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 0);
+        const Rect rt(25, 20, 34, 34);
+        SetItemSize(rt.w, rt.h);
+        backsf.Set(rt.w, rt.h);
+        sprite.Blit(rt, 0, 0, backsf);
+        Cursor::DrawCursor(backsf, 0x70, true);
+	cursf.Set(rt.w, rt.h);
+	Cursor::DrawCursor(cursf, 0x10, true);
+        spcursor.SetSprite(cursf);
+    }
+    else
+    {
+        const Sprite & sprite = AGG::GetICN(ICN::ARTIFACT, 0);
+        SetItemSize(sprite.w(), sprite.h());
+        spcursor.SetSprite(AGG::GetICN(ICN::NGEXTRA, 62));
+    }
+}
+
+void ArtifactsBar::ResetSelected(void)
+{
+    Cursor::Get().Hide();
+    spcursor.Hide();
+    Interface::ItemsActionBar<Artifact>::ResetSelected();
+}
+
+void ArtifactsBar::Redraw(Surface & dstsf)
+{
+    Cursor::Get().Hide();
+    spcursor.Hide();
+    Interface::ItemsActionBar<Artifact>::Redraw(dstsf);
+}
+
+void ArtifactsBar::RedrawBackground(const Rect & pos, bool validItem, Surface & dstsf)
+{
+    if(use_mini_sprite)
+    	backsf.Blit(pos, dstsf);
+    else
+    if(! validItem)
+    {
+	AGG::GetICN(ICN::ARTIFACT, 0).Blit(pos, dstsf);
+    }
+}
+
+void ArtifactsBar::RedrawItem(Artifact & art, const Rect & pos, bool current, Surface & dstsf)
+{
+    if(art.isValid())
+    {
+	Cursor::Get().Hide();
+
+	if(use_mini_sprite)
+	    AGG::GetICN(ICN::ARTFX, art.IndexSprite32()).Blit(pos.x + 1, pos.y + 1, dstsf);
+	else
+	    AGG::GetICN(ICN::ARTIFACT, art.IndexSprite64()).Blit(pos, dstsf);
+
+	if(current)
+	{
+	    if(use_mini_sprite)
+		spcursor.Show(pos.x, pos.y);
+	    else
+		spcursor.Show(pos.x - 3, pos.y - 3);
+	}
+    }
+    else
+	RedrawBackground(pos, false, dstsf);
+}
+
+bool ArtifactsBar::ActionBarSingleClick(const Point & cursor, Artifact & art, const Rect & pos)
+{
+    if(isSelected())
+    {
+	std::swap(art, *GetSelectedItem());
+	return false;
+    }
+    else
+    if(art.isValid())
+    {
+	if(! read_only)
+	{
+	    Cursor::Get().Hide();
+	    spcursor.Hide();
+	}
+    }
+    else
+    {
+	if(can_change)
+	    art = Dialog::SelectArtifact();
+
+	return false;
+    }
+
+    return true;
+}
+
+bool ArtifactsBar::ActionBarDoubleClick(const Point & cursor, Artifact & art, const Rect & pos)
+{
+    if(art() == Artifact::MAGIC_BOOK)
+    {
+        if(can_change)
+	    const_cast<Heroes*>(hero)->EditSpellBook();
+	else
+	    hero->OpenSpellBook(SpellBook::ALL, false);
+    }
+    else
+    if(art() == Artifact::SPELL_SCROLL &&
+	Settings::Get().ExtHeroAllowTranscribingScroll() &&
+        hero->CanTranscribeScroll(art))
+    {
+	Spell spell = art.GetSpell();
+
+	if(! spell.isValid())
+        {
+            DEBUG(DBG_GAME, DBG_WARN, "invalid spell");
+        }
+	else
+        if(hero->CanLearnSpell(spell))
+        {
+	    payment_t cost = spell.GetCost();
+            u16 answer = 0;
+            std::string msg = _("Do you want to use your knowledge of magical secrets to transcribe the %{spell} Scroll into your spell book?\nThe Scroll will be consumed.\n Spell point: %{sp}");
+
+            String::Replace(msg, "%{spell}", spell.GetName());
+            String::Replace(msg, "%{sp}", spell.SpellPoint());
+
+	    if(spell.MovePoint())
+            {
+        	msg.append("\n");
+                msg.append("Move point: %{mp}");
+                String::Replace(msg, "%{mp}", spell.MovePoint());
+            }
+
+            if(cost.GetValidItemsCount())
+        	answer = Dialog::ResourceInfo("", msg, cost, Dialog::YES|Dialog::NO);
+            else
+        	answer = Dialog::Message("", msg, Font::BIG, Dialog::YES|Dialog::NO);
+
+    	    if(answer == Dialog::YES)
+		const_cast<Heroes*>(hero)->TranscribeScroll(art);
+
+	    return true;
+	}
+    }
+    else
+	Dialog::ArtifactInfo(art.GetName(), "", art);
+
+    ResetSelected();
+
+    return true;
+}
+
+bool ArtifactsBar::ActionBarPressRight(Artifact & art)
+{
+    ResetSelected();
+
+    if(art.isValid())
+    {
+	if(can_change)
+	{
+    	    art.Reset();
+            return true;
+	}
+        else
+            Dialog::ArtifactInfo(art.GetName(), "", art, 0);
+    }
+
+    return true;
+}
+
+bool ArtifactsBar::ActionBarSingleClick(const Point & cursor, Artifact & art1, const Rect & pos1, Artifact & art2, const Rect & pos2)
+{
+    if(art1() != Artifact::MAGIC_BOOK && art2() != Artifact::MAGIC_BOOK)
+    {
+	std::swap(art1, art2);
+	return false;
+    }
+
+    return true;
 }

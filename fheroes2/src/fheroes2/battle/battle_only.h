@@ -30,7 +30,6 @@
 
 class MoraleIndicator;
 class LuckIndicator;
-class SelectArtifactsBar;
 
 namespace Battle
 {
@@ -75,8 +74,8 @@ namespace Battle
 	SelectArmyBar selectArmy1;
 	SelectArmyBar selectArmy2;
 
-	SelectArtifactsBar* selectArtifacts1;
-	SelectArtifactsBar* selectArtifacts2;
+	ArtifactsBar* selectArtifacts1;
+	ArtifactsBar* selectArtifacts2;
 
 	ControlInfo*	cinfo2;
 

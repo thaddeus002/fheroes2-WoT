@@ -27,7 +27,6 @@
 #include "heroes.h"
 #include "heroes_indicator.h"
 #include "selectarmybar.h"
-#include "selectartifactbar.h"
 #include "world.h"
 #include "race.h"
 #include "kingdom.h"
@@ -125,21 +124,12 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
     selectArmy.Redraw();
             
     // art bar
-    const Rect rt2(23, 347, 34, 34);
-    Surface sfb2(rt2.w, rt2.h);
-    backSprite.Blit(rt2, 0, 0, sfb2);
-    Surface sfc2(rt2.w, rt2.h);
-    Cursor::DrawCursor(sfc2, 0xd6, true);
-
-    SelectArtifactsBar selectArtifacts;
-
-    selectArtifacts.SetHero(hero);
+    ArtifactsBar selectArtifacts(&hero, true, readonly);
+    selectArtifacts.SetColRows(7, 2);
+    selectArtifacts.SetHSpace(2);
+    selectArtifacts.SetVSpace(2);
+    selectArtifacts.SetContent(hero.GetBagArtifacts());
     selectArtifacts.SetPos(dst_rt.x + 37, dst_rt.y + 95);
-    selectArtifacts.SetInterval(2);
-    selectArtifacts.SetBackgroundSprite(sfb2);
-    selectArtifacts.SetCursorSprite(sfc2);
-    selectArtifacts.SetUseArts32Sprite();
-    if(readonly) selectArtifacts.SetReadOnly();
     selectArtifacts.Redraw();
 
     Button buttonDismiss(dst_rt.x + dst_rt.w / 2 - 160, dst_rt.y + dst_rt.h - 125, ICN::HSBTNS, 0, 1);
@@ -206,10 +196,12 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
         // selector troops event
         if(le.MouseCursor(selectArmy.GetArea()))
         {
-            if(selectArtifacts.isSelected()) selectArtifacts.Reset();
 	    if(SelectArmyBar::QueueEventProcessing(selectArmy))
             {
                 cursor.Hide();
+
+        	if(selectArtifacts.isSelected()) selectArtifacts.ResetSelected();
+
                 moraleIndicator.Redraw();
                 luckIndicator.Redraw();
                 cursor.Show();
@@ -220,8 +212,13 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
         // selector artifacts event
         if(le.MouseCursor(selectArtifacts.GetArea()))
         {
-            if(selectArmy.isSelected()) selectArmy.Reset();
-            SelectArtifactsBar::QueueEventProcessing(selectArtifacts);
+            if(selectArtifacts.QueueEventProcessing())
+	    {
+        	if(selectArmy.isSelected()) selectArmy.Reset();
+		selectArtifacts.Redraw();
+        	cursor.Show();
+    		display.Flip();
+	    }
         }
 
         if(le.MouseCursor(moraleIndicator.GetArea())) MoraleIndicator::QueueEventProcessing(moraleIndicator);

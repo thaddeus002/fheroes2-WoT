@@ -29,7 +29,6 @@
 #include "castle.h"
 #include "kingdom.h"
 #include "heroes.h"
-#include "selectartifactbar.h"
 #include "heroes_indicator.h"
 #include "heroes_recruits.h"
 #include "editor_dialogs.h"
@@ -360,48 +359,48 @@ bool Battle::Only::ChangeSettings(void)
 	    }
 	}
 
-	if(allow1 && le.MouseCursor(selectArmy1.GetArea()))
+	if(allow1 && le.MouseCursor(selectArmy1.GetArea()) &&
+	    SelectArmyBar::QueueEventProcessing(selectArmy1))
 	{
-	  if(selectArtifacts1->isSelected()) selectArtifacts1->Reset();
-	  else
-	  if(selectArtifacts2 && selectArtifacts2->isSelected()) selectArtifacts2->Reset();
+	    if(selectArtifacts1->isSelected()) selectArtifacts1->ResetSelected();
+	    else
+	    if(selectArtifacts2 && selectArtifacts2->isSelected()) selectArtifacts2->ResetSelected();
 
-    	  if(SelectArmyBar::QueueEventProcessing(selectArmy1))
-	  {
 	    redraw = true;
-	  }
 	}
 
-	if(allow2 && le.MouseCursor(selectArmy2.GetArea()))
+	if(allow2 && le.MouseCursor(selectArmy2.GetArea()) &&
+	    SelectArmyBar::QueueEventProcessing(selectArmy2))
 	{
-	  if(selectArtifacts1->isSelected()) selectArtifacts1->Reset();
-	  else
-	  if(selectArtifacts2 && selectArtifacts2->isSelected()) selectArtifacts2->Reset();
+	    if(selectArtifacts1->isSelected()) selectArtifacts1->ResetSelected();
+	    else
+	    if(selectArtifacts2 && selectArtifacts2->isSelected()) selectArtifacts2->ResetSelected();
 
-	  if(SelectArmyBar::QueueEventProcessing(selectArmy2))
-	  {
 	    redraw = true;
-	  }
 	}
 
-	if(allow1 && le.MouseCursor(selectArtifacts1->GetArea()))
+	if(allow1 && le.MouseCursor(selectArtifacts1->GetArea()) &&
+	    selectArtifacts1->QueueEventProcessing())
 	{
-	  if(selectArmy1.isSelected()) selectArmy1.Reset();
-	  else
-	  if(selectArmy2.isSelected()) selectArmy2.Reset();
+	    if(selectArmy1.isSelected()) selectArmy1.Reset();
+	    else
+	    if(selectArmy2.isSelected()) selectArmy2.Reset();
 
-	  if(SelectArtifactsBar::QueueEventProcessing(*selectArtifacts1))
-	      redraw = true;
+	    if(selectArtifacts2 && selectArtifacts2->isSelected()) selectArtifacts2->ResetSelected();
+
+	    redraw = true;
 	}
 
-	if(allow2 && selectArtifacts2 && le.MouseCursor(selectArtifacts2->GetArea()))
+	if(allow2 && selectArtifacts2 && le.MouseCursor(selectArtifacts2->GetArea()) &&
+	    selectArtifacts2->QueueEventProcessing())
 	{
-	  if(selectArmy1.isSelected()) selectArmy1.Reset();
-	  else
-	  if(selectArmy2.isSelected()) selectArmy2.Reset();
+	    if(selectArmy1.isSelected()) selectArmy1.Reset();
+	    else
+	    if(selectArmy2.isSelected()) selectArmy2.Reset();
 
-	  if(SelectArtifactsBar::QueueEventProcessing(*selectArtifacts2))
-	      redraw = true;
+	    if(selectArtifacts1->isSelected()) selectArtifacts1->ResetSelected();
+
+	    redraw = true;
 	}
 
 	if(hero1 && allow1)
@@ -545,14 +544,12 @@ void Battle::Only::UpdateHero1(const Point & cur_pt)
       secskill_bar1->SetContent(hero1->GetSecondarySkills());
       secskill_bar1->SetPos(cur_pt.x + 22, cur_pt.y + 199);
 
-      selectArtifacts1 = new SelectArtifactsBar();
-      selectArtifacts1->SetHero(*hero1);
-      selectArtifacts1->SetPos(Point(cur_pt.x + 23, cur_pt.y + 347));
-      selectArtifacts1->SetInterval(2);
-      selectArtifacts1->SetBackgroundSprite(sfb2);
-      selectArtifacts1->SetCursorSprite(sfc2);
-      selectArtifacts1->SetUseArts32Sprite();
-      selectArtifacts1->SetChangeMode();
+      selectArtifacts1 = new ArtifactsBar(hero1, true, false, true);
+      selectArtifacts1->SetColRows(7, 2);
+      selectArtifacts1->SetHSpace(2);
+      selectArtifacts1->SetVSpace(2);
+      selectArtifacts1->SetContent(hero1->GetBagArtifacts());
+      selectArtifacts1->SetPos(cur_pt.x + 23, cur_pt.y + 347);
 
       army1 = &hero1->GetArmy();
       selectArmy1.SetArmy(*army1);
@@ -614,14 +611,12 @@ void Battle::Only::UpdateHero2(const Point & cur_pt)
       secskill_bar2->SetContent(hero2->GetSecondarySkills());
       secskill_bar2->SetPos(cur_pt.x + 353, cur_pt.y + 199);
 
-      selectArtifacts2 = new SelectArtifactsBar();
-      selectArtifacts2->SetHero(*hero2);
-      selectArtifacts2->SetPos(Point(cur_pt.x + 367, cur_pt.y + 347));
-      selectArtifacts2->SetInterval(2);
-      selectArtifacts2->SetBackgroundSprite(sfb2);
-      selectArtifacts2->SetCursorSprite(sfc2);
-      selectArtifacts2->SetUseArts32Sprite();
-      selectArtifacts2->SetChangeMode();
+      selectArtifacts2 = new ArtifactsBar(hero2, true, false, true);
+      selectArtifacts2->SetColRows(7, 2);
+      selectArtifacts2->SetHSpace(2);
+      selectArtifacts2->SetVSpace(2);
+      selectArtifacts2->SetContent(hero2->GetBagArtifacts());
+      selectArtifacts2->SetPos(cur_pt.x + 367, cur_pt.y + 347);
 
       army2 = &hero2->GetArmy();
       selectArmy2.SetArmy(*army2);

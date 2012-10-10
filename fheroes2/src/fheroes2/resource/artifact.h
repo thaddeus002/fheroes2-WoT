@@ -24,8 +24,10 @@
 
 #include <vector>
 #include "gamedefs.h"
+#include "interface_itemsbar.h"
 
 class Spell;
+class Heroes;
 class StreamBase;
 class StreamBase;
 
@@ -223,6 +225,32 @@ public:
     u8   Count(const Artifact &) const;
 
     std::string String(void) const;
+};
+
+class ArtifactsBar : public Interface::ItemsActionBar<Artifact>
+{
+public:
+    ArtifactsBar(const Heroes*, bool mini, bool ro, bool change = false);
+
+    void        RedrawBackground(const Rect &, bool, Surface &);
+    void        RedrawItem(Artifact &, const Rect &, bool, Surface &);
+
+    void	ResetSelected(void);
+    void	Redraw(Surface & dstsf = Display::Get());
+
+    bool	ActionBarSingleClick(const Point &, Artifact &, const Rect &);
+    bool	ActionBarSingleClick(const Point &, Artifact &, const Rect &, Artifact &, const Rect &);
+    bool	ActionBarDoubleClick(const Point &, Artifact &, const Rect &);
+    bool        ActionBarPressRight(Artifact &);
+
+protected:
+    const Heroes*	hero;
+    Surface     	backsf;
+    Surface     	cursf;
+    SpriteCursor	spcursor;
+    bool        	use_mini_sprite;
+    bool		read_only;
+    bool        	can_change;
 };
 
 #endif

@@ -27,7 +27,6 @@
 #include "heroes.h"
 #include "heroes_indicator.h"
 #include "selectarmybar.h"
-#include "selectartifactbar.h"
 #include "world.h"
 #include "kingdom.h"
 #include "pocketpc.h"
@@ -61,30 +60,20 @@ void PocketPC::HeroesMeeting(Heroes & hero1, Heroes & hero2)
     hero2.GetPortrait50x46().Blit(dst_rt.x + 8, dst_rt.y + 122, display);
 
     // art bar
-    const Rect rt2(23, 347, 34, 34);
-    Surface sfb2(rt2.w, rt2.h);
-    backSprite.Blit(rt2, 0, 0, sfb2);
-    Surface sfc2(rt2.w, rt2.h);
-    Cursor::DrawCursor(sfc2, 0xd6, true);
-
-    SelectArtifactsBar selectArtifacts1;
-
-    selectArtifacts1.SetHero(hero1);
+    ArtifactsBar selectArtifacts1(&hero1, true, false);
+    selectArtifacts1.SetColRows(7, 2);
+    selectArtifacts1.SetHSpace(2);
+    selectArtifacts1.SetVSpace(2);
+    selectArtifacts1.SetContent(hero1.GetBagArtifacts());
     selectArtifacts1.SetPos(dst_rt.x + 68, dst_rt.y + 2);
-    selectArtifacts1.SetInterval(2);
-    selectArtifacts1.SetBackgroundSprite(sfb2);
-    selectArtifacts1.SetCursorSprite(sfc2);
-    selectArtifacts1.SetUseArts32Sprite();
     selectArtifacts1.Redraw();
 
-    SelectArtifactsBar selectArtifacts2;
-
-    selectArtifacts2.SetHero(hero2);
+    ArtifactsBar selectArtifacts2(&hero2, true, false);
+    selectArtifacts2.SetColRows(7, 2);
+    selectArtifacts2.SetHSpace(2);
+    selectArtifacts2.SetVSpace(2);
+    selectArtifacts2.SetContent(hero2.GetBagArtifacts());
     selectArtifacts2.SetPos(dst_rt.x + 68, dst_rt.y + 164);
-    selectArtifacts2.SetInterval(2);
-    selectArtifacts2.SetBackgroundSprite(sfb2);
-    selectArtifacts2.SetCursorSprite(sfc2);
-    selectArtifacts2.SetUseArts32Sprite();
     selectArtifacts2.Redraw();
 
     // army bar
@@ -129,16 +118,27 @@ void PocketPC::HeroesMeeting(Heroes & hero1, Heroes & hero2)
 
 	if(SelectArmyBar::QueueEventProcessing(selectArmy1, selectArmy2))
 	{
-    	    if(selectArtifacts1.isSelected()) selectArtifacts1.Reset();
+    	    if(selectArtifacts1.isSelected()) selectArtifacts1.ResetSelected();
             else
-            if(selectArtifacts2.isSelected()) selectArtifacts2.Reset();
+            if(selectArtifacts2.isSelected()) selectArtifacts2.ResetSelected();
 	}
 
-	if(SelectArtifactsBar::QueueEventProcessing(selectArtifacts1, selectArtifacts2))
+        if((le.MouseCursor(selectArtifacts1.GetArea()) &&
+            selectArtifacts1.QueueEventProcessing(selectArtifacts2)) ||
+           (le.MouseCursor(selectArtifacts2.GetArea()) &&
+            selectArtifacts2.QueueEventProcessing(selectArtifacts1)))
         {
+            cursor.Hide();
+
     	    if(selectArmy1.isSelected()) selectArmy1.Reset();
             else
             if(selectArmy2.isSelected()) selectArmy2.Reset();
+
+            selectArtifacts1.Redraw();
+            selectArtifacts2.Redraw();
+
+            cursor.Show();
+            display.Flip();
     	}
     }
 }

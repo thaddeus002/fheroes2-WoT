@@ -736,13 +736,16 @@ PrimarySkillsBar::PrimarySkillsBar(const Heroes* hr, bool mini) : hero(hr), use_
     if(use_mini_sprite)
     {
 	const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 0);
-	SetItemBackground(sprite, Rect(25, 20, 34, 34), 0x70);
+	const Rect rt(25, 20, 34, 34);
+	backsf.Set(rt.w, rt.h);
+	sprite.Blit(rt, 0, 0, backsf);
+	Cursor::DrawCursor(backsf, 0x70, true);
+	SetItemSize(rt.w, rt.h);
     }
     else
     {
-	Surface black(82, 93);
-	black.Fill(0, 0, 0);
-	SetItemBackground(black);
+	const Sprite & sprite = AGG::GetICN(ICN::PRIMSKIL, 0);
+	SetItemSize(sprite.w(), sprite.h());
     }
 
     SetContent(content);
@@ -753,7 +756,13 @@ void PrimarySkillsBar::SetTextOff(s16 ox, s16 oy)
     toff = Point(ox, oy);
 }
 
-void PrimarySkillsBar::RedrawItem(Skill::Primary::skill_t & skill, const Rect & pos, bool selected, Surface & dstsf)
+void PrimarySkillsBar::RedrawBackground(const Rect & pos, bool validItem, Surface & dstsf)
+{
+    if(use_mini_sprite)
+	backsf.Blit(pos, dstsf);
+}
+
+void PrimarySkillsBar::RedrawItem(Skill::Primary::skill_t & skill, const Rect & pos, Surface & dstsf)
 {
     if(Skill::Primary::UNKNOWN != skill)
     {
@@ -855,16 +864,29 @@ SecondarySkillsBar::SecondarySkillsBar(bool mini /* true */, bool change /* fals
     if(use_mini_sprite)
     {
 	const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 0);
-	SetItemBackground(sprite, Rect(25, 20, 34, 34), 0x70);
+	const Rect rt(25, 20, 34, 34);
+	backsf.Set(rt.w, rt.h);
+	sprite.Blit(rt, 0, 0, backsf);
+	Cursor::DrawCursor(backsf, 0x70, true);
+	SetItemSize(rt.w, rt.h);
     }
     else
     {
 	const Sprite & sprite = AGG::GetICN(ICN::SECSKILL, 0);
-	SetItemBackground(sprite);
+	SetItemSize(sprite.w(), sprite.h());
     }
 }
 
-void SecondarySkillsBar::RedrawItem(Skill::Secondary & skill, const Rect & pos, bool selected, Surface & dstsf)
+void SecondarySkillsBar::RedrawBackground(const Rect & pos, bool validItem, Surface & dstsf)
+{
+    if(use_mini_sprite)
+	backsf.Blit(pos, dstsf);
+    else
+    if(! validItem) // big sprite eq background size
+	AGG::GetICN(ICN::SECSKILL, 0).Blit(pos, dstsf);
+}
+
+void SecondarySkillsBar::RedrawItem(Skill::Secondary & skill, const Rect & pos, Surface & dstsf)
 {
     if(skill.isValid())
     {

@@ -31,62 +31,52 @@
 namespace Interface
 {
     template<class Item>
-    struct ItemsBar
+    class ItemsBar
     {
-    public:
+    protected:
 	typedef std::list<Item*> Items;
 	typedef typename std::list<Item*>::iterator ItemsIterator;
+	typedef std::pair<ItemsIterator, Rect> ItemIterPos;
 
-    protected:
+	Items		items;
 	Rect		barsz;
+	Size		itemsz;
 	Size		colrows;
-	Point		curof;
 	s8		hspace;
 	s8		vspace;
-	Surface		backsf;
-	SpriteCursor	spcursor;
-	Items		items;
-	ItemsIterator	topItem;
-	ItemsIterator	curItem;
 
     public:
-	ItemsBar() : colrows(0, 0), hspace(0), vspace(0), topItem(items.begin()), curItem(items.end()) {}
+	ItemsBar() : colrows(0, 0), hspace(0), vspace(0) {}
 	virtual ~ItemsBar(){}
 
 /*
 	void		SetColRows(u8, u8);
 	void        	SetPos(s16, s16);
+	void        	SetItemSize(s16, s16);
 	void		SetHSpace(s8);
 	void		SetVSpace(s8);
 	void		SetContent(const std::list<Item> &);
 	void		SetContent(const std::vector<Item> &);
-	void		SetItemBackground(const Surface &, const Rect &, u8 colorindex = 0);
-	void		SetSpriteCursor(const Surface &);
 	
 	const Point &	GetPos(void) const;
 	const Rect &	GetArea(void) const;
 	const Size &	GetColRows(void) const;
 	Item*		GetItem(const Point &) const;
-	Item*		GetSelectedItem(void) const;
-	s8		GetSelectedIndex(void) const;
 
-	bool		isSelected(void) const;
-
-	void		Redraw(void);
+	void		Redraw(Surface & dstsf = Display::Get());
 	bool		QueueEventProcessing(void);
 */
 
-	virtual void	RedrawItem(Item &, const Rect &, bool, Surface &) = 0;
+	virtual void	RedrawBackground(const Rect &, bool, Surface &) {}
+	virtual void	RedrawItem(Item &, const Rect &, Surface &) {}
 
         virtual bool	ActionBarSingleClick(Item & item){ return false; }
-        virtual bool	ActionBarDoubleClick(Item & item){ return ActionBarSingleClick(item); }
         virtual bool	ActionBarPressRight(Item & item){ return false; }
 
-        virtual bool	ActionBarSingleClick(Item & item, const Point & cursor, const Rect & itemPos){ return ActionBarSingleClick(item); }
-        virtual bool	ActionBarDoubleClick(Item & item, const Point & cursor, const Rect & itemPos){ return ActionBarDoubleClick(item); }
-        virtual bool	ActionBarPressRight( Item & item, const Point & cursor, const Rect & itemPos){ return ActionBarPressRight(item); }
+        virtual bool	ActionBarSingleClick(const Point &, Item & item, const Rect &){ return ActionBarSingleClick(item); }
+        virtual bool	ActionBarPressRight(const Point &, Item & item, const Rect &){ return ActionBarPressRight(item); }
 
-        virtual bool	ActionBarCursor(Item &, const Point & cursor, const Rect & itemPos){ return false; }
+        virtual bool	ActionBarCursor(const Point &, Item &, const Rect &){ return false; }
 
 	//body
 	void SetColRows(u8 col, u8 row)
@@ -102,8 +92,7 @@ namespace Interface
 	    for(typename std::list<Item>::iterator
 		it = content.begin(); it != content.end(); ++it)
 		items.push_back(&(*it));
-	    topItem = items.begin();
-	    curItem = items.end();
+	    SetContentItems();
 	}
 
 	void SetContent(std::vector<Item> & content)
@@ -112,14 +101,20 @@ namespace Interface
 	    for(typename std::vector<Item>::iterator
 		it = content.begin(); it != content.end(); ++it)
 		items.push_back(&(*it));
-	    topItem = items.begin();
-	    curItem = items.end();
+	    SetContentItems();
 	}
 
 	void SetPos(s16 px, s16 py)
 	{
 	    barsz.x = px;
 	    barsz.y = py;
+	}
+
+	void SetItemSize(u16 pw, u16 ph)
+	{
+	    itemsz.w = pw;
+	    itemsz.h = ph;
+	    RescanSize();
 	}
 
 	void SetHSpace(s8 val)
@@ -132,37 +127,6 @@ namespace Interface
 	{
 	    vspace = val;
 	    RescanSize();
-	}
-
-	void SetItemBackground(const Surface & srcsf)
-	{
-	    SetItemBackground(srcsf, Rect(0, 0, srcsf.w(), srcsf.h()));
-	}
-
-	void SetItemBackground(const Surface & srcsf, const Rect & srcrt, u8 colorindex = 0)
-	{
-	    backsf.Set(srcrt.w, srcrt.h);
-	    srcsf.Blit(srcrt, 0, 0, backsf);
-	    if(colorindex) Cursor::DrawCursor(backsf, colorindex, true);
-	    RescanSize();
-	    RescanCursorOffset();
-	}
-
-	void SetSpriteCursor(const Surface & sf)
-	{
-	    spcursor.SetSprite(sf);
-	    RescanSize();
-	    RescanCursorOffset();
-	}
-
-	Item* GetSelectedItem(void) const
-	{
-	    return curItem != items.end() ? *curItem : NULL;
-	}
-
-	s8 GetSelectedIndex(void) const
-	{
-	    return curItem != items.end() ? std::distance(items.begin(), curItem) : -1;
 	}
 
 	Item* GetItem(const Point & pt)
@@ -186,53 +150,325 @@ namespace Interface
 	    return colrows;
 	}
 
-	bool isSelected(void) const
-	{
-	    return NULL != GetSelectedItem();
-	}
-
 	void Redraw(Surface & dstsf = Display::Get())
 	{
-	    spcursor.Hide();
 	    Point dstpt(barsz);
-	    ItemsIterator posItem = topItem;
+	    ItemsIterator posItem = GetTopItemIter();
 
 	    for(u16 yy = 0; yy < colrows.h; ++yy)
 	    {
 		for(u16 xx = 0; xx < colrows.w; ++xx)
 		{
-		    if(backsf.isValid())
-			backsf.Blit(dstpt, dstsf);
+		    RedrawBackground(Rect(dstpt, itemsz.w, itemsz.h), posItem != items.end(), dstsf);
 
 		    if(posItem != items.end())
 		    {
-			RedrawItem(**posItem, Rect(dstpt, backsf.w(), backsf.h()), curItem == posItem, dstsf);
-
-			if(curItem == posItem)
-			    spcursor.Show(dstpt + curof);
+			RedrawItemIter(posItem, Rect(dstpt, itemsz.w, itemsz.h), dstsf);
 
 			++posItem;
 		    }
 
-		    dstpt.x += hspace + backsf.w();
+		    dstpt.x += hspace + itemsz.w;
 		}
 
 		dstpt.x = barsz.x;
-		dstpt.y += vspace + backsf.h();
+		dstpt.y += vspace + itemsz.h;
 	    }
 	}
 
         bool QueueEventProcessing(void)
         {
-            LocalEvent & le = LocalEvent::Get();
+	    const Point & cursor = LocalEvent::Get().GetMouseCursor();
+
+    	    return isItemsEmpty() ? false :
+		    ActionCursorItemIter(cursor, GetItemIterPos(cursor));
+        }
+
+    protected:
+	virtual void SetContentItems(void)
+	{
+	}
+
+	ItemsIterator GetBeginItemIter(void)
+	{
+	    return items.begin();
+	}
+
+	ItemsIterator GetEndItemIter(void)
+	{
+	    return items.end();
+	}
+
+	virtual ItemsIterator GetTopItemIter(void)
+	{
+	    return items.begin();
+	}
+
+	virtual ItemsIterator GetCurItemIter(void)
+	{
+	    return items.end();
+	}
+
+	virtual void RedrawItemIter(ItemsIterator it, const Rect & pos, Surface & dstsf)
+	{
+	    RedrawItem(**it, pos, dstsf);
+	}
+
+        virtual bool ActionCursorItemIter(const Point & cursor, ItemIterPos iterPos)
+	{
+	    if(iterPos.first != GetEndItemIter())
+	    {
+		LocalEvent & le = LocalEvent::Get();
+
+        	if(ActionBarCursor(cursor, **iterPos.first, iterPos.second))
+            	    return true;
+        	else
+		if(le.MouseClickLeft(iterPos.second))
+            	    return ActionBarSingleClick(cursor, **iterPos.first, iterPos.second);
+        	else
+            	if(le.MousePressRight(iterPos.second))
+            	    return ActionBarPressRight(cursor, **iterPos.first, iterPos.second);
+	    }
+
+	    return false;
+	}
+
+	bool isItemsEmpty(void)
+	{
+	    return items.empty();
+	}
+
+	ItemsIterator GetItemIter(const Point & pt)
+	{
+	    return GetItemIterPos(pt).first;
+	}
+
+	ItemIterPos GetItemIterPos(const Point & pt)
+	{
+	    Rect dstrt(barsz, itemsz.w, itemsz.h);
+	    ItemsIterator posItem = GetTopItemIter();
+
+	    for(u16 yy = 0; yy < colrows.h; ++yy)
+	    {
+		for(u16 xx = 0; xx < colrows.w; ++xx)
+		{
+		    if(posItem != items.end())
+		    {
+			if(dstrt & pt)
+			    return ItemIterPos(posItem, dstrt);
+			++posItem;
+		    }
+
+		    dstrt.x += hspace + itemsz.w;
+		}
+
+		dstrt.x = barsz.x;
+		dstrt.y += vspace + itemsz.h;
+	    }
+
+	    return std::pair<ItemsIterator, Rect>(items.end(), Rect());
+	}
+
+    private:
+	void RescanSize(void)
+	{
+	    barsz.w = colrows.w ? colrows.w * itemsz.w + (colrows.w - 1) * hspace : 0;
+	    barsz.h = colrows.h ? colrows.h * itemsz.h + (colrows.h - 1) * vspace : 0;
+	}
+    };
+
+    template<class Item>
+    class ItemsActionBar : public ItemsBar<Item>
+    {
+    protected:
+	typedef typename ItemsBar<Item>::ItemsIterator ItemsIterator;
+	typedef typename ItemsBar<Item>::ItemIterPos ItemIterPos;
+
+	ItemsIterator	topItem;
+	ItemIterPos	curItemPos;
+
+    public:
+	ItemsActionBar()
+	{
+	    ResetSelected();
+	}
+
+	virtual ~ItemsActionBar() {}
+
+/*
+	Item*		GetSelectedItem(void);
+	Rect*		GetSelectedPos(void);
+	s8		GetSelectedIndex(void);
+
+	bool		isSelected(void);
+	void		ResetSelected(void);
+*/
+	virtual void	RedrawItem(Item &, const Rect &, bool, Surface &) {}
+
+        virtual bool	ActionBarSingleClick(Item & item){ return false; }
+        virtual bool	ActionBarDoubleClick(Item & item){ return ActionBarSingleClick(item); }
+        virtual bool	ActionBarPressRight(Item & item){ return false; }
+
+        virtual bool	ActionBarSingleClick(const Point &, Item &, const Rect &, Item &, const Rect &){ return false; }
+        virtual bool	ActionBarSingleClick(const Point &, Item & item, const Rect &){ return ActionBarSingleClick(item); }
+        virtual bool	ActionBarDoubleClick(const Point &, Item & item, const Rect &){ return ActionBarDoubleClick(item); }
+        virtual bool	ActionBarPressRight(const Point &, Item & item, const Rect &){ return ActionBarPressRight(item); }
+
+        virtual bool	ActionBarCursor(const Point &, Item &, const Rect &){ return false; }
+        virtual bool	ActionBarCursor(const Point &, Item &, const Rect &, Item &, const Rect &){ return false; }
+
+	// body
+	Item* GetSelectedItem(void)
+	{
+	    return *GetCurItemIter();
+	}
+
+	Rect* GetSelectedPos(void)
+	{
+	    return &curItemPos.second;
+	}
+
+	s8 GetSelectedIndex(void)
+	{
+	    return std::distance(ItemsBar<Item>::GetBeginItemIter(), GetCurItemIter());
+	}
+
+	bool isSelected(void)
+	{
+	    return GetCurItemIter() != ItemsBar<Item>::GetEndItemIter();
+	}
+
+	void ResetSelected(void)
+	{
+	    topItem = ItemsBar<Item>::GetBeginItemIter();
+	    curItemPos = ItemIterPos(ItemsBar<Item>::items.end(), Rect());
+	}
+
+        bool QueueEventProcessing(void)
+        {
+	    return ItemsBar<Item>::QueueEventProcessing();
+        }
+
+	bool QueueEventProcessing(ItemsActionBar<Item> & other)
+        {
+	    const Point & cursor = LocalEvent::Get().GetMouseCursor();
+
+    	    if(ItemsBar<Item>::isItemsEmpty() && other.isItemsEmpty())
+		return false;
+	    else
+	    if(other.isSelected())
+    		return ActionCursorItemIter(cursor, other);
+
+	    return ActionCursorItemIter(cursor, ItemsBar<Item>::GetItemIterPos(cursor));
+        }
+
+    protected:
+	ItemsIterator GetTopItemIter(void)
+	{
+	    return topItem;
+	}
+
+	ItemsIterator GetCurItemIter(void)
+	{
+	    return curItemPos.first;
+	}
+
+	void SetContentItems(void)
+	{
+	    ResetSelected();
+	}
+
+	void RedrawItemIter(ItemsIterator it, const Rect & pos, Surface & dstsf)
+	{
+	    RedrawItem(**it, pos, GetCurItemIter() == it, dstsf);
+	}
+
+        bool ActionCursorItemIter(const Point & cursor, ItemIterPos iterPos)
+	{
+	    if(iterPos.first != ItemsBar<Item>::GetEndItemIter())
+	    {
+		LocalEvent & le = LocalEvent::Get();
+
+        	if(ActionBarCursor(cursor, **iterPos.first, iterPos.second))
+            	    return true;
+        	else
+		if(le.MouseClickLeft(iterPos.second))
+		{
+            	    if(iterPos.first == GetCurItemIter())
+		    {
+                    	return ActionBarDoubleClick(cursor, **iterPos.first, iterPos.second);
+            	    }
+		    else
+            	    {
+            		if(ActionBarSingleClick(cursor, **iterPos.first, iterPos.second))
+			    curItemPos = iterPos;
+                	else
+			    ResetSelected();
+
+			return true;
+		    }
+		}
+        	else
+            	if(le.MousePressRight(iterPos.second))
+            	    return ActionBarPressRight(cursor, **iterPos.first, iterPos.second);
+	    }
+
+	    return false;
+	}
+
+        bool ActionCursorItemIter(const Point & cursor, ItemsActionBar<Item> & other)
+	{
+	    ItemIterPos iterPos1 = ItemsBar<Item>::GetItemIterPos(cursor);
+	    ItemIterPos iterPos2 = other.curItemPos;
+
+	    if(iterPos1.first != ItemsBar<Item>::GetEndItemIter())
+	    {
+		LocalEvent & le = LocalEvent::Get();
+
+        	if(ActionBarCursor(cursor, **iterPos1.first, iterPos1.second, **iterPos2.first, iterPos2.second))
+            	    return true;
+        	else
+		if(le.MouseClickLeft(iterPos1.second))
+		{
+            	    if(ActionBarSingleClick(cursor, **iterPos1.first, iterPos1.second, **iterPos2.first, iterPos2.second))
+			curItemPos = iterPos1;
+            	    else
+			ResetSelected();
+
+		    other.ResetSelected();
+		    return true;
+		}
+        	else
+            	if(le.MousePressRight(iterPos1.second))
+		{
+		    other.ResetSelected();
+            	    return ActionBarPressRight(cursor, **iterPos1.first, iterPos1.second);
+		}
+	    }
+
+	    return false;
+	}
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
             //Cursor & cursor = Cursor::Get();
 
             //le.MousePressLeft(buttonPgUp) ? buttonPgUp.PressDraw() : buttonPgUp.ReleaseDraw();
             //le.MousePressLeft(buttonPgDn) ? buttonPgDn.PressDraw() : buttonPgDn.ReleaseDraw();
 
-            if(items.size())
-            {
-/*
             if((le.MouseClickLeft(buttonPgUp) || (useHotkeys && le.KeyPress(KEY_PAGEUP))) &&
                     (top > content->begin()))
             {
@@ -301,76 +537,6 @@ namespace Interface
                 return true;
             }
 */
-		std::pair<ItemsIterator, Rect> iterPos = GetItemIterPos(le.GetMouseCursor());
-
-		if(iterPos.first != items.end())
-		{
-            	    if(ActionBarCursor(**iterPos.first, le.GetMouseCursor(), iterPos.second))
-                	return true;
-            	    else
-		    if(le.MouseClickLeft(iterPos.second))
-            	    {
-            		if(iterPos.first == curItem)
-                    	    return ActionBarDoubleClick(**curItem, le.GetMouseCursor(), iterPos.second);
-            		else
-                	{
-                    	    curItem = iterPos.first;
-                    	    return ActionBarSingleClick(**curItem, le.GetMouseCursor(), iterPos.second);
-            		}
-            	    }
-            	    else
-            	    if(le.MousePressRight(iterPos.second))
-            		return ActionBarPressRight(**iterPos.first, le.GetMouseCursor(), iterPos.second);
-		}
-	    }
-
-            return false;
-        }
-
-    private:
-	void RescanSize(void)
-	{
-	    barsz.w = colrows.w ? colrows.w * backsf.w() + (colrows.w - 1) * hspace : 0;
-	    barsz.h = colrows.h ? colrows.h * backsf.h() + (colrows.h - 1) * vspace : 0;
-	}
-
-	void RescanCursorOffset(void)
-	{
-	    curof.x = spcursor.Sprite() ? (backsf.w() - spcursor.Sprite()->w()) / 2 : 0;
-	    curof.y = spcursor.Sprite() ? (backsf.h() - spcursor.Sprite()->h()) / 2 : 0;
-	}
-
-	ItemsIterator GetItemIter(const Point & pt)
-	{
-	    return GetItemIterPos(pt).first;
-	}
-
-	std::pair<ItemsIterator, Rect> GetItemIterPos(const Point & pt)
-	{
-	    Rect dstrt(barsz, backsf.w(), backsf.h());
-	    ItemsIterator posItem = topItem;
-
-	    for(u16 yy = 0; yy < colrows.h; ++yy)
-	    {
-		for(u16 xx = 0; xx < colrows.w; ++xx)
-		{
-		    if(posItem != items.end())
-		    {
-			if(dstrt & pt)
-			    return std::pair<ItemsIterator, Rect>(posItem, dstrt);
-			++posItem;
-		    }
-
-		    dstrt.x += hspace + backsf.w();
-		}
-
-		dstrt.x = barsz.x;
-		dstrt.y += vspace + backsf.h();
-	    }
-
-	    return std::pair<ItemsIterator, Rect>(items.end(), Rect());
-	}
-    };
 }
 
 #endif

@@ -38,7 +38,6 @@
 #include "heroes_indicator.h"
 #include "selectarmybar.h"
 #include "statusbar.h"
-#include "selectartifactbar.h"
 #include "pocketpc.h"
 
 /* readonly: false, fade: false */
@@ -169,14 +168,13 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     dst_pt.x = cur_pt.x + 51;
     dst_pt.y = cur_pt.y + 308;
 
-    SelectArtifactsBar selectArtifacts;
+    ArtifactsBar selectArtifacts(this, false, readonly);
 
-    selectArtifacts.SetHero(*this);
-    selectArtifacts.SetPos(dst_pt);
-    selectArtifacts.SetInterval(15);
-    selectArtifacts.SetBackgroundSprite(AGG::GetICN(ICN::ARTIFACT, 0));
-    selectArtifacts.SetCursorSprite(AGG::GetICN(ICN::NGEXTRA, 62));
-    if(readonly) selectArtifacts.SetReadOnly();
+    selectArtifacts.SetColRows(7, 2);
+    selectArtifacts.SetHSpace(15);
+    selectArtifacts.SetVSpace(15);
+    selectArtifacts.SetContent(GetBagArtifacts());
+    selectArtifacts.SetPos(dst_pt.x, dst_pt.y);
     selectArtifacts.Redraw();
 
     // bottom small bar
@@ -264,18 +262,21 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
         {
             if(SelectArmyBar::QueueEventProcessing(selectArmy))
             {
+		cursor.Hide();
+		if(selectArtifacts.isSelected()) selectArtifacts.ResetSelected();
         	redrawMorale = true;
         	redrawLuck = true;
     	    }
 	}
 
-        if(le.MouseCursor(selectArtifacts.GetArea()))
+        if(le.MouseCursor(selectArtifacts.GetArea()) &&
+	    selectArtifacts.QueueEventProcessing())
         {
-            if(SelectArtifactsBar::QueueEventProcessing(selectArtifacts))
-            {
-        	redrawMorale = true;
-        	redrawLuck = true;
-    	    }
+	    cursor.Hide();
+	    if(selectArmy.isSelected()) selectArmy.Reset();
+	    selectArtifacts.Redraw();
+    	    redrawMorale = true;
+	    redrawLuck = true;
 	}
 
         // button click
@@ -367,13 +368,12 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
         if(le.MouseCursor(buttonNextHero)) statusBar.ShowMessage(_("Show next heroes"));
         else
 	// status message over artifact
-	if(le.MouseCursor(selectArtifacts.GetArea()))
+	if(const Artifact* art = selectArtifacts.GetItem(le.GetMouseCursor()))
 	{
-	    const s8 index = selectArtifacts.GetIndexFromCoord(le.GetMouseCursor());
-	    if(0 <= index && index < HEROESMAXARTIFACT && bag_artifacts[index] != Artifact::UNKNOWN)
+	    if(art->isValid())
 	    {
 		message = _("View %{art} Info");
-		String::Replace(message, "%{art}", bag_artifacts[index].GetName());
+		String::Replace(message, "%{art}", art->GetName());
 		statusBar.ShowMessage(message);
 	    }
 	    else

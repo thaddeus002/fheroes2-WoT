@@ -31,7 +31,6 @@
 #include "kingdom.h"
 #include "skill.h"
 #include "army.h"
-#include "selectartifactbar.h"
 #include "selectarmybar.h"
 #include "interface_icons.h"
 #include "interface_list.h"
@@ -40,15 +39,19 @@ struct HeroRow
 {
     Heroes* 		hero;
     SelectArmyBar	armyBar;
-    SelectArtifactsBar	artifactsBar;
+    ArtifactsBar*	artifactsBar;
     SecondarySkillsBar	secskillsBar;
     PrimarySkillsBar*	primskillsBar;
     Surface		sfb;
     Surface		sfc;
     Surface		sfd;
 
-    HeroRow() : hero(NULL), primskillsBar(NULL) {}
-    ~HeroRow() { delete primskillsBar; }
+    HeroRow() : hero(NULL), artifactsBar(NULL), primskillsBar(NULL) {}
+    ~HeroRow()
+    {
+	delete artifactsBar;
+	delete primskillsBar;
+    }
 
     void Init(Heroes* ptr)
     {
@@ -69,15 +72,11 @@ struct HeroRow
 	armyBar.SetUseMons32Sprite();
 	if(hero->inCastle()) armyBar.SetCastle(*hero->inCastle());
 
-	sfd.Set(34, 34);
-	Cursor::DrawCursor(sfd, 0xd7, true);
-
-	artifactsBar.SetHero(*hero);
-	artifactsBar.SetInterval(1);
-	artifactsBar.SetVerticalSpace(8);
-	artifactsBar.SetBackgroundSprite(AGG::GetICN(ICN::OVERVIEW, 12));
-	artifactsBar.SetCursorSprite(sfd);
-	artifactsBar.SetUseArts32Sprite();
+	artifactsBar = new ArtifactsBar(hero, true, false);
+	artifactsBar->SetColRows(7, 2);
+	artifactsBar->SetHSpace(1);
+	artifactsBar->SetVSpace(8);
+	artifactsBar->SetContent(hero->GetBagArtifacts());
 
 	secskillsBar.SetColRows(4, 2);
         secskillsBar.SetHSpace(-1);
@@ -161,13 +160,13 @@ bool StatsHeroesList::ActionListCursor(HeroRow & row, const Point & cursor, s16 
     if((row.armyBar.GetArea() & cursor) &&
 	SelectArmyBar::QueueEventProcessing(row.armyBar))
     {
-	if(row.artifactsBar.isSelected()) row.artifactsBar.Reset();
+	if(row.artifactsBar->isSelected()) row.artifactsBar->ResetSelected();
 	Cursor::Get().Hide();
 	return true;
     }
     else
-    if((row.artifactsBar.GetArea() & cursor) &&
-	SelectArtifactsBar::QueueEventProcessing(row.artifactsBar))
+    if((row.artifactsBar->GetArea() & cursor) &&
+	row.artifactsBar->QueueEventProcessing())
     {
 	if(row.armyBar.isSelected()) row.armyBar.Reset();
 	Cursor::Get().Hide();
@@ -223,8 +222,8 @@ void StatsHeroesList::RedrawItem(const HeroRow & row, s16 dstx, s16 dsty, bool c
 	const_cast<SecondarySkillsBar &>(row.secskillsBar).Redraw();
 
 	// artifacts info
-	const_cast<SelectArtifactsBar &>(row.artifactsBar).SetPos(Point(dstx + 348, dsty + 3));
-	const_cast<SelectArtifactsBar &>(row.artifactsBar).Redraw();
+	const_cast<ArtifactsBar*>(row.artifactsBar)->SetPos(dstx + 348, dsty + 3);
+	const_cast<ArtifactsBar*>(row.artifactsBar)->Redraw();
 
 	// army info
 	const_cast<SelectArmyBar &>(row.armyBar).SetPos(Point(dstx -1, dsty + 30));

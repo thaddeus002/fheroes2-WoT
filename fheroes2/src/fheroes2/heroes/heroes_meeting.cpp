@@ -31,7 +31,6 @@
 #include "background.h"
 #include "heroes.h"
 #include "selectarmybar.h"
-#include "selectartifactbar.h"
 #include "heroes_indicator.h"
 #include "pocketpc.h"
 #include "game_interface.h"
@@ -172,33 +171,23 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     dst_pt.x = cur_pt.x + 23;
     dst_pt.y = cur_pt.y + 347;
 
-    const Rect rt2(23, 347, 34, 34);
-    Surface sfb2(rt2.w, rt2.h);
-    backSprite.Blit(rt2, 0, 0, sfb2);
-    Surface sfc2(rt2.w, rt2.h);
-    Cursor::DrawCursor(sfc2, 0x10, true);
-
-    SelectArtifactsBar selectArtifacts1;
-
-    selectArtifacts1.SetHero(*this);
-    selectArtifacts1.SetPos(dst_pt);
-    selectArtifacts1.SetInterval(2);
-    selectArtifacts1.SetBackgroundSprite(sfb2);
-    selectArtifacts1.SetCursorSprite(sfc2);
-    selectArtifacts1.SetUseArts32Sprite();
+    ArtifactsBar selectArtifacts1(this, true, false);
+    selectArtifacts1.SetColRows(7, 2);
+    selectArtifacts1.SetHSpace(2);
+    selectArtifacts1.SetVSpace(2);
+    selectArtifacts1.SetContent(GetBagArtifacts());
+    selectArtifacts1.SetPos(dst_pt.x, dst_pt.y);
     selectArtifacts1.Redraw();
 
     dst_pt.x = cur_pt.x + 367;
     dst_pt.y = cur_pt.y + 347;
 
-    SelectArtifactsBar selectArtifacts2;
-
-    selectArtifacts2.SetHero(heroes2);
-    selectArtifacts2.SetPos(dst_pt);
-    selectArtifacts2.SetInterval(2);
-    selectArtifacts2.SetBackgroundSprite(sfb2);
-    selectArtifacts2.SetCursorSprite(sfc2);
-    selectArtifacts2.SetUseArts32Sprite();
+    ArtifactsBar selectArtifacts2(&heroes2, true, false);
+    selectArtifacts2.SetColRows(7, 2);
+    selectArtifacts2.SetHSpace(2);
+    selectArtifacts2.SetVSpace(2);
+    selectArtifacts2.SetContent(heroes2.GetBagArtifacts());
+    selectArtifacts2.SetPos(dst_pt.x, dst_pt.y);
     selectArtifacts2.Redraw();
 
     // button exit
@@ -229,13 +218,14 @@ void Heroes::MeetingDialog(Heroes & heroes2)
 	// selector troops event
 	if(le.MouseCursor(selectArmy1.GetArea()) || le.MouseCursor(selectArmy2.GetArea()))
 	{
-	    if(selectArtifacts1.isSelected()) selectArtifacts1.Reset();
-	    else
-	    if(selectArtifacts2.isSelected()) selectArtifacts2.Reset();
-
     	    if(SelectArmyBar::QueueEventProcessing(selectArmy1, selectArmy2))
 	    {
 		cursor.Hide();
+
+		if(selectArtifacts1.isSelected()) selectArtifacts1.ResetSelected();
+		else
+		if(selectArtifacts2.isSelected()) selectArtifacts2.ResetSelected();
+
 		moraleIndicator1.Redraw();
 		moraleIndicator2.Redraw();
 		luckIndicator1.Redraw();
@@ -246,45 +236,34 @@ void Heroes::MeetingDialog(Heroes & heroes2)
 	}
 
 	// selector artifacts event
-	if(le.MouseCursor(selectArtifacts1.GetArea()) || le.MouseCursor(selectArtifacts2.GetArea()))
+	if((le.MouseCursor(selectArtifacts1.GetArea()) &&
+    	    selectArtifacts1.QueueEventProcessing(selectArtifacts2)) ||
+	   (le.MouseCursor(selectArtifacts2.GetArea()) &&
+    	    selectArtifacts2.QueueEventProcessing(selectArtifacts1)))
 	{
+	    cursor.Hide();
+
 	    if(selectArmy1.isSelected()) selectArmy1.Reset();
 	    else
 	    if(selectArmy2.isSelected()) selectArmy2.Reset();
 
-    	    if(SelectArtifactsBar::QueueEventProcessing(selectArtifacts1, selectArtifacts2))
-	    {
-		cursor.Hide();
-		backPrimary.Restore();
-		RedrawPrimarySkillInfo(cur_pt, &primskill_bar1, &primskill_bar2);
-		moraleIndicator1.Redraw();
-		moraleIndicator2.Redraw();
-		luckIndicator1.Redraw();
-		luckIndicator2.Redraw();
-		cursor.Show();
-		display.Flip();
-	    }
+	    selectArtifacts1.Redraw();
+	    selectArtifacts2.Redraw();
+
+	    backPrimary.Restore();
+	    RedrawPrimarySkillInfo(cur_pt, &primskill_bar1, &primskill_bar2);
+	    moraleIndicator1.Redraw();
+	    moraleIndicator2.Redraw();
+	    luckIndicator1.Redraw();
+	    luckIndicator2.Redraw();
+	    cursor.Show();
+	    display.Flip();
 	}
 
-        if(le.MouseCursor(primskill_bar1.GetArea()) && primskill_bar1.QueueEventProcessing())
-	{
-	    cursor.Show();
-	    display.Flip();
-	}
-	else
-        if(le.MouseCursor(primskill_bar2.GetArea()) && primskill_bar2.QueueEventProcessing())
-	{
-	    cursor.Show();
-	    display.Flip();
-	}
-	else
-        if(le.MouseCursor(secskill_bar1.GetArea()) && secskill_bar1.QueueEventProcessing())
-	{
-	    cursor.Show();
-	    display.Flip();
-	}
-	else
-        if(le.MouseCursor(secskill_bar2.GetArea()) && secskill_bar2.QueueEventProcessing())
+        if((le.MouseCursor(primskill_bar1.GetArea()) && primskill_bar1.QueueEventProcessing()) ||
+           (le.MouseCursor(primskill_bar2.GetArea()) && primskill_bar2.QueueEventProcessing()) ||
+           (le.MouseCursor(secskill_bar1.GetArea()) && secskill_bar1.QueueEventProcessing()) ||
+           (le.MouseCursor(secskill_bar2.GetArea()) && secskill_bar2.QueueEventProcessing()))
 	{
 	    cursor.Show();
 	    display.Flip();
