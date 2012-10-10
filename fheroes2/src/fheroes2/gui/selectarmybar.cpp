@@ -655,7 +655,7 @@ void DialogRedistributeArmy(Army & army1, u8 index1, Army & army2, u8 index2)
     Troop* troop1 = army1.GetTroop(index1);
     Troop* troop2 = army2.GetTroop(index2);
 
-    const bool last = (1 == army1.GetCount()) && (&army1 != &army2);
+    const bool last = (1 == army1.GetCount());
 
     if(2 > troop1->GetCount())
     {
@@ -664,10 +664,9 @@ void DialogRedistributeArmy(Army & army1, u8 index1, Army & army2, u8 index2)
     }
     else
     {
-	const u8 free_slots = (&army1 == &army2 ? 1 : 0) + army2.Size() - army2.GetCount();
-	const u32 max_count = last ? troop1->GetCount() - 1 : troop1->GetCount();
 	u32 redistr_count = troop1->GetCount() / 2;
-	const u8 slots = Dialog::ArmySplitTroop((free_slots > max_count ? max_count : free_slots), max_count, redistr_count);
+	u8 slots = Dialog::ArmySplitTroop((army2.GetTroop(index1) == troop1 ? 1 : 0) + army2.Size() - army2.GetCount(),
+							(last ? troop1->GetCount() - 1 : troop1->GetCount()), redistr_count);
 
 	switch(slots)
 	{
