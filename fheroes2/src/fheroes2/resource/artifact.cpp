@@ -24,6 +24,7 @@
 #include <vector>
 #include <algorithm>
 #include "agg.h"
+#include "cursor.h"
 #include "settings.h"
 #include "world.h"
 #include "spell.h"
