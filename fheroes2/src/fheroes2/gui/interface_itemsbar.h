@@ -66,7 +66,7 @@ namespace Interface
 	bool		QueueEventProcessing(void);
 */
 
-	virtual void	RedrawBackground(const Rect &, bool, Surface &) {}
+	virtual void	RedrawBackground(const Rect &, Item*, Surface &) {}
 	virtual void	RedrawItem(Item &, const Rect &, Surface &) {}
 
         virtual bool	ActionBarSingleClick(Item & item){ return false; }
@@ -158,7 +158,7 @@ namespace Interface
 	    {
 		for(u16 xx = 0; xx < colrows.w; ++xx)
 		{
-		    RedrawBackground(Rect(dstpt, itemsz.w, itemsz.h), posItem != items.end(), dstsf);
+		    RedrawBackground(Rect(dstpt, itemsz.w, itemsz.h), (posItem != items.end() ? *posItem : NULL), dstsf);
 
 		    if(posItem != items.end())
 		    {

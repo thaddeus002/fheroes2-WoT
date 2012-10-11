@@ -798,15 +798,13 @@ void ArtifactsBar::Redraw(Surface & dstsf)
     Interface::ItemsActionBar<Artifact>::Redraw(dstsf);
 }
 
-void ArtifactsBar::RedrawBackground(const Rect & pos, bool validItem, Surface & dstsf)
+void ArtifactsBar::RedrawBackground(const Rect & pos, Artifact* art, Surface & dstsf)
 {
     if(use_mini_sprite)
     	backsf.Blit(pos, dstsf);
     else
-    if(! validItem)
-    {
+    if(!art || ! art->isValid())
 	AGG::GetICN(ICN::ARTIFACT, 0).Blit(pos, dstsf);
-    }
 }
 
 void ArtifactsBar::RedrawItem(Artifact & art, const Rect & pos, bool current, Surface & dstsf)
@@ -828,8 +826,6 @@ void ArtifactsBar::RedrawItem(Artifact & art, const Rect & pos, bool current, Su
 		spcursor.Show(pos.x - 3, pos.y - 3);
 	}
     }
-    else
-	RedrawBackground(pos, false, dstsf);
 }
 
 bool ArtifactsBar::ActionBarSingleClick(const Point & cursor, Artifact & art, const Rect & pos)

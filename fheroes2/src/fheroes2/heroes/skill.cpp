@@ -756,7 +756,7 @@ void PrimarySkillsBar::SetTextOff(s16 ox, s16 oy)
     toff = Point(ox, oy);
 }
 
-void PrimarySkillsBar::RedrawBackground(const Rect & pos, bool validItem, Surface & dstsf)
+void PrimarySkillsBar::RedrawBackground(const Rect & pos, Skill::Primary::skill_t* skill, Surface & dstsf)
 {
     if(use_mini_sprite)
 	backsf.Blit(pos, dstsf);
@@ -877,12 +877,12 @@ SecondarySkillsBar::SecondarySkillsBar(bool mini /* true */, bool change /* fals
     }
 }
 
-void SecondarySkillsBar::RedrawBackground(const Rect & pos, bool validItem, Surface & dstsf)
+void SecondarySkillsBar::RedrawBackground(const Rect & pos, Skill::Secondary* skill, Surface & dstsf)
 {
     if(use_mini_sprite)
 	backsf.Blit(pos, dstsf);
     else
-    if(! validItem) // big sprite eq background size
+    if(! skill || !skill->isValid()) // big sprite eq background size
 	AGG::GetICN(ICN::SECSKILL, 0).Blit(pos, dstsf);
 }
 

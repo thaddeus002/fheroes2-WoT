@@ -232,7 +232,7 @@ class ArtifactsBar : public Interface::ItemsActionBar<Artifact>
 public:
     ArtifactsBar(const Heroes*, bool mini, bool ro, bool change = false);
 
-    void        RedrawBackground(const Rect &, bool, Surface &);
+    void        RedrawBackground(const Rect &, Artifact*, Surface &);
     void        RedrawItem(Artifact &, const Rect &, bool, Surface &);
 
     void	ResetSelected(void);

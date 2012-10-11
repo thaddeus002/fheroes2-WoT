@@ -177,7 +177,7 @@ public:
     PrimarySkillsBar(const Heroes*, bool mini);
 
     void	SetTextOff(s16, s16);
-    void	RedrawBackground(const Rect &, bool, Surface &);
+    void	RedrawBackground(const Rect &, Skill::Primary::skill_t*, Surface &);
     void	RedrawItem(Skill::Primary::skill_t &, const Rect &, Surface &);
 
     bool	ActionBarSingleClick(Skill::Primary::skill_t &);
@@ -196,7 +196,7 @@ class SecondarySkillsBar : public Interface::ItemsBar<Skill::Secondary>
 public:
     SecondarySkillsBar(bool mini = true, bool change = false);
 
-    void	RedrawBackground(const Rect &, bool, Surface &);
+    void	RedrawBackground(const Rect &, Skill::Secondary*, Surface &);
     void	RedrawItem(Skill::Secondary &, const Rect &, Surface &);
 
     bool	ActionBarSingleClick(Skill::Secondary &);
