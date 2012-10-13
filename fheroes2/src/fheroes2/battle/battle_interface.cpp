@@ -1180,7 +1180,7 @@ void Battle::Interface::RedrawCastle2(const Castle & castle, s16 cell_index) con
     // castle archer towers
     if(19 == cell_index)
     {
-	const Tower* ltower = Arena::GetTower(0);
+	const Tower* ltower = Arena::GetTower(TWR_LEFT);
 	u8 index = 17;
 
 	if(castle.isBuild(BUILD_LEFTTURRET) && ltower)
@@ -1191,7 +1191,7 @@ void Battle::Interface::RedrawCastle2(const Castle & castle, s16 cell_index) con
     else
     if(85 == cell_index)
     {
-	const Tower* rtower = Arena::GetTower(2);
+	const Tower* rtower = Arena::GetTower(TWR_RIGHT);
 	u8 index = 17;
 
 	if(castle.isBuild(BUILD_RIGHTTURRET) && rtower)
@@ -1214,7 +1214,7 @@ void Battle::Interface::RedrawCastle3(const Castle & castle) const
     //const Settings & conf = Settings::Get();
     const Point & topleft = border.GetArea();
     const Sprite & sprite = AGG::GetICN(ICN::Get4Castle(castle.GetRace()),
-					(Arena::GetTower(1)->isValid() ? 20 : 26));
+					(Arena::GetTower(TWR_CENTER)->isValid() ? 20 : 26));
 
     sprite.Blit(topleft.x + sprite.x() ,topleft.y + sprite.y());
 }
