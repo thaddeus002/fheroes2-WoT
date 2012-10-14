@@ -66,7 +66,7 @@ namespace Interface
 	bool		QueueEventProcessing(void);
 */
 
-	virtual void	RedrawBackground(const Rect &, Item*, Surface &) {}
+	virtual void	RedrawBackground(const Rect &, Surface &) {}
 	virtual void	RedrawItem(Item &, const Rect &, Surface &) {}
 
         virtual bool	ActionBarSingleClick(Item & item){ return false; }
@@ -134,6 +134,12 @@ namespace Interface
 	    return posItem != items.end() ? *posItem : NULL;
 	}
 
+	s8 GetIndex(const Point & pt)
+	{
+	    ItemsIterator posItem = GetItemIter(pt);
+	    return posItem != items.end() ? std::distance(items.end(), posItem) : -1;
+	}
+
 	const Point & GetPos(void) const
 	{
 	    return barsz;
@@ -152,14 +158,27 @@ namespace Interface
 	void Redraw(Surface & dstsf = Display::Get())
 	{
 	    Point dstpt(barsz);
+
+	    for(u16 yy = 0; yy < colrows.h; ++yy)
+	    {
+		for(u16 xx = 0; xx < colrows.w; ++xx)
+		{
+		    RedrawBackground(Rect(dstpt, itemsz.w, itemsz.h), dstsf);
+
+		    dstpt.x += hspace + itemsz.w;
+		}
+
+		dstpt.x = barsz.x;
+		dstpt.y += vspace + itemsz.h;
+	    }
+
+	    dstpt = barsz;
 	    ItemsIterator posItem = GetTopItemIter();
 
 	    for(u16 yy = 0; yy < colrows.h; ++yy)
 	    {
 		for(u16 xx = 0; xx < colrows.w; ++xx)
 		{
-		    RedrawBackground(Rect(dstpt, itemsz.w, itemsz.h), (posItem != items.end() ? *posItem : NULL), dstsf);
-
 		    if(posItem != items.end())
 		    {
 			RedrawItemIter(posItem, Rect(dstpt, itemsz.w, itemsz.h), dstsf);

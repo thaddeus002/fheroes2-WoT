@@ -73,6 +73,7 @@ u32 Interface::StatusWindow::ResetResourceStatus(u32 tick, void *ptr)
 	if(STATUS_RESOURCE == status->state)
 	{
 	    status->state = status->oldState;
+	    Cursor::Get().Hide();
 	    Interface::Basic::Get().Redraw(REDRAW_STATUS);
 	}
 	else
