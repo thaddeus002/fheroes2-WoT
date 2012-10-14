@@ -1579,7 +1579,8 @@ bool SkipRedrawTileBottom4Hero(const Maps::TilesAddon & ta, const u16 & passable
 	    return true;
 
 	case ICN::OBJNCRCK:
-	    return (ta.index == 188 || ta.index == 189 || (passable & DIRECTION_TOP_ROW));
+	    return (ta.index == 58 || ta.index == 59 || ta.index == 64 || ta.index == 65 ||
+			ta.index == 188 || ta.index == 189 || (passable & DIRECTION_TOP_ROW));
 
 	case ICN::OBJNDIRT:
 	case ICN::OBJNDSRT:
