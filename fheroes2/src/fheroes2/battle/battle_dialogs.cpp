@@ -362,7 +362,7 @@ void Battle::Arena::DialogBattleSummary(const Result & res) const
     display.Flip();
 }
 
-u8 Battle::Arena::DialogBattleHero(const HeroBase & hero) const
+u8 Battle::Arena::DialogBattleHero(const HeroBase & hero, bool buttons) const
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
@@ -372,7 +372,7 @@ u8 Battle::Arena::DialogBattleHero(const HeroBase & hero) const
     cursor.Hide();
     cursor.SetThemes(Cursor::POINTER);
 
-    const bool readonly = current_color != hero.GetColor();
+    const bool readonly = current_color != hero.GetColor() || !buttons;
     const Sprite & dialog = AGG::GetICN((conf.ExtGameEvilInterface() ? ICN::VGENBKGE : ICN::VGENBKG), 0);
 
     Rect pos_rt;
@@ -473,6 +473,8 @@ u8 Battle::Arena::DialogBattleHero(const HeroBase & hero) const
 	btnRetreat.isEnable() && le.MousePressLeft(btnRetreat) ? btnRetreat.PressDraw() : btnRetreat.ReleaseDraw();
 	btnSurrender.isEnable() && le.MousePressLeft(btnSurrender) ? btnSurrender.PressDraw() : btnSurrender.ReleaseDraw();
 	le.MousePressLeft(btnClose) ? btnClose.PressDraw() : btnClose.ReleaseDraw();
+
+	if(!buttons && !le.MousePressRight()) break;
 
 	if(Game::HotKeyPress(Game::EVENT_BATTLE_CASTSPELL) ||
 		(btnCast.isEnable() && le.MouseClickLeft(btnCast))) result = 1;

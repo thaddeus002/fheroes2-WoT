@@ -1683,7 +1683,7 @@ void Battle::Interface::HumanBattleTurn(const Unit & b, Actions & a, std::string
 
 	    if(le.MouseClickLeft(opponent1->GetArea()))
 	    {
-		ProcessingHeroDialogResult(arena.DialogBattleHero(*opponent1->GetHero()), a);
+		ProcessingHeroDialogResult(arena.DialogBattleHero(*opponent1->GetHero(), true), a);
 		humanturn_redraw = true;
 	    }
 	}
@@ -1694,9 +1694,15 @@ void Battle::Interface::HumanBattleTurn(const Unit & b, Actions & a, std::string
 
 	    if(le.MouseClickLeft(opponent1->GetArea()))
 	    {
-		arena.DialogBattleHero(*opponent1->GetHero());
+		arena.DialogBattleHero(*opponent1->GetHero(), true);
 		humanturn_redraw = true;
 	    }
+	}
+
+	if(le.MousePressRight(opponent1->GetArea()))
+	{
+	    arena.DialogBattleHero(*opponent1->GetHero(), false);
+	    humanturn_redraw = true;
 	}
     }
     else
@@ -1709,7 +1715,7 @@ void Battle::Interface::HumanBattleTurn(const Unit & b, Actions & a, std::string
 
 	    if(le.MouseClickLeft(opponent2->GetArea()))
 	    {
-		ProcessingHeroDialogResult(arena.DialogBattleHero(*opponent2->GetHero()), a);
+		ProcessingHeroDialogResult(arena.DialogBattleHero(*opponent2->GetHero(), true), a);
 		humanturn_redraw = true;
 	    }
 	}
@@ -1720,9 +1726,15 @@ void Battle::Interface::HumanBattleTurn(const Unit & b, Actions & a, std::string
 
 	    if(le.MouseClickLeft(opponent2->GetArea()))
 	    {
-		arena.DialogBattleHero(*opponent2->GetHero());
+		arena.DialogBattleHero(*opponent2->GetHero(), true);
 		humanturn_redraw = true;
 	    }
+	}
+
+	if(le.MousePressRight(opponent2->GetArea()))
+	{
+	    arena.DialogBattleHero(*opponent2->GetHero(), false);
+	    humanturn_redraw = true;
 	}
     }
     else

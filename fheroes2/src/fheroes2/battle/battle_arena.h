@@ -95,7 +95,7 @@ namespace Battle
 			GetUsageSpells(void) const;
 
 	void		DialogBattleSummary(const Result &) const;
-	u8		DialogBattleHero(const HeroBase &) const;
+	u8		DialogBattleHero(const HeroBase &, bool) const;
 
 	void		FadeArena(void) const;
 
