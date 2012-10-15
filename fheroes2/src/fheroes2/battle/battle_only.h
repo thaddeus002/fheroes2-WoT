@@ -26,11 +26,8 @@
 #include "army.h"
 #include "players.h"
 #include "heroes_recruits.h"
+#include "selectarmybar.h"
 
-class ArmyBar;
-class PrimarySkillsBar;
-class SecondarySkillsBar;
-class ArtifactsBar;
 class MoraleIndicator;
 class LuckIndicator;
 
@@ -74,8 +71,8 @@ namespace Battle
 	SecondarySkillsBar* secskill_bar1;
 	SecondarySkillsBar* secskill_bar2;
 
-	ArmyBar* selectArmy1;
-	ArmyBar* selectArmy2;
+	SelectArmyBar selectArmy1;
+	SelectArmyBar selectArmy2;
 
 	ArtifactsBar* selectArtifacts1;
 	ArtifactsBar* selectArtifacts2;

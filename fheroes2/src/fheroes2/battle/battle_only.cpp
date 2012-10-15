@@ -35,7 +35,6 @@
 #include "button.h"
 #include "race.h"
 #include "game.h"
-#include "army_bar.h"
 #include "battle_only.h"
 
 #define PRIMARY_MAX_VALUE	20
@@ -61,8 +60,7 @@ void Battle::ControlInfo::Redraw(void)
 Battle::Only::Only() : hero1(NULL), hero2(NULL), player1(Color::BLUE), player2(Color::NONE),
 	army1(NULL), army2(NULL), moraleIndicator1(NULL), moraleIndicator2(NULL),
 	luckIndicator1(NULL), luckIndicator2(NULL), primskill_bar1(NULL), primskill_bar2(NULL),
-	secskill_bar1(NULL), secskill_bar2(NULL), selectArmy1(NULL), selectArmy2(NULL),
-	selectArtifacts1(NULL), selectArtifacts2(NULL), cinfo2(NULL),
+	secskill_bar1(NULL), secskill_bar2(NULL), selectArtifacts1(NULL), selectArtifacts2(NULL), cinfo2(NULL),
 	rt1(36, 267, 43, 53), sfb1(rt1.w, rt1.h), sfc1(rt1.w, rt1.h - 10),
 	rt2(23, 347, 34, 34), sfb2(rt2.w, rt2.h), sfc2(rt2.w, rt2.h)
 {
@@ -170,18 +168,22 @@ bool Battle::Only::ChangeSettings(void)
     RedrawBaseInfo(cur_pt);
 
     UpdateHero1(cur_pt);
-
     moraleIndicator1->Redraw();
     luckIndicator1->Redraw();
     primskill_bar1->Redraw();
     secskill_bar1->Redraw();
     selectArtifacts1->Redraw();
+    selectArmy1.Redraw();
 
-    selectArmy1 = new ArmyBar(army1, true, false, true);
-    selectArmy1->SetColRows(5, 1);
-    selectArmy1->SetPos(cur_pt.x + 36, cur_pt.y + 267);
-    selectArmy1->SetHSpace(2);
-    selectArmy1->Redraw();
+    selectArmy1.SetArmy(*army1);
+    selectArmy1.SetPos(Point(cur_pt.x + 36, cur_pt.y + 267));
+    selectArmy1.SetInterval(2);
+    selectArmy1.SetBackgroundSprite(sfb1);
+    selectArmy1.SetCursorSprite(sfc1);
+    selectArmy1.SetUseMons32Sprite();
+    selectArmy1.SetSaveLastTroop();
+    selectArmy1.SetChangeMode();
+    selectArmy1.Redraw();
 
     if(hero2)
     {
@@ -192,17 +194,21 @@ bool Battle::Only::ChangeSettings(void)
 	luckIndicator2->Redraw();
 	secskill_bar2->Redraw();
 	selectArtifacts2->Redraw();
-	selectArmy2->Redraw();
+	selectArmy2.Redraw();
     }
 
     monsters.GetTroop(0)->Set(Monster::PEASANT, 100);
     army2 = hero2 ? &hero2->GetArmy() : &monsters;
 
-    selectArmy2 = new ArmyBar(army2, true, false, true);
-    selectArmy2->SetColRows(5, 1);
-    selectArmy2->SetPos(cur_pt.x + 381, cur_pt.y + 267);
-    selectArmy2->SetHSpace(2);
-    selectArmy2->Redraw();
+    selectArmy2.SetArmy(*army2);
+    selectArmy2.SetPos(Point(cur_pt.x + 381, cur_pt.y + 267));
+    selectArmy2.SetInterval(2);
+    selectArmy2.SetBackgroundSprite(sfb1);
+    selectArmy2.SetCursorSprite(sfc1);
+    selectArmy2.SetUseMons32Sprite();
+    selectArmy2.SetSaveLastTroop();
+    selectArmy2.SetChangeMode();
+    selectArmy2.Redraw();
 
     bool exit = false;
     bool redraw = false;
@@ -353,26 +359,22 @@ bool Battle::Only::ChangeSettings(void)
 	    }
 	}
 
-	if(allow1 && le.MouseCursor(selectArmy1->GetArea()) &&
-	    selectArmy1->QueueEventProcessing())
+	if(allow1 && le.MouseCursor(selectArmy1.GetArea()) &&
+	    SelectArmyBar::QueueEventProcessing(selectArmy1))
 	{
 	    if(selectArtifacts1->isSelected()) selectArtifacts1->ResetSelected();
 	    else
 	    if(selectArtifacts2 && selectArtifacts2->isSelected()) selectArtifacts2->ResetSelected();
-
-	    if(selectArmy2->isSelected()) selectArmy2->ResetSelected();
 
 	    redraw = true;
 	}
 
-	if(allow2 && le.MouseCursor(selectArmy2->GetArea()) &&
-	    selectArmy2->QueueEventProcessing())
+	if(allow2 && le.MouseCursor(selectArmy2.GetArea()) &&
+	    SelectArmyBar::QueueEventProcessing(selectArmy2))
 	{
 	    if(selectArtifacts1->isSelected()) selectArtifacts1->ResetSelected();
 	    else
 	    if(selectArtifacts2 && selectArtifacts2->isSelected()) selectArtifacts2->ResetSelected();
-
-	    if(selectArmy1->isSelected()) selectArmy1->ResetSelected();
 
 	    redraw = true;
 	}
@@ -380,9 +382,9 @@ bool Battle::Only::ChangeSettings(void)
 	if(allow1 && le.MouseCursor(selectArtifacts1->GetArea()) &&
 	    selectArtifacts1->QueueEventProcessing())
 	{
-	    if(selectArmy1->isSelected()) selectArmy1->ResetSelected();
+	    if(selectArmy1.isSelected()) selectArmy1.Reset();
 	    else
-	    if(selectArmy2->isSelected()) selectArmy2->ResetSelected();
+	    if(selectArmy2.isSelected()) selectArmy2.Reset();
 
 	    if(selectArtifacts2 && selectArtifacts2->isSelected()) selectArtifacts2->ResetSelected();
 
@@ -392,9 +394,9 @@ bool Battle::Only::ChangeSettings(void)
 	if(allow2 && selectArtifacts2 && le.MouseCursor(selectArtifacts2->GetArea()) &&
 	    selectArtifacts2->QueueEventProcessing())
 	{
-	    if(selectArmy1->isSelected()) selectArmy1->ResetSelected();
+	    if(selectArmy1.isSelected()) selectArmy1.Reset();
 	    else
-	    if(selectArmy2->isSelected()) selectArmy2->ResetSelected();
+	    if(selectArmy2.isSelected()) selectArmy2.Reset();
 
 	    if(selectArtifacts1->isSelected()) selectArtifacts1->ResetSelected();
 
@@ -450,7 +452,7 @@ bool Battle::Only::ChangeSettings(void)
 	  luckIndicator1->Redraw();
 	  secskill_bar1->Redraw();
 	  selectArtifacts1->Redraw();
-	  selectArmy1->Redraw();
+	  selectArmy1.Redraw();
 	  if(hero2)
 	  {
 	    moraleIndicator2->Redraw();
@@ -458,7 +460,7 @@ bool Battle::Only::ChangeSettings(void)
 	    secskill_bar2->Redraw();
 	    selectArtifacts2->Redraw();
 	  }
-	  selectArmy2->Redraw();
+	  selectArmy2.Redraw();
 	  if(cinfo2) cinfo2->Redraw();
 	  buttonStart.Draw();
 	  cursor.Show();
@@ -472,7 +474,6 @@ bool Battle::Only::ChangeSettings(void)
     delete primskill_bar1;
     delete secskill_bar1;
     delete selectArtifacts1;
-    delete selectArmy1;
 
     if(hero2)
     {
@@ -481,7 +482,6 @@ bool Battle::Only::ChangeSettings(void)
       delete primskill_bar2;
       delete secskill_bar2;
       delete selectArtifacts2;
-      delete selectArmy2;
     }
 
     if(cinfo2) delete cinfo2;
@@ -521,12 +521,6 @@ void Battle::Only::UpdateHero1(const Point & cur_pt)
       selectArtifacts1 = NULL;
     }
 
-    if(selectArmy1)
-    {
-      delete selectArmy1;
-      selectArmy1 = NULL;
-    }
-
     if(hero1)
     {
       player1.color = Color::BLUE;
@@ -558,11 +552,7 @@ void Battle::Only::UpdateHero1(const Point & cur_pt)
       selectArtifacts1->SetPos(cur_pt.x + 23, cur_pt.y + 347);
 
       army1 = &hero1->GetArmy();
-
-      selectArmy1 = new ArmyBar(army1, true, false, true);
-      selectArmy1->SetColRows(5, 1);
-      selectArmy1->SetPos(cur_pt.x + 36, cur_pt.y + 267);
-      selectArmy1->SetHSpace(2);
+      selectArmy1.SetArmy(*army1);
     }
 }
 
@@ -598,12 +588,6 @@ void Battle::Only::UpdateHero2(const Point & cur_pt)
       selectArtifacts2 = NULL;
     }
 
-    if(selectArmy2)
-    {
-      delete selectArmy2;
-      selectArmy2 = NULL;
-    }
-
     if(hero2)
     {
       player2.color = Color::RED;
@@ -634,12 +618,8 @@ void Battle::Only::UpdateHero2(const Point & cur_pt)
       selectArtifacts2->SetContent(hero2->GetBagArtifacts());
       selectArtifacts2->SetPos(cur_pt.x + 367, cur_pt.y + 347);
 
-      army1 = &hero1->GetArmy();
-
-      selectArmy2 = new ArmyBar(army2, true, false, true);
-      selectArmy2->SetColRows(5, 1);
-      selectArmy2->SetPos(cur_pt.x + 381, cur_pt.y + 267);
-      selectArmy2->SetHSpace(2);
+      army2 = &hero2->GetArmy();
+      selectArmy2.SetArmy(*army2);
     }
 }
 
