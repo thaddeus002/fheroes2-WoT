@@ -769,7 +769,7 @@ void Battle::Interface::RedrawOrderArmies(const Units & units) const
 	// background
 	display.FillRect(0x33, 0x33, 0x33, Rect(ox, oy, ow, ow));
 	// mons32 sprite
-	mons32.Blit(ox + (ow - mons32.w()) / 2, oy + ow - mons32.h(), display);
+	mons32.Blit(ox + (ow - mons32.w()) / 2, oy + ow - mons32.h() - (mons32.h() + 3 < ow ? 3 : 0), display);
 
 	// window
 	const Surface* sf = NULL;
@@ -1449,15 +1449,6 @@ void Battle::Interface::HumanTurn(const Unit & b, Actions & a)
     humanturn_redraw = false;
     humanturn_exit = false;
     catapult_frame = 0;
-
-    /*
-     may be: network client: fix current color
-    if(arena.GetCurrentColor() != b.GetArmyColor())
-    {
-	VERBOSE("FIXME: !!!!!!!!!!!!!!!!! Interface::HumanTurn");
-	arena.current_color = b.GetArmyColor();
-    }
-    */
 
     Board & board = *Arena::GetBoard();
 
