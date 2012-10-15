@@ -548,6 +548,10 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 
     	    if(NULL != castle)
 	    {
+		if(tile.GetObject() == MP2::OBJN_CASTLE &&
+		    from_hero.GetColor() == castle->GetColor())
+		    return Cursor::CASTLE;
+		else
 		if(from_hero.Modes(Heroes::GUARDIAN) ||
 		    from_hero.GetIndex() == castle->GetIndex())
 		    return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::POINTER;
