@@ -3845,6 +3845,20 @@ void RedrawSparksEffects(const Point & src, const Point & dst)
     display.DrawLine(src.x, src.y, dst.x, dst.y, yellow);
 }
 
+Point RedrawTroopWithFrameAnimationOffset(ICN::icn_t icn, const Rect & pos, const Sprite & sp,  bool qvga)
+{
+    Point res(sp.x() + pos.x, pos.y + sp.y());
+
+    switch(icn)
+    {
+	case ICN::STONSKIN:
+	case ICN::STELSKIN: res.y += pos.h / 2; break;
+	default: res.y += (qvga ? pos.h / 2 : 0); break;
+    }
+
+    return res;
+}
+
 void Battle::Interface::RedrawTroopWithFrameAnimation(Unit & b, ICN::icn_t icn, M82::m82_t m82, bool pain)
 {
     Display & display = Display::Get();
@@ -3883,8 +3897,8 @@ void Battle::Interface::RedrawTroopWithFrameAnimation(Unit & b, ICN::icn_t icn, 
 	    Redraw();
 
 	    const Sprite & sprite = AGG::GetICN(icn, frame, reflect);
-	    const Point sprite_pos(pos.x + (reflect ? 0 : pos.w / 2) + sprite.x(),
-				pos.y + sprite.y() + (Settings::Get().QVGA() ? pos.h / 2 : 0));
+	    const Point offset = RedrawTroopWithFrameAnimationOffset(icn, pos, sprite, Settings::Get().QVGA());
+	    const Point sprite_pos(offset.x + (reflect ? 0 : pos.w / 2), offset.y);
 
 	    if(icn == ICN::SPARKS)
 		RedrawSparksEffects(Point(rectArea.x + rectArea.w / 2, rectArea.y), sprite_pos);
