@@ -150,7 +150,7 @@ const settings_t settingsFHeroes2[] =
     { Settings::WORLD_DWELLING_ACCUMULATE_UNITS,_("world: Outer creature dwellings should accumulate units"), },
     { Settings::WORLD_USE_UNIQUE_ARTIFACTS_ML,	_("world: use unique artifacts for morale/luck"),       },
     { Settings::WORLD_USE_UNIQUE_ARTIFACTS_RS,	_("world: use unique artifacts for resource affecting"),},
-    { Settings::WORLD_USE_UNIQUE_ARTIFACTS_PS,	_("world: use unique artifacts for for primary skills"),},
+    { Settings::WORLD_USE_UNIQUE_ARTIFACTS_PS,	_("world: use unique artifacts for primary skills"),},
     { Settings::WORLD_USE_UNIQUE_ARTIFACTS_SS,	_("world: use unique artifacts for secondary skills"),},
     { Settings::WORLD_EXT_OBJECTS_CAPTURED,	_("world: Wind/Water Mills and Magic Garden can be captured"),},
     { Settings::WORLD_DISABLE_BARROW_MOUNDS,	_("world: disable Barrow Mounds"),			},
