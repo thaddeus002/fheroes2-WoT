@@ -135,7 +135,7 @@ namespace Interface
 
     struct PlayersInfo : std::vector<PlayerInfo>
     {
-	PlayersInfo(bool, bool, bool);
+	PlayersInfo(bool /* show name */, bool /* show race */, bool /* show swap button */);
 
 	void UpdateInfo(Players &, const Point & opponents, const Point & classes);
 

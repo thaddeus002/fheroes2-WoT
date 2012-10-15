@@ -91,7 +91,7 @@ void Dialog::GameInfo(void)
     text.Set(_("Class"), Font::SMALL, 350);
     text.Blit(pt.x + 52, pt.y + 225);
 
-    Interface::PlayersInfo playersInfo(true, false, false);
+    Interface::PlayersInfo playersInfo(true, true, false);
 
     playersInfo.UpdateInfo(conf.GetPlayers(), Point(pt.x + 40, pt.y + 165), Point(pt.x + 40, pt.y + 240));
     playersInfo.RedrawInfo(true);

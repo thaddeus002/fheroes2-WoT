@@ -105,7 +105,7 @@ std::string GameOver::GetActualDescription(u16 cond)
     if(WINS_ALL != cond && (WINS_ALL & cond)) msg.append(_(", or you may win by defeating all enemy heroes and capturing all enemy towns and castles."));
 
     if(LOSS_ALL == cond)
-	msg = GetString(WINS_ALL);
+	msg = GetString(LOSS_ALL);
     else
     if(LOSS_TOWN & cond)
     {
