@@ -61,7 +61,7 @@ s8 ArtifactsModifiersResult(u8 type, const u8* arts, u8 size, const HeroBase & b
 
     		    result += mod * acount;
 
-    		    if(strs)
+    		    if(strs && mod)
     		    {
         		strs->append(art.GetName());
 			StringAppendModifiers(*strs, mod);
