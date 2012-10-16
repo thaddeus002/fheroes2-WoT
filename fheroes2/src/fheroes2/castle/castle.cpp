@@ -710,10 +710,19 @@ bool Castle::RecruitMonster(const Troop & troop)
     const payment_t paymentCosts = ms.GetCost() * count;
     Kingdom & kingdom = GetKingdom();
 
-    // may be guardian present
-    Army & army2 = GetArmy();
+    if(! kingdom.AllowPayment(paymentCosts)) return false;
 
-    if(! kingdom.AllowPayment(paymentCosts) || !army2.JoinTroop(ms, count)) return false;
+    // first: guard army join
+    if(!GetArmy().JoinTroop(ms, count))
+    {
+	CastleHeroes heroes = world.GetHeroes(*this);
+
+	if(!heroes.Guest() || !heroes.Guest()->GetArmy().JoinTroop(ms, count))
+	{
+	    Dialog::Message("", _("There is no room in the garrison for this army."), Font::BIG, Dialog::OK);
+	    return false;
+	}
+    }
 
     kingdom.OddFundsResource(paymentCosts);
     dwelling[dw_index] -= count;
