@@ -35,6 +35,7 @@
 #include "kingdom.h"
 #include "players.h"
 #include "game_static.h"
+#include "interface_icons.h"
 #include "ai.h"
 
 bool HeroesStrongestArmy(const Heroes* h1, const Heroes* h2)
@@ -227,6 +228,10 @@ void Kingdom::AddHeroes(Heroes* hero)
 	if(heroes.end() == std::find(heroes.begin(), heroes.end(), hero))
 	    heroes.push_back(hero);
 
+	Player* player = Settings::Get().GetPlayers().GetCurrent();
+	if(player && player->isColor(GetColor()))
+	    Interface::IconsPanel::Get().ResetIcons(ICON_HEROES);
+
 	AI::HeroesAdd(*hero);
     }
 }
@@ -277,6 +282,10 @@ void Kingdom::AddCastle(const Castle* castle)
     {
 	if(castles.end() == std::find(castles.begin(), castles.end(), castle))
 	    castles.push_back(const_cast<Castle*>(castle));
+
+	Player* player = Settings::Get().GetPlayers().GetCurrent();
+	if(player && player->isColor(GetColor()))
+	    Interface::IconsPanel::Get().ResetIcons(ICON_CASTLES);
 
 	AI::CastleAdd(*castle);
     }
