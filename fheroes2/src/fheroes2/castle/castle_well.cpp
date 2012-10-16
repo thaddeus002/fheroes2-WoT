@@ -165,7 +165,7 @@ void Castle::OpenWell(void)
 			it = results.begin(); it != results.end(); ++it)
 		    {
 			const dwelling_t & dw = *it;
-			RecruitMonster(dw.first, dw.second);
+			RecruitMonsterFromDwelling(dw.first, dw.second);
 		    }
 		    redraw = true;
 		}

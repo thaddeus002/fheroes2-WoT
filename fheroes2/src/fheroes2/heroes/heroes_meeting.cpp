@@ -30,7 +30,7 @@
 #include "army.h"
 #include "background.h"
 #include "heroes.h"
-#include "selectarmybar.h"
+#include "army_bar.h"
 #include "heroes_indicator.h"
 #include "pocketpc.h"
 #include "game_interface.h"
@@ -139,32 +139,19 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     dst_pt.x = cur_pt.x + 36;
     dst_pt.y = cur_pt.y + 267;
 
-    const Rect rt1(36, 267, 43, 53);
-    Surface sfb1(rt1.w, rt1.h);
-    backSprite.Blit(rt1, 0, 0, sfb1);
-    Surface sfc1(rt1.w, rt1.h - 10);
-    Cursor::DrawCursor(sfc1, 0x10, true);
-
-    SelectArmyBar selectArmy1;
-    selectArmy1.SetArmy(army);
-    selectArmy1.SetPos(dst_pt);
-    selectArmy1.SetInterval(2);
-    selectArmy1.SetBackgroundSprite(sfb1);
-    selectArmy1.SetCursorSprite(sfc1);
-    selectArmy1.SetUseMons32Sprite();
-    selectArmy1.SetSaveLastTroop();
+    ArmyBar selectArmy1(&GetArmy(), true, false);
+    selectArmy1.SetColRows(5, 1);
+    selectArmy1.SetPos(dst_pt.x, dst_pt.y);
+    selectArmy1.SetHSpace(2);
     selectArmy1.Redraw();
 
     dst_pt.x = cur_pt.x + 381;
     dst_pt.y = cur_pt.y + 267;
-    SelectArmyBar selectArmy2;
-    selectArmy2.SetArmy(heroes2.GetArmy());
-    selectArmy2.SetPos(dst_pt);
-    selectArmy2.SetInterval(2);
-    selectArmy2.SetBackgroundSprite(sfb1);
-    selectArmy2.SetCursorSprite(sfc1);
-    selectArmy2.SetUseMons32Sprite();
-    selectArmy2.SetSaveLastTroop();
+
+    ArmyBar selectArmy2(&heroes2.GetArmy(), true, false);
+    selectArmy2.SetColRows(5, 1);
+    selectArmy2.SetPos(dst_pt.x, dst_pt.y);
+    selectArmy2.SetHSpace(2);
     selectArmy2.Redraw();
 
     // artifact
@@ -216,23 +203,26 @@ void Heroes::MeetingDialog(Heroes & heroes2)
         if(le.MouseClickLeft(buttonExit) || HotKeyCloseWindow) break;
 
 	// selector troops event
-	if(le.MouseCursor(selectArmy1.GetArea()) || le.MouseCursor(selectArmy2.GetArea()))
+	if((le.MouseCursor(selectArmy1.GetArea()) &&
+    	    selectArmy1.QueueEventProcessing(selectArmy2)) ||
+	   (le.MouseCursor(selectArmy2.GetArea()) &&
+    	    selectArmy2.QueueEventProcessing(selectArmy1)))
 	{
-    	    if(SelectArmyBar::QueueEventProcessing(selectArmy1, selectArmy2))
-	    {
-		cursor.Hide();
+	    cursor.Hide();
 
-		if(selectArtifacts1.isSelected()) selectArtifacts1.ResetSelected();
-		else
-		if(selectArtifacts2.isSelected()) selectArtifacts2.ResetSelected();
+	    if(selectArtifacts1.isSelected()) selectArtifacts1.ResetSelected();
+	    else
+	    if(selectArtifacts2.isSelected()) selectArtifacts2.ResetSelected();
 
-		moraleIndicator1.Redraw();
-		moraleIndicator2.Redraw();
-		luckIndicator1.Redraw();
-		luckIndicator2.Redraw();
-		cursor.Show();
-		display.Flip();
-	    }
+	    selectArmy1.Redraw();
+	    selectArmy2.Redraw();
+
+	    moraleIndicator1.Redraw();
+	    moraleIndicator2.Redraw();
+	    luckIndicator1.Redraw();
+	    luckIndicator2.Redraw();
+	    cursor.Show();
+	    display.Flip();
 	}
 
 	// selector artifacts event
@@ -243,9 +233,9 @@ void Heroes::MeetingDialog(Heroes & heroes2)
 	{
 	    cursor.Hide();
 
-	    if(selectArmy1.isSelected()) selectArmy1.Reset();
+	    if(selectArmy1.isSelected()) selectArmy1.ResetSelected();
 	    else
-	    if(selectArmy2.isSelected()) selectArmy2.Reset();
+	    if(selectArmy2.isSelected()) selectArmy2.ResetSelected();
 
 	    selectArtifacts1.Redraw();
 	    selectArtifacts2.Redraw();

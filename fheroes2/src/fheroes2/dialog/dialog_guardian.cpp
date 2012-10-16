@@ -26,7 +26,7 @@
 #include "heroes.h"
 #include "portrait.h"
 #include "button.h"
-#include "selectarmybar.h"
+#include "army_bar.h"
 #include "heroes_indicator.h"
 #include "army_troop.h"
 #include "world.h"
@@ -35,8 +35,17 @@
 class ArmyCell : public Rect
 {
 public:
-    ArmyCell(const Troop & t, const Surface & bg, const Surface & cr, const Point & pt, const bool & ro)
-	: Rect(pt.x, pt.y, bg.w(), bg.h()), select(false), troop(t), back(bg), curs(cr), readonly(ro) {};
+    ArmyCell(const Troop & t, const Point & pt, const bool & ro)
+	: Rect(pt.x, pt.y, 43, 53), select(false), troop(t), readonly(ro)
+    {
+	const Sprite & backSprite = AGG::GetICN(ICN::SWAPWIN, 0);
+	
+	back.Set(w, h);
+	backSprite.Blit(Rect(36, 267, w, h), 0, 0, back);
+
+	curs.Set(w, h - 10);
+	Cursor::DrawCursor(curs, 0xd7, true);
+    }
 
     void Redraw(void)
     {
@@ -61,8 +70,8 @@ public:
 
     bool select;
     const Troop & troop;
-    const Surface & back;
-    const Surface & curs;
+    Surface back;
+    Surface curs;
     const bool & readonly;
 };
 
@@ -181,27 +190,17 @@ bool Dialog::SetGuardian(Heroes & hero, Troop & troop, CapturedObject & co, bool
     dst_pt.x = area.x + 3;
     dst_pt.y = area.y + 73;
 
-    const Sprite &backSprite = AGG::GetICN(ICN::SWAPWIN, 0);
-    const Rect rt(36, 267, 43, 53);
-    Surface sfb(rt.w, rt.h);
-    backSprite.Blit(rt, 0, 0, sfb);
-    Surface sfc(rt.w, rt.h - 10);
-    Cursor::DrawCursor(sfc, 0x10, true);
-
-    SelectArmyBar selectArmy;
-    selectArmy.SetArmy(hero.GetArmy());
-    selectArmy.SetPos(dst_pt);
-    selectArmy.SetInterval(2);
-    selectArmy.SetBackgroundSprite(sfb);
-    selectArmy.SetCursorSprite(sfc);
-    selectArmy.SetUseMons32Sprite();
-    selectArmy.SetSaveLastTroop();
+    ArmyBar selectArmy(&hero.GetArmy(), true, false);
+    selectArmy.SetColRows(5, 1);
+    selectArmy.SetPos(dst_pt.x, dst_pt.y);
+    selectArmy.SetHSpace(2);
     selectArmy.Redraw();
 
     // guardian
     dst_pt.x = area.x + 93;
     dst_pt.y = area.y + 17;
-    ArmyCell guardian(troop, sfb, sfc, dst_pt, readonly);
+
+    ArmyCell guardian(troop, dst_pt, readonly);
     guardian.Redraw();
 
     // label
@@ -230,7 +229,7 @@ bool Dialog::SetGuardian(Heroes & hero, Troop & troop, CapturedObject & co, bool
 	{
     	    if(guardian.select && le.MouseClickLeft(selectArmy.GetArea()))
 	    {
-		Troop* troop1 = hero.GetArmy().GetTroop(selectArmy.GetIndexFromCoord(le.GetMouseCursor()));
+		Troop* troop1 = selectArmy.GetItem(le.GetMouseCursor());
 
 		if(troop1)
 		{
@@ -254,10 +253,11 @@ bool Dialog::SetGuardian(Heroes & hero, Troop & troop, CapturedObject & co, bool
 		cursor.Hide();
 	    }
     	    else
-	    if(SelectArmyBar::QueueEventProcessing(selectArmy))
+	    if(selectArmy.QueueEventProcessing())
 	    {
 		guardian.select = false;
 		cursor.Hide();
+		selectArmy.Redraw();
 	    }
 	}
 	else
@@ -275,9 +275,9 @@ bool Dialog::SetGuardian(Heroes & hero, Troop & troop, CapturedObject & co, bool
 		cursor.Hide();
 	    }
 	    else
-	    if(selectArmy.isSelected() && !readonly && !selectArmy.SaveLastTroop())
+	    if(selectArmy.isSelected() && !readonly && ! hero.GetArmy().SaveLastTroop())
 	    {
-		Troop* troop1 = hero.GetArmy().GetTroop(selectArmy.Selected());
+		Troop* troop1 = selectArmy.GetSelectedItem();
 
 		if(troop1)
 		{
@@ -305,14 +305,14 @@ bool Dialog::SetGuardian(Heroes & hero, Troop & troop, CapturedObject & co, bool
 		    }
 		}
 
-		selectArmy.Reset();
+		selectArmy.ResetSelected();
 		cursor.Hide();
 	    }
 	    else
 	    // select
 	    if(troop.isValid() && !readonly)
 	    {
-		selectArmy.Reset();
+		selectArmy.ResetSelected();
 		guardian.select = true;
 		cursor.Hide();
 	    }
@@ -320,7 +320,7 @@ bool Dialog::SetGuardian(Heroes & hero, Troop & troop, CapturedObject & co, bool
 	else
         if(le.MousePressRight(guardian) && troop.isValid())
 	{
-	    selectArmy.Reset();
+	    selectArmy.ResetSelected();
 	    Dialog::ArmyInfo(troop, 0);
 	    cursor.Hide();
 	}

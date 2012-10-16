@@ -798,16 +798,15 @@ void ArtifactsBar::Redraw(Surface & dstsf)
     Interface::ItemsActionBar<Artifact>::Redraw(dstsf);
 }
 
-void ArtifactsBar::RedrawBackground(const Rect & pos, Artifact* art, Surface & dstsf)
+void ArtifactsBar::RedrawBackground(const Rect & pos, Surface & dstsf)
 {
     if(use_mini_sprite)
     	backsf.Blit(pos, dstsf);
     else
-    if(!art || ! art->isValid())
 	AGG::GetICN(ICN::ARTIFACT, 0).Blit(pos, dstsf);
 }
 
-void ArtifactsBar::RedrawItem(Artifact & art, const Rect & pos, bool current, Surface & dstsf)
+void ArtifactsBar::RedrawItem(Artifact & art, const Rect & pos, bool selected, Surface & dstsf)
 {
     if(art.isValid())
     {
@@ -818,7 +817,7 @@ void ArtifactsBar::RedrawItem(Artifact & art, const Rect & pos, bool current, Su
 	else
 	    AGG::GetICN(ICN::ARTIFACT, art.IndexSprite64()).Blit(pos, dstsf);
 
-	if(current)
+	if(selected)
 	{
 	    if(use_mini_sprite)
 		spcursor.Show(pos.x, pos.y);
@@ -899,8 +898,6 @@ bool ArtifactsBar::ActionBarDoubleClick(const Point & cursor, Artifact & art, co
 
     	    if(answer == Dialog::YES)
 		const_cast<Heroes*>(hero)->TranscribeScroll(art);
-
-	    return true;
 	}
     }
     else
@@ -911,17 +908,14 @@ bool ArtifactsBar::ActionBarDoubleClick(const Point & cursor, Artifact & art, co
     return true;
 }
 
-bool ArtifactsBar::ActionBarPressRight(Artifact & art)
+bool ArtifactsBar::ActionBarPressRight(const Point & cursor, Artifact & art, const Rect & pos)
 {
     ResetSelected();
 
     if(art.isValid())
     {
 	if(can_change)
-	{
     	    art.Reset();
-            return true;
-	}
         else
             Dialog::ArtifactInfo(art.GetName(), "", art, 0);
     }
@@ -938,4 +932,84 @@ bool ArtifactsBar::ActionBarSingleClick(const Point & cursor, Artifact & art1, c
     }
 
     return true;
+}
+
+bool ArtifactsBar::ActionBarCursor(const Point & cursor, Artifact & art, const Rect & pos)
+{
+    if(isSelected())
+    {
+        Artifact* art2 = GetSelectedItem();
+
+        if(&art == art2)
+        {
+	    if(art() == Artifact::MAGIC_BOOK)
+		msg = _("Open book");
+	    else
+	    if(art() == Artifact::SPELL_SCROLL &&
+		Settings::Get().ExtHeroAllowTranscribingScroll() &&
+    		hero->CanTranscribeScroll(art))
+		msg = _("Transcribe scroll");
+	    else
+	    {
+        	msg = _("View %{name}");
+        	String::Replace(msg, "%{name}", art.GetName());
+	    }
+        }
+        else
+        if(! art.isValid())
+        {
+            msg = _("Move %{name}");
+            String::Replace(msg, "%{name}", art2->GetName());
+        }
+        else
+        {
+            msg = _("Exchange %{name2} with %{name}");
+            String::Replace(msg, "%{name}", art.GetName());
+            String::Replace(msg, "%{name2}", art2->GetName());
+        }
+    }
+    else
+    if(art.isValid())
+    {
+        msg = _("Select %{name}");
+        String::Replace(msg, "%{name}", art.GetName());
+    }
+
+    return false;
+}
+
+bool ArtifactsBar::ActionBarCursor(const Point & cursor, Artifact & art1, const Rect & pos1, Artifact & art2 /* selected */, const Rect & pos2)
+{
+    if(art2() == Artifact::MAGIC_BOOK || art1() == Artifact::MAGIC_BOOK)
+	msg = _("Cannot move artifact");
+    else
+    if(art1.isValid())
+    {
+	msg = _("Exchange %{name2} with %{name}");
+        String::Replace(msg, "%{name}", art1.GetName());
+        String::Replace(msg, "%{name2}", art2.GetName());
+    }
+    else
+    {
+        msg = _("Move %{name}");
+        String::Replace(msg, "%{name}", art2.GetName());
+    }
+
+    return false;
+}
+
+bool ArtifactsBar::QueueEventProcessing(std::string* str)
+{
+    msg.clear();
+    bool res = Interface::ItemsActionBar<Artifact>::QueueEventProcessing();
+    if(str) *str = msg;
+    return res;
+}
+
+bool ArtifactsBar::QueueEventProcessing(ArtifactsBar & bar, std::string* str)
+{
+    msg.clear();
+    bool res = Interface::ItemsActionBar<Artifact>::QueueEventProcessing(bar);
+    if(str) *str = msg;
+    return res;
 }

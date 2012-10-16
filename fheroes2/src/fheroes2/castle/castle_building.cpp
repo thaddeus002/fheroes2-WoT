@@ -67,6 +67,7 @@ const Rect & CastleDialog::CacheBuildings::GetRect(building_t b) const
 
 void CastleDialog::RedrawAnimationBuilding(const Castle & castle, const Point & dst_pt, const CacheBuildings & orders, u32 build)
 {
+    Cursor::Get().Hide();
     CastleRedrawCurrentBuilding(castle, dst_pt, orders, build, BUILD_NOTHING);
 }
 
@@ -487,7 +488,7 @@ Rect CastleGetCoordBuilding(u8 race, building_t building, const Point & pt)
 		case Race::BARB:	return Rect(pt.x + 348, pt.y + 118, 50, 25);
 		case Race::SORC:	return Rect(pt.x + 285, pt.y + 32, 55, 129);
 		case Race::WRLK:	return Rect(pt.x + 590, pt.y + 135, 50, 35);
-		case Race::WZRD:	return Rect(pt.x + 583, pt.y + 93, 57, 28);
+		case Race::WZRD:	return Rect(pt.x + 583, pt.y + 73, 57, 48);
 		case Race::NECR:	return Rect(pt.x + 565, pt.y + 131, 73, 74);
 		default: break;
 	    }

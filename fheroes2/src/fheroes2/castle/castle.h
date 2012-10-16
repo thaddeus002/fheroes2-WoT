@@ -68,12 +68,14 @@ enum building_t
     DWELLING_MONSTER4       = 0x00800000,
     DWELLING_MONSTER5       = 0x01000000,
     DWELLING_MONSTER6       = 0x02000000,
+    DWELLING_MONSTERS       = DWELLING_MONSTER1 | DWELLING_MONSTER2 | DWELLING_MONSTER3 | DWELLING_MONSTER4 | DWELLING_MONSTER5 | DWELLING_MONSTER6,
     DWELLING_UPGRADE2       = 0x04000000,
     DWELLING_UPGRADE3       = 0x08000000,
     DWELLING_UPGRADE4       = 0x10000000,
     DWELLING_UPGRADE5       = 0x20000000,
     DWELLING_UPGRADE6       = 0x40000000,
-    DWELLING_UPGRADE7       = 0x80000000        // black dragon
+    DWELLING_UPGRADE7       = 0x80000000,        // black dragon
+    DWELLING_UPGRADES       = DWELLING_UPGRADE2 | DWELLING_UPGRADE3 | DWELLING_UPGRADE4 | DWELLING_UPGRADE5 | DWELLING_UPGRADE6 | DWELLING_UPGRADE7
 };
 
 enum buildcond_t
@@ -137,9 +139,8 @@ public:
     u16 GetDwellingLivedCount(u32) const;
     u32 GetActualDwelling(u32) const;
 
-    bool RecruitMonster(u32 dw, u16 count);
+    bool RecruitMonsterFromDwelling(u32 dw, u16 count);
     bool RecruitMonster(const Troop &);
-    u16  RecruitMaxMonster(u32 dw);
     void RecruitAllMonster(void);
 
     void ChangeColor(Color::color_t cl);
@@ -175,10 +176,12 @@ public:
 
     void Scoute(void) const;
 
-    std::string GetDescription(void);
+    std::string GetStringBuilding(u32) const;
+    std::string GetDescriptionBuilding(u32) const;
 
-    static const char* GetStringBuilding(u32, u8 race = 0);
-    static const char* GetDescriptionBuilding(u32, u8 race = 0);
+    static const char* GetStringBuilding(u32, u8 race);
+    static const char* GetDescriptionBuilding(u32, u8 race);
+
     static ICN::icn_t GetICNBuilding(u32, u8);
     static ICN::icn_t GetICNBoat(const u8 & race);
     u32 GetUpgradeBuilding(u32) const;

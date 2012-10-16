@@ -1022,6 +1022,11 @@ HeroBase* Army::GetCommander(void)
     return (!commander || (Skill::Primary::CAPTAIN == commander->GetType() && !commander->isValid())) ? NULL : commander;
 }
 
+const Castle* Army::inCastle(void) const
+{
+    return commander ? commander->inCastle() : NULL;
+}
+
 const HeroBase* Army::GetCommander(void) const
 {
     return (!commander || (Skill::Primary::CAPTAIN == commander->GetType() && !commander->isValid())) ? NULL : commander;
@@ -1201,6 +1206,11 @@ bool Army::FastestTroop(const Troop* t1, const Troop* t2)
 void Army::SwapTroops(Troop & t1, Troop & t2)
 {
     std::swap(t1, t2);
+}
+
+bool Army::SaveLastTroop(void) const
+{
+    return commander && Skill::Primary::HEROES == commander->GetType() && 1 == GetCount();
 }
 
 StreamBase & operator<< (StreamBase & msg, const Army & army)

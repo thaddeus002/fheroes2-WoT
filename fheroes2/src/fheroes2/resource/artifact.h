@@ -232,7 +232,7 @@ class ArtifactsBar : public Interface::ItemsActionBar<Artifact>
 public:
     ArtifactsBar(const Heroes*, bool mini, bool ro, bool change = false);
 
-    void        RedrawBackground(const Rect &, Artifact*, Surface &);
+    void        RedrawBackground(const Rect &, Surface &);
     void        RedrawItem(Artifact &, const Rect &, bool, Surface &);
 
     void	ResetSelected(void);
@@ -241,7 +241,13 @@ public:
     bool	ActionBarSingleClick(const Point &, Artifact &, const Rect &);
     bool	ActionBarSingleClick(const Point &, Artifact &, const Rect &, Artifact &, const Rect &);
     bool	ActionBarDoubleClick(const Point &, Artifact &, const Rect &);
-    bool        ActionBarPressRight(Artifact &);
+    bool        ActionBarPressRight(const Point &, Artifact &, const Rect &);
+
+    bool	QueueEventProcessing(std::string* = NULL);
+    bool	QueueEventProcessing(ArtifactsBar &, std::string* = NULL);
+
+    bool	ActionBarCursor(const Point &, Artifact &, const Rect &);
+    bool	ActionBarCursor(const Point &, Artifact &, const Rect &, Artifact &, const Rect &);
 
 protected:
     const Heroes*	hero;
@@ -251,6 +257,7 @@ protected:
     bool        	use_mini_sprite;
     bool		read_only;
     bool        	can_change;
+    std::string		msg;
 };
 
 #endif

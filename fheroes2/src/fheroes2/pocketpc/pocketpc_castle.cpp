@@ -33,7 +33,7 @@
 #include "portrait.h"
 #include "world.h"
 #include "race.h"
-#include "selectarmybar.h"
+#include "army_bar.h"
 #include "buildinginfo.h"
 #include "profit.h"
 #include "pocketpc.h"
@@ -179,7 +179,6 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     frameborder.Redraw();
 
     const Rect & dst_rt = frameborder.GetArea();
-    const Sprite & backSprite = AGG::GetICN(ICN::SWAPWIN, 0);
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
     background.Blit(Rect(0, 0, window_w, window_h), dst_rt);
 
@@ -204,50 +203,28 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     const Rect rectSign2(dst_rt.x + 3, dst_rt.y + 133, 41, 41);
 
     // castle army bar
-    const Rect rt1(36, 267, 43, 53);
-    Surface sfb1(rt1.w, rt1.h);
-    backSprite.Blit(rt1, 0, 0, sfb1);
-    Surface sfc1(rt1.w, rt1.h - 10);
-    Cursor::DrawCursor(sfc1, 0x10, true);
-
-    SelectArmyBar selectArmy1;
-    if(heroes.Guard())
-    {
-        selectArmy1.SetArmy(heroes.Guard()->GetArmy());
-        selectArmy1.SetSaveLastTroop();
-    }
-    else
-        selectArmy1.SetArmy(castle.GetArmy());
+    ArmyBar selectArmy1((heroes.Guard() ? & heroes.Guard()->GetArmy() : & castle.GetArmy()), true, readonly);
+    selectArmy1.SetColRows(5, 1);
     selectArmy1.SetPos(dst_rt.x + 47, dst_rt.y + 79);
-    selectArmy1.SetInterval(2);
-    selectArmy1.SetBackgroundSprite(sfb1);
-    selectArmy1.SetCursorSprite(sfc1);
-    selectArmy1.SetUseMons32Sprite();
-    selectArmy1.SetCastle(castle);
-    if(readonly) selectArmy1.SetReadOnly();
+    selectArmy1.SetHSpace(2);
     selectArmy1.Redraw();
 
-    // hero army bar
-    SelectArmyBar selectArmy2;
-    selectArmy2.SetPos(dst_rt.x + 47, dst_rt.y + 132);
-    selectArmy2.SetInterval(2);
-    selectArmy2.SetBackgroundSprite(sfb1);
-    selectArmy2.SetCursorSprite(sfc1);
-    selectArmy2.SetUseMons32Sprite();
-    selectArmy2.SetSaveLastTroop();
-    selectArmy2.SetCastle(castle);
+    ArmyBar selectArmy2(NULL, true, readonly);
+    selectArmy2.SetColRows(5, 1);
+    selectArmy2.SetPos(dst_rt.x + 47, dst_rt.y + 124);
+    selectArmy2.SetHSpace(2);
 
     if(heroes.Guest())
     {
         heroes.Guest()->MovePointsScaleFixed();
-        selectArmy2.SetArmy(heroes.Guest()->GetArmy());
-        selectArmy2.Redraw();
+	selectArmy2.SetArmy(& heroes.Guest()->GetArmy());
+	selectArmy2.Redraw();
     }
 
     const Kingdom & kingdom = castle.GetKingdom();
 
     // resource bar
-    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), kingdom.GetFunds());
+    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 176), kingdom.GetFunds());
 
     const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
     AGG::GetICN(ICN::TOWNWIND, 12).Blit(rectExit.x, rectExit.y);
@@ -317,48 +294,67 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
 	    cursor.Hide();
 	    dwbar.Redraw();
 	    selectArmy1.Redraw();
-	    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), kingdom.GetFunds());
+	    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 176), kingdom.GetFunds());
 	    cursor.Show();
 	    display.Flip();
 	}
 	else
-	if(!readonly && heroes.Guard() && le.MouseClickLeft(rectSign1))
+	if(!readonly)
 	{
-	    cursor.Hide();
-	    heroes.Guard()->OpenDialog(false, false);
-            if(selectArmy1.isSelected()) selectArmy1.Reset();
-            if(selectArmy2.isSelected()) selectArmy2.Reset();
-            selectArmy2.Redraw();
-	    cursor.Show();
-	    display.Flip();
-	}
-	else
-	if(!readonly && heroes.Guest() && le.MouseClickLeft(rectSign2))
-	{
-	    cursor.Hide();
-	    heroes.Guest()->OpenDialog(false, false);
-            if(selectArmy1.isSelected()) selectArmy1.Reset();
-            if(selectArmy2.isSelected()) selectArmy2.Reset();
-            selectArmy2.Redraw();
-	    cursor.Show();
-	    display.Flip();
+	    if(heroes.Guard() && le.MouseClickLeft(rectSign1))
+	    {
+		cursor.Hide();
+		heroes.Guard()->OpenDialog(false, false);
+	    }
+	    else
+	    if(heroes.Guest() && le.MouseClickLeft(rectSign2))
+	    {
+		cursor.Hide();
+		heroes.Guest()->OpenDialog(false, false);
+	    }
+
+	    if(! cursor.isVisible())
+	    {
+        	if(selectArmy1.isSelected()) selectArmy1.ResetSelected();
+        	selectArmy1.Redraw();
+        	if(selectArmy2.isValid())
+		{
+		    if(selectArmy2.isSelected()) selectArmy2.ResetSelected();
+        	    selectArmy2.Redraw();
+		}
+		cursor.Show();
+		display.Flip();
+	    }
 	}
 
 	// troops event
         if(heroes.Guest() && selectArmy2.isValid())
         {
-    	    if(le.MouseCursor(selectArmy1.GetArea()) || le.MouseCursor(selectArmy2.GetArea()))
+	    if((le.MouseCursor(selectArmy1.GetArea()) &&
+        	selectArmy1.QueueEventProcessing(selectArmy2)) ||
+		(le.MouseCursor(selectArmy2.GetArea()) &&
+		selectArmy2.QueueEventProcessing(selectArmy1)))
     	    {
-		if(SelectArmyBar::QueueEventProcessing(selectArmy1, selectArmy2))
-		    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), kingdom.GetFunds());
+		cursor.Hide();
+		RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 176), kingdom.GetFunds());
+
+        	selectArmy1.Redraw();
+        	if(selectArmy2.isValid()) selectArmy2.Redraw();
+		cursor.Show();
+		display.Flip();
 	    }
 	}
         else
         {
-    	    if(le.MouseCursor(selectArmy1.GetArea()))
+    	    if(le.MouseCursor(selectArmy1.GetArea()) &&
+    		selectArmy1.QueueEventProcessing())
 	    {
-    		if(SelectArmyBar::QueueEventProcessing(selectArmy1))
-		    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), kingdom.GetFunds());
+		cursor.Hide();
+		RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 176), kingdom.GetFunds());
+
+        	selectArmy1.Redraw();
+		cursor.Show();
+		display.Flip();
 	    }
 	}
 
@@ -371,7 +367,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
 	    // swap guest <-> guardian
     	    if(heroes.Guest() && heroes.Guard() && le.MouseClickLeft(buttonSwap))
     	    {
-        	SwapCastleHeroes(heroes);
+        	castle.SwapCastleHeroes(heroes);
         	army1 = &heroes.Guard()->GetArmy();
         	army2 = &heroes.Guest()->GetArmy();
     	    }
@@ -402,40 +398,32 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     	    if(army1 || army2)
     	    {
         	cursor.Hide();
-        	if(selectArmy1.isSelected()) selectArmy1.Reset();
-        	if(selectArmy2.isSelected()) selectArmy2.Reset();
+        	if(selectArmy1.isSelected()) selectArmy1.ResetSelected();
+        	if(selectArmy2.isValid() && selectArmy2.isSelected()) selectArmy2.ResetSelected();
 
         	if(army1 && army2)
         	{
-            	    selectArmy1.ResetArmy();
-            	    selectArmy2.ResetArmy();
-
-            	    selectArmy1.SetArmy(*army1);
-            	    selectArmy1.SetSaveLastTroop();
-
-            	    selectArmy2.SetArmy(*army2);
-            	    selectArmy2.SetSaveLastTroop();
+            	    selectArmy1.SetArmy(army1);
+            	    selectArmy2.SetArmy(army2);
         	}
         	else
         	if(army1)
         	{
-            	    selectArmy2.ResetArmy();
-            	    selectArmy1.SetArmy(*army1);
-            	    selectArmy1.SetSaveLastTroop();
+            	    selectArmy1.SetArmy(army1);
+            	    selectArmy2.SetArmy(NULL);
         	}
         	else
         	if(army2)
         	{
-            	    selectArmy1.ResetArmy();
-            	    selectArmy1.SetArmy(castle.GetArmy());
-            	    selectArmy2.SetArmy(*army2);
-            	    selectArmy2.SetSaveLastTroop();
+            	    selectArmy1.SetArmy(&castle.GetArmy());
+            	    selectArmy2.SetArmy(army2);
         	}
 
             	RedrawIcons(castle, heroes, dst_rt);
+
             	selectArmy1.Redraw();
-            	selectArmy2.Redraw();
-//                if(army1 && army2) RedrawSwapButton(buttonSwap);
+            	if(selectArmy2.isValid()) selectArmy2.Redraw();
+
                 cursor.Show();
                 display.Flip();
     	    }

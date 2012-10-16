@@ -140,6 +140,8 @@ public:
     HeroBase*		GetCommander(void);
     void		SetCommander(HeroBase*);
 
+    const Castle*	inCastle(void) const;
+
     std::string		String(void) const;
 
     void		JoinStrongestFromArmy(Army &);
@@ -149,6 +151,7 @@ public:
     bool		isSpreadFormat(void) const;
 
     bool		isFullHouse(void) const;
+    bool		SaveLastTroop(void) const;
 
 protected:
     friend StreamBase & operator<< (StreamBase &, const Army &);

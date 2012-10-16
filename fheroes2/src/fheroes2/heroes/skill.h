@@ -177,11 +177,14 @@ public:
     PrimarySkillsBar(const Heroes*, bool mini);
 
     void	SetTextOff(s16, s16);
-    void	RedrawBackground(const Rect &, Skill::Primary::skill_t*, Surface &);
+    void	RedrawBackground(const Rect &, Surface &);
     void	RedrawItem(Skill::Primary::skill_t &, const Rect &, Surface &);
 
-    bool	ActionBarSingleClick(Skill::Primary::skill_t &);
-    bool	ActionBarPressRight(Skill::Primary::skill_t &);
+    bool	ActionBarSingleClick(const Point &, Skill::Primary::skill_t &, const Rect &);
+    bool	ActionBarPressRight(const Point &, Skill::Primary::skill_t &, const Rect &);
+    bool        ActionBarCursor(const Point &, Skill::Primary::skill_t &, const Rect &);
+
+    bool        QueueEventProcessing(std::string* = NULL);
 
 protected:
     const Heroes*                        hero;
@@ -189,6 +192,7 @@ protected:
     bool	                         use_mini_sprite;
     std::vector<Skill::Primary::skill_t> content;
     Point				 toff;
+    std::string				 msg;
 };
 
 class SecondarySkillsBar : public Interface::ItemsBar<Skill::Secondary>
@@ -196,16 +200,20 @@ class SecondarySkillsBar : public Interface::ItemsBar<Skill::Secondary>
 public:
     SecondarySkillsBar(bool mini = true, bool change = false);
 
-    void	RedrawBackground(const Rect &, Skill::Secondary*, Surface &);
+    void	RedrawBackground(const Rect &, Surface &);
     void	RedrawItem(Skill::Secondary &, const Rect &, Surface &);
 
-    bool	ActionBarSingleClick(Skill::Secondary &);
-    bool	ActionBarPressRight(Skill::Secondary &);
+    bool	ActionBarSingleClick(const Point &, Skill::Secondary &, const Rect &);
+    bool	ActionBarPressRight(const Point &, Skill::Secondary &, const Rect &);
+    bool        ActionBarCursor(const Point &, Skill::Secondary &, const Rect &);
+
+    bool        QueueEventProcessing(std::string* = NULL);
 
 protected:
     Surface	backsf;
     bool	use_mini_sprite;
     bool	can_change;
+    std::string	msg;
 };
 
 #endif

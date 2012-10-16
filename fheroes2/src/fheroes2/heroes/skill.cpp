@@ -412,8 +412,8 @@ std::string Skill::Secondary::GetDescription(void) const
 	    str = ngettext("Increases your hero's movement points over water by %{count} percent.",
 		    "Increases your hero's movement points over water by %{count} percent.", count); break;
         case LEADERSHIP:
-	    str = ngettext("Increases your hero's troops' morale by %{count}.",
-		    "Increases your hero's troops' morale by %{count}.", count); break;
+	    str = ngettext("Increases your hero's troops morale by %{count}.",
+		    "Increases your hero's troops morale by %{count}.", count); break;
         case WISDOM:
 	{
 	    switch(Level())
@@ -756,7 +756,7 @@ void PrimarySkillsBar::SetTextOff(s16 ox, s16 oy)
     toff = Point(ox, oy);
 }
 
-void PrimarySkillsBar::RedrawBackground(const Rect & pos, Skill::Primary::skill_t* skill, Surface & dstsf)
+void PrimarySkillsBar::RedrawBackground(const Rect & pos, Surface & dstsf)
 {
     if(use_mini_sprite)
 	backsf.Blit(pos, dstsf);
@@ -837,7 +837,7 @@ void PrimarySkillsBar::RedrawItem(Skill::Primary::skill_t & skill, const Rect & 
     }
 }
 
-bool PrimarySkillsBar::ActionBarSingleClick(Skill::Primary::skill_t & skill)
+bool PrimarySkillsBar::ActionBarSingleClick(const Point & cursor, Skill::Primary::skill_t & skill, const Rect & pos)
 {
     if(Skill::Primary::UNKNOWN != skill)
     {
@@ -848,7 +848,7 @@ bool PrimarySkillsBar::ActionBarSingleClick(Skill::Primary::skill_t & skill)
     return false;
 }
 
-bool PrimarySkillsBar::ActionBarPressRight(Skill::Primary::skill_t & skill)
+bool PrimarySkillsBar::ActionBarPressRight(const Point & cursor, Skill::Primary::skill_t & skill, const Rect & pos)
 {
     if(Skill::Primary::UNKNOWN != skill)
     {
@@ -857,6 +857,25 @@ bool PrimarySkillsBar::ActionBarPressRight(Skill::Primary::skill_t & skill)
     }
 
     return false;
+}
+
+bool PrimarySkillsBar::ActionBarCursor(const Point & cursor, Skill::Primary::skill_t & skill, const Rect & pos)
+{
+    if(Skill::Primary::UNKNOWN != skill)
+    {
+	msg = _("View %{skill} Info");
+        String::Replace(msg, "%{skill}", Skill::Primary::String(skill));
+    }
+
+    return false;
+}
+
+bool PrimarySkillsBar::QueueEventProcessing(std::string* str)
+{
+    msg.clear();
+    bool res = Interface::ItemsBar<Skill::Primary::skill_t>::QueueEventProcessing();
+    if(str) *str = msg;
+    return res;
 }
 
 SecondarySkillsBar::SecondarySkillsBar(bool mini /* true */, bool change /* false */) : use_mini_sprite(mini), can_change(change)
@@ -877,12 +896,11 @@ SecondarySkillsBar::SecondarySkillsBar(bool mini /* true */, bool change /* fals
     }
 }
 
-void SecondarySkillsBar::RedrawBackground(const Rect & pos, Skill::Secondary* skill, Surface & dstsf)
+void SecondarySkillsBar::RedrawBackground(const Rect & pos, Surface & dstsf)
 {
     if(use_mini_sprite)
 	backsf.Blit(pos, dstsf);
     else
-    if(! skill || !skill->isValid()) // big sprite eq background size
 	AGG::GetICN(ICN::SECSKILL, 0).Blit(pos, dstsf);
 }
 
@@ -910,7 +928,7 @@ void SecondarySkillsBar::RedrawItem(Skill::Secondary & skill, const Rect & pos, 
     }
 }
 
-bool SecondarySkillsBar::ActionBarSingleClick(Skill::Secondary & skill)
+bool SecondarySkillsBar::ActionBarSingleClick(const Point & cursor, Skill::Secondary & skill, const Rect & pos)
 {
     if(skill.isValid())
     {
@@ -932,7 +950,7 @@ bool SecondarySkillsBar::ActionBarSingleClick(Skill::Secondary & skill)
     return false;
 }
 
-bool SecondarySkillsBar::ActionBarPressRight(Skill::Secondary & skill)
+bool SecondarySkillsBar::ActionBarPressRight(const Point & cursor, Skill::Secondary & skill, const Rect & pos)
 {
     if(skill.isValid())
     {
@@ -944,4 +962,23 @@ bool SecondarySkillsBar::ActionBarPressRight(Skill::Secondary & skill)
     }
 
     return false;
+}
+
+bool SecondarySkillsBar::ActionBarCursor(const Point & cursor, Skill::Secondary & skill, const Rect & pos)
+{
+    if(skill.isValid())
+    {
+	msg = _("View %{skill} Info");
+        String::Replace(msg, "%{skill}", skill.GetName());
+    }
+
+    return false;
+}
+
+bool SecondarySkillsBar::QueueEventProcessing(std::string* str)
+{
+    msg.clear();
+    bool res = Interface::ItemsBar<Skill::Secondary>::QueueEventProcessing();
+    if(str) *str = msg;
+    return res;
 }

@@ -26,7 +26,7 @@
 #include "button.h"
 #include "heroes.h"
 #include "heroes_indicator.h"
-#include "selectarmybar.h"
+#include "army_bar.h"
 #include "world.h"
 #include "race.h"
 #include "kingdom.h"
@@ -104,23 +104,10 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
     secskill_bar.Redraw();
 
     // army bar
-    const Rect rt1(36, 267, 43, 53);
-    Surface sfb1(rt1.w, rt1.h);
-    backSprite.Blit(rt1, 0, 0, sfb1);
-    Surface sfc1(rt1.w, rt1.h - 10);
-    Cursor::DrawCursor(sfc1, 0xd6, true);
-
-    SelectArmyBar selectArmy;
-    selectArmy.SetArmy(hero.GetArmy());
-    selectArmy.SetPos(dst_rt.x + 50, dst_rt.y + 170);
-    selectArmy.SetInterval(2);
-    selectArmy.SetBackgroundSprite(sfb1);
-    selectArmy.SetCursorSprite(sfc1);
-    selectArmy.SetUseMons32Sprite();
-    selectArmy.SetSaveLastTroop();
-    if(readonly) selectArmy.SetReadOnly();
-    const Castle* castle = hero.inCastle();
-    if(castle) selectArmy.SetCastle(*castle);
+    ArmyBar selectArmy(&hero.GetArmy(), true, readonly);
+    selectArmy.SetColRows(5, 1);
+    selectArmy.SetPos(dst_rt.x + 51, dst_rt.y + 170);
+    selectArmy.SetHSpace(-1);
     selectArmy.Redraw();
             
     // art bar
@@ -138,7 +125,7 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
     Button buttonPrev(dst_rt.x + 34, dst_rt.y + 200, ICN::TRADPOST, 3, 4);
     Button buttonNext(dst_rt.x + 275, dst_rt.y + 200, ICN::TRADPOST, 5, 6);
 
-    if(castle || readonly)
+    if(hero.inCastle() || readonly)
     {
 	buttonDismiss.Press();
         buttonDismiss.SetDisable(true);
@@ -194,31 +181,23 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
         }
 
         // selector troops event
-        if(le.MouseCursor(selectArmy.GetArea()))
-        {
-	    if(SelectArmyBar::QueueEventProcessing(selectArmy))
-            {
-                cursor.Hide();
-
-        	if(selectArtifacts.isSelected()) selectArtifacts.ResetSelected();
-
-                moraleIndicator.Redraw();
-                luckIndicator.Redraw();
-                cursor.Show();
-        	display.Flip();
-            }
+        if(le.MouseCursor(selectArmy.GetArea()) && selectArmy.QueueEventProcessing())
+	{
+	    if(selectArtifacts.isSelected()) selectArtifacts.ResetSelected();
+    	    moraleIndicator.Redraw();
+            luckIndicator.Redraw();
+	    selectArmy.Redraw();
+            cursor.Show();
+    	    display.Flip();
         }
 
         // selector artifacts event
-        if(le.MouseCursor(selectArtifacts.GetArea()))
-        {
-            if(selectArtifacts.QueueEventProcessing())
-	    {
-        	if(selectArmy.isSelected()) selectArmy.Reset();
-		selectArtifacts.Redraw();
-        	cursor.Show();
-    		display.Flip();
-	    }
+        if(le.MouseCursor(selectArtifacts.GetArea()) && selectArtifacts.QueueEventProcessing())
+	{
+    	    if(selectArmy.isSelected()) selectArmy.ResetSelected();
+	    selectArtifacts.Redraw();
+    	    cursor.Show();
+    	    display.Flip();
         }
 
         if(le.MouseCursor(moraleIndicator.GetArea())) MoraleIndicator::QueueEventProcessing(moraleIndicator);

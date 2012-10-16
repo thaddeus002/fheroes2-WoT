@@ -26,7 +26,6 @@
 #include "text.h"
 #include "button.h"
 #include "army.h"
-#include "selectarmybar.h"
 #include "army_troop.h"
 #include "pocketpc.h"
 

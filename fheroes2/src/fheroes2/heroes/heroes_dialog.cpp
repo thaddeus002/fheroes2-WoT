@@ -36,7 +36,7 @@
 #include "portrait.h"
 #include "dialog.h"
 #include "heroes_indicator.h"
-#include "selectarmybar.h"
+#include "army_bar.h"
 #include "statusbar.h"
 #include "pocketpc.h"
 
@@ -145,16 +145,10 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     dst_pt.x = cur_pt.x + 156;
     dst_pt.y = cur_pt.y + 130;
 
-    SelectArmyBar selectArmy;
-    selectArmy.SetArmy(army);
-    selectArmy.SetPos(dst_pt);
-    selectArmy.SetInterval(6);
-    selectArmy.SetBackgroundSprite(AGG::GetICN(ICN::STRIP, 2));
-    selectArmy.SetCursorSprite(AGG::GetICN(ICN::STRIP, 1));
-    selectArmy.SetSaveLastTroop();
-    if(readonly) selectArmy.SetReadOnly();
-    const Castle* castle = inCastle();
-    if(castle) selectArmy.SetCastle(*castle);
+    ArmyBar selectArmy(&army, false, readonly);
+    selectArmy.SetColRows(5, 1);
+    selectArmy.SetPos(dst_pt.x, dst_pt.y);
+    selectArmy.SetHSpace(6);
     selectArmy.Redraw();
 
     // secskill
@@ -208,7 +202,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 
     LocalEvent & le = LocalEvent::Get();
 
-    if(castle || readonly || Modes(NOTDISMISS))
+    if(inCastle() || readonly || Modes(NOTDISMISS))
     {
 	buttonDismiss.Press();
 	buttonDismiss.SetDisable(true);
@@ -232,6 +226,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 
     bool redrawMorale = false;
     bool redrawLuck = false;
+    message.clear();
 
     // dialog menu loop
     while(le.HandleEvents())
@@ -258,22 +253,21 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	if(le.MouseClickLeft(buttonExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) return Dialog::CANCEL;
 
         // heroes troops
-        if(le.MouseCursor(selectArmy.GetArea()))
-        {
-            if(SelectArmyBar::QueueEventProcessing(selectArmy))
-            {
-		cursor.Hide();
-		if(selectArtifacts.isSelected()) selectArtifacts.ResetSelected();
-        	redrawMorale = true;
-        	redrawLuck = true;
-    	    }
+        if(le.MouseCursor(selectArmy.GetArea()) &&
+	    selectArmy.QueueEventProcessing(&message))
+	{
+	    cursor.Hide();
+	    if(selectArtifacts.isSelected()) selectArtifacts.ResetSelected();
+	    selectArmy.Redraw();
+	    redrawMorale = true;
+	    redrawLuck = true;
 	}
 
         if(le.MouseCursor(selectArtifacts.GetArea()) &&
-	    selectArtifacts.QueueEventProcessing())
+	    selectArtifacts.QueueEventProcessing(&message))
         {
 	    cursor.Hide();
-	    if(selectArmy.isSelected()) selectArmy.Reset();
+	    if(selectArmy.isSelected()) selectArmy.ResetSelected();
 	    selectArtifacts.Redraw();
     	    redrawMorale = true;
 	    redrawLuck = true;
@@ -323,139 +317,68 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     	    army.SetSpreadFormat(false);
         }
 	else
-	if(le.MouseCursor(secskill_bar.GetArea()) && secskill_bar.QueueEventProcessing())
+	if(le.MouseCursor(secskill_bar.GetArea()) && secskill_bar.QueueEventProcessing(&message))
 	{
 	    cursor.Show();
 	    display.Flip();
 	}
 	else
-	if(le.MouseCursor(primskill_bar.GetArea()) && primskill_bar.QueueEventProcessing())
+	if(le.MouseCursor(primskill_bar.GetArea()) && primskill_bar.QueueEventProcessing(&message))
 	{
 	    cursor.Show();
 	    display.Flip();
 	}
 
 	// right info
-        if(le.MousePressRight(rectSpreadArmyFormat)) Dialog::Message(_("Spread Formation"), descriptionSpreadArmyFormat, Font::BIG);
+        if(le.MousePressRight(rectSpreadArmyFormat))
+	    Dialog::Message(_("Spread Formation"), descriptionSpreadArmyFormat, Font::BIG);
         else
-        if(le.MousePressRight(rectGroupedArmyFormat)) Dialog::Message(_("Grouped Formation"), descriptionGroupedArmyFormat, Font::BIG);
+        if(le.MousePressRight(rectGroupedArmyFormat))
+	    Dialog::Message(_("Grouped Formation"), descriptionGroupedArmyFormat, Font::BIG);
 
         // status message
-	if(le.MouseCursor(moraleIndicator.GetArea())) statusBar.ShowMessage(_("View Morale Info"));
+	if(le.MouseCursor(moraleIndicator.GetArea()))
+	    message = _("View Morale Info");
 	else
-	if(le.MouseCursor(luckIndicator.GetArea())) statusBar.ShowMessage(_("View Luck Info"));
+	if(le.MouseCursor(luckIndicator.GetArea()))
+	    message = _("View Luck Info");
 	else
-	if(le.MouseCursor(experienceInfo.GetArea())) statusBar.ShowMessage(_("View Experience Info"));
+	if(le.MouseCursor(experienceInfo.GetArea()))
+	    message = _("View Experience Info");
 	else
-	if(le.MouseCursor(spellPointsInfo.GetArea())) statusBar.ShowMessage(_("View Spell Points Info"));
+	if(le.MouseCursor(spellPointsInfo.GetArea()))
+	    message = _("View Spell Points Info");
 	else
-	if(le.MouseCursor(rectSpreadArmyFormat)) statusBar.ShowMessage(_("Set army combat formation to 'Spread'"));
+	if(le.MouseCursor(rectSpreadArmyFormat))
+	    message = _("Set army combat formation to 'Spread'");
 	else
-	if(le.MouseCursor(rectGroupedArmyFormat)) statusBar.ShowMessage(_("Set army combat formation to 'Grouped'"));
+	if(le.MouseCursor(rectGroupedArmyFormat))
+	    message = _("Set army combat formation to 'Grouped'");
 	else
-        if(le.MouseCursor(buttonExit)) statusBar.ShowMessage(_("Exit hero"));
+        if(le.MouseCursor(buttonExit))
+	    message = _("Exit hero");
         else
         if(le.MouseCursor(buttonDismiss))
 	{
 	    if(Modes(NOTDISMISS))
-	        statusBar.ShowMessage("Dismiss disabled, see game info");
+	        message = "Dismiss disabled, see game info";
 	    else
-	        statusBar.ShowMessage(_("Dismiss hero"));
+	        message = _("Dismiss hero");
         }
 	else
-        if(le.MouseCursor(buttonPrevHero)) statusBar.ShowMessage(_("Show prev heroes"));
+        if(le.MouseCursor(buttonPrevHero))
+	    message = _("Show prev heroes");
         else
-        if(le.MouseCursor(buttonNextHero)) statusBar.ShowMessage(_("Show next heroes"));
-        else
-	// status message over artifact
-	if(const Artifact* art = selectArtifacts.GetItem(le.GetMouseCursor()))
-	{
-	    if(art->isValid())
-	    {
-		message = _("View %{art} Info");
-		String::Replace(message, "%{art}", art->GetName());
-		statusBar.ShowMessage(message);
-	    }
-	    else
-		statusBar.ShowMessage(_("Hero Screen"));
-	}
+        if(le.MouseCursor(buttonNextHero))
+	    message = _("Show next heroes");
+
+	if(message.empty())
+    	    statusBar.ShowMessage(_("Hero Screen"));
 	else
-	// status message over skill
-	if(const Skill::Primary::skill_t* skill = primskill_bar.GetItem(le.GetMouseCursor()))
 	{
-	    if(Skill::Primary::UNKNOWN != *skill)
-	    {
-		message = _("View %{skill} Info");
-		String::Replace(message, "%{skill}", Skill::Primary::String(*skill));
-		statusBar.ShowMessage(message);
-	    }
-	    else
-		statusBar.ShowMessage(_("Hero Screen"));
+	    statusBar.ShowMessage(message);
+	    message.clear();
 	}
-	else
-	if(const Skill::Secondary* skill = secskill_bar.GetItem(le.GetMouseCursor()))
-	{
-	    if(skill->isValid())
-	    {
-		message = _("View %{skill} Info");
-		String::Replace(message, "%{skill}", skill->GetName());
-		statusBar.ShowMessage(message);
-	    }
-	    else
-		statusBar.ShowMessage(_("Hero Screen"));
-	}
-	else
-        // status message over troops
-        if(le.MouseCursor(selectArmy.GetArea()))
-        {
-            const s8 index1 = selectArmy.GetIndexFromCoord(le.GetMouseCursor());
-            const Troop* troop1 = army.GetTroop(index1);
-
-            if(troop1)
-            {
-                const std::string & monster1 = troop1->GetName();
-
-                if(selectArmy.isSelected())
-                {
-                    const u8 index2 = selectArmy.Selected();
-                    const Troop* troop2 = army.GetTroop(index2);
-                    const std::string & monster2 = troop2->GetName();
-
-                    if(index1 == index2)
-            	    {
-                	message = _("View %{monster}");
-                	String::Replace(message, "%{monster}", monster1);
-            	    }
-                    else
-                    if(troop1->isValid() && troop2->isValid())
-                    {
-                        message = troop1->GetID() == troop2->GetID() ? _("Combine %{monster1} armies") : _("Exchange %{monster2} with %{monster1}");
-                	String::Replace(message, "%{monster1}", monster1);
-                	String::Replace(message, "%{monster2}", monster2);
-                    }
-                    else
-                    {
-                        message = _("Move and right click Redistribute %{monster}");
-                	String::Replace(message, "%{monster}", monster2);
-                    }
-                }
-                else
-                if(troop1->isValid())
-                {
-                    message = _("Select %{monster}");
-                    String::Replace(message, "%{monster}", monster1);
-                }
-                else
-                    message = _("Empty");
-
-                statusBar.ShowMessage(message);
-            }
-	    else
-		statusBar.ShowMessage(_("Hero Screen"));
-        }
-        else
-        // clear all
-        statusBar.ShowMessage(_("Hero Screen"));
     }
 
     return Dialog::ZERO;

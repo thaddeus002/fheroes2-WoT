@@ -1,4 +1,4 @@
-/*************************************************************************
+/***************************************************************************
  *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
@@ -686,10 +686,16 @@ bool Castle::RecruitMonster(const Troop & troop)
     switch(troop.GetDwelling())
     {
 	case DWELLING_MONSTER1: dw_index = 0; break;
+	case DWELLING_UPGRADE2:
 	case DWELLING_MONSTER2: dw_index = 1; break;
+	case DWELLING_UPGRADE3:
 	case DWELLING_MONSTER3: dw_index = 2; break;
+	case DWELLING_UPGRADE4:
 	case DWELLING_MONSTER4: dw_index = 3; break;
+	case DWELLING_UPGRADE5:
 	case DWELLING_MONSTER5: dw_index = 4; break;
+	case DWELLING_UPGRADE7:
+	case DWELLING_UPGRADE6:
 	case DWELLING_MONSTER6: dw_index = 5; break;
 	default: return false;
     }
@@ -717,17 +723,23 @@ bool Castle::RecruitMonster(const Troop & troop)
     return true;
 }
 
-bool Castle::RecruitMonster(u32 dw, u16 count)
+bool Castle::RecruitMonsterFromDwelling(u32 dw, u16 count)
 {
     u8 dw_index = 0;
 
     switch(dw)
     {
 	case DWELLING_MONSTER1: dw_index = 0; break;
+	case DWELLING_UPGRADE2:
 	case DWELLING_MONSTER2: dw_index = 1; break;
+	case DWELLING_UPGRADE3:
 	case DWELLING_MONSTER3: dw_index = 2; break;
+	case DWELLING_UPGRADE4:
 	case DWELLING_MONSTER4: dw_index = 3; break;
+	case DWELLING_UPGRADE5:
 	case DWELLING_MONSTER5: dw_index = 4; break;
+	case DWELLING_UPGRADE7:
+	case DWELLING_UPGRADE6:
 	case DWELLING_MONSTER6: dw_index = 5; break;
 	default: return false;
     }
@@ -752,49 +764,6 @@ bool Castle::RecruitMonster(u32 dw, u16 count)
     DEBUG(DBG_GAME, DBG_INFO, name << " recruit: " << ms.GetMultiName() << "(" << count << ")");
 
     return true;
-}
-
-u16 Castle::RecruitMaxMonster(u32 dw)
-{
-    u8 dw_index = 0;
-
-    switch(dw)
-    {
-	case DWELLING_MONSTER1: dw_index = 0; break;
-	case DWELLING_MONSTER2: dw_index = 1; break;
-	case DWELLING_MONSTER3: dw_index = 2; break;
-	case DWELLING_MONSTER4: dw_index = 3; break;
-	case DWELLING_MONSTER5: dw_index = 4; break;
-	case DWELLING_MONSTER6: dw_index = 5; break;
-	default: return false;
-    }
-
-    const Monster ms(race, GetActualDwelling(dw));
-    u16 count = 0;
-
-    // may be guardian present
-    Army & army2 = GetArmy();
-
-    if(army2.CanJoinTroop(ms))
-    {
-	Kingdom & kingdom = GetKingdom();
-	count = dwelling[dw_index];
-	const payment_t paymentCosts = ms.GetCost();
-
-	while(count && kingdom.AllowPayment(paymentCosts * count)) --count;
-
-	// buy
-	if(count)
-	{
-	    kingdom.OddFundsResource(paymentCosts);
-	    army2.JoinTroop(ms, count);
-	    dwelling[dw_index] -= count;
-
-	    DEBUG(DBG_GAME, DBG_INFO, name << " recruit: " << ms.GetMultiName() << "(" << count << ")");
-	}
-    }
-
-    return count;
 }
 
 /* return current count monster in dwelling */
@@ -1618,15 +1587,22 @@ u32 Castle::GetActualDwelling(u32 build) const
 {
     switch(build)
     {
+	case DWELLING_MONSTER1:
+	case DWELLING_UPGRADE2:
+	case DWELLING_UPGRADE3:
+	case DWELLING_UPGRADE4:
+	case DWELLING_UPGRADE5:
+	case DWELLING_UPGRADE7: return build;
 	case DWELLING_MONSTER2: return building & DWELLING_UPGRADE2 ? DWELLING_UPGRADE2 : build;
 	case DWELLING_MONSTER3: return building & DWELLING_UPGRADE3 ? DWELLING_UPGRADE3 : build;
 	case DWELLING_MONSTER4: return building & DWELLING_UPGRADE4 ? DWELLING_UPGRADE4 : build;
 	case DWELLING_MONSTER5: return building & DWELLING_UPGRADE5 ? DWELLING_UPGRADE5 : build;
-	case DWELLING_UPGRADE6: return building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : build;
 	case DWELLING_MONSTER6: return building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : build);
+	case DWELLING_UPGRADE6: return building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : build;
 	default: break;
     }
-    return build;
+
+    return BUILD_NOTHING;
 }
 
 u32 Castle::GetUpgradeBuilding(u32 build) const
@@ -1856,7 +1832,7 @@ void Castle::RecruitAllMonster(void)
 
     if(! skip_recruit)
     for(u32 dw = DWELLING_MONSTER6; dw >= DWELLING_MONSTER1; dw >>= 1)
-	if(isBuild(dw)) RecruitMaxMonster(dw);
+	if(isBuild(dw)) RecruitMonsterFromDwelling(dw, GetDwellingLivedCount(dw));
 }
 
 const Army & Castle::GetArmy(void) const
@@ -2256,22 +2232,54 @@ void Castle::SwapCastleHeroes(CastleHeroes & heroes)
     }
 }
 
-std::string Castle::GetDescription(void)
+std::string Castle::GetStringBuilding(u32 build) const
 {
-    std::string msg = GetDescriptionBuilding(BUILD_CASTLE, race);
-    String::Replace(msg, "%{count}", ProfitConditions::FromBuilding(BUILD_CASTLE, race).gold);
+    return GetStringBuilding(build, GetRace());
+}
 
-    if(isBuild(BUILD_CASTLE))
+std::string Castle::GetDescriptionBuilding(u32 build) const
+{
+    std::string res = GetDescriptionBuilding(build, GetRace());
+
+    switch(build)
     {
-        msg.append("\n \n");
-        msg.append(Battle::Tower::GetInfo(*this));
+	case BUILD_WELL:
+	    String::Replace(res, "%{count}", GetGrownWell());
+	    break;
+
+	case BUILD_WEL2:
+	    String::Replace(res, "%{count}", GetGrownWel2());
+	    break;
+
+	case BUILD_CASTLE:
+	{
+	    String::Replace(res, "%{count}", ProfitConditions::FromBuilding(BUILD_CASTLE, race).gold);
+
+	    if(isBuild(BUILD_CASTLE))
+	    {
+    		res.append("\n \n");
+    		res.append(Battle::Tower::GetInfo(*this));
+	    }
+
+	    if(isBuild(BUILD_MOAT))
+	    {
+    		res.append("\n \n");
+    		res.append(Battle::Board::GetMoatInfo());
+	    }
+	}
+	    break;
+
+	case BUILD_SPEC:
+	case BUILD_STATUE:
+	{
+	    payment_t profit = ProfitConditions::FromBuilding(build, GetRace());
+	    String::Replace(res, "%{count}", profit.gold);
+	}
+	    break;
+
+	default:
+	    break;
     }
 
-    if(isBuild(BUILD_MOAT))
-    {
-        msg.append("\n \n");
-        msg.append(Battle::Board::GetMoatInfo());
-    }
-
-    return msg;
+    return res;
 }

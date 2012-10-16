@@ -31,25 +31,27 @@
 #include "kingdom.h"
 #include "skill.h"
 #include "army.h"
-#include "selectarmybar.h"
+#include "army_bar.h"
 #include "interface_icons.h"
 #include "interface_list.h"
 
 struct HeroRow
 {
     Heroes* 		hero;
-    SelectArmyBar	armyBar;
+    ArmyBar*		armyBar;
     ArtifactsBar*	artifactsBar;
-    SecondarySkillsBar	secskillsBar;
+    SecondarySkillsBar*	secskillsBar;
     PrimarySkillsBar*	primskillsBar;
     Surface		sfb;
     Surface		sfc;
     Surface		sfd;
 
-    HeroRow() : hero(NULL), artifactsBar(NULL), primskillsBar(NULL) {}
+    HeroRow() : hero(NULL), armyBar(NULL), artifactsBar(NULL), secskillsBar(NULL), primskillsBar(NULL) {}
     ~HeroRow()
     {
+	delete armyBar;
 	delete artifactsBar;
+	delete secskillsBar;
 	delete primskillsBar;
     }
 
@@ -57,31 +59,25 @@ struct HeroRow
     {
 	hero = ptr;
 
-	const Size cell(41, 53);
-	sfb.Set(cell.w, cell.h);
-	Cursor::DrawCursor(sfb, 0x70, true);
+	if(armyBar) delete armyBar;
+	armyBar = new ArmyBar(&hero->GetArmy(), true, false);
+	armyBar->SetBackground(41, 53, 0x82);
+	armyBar->SetColRows(5, 1);
+	armyBar->SetHSpace(-1);
 
-	sfc.Set(cell.w, cell.h);
-	Cursor::DrawCursor(sfc, 0xd7, true);
-
-	armyBar.SetArmy(hero->GetArmy());
-        armyBar.SetSaveLastTroop();
-	armyBar.SetInterval(-1);
-	armyBar.SetBackgroundSprite(sfb);
-	armyBar.SetCursorSprite(sfc);
-	armyBar.SetUseMons32Sprite();
-	if(hero->inCastle()) armyBar.SetCastle(*hero->inCastle());
-
+	if(artifactsBar) delete artifactsBar;
 	artifactsBar = new ArtifactsBar(hero, true, false);
 	artifactsBar->SetColRows(7, 2);
 	artifactsBar->SetHSpace(1);
 	artifactsBar->SetVSpace(8);
 	artifactsBar->SetContent(hero->GetBagArtifacts());
 
-	secskillsBar.SetColRows(4, 2);
-        secskillsBar.SetHSpace(-1);
-        secskillsBar.SetVSpace(8);
-        secskillsBar.SetContent(hero->GetSecondarySkills());
+	if(secskillsBar) delete secskillsBar;
+	secskillsBar = new SecondarySkillsBar();
+	secskillsBar->SetColRows(4, 2);
+        secskillsBar->SetHSpace(-1);
+        secskillsBar->SetVSpace(8);
+        secskillsBar->SetContent(hero->GetSecondarySkills());
 
 	if(primskillsBar) delete primskillsBar;
 	primskillsBar = new PrimarySkillsBar(ptr, true);
@@ -157,8 +153,8 @@ void StatsHeroesList::ActionListPressRight(HeroRow & row, const Point & cursor, 
 
 bool StatsHeroesList::ActionListCursor(HeroRow & row, const Point & cursor, s16 ox, s16 oy)
 {
-    if((row.armyBar.GetArea() & cursor) &&
-	SelectArmyBar::QueueEventProcessing(row.armyBar))
+    if((row.armyBar->GetArea() & cursor) &&
+	row.armyBar->QueueEventProcessing())
     {
 	if(row.artifactsBar->isSelected()) row.artifactsBar->ResetSelected();
 	Cursor::Get().Hide();
@@ -168,7 +164,7 @@ bool StatsHeroesList::ActionListCursor(HeroRow & row, const Point & cursor, s16 
     if((row.artifactsBar->GetArea() & cursor) &&
 	row.artifactsBar->QueueEventProcessing())
     {
-	if(row.armyBar.isSelected()) row.armyBar.Reset();
+	if(row.armyBar->isSelected()) row.armyBar->ResetSelected();
 	Cursor::Get().Hide();
 	return true;
     }
@@ -180,8 +176,8 @@ bool StatsHeroesList::ActionListCursor(HeroRow & row, const Point & cursor, s16 
 	return true;
     }
     else
-    if((row.secskillsBar.GetArea() & cursor) &&
-	row.secskillsBar.QueueEventProcessing())
+    if((row.secskillsBar->GetArea() & cursor) &&
+	row.secskillsBar->QueueEventProcessing())
     {
 	Cursor::Get().Hide();
 	return true;
@@ -218,16 +214,16 @@ void StatsHeroesList::RedrawItem(const HeroRow & row, s16 dstx, s16 dsty, bool c
 	const_cast<PrimarySkillsBar*>(row.primskillsBar)->Redraw();
 
 	// secondary skills info
-	const_cast<SecondarySkillsBar &>(row.secskillsBar).SetPos(dstx + 206, dsty + 3);
-	const_cast<SecondarySkillsBar &>(row.secskillsBar).Redraw();
+	const_cast<SecondarySkillsBar*>(row.secskillsBar)->SetPos(dstx + 206, dsty + 3);
+	const_cast<SecondarySkillsBar*>(row.secskillsBar)->Redraw();
 
 	// artifacts info
 	const_cast<ArtifactsBar*>(row.artifactsBar)->SetPos(dstx + 348, dsty + 3);
 	const_cast<ArtifactsBar*>(row.artifactsBar)->Redraw();
 
 	// army info
-	const_cast<SelectArmyBar &>(row.armyBar).SetPos(Point(dstx -1, dsty + 30));
-	const_cast<SelectArmyBar &>(row.armyBar).Redraw();
+	const_cast<ArmyBar*>(row.armyBar)->SetPos(dstx -1, dsty + 30);
+	const_cast<ArmyBar*>(row.armyBar)->Redraw();
     }
 }
 

@@ -69,11 +69,8 @@ namespace Interface
 	virtual void	RedrawBackground(const Rect &, Surface &) {}
 	virtual void	RedrawItem(Item &, const Rect &, Surface &) {}
 
-        virtual bool	ActionBarSingleClick(Item & item){ return false; }
-        virtual bool	ActionBarPressRight(Item & item){ return false; }
-
-        virtual bool	ActionBarSingleClick(const Point &, Item & item, const Rect &){ return ActionBarSingleClick(item); }
-        virtual bool	ActionBarPressRight(const Point &, Item & item, const Rect &){ return ActionBarPressRight(item); }
+        virtual bool	ActionBarSingleClick(const Point &, Item & item, const Rect &){ return false; }
+        virtual bool	ActionBarPressRight(const Point &, Item & item, const Rect &){ return false; }
 
         virtual bool	ActionBarCursor(const Point &, Item &, const Rect &){ return false; }
 
@@ -323,14 +320,12 @@ namespace Interface
 */
 	virtual void	RedrawItem(Item &, const Rect &, bool, Surface &) {}
 
-        virtual bool	ActionBarSingleClick(Item & item){ return false; }
-        virtual bool	ActionBarDoubleClick(Item & item){ return ActionBarSingleClick(item); }
-        virtual bool	ActionBarPressRight(Item & item){ return false; }
-
         virtual bool	ActionBarSingleClick(const Point &, Item &, const Rect &, Item &, const Rect &){ return false; }
-        virtual bool	ActionBarSingleClick(const Point &, Item & item, const Rect &){ return ActionBarSingleClick(item); }
-        virtual bool	ActionBarDoubleClick(const Point &, Item & item, const Rect &){ return ActionBarDoubleClick(item); }
-        virtual bool	ActionBarPressRight(const Point &, Item & item, const Rect &){ return ActionBarPressRight(item); }
+        virtual bool	ActionBarPressRight(const Point &, Item &, const Rect &, Item &, const Rect &){ return false; }
+
+        virtual bool	ActionBarSingleClick(const Point &, Item & item, const Rect &){ return false; }
+        virtual bool	ActionBarDoubleClick(const Point & cursor, Item & item, const Rect & pos){ return ActionBarSingleClick(cursor, item, pos); }
+        virtual bool	ActionBarPressRight(const Point &, Item & item, const Rect &){ return false; }
 
         virtual bool	ActionBarCursor(const Point &, Item &, const Rect &){ return false; }
         virtual bool	ActionBarCursor(const Point &, Item &, const Rect &, Item &, const Rect &){ return false; }
@@ -373,11 +368,9 @@ namespace Interface
 
     	    if(ItemsBar<Item>::isItemsEmpty() && other.isItemsEmpty())
 		return false;
-	    else
-	    if(other.isSelected())
-    		return ActionCursorItemIter(cursor, other);
 
-	    return ActionCursorItemIter(cursor, ItemsBar<Item>::GetItemIterPos(cursor));
+	    return other.isSelected() ?
+		ActionCursorItemIter(cursor, other) : ActionCursorItemIter(cursor, ItemsBar<Item>::GetItemIterPos(cursor));
         }
 
     protected:
@@ -460,7 +453,7 @@ namespace Interface
             	if(le.MousePressRight(iterPos1.second))
 		{
 		    other.ResetSelected();
-            	    return ActionBarPressRight(cursor, **iterPos1.first, iterPos1.second);
+            	    return ActionBarPressRight(cursor, **iterPos1.first, iterPos1.second, **iterPos2.first, iterPos2.second);
 		}
 	    }
 
