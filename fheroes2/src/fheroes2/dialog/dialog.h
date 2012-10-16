@@ -73,7 +73,6 @@ namespace Dialog
 	UPGRADE_DISABLE = MAX,
 
 	READONLY= 0x2000,
-	BATTLE	= 0x4000,
 	BUTTONS = (YES|OK|NO|CANCEL)
     };
 

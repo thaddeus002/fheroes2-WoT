@@ -79,28 +79,25 @@ Dialog::answer_t PocketPC::DialogArmyInfo(const Troop & troop, u16 flags)
         buttonDismiss.SetDisable(true);
     }
 
-    if(!(Dialog::BATTLE & flags) && troop.isAllowUpgrade())
+    if(! troop.isBattle() && troop.isAllowUpgrade())
     {
 	if(Dialog::UPGRADE & flags)
         {
-            buttonUpgrade.SetDisable(false);
-            buttonUpgrade.Draw();
-        }
-        else if(Dialog::READONLY & flags)
-        {
-            buttonUpgrade.Press();
-            buttonUpgrade.SetDisable(true);
+	    if(Dialog::UPGRADE_DISABLE & flags)
+	    {
+        	buttonUpgrade.Press();
+        	buttonUpgrade.SetDisable(true);
+    	    }
+    	    else
+        	buttonUpgrade.SetDisable(false);
     	    buttonUpgrade.Draw();
         }
         else buttonUpgrade.SetDisable(true);
     }
     else buttonUpgrade.SetDisable(true);
 
-    if(!(Dialog::BATTLE & flags))
-    {
-	buttonDismiss.Draw();
-        buttonExit.Draw();
-    }
+    if(! troop.isBattle()) buttonDismiss.Draw();
+    buttonExit.Draw();
 
     cursor.Show();
     display.Flip();

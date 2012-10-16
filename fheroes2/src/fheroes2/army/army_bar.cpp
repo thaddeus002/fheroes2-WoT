@@ -237,32 +237,39 @@ bool ArmyBar::ActionBarCursor(const Point & cursor, ArmyTroop & troop, const Rec
         String::Replace(msg, "%{name}", troop.GetName());
     }
 
+    // drag drop - redistribute troops
+    LocalEvent & le = LocalEvent::Get();
+    ArmyTroop* troop_p = GetItem(le.GetMousePressLeft());
+
+    if(!troop.isValid() && troop_p && troop_p->isValid())
+    {
+/*
+	const Rect* pos_p = GetItemPos(le.GetMousePressLeft());
+	const Point offset(Point(le.GetMousePressLeft()) - *pos_p);
+	Surface sf(pos.w, pos.h);
+	RedrawItem(*troop_p, Rect(0, 0, pos.w, pos.h), false, sf);
+	sf.GrayScale();
+	SpriteCursor sp;
+	sp.SetSprite(sf);
+	while(le.HandleEvents() && le.MousePressLeft()){ Cursor::Get().Hide(); sp.Move(Point(le.GetMouseCursor()) - offset); Cursor::Get().Show(); Display::Get().Flip(); DELAY(1); };
+	Cursor::Get().Hide();
+	sp.Hide();
+*/
+	while(le.HandleEvents() && le.MousePressLeft()){ Cursor::Get().Show(); Display::Get().Flip(); DELAY(1); };
+	ArmyTroop* troop_r = GetItem(le.GetMouseReleaseLeft());
+
+	if(troop_r && !troop_r->isValid())
+	{
+	    RedistributeArmy(*troop_p, *troop_r);
+	    if(isSelected()) ResetSelected();
+	    le.ResetPressLeft();
+	    return true;
+	}
+	le.ResetPressLeft();
+    }
+
     return false;
 }
-
-/*
-    const s8 index_p = bar.GetIndexFromCoord(le.GetMousePressLeft());
-    Troop* troop3 = bar.army->GetTroop(index_p);
-
-    // drag drop - redistribute troops
-    if(0 <= index_p && ARMYMAXTROOPS > index_p &&
-       troop3 && troop3->isValid() &&
-       !troop1->isValid())
-    {
-        while(le.HandleEvents() && le.MousePressLeft()){ Cursor::Get().Show(); Display::Get().Flip(); DELAY(1); };
-        const s8 index_r = bar.GetIndexFromCoord(le.GetMouseReleaseLeft());
-        troop3 = bar.army->GetTroop(index_r);
-
-        if(troop3 && !troop3->isValid())
-        {
-            DialogRedistributeArmy(*bar.army, index_p, *bar.army, index_r);
-            bar.Reset();
-            bar.Redraw();
-            change = true;
-        }
-        le.ResetPressLeft();
-    }
-*/
 
 bool ArmyBar::ActionBarCursor(const Point & cursor, ArmyTroop & troop1, const Rect & pos1, ArmyTroop & troop2 /* selected */, const Rect & pos2)
 {

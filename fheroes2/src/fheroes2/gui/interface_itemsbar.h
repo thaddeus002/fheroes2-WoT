@@ -131,6 +131,12 @@ namespace Interface
 	    return posItem != items.end() ? *posItem : NULL;
 	}
 
+	Rect* GetItemPos(const Point & pt)
+	{
+	    ItemIterPos posItem = GetItemIterPos(pt);
+	    return posItem.first != items.end() ? &posItem.second : NULL;
+	}
+
 	s8 GetIndex(const Point & pt)
 	{
 	    ItemsIterator posItem = GetItemIter(pt);
