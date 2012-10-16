@@ -238,7 +238,10 @@ void DrawMonsterStats(const Point & dst, const Troop & troop)
     dst_pt.y += (pda ? 14 : 18);
     text.Blit(dst_pt);
 
-    text.Set(GetString(troop().GetDamageMin()) + " - " + GetString(troop().GetDamageMax()));
+    if(troop().GetDamageMin() != troop().GetDamageMax())
+	text.Set(GetString(troop().GetDamageMin()) + " - " + GetString(troop().GetDamageMax()));
+    else
+	text.Set(GetString(troop().GetDamageMin()));
     dst_pt.x = dst.x + ox;
     text.Blit(dst_pt);
 
