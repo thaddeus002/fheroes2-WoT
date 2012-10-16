@@ -95,7 +95,7 @@ namespace Battle
 	{
 	    messages.push_back(str);
 	    SetListContent(messages);
-	    if(openlog) SetCurrent(messages.size()-1);
+	    SetCurrent(messages.size()-1);
 	}
 
 	void RedrawItem(const std::string & str, s16 px, s16 py, bool f)
