@@ -393,7 +393,7 @@ void StatsCastlesList::ActionListPressRight(CstlRow & row, const Point & cursor,
 bool StatsCastlesList::ActionListCursor(CstlRow & row, const Point & cursor, s16 ox, s16 oy)
 {
     if(row.armyBarGuard && (row.armyBarGuard->GetArea() & cursor) &&
-	row.armyBarGuard->QueueEventProcessing())
+	(row.armyBarGuest ? row.armyBarGuard->QueueEventProcessing(*row.armyBarGuest) : row.armyBarGuard->QueueEventProcessing()))
     {
 	Cursor::Get().Hide();
 	if(row.armyBarGuest && row.armyBarGuest->isSelected()) row.armyBarGuest->ResetSelected();
@@ -401,7 +401,7 @@ bool StatsCastlesList::ActionListCursor(CstlRow & row, const Point & cursor, s16
     }
     else
     if(row.armyBarGuest && (row.armyBarGuest->GetArea() & cursor) &&
-	row.armyBarGuest->QueueEventProcessing())
+	(row.armyBarGuard ? row.armyBarGuest->QueueEventProcessing(*row.armyBarGuard) : row.armyBarGuest->QueueEventProcessing()))
     {
 	Cursor::Get().Hide();
 	if(row.armyBarGuard && row.armyBarGuard->isSelected()) row.armyBarGuard->ResetSelected();
