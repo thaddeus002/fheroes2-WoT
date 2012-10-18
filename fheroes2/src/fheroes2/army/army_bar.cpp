@@ -179,7 +179,11 @@ void ArmyBar::RedrawItem(ArmyTroop & troop, const Rect & pos, bool selected, Sur
 	    spmonh.Blit(pos.x + spmonh.x(), pos.y + spmonh.y(), dstsf);
 	}
 
-	text.Blit(pos.x + pos.w - text.w() - 2, pos.y + pos.h - text.h() - 1, dstsf);
+	Surface black(text.w() + 4, text.h());
+	black.Fill(0, 0, 0);
+	const Point pt(pos.x + pos.w - black.w() - 1, pos.y + pos.h - black.h() - 1);
+	black.Blit(pt.x, pt.y, dstsf);
+	text.Blit(pt.x + 2, pt.y + 1, dstsf);
 
 	if(selected)
             spcursor.Show(pos.x, pos.y);
