@@ -27,6 +27,7 @@
 #include "castle.h"
 
 class StatusBar;
+class Castle;
 
 class BuildingInfo
 {
@@ -53,12 +54,38 @@ public:
 
 private:
     void RedrawCaptain(void);
+    std::string GetConditionDescription(void) const;
 
     const Castle & castle;
     u32 building;
     std::string description;
     Rect area;
     s8 bcond;
+};
+
+struct DwellingItem
+{
+    DwellingItem(Castle &, u32 dw);
+
+    u32         type;
+    Monster     mons;
+};
+
+class DwellingsBar : public Interface::ItemsBar<DwellingItem>
+{
+public:
+    DwellingsBar(Castle &, u16, u16, u8);
+
+    void        RedrawBackground(const Rect &, Surface &);
+    void        RedrawItem(DwellingItem &, const Rect &, Surface &);
+
+    bool        ActionBarSingleClick(const Point &, DwellingItem &, const Rect &);
+    bool        ActionBarPressRight(const Point &, DwellingItem &, const Rect &);
+
+protected:
+    Castle &                    castle;
+    Surface                     backsf;
+    std::vector<DwellingItem>   content;
 };
 
 #endif

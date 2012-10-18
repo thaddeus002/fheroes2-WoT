@@ -45,7 +45,7 @@ struct buildstats_t
 };
 
 buildstats_t _builds[] = {
-    // id                                             gold wood mercury ore sulfur crystal gems
+    // id                             gold wood mercury ore sulfur crystal gems
     { BUILD_THIEVESGUILD, Race::ALL, { 750, 5, 0, 0, 0, 0, 0 } },
     { BUILD_TAVERN,       Race::ALL, { 500, 5, 0, 0, 0, 0, 0 } },
     { BUILD_SHIPYARD,     Race::ALL, {2000,20, 0, 0, 0, 0, 0 } },
@@ -252,19 +252,7 @@ BuildingInfo::BuildingInfo(const Castle & c, building_t b) : castle(c), building
 
     // generate description
     if(BUILD_DISABLE == bcond)
-    {
-	switch(building)
-	{
-	    case BUILD_SHIPYARD:
-		description = _("Cannot build %{name} because castle is too far from water.");
-		String::Replace(description, "%{name}", GetName());
-		break;
-
-	    default:
-		description = "disable build.";
-		break;
-	}
-    }
+	description = GetConditionDescription();
     else
     if(IsDwelling())
     {
@@ -456,13 +444,13 @@ bool BuildingInfo::QueueEventProcessing(void)
 
     if(le.MouseClickLeft(area))
     {
-	if(! castle.isBuild(BUILD_CASTLE))
-	    Dialog::Message("", _("For this action it is necessary first to build a castle."), Font::BIG, Dialog::OK);
-	else
 	if(bcond == ALREADY_BUILT)
 	    Dialog::Message(GetName(), GetDescription(), Font::BIG, Dialog::OK);
 	else
+	if(bcond == ALLOW_BUILD || bcond == REQUIRES_BUILD || bcond == LACK_RESOURCES)
 	    return DialogBuyBuilding(true);
+	else
+	    Dialog::Message("", GetConditionDescription(), Font::BIG, Dialog::OK);
     }
     else
     if(le.MousePressRight(area))
@@ -470,7 +458,10 @@ bool BuildingInfo::QueueEventProcessing(void)
 	if(bcond == ALREADY_BUILT)
 	    Dialog::Message(GetName(), GetDescription(), Font::BIG);
 	else
+	if(bcond == ALLOW_BUILD || bcond == REQUIRES_BUILD || bcond == LACK_RESOURCES)
 	    DialogBuyBuilding(false);
+	else
+	    Dialog::Message("", GetConditionDescription(), Font::BIG);
     }
     return false;
 }
@@ -484,7 +475,20 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
 
-    TextBox box1(description, Font::BIG, BOXAREA_WIDTH);
+    std::string box1str = description;
+
+    if(ALLOW_BUILD != bcond)
+    {
+	const std::string & ext = GetConditionDescription();
+
+	if(! ext.empty())
+	{
+	    box1str.append("\n \n");
+	    box1str.append(ext);
+	}
+    }
+
+    TextBox box1(box1str, Font::BIG, BOXAREA_WIDTH);
 
     // prepare requires build string
     std::string str;
@@ -590,45 +594,160 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
     return false;
 }
 
+const char* GetBuildConditionDescription(s8 bcond)
+{
+    switch(bcond)
+    {
+	case NOT_TODAY:
+	    return _("Cannot build. Already built here this turn.");
+	    break;
+
+	case NEED_CASTLE:
+	    return _("For this action it is necessary first to build a castle.");
+
+	default: break;
+    }
+
+    return NULL;
+}
+
+std::string BuildingInfo::GetConditionDescription(void) const
+{
+    std::string res;
+
+    switch(bcond)
+    {
+	case NOT_TODAY:
+	case NEED_CASTLE:
+	    res = GetBuildConditionDescription(bcond);
+	    break;
+
+	case BUILD_DISABLE:
+	    if(building == BUILD_SHIPYARD)
+	    {
+		res = _("Cannot build %{name} because castle is too far from water.");
+		String::Replace(res, "%{name}", Castle::GetStringBuilding(BUILD_SHIPYARD, castle.GetRace()));
+	    }
+	    else
+		res = "disable build.";
+	    break;
+
+	case LACK_RESOURCES:
+	    res = _("Cannot afford %{name}");
+    	    String::Replace(res, "%{name}", GetName());
+	    break;
+
+	case ALREADY_BUILT:
+	    res = _("%{name} is already built");
+	    String::Replace(res, "%{name}", GetName());
+	    break;
+
+	default: break;
+    }
+
+    return res;
+}
+
 void BuildingInfo::SetStatusMessage(StatusBar & bar) const
 {
     std::string str;
-    const char* name = GetName();
 
-    if(bcond == ALREADY_BUILT)
+    switch(bcond)
     {
-        str = _("%{name} is already built");
-        String::Replace(str, "%{name}", name);
-    }
-    else
-    if(bcond == BUILD_DISABLE)
-    {
-	str = description;
-    }
-    else
-    {
-        if(!castle.AllowBuild())
-        {
-            str = _("Cannot build. Already built here this turn.");
-        }
-        else
-        if(castle.AllowBuild() && ! castle.GetKingdom().AllowPayment(GetCost(castle.GetRace(), building)))
-        {
-            str = _("Cannot afford %{name}");
-            String::Replace(str, "%{name}", name);
-        }
-        else
-        if(!castle.AllowBuyBuilding(building))
-        {
-            str = _("Cannot build %{name}");
-            String::Replace(str, "%{name}", name);
-        }
-        else
-        {
-            str = _("Build %{name}");
-            String::Replace(str, "%{name}", name);
-        }
+	case NOT_TODAY:
+	case ALREADY_BUILT:
+	case NEED_CASTLE:
+	case BUILD_DISABLE:
+	case LACK_RESOURCES:
+	    str = GetConditionDescription();
+	    break;
+
+	case REQUIRES_BUILD:
+	case ALLOW_BUILD:
+    	    str = bcond == ALLOW_BUILD ? _("Build %{name}") : _("Cannot build %{name}");
+    	    String::Replace(str, "%{name}", GetName());
+	    break;
+
+	default:
+	    break;
     }
 
     bar.ShowMessage(str);
+}
+
+DwellingItem::DwellingItem(Castle & castle, u32 dw)
+{
+    type = castle.GetActualDwelling(dw);
+    mons = Monster(castle.GetRace(), dw);
+}
+
+DwellingsBar::DwellingsBar(Castle & cstl, u16 sw, u16 sh, u8 col) : castle(cstl)
+{
+    for(u32 dw = DWELLING_MONSTER1; dw <= DWELLING_MONSTER6; dw <<= 1)
+        content.push_back(DwellingItem(castle, dw));
+
+    SetContent(content);
+
+    backsf.Set(sw, sh);
+    backsf.Fill(backsf.GetColorIndex(col));
+    Cursor::DrawCursor(backsf, 0x70, true);
+    SetItemSize(sw, sh);
+}
+
+void DwellingsBar::RedrawBackground(const Rect & pos, Surface & dstsf)
+{
+    backsf.Blit(pos.x, pos.y, dstsf);
+}
+
+void DwellingsBar::RedrawItem(DwellingItem & dwl, const Rect & pos, Surface & dstsf)
+{
+    const Sprite & mons32 = AGG::GetICN(ICN::MONS32, dwl.mons.GetSpriteIndex());
+    mons32.Blit(pos.x + (pos.w - mons32.w()) / 2, pos.y + (pos.h - 3 - mons32.h()));
+
+    if(castle.isBuild(dwl.type))
+    {
+        // count
+        Text text(GetString(castle.GetDwellingLivedCount(dwl.type)), Font::SMALL);
+        text.Blit(pos.x + pos.w - text.w() - 3, pos.y + pos.h - text.h() - 1);
+
+        u8 grown = dwl.mons.GetGrown();
+        if(castle.isBuild(BUILD_WELL)) grown += Castle::GetGrownWell();
+        if(castle.isBuild(BUILD_WEL2) && DWELLING_MONSTER1 == dwl.type) grown += Castle::GetGrownWel2();
+
+        // grown
+        text.Set("+" + GetString(grown), Font::YELLOW_SMALL);
+        text.Blit(pos.x + pos.w - text.w() - 3, pos.y + 2);
+    }
+    else
+        AGG::GetICN(ICN::CSLMARKER, 0).Blit(pos.x + pos.w - 10, pos.y + 4, dstsf);
+}
+
+bool DwellingsBar::ActionBarSingleClick(const Point & cursor, DwellingItem & dwl, const Rect & pos)
+{
+    if(castle.isBuild(dwl.type))
+    {
+        castle.RecruitMonster(Dialog::RecruitMonster(dwl.mons, castle.GetDwellingLivedCount(dwl.type), true));
+    }
+    else
+    if(!castle.isBuild(BUILD_CASTLE))
+        Dialog::Message("", GetBuildConditionDescription(NEED_CASTLE), Font::BIG, Dialog::OK);
+    else
+    {
+        BuildingInfo dwelling(castle, static_cast<building_t>(dwl.type));
+
+        if(dwelling.DialogBuyBuilding(true))
+        {
+            AGG::PlaySound(M82::BUILDTWN);
+            castle.BuyBuilding(dwl.type);
+        }
+    }
+
+    return true;
+}
+
+bool DwellingsBar::ActionBarPressRight(const Point & cursor, DwellingItem & dwl, const Rect & pos)
+{
+    Dialog::ArmyInfo(Troop(dwl.mons, castle.GetDwellingLivedCount(dwl.type)), 0);
+
+    return true;
 }

@@ -32,6 +32,7 @@
 #include "skill.h"
 #include "army.h"
 #include "army_bar.h"
+#include "buildinginfo.h"
 #include "interface_icons.h"
 #include "interface_list.h"
 
@@ -258,6 +259,7 @@ struct CstlRow
     Castle* 		castle;
     ArmyBar*		armyBarGuard;
     ArmyBar*		armyBarGuest;
+    DwellingsBar*	dwellingsBar;
 
     CstlRow() : castle(NULL), armyBarGuard(NULL), armyBarGuest(NULL) {}
     ~CstlRow()
@@ -269,6 +271,7 @@ struct CstlRow
     {
 	if(armyBarGuard) delete armyBarGuard;
 	if(armyBarGuest) delete armyBarGuest;
+	if(dwellingsBar) delete dwellingsBar;
     }
 
     void Init(Castle* ptr)
@@ -278,7 +281,7 @@ struct CstlRow
 	Clear();
 
 	armyBarGuard = new ArmyBar(& castle->GetArmy(), true, false);
-	armyBarGuard->SetBackground(41, 41, 0x3B);
+	armyBarGuard->SetBackground(41, 41, 0x3C);
 	armyBarGuard->SetColRows(5, 1);
 	armyBarGuard->SetHSpace(-1);
 
@@ -287,10 +290,14 @@ struct CstlRow
         if(heroes.Guest())
 	{
 	    armyBarGuest = new ArmyBar(& heroes.Guest()->GetArmy(), true, false);
-	    armyBarGuest->SetBackground(41, 41, 0x3B);
+	    armyBarGuest->SetBackground(41, 41, 0x3C);
 	    armyBarGuest->SetColRows(5, 1);
 	    armyBarGuest->SetHSpace(-1);
 	}
+
+	dwellingsBar = new DwellingsBar(*castle, 39, 52, 0x3C);
+	dwellingsBar->SetColRows(6, 1);
+	dwellingsBar->SetHSpace(2);
     }
 };
 
@@ -352,13 +359,18 @@ void StatsCastlesList::ActionListSingleClick(CstlRow & row, const Point & cursor
 	if(Rect(ox + 17, oy + 19, Interface::IconsBar::GetItemWidth(), Interface::IconsBar::GetItemHeight()) & cursor)
 	{
 	    Game::OpenCastleDialog(row.castle);
+	    row.Init(row.castle);
 	}
 	else
 	// click hero icon
 	if(Rect(ox + 82, oy + 19, Interface::IconsBar::GetItemWidth(), Interface::IconsBar::GetItemHeight()) & cursor)
 	{
 	    Heroes* hero = row.castle->GetHeroes().GuardFirst();
-	    if(hero) Game::OpenHeroesDialog(hero);
+	    if(hero)
+	    {
+		Game::OpenHeroesDialog(hero);
+		row.Init(row.castle);
+	    }
 	}
     }
 }
@@ -392,6 +404,15 @@ bool StatsCastlesList::ActionListCursor(CstlRow & row, const Point & cursor, s16
 	row.armyBarGuest->QueueEventProcessing())
     {
 	Cursor::Get().Hide();
+	if(row.armyBarGuard && row.armyBarGuard->isSelected()) row.armyBarGuard->ResetSelected();
+	return true;
+    }
+    else
+    if(row.dwellingsBar && (row.dwellingsBar->GetArea() & cursor) &&
+	row.dwellingsBar->QueueEventProcessing())
+    {
+	Cursor::Get().Hide();
+	if(row.armyBarGuest && row.armyBarGuest->isSelected()) row.armyBarGuest->ResetSelected();
 	if(row.armyBarGuard && row.armyBarGuard->isSelected()) row.armyBarGuard->ResetSelected();
 	return true;
     }
@@ -431,21 +452,12 @@ void StatsCastlesList::RedrawItem(const CstlRow & row, s16 dstx, s16 dsty, bool 
 
 	if(row.armyBarGuest)
 	{
-	    const_cast<ArmyBar*>(row.armyBarGuest)->SetPos(dstx + 146, row.armyBarGuard ? dsty + 40 : dsty + 20);
+	    const_cast<ArmyBar*>(row.armyBarGuest)->SetPos(dstx + 146, row.armyBarGuard ? dsty + 41 : dsty + 20);
 	    const_cast<ArmyBar*>(row.armyBarGuest)->Redraw();
 	}
 
-	// available
-	Troops troops;
-	const u32 dwellings[] = { DWELLING_MONSTER1, DWELLING_MONSTER2, DWELLING_MONSTER3, DWELLING_MONSTER4, DWELLING_MONSTER5, DWELLING_MONSTER6 };
-
-	for(u8 ii = 0; ii < ARRAY_COUNT(dwellings); ++ii)
-	{
-    	    u16 count = row.castle->GetDwellingLivedCount(dwellings[ii]);
-    	    if(count) troops.PushBack(Monster(row.castle->GetRace(), row.castle->GetActualDwelling(dwellings[ii])), count);
-	}
-
-	Army::DrawMons32Line(troops, dstx + 360, dsty + 30, 220);
+	const_cast<DwellingsBar*>(row.dwellingsBar)->SetPos(dstx + 349, dsty + 15);
+	const_cast<DwellingsBar*>(row.dwellingsBar)->Redraw();
     }
 }
 
@@ -473,6 +485,8 @@ void StatsCastlesList::RedrawBackground(const Point & dst)
     {
 	const Sprite & back = AGG::GetICN(ICN::OVERVIEW, 8);
 	back.Blit(dst.x + 30, dst.y + 17 + ii * (back.h() + 4));
+	// fix bar
+	AGG::GetICN(ICN::OVERBACK, 0).Blit(Rect(28, 12, 599, 6), dst.x + 28, dst.y + 12 + ii * (back.h() + 4));
     }
 }
 

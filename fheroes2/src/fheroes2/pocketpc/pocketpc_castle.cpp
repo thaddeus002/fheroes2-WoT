@@ -38,20 +38,6 @@
 #include "profit.h"
 #include "pocketpc.h"
 
-class DwellingBar : protected Rect
-{
-public:
-    DwellingBar(const Point &, Castle &);
-    void Redraw(void) const;
-    const Rect & GetArea(void) const;
-    bool QueueEventProcessing(void);
-    static u32 GetDwellingFromIndex(u8);
-
-private:
-    Castle & castle;
-    Rects dw;
-};
-
 void RedrawTownSprite(const Rect &, const Castle &);
 void RedrawBackground(const Rect &, const Castle &);
 void RedrawResourceBar(const Point &, const Funds &);
@@ -194,8 +180,11 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     RedrawTownSprite(rectTown, castle);
 
     // dwelling bar
-    DwellingBar dwbar(Point(dst_rt.x + 2, dst_rt.y + 34), castle);
-    dwbar.Redraw();
+    DwellingsBar dwellingsBar(castle, 43, 43, 0x67);
+    dwellingsBar.SetPos(dst_rt.x + 2, dst_rt.y + 34);
+    dwellingsBar.SetColRows(6, 1);
+    dwellingsBar.SetHSpace(2);
+    dwellingsBar.Redraw();
 
     RedrawIcons(castle, heroes, dst_rt);
 
@@ -289,10 +278,10 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
             }
 	}
 	else
-	if(!readonly && le.MouseClickLeft(dwbar.GetArea()) && dwbar.QueueEventProcessing())
+	if(!readonly && le.MouseCursor(dwellingsBar.GetArea()) && dwellingsBar.QueueEventProcessing())
 	{
 	    cursor.Hide();
-	    dwbar.Redraw();
+	    dwellingsBar.Redraw();
 	    selectArmy1.Redraw();
 	    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 176), kingdom.GetFunds());
 	    cursor.Show();
@@ -985,102 +974,6 @@ void RedrawBackground(const Rect & rt, const Castle & castle)
     }
 
     if(sprite) sprite->Blit(src, rt.x, rt.y);
-}
-
-const Rect & DwellingBar::GetArea(void) const
-{
-    return *this;
-}
-
-DwellingBar::DwellingBar(const Point & dst, Castle & cst) : Rect(dst.x, dst.y, 0, 0), castle(cst)
-{
-    dw.reserve(CASTLEMAXMONSTER);
-
-    for(u8 ii = 0; ii < CASTLEMAXMONSTER; ++ii)
-	dw.push_back(Rect(dst.x + ii * (43 + 2), dst.y, 43, 43));
-
-    const Rect max = dw.GetRect();
-
-    w = max.w;
-    h = max.h;
-}
-
-u32 DwellingBar::GetDwellingFromIndex(u8 ii)
-{
-    switch(ii)
-    {
-	case 0: return DWELLING_MONSTER1;
-	case 1: return DWELLING_MONSTER2;
-	case 2: return DWELLING_MONSTER3;
-	case 3: return DWELLING_MONSTER4;
-	case 4: return DWELLING_MONSTER5;
-	case 5: return DWELLING_MONSTER6;
-	default: break;
-    }
-    return 0;
-}
-
-void DwellingBar::Redraw(void) const
-{
-    const u8 w = 43;
-    const u8 h = 43;
-    Text text;
-
-    for(u8 ii = 0; ii < dw.size(); ++ii)
-    {
-    	AGG::GetICN(ICN::SWAPWIN, 0).Blit(Rect(36, 267, w, h), dw[ii].x, dw[ii].y);
-    	const u32 dwelling = castle.GetActualDwelling(GetDwellingFromIndex(ii));
-	const Monster m(castle.GetRace(), dwelling);
-	const Sprite & mons32 = AGG::GetICN(ICN::MONS32, m.GetSpriteIndex());
-    	mons32.Blit(dw[ii].x + (w - mons32.w()) / 2, dw[ii].y + (h - 3 - mons32.h()));
-
-    	if(castle.isBuild(dwelling))
-    	{
-	    // count
-    	    text.Set(GetString(castle.GetDwellingLivedCount(dwelling)), Font::SMALL);
-    	    text.Blit(dw[ii].x + dw[ii].w - text.w() - 3, dw[ii].y + dw[ii].h - text.h() - 1);
-
-	    // grown
-	    u8 grown = m.GetGrown();
-	    if(castle.isBuild(BUILD_WELL)) grown += Castle::GetGrownWell();
-	    if(castle.isBuild(BUILD_WEL2) && DWELLING_MONSTER1 == dwelling) grown += Castle::GetGrownWel2();
-    	    text.Set("+" + GetString(grown), Font::YELLOW_SMALL);
-    	    text.Blit(dw[ii].x + dw[ii].w - text.w() - 3, dw[ii].y + 2);
-    	}
-    	else
-    	{
-    	    AGG::GetICN(ICN::LOCATORS, 24).Blit(dw[ii].x + w - 8, dw[ii].y + 3);
-    	}
-    }
-}
-
-bool DwellingBar::QueueEventProcessing(void)
-{
-    LocalEvent & le = LocalEvent::Get();
-    const s32 index = dw.GetIndex(le.GetMouseCursor());
-
-    if(0 <= index)
-    {
-	const u32 dwelling = GetDwellingFromIndex(index);
-	if(castle.isBuild(dwelling))
-	{
-            return castle.RecruitMonster(Dialog::RecruitMonster(Monster(castle.GetRace(),
-        				castle.GetActualDwelling(dwelling)), castle.GetDwellingLivedCount(dwelling), true));
-	}
-        if(!castle.isBuild(BUILD_CASTLE))
-            Dialog::Message("", _("For this action it is necessary first to build a castle."), Font::BIG, Dialog::OK);
-	else
-	{
-	    BuildingInfo dwelling2(castle, static_cast<building_t>(dwelling));
-	    if(dwelling2.DialogBuyBuilding(true))
-	    {
-		AGG::PlaySound(M82::BUILDTWN);
-		castle.BuyBuilding(dwelling);
-		return true;
-	    }
-	}
-    }
-    return false;
 }
 
 void RedrawTownSprite(const Rect & rt, const Castle & castle)
