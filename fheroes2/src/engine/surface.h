@@ -110,7 +110,8 @@ public:
     u32  GetMemoryUsage(void) const;
     std::string Info(void) const;
 
-    static void Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape /* 0: none, 1 : vert, 2: horz, 3: both */);
+    static void Reflect(Surface &, const Surface &, u8 shape /* 0: none, 1 : vert, 2: horz, 3: both */);
+    static void Rotate(Surface &, const Surface &, u8 parm /* 0: none, 1 : 90 CW, 2: 90 CCW, 3: 180 */);
 
     static void MakeStencil(Surface &, const Surface &, u32);
     static void MakeContour(Surface &, const Surface &, u32);

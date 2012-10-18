@@ -1115,7 +1115,37 @@ void Surface::Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape)
 	sf_dst.Unlock();
     }
     else
-	std::cerr << "Surface::TILReflect: " << "incorrect param" << std::endl;
+	std::cerr << __FUNCTION__ << "incorrect param" << std::endl;
+}
+
+void Surface::Rotate(Surface & sf_dst, const Surface & sf_src, u8 parm)
+{
+    if(sf_src.isValid())
+    {
+	// 90 CW or 90 CCW
+	if(parm == 1 || parm == 2)
+	{
+	    sf_dst.Set(sf_src.h(), sf_src.w());
+
+	    sf_src.Lock();
+	    sf_dst.Lock();
+
+    	    for(u16 yy = 0; yy < sf_src.h(); ++yy)
+        	for(u16 xx = 0; xx < sf_src.w(); ++xx)
+		    if(parm == 1)
+			sf_dst.SetPixel(yy, sf_src.w() - xx - 1, sf_src.GetPixel(xx, yy));
+		    else
+			sf_dst.SetPixel(sf_src.h() - yy - 1, xx, sf_src.GetPixel(xx, yy));
+
+	    sf_src.Unlock();
+	    sf_dst.Unlock();
+	}
+	else
+	if(parm == 3)
+	    Reflect(sf_dst, sf_src, 3);
+    }
+    else
+	std::cerr << __FUNCTION__ << "incorrect param" << std::endl;
 }
 
 u32 Surface::GetMemoryUsage(void) const
