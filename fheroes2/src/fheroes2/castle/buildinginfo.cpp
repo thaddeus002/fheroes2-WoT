@@ -642,6 +642,16 @@ std::string BuildingInfo::GetConditionDescription(void) const
 	    String::Replace(res, "%{name}", GetName());
 	    break;
 
+	case REQUIRES_BUILD:
+    	    res = _("Cannot build %{name}");
+    	    String::Replace(res, "%{name}", GetName());
+	    break;
+
+	case ALLOW_BUILD:
+    	    res = _("Build %{name}");
+    	    String::Replace(res, "%{name}", GetName());
+	    break;
+
 	default: break;
     }
 
@@ -659,13 +669,9 @@ void BuildingInfo::SetStatusMessage(StatusBar & bar) const
 	case NEED_CASTLE:
 	case BUILD_DISABLE:
 	case LACK_RESOURCES:
-	    str = GetConditionDescription();
-	    break;
-
 	case REQUIRES_BUILD:
 	case ALLOW_BUILD:
-    	    str = bcond == ALLOW_BUILD ? _("Build %{name}") : _("Cannot build %{name}");
-    	    String::Replace(str, "%{name}", GetName());
+	    str = GetConditionDescription();
 	    break;
 
 	default:
