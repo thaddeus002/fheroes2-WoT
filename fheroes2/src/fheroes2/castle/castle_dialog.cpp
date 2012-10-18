@@ -210,17 +210,46 @@ void RedrawIcons(const Castle & castle, const CastleHeroes & heroes, const Point
     }
 }
 
-void RedrawSwapButton(const Rect & rt)
+struct ButtonSprite : public Rect
 {
-    const Sprite & sprite = AGG::GetICN(ICN::ADVMCO, 8);
-    Surface sf(sprite.w() + 4, sprite.h() + 4);
-    Display & display = Display::Get();
+    Surface	image;
 
-    Cursor::DrawCursor(sf, 0xDB, true);
-    display.FillRect(0, Rect(rt.x, rt.y, sf.w(), sf.h()));
-    sf.Blit(rt, display);
-    sprite.Blit(rt.x + 2, rt.y + 2, display);
-}
+    ButtonSprite(s16 px, s16 py) : Rect(px, py, 0, 0) {}
+
+    void Redraw(void)
+    {
+	image.Blit(x, y, Display::Get());
+    }
+
+    void SetSize(void)
+    {
+	w = image.w();
+	h = image.h();
+    }
+};
+
+struct MeetingButton : public ButtonSprite
+{
+    MeetingButton(s16 px, s16 py) : ButtonSprite(px, py)
+    {
+	const Sprite & sprite = AGG::GetICN(ICN::ADVMCO, 8);
+	image.Set(sprite.w() + 4, sprite.h() + 4);
+	image.Fill(0);
+	Cursor::DrawCursor(image, 0xDB, true);
+	sprite.Blit(2, 2, image);
+	SetSize();
+    }
+};
+
+struct SwapButton : public ButtonSprite
+{
+    SwapButton(s16 px, s16 py) : ButtonSprite(px, py)
+    {
+	MeetingButton but(px, py);
+	Surface::Rotate(image, but.image, 1);
+	SetSize();
+    }
+};
 
 Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 {
@@ -323,13 +352,13 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     RedrawResourcePanel(cur_pt);
 
     // button swap
-    const Sprite & sprite8 = AGG::GetICN(ICN::ADVMCO, 8);
-    Rect buttonSwap(cur_pt.x + 4, cur_pt.y + 345, sprite8.w() + 4, sprite8.h() + 4);
+    SwapButton buttonSwap(cur_pt.x + 4, cur_pt.y + 345);
+    MeetingButton buttonMeeting(cur_pt.x + 88, cur_pt.y + 345);
 
     if(heroes.Guest() && heroes.Guard() && !readonly)
     {
-	Surface sf(buttonSwap.w, buttonSwap.h);
-	RedrawSwapButton(buttonSwap);
+	buttonSwap.Redraw();
+	buttonMeeting.Redraw();
     }
 
     // button exit
@@ -394,11 +423,20 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	    Army* army2 = NULL;
 
 	    // swap guest <-> guardian
-	    if(heroes.Guest() && heroes.Guard() && le.MouseClickLeft(buttonSwap))
+	    if(heroes.Guest() && heroes.Guard())
 	    {
-		SwapCastleHeroes(heroes);
-		army1 = &heroes.Guard()->GetArmy();
-		army2 = &heroes.Guest()->GetArmy();
+		if(le.MouseClickLeft(buttonSwap))
+		{
+		    SwapCastleHeroes(heroes);
+		    army1 = &heroes.Guard()->GetArmy();
+		    army2 = &heroes.Guest()->GetArmy();
+		}
+		else
+		if(le.MouseClickLeft(buttonMeeting))
+		{
+		    heroes.Guest()->MeetingDialog(*heroes.Guard());
+		    need_redraw = true;
+		}
 	    }
 	    else
 	    // move hero to guardian
@@ -663,7 +701,11 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	    if(selectArmy2.isValid()) selectArmy2.Redraw();
 	    CastleRedrawTownName(*this, cur_pt);
 	    RedrawResourcePanel(cur_pt);
-	    if(heroes.Guest() && heroes.Guard() && !readonly) RedrawSwapButton(buttonSwap);
+	    if(heroes.Guest() && heroes.Guard() && !readonly)
+	    {
+		buttonSwap.Redraw();
+		buttonMeeting.Redraw();
+	    }
 	    if(buttonExit.isPressed()) buttonExit.Draw();
 	    cursor.Show();
 	    display.Flip();
@@ -684,6 +726,9 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	else
 	if(heroes.Guest() && heroes.Guard() && le.MouseCursor(buttonSwap))
 	    msg_status = _("Swap Heroes");
+	else
+	if(heroes.Guest() && heroes.Guard() && le.MouseCursor(buttonMeeting))
+	    msg_status = _("Meeting Heroes");
 	else
 	// status message over sign
 	if((heroes.Guard() && le.MouseCursor(rectSign1)) ||
