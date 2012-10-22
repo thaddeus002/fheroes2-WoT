@@ -173,9 +173,6 @@ Game::menu_t Game::StartGame(void)
     Interface::GameArea & areaMaps = I.gameArea;
     areaMaps.Build();
 
-    // init focus: set first hero
-    GameFocus::Reset(GameFocus::FIRSTHERO);
-
     Interface::Radar & radar = I.radar;
     Interface::StatusWindow& statusWin = I.statusWindow;
 
@@ -701,7 +698,8 @@ Game::menu_t Game::HumanTurn(bool isload)
     GameOver::Result & gameResult = GameOver::Result::Get();
 
     // set focus
-    if(conf.ExtGameRememberLastFocus())
+    if(conf.LoadedGameVersion() &&
+	conf.ExtGameRememberLastFocus())
     {
 	if(GameFocus::GetHeroes())
 	    GameFocus::Reset(GameFocus::HEROES);
