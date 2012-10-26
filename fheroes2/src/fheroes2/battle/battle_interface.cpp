@@ -4068,28 +4068,33 @@ void Battle::Interface::ProcessingHeroDialogResult(u8 res, Actions & a)
 		a.push_back(Command(MSG_BATTLE_END_TURN, b_current->GetUID()));
 		humanturn_exit = true;
 	    }
+	    else
+		Dialog::Message("", "Retreat disabled", Font::BIG, Dialog::OK);
 	    break;
 
 	//surrender
 	case 3:
-	{
-	    const HeroBase* enemy = arena.GetCommander(arena.GetCurrentColor(), true);
-
-	    if(enemy)
+	    if(arena.CanSurrenderOpponent(b_current->GetColor()))
 	    {
-		const s32 cost = arena.GetCurrentForce().GetSurrenderCost();
+		const HeroBase* enemy = arena.GetCommander(arena.GetCurrentColor(), true);
 
-		if(DialogBattleSurrender(*enemy, cost))
+		if(enemy)
 		{
-		    a.push_back(Command(MSG_BATTLE_SURRENDER));
-		    a.push_back(Command(MSG_BATTLE_END_TURN, b_current->GetUID()));
-		    humanturn_exit = true;
+		    const s32 cost = arena.GetCurrentForce().GetSurrenderCost();
+
+		    if(DialogBattleSurrender(*enemy, cost))
+		    {
+			a.push_back(Command(MSG_BATTLE_SURRENDER));
+			a.push_back(Command(MSG_BATTLE_END_TURN, b_current->GetUID()));
+			humanturn_exit = true;
+		    }
+		    else
+		    if(! world.GetKingdom(arena.GetCurrentColor()).AllowPayment(Funds(Resource::GOLD, cost)))
+			Dialog::Message("", _("You don't have enough gold!"), Font::BIG, Dialog::OK);
 		}
-		else
-		if(! world.GetKingdom(arena.GetCurrentColor()).AllowPayment(Funds(Resource::GOLD, cost)))
-		    Dialog::Message("", _("You don't have enough gold!"), Font::BIG, Dialog::OK);
 	    }
-	}
+	    else
+		Dialog::Message("", "Surrender disabled", Font::BIG, Dialog::OK);
         break;
 
 	default: break;
