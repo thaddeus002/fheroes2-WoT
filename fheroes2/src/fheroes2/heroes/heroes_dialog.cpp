@@ -69,7 +69,9 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     // portrait
     dst_pt.x = cur_pt.x + 49;
     dst_pt.y = cur_pt.y + 31;
-    GetPortrait101x93().Blit(dst_pt, display);
+    const Surface & port = GetPortrait101x93();
+    const Rect portPos(dst_pt.x, dst_pt.y, port.w(), port.h());
+    port.Blit(dst_pt, display);
 
     // name
     message = _("%{name} the %{race} ( Level %{level} )");
@@ -330,6 +332,9 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	}
 
 	// right info
+	if(le.MousePressRight(portPos))
+	    Dialog::QuickInfo(*this);
+	else
         if(le.MousePressRight(rectSpreadArmyFormat))
 	    Dialog::Message(_("Spread Formation"), descriptionSpreadArmyFormat, Font::BIG);
         else
@@ -337,6 +342,9 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	    Dialog::Message(_("Grouped Formation"), descriptionGroupedArmyFormat, Font::BIG);
 
         // status message
+	if(le.MouseCursor(portPos))
+	    message = _("View Stats");
+	else
 	if(le.MouseCursor(moraleIndicator.GetArea()))
 	    message = _("View Morale Info");
 	else
