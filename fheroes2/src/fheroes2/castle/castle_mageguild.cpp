@@ -145,23 +145,17 @@ void Castle::OpenMageGuild(void)
     frameborder.Redraw();
 
     const Point cur_pt(frameborder.GetArea().x, frameborder.GetArea().y);
-    Point dst_pt(cur_pt);
-
-    AGG::GetICN(ICN::STONEBAK, 0).Blit(dst_pt);
+    AGG::GetICN(ICN::STONEBAK, 0).Blit(cur_pt);
 
     std::string message;
     Text text;
 
     // bar
-    dst_pt.x = cur_pt.x;
-    dst_pt.y = cur_pt.y + 461;
-    AGG::GetICN(ICN::WELLXTRA, 2).Blit(dst_pt);
+    AGG::GetICN(ICN::WELLXTRA, 2).Blit(cur_pt.x, cur_pt.y + 461);
 
     // text bar
     text.Set(_("The above spells have been added to your book."), Font::BIG);
-    dst_pt.x = cur_pt.x + 280 - text.w() / 2;
-    dst_pt.y = cur_pt.y + 461;
-    text.Blit(dst_pt);
+    text.Blit(cur_pt.x + 280 - text.w() / 2, cur_pt.y + 461);
 
     const u8 level = GetLevelMageGuild();
     // sprite
@@ -177,9 +171,7 @@ void Castle::OpenMageGuild(void)
 	default: break;
     }
     const Sprite & sprite = AGG::GetICN(icn, level - 1);
-    dst_pt.x = cur_pt.x + 90 - sprite.w() / 2;
-    dst_pt.y = cur_pt.y + 290 - sprite.h();
-    sprite.Blit(dst_pt);
+    sprite.Blit(cur_pt.x + 90 - sprite.w() / 2, cur_pt.y + 290 - sprite.h());
 
     RowSpells spells5(Point(cur_pt.x + 250, cur_pt.y +  5),  *this, 5);
     RowSpells spells4(Point(cur_pt.x + 250, cur_pt.y +  95), *this, 4);
@@ -194,10 +186,7 @@ void Castle::OpenMageGuild(void)
     spells5.Redraw();
 
     // button exit
-    dst_pt.x = cur_pt.x + 578;
-    dst_pt.y = cur_pt.y + 461;
-    Button buttonExit(dst_pt, ICN::WELLXTRA, 0, 1);
-
+    Button buttonExit(cur_pt.x + 578, cur_pt.y + 461, ICN::WELLXTRA, 0, 1);
     buttonExit.Draw();
 
     cursor.Show();

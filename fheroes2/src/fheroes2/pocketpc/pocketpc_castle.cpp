@@ -215,6 +215,16 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     // resource bar
     RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 176), kingdom.GetFunds());
 
+    // button swap
+    SwapButton buttonSwap(dst_rt.x + 2, dst_rt.y + 113);
+    MeetingButton buttonMeeting(dst_rt.x + 26, dst_rt.y + 110);
+
+    if(heroes.Guest() && heroes.Guard() && !readonly)
+    {
+        buttonSwap.Draw();
+        buttonMeeting.Draw();
+    }
+
     const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
     AGG::GetICN(ICN::TOWNWIND, 12).Blit(rectExit.x, rectExit.y);
 
@@ -287,34 +297,6 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
 	    cursor.Show();
 	    display.Flip();
 	}
-	else
-	if(!readonly)
-	{
-	    if(heroes.Guard() && le.MouseClickLeft(rectSign1))
-	    {
-		cursor.Hide();
-		heroes.Guard()->OpenDialog(false, false);
-	    }
-	    else
-	    if(heroes.Guest() && le.MouseClickLeft(rectSign2))
-	    {
-		cursor.Hide();
-		heroes.Guest()->OpenDialog(false, false);
-	    }
-
-	    if(! cursor.isVisible())
-	    {
-        	if(selectArmy1.isSelected()) selectArmy1.ResetSelected();
-        	selectArmy1.Redraw();
-        	if(selectArmy2.isValid())
-		{
-		    if(selectArmy2.isSelected()) selectArmy2.ResetSelected();
-        	    selectArmy2.Redraw();
-		}
-		cursor.Show();
-		display.Flip();
-	    }
-	}
 
 	// troops event
         if(heroes.Guest() && selectArmy2.isValid())
@@ -352,16 +334,22 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
             Army* army1 = NULL;
             Army* army2 = NULL;
 
-/*
-	    // swap guest <-> guardian
-    	    if(heroes.Guest() && heroes.Guard() && le.MouseClickLeft(buttonSwap))
-    	    {
-        	castle.SwapCastleHeroes(heroes);
-        	army1 = &heroes.Guard()->GetArmy();
-        	army2 = &heroes.Guest()->GetArmy();
-    	    }
-    	    else
-*/
+            // swap guest <-> guardian
+            if(heroes.Guest() && heroes.Guard())
+            {
+                if(le.MouseClickLeft(buttonSwap))
+                {
+                    castle.SwapCastleHeroes(heroes);
+                    army1 = &heroes.Guard()->GetArmy();
+                    army2 = &heroes.Guest()->GetArmy();
+                }
+                else
+                if(le.MouseClickLeft(buttonMeeting))
+                {
+                    heroes.Guest()->MeetingDialog(*heroes.Guard());
+                }
+            }
+            else
     	    // move hero to guardian
     	    if(heroes.Guest() && !heroes.Guard() && le.MouseClickLeft(rectSign1))
     	    {
@@ -410,6 +398,12 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
 
             	RedrawIcons(castle, heroes, dst_rt);
 
+        	if(heroes.Guest() && heroes.Guard() && !readonly)
+        	{
+            	    buttonSwap.Draw();
+            	    buttonMeeting.Draw();
+        	}
+
             	selectArmy1.Redraw();
             	if(selectArmy2.isValid()) selectArmy2.Redraw();
 
@@ -417,6 +411,34 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
                 display.Flip();
     	    }
         }
+
+	if(!readonly)
+	{
+	    if(heroes.Guard() && le.MouseClickLeft(rectSign1))
+	    {
+		cursor.Hide();
+		heroes.Guard()->OpenDialog(false, false);
+	    }
+	    else
+	    if(heroes.Guest() && le.MouseClickLeft(rectSign2))
+	    {
+		cursor.Hide();
+		heroes.Guest()->OpenDialog(false, false);
+	    }
+
+	    if(! cursor.isVisible())
+	    {
+        	if(selectArmy1.isSelected()) selectArmy1.ResetSelected();
+        	selectArmy1.Redraw();
+        	if(selectArmy2.isValid())
+		{
+		    if(selectArmy2.isSelected()) selectArmy2.ResetSelected();
+        	    selectArmy2.Redraw();
+		}
+		cursor.Show();
+		display.Flip();
+	    }
+	}
     }
 
     return SCREENOUT;

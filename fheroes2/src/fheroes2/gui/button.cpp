@@ -26,104 +26,128 @@
 #include "dialog.h"
 #include "button.h"
 
-Button::Button() : icn(ICN::UNKNOWN), index1(0), index2(0), pressed(false), disable(false)
+enum { BTN_PRESSED = 0x0080, BTN_DISABLE = 0x0008 };
+
+Button::Button() : sf1(NULL), sf2(NULL), flags(0)
 {
 }
 
-Button::Button(const Point &pt, const ICN::icn_t n, u16 i1, u16 i2) : icn(n), index1(i1), index2(i2),
-    pressed(false), disable(false)
-{
-    SetPos(pt);
-
-    const Sprite & sprite1 = AGG::GetICN(icn, index1);
-
-    w = sprite1.w();
-    h = sprite1.h();
-}
-
-Button::Button(u16 ox, u16 oy, const ICN::icn_t n, u16 i1, u16 i2) : icn(n), index1(i1), index2(i2),
-    pressed(false), disable(false)
+Button::Button(s16 ox, s16 oy, ICN::icn_t icn, u16 index1, u16 index2) : sf1(NULL), sf2(NULL), flags(0)
 {
     SetPos(ox, oy);
 
-    const Sprite & sprite1 = AGG::GetICN(icn, index1);
+    sf1 = & AGG::GetICN(icn, index1);
+    sf2 = & AGG::GetICN(icn, index2);
 
-    w = sprite1.w();
-    h = sprite1.h();
+    if(sf1) SetSize(sf1->w(), sf1->h());
 }
 
-void Button::SetPos(const Point & pt)
+bool Button::isEnable(void) const
 {
-    SetPos(pt.x, pt.y);
+    return ! isDisable();
 }
 
-void Button::SetPos(const u16 ox, const u16 oy)
+bool Button::isDisable(void) const
+{
+    return flags & BTN_DISABLE;
+}
+
+bool Button::isPressed(void) const
+{
+    return flags & BTN_PRESSED;
+}
+
+bool Button::isReleased(void) const
+{
+    return ! isPressed();
+}
+
+void Button::SetPos(s16 ox, s16 oy)
 {
     x = ox;
     y = oy;
 }
 
-void Button::SetSprite(const ICN::icn_t n, const u16 i1, const u16 i2)
+void Button::SetSize(u16 ow, u16 oh)
 {
-    icn = n;
-    index1 = i1;
-    index2 = i2;
+    w = ow;
+    h = oh;
+}
 
-    const Sprite & sprite1 = AGG::GetICN(icn, index1);
+void Button::SetPos(const Point & pos)
+{
+    SetPos(pos.x, pos.y);
+}
 
-    w = sprite1.w();
-    h = sprite1.h();
+void Button::SetSprite(ICN::icn_t icn, u16 index1, u16 index2)
+{
+    sf1 = & AGG::GetICN(icn, index1);
+    sf2 = & AGG::GetICN(icn, index2);
+
+    if(sf1) SetSize(sf1->w(), sf1->h());
+}
+
+void Button::SetSprite(const Surface & s1, const Surface & s2)
+{
+    sf1 = &s1;
+    sf2 = &s2;
+
+    if(sf1) SetSize(sf1->w(), sf1->h());
+}
+
+void Button::SetDisable(bool f)
+{
+    if(f)
+	flags |= (BTN_DISABLE | BTN_PRESSED);
+    else
+	flags &= ~(BTN_DISABLE | BTN_PRESSED);
 }
 
 void Button::Press(void)
 {
-    if(disable || pressed) return;
-
-    pressed = true;
+    if(isEnable() && isReleased())
+	flags |= BTN_PRESSED;
 }
 
 void Button::Release(void)
 {
-    if(disable || !pressed) return;
-
-    pressed = false;
+    if(isEnable() && isPressed())
+	flags &= ~BTN_PRESSED;
 }
 
 void Button::PressDraw(void)
 {
-    if(disable || pressed) return;
-
-    Press();
-
-    Draw();
-
-    Display::Get().Flip();
+    if(isEnable() && isReleased())
+    {
+	Press();
+	Draw();
+	Display::Get().Flip();
+    }
 }
 
 void Button::ReleaseDraw(void)
 {
-    if(disable || !pressed) return;
-
-    Release();
-
-    Draw();
-
-    Display::Get().Flip();
+    if(isEnable() && isPressed())
+    {
+	Release();
+	Draw();
+	Display::Get().Flip();
+    }
 }
 
 void Button::Draw(void)
 {
     bool localcursor = false;
     Cursor & cursor = Cursor::Get();
-    if(*this & cursor.GetRect() && cursor.isVisible()){ cursor.Hide(); localcursor = true; }
+    const Surface* sf = isPressed() ? sf2 : sf1;
 
-    const Sprite & sprite1 = AGG::GetICN(icn, index1);
-    const Sprite & sprite2 = AGG::GetICN(icn, index2);
+    if(*this & cursor.GetRect() && cursor.isVisible())
+    {
+	cursor.Hide();
+	localcursor = true;
+    }
 
-    if(pressed)
-	sprite2.Blit(x, y);
-    else
-	sprite1.Blit(x, y);
+    if(sf) sf->Blit(x, y, Display::Get());
 
     if(localcursor) cursor.Show();
 }
@@ -138,36 +162,36 @@ ButtonGroups::ButtonGroups(const Rect & pos, u16 btns) : button1(NULL), button2(
 	case Dialog::YES|Dialog::NO:
             pt.x = pos.x;
             pt.y = pos.y + pos.h - AGG::GetICN(system, 5).h();
-	    button1 = new Button(pt, system, 5, 6);
+	    button1 = new Button(pt.x, pt.y, system, 5, 6);
 	    result1 = Dialog::YES;
             pt.x = pos.x + pos.w - AGG::GetICN(system, 7).w();
             pt.y = pos.y + pos.h - AGG::GetICN(system, 7).h();
-	    button2 = new Button(pt, system, 7, 8);
+	    button2 = new Button(pt.x, pt.y, system, 7, 8);
 	    result2 = Dialog::NO;
 	    break;
 
 	case Dialog::OK|Dialog::CANCEL:
             pt.x = pos.x;
             pt.y = pos.y + pos.h - AGG::GetICN(system, 1).h();
-	    button1 = new Button(pt, system, 1, 2);
+	    button1 = new Button(pt.x, pt.y, system, 1, 2);
 	    result1 = Dialog::OK;
             pt.x = pos.x + pos.w - AGG::GetICN(system, 3).w();
             pt.y = pos.y + pos.h - AGG::GetICN(system, 3).h();
-	    button2 = new Button(pt, system, 3, 4);
+	    button2 = new Button(pt.x, pt.y, system, 3, 4);
 	    result2 = Dialog::CANCEL;
 	    break;
 
 	case Dialog::OK:
             pt.x = pos.x + (pos.w - AGG::GetICN(system, 1).w()) / 2;
             pt.y = pos.y + pos.h - AGG::GetICN(system, 1).h();
-	    button1 = new Button(pt, system, 1, 2);
+	    button1 = new Button(pt.x, pt.y, system, 1, 2);
 	    result1 = Dialog::OK;
 	    break;
 
 	case Dialog::CANCEL:
             pt.x = pos.x + (pos.w - AGG::GetICN(system, 3).w()) / 2;
             pt.y = pos.y + pos.h - AGG::GetICN(system, 3).h();
-	    button2 = new Button(pt, system, 3, 4);
+	    button2 = new Button(pt.x, pt.y, system, 3, 4);
 	    result2 = Dialog::CANCEL;
 	    break;
 

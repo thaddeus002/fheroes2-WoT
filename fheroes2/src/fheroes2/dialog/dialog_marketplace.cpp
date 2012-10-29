@@ -287,7 +287,7 @@ void Dialog::Marketplace(bool fromTradingPost)
     const Sprite & sprite_exit = AGG::GetICN(tradpost, 17);
     dst_pt.x = pos_rt.x + (pos_rt.w - sprite_exit.w()) / 2;
     dst_pt.y = pos_rt.y + pos_rt.h - sprite_exit.h();
-    Button buttonExit(dst_pt, tradpost, 17, 18);
+    Button buttonExit(dst_pt.x, dst_pt.y, tradpost, 17, 18);
 
     buttonGift.Draw();
     buttonExit.Draw();

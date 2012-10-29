@@ -38,6 +38,18 @@
 class Heroes;
 namespace Maps { class Tiles; }
 
+class MeetingButton : public ButtonSprite
+{
+public:
+    MeetingButton(s16, s16);
+};
+
+class SwapButton : public ButtonSprite
+{
+public:
+    SwapButton(s16, s16);
+};
+
 enum building_t
 {
     BUILD_NOTHING           = 0x00000000,

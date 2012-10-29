@@ -210,46 +210,37 @@ void RedrawIcons(const Castle & castle, const CastleHeroes & heroes, const Point
     }
 }
 
-struct ButtonSprite : public Rect
+Surface GetMeetingSprite(void)
 {
-    Surface	image;
+    const Sprite & sprite = AGG::GetICN(ICN::ADVMCO, 8);
 
-    ButtonSprite(s16 px, s16 py) : Rect(px, py, 0, 0) {}
+    Surface res(sprite.w() + 4, sprite.h() + 4);
+    res.Fill(0);
 
-    void Redraw(void)
-    {
-	image.Blit(x, y, Display::Get());
-    }
+    Cursor::DrawCursor(res, 0xDB, true);
+    sprite.Blit(2, 2, res);
 
-    void SetSize(void)
-    {
-	w = image.w();
-	h = image.h();
-    }
-};
+    return res;
+}
 
-struct MeetingButton : public ButtonSprite
+MeetingButton::MeetingButton(s16 px, s16 py)
 {
-    MeetingButton(s16 px, s16 py) : ButtonSprite(px, py)
-    {
-	const Sprite & sprite = AGG::GetICN(ICN::ADVMCO, 8);
-	image.Set(sprite.w() + 4, sprite.h() + 4);
-	image.Fill(0);
-	Cursor::DrawCursor(image, 0xDB, true);
-	sprite.Blit(2, 2, image);
-	SetSize();
-    }
-};
+    sf = GetMeetingSprite();
 
-struct SwapButton : public ButtonSprite
+    SetPos(px, py);
+    SetSize(sf.w(), sf.h());
+    SetSprite(sf, sf);
+}
+
+SwapButton::SwapButton(s16 px, s16 py)
 {
-    SwapButton(s16 px, s16 py) : ButtonSprite(px, py)
-    {
-	MeetingButton but(px, py);
-	Surface::Rotate(image, but.image, 1);
-	SetSize();
-    }
-};
+    Surface sf2 = GetMeetingSprite();
+    Surface::Rotate(sf, sf2, 1);
+
+    SetPos(px, py);
+    SetSize(sf.w(), sf.h());
+    SetSprite(sf, sf);
+}
 
 Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 {
@@ -292,7 +283,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 
     // button prev castle
     dst_pt.y += 480 - 19;
-    Button buttonPrevCastle(dst_pt, ICN::SMALLBAR, 1, 2);
+    Button buttonPrevCastle(dst_pt.x, dst_pt.y, ICN::SMALLBAR, 1, 2);
 
     // bottom small bar
     const Sprite & bar = AGG::GetICN(ICN::SMALLBAR, 0);
@@ -305,7 +296,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 
     // button next castle
     dst_pt.x += bar.w();
-    Button buttonNextCastle(dst_pt, ICN::SMALLBAR, 3, 4);
+    Button buttonNextCastle(dst_pt.x, dst_pt.y, ICN::SMALLBAR, 3, 4);
 
     // color crest
     const Sprite & crest = AGG::GetICN(ICN::CREST, Color::GetIndex(GetColor()));
@@ -357,14 +348,14 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 
     if(heroes.Guest() && heroes.Guard() && !readonly)
     {
-	buttonSwap.Redraw();
-	buttonMeeting.Redraw();
+	buttonSwap.Draw();
+	buttonMeeting.Draw();
     }
 
     // button exit
     dst_pt.x = cur_pt.x + 553;
     dst_pt.y = cur_pt.y + 428;
-    Button buttonExit(dst_pt, ICN::SWAPBTN, 0, 1);
+    Button buttonExit(dst_pt.x, dst_pt.y, ICN::SWAPBTN, 0, 1);
 
     // fill cache buildings
     CastleDialog::CacheBuildings cacheBuildings(*this, cur_pt);
@@ -703,8 +694,8 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	    RedrawResourcePanel(cur_pt);
 	    if(heroes.Guest() && heroes.Guard() && !readonly)
 	    {
-		buttonSwap.Redraw();
-		buttonMeeting.Redraw();
+		buttonSwap.Draw();
+		buttonMeeting.Draw();
 	    }
 	    if(buttonExit.isPressed()) buttonExit.Draw();
 	    cursor.Show();

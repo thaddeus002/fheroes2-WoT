@@ -522,11 +522,11 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
 
     dst_pt.x = box_rt.x;
     dst_pt.y = box_rt.y + box_rt.h - AGG::GetICN(system, 1).h();
-    Button button1(dst_pt, system, 1, 2);
+    Button button1(dst_pt.x, dst_pt.y, system, 1, 2);
 
     dst_pt.x = box_rt.x + box_rt.w - AGG::GetICN(system, 3).w();
     dst_pt.y = box_rt.y + box_rt.h - AGG::GetICN(system, 3).h();
-    Button button2(dst_pt, system, 3, 4);
+    Button button2(dst_pt.x, dst_pt.y, system, 3, 4);
 
     dst_pt.x = box_rt.x + (box_rt.w - window_icons.w()) / 2;
     dst_pt.y = box_rt.y + space;

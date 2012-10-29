@@ -57,11 +57,11 @@ bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &messa
 
     pt.x = box.GetArea().x + box.GetArea().w / 2 - AGG::GetICN(system, 9).w() - 20;
     pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 5).h();
-    Button button_yes(pt, system, 5, 6);
+    Button button_yes(pt.x, pt.y, system, 5, 6);
 
     pt.x = box.GetArea().x + box.GetArea().w / 2 + 20;
     pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 7).h();
-    Button button_no(pt, system, 7, 8);
+    Button button_no(pt.x, pt.y, system, 7, 8);
 
     Rect pos = box.GetArea();
 

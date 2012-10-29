@@ -101,7 +101,7 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
 
     dst_pt.x = box_rt.x;
     dst_pt.y = box_rt.y + box_rt.h - AGG::GetICN(system, 1).h();
-    Button button1(dst_pt, system, 1, 2);
+    Button button1(dst_pt.x, dst_pt.y, system, 1, 2);
 
     if(! AllowBuyHero(*hero))
     {
@@ -111,7 +111,7 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
 
     dst_pt.x = box_rt.x + box_rt.w - AGG::GetICN(system, 3).w();
     dst_pt.y = box_rt.y + box_rt.h - AGG::GetICN(system, 3).h();
-    Button button2(dst_pt, system, 3, 4);
+    Button button2(dst_pt.x, dst_pt.y, system, 3, 4);
 
     button1.Draw();
     button2.Draw();
@@ -393,7 +393,7 @@ u32 Castle::OpenTown(void)
     // button exit
     dst_pt.x = cur_pt.x + 554;
     dst_pt.y = cur_pt.y + 428;
-    Button buttonExit(dst_pt, ICN::SWAPBTN, 0, 1);
+    Button buttonExit(dst_pt.x, dst_pt.y, ICN::SWAPBTN, 0, 1);
 
     buttonExit.Draw();
 

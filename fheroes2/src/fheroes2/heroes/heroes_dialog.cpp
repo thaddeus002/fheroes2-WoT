@@ -185,22 +185,22 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     // button prev
     dst_pt.x = cur_pt.x + 1;
     dst_pt.y = cur_pt.y + 480 - 20;
-    Button buttonPrevHero(dst_pt, ICN::HSBTNS, 4, 5);
+    Button buttonPrevHero(dst_pt.x, dst_pt.y, ICN::HSBTNS, 4, 5);
 
     // button next
     dst_pt.x = cur_pt.x + 640 - 23;
     dst_pt.y = cur_pt.y + 480 - 20;
-    Button buttonNextHero(dst_pt, ICN::HSBTNS, 6, 7);
+    Button buttonNextHero(dst_pt.x, dst_pt.y, ICN::HSBTNS, 6, 7);
 
     // button dismiss
     dst_pt.x = cur_pt.x + 5;
     dst_pt.y = cur_pt.y + 318;
-    Button buttonDismiss(dst_pt, ICN::HSBTNS, 0, 1);
+    Button buttonDismiss(dst_pt.x, dst_pt.y, ICN::HSBTNS, 0, 1);
 
     // button exit
     dst_pt.x = cur_pt.x + 603;
     dst_pt.y = cur_pt.y + 318;
-    Button buttonExit(dst_pt, ICN::HSBTNS, 2, 3);
+    Button buttonExit(dst_pt.x, dst_pt.y, ICN::HSBTNS, 2, 3);
 
     LocalEvent & le = LocalEvent::Get();
 

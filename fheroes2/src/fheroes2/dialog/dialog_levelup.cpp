@@ -109,11 +109,11 @@ u8 DialogSelectSecondary(const std::string & name, const std::string & primary, 
 
     pt.x = box.GetArea().x + box.GetArea().w / 2 - AGG::GetICN(system, 9).w() - 20;
     pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 9).h();
-    Button button_learn1(pt, system, 9, 10);
+    Button button_learn1(pt.x, pt.y, system, 9, 10);
 
     pt.x = box.GetArea().x + box.GetArea().w / 2 + 20;
     pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 9).h();
-    Button button_learn2(pt, system, 9, 10);
+    Button button_learn2(pt.x, pt.y, system, 9, 10);
 
     Rect pos = box.GetArea();
 
@@ -152,7 +152,7 @@ u8 DialogSelectSecondary(const std::string & name, const std::string & primary, 
     // hero button
     pt.x = box.GetArea().x + box.GetArea().w / 2 - 18;
     pt.y = box.GetArea().y + box.GetArea().h - 36;
-    Button button_hero(pt, (Settings::Get().ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS), 0, 1);
+    Button button_hero(pt.x, pt.y, (Settings::Get().ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS), 0, 1);
     text.Set(GetString(HEROESMAXSKILL) +"/" + GetString(hero.GetSecondarySkills().size()), Font::BIG);
     text.Blit(box.GetArea().x + (box.GetArea().w - text.w()) / 2, pt.y - 15);
 

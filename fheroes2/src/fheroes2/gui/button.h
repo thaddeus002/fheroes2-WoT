@@ -25,38 +25,46 @@
 #include "icn.h"
 #include "gamedefs.h"
 
-class Sprite;
+class Surface;
 
 class Button : public Rect
 {
 public:
     Button();
-    Button(const Point &pt, const ICN::icn_t icn, u16 index1, u16 index2);
-    Button(u16 ox, u16 oy, const ICN::icn_t icn, u16 index1, u16 index2);
+    Button(s16, s16, ICN::icn_t, u16 index1, u16 index2);
 
-    bool isEnable(void) const{ return !disable; }
-    bool isDisable(void) const{ return disable; }
-    bool isPressed(void) const{ return pressed; }
-    bool isReleased(void) const{ return !pressed; }
+    bool isEnable(void) const;
+    bool isDisable(void) const;
+    bool isPressed(void) const;
+    bool isReleased(void) const;
 
     void Press(void);
     void Release(void);
 
-    void SetPos(const Point & pt);
-    void SetPos(const u16 ox, const u16 oy);
-    void SetSprite(const ICN::icn_t icn, const u16 index1, const u16 index2);
-    void SetDisable(bool fl){ disable = fl; pressed = fl; }
+    void SetPos(s16, s16);
+    void SetPos(const Point &);
+    void SetSize(u16, u16);
+    void SetSprite(ICN::icn_t, u16 index1, u16);
+    void SetSprite(const Surface &, const Surface &);
+    void SetDisable(bool);
 
     void Draw(void);
     void PressDraw(void);
     void ReleaseDraw(void);
 
-private:
-    ICN::icn_t icn;
-    u16 index1;
-    u16 index2;
-    bool pressed;
-    bool disable;
+protected:
+    const Surface*	sf1;
+    const Surface*	sf2;
+    u32			flags;
+};
+
+class ButtonSprite : public Button
+{
+public:
+    ButtonSprite(){}
+
+protected:
+    Surface sf;
 };
 
 class ButtonGroups
@@ -71,7 +79,7 @@ public:
     void DisableButton1(bool);
     void DisableButton2(bool);
 
-private:
+protected:
     Button *button1;
     Button *button2;
     u16 result1;

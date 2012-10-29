@@ -323,7 +323,11 @@ namespace Interface
 
 	bool		isSelected(void);
 	void		ResetSelected(void);
+
+        bool QueueEventProcessing(void);
+	bool QueueEventProcessing(ItemsActionBar<Item> &);
 */
+
 	virtual void	RedrawItem(Item &, const Rect &, bool, Surface &) {}
 
         virtual bool	ActionBarSingleClick(const Point &, Item &, const Rect &, Item &, const Rect &){ return false; }
@@ -466,19 +470,24 @@ namespace Interface
 	    return false;
 	}
     };
+}
 
+#include "button.h"
+#include "splitter.h"
 
+namespace Interface
+{
+    template<class Item>
+    class ItemsScroll : public ItemsActionBar<Item>
+    {
+    protected:
+        Button		buttonPgUp;
+        Button		buttonPgDn;
+        Splitter	splitterIndicator;
 
-
-
-
-
-
-
-
-
-
-
+    public:
+	ItemsScroll() {}
+    };
 
 /*
             //Cursor & cursor = Cursor::Get();

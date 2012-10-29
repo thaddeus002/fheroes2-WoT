@@ -210,7 +210,7 @@ bool Battle::Only::ChangeSettings(void)
     bool allow1 = true;
     bool allow2 = true;
 
-    Button buttonStart(Point(cur_pt.x + 280, cur_pt.y + 428), ICN::SYSTEM, 1, 2);
+    Button buttonStart(cur_pt.x + 280, cur_pt.y + 428, ICN::SYSTEM, 1, 2);
     buttonStart.Draw();
 
     cursor.Show();

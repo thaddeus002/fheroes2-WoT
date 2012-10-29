@@ -101,7 +101,7 @@ Skill::Primary::skill_t Dialog::SelectSkillFromArena(void)
     // buttons
     dst_pt.x = box_rt.x + (box_rt.w - AGG::GetICN(system, 1).w()) / 2;
     dst_pt.y = box_rt.y + box_rt.h - AGG::GetICN(system, 1).h();
-    Button buttonOk(dst_pt, system, 1, 2);
+    Button buttonOk(dst_pt.x, dst_pt.y, system, 1, 2);
 
     LocalEvent & le = LocalEvent::Get();
     bool redraw = false;

@@ -169,7 +169,7 @@ void ShowStandardDialog(const Puzzle & pzl, const Surface & sf)
     sf.Blit(BORDERWIDTH, BORDERWIDTH, display);
 
     Point dst_pt(radar_pos.x + 32, radar_pos.y + radar_pos.h - 37);
-    Button buttonExit(dst_pt, (evil_interface ? ICN::LGNDXTRE : ICN::LGNDXTRA), 4, 5);
+    Button buttonExit(dst_pt.x, dst_pt.y, (evil_interface ? ICN::LGNDXTRE : ICN::LGNDXTRA), 4, 5);
 
     buttonExit.Draw();
     PuzzlesDraw(pzl, sf, BORDERWIDTH, BORDERWIDTH);

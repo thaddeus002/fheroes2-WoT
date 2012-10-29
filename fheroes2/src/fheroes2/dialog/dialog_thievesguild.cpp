@@ -315,7 +315,7 @@ void Dialog::ThievesGuild(bool oracle)
     // button exit
     dst_pt.x = cur_pt.x + 578;
     dst_pt.y = cur_pt.y + 461;
-    Button buttonExit(dst_pt, ICN::WELLXTRA, 0, 1);
+    Button buttonExit(dst_pt.x, dst_pt.y, ICN::WELLXTRA, 0, 1);
 
     text.Set(_("Number of Towns:"));
     dst_pt.x = cur_pt.x + textx - text.w();

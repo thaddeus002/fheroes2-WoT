@@ -96,17 +96,17 @@ u16 Dialog::ArmyInfo(const Troop & troop, u16 flags)
     // button upgrade
     dst_pt.x = pos_rt.x + 284;
     dst_pt.y = pos_rt.y + 190;
-    Button buttonUpgrade(dst_pt, viewarmy, 5, 6);
+    Button buttonUpgrade(dst_pt.x, dst_pt.y, viewarmy, 5, 6);
 
     // button dismiss
     dst_pt.x = pos_rt.x + 284;
     dst_pt.y = pos_rt.y + 222;
-    Button buttonDismiss(dst_pt, viewarmy, 1, 2);
+    Button buttonDismiss(dst_pt.x, dst_pt.y, viewarmy, 1, 2);
 
     // button exit
     dst_pt.x = pos_rt.x + 415;
     dst_pt.y = pos_rt.y + 225;
-    Button buttonExit(dst_pt, viewarmy, 3, 4);
+    Button buttonExit(dst_pt.x, dst_pt.y, viewarmy, 3, 4);
 
     if(READONLY & flags)
     {

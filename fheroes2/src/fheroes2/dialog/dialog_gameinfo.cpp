@@ -132,7 +132,7 @@ void Dialog::GameInfo(void)
 	{
 	    Dialog::ExtSettings(true);
 	    Cursor::Get().Show();
-	    Display::Flip();
+	    Display::Get().Flip();
 	}
 
         if(le.MouseClickLeft(buttonOk) ||

@@ -229,11 +229,11 @@ bool Dialog::InputString(const std::string &header, std::string &res)
 
     dst_pt.x = box_rt.x;
     dst_pt.y = box_rt.y + box_rt.h - AGG::GetICN(system, 1).h();
-    Button buttonOk(dst_pt, system, 1, 2);
+    Button buttonOk(dst_pt.x, dst_pt.y, system, 1, 2);
 
     dst_pt.x = box_rt.x + box_rt.w - AGG::GetICN(system, 3).w();
     dst_pt.y = box_rt.y + box_rt.h - AGG::GetICN(system, 3).h();
-    Button buttonCancel(dst_pt, system, 3, 4);
+    Button buttonCancel(dst_pt.x, dst_pt.y, system, 3, 4);
 
     buttonOk.SetDisable(res.empty());
     buttonOk.Draw();

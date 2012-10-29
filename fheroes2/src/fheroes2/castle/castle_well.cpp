@@ -84,11 +84,11 @@ void Castle::OpenWell(void)
     // button exit
     dst_pt.x = cur_pt.x + 578;
     dst_pt.y = cur_pt.y + 461;
-    Button buttonExit(dst_pt, ICN::WELLXTRA, 0, 1);
+    Button buttonExit(dst_pt.x, dst_pt.y, ICN::WELLXTRA, 0, 1);
 
     dst_pt.x = cur_pt.x;
     dst_pt.y = cur_pt.y + 461;
-    Button buttonMax(dst_pt, ICN::BUYMAX, 0, 1);
+    Button buttonMax(dst_pt.x, dst_pt.y, ICN::BUYMAX, 0, 1);
 
     const Rect rectMonster1(cur_pt.x + 20, cur_pt.y + 18, 288, 124);
     const Rect rectMonster2(cur_pt.x + 20, cur_pt.y + 168, 288, 124);

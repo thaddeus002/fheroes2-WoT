@@ -588,15 +588,15 @@ void Kingdom::OverviewDialog(void)
     // buttons
     dst_pt.x = cur_pt.x + 540;
     dst_pt.y = cur_pt.y + 360;
-    Button buttonHeroes(dst_pt, ICN::OVERVIEW, 0, 1);
+    Button buttonHeroes(dst_pt.x, dst_pt.y, ICN::OVERVIEW, 0, 1);
 
     dst_pt.x = cur_pt.x + 540;
     dst_pt.y = cur_pt.y + 405;
-    Button buttonCastle(dst_pt, ICN::OVERVIEW, 2, 3);
+    Button buttonCastle(dst_pt.x, dst_pt.y, ICN::OVERVIEW, 2, 3);
 
     dst_pt.x = cur_pt.x + 540;
     dst_pt.y = cur_pt.y + 453;
-    Button buttonExit(dst_pt, ICN::OVERVIEW, 4, 5);
+    Button buttonExit(dst_pt.x, dst_pt.y, ICN::OVERVIEW, 4, 5);
 
     // set state view: heroes
     buttonHeroes.Press();

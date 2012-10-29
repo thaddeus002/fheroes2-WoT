@@ -276,24 +276,24 @@ Troop Dialog::RecruitMonster(const Monster & monster0, u16 available, bool ext)
 
     dst_pt.x = pos.x + 34;
     dst_pt.y = pos.y + 249;
-    Button buttonOk(dst_pt, ICN::RECRUIT, 8, 9);
+    Button buttonOk(dst_pt.x, dst_pt.y, ICN::RECRUIT, 8, 9);
 
     dst_pt.x = pos.x + 187;
     dst_pt.y = pos.y + 249;
-    Button buttonCancel(dst_pt, ICN::RECRUIT, 6, 7);
+    Button buttonCancel(dst_pt.x, dst_pt.y, ICN::RECRUIT, 6, 7);
 
     dst_pt.x = pos.x + 230;
     dst_pt.y = pos.y + 155;
-    Button buttonMax(dst_pt, ICN::RECRUIT, 4, 5);
-    Button buttonMin(dst_pt, ICN::BTNMIN, 0, 1);
+    Button buttonMax(dst_pt.x, dst_pt.y, ICN::RECRUIT, 4, 5);
+    Button buttonMin(dst_pt.x, dst_pt.y, ICN::BTNMIN, 0, 1);
 
     dst_pt.x = pos.x + 208;
     dst_pt.y = pos.y + 156;
-    Button buttonUp(dst_pt, ICN::RECRUIT, 0, 1);
+    Button buttonUp(dst_pt.x, dst_pt.y, ICN::RECRUIT, 0, 1);
 
     dst_pt.x = pos.x + 208;
     dst_pt.y = pos.y + 171;
-    Button buttonDn(dst_pt, ICN::RECRUIT, 2, 3);
+    Button buttonDn(dst_pt.x, dst_pt.y, ICN::RECRUIT, 2, 3);
 
     const Rect rtWheel(pos.x + 130, pos.y +155, 100, 30);
 
