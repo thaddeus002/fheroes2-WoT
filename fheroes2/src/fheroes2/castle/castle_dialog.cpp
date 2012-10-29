@@ -343,7 +343,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     }
 
     // resource
-    RedrawResourcePanel(cur_pt);
+    const Rect rectResource = RedrawResourcePanel(cur_pt);
 
     // button swap
     SwapButton buttonSwap(cur_pt.x + 4, cur_pt.y + 345);
@@ -400,6 +400,12 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
         if(buttonNextCastle.isEnable()) le.MousePressLeft(buttonNextCastle) ? buttonNextCastle.PressDraw() : buttonNextCastle.ReleaseDraw();
 
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
+
+	if(le.MouseClickLeft(rectResource))
+	    Dialog::ResourceInfo("", "income:", world.GetKingdom(GetColor()).GetIncome(INCOME_ALL), Dialog::OK);
+	else
+	if(le.MousePressRight(rectResource))
+	    Dialog::ResourceInfo("", "income:", world.GetKingdom(GetColor()).GetIncome(INCOME_ALL), 0);
 
         // selector troops event
         if((selectArmy2.isValid() &&
@@ -710,6 +716,9 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	if(le.MouseCursor(buttonExit))
 	    msg_status = isCastle() ? _("Exit castle") : _("Exit town");
 	else
+	if(le.MouseCursor(rectResource))
+	    msg_status = _("Show income");
+	else
 	// status message prev castle
 	if(le.MouseCursor(buttonPrevCastle))
 	    msg_status = _("Show previous town");
@@ -760,7 +769,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 }
 
 /* redraw resource info panel */
-void Castle::RedrawResourcePanel(const Point & pt)
+Rect Castle::RedrawResourcePanel(const Point & pt)
 {
     Display & display = Display::Get();
     const Funds & resource = world.GetKingdom(GetColor()).GetFunds();
@@ -854,4 +863,6 @@ void Castle::RedrawResourcePanel(const Point & pt)
     dst_pt.y = src_rt.y + 166;
     const Sprite & exit = AGG::GetICN(ICN::SWAPBTN, 0);
     exit.Blit(dst_pt);
+
+    return src_rt;
 }

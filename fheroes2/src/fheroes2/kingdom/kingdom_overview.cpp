@@ -598,6 +598,8 @@ void Kingdom::OverviewDialog(void)
     dst_pt.y = cur_pt.y + 453;
     Button buttonExit(dst_pt.x, dst_pt.y, ICN::OVERVIEW, 4, 5);
 
+    const Rect rectIncome(cur_pt.x + 1, cur_pt.y + 360, 535, 60);
+
     // set state view: heroes
     buttonHeroes.Press();
     buttonCastle.Release();
@@ -646,6 +648,12 @@ void Kingdom::OverviewDialog(void)
 	    Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
 
 	listStats->QueueEventProcessing();
+
+        if(le.MouseClickLeft(rectIncome))
+            Dialog::ResourceInfo("", "income:", GetIncome(INCOME_ALL), Dialog::OK);
+        else
+        if(le.MousePressRight(rectIncome))
+            Dialog::ResourceInfo("", "income:", GetIncome(INCOME_ALL), 0);
 
 	// redraw
 	if(! cursor.isVisible())

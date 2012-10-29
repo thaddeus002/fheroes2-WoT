@@ -34,8 +34,27 @@
 #include "world.h"
 #include "settings.h"
 #include "kingdom.h"
+#include "profit.h"
 #include "spell.h"
 #include "dialog.h"
+
+std::string GetMinesIncomeString(u8 type)
+{
+    const payment_t income = ProfitConditions::FromMine(type);
+    const s32 value = income.Get(type);
+    std::string res;
+
+    if(value)
+    {
+	res.append(" ");
+        res.append("(");
+        res.append(value > 0 ? "+" : "-");
+        res.append(GetString(value));
+        res.append(")");
+    }
+
+    return res;
+}
 
 std::string ShowGuardiansInfo(const Maps::Tiles & tile, u8 scoute)
 {
@@ -43,7 +62,10 @@ std::string ShowGuardiansInfo(const Maps::Tiles & tile, u8 scoute)
     const Troop & troop = tile.QuantityTroop();
 
     if(MP2::OBJ_MINES == tile.GetObject())
+    {
         str = Maps::GetMinesName(tile.QuantityResourceCount().first);
+	str.append(GetMinesIncomeString(tile.QuantityResourceCount().first));
+    }
     else
 	str = MP2::StringObject(tile.GetObject());
 
@@ -412,6 +434,15 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 
 	case MP2::OBJ_MINES:
 	    name_object = Maps::GetMinesName(tile.QuantityResourceCount().first);
+	    if(settings.CurrentColor() == tile.QuantityColor())
+		name_object.append(GetMinesIncomeString(tile.QuantityResourceCount().first));
+	    break;
+
+	case MP2::OBJ_ALCHEMYLAB:
+	case MP2::OBJ_SAWMILL:
+	    name_object = MP2::StringObject(tile.GetObject());
+	    if(settings.CurrentColor() == tile.QuantityColor())
+		name_object.append(GetMinesIncomeString(tile.QuantityResourceCount().first));
 	    break;
 
         // join army

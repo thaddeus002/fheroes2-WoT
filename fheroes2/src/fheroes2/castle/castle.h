@@ -220,7 +220,7 @@ public:
 private:
     u16* GetDwelling(u32 dw);
     void EducateHeroes(void);
-    void RedrawResourcePanel(const Point &);
+    Rect RedrawResourcePanel(const Point &);
     u32  OpenTown(void);
     void OpenTavern(void);
     void OpenThievesGuild(void);
