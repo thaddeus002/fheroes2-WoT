@@ -64,21 +64,21 @@ public:
 
     static void		HideCursor(void);
     static void		ShowCursor(void);
+
     static void		SetCaption(const char*);
     static void		SetIcons(Surface &);
 
     void		AddUpdateRect(s16, s16, u16, u16);
-
-    static void		Flip();
-    static void		FullScreen(void);
-    
-    static void		Fade(void);
-    static void		Rise(void);
+    void		Flip();
+    void		Fade(void);
+    void		Rise(void);
+    void		FullScreen(void);
 
 private:
     Display();
 
     UpdateRects update_rects;
+    bool	dirty;
 };
 
 #endif

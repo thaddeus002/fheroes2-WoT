@@ -41,6 +41,7 @@ public:
     Surface(SDL_Surface* sf);
 
     virtual ~Surface();
+    virtual bool isDisplay(void) const;
 
     Surface & operator= (const Surface & bs);
     void Set(const Surface &);
@@ -63,7 +64,6 @@ public:
     Size GetSize(void) const;
 
     bool isValid(void) const;
-    virtual bool isDisplay(void) const;
     u32 MapRGB(u8 r, u8 g, u8 b, u8 a = 0) const;
     void GetRGB(u32 pixel, u8 *r, u8 *g, u8 *b, u8 *a = NULL) const;
 

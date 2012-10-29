@@ -202,7 +202,7 @@ bool UpdateRects::GetBit(u32 index) const
     return (bits[index >> 3] >> (index % 8));
 }
 
-Display::Display()
+Display::Display() : dirty(false)
 {
 }
 
@@ -233,23 +233,25 @@ void Display::SetVideoMode(const u16 w, const u16 h, u32 flags)
 /* flip */
 void Display::Flip()
 {
-    Display & display = Display::Get();
-
-    if(display.surface->flags & SDL_HWSURFACE)
-	SDL_Flip(display.surface);
-    else
-    if(display.update_rects.BitsToRects())
+    if(dirty)
     {
-	SDL_UpdateRects(display.surface, display.update_rects.Size(), display.update_rects.Data());
-	display.update_rects.Clear();
+	if(surface->flags & SDL_HWSURFACE)
+	    SDL_Flip(surface);
+	else
+	if(update_rects.BitsToRects())
+	{
+	    SDL_UpdateRects(surface, update_rects.Size(), update_rects.Data());
+	    update_rects.Clear();
+	}
+
+	dirty = false;
     }
 }
 
 /* full screen */
 void Display::FullScreen(void)
 {
-    Display & display = Display::Get();
-    SDL_WM_ToggleFullScreen(display.surface);
+    SDL_WM_ToggleFullScreen(surface);
 }
 
 /* set caption main window */
@@ -278,15 +280,14 @@ void Display::ShowCursor(void)
 
 void Display::Fade(void)
 {
-    Display & display = Display::Get();
-    Surface temp(display.w(), display.h(), false);
+    Surface temp(w(), h(), false);
     temp.Fill(0, 0, 0);
     u8 alpha = 0;
 
     while(alpha < 70)
     {
-	temp.Blit(alpha, 0, 0, display);
-        display.Flip();
+	temp.Blit(alpha, 0, 0, *this);
+        Flip();
 	alpha += 5;
 	DELAY(10);
     }
@@ -294,15 +295,14 @@ void Display::Fade(void)
 
 void Display::Rise(void)
 {
-    Display & display = Display::Get();
-    Surface temp(display.w(), display.h(), false);
+    Surface temp(w(), h(), false);
     temp.Fill(0, 0, 0);
     u8 alpha = 71;
 
     while(alpha > 5)
     {
-	temp.Blit(alpha, 0, 0, display);
-        display.Flip();
+	temp.Blit(alpha, 0, 0, *this);
+	Flip();
 	alpha -= 5;
 	DELAY(10);
     }
@@ -361,6 +361,7 @@ void Display::AddUpdateRect(s16 px, s16 py, u16 pw, u16 ph)
 {
     if(0 == (surface->flags & SDL_HWSURFACE))
 	update_rects.PushRect(px, py, pw, ph);
+    dirty = true;
 }
 
 std::string Display::GetInfo(void)
