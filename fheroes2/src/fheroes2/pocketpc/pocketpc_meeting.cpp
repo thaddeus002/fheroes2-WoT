@@ -53,10 +53,10 @@ void PocketPC::HeroesMeeting(Heroes & hero1, Heroes & hero2)
 
     // portrait
     AGG::GetICN(ICN::BRCREST, 6).Blit(dst_rt.x + 4, dst_rt.y + 4, display);
-    hero1.GetPortrait50x46().Blit(dst_rt.x + 8, dst_rt.y + 8, display);
+    hero1.PortraitRedraw(dst_rt.x + 8, dst_rt.y + 8, PORT_MEDIUM, display);
 
     AGG::GetICN(ICN::BRCREST, 6).Blit(dst_rt.x + 4, dst_rt.y + 118, display);
-    hero2.GetPortrait50x46().Blit(dst_rt.x + 8, dst_rt.y + 122, display);
+    hero2.PortraitRedraw(dst_rt.x + 8, dst_rt.y + 122, PORT_MEDIUM, display);
 
     // art bar
     ArtifactsBar selectArtifacts1(&hero1, true, false);

@@ -90,7 +90,7 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
 
     dst_pt.x = dst_pt.x + 5;
     dst_pt.y = dst_pt.y + 5;
-    hero->GetPortrait101x93().Blit(dst_pt, display);
+    hero->PortraitRedraw(dst_pt.x, dst_pt.y, PORT_BIG, display);
 
     dst_pt.x = box_rt.x;
     dst_pt.y = dst_pt.y + portrait_frame.h() + spacer;
@@ -348,7 +348,7 @@ u32 Castle::OpenTown(void)
     const Rect rectHero1(dst_pt, 102, 93);
     if(hero1)
     {
-	hero1->GetPortrait101x93().Blit(dst_pt, display);
+	hero1->PortraitRedraw(dst_pt.x, dst_pt.y, PORT_BIG, display);
     }
     else
 	display.FillRect(0, 0, 0, rectHero1);
@@ -366,7 +366,7 @@ u32 Castle::OpenTown(void)
     const Rect rectHero2(dst_pt, 102, 94);
     if(hero2)
     {
-	hero2->GetPortrait101x93().Blit(dst_pt, display);
+	hero2->PortraitRedraw(dst_pt.x, dst_pt.y, PORT_BIG, display);
     }
     else
 	display.FillRect(0, 0, 0, rectHero2);

@@ -27,7 +27,6 @@
 #include "button.h"
 #include "army.h"
 #include "text.h"
-#include "portrait.h"
 #include "morale.h"
 #include "luck.h"
 #include "race.h"
@@ -385,7 +384,7 @@ u8 Battle::Arena::DialogBattleHero(const HeroBase & hero, bool buttons) const
     back.Save();
 
     dialog.Blit(pos_rt.x, pos_rt.y);
-    Portrait::Get(hero, Portrait::BIG).Blit(pos_rt.x + 27, pos_rt.y + 42, display);
+    hero.PortraitRedraw(pos_rt.x + 27, pos_rt.y + 42, PORT_BIG, display);
 
     u8 col = (Color::NONE == hero.GetColor() ? 1 : Color::GetIndex(hero.GetColor()) + 1);
     AGG::GetICN(ICN::VIEWGEN, col).Blit(pos_rt.x + 148, pos_rt.y + 36);
@@ -564,7 +563,7 @@ bool Battle::DialogBattleSurrender(const HeroBase & hero, u32 cost)
 
     const Sprite & window = AGG::GetICN(icn, 4);
     window.Blit(pos_rt.x + 54, pos_rt.y + 30);
-    Portrait::Get(hero, Portrait::BIG).Blit(pos_rt.x + 58, pos_rt.y + 38, display);
+    hero.PortraitRedraw(pos_rt.x + 58, pos_rt.y + 38, PORT_BIG, display);
 
     std::string str = _("%{name} states:");
     String::Replace(str, "%{name}", hero.GetName());

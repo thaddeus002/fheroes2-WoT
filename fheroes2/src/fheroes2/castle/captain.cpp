@@ -24,8 +24,9 @@
 #include "luck.h"
 #include "morale.h"
 #include "race.h"
-#include "captain.h"
+#include "agg.h"
 #include "settings.h"
+#include "captain.h"
 
 Captain::Captain(Castle & cstl) : HeroBase(Skill::Primary::CAPTAIN, cstl.GetRace()), home(cstl)
 {
@@ -171,4 +172,43 @@ void Captain::ActionPreBattle(void)
 const Castle* Captain::inCastle(void) const
 {
     return &home;
+}
+
+const Surface & Captain::GetPortrait(u8 type) const
+{
+    switch(type)
+    {
+        case PORT_BIG:
+            switch(GetRace())
+            {
+                case Race::KNGT:        return AGG::GetICN(ICN::PORT0090, 0);
+                case Race::BARB:        return AGG::GetICN(ICN::PORT0091, 0);
+                case Race::SORC:        return AGG::GetICN(ICN::PORT0092, 0);
+                case Race::WRLK:        return AGG::GetICN(ICN::PORT0093, 0);
+                case Race::WZRD:        return AGG::GetICN(ICN::PORT0094, 0);
+                case Race::NECR:        return AGG::GetICN(ICN::PORT0095, 0);
+                default: break;
+            }
+            break;
+
+        case PORT_MEDIUM:
+        case PORT_SMALL:
+            switch(GetRace())
+            {
+                case Race::KNGT:        return AGG::GetICN(ICN::MINICAPT, 0);
+                case Race::BARB:        return AGG::GetICN(ICN::MINICAPT, 1);
+                case Race::SORC:        return AGG::GetICN(ICN::MINICAPT, 2);
+                case Race::WRLK:        return AGG::GetICN(ICN::MINICAPT, 3);
+                case Race::WZRD:        return AGG::GetICN(ICN::MINICAPT, 4);
+                case Race::NECR:        return AGG::GetICN(ICN::MINICAPT, 5);
+                default: break;
+            }
+            break;
+    }
+
+    return AGG::GetICN(ICN::PORT0090, 0);
+}
+
+void Captain::PortraitRedraw(s16 px, s16 py, u8 type, Surface & dstsf) const
+{
 }

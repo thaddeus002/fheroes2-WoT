@@ -34,6 +34,7 @@
 class Army;
 
 enum { MDF_NONE, MDF_ATTACK, MDF_DEFENSE, MDF_POWER, MDF_KNOWLEDGE, MDF_MORALE, MDF_LUCK };
+enum { PORT_BIG = 1, PORT_MEDIUM = 2, PORT_SMALL = 3 };
 
 class HeroBase : public Skill::Primary, public Maps::Position, public BitModes
 {
@@ -58,6 +59,7 @@ public:
     virtual void ActionPreBattle(void) = 0;
 
     virtual const Castle* inCastle(void) const = 0;
+    virtual void PortraitRedraw(s16, s16, u8 type, Surface &) const = 0;
 
     s8 GetAttackModificator(std::string* = NULL) const;
     s8 GetDefenseModificator(std::string* = NULL) const;

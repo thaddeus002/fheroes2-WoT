@@ -59,6 +59,9 @@ class Captain : public HeroBase
     void ActionPreBattle(void);
     void ActionAfterBattle(void);
 
+    void PortraitRedraw(s16, s16, u8 type, Surface &) const;
+    const Surface & GetPortrait(u8 type) const;
+
   private:
     Castle & home;
 };

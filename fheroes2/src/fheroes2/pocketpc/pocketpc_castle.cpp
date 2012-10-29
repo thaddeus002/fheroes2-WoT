@@ -30,7 +30,6 @@
 #include "castle.h"
 #include "kingdom.h"
 #include "heroes.h"
-#include "portrait.h"
 #include "world.h"
 #include "race.h"
 #include "army_bar.h"
@@ -821,14 +820,14 @@ screen_t CastleOpenDialog6(Castle & castle, bool readonly)
 	hero2 = castle.GetKingdom().GetRecruits().GetHero2();
 
 	crest.Blit(rectRecruit1);
-	if(hero1) hero1->GetPortrait50x46().Blit(rectRecruit1.x + 4, rectRecruit1.y + 4, display);
+	if(hero1) hero1->PortraitRedraw(rectRecruit1.x + 4, rectRecruit1.y + 4, PORT_MEDIUM, display);
 
 	crest.Blit(rectRecruit2);
-        if(hero2) hero2->GetPortrait50x46().Blit(rectRecruit2.x + 4, rectRecruit2.y + 4, display);
+        if(hero2) hero2->PortraitRedraw(rectRecruit2.x + 4, rectRecruit2.y + 4, PORT_MEDIUM, display);
 
 	// captain
 	crest.Blit(rectCaptain);
-	const Surface & captain = Portrait::Captain(castle.GetRace(), Portrait::BIG);
+	const Surface & captain = castle.GetCaptain().GetPortrait(PORT_BIG);
         captain.Blit(Rect((captain.w() - 50) / 2, 15, 50, 47), rectCaptain.x + 4, rectCaptain.y + 4, display);
     }
 

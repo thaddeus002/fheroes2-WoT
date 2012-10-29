@@ -55,7 +55,7 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
 
     // portrait
     AGG::GetICN(ICN::BRCREST, 6).Blit(dst_rt.x + 8, dst_rt.y, display);
-    hero.GetPortrait50x46().Blit(dst_rt.x + 12, dst_rt.y + 4, display);
+    hero.PortraitRedraw(dst_rt.x + 12, dst_rt.y + 4, PORT_MEDIUM, display);
 
     // name
     std::string message = _("%{name} the %{race} ( Level %{level} )");

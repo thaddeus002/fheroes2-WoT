@@ -632,7 +632,7 @@ void Dialog::QuickInfo(const Castle & castle)
 	text.Blit(dst_pt);
 
 	// mini port heroes
-	const Surface & port = guardian->GetPortrait30x22();
+	const Surface & port = Heroes::GetPortrait(guardian->GetID(), PORT_SMALL);
 	dst_pt.x = cur_rt.x + (cur_rt.w - port.w()) / 2;
 	dst_pt.y += 15;
 	port.Blit(dst_pt, display);
@@ -738,7 +738,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     text.Blit(dst_pt);
 
     // mini port heroes
-    const Surface & port = hero.GetPortrait30x22();
+    const Surface & port = Heroes::GetPortrait(hero.GetID(), PORT_SMALL);
     dst_pt.x = cur_rt.x + (cur_rt.w - port.w()) / 2;
     dst_pt.y = cur_rt.y + 13;
     port.Blit(dst_pt, display);

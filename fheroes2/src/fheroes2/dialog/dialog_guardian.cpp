@@ -24,7 +24,6 @@
 #include "settings.h"
 #include "cursor.h"
 #include "heroes.h"
-#include "portrait.h"
 #include "button.h"
 #include "army_bar.h"
 #include "heroes_indicator.h"
@@ -171,7 +170,7 @@ bool Dialog::SetGuardian(Heroes & hero, Troop & troop, CapturedObject & co, bool
     dst_pt.x = area.x + 3;
     dst_pt.y = area.y + 5;
     window.Blit(dst_pt);
-    Portrait::Get(hero, Portrait::MEDIUM).Blit(dst_pt.x + 4, dst_pt.y + 4, display);
+    Heroes::GetPortrait(hero.GetID(), PORT_MEDIUM).Blit(dst_pt.x + 4, dst_pt.y + 4, display);
 
     // indicators
     dst_pt.x = area.x + 185;

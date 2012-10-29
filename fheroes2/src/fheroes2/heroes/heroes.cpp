@@ -1329,46 +1329,6 @@ void Heroes::SetFreeman(const u8 reason)
     if(savepoints) SetModes(SAVEPOINTS);
 }
 
-const Surface & Heroes::GetPortrait30x22(heroes_t hid)
-{
-    if(Heroes::SANDYSANDY > hid) return AGG::GetICN(ICN::MINIPORT, hid);
-    else
-    if(Heroes::SANDYSANDY == hid) return AGG::GetICN(ICN::MINIPORT, BAX);
-
-    return AGG::GetICN(ICN::MINIPORT, 0);
-}
-
-const Surface & Heroes::GetPortrait50x46(heroes_t hid)
-{
-    if(Heroes::SANDYSANDY > hid) return AGG::GetICN(ICN::PORTMEDI, hid + 1);
-    else
-    if(Heroes::SANDYSANDY == hid) return AGG::GetICN(ICN::PORTMEDI, BAX + 1);
-
-    return AGG::GetICN(ICN::PORTMEDI, 0);
-}
-
-const Surface & Heroes::GetPortrait101x93(heroes_t hid)
-{
-    ICN::icn_t icn = ICN::PORTxxxx(hid);
-
-    return AGG::GetICN(ICN::UNKNOWN != icn ? icn : ICN::PORT0000, 0);
-}
-
-const Surface & Heroes::GetPortrait30x22(void) const
-{
-    return GetPortrait30x22(portrait);
-}
-
-const Surface & Heroes::GetPortrait50x46(void) const
-{
-    return GetPortrait50x46(portrait);
-}
-
-const Surface & Heroes::GetPortrait101x93(void) const
-{
-    return GetPortrait101x93(portrait);
-}
-
 void Heroes::SetKillerColor(u8 col)
 {
     killer_color.SetColor(col);
@@ -1558,6 +1518,94 @@ void Heroes::Move2Dest(const s32 & dst_index, bool skip_action /* false */)
 
 	if(!skip_action)
 	    ActionNewPosition();
+    }
+}
+
+const Surface & Heroes::GetPortrait(heroes_t id, u8 type)
+{
+    if(Heroes::UNKNOWN != id)
+    switch(type)
+    {
+	case PORT_BIG:		return AGG::GetICN(ICN::PORTxxxx(id), 0);
+        case PORT_MEDIUM:	return Heroes::SANDYSANDY > id ? AGG::GetICN(ICN::PORTMEDI, id + 1) : AGG::GetICN(ICN::PORTMEDI, BAX + 1);
+        case PORT_SMALL:	return Heroes::SANDYSANDY > id ? AGG::GetICN(ICN::MINIPORT, id) : AGG::GetICN(ICN::MINIPORT, BAX);
+	default: break;
+    }
+
+    return AGG::GetICN(ICN::PORTxxxx(LORDKILBURN), 0);
+}
+
+void Heroes::PortraitRedraw(s16 px, s16 py, u8 type, Surface & dstsf) const
+{
+    const Surface & port = GetPortrait(hid, type);
+    Point mp(0, 0);
+
+    if(PORT_BIG == type)
+    {
+	port.Blit(px, py, dstsf);
+	mp.y = 2;
+	mp.x = port.w() - 12;
+    }
+    else
+    if(PORT_MEDIUM == type)
+    {
+	port.Blit(px, py, dstsf);
+	mp.x = port.w() - 10;
+    }
+    else
+    if(PORT_SMALL == type)
+    {
+        const Sprite & mobility = AGG::GetICN(ICN::MOBILITY, GetMobilityIndexSprite());
+        const Sprite & mana = AGG::GetICN(ICN::MANA, GetManaIndexSprite());
+
+        const u8 & iconsw = Interface::IconsBar::GetItemWidth();
+        const u8 & iconsh = Interface::IconsBar::GetItemHeight();
+        const u8  barw = 7;
+
+        dstsf.FillRect(0, 0, 0, Rect(px, py, iconsw, iconsh));
+
+        const u32 blue = dstsf.MapRGB(15, 30, 120);
+
+        // mobility
+        dstsf.FillRect(blue, Rect(px, py, barw, iconsh));
+        mobility.Blit(px, py + mobility.y(), dstsf);
+
+        // portrait
+        port.Blit(px + barw + 1, py, dstsf);
+
+        // mana
+        dstsf.FillRect(blue, Rect(px + barw + port.w() + 2, py, barw, iconsh));
+        mana.Blit(px + barw + port.w() + 2, py + mana.y(), dstsf);
+
+	mp.x = 35;
+    }
+
+
+    // heroes marker
+    if(Modes(Heroes::SHIPMASTER))
+    {
+        const Sprite & sprite = AGG::GetICN(ICN::BOAT12, 0);
+	const Rect pos(px + mp.x, py + mp.y - 1, sprite.w(), sprite.h());
+	dstsf.FillRect(0, 0, 0, pos);
+	sprite.Blit(pos.x, pos.y, dstsf);
+        mp.y = sprite.h();
+    }
+    else
+    if(Modes(Heroes::GUARDIAN))
+    {
+	const Sprite & sprite = AGG::GetICN(ICN::MISC6, 11);
+	const Rect pos(px + mp.x + 3, py + mp.y, sprite.w(), sprite.h());
+	dstsf.FillRect(0, 0, 0, pos);
+	sprite.Blit(pos.x, pos.y, dstsf);
+        mp.y = sprite.h();
+    }
+
+    if(Modes(Heroes::SLEEPER))
+    {
+        const Sprite & sprite = AGG::GetICN(ICN::MISC4, 14);
+	const Rect pos(px + mp.x + 3, py + mp.y - 1, sprite.w() - 4, sprite.h() - 4);
+	dstsf.FillRect(0, 0, 0, pos);
+	sprite.Blit(pos.x - 2, pos.y - 2);
     }
 }
 

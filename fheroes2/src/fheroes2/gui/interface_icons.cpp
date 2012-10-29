@@ -28,7 +28,6 @@
 #include "race.h"
 #include "cursor.h"
 #include "world.h"
-#include "portrait.h"
 #include "settings.h"
 #include "game_focus.h"
 #include "kingdom.h"
@@ -92,44 +91,7 @@ void Interface::RedrawCastleIcon(const Castle & castle, s16 sx, s16 sy)
 
 void Interface::RedrawHeroesIcon(const Heroes & hero, s16 sx, s16 sy)
 {
-    Display & display = Display::Get();
-    const Sprite & mobility = AGG::GetICN(ICN::MOBILITY, hero.GetMobilityIndexSprite());
-    const Sprite & mana = AGG::GetICN(ICN::MANA, hero.GetManaIndexSprite());
-    const Surface & port = Portrait::Hero(hero, Portrait::SMALL);
-
-    display.FillRect(0, 0, 0, Rect(sx, sy, IconsBar::GetItemWidth(), IconsBar::GetItemHeight()));
-
-    const u8  barw = 7;
-    const u32 blue = display.MapRGB(15, 30, 120);
-
-    // mobility
-    display.FillRect(blue, Rect(sx, sy, barw, IconsBar::GetItemHeight()));
-    mobility.Blit(sx, sy + mobility.y());
-
-    // portrait
-    port.Blit(sx + barw + 1, sy, display);
-
-    // mana
-    display.FillRect(blue, Rect(sx + barw + port.w() + 2, sy, barw, IconsBar::GetItemHeight()));
-    mana.Blit(sx + barw + port.w() + 2, sy + mana.y());
-
-    u8 oy = 0;
-
-    // heroes marker
-    if(hero.Modes(Heroes::SHIPMASTER))
-    {
-        AGG::GetICN(ICN::BOAT12, 0).Blit(sx + 35, sy - 1);
-	oy = AGG::GetICN(ICN::BOAT12, 0).h();
-    }
-    else
-    if(hero.Modes(Heroes::GUARDIAN))
-    {
-        AGG::GetICN(ICN::MISC6, 11).Blit(sx + 38, sy);
-	oy = AGG::GetICN(ICN::MISC6, 11).h();
-    }
-
-    if(hero.Modes(Heroes::SLEEPER))
-        AGG::GetICN(ICN::MISC4, 14).Blit(sx + 36, sy - 2 + oy);
+    hero.PortraitRedraw(sx, sy, PORT_SMALL, Display::Get());
 }
 
 void Interface::IconsBar::RedrawBackground(const Point & pos)

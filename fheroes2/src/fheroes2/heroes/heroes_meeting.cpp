@@ -72,11 +72,11 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     // portrait
     dst_pt.x = cur_pt.x + 93;
     dst_pt.y = cur_pt.y + 72;
-    GetPortrait101x93().Blit(dst_pt, display);
+    PortraitRedraw(dst_pt.x, dst_pt.y, PORT_BIG, display);
 
     dst_pt.x = cur_pt.x + 445;
     dst_pt.y = cur_pt.y + 72;
-    heroes2.GetPortrait101x93().Blit(dst_pt, display);
+    heroes2.PortraitRedraw(dst_pt.x, dst_pt.y, PORT_BIG, display);
 
     dst_pt.x = cur_pt.x + 34;
     dst_pt.y = cur_pt.y + 75;

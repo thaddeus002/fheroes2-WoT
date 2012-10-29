@@ -107,7 +107,7 @@ public:
     {
       Display & display = Display::Get();
       Heroes::heroes_t hero = Heroes::ConvertID(index);
-      Heroes::GetPortrait30x22(hero).Blit(dstx + 5, dsty + 3, display);
+      Heroes::GetPortrait(hero, PORT_SMALL).Blit(dstx + 5, dsty + 3, display);
 
       Text text(Heroes::GetName(hero), (current ? Font::YELLOW_BIG : Font::BIG));
       text.Blit(dstx + 50, dsty + 5);

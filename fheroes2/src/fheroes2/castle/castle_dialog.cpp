@@ -37,7 +37,6 @@
 #include "race.h"
 #include "tools.h"
 #include "text.h"
-#include "portrait.h"
 #include "dialog.h"
 #include "statusbar.h"
 #include "army_bar.h"
@@ -156,55 +155,59 @@ void RedrawIcons(const Castle & castle, const CastleHeroes & heroes, const Point
     if(Settings::Get().QVGA())
     {
 	AGG::GetICN(ICN::SWAPWIN, 0).Blit(Rect(36, 267, 43, 43), pt.x + 2, pt.y + 79);
-
-	if(hero1 || !castle.isBuild(BUILD_CAPTAIN))
-	{
-    	    const Surface & icon = hero1 ? Portrait::Hero(*hero1, Portrait::MEDIUM) :
-					    AGG::GetICN(ICN::BRCREST, Color::GetIndex(castle.GetColor()));
-    	    icon.Blit(Rect((icon.w() - 41) / 2, (icon.h() - 41) / 2, 41, 41), pt.x + 3, pt.y + 80, display);
-	}
-	else
-	if(castle.isBuild(BUILD_CAPTAIN))
-	{
-    	    const Surface & icon = Portrait::Captain(castle.GetRace(), Portrait::BIG);
-    	    icon.Blit(Rect((icon.w() - 41) / 2, 15, 41, 41), pt.x + 3, pt.y + 80, display);
-	}
-
 	AGG::GetICN(ICN::SWAPWIN, 0).Blit(Rect(36, 267, 43, 43), pt.x + 2, pt.y + 124);
 
-        if(hero2)
-	{
-    	    const Surface & icon = Portrait::Hero(*hero2, Portrait::MEDIUM);
-    	    icon.Blit(Rect((icon.w() - 41) / 2, (icon.h() - 41) / 2, 41, 41), pt.x + 3, pt.y + 125, display);
+	const Surface* icon1 = NULL;
+	const Surface* icon2 = NULL;
 
-	}
+	if(hero1)
+    	    icon1 = & Heroes::GetPortrait(hero1->GetID(), PORT_MEDIUM);
 	else
-	{
-    	    const Sprite & crest = AGG::GetICN(ICN::BRCREST, Color::GetIndex(castle.GetColor()));
-    	    crest.Blit(Rect((crest.w() - 41) / 2, (crest.h() - 41) / 2, 41, 41), pt.x + 3, pt.y + 125, display);
+	if(castle.isBuild(BUILD_CAPTAIN))
+    	    icon1 = & castle.GetCaptain().GetPortrait(PORT_MEDIUM);
+	else
+    	    icon1 = & AGG::GetICN(ICN::BRCREST, Color::GetIndex(castle.GetColor()));
 
-	    //
+        if(hero2)
+    	    icon2 = & Heroes::GetPortrait(hero2->GetID(), PORT_MEDIUM);
+	else
+	    icon2 = & AGG::GetICN(ICN::BRCREST, Color::GetIndex(castle.GetColor()));
+
+	if(icon1)
+	    icon1->Blit(Rect((icon1->w() - 41) / 2, (icon1->h() - 41) / 2, 41, 41), pt.x + 3, pt.y + 80, display);
+
+	if(icon2)
+    	    icon2->Blit(Rect((icon2->w() - 41) / 2, (icon2->h() - 41) / 2, 41, 41), pt.x + 3, pt.y + 125, display);
+
+        if(! hero2)
 	    AGG::GetICN(ICN::STONEBAK, 0).Blit(Rect(0, 0, 223, 53), pt.x + 47, pt.y + 124);
-	}
     }
     else
     {
 	AGG::GetICN(ICN::STRIP, 0).Blit(pt.x, pt.y + 256);
 
-	const Surface & sprite1 = hero1 ? Portrait::Hero(*hero1, Portrait::BIG) :
-	    (castle.isBuild(BUILD_CAPTAIN) ? Portrait::Captain(castle.GetRace(), Portrait::BIG) :
-		AGG::GetICN(ICN::CREST, Color::GetIndex(castle.GetColor())));
+	const Surface* icon1 = NULL;
+	const Surface* icon2 = NULL;
 
-	// icons 1
-	sprite1.Blit(pt.x + 5, pt.y + 262, display);
+	if(hero1)
+	    icon1 = & Heroes::GetPortrait(hero1->GetID(), PORT_BIG);
+	else
+	if(castle.isBuild(BUILD_CAPTAIN))
+	    icon1 = & castle.GetCaptain().GetPortrait(PORT_BIG);
+	else
+	    icon1 = & AGG::GetICN(ICN::CREST, Color::GetIndex(castle.GetColor()));
 
-	const Surface & sprite2 = hero2 ? Portrait::Hero(*hero2, Portrait::BIG) :
-					    AGG::GetICN(ICN::STRIP, 3);
+	if(hero2)
+	    icon2 = & Heroes::GetPortrait(hero2->GetID(), PORT_BIG);
+	else
+	    icon2 = & AGG::GetICN(ICN::STRIP, 3);
 
-	// icons 2
-	sprite2.Blit(pt.x + 5, pt.y + 361, display);
+	if(icon1)
+	    icon1->Blit(pt.x + 5, pt.y + 262, display);
 
-	// ext
+	if(icon2)
+	    icon2->Blit(pt.x + 5, pt.y + 361, display);
+
 	if(! hero2)
     	    AGG::GetICN(ICN::STRIP, 11).Blit(pt.x + 112, pt.y + 361);
     }
@@ -644,7 +647,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 				const Rect rt(0, 98, 552, 107);
 				Surface sf(rt.w, rt.h, false);
             			AGG::GetICN(ICN::STRIP, 0).Blit(rt, 0, 0, sf);
-				const Surface & port = Portrait::Hero((*heroes.Guest()), Portrait::BIG);
+				const Surface & port = Heroes::GetPortrait(heroes.Guest()->GetID(), PORT_BIG);
 				port.Blit(6, 6, sf);
 				const Point savept = selectArmy2.GetPos();
 				selectArmy2.SetPos(112, 5);

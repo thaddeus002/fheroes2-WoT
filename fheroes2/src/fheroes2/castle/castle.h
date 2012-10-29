@@ -119,7 +119,8 @@ public:
     Castle(s16 cx, s16 cy, const u8 rs);
     void LoadFromMP2(const void *ptr);
 
-    Captain &GetCaptain() { return captain; }
+    Captain & GetCaptain(void) { return captain; }
+    const Captain & GetCaptain(void) const { return captain; }
 
     bool isCastle(void) const{ return building & BUILD_CASTLE; }
     bool isCapital(void) const{ return Modes(CAPITAL); }

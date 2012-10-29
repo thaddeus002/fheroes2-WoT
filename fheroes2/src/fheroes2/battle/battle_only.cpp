@@ -659,10 +659,10 @@ void Battle::Only::RedrawBaseInfo(const Point & top)
     text.Blit(top.x + 320 - text.w() / 2, top.y + 26);
 
     // portrait
-    hero1->GetPortrait101x93().Blit(rtPortrait1, display);
+    Heroes::GetPortrait(hero1->GetID(), PORT_BIG).Blit(rtPortrait1.x, rtPortrait1.y, PORT_BIG, display);
 
     if(hero2)
-      hero2->GetPortrait101x93().Blit(rtPortrait2, display);
+	Heroes::GetPortrait(hero2->GetID(), PORT_BIG).Blit(rtPortrait2.x, rtPortrait2.y, PORT_BIG, display);
     else
     {
       display.FillRect(0, 0, 0, rtPortrait2);

@@ -33,7 +33,6 @@
 #include "kingdom.h"
 #include "text.h"
 #include "castle.h"
-#include "portrait.h"
 #include "dialog.h"
 #include "heroes_indicator.h"
 #include "army_bar.h"
@@ -69,9 +68,8 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     // portrait
     dst_pt.x = cur_pt.x + 49;
     dst_pt.y = cur_pt.y + 31;
-    const Surface & port = GetPortrait101x93();
-    const Rect portPos(dst_pt.x, dst_pt.y, port.w(), port.h());
-    port.Blit(dst_pt, display);
+    const Rect portPos(dst_pt.x, dst_pt.y, 101, 93);
+    PortraitRedraw(dst_pt.x, dst_pt.y, PORT_BIG, display);
 
     // name
     message = _("%{name} the %{race} ( Level %{level} )");

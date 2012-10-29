@@ -67,6 +67,7 @@ public:
     };
 
     static heroes_t ConvertID(u8);
+    static const Surface & GetPortrait(heroes_t, u8);
 
     enum flags_t
     {
@@ -110,14 +111,6 @@ public:
 
     const Color::color_t & GetKillerColor(void) const;
     void SetKillerColor(u8);
-
-    const Surface & GetPortrait30x22(void) const;
-    const Surface & GetPortrait50x46(void) const;
-    const Surface & GetPortrait101x93(void) const;
-
-    static const Surface & GetPortrait30x22(heroes_t);
-    static const Surface & GetPortrait50x46(heroes_t);
-    static const Surface & GetPortrait101x93(heroes_t);
 
     const Army & GetArmy(void) const{ return army; }
     Army & GetArmy(void) { return army; }
@@ -216,6 +209,7 @@ public:
 
     void Redraw(Surface &, bool) const;
     void Redraw(Surface &, const s16, const s16, bool) const;
+    void PortraitRedraw(s16, s16, u8 type, Surface &) const;
     u8   GetSpriteIndex(void) const{ return sprite_index; }
     void FadeOut(void) const;
     void FadeIn(void) const;
