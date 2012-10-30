@@ -1082,6 +1082,8 @@ u32 Castle::GetBuildingRequires(u32 build) const
 /* check allow buy building */
 s8 Castle::CheckBuyBuilding(u32 build) const
 {
+    if(build & building) return ALREADY_BUILT;
+
     switch(build)
     {
 	// allow build castle
@@ -1103,8 +1105,6 @@ s8 Castle::CheckBuyBuilding(u32 build) const
     }
 
     if(! Modes(ALLOWBUILD)) return NOT_TODAY;
-
-    if(build & building) return ALREADY_BUILT;
 
     if(isCastle())
     {
