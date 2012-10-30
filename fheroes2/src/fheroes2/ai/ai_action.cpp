@@ -800,7 +800,7 @@ void AIToMagellanMaps(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 void AIToTeleports(Heroes & hero, const s32 & index_from)
 {
-    u16 index_to = world.NextTeleport(index_from);
+    s32 index_to = world.NextTeleport(index_from);
     hero.ApplyPenaltyMovement();
 
     if(index_from == index_to)
@@ -826,15 +826,16 @@ void AIToTeleports(Heroes & hero, const s32 & index_from)
         }
     }
 
-    hero.Move2Dest(index_to);
+    hero.Move2Dest(index_to, true);
     hero.GetPath().Reset();
+    hero.ActionNewPosition();
 
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToWhirlpools(Heroes & hero, const s32 & index_from)
 {
-    const u16 index_to = world.NextWhirlpool(index_from);
+    s32 index_to = world.NextWhirlpool(index_from);
     hero.ApplyPenaltyMovement();
 
     if(index_from == index_to)
