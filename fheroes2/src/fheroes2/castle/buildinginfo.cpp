@@ -684,7 +684,7 @@ void BuildingInfo::SetStatusMessage(StatusBar & bar) const
 DwellingItem::DwellingItem(Castle & castle, u32 dw)
 {
     type = castle.GetActualDwelling(dw);
-    mons = Monster(castle.GetRace(), dw);
+    mons = Monster(castle.GetRace(), type);
 }
 
 DwellingsBar::DwellingsBar(Castle & cstl, u16 sw, u16 sh, u8 col) : castle(cstl)
