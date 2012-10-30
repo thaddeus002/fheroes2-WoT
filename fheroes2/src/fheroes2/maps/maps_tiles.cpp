@@ -132,9 +132,9 @@ std::string Maps::TilesAddon::String(int level) const
 {
     std::ostringstream os;
     os << "----------------" << level << "--------" << std::endl <<
-	  "object          : " << "0x" << std::setw(2) << std::setfill('0') << static_cast<int>(object) <<
+	  "object          : " << "0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(object) <<
 				", (" << ICN::GetString(MP2::GetICNObject(object)) << ")" << std::endl <<
-	  "index           : " << static_cast<int>(index) << std::endl <<
+	  "index           : " << std::dec << static_cast<int>(index) << std::endl <<
 	  "uniq            : " << uniq << std::endl <<
 	  "level           : " << static_cast<int>(level) << std::endl <<
 	  "tmp             : " << static_cast<int>(tmp) << std::endl;
@@ -2798,10 +2798,25 @@ StreamBase & Maps::operator>> (StreamBase & msg, Tiles & tile)
         // addons 2
 	tile.addons_level2;
 
-    // fix: GetHeroes
-    if(FORMAT_VERSION_2945 <= Game::GetLoadVersion() && MP2::OBJ_HEROES == tile.mp2_object)
+    // fix old format: GetHeroes
+    if(FORMAT_VERSION_2945 > Game::GetLoadVersion())
     {
-	tile.SetQuantity3(tile.GetQuantity3() + 1);
+	if(MP2::OBJ_HEROES == tile.mp2_object)
+	    tile.SetQuantity3(tile.GetQuantity3() + 1);
+	else
+	// fix old format: teleports
+	if(MP2::OBJ_ZERO == tile.mp2_object && 1 == tile.addons_level1.size())
+	{
+	    const TilesAddon & ta = tile.addons_level1.front();
+
+	    switch(MP2::GetICNObject(ta.object))
+	    {
+		case ICN::TELEPORT1:
+		case ICN::TELEPORT2:
+		case ICN::TELEPORT3: tile.mp2_object = MP2::OBJ_STONELIGHTS; break;
+		default: break;
+	    }
+	}
     }
 
     return msg;
