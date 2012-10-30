@@ -1030,8 +1030,8 @@ void Maps::Tiles::SetQuantity3(u8 mod)
 
 Heroes* Maps::Tiles::GetHeroes(void) const
 {
-    return MP2::OBJ_HEROES == mp2_object ?
-	world.GetHeroes(Heroes::ConvertID(GetQuantity3())) : NULL;
+    return MP2::OBJ_HEROES == mp2_object && GetQuantity3() ?
+	world.GetHeroes(Heroes::ConvertID(GetQuantity3() - 1)) : NULL;
 }
 
 void Maps::Tiles::SetHeroes(Heroes* hero)
@@ -1039,12 +1039,13 @@ void Maps::Tiles::SetHeroes(Heroes* hero)
     if(hero)
     {
 	hero->SetMapsObject(mp2_object);
-	SetQuantity3(hero->GetID());
+	SetQuantity3(hero->GetID() + 1);
 	SetObject(MP2::OBJ_HEROES);
     }
     else
     {
 	hero = GetHeroes();
+
 	if(hero)
 	{
 	    SetObject(hero->GetMapsObject());
@@ -1052,6 +1053,7 @@ void Maps::Tiles::SetHeroes(Heroes* hero)
 	}
 	else
 	    SetObject(MP2::OBJ_ZERO);
+
 	SetQuantity3(0);
     }
 }
@@ -2783,7 +2785,7 @@ StreamBase & Maps::operator<< (StreamBase & msg, const Tiles & tile)
 
 StreamBase & Maps::operator>> (StreamBase & msg, Tiles & tile)
 {
-    return msg >>
+    msg >>
 	tile.pack_maps_index >>
 	tile.pack_sprite_index >>
 	tile.tile_passable >>
@@ -2795,4 +2797,12 @@ StreamBase & Maps::operator>> (StreamBase & msg, Tiles & tile)
 	tile.addons_level1 >>
         // addons 2
 	tile.addons_level2;
+
+    // fix: GetHeroes
+    if(FORMAT_VERSION_2945 <= Game::GetLoadVersion() && MP2::OBJ_HEROES == tile.mp2_object)
+    {
+	tile.SetQuantity3(tile.GetQuantity3() + 1);
+    }
+
+    return msg;
 }
