@@ -1793,6 +1793,7 @@ s8 Castle::GetMoraleModificator(std::string *strs) const
     	{
 	    strs->append(GetStringBuilding(BUILD_TAVERN, race));
             StringAppendModifiers(*strs, mod);
+	    strs->append("\n");
 	}
     }
 
@@ -1805,6 +1806,7 @@ s8 Castle::GetMoraleModificator(std::string *strs) const
 	{
 	    strs->append(GetStringBuilding(BUILD_SPEC, race));
             StringAppendModifiers(*strs, mod);
+	    strs->append("\n");
 	}
     }
 
@@ -1823,6 +1825,7 @@ s8 Castle::GetLuckModificator(std::string *strs) const
 	{
 	    strs->append(Castle::GetStringBuilding(BUILD_SPEC, race));
             StringAppendModifiers(*strs, mod);
+	    strs->append("\n");
 	}
     }
 
