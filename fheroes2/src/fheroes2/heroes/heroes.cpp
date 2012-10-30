@@ -1022,7 +1022,7 @@ bool Heroes::BuySpellBook(const Castle* castle, u8 shrine)
     {
 	if(CONTROL_HUMAN == GetControl())
 	{
-	    header.append(". ");
+	    header.append(" ");
 	    header.append(_("Unfortunately, you seem to be a little short of cash at the moment."));
 	    Dialog::Message("", header, Font::BIG, Dialog::OK);
 	}
@@ -1037,10 +1037,10 @@ bool Heroes::BuySpellBook(const Castle* castle, u8 shrine)
 	border.Blit(sprite);
 	AGG::GetICN(ICN::ARTIFACT, Artifact(Artifact::MAGIC_BOOK).IndexSprite64()).Blit(5, 5, sprite);
 
-	header.append(". ");
+	header.append(" ");
 	header.append(_("Do you wish to buy one?"));
 
-	if(Dialog::NO == Dialog::SpriteInfo("", header, sprite, Dialog::YES | Dialog::NO)) return false;
+	if(Dialog::NO == Dialog::SpriteInfo(GetName(), header, sprite, Dialog::YES | Dialog::NO)) return false;
     }
 
     if(SpellBookActivate())

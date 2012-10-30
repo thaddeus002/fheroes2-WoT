@@ -547,11 +547,13 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
         	{
             	    if(le.MouseClickLeft((*it).coord))
             	    {
-                	if(!heroes.Guest() || heroes.Guest()->HaveSpellBook())
-                    	    OpenMageGuild();
-                	else
-                	if(heroes.Guest()->BuySpellBook(this))
+                	if(heroes.Guard() && ! heroes.Guard()->HaveSpellBook() && heroes.Guard()->BuySpellBook(this))
                     	    need_redraw = true;
+
+                	if(heroes.Guest() && ! heroes.Guest()->HaveSpellBook() && heroes.Guest()->BuySpellBook(this))
+                    	    need_redraw = true;
+
+                	OpenMageGuild();
             	    }
             	    else
             	    if(le.MousePressRight((*it).coord))
