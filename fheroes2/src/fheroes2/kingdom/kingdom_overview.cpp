@@ -508,9 +508,7 @@ std::string CapturedExtInfoString(u8 res, u8 color, const Funds & funds)
 
 void RedrawIncomeInfo(const Point & pt, const Kingdom & myKingdom)
 {
-    const Funds & funds = myKingdom.GetFunds();
     const Funds income = myKingdom.GetIncome(INCOME_ARTIFACTS | INCOME_HEROSKILLS);
-
     Text text("", Font::SMALL);
 
     text.Set(CapturedExtInfoString(Resource::WOOD, myKingdom.GetColor(), income));
@@ -533,6 +531,14 @@ void RedrawIncomeInfo(const Point & pt, const Kingdom & myKingdom)
 
     text.Set(CapturedExtInfoString(Resource::GOLD, myKingdom.GetColor(), income));
     text.Blit(pt.x + 494 - text.w() / 2, pt.y + 408);
+}
+
+void RedrawFundsInfo(const Point & pt, const Kingdom & myKingdom)
+{
+    const Funds & funds = myKingdom.GetFunds();
+    Text text("", Font::SMALL);
+
+    AGG::GetICN(ICN::OVERBACK, 0).Blit(Rect(4, 422, 530, 56), pt.x + 4, pt.y + 422);
 
     text.Set(GetString(funds.wood));
     text.Blit(pt.x + 56 - text.w() / 2, pt.y + 448);
@@ -580,7 +586,9 @@ void Kingdom::OverviewDialog(void)
 
     AGG::GetICN(ICN::STONEBAK, 0).Blit(dst_pt);
     AGG::GetICN(ICN::OVERBACK, 0).Blit(dst_pt);
+
     RedrawIncomeInfo(cur_pt, *this);
+    RedrawFundsInfo(cur_pt, *this);
 
     StatsHeroesList listHeroes(dst_pt, heroes);
     StatsCastlesList listCastles(dst_pt, castles);
@@ -659,6 +667,7 @@ void Kingdom::OverviewDialog(void)
 	if(! cursor.isVisible())
 	{
 	    listStats->Redraw();
+	    RedrawFundsInfo(cur_pt, *this);
 	    cursor.Show();
 	    display.Flip();
 	}
