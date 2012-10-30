@@ -1244,6 +1244,8 @@ void Game::EventKingdomInfo(void)
 	PocketPC::KingdomOverviewDialog(myKingdom);
     else
 	myKingdom.OverviewDialog();
+
+    Interface::Basic::Get().SetRedraw(REDRAW_ICONS);
 }
 
 void Game::EventCastSpell(void)
