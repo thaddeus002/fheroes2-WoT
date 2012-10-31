@@ -172,6 +172,48 @@ bool PassableFromToTile(const Heroes & hero, const s32 & from, const s32 & to, c
 	}
     }
 
+    // check corner water/coast
+    if(hero.isShipMaster() && 
+	(direct & (Direction::TOP_LEFT | Direction::TOP_RIGHT | Direction::BOTTOM_RIGHT | Direction::BOTTOM_LEFT)))
+    {
+	switch(direct)
+	{
+	    case Direction::TOP_LEFT:
+		if((Maps::isValidDirection(from, Direction::TOP) &&
+		    ! world.GetTiles(Maps::GetDirectionIndex(from, Direction::TOP)).isWater()) ||
+		   (Maps::isValidDirection(from, Direction::LEFT) &&
+		    ! world.GetTiles(Maps::GetDirectionIndex(from, Direction::LEFT)).isWater()))
+		    return false;
+		break;
+
+	    case Direction::TOP_RIGHT:
+		if((Maps::isValidDirection(from, Direction::TOP) &&
+		    ! world.GetTiles(Maps::GetDirectionIndex(from, Direction::TOP)).isWater()) ||
+		   (Maps::isValidDirection(from, Direction::RIGHT) &&
+		    ! world.GetTiles(Maps::GetDirectionIndex(from, Direction::RIGHT)).isWater()))
+		    return false;
+		break;
+
+	    case Direction::BOTTOM_RIGHT:
+		if((Maps::isValidDirection(from, Direction::BOTTOM) &&
+		    ! world.GetTiles(Maps::GetDirectionIndex(from, Direction::BOTTOM)).isWater()) ||
+		   (Maps::isValidDirection(from, Direction::RIGHT) &&
+		    ! world.GetTiles(Maps::GetDirectionIndex(from, Direction::RIGHT)).isWater()))
+		    return false;
+		break;
+
+	    case Direction::BOTTOM_LEFT:
+		if((Maps::isValidDirection(from, Direction::BOTTOM) &&
+		    ! world.GetTiles(Maps::GetDirectionIndex(from, Direction::BOTTOM)).isWater()) ||
+		   (Maps::isValidDirection(from, Direction::LEFT) &&
+		    ! world.GetTiles(Maps::GetDirectionIndex(from, Direction::LEFT)).isWater()))
+		    return false;
+		break;
+
+	    default: break;
+	}
+    }
+
     return PassableToTile(hero, toTile, direct, dst);
 }
 

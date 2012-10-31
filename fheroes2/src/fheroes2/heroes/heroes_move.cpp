@@ -276,6 +276,11 @@ void Heroes::Redraw(Surface & dst, const s16 dx, const s16 dy, bool with_shadow)
 
     if(isShipMaster())
     {
+	dst_pt1.y -= 15;
+	dst_pt2.y -= 15;
+	dst_pt3.y -= 15;
+	dst_pt4.y -= 15;
+
 	gamearea.SrcRectFixed(src_rt, dst_pt4, sprite4.w(), sprite4.h());
 	sprite4.Blit(src_rt, dst_pt4, dst);
     }
