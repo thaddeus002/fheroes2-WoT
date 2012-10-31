@@ -292,7 +292,7 @@ bool Dialog::InputString(const std::string &header, std::string &res)
     return res.size();
 }
 
-u8 Dialog::ArmySplitTroop(u8 free_slots, u32 max, u32 & cur)
+u8 Dialog::ArmySplitTroop(u8 free_slots, u32 max, u32 & cur, bool savelast)
 {
     Display & display = Display::Get();
 
@@ -374,7 +374,10 @@ u8 Dialog::ArmySplitTroop(u8 free_slots, u32 max, u32 & cur)
     ButtonGroups btnGroups(box.GetArea(), Dialog::OK | Dialog::CANCEL);
     btnGroups.Draw();
 
-    text.Set(std::string("MAX") + " " + "(" + GetString(max) + ")" + " " + "-" + " " + "1", Font::SMALL);
+    if(savelast)
+	text.Set(std::string("MAX") + " " + "(" + GetString(max) + ")", Font::SMALL);
+    else
+	text.Set(std::string("MAX") + " " + "(" + GetString(max) + ")" + " " + "-" + " " + "1", Font::SMALL);
     const Rect rectMax(pos.x + 163, pos.y + 30, text.w(), text.h());
     text.Blit(rectMax.x, rectMax.y);
 
@@ -401,7 +404,7 @@ u8 Dialog::ArmySplitTroop(u8 free_slots, u32 max, u32 & cur)
 	else
         if(le.MouseClickLeft(rectMax))
         {
-	    sel.SetCur(max - 1);
+	    sel.SetCur(savelast ? max : max - 1);
     	    redraw_count = true;
         }
 	else

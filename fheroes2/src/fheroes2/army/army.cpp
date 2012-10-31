@@ -625,18 +625,25 @@ void Troops::SplitTroopIntoFreeSlots(const Troop & troop, u8 slots)
     {
 	u32 chunk = troop.GetCount() / slots;
 	u8 limits = slots;
-	Troop* first = NULL;
+	std::vector<iterator> iters;
 
 	for(iterator it = begin(); it != end(); ++it)
 	    if(! (*it)->isValid() && limits)
 	{
-	    if(! first) first = *it;
+	    iters.push_back(it);
 	    (*it)->Set(troop.GetMonster(), chunk);
 	    --limits;
 	}
 
-	if(first && chunk * slots < troop.GetCount())
-	    first->SetCount(chunk + troop.GetCount() - chunk * slots);
+	u32 last = troop.GetCount() - chunk * slots;
+
+	for(std::vector<iterator>::iterator
+	    it = iters.begin(); it != iters.end(); ++it)
+	    if(last)
+	{
+	    (**it)->SetCount((**it)->GetCount() + 1);
+	    --last;
+	}
     }
 }
 
