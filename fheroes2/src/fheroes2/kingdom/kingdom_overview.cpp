@@ -608,10 +608,23 @@ void Kingdom::OverviewDialog(void)
 
     const Rect rectIncome(cur_pt.x + 1, cur_pt.y + 360, 535, 60);
 
+    Interface::ListBasic* listStats = NULL;
+
+    // set state view: castles
+    if(Modes(OVERVIEWCSTL))
+    {
+	buttonCastle.Press();
+	buttonHeroes.Release();
+	listStats = &listCastles;
+    }
+    else
     // set state view: heroes
-    buttonHeroes.Press();
-    buttonCastle.Release();
-    Interface::ListBasic* listStats = &listHeroes;
+    {
+	buttonHeroes.Press();
+	buttonCastle.Release();
+	listStats = &listHeroes;
+    }
+
     listStats->Redraw();
 
     buttonHeroes.Draw();
@@ -638,6 +651,7 @@ void Kingdom::OverviewDialog(void)
 	    buttonHeroes.Draw();
 	    buttonCastle.Draw();
 	    listStats = &listHeroes;
+	    ResetModes(OVERVIEWCSTL);
 	}
 	else
 	if(buttonCastle.isReleased() &&
@@ -649,6 +663,7 @@ void Kingdom::OverviewDialog(void)
 	    buttonHeroes.Draw();
 	    buttonCastle.Draw();
 	    listStats = &listCastles;
+	    SetModes(OVERVIEWCSTL);
 	}
 
 	// exit event

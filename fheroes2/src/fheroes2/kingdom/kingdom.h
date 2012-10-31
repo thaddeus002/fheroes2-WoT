@@ -63,7 +63,8 @@ public:
     {
 	//UNDEF	     = 0x0001,
 	IDENTIFYHERO = 0x0002,
-	DISABLEHIRES = 0x0004
+	DISABLEHIRES = 0x0004,
+	OVERVIEWCSTL = 0x0008
     };
 
     Kingdom();
