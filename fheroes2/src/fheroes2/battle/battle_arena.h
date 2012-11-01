@@ -76,7 +76,6 @@ namespace Battle
 	Force &		GetForce2(void);
 	Force &		GetForce(u8 color, bool invert = false);
 	Force &		GetCurrentForce(void);
-	const Units*	GetOrderArmies(void) const;
 
 	u8		GetArmyColor1(void) const;
 	u8		GetArmyColor2(void) const;
@@ -170,7 +169,7 @@ namespace Battle
 
 	Force*		army1;
         Force*		army2;
-	Units*		armies;
+	Units*		armies_order;
 
 	const Castle*	castle;
 	u8		current_color;

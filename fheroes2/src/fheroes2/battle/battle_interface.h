@@ -95,6 +95,27 @@ namespace Battle
 	StatusListBox*	listlog;
     };
 
+    class ArmiesOrder : public Rect
+    {
+    public:
+	ArmiesOrder();
+
+	void	Set(const Rect &, const Units*, u8);
+	void	Redraw(const Unit*);
+	void	QueueEventProcessing(std::string &);
+
+    private:
+	typedef std::pair<const Unit*, Rect> UnitPos;
+
+	void RedrawUnit(const Rect &, const Unit &, bool, bool) const;
+
+	const Units*	orders;
+	u8		army_color2;
+	Rect		area;
+	Surface		sf_color[3];
+	std::vector<UnitPos> rects;
+    };
+
     class PopupDamageInfo : public Dialog::FrameBorder
     {
     public:
@@ -124,6 +145,7 @@ namespace Battle
 	const Rect & GetArea(void) const;
 
 	void	SetStatus(const std::string &, bool = false);
+	void	SetArmiesOrder(const Units*);
 	void	FadeArena(void);
 
         void	RedrawActionAttackPart1(Unit &, Unit &, const TargetsInfo &);
@@ -163,7 +185,6 @@ namespace Battle
 	void	RedrawOpponents(void) const;
 	void	RedrawOpponentsFlags(void) const;
 	void	RedrawArmies(void) const;
-	void	RedrawOrderArmies(const Units &) const;
 	void	RedrawTroopSprite(const Unit &) const;
 	void	RedrawTroopCount(const Unit &) const;
 	void	RedrawPocketControls(void) const;
@@ -246,7 +267,7 @@ namespace Battle
 	u16		turn;
 
 	PopupDamageInfo popup;
-	Surface		sf_color[3];
+	ArmiesOrder	armies_order;
     };
 }
 

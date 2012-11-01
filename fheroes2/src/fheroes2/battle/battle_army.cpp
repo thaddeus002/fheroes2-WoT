@@ -41,6 +41,67 @@ namespace Battle
     {
         return b->Modes(TR_SKIPMOVE) && Speed::STANDING < b->GetSpeed();
     }
+
+    Unit* ForceGetCurrentUnitPart(Units & units1, Units & units2, bool part1, bool units1_first)
+    {
+	Units::iterator it1 = part1 ? std::find_if(units1.begin(), units1.end(), AllowPart1) :
+                                    std::find_if(units1.begin(), units1.end(), AllowPart2);
+
+	Units::iterator it2 = part1 ? std::find_if(units2.begin(), units2.end(), AllowPart1) :
+                                    std::find_if(units2.begin(), units2.end(), AllowPart2);
+
+	Unit* result = NULL;
+
+	if(it1 != units1.end() &&
+    	    it2 != units2.end())
+	{
+	    if((*it1)->GetSpeed() == (*it2)->GetSpeed())
+	    {
+        	if(units1_first)
+        	{
+            	    result = *it1;
+        	}
+        	else
+        	{
+            	    result = *it2;
+        	}
+	    }
+	    else
+	    if(part1 || Settings::Get().ExtBattleReverseWaitOrder())
+	    {
+    		if((*it1)->GetSpeed() > (*it2)->GetSpeed())
+        	    result = *it1;
+    		else
+    		if((*it2)->GetSpeed() > (*it1)->GetSpeed())
+        	    result = *it2;
+    	    }
+	    else
+    	    {
+    		if((*it1)->GetSpeed() < (*it2)->GetSpeed())
+        	    result = *it1;
+    		else
+    		if((*it2)->GetSpeed() < (*it1)->GetSpeed())
+        	    result = *it2;
+    	    }
+	}
+	else
+	if(it1 != units1.end())
+    	    result = *it1;
+	else
+	if(it2 != units2.end())
+    	    result = *it2;
+
+	if(result)
+	{
+	    if(result == *it1)
+		units1.erase(it1);
+	    else
+	    if(result == *it2)
+		units2.erase(it2);
+	}
+
+	return result;
+    }
 }
 
 Battle::Units::Units()
@@ -212,68 +273,41 @@ void Battle::Force::NewTurn(void)
     std::for_each(begin(), end(), std::mem_fun(&Unit::NewTurn));
 }
 
+
 Battle::Unit* Battle::Force::GetCurrentUnit(const Force & army1, const Force & army2, Unit* last, Units* all, bool part1)
 {
     Units units1(army1, true);
     Units units2(army2, true);
 
-    if(all)
-	*all = Units(army1, army2);
-
     if(part1 || Settings::Get().ExtBattleReverseWaitOrder())
     {
         units1.SortFastest();
         units2.SortFastest();
-	if(all) all->SortFastest();
     }
     else
     {
         units1.SortSlowest();
         units2.SortSlowest();
-	if(all) all->SortSlowest();
     }
 
-    Unit* result = NULL;
+    bool units1_first = (!last && part1) || (last && army2.GetColor() == last->GetColor());
+    Unit* result = ForceGetCurrentUnitPart(units1, units2, part1, units1_first);
 
-    Units::iterator it1 = part1 ? std::find_if(units1.begin(), units1.end(), AllowPart1) :
-                                    std::find_if(units1.begin(), units1.end(), AllowPart2);
-
-    Units::iterator it2 = part1 ? std::find_if(units2.begin(), units2.end(), AllowPart1) :
-                                    std::find_if(units2.begin(), units2.end(), AllowPart2);
-
-    if(it1 != units1.end() &&
-        it2 != units2.end())
+    if(all && result)
     {
-        // attacker first
-        if((*it1)->GetSpeed() > (*it2)->GetSpeed())
-        {
-            result = *it1;
-        }
-        else
-        if((*it2)->GetSpeed() > (*it1)->GetSpeed())
-        {
-            result = *it2;
-        }
-        else
-        {
-            // attacker first
-            if(!last ||
-                army2.GetColor() == last->GetColor())
-            {
-                result = *it1;
-            }
-            else
-            {
-                result = *it2;
-            }
-        }
+	last = result;
+
+	all->clear();
+	all->push_back(last);
+
+	units1_first = (!last && part1) || (last && army2.GetColor() == last->GetColor());
+
+	while(NULL != (last = ForceGetCurrentUnitPart(units1, units2, part1, units1_first)))
+	{
+	    all->push_back(last);
+	    units1_first = (!last && part1) || (last && army2.GetColor() == last->GetColor());
+	}
     }
-    else
-    if(it1 != units1.end())
-        result = *it1;
-    else
-    if(it2 != units2.end())
-        result = *it2;
 
     return result &&
         result->isValid() &&

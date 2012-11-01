@@ -575,6 +575,124 @@ const std::string & Battle::Status::GetMessage(void) const
     return message;
 }
 
+Battle::ArmiesOrder::ArmiesOrder() : orders(NULL), army_color2(0)
+{
+    sf_color[0].Set(ARMYORDERW, ARMYORDERW);
+    sf_color[1].Set(ARMYORDERW, ARMYORDERW);
+    sf_color[2].Set(ARMYORDERW, ARMYORDERW);
+
+    Cursor::DrawCursor(sf_color[0], 0xDA, true); // yellow
+    Cursor::DrawCursor(sf_color[1], 0xD6, true); // orange
+    Cursor::DrawCursor(sf_color[2], 0xDE, true); // green
+}
+
+void Battle::ArmiesOrder::Set(const Rect & rt, const Units* units, u8 color)
+{
+    area = rt;
+    orders = units;
+    army_color2 = color;
+    if(units) rects.reserve(units->size());
+}
+
+void Battle::ArmiesOrder::QueueEventProcessing(std::string & msg)
+{
+    LocalEvent & le = LocalEvent::Get();
+
+    for(std::vector<UnitPos>::const_iterator
+	it = rects.begin(); it != rects.end(); ++it) if((*it).first)
+    {
+	if(le.MouseCursor((*it).second))
+	{
+	    msg = _("View %{monster} info.");
+	    String::Replace(msg, "%{monster}", (*it).first->GetName());
+	}
+
+	if(le.MouseClickLeft((*it).second))
+	    Dialog::ArmyInfo(*(*it).first, Dialog::READONLY|Dialog::BUTTONS);
+	else
+	if(le.MousePressRight((*it).second))
+	    Dialog::ArmyInfo(*(*it).first, Dialog::READONLY);
+    }
+}
+
+void Battle::ArmiesOrder::RedrawUnit(const Rect & pos, const Battle::Unit & unit, bool revert, bool current) const
+{
+    Display & display = Display::Get();
+    const Sprite & mons32 = AGG::GetICN(ICN::MONS32, unit.GetSpriteIndex(), revert);
+
+    // background
+    display.FillRect(0x33, 0x33, 0x33, pos);
+    // mons32 sprite
+    mons32.Blit(pos.x + (pos.w - mons32.w()) / 2, pos.y + pos.h - mons32.h() - (mons32.h() + 3 < pos.h ? 3 : 0), display);
+
+    // window
+    if(current)
+	sf_color[0].Blit(pos.x + 1, pos.y + 1, display);
+    else
+    if(unit.Modes(Battle::TR_MOVED))
+	sf_color[1].Blit(pos.x + 1, pos.y + 1, display);
+    else
+	sf_color[2].Blit(pos.x + 1, pos.y + 1, display);
+
+    // number
+    Text number(GetString(unit.GetCount()), Font::SMALL);
+    number.Blit(pos.x + 2, pos.y + 2);
+}
+
+void Battle::ArmiesOrder::Redraw(const Unit* current)
+{
+    if(orders)
+    {
+	const u16 ow = ARMYORDERW + 2;
+
+	u16 ox = area.x + (area.w - ow * std::count_if(orders->begin(), orders->end(),
+						std::mem_fun(&Unit::isValid))) / 2;
+	u16 oy = area.y;
+
+	Rect::x = ox;
+	Rect::y = oy;
+	Rect::h = ow;
+
+	rects.clear();
+
+	for(Units::const_iterator
+	    it = orders->begin(); it != orders->end(); ++it)
+	if(*it && (*it)->isValid() && (! (*it)->Modes(TR_SKIPMOVE) || (*it)->Modes(TR_HARDSKIP)))
+	{
+	    rects.push_back(UnitPos(*it, Rect(ox, oy, ow, ow)));
+	    RedrawUnit(rects.back().second, **it, (**it).GetColor() == army_color2, current == *it);
+	    ox += ow;
+	    Rect::w += ow;
+	}
+
+	if(Settings::Get().ExtBattleReverseWaitOrder())
+	{
+	    for(Units::const_iterator
+		it = orders->begin(); it != orders->end(); ++it)
+	    if(*it && (*it)->isValid() && (*it)->Modes(TR_SKIPMOVE) && ! (*it)->Modes(TR_HARDSKIP))
+	    {
+		rects.push_back(UnitPos(*it, Rect(ox, oy, ow, ow)));
+		RedrawUnit(rects.back().second, **it, (**it).GetColor() == army_color2, current == *it);
+		ox += ow;
+		Rect::w += ow;
+	    }
+	}
+	else
+	{
+	    for(Units::const_reverse_iterator
+		it = orders->rbegin(); it != orders->rend(); ++it)
+	    if(*it && (*it)->isValid() && (*it)->Modes(TR_SKIPMOVE) && ! (*it)->Modes(TR_HARDSKIP))
+	    {
+		rects.push_back(UnitPos(*it, Rect(ox, oy, ow, ow)));
+		RedrawUnit(rects.back().second, **it, (**it).GetColor() == army_color2, current == *it);
+		ox += ow;
+		Rect::w += ow;
+	    }
+	}
+    }
+}
+
+
 Battle::Interface::Interface(Arena & a, s32 center) : arena(a), icn_cbkg(ICN::UNKNOWN), icn_frng(ICN::UNKNOWN),
     humanturn_spell(Spell::NONE), humanturn_exit(true), humanturn_redraw(true), animation_frame(0), catapult_frame(0),
     b_current(NULL), b_move(NULL), b_fly(NULL), b_current_sprite(NULL), b_current_alpha(255), index_pos(-1), teleport_src(-1),
@@ -676,14 +794,6 @@ Battle::Interface::Interface(Arena & a, s32 center) : arena(a), icn_cbkg(ICN::UN
     opponent1 = arena.GetCommander1() ? new OpponentSprite(area, arena.GetCommander1(), false) : NULL;
     opponent2 = arena.GetCommander2() ? new OpponentSprite(area, arena.GetCommander2(), true) : NULL;
 
-    sf_color[0].Set(ARMYORDERW, ARMYORDERW);
-    sf_color[1].Set(ARMYORDERW, ARMYORDERW);
-    sf_color[2].Set(ARMYORDERW, ARMYORDERW);
-
-    Cursor::DrawCursor(sf_color[0], 0xDA, true); // yellow
-    Cursor::DrawCursor(sf_color[1], 0xD6, true); // orange
-    Cursor::DrawCursor(sf_color[2], 0xDE, true); // green
-
     if(Arena::GetCastle())
         main_tower = Rect(area.x + 570, area.y + 145, 70, 70);
 }
@@ -693,6 +803,11 @@ Battle::Interface::~Interface()
     if(listlog) delete listlog;
     if(opponent1) delete opponent1;
     if(opponent2) delete opponent2;
+}
+
+void Battle::Interface::SetArmiesOrder(const Units* units)
+{
+     armies_order.Set(border.GetArea(), units, arena.GetArmyColor2());
 }
 
 const Rect & Battle::Interface::GetArea(void) const
@@ -723,8 +838,7 @@ void Battle::Interface::Redraw(void)
     if(castle) RedrawCastle3(*castle);
     RedrawArmies();
     RedrawInterface();
-    if(! Settings::Get().QVGA() &&
-	arena.GetOrderArmies()) RedrawOrderArmies(*arena.GetOrderArmies());
+    if(! Settings::Get().QVGA()) armies_order.Redraw(b_current);
     RedrawBorder();
     if(Settings::Get().QVGA()) RedrawPocketControls();
 }
@@ -746,50 +860,6 @@ void Battle::Interface::RedrawInterface(void)
 
     if(listlog && listlog->isOpenLog())
 	listlog->Redraw();
-}
-
-void Battle::Interface::RedrawOrderArmies(const Units & units) const
-{
-    Display & display = Display::Get();
-    const Rect & topleft = border.GetArea();
-    const u16 ow = ARMYORDERW + 2;
-    Text number;
-
-    u16 ox = topleft.x + (topleft.w - ow * std::count_if(units.begin(), units.end(),
-							std::mem_fun(&Unit::isValid))) / 2;
-    u16 oy = topleft.y;
-
-    for(Units::const_iterator
-	it = units.begin(); it != units.end(); ++it)
-    if(*it && (*it)->isValid())
-    {
-	const Unit & unit = **it;
-	const Sprite & mons32 = AGG::GetICN(ICN::MONS32, unit.GetSpriteIndex(), unit.GetColor() == arena.GetArmyColor2());
-
-	// background
-	display.FillRect(0x33, 0x33, 0x33, Rect(ox, oy, ow, ow));
-	// mons32 sprite
-	mons32.Blit(ox + (ow - mons32.w()) / 2, oy + ow - mons32.h() - (mons32.h() + 3 < ow ? 3 : 0), display);
-
-	// window
-	const Surface* sf = NULL;
-
-	if(b_current == *it)
-	    sf = & sf_color[0];
-	else
-	if(unit.Modes(TR_MOVED))
-	    sf = & sf_color[1];
-	else
-	    sf = & sf_color[2];
-
-	if(sf) sf->Blit(ox + 1, oy + 1, display);
-
-	// number
-	number.Set(GetString(unit.GetCount()), Font::SMALL);
-	number.Blit(ox + 2, oy + 2);
-
-	ox += ow;
-    }
 }
 
 void Battle::Interface::RedrawArmies(void) const
@@ -1634,6 +1704,12 @@ void Battle::Interface::HumanBattleTurn(const Unit & b, Actions & a, std::string
 
 	    Dialog::Message(_("Ballista"), msg, Font::BIG, le.MousePressRight() ? 0 : Dialog::OK);
 	}
+    }
+    else
+    if(le.MouseCursor(armies_order))
+    {
+	cursor.SetThemes(Cursor::POINTER);
+	armies_order.QueueEventProcessing(msg);
     }
     else
     if(le.MouseCursor(btn_auto))

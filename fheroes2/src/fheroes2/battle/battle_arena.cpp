@@ -187,7 +187,7 @@ Battle::Tower* Battle::Arena::GetTower(u8 type)
 }
 
 Battle::Arena::Arena(Army & a1, Army & a2, s32 index, bool local) :
-	army1(NULL), army2(NULL), armies(NULL), castle(NULL), current_color(0), catapult(NULL),
+	army1(NULL), army2(NULL), armies_order(NULL), castle(NULL), current_color(0), catapult(NULL),
 	bridge(NULL), interface(NULL), icn_covr(ICN::UNKNOWN), current_turn(0), auto_battle(0), end_turn(false)
 {
     const Settings & conf = Settings::Get();
@@ -223,7 +223,10 @@ Battle::Arena::Arena(Army & a1, Army & a2, s32 index, bool local) :
 	if(conf.Sound())
 	    AGG::PlaySound(M82::PREBATTL);
 
-	armies = new Units();
+	armies_order = new Units();
+	armies_order->reserve(25);
+	Force::GetCurrentUnit(*army1, *army2, NULL, armies_order, true);
+	interface->SetArmiesOrder(armies_order);
     }
 
 
@@ -312,7 +315,7 @@ Battle::Arena::~Arena()
 
     if(catapult) delete catapult;
     if(interface) delete interface;
-    if(armies) delete armies;
+    if(armies_order) delete armies_order;
 }
 
 void Battle::Arena::TurnTroop(Unit* current_troop)
@@ -401,11 +404,12 @@ void Battle::Arena::Turns(void)
 
     bool tower_moved = false;
     bool catapult_moved = false;
+    //Force::GetCurrentUnit(*army1, *army2, NULL, armies, true);
 
     Unit* current_troop = NULL;
 
     while(BattleValid() &&
-	NULL != (current_troop = Force::GetCurrentUnit(*army1, *army2, current_troop, armies, true)))
+	NULL != (current_troop = Force::GetCurrentUnit(*army1, *army2, current_troop, NULL, true)))
     {
 	current_color = current_troop->GetArmyColor();
 
@@ -438,11 +442,12 @@ void Battle::Arena::Turns(void)
     }
 
     current_troop = NULL;
+    //Force::GetCurrentUnit(*army1, *army2, NULL, armies, false);
 
     // can skip move ?
     if(Settings::Get().ExtBattleSoftWait())
     while(BattleValid() &&
-	NULL != (current_troop = Force::GetCurrentUnit(*army1, *army2, current_troop, armies, false)))
+	NULL != (current_troop = Force::GetCurrentUnit(*army1, *army2, current_troop, NULL, false)))
     {
 	current_color = current_troop->GetArmyColor();
 
@@ -1119,11 +1124,6 @@ u16 Battle::Arena::GetCurrentTurn(void) const
 Battle::Result & Battle::Arena::GetResult(void)
 {
     return result_game;
-}
-
-const Battle::Units* Battle::Arena::GetOrderArmies(void) const
-{
-    return armies;
 }
 
 bool Battle::Arena::CanBreakAutoBattle(void) const
