@@ -225,7 +225,6 @@ Battle::Arena::Arena(Army & a1, Army & a2, s32 index, bool local) :
 
 	armies_order = new Units();
 	armies_order->reserve(25);
-	Force::GetCurrentUnit(*army1, *army2, NULL, armies_order, true);
 	interface->SetArmiesOrder(armies_order);
     }
 
@@ -404,9 +403,11 @@ void Battle::Arena::Turns(void)
 
     bool tower_moved = false;
     bool catapult_moved = false;
-    //Force::GetCurrentUnit(*army1, *army2, NULL, armies, true);
 
     Unit* current_troop = NULL;
+
+    // rescan orders
+    Force::GetCurrentUnit(*army1, *army2, NULL, armies_order, true);
 
     while(BattleValid() &&
 	NULL != (current_troop = Force::GetCurrentUnit(*army1, *army2, current_troop, NULL, true)))
@@ -442,7 +443,6 @@ void Battle::Arena::Turns(void)
     }
 
     current_troop = NULL;
-    //Force::GetCurrentUnit(*army1, *army2, NULL, armies, false);
 
     // can skip move ?
     if(Settings::Get().ExtBattleSoftWait())
