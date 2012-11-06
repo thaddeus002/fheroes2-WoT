@@ -407,7 +407,7 @@ std::string Battle::Unit::GetShotString(void) const
 std::string Battle::Unit::GetSpeedString(void) const
 {
     std::ostringstream os;
-    os << Speed::String(Monster::GetSpeed()) << " (" << static_cast<int>(Monster::GetSpeed()) << ")";
+    os << Speed::String(GetSpeed()) << " (" << static_cast<int>(GetSpeed()) << ")";
     return os.str();
 }
 
