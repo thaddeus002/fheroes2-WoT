@@ -238,14 +238,14 @@ void AI::BattleTurn(Arena & arena, const Unit & b, Actions & a)
     if(b.isArchers() && !b.isHandFighting())
     {
 	enemy = arena.GetEnemyMaxQuality(b.GetColor());
-	BattleMagicTurn(arena, b, a, enemy);
+	if(BattleMagicTurn(arena, b, a, enemy)) return; /* repeat turn: correct spell ability */
 	attack = true;
     }
     else
     if(b.isHandFighting())
     {
 	enemy = AIGetEnemyAbroadMaxQuality(b);
-	BattleMagicTurn(arena, b, a, enemy);
+	if(BattleMagicTurn(arena, b, a, enemy)) return; /* repeat turn: correct spell ability */
 	attack = true;
     }
     else
@@ -259,6 +259,8 @@ void AI::BattleTurn(Arena & arena, const Unit & b, Actions & a)
 	}
 	else
 	{
+	    if(BattleMagicTurn(arena, b, a, NULL)) return; /* repeat turn: correct spell ability */
+
 	    // set quality position from enemy
 	    board->SetPositionQuality(b);
 
@@ -275,13 +277,12 @@ void AI::BattleTurn(Arena & arena, const Unit & b, Actions & a)
 	    if(b.isFly())
 	    {
 		enemy = AIGetEnemyAbroadMaxQuality(move, b.GetColor());
-		BattleMagicTurn(arena, b, a, enemy);
+		if(BattleMagicTurn(arena, b, a, enemy)) return; /* repeat turn: correct spell ability */
 	    	a.push_back(Battle::Command(MSG_BATTLE_MOVE, b.GetUID(), move));
 		attack = true;
 	    }
 	    else
 	    {
-		BattleMagicTurn(arena, b, a, NULL);
 		Position dst = Position::GetCorrect(b, move);
 		Indexes path = arena.GetPath(b, dst);
 
@@ -320,7 +321,6 @@ void AI::BattleTurn(Arena & arena, const Unit & b, Actions & a)
 		    if(! enemy)
 			enemy = AIGetEnemyAbroadMaxQuality(path.back(), b.GetColor());
 
-		    BattleMagicTurn(arena, b, a, enemy);
 	    	    a.push_back(Battle::Command(MSG_BATTLE_MOVE, b.GetUID(), path.back()));
 
 		    // archers move and short attack only
