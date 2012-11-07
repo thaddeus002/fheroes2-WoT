@@ -657,37 +657,12 @@ void Battle::ArmiesOrder::Redraw(const Unit* current)
 
 	for(Units::const_iterator
 	    it = orders->begin(); it != orders->end(); ++it)
-	if(*it && (*it)->isValid() && (! (*it)->Modes(TR_SKIPMOVE) || (*it)->Modes(TR_HARDSKIP)))
+	if(*it && (*it)->isValid())
 	{
 	    rects.push_back(UnitPos(*it, Rect(ox, oy, ow, ow)));
 	    RedrawUnit(rects.back().second, **it, (**it).GetColor() == army_color2, current == *it);
 	    ox += ow;
 	    Rect::w += ow;
-	}
-
-	if(Settings::Get().ExtBattleReverseWaitOrder())
-	{
-	    for(Units::const_iterator
-		it = orders->begin(); it != orders->end(); ++it)
-	    if(*it && (*it)->isValid() && (*it)->Modes(TR_SKIPMOVE) && ! (*it)->Modes(TR_HARDSKIP))
-	    {
-		rects.push_back(UnitPos(*it, Rect(ox, oy, ow, ow)));
-		RedrawUnit(rects.back().second, **it, (**it).GetColor() == army_color2, current == *it);
-		ox += ow;
-		Rect::w += ow;
-	    }
-	}
-	else
-	{
-	    for(Units::const_reverse_iterator
-		it = orders->rbegin(); it != orders->rend(); ++it)
-	    if(*it && (*it)->isValid() && (*it)->Modes(TR_SKIPMOVE) && ! (*it)->Modes(TR_HARDSKIP))
-	    {
-		rects.push_back(UnitPos(*it, Rect(ox, oy, ow, ow)));
-		RedrawUnit(rects.back().second, **it, (**it).GetColor() == army_color2, current == *it);
-		ox += ow;
-		Rect::w += ow;
-	    }
 	}
     }
 }

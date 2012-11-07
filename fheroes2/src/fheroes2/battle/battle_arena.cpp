@@ -357,6 +357,9 @@ void Battle::Arena::TurnTroop(Unit* current_troop)
 	    ApplyAction(actions.front().GetStream());
 	    actions.pop_front();
 
+	    // rescan orders
+	    if(armies_order) Force::UpdateOrderUnits(*army1, *army2, *armies_order);
+
     	    // check end battle
     	    if(! BattleValid())
 		end_turn = true;
@@ -407,10 +410,10 @@ void Battle::Arena::Turns(void)
     Unit* current_troop = NULL;
 
     // rescan orders
-    Force::GetCurrentUnit(*army1, *army2, NULL, armies_order, true);
+    if(armies_order) Force::UpdateOrderUnits(*army1, *army2, *armies_order);
 
     while(BattleValid() &&
-	NULL != (current_troop = Force::GetCurrentUnit(*army1, *army2, current_troop, NULL, true)))
+	NULL != (current_troop = Force::GetCurrentUnit(*army1, *army2, current_troop, true)))
     {
 	current_color = current_troop->GetArmyColor();
 
@@ -447,7 +450,7 @@ void Battle::Arena::Turns(void)
     // can skip move ?
     if(Settings::Get().ExtBattleSoftWait())
     while(BattleValid() &&
-	NULL != (current_troop = Force::GetCurrentUnit(*army1, *army2, current_troop, NULL, false)))
+	NULL != (current_troop = Force::GetCurrentUnit(*army1, *army2, current_troop, false)))
     {
 	current_color = current_troop->GetArmyColor();
 

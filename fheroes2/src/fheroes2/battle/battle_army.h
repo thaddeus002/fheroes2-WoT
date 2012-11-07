@@ -43,8 +43,8 @@ namespace Battle
 	Unit*		FindMode(u32);
         Unit*		FindUID(u32);
 
-        void		SortSlowest(void);
-        void		SortFastest(void);
+        void		SortSlowest(bool);
+        void		SortFastest(bool);
         void		SortStrongest(void);
         void		SortWeakest(void);
     };
@@ -75,6 +75,8 @@ namespace Battle
     void		SyncArmyCount(void);
 
     static Unit*	GetCurrentUnit(const Force &, const Force &, Unit* last, Units* all, bool part1);
+    static Unit*	GetCurrentUnit(const Force &, const Force &, Unit* last, bool part1);
+    static void		UpdateOrderUnits(const Force &, const Force &, Units &);
 
     private:
 	Army &		army;

@@ -32,55 +32,48 @@
 
 namespace Battle
 {
-    bool AllowPart1(const Unit* b)
+    bool AllowPart1(const Unit* b, bool f)
     {
-        return ! b->Modes(TR_SKIPMOVE) && Speed::STANDING < b->GetSpeed();
+        return (f ? ! b->Modes(TR_SKIPMOVE) || b->Modes(TR_HARDSKIP) : ! b->Modes(TR_SKIPMOVE)) &&
+	    Speed::STANDING != b->GetSpeed(f);
     }
 
-    bool AllowPart2(const Unit* b)
+    bool AllowPart2(const Unit* b, bool f)
     {
-        return b->Modes(TR_SKIPMOVE) && Speed::STANDING < b->GetSpeed();
+        return (f ? b->Modes(TR_SKIPMOVE) && ! b->Modes(TR_HARDSKIP) : b->Modes(TR_SKIPMOVE)) &&
+	    Speed::STANDING != b->GetSpeed(f);
     }
 
-    Unit* ForceGetCurrentUnitPart(Units & units1, Units & units2, bool part1, bool units1_first)
+    Unit* ForceGetCurrentUnitPart(Units & units1, Units & units2, bool part1, bool units1_first, bool orders_mode)
     {
-	Units::iterator it1 = part1 ? std::find_if(units1.begin(), units1.end(), AllowPart1) :
-                                    std::find_if(units1.begin(), units1.end(), AllowPart2);
-
-	Units::iterator it2 = part1 ? std::find_if(units2.begin(), units2.end(), AllowPart1) :
-                                    std::find_if(units2.begin(), units2.end(), AllowPart2);
-
+	Units::iterator it1 = part1 ? std::find_if(units1.begin(), units1.end(), std::bind2nd(std::ptr_fun(&AllowPart1), orders_mode)) :
+                                    std::find_if(units1.begin(), units1.end(), std::bind2nd(std::ptr_fun(&AllowPart2), orders_mode));
+	Units::iterator it2 = part1 ? std::find_if(units2.begin(), units2.end(), std::bind2nd(std::ptr_fun(&AllowPart1), orders_mode)) :
+                                    std::find_if(units2.begin(), units2.end(), std::bind2nd(std::ptr_fun(&AllowPart2), orders_mode));
 	Unit* result = NULL;
 
 	if(it1 != units1.end() &&
     	    it2 != units2.end())
 	{
-	    if((*it1)->GetSpeed() == (*it2)->GetSpeed())
+	    if((*it1)->GetSpeed(orders_mode) == (*it2)->GetSpeed(orders_mode))
 	    {
-        	if(units1_first)
-        	{
-            	    result = *it1;
-        	}
-        	else
-        	{
-            	    result = *it2;
-        	}
+        	result = units1_first ? *it1 : *it2;
 	    }
 	    else
 	    if(part1 || Settings::Get().ExtBattleReverseWaitOrder())
 	    {
-    		if((*it1)->GetSpeed() > (*it2)->GetSpeed())
+    		if((*it1)->GetSpeed(orders_mode) > (*it2)->GetSpeed(orders_mode))
         	    result = *it1;
     		else
-    		if((*it2)->GetSpeed() > (*it1)->GetSpeed())
+    		if((*it2)->GetSpeed(orders_mode) > (*it1)->GetSpeed(orders_mode))
         	    result = *it2;
     	    }
 	    else
     	    {
-    		if((*it1)->GetSpeed() < (*it2)->GetSpeed())
+    		if((*it1)->GetSpeed(orders_mode) < (*it2)->GetSpeed(orders_mode))
         	    result = *it1;
     		else
-    		if((*it2)->GetSpeed() < (*it1)->GetSpeed())
+    		if((*it2)->GetSpeed(orders_mode) < (*it1)->GetSpeed(orders_mode))
         	    result = *it2;
     	    }
 	}
@@ -91,7 +84,7 @@ namespace Battle
 	if(it2 != units2.end())
     	    result = *it2;
 
-	if(result)
+	if(result && orders_mode)
 	{
 	    if(result == *it1)
 		units1.erase(it1);
@@ -138,14 +131,42 @@ Battle::Units & Battle::Units::operator= (const Units & units)
     return *this;
 }
 
-void Battle::Units::SortSlowest(void)
+struct FastestUnits
 {
-    std::sort(begin(), end(), Army::SlowestTroop);
+    bool f;
+
+    FastestUnits(bool v) : f(v){}
+
+    bool operator() (const Battle::Unit* t1, const Battle::Unit* t2)
+    {
+	return t1->GetSpeed(f) > t2->GetSpeed(f);
+    }
+};
+
+struct SlowestUnits
+{
+    bool f;
+
+    SlowestUnits(bool v) : f(v){}
+
+    bool operator() (const Battle::Unit* t1, const Battle::Unit* t2)
+    {
+	return t1->GetSpeed(f) < t2->GetSpeed(f);
+    }
+};
+
+void Battle::Units::SortSlowest(bool f)
+{
+    SlowestUnits CompareFunc(f);
+
+    std::sort(begin(), end(), CompareFunc);
 }
 
-void Battle::Units::SortFastest(void)
+void Battle::Units::SortFastest(bool f)
 {
-    std::sort(begin(), end(), Army::FastestTroop);
+    FastestUnits CompareFunc(f);
+
+    std::sort(begin(), end(), CompareFunc);
 }
 
 void Battle::Units::SortStrongest(void)
@@ -273,41 +294,66 @@ void Battle::Force::NewTurn(void)
     std::for_each(begin(), end(), std::mem_fun(&Unit::NewTurn));
 }
 
+bool isUnitFirst(const Battle::Unit* last, bool part1, u8 army2_color)
+{
+    return (!last && part1) || (last && army2_color == last->GetColor());
+}
 
-Battle::Unit* Battle::Force::GetCurrentUnit(const Force & army1, const Force & army2, Unit* last, Units* all, bool part1)
+void Battle::Force::UpdateOrderUnits(const Force & army1, const Force & army2, Units & orders)
+{
+    orders.clear();
+    Unit* last = NULL;
+
+    if(1)
+    {
+	Units units1(army1, true);
+	Units units2(army2, true);
+
+	units1.SortFastest(true);
+	units2.SortFastest(true);
+
+	while(NULL != (last = ForceGetCurrentUnitPart(units1, units2, true, isUnitFirst(last, true, army2.GetColor()), true)))
+	    orders.push_back(last);
+    }
+
+    if(Settings::Get().ExtBattleSoftWait())
+    {
+	Units units1(army1, true);
+	Units units2(army2, true);
+
+	if(Settings::Get().ExtBattleReverseWaitOrder())
+	{
+	    units1.SortFastest(true);
+	    units2.SortFastest(true);
+	}
+	else
+	{
+    	    units1.SortSlowest(true);
+    	    units2.SortSlowest(true);
+	}
+
+	while(NULL != (last = ForceGetCurrentUnitPart(units1, units2, false, isUnitFirst(last, false, army2.GetColor()), true)))
+	    orders.push_back(last);
+    }
+}
+
+Battle::Unit* Battle::Force::GetCurrentUnit(const Force & army1, const Force & army2, Unit* last, bool part1)
 {
     Units units1(army1, true);
     Units units2(army2, true);
 
     if(part1 || Settings::Get().ExtBattleReverseWaitOrder())
     {
-        units1.SortFastest();
-        units2.SortFastest();
+	units1.SortFastest(false);
+    	units2.SortFastest(false);
     }
     else
     {
-        units1.SortSlowest();
-        units2.SortSlowest();
+    	units1.SortSlowest(false);
+    	units2.SortSlowest(false);
     }
 
-    bool units1_first = (!last && part1) || (last && army2.GetColor() == last->GetColor());
-    Unit* result = ForceGetCurrentUnitPart(units1, units2, part1, units1_first);
-
-    if(all && result)
-    {
-	last = result;
-
-	all->clear();
-	all->push_back(last);
-
-	units1_first = (!last && part1) || (last && army2.GetColor() == last->GetColor());
-
-	while(NULL != (last = ForceGetCurrentUnitPart(units1, units2, part1, units1_first)))
-	{
-	    all->push_back(last);
-	    units1_first = (!last && part1) || (last && army2.GetColor() == last->GetColor());
-	}
-    }
+    Unit* result = ForceGetCurrentUnitPart(units1, units2, part1, isUnitFirst(last, part1, army2.GetColor()), false);
 
     return result &&
         result->isValid() &&
