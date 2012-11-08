@@ -69,7 +69,11 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
         AGG::ICNRegistryEnable(true);
 
     AGG::ResetMixer();
-    bool local = (CONTROL_HUMAN & army1.GetControl()) || (CONTROL_HUMAN & army2.GetControl()) || IS_DEBUG(DBG_BATTLE, DBG_TRACE);
+    bool local = (CONTROL_HUMAN & army1.GetControl()) || (CONTROL_HUMAN & army2.GetControl());
+
+#ifdef DEBUG
+    if(IS_DEBUG(DBG_BATTLE, DBG_TRACE)) local = true;
+#endif
 
     Arena arena(army1, army2, mapsindex, local);
 
