@@ -63,15 +63,15 @@ namespace AGG
 	const FAT & Fat(const std::string & key);
 	u16 CountItems(void);
 
-	bool Read(const std::string & key, std::vector<u8> & body);
+	const std::vector<u8> & Read(const std::string & key);
 
     private:
 	std::string filename;
 	std::map<std::string, FAT> fat;
 	u16 count_items;
 	std::ifstream* stream;
-	std::string last_key;
-	std::vector<u8> last_body;
+	std::string key;
+	std::vector<u8> body;
     };
 
     struct icn_cache_t
@@ -153,7 +153,8 @@ namespace AGG
     private:
 	Cache();
 
-	bool ReadChunk(const std::string & key, std::vector<u8> & body);
+	const std::vector<u8> & ReadICNChunk(const ICN::icn_t, const u32);
+	const std::vector<u8> & ReadChunk(const std::string &);
 
 	bool LoadExtICN(const ICN::icn_t, const u32, bool);
 	bool LoadAltICN(const ICN::icn_t, const u32, bool);

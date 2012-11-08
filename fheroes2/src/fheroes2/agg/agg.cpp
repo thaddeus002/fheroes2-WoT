@@ -55,6 +55,10 @@ bool AGG::File::Open(const std::string & fname)
 	return false;
     }
 
+    stream->seekg(0, std::ios_base::end);
+    const u32 size = stream->tellg();
+    stream->seekg(0, std::ios_base::beg);
+
     stream->read(reinterpret_cast<char *>(&count_items), sizeof(u16));
     SwapLE16(count_items);
 
@@ -65,26 +69,33 @@ bool AGG::File::Open(const std::string & fname)
 
     for(u16 ii = 0; ii < count_items; ++ii)
     {
-            const u32 pos = stream->tellg();
+	if(! stream->good())
+	{
+	    DEBUG(DBG_ENGINE, DBG_WARN, "stream error");
+	    return false;
+	}
 
-            stream->seekg(-FATSIZENAME * (count_items - ii), std::ios_base::end);
-            stream->read(buf, FATSIZENAME);
+        const u32 pos = stream->tellg();
 
-            const std::string key(buf);
+        stream->seekg(size - FATSIZENAME * (count_items - ii), std::ios_base::beg);
+        stream->read(buf, FATSIZENAME);
 
-            FAT & f = fat[key];
+        const std::string key(buf);
+
+        FAT & f = fat[key];
 		
-            stream->seekg(pos, std::ios_base::beg);
+        stream->seekg(pos, std::ios_base::beg);
 
-            stream->read(reinterpret_cast<char *>(&f.crc), sizeof(u32));
-            SwapLE32(f.crc);
+        stream->read(reinterpret_cast<char *>(&f.crc), sizeof(u32));
+        SwapLE32(f.crc);
 
-            stream->read(reinterpret_cast<char *>(&f.offset), sizeof(u32));
-            SwapLE32(f.offset);
+        stream->read(reinterpret_cast<char *>(&f.offset), sizeof(u32));
+        SwapLE32(f.offset);
 
-            stream->read(reinterpret_cast<char *>(&f.size), sizeof(u32));
-            SwapLE32(f.size);
+        stream->read(reinterpret_cast<char *>(&f.size), sizeof(u32));
+        SwapLE32(f.size);
     }
+
     return true;
 }
 
@@ -130,29 +141,31 @@ std::string AGG::FAT::Info(void) const
 }
 
 /* read element to body */
-bool AGG::File::Read(const std::string & key, std::vector<u8> & body)
+const std::vector<u8> & AGG::File::Read(const std::string & str)
 {
-    const FAT & f = fat[key];
-
-    if(f.size)
+    if(key != str)
     {
-	if(last_key != key)
+	std::map<std::string, FAT>::const_iterator it = fat.find(str);
+
+	if(it != fat.end())
 	{
-	    DEBUG(DBG_ENGINE, DBG_TRACE, key << ":\t" << f.Info());
+	    const FAT & f = (*it).second;
+	    key = str;
+	    body.resize(f.size);
 
-	    last_key = key;
-	    last_body.resize(f.size);
+	    if(f.size)
+	    {
+		DEBUG(DBG_ENGINE, DBG_TRACE, key << ":\t" << f.Info());
 
-	    stream->seekg(f.offset, std::ios_base::beg);
-	    stream->read(reinterpret_cast<char*>(&last_body[0]), f.size);
+		stream->seekg(f.offset, std::ios_base::beg);
+		stream->read(reinterpret_cast<char*>(&body[0]), f.size);
+	    }
 	}
-
-	body = last_body;
-
-	return true;
+	else
+	if(body.size()) body.clear();
     }
 
-    return false;
+    return body;
 }
 
 /* AGG::Cache constructor */
@@ -267,11 +280,15 @@ bool AGG::Cache::ReadDataDir(void)
     return heroes2_agg.isGood();
 }
 
-bool AGG::Cache::ReadChunk(const std::string & key, std::vector<u8> & body)
+const std::vector<u8> & AGG::Cache::ReadChunk(const std::string & key)
 {
-    if(heroes2x_agg.isGood() && heroes2x_agg.Read(key, body)) return true;
+    if(heroes2x_agg.isGood())
+    {
+	const std::vector<u8> & buf = heroes2x_agg.Read(key);
+	if(buf.size()) return buf;
+    }
 
-    return heroes2_agg.isGood() && heroes2_agg.Read(key, body);
+    return heroes2_agg.Read(key);
 }
 
 /* load manual ICN object */
@@ -729,21 +746,24 @@ void AGG::Cache::SaveICN(const ICN::icn_t icn)
 #endif
 }
 
+const std::vector<u8> & AGG::Cache::ReadICNChunk(const ICN::icn_t icn, const u32 index)
+{
+    // hard fix artifact "ultimate stuff" sprite for loyalty version
+    if(ICN::ARTIFACT == icn &&
+	Artifact(Artifact::ULTIMATE_STAFF).IndexSprite64() == index && heroes2x_agg.isGood())
+    {
+	return heroes2x_agg.Read(ICN::GetString(icn));
+    }
+
+    return ReadChunk(ICN::GetString(icn));
+}
+
 bool AGG::Cache::LoadOrgICN(Sprite & sp, const ICN::icn_t icn, const u32 index, bool reflect)
 {
-    std::vector<u8> body;
+    const std::vector<u8> & body = ReadICNChunk(icn, index);
 
-    if(ReadChunk(ICN::GetString(icn), body))
+    if(body.size())
     {
-	// hard fix artifact "ultimate stuff" sprite for loyalty version
-	if(Settings::Get().PriceLoyaltyVersion() &&
-	    ICN::ARTIFACT == icn &&
-	    Artifact(Artifact::ULTIMATE_STAFF).IndexSprite64() == index)
-	{
-	    body.clear();
-	    heroes2_agg.Read(ICN::GetString(icn), body);
-	}
-
 	// loading original
 	DEBUG(DBG_ENGINE, DBG_TRACE, ICN::GetString(icn) << ", " << index);
 
@@ -776,12 +796,16 @@ bool AGG::Cache::LoadOrgICN(const ICN::icn_t icn, const u32 index, bool reflect)
 
     if(NULL == v.sprites)
     {
-	std::vector<u8> body;
-	ReadChunk(ICN::GetString(icn), body);
+	const std::vector<u8> & body = ReadChunk(ICN::GetString(icn));
 
-	v.count = ReadLE16(&body[0]);
-	v.sprites = new Sprite [v.count];
-	v.reflect = new Sprite [v.count];
+	if(body.size())
+	{
+	    v.count = ReadLE16(&body[0]);
+	    v.sprites = new Sprite [v.count];
+	    v.reflect = new Sprite [v.count];
+	}
+	else
+	    return false;
     }
 
     Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
@@ -878,9 +902,9 @@ bool AGG::Cache::LoadAltTIL(const TIL::til_t til, u32 max)
 
 bool AGG::Cache::LoadOrgTIL(const TIL::til_t til, u32 max)
 {
-    std::vector<u8> body;
+    const std::vector<u8> & body = ReadChunk(TIL::GetString(til));
 
-    if(ReadChunk(TIL::GetString(til), body))
+    if(body.size())
     {
 	const u16 count = ReadLE16(&body.at(0));
 	const u16 width = ReadLE16(&body.at(2));
@@ -976,11 +1000,12 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
 #endif
 
     DEBUG(DBG_ENGINE, DBG_INFO, M82::GetString(m82));
-    std::vector<u8> body;
+    
+    const std::vector<u8> & body = ReadChunk(M82::GetString(m82));
 
-#ifdef WITH_MIXER
-    if(ReadChunk(M82::GetString(m82), body))
+    if(body.size())
     {
+#ifdef WITH_MIXER
 	// create WAV format
 	v.resize(body.size() + 44);
 
@@ -999,35 +1024,34 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
 	WriteLE32(&v[40], body.size());		// size
 
 	std::copy(body.begin(), body.end(), &v[44]);
-    }
 #else
-    Audio::Spec wav_spec;
-    wav_spec.format = AUDIO_U8;
-    wav_spec.channels = 1;
-    wav_spec.freq = 22050;
+	Audio::Spec wav_spec;
+	wav_spec.format = AUDIO_U8;
+	wav_spec.channels = 1;
+	wav_spec.freq = 22050;
 
-    const Audio::Spec & hardware = Audio::GetHardwareSpec();
+	const Audio::Spec & hardware = Audio::GetHardwareSpec();
 
-    Audio::CVT cvt;
+	Audio::CVT cvt;
 
-    if(cvt.Build(wav_spec, hardware) &&
-       ReadChunk(M82::GetString(m82), body))
-    {
-	const u32 size = cvt.len_mult * body.size();
+	if(cvt.Build(wav_spec, hardware))
+	{
+	    const u32 size = cvt.len_mult * body.size();
 
-	cvt.buf = new u8[size];
-	cvt.len = body.size();
+	    cvt.buf = new u8[size];
+	    cvt.len = body.size();
 
-	memcpy(cvt.buf, &body[0], body.size());
+	    memcpy(cvt.buf, &body[0], body.size());
 
-	cvt.Convert();
+	    cvt.Convert();
 
-	v.assign(cvt.buf, cvt.buf + size - 1);
+	    v.assign(cvt.buf, cvt.buf + size - 1);
 
-	delete [] cvt.buf;
-	cvt.buf = NULL;
-    }
+	    delete [] cvt.buf;
+	    cvt.buf = NULL;
+	}
 #endif
+    }
 }
 
 /* load XMI object to AGG::Cache */
@@ -1035,27 +1059,29 @@ void AGG::Cache::LoadMID(const XMI::xmi_t xmi)
 {
     std::vector<u8> & v = mid_cache[xmi];
 
-    if(v.size()) return;
-
-    DEBUG(DBG_ENGINE, DBG_INFO, XMI::GetString(xmi));
-
-    if(! Mixer::isValid()) return;
-
-    std::vector<u8> body;
-
-    if(ReadChunk(XMI::GetString(xmi), body))
+    if(v.empty())
     {
-	MIDI::Xmi x;
-	MIDI::Mid m;
-	MIDI::MTrk track;
+	DEBUG(DBG_ENGINE, DBG_INFO, XMI::GetString(xmi));
 
-	x.Read(body);
-	track.ImportXmiEVNT(x.EVNT());
+	if(Mixer::isValid())
+	{
+	    const std::vector<u8> & body = ReadChunk(XMI::GetString(xmi));
 
-	m.AddTrack(track);
-	m.SetPPQN(64);
+	    if(body.size())
+	    {
+		MIDI::Xmi x;
+		MIDI::Mid m;
+		MIDI::MTrk track;
 
-	m.Write(v);
+		x.Read(body);
+		track.ImportXmiEVNT(x.EVNT());
+
+		m.AddTrack(track);
+		m.SetPPQN(64);
+
+		m.Write(v);
+	    }
+	}
     }
 }
 
