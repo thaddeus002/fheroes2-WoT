@@ -162,7 +162,11 @@ const std::vector<u8> & AGG::File::Read(const std::string & str)
 	    }
 	}
 	else
-	if(body.size()) body.clear();
+	if(body.size())
+	{
+	    body.clear();
+	    key.clear();
+	}
     }
 
     return body;
