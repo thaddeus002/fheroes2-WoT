@@ -256,31 +256,26 @@ void LoadZLogo(void)
     if(Settings::Get().ExtGameShowSDL())
     {
 	Display & display = Display::Get();
+    	ZSurface zlogo;
 
-    	ZSurface* zlogo = new ZSurface();
-	if(zlogo->Load(_ptr_0806f690.width, _ptr_0806f690.height, _ptr_0806f690.bpp, _ptr_0806f690.pitch,
+	if(zlogo.Load(_ptr_0806f690.width, _ptr_0806f690.height, _ptr_0806f690.bpp, _ptr_0806f690.pitch,
     		_ptr_0806f690.rmask, _ptr_0806f690.gmask, _ptr_0806f690.bmask, _ptr_0806f690.amask, _ptr_0806f690.zdata, sizeof(_ptr_0806f690.zdata)))
 	{
-	    Surface* logo = zlogo;
-
 	    // scale logo
 	    if(Settings::Get().QVGA())
 	    {
-    		Surface* small = new Surface();
-		Surface::ScaleMinifyByTwo(*small, *zlogo);
-		delete zlogo;
-		zlogo = NULL;
-		logo = small;
+		Surface small = Surface::ScaleMinifyByTwo(zlogo);
+		Surface::Swap(zlogo, small);
 	    }
 
-	    const u32 black = logo->MapRGB(0, 0, 0);
-	    const Point offset((display.w() - logo->w()) / 2, (display.h() - logo->h()) / 2);
+	    const u32 black = zlogo.MapRGB(0, 0, 0);
+	    const Point offset((display.w() - zlogo.w()) / 2, (display.h() - zlogo.h()) / 2);
 
 	    u8 ii = 0;
 
 	    while(ii < 250)
 	    {
-		logo->Blit(ii, offset.x, offset.y, display);
+		zlogo.Blit(ii, offset.x, offset.y, display);
 		display.Flip();
 		display.Fill(black);
 		ii += 10;
@@ -290,13 +285,12 @@ void LoadZLogo(void)
 
 	    while(ii > 0)
 	    {
-		logo->Blit(ii, offset.x, offset.y, display);
+		zlogo.Blit(ii, offset.x, offset.y, display);
 		display.Flip();
 		display.Fill(black);
 		ii -= 10;
 	    }
 	}
-	if(zlogo) delete zlogo;
     }
 #endif
 #endif
