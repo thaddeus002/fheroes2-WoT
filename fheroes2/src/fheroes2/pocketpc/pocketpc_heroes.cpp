@@ -59,9 +59,9 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
 
     // name
     std::string message = _("%{name} the %{race} ( Level %{level} )");
-    String::Replace(message, "%{name}", hero.GetName());
-    String::Replace(message, "%{race}", Race::String(hero.GetRace()));
-    String::Replace(message, "%{level}", hero.GetLevel());
+    StringReplace(message, "%{name}", hero.GetName());
+    StringReplace(message, "%{race}", Race::String(hero.GetRace()));
+    StringReplace(message, "%{level}", hero.GetLevel());
     Text text(message, Font::SMALL);
     text.Blit(dst_rt.x + 73, dst_rt.y + 1);
 

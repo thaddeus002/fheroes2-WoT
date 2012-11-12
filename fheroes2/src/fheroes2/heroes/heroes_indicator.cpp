@@ -192,8 +192,8 @@ ExperienceIndicator::ExperienceIndicator(const Heroes & h) : HeroesIndicator(h)
     area.h = 36;
 
     descriptions = _("Current experience %{exp1} Next level %{exp2}.");
-    String::Replace(descriptions, "%{exp1}", hero.GetExperience());
-    String::Replace(descriptions, "%{exp2}", hero.GetExperienceFromLevel(hero.GetLevelFromExperience(hero.GetExperience())));
+    StringReplace(descriptions, "%{exp1}", hero.GetExperience());
+    StringReplace(descriptions, "%{exp2}", hero.GetExperienceFromLevel(hero.GetLevelFromExperience(hero.GetExperience())));
 }
 
 void ExperienceIndicator::Redraw(void)
@@ -212,7 +212,7 @@ void ExperienceIndicator::QueueEventProcessing(void)
     if(le.MouseClickLeft(area) || le.MousePressRight(area))
     {
 	std::string message = _("Level %{level}");
-	String::Replace(message, "%{level}", hero.GetLevel());
+	StringReplace(message, "%{level}", hero.GetLevel());
 	Dialog::Message(message, descriptions, Font::BIG, (le.MousePressRight() ? 0 : Dialog::OK));
     }
 }
@@ -223,9 +223,9 @@ SpellPointsIndicator::SpellPointsIndicator(const Heroes & h) : HeroesIndicator(h
     area.h = 36;
 
     descriptions = _("%{name} currently has %{point} spell points out of a maximum of %{max}. The maximum number of spell points is 10 times your knowledge. It is occasionally possible to have more than your maximum spell points via special events.");
-    String::Replace(descriptions, "%{name}", hero.GetName());
-    String::Replace(descriptions, "%{point}", hero.GetSpellPoints());
-    String::Replace(descriptions, "%{max}", hero.GetMaxSpellPoints());
+    StringReplace(descriptions, "%{name}", hero.GetName());
+    StringReplace(descriptions, "%{point}", hero.GetSpellPoints());
+    StringReplace(descriptions, "%{max}", hero.GetMaxSpellPoints());
 }
 
 void SpellPointsIndicator::Redraw(void)

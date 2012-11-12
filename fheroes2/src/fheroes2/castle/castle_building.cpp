@@ -38,10 +38,7 @@ Rect CastleGetMaxArea(const Castle &, const Point &);
 
 void CastleDialog::RedrawBuildingSpriteToArea(const Sprite & sprite, s16 dst_x, s16 dst_y, const Rect & max)
 {
-    Rect src;
-
-    ToolsSrcRectFixed(src, dst_x, dst_y, sprite.w(), sprite.h(), max);
-    sprite.Blit(src, dst_x, dst_y);
+    sprite.Blit(Rect::Fixed(dst_x, dst_y, sprite.w(), sprite.h(), max), dst_x, dst_y);
 }
 
 CastleDialog::CacheBuildings::CacheBuildings(const Castle & castle, const Point & top)

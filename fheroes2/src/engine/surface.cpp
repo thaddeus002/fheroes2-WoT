@@ -27,7 +27,6 @@
 #include <cstring>
 #include <memory>
 #include "surface.h"
-#include "palette.h"
 #include "error.h"
 #include "localevent.h"
 #include "palette_h2.h"
@@ -221,17 +220,35 @@ Surface::Surface(SDL_Surface* sf) : surface(NULL)
     Set(sf);
 }
 
+Surface::Surface(const std::string & file) : surface(NULL)
+{
+    Load(file);
+}
+
+Surface Surface::RefCopy(const Surface & bs)
+{
+    Surface res;
+
+    res.surface = bs.surface;
+    if(res.surface) res.surface->refcount += 1;
+
+    return res;
+}
+
 Surface::~Surface()
 {
-    if(! isDisplay())
-	FreeSurface(*this);
+    if(! isDisplay()) FreeSurface(*this);
+}
+
+bool Surface::isDisplay(void) const
+{
+    return false;
 }
 
 /* operator = */
 Surface & Surface::operator= (const Surface & bs)
 {
     Set(bs);
-
     return *this;
 }
 
@@ -267,16 +284,20 @@ void Surface::Set(SDL_Surface* sf)
     surface = sf ? sf : NULL;
 }
 
-void Surface::Set(const Surface & bs)
+void Surface::Set(const Surface & bs) /* copy surface */
 {
     FreeSurface(*this);
 
     if(bs.isValid())
     {
-	surface = SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags);
+	if(8 == bs.depth())
+	    Set(bs.surface->pixels, bs.w(), bs.h(), 1, false);
+	else
+	    surface = SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags);
 
 	if(!surface)
 	    Error::Except(__FUNCTION__, SDL_GetError());
+
     }
 }
 
@@ -337,11 +358,6 @@ void Surface::CreateSurface(u16 sw, u16 sh, u8 bpp, bool amask0)
 bool Surface::isValid(void) const
 {
     return surface;
-}
-
-bool Surface::isDisplay(void) const
-{
-    return false;
 }
 
 bool Surface::Load(const char* fn)
@@ -679,7 +695,7 @@ void Surface::BlitSurface(const Surface & sf1, SDL_Rect* srt, Surface & sf2, SDL
 
         if(srt != &rt1)
 	{
-            Rect tmp = Rect::Get(Rect(*srt), Rect(rt1), true);
+            Rect tmp = Rect::Get(Rect::Get(*srt), Rect::Get(rt1), true);
 
 	    srt->x = tmp.x;
 	    srt->y = tmp.y;
@@ -689,7 +705,7 @@ void Surface::BlitSurface(const Surface & sf1, SDL_Rect* srt, Surface & sf2, SDL
 
         if(drt != &rt2)
 	{
-            Rect tmp = Rect::Get(Rect(*drt), Rect(rt2), true);
+            Rect tmp = Rect::Get(Rect::Get(*drt), Rect::Get(rt2), true);
 
 	    drt->x = tmp.x;
 	    drt->y = tmp.y;
@@ -871,8 +887,13 @@ void Surface::FreeSurface(Surface & sf)
 {
     if(sf.surface)
     {
-	SDLFreeSurface(sf.surface);
-	sf.surface = NULL;
+	if(1 < sf.surface->refcount)
+	    --sf.surface->refcount;
+	else
+	{
+	    SDLFreeSurface(sf.surface);
+	    sf.surface = NULL;
+	}
     }
 }
 
@@ -1004,9 +1025,9 @@ void Surface::DrawLine(u16 x1, u16 y1, u16 x2, u16 y2, u32 c)
     Unlock();
 }
 
-void Surface::MakeStencil(Surface & dst, const Surface & src, u32 col)
+Surface Surface::Stencil(const Surface & src, u32 col)
 {
-    dst.Set(src.surface->w, src.surface->h, false);
+    Surface dst(src.surface->w, src.surface->h, false);
     const u32 clkey = src.GetColorKey();
     u8 r, g, b, a;
 
@@ -1034,16 +1055,15 @@ void Surface::MakeStencil(Surface & dst, const Surface & src, u32 col)
 
     dst.Unlock();
     src.Unlock();
+
+    return dst;
 }
 
-void Surface::MakeContour(Surface & dst, const Surface & src, u32 col)
+Surface Surface::Contour(const Surface & src, u32 col)
 {
-    dst.Set(src.surface->w + 2, src.surface->h + 2, false);
-
-    Surface trf;
-    u32 fake = src.MapRGB(0x00, 0xFF, 0xFF);
-
-    MakeStencil(trf, src, fake);
+    const u32 fake = src.MapRGB(0x00, 0xFF, 0xFF);
+    Surface dst(src.surface->w + 2, src.surface->h + 2, false);
+    Surface trf = Stencil(src, fake);
     const u32 clkey = trf.GetColorKey();
 
     trf.Lock();
@@ -1072,10 +1092,14 @@ void Surface::MakeContour(Surface & dst, const Surface & src, u32 col)
 
     trf.Unlock();
     dst.Unlock();
+
+    return dst;
 }
 
-void Surface::Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape)
+Surface Surface::Reflect(const Surface & sf_src, const u8 shape)
 {
+    Surface sf_dst;
+
     if(sf_src.isValid())
     {
 	sf_dst.Set(sf_src);
@@ -1116,10 +1140,14 @@ void Surface::Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape)
     }
     else
 	std::cerr << __FUNCTION__ << "incorrect param" << std::endl;
+
+    return sf_dst;
 }
 
-void Surface::Rotate(Surface & sf_dst, const Surface & sf_src, u8 parm)
+Surface Surface::Rotate(const Surface & sf_src, u8 parm)
 {
+    Surface sf_dst;
+
     if(sf_src.isValid())
     {
 	// 90 CW or 90 CCW
@@ -1142,10 +1170,12 @@ void Surface::Rotate(Surface & sf_dst, const Surface & sf_src, u8 parm)
 	}
 	else
 	if(parm == 3)
-	    Reflect(sf_dst, sf_src, 3);
+	    sf_dst = Reflect(sf_src, 3);
     }
     else
 	std::cerr << __FUNCTION__ << "incorrect param" << std::endl;
+
+    return sf_dst;
 }
 
 u32 Surface::GetMemoryUsage(void) const
@@ -1205,35 +1235,42 @@ u32 AVERAGE(SDL_PixelFormat* fm, u32 c1, u32 c2)
 }
 
 /* scale surface */
-void Surface::ScaleMinifyByTwo(Surface & sf_dst, const Surface & sf_src, bool event)
+Surface Surface::ScaleMinifyByTwo(const Surface & sf_src, bool event)
 {
-    if(!sf_src.isValid()) { std::cerr << __FUNCTION__ << "invalid surface" << std::endl; return; };
-    u16 x, y, x2, y2;
+    Surface sf_dst;
+    const u8 mul = 2;
 
-    u8 mul = 2;
-    u16 w = sf_src.w() / mul;
-    u16 h = sf_src.h() / mul;
-
-    if(2 > w || 2 > h){ std::cerr << __FUNCTION__ << "small size" << std::endl; return; };
-
-    sf_dst.Set(w, h, sf_src.depth(), sf_src.amask());
-
-    sf_dst.Lock();
-    sf_src.Lock();
-    for(y = 0; y < h; y++)
+    if(sf_src.isValid() && 4 < sf_src.w() && 4 < sf_src.h())
     {
-       y2 = mul * y;
-       for(x = 0; x < w; x++)
-       {
-	    x2 = mul * x;
-	    const u32 & p = AVERAGE(sf_src.surface->format, sf_src.GetPixel(x2, y2), sf_src.GetPixel(x2 + 1, y2));
-	    const u32 & q = AVERAGE(sf_src.surface->format, sf_src.GetPixel(x2, y2 + 1), sf_src.GetPixel(x2 + 1, y2 + 1));
-	    sf_dst.SetPixel(x, y, AVERAGE(sf_src.surface->format, p, q));
-	    if(event) LocalEvent::Get().HandleEvents(false);
-       }
+	u16 x, y, x2, y2;
+
+	u16 w = sf_src.w() / mul;
+	u16 h = sf_src.h() / mul;
+
+	sf_dst.Set(w, h, sf_src.depth(), sf_src.amask());
+
+	sf_dst.Lock();
+	sf_src.Lock();
+
+	for(y = 0; y < h; y++)
+	{
+    	    y2 = mul * y;
+	    for(x = 0; x < w; x++)
+    	    {
+		x2 = mul * x;
+		const u32 & p = AVERAGE(sf_src.surface->format, sf_src.GetPixel(x2, y2), sf_src.GetPixel(x2 + 1, y2));
+		const u32 & q = AVERAGE(sf_src.surface->format, sf_src.GetPixel(x2, y2 + 1), sf_src.GetPixel(x2 + 1, y2 + 1));
+		sf_dst.SetPixel(x, y, AVERAGE(sf_src.surface->format, p, q));
+		if(event) LocalEvent::Get().HandleEvents(false);
+    	    }
+	}
+	sf_src.Unlock();
+	sf_dst.Unlock();
     }
-    sf_src.Unlock();
-    sf_dst.Unlock();
+    else
+	std::cerr << __FUNCTION__ << "invalid surface" << std::endl;
+
+    return sf_dst;
 }
 
 void Surface::Swap(Surface & sf1, Surface & sf2)

@@ -126,7 +126,7 @@ void Game::MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct)
 void Game::DialogPlayers(u8 color, std::string str)
 {
     const Player* player = Settings::Get().GetPlayers().Get(color);
-    String::Replace(str, "%{color}", (player ? player->name : Color::String(color)));
+    StringReplace(str, "%{color}", (player ? player->name : Color::String(color)));
 
     const Sprite & border = AGG::GetICN(ICN::BRCREST, 6);
 
@@ -1078,7 +1078,7 @@ bool Game::DiggingForArtifacts(Heroes & hero)
 	    const Artifact & ultimate = world.GetUltimateArtifact().GetArtifact();
 	    hero.PickupArtifact(ultimate);
 	    std::string msg(_("After spending many hours digging here, you have uncovered the %{artifact}"));
-	    String::Replace(msg, "%{artifact}", ultimate.GetName());
+	    StringReplace(msg, "%{artifact}", ultimate.GetName());
 	    Dialog::ArtifactInfo(_("Congratulations!"), msg, ultimate());
 	}
 	else
@@ -1533,7 +1533,7 @@ void Game::NewWeekDialog(void)
     std::string message = world.BeginMonth() ? _("Astrologers proclaim Month of the %{name}.") : _("Astrologers proclaim Week of the %{name}.");
     AGG::PlayMusic(world.BeginMonth() ?
 	(week.GetType() == Week::MONSTERS ? MUS::MONTH2 : MUS::WEEK2_MONTH1) : MUS::WEEK1, false);
-    String::Replace(message, "%{name}", week.GetName());
+    StringReplace(message, "%{name}", week.GetName());
     message += "\n \n";
 
     if(week.GetType() == Week::MONSTERS)
@@ -1549,8 +1549,8 @@ void Game::NewWeekDialog(void)
 										"After regular growth, population of %{monter} increase on %{count} percent!", count);
 	    else
 		message += ngettext("%{monster} population increases by +%{count}.", "%{monster} population increases by +%{count}.", count);
-	    String::Replace(message, "%{monster}", monster.GetMultiName());
-	    String::Replace(message, "%{count}", count);
+	    StringReplace(message, "%{monster}", monster.GetMultiName());
+	    StringReplace(message, "%{count}", count);
 	    message += "\n";
 	}
     }
@@ -1599,7 +1599,7 @@ void Game::ShowWarningLostTowns(menu_t & ret)
     if(Game::GetLostTownDays() >= myKingdom.GetLostTownDays())
     {
 	    std::string str = _("%{color} player, you only have %{day} days left to capture a town, or you will be banished from this land.");
-	    String::Replace(str, "%{day}", myKingdom.GetLostTownDays());
+	    StringReplace(str, "%{day}", myKingdom.GetLostTownDays());
 	    DialogPlayers(myKingdom.GetColor(), str);
     }
 }

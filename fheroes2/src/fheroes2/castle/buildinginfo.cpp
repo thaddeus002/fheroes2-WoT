@@ -257,8 +257,8 @@ BuildingInfo::BuildingInfo(const Castle & c, building_t b) : castle(c), building
     if(IsDwelling())
     {
 	description = _("The %{building} produces %{monster}.");
-        String::Replace(description, "%{building}", Castle::GetStringBuilding(building, castle.GetRace()));
-        String::Replace(description, "%{monster}", String::Lower(Monster(castle.GetRace(), building).GetMultiName()));
+        StringReplace(description, "%{building}", Castle::GetStringBuilding(building, castle.GetRace()));
+        StringReplace(description, "%{monster}", StringLower(Monster(castle.GetRace(), building).GetMultiName()));
     }
     else
     	description = Castle::GetDescriptionBuilding(building, castle.GetRace());
@@ -266,11 +266,11 @@ BuildingInfo::BuildingInfo(const Castle & c, building_t b) : castle(c), building
     switch(building)
     {
 	case BUILD_WELL:
-    	    String::Replace(description, "%{count}", Castle::GetGrownWell());
+    	    StringReplace(description, "%{count}", Castle::GetGrownWell());
 	    break;
 
 	case BUILD_WEL2:
-    	    String::Replace(description, "%{count}", Castle::GetGrownWel2());
+    	    StringReplace(description, "%{count}", Castle::GetGrownWel2());
 	    break;
 
 	case BUILD_CASTLE:
@@ -278,7 +278,7 @@ BuildingInfo::BuildingInfo(const Castle & c, building_t b) : castle(c), building
 	case BUILD_SPEC:
 	{
 	    const payment_t profit = ProfitConditions::FromBuilding(building, castle.GetRace());
-	    String::Replace(description, "%{count}", profit.gold);
+	    StringReplace(description, "%{count}", profit.gold);
 	    break;
 	}
 
@@ -626,7 +626,7 @@ std::string BuildingInfo::GetConditionDescription(void) const
 	    if(building == BUILD_SHIPYARD)
 	    {
 		res = _("Cannot build %{name} because castle is too far from water.");
-		String::Replace(res, "%{name}", Castle::GetStringBuilding(BUILD_SHIPYARD, castle.GetRace()));
+		StringReplace(res, "%{name}", Castle::GetStringBuilding(BUILD_SHIPYARD, castle.GetRace()));
 	    }
 	    else
 		res = "disable build.";
@@ -634,22 +634,22 @@ std::string BuildingInfo::GetConditionDescription(void) const
 
 	case LACK_RESOURCES:
 	    res = _("Cannot afford %{name}");
-    	    String::Replace(res, "%{name}", GetName());
+    	    StringReplace(res, "%{name}", GetName());
 	    break;
 
 	case ALREADY_BUILT:
 	    res = _("%{name} is already built");
-	    String::Replace(res, "%{name}", GetName());
+	    StringReplace(res, "%{name}", GetName());
 	    break;
 
 	case REQUIRES_BUILD:
     	    res = _("Cannot build %{name}");
-    	    String::Replace(res, "%{name}", GetName());
+    	    StringReplace(res, "%{name}", GetName());
 	    break;
 
 	case ALLOW_BUILD:
     	    res = _("Build %{name}");
-    	    String::Replace(res, "%{name}", GetName());
+    	    StringReplace(res, "%{name}", GetName());
 	    break;
 
 	default: break;

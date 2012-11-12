@@ -74,8 +74,8 @@ std::string ShowGuardiansInfo(const Maps::Tiles & tile, u8 scoute)
 	str.append("\n");
 	str.append(_("guarded by %{count} of %{monster}"));
 
-	String::Replace(str, "%{monster}", String::Lower(troop.GetMultiName()));
-	String::Replace(str, "%{count}", Game::CountScoute(troop.GetCount(), scoute));
+	StringReplace(str, "%{monster}", StringLower(troop.GetMultiName()));
+	StringReplace(str, "%{count}", Game::CountScoute(troop.GetCount(), scoute));
     }
 
     return str;
@@ -89,8 +89,8 @@ std::string ShowMonsterInfo(const Maps::Tiles & tile, u8 scoute)
     if(scoute)
     {
         str = "%{count} %{monster}";
-	String::Replace(str, "%{count}", Game::CountScoute(troop.GetCount(), scoute));
-	String::Replace(str, "%{monster}", String::Lower(troop.GetMultiName()));
+	StringReplace(str, "%{count}", Game::CountScoute(troop.GetCount(), scoute));
+	StringReplace(str, "%{monster}", StringLower(troop.GetMultiName()));
     }
     else
 	str = Army::TroopSizeString(troop);
@@ -145,7 +145,7 @@ std::string ShowDwellingInfo(const Maps::Tiles & tile, u8 scoute)
 	if(troop.isValid())
 	{
 	    str.append(_("(available: %{count})"));
-	    String::Replace(str, "%{count}", Game::CountScoute(troop.GetCount(), scoute));
+	    StringReplace(str, "%{count}", Game::CountScoute(troop.GetCount(), scoute));
 	}
 	else
 	    str.append("(empty)");
@@ -292,7 +292,7 @@ std::string ShowGroundInfo(const Maps::Tiles & tile, bool show, const Heroes* he
 	    {
 		str.append("\n");
 		str.append(_("penalty: %{cost}"));
-		String::Replace(str, "%{cost}", cost);
+		StringReplace(str, "%{cost}", cost);
 	    }
 	}
     }
@@ -758,8 +758,8 @@ void Dialog::QuickInfo(const Heroes & hero)
     if(hero.isFriends(conf.CurrentColor()))
     {
 	message = _("%{name} ( Level %{level} )");
-	String::Replace(message, "%{name}", hero.GetName());
-	String::Replace(message, "%{level}", hero.GetLevel());
+	StringReplace(message, "%{name}", hero.GetName());
+	StringReplace(message, "%{level}", hero.GetLevel());
     }
     else
 	message = hero.GetName();

@@ -34,7 +34,7 @@
 #include "tools.h"
 
 /* trim left right space */
-std::string String::Trim(std::string str)
+std::string StringTrim(std::string str)
 {
     std::string::iterator iter;
 
@@ -52,14 +52,14 @@ std::string String::Trim(std::string str)
 }
 
 /* convert to lower case */
-std::string String::Lower(std::string str)
+std::string StringLower(std::string str)
 {
     std::transform(str.begin(), str.end(), str.begin(), ::tolower);
     return str;
 }
 
 /* convert to upper case */
-std::string String::Upper(std::string str)
+std::string StringUpper(std::string str)
 {
     std::transform(str.begin(), str.end(), str.begin(), ::toupper);
     return str;
@@ -73,12 +73,35 @@ std::string GetString(int value)
     return stream.str();
 }
 
-void String::AddInt(std::string &str, int value)
+std::string GetString(double value, u8 prec)
 {
-    str += GetString(value);
+    std::ostringstream stream;
+    stream << std::setprecision(prec) << value;
+    return stream.str();
 }
 
-int String::ToInt(const std::string & str)
+std::string GetString(const Point & pt)
+{
+    std::ostringstream os;
+    os << "point: x(" << pt.x << "), y(" << pt.y << ")";
+    return os.str();
+}
+
+std::string GetString(const Size & sz)
+{
+    std::ostringstream os;
+    os << "size: w(" << sz.w << "), h(" << sz.h << ")";
+    return os.str();
+}
+
+std::string GetString(const Rect & rt)
+{
+    std::ostringstream os;
+    os << "rect: x(" << rt.x << "), y(" << rt.y << "), w(" << rt.w << "), h(" << rt.h << ")";
+    return os.str();
+}
+
+int GetInt(const std::string & str)
 {
     int res = 0;
 
@@ -105,7 +128,7 @@ int String::ToInt(const std::string & str)
     else
     // str
     {
-        std::string lower = String::Lower(str);
+        std::string lower = StringLower(str);
 
         if(lower == "on")       return 1;
         else
@@ -131,31 +154,19 @@ int String::ToInt(const std::string & str)
     return res;
 }
 
-void String::Replace(std::string & dst, const char* pred, const char* src)
+void StringReplace(std::string & dst, const char* pred, const std::string & src)
 {
     size_t pos = std::string::npos;
 
     while(std::string::npos != (pos = dst.find(pred))) dst.replace(pos, std::strlen(pred), src);
 }
 
-void String::Replace(std::string & dst, const char* pred, const std::string & src)
+void StringReplace(std::string & dst, const char* pred, int value)
 {
-    size_t pos = std::string::npos;
-
-    while(std::string::npos != (pos = dst.find(pred))) dst.replace(pos, std::strlen(pred), src);
+    StringReplace(dst, pred, GetString(value));
 }
 
-void String::Replace(std::string & dst, const char* pred, int value)
-{
-    if(std::string::npos != dst.find(pred))
-    {
-	std::ostringstream stream;
-	stream << value;
-	Replace(dst, pred, stream.str());
-    }
-}
-
-std::string String::InsertString(const std::string & src, size_t pos, const char* c)
+std::string InsertString(const std::string & src, size_t pos, const char* c)
 {
     std::string res = src;
 
@@ -167,15 +178,8 @@ std::string String::InsertString(const std::string & src, size_t pos, const char
     return res;
 }
 
-std::string String::Double(double value, u8 prec)
-{
-    std::ostringstream stream;
-    stream << std::setprecision(prec) << value;
-    return stream.str();
-}
-
 // from SDL_ttf
-std::vector<u16> String::UTF8_to_UNICODE(const std::string & utf8)
+std::vector<u16> StringUTF8_to_UNICODE(const std::string & utf8)
 {
     std::vector<u16> unicode;
     unicode.reserve(utf8.size());
@@ -224,7 +228,7 @@ std::vector<u16> String::UTF8_to_UNICODE(const std::string & utf8)
     return unicode;
 }
 
-std::string UNICODE_to_UTF8(const std::vector<u16> & unicode)
+std::string StringUNICODE_to_UTF8(const std::vector<u16> & unicode)
 {
     std::string utf8;
     utf8.reserve(2 * unicode.size());
@@ -342,7 +346,7 @@ char CharFromKeySym(KeySym sym, u16 mod)
     return 0;
 }
 
-size_t String::InsertKeySym(std::string & res, size_t pos, KeySym sym, u16 mod)
+size_t InsertKeySym(std::string & res, size_t pos, KeySym sym, u16 mod)
 {
     switch(sym)
     {
@@ -377,7 +381,7 @@ size_t String::InsertKeySym(std::string & res, size_t pos, KeySym sym, u16 mod)
     return pos;
 }
 
-std::string String::GetTime(void)
+std::string GetTime(void)
 {
     time_t raw;
     struct tm* tmi;
@@ -626,37 +630,6 @@ bool PressIntKey(u32 min, u32 max, u32 & result)
         return true;
     }
     return false;
-}
-
-void ToolsSrcRectFixed(Rect & src, s16 & rx, s16 & ry, const u16 rw, const u16 rh, const Rect & max)
-{
-    src = Rect(0, 0, 0, 0);
-
-    if(0 != rw && 0 != rh &&
-        rx + rw > max.x && ry + rh > max.y &&
-        rx < max.x + max.w && ry < max.y + max.h)
-    {
-        src.w = rw;
-        src.h = rh;
-
-        if(rx < max.x)
-        {
-            src.x = max.x - rx;
-            rx = max.x;
-        }
-
-        if(ry < max.y)
-        {
-            src.y = max.y - ry;
-            ry = max.y;
-        }
-
-        if(rx + rw > max.x + max.w)
-            src.w = max.x + max.w - rx;
-
-        if(ry + rh > max.y + max.h)
-            src.h = max.y + max.h - ry;
-    }
 }
 
 #ifdef WITH_ICONV

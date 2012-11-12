@@ -131,14 +131,14 @@ std::string Battle::Tower::GetInfo(const Castle & cstl)
     	    Tower twr = Tower(cstl, *it);
 
     	    msg.append(tmpl);
-    	    String::Replace(msg, "%{name}", twr.GetName());
-    	    String::Replace(msg, "%{count}", twr.GetCount());
+    	    StringReplace(msg, "%{name}", twr.GetName());
+    	    StringReplace(msg, "%{count}", twr.GetCount());
 
 	    if(twr.GetBonus())
 	    {
 		msg.append(", ");
 		msg.append(addn);
-    		String::Replace(msg, "%{attack}", twr.GetBonus());
+    		StringReplace(msg, "%{attack}", twr.GetBonus());
 	    }
 	    else
 		msg.append(".");

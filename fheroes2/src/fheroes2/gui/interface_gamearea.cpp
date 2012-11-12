@@ -61,16 +61,9 @@ const Rect & Interface::GameArea::GetRectMaps(void) const
 { return rectMaps; }
 
 /* fixed src rect image */
-void Interface::GameArea::SrcRectFixed(Rect & src, Point & dst, const u16 rw, const u16 rh)
+Rect Interface::GameArea::RectFixed(Point & dst, const u16 rw, const u16 rh)
 {
-    const Rect & areaPosition = Interface::GameArea::Get().GetArea();
-    ToolsSrcRectFixed(src, dst.x, dst.y, rw, rh, areaPosition);
-}
-
-void Interface::GameArea::SrcRectFixed(Rect & src, s16 & dst_x, s16 & dst_y, const u16 rw, const u16 rh)
-{
-    const Rect & areaPosition = Interface::GameArea::Get().GetArea();
-    ToolsSrcRectFixed(src, dst_x, dst_y, rw, rh, areaPosition);
+    return Rect::Fixed(dst.x, dst.y, rw, rh, Get().GetArea());
 }
 
 void Interface::GameArea::Build(void)
@@ -144,9 +137,7 @@ void Interface::GameArea::BlitOnTile(Surface & dst, const Surface & src, const s
 
     if(areaPosition & Rect(dstpt, src.w(), src.h()))
     {
-	Rect srcrt;
-	SrcRectFixed(srcrt, dstpt, src.w(), src.h());
-	src.Blit(srcrt, dstpt, dst);
+	src.Blit(Rect::Fixed(dstpt.x, dstpt.y, src.w(), src.h(), areaPosition), dstpt, dst);
     }
 }
 
@@ -472,8 +463,7 @@ void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const s32 index, S
 
 	if(Settings::Get().QVGA())
 	{
-    	    Surface sf2;
-    	    Surface::ScaleMinifyByTwo(sf2, sf);
+    	    Surface sf2 = Surface::ScaleMinifyByTwo(sf);
     	    Surface::Swap(sf2, sf);
 	}
 

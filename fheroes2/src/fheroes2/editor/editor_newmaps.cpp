@@ -115,28 +115,28 @@ Game::menu_t Game::Editor::NewMaps(void)
 	if(le.MousePressRight(buttonSmall)) 
 	{
 	    std::string str = _("Create a map that is %{size} squares wide by %{size} squares high.");
-	    String::Replace(str, "%{size}", Maps::SMALL);
+	    StringReplace(str, "%{size}", Maps::SMALL);
 	    Dialog::Message("", str, Font::BIG);
 	}
 	else
 	if(le.MousePressRight(buttonMedium))
 	{
 	    std::string str = _("Create a map that is %{size} squares wide by %{size} squares high.");
-	    String::Replace(str, "%{size}", Maps::MEDIUM);
+	    StringReplace(str, "%{size}", Maps::MEDIUM);
 	    Dialog::Message("", str, Font::BIG);
 	}
 	else
 	if(le.MousePressRight(buttonLarge))
 	{
 	    std::string str = _("Create a map that is %{size} squares wide by %{size} squares high.");
-	    String::Replace(str, "%{size}", Maps::LARGE);
+	    StringReplace(str, "%{size}", Maps::LARGE);
 	    Dialog::Message("", str, Font::BIG);
 	}
 	else
 	if(le.MousePressRight(buttonXLarge))
 	{
 	    std::string str = _("Create a map that is %{size} squares wide by %{size} squares high.");
-	    String::Replace(str, "%{size}", Maps::XLARGE);
+	    StringReplace(str, "%{size}", Maps::XLARGE);
 	    Dialog::Message("", str, Font::BIG);
 	}
 	else

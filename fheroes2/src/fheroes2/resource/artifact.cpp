@@ -317,12 +317,12 @@ std::string Artifact::GetDescription(void) const
     u16 count = ExtraValue();
     std::string str = GetPluralDescription(*this, count);
 
-    String::Replace(str, "%{name}", GetName());
+    StringReplace(str, "%{name}", GetName());
 
     if(id == Artifact::SPELL_SCROLL)
-        String::Replace(str, "%{spell}", Spell(ext).GetName());
+        StringReplace(str, "%{spell}", Spell(ext).GetName());
     else
-        String::Replace(str, "%{count}", count);
+        StringReplace(str, "%{count}", count);
 
     return str;
 }
@@ -881,14 +881,14 @@ bool ArtifactsBar::ActionBarDoubleClick(const Point & cursor, Artifact & art, co
             u16 answer = 0;
             std::string msg = _("Do you want to use your knowledge of magical secrets to transcribe the %{spell} Scroll into your spell book?\nThe Scroll will be consumed.\n Spell point: %{sp}");
 
-            String::Replace(msg, "%{spell}", spell.GetName());
-            String::Replace(msg, "%{sp}", spell.SpellPoint());
+            StringReplace(msg, "%{spell}", spell.GetName());
+            StringReplace(msg, "%{sp}", spell.SpellPoint());
 
 	    if(spell.MovePoint())
             {
         	msg.append("\n");
                 msg.append("Move point: %{mp}");
-                String::Replace(msg, "%{mp}", spell.MovePoint());
+                StringReplace(msg, "%{mp}", spell.MovePoint());
             }
 
             if(cost.GetValidItemsCount())
@@ -952,27 +952,27 @@ bool ArtifactsBar::ActionBarCursor(const Point & cursor, Artifact & art, const R
 	    else
 	    {
         	msg = _("View %{name}");
-        	String::Replace(msg, "%{name}", art.GetName());
+        	StringReplace(msg, "%{name}", art.GetName());
 	    }
         }
         else
         if(! art.isValid())
         {
             msg = _("Move %{name}");
-            String::Replace(msg, "%{name}", art2->GetName());
+            StringReplace(msg, "%{name}", art2->GetName());
         }
         else
         {
             msg = _("Exchange %{name2} with %{name}");
-            String::Replace(msg, "%{name}", art.GetName());
-            String::Replace(msg, "%{name2}", art2->GetName());
+            StringReplace(msg, "%{name}", art.GetName());
+            StringReplace(msg, "%{name2}", art2->GetName());
         }
     }
     else
     if(art.isValid())
     {
         msg = _("Select %{name}");
-        String::Replace(msg, "%{name}", art.GetName());
+        StringReplace(msg, "%{name}", art.GetName());
     }
 
     return false;
@@ -986,13 +986,13 @@ bool ArtifactsBar::ActionBarCursor(const Point & cursor, Artifact & art1, const 
     if(art1.isValid())
     {
 	msg = _("Exchange %{name2} with %{name}");
-        String::Replace(msg, "%{name}", art1.GetName());
-        String::Replace(msg, "%{name2}", art2.GetName());
+        StringReplace(msg, "%{name}", art1.GetName());
+        StringReplace(msg, "%{name2}", art2.GetName());
     }
     else
     {
         msg = _("Move %{name}");
-        String::Replace(msg, "%{name}", art2.GetName());
+        StringReplace(msg, "%{name}", art2.GetName());
     }
 
     return false;

@@ -154,8 +154,8 @@ void AIBattleLose(Heroes &hero, const Battle::Result & res, bool attacker, Color
         if(CONTROL_HUMAN == hero.GetControl())
         {
             std::string msg = _("Hero %{name} also got a %{count} experience.");
-            String::Replace(msg, "%{name}", hero.GetName());
-            String::Replace(msg, "%{count}", exp);
+            StringReplace(msg, "%{name}", hero.GetName());
+            StringReplace(msg, "%{count}", exp);
             Dialog::Message("", msg, Font::BIG, Dialog::OK);
         }
         hero.IncreaseExperience(exp);

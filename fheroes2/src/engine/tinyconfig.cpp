@@ -36,7 +36,7 @@ bool SpaceCompare(char a, char b)
 
 std::string ModifyKey(const std::string & str)
 {
-    std::string key = String::Trim(String::Lower(str));
+    std::string key = StringTrim(StringLower(str));
 
     // remove multiple space
     std::string::iterator it = std::unique(key.begin(), key.end(), SpaceCompare);
@@ -62,7 +62,7 @@ bool TinyConfig::Load(const char* cfile)
     std::string str;
     while(std::getline(fs, str))
     {
-	str = String::Trim(str);
+	str = StringTrim(str);
 	if(str.empty() || str[0] == comment) continue;
 
         size_t pos = str.find(separator);
@@ -71,8 +71,8 @@ bool TinyConfig::Load(const char* cfile)
             std::string left(str.substr(0, pos));
             std::string right(str.substr(pos + 1, str.length() - pos - 1));
 
-	    left = String::Trim(left);
-    	    right = String::Trim(right);
+	    left = StringTrim(left);
+    	    right = StringTrim(right);
 
 	    AddEntry(left, right, false);
         }
@@ -133,7 +133,7 @@ void TinyConfig::AddEntry(const std::string & key, int val, bool uniq)
 int TinyConfig::IntParams(const std::string & key) const
 {
     const_iterator it = find(ModifyKey(key));
-    return it != end() ? String::ToInt(it->second) : 0;
+    return it != end() ? GetInt(it->second) : 0;
 }
 
 std::string TinyConfig::StrParams(const std::string & key) const
@@ -161,7 +161,7 @@ std::list<int> TinyConfig::ListInt(const std::string & key) const
 
     for(const_iterator
 	it = ret.first; it != ret.second; ++it)
-	res.push_back(String::ToInt(it->second));
+	res.push_back(GetInt(it->second));
 
     return res;
 }

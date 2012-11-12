@@ -20,10 +20,15 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <climits>
 #include <algorithm>
 #include <iterator>
 #include <sstream>
 #include "rect.h"
+
+Point::Point() : x(0), y(0)
+{
+}
 
 Point::Point(s16 px, s16 py) : x(px), y(py)
 {
@@ -74,11 +79,8 @@ bool Point::inABC(const Point & pt1, const Point & pt2, const Point & pt3) const
     return ((a >= 0 && b >= 0 && c >= 0) || (a < 0 && b < 0 && c < 0));
 }
 
-std::string Point::String(void) const
+Size::Size() : w(0), h(0)
 {
-    std::ostringstream os;
-    os << "point: x(" << x << "), y(" << y << ")";
-    return os.str();
 }
 
 Size::Size(u16 sw, u16 sh) : w(sw), h(sh)
@@ -104,18 +106,11 @@ bool Size::isEmpty(void) const
     return 0 == w && 0 == h;
 }
 
-std::string Size::String(void) const
+Rect::Rect()
 {
-    std::ostringstream os;
-    os << "size: w(" << w << "), h(" << h << ")";
-    return os.str();
 }
 
 Rect::Rect(s16 rx, s16 ry, u16 rw, u16 rh) : Point(rx, ry), Size(rw, rh)
-{
-}
-
-Rect::Rect(const SDL_Rect & rt) : Point(rt.x, rt.y), Size(rt.w, rt.h)
 {
 }
 
@@ -125,6 +120,23 @@ Rect::Rect(const Point & pt, u16 rw, u16 rh) : Point(pt), Size(rw, rh)
 
 Rect::Rect(const Point & pt, const Size & sz) : Point(pt), Size(sz)
 {
+}
+
+Rect Rect::Get(const SDL_Rect & rt)
+{
+    return Rect(rt.x, rt.y, rt.w, rt.h);
+}
+
+Rect Rect::Get(const Point & pt1, const Point & pt2)
+{
+    Rect res;
+
+    res.x = pt1.x < pt2.x ? pt1.x : pt2.x;
+    res.y = pt1.y < pt2.y ? pt1.y : pt2.y;
+    res.w = (pt1.x < pt2.x ? pt2.x - pt1.x : pt1.x - pt2.x) + 1;
+    res.h = (pt1.y < pt2.y ? pt2.y - pt1.y : pt1.y - pt2.y) + 1;
+
+    return res;
 }
 
 Rect Rect::Get(const Rect & rt1, const Rect & rt2, bool intersect)
@@ -181,23 +193,46 @@ bool Rect::operator& (const Rect & rt) const
     return ! (x > rt.x + rt.w || x + w < rt.x || y > rt.y + rt.h || y + h < rt.y);
 }
 
-Rect Rects::GetRect(void) const
+Rect Points::GetRect(void) const
 {
-    s32 x1 = 32766;
-    s32 y1 = 32766;
-    s32 x2 = -32766;
-    s32 y2 = -32766;
+    Rect res;
 
-    for(const_iterator
-	it = begin(); it != end(); ++it)
+    if(1 < size())
     {
-	if((*it).x < x1) x1 = (*it).x;
-	if((*it).y < y1) y1 = (*it).y;
-	if((*it).x + (*it).w > x2) x2 = (*it).x + (*it).w;
-	if((*it).y + (*it).h > y2) y2 = (*it).y + (*it).h;
+	res = Rect::Get(at(0), at(1));
+
+	for(const_iterator
+	    it = begin() + 2; it != end(); ++it)
+	{
+	    if((*it).x < res.x) res.x = (*it).x;
+	    else
+	    if((*it).x > res.x + res.w) res.w = (*it).x - res.x + 1;
+
+	    if((*it).y < res.y) res.y = (*it).y;
+	    else
+	    if((*it).y > res.y + res.h) res.h = (*it).y - res.y + 1;
+	}
     }
 
-    return Rect(x1, y1, x2 - x1, y2 - y1);
+    return res;
+}
+
+Rect Rects::GetRect(void) const
+{
+    Rect res;
+
+    if(size())
+    {
+	const_iterator it = begin();
+	res = *it;
+
+	++it;
+
+	for(; it != end(); ++it)
+	    res = Rect::Get(*it, res, false);
+    }
+
+    return res;
 }
 
 s32 Rects::GetIndex(const Point & pt) const
@@ -208,9 +243,35 @@ s32 Rects::GetIndex(const Point & pt) const
     return -1;
 }
 
-std::string Rect::String(void) const
+Rect Rect::Fixed(s16 & rx, s16 & ry, u16 rw, u16 rh, const Rect & max)
 {
-    std::ostringstream os;
-    os << "rect: x(" << x << "), y(" << y << "), w(" << w << "), h(" << h << ")";
-    return os.str();
+    Rect res;
+
+    if(rw && rh &&
+        rx + rw > max.x && ry + rh > max.y &&
+        rx < max.x + max.w && ry < max.y + max.h)
+    {
+        res.w = rw;
+        res.h = rh;
+
+        if(rx < max.x)
+        {
+            res.x = max.x - rx;
+            rx = max.x;
+        }
+
+        if(ry < max.y)
+        {
+            res.y = max.y - ry;
+            ry = max.y;
+        }
+
+        if(rx + rw > max.x + max.w)
+            res.w = max.x + max.w - rx;
+
+        if(ry + rh > max.y + max.h)
+            res.h = max.y + max.h - ry;
+    }
+
+    return res;
 }

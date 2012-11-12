@@ -263,7 +263,7 @@ bool Dialog::InputString(const std::string &header, std::string &res)
 	else
 	if(le.KeyPress())
 	{
-	    charInsertPos = String::InsertKeySym(res, charInsertPos, le.KeyValue(), le.KeyMod());
+	    charInsertPos = InsertKeySym(res, charInsertPos, le.KeyValue(), le.KeyMod());
 	    redraw = true;
 	}
 
@@ -272,7 +272,7 @@ bool Dialog::InputString(const std::string &header, std::string &res)
 	    buttonOk.SetDisable(res.empty());
 	    buttonOk.Draw();
 
-	    text.Set(String::InsertString(res, charInsertPos, "_"));
+	    text.Set(InsertString(res, charInsertPos, "_"));
 
 	    if(text.w() < sprite.w() - 24)
 	    {

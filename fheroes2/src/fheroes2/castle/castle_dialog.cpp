@@ -137,7 +137,7 @@ building_t GetCurrentFlash(const Castle & castle, CastleDialog::CacheBuildings &
 	if(! (*it).contour.isValid())
         {
             const Sprite & sprite = GetActualSpriteBuilding(castle, flash);
-    	    Surface::MakeContour((*it).contour, sprite, sprite.GetColorIndex(0xDA));
+    	    (*it).contour.Set(Surface::Contour(sprite, sprite.GetColorIndex(0xDA)));
 	    (*it).contour.SetOffset(sprite.x() - 1, sprite.y() - 1);
 	}
     }
@@ -238,7 +238,7 @@ MeetingButton::MeetingButton(s16 px, s16 py)
 SwapButton::SwapButton(s16 px, s16 py)
 {
     Surface sf2 = GetMeetingSprite();
-    Surface::Rotate(sf, sf2, 1);
+    sf = Surface::Rotate(sf2, 1);
 
     SetPos(px, py);
     SetSize(sf.w(), sf.h());
@@ -274,9 +274,9 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 
     // date string
     msg_date = _("Month: %{month}, Week: %{week}, Day: %{day}");
-    String::Replace(msg_date, "%{month}", world.GetMonth());
-    String::Replace(msg_date, "%{week}", world.GetWeek());
-    String::Replace(msg_date, "%{day}", world.GetDay());
+    StringReplace(msg_date, "%{month}", world.GetMonth());
+    StringReplace(msg_date, "%{week}", world.GetWeek());
+    StringReplace(msg_date, "%{day}", world.GetDay());
 
     // fade
     if(conf.ExtGameUseFade()) display.Fade();

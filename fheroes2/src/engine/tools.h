@@ -26,54 +26,47 @@
 #include "localevent.h"
 #include "types.h"
 
-namespace String
-{
-    std::string Trim(std::string);
-    std::string Lower(std::string);
-    std::string Upper(std::string);
-    void AddInt(std::string &str, int value);
-    int  ToInt(const std::string &str);
-    std::string Double(double, u8);
+std::string		GetString(int);
+std::string		GetString(const Point &);
+std::string		GetString(const Size &);
+std::string		GetString(const Rect &);
+std::string		GetString(double, u8);
+std::string		GetDirname(const std::string &);
+std::string		GetBasename(const std::string &);
+std::string		GetTime(void);
 
-    void Replace(std::string &, const char*, const char*);
-    void Replace(std::string &, const char*, const std::string &);
-    void Replace(std::string &, const char*, int);
+int			GetInt(const std::string &);
+int			Sign(int);
 
-    std::string InsertString(const std::string &, size_t, const char*);
-    size_t InsertKeySym(std::string &, size_t, KeySym, u16 mod = 0);
+std::string		StringTrim(std::string);
+std::string		StringLower(std::string);
+std::string		StringUpper(std::string);
 
-    // from SDL_ttf
-    std::vector<u16> UTF8_to_UNICODE(const std::string &);
-    std::string UNICODE_to_UTF8(const std::vector<u16> &);
+void			StringReplace(std::string &, const char*, const std::string &);
+void			StringReplace(std::string &, const char*, int);
 
-    std::string GetTime(void);
-}
+std::string		EncodeString(const std::string &, const char* charset);
+std::vector<u16>	StringUTF8_to_UNICODE(const std::string &);
+std::string		StringUNICODE_to_UTF8(const std::vector<u16> &);
 
-int	Sign(int);
-KeySym	KeySymFromChar(char);
-char	CharFromKeySym(KeySym, u16 mod = 0);
-bool	PressIntKey(u32 min, u32 max, u32 & result);
+std::string	InsertString(const std::string &, size_t, const char*);
+size_t		InsertKeySym(std::string &, size_t, KeySym, u16 mod = 0);
+KeySym		KeySymFromChar(char);
+char		CharFromKeySym(KeySym, u16 mod = 0);
+bool		PressIntKey(u32 min, u32 max, u32 & result);
 
-std::string GetString(int);
-std::string GetDirname(const std::string &);
-std::string GetBasename(const std::string &);
+u32		GetMemoryUsage(void);
 
-u32 GetMemoryUsage(void);
+bool		SaveMemToFile(const std::vector<u8> &, const std::string &);
+bool		LoadFileToMem(std::vector<u8> &, const std::string &);
 
-bool SaveMemToFile(const std::vector<u8> &, const std::string &);
-bool LoadFileToMem(std::vector<u8> &, const std::string &);
+int		sdl_putenv(const char* name, const char* value, int overwrite);
+char*		sdl_getenv(const char* env);
 
-std::string EncodeString(const std::string & str, const char* charset);
+bool		IsFile(const std::string &, bool writable = false);
+bool		IsDirectory(const std::string &, bool writable = false);
 
-void ToolsSrcRectFixed(Rect &, s16 &, s16 &, const u16, const u16, const Rect &);
-
-int	sdl_putenv(const char* name, const char* value, int overwrite);
-char*	sdl_getenv(const char* env);
-
-bool	IsFile(const std::string &, bool writable = false);
-bool	IsDirectory(const std::string &, bool writable = false);
-
-Points GetLinePoints(const Point & pt1, const Point & pt2, u16 step);
-Points GetArcPoints(const Point & from, const Point & to, const Point & max, u16 step);
+Points		GetLinePoints(const Point & pt1, const Point & pt2, u16 step);
+Points		GetArcPoints(const Point & from, const Point & to, const Point & max, u16 step);
 
 #endif

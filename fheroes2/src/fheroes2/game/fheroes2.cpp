@@ -65,7 +65,7 @@ std::string GetCaption(void)
 bool RunEditor(const char* name)
 {
     const char* feditor2 = "feditor2";
-    return 0 == String::Lower(GetBasename(name)).compare(0, strlen(feditor2), feditor2);
+    return 0 == StringLower(GetBasename(name)).compare(0, strlen(feditor2), feditor2);
 }
 
 int main(int argc, char **argv)
@@ -97,11 +97,11 @@ int main(int argc, char **argv)
 #endif
 #ifndef BUILD_RELEASE
                     case 't':
-			test = String::ToInt(optarg);
+			test = GetInt(optarg);
 			break;
 
                     case 'd':
-                	conf.SetDebug(optarg ? String::ToInt(optarg) : 0);
+                	conf.SetDebug(optarg ? GetInt(optarg) : 0);
                 	break;
 #endif
                     case '?':

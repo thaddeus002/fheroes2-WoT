@@ -164,13 +164,13 @@ struct ResourceBar
 	    if(0 == max)
 	    {
 		std::string msg = _("You cannot select %{resource}!");
-		String::Replace(msg, "%{resource}", Resource::String(rs));
+		StringReplace(msg, "%{resource}", Resource::String(rs));
 		Dialog::Message("", msg, Font::BIG, Dialog::OK);
 	    }
 	    else
 	    {
 		std::string msg = _("Select count %{resource}:");
-		String::Replace(msg, "%{resource}", Resource::String(rs));
+		StringReplace(msg, "%{resource}", Resource::String(rs));
 
 		if(Dialog::SelectCount(msg, 0, max, sel, step) && cur != sel)
 		{
@@ -300,7 +300,7 @@ void Dialog::MakeGiftResource(void)
 	event.message = "Gift from %{name}";
 	const Player* player = Settings::Get().GetPlayers().GetCurrent();
 	if(player)
-	    String::Replace(event.message, "%{name}", player->name);
+	    StringReplace(event.message, "%{name}", player->name);
 
 	world.AddEventDate(event);
 

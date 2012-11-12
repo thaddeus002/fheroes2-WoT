@@ -126,13 +126,13 @@ u16 DialogCaptureResourceObject(const std::string & hdr, const std::string & str
 
     if(current)
     {
-	String::Replace(perday, "%{count}", *current);
+	StringReplace(perday, "%{count}", *current);
 
 	switch(*current)
 	{
-	    case 1:  String::Replace(msg, "%{count}", _("one")); break;
-	    case 2:  String::Replace(msg, "%{count}", _("two")); break;
-	    default: String::Replace(msg, "%{count}", *current); break;
+	    case 1:  StringReplace(msg, "%{count}", _("one")); break;
+	    case 2:  StringReplace(msg, "%{count}", _("two")); break;
+	    default: StringReplace(msg, "%{count}", *current); break;
 	}
     }
 
@@ -245,8 +245,8 @@ void BattleLose(Heroes &hero, const Battle::Result & res, bool attacker, Color::
 	if(CONTROL_HUMAN == hero.GetControl())
 	{
 	    std::string msg = _("Hero %{name} also got a %{count} experience.");
-	    String::Replace(msg, "%{name}", hero.GetName());
-	    String::Replace(msg, "%{count}", exp);
+	    StringReplace(msg, "%{name}", hero.GetName());
+	    StringReplace(msg, "%{count}", exp);
 	    Dialog::Message("", msg, Font::BIG, Dialog::OK);
 	}
 	hero.IncreaseExperience(exp);
@@ -541,7 +541,7 @@ void ActionToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " join monster " << troop.GetName());
 
         std::string message = _("A group of %{monster} with a desire for greater glory wish to join you.\nDo you accept?");
-        String::Replace(message, "%{monster}", String::Lower(troop.GetMultiName()));
+        StringReplace(message, "%{monster}", StringLower(troop.GetMultiName()));
 
         if(Dialog::Message("Followers", message, Font::BIG, Dialog::YES | Dialog::NO) == Dialog::YES)
 	{
@@ -580,7 +580,7 @@ void ActionToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
     if(3 == reason)
     {
 	std::string message = _("The %{monster}, awed by the power of your forces, begin to scatter.\nDo you wish to pursue and engage them?");
-    	String::Replace(message, "%{monster}", String::Lower(troop.GetMultiName()));
+    	StringReplace(message, "%{monster}", StringLower(troop.GetMultiName()));
 
     	if(Dialog::Message("", message, Font::BIG, Dialog::YES | Dialog::NO) == Dialog::NO)
     	    destroy = true;
@@ -977,7 +977,7 @@ void ActionToSkeleton(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    const Artifact & art = tile.QuantityArtifact();
 	    message.append("\n");
 	    message.append(_("Searching through the tattered clothing, you find %{artifact}."));
-	    String::Replace(message, "%{artifact}", art.GetName());
+	    StringReplace(message, "%{artifact}", art.GetName());
 	    Dialog::ArtifactInfo("", message, art);
 	    hero.PickupArtifact(art);
 	}
@@ -1018,7 +1018,7 @@ void ActionToWagon(Heroes & hero, const u8 & obj, const s32 & dst_index)
 		Game::PlayPickupSound();
 		message.append("\n");
 		message.append(_("Searching inside, you find the %{artifact}."));
-		String::Replace(message, "%{artifact}", art.GetName());
+		StringReplace(message, "%{artifact}", art.GetName());
 		Dialog::ArtifactInfo("", message, art);
 		hero.PickupArtifact(art);
 	    }
@@ -1100,7 +1100,7 @@ void ActionToShrine(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	default: return;
     }
 
-    String::Replace(body, "%{spell}", spell.GetName());
+    StringReplace(body, "%{spell}", spell.GetName());
 
     // check spell book
     if(!hero.HaveSpellBook())
@@ -1152,7 +1152,7 @@ void ActionToWitchsHut(Heroes & hero, const u8 & obj, const s32 & dst_index)
     {
 	std::string msg = _("You approach the hut and observe a witch inside studying an ancient tome on %{skill}.\n \n");
 	const std::string & skill_name = Skill::Secondary::String(skill.Skill());
-	String::Replace(msg, "%{skill}", skill_name);
+	StringReplace(msg, "%{skill}", skill_name);
 
 	// check full
 	if(hero.HasMaxSecondarySkill())
@@ -1172,7 +1172,7 @@ void ActionToWitchsHut(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    hero.LearnSkill(skill);
 
 	    msg.append(_("An ancient and immortal witch living in a hut with bird's legs for stilts teaches you %{skill} for her own inscrutable purposes."));
-	    String::Replace(msg, "%{skill}", skill_name);
+	    StringReplace(msg, "%{skill}", skill_name);
 	    Dialog::SecondarySkillInfo(MP2::StringObject(obj), msg, skill);
 	}
 
@@ -1603,7 +1603,7 @@ void ActionToShipwreckSurvivor(Heroes & hero, const u8 & obj, const s32 & dst_in
     {
 	const Artifact & art = tile.QuantityArtifact();
 	std::string str = _("You've pulled a shipwreck survivor from certain death in an unforgiving ocean. Grateful, he rewards you for your act of kindness by giving you the %{art}.");
-	String::Replace(str, "%{art}", art.GetName());
+	StringReplace(str, "%{art}", art.GetName());
 	Dialog::ArtifactInfo("", str, art);
 	hero.PickupArtifact(art);
     }
@@ -1638,18 +1638,18 @@ void ActionToArtifact(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    if(1 == cond)
 	    {
 		msg = _("A leprechaun offers you the %{art} for the small price of %{gold} Gold.");
-		String::Replace(msg, "%{gold}", payment.Get(Resource::GOLD));
+		StringReplace(msg, "%{gold}", payment.Get(Resource::GOLD));
 	    }
 	    else
 	    {
 		msg = _("A leprechaun offers you the %{art} for the small price of %{gold} Gold and %{count} %{res}.");
 
-		String::Replace(msg, "%{gold}", payment.Get(Resource::GOLD));
+		StringReplace(msg, "%{gold}", payment.Get(Resource::GOLD));
 		const ResourceCount & rc = tile.QuantityResourceCount();
-		String::Replace(msg, "%{count}", rc.second);
-		String::Replace(msg, "%{res}", Resource::String(rc.first));
+		StringReplace(msg, "%{count}", rc.second);
+		StringReplace(msg, "%{res}", Resource::String(rc.first));
 	    }
-	    String::Replace(msg, "%{art}", art.GetName());
+	    StringReplace(msg, "%{art}", art.GetName());
 	    msg.append("\n");
 	    msg.append(_("Do you wish to buy this artifact?"));
 
@@ -1696,7 +1696,7 @@ void ActionToArtifact(Heroes & hero, const u8 & obj, const s32 & dst_index)
 		else
 		    msg = "FIXME: (unknown condition): %{art}";
 
-		String::Replace(msg, "%{art}", art.GetName());
+		StringReplace(msg, "%{art}", art.GetName());
 		Dialog::Message("", msg, Font::BIG, Dialog::OK);
 	    }
 	}
@@ -1715,7 +1715,7 @@ void ActionToArtifact(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    else
 	    {
 		msg = _("Through a clearing you observe an ancient artifact. Unfortunately, it's guarded by a nearby %{monster}. Do you want to fight the %{monster} for the artifact?");
-		String::Replace(msg, "%{monster}", troop.GetName());
+		StringReplace(msg, "%{monster}", troop.GetName());
 		battle = (Dialog::YES == Dialog::Message("", msg, Font::BIG, Dialog::YES | Dialog::NO));
 	    }
 
@@ -1729,7 +1729,7 @@ void ActionToArtifact(Heroes & hero, const u8 & obj, const s32 & dst_index)
 		    result = true;
 		    PlaySoundSuccess;
 		    msg = _("Victorious, you take your prize, the %{art}.");
-		    String::Replace(msg, "%{art}", art.GetName());
+		    StringReplace(msg, "%{art}", art.GetName());
 		    Dialog::ArtifactInfo("", msg, art());
 		}
 		else
@@ -1797,14 +1797,14 @@ void ActionToTreasureChest(Heroes & hero, const u8 & obj, const s32 & dst_index)
 		{
 		    gold = GoldInsteadArtifact(obj);
 		    msg = _("After spending hours trying to fish the chest out of the sea, you open it and find %{gold} gold pieces.");
-		    String::Replace(msg, "%{gold}", gold);
+		    StringReplace(msg, "%{gold}", gold);
 		    DialogWithGold(hdr, msg, gold);
 		}
 		else
 		{
 		    msg = _("After spending hours trying to fish the chest out of the sea, you open it and find %{gold} gold and the %{art}.");
-		    String::Replace(msg, "%{gold}", gold);
-		    String::Replace(msg, "%{art}", art.GetName());
+		    StringReplace(msg, "%{gold}", gold);
+		    StringReplace(msg, "%{art}", art.GetName());
 		    DialogWithArtifactAndGold(hdr, msg, art, gold);
 		    hero.PickupArtifact(art);
 		}
@@ -1812,7 +1812,7 @@ void ActionToTreasureChest(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    else
 	    {
 		msg = _("After spending hours trying to fish the chest out of the sea, you open it and find %{gold} gold pieces.");
-		String::Replace(msg, "%{gold}", gold);
+		StringReplace(msg, "%{gold}", gold);
 		DialogWithGold(hdr, msg, gold);
 	    }
 	}
@@ -1843,13 +1843,13 @@ void ActionToTreasureChest(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    {
 		gold = GoldInsteadArtifact(obj);
 		msg = _("After scouring the area, you fall upon a hidden chest, containing the %{gold} gold pieces.");
-		String::Replace(msg, "%{gold}", gold);
+		StringReplace(msg, "%{gold}", gold);
 		DialogWithGold(hdr, msg, gold);
 	    }
 	    else
 	    {
 		msg = _("After scouring the area, you fall upon a hidden chest, containing the ancient artifact %{art}.");
-		String::Replace(msg, "%{art}", art.GetName());
+		StringReplace(msg, "%{art}", art.GetName());
 		Dialog::ArtifactInfo("", msg, art);
 		hero.PickupArtifact(art);
 	    }
@@ -2036,7 +2036,7 @@ void ActionToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
         default:
 	    body = _("You gain control of a %{name}.");
-    	    String::Replace(body, "%{name}", MP2::StringObject(obj));
+    	    StringReplace(body, "%{name}", MP2::StringObject(obj));
     	    break;
     }
 
@@ -2119,7 +2119,7 @@ void ActionToDwellingJoinMonster(Heroes & hero, const u8 & obj, const s32 & dst_
 	hero.MovePointsScaleFixed();
 
         std::string message = _("A group of %{monster} with a desire for greater glory wish to join you. Do you accept?");
-        String::Replace(message, "%{monster}", troop.GetMultiName());
+        StringReplace(message, "%{monster}", troop.GetMultiName());
 
 	if(! Settings::Get().MusicMIDI() && obj == MP2::OBJ_WATCHTOWER)
 	    AGG::PlayMusic(MUS::WATCHTOWER, false);
@@ -2441,8 +2441,8 @@ void ActionToUpgradeArmyObject(Heroes & hero, const u8 & obj, const s32 & dst_in
 		mons.push_back(Monster(Monster::OGRE));
 
 	    msg1 = _("All of the %{monsters} you have in your army have been trained by the battle masters of the fort. Your army now contains %{monsters2}.");
-	    String::Replace(msg1, "%{monsters}", monsters);
-	    String::Replace(msg1, "%{monsters2}", monsters_upgrade);
+	    StringReplace(msg1, "%{monsters}", monsters);
+	    StringReplace(msg1, "%{monsters2}", monsters_upgrade);
 	    msg2 = _("An unusual alliance of Orcs, Ogres, and Dwarves offer to train (upgrade) any such troops brought to them. Unfortunately, you have none with you.");
 	    break;
 
@@ -2455,8 +2455,8 @@ void ActionToUpgradeArmyObject(Heroes & hero, const u8 & obj, const s32 & dst_in
 		mons.push_back(Monster(Monster::IRON_GOLEM));
 
 	    msg1 = _("All of your %{monsters} have been upgraded into %{monsters2}.");
-	    String::Replace(msg1, "%{monsters}", monsters);
-	    String::Replace(msg1, "%{monsters2}", monsters_upgrade);
+	    StringReplace(msg1, "%{monsters}", monsters);
+	    StringReplace(msg1, "%{monsters2}", monsters_upgrade);
 	    msg2 = _("A blacksmith working at the foundry offers to convert all Pikemen and Swordsmen's weapons brought to him from iron to steel. He also says that he knows a process that will convert Iron Golems into Steel Golems.  Unfortunately, you have none of these troops in your army, so he can't help you.");
 	    break;
 
@@ -2561,7 +2561,7 @@ void ActionToEvent(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    {
 		Game::PlayPickupSound();
 		std::string message(_("You find %{artifact}."));
-		String::Replace(message, "%{artifact}", art.GetName());
+		StringReplace(message, "%{artifact}", art.GetName());
 		Dialog::ArtifactInfo("", message, art);
 	    }
 	}
@@ -2625,8 +2625,8 @@ void ActionToTreeKnowledge(Heroes & hero, const u8 & obj, const s32 & dst_index)
 		msg.append(_("\"Ahh, an adventurer! I will be happy to teach you a little of what I have learned over the ages for a mere %{count} %{res}.\""));
 		msg.append("\n");
 		msg.append(_("(Just bury it around my roots.)"));
-		String::Replace(msg, "%{res}", Resource::String(rc.first));
-		String::Replace(msg, "%{count}", rc.second);
+		StringReplace(msg, "%{res}", Resource::String(rc.first));
+		StringReplace(msg, "%{count}", rc.second);
 		conditions = Dialog::YES == Dialog::SpriteInfo(MP2::StringObject(obj), msg, AGG::GetICN(ICN::EXPMRL, 4), Dialog::YES|Dialog::NO);
     	    }
 	    else
@@ -2636,8 +2636,8 @@ void ActionToTreeKnowledge(Heroes & hero, const u8 & obj, const s32 & dst_index)
 		msg.append(_("\"I need %{count} %{res}.\""));
 		msg.append("\n");
 		msg.append(_("it whispers. (sniff) \"Well, come back when you can pay me.\""));
-		String::Replace(msg, "%{res}", Resource::String(rc.first));
-		String::Replace(msg, "%{count}", rc.second);
+		StringReplace(msg, "%{res}", Resource::String(rc.first));
+		StringReplace(msg, "%{count}", rc.second);
 		Dialog::Message(MP2::StringObject(obj), msg, Font::BIG, Dialog::OK);
 	    }
 	}
@@ -2687,7 +2687,7 @@ void ActionToDaemonCave(Heroes & hero, const u8 & obj, const s32 & dst_index)
     		{
 		    hero.IncreaseExperience(res.GetExperienceAttacker());
 		    msg = _("Upon defeating the daemon's servants, you find a hidden cache with %{count} gold.");
-		    String::Replace(msg, "%{count}", gold);
+		    StringReplace(msg, "%{count}", gold);
 		    DialogWithGold("", msg, gold);
 		    hero.GetKingdom().AddFundsResource(Funds(Resource::GOLD, gold));
 		}
@@ -2702,7 +2702,7 @@ void ActionToDaemonCave(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    {
 		const u16 exp = 1000;
 		msg = _("The Demon screams its challenge and attacks! After a short, desperate battle, you slay the monster and receive %{exp} experience points.");
-		String::Replace(msg, "%{exp}", exp);
+		StringReplace(msg, "%{exp}", exp);
 		DialogWithExp("", msg, exp);
     		hero.IncreaseExperience(exp);
 	    }
@@ -2712,7 +2712,7 @@ void ActionToDaemonCave(Heroes & hero, const u8 & obj, const s32 & dst_index)
 		const u16 exp = 1000;
 		const Artifact & art = tile.QuantityArtifact();
 		msg = _("The Demon screams its challenge and attacks! After a short, desperate battle, you slay the monster and find the %{art} in the back of the cave.");
-		String::Replace(msg, "%{art}", art.GetName());
+		StringReplace(msg, "%{art}", art.GetName());
 		if(art.isValid()) DialogArtifactWithExp("", msg, art, exp);
     		hero.PickupArtifact(art);
     		hero.IncreaseExperience(exp);
@@ -2722,8 +2722,8 @@ void ActionToDaemonCave(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    {
 		const u16 exp = 1000;
 		msg = _("The Demon screams its challenge and attacks! After a short, desperate battle, you slay the monster and receive %{exp) experience points and %{count} gold.");
-		String::Replace(msg, "%{exp}", exp);
-		String::Replace(msg, "%{count}", gold);
+		StringReplace(msg, "%{exp}", exp);
+		StringReplace(msg, "%{count}", gold);
 		DialogGoldWithExp("", msg, gold, exp);
     		hero.IncreaseExperience(exp);
 		hero.GetKingdom().AddFundsResource(Funds(Resource::GOLD, gold));
@@ -2738,7 +2738,7 @@ void ActionToDaemonCave(Heroes & hero, const u8 & obj, const s32 & dst_index)
 		msg = allow ?
 			    _("The Demon leaps upon you and has its claws at your throat before you can even draw your sword. \"Your life is mine,\" it says. \"I will sell it back to you for %{count} gold.\"") :
 			    _("Seeing that you do not have %{count} gold, the demon slashes you with its claws, and the last thing you see is a red haze.");
-		String::Replace(msg, "%{count}", gold);
+		StringReplace(msg, "%{count}", gold);
 
 		if(allow)
 		{
@@ -2785,10 +2785,10 @@ void ActionToAlchemistsTower(Heroes & hero, const u8 & obj, const s32 & dst_inde
 	    msg.append("\n");
 	    msg.append(ngettext("He checks your pack, and sees that you have 1 cursed item.",
 				    "He checks your pack, and sees that you have %{count} cursed items.", cursed));
-	    String::Replace(msg, "%{count}", cursed);
+	    StringReplace(msg, "%{count}", cursed);
 	    msg.append("\n");
 	    msg.append(_("For %{gold} gold, the alchemist will remove it for you. Do you pay?"));
-	    String::Replace(msg, "%{gold}", payment.gold);
+	    StringReplace(msg, "%{gold}", payment.gold);
 
 	    if(Dialog::YES == Dialog::Message("", msg, Font::BIG, Dialog::YES | Dialog::NO))
 	    {
@@ -2872,7 +2872,7 @@ void ActionToSirens(Heroes & hero, const u8 & obj, const s32 & dst_index)
     {
 	u32 exp = hero.GetArmy().ActionToSirens();
 	std::string str = _("You have your crew stop up their ears with wax before the sirens' eerie song has any chance of luring them to a watery grave. An eerie wailing song emanates from the sirens perched upon the rocks. Many of your crew fall under its spell, and dive into the water where they drown. You are now wiser for the visit, and gain %{exp} experience.");
-	String::Replace(str, "%{exp}", exp);
+	StringReplace(str, "%{exp}", exp);
 
 	hero.SetVisited(dst_index);
 	PlaySoundSuccess;
@@ -2908,7 +2908,7 @@ void ActionToJail(Heroes & hero, const u8 & obj, const s32 & dst_index)
     else
     {
 	std::string str = _("You already have %{count} heroes, and regretfully must leave the prisoner in this jail to languish in agony for untold days.");
-	String::Replace(str, "%{count}", Kingdom::GetMaxHeroes());
+	StringReplace(str, "%{count}", Kingdom::GetMaxHeroes());
 	PlaySoundFailure;
 	Dialog::Message(MP2::StringObject(obj), str, Font::BIG, Dialog::OK);
     }
@@ -2945,7 +2945,7 @@ void ActionToSphinx(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	if(Dialog::YES == Dialog::Message("", _("\"I have a riddle for you,\" the Sphinx says. \"Answer correctly, and you shall be rewarded. Answer incorrectly, and you shall be eaten. Do you accept the challenge?\""), Font::BIG, Dialog::YES|Dialog::NO))
 	{
 	    std::string header(_("The Sphinx asks you the following riddle: %{riddle}. Your answer?"));
-	    String::Replace(header, "%{riddle}", riddle->message);
+	    StringReplace(header, "%{riddle}", riddle->message);
 	    std::string answer;
 	    Dialog::InputString(header, answer);
 	    if(riddle->AnswerCorrect(answer))

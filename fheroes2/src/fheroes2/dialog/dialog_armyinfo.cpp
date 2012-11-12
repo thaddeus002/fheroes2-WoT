@@ -158,7 +158,7 @@ u16 Dialog::ArmyInfo(const Troop & troop, u16 flags)
 		std::string msg = 1.0f != Monster::GetUpgradeRatio() ?
 		    _("Your troops can be upgraded, but it will cost you %{ratio} times the difference in cost for each troop, rounded up to next highest number. Do you wish to upgrade them?") :
 		    _("Your troops can be upgraded, but it will cost you dearly. Do you wish to upgrade them?");
-		String::Replace(msg, "%{ratio}", String::Double(Monster::GetUpgradeRatio(), 2));
+		StringReplace(msg, "%{ratio}", GetString(Monster::GetUpgradeRatio(), 2));
         	if(Dialog::YES == Dialog::ResourceInfo("", msg,	troop.GetUpgradeCost(), Dialog::YES|Dialog::NO))
 		{
 		    result = Dialog::UPGRADE;
@@ -396,10 +396,10 @@ u16 Dialog::ArmyJoinWithCost(const Troop & troop, u32 join, u32 gold, Heroes & h
     	    message += _("All %{offer} of the %{monster} will join your army for the sum of %{gold} gold.\nDo you accept?");
     }
 
-    String::Replace(message, "%{offer}", join);
-    String::Replace(message, "%{total}", troop.GetCount());
-    String::Replace(message, "%{monster}", String::Lower(troop.GetPluralName(join)));
-    String::Replace(message, "%{gold}", gold);
+    StringReplace(message, "%{offer}", join);
+    StringReplace(message, "%{total}", troop.GetCount());
+    StringReplace(message, "%{monster}", StringLower(troop.GetPluralName(join)));
+    StringReplace(message, "%{gold}", gold);
 
     TextBox textbox(message, Font::BIG, BOXAREA_WIDTH);
     const u16 buttons = Dialog::YES | Dialog::NO;
@@ -408,7 +408,7 @@ u16 Dialog::ArmyJoinWithCost(const Troop & troop, u32 join, u32 gold, Heroes & h
     Text text;
 
     message = _("(Rate: %{percent})");
-    String::Replace(message, "%{percent}", troop.GetMonster().GetCost().gold * join * 100 / gold);
+    StringReplace(message, "%{percent}", troop.GetMonster().GetCost().gold * join * 100 / gold);
     text.Set(message, Font::BIG);
 
     Box box(10 + textbox.h() + 10 + text.h() + 40 + sprite.h() + 10, buttons);
@@ -446,7 +446,7 @@ u16 Dialog::ArmyJoinWithCost(const Troop & troop, u32 join, u32 gold, Heroes & h
 	else
 	{
 	    std::string msg = _("Not enough\ngold (%{gold})");
-	    String::Replace(msg, "%{gold}", gold - kingdom.GetFunds().Get(Resource::GOLD));
+	    StringReplace(msg, "%{gold}", gold - kingdom.GetFunds().Get(Resource::GOLD));
 	    TextBox textbox2(msg, Font::SMALL, 100);
 	    textbox2.Blit(btnMarket.x - 35, btnMarket.y - 30);
 	    btnMarket.Draw();

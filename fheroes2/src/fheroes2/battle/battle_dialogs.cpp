@@ -48,7 +48,7 @@ void Battle::SpeedRedraw(const Point & dst)
     u8 speed = Settings::Get().BattleSpeed();
     std::string str = _("speed: %{speed}");
 
-    String::Replace(str, "%{speed}", speed);
+    StringReplace(str, "%{speed}", speed);
     Text text(str, Font::SMALL);
     const Sprite & sprite = AGG::GetICN(ICN::CSPANEL, (speed < 3 ? 0 : (speed < 7 ? 1 : 2)));
 
@@ -174,8 +174,8 @@ void Battle::GetSummaryParams(u8 res1, u8 res2, const HeroBase & hero, u32 exp, 
 	{
     	    msg.append("\n");
     	    msg.append(_("For valor in combat, %{name} receives %{exp} experience"));
-    	    String::Replace(msg, "%{name}", hero.GetName());
-    	    String::Replace(msg, "%{exp}", exp);
+    	    StringReplace(msg, "%{name}", hero.GetName());
+    	    StringReplace(msg, "%{exp}", exp);
     	}
     }
     else
@@ -183,20 +183,20 @@ void Battle::GetSummaryParams(u8 res1, u8 res2, const HeroBase & hero, u32 exp, 
     {
 	icn_anim = ICN::CMBTFLE3;
 	msg.append(_("The cowardly %{name} flees from battle."));
-    	String::Replace(msg, "%{name}", hero.GetName());
+    	StringReplace(msg, "%{name}", hero.GetName());
     }
     else
     if(res1 & RESULT_SURRENDER)
     {
 	icn_anim = ICN::CMBTSURR;
 	msg.append(_("%{name} surrenders to the enemy, and departs in shame."));
-    	String::Replace(msg, "%{name}", hero.GetName());
+    	StringReplace(msg, "%{name}", hero.GetName());
     }
     else
     {
 	icn_anim = ICN::CMBTLOS3;
 	msg.append(_("Your force suffer a bitter defeat, and %{name} abandons your cause."));
-    	String::Replace(msg, "%{name}", hero.GetName());
+    	StringReplace(msg, "%{name}", hero.GetName());
     }
 }
 
@@ -395,8 +395,8 @@ u8 Battle::Arena::DialogBattleHero(const HeroBase & hero, bool buttons) const
     Text text;
     text.Set(Font::SMALL);
     str = _("%{name} the %{race}");
-    String::Replace(str, "%{name}", hero.GetName());
-    String::Replace(str, "%{race}", Race::String(hero.GetRace()));
+    StringReplace(str, "%{name}", hero.GetName());
+    StringReplace(str, "%{race}", Race::String(hero.GetRace()));
     text.Set(str);
     tp.x = pos_rt.x + (pos_rt.w - text.w()) / 2;
     tp.y += 10;
@@ -551,7 +551,7 @@ bool Battle::DialogBattleSurrender(const HeroBase & hero, u32 cost)
 	else
 	{
     	    std::string msg = _("Not enough gold (%{gold})");
-    	    String::Replace(msg, "%{gold}", cost - kingdom.GetFunds().Get(Resource::GOLD));
+    	    StringReplace(msg, "%{gold}", cost - kingdom.GetFunds().Get(Resource::GOLD));
 	    Text text(msg, Font::SMALL);
 	    text.Blit(btnMarket.x + (btnMarket.w - text.w()) / 2, btnMarket.y - 15);
     	    btnMarket.Draw();
@@ -566,12 +566,12 @@ bool Battle::DialogBattleSurrender(const HeroBase & hero, u32 cost)
     hero.PortraitRedraw(pos_rt.x + 58, pos_rt.y + 38, PORT_BIG, display);
 
     std::string str = _("%{name} states:");
-    String::Replace(str, "%{name}", hero.GetName());
+    StringReplace(str, "%{name}", hero.GetName());
     Text text(str, Font::BIG);
     text.Blit(pos_rt.x + 320 - text.w() / 2, pos_rt.y + 30);
 
     str = _("I will accept your surrender and grant you and your troops safe passage for the price of %{price} gold.");
-    String::Replace(str, "%{price}", cost);
+    StringReplace(str, "%{price}", cost);
 
     TextBox box(str, Font::BIG, 275);
     box.Blit(pos_rt.x + 175, pos_rt.y + 50);

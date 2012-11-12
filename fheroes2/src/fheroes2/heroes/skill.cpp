@@ -470,7 +470,7 @@ std::string Skill::Secondary::GetDescription(void) const
 	default: break;
     }
 
-    String::Replace(str, "%{count}", count);
+    StringReplace(str, "%{count}", count);
 
     return str;
 }
@@ -864,7 +864,7 @@ bool PrimarySkillsBar::ActionBarCursor(const Point & cursor, Skill::Primary::ski
     if(Skill::Primary::UNKNOWN != skill)
     {
 	msg = _("View %{skill} Info");
-        String::Replace(msg, "%{skill}", Skill::Primary::String(skill));
+        StringReplace(msg, "%{skill}", Skill::Primary::String(skill));
     }
 
     return false;
@@ -969,7 +969,7 @@ bool SecondarySkillsBar::ActionBarCursor(const Point & cursor, Skill::Secondary 
     if(skill.isValid())
     {
 	msg = _("View %{skill} Info");
-        String::Replace(msg, "%{skill}", skill.GetName());
+        StringReplace(msg, "%{skill}", skill.GetName());
     }
 
     return false;

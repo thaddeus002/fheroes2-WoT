@@ -135,7 +135,7 @@ Spell SpellBook::Open(const HeroBase & hero, const u8 filt, bool canselect) cons
 	   (le.MousePressRight(info_rt)))
 	{
 	    std::string str = _("Your hero has %{point} spell points remaining");
-	    String::Replace(str, "%{point}", hero.GetSpellPoints());
+	    StringReplace(str, "%{point}", hero.GetSpellPoints());
 	    str += " spell points remaining";
 	    cursor.Hide();
 	    Dialog::Message("", str, Font::BIG, Dialog::OK);
@@ -183,8 +183,8 @@ Spell SpellBook::Open(const HeroBase & hero, const u8 filt, bool canselect) cons
 			else
 			{
 			    cursor.Hide();
-			    String::Replace(str, "%{mana}", (*spell).SpellPoint(&hero));
-			    String::Replace(str, "%{point}", hero.GetSpellPoints());
+			    StringReplace(str, "%{mana}", (*spell).SpellPoint(&hero));
+			    StringReplace(str, "%{point}", hero.GetSpellPoints());
 			    Dialog::Message("", str, Font::BIG, Dialog::OK);
 			    cursor.Show();
 			    display.Flip();

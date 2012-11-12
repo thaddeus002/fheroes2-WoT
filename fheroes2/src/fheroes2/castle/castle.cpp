@@ -2256,16 +2256,16 @@ std::string Castle::GetDescriptionBuilding(u32 build) const
     switch(build)
     {
 	case BUILD_WELL:
-	    String::Replace(res, "%{count}", GetGrownWell());
+	    StringReplace(res, "%{count}", GetGrownWell());
 	    break;
 
 	case BUILD_WEL2:
-	    String::Replace(res, "%{count}", GetGrownWel2());
+	    StringReplace(res, "%{count}", GetGrownWel2());
 	    break;
 
 	case BUILD_CASTLE:
 	{
-	    String::Replace(res, "%{count}", ProfitConditions::FromBuilding(BUILD_CASTLE, race).gold);
+	    StringReplace(res, "%{count}", ProfitConditions::FromBuilding(BUILD_CASTLE, race).gold);
 
 	    if(isBuild(BUILD_CASTLE))
 	    {
@@ -2285,7 +2285,7 @@ std::string Castle::GetDescriptionBuilding(u32 build) const
 	case BUILD_STATUE:
 	{
 	    payment_t profit = ProfitConditions::FromBuilding(build, GetRace());
-	    String::Replace(res, "%{count}", profit.gold);
+	    StringReplace(res, "%{count}", profit.gold);
 	}
 	    break;
 

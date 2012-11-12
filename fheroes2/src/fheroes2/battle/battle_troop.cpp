@@ -176,7 +176,7 @@ void Battle::UpdateMonsterSpriteAnimation(const std::string & spec)
         const TiXmlElement* xml_icn = xml_animation->FirstChildElement("icn");
         for(; xml_icn; xml_icn = xml_icn->NextSiblingElement("icn"))
 	{
-	    std::string icn_name = String::Upper(xml_icn->Attribute("name"));
+	    std::string icn_name = StringUpper(xml_icn->Attribute("name"));
 	    // find icn name
 	    ICN::icn_t icn = ICN::FromString(icn_name.c_str());
 	    if(icn == ICN::UNKNOWN) continue;
@@ -313,17 +313,11 @@ Battle::Unit::Unit(const Troop & t, u32 _uid, s16 pos, bool ref) : ArmyTroop(NUL
 	SetPosition(pos);
     }
 
-    for(u8 ii = 0; ii < ARRAY_COUNT(contours); ++ii)
-	contours[ii] = NULL;
-
     ResetAnimFrame(AS_IDLE);
 }
 
 Battle::Unit::~Unit()
 {
-    for(u8 ii = 0; ii < ARRAY_COUNT(contours); ++ii)
-	if(contours[ii]) delete contours[ii];
-
     // reset summon elemental and mirror image
     if(Modes(CAP_SUMMONELEM) || Modes(CAP_MIRRORIMAGE))
     {
@@ -411,14 +405,14 @@ std::string Battle::Unit::GetSpeedString(void) const
     return os.str();
 }
 
-Sprite* Battle::Unit::GetContour(u8 val) const
+const Sprite* Battle::Unit::GetContour(u8 val) const
 {
     switch(val)
     {
-	case CONTOUR_MAIN:			return contours[0];
-	case CONTOUR_REFLECT:			return contours[1];
-	case CONTOUR_BLACK:			return contours[2];
-	case CONTOUR_BLACK|CONTOUR_REFLECT:	return contours[3];
+	case CONTOUR_MAIN:			return &contours[0];
+	case CONTOUR_REFLECT:			return &contours[1];
+	case CONTOUR_BLACK:			return &contours[2];
+	case CONTOUR_BLACK|CONTOUR_REFLECT:	return &contours[3];
 	default: break;
     }
 
@@ -466,22 +460,17 @@ void Battle::Unit::InitContours(void)
     const Sprite & sprite1 = AGG::GetICN(msi.icn_file, msi.frm_idle.start, false);
     const Sprite & sprite2 = AGG::GetICN(msi.icn_file, msi.frm_idle.start, true);
 
-    for(u8 ii = 0; ii < ARRAY_COUNT(contours); ++ii)
-	if(contours[ii]) delete contours[ii];
-
     // main sprite
-    contours[0] = new Sprite();
-    Surface::MakeContour(*contours[0], sprite1, sprite1.GetColorIndex(0xDA));
+    contours[0].Set(Surface::Contour(sprite1, sprite1.GetColorIndex(0xDA)));
 
     // revert sprite
-    contours[1] = new Sprite();
-    Surface::MakeContour(*contours[1], sprite2, sprite2.GetColorIndex(0xDA));
+    contours[1].Set(Surface::Contour(sprite2, sprite2.GetColorIndex(0xDA)));
 
     // create white black sprite
-    contours[2] = new Sprite(sprite1);
-    contours[2]->GrayScale();
-    contours[3] = new Sprite(sprite2);
-    contours[3]->GrayScale();
+    contours[2].Set(sprite1);
+    contours[2].GrayScale();
+    contours[3].Set(sprite2);
+    contours[3].GrayScale();
 }
 
 void Battle::Unit::SetMirror(Unit* ptr)
@@ -878,7 +867,7 @@ u32 Battle::Unit::ApplyDamage(Unit & enemy, u32 dmg)
                 if(Arena::GetInterface())
                 {
                     std::string str(_("%{name} half the enemy troops!"));
-                    String::Replace(str, "%{name}", enemy.GetName());
+                    StringReplace(str, "%{name}", enemy.GetName());
                     Arena::GetInterface()->SetStatus(str, true);
                 }
             }
@@ -965,8 +954,8 @@ bool Battle::Unit::AllowApplySpell(const Spell & spell, const HeroBase* hero, st
 	if(msg)
 	{
 	    *msg = _("The %{artifact} artifact is in effect for this battle, disabling %{spell} spell.");
-	    String::Replace(*msg, "%{artifact}", guard_art.GetName());
-	    String::Replace(*msg, "%{spell}", spell.GetName());
+	    StringReplace(*msg, "%{artifact}", guard_art.GetName());
+	    StringReplace(*msg, "%{spell}", spell.GetName());
 	}
 	return false;
     }
@@ -1613,8 +1602,8 @@ void Battle::Unit::SpellRestoreAction(const Spell & spell, u8 spoint, const Hero
 	    if(Arena::GetInterface())
 	    {
 		std::string str(_("%{count} %{name} rise(s) from the dead!"));
-		String::Replace(str, "%{count}", resurrect);
-		String::Replace(str, "%{name}", GetName());
+		StringReplace(str, "%{count}", resurrect);
+		StringReplace(str, "%{name}", GetName());
 		Arena::GetInterface()->SetStatus(str, true);
 	    }
 	}

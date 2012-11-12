@@ -220,13 +220,13 @@ void Interface::StatusWindow::DrawDayInfo(const u8 oh) const
     AGG::GetICN(Settings::Get().ExtGameEvilInterface() ? ICN::SUNMOONE : ICN::SUNMOON, (world.GetWeek() - 1) % 5).Blit(x, y + 1 + oh);
 
     message = _("Month: %{month} Week: %{week}");
-    String::Replace(message, "%{month}", world.GetMonth());
-    String::Replace(message, "%{week}", world.GetWeek());
+    StringReplace(message, "%{month}", world.GetMonth());
+    StringReplace(message, "%{week}", world.GetWeek());
     Text text(message, Font::SMALL);
     text.Blit(x + (w - text.w()) / 2, y + 30 + oh);
 
     message = _("Day: %{day}");
-    String::Replace(message, "%{day}", world.GetDay());
+    StringReplace(message, "%{day}", world.GetDay());
     text.Set(message, Font::BIG);
     text.Blit(x + (w - text.w()) / 2, y + 46 + oh);
 }
@@ -258,7 +258,7 @@ void Interface::StatusWindow::ResetTimer(void)
 void Interface::StatusWindow::DrawResourceInfo(const u8 oh) const
 {
     std::string message = _("You find a small\nquantity of %{resource}.");
-    String::Replace(message, "%{resource}", Resource::String(lastResource));
+    StringReplace(message, "%{resource}", Resource::String(lastResource));
     TextBox text(message, Font::SMALL, w);
     text.Blit(x, y + 4 + oh);
     

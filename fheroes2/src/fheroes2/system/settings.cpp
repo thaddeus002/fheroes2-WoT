@@ -421,7 +421,7 @@ bool Settings::Read(const std::string & filename)
 	video_mode.w = 640;
         video_mode.h = 480;
 
-        std::string value = String::Lower(sval);
+        std::string value = StringLower(sval);
         const size_t pos = value.find('x');
 
         if(std::string::npos != pos)
@@ -429,8 +429,8 @@ bool Settings::Read(const std::string & filename)
     	    std::string width(value.substr(0, pos));
 	    std::string height(value.substr(pos + 1, value.length() - pos - 1));
 
-	    video_mode.w = String::ToInt(width);
-	    video_mode.h = String::ToInt(height);
+	    video_mode.w = GetInt(width);
+	    video_mode.h = GetInt(height);
         }
 	else
 	if(value == "auto")
@@ -466,7 +466,7 @@ bool Settings::Read(const std::string & filename)
     BinaryLoad();
 
     if(video_driver.size())
-	video_driver = String::Lower(video_driver);
+	video_driver = StringLower(video_driver);
 
     if(video_mode.w && video_mode.h) PostLoad();
 

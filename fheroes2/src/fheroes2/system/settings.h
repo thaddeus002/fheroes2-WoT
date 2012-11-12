@@ -108,12 +108,12 @@ namespace std
  static const char* android_endl = "\n";
 }
  #define endl android_endl
- #define VERBOSE(x) if(true) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "FHeroes", "%s", osss.str().c_str()); } else String::GetTime()
+ #define VERBOSE(x) if(true) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "FHeroes", "%s", osss.str().c_str()); } else GetTime()
 #else
  #define VERBOSE(x) std::cout << x << std::endl
 #endif
 
-#define DEBUG(x, y, z) if(IS_DEBUG(x, y)) VERBOSE(String::GetTime() << ": [" << StringDebug(x) << "]\t" << __FUNCTION__ << ":  " << z)
+#define DEBUG(x, y, z) if(IS_DEBUG(x, y)) VERBOSE(GetTime() << ": [" << StringDebug(x) << "]\t" << __FUNCTION__ << ":  " << z)
 #define IS_DEVEL() IS_DEBUG(DBG_DEVEL, DBG_INFO)
 
 bool IS_DEBUG(int name, int level);

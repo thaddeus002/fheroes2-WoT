@@ -36,7 +36,7 @@ void RedrawCurrentInfo(const Point & pos, u16 available, u32 result,
     Text text;
 
     std::string str = _("Available: %{count}");
-    String::Replace(str, "%{count}", available);
+    StringReplace(str, "%{count}", available);
     text.Set(str, Font::SMALL);
     text.Blit(pos.x + 70 - text.w() / 2, pos.y + 130);
     text.Set(GetString(result), Font::BIG);
@@ -103,7 +103,7 @@ void RedrawStaticInfo(const Rect & pos, const Monster & monster, bool label)
 
     // text recruit monster
     str = _("Recruit %{name}");
-    String::Replace(str, "%{name}", monster.GetMultiName());
+    StringReplace(str, "%{name}", monster.GetMultiName());
     text.Set(str, Font::BIG);
     dst_pt.x = pos.x + (pos.w - text.w()) / 2;
     dst_pt.y = pos.y + 25;
@@ -504,7 +504,7 @@ void Dialog::DwellingInfo(const Monster & monster, u16 available)
 
     // text recruit monster
     str = _("Recruit %{name}");
-    String::Replace(str, "%{name}", monster.GetMultiName());
+    StringReplace(str, "%{name}", monster.GetMultiName());
     text.Set(str, Font::BIG);
     text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + 25);
 
@@ -577,7 +577,7 @@ void Dialog::DwellingInfo(const Monster & monster, u16 available)
 
     // text available
     str = _("Available: %{count}");
-    String::Replace(str, "%{count}", available);
+    StringReplace(str, "%{count}", available);
     text.Set(str);
     text.Blit(pos.x + 70 - text.w() / 2, pos.y + 130);
 

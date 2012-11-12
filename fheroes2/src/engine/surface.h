@@ -30,6 +30,7 @@ struct Point;
 struct Rect;
 struct SDL_Surface;
 class Display;
+class Sprite;
 
 class Surface
 {
@@ -37,13 +38,17 @@ public:
     Surface();
     Surface(const void* pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool amask);
     Surface(u16 sw, u16 sh, bool amask = false);
-    Surface(const Surface & bs);
     Surface(SDL_Surface* sf);
+    Surface(const std::string &);
+
+    Surface(const Surface &);
+    Surface & operator= (const Surface &);
+
+    static Surface RefCopy(const Surface &);
 
     virtual ~Surface();
     virtual bool isDisplay(void) const;
 
-    Surface & operator= (const Surface & bs);
     void Set(const Surface &);
     void Set(SDL_Surface* sf);
     void Set(u16 sw, u16 sh, bool amask = false);
@@ -110,13 +115,12 @@ public:
     u32  GetMemoryUsage(void) const;
     std::string Info(void) const;
 
-    static void Reflect(Surface &, const Surface &, u8 shape /* 0: none, 1 : vert, 2: horz, 3: both */);
-    static void Rotate(Surface &, const Surface &, u8 parm /* 0: none, 1 : 90 CW, 2: 90 CCW, 3: 180 */);
+    static Surface Reflect(const Surface &, u8 shape /* 0: none, 1 : vert, 2: horz, 3: both */);
+    static Surface Rotate(const Surface &, u8 parm /* 0: none, 1 : 90 CW, 2: 90 CCW, 3: 180 */);
+    static Surface Stencil(const Surface &, u32);
+    static Surface Contour(const Surface &, u32);
+    static Surface ScaleMinifyByTwo(const Surface & sf_src, bool event = false);
 
-    static void MakeStencil(Surface &, const Surface &, u32);
-    static void MakeContour(Surface &, const Surface &, u32);
-
-    static void ScaleMinifyByTwo(Surface & sf_dst, const Surface & sf_src, bool event = false);
     static void SetDefaultDepth(u8);
     static u8   GetDefaultDepth(void);
     static void FreeSurface(Surface &);

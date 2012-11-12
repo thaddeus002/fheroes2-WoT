@@ -64,8 +64,8 @@ void Heroes::MeetingDialog(Heroes & heroes2)
 
     // header
     message = _("%{name1} meets %{name2}");
-    String::Replace(message, "%{name1}", GetName());
-    String::Replace(message, "%{name2}", heroes2.GetName());
+    StringReplace(message, "%{name1}", GetName());
+    StringReplace(message, "%{name2}", heroes2.GetName());
     Text text(message, Font::BIG);
     text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 26);
 
@@ -423,12 +423,12 @@ void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
 
 	if(message.size())
 	{
-	    String::Replace(message, "%{teacher}", teacher->GetName());
-	    String::Replace(message, "%{learner}", learner->GetName());
-	    String::Replace(message, "%{level}", Skill::Level::String(scholar));
-	    String::Replace(message, "%{scholar}", Skill::Secondary::String(Skill::Secondary::EAGLEEYE));
-	    String::Replace(message, "%{spells1}", spells1);
-	    String::Replace(message, "%{spells2}", spells2);
+	    StringReplace(message, "%{teacher}", teacher->GetName());
+	    StringReplace(message, "%{learner}", learner->GetName());
+	    StringReplace(message, "%{level}", Skill::Level::String(scholar));
+	    StringReplace(message, "%{scholar}", Skill::Secondary::String(Skill::Secondary::EAGLEEYE));
+	    StringReplace(message, "%{spells1}", spells1);
+	    StringReplace(message, "%{spells2}", spells2);
 
 	    Dialog::Message(_("Scholar Ability"), message, Font::BIG, Dialog::OK);
 	}

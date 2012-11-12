@@ -32,8 +32,8 @@ void DialogPrimaryOnly(const std::string & name, const std::string & primary)
     std::string message = _("%{name} has gained a level.");
     message.append("\n \n");
     message.append(_("%{skill} Skill +1"));
-    String::Replace(message, "%{name}", name);
-    String::Replace(message, "%{skill}", primary);
+    StringReplace(message, "%{name}", name);
+    StringReplace(message, "%{skill}", primary);
     Dialog::Message("", message, Font::BIG, Dialog::OK);
 }
 
@@ -42,12 +42,12 @@ u8 DialogOneSecondary(const std::string & name, const std::string & primary, con
     std::string message = _("%{name} has gained a level.");
     message.append("\n \n");
     message.append(_("%{skill} Skill +1"));
-    String::Replace(message, "%{name}", name);
-    String::Replace(message, "%{skill}", primary);
+    StringReplace(message, "%{name}", name);
+    StringReplace(message, "%{skill}", primary);
 
     message.append("\n \n");
     message.append(_("You have learned %{skill}."));
-    String::Replace(message, "%{skill}", sec.GetName());
+    StringReplace(message, "%{skill}", sec.GetName());
 
     const Sprite & sprite_frame = AGG::GetICN(ICN::SECSKILL, 15);
     Surface sf(sprite_frame.w(), sprite_frame.h());
@@ -72,8 +72,8 @@ u8 DialogSelectSecondary(const std::string & name, const std::string & primary, 
     std::string header = _("%{name} has gained a level.");
     header.append("\n \n");
     header.append(_("%{skill} Skill +1"));
-    String::Replace(header, "%{name}", name);
-    String::Replace(header, "%{skill}", primary);
+    StringReplace(header, "%{name}", name);
+    StringReplace(header, "%{skill}", primary);
 
     Display & display = Display::Get();
     const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
@@ -98,8 +98,8 @@ u8 DialogSelectSecondary(const std::string & name, const std::string & primary, 
     message.append(_("or"));
     message.append(" ");
     message.append("\n%{skill2}");
-    String::Replace(message, "%{skill1}", sec1.GetName());
-    String::Replace(message, "%{skill2}", sec2.GetName());
+    StringReplace(message, "%{skill1}", sec1.GetName());
+    StringReplace(message, "%{skill2}", sec2.GetName());
 
     TextBox box1(header, Font::BIG, BOXAREA_WIDTH);
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);

@@ -242,8 +242,8 @@ void Battle::EagleEyeSkillAction(HeroBase & hero, const SpellStorage & spells, b
 	if(local)
 	{
 	    std::string msg = _("Through eagle-eyed observation, %{name} is able to learn the magic spell %{spell}.");
-	    String::Replace(msg, "%{name}", hero.GetName());
-	    String::Replace(msg, "%{spell}", sp.GetName());
+	    StringReplace(msg, "%{name}", hero.GetName());
+	    StringReplace(msg, "%{spell}", sp.GetName());
 	    Game::PlayPickupSound();
 	    Dialog::SpellInfo("", msg, sp);
 	}
@@ -281,8 +281,8 @@ void Battle::NecromancySkillAction(HeroBase & hero, u32 killed, bool local)
     if(local)
     {
 	std::string msg = _("Practicing the dark arts of necromancy, you are able to raise %{count} of the enemy's dead to return under your service as %{monster}");
-	String::Replace(msg, "%{count}", count);
-	String::Replace(msg, "%{monster}", mons.GetMultiName());
+	StringReplace(msg, "%{count}", count);
+	StringReplace(msg, "%{monster}", mons.GetMultiName());
 	Surface sf1(40, 45);
 	const Sprite & sf2 = AGG::GetICN(ICN::MONS32, mons.GetSpriteIndex());
 	sf2.Blit((sf1.w() - sf2.w()) / 2, 0, sf1);

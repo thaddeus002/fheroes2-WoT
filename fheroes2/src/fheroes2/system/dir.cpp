@@ -61,7 +61,7 @@ void ListFiles::ReadDir(const std::string &path, const std::string &filter, bool
     		}
     		else
     		{
-		    if(std::string::npos == String::Lower(filename).find(String::Lower(filter))) continue;
+		    if(std::string::npos == StringLower(filename).find(StringLower(filter))) continue;
 		}
     	    }
 

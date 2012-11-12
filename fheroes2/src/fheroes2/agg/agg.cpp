@@ -270,7 +270,7 @@ bool AGG::Cache::ReadDataDir(void)
     for(ListFiles::const_iterator
 	it = aggs.begin(); it != aggs.end(); ++it)
     {
-	std::string lower = String::Lower(*it);
+	std::string lower = StringLower(*it);
 	if(std::string::npos != lower.find("heroes2.agg") && !heroes2_agg.isGood()) heroes2_agg.Open(*it);
 	if(std::string::npos != lower.find("heroes2x.agg") && !heroes2x_agg.isGood()) heroes2x_agg.Open(*it);
     }
@@ -471,10 +471,9 @@ bool AGG::Cache::LoadExtICN(const ICN::icn_t icn, const u32 index, bool reflect)
 		// clean
 		GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(3, 8, 43, 14), 3, 1, sprite);
 		// wait
-		Surface src, dst;
-		src.Set(28, 28);
+		Surface src(28, 28);
 		GetICN(ICN::ADVBTNS, 8 + index).Blit(Rect(5, 4, 28, 28), 0, 0, src);
-		Surface::ScaleMinifyByTwo(dst, src);
+		Surface dst = Surface::ScaleMinifyByTwo(src);
 		dst.Blit((sprite.w() - dst.w()) / 2, 2, sprite);
 	    }
 	}
@@ -485,8 +484,7 @@ bool AGG::Cache::LoadExtICN(const ICN::icn_t icn, const u32 index, bool reflect)
 	{
 	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
 	    LoadOrgICN(sprite, ICN::ADVMCO, 28 + index, false);
-	    Surface dst;
-	    Surface::ScaleMinifyByTwo(dst, sprite);
+	    Surface dst = Surface::ScaleMinifyByTwo(sprite);
 	    Surface::Swap(sprite, dst);
 	}
 	break;
@@ -606,7 +604,7 @@ bool AGG::Cache::LoadExtICN(const ICN::icn_t icn, const u32 index, bool reflect)
 bool AGG::Cache::LoadAltICN(const ICN::icn_t icn, const u32 index, bool reflect)
 {
 #ifdef WITH_XML
-    const std::string prefix_images_icn = std::string("files") + SEPARATOR + std::string("images") + SEPARATOR + String::Lower(ICN::GetString(icn));
+    const std::string prefix_images_icn = std::string("files") + SEPARATOR + std::string("images") + SEPARATOR + StringLower(ICN::GetString(icn));
     const std::string xml_spec = Settings::GetLastFile(prefix_images_icn, "spec.xml");
 
     // parse spec.xml
@@ -640,7 +638,7 @@ bool AGG::Cache::LoadAltICN(const ICN::icn_t icn, const u32 index, bool reflect)
 	    xml_sprite->Attribute("ox", &ox);
 	    xml_sprite->Attribute("oy", &oy);
 	    std::string name(xml_spec);
-	    String::Replace(name, "spec.xml", xml_sprite->Attribute("name"));
+	    StringReplace(name, "spec.xml", xml_sprite->Attribute("name"));
 
 	    Sprite & sp1 = v.sprites[index];
 	    Sprite & sp2 = v.reflect[index];
@@ -654,7 +652,7 @@ bool AGG::Cache::LoadAltICN(const ICN::icn_t icn, const u32 index, bool reflect)
 
 	    if(reflect && sp1.isValid() && ! sp2.isValid())
 	    {
-		Surface::Reflect(sp2, sp1, 2);
+		sp2.Set(Surface::Reflect(sp1, 2));
 		return sp2.isValid();
 	    }
 	}
@@ -676,7 +674,7 @@ void AGG::Cache::SaveICN(const ICN::icn_t icn)
     {
 	icn_cache_t & v = icn_cache[icn];
 
-        const std::string icn_lower = String::Lower(ICN::GetString(icn));
+        const std::string icn_lower = StringLower(ICN::GetString(icn));
 	const std::string icn_dir = images_dir + SEPARATOR + icn_lower;
 
 	if(! IsDirectory(icn_dir))
@@ -854,7 +852,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u32 index, bool reflect)
 bool AGG::Cache::LoadAltTIL(const TIL::til_t til, u32 max)
 {
 #ifdef WITH_XML
-    const std::string prefix_images_til = std::string("files") + SEPARATOR + std::string("images") + SEPARATOR + String::Lower(TIL::GetString(til));
+    const std::string prefix_images_til = std::string("files") + SEPARATOR + std::string("images") + SEPARATOR + StringLower(TIL::GetString(til));
     const std::string xml_spec = Settings::GetLastFile(prefix_images_til, "spec.xml");
 
     // parse spec.xml
@@ -884,10 +882,15 @@ bool AGG::Cache::LoadAltTIL(const TIL::til_t til, u32 max)
 	    {
 		Surface & sf = v.sprites[index];
 		std::string name(xml_spec);
-		String::Replace(name, "spec.xml", xml_sprite->Attribute("name"));
+		StringReplace(name, "spec.xml", xml_sprite->Attribute("name"));
 
-		if(! sf.isValid() && IsFile(name) && sf.Load(name.c_str()))
-		    DEBUG(DBG_ENGINE, DBG_TRACE, xml_spec << ", " << index);
+		if(IsFile(name))
+		    sf.Load(name.c_str());
+		else
+		    DEBUG(DBG_ENGINE, DBG_TRACE, "load til" << ": " << name);
+
+		if(! sf.isValid())
+		    return false;
 	    }
 	}
 
@@ -976,16 +979,16 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
 
     if(conf.UseAltResource())
     {
-       std::string name = String::Lower(M82::GetString(m82));
+       std::string name = StringLower(M82::GetString(m82));
 	const std::string prefix_sounds = std::string("files") + SEPARATOR + std::string("sounds");
        // ogg
-       String::Replace(name, ".82m", ".ogg");
+       StringReplace(name, ".82m", ".ogg");
        std::string sound = Settings::GetLastFile(prefix_sounds, name);
 
 	if(! LoadFileToMem(v, sound))
 	{
 	    // find mp3
-	    String::Replace(name, ".82m", ".mp3");
+	    StringReplace(name, ".82m", ".mp3");
 	    sound = Settings::GetLastFile(prefix_sounds, name);
 
 	    LoadFileToMem(v, sound);
@@ -1099,7 +1102,7 @@ void AGG::Cache::LoadFNT(void)
 	if(fnt_cache.size()) return;
 
 	const std::string letters = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
-	std::vector<u16> unicode = String::UTF8_to_UNICODE(letters);
+	std::vector<u16> unicode = StringUTF8_to_UNICODE(letters);
 
 	for(std::vector<u16>::const_iterator
 	    it = unicode.begin(); it != unicode.end(); ++it)
@@ -1245,7 +1248,7 @@ const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u32 index, u8 shape)
 
 	if(src.isValid())
 	{
-	    Surface::Reflect(surface, src, shape);
+	    surface.Set(Surface::Reflect(src, shape));
 	}
 	else
 	DEBUG(DBG_ENGINE, DBG_WARN, "is NULL");
@@ -1603,7 +1606,7 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 	if(IsFile(shortname)) filename = shortname.c_str();
 	else
 	{
-	    String::Replace(shortname, ".ogg", ".mp3");
+	    StringReplace(shortname, ".ogg", ".mp3");
 	    if(IsFile(shortname)) filename = shortname.c_str();
 	    else
 		DEBUG(DBG_ENGINE, DBG_WARN, "error read file: " << musname << ", skipping...");

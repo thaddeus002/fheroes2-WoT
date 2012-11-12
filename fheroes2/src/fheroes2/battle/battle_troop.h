@@ -26,6 +26,7 @@
 #include <vector>
 #include <utility>
 #include "bitmodes.h"
+#include "sprite.h"
 #include "battle.h"
 #include "battle_army.h"
 #include "battle_arena.h"
@@ -77,7 +78,7 @@ namespace Battle
 	u32		GetHitPointsLeft(void) const;
 	u16		GetAffectedDuration(u32) const;
 	u8		GetSpeed(void) const;
-	Sprite*		GetContour(u8) const;
+	const Sprite*	GetContour(u8) const;
 
 	void	InitContours(void);
 	void	SetMirror(Unit*);
@@ -200,7 +201,7 @@ namespace Battle
 	Position	position;
 	ModesAffected	affected;
 	Unit*		mirror;
-	Sprite*		contours[4];
+	Sprite		contours[4];
 
 	bool		blindanswer;
     };

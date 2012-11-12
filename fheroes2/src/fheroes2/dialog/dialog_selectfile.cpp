@@ -71,7 +71,7 @@ void FileInfoListBox::RedrawItem(const Maps::FileInfo & info, s16 dstx, s16 dsty
     {
 	Text text;
 	const size_t dotpos = savname.size() - 4;
-    	if(String::Lower(savname.substr(dotpos)) == ".sav") savname.erase(dotpos);
+    	if(StringLower(savname.substr(dotpos)) == ".sav") savname.erase(dotpos);
 
 	text.Set(savname, (current ? Font::YELLOW_BIG : Font::BIG));
 	text.Blit(dstx + 5, dsty, (Settings::Get().QVGA() ? 190 : 155));
@@ -298,7 +298,7 @@ bool SelectFileListSimple(const std::string & header, std::string & result, bool
 	else
 	if(edit_mode && le.KeyPress())
 	{
-	    charInsertPos = String::InsertKeySym(filename, charInsertPos, le.KeyValue(), le.KeyMod());
+	    charInsertPos = InsertKeySym(filename, charInsertPos, le.KeyValue(), le.KeyMod());
 	    buttonOk.SetDisable(filename.empty());
 	    cursor.Hide();
 	}
@@ -322,7 +322,7 @@ bool SelectFileListSimple(const std::string & header, std::string & result, bool
 	    listbox.Redraw();
 
 	    if(edit_mode && editor)
-		RedrawExtraInfo(rt, header, String::InsertString(filename, charInsertPos, "_"));
+		RedrawExtraInfo(rt, header, InsertString(filename, charInsertPos, "_"));
 	    else
 	    if(listbox.isSelected())
 	    {

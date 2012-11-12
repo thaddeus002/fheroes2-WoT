@@ -1016,7 +1016,7 @@ bool Heroes::BuySpellBook(const Castle* castle, u8 shrine)
     Kingdom & kingdom = GetKingdom();
 
     std::string header = _("To cast spells, you must first buy a spell book for %{gold} gold.");
-    String::Replace(header, "%{gold}", payment.gold);
+    StringReplace(header, "%{gold}", payment.gold);
 
     if( ! kingdom.AllowPayment(payment))
     {

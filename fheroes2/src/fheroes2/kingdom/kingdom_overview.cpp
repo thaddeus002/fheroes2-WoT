@@ -565,7 +565,7 @@ void RedrawFundsInfo(const Point & pt, const Kingdom & myKingdom)
     text.Blit(pt.x + 180, pt.y + 462);
 
     std::string msg = _("Day: %{day}");
-    String::Replace(msg, "%{day}", world.GetDay());
+    StringReplace(msg, "%{day}", world.GetDay());
     text.Set(msg);
     text.Blit(pt.x + 360, pt.y + 462);
 }

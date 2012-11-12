@@ -65,10 +65,10 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
 	str += count > 1 ? _(" with %{count} artifacts") : _(" with one artifact");
     }
 
-    String::Replace(str, "%{name}", hero->GetName());
-    String::Replace(str, "%{value}", hero->GetLevel());
-    String::Replace(str, "%{race}", Race::String(hero->GetRace()));
-    String::Replace(str, "%{count}", count);
+    StringReplace(str, "%{name}", hero->GetName());
+    StringReplace(str, "%{value}", hero->GetLevel());
+    StringReplace(str, "%{race}", Race::String(hero->GetRace()));
+    StringReplace(str, "%{count}", count);
 
     TextBox box2(str, Font::BIG, BOXAREA_WIDTH);
 
@@ -541,8 +541,8 @@ u32 Castle::OpenTown(void)
 	    else
 	    {
 		std::string str = _("Recruit %{name} the %{race}");
-		String::Replace(str, "%{name}", hero1->GetName());
-		String::Replace(str, "%{race}", Race::String(hero1->GetRace()));
+		StringReplace(str, "%{name}", hero1->GetName());
+		StringReplace(str, "%{race}", Race::String(hero1->GetRace()));
 	    	statusBar.ShowMessage(str);
 	    }
 	}
@@ -554,8 +554,8 @@ u32 Castle::OpenTown(void)
 	    else
 	    {
 		std::string str = _("Recruit %{name} the %{race}");
-		String::Replace(str, "%{name}", hero2->GetName());
-		String::Replace(str, "%{race}", Race::String(hero2->GetRace()));
+		StringReplace(str, "%{name}", hero2->GetName());
+		StringReplace(str, "%{race}", Race::String(hero2->GetRace()));
 	    	statusBar.ShowMessage(str);
 	    }
 	}

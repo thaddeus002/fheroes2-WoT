@@ -271,9 +271,6 @@ void Heroes::Redraw(Surface & dst, const s16 dx, const s16 dy, bool with_shadow)
 	dst_pt4.y += oy;
     }
 
-    Rect src_rt;
-
-
     if(isShipMaster())
     {
 	dst_pt1.y -= 15;
@@ -281,23 +278,16 @@ void Heroes::Redraw(Surface & dst, const s16 dx, const s16 dy, bool with_shadow)
 	dst_pt3.y -= 15;
 	dst_pt4.y -= 15;
 
-	gamearea.SrcRectFixed(src_rt, dst_pt4, sprite4.w(), sprite4.h());
-	sprite4.Blit(src_rt, dst_pt4, dst);
+	sprite4.Blit(Interface::GameArea::RectFixed(dst_pt4, sprite4.w(), sprite4.h()), dst_pt4, dst);
     }
 
     // redraw sprites for shadow
     if(with_shadow)
-    {
-	gamearea.SrcRectFixed(src_rt, dst_pt3, sprite3.w(), sprite3.h());
-	sprite3.Blit(src_rt, dst_pt3, dst);
-    }
+	sprite3.Blit(Interface::GameArea::RectFixed(dst_pt3, sprite3.w(), sprite3.h()), dst_pt3, dst);
 
     // redraw sprites hero and flag
-    gamearea.SrcRectFixed(src_rt, dst_pt1, sprite1.w(), sprite1.h());
-    sprite1.Blit(src_rt, dst_pt1, dst);
-
-    gamearea.SrcRectFixed(src_rt, dst_pt2, sprite2.w(), sprite2.h());
-    sprite2.Blit(src_rt, dst_pt2, dst);
+    sprite1.Blit(Interface::GameArea::RectFixed(dst_pt1, sprite1.w(), sprite1.h()), dst_pt1, dst);
+    sprite2.Blit(Interface::GameArea::RectFixed(dst_pt2, sprite2.w(), sprite2.h()), dst_pt2, dst);
 
     // redraw dependences tiles
     Maps::Tiles & tile = world.GetTiles(center);
@@ -544,9 +534,7 @@ void Heroes::FadeOut(void) const
     const Sprite & sprite1 = SpriteHero(*this, sprite_index, reflect);
 
     Point dst_pt1(dx + (reflect ? TILEWIDTH - sprite1.x() - sprite1.w() : sprite1.x()), dy + sprite1.y() + TILEWIDTH);
-    Rect src_rt;
-
-    gamearea.SrcRectFixed(src_rt, dst_pt1, sprite1.w(), sprite1.h());
+    const Rect src_rt = Interface::GameArea::RectFixed(dst_pt1, sprite1.w(), sprite1.h());
 
     LocalEvent & le = LocalEvent::Get();
     u8 alpha = 250;
@@ -603,9 +591,7 @@ void Heroes::FadeIn(void) const
     const Sprite & sprite1 = SpriteHero(*this, sprite_index, reflect);
 
     Point dst_pt1(dx + (reflect ? TILEWIDTH - sprite1.x() - sprite1.w() : sprite1.x()), dy + sprite1.y() + TILEWIDTH);
-    Rect src_rt;
-
-    gamearea.SrcRectFixed(src_rt, dst_pt1, sprite1.w(), sprite1.h());
+    const Rect src_rt = Interface::GameArea::RectFixed(dst_pt1, sprite1.w(), sprite1.h());
 
     LocalEvent & le = LocalEvent::Get();
     u8 alpha = 0;

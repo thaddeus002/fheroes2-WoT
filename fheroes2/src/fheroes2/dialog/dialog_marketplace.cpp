@@ -126,15 +126,15 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
         if(Resource::GOLD == resourceTo)
         {
             message = _("I can offer you %{count} for 1 unit of %{resfrom}.");
-            String::Replace(message, "%{count}", exchange_rate);
-            String::Replace(message, "%{resfrom}", Resource::String(resourceFrom));
+            StringReplace(message, "%{count}", exchange_rate);
+            StringReplace(message, "%{resfrom}", Resource::String(resourceFrom));
         }
         else
         {
             message = _("I can offer you 1 unit of %{resto} for %{count} units of %{resfrom}.");
-            String::Replace(message, "%{resto}", Resource::String(resourceTo));
-            String::Replace(message, "%{resfrom}", Resource::String(resourceFrom));
-            String::Replace(message, "%{count}", exchange_rate);
+            StringReplace(message, "%{resto}", Resource::String(resourceTo));
+            StringReplace(message, "%{resfrom}", Resource::String(resourceFrom));
+            StringReplace(message, "%{count}", exchange_rate);
         }
         TextBox(message, Font::BIG, Rect(pos_rt.x, pos_rt.y + 30, pos_rt.w, 100));
         const Sprite & sprite_from = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(resourceFrom));

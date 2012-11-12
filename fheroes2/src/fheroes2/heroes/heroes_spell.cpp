@@ -186,7 +186,7 @@ void DialogSpellFailed(const Spell & spell)
 {
     // failed
     std::string str = "%{spell} failed!!!";
-    String::Replace(str, "%{spell}", spell.GetName());
+    StringReplace(str, "%{spell}", spell.GetName());
     Dialog::Message("", str, Font::BIG, Dialog::OK);
 }
 
@@ -460,8 +460,8 @@ bool ActionSpellVisions(Heroes & hero)
 	    const u8 reason = Army::GetJoinSolution(hero, tile, join);
 	    std::string hdr, msg;
 
-	    hdr = std::string("%{count} ") + String::Lower(troop.GetPluralName(join));
-	    String::Replace(hdr, "%{count}", join);
+	    hdr = std::string("%{count} ") + StringLower(troop.GetPluralName(join));
+	    StringReplace(hdr, "%{count}", join);
 
 	    switch(reason)
 	    {
@@ -479,11 +479,11 @@ bool ActionSpellVisions(Heroes & hero)
 		    else
 		    {
 			msg = ngettext("The creature will join us...", "%{count} of the creatures will join us...", join);
-			String::Replace(msg, "%{count}", join);
+			StringReplace(msg, "%{count}", join);
 		    }
 		    msg.append("\n");
 		    msg.append("\n for a fee of %{gold} gold.");
-		    String::Replace(msg, "%{gold}", troop.GetCost().gold);
+		    StringReplace(msg, "%{gold}", troop.GetCost().gold);
 		    break;
 
 		default:
@@ -497,7 +497,7 @@ bool ActionSpellVisions(Heroes & hero)
     else
     {
 	std::string msg = _("You must be within %{count} spaces of a monster for the Visions spell to work.");
-	String::Replace(msg, "%{count}", dist);
+	StringReplace(msg, "%{count}", dist);
 	Dialog::Message("", msg, Font::BIG, Dialog::OK);
 	return false;
     }

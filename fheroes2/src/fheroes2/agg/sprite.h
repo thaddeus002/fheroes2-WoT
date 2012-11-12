@@ -29,7 +29,6 @@ class Sprite : public Surface
 {
 public:
     Sprite();
-    Sprite(const Sprite &);
 
     void SetOffset(s16, s16);
 
@@ -51,7 +50,6 @@ public:
     static void AddonExtensionModify(Sprite & sp, u16 icn, u16 index);
 
 private:
-
     s16		offsetX;
     s16		offsetY;
 };

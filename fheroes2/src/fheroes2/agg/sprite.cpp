@@ -51,10 +51,6 @@ Sprite::Sprite() : offsetX(0), offsetY(0)
 {
 }
 
-Sprite::Sprite(const Sprite & sp) : Surface(sp), offsetX(sp.offsetX), offsetY(sp.offsetY)
-{
-}
-
 void Sprite::SetOffset(s16 ox, s16 oy)
 {
     offsetX = ox;
@@ -193,9 +189,8 @@ void Sprite::ScaleMinifyByTwo(void)
 	    display.Flip();
 	}
 
-	Surface sf;
-	Surface::ScaleMinifyByTwo(sf, *this, cursor.isVisible());
-	Surface::Swap(sf, *this);
+	Surface mini = Surface::ScaleMinifyByTwo(*this, cursor.isVisible());
+	Surface::Swap(mini, *this);
 
 	if(theme)
 	{
@@ -216,8 +211,7 @@ void Sprite::AddonExtensionModify(Sprite & sp, u16 icn, u16 index)
 	case ICN::AELEM:
 	    if(sp.w() > 3 && sp.h() > 3)
 	    {
-		Surface sf;
-		Surface::MakeContour(sf, sp, sp.GetColorIndex(0xEF));
+		Surface sf = Surface::Contour(sp, sp.GetColorIndex(0xEF));
 		sf.Blit(-1, -1, sp);
 	    }
 	    break;

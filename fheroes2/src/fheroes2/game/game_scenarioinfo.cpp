@@ -391,7 +391,7 @@ void RedrawRatingInfo(TextSprite & sprite)
 {
     sprite.Hide();
     std::string str(_("Rating %{rating}%"));
-    String::Replace(str, "%{rating}", Game::GetRating());
+    StringReplace(str, "%{rating}", Game::GetRating());
     sprite.SetText(str);
     sprite.Show();
 }

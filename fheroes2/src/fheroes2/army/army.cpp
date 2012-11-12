@@ -92,7 +92,7 @@ std::string Army::TroopSizeString(const Troop & troop)
         case ARMY_LEGION:	str = _("A legion of\n%{monster}"); break;
     }
 
-    String::Replace(str, "%{monster}", String::Lower(troop.GetMultiName()));
+    StringReplace(str, "%{monster}", StringLower(troop.GetMultiName()));
     return str;
 }
 
@@ -906,7 +906,7 @@ s8 Army::GetMoraleModificator(std::string *strs) const
             	    if(strs)
             	    {
             		std::string str = _("All %{race} troops +1");
-            		String::Replace(str, "%{race}", Race::String(r));
+            		StringReplace(str, "%{race}", Race::String(r));
             		strs->append(str);
             		strs->append("\n");
             	    }

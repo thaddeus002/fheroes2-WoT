@@ -965,7 +965,7 @@ bool Battle::Board::isValidMirrorImageIndex(s16 index, const Unit* b)
 std::string Battle::Board::GetMoatInfo(void)
 {
     std::string msg = _("The Moat reduces by -%{count} the defense skill of any unit and slows to half movement rate.");
-    String::Replace(msg, "%{count}", GameStatic::GetBattleMoatReduceDefense());
+    StringReplace(msg, "%{count}", GameStatic::GetBattleMoatReduceDefense());
 
     return msg;
 }

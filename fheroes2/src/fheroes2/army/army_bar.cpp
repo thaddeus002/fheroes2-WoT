@@ -218,32 +218,32 @@ bool ArmyBar::ActionBarCursor(const Point & cursor, ArmyTroop & troop, const Rec
 	if(&troop == troop2)
 	{
 	    msg = _("View %{name}");
-	    String::Replace(msg, "%{name}", troop.GetName());
+	    StringReplace(msg, "%{name}", troop.GetName());
 	}
 	else
 	if(! troop.isValid())
 	{
     	    msg = _("Move or right click Redistribute %{name}");
-    	    String::Replace(msg, "%{name}", troop2->GetName());
+    	    StringReplace(msg, "%{name}", troop2->GetName());
 	}
 	else
 	if(troop.GetID() == troop2->GetID())
 	{
 	    msg = _("Combine %{name} armies");
-	    String::Replace(msg, "%{name}", troop.GetName());
+	    StringReplace(msg, "%{name}", troop.GetName());
 	}
 	else
 	{
 	    msg = _("Exchange %{name2} with %{name}");
-	    String::Replace(msg, "%{name}", troop.GetName());
-	    String::Replace(msg, "%{name2}", troop2->GetName());
+	    StringReplace(msg, "%{name}", troop.GetName());
+	    StringReplace(msg, "%{name2}", troop2->GetName());
 	}
     }
     else
     if(troop.isValid())
     {
         msg = _("Select %{name}");
-        String::Replace(msg, "%{name}", troop.GetName());
+        StringReplace(msg, "%{name}", troop.GetName());
     }
 
     // drag drop - redistribute troops
@@ -289,8 +289,8 @@ bool ArmyBar::ActionBarCursor(const Point & cursor, ArmyTroop & troop1, const Re
 	if(troop1.GetID() != troop2.GetID())
 	{
 	    msg = _("Exchange %{name2} with %{name}");
-	    String::Replace(msg, "%{name}", troop1.GetName());
-	    String::Replace(msg, "%{name2}", troop2.GetName());
+	    StringReplace(msg, "%{name}", troop1.GetName());
+	    StringReplace(msg, "%{name2}", troop2.GetName());
 	}
 	else
 	if(save_last_troop)
@@ -298,7 +298,7 @@ bool ArmyBar::ActionBarCursor(const Point & cursor, ArmyTroop & troop1, const Re
 	else
 	{
 	    msg = _("Combine %{name} armies");
-	    String::Replace(msg, "%{name}", troop1.GetName());
+	    StringReplace(msg, "%{name}", troop1.GetName());
 	}
     }
     else
@@ -307,7 +307,7 @@ bool ArmyBar::ActionBarCursor(const Point & cursor, ArmyTroop & troop1, const Re
     else
     {
     	msg = _("Move or right click Redistribute %{name}");
-    	String::Replace(msg, "%{name}", troop2.GetName());
+    	StringReplace(msg, "%{name}", troop2.GetName());
     }
 
     return false;

@@ -44,12 +44,12 @@ void Dialog::SpellInfo(const Spell & spell, const bool ok_button)
     }
 
     if(1 == extra)
-        String::Replace(msg, "%{count}", _("one"));
+        StringReplace(msg, "%{count}", _("one"));
     else
     if(2 == extra)
-        String::Replace(msg, "%{count}", _("two"));
+        StringReplace(msg, "%{count}", _("two"));
     else
-	String::Replace(msg, "%{count}", extra);
+	StringReplace(msg, "%{count}", extra);
 
     Dialog::SpellInfo(spell.GetName(), msg, spell, ok_button);
 }
