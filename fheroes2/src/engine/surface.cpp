@@ -1215,7 +1215,7 @@ std::string Surface::Info(void) const
 #endif
     }
     else
-	os << "invalid";
+	os << "invalid surface";
 
     return os.str();
 }

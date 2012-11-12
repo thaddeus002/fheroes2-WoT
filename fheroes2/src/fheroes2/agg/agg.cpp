@@ -1325,9 +1325,9 @@ void AGG::Cache::ICNRegistryEnable(bool f)
 
 void AGG::Cache::ICNRegistryFreeObjects(void)
 {
-    std::vector<ICN::icn_t>::const_iterator it1 = icn_registry.begin();
-    std::vector<ICN::icn_t>::const_iterator it2 = icn_registry.end();
-    for(; it1 != it2; ++it1) if(!ICN::SkipRegistryFree(*it1)) FreeICN(*it1);
+    for(std::vector<ICN::icn_t>::const_iterator
+	it = icn_registry.begin(); it != icn_registry.end(); ++it)
+	if(!ICN::SkipRegistryFree(*it)) FreeICN(*it);
 }
 
 void AGG::Cache::Dump(void) const

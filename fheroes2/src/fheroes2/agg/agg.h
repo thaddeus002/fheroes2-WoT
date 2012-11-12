@@ -93,7 +93,6 @@ namespace AGG
 
     struct fnt_cache_t
     {
-	fnt_cache_t() : medium_white(NULL), medium_yellow(NULL), small_white(NULL), small_yellow(NULL) {}
 	Surface medium_white;
 	Surface medium_yellow;
 	Surface small_white;
