@@ -219,11 +219,12 @@ void AGG::Cache::ClearAllICN(void)
 {
     if(icn_cache)
     {
-	for(u32 ii = 0; ii < ICN::UNKNOWN; ++ii)
+	for(u32 ii = 0; ii <= ICN::UNKNOWN; ++ii)
 	{
 	    if(icn_cache[ii].sprites)
 	    {
-		if(Settings::Get().UseAltResource()) SaveICN(static_cast<ICN::icn_t>(ii));
+		if(ii < ICN::UNKNOWN &&
+		    Settings::Get().UseAltResource()) SaveICN(static_cast<ICN::icn_t>(ii));
 		delete [] icn_cache[ii].sprites;
 	    }
 	    icn_cache[ii].sprites = NULL;
