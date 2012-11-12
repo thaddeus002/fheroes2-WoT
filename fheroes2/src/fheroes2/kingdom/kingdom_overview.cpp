@@ -261,7 +261,7 @@ struct CstlRow
     ArmyBar*		armyBarGuest;
     DwellingsBar*	dwellingsBar;
 
-    CstlRow() : castle(NULL), armyBarGuard(NULL), armyBarGuest(NULL) {}
+    CstlRow() : castle(NULL), armyBarGuard(NULL), armyBarGuest(NULL), dwellingsBar(NULL) {}
     ~CstlRow()
     {
 	Clear();
