@@ -121,13 +121,13 @@ public:
 	    return true;
 	}
 	else
-        if(le.MouseClickLeft(rt2) && 3 != cobj.GetSplit() && troop.GetCount() > 3)
+        if(le.MouseClickLeft(rt2) && 3 != cobj.GetSplit() && troop.GetCount() >= 3)
 	{
 	    cobj.SetSplit(3);
 	    return true;
 	}
 	else
-        if(le.MouseClickLeft(rt3) && 5 != cobj.GetSplit() && troop.GetCount() > 5)
+        if(le.MouseClickLeft(rt3) && 5 != cobj.GetSplit() && troop.GetCount() >= 5)
 	{
 	    cobj.SetSplit(5);
 	    return true;
