@@ -443,7 +443,7 @@ void Battle::OpponentSprite::ResetAnimFrame(u8 rule)
 		    icn = ICN::CMBTHRON;
 		    switch(rule)
 		    {
-			case OP_IDLE:	animframe_start = 16; animframe_count = 4; break;
+			case OP_IDLE:	animframe_start = 16; animframe_count = 2; break;
 			case OP_SRRW:	animframe_start = 1; animframe_count = 5; break;
 			case OP_CAST:	animframe_start = 6; animframe_count = 9; break;
 			default: break;
@@ -2719,8 +2719,8 @@ void Battle::Interface::RedrawActionSpellCastPart2(const Spell & spell, TargetsI
 
 	    if(killed)
 	    {
-		msg.append(" ");
-		msg.append(ngettext("one creature perishes.", "%{count} creatures perish.", killed));
+		status.SetMessage(msg, true);
+		msg = ngettext("one creature perishes.", "%{count} creatures perish.", killed);
     		StringReplace(msg, "%{count}", killed);
 	    }
 
@@ -3815,6 +3815,21 @@ void Battle::Interface::RedrawTargetsWithFrameAnimation(s16 dst, const TargetsIn
     }
 }
 
+Point RedrawTroopWithFrameAnimationOffset(ICN::icn_t icn, const Rect & pos, const Sprite & sp,  bool wide, bool reflect, bool qvga)
+{
+    Point res(sp.x() + pos.x, pos.y + sp.y());
+
+    switch(icn)
+    {
+	case ICN::SHIELD: res.x += reflect ? -pos.w / (wide ? 2 : 1) : pos.w / 2; break;
+	case ICN::STONSKIN:
+	case ICN::STELSKIN: res.y += pos.h / 2; break;
+	default: res.y += (qvga ? pos.h / 2 : 0); break;
+    }
+
+    return res;
+}
+
 void Battle::Interface::RedrawTargetsWithFrameAnimation(const TargetsInfo & targets, ICN::icn_t icn, M82::m82_t m82, bool wnce)
 {
     Display & display = Display::Get();
@@ -3856,8 +3871,10 @@ void Battle::Interface::RedrawTargetsWithFrameAnimation(const TargetsInfo & targ
 		}
 
 		const Sprite & sprite = AGG::GetICN(icn, frame, reflect);
-		sprite.Blit(pos.x + sprite.x() + pos.w / 2,
-				pos.y + sprite.y() + (Settings::Get().QVGA() ? pos.h / 2 : 0));
+		const Point offset = RedrawTroopWithFrameAnimationOffset(icn, pos, sprite, (*it).defender->isWide(), reflect, Settings::Get().QVGA());
+		const Point sprite_pos(offset.x + (reflect ? 0 : pos.w / 2), offset.y);
+
+		sprite.Blit(sprite_pos);
 	    }
 	    cursor.Show();
 	    display.Flip();
@@ -3884,20 +3901,6 @@ void RedrawSparksEffects(const Point & src, const Point & dst)
     Display & display = Display::Get();
     u32 yellow = display.MapRGB(0xFF, 0xFF, 0);
     display.DrawLine(src.x, src.y, dst.x, dst.y, yellow);
-}
-
-Point RedrawTroopWithFrameAnimationOffset(ICN::icn_t icn, const Rect & pos, const Sprite & sp,  bool qvga)
-{
-    Point res(sp.x() + pos.x, pos.y + sp.y());
-
-    switch(icn)
-    {
-	case ICN::STONSKIN:
-	case ICN::STELSKIN: res.y += pos.h / 2; break;
-	default: res.y += (qvga ? pos.h / 2 : 0); break;
-    }
-
-    return res;
 }
 
 void Battle::Interface::RedrawTroopWithFrameAnimation(Unit & b, ICN::icn_t icn, M82::m82_t m82, bool pain)
@@ -3938,7 +3941,7 @@ void Battle::Interface::RedrawTroopWithFrameAnimation(Unit & b, ICN::icn_t icn, 
 	    Redraw();
 
 	    const Sprite & sprite = AGG::GetICN(icn, frame, reflect);
-	    const Point offset = RedrawTroopWithFrameAnimationOffset(icn, pos, sprite, Settings::Get().QVGA());
+	    const Point offset = RedrawTroopWithFrameAnimationOffset(icn, pos, sprite, b.isWide(), reflect, Settings::Get().QVGA());
 	    const Point sprite_pos(offset.x + (reflect ? 0 : pos.w / 2), offset.y);
 
 	    if(icn == ICN::SPARKS)
