@@ -698,8 +698,7 @@ bool Heroes::Recruit(u8 cl, const Point & pt)
 
 bool Heroes::Recruit(const Castle & castle)
 {
-    if(NULL == castle.GetHeroes().Guest() &&
-	Recruit(castle.GetColor(), castle.GetCenter()))
+    if(Recruit(castle.GetColor(), castle.GetCenter()))
     {
 	if(castle.GetLevelMageGuild())
 	{

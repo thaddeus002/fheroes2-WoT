@@ -648,7 +648,18 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 
 			    if(buyhero)
 			    {
-            			selectArmy2.SetArmy(& heroes.Guest()->GetArmy());
+            			if(prev)
+				{
+				    selectArmy1.SetArmy(& heroes.Guard()->GetArmy());
+            			    selectArmy2.SetArmy(NULL);
+				    cursor.Hide();
+				    RedrawIcons(*this, CastleHeroes(NULL, heroes.Guard()), cur_pt);
+				    selectArmy1.Redraw();
+				    if(selectArmy2.isValid()) selectArmy2.Redraw();
+				    cursor.Show();
+				    display.Flip();
+            			}
+				selectArmy2.SetArmy(& heroes.Guest()->GetArmy());
 				AGG::PlaySound(M82::BUILDTWN);
 
 				// animate fade in for hero army bar

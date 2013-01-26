@@ -634,9 +634,22 @@ bool Castle::AllowBuyHero(const Heroes & hero, std::string* msg)
 
     if(heroes.Guest())
     {
-	if(msg) *msg = _("Cannot recruit - you already have a Hero in this town.");
-	return false;
+	// allow recruit with auto move guest to guard
+        if(Settings::Get().ExtCastleAllowGuardians() && ! heroes.Guard())
+	{
+	    if(! heroes.Guest()->GetArmy().CanJoinTroops(army))
+            {
+		if(msg) *msg = _("Cannot recruit - guest to guard automove error.");
+	        return false;
+            }
+	}
+	else
+	{
+	    if(msg) *msg = _("Cannot recruit - you already have a Hero in this town.");
+	    return false;
+	}
     }
+
 
     if(!myKingdom.AllowRecruitHero(false, hero.GetLevel()))
     {
@@ -655,7 +668,22 @@ bool Castle::AllowBuyHero(const Heroes & hero, std::string* msg)
 
 Heroes* Castle::RecruitHero(Heroes* hero)
 {
-    if(!hero || !AllowBuyHero(*hero) || !hero->Recruit(*this)) return NULL;
+    if(!hero || !AllowBuyHero(*hero)) return NULL;
+
+    CastleHeroes heroes = world.GetHeroes(*this);
+    if(heroes.Guest())
+    {
+        if(Settings::Get().ExtCastleAllowGuardians() && ! heroes.Guard())
+	{
+	    // move guest to guard
+            SwapCastleHeroes(heroes);
+	}
+	else
+	    return NULL;
+    }
+
+    // recruit
+    if(!hero->Recruit(*this)) return NULL;
 
     Kingdom & kingdom = GetKingdom();
 

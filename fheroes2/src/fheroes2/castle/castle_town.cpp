@@ -459,7 +459,7 @@ u32 Castle::OpenTown(void)
 	if(hero2 && le.MouseClickLeft(rectHero2) &&
 	    Dialog::OK == DialogBuyHero(hero2))
         {
-    	    RecruitHero(hero2);
+	    RecruitHero(hero2);
 
 	    return BUILD_NOTHING;
         }
