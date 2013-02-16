@@ -51,8 +51,6 @@ namespace Interface
 {
     bool NoGUI(void);
 
-    void FixOutOfDisplay(const Rect &, s16 & , s16 &);
-
     class Basic
     {
     public:
@@ -74,7 +72,7 @@ namespace Interface
 	IconsPanel & iconsPanel;
 	ButtonsArea & buttonsArea;
 	StatusWindow & statusWindow;
-	BorderWindow & borderWindow;
+	GameBorder & gameBorder;
 	ControlPanel & controlPanel;
 
 	void	SetHideInterface(bool);

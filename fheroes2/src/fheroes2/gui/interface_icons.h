@@ -23,9 +23,8 @@
 #ifndef H2INTERFACE_ICONS_H
 #define H2INTERFACE_ICONS_H
 
-#include "gamedefs.h"
 #include "interface_list.h"
-#include "dialog.h"
+#include "interface_border.h"
 
 enum icons_t { ICON_HEROES = 0x01, ICON_CASTLES = 0x02, ICON_ANY = ICON_HEROES|ICON_CASTLES };
 
@@ -92,18 +91,18 @@ namespace Interface
 	void RedrawBackground(const Point &);
     };
 
-    class IconsPanel : protected Rect
+    class IconsPanel : public BorderWindow
     {
     public:
 	static IconsPanel & Get(void);
     
 	void SetPos(s16, s16);
-	void SetCount(u8);
+	void SavePosition(void);
+
 	void Redraw(void);
 	void QueueEventProcessing(void);
 
-        const Rect & GetArea(void) const;
-        u8           CountIcons(void) const;
+        u8   CountIcons(void) const;
 
 	void Select(const Heroes &);
 	void Select(const Castle &);
@@ -119,8 +118,6 @@ namespace Interface
 	IconsPanel();
 
 	u8 icons;
-	Dialog::FrameBorder border;
-
         Surface sfMarker;
 
 	CastleIcons castleIcons;

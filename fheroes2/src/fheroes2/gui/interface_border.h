@@ -23,19 +23,43 @@
 #ifndef H2INTERFACE_BORDER_H
 #define H2INTERFACE_BORDER_H
 
+#include "dialog.h"
 #include "gamedefs.h"
 
 namespace Interface
 {
-    class BorderWindow
+    class GameBorder
     {
     public:
-    	static BorderWindow & Get(void);
+    	static GameBorder & Get(void);
 
         void Redraw(void);
 
     private:
-	BorderWindow();
+	GameBorder();
+    };
+
+    class BorderWindow
+    {
+    public:
+	BorderWindow(const Rect &);
+	virtual ~BorderWindow(){}
+
+        virtual void SetPos(s16, s16) = 0;
+	virtual void SavePosition(void) = 0;
+
+        void Redraw(void);
+        bool QueueEventProcessing(void);
+
+        const Rect & GetArea(void) const;
+	const Rect & GetRect(void) const;
+
+    protected:
+        void SetPosition(s16, s16, u16, u16);
+        void SetPosition(s16, s16);
+
+	Rect			area;
+        Dialog::FrameBorder	border;
     };
 }
 

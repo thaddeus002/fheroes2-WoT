@@ -39,7 +39,7 @@ bool Interface::NoGUI(void)
 
 Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
     iconsPanel(IconsPanel::Get()), buttonsArea(ButtonsArea::Get()),
-    statusWindow(StatusWindow::Get()), borderWindow(BorderWindow::Get()),
+    statusWindow(StatusWindow::Get()), gameBorder(GameBorder::Get()),
     controlPanel(ControlPanel::Get()), redraw(0)
 {
     Settings & conf = Settings::Get().Get();
@@ -67,7 +67,6 @@ void Interface::Basic::SetHideInterface(bool f)
 
     if(f)
     {
-        iconsPanel.SetCount(2);
 	conf.SetShowPanel(true);
 
 	Point pos_radr = conf.PosRadar();
@@ -94,9 +93,6 @@ void Interface::Basic::SetHideInterface(bool f)
     {
 	radar.SetPos(px, BORDERWIDTH);
 	iconsPanel.SetPos(px, radar.GetArea().y + radar.GetArea().h + BORDERWIDTH);
-
-        const u8 count_h = (display.h() - 480) / TILEWIDTH;
-        iconsPanel.SetCount(count_h > 3 ? 8 : ( count_h < 3 ? 4 : 7));
 
 	buttonsArea.SetPos(px, iconsPanel.GetArea().y + iconsPanel.GetArea().h + BORDERWIDTH);
 	statusWindow.SetPos(px, buttonsArea.GetArea().y + buttonsArea.GetArea().h);
@@ -221,7 +217,7 @@ void Interface::Basic::Redraw(u8 force)
 	}
     }
 
-    if((redraw | force) & REDRAW_BORDER) borderWindow.Redraw();
+    if((redraw | force) & REDRAW_BORDER) gameBorder.Redraw();
 
     redraw = 0;
 }
@@ -283,17 +279,4 @@ s32 Interface::Basic::GetDimensionDoorDestination(const s32 from, const u8 dista
     }
 
     return -1;
-}
-
-void Interface::FixOutOfDisplay(const Rect & rt, s16 & ox, s16 & oy)
-{
-    Display & display = Display::Get();
-
-    if(ox + rt.w < 0) ox = 0;
-    else
-    if(ox > display.w() - rt.w + BORDERWIDTH) ox = display.w() - rt.w;
-
-    if(oy + rt.h < 0) oy = 0;
-    else
-    if(oy > display.h() - rt.h + BORDERWIDTH) oy = display.h() - rt.h;
 }

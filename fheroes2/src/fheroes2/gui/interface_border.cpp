@@ -23,19 +23,20 @@
 #include "agg.h"
 #include "maps.h"
 #include "settings.h"
+#include "game_interface.h"
 #include "interface_border.h"
 
-Interface::BorderWindow::BorderWindow()
+Interface::GameBorder::GameBorder()
 {
 }
 
-Interface::BorderWindow & Interface::BorderWindow::Get(void)
+Interface::GameBorder & Interface::GameBorder::Get(void)
 {
-    static BorderWindow borderWindow;
-    return borderWindow;
+    static GameBorder GameBorder;
+    return GameBorder;
 }
 
-void Interface::BorderWindow::Redraw(void)
+void Interface::GameBorder::Redraw(void)
 {
     const Settings & conf = Settings::Get();
     if(conf.ExtGameHideInterface()) return;
@@ -171,4 +172,105 @@ void Interface::BorderWindow::Redraw(void)
     dstpt.y = srcrt.y + BORDERWIDTH + count_icons * 32;
     srcrt.y = srcrt.y + BORDERWIDTH + 4 * 32;
     icnadv.Blit(srcrt, dstpt);
+}
+
+Interface::BorderWindow::BorderWindow(const Rect & rt) : area(rt)
+{
+}
+
+const Rect & Interface::BorderWindow::GetRect(void) const
+{
+    return Settings::Get().ExtGameHideInterface() && border.isValid() ?
+	border.GetRect() : GetArea();
+}
+
+const Rect & Interface::BorderWindow::GetArea(void) const
+{
+    return area;
+}
+
+void Interface::BorderWindow::Redraw(void)
+{
+    border.Redraw();
+}
+
+void Interface::BorderWindow::SetPosition(s16 px, s16 py, u16 pw, u16 ph)
+{
+    area.w = pw;
+    area.h = ph;
+
+    SetPosition(px, py);
+}
+
+void Interface::BorderWindow::SetPosition(s16 px, s16 py)
+{
+    if(Settings::Get().ExtGameHideInterface())
+    {
+	Display & display = Display::Get();
+
+	if(px + area.w < 0) px = 0;
+	else
+	if(px > display.w() - area.w + BORDERWIDTH) px = display.w() - area.w;
+
+	if(py + area.h < 0) py = 0;
+	else
+	if(py > display.h() - area.h + BORDERWIDTH) py = display.h() - area.h;
+
+        area.x = px + BORDERWIDTH;
+        area.y = py + BORDERWIDTH;
+
+        border.SetPosition(px, py, area.w, area.h);
+	SavePosition();
+    }
+    else
+    {
+        area.x = px;
+        area.y = py;
+    }
+}
+
+bool Interface::BorderWindow::QueueEventProcessing(void)
+{
+    Settings & conf = Settings::Get();
+    LocalEvent & le = LocalEvent::Get();
+
+    if(conf.ExtGameHideInterface() &&
+	le.MousePressLeft(border.GetTop()))
+    {
+	Display & display = Display::Get();
+	Cursor & cursor = Cursor::Get();
+
+        const Point & mp = le.GetMouseCursor();
+	const Rect & pos = GetRect();
+
+        Surface sf(pos.w, pos.h);
+        Cursor::DrawCursor(sf, 0x70);
+        const s16 ox = mp.x - pos.x;
+        const s16 oy = mp.y - pos.y;
+        SpriteCursor sp(sf, pos.x, pos.y);
+
+        cursor.Hide();
+        sp.Redraw();
+        cursor.Show();
+        display.Flip();
+
+        while(le.HandleEvents() && le.MousePressLeft())
+        {
+            if(le.MouseMotion())
+            {
+                cursor.Hide();
+                sp.Move(mp.x - ox, mp.y - oy);
+                cursor.Show();
+                display.Flip();
+            }
+        }
+
+        cursor.Hide();
+        SetPos(mp.x - ox, mp.y - oy);
+        Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
+
+	return true;
+    }
+
+    return false;
 }

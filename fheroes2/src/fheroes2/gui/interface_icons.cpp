@@ -309,7 +309,7 @@ void Interface::HeroesIcons::SetPos(s16 px, s16 py)
 }
 
 /* Interface::IconsPanel */
-Interface::IconsPanel::IconsPanel() : Rect(0, 0, 144, 128), icons(4),
+Interface::IconsPanel::IconsPanel() : BorderWindow(Rect(0, 0, 144, 128)), icons(4),
     castleIcons(icons, sfMarker), heroesIcons(icons, sfMarker)
 {
     sfMarker.Set(ICONS_CURSOR_WIDTH, ICONS_CURSOR_HEIGHT, false);
@@ -322,46 +322,34 @@ Interface::IconsPanel & Interface::IconsPanel::Get(void)
     return iconsPanel;
 }
 
-const Rect & Interface::IconsPanel::GetArea(void) const
-{
-    return Settings::Get().ExtGameHideInterface() && border.isValid() ? border.GetRect() : *this;
-}
-
 u8 Interface::IconsPanel::CountIcons(void) const
 {
     return icons;
+}
+
+void Interface::IconsPanel::SavePosition(void)
+{
+    Settings::Get().SetPosIcons(GetRect());
 }
 
 void Interface::IconsPanel::SetPos(s16 ox, s16 oy)
 {
     if(Settings::Get().ExtGameHideInterface())
     {
-	FixOutOfDisplay(*this, ox, oy); 
-
-        Rect::x = ox + BORDERWIDTH;
-        Rect::y = oy + BORDERWIDTH;
-
-        border.SetPosition(ox, oy, Rect::w, Rect::h);
-	Settings::Get().SetPosIcons(Point(ox, oy));
+	icons = 2;
     }
     else
     {
-	Rect::x = ox;
-	Rect::y = oy;
+	const u8 count_h = (Display::Get().h() - 480) / TILEWIDTH;
+	icons = count_h > 3 ? 8 : ( count_h < 3 ? 4 : 7);
     }
 
-    SetCount(icons);
-}
+    BorderWindow::SetPosition(ox, oy, 144, icons * ICONS_CURSOR_HEIGHT);
 
-void Interface::IconsPanel::SetCount(u8 count)
-{
-    icons = count;
-    Rect::h = icons * ICONS_CURSOR_HEIGHT;
+    const Rect & area = GetArea();
 
-    heroesIcons.SetPos(x, y);
-    castleIcons.SetPos(x + 72, y);
-
-    border.SetPosition(border.GetRect().x, border.GetRect().y, w, h);
+    heroesIcons.SetPos(area.x, area.y);
+    castleIcons.SetPos(area.x + 72, area.y);
 }
 
 void Interface::IconsPanel::Redraw(void)
@@ -371,23 +359,25 @@ void Interface::IconsPanel::Redraw(void)
     // is visible
     if(!conf.ExtGameHideInterface() || conf.ShowIcons())
     {
-	//Display::Get().FillRect(0, 0, 0, *this);
-
 	heroesIcons.Redraw();
 	castleIcons.Redraw();
 
 	// redraw border
-	if(conf.ExtGameHideInterface()) border.Redraw();
+	if(conf.ExtGameHideInterface())
+	    BorderWindow::Redraw();
     }
 }
 
 void Interface::IconsPanel::QueueEventProcessing(void)
 {
-    Display & display = Display::Get();
-    Cursor & cursor = Cursor::Get();
-    Settings & conf = Settings::Get();
-    LocalEvent & le = LocalEvent::Get();
-
+    if(Settings::Get().ShowIcons() &&
+	// move border window
+	BorderWindow::QueueEventProcessing())
+    {
+	GameFocus::SetRedraw();
+	Interface::Basic::Get().SetRedraw(REDRAW_ICONS);
+    }
+    else
     if(heroesIcons.QueueEventProcessing())
     {
 	if(heroesIcons.isSelected())
@@ -402,37 +392,6 @@ void Interface::IconsPanel::QueueEventProcessing(void)
 	    heroesIcons.Unselect();
 
 	Interface::Basic::Get().SetRedraw(REDRAW_ICONS);
-    }
-    else
-    // move border
-    if(conf.ExtGameHideInterface() && conf.ShowIcons() && le.MousePressLeft(border.GetTop()))
-    {
-        Surface sf(border.GetRect().w, border.GetRect().h);
-        Cursor::DrawCursor(sf, 0x70);
-        const Point & mp = le.GetMouseCursor();
-        const s16 ox = mp.x - border.GetRect().x;
-        const s16 oy = mp.y - border.GetRect().y;
-        SpriteCursor sp(sf, border.GetRect().x, border.GetRect().y);
-        cursor.Hide();
-        sp.Redraw();
-        cursor.Show();
-        display.Flip();
-        while(le.HandleEvents() && le.MousePressLeft())
-        {
-            if(le.MouseMotion())
-            {
-                cursor.Hide();
-                sp.Move(mp.x - ox, mp.y - oy);
-                cursor.Show();
-                display.Flip();
-            }
-        }
-        cursor.Hide();
-
-        SetPos(mp.x - ox, mp.y - oy);
-
-	GameFocus::SetRedraw();
-	Interface::Basic::Get().SetRedraw(REDRAW_ICONS|REDRAW_GAMEAREA);
     }
 }
 

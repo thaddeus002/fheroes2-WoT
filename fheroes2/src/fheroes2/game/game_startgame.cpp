@@ -887,7 +887,7 @@ Game::menu_t Game::HumanTurn(bool isload)
 
 	// cursor over radar
         if((!conf.ExtGameHideInterface() || conf.ShowRadar()) &&
-           le.MouseCursor(I.radar.GetArea()))
+           le.MouseCursor(I.radar.GetRect()))
 	{
 	    if(Cursor::POINTER != cursor.Themes())
 	    {
@@ -898,7 +898,7 @@ Game::menu_t Game::HumanTurn(bool isload)
 	else
 	// cursor over icons panel
         if((!conf.ExtGameHideInterface() || conf.ShowIcons()) &&
-           le.MouseCursor(I.iconsPanel.GetArea()))
+           le.MouseCursor(I.iconsPanel.GetRect()))
 	{
 	    if(Cursor::POINTER != cursor.Themes())
 	    {
@@ -909,7 +909,7 @@ Game::menu_t Game::HumanTurn(bool isload)
 	else
 	// cursor over buttons area
         if((!conf.ExtGameHideInterface() || conf.ShowButtons()) &&
-           le.MouseCursor(I.buttonsArea.GetArea()))
+           le.MouseCursor(I.buttonsArea.GetRect()))
 	{
 	    if(Cursor::POINTER != cursor.Themes())
 	    {
@@ -920,7 +920,7 @@ Game::menu_t Game::HumanTurn(bool isload)
 	else
         // cursor over status area
         if((!conf.ExtGameHideInterface() || conf.ShowStatus()) &&
-           le.MouseCursor(I.statusWindow.GetArea()))
+           le.MouseCursor(I.statusWindow.GetRect()))
 	{
 	    if(Cursor::POINTER != cursor.Themes())
 	    {

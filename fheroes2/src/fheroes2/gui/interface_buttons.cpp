@@ -27,7 +27,7 @@
 #include "game_interface.h"
 #include "interface_buttons.h"
 
-Interface::ButtonsArea::ButtonsArea() : Rect(0, 0, 144, 72)
+Interface::ButtonsArea::ButtonsArea() : BorderWindow(Rect(0, 0, 144, 72))
 {
 }
 
@@ -38,29 +38,14 @@ Interface::ButtonsArea & Interface::ButtonsArea::Get(void)
     return buttonsArea;
 }
 
-const Rect & Interface::ButtonsArea::GetArea(void)
+void Interface::ButtonsArea::SavePosition(void)
 {
-    return Settings::Get().ExtGameHideInterface() && border.isValid() ? border.GetRect() : *this;
+    Settings::Get().SetPosButtons(GetRect());
 }
 
 void Interface::ButtonsArea::SetPos(s16 ox, s16 oy)
 {
-    if(Settings::Get().ExtGameHideInterface())
-    {
-	FixOutOfDisplay(*this, ox, oy);
-
-	Rect::x = ox + BORDERWIDTH;
-        Rect::y = oy + BORDERWIDTH;
-
-        border.SetPosition(ox, oy, Rect::w, Rect::h);
-
-	Settings::Get().SetPosButtons(Point(ox, oy));
-    }
-    else
-    {
-	Rect::x = ox;
-	Rect::y = oy;
-    }
+    BorderWindow::SetPosition(ox, oy);
 
     const ICN::icn_t icnbtn = Settings::Get().ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
 
@@ -73,8 +58,8 @@ void Interface::ButtonsArea::SetPos(s16 ox, s16 oy)
     buttonFile.SetSprite(icnbtn, 12, 13);
     buttonSystem.SetSprite(icnbtn, 14, 15);
 
-    ox = Rect::x;
-    oy = Rect::y;
+    ox = GetArea().x;
+    oy = GetArea().y;
 
     buttonNextHero.SetPos(ox, oy);
     buttonMovement.SetPos(buttonNextHero.x + buttonNextHero.w, oy);
@@ -92,36 +77,36 @@ void Interface::ButtonsArea::SetPos(s16 ox, s16 oy)
 void Interface::ButtonsArea::Redraw(void)
 {
     const Settings & conf = Settings::Get();
-    if(conf.ExtGameHideInterface() && !conf.ShowButtons()) return;
 
-    const ICN::icn_t icnbtn = Settings::Get().ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
+    if(!conf.ExtGameHideInterface() || conf.ShowButtons())
+    {
+	const ICN::icn_t icnbtn = Settings::Get().ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
 
-    buttonNextHero.SetSprite(icnbtn, 0, 1);
-    buttonMovement.SetSprite(icnbtn, 2, 3);
-    buttonKingdom.SetSprite(icnbtn, 4, 5);
-    buttonSpell.SetSprite(icnbtn, 6, 7);
-    buttonEndTur.SetSprite(icnbtn, 8, 9);
-    buttonAdventure.SetSprite(icnbtn, 10, 11);
-    buttonFile.SetSprite(icnbtn, 12, 13);
-    buttonSystem.SetSprite(icnbtn, 14, 15);
+	buttonNextHero.SetSprite(icnbtn, 0, 1);
+	buttonMovement.SetSprite(icnbtn, 2, 3);
+	buttonKingdom.SetSprite(icnbtn, 4, 5);
+	buttonSpell.SetSprite(icnbtn, 6, 7);
+	buttonEndTur.SetSprite(icnbtn, 8, 9);
+	buttonAdventure.SetSprite(icnbtn, 10, 11);
+	buttonFile.SetSprite(icnbtn, 12, 13);
+	buttonSystem.SetSprite(icnbtn, 14, 15);
 
-    buttonNextHero.Draw();
-    buttonMovement.Draw();
-    buttonKingdom.Draw();
-    buttonSpell.Draw();
-    buttonEndTur.Draw();
-    buttonAdventure.Draw();
-    buttonFile.Draw();
-    buttonSystem.Draw();
+	buttonNextHero.Draw();
+	buttonMovement.Draw();
+	buttonKingdom.Draw();
+	buttonSpell.Draw();
+	buttonEndTur.Draw();
+	buttonAdventure.Draw();
+	buttonFile.Draw();
+	buttonSystem.Draw();
 
-    // redraw border
-    if(conf.ExtGameHideInterface()) border.Redraw();
+	if(conf.ExtGameHideInterface())
+	    BorderWindow::Redraw();
+    }
 }
 
 void Interface::ButtonsArea::QueueEventProcessing(Game::menu_t & ret)
 {
-    Display & display = Display::Get();
-    Cursor & cursor = Cursor::Get();
     Settings & conf = Settings::Get();
     LocalEvent & le = LocalEvent::Get();
 
@@ -134,31 +119,10 @@ void Interface::ButtonsArea::QueueEventProcessing(Game::menu_t & ret)
     le.MousePressLeft(buttonFile) ? buttonFile.PressDraw() : buttonFile.ReleaseDraw();
     le.MousePressLeft(buttonSystem) ? buttonSystem.PressDraw() : buttonSystem.ReleaseDraw();
 
-    if(conf.ExtGameHideInterface() && conf.ShowButtons() && le.MousePressLeft(border.GetTop()))
+    if(conf.ShowButtons() &&
+	// move border window
+	BorderWindow::QueueEventProcessing())
     {
-	Surface sf(border.GetRect().w, border.GetRect().h);
-        Cursor::DrawCursor(sf, 0x70);
-        const Point & mp = le.GetMouseCursor();
-        const s16 ox = mp.x - border.GetRect().x;
-        const s16 oy = mp.y - border.GetRect().y;
-        SpriteCursor sp(sf, border.GetRect().x, border.GetRect().y);
-        cursor.Hide();
-        sp.Redraw();
-        cursor.Show();
-        display.Flip();
-        while(le.HandleEvents() && le.MousePressLeft())
-        {
-    	    if(le.MouseMotion())
-            {
-                cursor.Hide();
-                sp.Move(mp.x - ox, mp.y - oy);
-                cursor.Show();
-                display.Flip();
-            }
-        }
-        cursor.Hide();
-        SetPos(mp.x - ox, mp.y - oy);
-        Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
     }
     else
     if(le.MouseClickLeft(buttonNextHero))

@@ -38,11 +38,8 @@
 #define AITURN_REDRAW_EXPIRE 20
 #define RESOURCE_WINDOW_EXPIRE 2500
 
-Interface::StatusWindow::StatusWindow() : state(STATUS_UNKNOWN), oldState(STATUS_UNKNOWN)
+Interface::StatusWindow::StatusWindow() : BorderWindow(Rect(0, 0, 144, 72)), state(STATUS_UNKNOWN), oldState(STATUS_UNKNOWN)
 {
-    const Sprite & ston = AGG::GetICN(Settings::Get().ExtGameEvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
-    Rect::w = ston.w();
-    Rect::h = ston.h();
 }
 
 Interface::StatusWindow & Interface::StatusWindow::Get(void)
@@ -83,31 +80,22 @@ u32 Interface::StatusWindow::ResetResourceStatus(u32 tick, void *ptr)
     return tick;
 }
 
-void Interface::StatusWindow::SetPos(s16 ox, s16 oy)
+void Interface::StatusWindow::SavePosition(void)
 {
-    if(Settings::Get().ExtGameHideInterface())
-    {
-	const Sprite & ston = AGG::GetICN(Settings::Get().ExtGameEvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
-	FixOutOfDisplay(*this, ox, oy); 
-
-	Rect::x = ox + BORDERWIDTH;
-	Rect::y = oy + BORDERWIDTH;
-	Rect::h = ston.h();
-
-	border.SetPosition(ox, oy, Rect::w, Rect::h);
-	Settings::Get().SetPosStatus(Point(ox, oy));
-    }
-    else
-    {
-	Rect::x = ox;
-	Rect::y = oy;
-	Rect::h = Display::Get().h() - oy - BORDERWIDTH;
-    }
+    Settings::Get().SetPosStatus(GetRect());
 }
 
-const Rect & Interface::StatusWindow::GetArea(void) const
+void Interface::StatusWindow::SetPos(s16 ox, s16 oy)
 {
-    return Settings::Get().ExtGameHideInterface() && border.isValid() ? border.GetRect() : *this;
+    u16 ow = 144;
+    u16 oh = 72;
+
+    if(! Settings::Get().ExtGameHideInterface())
+    {
+	oh = Display::Get().h() - oy - BORDERWIDTH;
+    }
+
+    BorderWindow::SetPosition(ox, oy, ow, oh);
 }
 
 void Interface::StatusWindow::SetState(info_t info)
@@ -118,42 +106,47 @@ void Interface::StatusWindow::SetState(info_t info)
 void Interface::StatusWindow::Redraw(void)
 {
     const Settings & conf = Settings::Get();
-    if(conf.ExtGameHideInterface() && !conf.ShowStatus()) return;
 
-    // restore background
-    DrawBackground();
-
-    // draw info: Day and Funds and Army
-    const Sprite & ston = AGG::GetICN(Settings::Get().ExtGameEvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
-
-    if(STATUS_AITURN == state)
-	DrawAITurns();
-    else
-    if(STATUS_UNKNOWN != state && h >= (ston.h() * 3 + 15))
+    if(!conf.ExtGameHideInterface() || conf.ShowStatus())
     {
-        DrawDayInfo();
-	if(conf.CurrentColor() & Players::HumanColors())
+	// restore background
+	DrawBackground();
+
+	// draw info: Day and Funds and Army
+	const Sprite & ston = AGG::GetICN(Settings::Get().ExtGameEvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
+	const Rect & pos = GetArea();
+
+	if(STATUS_AITURN == state)
+	    DrawAITurns();
+	else
+	if(STATUS_UNKNOWN != state && pos.h >= (ston.h() * 3 + 15))
 	{
-    	    DrawKingdomInfo(ston.h() + 5);
+    	    DrawDayInfo();
 
-    	    if(state != STATUS_RESOURCE)
-        	DrawArmyInfo(2 * ston.h() + 10);
-    	    else
-    		DrawResourceInfo(2 * ston.h() + 10);
+	    if(conf.CurrentColor() & Players::HumanColors())
+	    {
+    		DrawKingdomInfo(ston.h() + 5);
+
+    		if(state != STATUS_RESOURCE)
+        	    DrawArmyInfo(2 * ston.h() + 10);
+    		else
+    		    DrawResourceInfo(2 * ston.h() + 10);
+	    }
 	}
-    }
-    else
-    switch(state)
-    {
-        case STATUS_DAY:	DrawDayInfo();		break;
-        case STATUS_FUNDS:	DrawKingdomInfo();	break;
-        case STATUS_ARMY:	DrawArmyInfo();		break;
-        case STATUS_RESOURCE:   DrawResourceInfo();     break;
-	default: break;
-    }
+	else
+	switch(state)
+	{
+    	    case STATUS_DAY:		DrawDayInfo();		break;
+    	    case STATUS_FUNDS:		DrawKingdomInfo();	break;
+    	    case STATUS_ARMY:		DrawArmyInfo();		break;
+    	    case STATUS_RESOURCE:	DrawResourceInfo();     break;
+	    default: break;
+	}
     
-    // redraw border
-    if(conf.ExtGameHideInterface()) border.Redraw();
+	// redraw border
+	if(conf.ExtGameHideInterface())
+	    BorderWindow::Redraw();
+    }
 }
 
 void Interface::StatusWindow::NextState(void)
@@ -177,58 +170,58 @@ void Interface::StatusWindow::NextState(void)
 
 void Interface::StatusWindow::DrawKingdomInfo(const u8 oh) const
 {
-    std::string str;
-
+    const Rect & pos = GetArea();
     Kingdom & myKingdom = world.GetKingdom(Settings::Get().CurrentColor());
 
     // sprite all resource
-    AGG::GetICN(ICN::RESSMALL, 0).Blit(x + 6, y + 3 + oh);
+    AGG::GetICN(ICN::RESSMALL, 0).Blit(pos.x + 6, pos.y + 3 + oh);
 
     // count castle
     Text text(GetString(myKingdom.GetCountCastle()), Font::SMALL);
-    text.Blit(x + 26 - text.w() / 2, y + 28 + oh);
+    text.Blit(pos.x + 26 - text.w() / 2, pos.y + 28 + oh);
     // count town
     text.Set(GetString(myKingdom.GetCountTown()));
-    text.Blit(x + 78 - text.w() / 2, y + 28 + oh);
+    text.Blit(pos.x + 78 - text.w() / 2, pos.y + 28 + oh);
     // count gold
     text.Set(GetString(myKingdom.GetFunds().Get(Resource::GOLD)));
-    text.Blit(x + 122 - text.w() / 2, y + 28 + oh);
+    text.Blit(pos.x + 122 - text.w() / 2, pos.y + 28 + oh);
     // count wood
     text.Set(GetString(myKingdom.GetFunds().Get(Resource::WOOD)));
-    text.Blit(x + 15 - text.w() / 2, y + 58 + oh);
+    text.Blit(pos.x + 15 - text.w() / 2, pos.y + 58 + oh);
     // count mercury
     text.Set(GetString(myKingdom.GetFunds().Get(Resource::MERCURY)));
-    text.Blit(x + 37 - text.w() / 2, y + 58 + oh);
+    text.Blit(pos.x + 37 - text.w() / 2, pos.y + 58 + oh);
     // count ore
     text.Set(GetString(myKingdom.GetFunds().Get(Resource::ORE)));
-    text.Blit(x + 60 - text.w() / 2, y + 58 + oh);
+    text.Blit(pos.x + 60 - text.w() / 2, pos.y + 58 + oh);
     // count sulfur
     text.Set(GetString(myKingdom.GetFunds().Get(Resource::SULFUR)));
-    text.Blit(x + 84 - text.w() / 2, y + 58 + oh);
+    text.Blit(pos.x + 84 - text.w() / 2, pos.y + 58 + oh);
     // count crystal
     text.Set(GetString(myKingdom.GetFunds().Get(Resource::CRYSTAL)));
-    text.Blit(x + 108 - text.w() / 2, y + 58 + oh);
+    text.Blit(pos.x + 108 - text.w() / 2, pos.y + 58 + oh);
     // count gems
     text.Set(GetString(myKingdom.GetFunds().Get(Resource::GEMS)));
-    text.Blit(x + 130 - text.w() / 2, y + 58 + oh);
+    text.Blit(pos.x + 130 - text.w() / 2, pos.y + 58 + oh);
 }
 
 void Interface::StatusWindow::DrawDayInfo(const u8 oh) const
 {
-    std::string message;
+    const Rect & pos = GetArea();
 
-    AGG::GetICN(Settings::Get().ExtGameEvilInterface() ? ICN::SUNMOONE : ICN::SUNMOON, (world.GetWeek() - 1) % 5).Blit(x, y + 1 + oh);
+    AGG::GetICN(Settings::Get().ExtGameEvilInterface() ? ICN::SUNMOONE : ICN::SUNMOON,
+				    (world.GetWeek() - 1) % 5).Blit(pos.x, pos.y + 1 + oh);
 
-    message = _("Month: %{month} Week: %{week}");
+    std::string message = _("Month: %{month} Week: %{week}");
     StringReplace(message, "%{month}", world.GetMonth());
     StringReplace(message, "%{week}", world.GetWeek());
     Text text(message, Font::SMALL);
-    text.Blit(x + (w - text.w()) / 2, y + 30 + oh);
+    text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + 30 + oh);
 
     message = _("Day: %{day}");
     StringReplace(message, "%{day}", world.GetDay());
     text.Set(message, Font::BIG);
-    text.Blit(x + (w - text.w()) / 2, y + 46 + oh);
+    text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + 46 + oh);
 }
 
 void Interface::StatusWindow::SetResource(u8 res, u16 count)
@@ -257,16 +250,18 @@ void Interface::StatusWindow::ResetTimer(void)
 
 void Interface::StatusWindow::DrawResourceInfo(const u8 oh) const
 {
+    const Rect & pos = GetArea();
+
     std::string message = _("You find a small\nquantity of %{resource}.");
     StringReplace(message, "%{resource}", Resource::String(lastResource));
-    TextBox text(message, Font::SMALL, w);
-    text.Blit(x, y + 4 + oh);
+    TextBox text(message, Font::SMALL, pos.w);
+    text.Blit(pos.x, pos.y + 4 + oh);
     
     const Sprite &spr = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(lastResource));
-    spr.Blit(x + (w - spr.w()) / 2, y + 6 + oh + text.h());
+    spr.Blit(pos.x + (pos.w - spr.w()) / 2, pos.y + 6 + oh + text.h());
 
-    text.Set(GetString(countLastResource), Font::SMALL, w);
-    text.Blit(x + (w - text.w()) / 2, y + oh + text.h() + spr.h() - 8);
+    text.Set(GetString(countLastResource), Font::SMALL, pos.w);
+    text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + oh + text.h() + spr.h() - 8);
 }
 
 void Interface::StatusWindow::DrawArmyInfo(const u8 oh) const
@@ -281,22 +276,23 @@ void Interface::StatusWindow::DrawArmyInfo(const u8 oh) const
 
     if(armies)
     {
+	const Rect & pos = GetArea();
 	u8 count = armies->GetCount();
 
 	if(4 > count)
 	{
-	    Army::DrawMons32Line(*armies, x, y + 20 + oh, 144);
+	    Army::DrawMons32Line(*armies, pos.x, pos.y + 20 + oh, 144);
 	}
 	else
 	if(5 > count)
 	{
-	    Army::DrawMons32Line(*armies, x, y + 15 + oh, 110, 0, 2);
-	    Army::DrawMons32Line(*armies, x + 20, y + 30 + oh, 120, 2, 2);
+	    Army::DrawMons32Line(*armies, pos.x, pos.y + 15 + oh, 110, 0, 2);
+	    Army::DrawMons32Line(*armies, pos.x + 20, pos.y + 30 + oh, 120, 2, 2);
 	}
 	else
 	{
-	    Army::DrawMons32Line(*armies, x, y + 15 + oh, 140, 0, 3);
-	    Army::DrawMons32Line(*armies, x + 10, y + 30 + oh, 120, 3, 2);
+	    Army::DrawMons32Line(*armies, pos.x, pos.y + 15 + oh, 140, 0, 3);
+	    Army::DrawMons32Line(*armies, pos.x + 10, pos.y + 30 + oh, 120, 3, 2);
 	}
     }
 }
@@ -310,9 +306,10 @@ void Interface::StatusWindow::DrawAITurns(void) const
     DrawBackground();
 
     const Sprite & glass = AGG::GetICN(ICN::HOURGLAS, 0);
+    const Rect & pos = GetArea();
 
-    u16 dst_x = x + (w - glass.w()) / 2;
-    u16 dst_y = y + (h - glass.h()) / 2;
+    u16 dst_x = pos.x + (pos.w - glass.w()) / 2;
+    u16 dst_y = pos.y + (pos.h - glass.h()) / 2;
 
     glass.Blit(dst_x, dst_y);
 
@@ -353,84 +350,48 @@ void Interface::StatusWindow::DrawBackground(void) const
 {
     Display & display = Display::Get();
     const Sprite & icnston = AGG::GetICN(Settings::Get().ExtGameEvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
+    const Rect & pos = GetArea();
 
-    if(!Settings::Get().ExtGameHideInterface() && display.h() - BORDERWIDTH - icnston.h() > y)
+    if(!Settings::Get().ExtGameHideInterface() &&
+	    display.h() - BORDERWIDTH - icnston.h() > pos.y)
     {
-        Rect srcrt;
-	Point dstpt(x, y);
+	// top
+        Rect srcrt(0, 0, icnston.w(), 16);
+	Point dstpt(pos.x, pos.y);
+	icnston.Blit(srcrt, dstpt);
 
-        srcrt.x = 0;
-        srcrt.y = 0;
-        srcrt.w = icnston.w();
-        srcrt.h = 16;
-        icnston.Blit(srcrt, dstpt);
-
-        srcrt.y = 16;
-        srcrt.h = 32;
-        dstpt.y = dstpt.y + 16;
-
-	u16 body = h - 32;
-
-        for(u8 ii = 0; ii < body / 32; ++ii)
-        {
-            icnston.Blit(srcrt, dstpt);
-    	    dstpt.y = dstpt.y + srcrt.h;
-        }
-
-	if(body % 32)
+	//
+	srcrt = Rect(0, 16, icnston.w(), 16);
+	const u16 hh = 1 + (pos.h - 32) / 16;
+	for(u16 yy = 1; yy <= hh; ++yy)
 	{
-    	    dstpt.y = display.h() - BORDERWIDTH - 48;
-    	    srcrt.y = icnston.h() - 48;
-    	    srcrt.h = 48;
-    	    icnston.Blit(srcrt, dstpt);
+	    dstpt = Point(pos.x, pos.y + 16 * yy);
+	    icnston.Blit(srcrt, dstpt);
 	}
-	else
-	{
-	    dstpt.y = display.h() - BORDERWIDTH - 16;
-    	    srcrt.y = icnston.h() - 16;
-    	    srcrt.h = 16;
-    	    icnston.Blit(srcrt, dstpt);
-	}
+
+	// botom
+	srcrt = Rect(0, icnston.h() - 16, icnston.w(), 16);
+	dstpt = Point(pos.x, pos.y + pos.h - 16);
+	icnston.Blit(srcrt, dstpt);
     }
     else
-	icnston.Blit(x, y);
+	icnston.Blit(pos.x, pos.y);
 }
 
 void Interface::StatusWindow::QueueEventProcessing(void)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
-    Settings & conf = Settings::Get();
     LocalEvent & le = LocalEvent::Get();
+    const Rect & area = GetArea();
 
-    if(conf.ExtGameHideInterface() && conf.ShowStatus() && le.MousePressLeft(border.GetTop()))
+    if(Settings::Get().ShowStatus() &&
+	// move border window
+	BorderWindow::QueueEventProcessing())
     {
-        Surface sf(border.GetRect().w, border.GetRect().h);
-        Cursor::DrawCursor(sf, 0x70);
-        const Point & mp = le.GetMouseCursor();
-        const s16 ox = mp.x - border.GetRect().x;
-        const s16 oy = mp.y - border.GetRect().y;
-        SpriteCursor sp(sf, border.GetRect().x, border.GetRect().y);
-        cursor.Hide();
-        sp.Redraw();
-        cursor.Show();
-        display.Flip();
-        while(le.HandleEvents() && le.MousePressLeft())
-        {
-    	    if(le.MouseMotion())
-            {
-		cursor.Hide();
-        	sp.Move(mp.x - ox, mp.y - oy);
-                cursor.Show();
-                display.Flip();
-            }
-        }
-        cursor.Hide();
-        SetPos(mp.x - ox, mp.y - oy);
-        Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
     }
     else
-    if(le.MouseClickLeft(*this))
+    if(le.MouseClickLeft(area))
     {
         cursor.Hide();
         NextState();
@@ -438,7 +399,8 @@ void Interface::StatusWindow::QueueEventProcessing(void)
         cursor.Show();
         display.Flip();
     }
-    if(le.MousePressRight(*this)) Dialog::Message(_("Status Window"), _("This window provides information on the status of your hero or kingdom, and shows the date. Left click here to cycle throungh these windows."), Font::BIG);
+    if(le.MousePressRight(GetRect()))
+	Dialog::Message(_("Status Window"), _("This window provides information on the status of your hero or kingdom, and shows the date. Left click here to cycle throungh these windows."), Font::BIG);
 }
 
 void Interface::StatusWindow::RedrawTurnProgress(u8 v)

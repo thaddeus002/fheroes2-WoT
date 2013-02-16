@@ -23,9 +23,8 @@
 #ifndef H2INTERFACE_STATUS_H
 #define H2INTERFACE_STATUS_H
 
-#include "gamedefs.h"
 #include "thread.h"
-#include "dialog.h"
+#include "interface_border.h"
 
 class Surface;
 class Castle;
@@ -35,13 +34,14 @@ enum info_t { STATUS_UNKNOWN, STATUS_DAY, STATUS_FUNDS, STATUS_ARMY, STATUS_RESO
 
 namespace Interface
 {
-    class StatusWindow : protected Rect
+    class StatusWindow : public BorderWindow
     {
     public:
 	static StatusWindow & Get(void);
 
 	void SetPos(s16, s16);
-	const Rect & GetArea(void) const;
+	void SavePosition(void);
+
 	void Reset(void);
 	    
 	void Redraw(void);
@@ -72,7 +72,6 @@ namespace Interface
 	u16                  countLastResource;
 	SDL::Timer           timerShowLastResource;
 	SDL::Timer           timerRedrawAIStatus;
-	Dialog::FrameBorder border;
 
 	u8 turn_progress;
     };

@@ -23,22 +23,21 @@
 #ifndef H2INTERFACE_BUTTONS_H
 #define H2INTERFACE_BUTTONS_H
 
-#include "gamedefs.h"
 #include "button.h"
-#include "dialog.h"
+#include "interface_border.h"
 
 namespace Interface
 {
-    class ButtonsArea : protected Rect
+    class ButtonsArea : public BorderWindow
     {
     public:
     	static ButtonsArea & Get(void);
 
 	void SetPos(s16, s16);
+	void SavePosition(void);
+
 	void Redraw(void);
 	void QueueEventProcessing(Game::menu_t &);
-
-	const Rect & GetArea(void);
 
     private:
 	ButtonsArea();
@@ -51,8 +50,6 @@ namespace Interface
 	Button	buttonAdventure;
 	Button	buttonFile;
 	Button	buttonSystem;
-
-	Dialog::FrameBorder border;
     };
 }
 
