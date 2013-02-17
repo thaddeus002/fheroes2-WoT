@@ -107,7 +107,6 @@ namespace Interface
 
 	void SetScrollSplitter(const Sprite & sp, const Rect & area)
 	{
-	    splitter.SetOrientation(Splitter::VERTICAL);
 	    splitter.SetArea(area);
 	    splitter.SetSprite(sp);
 	}

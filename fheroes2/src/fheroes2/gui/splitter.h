@@ -27,10 +27,8 @@
 class Splitter
 {
 public:
-    enum positions_t { HORIZONTAL, VERTICAL };
-
     Splitter();
-    Splitter(const Surface &, const Rect &, positions_t);
+    Splitter(const Surface &, const Rect &);
 
     void Forward(void);
     void Backward(void);
@@ -43,9 +41,9 @@ public:
 
     void SetSprite(const Surface &);
     void SetArea(const Rect &);
-    void SetOrientation(positions_t);
     void SetRange(u16 smin, u16 smax);
 
+    bool isVertical(void) const;
     u16 GetCurrent(void) const{ return cur; };
     u16 GetStep(void) const{ return step; };
     u16 Max(void) const{ return max; };
@@ -62,7 +60,6 @@ private:
     u16		min;
     u16		max;
     u16		cur;
-    positions_t position;
 };
 
 #endif

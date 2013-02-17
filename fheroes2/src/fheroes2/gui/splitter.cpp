@@ -26,12 +26,12 @@
 #include "splitter.h"
 
 /* splitter constructor */
-Splitter::Splitter() : step(0), min(0), max(0), cur(-1), position(HORIZONTAL)
+Splitter::Splitter() : step(0), min(0), max(0), cur(-1)
 {
 }
 
-Splitter::Splitter(const Surface & sf, const Rect & rt, positions_t pos)
-    : cursor(sf), area(rt), step(0), min(0), max(0), cur(0), position(pos)
+Splitter::Splitter(const Surface & sf, const Rect & rt)
+    : cursor(sf), area(rt), step(0), min(0), max(0), cur(0)
 {
 }
 
@@ -45,9 +45,9 @@ void Splitter::SetArea(const Rect & rt)
     area = rt;
 }
 
-void Splitter::SetOrientation(positions_t ps)
+bool Splitter::isVertical(void) const
 {
-    position = ps;
+    return area.w < area.h;
 }
 
 /* set range */
@@ -58,7 +58,7 @@ void Splitter::SetRange(u16 smin, u16 smax)
 
     if(min < max)
     {
-        step = 100 * (VERTICAL == position ? (area.h - cursor.h()) : (area.w - cursor.w())) / (max - min);
+        step = 100 * (isVertical() ? (area.h - cursor.h()) : (area.w - cursor.w())) / (max - min);
 	MoveIndex(min);
     }
     else
@@ -72,7 +72,7 @@ Point Splitter::GetPositionCursor(void)
 {
     Point res;
 
-    if(VERTICAL == position)
+    if(isVertical())
     {
 	res.x = area.x + (area.w - cursor.w()) / 2;
     	res.y = area.y + cur * step / 100;
