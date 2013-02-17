@@ -30,7 +30,7 @@
 #include "spell.h"
 #include "heroes.h"
 #include "dialog.h"
-#include "editor_dialogs.h"
+#include "dialog_selectitems.h"
 #include "artifact.h"
 
 #ifdef WITH_XML

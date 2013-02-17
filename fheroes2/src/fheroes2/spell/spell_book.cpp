@@ -27,7 +27,7 @@
 #include "dialog.h"
 #include "heroes_base.h"
 #include "skill.h"
-#include "editor_dialogs.h"
+#include "dialog_selectitems.h"
 #include "settings.h"
 #include "spell_book.h"
 

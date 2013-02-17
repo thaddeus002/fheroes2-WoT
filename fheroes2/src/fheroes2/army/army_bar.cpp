@@ -25,7 +25,7 @@
 #include "settings.h"
 #include "race.h"
 #include "dialog.h"
-#include "editor_dialogs.h"
+#include "dialog_selectitems.h"
 #include "world.h"
 #include "army.h"
 #include "army_troop.h"

@@ -24,7 +24,7 @@
 #include "text.h"
 #include "army_troop.h"
 #include "interface_list.h"
-#include "editor_dialogs.h"
+#include "dialog_selectitems.h"
 
 class SelectEnum : public Interface::ListBox<int>
 {

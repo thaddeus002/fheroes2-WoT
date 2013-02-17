@@ -28,7 +28,7 @@
 #include "agg.h"
 #include "cursor.h"
 #include "dialog.h"
-#include "editor_dialogs.h"
+#include "dialog_selectitems.h"
 #include "heroes.h"
 #include "settings.h"
 #include "skill_static.h"
