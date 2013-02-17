@@ -212,7 +212,7 @@ Surface::Surface(u16 sw, u16 sh, bool amask) : surface(NULL)
 
 Surface::Surface(const Surface & bs) : surface(NULL)
 {
-    Set(bs);
+    Set(bs, false);
 }
 
 Surface::Surface(SDL_Surface* sf) : surface(NULL)
@@ -223,16 +223,6 @@ Surface::Surface(SDL_Surface* sf) : surface(NULL)
 Surface::Surface(const std::string & file) : surface(NULL)
 {
     Load(file);
-}
-
-Surface Surface::RefCopy(const Surface & bs)
-{
-    Surface res;
-
-    res.surface = bs.surface;
-    if(res.surface) res.surface->refcount += 1;
-
-    return res;
 }
 
 Surface::~Surface()
@@ -248,7 +238,7 @@ bool Surface::isDisplay(void) const
 /* operator = */
 Surface & Surface::operator= (const Surface & bs)
 {
-    Set(bs);
+    Set(bs, false);
     return *this;
 }
 
@@ -284,20 +274,27 @@ void Surface::Set(SDL_Surface* sf)
     surface = sf ? sf : NULL;
 }
 
-void Surface::Set(const Surface & bs) /* copy surface */
+void Surface::Set(const Surface & bs, bool refcopy) /* copy surface */
 {
     FreeSurface(*this);
 
     if(bs.isValid())
     {
-	if(8 == bs.depth())
-	    Set(bs.surface->pixels, bs.w(), bs.h(), 1, false);
+	if(refcopy || 1 < bs.RefCount())
+	{
+	    surface = bs.surface;
+	    if(surface) surface->refcount += 1;
+	}
 	else
-	    surface = SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags);
+	{
+	    if(8 == bs.depth())
+		Set(bs.surface->pixels, bs.w(), bs.h(), 1, false);
+	    else
+		surface = SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags);
 
-	if(!surface)
-	    Error::Except(__FUNCTION__, SDL_GetError());
-
+	    if(!surface)
+		Error::Except(__FUNCTION__, SDL_GetError());
+	}
     }
 }
 
@@ -389,6 +386,11 @@ bool Surface::Save(const char *fn) const
 bool Surface::Save(const std::string & str) const
 {
     return Save(str.c_str());
+}
+
+u32 Surface::RefCount(void) const
+{
+    return surface ? surface->refcount : 0;
 }
 
 u16 Surface::w(void) const

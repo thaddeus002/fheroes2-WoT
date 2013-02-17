@@ -21,35 +21,28 @@
  ***************************************************************************/
 
 #include <iostream>
-#include "cursor.h"
 #include "settings.h"
+#include "cursor.h"
 #include "splitter.h"
 
 /* splitter constructor */
-Splitter::Splitter() : step(0), min(0), max(0), cur(0), position(HORIZONTAL)
+Splitter::Splitter() : step(0), min(0), max(0), cur(-1), position(HORIZONTAL)
 {
 }
 
-Splitter::Splitter(const Surface &sf, const Rect &rt, positions_t pos)
-    : SpriteCursor(sf, rt.x, rt.y), area(rt), step(0), min(0), max(0), cur(0), position(pos)
+Splitter::Splitter(const Surface & sf, const Rect & rt, positions_t pos)
+    : cursor(sf), area(rt), step(0), min(0), max(0), cur(0), position(pos)
 {
-    SpriteCursor::Hide();
-    SpriteCursor::Move(rt.x, rt.y);
-    SpriteCursor::Show();
 }
 
-void Splitter::SetArea(s16 rx, s16 ry, u16 rw, u16 rh)
+void Splitter::SetSprite(const Surface & sf)
 {
-    area.x = rx;
-    area.y = ry;
-    area.w = rw;
-    area.h = rh;
+    cursor.Set(sf, true);
 }
 
 void Splitter::SetArea(const Rect & rt)
 {
     area = rt;
-    SpriteCursor::Move(rt.x, rt.y);
 }
 
 void Splitter::SetOrientation(positions_t ps)
@@ -63,81 +56,87 @@ void Splitter::SetRange(u16 smin, u16 smax)
     min = smin;
     max = smax;
 
-    // recalculate step
-    if(max) step = (Splitter::VERTICAL == position ? 100 * (area.h - h()) / (max - min) : 100 * (area.w - w()) / (max - min));
+    if(min < max)
+    {
+        step = 100 * (VERTICAL == position ? (area.h - cursor.h()) : (area.w - cursor.w())) / (max - min);
+	MoveIndex(min);
+    }
+    else
+    {
+	step = 0;
+	MoveCenter();
+    }
+}
 
-    Splitter::Move(min);
+Point Splitter::GetPositionCursor(void)
+{
+    Point res;
+
+    if(VERTICAL == position)
+    {
+	res.x = area.x + (area.w - cursor.w()) / 2;
+    	res.y = area.y + cur * step / 100;
+    }
+    else
+    {
+	res.x = area.x + cur * step / 100;
+	res.y = area.y + (area.h - cursor.h()) / 2;
+    }
+
+    return res;
+}
+
+void Splitter::RedrawCursor(void)
+{
+    cursor.Redraw();
+}
+
+void Splitter::HideCursor(void)
+{
+    cursor.Hide();
+}
+
+void Splitter::ShowCursor(void)
+{
+    cursor.Show();
+}
+
+void Splitter::MoveCenter(void)
+{
+    cursor.Move(area.x + (area.w - cursor.w()) / 2,
+		    area.y + (area.h - cursor.h()) / 2);
 }
 
 /* move splitter to pos */
-void Splitter::Move(u16 pos)
+void Splitter::MoveIndex(u16 num)
 {
-    if(pos > max || pos < min)
+    if(num > max || num < min)
     {
-	DEBUG(DBG_ENGINE, DBG_WARN, "out of range" << ", min: " << min << ", max: " << max << ", cur: " << cur << ", step: " << step);
+	DEBUG(DBG_ENGINE, DBG_WARN, "out of range" << ": " << num << ", min: " << min << ", max: " << max << ", cur: " << cur << ", step: " << step);
     }
     else
-    if(cur != pos)
     {
-	Point pt(GetRect().x, GetRect().y);
-
-	cur = pos;
-
-	if(Splitter::VERTICAL == position)
-    	    pt.y = area.y + cur * step / 100;
-	else
-    	    pt.x = area.x + cur * step / 100;
-
-	// move center
-	if(!max) Splitter::VERTICAL == position ? pt.y = area.y + (area.h - h()) / 2 : pt.x = area.x + (area.w - w());
-
-	Cursor::Get().Hide();
-
-	if(isVisible())
-	{
-	    SpriteCursor::Hide();
-	    SpriteCursor::Move(pt);
-	    SpriteCursor::Show();
-	}
-	else
-	    SpriteCursor::Save(pt);
+	cur = num;
+	cursor.Move(GetPositionCursor());
     }
 }
 
 /* forward spliter */
 void Splitter::Forward(void)
 {
-    if(cur == max) return;
-
-    Point pt(GetRect().x, GetRect().y);
-
-    ++cur;
-
-    if(Splitter::VERTICAL == position)
-        pt.y = area.y + cur * step / 100;
-    else
-        pt.x = area.x + cur * step / 100;
-
-    SpriteCursor::Hide();
-    SpriteCursor::Move(pt);
-    SpriteCursor::Show();
+    if(cur != max)
+    {
+	++cur;
+	cursor.Move(GetPositionCursor());
+    }
 }
 
 /* backward spliter */
 void Splitter::Backward(void)
 {
-    if(! cur) return;
-
-    Point pt(GetRect().x, GetRect().y);
-
-    --cur;
-		    
-    if(Splitter::VERTICAL == position)
-	pt.y = area.y + cur * step / 100;
-    else
-        pt.x = area.x + cur * step / 100;
-
-    SpriteCursor::Hide();
-    SpriteCursor::Move(pt);
-    SpriteCursor::Show();
+    if(cur)
+    {
+	--cur;
+	cursor.Move(GetPositionCursor());
+    }
 }

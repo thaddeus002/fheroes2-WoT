@@ -53,9 +53,10 @@ public:
     void ReleaseDraw(void);
 
 protected:
-    const Surface*	sf1;
-    const Surface*	sf2;
-    u32			flags;
+    Surface	sf1;
+    Surface	sf2;
+
+    u32		flags;
 };
 
 class ButtonSprite : public Button
@@ -80,8 +81,8 @@ public:
     void DisableButton2(bool);
 
 protected:
-    Button *button1;
-    Button *button2;
+    Button* button1;
+    Button* button2;
     u16 result1;
     u16 result2;
     u16 buttons;

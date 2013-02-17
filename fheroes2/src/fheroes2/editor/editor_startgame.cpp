@@ -609,11 +609,13 @@ Game::menu_t Game::Editor::StartGame(void)
     const Rect rectObjectArtifact(dstPanel.x + 14, dstPanel.y + 95, 28, 28);
     const Rect rectObjectResource(dstPanel.x + 101, dstPanel.y + 95, 28, 28);
 
-    SpriteCursor selectTerrainCursor(AGG::GetICN(ICN::TERRAINS, 9), rectTerrainWater.x - 1, rectTerrainWater.y - 1);
+    SpriteMove selectTerrainCursor(AGG::GetICN(ICN::TERRAINS, 9));
+    selectTerrainCursor.Move(rectTerrainWater.x - 1, rectTerrainWater.y - 1);
     selectTerrainCursor.Hide();
 
-    SpriteCursor selectObjectCursor(AGG::GetICN(ICN::TERRAINS, 9), rectObjectWater.x - 1, rectObjectWater.y - 1);
-    selectTerrainCursor.Hide();
+    SpriteMove selectObjectCursor(AGG::GetICN(ICN::TERRAINS, 9));
+    selectObjectCursor.Move(rectObjectWater.x - 1, rectObjectWater.y - 1);
+    selectObjectCursor.Hide();
 
     // redraw
     I.gameArea.Redraw(display, LEVEL_ALL);

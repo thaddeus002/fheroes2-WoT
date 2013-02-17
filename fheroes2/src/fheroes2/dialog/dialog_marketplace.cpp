@@ -59,7 +59,7 @@ public:
 
         splitter.SetSprite(AGG::GetICN(tradpost, 2));
         splitter.SetArea(Rect(pos_rt.x + (pos_rt.w - AGG::GetICN(tradpost, 1).w()) / 2 + 22, pos_rt.y + 132, 188, 10));
-        splitter.Hide();
+        splitter.HideCursor();
 	splitter.SetOrientation(Splitter::HORIZONTAL);
 
 	TextBox(_("Please inspect our fine wares. If you feel like offering a trade, click on the items you wish to trade with and for."), Font::BIG, Rect(pos_rt.x, pos_rt.y + 30, pos_rt.w, 100));
@@ -96,7 +96,7 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
     if(resourceFrom == resourceTo || (Resource::GOLD != resourceTo && 0 == max_buy))
     {
         cursor.Hide();
-	splitter.Hide();
+	splitter.HideCursor();
         back.Restore();
         Rect dst_rt(pos_rt.x, pos_rt.y + 30, pos_rt.w, 100);
         TextBox(_("You have received quite a bargain. I expect to make no profit on the deal. Can I interest you in any of my other wares?"), Font::BIG, dst_rt);
@@ -174,7 +174,7 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
         buttonRight.Draw();
 
         RedrawInfoBuySell(count_sell, count_buy, max_sell, world.GetKingdom(Settings::Get().CurrentColor()).GetFunds().Get(resourceTo));
-	splitter.Show();
+	splitter.ShowCursor();
         cursor.Show();
         display.Flip();
     }
@@ -225,7 +225,6 @@ void Dialog::Marketplace(bool fromTradingPost)
     TradeWindowGUI gui(pos_rt);
 
     Kingdom & kingdom = world.GetKingdom(Settings::Get().CurrentColor());
-    const Sprite & spritecursor = AGG::GetICN(tradpost, 14);
 
     const std::string & header_from = _("Your Resources");
 
@@ -241,7 +240,8 @@ void Dialog::Marketplace(bool fromTradingPost)
     rectsFrom.push_back(Rect(pt1.x + 37, pt1.y + 37, 34, 34));	// crystal
     rectsFrom.push_back(Rect(pt1.x + 74, pt1.y + 37, 34, 34));	// gems
     rectsFrom.push_back(Rect(pt1.x + 37, pt1.y + 74, 34, 34));	// gold
-    SpriteCursor cursorFrom(spritecursor);
+
+    SpriteMove cursorFrom(AGG::GetICN(tradpost, 14));
     text.Set(header_from, Font::SMALL);
     dst_pt.x = pt1.x + (108 - text.w()) / 2;
     dst_pt.y = pt1.y - 15;
@@ -262,7 +262,8 @@ void Dialog::Marketplace(bool fromTradingPost)
     rectsTo.push_back(Rect(pt2.x + 37, pt2.y + 37, 34, 34));	// crystal
     rectsTo.push_back(Rect(pt2.x + 74, pt2.y + 37, 34, 34));	// gems
     rectsTo.push_back(Rect(pt2.x + 37, pt2.y + 74, 34, 34));	// gold
-    SpriteCursor cursorTo(spritecursor);
+
+    SpriteMove cursorTo(AGG::GetICN(tradpost, 14));
     text.Set(header_to, Font::SMALL);
     dst_pt.x = pt2.x + (108 - text.w()) / 2;
     dst_pt.y = pt2.y - 15;
@@ -341,7 +342,6 @@ void Dialog::Marketplace(bool fromTradingPost)
 
                 cursor.Hide();
                 cursorFrom.Move(rect_from.x - 2, rect_from.y - 2);
-                cursorFrom.Show();
 
                 if(resourceTo) cursorTo.Hide();
                 RedrawToResource(pt2, true, fromTradingPost, resourceFrom);
@@ -403,7 +403,7 @@ void Dialog::Marketplace(bool fromTradingPost)
             count_sell = seek * (Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo, fromTradingPost));
 
             cursor.Hide();
-            splitter.Move(seek);
+            splitter.MoveIndex(seek);
             gui.RedrawInfoBuySell(count_sell, count_buy, max_sell, fundsFrom.Get(resourceTo));
             cursor.Show();
             display.Flip();
@@ -418,7 +418,7 @@ void Dialog::Marketplace(bool fromTradingPost)
             count_sell = max * (Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo, fromTradingPost));
 
             cursor.Hide();
-            splitter.Move(max);
+            splitter.MoveIndex(max);
             gui.RedrawInfoBuySell(count_sell, count_buy, max_sell, fundsFrom.Get(resourceTo));
             cursor.Show();
             display.Flip();
@@ -432,7 +432,7 @@ void Dialog::Marketplace(bool fromTradingPost)
             count_sell = min * (Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo, fromTradingPost));
 
             cursor.Hide();
-            splitter.Move(min);
+            splitter.MoveIndex(min);
             gui.RedrawInfoBuySell(count_sell, count_buy, max_sell, fundsFrom.Get(resourceTo));
             cursor.Show();
             display.Flip();

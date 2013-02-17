@@ -28,18 +28,18 @@
 
 enum { BTN_PRESSED = 0x0080, BTN_DISABLE = 0x0008 };
 
-Button::Button() : sf1(NULL), sf2(NULL), flags(0)
+Button::Button() : flags(0)
 {
 }
 
-Button::Button(s16 ox, s16 oy, ICN::icn_t icn, u16 index1, u16 index2) : sf1(NULL), sf2(NULL), flags(0)
+Button::Button(s16 ox, s16 oy, ICN::icn_t icn, u16 index1, u16 index2) : flags(0)
 {
     SetPos(ox, oy);
 
-    sf1 = & AGG::GetICN(icn, index1);
-    sf2 = & AGG::GetICN(icn, index2);
+    sf1.Set(AGG::GetICN(icn, index1), true);
+    sf2.Set(AGG::GetICN(icn, index2), true);
 
-    if(sf1) SetSize(sf1->w(), sf1->h());
+    SetSize(sf1.w(), sf1.h());
 }
 
 bool Button::isEnable(void) const
@@ -81,18 +81,18 @@ void Button::SetPos(const Point & pos)
 
 void Button::SetSprite(ICN::icn_t icn, u16 index1, u16 index2)
 {
-    sf1 = & AGG::GetICN(icn, index1);
-    sf2 = & AGG::GetICN(icn, index2);
+    sf1.Set(AGG::GetICN(icn, index1), true);
+    sf2.Set(AGG::GetICN(icn, index2), true);
 
-    if(sf1) SetSize(sf1->w(), sf1->h());
+    SetSize(sf1.w(), sf1.h());
 }
 
 void Button::SetSprite(const Surface & s1, const Surface & s2)
 {
-    sf1 = &s1;
-    sf2 = &s2;
+    sf1.Set(s1, true);
+    sf2.Set(s2, true);
 
-    if(sf1) SetSize(sf1->w(), sf1->h());
+    SetSize(sf1.w(), sf1.h());
 }
 
 void Button::SetDisable(bool f)
@@ -139,15 +139,17 @@ void Button::Draw(void)
 {
     bool localcursor = false;
     Cursor & cursor = Cursor::Get();
-    const Surface* sf = isPressed() ? sf2 : sf1;
 
-    if(*this & cursor.GetRect() && cursor.isVisible())
+    if((*this & cursor.GetArea()) && cursor.isVisible())
     {
 	cursor.Hide();
 	localcursor = true;
     }
 
-    if(sf) sf->Blit(x, y, Display::Get());
+    if(isPressed())
+	sf2.Blit(x, y, Display::Get());
+    else
+	sf1.Blit(x, y, Display::Get());
 
     if(localcursor) cursor.Show();
 }

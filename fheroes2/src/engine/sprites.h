@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *   Copyright (C) 2012 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
@@ -19,28 +19,66 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2SIZECURSOR_H
-#define H2SIZECURSOR_H
 
-#include "gamedefs.h"
+#ifndef H2SPRITES_H
+#define H2SPRITES_H
 
-class Surface;
+#include "surface.h"
 
-class SizeCursor : public SpriteCursor
+class SpritePos : public Surface, protected Point
 {
 public:
-    SizeCursor(u8 sw = 1, u8 sh = 1);
+    SpritePos();
+    SpritePos(const Point &, const Size &, bool amask);
 
-    void ModifySize(const u8 w, const u8 h);
-    void ModifySize(const Size & sz);
+    void SetPos(const Point &);
 
-    u8 w(void);
-    u8 h(void);
+    const Point & GetPos(void) const;
+    Rect GetArea(void) const;
+};
 
-private:
-    void ModifyCursor(const u8 w, const u8 h);
+class SpriteBack : protected SpritePos
+{
+public:
+    SpriteBack();
 
-    Surface cursor;
+    bool isValid(void) const;
+
+    void Save(const Point &);
+    void Save(const Rect &);
+    void Restore(void);
+    void Destroy(void);
+
+    const Point & GetPos(void) const;
+    Rect GetArea(void) const;
+    Size GetSize(void) const;
+};
+
+
+class SpriteMove : public Surface
+{
+public:
+    SpriteMove();
+    SpriteMove(const Surface &);
+
+    void Move(const Point &);
+    void Move(s16, s16);
+
+    void Hide(void);
+    void Show(void);
+    void Redraw(void);
+
+    bool isVisible(void) const;
+
+    const Point & GetPos(void) const;
+    Rect GetArea(void) const;
+    Size GetSize(void) const;
+
+protected:
+    void Show(const Point &);
+
+    SpriteBack background;
+    bool visible;
 };
 
 #endif

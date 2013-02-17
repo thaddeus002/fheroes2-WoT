@@ -80,10 +80,10 @@ namespace Battle
 	    SetScrollButtonDn(ICN::DROPLISL, 8, 9, Point(ax, area.y + area.h - 20));
 	    SetScrollSplitter(AGG::GetICN(ICN::DROPLISL, 13),
 		Rect(ax + 5, buttonPgUp.y + buttonPgUp.h + 3, 12, buttonPgDn.y - (buttonPgUp.y + buttonPgUp.h) - 6));
-	    splitter.Hide();
+	    splitter.HideCursor();
 	    SetAreaItems(Rect(area.x, area.y, area.w - 10, area.h));
 	    SetListContent(messages);
-	    splitter.Show();
+	    splitter.ShowCursor();
 	}
 
 	const Rect & GetArea(void) const

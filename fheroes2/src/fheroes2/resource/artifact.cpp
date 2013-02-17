@@ -772,15 +772,14 @@ ArtifactsBar::ArtifactsBar(const Heroes* ptr, bool mini, bool ro, bool change /*
         backsf.Set(rt.w, rt.h);
         sprite.Blit(rt, 0, 0, backsf);
         Cursor::DrawCursor(backsf, 0x70, true);
-	cursf.Set(rt.w, rt.h);
-	Cursor::DrawCursor(cursf, 0x10, true);
-        spcursor.SetSprite(cursf);
+	spcursor.Set(rt.w, rt.h);
+	Cursor::DrawCursor(spcursor, 0x10, true);
     }
     else
     {
         const Sprite & sprite = AGG::GetICN(ICN::ARTIFACT, 0);
         SetItemSize(sprite.w(), sprite.h());
-        spcursor.SetSprite(AGG::GetICN(ICN::NGEXTRA, 62));
+        spcursor.Set(AGG::GetICN(ICN::NGEXTRA, 62), true);
     }
 }
 
@@ -820,9 +819,9 @@ void ArtifactsBar::RedrawItem(Artifact & art, const Rect & pos, bool selected, S
 	if(selected)
 	{
 	    if(use_mini_sprite)
-		spcursor.Show(pos.x, pos.y);
+		spcursor.Move(pos.x, pos.y);
 	    else
-		spcursor.Show(pos.x - 3, pos.y - 3);
+		spcursor.Move(pos.x - 3, pos.y - 3);
 	}
     }
 }

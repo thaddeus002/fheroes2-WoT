@@ -122,8 +122,8 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     const Point army2_pt(dst_pt.x - 1, dst_pt.y - 1);
 
     // cursor format
-    SpriteCursor cursorFormat(AGG::GetICN(ICN::HSICONS, 11), army.isSpreadFormat() ? army1_pt : army2_pt);
-    cursorFormat.Show(army.isSpreadFormat() ? army1_pt : army2_pt);
+    SpriteMove cursorFormat(AGG::GetICN(ICN::HSICONS, 11));
+    cursorFormat.Move(army.isSpreadFormat() ? army1_pt : army2_pt);
 
     // experience
     ExperienceIndicator experienceInfo(*this);

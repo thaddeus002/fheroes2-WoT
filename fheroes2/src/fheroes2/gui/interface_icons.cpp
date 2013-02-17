@@ -193,9 +193,9 @@ void Interface::CastleIcons::SetShow(bool f)
     IconsBar::SetShow(f);
 
     if(f)
-	GetSplitter().Show();
+	GetSplitter().ShowCursor();
     else
-	GetSplitter().Hide();
+	GetSplitter().HideCursor();
 }
 
 void Interface::CastleIcons::SetPos(s16 px, s16 py)
@@ -204,7 +204,7 @@ void Interface::CastleIcons::SetPos(s16 px, s16 py)
 
     SetTopLeft(Point(px, py));
     SetScrollSplitter(AGG::GetICN(icnscroll, 4),
-			Rect(px + ICONS_CURSOR_WIDTH + 4, py + 18, 10, ICONS_CURSOR_HEIGHT * icons - 35));
+			Rect(px + ICONS_CURSOR_WIDTH + 3, py + 19, 10, ICONS_CURSOR_HEIGHT * icons - 37));
     SetScrollButtonUp(icnscroll, 0, 1,
 			Point(px + ICONS_CURSOR_WIDTH + 1, py + 1));
     SetScrollButtonDn(icnscroll, 2, 3,
@@ -284,9 +284,9 @@ void Interface::HeroesIcons::SetShow(bool f)
     IconsBar::SetShow(f);
 
     if(f)
-	GetSplitter().Show();
+	GetSplitter().ShowCursor();
     else
-	GetSplitter().Hide();
+	GetSplitter().HideCursor();
 }
 
 void Interface::HeroesIcons::SetPos(s16 px, s16 py)
@@ -295,7 +295,7 @@ void Interface::HeroesIcons::SetPos(s16 px, s16 py)
 
     SetTopLeft(Point(px, py));
     SetScrollSplitter(AGG::GetICN(icnscroll, 4),
-			Rect(px + ICONS_CURSOR_WIDTH + 4, py + 18, 10, ICONS_CURSOR_HEIGHT * icons - 35));
+			Rect(px + ICONS_CURSOR_WIDTH + 3, py + 19, 10, ICONS_CURSOR_HEIGHT * icons - 37));
     SetScrollButtonUp(icnscroll, 0, 1,
 			Point(px + ICONS_CURSOR_WIDTH + 1, py + 1));
     SetScrollButtonDn(icnscroll, 2, 3,

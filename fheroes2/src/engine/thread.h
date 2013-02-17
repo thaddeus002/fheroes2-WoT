@@ -76,8 +76,8 @@ public:
 
     bool IsValid(void) const;
 
-    static void Run(Timer &, u32, u32 (*)(u32, void *), void *param = NULL);
-    static void Remove(Timer &);
+    void Run(u32, u32 (*)(u32, void *), void *param = NULL);
+    void Remove(void);
 
 private:
     SDL_TimerID id;

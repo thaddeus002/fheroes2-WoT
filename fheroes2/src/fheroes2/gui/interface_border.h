@@ -28,16 +28,7 @@
 
 namespace Interface
 {
-    class GameBorder
-    {
-    public:
-    	static GameBorder & Get(void);
-
-        void Redraw(void);
-
-    private:
-	GameBorder();
-    };
+    void GameBorderRedraw(void);
 
     class BorderWindow
     {
@@ -60,6 +51,7 @@ namespace Interface
 
 	Rect			area;
         Dialog::FrameBorder	border;
+	SpriteMove		moveIndicator;
     };
 }
 

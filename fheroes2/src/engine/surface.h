@@ -44,12 +44,10 @@ public:
     Surface(const Surface &);
     Surface & operator= (const Surface &);
 
-    static Surface RefCopy(const Surface &);
-
     virtual ~Surface();
     virtual bool isDisplay(void) const;
 
-    void Set(const Surface &);
+    void Set(const Surface &, bool refcopy = false);
     void Set(SDL_Surface* sf);
     void Set(u16 sw, u16 sh, bool amask = false);
     void Set(u16 sw, u16 sh, u8 bpp, bool amask); /* bpp: 8, 16, 24, 32 */
@@ -67,6 +65,7 @@ public:
     u32 amask(void) const;
     u8  alpha(void) const;
     Size GetSize(void) const;
+    u32	RefCount(void) const;
 
     bool isValid(void) const;
     u32 MapRGB(u8 r, u8 g, u8 b, u8 a = 0) const;

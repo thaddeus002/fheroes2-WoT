@@ -110,19 +110,19 @@ Timer::Timer() : id(0)
 {
 }
 
-void Timer::Run(Timer & timer, u32 interval, u32 (*fn)(u32, void *), void *param)
+void Timer::Run(u32 interval, u32 (*fn)(u32, void *), void *param)
 {
-    if(timer.id) Remove(timer);
+    if(id) Remove();
 
-    timer.id = SDL_AddTimer(interval, fn, param);
+    id = SDL_AddTimer(interval, fn, param);
 }
 
-void Timer::Remove(Timer & timer)
+void Timer::Remove(void)
 {
-    if(timer.id)
+    if(id)
     {
-	SDL_RemoveTimer(timer.id);
-	timer.id = 0;
+	SDL_RemoveTimer(id);
+	id = 0;
     }
 }
 

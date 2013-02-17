@@ -89,7 +89,7 @@ ArmyBar::ArmyBar(Army* ptr, bool mini, bool ro, bool change /* false */)
     {
         const Sprite & sprite = AGG::GetICN(ICN::STRIP, 2);
         SetItemSize(sprite.w(), sprite.h());
-        spcursor.SetSprite(AGG::GetICN(ICN::STRIP, 1));
+        spcursor.Set(AGG::GetICN(ICN::STRIP, 1), true);
     }
 
     SetArmy(ptr);
@@ -123,9 +123,8 @@ void ArmyBar::SetBackground(u16 sw, u16 sh, u8 index)
         backsf.Set(sw, sh);
 	backsf.Fill(backsf.GetColorIndex(index));
         Cursor::DrawCursor(backsf, 0x70, true);
-        cursf.Set(sw, sh);
-        Cursor::DrawCursor(cursf, 0xd7, true);
-        spcursor.SetSprite(cursf);
+        spcursor.Set(sw, sh);
+        Cursor::DrawCursor(spcursor, 0xd7, true);
     }
 }
 
@@ -191,7 +190,7 @@ void ArmyBar::RedrawItem(ArmyTroop & troop, const Rect & pos, bool selected, Sur
 	    text.Blit(pos.x + pos.w - text.w() - 3, pos.y + pos.h - text.h() - 1, dstsf);
 
 	if(selected)
-            spcursor.Show(pos.x, pos.y);
+            spcursor.Move(pos.x, pos.y);
     }
 }
 

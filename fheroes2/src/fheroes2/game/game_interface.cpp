@@ -39,8 +39,7 @@ bool Interface::NoGUI(void)
 
 Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
     iconsPanel(IconsPanel::Get()), buttonsArea(ButtonsArea::Get()),
-    statusWindow(StatusWindow::Get()), gameBorder(GameBorder::Get()),
-    controlPanel(ControlPanel::Get()), redraw(0)
+    statusWindow(StatusWindow::Get()), controlPanel(ControlPanel::Get()), redraw(0)
 {
     Settings & conf = Settings::Get().Get();
     const Display & display = Display::Get();
@@ -217,7 +216,8 @@ void Interface::Basic::Redraw(u8 force)
 	}
     }
 
-    if((redraw | force) & REDRAW_BORDER) gameBorder.Redraw();
+    if((redraw | force) & REDRAW_BORDER)
+	    GameBorderRedraw();
 
     redraw = 0;
 }

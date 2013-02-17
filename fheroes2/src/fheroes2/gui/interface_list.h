@@ -132,7 +132,16 @@ namespace Interface
 	    content = &list;
 	    cur = content->begin();
 	    top = content->begin();
-	    splitter.SetRange(0, (maxItems < list.size() ? list.size() - maxItems : 0));
+	    if(maxItems < list.size())
+	    {
+		splitter.SetRange(0, list.size() - maxItems);
+		splitter.MoveIndex(0);
+	    }
+	    else
+	    {
+		splitter.SetRange(0, 0);
+		splitter.MoveCenter();
+	    }
 	}
 
 	void Reset(void)
@@ -142,7 +151,12 @@ namespace Interface
 		cur = content->end();
 		top = content->begin();
 		UpdateSplitterRange();
-		splitter.Move(0);
+		splitter.MoveCenter();
+
+		if(maxItems < content->size())
+		    splitter.MoveIndex(0);
+		else
+		    splitter.MoveCenter();
 	    }
 	}
 
@@ -159,7 +173,7 @@ namespace Interface
 
             buttonPgUp.Draw();
             buttonPgDn.Draw();
-            splitter.Redraw();
+            splitter.RedrawCursor();
 
             ItemsIterator curt = top;
             ItemsIterator last = top + maxItems < content->end() ? top + maxItems : content->end();
@@ -195,7 +209,7 @@ namespace Interface
 		top = cur + maxItems > content->end() ? content->end() - maxItems : cur;
 		if(top < content->begin()) top = content->begin();
 		UpdateSplitterRange();
-    		splitter.Move(top - content->begin());
+    		splitter.MoveIndex(top - content->begin());
 	    }
 	}
 
@@ -236,7 +250,7 @@ namespace Interface
 		cursor.Hide();
 		top = (top - content->begin() > maxItems ? top - maxItems : content->begin());
 		UpdateSplitterRange();
-    		splitter.Move(top - content->begin());
+    		splitter.MoveIndex(top - content->begin());
 		return true;
 	    }
 	    else
@@ -247,7 +261,7 @@ namespace Interface
 		top += maxItems;
 		if(top + maxItems > content->end()) top = content->end() - maxItems;
 		UpdateSplitterRange();
-		splitter.Move(top - content->begin());
+		splitter.MoveIndex(top - content->begin());
 		return true;
 	    }
 	    else
@@ -294,7 +308,7 @@ namespace Interface
 		else
 		if(seek > splitter.Max()) seek = splitter.Max();
 		top = content->begin() + seek;
-		splitter.Move(seek);
+		splitter.MoveIndex(seek);
 		return true;
 	    }
 

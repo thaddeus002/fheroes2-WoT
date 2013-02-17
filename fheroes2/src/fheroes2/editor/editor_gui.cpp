@@ -20,105 +20,44 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "rect.h"
-#include "surface.h"
-#include "display.h"
-#include "spritecursor.h"
+#ifdef WITH_EDITOR
 
-SpriteCursor::SpriteCursor() : Background(), sprite(NULL), visible(false)
+#include "maps.h"
+#include "cursor.h"
+#include "editor_gui.h"
+
+SizeCursor::SizeCursor(u8 sw, u8 sh)
 {
+    ModifyCursor(sw * TILEWIDTH, sh * TILEWIDTH);
 }
 
-SpriteCursor::SpriteCursor(const Surface &cursor, const Point & pt) : Background(pt, cursor.w(), cursor.h()), sprite(&cursor), visible(false)
+u8 SizeCursor::w(void)
 {
+    return Surface::w() / TILEWIDTH;
 }
 
-SpriteCursor::SpriteCursor(const Surface &cursor, s16 x, s16 y) : Background(x, y, cursor.w(), cursor.h()), sprite(&cursor), visible(false)
+u8 SizeCursor::h(void)
 {
+    return Surface::h() / TILEWIDTH;
 }
 
-u16  SpriteCursor::w(void) const
+void SizeCursor::ModifySize(const Size & sz)
 {
-    return sprite ? sprite->w() : 0;
+    ModifySize(sz.w, sz.h);
 }
 
-u16  SpriteCursor::h(void) const
+void SizeCursor::ModifySize(const u8 w, const u8 h)
 {
-    return sprite ? sprite->h() : 0;
+    ModifyCursor(w * TILEWIDTH, h * TILEWIDTH);
 }
 
-void SpriteCursor::SetSprite(const Surface & sf)
+void SizeCursor::ModifyCursor(u16 w, u16 h)
 {
-    if(visible) Restore();
-
-    Save(Background::x, Background::y, sf.w(), sf.h());
-
-    sprite = &sf;
-}
-
-const Surface* SpriteCursor::Sprite(void)
-{
-    return sprite && sprite->isValid() ? sprite : NULL;
-}
-
-void SpriteCursor::Move(const Point &pt)
-{
-    Move(pt.x, pt.y);
-}
-
-void SpriteCursor::Move(s16 ax, s16 ay)
-{
-    if(Background::x == ax && Background::y == ay)
+    if(Surface::w() != w || Surface::h() != h)
     {
-	if(!visible) Show();
-    }
-    else
-    {
-	if(visible) Hide();
-	Show(ax, ay);
+	Set(w, h);
+	Cursor::DrawCursor(*this, 0x40);
     }
 }
 
-void SpriteCursor::Hide(void)
-{
-    if(visible)
-    {
-	Restore();
-	visible = false;
-    }
-}
-
-void SpriteCursor::Redraw(void)
-{
-    if(visible)
-    {
-	Hide();
-	Show();
-    }
-}
-
-void SpriteCursor::Show(void)
-{
-    Show(GetPos());
-}
-
-void SpriteCursor::Show(const Point &pt)
-{
-    Show(pt.x, pt.y);
-}
-
-void SpriteCursor::Show(s16 ax, s16 ay)
-{
-    if(! visible)
-    {
-	Display & display = Display::Get();
-	Save(ax, ay);
-	if(sprite) sprite->Blit(ax, ay, display);
-	visible = true;
-    }
-}
-
-bool SpriteCursor::isVisible(void) const
-{
-    return visible;
-}
+#endif

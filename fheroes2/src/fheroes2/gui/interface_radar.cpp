@@ -98,10 +98,9 @@ void Interface::Radar::Build(void)
     const Size & rectMaps = Interface::GameArea::Get().GetRectMaps();
     const u16 & sw = static_cast<u16>(rectMaps.w * (area.w / static_cast<float>(world.w())));
     const u16 & sh = static_cast<u16>(rectMaps.h * (area.h / static_cast<float>(world.h())));
-    spriteCursor.Set(sw, sh);
-    cursorArea.SetSprite(spriteCursor);
+    cursorArea.Set(sw, sh);
+    Cursor::DrawCursor(cursorArea, RADARCOLOR);
     cursorArea.Move(area.x, area.y);
-    Cursor::DrawCursor(spriteCursor, RADARCOLOR);
 }
 
 Interface::Radar & Interface::Radar::Get(void)
@@ -178,7 +177,7 @@ void Interface::Radar::RedrawArea(const u8 color)
 
 	const u16 world_w = world.w();
 	const u16 world_h = world.h();
-	const Surface *tile_surface = NULL;
+	const Surface* tile_surface = NULL;
 
 	cursorArea.Hide();
 	spriteArea.Blit(area.x, area.y, display);
@@ -251,17 +250,14 @@ void Interface::Radar::RedrawCursor(void)
 	const u16 & sh = static_cast<u16>(rectMaps.h * (area.h / static_cast<float>(world.h())));
 
 	// check change game area
-	if(spriteCursor.w() != sw && spriteCursor.h() != sh)
+	if(cursorArea.w() != sw && cursorArea.h() != sh)
 	{
-	    spriteCursor.Set(sw, sh);
-	    Cursor::DrawCursor(spriteCursor, RADARCOLOR);
-	    cursorArea.SetSprite(spriteCursor);
+	    cursorArea.Set(sw, sh);
+	    Cursor::DrawCursor(cursorArea, RADARCOLOR);
 	}
 
-	cursorArea.Hide();
         cursorArea.Move(area.x + rectMaps.x * area.w / world.w(),
             		    area.y + rectMaps.y * area.h / world.h());
-	cursorArea.Show();
     }
 }
 

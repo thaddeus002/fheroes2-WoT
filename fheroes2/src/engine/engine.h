@@ -22,12 +22,13 @@
 #ifndef H2ENGINE_H
 #define H2ENGINE_H
 
+#include "types.h"
+#include "sprites.h"
 #include "background.h"
 #include "display.h"
 #include "localevent.h"
 #include "error.h"
 #include "rect.h"
-#include "spritecursor.h"
 #include "surface.h"
 #include "palette.h"
 #include "rand.h"
@@ -36,7 +37,6 @@
 #include "audio_mixer.h"
 #include "audio_music.h"
 #include "audio_cdrom.h"
-#include "types.h"
 #include "serialize.h"
 
 #define INIT_VIDEO	SDL_INIT_VIDEO

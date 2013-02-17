@@ -316,11 +316,8 @@ u8 Dialog::ArmySplitTroop(u8 free_slots, u32 max, u32 & cur, bool savelast)
     sel.SetPos(Point(pos.x + 70, pos.y + 30));
     sel.Redraw();
 
-    Surface ssf;
-    SpriteCursor* ssp = NULL;
-    const Sprite* sp3 = NULL;
-    const Sprite* sp4 = NULL;
-    const Sprite* sp5 = NULL;
+    SpriteMove ssp;
+    Surface sp3, sp4, sp5;
 
     std::vector<Rect> vrts(3);
 
@@ -334,41 +331,38 @@ u8 Dialog::ArmySplitTroop(u8 free_slots, u32 max, u32 & cur, bool savelast)
 	    break;
 
 	case 3:	
-	    sp3 = &AGG::GetICN(ICN::REQUESTS, 22);
-	    rt3 = Rect(center - sp3->w() / 2, pos.y + 95, sp3->w(), sp3->h());
+	    sp3.Set(AGG::GetICN(ICN::REQUESTS, 22), true);
+	    rt3 = Rect(center - sp3.w() / 2, pos.y + 95, sp3.w(), sp3.h());
 	    break;
 
 	case 4:
-	    sp3 = &AGG::GetICN(ICN::REQUESTS, 22);
-	    sp4 = &AGG::GetICN(ICN::REQUESTS, 23);
-	    rt3 = Rect(center - 5 - sp3->w(), pos.y + 95, sp3->w(), sp3->h());
-	    rt4 = Rect(center + 5, pos.y + 95, sp4->w(), sp4->h());
+	    sp3.Set(AGG::GetICN(ICN::REQUESTS, 22), true);
+	    sp4.Set(AGG::GetICN(ICN::REQUESTS, 23), true);
+	    rt3 = Rect(center - 5 - sp3.w(), pos.y + 95, sp3.w(), sp3.h());
+	    rt4 = Rect(center + 5, pos.y + 95, sp4.w(), sp4.h());
 	    break;
 
 	case 5:
-	    sp3 = &AGG::GetICN(ICN::REQUESTS, 22);
-	    sp4 = &AGG::GetICN(ICN::REQUESTS, 23);
-	    sp5 = &AGG::GetICN(ICN::REQUESTS, 24);
-	    rt3 = Rect(center - sp3->w() / 2 - 10 - sp3->w(), pos.y + 95, sp3->w(), sp3->h());
-	    rt4 = Rect(center - sp4->w() / 2, pos.y + 95, sp4->w(), sp4->h());
-	    rt5 = Rect(center + sp5->w() / 2 + 10, pos.y + 95, sp5->w(), sp5->h());
+	    sp3.Set(AGG::GetICN(ICN::REQUESTS, 22), true);
+	    sp4.Set(AGG::GetICN(ICN::REQUESTS, 23), true);
+	    sp5.Set(AGG::GetICN(ICN::REQUESTS, 24), true);
+	    rt3 = Rect(center - sp3.w() / 2 - 10 - sp3.w(), pos.y + 95, sp3.w(), sp3.h());
+	    rt4 = Rect(center - sp4.w() / 2, pos.y + 95, sp4.w(), sp4.h());
+	    rt5 = Rect(center + sp5.w() / 2 + 10, pos.y + 95, sp5.w(), sp5.h());
 	    break;
     }
 
-    if(sp3)
+    if(sp3.isValid())
     {
 	text.Set(_("Fast separation into slots:"), Font::BIG);
 	text.Blit(center - text.w() / 2, pos.y + 65);
 
-	sp3->Blit(rt3);
-	if(sp4) sp4->Blit(rt4);
-	if(sp5) sp5->Blit(rt5);
+	sp3.Blit(rt3, display);
+	if(sp4.isValid()) sp4.Blit(rt4, display);
+	if(sp5.isValid()) sp5.Blit(rt5, display);
 
-	ssf.Set(sp3->w(), sp3->h());
-	Cursor::DrawCursor(ssf, 0xD7, true);
-
-	ssp = new SpriteCursor(ssf, rt3.x, rt3.y);
-	ssp->Hide();
+	ssp.Set(sp3.w(), sp3.h());
+	Cursor::DrawCursor(ssp, 0xD7, true);
     }
 
     ButtonGroups btnGroups(box.GetArea(), Dialog::OK | Dialog::CANCEL);
@@ -417,14 +411,14 @@ u8 Dialog::ArmySplitTroop(u8 free_slots, u32 max, u32 & cur, bool savelast)
 	if(sel.QueueEventProcessing())
     	    redraw_count = true;
 
-	if(ssp)
+	if(ssp.isValid())
 	for(std::vector<Rect>::const_iterator
 	    it = vrts.begin(); it != vrts.end(); ++it)
 	{
 	    if(le.MouseClickLeft(*it))
 	    {
 		cursor.Hide();
-		ssp->Move(*it);
+		ssp.Move(*it);
 		cursor.Show();
 		display.Flip();
 	    }
@@ -433,7 +427,7 @@ u8 Dialog::ArmySplitTroop(u8 free_slots, u32 max, u32 & cur, bool savelast)
 	if(redraw_count)
 	{
 	    cursor.Hide();
-	    if(ssp) ssp->Hide();
+	    if(ssp.isValid()) ssp.Hide();
 	    sel.Redraw();
 	    cursor.Show();
 	    display.Flip();
@@ -450,9 +444,9 @@ u8 Dialog::ArmySplitTroop(u8 free_slots, u32 max, u32 & cur, bool savelast)
     {
 	cur = sel();
 
-	if(ssp && ssp->isVisible())
+	if(ssp.isVisible())
 	{
-	    const Rect & rt = ssp->GetRect();
+	    const Rect & rt = ssp.GetArea();
 
 	    if(rt == rt3)
 		result = 3;
@@ -466,8 +460,6 @@ u8 Dialog::ArmySplitTroop(u8 free_slots, u32 max, u32 & cur, bool savelast)
 	else
 	    result = 2;
     }
-
-    if(ssp) delete ssp;
 
     return result;
 }

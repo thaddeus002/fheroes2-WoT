@@ -117,7 +117,7 @@ StatsHeroesList::StatsHeroesList(const Point & pt, KingdomHeroes & heroes) : Int
 
     SetTopLeft(pt);
     SetScrollSplitter(AGG::GetICN(ICN::SCROLL, 4),
-                        Rect(pt.x + 630, pt.y + 18, back.w(), back.h()));
+                        Rect(pt.x + 629, pt.y + 18, back.w(), back.h()));
     SetScrollButtonUp(ICN::SCROLL, 0, 1,
                         Point(pt.x + 626, pt.y));
     SetScrollButtonDn(ICN::SCROLL, 2, 3,
@@ -329,7 +329,7 @@ StatsCastlesList::StatsCastlesList(const Point & pt, KingdomCastles & castles) :
 
     SetTopLeft(pt);
     SetScrollSplitter(AGG::GetICN(ICN::SCROLL, 4),
-                        Rect(pt.x + 630, pt.y + 18, back.w(), back.h()));
+                        Rect(pt.x + 629, pt.y + 18, back.w(), back.h()));
     SetScrollButtonUp(ICN::SCROLL, 0, 1,
                         Point(pt.x + 626, pt.y));
     SetScrollButtonDn(ICN::SCROLL, 2, 3,

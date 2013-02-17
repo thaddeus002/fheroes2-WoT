@@ -26,17 +26,7 @@
 #include "game_interface.h"
 #include "interface_border.h"
 
-Interface::GameBorder::GameBorder()
-{
-}
-
-Interface::GameBorder & Interface::GameBorder::Get(void)
-{
-    static GameBorder GameBorder;
-    return GameBorder;
-}
-
-void Interface::GameBorder::Redraw(void)
+void Interface::GameBorderRedraw(void)
 {
     const Settings & conf = Settings::Get();
     if(conf.ExtGameHideInterface()) return;
@@ -243,14 +233,17 @@ bool Interface::BorderWindow::QueueEventProcessing(void)
         const Point & mp = le.GetMouseCursor();
 	const Rect & pos = GetRect();
 
-        Surface sf(pos.w, pos.h);
-        Cursor::DrawCursor(sf, 0x70);
+	if(! moveIndicator.isValid())
+	{
+	    moveIndicator.Set(pos.w, pos.h);
+	    Cursor::DrawCursor(moveIndicator, 0x70);
+	}
+
         const s16 ox = mp.x - pos.x;
         const s16 oy = mp.y - pos.y;
-        SpriteCursor sp(sf, pos.x, pos.y);
 
         cursor.Hide();
-        sp.Redraw();
+	moveIndicator.Move(pos.x, pos.y);
         cursor.Show();
         display.Flip();
 
@@ -259,7 +252,7 @@ bool Interface::BorderWindow::QueueEventProcessing(void)
             if(le.MouseMotion())
             {
                 cursor.Hide();
-                sp.Move(mp.x - ox, mp.y - oy);
+		moveIndicator.Move(mp.x - ox, mp.y - oy);
                 cursor.Show();
                 display.Flip();
             }

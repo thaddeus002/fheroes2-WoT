@@ -60,8 +60,7 @@ public:
 protected:
     Army*		army;
     Surface             backsf;
-    Surface             cursf;
-    SpriteCursor        spcursor;
+    SpriteMove          spcursor;
     bool                use_mini_sprite;
     bool                read_only;
     bool                can_change;

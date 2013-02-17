@@ -28,7 +28,7 @@
 #include "gamedefs.h"
 #include "button.h"
 #include "splitter.h"
-#include "sizecursor.h"
+#include "editor_gui.h"
 #include "interface_radar.h"
 #include "interface_gamearea.h"
 

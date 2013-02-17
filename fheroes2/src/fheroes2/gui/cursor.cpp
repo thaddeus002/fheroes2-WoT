@@ -54,23 +54,23 @@ bool Cursor::SetThemes(u16 name, bool force)
 	switch(0xF000 & name)
 	{
 	    case 0x3000:
-            SetSprite(AGG::GetICN(ICN::SPELCO, 0xFF & name));
+            Set(AGG::GetICN(ICN::SPELCO, 0xFF & name), true);
 		DEBUG(DBG_ENGINE, DBG_TRACE, ICN::GetString(ICN::SPELCO) << ", " << static_cast<int>(0xFF & name));
 		break;
 	    
 	    case 0x2000:
-            SetSprite(AGG::GetICN(ICN::CMSECO, 0xFF & name));
+            Set(AGG::GetICN(ICN::CMSECO, 0xFF & name), true);
 		DEBUG(DBG_ENGINE , DBG_TRACE, ICN::GetString(ICN::CMSECO) << ", " << static_cast<int>(0xFF & name));
 		break;
 	    
 	    case 0x1000:
-            SetSprite(AGG::GetICN(ICN::ADVMCO, 0xFF & name));
+            Set(AGG::GetICN(ICN::ADVMCO, 0xFF & name), true);
 		DEBUG(DBG_ENGINE , DBG_TRACE, ICN::GetString(ICN::ADVMCO) << ", " << static_cast<int>(0xFF & name));
 		break;
 
 	    default:
 		// default Cursor::POINTER
-            SetSprite(AGG::GetICN(ICN::ADVMCO, 0));
+            Set(AGG::GetICN(ICN::ADVMCO, 0), true);
 		break;
 	}
 
@@ -97,7 +97,7 @@ void Cursor::Redraw(u16 x, u16 y)
 /* move cursor */
 void Cursor::Move(u16 x, u16 y)
 {
-    if(isVisible()) SpriteCursor::Move(x + offset_x, y + offset_y);
+    if(isVisible()) SpriteMove::Move(x + offset_x, y + offset_y);
 }
 
 /* set offset big cursor */
@@ -305,7 +305,7 @@ void Cursor::DrawCursor(Surface &surface, const u8 indexcolor, bool solid)
 
 void Cursor::Show(void)
 {
-    if(! Settings::Get().ExtPocketHideCursor()) SpriteCursor::Show();
+    if(! Settings::Get().ExtPocketHideCursor()) SpriteMove::Show();
 }
 
 Cursor::themes_t Cursor::DistanceThemes(themes_t theme, u16 dist)

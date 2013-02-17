@@ -288,7 +288,9 @@ u32 Castle::OpenTown(void)
     const std::string descriptionGroupedArmyFormat(_("'Grouped' combat formation bunches your army toget her in the center of your side of the battlefield."));
     const Point pointSpreadArmyFormat(rectSpreadArmyFormat.x - 1, rectSpreadArmyFormat.y - 1);
     const Point pointGroupedArmyFormat(rectGroupedArmyFormat.x - 1, rectGroupedArmyFormat.y - 1);
-    SpriteCursor cursorFormat(AGG::GetICN(ICN::HSICONS, 11), army.isSpreadFormat() ? pointSpreadArmyFormat : pointGroupedArmyFormat);
+
+    SpriteMove cursorFormat(AGG::GetICN(ICN::HSICONS, 11));
+
     if(isBuild(BUILD_CAPTAIN))
     {
 	text.Set(_("Attack Skill") + std::string(" "), Font::SMALL);
@@ -330,7 +332,7 @@ u32 Castle::OpenTown(void)
 	spriteSpreadArmyFormat.Blit(rectSpreadArmyFormat.x, rectSpreadArmyFormat.y);
 	spriteGroupedArmyFormat.Blit(rectGroupedArmyFormat.x, rectGroupedArmyFormat.y);
 
-	cursorFormat.Show(army.isSpreadFormat() ? pointSpreadArmyFormat : pointGroupedArmyFormat);
+	cursorFormat.Move(army.isSpreadFormat() ? pointSpreadArmyFormat : pointGroupedArmyFormat);
     }
 
     Kingdom & kingdom = GetKingdom();
@@ -484,7 +486,6 @@ u32 Castle::OpenTown(void)
         	army.SetSpreadFormat(false);
     	    }
 	}
-
 
 	// right
 	if(le.MousePressRight(rectSpreadArmyFormat)) Dialog::Message(_("Spread Formation"), descriptionSpreadArmyFormat, Font::BIG);

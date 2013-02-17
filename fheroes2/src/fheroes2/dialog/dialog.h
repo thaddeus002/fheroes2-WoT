@@ -38,7 +38,6 @@ class Heroes;
 class Surface;
 class Artifact;
 class Spell;
-class SpriteCursor;
 class Monster;
 class Funds;
 class Troop;

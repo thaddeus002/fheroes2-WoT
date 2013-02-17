@@ -24,36 +24,44 @@
 
 #include "gamedefs.h"
 
-class Splitter : public SpriteCursor
+class Splitter
 {
 public:
     enum positions_t { HORIZONTAL, VERTICAL };
 
     Splitter();
-    Splitter(const Surface &sf, const Rect &rt, positions_t pos);
+    Splitter(const Surface &, const Rect &, positions_t);
 
     void Forward(void);
     void Backward(void);
-    void Move(u16 pos);
+    void MoveIndex(u16 pos);
+    void MoveCenter(void);
 
-    void SetArea(s16, s16, u16, u16);
-    void SetArea(const Rect & rt);
-    void SetOrientation(positions_t ps);
+    void RedrawCursor(void);
+    void HideCursor(void);
+    void ShowCursor(void);
+
+    void SetSprite(const Surface &);
+    void SetArea(const Rect &);
+    void SetOrientation(positions_t);
     void SetRange(u16 smin, u16 smax);
 
     u16 GetCurrent(void) const{ return cur; };
     u16 GetStep(void) const{ return step; };
     u16 Max(void) const{ return max; };
     u16 Min(void) const{ return min; };
+
     const Rect & GetRect(void) const{ return area; };
-    const Rect & GetCursor(void) const{ return SpriteCursor::GetRect(); };
 
 private:
-    Rect area;
-    u16 step;
-    u16 min;
-    u16 max;
-    u16 cur;
+    Point	GetPositionCursor(void);
+
+    SpriteMove	cursor;
+    Rect	area;
+    u16		step;
+    u16		min;
+    u16		max;
+    u16		cur;
     positions_t position;
 };
 

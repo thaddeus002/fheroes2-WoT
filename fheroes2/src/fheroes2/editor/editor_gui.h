@@ -19,41 +19,28 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef H2SIZECURSOR_H
+#define H2SIZECURSOR_H
 
-#include "maps.h"
-#include "cursor.h"
-#include "sizecursor.h"
+#ifdef WITH_EDITOR
+#include "gamedefs.h"
 
-SizeCursor::SizeCursor(u8 sw, u8 sh) : SpriteCursor(), cursor()
+class Surface;
+
+class SizeCursor : public SpriteMove
 {
-    ModifyCursor(sw, sh);
-}
+public:
+    SizeCursor(u8 sw = 1, u8 sh = 1);
 
-u8 SizeCursor::w(void)
-{
-    return cursor.w() / TILEWIDTH;
-}
+    void ModifySize(const u8 w, const u8 h);
+    void ModifySize(const Size & sz);
 
-u8 SizeCursor::h(void)
-{
-    return cursor.h() / TILEWIDTH;
-}
+    u8 w(void);
+    u8 h(void);
 
-void SizeCursor::ModifySize(const Size & sz)
-{
-    ModifySize(sz.w, sz.h);
-}
+private:
+    void ModifyCursor(u16 w, u16 h);
+};
 
-void SizeCursor::ModifySize(const u8 w, const u8 h)
-{
-    ModifyCursor(w, h);
-}
-
-void SizeCursor::ModifyCursor(const u8 w, const u8 h)
-{
-    if(cursor.w() == w && cursor.h() == h) return;
-
-    cursor = Surface(w * TILEWIDTH, h * TILEWIDTH);
-    Cursor::DrawCursor(cursor, 0x40);
-    SetSprite(cursor);
-}
+#endif
+#endif

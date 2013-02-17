@@ -23,7 +23,6 @@
 #ifndef H2INTERFACE_RADAR_H
 #define H2INTERFACE_RADAR_H
 
-#include"spritecursor.h"
 #include "interface_border.h"
 
 namespace Interface
@@ -50,8 +49,7 @@ namespace Interface
 	Radar();
 
         Surface spriteArea;
-	Surface spriteCursor;
-	SpriteCursor cursorArea;
+	SpriteMove cursorArea;
 
         Surface sf_blue;
 	Surface sf_green;

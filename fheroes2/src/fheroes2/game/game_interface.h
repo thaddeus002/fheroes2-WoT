@@ -72,7 +72,6 @@ namespace Interface
 	IconsPanel & iconsPanel;
 	ButtonsArea & buttonsArea;
 	StatusWindow & statusWindow;
-	GameBorder & gameBorder;
 	ControlPanel & controlPanel;
 
 	void	SetHideInterface(bool);

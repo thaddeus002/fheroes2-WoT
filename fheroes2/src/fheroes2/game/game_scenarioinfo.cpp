@@ -165,7 +165,8 @@ Game::menu_t Game::ScenarioInfo(void)
 	RedrawRatingInfo(*rating);
     }
 
-    SpriteCursor levelCursor(ngextra);
+    SpriteMove levelCursor(ngextra);
+
     switch(conf.GameDifficulty())
     {
 	case Difficulty::EASY:		levelCursor.Move(coordDifficulty[0]); break;
@@ -174,7 +175,6 @@ Game::menu_t Game::ScenarioInfo(void)
 	case Difficulty::EXPERT:	levelCursor.Move(coordDifficulty[3]); break;
 	case Difficulty::IMPOSSIBLE:	levelCursor.Move(coordDifficulty[4]); break;
     }
-    levelCursor.Show();
 
     if(buttonSelectMaps) buttonSelectMaps->Draw();
     buttonOk->Draw();
@@ -202,14 +202,12 @@ Game::menu_t Game::ScenarioInfo(void)
 		playersInfo.UpdateInfo(players, pointOpponentInfo, pointClassInfo);
 
 		cursor.Hide();
-		levelCursor.Hide();
 		RedrawScenarioStaticInfo(rectPanel);
 		RedrawDifficultyInfo(pointDifficultyInfo, !conf.QVGA());
 		playersInfo.RedrawInfo();
 		if(rating) RedrawRatingInfo(*rating);
 		// default difficulty normal
 		levelCursor.Move(coordDifficulty[1]);
-		levelCursor.Show();
     		conf.SetGameDifficulty(Difficulty::NORMAL);
 		buttonOk->Draw();
 		buttonCancel->Draw();

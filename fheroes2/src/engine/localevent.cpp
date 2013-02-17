@@ -285,6 +285,7 @@ bool LocalEvent::HandleEvents(bool delay)
 	    case SDL_ACTIVEEVENT:
 		if(event.active.state & SDL_APPACTIVE)
 		{
+#ifdef WITH_MIXER
 		    if(Mixer::isValid())
 		    {
 			//iconify
@@ -297,6 +298,7 @@ bool LocalEvent::HandleEvents(bool delay)
 			else
 			    loop_delay = 1;
 		    }
+#endif
 		}
 		break;
 
