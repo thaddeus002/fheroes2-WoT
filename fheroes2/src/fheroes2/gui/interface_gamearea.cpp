@@ -108,14 +108,6 @@ void Interface::GameArea::SetAreaPosition(s16 x, s16 y, u16 w, u16 h)
 	scrollStepY = SCROLL_MAX;
     }
 
-    if(Settings::Get().Editor())
-    {
-	rectMaps.w = (areaPosition.w / TILEWIDTH);
-	rectMaps.h = (areaPosition.h / TILEWIDTH);
-	scrollStepX = SCROLL_MAX;
-	scrollStepY = SCROLL_MAX;
-    }
-
     tailX = areaPosition.w - TILEWIDTH * (areaPosition.w / TILEWIDTH);
     tailY = areaPosition.h - TILEWIDTH * (areaPosition.h / TILEWIDTH);
 
@@ -266,8 +258,6 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
 /* scroll area */
 void Interface::GameArea::Scroll(void)
 {
-    const Settings & conf = Settings::Get();
-
     if(scrollDirection & SCROLL_LEFT)
     {
 	if(0 < scrollOffset.x)
@@ -275,20 +265,19 @@ void Interface::GameArea::Scroll(void)
 	else
 	if(0 < rectMaps.x)
 	{
-	    scrollOffset.x = conf.Editor() ? 0 : SCROLL_MAX - scrollStepX;
+	    scrollOffset.x = SCROLL_MAX - scrollStepX;
 	    --rectMaps.x;
 	}
     }
     else
     if(scrollDirection & SCROLL_RIGHT)
     {
-	if(!conf.Editor() &&
-	    scrollOffset.x < SCROLL_MAX * 2 - tailX)
+	if(scrollOffset.x < SCROLL_MAX * 2 - tailX)
 	    scrollOffset.x += scrollStepX;
 	else
 	if(world.w() - rectMaps.w > rectMaps.x)
 	{
-	    scrollOffset.x = conf.Editor() ? 0 : SCROLL_MAX + scrollStepX - tailX;
+	    scrollOffset.x = SCROLL_MAX + scrollStepX - tailX;
 	    ++rectMaps.x;
 	}
     }
@@ -300,20 +289,19 @@ void Interface::GameArea::Scroll(void)
 	else
 	if(0 < rectMaps.y)
 	{
-	    scrollOffset.y = conf.Editor() ? 0 : SCROLL_MAX - scrollStepY;
+	    scrollOffset.y = SCROLL_MAX - scrollStepY;
 	    --rectMaps.y;
 	}
     }
     else
     if(scrollDirection & SCROLL_BOTTOM)
     {
-	if(!conf.Editor() &&
-	    scrollOffset.y < SCROLL_MAX * 2 - tailY)
+	if(scrollOffset.y < SCROLL_MAX * 2 - tailY)
 	    scrollOffset.y += scrollStepY;
 	else
 	if(world.h() - rectMaps.h > rectMaps.y)
 	{
-	    scrollOffset.y = conf.Editor() ? 0 : SCROLL_MAX + scrollStepY - tailY;
+	    scrollOffset.y = SCROLL_MAX + scrollStepY - tailY;
 	    ++rectMaps.y;
 	}
     }
@@ -403,12 +391,6 @@ void Interface::GameArea::SetCenter(s16 px, s16 py)
 	{
  	    scrollOffset.y = (rectMaps.h % 2 == 0 ?
 		    SCROLL_MAX + TILEWIDTH / 2 : SCROLL_MAX) - tailY;
-	}
-
-	if(Settings::Get().Editor())
-	{
-	    scrollOffset.x = 0;
-	    scrollOffset.y = 0;
 	}
 
 	rectMapsPosition.x = areaPosition.x - scrollOffset.x;

@@ -1548,14 +1548,10 @@ void Maps::Tiles::RedrawBoat(Surface & dst) const
     const Point mp = Maps::GetPoint(GetIndex());
     const Interface::GameArea & area = Interface::GameArea::Get();
 
-    if(!(area.GetRectMaps() & mp)) return;
-
-    if(Settings::Get().Editor())
-	area.BlitOnTile(dst, AGG::GetICN(ICN::OBJNWAT2, 23), 0, 0, mp);
-    else
+    if(area.GetRectMaps() & mp)
     {
-        // FIXME: restore direction from Maps::Tiles
-        const Sprite & sprite = AGG::GetICN(ICN::BOAT32, 18);
+	// FIXME: restore direction from Maps::Tiles
+	const Sprite & sprite = AGG::GetICN(ICN::BOAT32, 18);
 	area.BlitOnTile(dst, sprite, sprite.x(), TILEWIDTH + sprite.y(), mp);
     }
 }

@@ -46,9 +46,6 @@ void ShowAGGError(void);
 int PrintHelp(const char *basename)
 {
     VERBOSE("Usage: " << basename << " [OPTIONS]");
-#ifdef WITH_EDITOR
-    VERBOSE("  -e\teditors mode");
-#endif
 #ifndef BUILD_RELEASE
     VERBOSE("  -d\tdebug mode");
 #endif
@@ -60,12 +57,6 @@ int PrintHelp(const char *basename)
 std::string GetCaption(void)
 {
     return std::string("Free Heroes II, version: " + Settings::GetVersion());
-}
-
-bool RunEditor(const char* name)
-{
-    const char* feditor2 = "feditor2";
-    return 0 == StringLower(GetBasename(name)).compare(0, strlen(feditor2), feditor2);
 }
 
 int main(int argc, char **argv)
@@ -80,21 +71,12 @@ int main(int argc, char **argv)
 	InitHomeDir();
 	ReadConfigs();
 
-#ifdef WITH_EDITOR
-	if(RunEditor(argv[0])) conf.SetEditor();
-#endif
-
 	// getopt
 	{
 	    int opt;
 	    while((opt = getopt(argc, argv, "hest:d:")) != -1)
     		switch(opt)
                 {
-#ifdef WITH_EDITOR
-                    case 'e':
-			conf.SetEditor();
-			break;
-#endif
 #ifndef BUILD_RELEASE
                     case 't':
 			test = GetInt(optarg);
@@ -199,22 +181,12 @@ int main(int argc, char **argv)
 	    Game::Init();
 
 	    // goto main menu
-#ifdef WITH_EDITOR
-	    Game::menu_t rs = (test ? Game::TESTING : (conf.Editor() ? Game::EDITMAINMENU : Game::MAINMENU));
-#else
 	    Game::menu_t rs = (test ? Game::TESTING : Game::MAINMENU);
-#endif
 
 	    while(rs != Game::QUITGAME)
 	    {
 		switch(rs)
 		{
-#ifdef WITH_EDITOR
-	    		case Game::EDITMAINMENU:   rs = Game::Editor::MainMenu();	break;
-	    		case Game::EDITNEWMAP:     rs = Game::Editor::NewMaps();	break;
-	    		case Game::EDITLOADMAP:    rs = Game::Editor::LoadMaps();       break;
-	    		case Game::EDITSTART:      rs = Game::Editor::StartGame();      break;
-#endif
 	    		case Game::MAINMENU:       rs = Game::MainMenu();		break;
 	    		case Game::NEWGAME:        rs = Game::NewGame();		break;
 	    		case Game::LOADGAME:       rs = Game::LoadGame();		break;

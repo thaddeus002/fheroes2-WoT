@@ -87,7 +87,7 @@ enum
     GLOBAL_MUSIC_CD          = 0x04000000,
     GLOBAL_MUSIC_MIDI        = 0x08000000,
 
-    GLOBAL_EDITOR            = 0x20000000,
+    //GLOBAL_UNUSED          = 0x20000000,
     GLOBAL_USEUNICODE        = 0x40000000,
     GLOBAL_ALTRESOURCE       = 0x80000000,
 
@@ -489,13 +489,6 @@ bool Settings::Read(const std::string & filename)
 
 void Settings::PostLoad(void)
 {
-    if(opt_global.Modes(GLOBAL_EDITOR))
-    {
-	ExtResetModes(GAME_HIDE_INTERFACE);
-	if(video_mode.w % TILEWIDTH) video_mode.w = TILEWIDTH * (video_mode.w / TILEWIDTH);
-	if(video_mode.h % TILEWIDTH) video_mode.h = TILEWIDTH * (video_mode.h / TILEWIDTH);
-    }
-
     if(QVGA())
     {
 	opt_global.SetModes(GLOBAL_POCKETPC);
@@ -774,9 +767,6 @@ bool Settings::MusicExt(void) const { return opt_global.Modes(GLOBAL_MUSIC_EXT);
 bool Settings::MusicMIDI(void) const { return opt_global.Modes(GLOBAL_MUSIC_MIDI); }
 bool Settings::MusicCD(void) const { return opt_global.Modes(GLOBAL_MUSIC_CD); }
 
-/* return editor */
-bool Settings::Editor(void) const { return opt_global.Modes(GLOBAL_EDITOR); }
-
 /* return sound */
 bool Settings::Sound(void) const { return opt_global.Modes(GLOBAL_SOUND); }
 
@@ -1008,13 +998,6 @@ u32 Settings::LossMapsIndexObject(void) const
 u16 Settings::LossCountDays(void) const
 {
     return current_maps_file.LossCountDays();
-}
-
-void Settings::SetEditor(void)
-{
-    opt_global.SetModes(GLOBAL_EDITOR);
-    SetDebug(DBG_DEVEL | DBG_GAME | DBG_INFO);
-    PostLoad();
 }
 
 void Settings::SetUnicode(bool f)

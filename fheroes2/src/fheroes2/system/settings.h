@@ -250,7 +250,6 @@ public:
     u32  DisplayFlags(void) const;
 
     bool QVGA(void) const;
-    bool Editor(void) const;
     bool Sound(void) const;
     bool Music(void) const;
     bool ShowControlPanel(void) const;
@@ -357,7 +356,6 @@ public:
     u8   MusicVolume(void) const;
 
     void SetDebug(const u16 d);
-    void SetEditor(void);
     void SetUnicode(bool);
     void SetPriceLoyaltyVersion(void);
     void SetGameDifficulty(u8);
