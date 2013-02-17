@@ -156,16 +156,8 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    const u16 window_w = 320;
-    const u16 window_h = 224;
-
-    Dialog::FrameBorder frameborder;
-    frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH, (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
-    frameborder.Redraw();
-
+    Dialog::FrameBorder frameborder(Size(320, 224));
     const Rect & dst_rt = frameborder.GetArea();
-    const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    background.Blit(Rect(0, 0, window_w, window_h), dst_rt);
 
     RedrawBackground(dst_rt, castle);
 
@@ -452,17 +444,8 @@ screen_t CastleOpenDialog2(Castle & castle, bool readonly)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    const u16 window_w = 320;
-    const u16 window_h = 224;
-
-    Dialog::FrameBorder frameborder;
-    frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH, (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
-    frameborder.Redraw();
-
-
+    Dialog::FrameBorder frameborder(Size(320, 224));
     const Rect & dst_rt = frameborder.GetArea();
-    const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    background.Blit(Rect(0, 0, window_w, window_h), dst_rt);
 
     const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
     AGG::GetICN(ICN::TOWNWIND, 12).Blit(rectExit.x, rectExit.y);
@@ -529,16 +512,8 @@ screen_t CastleOpenDialog3(Castle & castle, bool readonly)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    const u16 window_w = 320;
-    const u16 window_h = 224;
-
-    Dialog::FrameBorder frameborder;
-    frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH, (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
-    frameborder.Redraw();
-
+    Dialog::FrameBorder frameborder(Size(320, 224));
     const Rect & dst_rt = frameborder.GetArea();
-    const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    background.Blit(Rect(0, 0, window_w, window_h), dst_rt);
 
     const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
     AGG::GetICN(ICN::TOWNWIND, 12).Blit(rectExit.x, rectExit.y);
@@ -621,16 +596,8 @@ screen_t CastleOpenDialog4(Castle & castle, bool readonly)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    const u16 window_w = 320;
-    const u16 window_h = 224;
-
-    Dialog::FrameBorder frameborder;
-    frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH, (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
-    frameborder.Redraw();
-
+    Dialog::FrameBorder frameborder(Size(320, 224));
     const Rect & dst_rt = frameborder.GetArea();
-    const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    background.Blit(Rect(0, 0, window_w, window_h), dst_rt);
 
     const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
     AGG::GetICN(ICN::TOWNWIND, 12).Blit(rectExit.x, rectExit.y);
@@ -697,17 +664,8 @@ screen_t CastleOpenDialog5(Castle & castle, bool readonly)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    const u16 window_w = 320;
-    const u16 window_h = 224;
-
-    Dialog::FrameBorder frameborder;
-    frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH, (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
-    frameborder.Redraw();
-
+    Dialog::FrameBorder frameborder(Size(320, 224));
     const Rect & dst_rt = frameborder.GetArea();
-    const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    background.Blit(Rect(0, 0, window_w, window_h), dst_rt);
-
 
     RowSpells spells1(Point(dst_rt.x + 38, dst_rt.y + 220 - 44), castle, 1);
     RowSpells spells2(Point(dst_rt.x + 38, dst_rt.y + 220 - 44 * 2), castle, 2);
@@ -771,16 +729,8 @@ screen_t CastleOpenDialog6(Castle & castle, bool readonly)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    const u16 window_w = 320;
-    const u16 window_h = 224;
-
-    Dialog::FrameBorder frameborder;
-    frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH, (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
-    frameborder.Redraw();
-
+    Dialog::FrameBorder frameborder(Size(320, 224));
     const Rect & dst_rt = frameborder.GetArea();
-    const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    background.Blit(Rect(0, 0, window_w, window_h), dst_rt);
 
     // tavern
     Point dst_pt;

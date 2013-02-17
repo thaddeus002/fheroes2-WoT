@@ -82,6 +82,9 @@ void Interface::ButtonsArea::Redraw(void)
     {
 	const ICN::icn_t icnbtn = Settings::Get().ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
 
+	if(conf.ExtGameHideInterface())
+	    BorderWindow::Redraw();
+
 	buttonNextHero.SetSprite(icnbtn, 0, 1);
 	buttonMovement.SetSprite(icnbtn, 2, 3);
 	buttonKingdom.SetSprite(icnbtn, 4, 5);
@@ -99,9 +102,6 @@ void Interface::ButtonsArea::Redraw(void)
 	buttonAdventure.Draw();
 	buttonFile.Draw();
 	buttonSystem.Draw();
-
-	if(conf.ExtGameHideInterface())
-	    BorderWindow::Redraw();
     }
 }
 

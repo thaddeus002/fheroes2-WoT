@@ -62,7 +62,7 @@ u16 Dialog::SpriteInfo(const std::string &header, const std::string &message, co
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
     const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
-    Box box(box1.h() + spacer + box2.h() + spacer + sprite.h(), buttons);
+    FrameBox box(box1.h() + spacer + box2.h() + spacer + sprite.h(), buttons);
     Rect pos = box.GetArea();
 
     if(header.size()) box1.Blit(pos);

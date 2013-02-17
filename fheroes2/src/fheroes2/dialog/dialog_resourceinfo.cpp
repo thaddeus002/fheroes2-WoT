@@ -47,7 +47,7 @@ u16 Dialog::ResourceInfo(const std::string &header, const std::string &message, 
 
     const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
-    Box box(box1.h() + spacer + box2.h() + spacer + rbs.GetArea().h, true);
+    FrameBox box(box1.h() + spacer + box2.h() + spacer + rbs.GetArea().h, true);
     Point pos = box.GetArea();
 
     if(header.size()) box1.Blit(pos);

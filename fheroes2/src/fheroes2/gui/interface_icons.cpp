@@ -359,12 +359,12 @@ void Interface::IconsPanel::Redraw(void)
     // is visible
     if(!conf.ExtGameHideInterface() || conf.ShowIcons())
     {
-	heroesIcons.Redraw();
-	castleIcons.Redraw();
-
 	// redraw border
 	if(conf.ExtGameHideInterface())
 	    BorderWindow::Redraw();
+
+	heroesIcons.Redraw();
+	castleIcons.Redraw();
     }
 }
 

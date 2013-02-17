@@ -112,7 +112,7 @@ namespace Battle
 	    const u16 ax = buttonPgUp.x;
 	    const u16 ah = buttonPgDn.y - (buttonPgUp.y + buttonPgUp.h);
 
-	    border.Redraw(AGG::GetICN(ICN::TEXTBAK2, 0));
+	    border.FBRedraw(AGG::GetICN(ICN::TEXTBAK2, 0));
 
 	    for(u16 ii = 0; ii < (ah / sp3.h()); ++ii)
     		sp3.Blit(ax, buttonPgUp.y + buttonPgUp.h + (sp3.h() * ii));
@@ -676,6 +676,8 @@ Battle::Interface::Interface(Arena & a, s32 center) : arena(a), icn_cbkg(ICN::UN
     const Settings & conf = Settings::Get();
     bool pda = conf.QVGA();
 
+    Cursor::Get().Hide();
+
     // border
     Display & display = Display::Get();
     const u16 arenaw = pda ? 320 : 640;
@@ -808,13 +810,13 @@ void Battle::Interface::Redraw(void)
 {
     const Castle* castle = Arena::GetCastle();
 
+    RedrawBorder();
     RedrawCover();
     RedrawOpponents();
     if(castle) RedrawCastle3(*castle);
     RedrawArmies();
     RedrawInterface();
     if(! Settings::Get().QVGA()) armies_order.Redraw(b_current);
-    RedrawBorder();
     if(Settings::Get().QVGA()) RedrawPocketControls();
 }
 
@@ -1034,25 +1036,9 @@ void Battle::Interface::RedrawTroopCount(const Unit & b) const
 	    sx = rt.x + rt.w - bar.w() - 3;
     }
 
-    std::string str;
-
     bar.Blit(sx, sy);
 
-    if(b.GetCount() < 1000)
-	str = GetString(b.GetCount());
-    else
-    if(b.GetCount() < 1000000)
-    {
-	str = GetString(b.GetCount() / 1000);
-    	str += "K";
-    }
-    else
-    {
-	str = GetString(b.GetCount() / 1000000);
-	str += "M";
-    }
-
-    Text text(str, Font::SMALL);
+    Text text(GetStringShort(b.GetCount()), Font::SMALL);
     text.Blit(sx + (bar.w() - text.w()) / 2, sy);
 }
 
@@ -1353,7 +1339,7 @@ void Battle::Interface::RedrawKilled(void)
 
 void Battle::Interface::RedrawBorder(void)
 {
-    border.Redraw();
+    border.FBRedraw();
 }
 
 void Battle::Interface::RedrawPocketControls(void) const
@@ -4156,10 +4142,8 @@ void Battle::Interface::ProcessingHeroDialogResult(u8 res, Actions & a)
     }
 }
 
-Battle::PopupDamageInfo::PopupDamageInfo() : cell(NULL), attacker(NULL), defender(NULL), redraw(false)
+Battle::PopupDamageInfo::PopupDamageInfo() : Dialog::FrameBorder(5), cell(NULL), attacker(NULL), defender(NULL), redraw(false)
 {
-    SetBorder(5);
-    SetSize(20, 20);
 }
 
 void Battle::PopupDamageInfo::SetInfo(const Cell* c, const Unit* a, const Unit* b)
@@ -4176,7 +4160,7 @@ void Battle::PopupDamageInfo::SetInfo(const Cell* c, const Unit* a, const Unit* 
 	defender = b;
 
 	const Rect & rt = cell->GetPos();
-	SetPosition(rt.x + rt.w, rt.y);
+	SetPosition(rt.x + rt.w, rt.y, 20, 20);
     }
 }
 
@@ -4185,7 +4169,7 @@ void Battle::PopupDamageInfo::Reset(void)
     if(redraw)
     {
 	Cursor::Get().Hide();
-	Restore();
+	background.Restore();
 	redraw = false;
 	cell = NULL;
 	attacker = NULL;
@@ -4233,9 +4217,6 @@ void Battle::PopupDamageInfo::Redraw(u16 maxw, u16 maxh)
 	const Rect & rect = GetRect();
 	const Rect & pos = cell->GetPos();
 
-	if(area.w != tw || area.h != th)
-	    SetSize(tw, th);
-
 	u16 tx = rect.x;
 	u16 ty = rect.y;
 
@@ -4245,10 +4226,10 @@ void Battle::PopupDamageInfo::Redraw(u16 maxw, u16 maxh)
 	    ty = pos.y - pos.h;
 	}
 
-	if(rect.x != tx || rect.y != ty)
-	    SetPosition(tx, ty);
+	if(rect.x != tx || rect.y != ty || area.w != tw || area.h != th)
+	    SetPosition(tx, ty, tw, th);
 
-	Dialog::FrameBorder::Redraw(AGG::GetICN(ICN::CELLWIN, 1));
+	Dialog::FrameBorder::FBRedraw(AGG::GetICN(ICN::CELLWIN, 1));
 
 	text1.Blit(area.x, area.y);
 	text2.Blit(area.x, area.y + area.h/2);

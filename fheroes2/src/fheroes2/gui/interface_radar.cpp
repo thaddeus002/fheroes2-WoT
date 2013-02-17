@@ -150,6 +150,10 @@ void Interface::Radar::Redraw(void)
     const Settings & conf = Settings::Get();
     const Rect & area = GetArea();
 
+    // redraw border
+    if(conf.ExtGameHideInterface() && conf.ShowRadar())
+	BorderWindow::Redraw();
+
     if(!hide)
     {
 	RedrawArea(Players::FriendColors());
@@ -159,10 +163,6 @@ void Interface::Radar::Redraw(void)
     // hide radar
     if(!conf.ExtGameHideInterface() || conf.ShowRadar())
 	AGG::GetICN((conf.ExtGameEvilInterface() ? ICN::HEROLOGE : ICN::HEROLOGO), 0).Blit(area.x, area.y);
-
-    // redraw border
-    if(conf.ExtGameHideInterface() && conf.ShowRadar())
-	BorderWindow::Redraw();
 }
 
 /* redraw radar area for color */

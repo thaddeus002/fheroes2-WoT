@@ -137,43 +137,48 @@ namespace Dialog
 
     void GameInfo(void);
 
-class Box : protected Background
-{
-public:
-    Box(u16 height, bool buttons = false);
-    ~Box();
+    class FrameBox
+    {
+    public:
+	FrameBox(u16 height, bool buttons = false);
+	~FrameBox();
 
-    const Rect & GetArea(void){ return area; };
+	const Rect & GetArea(void){ return area; };
 
-private:
-    Rect area;
-};
+    protected:
+	SpriteBack	background;
+	Rect		area;
+    };
 
-class FrameBorder : protected Background
-{
-public:
-    FrameBorder();
-    ~FrameBorder();
+    class FrameBorder
+    {
+    public:
+	FrameBorder(u8 brd = BORDERWIDTH);
+	FrameBorder(const Size &);
+	FrameBorder(const Size &, const Surface &);
+	FrameBorder(s16, s16, u16, u16);
+	~FrameBorder();
 
-    bool isValid(void) const;
+	bool isValid(void) const;
 
-    void SetBorder(u8);
-    void SetSize(u16, u16);
-    void SetPosition(s16, s16, u16 = 0, u16 = 0);
-    void Redraw(void);
-    void Redraw(const Surface &);
-    const Rect & GetRect(void) const;
-    const Rect & GetArea(void) const;
-    const Rect & GetTop(void) const;
+	void SetPosition(s16, s16, u16 = 0, u16 = 0);
 
-    static void Redraw(const Rect &, const Surface &);
+	void FBRedraw(void);
+	void FBRedraw(const Surface &);
 
-private:
-    Rect area;
-    Rect top;
-    u8 border;
-};
+	const Rect & GetRect(void) const;
+	const Rect & GetArea(void) const;
+	const Rect & GetTop(void) const;
 
+	static void FBRedraw(const Rect &, const Surface &);
+
+    protected:
+	SpriteBack	background;
+	Rect		rect;
+	Rect		area;
+	Rect		top;
+	u8		border;
+    };
 }
 
 #endif

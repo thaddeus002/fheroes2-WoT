@@ -90,14 +90,9 @@ Game::menu_t Game::ScenarioInfo(void)
     // image background
     if(conf.QVGA())
     {
-	const u16 window_w = 380;
-	const u16 window_h = 224;
-
-	frameborder = new Dialog::FrameBorder();
-	frameborder->SetPosition((display.w() - window_w) / 2 - BORDERWIDTH, (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
-	frameborder->Redraw();
-
+	frameborder = new Dialog::FrameBorder(Size(380, 224));
 	rectPanel = frameborder->GetArea();
+
 	pointDifficultyInfo = Point(rectPanel.x + 4, rectPanel.y + 24);
 	pointOpponentInfo = Point(rectPanel.x + 4, rectPanel.y + 94);
 	pointClassInfo = Point(rectPanel.x + 4, rectPanel.y + 148);
@@ -110,9 +105,6 @@ Game::menu_t Game::ScenarioInfo(void)
 
 	buttonOk = new Button(rectPanel.x + rectPanel.w / 2 - 160, rectPanel.y + rectPanel.h - 30, ICN::NGEXTRA, 66, 67);
 	buttonCancel = new Button(rectPanel.x + rectPanel.w / 2 + 60, rectPanel.y + rectPanel.h - 30, ICN::NGEXTRA, 68, 69);
-
-	const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-	background.Blit(Rect(0, 0, window_w, window_h), rectPanel);
 
 	Text text;
 	text.Set(conf.CurrentFileInfo().name, Font::BIG);

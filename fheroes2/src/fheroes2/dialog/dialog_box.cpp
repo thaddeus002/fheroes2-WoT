@@ -39,7 +39,7 @@
 
 void BoxRedraw(s16 posx, s16 posy, u8 count);
 
-Dialog::Box::Box(u16 height, bool buttons)
+Dialog::FrameBox::FrameBox(u16 height, bool buttons)
 {
     Display & display = Display::Get();
 
@@ -59,24 +59,27 @@ Dialog::Box::Box(u16 height, bool buttons)
     if(Settings::Get().QVGA() && height > display.h())
 	posy = display.h() - area.h - ((evil ? BOXE_TOP : BOX_TOP) - BOXAREA_TOP);
 
-    Save(posx, posy, BOX_WIDTH, height_top_bottom + height_middle);
+    background.Save(Rect(posx, posy, BOX_WIDTH, height_top_bottom + height_middle));
 
-    area.x = Rect::x + 36;
-    area.y = Rect::y + (evil ? BOXE_TOP - BOXAREA_TOP : BOX_TOP - BOXAREA_TOP);
+    area.x = posx + 36;
+    area.y = posy + (evil ? BOXE_TOP - BOXAREA_TOP : BOX_TOP - BOXAREA_TOP);
 
-    BoxRedraw(Rect::x, Rect::y, count_middle);
+    BoxRedraw(posx, posy, count_middle);
 }
 
-Dialog::Box::~Box()
+Dialog::FrameBox::~FrameBox()
 {
-    if(Cursor::Get().isVisible())
+    Cursor & cursor = Cursor::Get();
+
+    if(cursor.isVisible())
     {
-	Cursor::Get().Hide();
-	Background::Restore();
-	Cursor::Get().Show();
+	cursor.Hide();
+	background.Restore();
+	cursor.Show();
     }
     else
-	Background::Restore();
+	background.Restore();
+
     Display::Get().Flip();
 }
 

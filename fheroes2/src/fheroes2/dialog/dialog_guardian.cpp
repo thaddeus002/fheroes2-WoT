@@ -153,17 +153,9 @@ bool Dialog::SetGuardian(Heroes & hero, Troop & troop, CapturedObject & co, bool
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    const u16 window_w = 230;
-    const u16 window_h = 160;
-
-    Dialog::FrameBorder frameborder;
-    frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH, (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
-    frameborder.Redraw();
-
-    Point dst_pt;
+    Dialog::FrameBorder frameborder(Size(230, 160));
     const Rect & area = frameborder.GetArea();
-    const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    background.Blit(Rect(0, 0, window_w, window_h), area);
+    Point dst_pt;
 
     // portrait
     const Sprite & window = AGG::GetICN(ICN::BRCREST, 6);

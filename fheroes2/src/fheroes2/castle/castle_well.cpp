@@ -73,12 +73,9 @@ void Castle::OpenWell(void)
 
     cursor.Hide();
 
-    Dialog::FrameBorder frameborder;
-    frameborder.SetPosition((display.w() - 640 - BORDERWIDTH * 2) / 2, (display.h() - 480 - BORDERWIDTH * 2) / 2, 640, 480);
-    frameborder.Redraw();
+    Dialog::FrameBorder frameborder(Size(640, 480));
 
-    const Point cur_pt(frameborder.GetArea().x, frameborder.GetArea().y);
-
+    const Point cur_pt = frameborder.GetArea();
     Point dst_pt(cur_pt);
 
     // button exit

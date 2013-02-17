@@ -46,7 +46,7 @@ Skill::Primary::skill_t Dialog::SelectSkillFromArena(void)
     const Sprite & sprite = AGG::GetICN(ICN::XPRIMARY, 0);
     const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
-    Dialog::Box box(textbox.h() + spacer + sprite.h() + 15, true);
+    Dialog::FrameBox box(textbox.h() + spacer + sprite.h() + 15, true);
 
     const Rect & box_rt = box.GetArea();
     Point dst_pt = box_rt;

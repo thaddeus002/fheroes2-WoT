@@ -42,7 +42,7 @@ public:
    
     void RedrawBackground(const Point & dst)
     {
-      Dialog::FrameBorder::Redraw(Rect(dst.x, dst.y + 25, rtAreaItems.w + 5, rtAreaItems.h + 10),
+      Dialog::FrameBorder::FBRedraw(Rect(dst.x, dst.y + 25, rtAreaItems.w + 5, rtAreaItems.h + 10),
 							AGG::GetICN(ICN::CELLWIN, 1));
       // scroll
      AGG::GetICN(ICN::LISTBOX, 7).Blit(dst.x + area.w - 24, dst.y + 45);
@@ -204,14 +204,7 @@ Skill::Secondary Dialog::SelectSecondarySkill(void)
 
     for(size_t ii = 0; ii < MAXSECONDARYSKILL * 3; ++ii) skills[ii] = ii;
 
-    const u16 window_w = 310;
-    const u16 window_h = 280;
-
-    Dialog::FrameBorder frameborder;
-    frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH,
-			    (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
-    frameborder.Redraw(AGG::GetICN(ICN::TEXTBAK2, 0));
-
+    Dialog::FrameBorder frameborder(Size(310, 280), AGG::GetICN(ICN::TEXTBAK2, 0));
     const Rect & area = frameborder.GetArea();
 
     SelectEnumSecSkill listbox(area);
@@ -264,14 +257,7 @@ Spell Dialog::SelectSpell(u8 cur)
 
     for(size_t ii = 0; ii < spells.size(); ++ii) spells[ii] = ii + 1;
 
-    const u16 window_w = 340;
-    const u16 window_h = 280;
-
-    Dialog::FrameBorder frameborder;
-    frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH,
-			    (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
-    frameborder.Redraw(AGG::GetICN(ICN::TEXTBAK2, 0));
-
+    Dialog::FrameBorder frameborder(Size(340, 280), AGG::GetICN(ICN::TEXTBAK2, 0));
     const Rect & area = frameborder.GetArea();
 
     SelectEnumSpell listbox(area);
@@ -321,14 +307,7 @@ Artifact Dialog::SelectArtifact(u8 cur)
 
     for(size_t ii = 0; ii < artifacts.size(); ++ii) artifacts[ii] = ii;
 
-    const u16 window_w = 370;
-    const u16 window_h = 280;
-
-    Dialog::FrameBorder frameborder;
-    frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH,
-			    (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
-    frameborder.Redraw(AGG::GetICN(ICN::TEXTBAK2, 0));
-
+    Dialog::FrameBorder frameborder(Size(370, 280), AGG::GetICN(ICN::TEXTBAK2, 0));
     const Rect & area = frameborder.GetArea();
 
     SelectEnumArtifact listbox(area);
@@ -377,14 +356,7 @@ Monster Dialog::SelectMonster(u8 id)
 
     for(size_t ii = 0; ii < monsters.size(); ++ii) monsters[ii] = ii + 1; // skip Monser::UNKNOWN
 
-    const u16 window_w = 260;
-    const u16 window_h = 280;
-
-    Dialog::FrameBorder frameborder;
-    frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH,
-			    (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
-    frameborder.Redraw(AGG::GetICN(ICN::TEXTBAK2, 0));
-
+    Dialog::FrameBorder frameborder(Size(260, 280), AGG::GetICN(ICN::TEXTBAK2, 0));
     const Rect & area = frameborder.GetArea();
 
     SelectEnumMonster listbox(area);
@@ -433,14 +405,7 @@ Heroes::heroes_t Dialog::SelectHeroes(Heroes::heroes_t cur)
 
     for(size_t ii = 0; ii < heroes.size(); ++ii) heroes[ii] = Heroes::ConvertID(ii);
 
-    const u16 window_w = 240;
-    const u16 window_h = 280;
-
-    Dialog::FrameBorder frameborder;
-    frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH,
-			    (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
-    frameborder.Redraw(AGG::GetICN(ICN::TEXTBAK2, 0));
-
+    Dialog::FrameBorder frameborder(Size(240, 280), AGG::GetICN(ICN::TEXTBAK2, 0));
     const Rect & area = frameborder.GetArea();
 
     SelectEnumHeroes listbox(area);

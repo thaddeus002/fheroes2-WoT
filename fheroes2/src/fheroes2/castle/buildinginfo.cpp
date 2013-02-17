@@ -514,7 +514,7 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
 
     const Sprite & window_icons = AGG::GetICN(ICN::BLDGXTRA, 0);
     const u8 space = Settings::Get().QVGA() ? 5 : 10;
-    Dialog::Box box(space + window_icons.h() + space + box1.h() + space + (requires_true ? requires_text.h() + box2.h() + space : 0) + rbs.GetArea().h, buttons);
+    Dialog::FrameBox box(space + window_icons.h() + space + box1.h() + space + (requires_true ? requires_text.h() + box2.h() + space : 0) + rbs.GetArea().h, buttons);
     const Rect & box_rt = box.GetArea();
     LocalEvent & le = LocalEvent::Get();
 

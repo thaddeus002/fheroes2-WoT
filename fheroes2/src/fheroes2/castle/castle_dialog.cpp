@@ -257,11 +257,13 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    Dialog::FrameBorder background;
-    background.SetPosition((display.w() - 640 - BORDERWIDTH * 2) / 2, (display.h() - 480 - BORDERWIDTH * 2) / 2, 640, 480);
-    background.Redraw();
+    // fade
+    if(conf.ExtGameUseFade()) display.Fade();
 
+    Dialog::FrameBorder background(Size(640, 480));
 
+    const Point & cur_pt = background.GetArea();
+    Point dst_pt(cur_pt);
     std::string msg_date, msg_status;
 
     // date string
@@ -269,12 +271,6 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     StringReplace(msg_date, "%{month}", world.GetMonth());
     StringReplace(msg_date, "%{week}", world.GetWeek());
     StringReplace(msg_date, "%{day}", world.GetDay());
-
-    // fade
-    if(conf.ExtGameUseFade()) display.Fade();
-
-    const Point cur_pt(background.GetArea().x, background.GetArea().y);
-    Point dst_pt(cur_pt);
 
     // button prev castle
     dst_pt.y += 480 - 19;

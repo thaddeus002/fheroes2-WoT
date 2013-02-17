@@ -74,7 +74,7 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
 
     Resource::BoxSprite rbs(PaymentConditions::RecruitHero(hero->GetLevel()), BOXAREA_WIDTH);
 
-    Dialog::Box box(text.h() + spacer + portrait_frame.h() + spacer + box2.h() + spacer + rbs.GetArea().h, true);
+    Dialog::FrameBox box(text.h() + spacer + portrait_frame.h() + spacer + box2.h() + spacer + rbs.GetArea().h, true);
     const Rect & box_rt = box.GetArea();
     LocalEvent & le = LocalEvent::Get();
     Point dst_pt;
@@ -150,11 +150,9 @@ u32 Castle::OpenTown(void)
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
 
-    Dialog::FrameBorder background;
-    background.SetPosition((display.w() - 640 - BORDERWIDTH * 2) / 2, (display.h() - 480 - BORDERWIDTH * 2) / 2, 640, 480);
-    background.Redraw();
+    Dialog::FrameBorder background(Size(640, 480));
 
-    const Point cur_pt(background.GetArea().x, background.GetArea().y);
+    const Point & cur_pt = background.GetArea();
     Point dst_pt(cur_pt);
 
     AGG::GetICN(ICN::CASLWIND, 0).Blit(dst_pt);

@@ -388,17 +388,9 @@ bool ActionSpellTownPortal(Heroes & hero)
 	return false;
     }
 
-    const u16 window_w = 280;
-    const u16 window_h = 200;
-
-    Dialog::FrameBorder* frameborder = new Dialog::FrameBorder();
-    frameborder->SetPosition((display.w() - window_w) / 2 - BORDERWIDTH, (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
-    frameborder->Redraw();
+    Dialog::FrameBorder* frameborder = new Dialog::FrameBorder(Size(280, 200));
 
     const Rect & area = frameborder->GetArea();
-    const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    background.Blit(Rect(0, 0, window_w, window_h), area);
-
     u16 result = Dialog::ZERO;
 
     CastleIndexListBox listbox(area, result);

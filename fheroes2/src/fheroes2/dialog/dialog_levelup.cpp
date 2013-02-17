@@ -105,7 +105,7 @@ u8 DialogSelectSecondary(const std::string & name, const std::string & primary, 
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
     const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
-    Dialog::Box box(box1.h() + spacer + box2.h() + 10 + sprite_frame.h(), true);
+    Dialog::FrameBox box(box1.h() + spacer + box2.h() + 10 + sprite_frame.h(), true);
 
     pt.x = box.GetArea().x + box.GetArea().w / 2 - AGG::GetICN(system, 9).w() - 20;
     pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 9).h();

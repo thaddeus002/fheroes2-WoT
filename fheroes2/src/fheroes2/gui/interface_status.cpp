@@ -109,8 +109,10 @@ void Interface::StatusWindow::Redraw(void)
 
     if(!conf.ExtGameHideInterface() || conf.ShowStatus())
     {
-	// restore background
-	DrawBackground();
+	if(conf.ExtGameHideInterface())
+	    BorderWindow::Redraw();
+	else
+	    DrawBackground();
 
 	// draw info: Day and Funds and Army
 	const Sprite & ston = AGG::GetICN(Settings::Get().ExtGameEvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
@@ -142,10 +144,6 @@ void Interface::StatusWindow::Redraw(void)
     	    case STATUS_RESOURCE:	DrawResourceInfo();     break;
 	    default: break;
 	}
-    
-	// redraw border
-	if(conf.ExtGameHideInterface())
-	    BorderWindow::Redraw();
     }
 }
 
@@ -168,6 +166,7 @@ void Interface::StatusWindow::NextState(void)
     }
 }
 
+
 void Interface::StatusWindow::DrawKingdomInfo(const u8 oh) const
 {
     const Rect & pos = GetArea();
@@ -186,22 +185,22 @@ void Interface::StatusWindow::DrawKingdomInfo(const u8 oh) const
     text.Set(GetString(myKingdom.GetFunds().Get(Resource::GOLD)));
     text.Blit(pos.x + 122 - text.w() / 2, pos.y + 28 + oh);
     // count wood
-    text.Set(GetString(myKingdom.GetFunds().Get(Resource::WOOD)));
+    text.Set(GetStringShort(myKingdom.GetFunds().Get(Resource::WOOD)));
     text.Blit(pos.x + 15 - text.w() / 2, pos.y + 58 + oh);
     // count mercury
-    text.Set(GetString(myKingdom.GetFunds().Get(Resource::MERCURY)));
+    text.Set(GetStringShort(myKingdom.GetFunds().Get(Resource::MERCURY)));
     text.Blit(pos.x + 37 - text.w() / 2, pos.y + 58 + oh);
     // count ore
-    text.Set(GetString(myKingdom.GetFunds().Get(Resource::ORE)));
+    text.Set(GetStringShort(myKingdom.GetFunds().Get(Resource::ORE)));
     text.Blit(pos.x + 60 - text.w() / 2, pos.y + 58 + oh);
     // count sulfur
-    text.Set(GetString(myKingdom.GetFunds().Get(Resource::SULFUR)));
+    text.Set(GetStringShort(myKingdom.GetFunds().Get(Resource::SULFUR)));
     text.Blit(pos.x + 84 - text.w() / 2, pos.y + 58 + oh);
     // count crystal
-    text.Set(GetString(myKingdom.GetFunds().Get(Resource::CRYSTAL)));
+    text.Set(GetStringShort(myKingdom.GetFunds().Get(Resource::CRYSTAL)));
     text.Blit(pos.x + 108 - text.w() / 2, pos.y + 58 + oh);
     // count gems
-    text.Set(GetString(myKingdom.GetFunds().Get(Resource::GEMS)));
+    text.Set(GetStringShort(myKingdom.GetFunds().Get(Resource::GEMS)));
     text.Blit(pos.x + 130 - text.w() / 2, pos.y + 58 + oh);
 }
 

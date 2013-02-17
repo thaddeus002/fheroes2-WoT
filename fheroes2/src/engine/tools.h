@@ -27,6 +27,7 @@
 #include "types.h"
 
 std::string		GetString(int);
+std::string		GetStringShort(int);
 std::string		GetString(const Point &);
 std::string		GetString(const Size &);
 std::string		GetString(const Rect &);

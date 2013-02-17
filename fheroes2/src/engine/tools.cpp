@@ -73,6 +73,23 @@ std::string GetString(int value)
     return stream.str();
 }
 
+std::string GetStringShort(int value)
+{
+    if(std::abs(value) > 1000)
+    {
+	std::ostringstream stream;
+
+	if(std::abs(value) > 1000000)
+	    stream << value / 1000000 << "M";
+	else
+	    stream << value / 1000 << "K";
+
+	return stream.str();
+    }
+
+    return GetString(value);
+}
+
 std::string GetString(double value, u8 prec)
 {
     std::ostringstream stream;

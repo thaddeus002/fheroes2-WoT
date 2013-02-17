@@ -75,16 +75,8 @@ Game::menu_t PocketPC::SelectScenario(void)
 	}
     }
 
-    const u16 window_w = 320;
-    const u16 window_h = 224;
-
-    Dialog::FrameBorder frameborder;
-    frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH, (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
-    frameborder.Redraw();
-
+    Dialog::FrameBorder frameborder(Size(320, 224));
     const Rect & rt = frameborder.GetArea();
-    const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    background.Blit(Rect(0, 0, window_w, window_h), rt);
 
     ButtonGroups btnGroups(rt, Dialog::OK|Dialog::CANCEL);
 

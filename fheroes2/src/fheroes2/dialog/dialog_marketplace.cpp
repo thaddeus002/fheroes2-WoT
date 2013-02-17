@@ -91,8 +91,9 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
 {
     Cursor &cursor = Cursor::Get();
     Display &display = Display::Get();
+    bool disable = world.GetKingdom(Settings::Get().CurrentColor()).GetFunds().Get(resourceFrom) <= 0;
 
-    if(resourceFrom == resourceTo || (Resource::GOLD != resourceTo && 0 == max_buy))
+    if(disable || resourceFrom == resourceTo || (Resource::GOLD != resourceTo && 0 == max_buy))
     {
         cursor.Hide();
 	splitter.HideCursor();
@@ -183,6 +184,8 @@ void TradeWindowGUI::RedrawInfoBuySell(u32 count_sell, u32 count_buy, u32 max_se
 {
     Point dst_pt;
 
+    splitter.HideCursor();
+
     textSell.Hide();
     textSell.SetText(std::string("-") + GetString(count_sell) + " " + "(" + GetString(max_sell - count_sell) + ")");
     dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - textSell.w() / 2;
@@ -196,6 +199,8 @@ void TradeWindowGUI::RedrawInfoBuySell(u32 count_sell, u32 count_buy, u32 max_se
     dst_pt.y = pos_rt.y + 116;
     textBuy.SetPos(dst_pt);
     textBuy.Show();
+
+    splitter.ShowCursor();
 }
 
 void Dialog::Marketplace(bool fromTradingPost)
@@ -208,7 +213,7 @@ void Dialog::Marketplace(bool fromTradingPost)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    Dialog::Box box(260, true);
+    Dialog::FrameBox box(260, true);
 
     const Rect & pos_rt = box.GetArea();
     Point dst_pt(pos_rt.x, pos_rt.y);

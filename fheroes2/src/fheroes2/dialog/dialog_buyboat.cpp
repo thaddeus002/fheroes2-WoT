@@ -46,7 +46,7 @@ Dialog::answer_t Dialog::BuyBoat(bool enable)
     Text text(_("Build a new ship:"), Font::BIG);
     const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
-    Dialog::Box box(text.h() + spacer + sprite.h() + spacer + text.h() + spacer + rbs.GetArea().h - 20, true);
+    Dialog::FrameBox box(text.h() + spacer + sprite.h() + spacer + text.h() + spacer + rbs.GetArea().h - 20, true);
 
     const Rect & box_rt = box.GetArea();
     Point dst_pt;

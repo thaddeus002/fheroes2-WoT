@@ -130,7 +130,7 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur,
     Text text(header, Font::BIG);
     const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
-    Box box(text.h() + spacer + 30, true);
+    FrameBox box(text.h() + spacer + 30, true);
     SelectValue sel(min, max, cur, step);
 
     const Rect & pos = box.GetArea();
@@ -210,7 +210,7 @@ bool Dialog::InputString(const std::string &header, std::string &res)
     Point dst_pt;
     const Surface & sprite = AGG::GetICN((Settings::Get().ExtGameEvilInterface() ? ICN::BUYBUILD : ICN::BUYBUILE), 3);
 
-    Box box(10 + textbox.h() + 10 + sprite.h(), OK|CANCEL);
+    FrameBox box(10 + textbox.h() + 10 + sprite.h(), OK|CANCEL);
     const Rect & box_rt = box.GetArea();
 
     // text
@@ -303,7 +303,7 @@ u8 Dialog::ArmySplitTroop(u8 free_slots, u32 max, u32 & cur, bool savelast)
     const u32 min = 1;
     const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
-    Box box(free_slots > 2 ? 90 + spacer : 45, true);
+    FrameBox box(free_slots > 2 ? 90 + spacer : 45, true);
     SelectValue sel(min, max, cur, 1);
     Text text;
 

@@ -75,7 +75,7 @@ void Dialog::SpellInfo(const std::string &header, const std::string &message, co
     const Sprite & sprite = AGG::GetICN(ICN::SPELLS, spell.IndexSprite());
     const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
-    Box box(box1.h() + spacer + box2.h() + spacer + sprite.h() + 2 + text.h(), ok_button);
+    FrameBox box(box1.h() + spacer + box2.h() + spacer + sprite.h() + 2 + text.h(), ok_button);
 
     Rect pos = box.GetArea();
 

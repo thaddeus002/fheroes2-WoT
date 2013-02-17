@@ -577,14 +577,11 @@ void Kingdom::OverviewDialog(void)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    Dialog::FrameBorder background;
-    background.SetPosition((display.w() - 640 - BORDERWIDTH * 2) / 2, (display.h() - 480 - BORDERWIDTH * 2) / 2, 640, 480);
-    background.Redraw();
+    Dialog::FrameBorder background(Size(640, 480));
 
-    const Point cur_pt(background.GetArea().x, background.GetArea().y);
+    const Point & cur_pt = background.GetArea();
     Point dst_pt(cur_pt);
 
-    AGG::GetICN(ICN::STONEBAK, 0).Blit(dst_pt);
     AGG::GetICN(ICN::OVERBACK, 0).Blit(dst_pt);
 
     RedrawIncomeInfo(cur_pt, *this);

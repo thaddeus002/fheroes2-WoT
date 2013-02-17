@@ -50,7 +50,7 @@ void Castle::OpenTavern(void)
     TextBox box1(header, Font::BIG, BOXAREA_WIDTH);
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
 
-    Dialog::Box box(text.h() + 10 + s1.h() + 13 + box1.h() + 20 + box2.h(), true);
+    Dialog::FrameBox box(text.h() + 10 + s1.h() + 13 + box1.h() + 20 + box2.h(), true);
 
     const Rect & pos = box.GetArea();
     Point dst_pt(pos.x, pos.y);

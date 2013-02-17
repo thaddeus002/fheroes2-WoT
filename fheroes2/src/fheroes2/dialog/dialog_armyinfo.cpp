@@ -411,7 +411,7 @@ u16 Dialog::ArmyJoinWithCost(const Troop & troop, u32 join, u32 gold, Heroes & h
     StringReplace(message, "%{percent}", troop.GetMonster().GetCost().gold * join * 100 / gold);
     text.Set(message, Font::BIG);
 
-    Box box(10 + textbox.h() + 10 + text.h() + 40 + sprite.h() + 10, buttons);
+    FrameBox box(10 + textbox.h() + 10 + text.h() + 40 + sprite.h() + 10, buttons);
     const Rect & pos = box.GetArea();
 
     posy = pos.y + 10;
