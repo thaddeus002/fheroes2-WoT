@@ -38,7 +38,7 @@
 #include "dialog.h"
 
 bool SelectFileListSimple(const std::string &, std::string &, bool);
-void RedrawExtraInfo(const Point &, const std::string &, const std::string &);
+bool RedrawExtraInfo(const Point &, const std::string &, const std::string &, const Rect &);
 
 class FileInfoListBox : public Interface::ListBox<Maps::FileInfo>
 {
@@ -123,21 +123,20 @@ std::string ResizeToShortName(const std::string & str)
     return res;
 }
 
-size_t GetInsertPosition(const std::string & name, u16 cx, u16 center)
+size_t GetInsertPosition(const std::string & name, u16 cx, u16 posx)
 {
     if(name.size())
     {
 	u16 tw = Text::width(name, Font::SMALL);
-	u16 spos = center - tw / 2;
-	if(cx <= spos)
+	if(cx <= posx)
 	    return 0;
 	else
-	if(cx >= spos + tw)
+	if(cx >= posx + tw)
 	    return name.size();
 	else
 	{
 	    float cw = tw / name.size();
-	    return static_cast<size_t>((cx - spos) / cw);
+	    return static_cast<size_t>((cx - posx) / cw);
 	}
     }
     return 0;
@@ -210,7 +209,7 @@ bool SelectFileListSimple(const std::string & header, std::string & result, bool
     back.Save();
 
     const Rect & rt = back.GetRect();
-    const Rect enter_field(rt.x + 45, rt.y + (pocket ? 148 : 286), 260, 16);
+    const Rect enter_field(rt.x + 42, rt.y + (pocket ? 148 : 286), 260, 16);
 
     Button buttonOk(rt.x + 34, rt.y + (pocket ? 176 : 315), ICN::REQUEST, 1, 2);
     Button buttonCancel(rt.x + 244, rt.y + (pocket ? 176 : 315), ICN::REQUEST, 3, 4);
@@ -257,13 +256,15 @@ bool SelectFileListSimple(const std::string & header, std::string & result, bool
     }
 
     listbox.Redraw();
-    RedrawExtraInfo(rt, header, filename);
+    RedrawExtraInfo(rt, header, filename, enter_field);
 
     buttonOk.Draw();
     buttonCancel.Draw();
 
     cursor.Show();
     display.Flip();
+
+    bool is_limit = false;
 
     while(le.HandleEvents() && result.empty())
     {
@@ -289,14 +290,15 @@ bool SelectFileListSimple(const std::string & header, std::string & result, bool
         if(le.MouseClickLeft(enter_field) && editor)
 	{
 	    edit_mode = true;
-	    charInsertPos = GetInsertPosition(filename, le.GetMouseCursor().x, rt.x + 175);
+	    charInsertPos = GetInsertPosition(filename, le.GetMouseCursor().x, enter_field.x);
 	    if(Settings::Get().PocketPC())
 		PocketPC::KeyboardDialog(filename);
     	    buttonOk.SetDisable(filename.empty());
 	    cursor.Hide();
 	}
 	else
-	if(edit_mode && le.KeyPress())
+	if(edit_mode && le.KeyPress() &&
+	    (!is_limit || KEY_BACKSPACE == le.KeyValue()))
 	{
 	    charInsertPos = InsertKeySym(filename, charInsertPos, le.KeyValue(), le.KeyMod());
 	    buttonOk.SetDisable(filename.empty());
@@ -322,16 +324,16 @@ bool SelectFileListSimple(const std::string & header, std::string & result, bool
 	    listbox.Redraw();
 
 	    if(edit_mode && editor)
-		RedrawExtraInfo(rt, header, InsertString(filename, charInsertPos, "_"));
+		is_limit = RedrawExtraInfo(rt, header, InsertString(filename, charInsertPos, "_"), enter_field);
 	    else
 	    if(listbox.isSelected())
 	    {
 		filename = ResizeToShortName(listbox.GetCurrent().file);
 		charInsertPos = filename.size();
-		RedrawExtraInfo(rt, header, filename);
+		is_limit = RedrawExtraInfo(rt, header, filename, enter_field);
 	    }
 	    else
-		RedrawExtraInfo(rt, header, filename);
+		is_limit = RedrawExtraInfo(rt, header, filename, enter_field);
 
 	    buttonOk.Draw();
 	    buttonCancel.Draw();
@@ -346,7 +348,7 @@ bool SelectFileListSimple(const std::string & header, std::string & result, bool
     return result.size();
 }
 
-void RedrawExtraInfo(const Point & dst, const std::string & header, const std::string & filename)
+bool RedrawExtraInfo(const Point & dst, const std::string & header, const std::string & filename, const Rect & field)
 {
     Text text(header, Font::BIG);
     text.Blit(dst.x + 175 - text.w() / 2, dst.y + 30);
@@ -354,6 +356,8 @@ void RedrawExtraInfo(const Point & dst, const std::string & header, const std::s
     if(filename.size())
     {
 	text.Set(filename, Font::BIG);
-	text.Blit(dst.x + 175 - text.w() / 2, Settings::Get().QVGA() ? dst.y + 148 : dst.y + 289);
+	text.Blit(field.x, field.y + 1, field.w);
     }
+
+    return text.w() + 10 > field.w;
 }
