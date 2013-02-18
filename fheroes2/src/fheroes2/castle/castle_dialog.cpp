@@ -499,8 +499,6 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
             if(selectArmy1.isSelected()) selectArmy1.ResetSelected();
 	    if(selectArmy2.isValid() && selectArmy2.isSelected()) selectArmy2.ResetSelected();
 
-	    cursor.Hide();
-
 	    need_redraw = true;
 	}
 

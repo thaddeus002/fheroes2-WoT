@@ -405,28 +405,30 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
 
 	if(!readonly)
 	{
+	    bool redraw = false;
+
 	    if(heroes.Guard() && le.MouseClickLeft(rectSign1))
 	    {
-		cursor.Hide();
 		heroes.Guard()->OpenDialog(false, false);
+        	if(selectArmy1.isSelected()) selectArmy1.ResetSelected();
+        	if(selectArmy2.isValid() && selectArmy2.isSelected()) selectArmy2.ResetSelected();
+		redraw = true;
 	    }
 	    else
 	    if(heroes.Guest() && le.MouseClickLeft(rectSign2))
 	    {
-		cursor.Hide();
 		heroes.Guest()->OpenDialog(false, false);
+        	if(selectArmy1.isSelected()) selectArmy1.ResetSelected();
+        	if(selectArmy2.isValid() && selectArmy2.isSelected()) selectArmy2.ResetSelected();
+		redraw = true;
 	    }
 
-	    if(! cursor.isVisible())
+	    if(redraw)
 	    {
-        	if(selectArmy1.isSelected()) selectArmy1.ResetSelected();
+                cursor.Hide();
         	selectArmy1.Redraw();
-        	if(selectArmy2.isValid())
-		{
-		    if(selectArmy2.isSelected()) selectArmy2.ResetSelected();
-        	    selectArmy2.Redraw();
-		}
-		cursor.Show();
+        	if(selectArmy2.isValid()) selectArmy2.Redraw();
+                cursor.Show();
 		display.Flip();
 	    }
 	}
