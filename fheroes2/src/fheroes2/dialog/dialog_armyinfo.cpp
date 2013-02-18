@@ -371,10 +371,6 @@ u16 Dialog::ArmyJoinWithCost(const Troop & troop, u32 join, u32 gold, Heroes & h
 {
     Display & display = Display::Get();
     const Settings & conf = Settings::Get();
-    const ICN::icn_t system = conf.ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
-
-    // preload
-    AGG::Cache::PreloadObject(system);
 
     // cursor
     Cursor & cursor = Cursor::Get();

@@ -111,7 +111,7 @@ public:
     void Lock(void) const;
     void Unlock(void) const;
 
-    u32  GetMemoryUsage(void) const;
+    virtual u32  GetMemoryUsage(void) const;
     std::string Info(void) const;
 
     static Surface Reflect(const Surface &, u8 shape /* 0: none, 1 : vert, 2: horz, 3: both */);
@@ -141,6 +141,12 @@ protected:
     friend class Display;
 
     SDL_Surface* surface;
+};
+
+class SurfaceRef : public Surface
+{
+public:
+    SurfaceRef(const Surface &);
 };
 
 #endif

@@ -45,8 +45,6 @@ namespace Battle
 
 Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
 {
-    const Settings & conf = Settings::Get();
-
     // pre battle army1
     if(army1.GetCommander())
     {
@@ -64,9 +62,6 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
         else
 	    army2.GetCommander()->ActionPreBattle();
     }
-
-    if(conf.ExtPocketLowMemory())
-        AGG::ICNRegistryEnable(true);
 
     AGG::ResetMixer();
     bool local = (CONTROL_HUMAN & army1.GetControl()) || (CONTROL_HUMAN & army2.GetControl());
@@ -154,12 +149,6 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
     {
 	// hard reset army
         if(!army2.isValid() || (result.army2 & RESULT_RETREAT)) army2.Reset(false);
-    }
-
-    if(conf.ExtPocketLowMemory())
-    {
-        AGG::ICNRegistryEnable(false);
-        AGG::ICNRegistryFreeObjects();
     }
 
     DEBUG(DBG_BATTLE, DBG_INFO, "army1: " << (result.army1 & RESULT_WINS ? "wins" : "loss") << ", army2: " << (result.army2 & RESULT_WINS ? "wins" : "loss"));

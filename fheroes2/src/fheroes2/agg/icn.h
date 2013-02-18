@@ -951,7 +951,6 @@ namespace ICN
     u8   GetMissIndex(const icn_t &, const s16 &, const s16 &);
 
     bool isBattleMonsterICN(u16);
-    bool SkipRegistryFree(icn_t);
 
     icn_t Get4Captain(u8 race);
     icn_t Get4Building(u8 race);

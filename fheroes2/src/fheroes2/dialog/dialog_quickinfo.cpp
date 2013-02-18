@@ -337,8 +337,6 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     // preload
     const ICN::icn_t qwikinfo = ICN::QWIKINFO;
 
-    AGG::Cache::PreloadObject(qwikinfo);
-
     // image box
     const Sprite &box = AGG::GetICN(qwikinfo, 0);
     const Interface::GameArea & gamearea = Interface::GameArea::Get();
@@ -544,7 +542,6 @@ void Dialog::QuickInfo(const Castle & castle)
     cursor.Hide();
 
     const ICN::icn_t qwiktown = ICN::QWIKTOWN;
-    AGG::Cache::PreloadObject(qwiktown);
 
     // image box
     const Sprite &box = AGG::GetICN(qwiktown, 0);
@@ -708,7 +705,6 @@ void Dialog::QuickInfo(const Heroes & hero)
     cursor.Hide();
 
     const ICN::icn_t qwikhero = ICN::QWIKHERO;
-    AGG::Cache::PreloadObject(qwikhero);
 
     // image box
     const Sprite &box = AGG::GetICN(qwikhero, 0);

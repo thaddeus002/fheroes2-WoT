@@ -34,9 +34,6 @@ Dialog::answer_t Dialog::AdventureOptions(const bool enabledig)
     const ICN::icn_t apanbkg = Settings::Get().ExtGameEvilInterface() ? ICN::APANBKGE : ICN::APANBKG;
     const ICN::icn_t apanel  = Settings::Get().ExtGameEvilInterface() ? ICN::APANELE : ICN::APANEL;
 
-    AGG::Cache::PreloadObject(apanbkg);
-    AGG::Cache::PreloadObject(apanel);
-
     // cursor
     Cursor & cursor = Cursor::Get();
     const Cursor::themes_t oldcursor = cursor.Themes();

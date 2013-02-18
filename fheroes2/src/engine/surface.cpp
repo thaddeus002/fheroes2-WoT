@@ -196,6 +196,11 @@ void SDLFreeSurface(SDL_Surface *sf)
     }
 }
 
+SurfaceRef::SurfaceRef(const Surface & sf)
+{
+    Set(sf, true);
+}
+
 Surface::Surface() : surface(NULL)
 {
 }

@@ -51,11 +51,6 @@ Game::menu_t Game::LoadGame(void)
 
     if(Settings::Get().QVGA()) return PocketPC::LoadGame();
 
-    // preload
-    AGG::Cache::PreloadObject(ICN::HEROES);
-    AGG::Cache::PreloadObject(ICN::BTNNEWGM);
-    AGG::Cache::PreloadObject(ICN::REDBACK);
-
     // cursor
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
@@ -106,9 +101,6 @@ Game::menu_t Game::LoadGame(void)
 
 Game::menu_t Game::LoadStandard(void)
 {
-    // preload
-    AGG::Cache::PreloadObject(ICN::HEROES);
-
     // cursor
     Cursor & cursor = Cursor::Get();
     cursor.Hide();

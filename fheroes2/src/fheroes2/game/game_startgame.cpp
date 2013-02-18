@@ -161,10 +161,6 @@ Game::menu_t Game::StartGame(void)
 	GameOver::Result::Get().Reset();
 
     cursor.Hide();
-
-    AGG::ICNRegistryFreeObjects();
-    AGG::ICNRegistryEnable(false);
-
     AGG::ResetMixer();
 
     // draw interface
@@ -304,17 +300,8 @@ void Game::OpenCastleDialog(Castle* castle)
 		DELAY(100);
 	    }
 */
-	    if(Settings::Get().ExtPocketLowMemory())
-    		AGG::ICNRegistryEnable(true);
-
 	    result = castle->OpenDialog((conf.CurrentColor() != castle->GetColor()), need_fade);
 	    if(need_fade) need_fade = false;
-
-	    if(Settings::Get().ExtPocketLowMemory())
-	    {
-    		AGG::ICNRegistryEnable(false);
-    		AGG::ICNRegistryFreeObjects();
-	    }
 
 	    if(it != myCastles.end())
 	    {
@@ -372,17 +359,8 @@ void Game::OpenHeroesDialog(Heroes* hero)
 
 	while(Dialog::CANCEL != result)
 	{
-	    if(Settings::Get().ExtPocketLowMemory())
-		AGG::ICNRegistryEnable(true);
-
 	    result = (*it)->OpenDialog(false, need_fade);
 	    if(need_fade) need_fade = false;
-
-	    if(Settings::Get().ExtPocketLowMemory())
-	    {
-    		AGG::ICNRegistryEnable(false);
-    		AGG::ICNRegistryFreeObjects();
-	    }
 
 	    switch(result)
 	    {
@@ -1723,7 +1701,7 @@ void Game::EventSwitchShowControlPanel(void)
 
 void Game::EventDebug1(void)
 {
-    AGG::Cache::Get().Dump();
+    VERBOSE("free objects: " << AGG::Cache::ClearFreeObjects() / 1024 << " kb");
 }
 
 void Game::EventDebug2(void)

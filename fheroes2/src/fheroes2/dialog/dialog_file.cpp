@@ -33,9 +33,6 @@ Game::menu_t Dialog::FileOptions(void)
     const ICN::icn_t cpanbkg = Settings::Get().ExtGameEvilInterface() ? ICN::CPANBKGE : ICN::CPANBKG;
     const ICN::icn_t cpanel  = Settings::Get().ExtGameEvilInterface() ? ICN::CPANELE : ICN::CPANEL;
 
-    AGG::Cache::PreloadObject(cpanbkg);
-    AGG::Cache::PreloadObject(cpanel);
-
     // cursor
     Cursor & cursor = Cursor::Get();
     const Cursor::themes_t oldcursor = cursor.Themes();

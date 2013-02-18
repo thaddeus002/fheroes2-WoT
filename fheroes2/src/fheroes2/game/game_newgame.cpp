@@ -141,11 +141,6 @@ Game::menu_t Game::NewGame(void)
 
     if(conf.QVGA()) return PocketPC::NewGame();
 
-    // preload
-    AGG::Cache::PreloadObject(ICN::HEROES);
-    AGG::Cache::PreloadObject(ICN::BTNNEWGM);
-    AGG::Cache::PreloadObject(ICN::REDBACK);
-
     // cursor
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
@@ -231,11 +226,6 @@ Game::menu_t Game::NewMulti(void)
 	conf.SetGameType(Game::TYPE_STANDARD);
 
     if(conf.QVGA()) return PocketPC::NewMulti();
-
-    // preload
-    AGG::Cache::PreloadObject(ICN::HEROES);
-    AGG::Cache::PreloadObject(ICN::BTNHOTST);
-    AGG::Cache::PreloadObject(ICN::REDBACK);
 
     // cursor
     Cursor & cursor = Cursor::Get();

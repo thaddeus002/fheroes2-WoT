@@ -213,8 +213,6 @@ void World::NewMaps(const u16 sw, const u16 sh)
     width = sw;
     height = sh;
 
-    AGG::Cache::PreloadObject(TIL::GROUND32);
-
     vec_tiles.resize(width * height);
 
     // init all tiles
@@ -258,8 +256,6 @@ void World::LoadMaps(const std::string &filename)
 	 DEBUG(DBG_GAME|DBG_ENGINE, DBG_WARN, "file not found " << filename.c_str());
 	 Error::Except(__FUNCTION__, "load maps");
     }
-
-    AGG::Cache::PreloadObject(TIL::GROUND32);
 
     u8   byte8;
     u16  byte16;

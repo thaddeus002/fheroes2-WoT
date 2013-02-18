@@ -182,15 +182,9 @@ void Interface::Basic::Redraw(u8 force)
 
 	    display.Flip();
 
-	    AGG::Cache & cache = AGG::Cache::Get();
-
 	    VERBOSE("MemoryLimit: " << "settings: " << conf.MemoryLimit() << ", game usage: " << usage);
-	    cache.ClearAllICN();
-	    VERBOSE("MemoryLimit: " << "free all " << "ICN" << ", game usage: " << GetMemoryUsage());
-	    cache.ClearAllWAV();
-	    VERBOSE("MemoryLimit: " << "free all " << "WAV" << ", game usage: " << GetMemoryUsage());
-	    cache.ClearAllMID();
-	    VERBOSE("MemoryLimit: " << "free all " << "MID" << ", game usage: " << GetMemoryUsage());
+	    const u32 freemem = AGG::Cache::ClearFreeObjects();
+	    VERBOSE("MemoryLimit: " << "free " << freemem);
 
 	    redraw = 0xFF;
 	    if(conf.ExtGameHideInterface()) redraw &= ~REDRAW_BORDER;

@@ -175,7 +175,6 @@ int main(int argc, char **argv)
 
 	    // init cursor
 	    Cursor::Get().SetThemes(Cursor::POINTER);
-	    AGG::ICNRegistryEnable(true);
 
 	    // init game data
 	    Game::Init();
@@ -213,7 +212,6 @@ int main(int argc, char **argv)
 #ifndef ANDROID
 	catch(Error::Exception)
 	{
-    	    AGG::Cache::Get().Dump();
 	    VERBOSE(std::endl << conf.String());
 	}
 #endif

@@ -930,21 +930,16 @@ void RedrawResourceBar(const Point & dst, const Funds & rs)
 
 void RedrawBackground(const Rect & rt, const Castle & castle)
 {
-    const Sprite* sprite = NULL;
-    Rect src;
-
     switch(castle.GetRace())
     {
-	case Race::KNGT: sprite = &AGG::GetICN(ICN::TOWNBKG0, 0); src = Rect(148, 0, rt.w, 123); break;
-	case Race::BARB: sprite = &AGG::GetICN(ICN::TOWNBKG1, 0); src = Rect(142, 0, rt.w, 123); break;
-	case Race::SORC: sprite = &AGG::GetICN(ICN::TOWNBKG2, 0); src = Rect(218, 0, rt.w, 123); break;
-	case Race::WRLK: sprite = &AGG::GetICN(ICN::TOWNBKG3, 0); src = Rect(300, 0, rt.w, 123); break;
-	case Race::WZRD: sprite = &AGG::GetICN(ICN::TOWNBKG4, 0); src = Rect(150, 0, rt.w, 123); break;
-	case Race::NECR: sprite = &AGG::GetICN(ICN::TOWNBKG5, 0); src = Rect(0, 0, rt.w, 123); break;
+	case Race::KNGT: AGG::GetICN(ICN::TOWNBKG0, 0).Blit(Rect(148, 0, rt.w, 123), rt.x, rt.y); break;
+	case Race::BARB: AGG::GetICN(ICN::TOWNBKG1, 0).Blit(Rect(142, 0, rt.w, 123), rt.x, rt.y); break;
+	case Race::SORC: AGG::GetICN(ICN::TOWNBKG2, 0).Blit(Rect(218, 0, rt.w, 123), rt.x, rt.y); break;
+	case Race::WRLK: AGG::GetICN(ICN::TOWNBKG3, 0).Blit(Rect(300, 0, rt.w, 123), rt.x, rt.y); break;
+	case Race::WZRD: AGG::GetICN(ICN::TOWNBKG4, 0).Blit(Rect(150, 0, rt.w, 123), rt.x, rt.y); break;
+	case Race::NECR: AGG::GetICN(ICN::TOWNBKG5, 0).Blit(Rect(0, 0, rt.w, 123), rt.x, rt.y); break;
 	default: break;
     }
-
-    if(sprite) sprite->Blit(src, rt.x, rt.y);
 }
 
 void RedrawTownSprite(const Rect & rt, const Castle & castle)

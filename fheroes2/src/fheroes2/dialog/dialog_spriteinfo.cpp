@@ -47,10 +47,6 @@ u16 Dialog::ArtifactInfo(const std::string & hdr, const std::string & msg, const
 u16 Dialog::SpriteInfo(const std::string &header, const std::string &message, const Surface & sprite, u16 buttons)
 {
     Display & display = Display::Get();
-    const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
-
-    // preload
-    AGG::Cache::PreloadObject(system);
 
     // cursor
     Cursor & cursor = Cursor::Get();

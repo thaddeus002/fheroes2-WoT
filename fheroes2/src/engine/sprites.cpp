@@ -47,6 +47,11 @@ void SpritePos::SetPos(const Point & pos)
     Point::y = pos.y;
 }
 
+u32 SpritePos::GetMemoryUsage(void) const
+{
+    return Surface::GetMemoryUsage() + sizeof(x) + sizeof(y);
+}
+
 SpriteBack::SpriteBack()
 {
 }
@@ -104,6 +109,11 @@ Rect SpriteBack::GetArea(void) const
 Size SpriteBack::GetSize(void) const
 {
     return Surface::GetSize();
+}
+
+u32 SpriteBack::GetMemoryUsage(void) const
+{
+    return Surface::GetMemoryUsage();
 }
 
 SpriteMove::SpriteMove() : visible(false)
@@ -176,4 +186,10 @@ Rect SpriteMove::GetArea(void) const
 Size SpriteMove::GetSize(void) const
 {
     return Surface::GetSize();
+}
+
+u32 SpriteMove::GetMemoryUsage(void) const
+{
+    return Surface::GetMemoryUsage() +
+	background.GetMemoryUsage() + sizeof(visible);
 }

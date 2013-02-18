@@ -45,11 +45,6 @@ Game::menu_t Game::MainMenu(void)
     conf.SetGameType(TYPE_MENU);
     if(conf.QVGA()) return PocketPC::MainMenu();
 
-    // preload
-    AGG::Cache::PreloadObject(ICN::HEROES);
-    AGG::Cache::PreloadObject(ICN::BTNSHNGL);
-    AGG::Cache::PreloadObject(ICN::SHNGANIM);
-
     // cursor
     Cursor & cursor = Cursor::Get();
     cursor.Hide();

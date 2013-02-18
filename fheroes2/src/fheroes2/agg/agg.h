@@ -132,22 +132,9 @@ namespace AGG
 
 	bool isValidFonts(void) const;
 
-	void ClearAllICN(void);
-	void ClearAllWAV(void);
-	void ClearAllMID(void);
-
-	void ICNRegistryEnable(bool);
-	void ICNRegistryFreeObjects(void);
-
-	void Dump(void) const;
-
-	static void PreloadObject(const ICN::icn_t, bool reflect = false);
-	static void PreloadObject(const TIL::til_t);
+	static u32 ClearFreeObjects(void);
 	static void PreloadPalette(void);
 	static void PreloadFonts(void);
-
-	static void FreeObject(const ICN::icn_t);
-	static void FreeObject(const TIL::til_t);
 
     private:
 	Cache();
@@ -165,17 +152,10 @@ namespace AGG
 	void LoadTIL(const TIL::til_t);
 	void LoadWAV(const M82::m82_t m82);
 	void LoadMID(const XMI::xmi_t xmi);
-
-	void SaveICN(const ICN::icn_t);
-
-	void FreeICN(const ICN::icn_t icn);
-	void FreeTIL(const TIL::til_t til);
-	void FreeWAV(const M82::m82_t m82);
-	void FreeMID(const XMI::xmi_t xmi);
-
 	void LoadPAL(void);
 	void LoadFNT(void);
-	
+
+	void SaveICN(const ICN::icn_t);
 
 	File heroes2_agg;
 	File heroes2x_agg;
@@ -194,12 +174,8 @@ namespace AGG
 	SDL::Font font_medium;
 	SDL::Font font_small;
 #endif
-	std::vector<ICN::icn_t> icn_registry;
-	bool icn_registry_enable;
     };
 
-    void ICNRegistryEnable(bool);
-    void ICNRegistryFreeObjects(void);
     int GetICNCount(const ICN::icn_t icn);
 
     const Sprite & GetICN(const ICN::icn_t icn, const u32 index, bool reflect = false);

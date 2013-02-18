@@ -37,9 +37,6 @@ void Dialog::SecondarySkillInfo(const std::string & header, const std::string & 
     Display & display = Display::Get();
     const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
-    // preload
-    AGG::Cache::PreloadObject(system);
-
     // cursor
     Cursor & cursor = Cursor::Get();
 
@@ -115,9 +112,6 @@ void Dialog::PrimarySkillInfo(const std::string &header, const std::string &mess
 {
     Display & display = Display::Get();
     const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
-
-    // preload
-    AGG::Cache::PreloadObject(system);
 
     // cursor
     Cursor & cursor = Cursor::Get();

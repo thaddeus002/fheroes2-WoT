@@ -193,29 +193,9 @@ AGG::Cache::Cache()
     icn_cache[ICN::UNKNOWN].count = 1;
     icn_cache[ICN::UNKNOWN].sprites = new Sprite [1];
     icn_cache[ICN::UNKNOWN].reflect = new Sprite [1];
-
-    icn_registry_enable = false;
-    icn_registry.reserve(250);
 }
 
 AGG::Cache::~Cache()
-{
-    if(icn_cache)
-    {
-	ClearAllICN();
-    }
-
-    if(til_cache)
-    {
-	for(u32 ii = 0; ii < TIL::UNKNOWN + 1; ++ii)
-	{
-	    if(til_cache[ii].sprites) delete [] til_cache[ii].sprites;
-	}
-	delete [] til_cache;
-    }
-}
-
-void AGG::Cache::ClearAllICN(void)
 {
     if(icn_cache)
     {
@@ -232,22 +212,114 @@ void AGG::Cache::ClearAllICN(void)
 	    icn_cache[ii].reflect = NULL;
 	}
     }
+
+    if(til_cache)
+    {
+	for(u32 ii = 0; ii < TIL::UNKNOWN + 1; ++ii)
+	{
+	    if(til_cache[ii].sprites) delete [] til_cache[ii].sprites;
+	}
+	delete [] til_cache;
+    }
 }
 
-void AGG::Cache::ClearAllWAV(void)
+u32 AGG::Cache::ClearFreeObjects(void)
 {
-    loop_sounds.clear();
+    u32 total = 0;
+    Cache & obj = Get();
 
+    // wav cache
     for(std::map<M82::m82_t, std::vector<u8> >::iterator
-	it = wav_cache.begin(); it != wav_cache.end(); ++it)
-	if((*it).second.size()) (*it).second.clear();
-}
+	it = obj.wav_cache.begin(); it != obj.wav_cache.end(); ++it)
+	total += (*it).second.size();
 
-void AGG::Cache::ClearAllMID(void)
-{
+    DEBUG(DBG_ENGINE, DBG_INFO, "WAV" << " " << "memory: " << total);
+    total = 0;
+
+    // mus cache
     for(std::map<XMI::xmi_t, std::vector<u8> >::iterator
-	it = mid_cache.begin(); it != mid_cache.end(); ++it)
-	if((*it).second.size()) (*it).second.clear();
+	it = obj.mid_cache.begin(); it != obj.mid_cache.end(); ++it)
+	total += (*it).second.size();
+
+    DEBUG(DBG_ENGINE, DBG_INFO, "MID" << " " << "memory: " << total);
+    total = 0;
+
+    // fnt cache
+    for(std::map<u16, fnt_cache_t>::iterator
+	it = obj.fnt_cache.begin(); it != obj.fnt_cache.end(); ++it)
+    {
+	total += (*it).second.medium_white.GetMemoryUsage();
+	total += (*it).second.medium_yellow.GetMemoryUsage();
+	total += (*it).second.small_white.GetMemoryUsage();
+	total += (*it).second.small_yellow.GetMemoryUsage();
+    }
+
+    DEBUG(DBG_ENGINE, DBG_INFO, "FNT" << " " << "memory: " << total);
+    total = 0;
+
+    // til cache
+    if(obj.til_cache)
+    {
+	for(u32 ii = 0; ii < TIL::UNKNOWN; ++ii)
+	{
+	    til_cache_t & tils = obj.til_cache[ii];
+
+	    for(u32 jj = 0; jj < tils.count; ++jj)
+	    {
+		if(tils.sprites)
+		{
+		    total += tils.sprites[jj].GetMemoryUsage();
+		}
+	    }
+	}
+    }
+
+    DEBUG(DBG_ENGINE, DBG_INFO, "TIL" << " " << "memory: " << total);
+    total = 0;
+
+    // icn cache
+    if(obj.icn_cache)
+    {
+	u32 used = 0;
+
+	for(u32 ii = 0; ii <= ICN::UNKNOWN; ++ii)
+	{
+	    icn_cache_t & icns = obj.icn_cache[ii];
+
+	    for(u32 jj = 0; jj < icns.count; ++jj)
+	    {
+		if(icns.sprites)
+		{
+		    Sprite & sprite1 = icns.sprites[jj];
+
+		    if(1 == sprite1.RefCount())
+		    {
+			total += sprite1.GetMemoryUsage();
+			Surface::FreeSurface(sprite1);
+		    }
+		    else
+			used += sprite1.GetMemoryUsage();
+		}
+
+		if(icns.reflect)
+		{
+		    Sprite & sprite2 = icns.reflect[jj];
+
+		    if(1 == sprite2.RefCount())
+		    {
+			total += sprite2.GetMemoryUsage();
+			Surface::FreeSurface(sprite2);
+		    }
+		    else
+			used += sprite2.GetMemoryUsage();
+		}
+	    }
+	}
+
+	DEBUG(DBG_ENGINE, DBG_INFO, "ICN" << " " << "memory: " << used);
+    }
+
+    return total;
 }
 
 /* get AGG::Cache object */
@@ -846,11 +918,6 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u32 index, bool reflect)
 	    Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
 	    sp.ScaleMinifyByTwo();
 	}
-
-	// registry icn
-	if(icn_registry_enable &&
-	    icn_registry.end() == std::find(icn_registry.begin(), icn_registry.end(), icn))
-	    icn_registry.push_back(icn);
     }
 }
 
@@ -1155,38 +1222,6 @@ void AGG::Cache::LoadFNT(u16 ch)
 }
 #endif
 
-/* free ICN object in AGG::Cache */
-void AGG::Cache::FreeICN(const ICN::icn_t icn)
-{
-    DEBUG(DBG_ENGINE, DBG_TRACE, ICN::GetString(icn));
-    if(icn_cache[icn].sprites){ delete [] icn_cache[icn].sprites; icn_cache[icn].sprites = NULL; }
-    if(icn_cache[icn].reflect){ delete [] icn_cache[icn].reflect; icn_cache[icn].reflect = NULL; }
-    icn_cache[icn].count = 0;
-}
-
-/* free TIL object in AGG::Cache */
-void AGG::Cache::FreeTIL(const TIL::til_t til)
-{
-    if(til_cache[til].sprites){ delete [] til_cache[til].sprites; til_cache[til].sprites = NULL; }
-    til_cache[til].count = 0;
-}
-
-/* free 82M object in AGG::Cache */
-void AGG::Cache::FreeWAV(const M82::m82_t m82)
-{
-    std::vector<u8> & v = wav_cache[m82];
-
-    if(v.size()) v.clear();
-}
-
-/* free XMI object in AGG::Cache */
-void AGG::Cache::FreeMID(const XMI::xmi_t xmi)
-{
-    std::vector<u8> & v = mid_cache[xmi];
-
-    if(v.size()) v.clear();
-}
-
 /* return ICN sprite from AGG::Cache */
 const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u32 index, bool reflect)
 {
@@ -1323,130 +1358,6 @@ bool AGG::Cache::isValidFonts(void) const
     return false;
 }
 
-void AGG::Cache::ICNRegistryEnable(bool f)
-{
-    icn_registry_enable = f;
-}
-
-void AGG::Cache::ICNRegistryFreeObjects(void)
-{
-    for(std::vector<ICN::icn_t>::const_iterator
-	it = icn_registry.begin(); it != icn_registry.end(); ++it)
-	if(!ICN::SkipRegistryFree(*it)) FreeICN(*it);
-}
-
-void AGG::Cache::Dump(void) const
-{
-    u32 total1 = 0;
-    u32 total2 = 0;
-
-    if(icn_cache)
-    {
-	std::ostringstream os;
-	total1 = 0;
-        for(u32 ii = 0; ii < ICN::UNKNOWN; ++ii)
-        {
-	    total2 = 0;
-            if(icn_cache[ii].sprites)
-        	for(u16 jj = 0; jj < icn_cache[ii].count; ++jj)
-		    total2 += (icn_cache[ii].sprites[jj].GetMemoryUsage() + icn_cache[ii].reflect[jj].GetMemoryUsage());
-	    if(icn_cache[ii].count)
-		os << ICN::GetString((ICN::icn_t) ii) << "(" << icn_cache[ii].count << ", " << total2 << "), ";
-	    total1 += total2;
-        }
-	if(total1)
-	{
-	    DEBUG(DBG_ENGINE, DBG_TRACE, os.str());
-	    DEBUG(DBG_ENGINE, DBG_INFO, "ICN" << " total: " << total1 << " bytes");
-	}
-    }
-
-    if(til_cache)
-    {
-	std::ostringstream os;
-	total1 = 0;
-        for(u32 ii = 0; ii < TIL::UNKNOWN; ++ii)
-        {
-	    total2 = 0;
-	    if(til_cache[ii].sprites)
-        	for(u16 jj = 0; jj < til_cache[ii].count; ++jj)
-        	    total2 += til_cache[ii].sprites[jj].GetMemoryUsage();
-	    if(til_cache[ii].count)
-		os << TIL::GetString((TIL::til_t) ii) << "(" << til_cache[ii].count << ", " << total2 << "), ";
-	    total1 += total2;
-        }
-	if(total1)
-	{
-	    DEBUG(DBG_ENGINE, DBG_TRACE, os.str());
-	    DEBUG(DBG_ENGINE, DBG_INFO, "TIL" << " total: " << total1 << " bytes");
-	}
-    }
-
-    if(wav_cache.size())
-    {
-	std::ostringstream os;
-	total1 = 0;
-	for(std::map<M82::m82_t, std::vector<u8> >::const_iterator
-	    it = wav_cache.begin(); it != wav_cache.end(); ++it)
-	{
-	    if((*it).second.size())
-	    	os << M82::GetString((*it).first) << "(" << (*it).second.size() << ",) ";
-	    total1 += (*it).second.size();
-	}
-	if(total1)
-	{
-	    DEBUG(DBG_ENGINE, DBG_TRACE, os.str());
-	    DEBUG(DBG_ENGINE, DBG_INFO, "WAV" << " total: " << total1 << " bytes");
-	}
-    }
-
-    if(mid_cache.size())
-    {
-	std::ostringstream os;
-	total1 = 0;
-	for(std::map<XMI::xmi_t, std::vector<u8> >::const_iterator
-	    it = mid_cache.begin(); it != mid_cache.end(); ++it)
-	{
-	    if((*it).second.size())
-	    	os << XMI::GetString((*it).first) << "(" << (*it).second.size() << "), ";
-	    total1 += (*it).second.size();
-	}
-	if(total1)
-	{
-	    DEBUG(DBG_ENGINE, DBG_TRACE, os.str());
-	    DEBUG(DBG_ENGINE, DBG_INFO, "MID" << " total: " << total1 << " bytes");
-	}
-    }
-
-#ifdef WITH_TTF
-    if(fnt_cache.size())
-    {
-	std::ostringstream os;
-	total1 = 0;
-	for(std::map<u16, fnt_cache_t>::const_iterator
-	    it = fnt_cache.begin(); it != fnt_cache.end(); ++it)
-	    total1 += ((*it).second.medium_white.GetMemoryUsage() + (*it).second.medium_yellow.GetMemoryUsage() +
-				(*it).second.small_white.GetMemoryUsage() + (*it).second.small_yellow.GetMemoryUsage());
-	if(total1)
-	{
-	    DEBUG(DBG_ENGINE, DBG_INFO, "FNT" << " total: " << total1 << " bytes");
-	}
-    }
-#endif
-}
-
-// wrapper AGG::Cache::PreloadObject
-void AGG::Cache::PreloadObject(const ICN::icn_t icn, bool reflect)
-{
-    // deprecated
-    // or loading all sprites? AGG::Cache::Get().LoadICN(icn, index, reflect);
-}
-
-void AGG::Cache::PreloadObject(const TIL::til_t til)
-{
-    return Get().LoadTIL(til);
-}
-
 void AGG::Cache::PreloadPalette(void)
 {
     return Get().LoadPAL();
@@ -1456,27 +1367,6 @@ void AGG::Cache::PreloadFonts(void)
 {
     return Get().LoadFNT();
 }
-
-void AGG::Cache::FreeObject(const ICN::icn_t icn)
-{
-    return Get().FreeICN(icn);
-}
-
-void AGG::Cache::FreeObject(const TIL::til_t til)
-{
-    return Get().FreeTIL(til);
-}
-
-void AGG::ICNRegistryEnable(bool f)
-{
-    AGG::Cache::Get().ICNRegistryEnable(f);
-}
-
-void AGG::ICNRegistryFreeObjects(void)
-{
-    AGG::Cache::Get().ICNRegistryFreeObjects();
-}
-
 
 // wrapper AGG::GetXXX
 int AGG::GetICNCount(const ICN::icn_t icn)

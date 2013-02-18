@@ -35,6 +35,8 @@ public:
 
     const Point & GetPos(void) const;
     Rect GetArea(void) const;
+
+    u32  GetMemoryUsage(void) const;
 };
 
 class SpriteBack : protected SpritePos
@@ -52,6 +54,8 @@ public:
     const Point & GetPos(void) const;
     Rect GetArea(void) const;
     Size GetSize(void) const;
+
+    u32 GetMemoryUsage(void) const;
 };
 
 
@@ -73,6 +77,8 @@ public:
     const Point & GetPos(void) const;
     Rect GetArea(void) const;
     Size GetSize(void) const;
+
+    u32  GetMemoryUsage(void) const;
 
 protected:
     void Show(const Point &);

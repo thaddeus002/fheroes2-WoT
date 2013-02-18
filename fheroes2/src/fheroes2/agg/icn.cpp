@@ -1929,21 +1929,6 @@ bool ICN::isBattleMonsterICN(u16 icn)
     return false;
 }
 
-bool ICN::SkipRegistryFree(ICN::icn_t icn)
-{
-    switch(icn)
-    {
-	case SPELCO:
-	case CMSECO:
-	case ADVMCO:
-	    return true;
-
-	default: break;
-    }
-
-    return false;
-}
-
 ICN::icn_t ICN::FromString(const char* str)
 {
     const icnmap_t* ptr = &icnmap[0];
