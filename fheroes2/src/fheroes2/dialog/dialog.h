@@ -163,14 +163,12 @@ namespace Dialog
 
 	void SetPosition(s16, s16, u16 = 0, u16 = 0);
 
-	void FBRedraw(void);
-	void FBRedraw(const Surface &);
-
 	const Rect & GetRect(void) const;
 	const Rect & GetArea(void) const;
 	const Rect & GetTop(void) const;
 
-	static void FBRedraw(const Rect &, const Surface &);
+	static void RedrawRegular(const Rect &);
+	static void Redraw(const Surface &, const Rect &, Surface &, const Rect &);
 
     protected:
 	SpriteBack	background;

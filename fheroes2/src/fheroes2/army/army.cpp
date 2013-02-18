@@ -587,7 +587,7 @@ void Troops::KeepOnlyWeakest(Troops & troops2, bool save_last)
     }
 }
 
-void Troops::DrawMons32LineWithScoute(s16 cx, s16 cy, u16 width, u8 first, u8 count, u8 scoute) const
+void Troops::DrawMons32LineWithScoute(s16 cx, s16 cy, u16 width, u8 first, u8 count, u8 scoute, bool shorts) const
 {
     if(isValid())
     {
@@ -607,7 +607,7 @@ void Troops::DrawMons32LineWithScoute(s16 cx, s16 cy, u16 width, u8 first, u8 co
 		const Sprite & monster = AGG::GetICN(ICN::MONS32, (*it)->GetSpriteIndex());
 
     	        monster.Blit(cx - monster.w() / 2, cy + 30 - monster.h());
-		text.Set(Game::CountScoute((*it)->GetCount(), scoute));
+		text.Set(Game::CountScoute((*it)->GetCount(), scoute, shorts));
 		text.Blit(cx - text.w() / 2, cy + 28);
 
 		cx += chunk;
@@ -1133,13 +1133,18 @@ bool Army::TroopsStrongerEnemyTroops(const Troops & troops1, const Troops & troo
 
 void Army::DrawMons32LineWithScoute(const Troops & troops, s16 cx, s16 cy, u16 width, u8 first, u8 count, u8 scoute)
 {
-    troops.DrawMons32LineWithScoute(cx, cy, width, first, count, scoute);
+    troops.DrawMons32LineWithScoute(cx, cy, width, first, count, scoute, false);
 }
 
 /* draw MONS32 sprite in line, first valid = 0, count = 0 */
 void Army::DrawMons32Line(const Troops & troops, s16 cx, s16 cy, u16 width, u8 first, u8 count)
 {
-    troops.DrawMons32LineWithScoute(cx, cy, width, first, count, Skill::Level::EXPERT);
+    troops.DrawMons32LineWithScoute(cx, cy, width, first, count, Skill::Level::EXPERT, false);
+}
+
+void Army::DrawMons32LineShort(const Troops & troops, s16 cx, s16 cy, u16 width, u8 first, u8 count)
+{
+    troops.DrawMons32LineWithScoute(cx, cy, width, first, count, Skill::Level::EXPERT, true);
 }
 
 u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & join)

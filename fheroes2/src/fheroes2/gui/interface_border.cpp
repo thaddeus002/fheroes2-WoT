@@ -181,7 +181,7 @@ const Rect & Interface::BorderWindow::GetArea(void) const
 
 void Interface::BorderWindow::Redraw(void)
 {
-    border.FBRedraw();
+    Dialog::FrameBorder::RedrawRegular(border.GetRect());
 }
 
 void Interface::BorderWindow::SetPosition(s16 px, s16 py, u16 pw, u16 ph)

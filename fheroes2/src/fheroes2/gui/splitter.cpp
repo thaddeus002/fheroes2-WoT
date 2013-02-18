@@ -26,7 +26,7 @@
 #include "splitter.h"
 
 /* splitter constructor */
-Splitter::Splitter() : step(0), min(0), max(0), cur(-1)
+Splitter::Splitter() : step(0), min(0), max(0), cur(MAXU16)
 {
 }
 

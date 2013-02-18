@@ -132,9 +132,7 @@ bool Battle::Only::ChangeSettings(void)
     cursor.Hide();
     cursor.SetThemes(Cursor::POINTER);
 
-    Dialog::FrameBorder frameborder;
-    frameborder.SetPosition((display.w() - 640 - BORDERWIDTH * 2) / 2, (display.h() - 480 - BORDERWIDTH * 2) / 2, 640, 480);
-    frameborder.FBRedraw();
+    Dialog::FrameBorder frameborder(Size(640, 480));
 
     const Point & cur_pt = frameborder.GetArea();
 

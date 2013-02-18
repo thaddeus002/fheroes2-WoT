@@ -459,7 +459,7 @@ u8 Game::GetActualKingdomColors(void)
 }
 
 #include <cmath>
-std::string Game::CountScoute(u32 count, u8 scoute)
+std::string Game::CountScoute(u32 count, u8 scoute, bool shorts)
 {
     float infelicity = 0;
     std::string res;
@@ -475,7 +475,7 @@ std::string Game::CountScoute(u32 count, u8 scoute)
             break;
 
         case Skill::Level::EXPERT:
-            res = GetString(count);
+            res = shorts ? GetStringShort(count) : GetString(count);
             break;
 
         default:

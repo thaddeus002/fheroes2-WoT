@@ -288,7 +288,7 @@ namespace Game
     }
 
     u16 GetStep4Player(u16, u16, u16);
-    std::string CountScoute(u32 count, u8 scoute);
+    std::string CountScoute(u32 count, u8 scoute, bool shorts = false);
 }
 
 #define HotKeyCloseWindow (Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) || Game::HotKeyPress(Game::EVENT_DEFAULT_READY))

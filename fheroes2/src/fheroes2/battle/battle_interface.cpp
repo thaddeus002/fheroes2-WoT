@@ -109,10 +109,11 @@ namespace Battle
 	    const Sprite & sp1 = AGG::GetICN(ICN::DROPLISL, 10);
 	    const Sprite & sp2 = AGG::GetICN(ICN::DROPLISL, 12);
 	    const Sprite & sp3 = AGG::GetICN(ICN::DROPLISL, 11);
+	    const Sprite & sp4 = AGG::GetICN(ICN::TEXTBAK2, 0);
 	    const u16 ax = buttonPgUp.x;
 	    const u16 ah = buttonPgDn.y - (buttonPgUp.y + buttonPgUp.h);
 
-	    border.FBRedraw(AGG::GetICN(ICN::TEXTBAK2, 0));
+	    Dialog::FrameBorder::Redraw(sp4, Rect(0, 0, sp4.w(), sp4.h()), Display::Get(), border.GetRect());
 
 	    for(u16 ii = 0; ii < (ah / sp3.h()); ++ii)
     		sp3.Blit(ax, buttonPgUp.y + buttonPgUp.h + (sp3.h() * ii));
@@ -1339,7 +1340,7 @@ void Battle::Interface::RedrawKilled(void)
 
 void Battle::Interface::RedrawBorder(void)
 {
-    border.FBRedraw();
+    Dialog::FrameBorder::RedrawRegular(border.GetRect());
 }
 
 void Battle::Interface::RedrawPocketControls(void) const
@@ -4229,7 +4230,8 @@ void Battle::PopupDamageInfo::Redraw(u16 maxw, u16 maxh)
 	if(rect.x != tx || rect.y != ty || area.w != tw || area.h != th)
 	    SetPosition(tx, ty, tw, th);
 
-	Dialog::FrameBorder::FBRedraw(AGG::GetICN(ICN::CELLWIN, 1));
+	const Sprite & sf = AGG::GetICN(ICN::CELLWIN, 1);
+	Dialog::FrameBorder::Redraw(sf, Rect(0, 0, sf.w(), sf.h()), Display::Get(), GetRect());
 
 	text1.Blit(area.x, area.y);
 	text2.Blit(area.x, area.y + area.h/2);

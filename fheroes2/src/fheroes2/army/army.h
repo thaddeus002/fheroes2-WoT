@@ -89,7 +89,7 @@ public:
     void		JoinStrongest(Troops &, bool);
     void		KeepOnlyWeakest(Troops &, bool);
 
-    void		DrawMons32LineWithScoute(s16, s16, u16, u8, u8, u8) const;
+    void		DrawMons32LineWithScoute(s16, s16, u16, u8, u8, u8, bool) const;
     void		SplitTroopIntoFreeSlots(const Troop &, u8 slots);
 };
 
@@ -113,7 +113,7 @@ public:
 
     static void		DrawMons32Line(const Troops &, s16, s16, u16, u8 = 0, u8 = 0);
     static void		DrawMons32LineWithScoute(const Troops &, s16, s16, u16, u8, u8, u8);
-
+    static void		DrawMons32LineShort(const Troops &, s16, s16, u16, u8, u8);
 
     Army(HeroBase* s = NULL);
     Army(const Maps::Tiles &);
