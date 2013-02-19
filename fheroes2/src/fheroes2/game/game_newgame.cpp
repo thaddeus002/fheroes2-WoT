@@ -76,6 +76,7 @@ Game::menu_t Game::NewCampain(void)
     return Game::NEWGAME;
 }
 
+#ifdef NETWORK_ENABLE
 Game::menu_t Game::NewNetwork(void)
 {
     Settings & conf = Settings::Get();
@@ -129,6 +130,7 @@ Game::menu_t Game::NewNetwork(void)
 
     return Game::MAINMENU;
 }
+#endif
 
 Game::menu_t Game::NewGame(void)
 {
@@ -268,12 +270,14 @@ Game::menu_t Game::NewMulti(void)
 	if(le.MousePressRight(buttonHotSeat)) Dialog::Message(_("Hot Seat"), _("Play a Hot Seat game, where 2 to 4 players play around the same computer, switching into the 'Hot Seat' when it is their turn."), Font::BIG);
 	if(le.MousePressRight(buttonCancelGame)) Dialog::Message(_("Cancel"), _("Cancel back to the main menu."), Font::BIG);
 
+#ifdef NETWORK_ENABLE
 	if(buttonNetwork.isEnable())
 	{
 	    le.MousePressLeft(buttonNetwork) ? buttonNetwork.PressDraw() : buttonNetwork.ReleaseDraw();
 	    if(le.MouseClickLeft(buttonNetwork) || HotKeyPress(EVENT_BUTTON_NETWORK)) return NEWNETWORK;
 	    if(le.MousePressRight(buttonNetwork)) Dialog::Message(_("Network"), _("Play a network game, where 2 players use their own computers connected through a LAN (Local Area Network)."), Font::BIG);
 	}
+#endif
     }
 
     return QUITGAME;

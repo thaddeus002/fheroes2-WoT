@@ -40,7 +40,6 @@
 #include "visit.h"
 #include "battle.h"
 #include "heroes.h"
-#include "game_focus.h"
 #include "game_interface.h"
 #include "game_static.h"
 #include "ai.h"
@@ -1376,8 +1375,8 @@ void RedrawGameAreaAndHeroAttackMonster(Heroes & hero, s32 dst)
     {
 	Interface::Basic & I = Interface::Basic::Get();
         Cursor::Get().Hide();
-	I.gameArea.SetCenter(hero.GetCenter());
-	GameFocus::SetRedraw();
+	I.GetGameArea().SetCenter(hero.GetCenter());
+	I.RedrawFocus();
 	I.Redraw();
         Cursor::Get().Show();
 	// force flip, for monster attack show sprite

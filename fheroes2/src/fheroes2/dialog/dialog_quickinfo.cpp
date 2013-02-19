@@ -30,7 +30,6 @@
 #include "interface_gamearea.h"
 #include "game_interface.h"
 #include "cursor.h"
-#include "game_focus.h"
 #include "world.h"
 #include "settings.h"
 #include "kingdom.h"
@@ -339,7 +338,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 
     // image box
     const Sprite &box = AGG::GetICN(qwikinfo, 0);
-    const Interface::GameArea & gamearea = Interface::GameArea::Get();
+    const Interface::GameArea & gamearea = Interface::Basic::Get().GetGameArea();
     const Rect ar(BORDERWIDTH, BORDERWIDTH, gamearea.GetArea().w, gamearea.GetArea().h);
 
     LocalEvent & le = LocalEvent::Get();
@@ -373,7 +372,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 
     std::string name_object;
 
-    const Heroes* from_hero = GameFocus::GetHeroes();
+    const Heroes* from_hero = Interface::GetFocusHeroes();
     const Kingdom & kingdom = world.GetKingdom(settings.CurrentColor());
     u8 scoute = from_hero ? from_hero->CanScouteTile(tile.GetIndex()) : 0;
     const bool & show = settings.ExtWorldShowVisitedContent();
@@ -545,7 +544,7 @@ void Dialog::QuickInfo(const Castle & castle)
 
     // image box
     const Sprite &box = AGG::GetICN(qwiktown, 0);
-    const Interface::GameArea & gamearea = Interface::GameArea::Get();
+    const Interface::GameArea & gamearea = Interface::Basic::Get().GetGameArea();
     const Rect ar(BORDERWIDTH, BORDERWIDTH, gamearea.GetArea().w, gamearea.GetArea().h);
 
     LocalEvent & le = LocalEvent::Get();
@@ -642,7 +641,7 @@ void Dialog::QuickInfo(const Castle & castle)
     u8 count = castle.GetArmy().GetCount();
     const Settings & conf = Settings::Get();
 
-    const Heroes* from_hero = GameFocus::GetHeroes();
+    const Heroes* from_hero = Interface::GetFocusHeroes();
     const Heroes* guardian = castle.GetHeroes().Guard();
 
     // draw guardian portrait
@@ -708,7 +707,7 @@ void Dialog::QuickInfo(const Heroes & hero)
 
     // image box
     const Sprite &box = AGG::GetICN(qwikhero, 0);
-    const Interface::GameArea & gamearea = Interface::GameArea::Get();
+    const Interface::GameArea & gamearea = Interface::Basic::Get().GetGameArea();
     const Rect ar(BORDERWIDTH, BORDERWIDTH, gamearea.GetArea().w, gamearea.GetArea().h);
 
     LocalEvent & le = LocalEvent::Get();
@@ -888,7 +887,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     text.Blit(dst_pt);
 
     // draw monster sprite in one string
-    const Heroes* from_hero = GameFocus::GetHeroes();
+    const Heroes* from_hero = Interface::GetFocusHeroes();
 
     if(hero.isFriends(conf.CurrentColor()))
 	// show all

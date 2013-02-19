@@ -28,19 +28,22 @@
 
 namespace Interface
 {
+    class Basic;
+
     class ButtonsArea : public BorderWindow
     {
     public:
-    	static ButtonsArea & Get(void);
+	ButtonsArea(Basic &);
 
 	void SetPos(s16, s16);
 	void SavePosition(void);
+	void SetRedraw(void) const;
 
 	void Redraw(void);
 	void QueueEventProcessing(Game::menu_t &);
 
     private:
-	ButtonsArea();
+	Basic & interface;
 
 	Button	buttonNextHero;
 	Button	buttonMovement;

@@ -52,11 +52,12 @@ namespace Maps { class Tiles; }
 
 namespace Interface
 {
+    class Basic;
+
     class GameArea
     {
     public:
-
-	static GameArea & Get(void);
+	GameArea(Basic &);
 	void Build(void);
 
 	const Rect & GetArea(void) const;
@@ -70,6 +71,7 @@ namespace Interface
 
 	void SetCenter(s16, s16);
 	void SetCenter(const Point &);
+	void SetRedraw(void) const;
 
 	void Redraw(Surface & dst, u8) const;
 	void Redraw(Surface & dst, u8, const Rect &) const;
@@ -81,13 +83,14 @@ namespace Interface
         void QueueEventProcessing(void);
         
 	s32 GetIndexFromMousePoint(const Point & pt) const;
+	Rect RectFixed(Point & dst, const u16 rw, const u16 rh) const;
 
 	static void GenerateUltimateArtifactAreaSurface(const s32, Surface &);
-	static Rect RectFixed(Point & dst, const u16 rw, const u16 rh);
 
     private:
 	void SetAreaPosition(s16, s16, u16, u16);
-	GameArea();
+
+	Basic & interface;
 
 	Rect	areaPosition;
 	Rect	rectMaps;

@@ -28,10 +28,12 @@
 
 namespace Interface
 {
+    class Basic;
+
     class ControlPanel : protected Rect
     {
     public:
-    	static ControlPanel & Get(void);
+	ControlPanel(Basic &);
 
 	void SetPos(s16, s16);
 	void Redraw(void);
@@ -41,7 +43,7 @@ namespace Interface
 	const Rect & GetArea(void);
 
     private:
-	ControlPanel();
+	Basic & interface;
 
 	Surface btn_radr;
 	Surface btn_icon;

@@ -139,11 +139,11 @@ void AI::KingdomTurn(Kingdom & kingdom)
 
     if(! Settings::Get().MusicMIDI()) AGG::PlayMusic(MUS::COMPUTER);
 
-    Interface::StatusWindow *status = Interface::NoGUI() ? NULL : &Interface::StatusWindow::Get();
+    Interface::StatusWindow & status = Interface::Basic::Get().GetStatusWindow();
     AIKingdom & ai = AIKingdoms::Get(color);
 
     // turn indicator
-    if(status) status->RedrawTurnProgress(0);
+    status.RedrawTurnProgress(0);
 
     // scan map
     ai.scans.clear();
@@ -172,7 +172,7 @@ void AI::KingdomTurn(Kingdom & kingdom)
     }
 
     // turn indicator
-    if(status) status->RedrawTurnProgress(1);
+    status.RedrawTurnProgress(1);
 
     // castles AI turn
     std::for_each(castles.begin(), castles.end(), AICastleTurn);
@@ -273,7 +273,7 @@ void AI::KingdomTurn(Kingdom & kingdom)
     }
 
     // turn indicator
-    if(status) status->RedrawTurnProgress(2);
+    status.RedrawTurnProgress(2);
 
     // heroes turns
     std::for_each(heroes.begin(), heroes.end(), std::ptr_fun(&AIHeroesTurn));
@@ -282,7 +282,7 @@ void AI::KingdomTurn(Kingdom & kingdom)
     std::for_each(heroes.begin(), heroes.end(), std::ptr_fun(&AIHeroesEnd));
 
     // turn indicator
-    if(status) status->RedrawTurnProgress(9);
+    status.RedrawTurnProgress(9);
 
     DEBUG(DBG_AI, DBG_INFO, Color::String(color) << " moved");
 }

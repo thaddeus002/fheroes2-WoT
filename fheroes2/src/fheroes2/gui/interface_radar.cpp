@@ -53,7 +53,7 @@
 u32 GetPaletteIndexFromGround(const u16 ground);
 
 /* constructor */
-Interface::Radar::Radar() : BorderWindow(Rect(0, 0, RADARWIDTH, RADARWIDTH)), hide(true)
+Interface::Radar::Radar(Basic & basic) : BorderWindow(Rect(0, 0, RADARWIDTH, RADARWIDTH)), interface(basic), hide(true)
 {
 }
 
@@ -95,19 +95,12 @@ void Interface::Radar::Build(void)
 
     Generate();
 
-    const Size & rectMaps = Interface::GameArea::Get().GetRectMaps();
+    const Size & rectMaps = interface.GetGameArea().GetRectMaps();
     const u16 & sw = static_cast<u16>(rectMaps.w * (area.w / static_cast<float>(world.w())));
     const u16 & sh = static_cast<u16>(rectMaps.h * (area.h / static_cast<float>(world.h())));
     cursorArea.Set(sw, sh);
     Cursor::DrawCursor(cursorArea, RADARCOLOR);
     cursorArea.Move(area.x, area.y);
-}
-
-Interface::Radar & Interface::Radar::Get(void)
-{
-    static Radar radar0;
-
-    return radar0;
 }
 
 /* generate mini maps */
@@ -143,6 +136,11 @@ void Interface::Radar::Generate(void)
 void Interface::Radar::SetHide(bool f)
 {
     hide = f;
+}
+
+void Interface::Radar::SetRedraw(void) const
+{
+     interface.SetRedraw(REDRAW_RADAR);
 }
 
 void Interface::Radar::Redraw(void)
@@ -244,7 +242,7 @@ void Interface::Radar::RedrawCursor(void)
     if(! conf.ExtGameHideInterface() || conf.ShowRadar())
     {
 	const Rect & area = GetArea();
-	const Rect & rectMaps = Interface::GameArea::Get().GetRectMaps();
+	const Rect & rectMaps = interface.GetGameArea().GetRectMaps();
 
 	const u16 & sw = static_cast<u16>(rectMaps.w * (area.w / static_cast<float>(world.w())));
 	const u16 & sh = static_cast<u16>(rectMaps.h * (area.h / static_cast<float>(world.h())));
@@ -299,7 +297,7 @@ u32 GetPaletteIndexFromGround(const u16 ground)
 
 void Interface::Radar::QueueEventProcessing(void)
 {
-    Interface::GameArea & gamearea = Interface::GameArea::Get();
+    GameArea & gamearea = interface.GetGameArea();
     Settings & conf = Settings::Get();
     LocalEvent & le = LocalEvent::Get();
     const Rect & area = GetArea();
@@ -327,7 +325,7 @@ void Interface::Radar::QueueEventProcessing(void)
     		{
 		    Cursor::Get().Hide();
         	    RedrawCursor();
-        	    Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
+        	    gamearea.SetRedraw();
     		}
 	    }
 	}

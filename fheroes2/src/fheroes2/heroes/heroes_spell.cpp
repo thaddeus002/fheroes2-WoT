@@ -29,7 +29,6 @@
 #include "castle.h"
 #include "spell.h"
 #include "settings.h"
-#include "game_focus.h"
 #include "game_interface.h"
 #include "interface_list.h"
 #include "heroes.h"
@@ -166,8 +165,8 @@ bool HeroesTownGate(Heroes & hero, const Castle* castle)
 	Cursor::Get().Hide();
 	hero.Move2Dest(dst);
 
-	I.gameArea.SetCenter(hero.GetCenter());
-	GameFocus::SetRedraw();
+	I.GetGameArea().SetCenter(hero.GetCenter());
+	I.RedrawFocus();
 	I.Redraw();
 
 	AGG::PlaySound(M82::KILLFADE);
@@ -294,8 +293,8 @@ bool ActionSpellDimensionDoor(Heroes & hero)
 
     // center hero
     cursor.Hide();
-    I.gameArea.SetCenter(hero.GetCenter());
-    GameFocus::SetRedraw();
+    I.GetGameArea().SetCenter(hero.GetCenter());
+    I.RedrawFocus();
     I.Redraw();
 
     const s32 src = hero.GetIndex();
@@ -313,8 +312,8 @@ bool ActionSpellDimensionDoor(Heroes & hero)
 	cursor.Hide();
 	hero.Move2Dest(dst, true);
 
-	I.gameArea.SetCenter(hero.GetCenter());
-	GameFocus::SetRedraw();
+	I.GetGameArea().SetCenter(hero.GetCenter());
+	I.RedrawFocus();
 	I.Redraw();
 
 	AGG::PlaySound(M82::KILLFADE);
@@ -354,8 +353,8 @@ bool ActionSpellTownGate(Heroes & hero)
 
     // center hero
     cursor.Hide();
-    I.gameArea.SetCenter(hero.GetCenter());
-    GameFocus::SetRedraw();
+    I.GetGameArea().SetCenter(hero.GetCenter());
+    I.RedrawFocus();
     I.Redraw();
 
     if(!castle)

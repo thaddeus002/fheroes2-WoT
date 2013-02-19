@@ -29,7 +29,6 @@
 #include "cursor.h"
 #include "world.h"
 #include "settings.h"
-#include "game_focus.h"
 #include "kingdom.h"
 #include "game_interface.h"
 #include "interface_icons.h"
@@ -148,19 +147,19 @@ void Interface::CastleIcons::RedrawBackground(const Point & pos)
 
 void Interface::CastleIcons::ActionCurrentUp(void)
 {
-    GameFocus::Set(GetCurrent());
+    Interface::Basic::Get().SetFocus(GetCurrent());
 }
 
 void Interface::CastleIcons::ActionCurrentDn(void)
 {
-    GameFocus::Set(GetCurrent());
+    Interface::Basic::Get().SetFocus(GetCurrent());
 }
 
 void Interface::CastleIcons::ActionListDoubleClick(CASTLE & item)
 {
     if(item)
     {
-        Game::OpenCastleDialog(item);
+        Game::OpenCastleDialog(*item);
 
 	// for QVGA: auto hide icons after click
 	if(Settings::Get().QVGA()) Settings::Get().SetShowIcons(false);
@@ -171,8 +170,10 @@ void Interface::CastleIcons::ActionListSingleClick(CASTLE & item)
 {
     if(item)
     {
-	GameFocus::Set(item);
-	GameFocus::SetRedraw();
+	Interface::Basic & I = Interface::Basic::Get();
+
+	I.SetFocus(item);
+	I.RedrawFocus();
 
 	// for QVGA: auto hide icons after click
 	if(Settings::Get().QVGA()) Settings::Get().SetShowIcons(false);
@@ -236,12 +237,12 @@ void Interface::HeroesIcons::RedrawBackground(const Point & pos)
 
 void Interface::HeroesIcons::ActionCurrentUp(void)
 {
-    GameFocus::Set(GetCurrent());
+    Interface::Basic::Get().SetFocus(GetCurrent());
 }
 
 void Interface::HeroesIcons::ActionCurrentDn(void)
 {
-    GameFocus::Set(GetCurrent());
+    Interface::Basic::Get().SetFocus(GetCurrent());
 }
 
 void Interface::HeroesIcons::ActionListDoubleClick(HEROES & item)
@@ -249,9 +250,12 @@ void Interface::HeroesIcons::ActionListDoubleClick(HEROES & item)
     if(item)
     {
 	if(item->Modes(Heroes::GUARDIAN))
-	    Game::OpenCastleDialog(world.GetCastle(item->GetIndex()));
+	{
+	    Castle* castle = world.GetCastle(item->GetIndex());
+	    if(castle) Game::OpenCastleDialog(*castle);
+	}
 	else
-	    Game::OpenHeroesDialog(item);
+	    Game::OpenHeroesDialog(*item);
 
 	// for QVGA: auto hide icons after click
 	if(Settings::Get().QVGA()) Settings::Get().SetShowIcons(false);
@@ -262,8 +266,10 @@ void Interface::HeroesIcons::ActionListSingleClick(HEROES & item)
 {
     if(item)
     {
-	GameFocus::Set(item);
-	GameFocus::SetRedraw();
+	Interface::Basic & I = Interface::Basic::Get();
+
+	I.SetFocus(item);
+	I.RedrawFocus();
 
 	// for QVGA: auto hide icons after click
 	if(Settings::Get().QVGA()) Settings::Get().SetShowIcons(false);
@@ -309,17 +315,11 @@ void Interface::HeroesIcons::SetPos(s16 px, s16 py)
 }
 
 /* Interface::IconsPanel */
-Interface::IconsPanel::IconsPanel() : BorderWindow(Rect(0, 0, 144, 128)), icons(4),
-    castleIcons(icons, sfMarker), heroesIcons(icons, sfMarker)
+Interface::IconsPanel::IconsPanel(Basic & basic) : BorderWindow(Rect(0, 0, 144, 128)),
+    interface(basic), icons(4), castleIcons(icons, sfMarker), heroesIcons(icons, sfMarker)
 {
     sfMarker.Set(ICONS_CURSOR_WIDTH, ICONS_CURSOR_HEIGHT, false);
     Cursor::DrawCursor(sfMarker, ICONS_CURSOR_COLOR, true);
-}
-
-Interface::IconsPanel & Interface::IconsPanel::Get(void)
-{
-    static IconsPanel iconsPanel;
-    return iconsPanel;
 }
 
 u8 Interface::IconsPanel::CountIcons(void) const
@@ -330,6 +330,23 @@ u8 Interface::IconsPanel::CountIcons(void) const
 void Interface::IconsPanel::SavePosition(void)
 {
     Settings::Get().SetPosIcons(GetRect());
+}
+
+void Interface::IconsPanel::SetRedraw(icons_t icons) const
+{
+    switch(icons)
+    {
+	case ICON_HEROES:	interface.SetRedraw(REDRAW_HEROES); break;
+	case ICON_CASTLES:	interface.SetRedraw(REDRAW_CASTLES); break;
+	default: break;
+    }
+
+    interface.SetRedraw(REDRAW_ICONS);
+}
+
+void Interface::IconsPanel::SetRedraw(void) const
+{
+    SetRedraw(ICON_ANY);
 }
 
 void Interface::IconsPanel::SetPos(s16 ox, s16 oy)
@@ -374,8 +391,8 @@ void Interface::IconsPanel::QueueEventProcessing(void)
 	// move border window
 	BorderWindow::QueueEventProcessing())
     {
-	GameFocus::SetRedraw();
-	Interface::Basic::Get().SetRedraw(REDRAW_ICONS);
+	interface.RedrawFocus();
+	SetRedraw();
     }
     else
     if(heroesIcons.QueueEventProcessing())
@@ -383,7 +400,7 @@ void Interface::IconsPanel::QueueEventProcessing(void)
 	if(heroesIcons.isSelected())
 	    castleIcons.Unselect();
 
-	Interface::Basic::Get().SetRedraw(REDRAW_ICONS);
+	SetRedraw();
     }
     else
     if(castleIcons.QueueEventProcessing())
@@ -391,7 +408,7 @@ void Interface::IconsPanel::QueueEventProcessing(void)
 	if(castleIcons.isSelected())
 	    heroesIcons.Unselect();
 
-	Interface::Basic::Get().SetRedraw(REDRAW_ICONS);
+	SetRedraw();
     }
 }
 
@@ -409,15 +426,17 @@ void Interface::IconsPanel::Select(const Castle & cs)
 
 void Interface::IconsPanel::ResetIcons(icons_t icons)
 {
+    Kingdom & kingdom = world.GetKingdom(Settings::Get().CurrentColor());
+
     if(icons & ICON_HEROES)
     {
-	heroesIcons.SetListContent(world.GetKingdom(Settings::Get().CurrentColor()).GetHeroes());
+	heroesIcons.SetListContent(kingdom.GetHeroes());
 	heroesIcons.Reset();
     }
 
     if(icons & ICON_CASTLES)
     {
-	castleIcons.SetListContent(world.GetKingdom(Settings::Get().CurrentColor()).GetCastles());
+	castleIcons.SetListContent(kingdom.GetCastles());
 	castleIcons.Reset();
     }
 }

@@ -39,7 +39,6 @@
 #include "pairs.h"
 #include "game_over.h"
 #include "resource.h"
-#include "game_focus.h"
 #include "world.h"
 #include "ai.h"
 

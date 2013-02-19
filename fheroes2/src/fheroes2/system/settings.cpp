@@ -827,10 +827,8 @@ bool Settings::ShowStatus(void) const { return opt_global.Modes(GLOBAL_SHOWSTATU
 
 /* unicode support */
 bool Settings::Unicode(void) const { return opt_global.Modes(GLOBAL_USEUNICODE); }
-
+/* pocketpc mode */
 bool Settings::PocketPC(void) const { return opt_global.Modes(GLOBAL_POCKETPC); }
-bool Settings::NetworkDedicatedServer(void) const { return opt_global.Modes(GLOBAL_DEDICATEDSERVER); }
-bool Settings::NetworkLocalClient(void) const { return opt_global.Modes(GLOBAL_LOCALCLIENT); }
 
 /* get video mode */
 const Size & Settings::VideoMode(void) const { return video_mode; }
@@ -1068,16 +1066,6 @@ void Settings::SetShowButtons(bool f)
 void Settings::SetShowStatus(bool f)
 {
     f ? opt_global.SetModes(GLOBAL_SHOWSTATUS) : opt_global.ResetModes(GLOBAL_SHOWSTATUS);
-}
-
-void Settings::SetNetworkLocalClient(bool f)
-{
-    f ? opt_global.SetModes(GLOBAL_LOCALCLIENT) : opt_global.ResetModes(GLOBAL_LOCALCLIENT);
-}
-
-void Settings::SetNetworkDedicatedServer(bool f)
-{
-    f ? opt_global.SetModes(GLOBAL_DEDICATEDSERVER) : opt_global.ResetModes(GLOBAL_DEDICATEDSERVER);
 }
 
 bool Settings::CanChangeInGame(u32 f) const

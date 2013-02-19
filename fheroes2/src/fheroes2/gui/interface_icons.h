@@ -91,13 +91,17 @@ namespace Interface
 	void RedrawBackground(const Point &);
     };
 
+    class Basic;
+
     class IconsPanel : public BorderWindow
     {
     public:
-	static IconsPanel & Get(void);
+	IconsPanel(Basic &);
     
 	void SetPos(s16, s16);
 	void SavePosition(void);
+	void SetRedraw(void) const;
+	void SetRedraw(icons_t) const;
 
 	void Redraw(void);
 	void QueueEventProcessing(void);
@@ -115,7 +119,7 @@ namespace Interface
 	void SetCurrentVisible(void);
 
     private:
-	IconsPanel();
+	Basic & interface;
 
 	u8 icons;
         Surface sfMarker;

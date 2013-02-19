@@ -29,7 +29,7 @@
 #include "tinyconfig.h"
 #include "agg.h"
 #include "settings.h"
-#include "game.h"
+#include "game_interface.h"
 
 namespace Game
 {
@@ -307,11 +307,11 @@ void Game::KeyboardGlobalFilter(int sym, u16 mod)
     else
     if(sym == key_events[EVENT_SYSTEM_DEBUG1])
     {
-	Game::EventDebug1();
+	Interface::Basic::Get().EventDebug1();
     }
     else
     if(sym == key_events[EVENT_SYSTEM_DEBUG2])
     {
-	Game::EventDebug2();
+	Interface::Basic::Get().EventDebug2();
     }
 }

@@ -25,7 +25,7 @@
 #include "game_interface.h"
 #include "interface_cpanel.h"
 
-Interface::ControlPanel::ControlPanel() : alpha(130)
+Interface::ControlPanel::ControlPanel(Basic & basic) : interface(basic), alpha(130)
 {
     w = 180;
     h = 36;
@@ -59,12 +59,6 @@ void Interface::ControlPanel::ResetTheme(void)
     btn_bttn.SetAlpha(alpha);
     btn_stat.SetAlpha(alpha);
     btn_quit.SetAlpha(alpha);
-}
-
-Interface::ControlPanel & Interface::ControlPanel::Get(void)
-{
-    static ControlPanel cp;
-    return cp;
 }
 
 const Rect & Interface::ControlPanel::GetArea(void)
@@ -104,13 +98,13 @@ void Interface::ControlPanel::QueueEventProcessing(Game::menu_t & ret)
 {
     LocalEvent & le = LocalEvent::Get();
 
-    if(le.MouseClickLeft(rt_radr))	Game::EventSwitchShowRadar();
+    if(le.MouseClickLeft(rt_radr))	interface.EventSwitchShowRadar();
     else
-    if(le.MouseClickLeft(rt_icon))	Game::EventSwitchShowIcons();
+    if(le.MouseClickLeft(rt_icon))	interface.EventSwitchShowIcons();
     else
-    if(le.MouseClickLeft(rt_bttn))	Game::EventSwitchShowButtons();
+    if(le.MouseClickLeft(rt_bttn))	interface.EventSwitchShowButtons();
     else
-    if(le.MouseClickLeft(rt_stat))	Game::EventSwitchShowStatus();
+    if(le.MouseClickLeft(rt_stat))	interface.EventSwitchShowStatus();
     else
-    if(le.MouseClickLeft(rt_quit))	Game::EventEndTurn(ret);
+    if(le.MouseClickLeft(rt_quit))	interface.EventEndTurn(ret);
 }

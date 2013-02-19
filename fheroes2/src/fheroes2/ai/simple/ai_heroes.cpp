@@ -681,28 +681,25 @@ void AI::HeroesTurn(Heroes & hero)
             (hero.Modes(AI::HEROES_WAITING) ? "WAITING," : "") <<
             (hero.Modes(AI::HEROES_STUPID) ? "STUPID" : ""));
 
-    Interface::StatusWindow *status = Interface::NoGUI() ? NULL : &Interface::StatusWindow::Get();
+    Interface::StatusWindow & status = Interface::Basic::Get().GetStatusWindow();
 
     while(hero.MayStillMove() &&
 	    !hero.Modes(AI::HEROES_WAITING|AI::HEROES_STUPID))
     {
         // turn indicator
-        if(status) status->RedrawTurnProgress(3);
-        //if(status) status->RedrawTurnProgress(4);
+        status.RedrawTurnProgress(3);
 
         // get task for heroes
         AI::HeroesGetTask(hero);
 
         // turn indicator
-        if(status) status->RedrawTurnProgress(5);
-        //if(status) status->RedrawTurnProgress(6);
+        status.RedrawTurnProgress(5);
 
         // heroes AI turn
         AI::HeroesMove(hero);
 
 	// turn indicator
-        if(status) status->RedrawTurnProgress(7);
-        //if(status) status->RedrawTurnProgress(8);
+        status.RedrawTurnProgress(7);
     }
 
     DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", end");

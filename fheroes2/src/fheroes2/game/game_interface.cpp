@@ -28,18 +28,10 @@
 #include "mp2.h"
 #include "world.h"
 #include "dialog.h"
-#include "game_focus.h"
 #include "game_interface.h"
 
-bool Interface::NoGUI(void)
-{
-    const Settings & conf = Settings::Get();
-    return conf.NetworkDedicatedServer();
-}
-
-Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
-    iconsPanel(IconsPanel::Get()), buttonsArea(ButtonsArea::Get()),
-    statusWindow(StatusWindow::Get()), controlPanel(ControlPanel::Get()), redraw(0)
+Interface::Basic::Basic() : gameArea(*this), radar(*this),
+	iconsPanel(*this), buttonsArea(*this), statusWindow(*this), controlPanel(*this), redraw(0)
 {
     Settings & conf = Settings::Get().Get();
     const Display & display = Display::Get();
@@ -53,6 +45,36 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
     scrollBottom = Rect(0, display.h() - scroll_width, display.w(), scroll_width);
 
     system_info.Set(Font::YELLOW_SMALL);
+}
+
+Interface::GameArea & Interface::Basic::GetGameArea(void)
+{
+    return gameArea;
+}
+
+Interface::Radar & Interface::Basic::GetRadar(void)
+{
+    return radar;
+}
+
+Interface::IconsPanel & Interface::Basic::GetIconsPanel(void)
+{
+    return iconsPanel;
+}
+
+Interface::ButtonsArea & Interface::Basic::GetButtonsArea(void)
+{
+    return buttonsArea;
+}
+
+Interface::StatusWindow & Interface::Basic::GetStatusWindow(void)
+{
+    return statusWindow;
+}
+
+Interface::ControlPanel & Interface::Basic::GetControlPanel(void)
+{
+    return controlPanel;
 }
 
 void Interface::Basic::SetHideInterface(bool f)
@@ -106,22 +128,22 @@ Interface::Basic & Interface::Basic::Get(void)
     return basic;
 }
 
-const Rect & Interface::Basic::GetAreaScrollLeft(void) const
+const Rect & Interface::Basic::GetScrollLeft(void) const
 {
     return scrollLeft;
 }
 
-const Rect & Interface::Basic::GetAreaScrollRight(void) const
+const Rect & Interface::Basic::GetScrollRight(void) const
 {
     return scrollRight;
 }
 
-const Rect & Interface::Basic::GetAreaScrollTop(void) const
+const Rect & Interface::Basic::GetScrollTop(void) const
 {
     return scrollTop;
 }
 
-const Rect & Interface::Basic::GetAreaScrollBottom(void) const
+const Rect & Interface::Basic::GetScrollBottom(void) const
 {
     return scrollBottom;
 }
@@ -192,8 +214,8 @@ void Interface::Basic::Redraw(u8 force)
 	    cursor.SetThemes(cursor.Themes(), true);
 	    cursor.Show();
 
-	    if(GameFocus::Type() != GameFocus::UNSEL)
-		AGG::PlayMusic(MUS::FromGround(world.GetTiles(GameFocus::GetCenter()).GetGround()));
+	    if(GetFocusType() != GameFocus::UNSEL)
+		AGG::PlayMusic(MUS::FromGround(world.GetTiles(GetFocusCenter()).GetGround()));
 	    Game::EnvironmentSoundMixer();
 	}
 

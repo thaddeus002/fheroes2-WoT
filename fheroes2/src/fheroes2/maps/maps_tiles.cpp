@@ -32,8 +32,7 @@
 #include "heroes.h"
 #include "castle.h"
 #include "maps.h"
-#include "interface_gamearea.h"
-#include "game_focus.h"
+#include "game_interface.h"
 #include "mounts.h"
 #include "trees.h"
 #include "objxloc.h"
@@ -1403,7 +1402,7 @@ void Maps::Tiles::Remove(u32 uniq)
 
 void Maps::Tiles::RedrawTile(Surface & dst) const
 {
-    const Interface::GameArea & area = Interface::GameArea::Get();
+    const Interface::GameArea & area = Interface::Basic::Get().GetGameArea();
     const Point mp = Maps::GetPoint(GetIndex());
 
     if(area.GetRectMaps() & mp)
@@ -1412,7 +1411,7 @@ void Maps::Tiles::RedrawTile(Surface & dst) const
 
 void Maps::Tiles::RedrawBottom(Surface & dst, bool skip_objs) const
 {
-    const Interface::GameArea & area = Interface::GameArea::Get();
+    const Interface::GameArea & area = Interface::Basic::Get().GetGameArea();
     const Point mp = Maps::GetPoint(GetIndex());
 
     if((area.GetRectMaps() & mp) &&
@@ -1449,7 +1448,7 @@ void Maps::Tiles::RedrawBottom(Surface & dst, bool skip_objs) const
 void Maps::Tiles::RedrawPassable(Surface & dst) const
 {
 #ifdef WITH_DEBUG
-    const Interface::GameArea & area = Interface::GameArea::Get();
+    const Interface::GameArea & area = Interface::Basic::Get().GetGameArea();
     const Point mp = Maps::GetPoint(GetIndex());
 
     if(area.GetRectMaps() & mp)
@@ -1488,7 +1487,7 @@ void Maps::Tiles::RedrawMonster(Surface & dst) const
 {
     const Settings & conf = Settings::Get();
     const Point mp = Maps::GetPoint(GetIndex());
-    const Interface::GameArea & area = Interface::GameArea::Get();
+    const Interface::GameArea & area = Interface::Basic::Get().GetGameArea();
     s32 dst_index = -1;
 
     if(!(area.GetRectMaps() & mp)) return;
@@ -1546,7 +1545,7 @@ void Maps::Tiles::RedrawMonster(Surface & dst) const
 void Maps::Tiles::RedrawBoat(Surface & dst) const
 {
     const Point mp = Maps::GetPoint(GetIndex());
-    const Interface::GameArea & area = Interface::GameArea::Get();
+    const Interface::GameArea & area = Interface::Basic::Get().GetGameArea();
 
     if(area.GetRectMaps() & mp)
     {
@@ -1597,7 +1596,7 @@ bool SkipRedrawTileBottom4Hero(const Maps::TilesAddon & ta, const u16 & passable
 
 void Maps::Tiles::RedrawBottom4Hero(Surface & dst) const
 {
-    const Interface::GameArea & area = Interface::GameArea::Get();
+    const Interface::GameArea & area = Interface::Basic::Get().GetGameArea();
     const Point mp = Maps::GetPoint(GetIndex());
 
     if((area.GetRectMaps() & mp) &&
@@ -1628,7 +1627,7 @@ void Maps::Tiles::RedrawBottom4Hero(Surface & dst) const
 
 void Maps::Tiles::RedrawTop(Surface & dst, const TilesAddon* skip) const
 {
-    const Interface::GameArea & area = Interface::GameArea::Get();
+    const Interface::GameArea & area = Interface::Basic::Get().GetGameArea();
     const Point mp = Maps::GetPoint(GetIndex());
 
     if(!(area.GetRectMaps() & mp)) return;
@@ -1685,12 +1684,11 @@ void Maps::Tiles::RedrawTop(Surface & dst, const TilesAddon* skip) const
 
 void Maps::Tiles::RedrawTop4Hero(Surface & dst, bool skip_ground) const
 {
-    const Interface::GameArea & area = Interface::GameArea::Get();
+    const Interface::GameArea & area = Interface::Basic::Get().GetGameArea();
     const Point mp = Maps::GetPoint(GetIndex());
 
-    if(!(area.GetRectMaps() & mp)) return;
-
-    if(!addons_level2.empty())
+    if((area.GetRectMaps() & mp) &&
+	!addons_level2.empty())
     {
 	for(Addons::const_iterator
 	    it = addons_level2.begin(); it != addons_level2.end(); ++it)
@@ -2527,7 +2525,7 @@ void Maps::Tiles::ClearFog(u8 colors)
 
 void Maps::Tiles::RedrawFogs(Surface & dst, u8 color) const
 {
-    const Interface::GameArea & area = Interface::GameArea::Get();
+    const Interface::GameArea & area = Interface::Basic::Get().GetGameArea();
     const Point mp = Maps::GetPoint(GetIndex());
 
     // get direction around foga

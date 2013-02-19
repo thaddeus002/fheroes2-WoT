@@ -38,7 +38,6 @@
 #include "game_over.h"
 #include "game_io.h"
 #include "game_static.h"
-#include "game_focus.h"
 #include "monster.h"
 
 static u16 SAV2ID = 0xFF02;

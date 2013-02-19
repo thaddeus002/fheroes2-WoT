@@ -159,7 +159,8 @@ void ShowStandardDialog(const Puzzle & pzl, const Surface & sf)
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
 
-    const Rect & radar_pos = Interface::Radar::Get().GetArea();
+    Interface::Radar & radar = Interface::Basic::Get().GetRadar();
+    const Rect & radar_pos = radar.GetArea();
     bool evil_interface = Settings::Get().ExtGameEvilInterface();
 
     Background back(BORDERWIDTH, BORDERWIDTH, sf.w(), sf.h());
@@ -185,7 +186,7 @@ void ShowStandardDialog(const Puzzle & pzl, const Surface & sf)
         if(le.MouseClickLeft(buttonExit) || HotKeyCloseWindow) break;
     }
 
-    Interface::Basic::Get().SetRedraw(REDRAW_RADAR);
+    radar.SetRedraw();
 
     cursor.Hide();
     back.Restore();
@@ -196,7 +197,7 @@ void ShowExtendedDialog(const Puzzle & pzl, const Surface & sf)
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
     const Settings & conf = Settings::Get();
-    const Rect & gameArea = Interface::Basic::Get().gameArea.GetArea();
+    const Rect & gameArea = Interface::Basic::Get().GetGameArea().GetArea();
 
     Dialog::FrameBorder frameborder(gameArea.x + (gameArea.w - sf.w() - BORDERWIDTH * 2) / 2,
 				    gameArea.y + (gameArea.h - sf.h() - BORDERWIDTH * 2) / 2,

@@ -346,9 +346,6 @@ public:
     bool ExtPocketDragDropScroll(void) const;
     bool ExtPocketLowResolution(void) const;
 
-    bool NetworkDedicatedServer(void) const;
-    bool NetworkLocalClient(void) const;
-
     const Size & VideoMode(void) const;
     void SetAutoVideoMode(void);
 
@@ -369,8 +366,6 @@ public:
     void SetShowIcons(bool);
     void SetShowButtons(bool);
     void SetShowStatus(bool);
-    void SetNetworkLocalClient(bool);
-    void SetNetworkDedicatedServer(bool);
     void SetMemoryLimit(u32);
     void SetAIMoveSpeed(u8);
     void SetScrollSpeed(u8);

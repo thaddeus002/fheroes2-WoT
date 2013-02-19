@@ -29,7 +29,6 @@
 #include "heroes.h"
 #include "race.h"
 #include "battle.h"
-#include "game_focus.h"
 #include "game_interface.h"
 #include "kingdom.h"
 #include "morale.h"
@@ -256,8 +255,10 @@ void BattleLose(Heroes &hero, const Battle::Result & res, bool attacker, Color::
     hero.FadeOut();
     hero.SetKillerColor(color);
     hero.SetFreeman(reason);
-    GameFocus::Reset(GameFocus::HEROES);
-    GameFocus::SetRedraw();
+
+    Interface::Basic & I = Interface::Basic::Get();
+    I.ResetFocus(GameFocus::HEROES);
+    I.RedrawFocus();
 }
 
 void AnimationRemoveObject(Maps::Tiles & tile)
@@ -266,7 +267,7 @@ void AnimationRemoveObject(Maps::Tiles & tile)
 
     if(NULL == addon) return;
 
-    const Interface::GameArea & gamearea = Interface::GameArea::Get();
+    const Interface::GameArea & gamearea = Interface::Basic::Get().GetGameArea();
     const Point & area = gamearea.GetMapsPos();
     const Rect & rect = gamearea.GetRectMaps();
     const Point pos = Maps::GetPoint(tile.GetIndex()) - rect;
@@ -351,7 +352,7 @@ void RecruitMonsterFromTile(Heroes & hero, Maps::Tiles & tile, const std::string
 	    if(Settings::Get().ExtHeroRecalculateMovement())
 		hero.RecalculateMovePoints();
 
-	    Interface::Basic::Get().SetRedraw(REDRAW_STATUS);
+	    Interface::Basic::Get().GetStatusWindow().SetRedraw();
 	}
     }
 }
@@ -371,7 +372,7 @@ void Heroes::Action(const s32 dst_index)
 
     if(MP2::isActionObject(object, isShipMaster()))
     {
-	Interface::Basic::Get().statusWindow.ResetTimer();
+	Interface::Basic::Get().GetStatusWindow().ResetTimer();
 	SetModes(ACTION);
     }
 
@@ -535,6 +536,8 @@ void ActionToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
     u32 join = 0;
     u8 reason = Army::GetJoinSolution(hero, tile, join);
 
+    Interface::StatusWindow & statusWindow = Interface::Basic::Get().GetStatusWindow();
+
     // free join
     if(1 == reason)
     {
@@ -546,7 +549,7 @@ void ActionToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
         if(Dialog::Message("Followers", message, Font::BIG, Dialog::YES | Dialog::NO) == Dialog::YES)
 	{
     	    hero.GetArmy().JoinTroop(troop);
-            Interface::Basic::Get().SetRedraw(REDRAW_STATUS);
+	    statusWindow.SetRedraw();
 	}
 	else
 	{
@@ -567,7 +570,7 @@ void ActionToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
             hero.GetArmy().JoinTroop(troop(), join);
             hero.GetKingdom().OddFundsResource(Funds(Resource::GOLD, gold));
-            Interface::Basic::Get().SetRedraw(REDRAW_STATUS);
+	    statusWindow.SetRedraw();
         }
         else
 	{
@@ -725,15 +728,18 @@ void ActionToCastle(Heroes & hero, const u8 & obj, const s32 & dst_index)
     Castle* castle = world.GetCastle(dst_index);
     const Settings & conf = Settings::Get();
 
-    if(! castle) return;
-
+    if(! castle)
+    {
+    	DEBUG(DBG_GAME, DBG_INFO, "castle not found " << dst_index);
+    }
+    else    
     if(hero.GetColor() == castle->GetColor() ||
 	(conf.ExtUnionsAllowCastleVisiting() && Players::isFriends(hero.GetColor(), castle->GetColor())))
     {
     	DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " goto castle " << castle->GetName());
     	Mixer::Reduce();
 	if(!conf.ExtHeroLearnSpellsWithDay()) castle->MageGuildEducateHero(hero);
-    	Game::OpenCastleDialog(castle);
+    	Game::OpenCastleDialog(*castle);
     	Mixer::Enhance();
     }
     else
@@ -875,7 +881,7 @@ void ActionToPickupResource(Heroes & hero, const u8 & obj, const s32 & dst_index
         {
 	    const ResourceCount & rc = tile.QuantityResourceCount();
             Interface::Basic & I = Interface::Basic::Get();
-            I.statusWindow.SetResource(rc.first, rc.second);
+            I.GetStatusWindow().SetResource(rc.first, rc.second);
             I.SetRedraw(REDRAW_STATUS);
 	}
 
@@ -1912,8 +1918,8 @@ void ActionToTeleports(Heroes & hero, const s32 & index_from)
     hero.Move2Dest(index_to, true);
 
     Interface::Basic & I = Interface::Basic::Get();
-    I.gameArea.SetCenter(hero.GetCenter());
-    GameFocus::SetRedraw();
+    I.GetGameArea().SetCenter(hero.GetCenter());
+    I.RedrawFocus();
     I.Redraw();
 
     AGG::PlaySound(M82::KILLFADE);
@@ -1947,8 +1953,8 @@ void ActionToWhirlpools(Heroes & hero, const u8 & obj, const s32 & index_from)
     hero.Move2Dest(index_to, true);
 
     Interface::Basic & I = Interface::Basic::Get();
-    I.gameArea.SetCenter(hero.GetCenter());
-    GameFocus::SetRedraw();
+    I.GetGameArea().SetCenter(hero.GetCenter());
+    I.RedrawFocus();
     I.Redraw();
 
     AGG::PlaySound(M82::KILLFADE);
@@ -2139,7 +2145,7 @@ void ActionToDwellingJoinMonster(Heroes & hero, const u8 & obj, const s32 & dst_
 		if(Settings::Get().ExtHeroRecalculateMovement())
 		    hero.RecalculateMovePoints();
 
-        	Interface::Basic::Get().SetRedraw(REDRAW_STATUS);
+        	Interface::Basic::Get().GetStatusWindow().SetRedraw();
 	    }
 	}
     }
@@ -2522,7 +2528,8 @@ void ActionToMagellanMaps(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    hero.SetVisited(dst_index, Visit::GLOBAL);
 	}
 
-	GameFocus::SetRedraw();
+	Interface::Basic & I = Interface::Basic::Get();
+	I.RedrawFocus();
     }
     else
     {

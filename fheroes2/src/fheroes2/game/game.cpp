@@ -27,7 +27,6 @@
 #include "gamedefs.h"
 #include "tinyconfig.h"
 #include "settings.h"
-#include "game_focus.h"
 #include "maps_tiles.h"
 #include "ground.h"
 #include "world.h"
@@ -46,6 +45,7 @@
 #include "battle.h"
 #include "tools.h"
 #include "difficulty.h"
+#include "game_interface.h"
 #include "game_static.h"
 #include "ai.h"
 #include "game.h"
@@ -211,7 +211,7 @@ void Game::SetFixVideoMode(void)
 /* play all sound from focus area game */
 void Game::EnvironmentSoundMixer(void)
 {
-    const Point abs_pt(GameFocus::GetCenter());
+    const Point abs_pt(Interface::GetFocusCenter());
     const Settings & conf = Settings::Get();
 
     if(conf.Sound())

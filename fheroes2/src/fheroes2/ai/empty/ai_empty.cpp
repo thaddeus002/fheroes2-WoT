@@ -127,30 +127,30 @@ bool AI::HeroesCanMove(const Heroes & hero)
 
 void AI::HeroesTurn(Heroes & hero)
 {
-   Interface::StatusWindow *status = Interface::NoGUI() ? NULL : &Interface::StatusWindow::Get();
+   Interface::StatusWindow & status = Interface::Basic::Get().GetStatusWindow();
 
     hero.ResetModes(HEROES_MOVED);
 
     while(AI::HeroesCanMove(hero))
     {
 	// turn indicator
-        if(status) status->RedrawTurnProgress(3);
-        if(status) status->RedrawTurnProgress(4);
+        status.RedrawTurnProgress(3);
+        status.RedrawTurnProgress(4);
 
         // get task for heroes
         AI::HeroesGetTask(hero);
 
         // turn indicator
-        if(status) status->RedrawTurnProgress(5);
-        if(status) status->RedrawTurnProgress(6);
+        status.RedrawTurnProgress(5);
+        status.RedrawTurnProgress(6);
 
         // heroes AI turn
         AI::HeroesMove(hero);
 	hero.SetModes(HEROES_MOVED);
 
         // turn indicator
-        if(status) status->RedrawTurnProgress(7);
-        if(status) status->RedrawTurnProgress(8);
+        status.RedrawTurnProgress(7);
+        status.RedrawTurnProgress(8);
     }
 
     DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", end");
@@ -171,29 +171,29 @@ void AI::KingdomTurn(Kingdom & kingdom)
 
     if(! Settings::Get().MusicMIDI()) AGG::PlayMusic(MUS::COMPUTER);
 
-    Interface::StatusWindow *status = Interface::NoGUI() ? NULL : &Interface::StatusWindow::Get();
+    Interface::StatusWindow & status = Interface::Basic::Get().GetStatusWindow();
 
     // indicator
-    if(status) status->RedrawTurnProgress(0);
+    status.RedrawTurnProgress(0);
 
-    if(status) status->RedrawTurnProgress(1);
+    status.RedrawTurnProgress(1);
 
     // castles AI turn
     for(KingdomCastles::iterator
 	it = castles.begin(); it != castles.end(); ++it)
 	if(*it) CastleTurn(**it);
 
-    if(status) status->RedrawTurnProgress(3);
+    status.RedrawTurnProgress(3);
 
     // heroes turns
     for(KingdomHeroes::iterator
 	it = heroes.begin(); it != heroes.end(); ++it)
 	if(*it) HeroesTurn(**it);
 
-    if(status) status->RedrawTurnProgress(6);
-    if(status) status->RedrawTurnProgress(7);
-    if(status) status->RedrawTurnProgress(8);
-    if(status) status->RedrawTurnProgress(9);
+    status.RedrawTurnProgress(6);
+    status.RedrawTurnProgress(7);
+    status.RedrawTurnProgress(8);
+    status.RedrawTurnProgress(9);
 
     DEBUG(DBG_AI, DBG_INFO, Color::String(color) << " moved");
 }

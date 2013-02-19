@@ -31,21 +31,15 @@
 #include "heroes.h"
 #include "army.h"
 #include "resource.h"
-#include "game_focus.h"
 #include "game_interface.h"
 #include "interface_status.h"
 
 #define AITURN_REDRAW_EXPIRE 20
 #define RESOURCE_WINDOW_EXPIRE 2500
 
-Interface::StatusWindow::StatusWindow() : BorderWindow(Rect(0, 0, 144, 72)), state(STATUS_UNKNOWN), oldState(STATUS_UNKNOWN)
+Interface::StatusWindow::StatusWindow(Basic & basic) : BorderWindow(Rect(0, 0, 144, 72)),
+	interface(basic), state(STATUS_UNKNOWN), oldState(STATUS_UNKNOWN)
 {
-}
-
-Interface::StatusWindow & Interface::StatusWindow::Get(void)
-{
-    static Interface::StatusWindow wstatus;
-    return wstatus;
 }
 
 void Interface::StatusWindow::Reset(void)
@@ -83,6 +77,11 @@ u32 Interface::StatusWindow::ResetResourceStatus(u32 tick, void *ptr)
 void Interface::StatusWindow::SavePosition(void)
 {
     Settings::Get().SetPosStatus(GetRect());
+}
+
+void Interface::StatusWindow::SetRedraw(void) const
+{
+     interface.SetRedraw(REDRAW_STATUS);
 }
 
 void Interface::StatusWindow::SetPos(s16 ox, s16 oy)
@@ -151,7 +150,7 @@ void Interface::StatusWindow::NextState(void)
 {
     if(STATUS_DAY == state) state = STATUS_FUNDS;
     else
-    if(STATUS_FUNDS == state) state = (GameFocus::UNSEL == GameFocus::Type() ? STATUS_DAY : STATUS_ARMY);
+    if(STATUS_FUNDS == state) state = (GameFocus::UNSEL == GetFocusType() ? STATUS_DAY : STATUS_ARMY);
     else
     if(STATUS_ARMY == state) state = STATUS_DAY;
     else
@@ -159,7 +158,7 @@ void Interface::StatusWindow::NextState(void)
     
     if(state == STATUS_ARMY)
     {
-	const Castle* castle = GameFocus::GetCastle();
+	const Castle* castle = GetFocusCastle();
 
 	// skip empty army for castle
         if(castle && ! castle->GetArmy().isValid()) NextState();
@@ -239,7 +238,8 @@ void Interface::StatusWindow::SetResource(u8 res, u16 count)
 
 void Interface::StatusWindow::ResetTimer(void)
 {
-    StatusWindow & window = Get();
+    StatusWindow & window = Interface::Basic::Get().GetStatusWindow();
+
     if(window.timerShowLastResource.IsValid())
     {
 	window.timerShowLastResource.Remove();
@@ -267,11 +267,11 @@ void Interface::StatusWindow::DrawArmyInfo(const u8 oh) const
 {
     const Army* armies = NULL;
 
-    if(GameFocus::GetHeroes())
-	armies = &GameFocus::GetHeroes()->GetArmy();
+    if(GetFocusHeroes())
+	armies = &GetFocusHeroes()->GetArmy();
     else
-    if(GameFocus::GetCastle())
-	armies = &GameFocus::GetCastle()->GetArmy();
+    if(GetFocusCastle())
+	armies = &GetFocusCastle()->GetArmy();
 
     if(armies)
     {
@@ -299,50 +299,52 @@ void Interface::StatusWindow::DrawArmyInfo(const u8 oh) const
 void Interface::StatusWindow::DrawAITurns(void) const
 {
     const Settings & conf = Settings::Get();
-    if(conf.ExtGameHideInterface() && !conf.ShowStatus()) return;
 
-    // restore background
-    DrawBackground();
-
-    const Sprite & glass = AGG::GetICN(ICN::HOURGLAS, 0);
-    const Rect & pos = GetArea();
-
-    u16 dst_x = pos.x + (pos.w - glass.w()) / 2;
-    u16 dst_y = pos.y + (pos.h - glass.h()) / 2;
-
-    glass.Blit(dst_x, dst_y);
-
-    u8 color_index = 0;
-
-    switch(conf.CurrentColor())
+    if(!conf.ExtGameHideInterface() || conf.ShowStatus())
     {
-	case Color::BLUE:	color_index = 0; break;
-	case Color::GREEN:	color_index = 1; break;
-	case Color::RED:	color_index = 2; break;
-	case Color::YELLOW:	color_index = 3; break;
-	case Color::ORANGE:	color_index = 4; break;
-	case Color::PURPLE:	color_index = 5; break;
-	default: return;
-    }
+	// restore background
+	DrawBackground();
 
-    const Sprite & crest = AGG::GetICN(ICN::BRCREST, color_index);
+	const Sprite & glass = AGG::GetICN(ICN::HOURGLAS, 0);
+	const Rect & pos = GetArea();
 
-    dst_x += 2;
-    dst_y += 2;
+	u16 dst_x = pos.x + (pos.w - glass.w()) / 2;
+	u16 dst_y = pos.y + (pos.h - glass.h()) / 2;
 
-    crest.Blit(dst_x, dst_y);
+	glass.Blit(dst_x, dst_y);
 
-    const Sprite & sand = AGG::GetICN(ICN::HOURGLAS, 1 + (turn_progress % 10));
+	u8 color_index = 0;
 
-    dst_x += (glass.w() - sand.w() - sand.x() - 3);
-    dst_y += sand.y();
+	switch(conf.CurrentColor())
+	{
+	    case Color::BLUE:	color_index = 0; break;
+	    case Color::GREEN:	color_index = 1; break;
+	    case Color::RED:	color_index = 2; break;
+	    case Color::YELLOW:	color_index = 3; break;
+	    case Color::ORANGE:	color_index = 4; break;
+	    case Color::PURPLE:	color_index = 5; break;
+	    default: return;
+	}
 
-    sand.Blit(dst_x, dst_y);
+	const Sprite & crest = AGG::GetICN(ICN::BRCREST, color_index);
+
+	dst_x += 2;
+	dst_y += 2;
+
+	crest.Blit(dst_x, dst_y);
+
+	const Sprite & sand = AGG::GetICN(ICN::HOURGLAS, 1 + (turn_progress % 10));
+
+        dst_x += (glass.w() - sand.w() - sand.x() - 3);
+	dst_y += sand.y();
+
+	sand.Blit(dst_x, dst_y);
     
-    // animation sand
-    //
-    // sprites ICN::HOURGLAS, 11, 30
-    //
+	// animation sand
+	//
+	// sprites ICN::HOURGLAS, 11, 30
+	//
+    }
 }
 
 void Interface::StatusWindow::DrawBackground(void) const
@@ -405,11 +407,10 @@ void Interface::StatusWindow::QueueEventProcessing(void)
 void Interface::StatusWindow::RedrawTurnProgress(u8 v)
 {
     turn_progress = v;
-    Interface::Basic & I = Interface::Basic::Get();
-    I.SetRedraw(REDRAW_STATUS);
+    SetRedraw();
 
     Cursor::Get().Hide();
-    I.Redraw();
+    interface.Redraw();
     Cursor::Get().Show();
     Display::Get().Flip();
 }

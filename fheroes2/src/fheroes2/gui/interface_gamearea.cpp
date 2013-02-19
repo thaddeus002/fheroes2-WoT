@@ -25,7 +25,6 @@
 #include "world.h"
 #include "maps.h"
 #include "game.h"
-#include "game_focus.h"
 #include "game_interface.h"
 #include "route.h"
 #include "interface_gamearea.h"
@@ -41,13 +40,7 @@ namespace Game
     void MouseCursorAreaPressRight(s32);
 }
 
-Interface::GameArea & Interface::GameArea::Get(void)
-{
-    static Interface::GameArea ga;
-    return ga;
-}
-
-Interface::GameArea::GameArea() : oldIndexPos(0), updateCursor(false)
+Interface::GameArea::GameArea(Basic & basic) : interface(basic), oldIndexPos(0), updateCursor(false)
 {
 }
 
@@ -61,9 +54,9 @@ const Rect & Interface::GameArea::GetRectMaps(void) const
 { return rectMaps; }
 
 /* fixed src rect image */
-Rect Interface::GameArea::RectFixed(Point & dst, const u16 rw, const u16 rh)
+Rect Interface::GameArea::RectFixed(Point & dst, const u16 rw, const u16 rh) const
 {
-    return Rect::Fixed(dst.x, dst.y, rw, rh, Get().GetArea());
+    return Rect::Fixed(dst.x, dst.y, rw, rh, interface.GetGameArea().GetArea());
 }
 
 void Interface::GameArea::Build(void)
@@ -177,7 +170,7 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
     }
 
     // route
-    const Heroes* hero = flag & LEVEL_HEROES ? GameFocus::GetHeroes() : NULL;
+    const Heroes* hero = flag & LEVEL_HEROES ? GetFocusHeroes() : NULL;
 
     if(hero && hero->GetPath().isShow())
     {
@@ -312,6 +305,11 @@ void Interface::GameArea::Scroll(void)
     scrollDirection = 0;
 }
 
+void Interface::GameArea::SetRedraw(void) const
+{
+     interface.SetRedraw(REDRAW_GAMEAREA);
+}
+
 /* scroll area to center point maps */
 void Interface::GameArea::SetCenter(const Point &pt)
 {
@@ -408,13 +406,11 @@ void Interface::GameArea::SetCenter(s16 px, s16 py)
 
 void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const s32 index, Surface & sf)
 {
-    if(Interface::NoGUI()) return;
-
     if(Maps::isValidAbsIndex(index))
     {
 	sf.Set(448, 448);
 
-	GameArea & gamearea = Get();
+	GameArea & gamearea = Basic::Get().GetGameArea();
 	const Rect origPosition(gamearea.areaPosition);
 	gamearea.SetAreaPosition(0, 0, sf.w(), sf.h());
 
@@ -556,15 +552,14 @@ void Interface::GameArea::QueueEventProcessing(void)
     // change cusor if need
     if(updateCursor || index != oldIndexPos)
     {
-	cursor.SetThemes(Game::GetCursor(index));
+	cursor.SetThemes(interface.GetCursorTileIndex(index));
 	oldIndexPos = index;
 	updateCursor = false;
     }
 
     // fixed pocket pc tap mode
-    if(conf.ExtGameHideInterface() && conf.ShowControlPanel() && le.MouseCursor(Interface::ControlPanel::Get().GetArea())) return;
-
-
+    if(conf.ExtGameHideInterface() && conf.ShowControlPanel() &&
+	    le.MouseCursor(interface.GetControlPanel().GetArea())) return;
 
     if(conf.ExtPocketTapMode())
     {
@@ -572,7 +567,6 @@ void Interface::GameArea::QueueEventProcessing(void)
 	if(conf.ExtPocketDragDropScroll() && le.MousePressLeft())
 	{
 	    Point pt1 = le.GetMouseCursor();
-	    Interface::Basic & I = Interface::Basic::Get();
 
     	    while(le.HandleEvents() && le.MousePressLeft())
 	    {
@@ -599,8 +593,8 @@ void Interface::GameArea::QueueEventProcessing(void)
 			{
 			    cursor.Hide();
 			    Scroll();
-			    I.SetRedraw(REDRAW_GAMEAREA);
-			    I.Redraw();
+			    interface.SetRedraw(REDRAW_GAMEAREA);
+			    interface.Redraw();
 			    cursor.Show();
 			    display.Flip();
 			}
@@ -618,8 +612,8 @@ void Interface::GameArea::QueueEventProcessing(void)
     }
 
     if(le.MouseClickLeft(tile_pos) && Cursor::POINTER != cursor.Themes())
-        Game::MouseCursorAreaClickLeft(index);
+        interface.MouseCursorAreaClickLeft(index);
     else
     if(le.MousePressRight(tile_pos))
-        Game::MouseCursorAreaPressRight(index);
+        interface.MouseCursorAreaPressRight(index);
 }

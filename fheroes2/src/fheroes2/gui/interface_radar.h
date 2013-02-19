@@ -27,13 +27,16 @@
 
 namespace Interface
 {
+    class Basic;
+
     class Radar : public BorderWindow
     {
     public:
-	static Radar & Get(void);
+	Radar(Basic &);
 
 	void SetPos(s16, s16);
 	void SavePosition(void);
+	void SetRedraw(void) const;
 
 	void Build(void);
 	void Generate(void);
@@ -46,7 +49,8 @@ namespace Interface
 
     private:
 	Surface* GetSurfaceFromColor(u8);
-	Radar();
+
+	Basic & interface;
 
         Surface spriteArea;
 	SpriteMove cursorArea;

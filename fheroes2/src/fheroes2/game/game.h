@@ -241,40 +241,13 @@ namespace Game
     u8  SelectCountPlayers(void);
 
     void ShowLoadMapsText(void);
-
-    void EventSwitchHeroSleeping(void);
-    void EventEndTurn(menu_t &);
-    void EventExit(menu_t &);
-    void EventNextHero(void);
-    void EventNextTown(void);
-    void EventDefaultAction(void);
-    void EventOpenFocus(void);
-    void EventSaveGame(void);
-    void EventLoadGame(menu_t &);
-    void EventContinueMovement(void);
-    void EventKingdomInfo(void);
-    void EventCastSpell(void);
-    void EventPuzzleMaps(void);
-    void EventGameInfo(void);
-    void EventDigArtifact(menu_t &);
-    void EventAdventureDialog(menu_t &);
-    void EventFileDialog(menu_t &);
-    void EventSystemDialog(void);
-    void EventSwitchShowRadar(void);
-    void EventSwitchShowStatus(void);
-    void EventSwitchShowButtons(void);
-    void EventSwitchShowIcons(void);
-    void EventSwitchShowControlPanel(void);
-    void EventDebug1(void);
-    void EventDebug2(void);
-
     void PlayPickupSound(void);
 
     void DisableChangeMusic(bool);
     bool ChangeMusicDisabled(void);
 
-    void OpenHeroesDialog(Heroes*);
-    void OpenCastleDialog(Castle*);
+    void OpenHeroesDialog(Heroes &);
+    void OpenCastleDialog(Castle &);
 
     std::string GetEncodeString(const char*);
 

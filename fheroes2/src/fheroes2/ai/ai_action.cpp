@@ -1882,17 +1882,7 @@ void AI::HeroesMove(Heroes & hero)
     {
 	hero.SetMove(true);
 
-	if(Interface::NoGUI())
-	{
-	    while(1)
-	    {
-    		if(hero.isFreeman() || !hero.isEnableMove()) break;
-
-	        hero.Move(true);
-	        DELAY(10);
-	    }
-	}
-	else
+	if(1)
 	{
 	    const Settings & conf = Settings::Get();
 	    Display & display = Display::Get();
@@ -1904,7 +1894,7 @@ void AI::HeroesMove(Heroes & hero)
 	    if(0 != conf.AIMoveSpeed() && AIHeroesShowAnimation(hero))
 	    {
 		cursor.Hide();
-		I.gameArea.SetCenter(hero.GetCenter());
+		I.GetGameArea().SetCenter(hero.GetCenter());
 		I.Redraw(REDRAW_GAMEAREA);
 		cursor.Show();
 		display.Flip();
@@ -1927,7 +1917,7 @@ void AI::HeroesMove(Heroes & hero)
 		    cursor.Hide();
 		    hero.Move();
 
-		    I.gameArea.SetCenter(hero.GetCenter());
+		    I.GetGameArea().SetCenter(hero.GetCenter());
 		    I.Redraw(REDRAW_GAMEAREA);
 		    cursor.Show();
 		    display.Flip();

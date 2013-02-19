@@ -34,13 +34,16 @@ enum info_t { STATUS_UNKNOWN, STATUS_DAY, STATUS_FUNDS, STATUS_ARMY, STATUS_RESO
 
 namespace Interface
 {
+    class Basic;
+
     class StatusWindow : public BorderWindow
     {
     public:
-	static StatusWindow & Get(void);
+	StatusWindow(Basic &);
 
 	void SetPos(s16, s16);
 	void SavePosition(void);
+	void SetRedraw(void) const;
 
 	void Reset(void);
 	    
@@ -55,8 +58,6 @@ namespace Interface
 	static void ResetTimer(void);
 
     private:
-	StatusWindow();
-
 	void DrawKingdomInfo(const u8 oh = 0) const;
 	void DrawDayInfo(const u8 oh = 0) const;
 	void DrawArmyInfo(const u8 oh = 0) const;
@@ -65,6 +66,8 @@ namespace Interface
 	void DrawAITurns(void) const;
 	static u32 ResetResourceStatus(u32, void *);
 	static u32 RedrawAIStatus(u32, void *);
+
+	Basic &	             interface;
 
 	info_t               state;
 	info_t               oldState;
