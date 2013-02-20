@@ -51,7 +51,6 @@ namespace Interface
 
 	Rect			area;
         Dialog::FrameBorder	border;
-	SpriteMove		moveIndicator;
     };
 }
 

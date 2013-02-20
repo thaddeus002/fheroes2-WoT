@@ -96,11 +96,6 @@ void SpriteBack::Destroy(void)
     Surface::FreeSurface(*this);
 }
 
-const Point & SpriteBack::GetPos(void) const
-{
-    return SpritePos::GetPos();
-}
-
 Rect SpriteBack::GetArea(void) const
 {
     return SpritePos::GetArea();
@@ -111,18 +106,20 @@ Size SpriteBack::GetSize(void) const
     return Surface::GetSize();
 }
 
-u32 SpriteBack::GetMemoryUsage(void) const
-{
-    return Surface::GetMemoryUsage();
-}
+enum { _VISIBLE = 0x00001, _DEFAULTHIDE };
 
-SpriteMove::SpriteMove() : visible(false)
+SpriteMove::SpriteMove() : mode(0)
 {
 }
 
-SpriteMove::SpriteMove(const Surface & sf) : visible(false)
+SpriteMove::SpriteMove(const Surface & sf) : mode(0)
 {
     Set(sf, true);
+}
+
+void SpriteMove::SetDefaultHide(void)
+{
+    mode |= _DEFAULTHIDE;
 }
 
 void SpriteMove::Move(const Point & pt)
@@ -130,7 +127,10 @@ void SpriteMove::Move(const Point & pt)
     if(GetPos() != pt)
         Hide();
 
-    Show(pt);
+    if(background.isValid() || !(mode & _DEFAULTHIDE))
+	Show(pt);
+    else
+    	background.SetPos(pt);
 }
 
 void SpriteMove::Move(s16 ax, s16 ay)
@@ -143,7 +143,7 @@ void SpriteMove::Hide(void)
     if(isVisible())
     {
         background.Restore();
-        visible = false;
+	mode &= ~(_VISIBLE);
     }
 }
 
@@ -164,13 +164,13 @@ void SpriteMove::Show(const Point & pos)
     {
         background.Save(Rect(pos, GetSize()));
         Surface::Blit(GetPos(), Display::Get());
-        visible = true;
+	mode |= _VISIBLE;
     }
 }
 
 bool SpriteMove::isVisible(void) const
 {
-    return visible;
+    return mode & _VISIBLE;
 }
 
 const Point & SpriteMove::GetPos(void) const
@@ -191,5 +191,5 @@ Size SpriteMove::GetSize(void) const
 u32 SpriteMove::GetMemoryUsage(void) const
 {
     return Surface::GetMemoryUsage() +
-	background.GetMemoryUsage() + sizeof(visible);
+	background.GetMemoryUsage() + sizeof(mode);
 }

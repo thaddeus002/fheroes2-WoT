@@ -233,29 +233,28 @@ bool Interface::BorderWindow::QueueEventProcessing(void)
         const Point & mp = le.GetMouseCursor();
 	const Rect & pos = GetRect();
 
-	if(! moveIndicator.isValid())
-	{
-	    moveIndicator.Set(pos.w, pos.h);
-	    Cursor::DrawCursor(moveIndicator, 0x70);
-	}
+        SpriteMove moveIndicator;
+	moveIndicator.Set(pos.w, pos.h);
+	Cursor::DrawCursor(moveIndicator, 0x70);
 
         const s16 ox = mp.x - pos.x;
         const s16 oy = mp.y - pos.y;
 
         cursor.Hide();
 	moveIndicator.Move(pos.x, pos.y);
+	moveIndicator.Redraw();
         cursor.Show();
         display.Flip();
 
         while(le.HandleEvents() && le.MousePressLeft())
-        {
-            if(le.MouseMotion())
-            {
-                cursor.Hide();
-		moveIndicator.Move(mp.x - ox, mp.y - oy);
-                cursor.Show();
-                display.Flip();
-            }
+	{
+    	    if(le.MouseMotion())
+    	    {
+        	    cursor.Hide();
+		    moveIndicator.Move(mp.x - ox, mp.y - oy);
+        	    cursor.Show();
+        	    display.Flip();
+    	    }
         }
 
         cursor.Hide();

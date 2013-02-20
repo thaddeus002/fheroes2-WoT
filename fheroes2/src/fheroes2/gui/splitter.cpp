@@ -28,11 +28,13 @@
 /* splitter constructor */
 Splitter::Splitter() : step(0), min(0), max(0), cur(MAXU16)
 {
+    cursor.SetDefaultHide();
 }
 
 Splitter::Splitter(const Surface & sf, const Rect & rt)
     : cursor(sf), area(rt), step(0), min(0), max(0), cur(0)
 {
+    cursor.SetDefaultHide();
 }
 
 void Splitter::SetSprite(const Surface & sf)

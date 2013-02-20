@@ -39,7 +39,7 @@ public:
     u32  GetMemoryUsage(void) const;
 };
 
-class SpriteBack : protected SpritePos
+class SpriteBack : public SpritePos
 {
 public:
     SpriteBack();
@@ -51,11 +51,8 @@ public:
     void Restore(void);
     void Destroy(void);
 
-    const Point & GetPos(void) const;
     Rect GetArea(void) const;
     Size GetSize(void) const;
-
-    u32 GetMemoryUsage(void) const;
 };
 
 
@@ -71,6 +68,7 @@ public:
     void Hide(void);
     void Show(void);
     void Redraw(void);
+    void SetDefaultHide(void);
 
     bool isVisible(void) const;
 
@@ -84,7 +82,7 @@ protected:
     void Show(const Point &);
 
     SpriteBack background;
-    bool visible;
+    u32 mode;
 };
 
 #endif

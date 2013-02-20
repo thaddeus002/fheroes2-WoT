@@ -256,8 +256,8 @@ void Interface::Basic::EventSystemDialog(void)
     {
 	SetHideInterface(conf.ExtGameHideInterface());
         SetRedraw(REDRAW_ALL);
-	Redraw();
 	ResetFocus(GameFocus::HEROES);
+	Redraw();
     }
 }
 
