@@ -43,11 +43,8 @@ Dialog::answer_t Dialog::AdventureOptions(const bool enabledig)
 
     // image box
     const Sprite &box = AGG::GetICN(apanbkg, 0);
-
-    Rect rb((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h());
-    Background back(rb);
-    back.Save();
-
+    SpriteBack back(Rect((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h()));
+    const Point & rb = back.GetPos();
     box.Blit(rb.x, rb.y);
 
     LocalEvent & le = LocalEvent::Get();

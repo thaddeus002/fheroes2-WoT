@@ -166,10 +166,8 @@ const Maps::FileInfo* Dialog::SelectScenario(const MapsFileInfoList & all)
     }
 
     const Sprite & panel = AGG::GetICN(ICN::REQSBKG, 0);
-    Background back((display.w() - panel.w()) / 2, (display.h() - panel.h()) / 2, panel.w(), panel.h());
-    back.Save();
-
-    const Rect & rt = back.GetRect();
+    SpriteBack back(Rect((display.w() - panel.w()) / 2, (display.h() - panel.h()) / 2, panel.w(), panel.h()));
+    const Rect & rt = back.GetArea();
 
     const Rect countPlayers(rt.x + 45, rt.y + 55, 20, 175);
     const Rect sizeMaps(rt.x + 62, rt.y + 55, 20, 175);

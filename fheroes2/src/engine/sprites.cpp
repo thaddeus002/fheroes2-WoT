@@ -56,6 +56,22 @@ SpriteBack::SpriteBack()
 {
 }
 
+u32 SpriteBack::GetMemoryUsage(void) const
+{
+    return Surface::GetMemoryUsage() + sizeof(Rect::x) + sizeof(Rect::y) + sizeof(Rect::w) + sizeof(Rect::h);
+}
+
+SpriteBack::SpriteBack(const Rect & pos)
+{
+    Save(pos);
+}
+
+void SpriteBack::SetPos(const Point & pos)
+{
+    Rect::x = pos.x;
+    Rect::y = pos.y;
+}
+
 bool SpriteBack::isValid(void) const
 {
     return Surface::isValid();
@@ -76,8 +92,13 @@ void SpriteBack::Save(const Rect & rt)
 	}
 
 	Display::Get().Blit(rt, 0, 0, *this);
-	SetPos(rt);
+
+	Rect::w = rt.w;
+	Rect::h = rt.h;
     }
+
+    Rect::x = rt.x;
+    Rect::y = rt.y;
 }
 
 void SpriteBack::Save(const Point & pt)
@@ -94,16 +115,26 @@ void SpriteBack::Restore(void)
 void SpriteBack::Destroy(void)
 {
     Surface::FreeSurface(*this);
+    Rect::w = 0;
+    Rect::h = 0;
 }
 
-Rect SpriteBack::GetArea(void) const
+const Point & SpriteBack::GetPos(void) const
 {
-    return SpritePos::GetArea();
+    const Point & pt = *this;
+    return pt;
 }
 
-Size SpriteBack::GetSize(void) const
+const Size & SpriteBack::GetSize(void) const
 {
-    return Surface::GetSize();
+    const Size & sz = *this;
+    return sz;
+}
+
+const Rect & SpriteBack::GetArea(void) const
+{
+    const Rect & rt = *this;
+    return rt;
 }
 
 enum { _VISIBLE = 0x00001, _DEFAULTHIDE };
@@ -178,14 +209,9 @@ const Point & SpriteMove::GetPos(void) const
     return background.GetPos();
 }
 
-Rect SpriteMove::GetArea(void) const
+const Rect & SpriteMove::GetArea(void) const
 {
-    return Rect(GetPos(), GetSize());
-}
-
-Size SpriteMove::GetSize(void) const
-{
-    return Surface::GetSize();
+    return background.GetArea();
 }
 
 u32 SpriteMove::GetMemoryUsage(void) const

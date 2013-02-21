@@ -73,10 +73,9 @@ void Battle::DialogBattleSettings(void)
     pos_rt.w = dialog.w();
     pos_rt.h = dialog.h();
 
-    Background back(pos_rt);
-    back.Save();
+    SpriteBack back(pos_rt);
 
-    display.FillRect(0x00, 0x00, 0x00, back.GetRect());
+    display.FillRect(0x00, 0x00, 0x00, back.GetArea());
     dialog.Blit(pos_rt.x, pos_rt.y);
 
     Button btn_ok(pos_rt.x + 113, pos_rt.y + 252, (conf.ExtGameEvilInterface() ? ICN::CSPANBTE : ICN::CSPANBTN), 0, 1);
@@ -266,8 +265,7 @@ void Battle::Arena::DialogBattleSummary(const Result & res) const
     pos_rt.w = dialog.w();
     pos_rt.h = conf.QVGA() ? 224 : dialog.h();
 
-    Background back(pos_rt);
-    back.Save();
+    SpriteBack back(pos_rt);
 
     if(conf.QVGA())
     {
@@ -380,8 +378,7 @@ u8 Battle::Arena::DialogBattleHero(const HeroBase & hero, bool buttons) const
     pos_rt.w = dialog.w();
     pos_rt.h = dialog.h();
 
-    Background back(pos_rt);
-    back.Save();
+    SpriteBack back(pos_rt);
 
     dialog.Blit(pos_rt.x, pos_rt.y);
     hero.PortraitRedraw(pos_rt.x + 27, pos_rt.y + 42, PORT_BIG, display);
@@ -526,8 +523,7 @@ bool Battle::DialogBattleSurrender(const HeroBase & hero, u32 cost)
     pos_rt.w = dialog.w();
     pos_rt.h = dialog.h();
 
-    Background back(pos_rt);
-    back.Save();
+    SpriteBack back(pos_rt);
 
     dialog.Blit(pos_rt.x, pos_rt.y);
 

@@ -47,10 +47,9 @@ void Dialog::GameInfo(void)
     cursor.SetThemes(cursor.POINTER);
 
     const Sprite & dlg = AGG::GetICN(ICN::SCENIBKG, 0);
-    const Point pt((display.w() - dlg.w()) / 2, (display.h() - dlg.h()) / 2);
-    Background back(pt, dlg.w(), dlg.h());
 
-    back.Save();
+    SpriteBack back(Rect((display.w() - dlg.w()) / 2, (display.h() - dlg.h()) / 2, dlg.w(), dlg.h()));
+    const Point & pt = back.GetPos();
     dlg.Blit(pt);
 
     TextBox text;

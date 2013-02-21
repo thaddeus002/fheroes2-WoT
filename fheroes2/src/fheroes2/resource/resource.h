@@ -128,7 +128,7 @@ namespace Resource
 	void SetPos(s16, s16);
 	void Redraw(void) const;
 
-	const Funds & rs;
+	const Funds rs;
     };
 }
 

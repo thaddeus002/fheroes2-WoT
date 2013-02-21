@@ -47,19 +47,13 @@ u16 Dialog::ArmyInfo(const Troop & troop, u16 flags)
 
     const ICN::icn_t viewarmy = Settings::Get().ExtGameEvilInterface() ? ICN::VIEWARME : ICN::VIEWARMY;
     const Surface & sprite_dialog = AGG::GetICN(viewarmy, 0);
-    Rect pos_rt;
-
-    pos_rt.x = (display.w() - sprite_dialog.w()) / 2;
-    pos_rt.y = (display.h() - sprite_dialog.h()) / 2;
-    pos_rt.w = sprite_dialog.w();
-    pos_rt.h = sprite_dialog.h();
 
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    Background back(pos_rt);
-    back.Save();
+    SpriteBack back(Rect((display.w() - sprite_dialog.w()) / 2, (display.h() - sprite_dialog.h()) / 2, sprite_dialog.w(), sprite_dialog.h()));
+    const Rect & pos_rt = back.GetArea();
     sprite_dialog.Blit(pos_rt.x, pos_rt.y, display);
 
     Point dst_pt;

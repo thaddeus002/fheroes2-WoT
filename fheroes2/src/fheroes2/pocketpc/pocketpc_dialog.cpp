@@ -50,8 +50,7 @@ u16 PocketPC::GetCursorAttackDialog(const Point & dst, u8 allow)
     shadow.Fill(0, 0, 0);
     shadow.SetAlpha(50);
 
-    Background back(rt);
-    back.Save();
+    SpriteBack back(rt);
 
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
@@ -166,9 +165,8 @@ void PocketPC::KeyboardDialog(std::string & str)
     const u16 width = 337;
     const u16 height = 118;
 
-    Background back;
-    back.Save((display.w() - width) / 2, 0, width, height);
-    const Rect & top = back.GetRect();
+    SpriteBack back(Rect((display.w() - width) / 2, 0, width, height));
+    const Rect & top = back.GetArea();
     display.FillRect(0, 0, 0, top);
 
     const Surface sp = CreateTouchButton();

@@ -39,10 +39,11 @@ public:
     u32  GetMemoryUsage(void) const;
 };
 
-class SpriteBack : public SpritePos
+class SpriteBack : protected Surface, protected Rect
 {
 public:
     SpriteBack();
+    SpriteBack(const Rect &);
 
     bool isValid(void) const;
 
@@ -50,9 +51,13 @@ public:
     void Save(const Rect &);
     void Restore(void);
     void Destroy(void);
+    void SetPos(const Point &);
 
-    Rect GetArea(void) const;
-    Size GetSize(void) const;
+    const Point & GetPos(void) const;
+    const Size & GetSize(void) const;
+    const Rect & GetArea(void) const;
+
+    u32  GetMemoryUsage(void) const;
 };
 
 
@@ -73,8 +78,7 @@ public:
     bool isVisible(void) const;
 
     const Point & GetPos(void) const;
-    Rect GetArea(void) const;
-    Size GetSize(void) const;
+    const Rect & GetArea(void) const;
 
     u32  GetMemoryUsage(void) const;
 

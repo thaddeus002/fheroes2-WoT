@@ -28,7 +28,6 @@
 #include "settings.h"
 #include "text.h"
 #include "army.h"
-#include "background.h"
 #include "heroes.h"
 #include "army_bar.h"
 #include "heroes_indicator.h"
@@ -50,8 +49,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
 
     const Sprite &backSprite = AGG::GetICN(ICN::SWAPWIN, 0);
     const Point cur_pt((display.w() - backSprite.w()) / 2, (display.h() - backSprite.h()) / 2);
-    Background background(cur_pt, backSprite.w(), backSprite.h());
-    background.Save();
+    SpriteBack background(Rect(cur_pt, backSprite.w(), backSprite.h()));
     Point dst_pt(cur_pt);
     std::string message;
 
@@ -103,8 +101,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     luckIndicator2.Redraw();
 
     // primary skill
-    Background backPrimary(cur_pt.x + 255, cur_pt.y + 50, 130, 135);
-    backPrimary.Save();
+    SpriteBack backPrimary(Rect(cur_pt.x + 255, cur_pt.y + 50, 130, 135));
 
     PrimarySkillsBar primskill_bar1(this, true);
     primskill_bar1.SetColRows(1, 4);

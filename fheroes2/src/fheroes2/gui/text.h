@@ -170,7 +170,7 @@ public:
     const Rect & GetRect(void) const;
 
 private:
-    Background back;
+    SpriteBack back;
     bool hide;
 };
 

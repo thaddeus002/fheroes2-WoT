@@ -42,7 +42,7 @@ void TestMonsterSprite(void)
 
     //Monster monster(Monster::PEASANT);
     Battle::Unit troop(Troop(Monster::PEASANT, 1), 0, -1, false);
-    Background back;
+    SpriteBack back;
     Rect pos;
 
     Display & display = Display::Get();

@@ -263,10 +263,9 @@ Troop Dialog::RecruitMonster(const Monster & monster0, u16 available, bool ext)
     payment_t paymentCosts(paymentMonster * result);
 
     const Sprite & box = AGG::GetICN(ICN::RECRBKG, 0);
-    const Rect pos((display.w() - box.w()) / 2, Settings::Get().QVGA() ? (display.h() - box.h()) / 2 - 15 : 0, box.w(), box.h());
 
-    Background back(pos);
-    back.Save();
+    SpriteBack back(Rect((display.w() - box.w()) / 2, Settings::Get().QVGA() ? (display.h() - box.h()) / 2 - 15 : 0, box.w(), box.h()));
+    const Rect & pos = back.GetArea();
 
     const Rect rtChange(pos.x + 25, pos.y + 35, 85, 95);
     RedrawStaticInfo(pos, monster, ext && monster0.GetDowngrade() != monster0);
@@ -489,10 +488,9 @@ void Dialog::DwellingInfo(const Monster & monster, u16 available)
 
     const payment_t paymentMonster = monster.GetCost();
     const Sprite & box = AGG::GetICN(ICN::RECR2BKG, 0);
-    const Rect pos((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h());
 
-    Background back(pos);
-    back.Save();
+    SpriteBack back(Rect((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h()));
+    const Rect & pos = back.GetArea();
 
     box.Blit(pos.x, pos.y);
 

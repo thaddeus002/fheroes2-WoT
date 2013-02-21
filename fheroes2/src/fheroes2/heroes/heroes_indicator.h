@@ -39,7 +39,7 @@ public:
 protected:
     const Heroes & 	hero;
     Rect		area;
-    Background		back;
+    SpriteBack		back;
     std::string		descriptions;
 };
 

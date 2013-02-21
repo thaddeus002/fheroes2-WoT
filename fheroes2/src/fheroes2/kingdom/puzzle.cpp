@@ -163,8 +163,7 @@ void ShowStandardDialog(const Puzzle & pzl, const Surface & sf)
     const Rect & radar_pos = radar.GetArea();
     bool evil_interface = Settings::Get().ExtGameEvilInterface();
 
-    Background back(BORDERWIDTH, BORDERWIDTH, sf.w(), sf.h());
-    back.Save();
+    SpriteBack back(Rect(BORDERWIDTH, BORDERWIDTH, sf.w(), sf.h()));
 
     AGG::GetICN((evil_interface ? ICN::EVIWPUZL : ICN::VIEWPUZL), 0).Blit(radar_pos);
     sf.Blit(BORDERWIDTH, BORDERWIDTH, display);

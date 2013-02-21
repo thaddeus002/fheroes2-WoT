@@ -42,10 +42,10 @@ class TradeWindowGUI
 {
 public:
     TradeWindowGUI(const Rect & rt) :
-	pos_rt(rt), back(rt.x - 5, rt.y + 15, rt.w + 10, 160),
+	pos_rt(rt),
 	tradpost(Settings::Get().ExtGameEvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST)
     {
-	back.Save();
+	back.Save(Rect(rt.x - 5, rt.y + 15, rt.w + 10, 160));
 
         buttonGift.SetPos(pos_rt.x + (pos_rt.w - AGG::GetICN(tradpost, 17).w()) / 2, pos_rt.y + 120);
         buttonTrade.SetPos(pos_rt.x + (pos_rt.w - AGG::GetICN(tradpost, 17).w()) / 2, pos_rt.y + 150);
@@ -80,7 +80,7 @@ public:
 
 private:
     Rect pos_rt;
-    Background back;
+    SpriteBack back;
     ICN::icn_t tradpost;
 
     TextSprite textSell;

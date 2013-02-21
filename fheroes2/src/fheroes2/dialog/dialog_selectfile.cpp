@@ -205,10 +205,9 @@ bool SelectFileListSimple(const std::string & header, std::string & result, bool
     bool pocket = Settings::Get().QVGA();
     if(pocket) panel = Size(sprite.w(), 224);
 
-    Background back((display.w() - panel.w) / 2, (display.h() - panel.h) / 2, panel.w, panel.h);
-    back.Save();
+    SpriteBack back(Rect((display.w() - panel.w) / 2, (display.h() - panel.h) / 2, panel.w, panel.h));
 
-    const Rect & rt = back.GetRect();
+    const Rect & rt = back.GetArea();
     const Rect enter_field(rt.x + 42, rt.y + (pocket ? 148 : 286), 260, 16);
 
     Button buttonOk(rt.x + 34, rt.y + (pocket ? 176 : 315), ICN::REQUEST, 1, 2);

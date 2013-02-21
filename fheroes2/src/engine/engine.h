@@ -24,7 +24,6 @@
 
 #include "types.h"
 #include "sprites.h"
-#include "background.h"
 #include "display.h"
 #include "localevent.h"
 #include "error.h"

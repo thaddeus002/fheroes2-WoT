@@ -365,9 +365,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     // bottom right
 	pos = Rect(mx - box.w(), my - box.h(), box.w(), box.h());
 
-    Background back(pos);
-    back.Save();
-
+    SpriteBack back(pos);
     box.Blit(pos.x, pos.y);
 
     std::string name_object;
@@ -576,11 +574,10 @@ void Dialog::QuickInfo(const Castle & castle)
 	cur_rt = Rect((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h());
     }
 
-    Background back(cur_rt);
-    back.Save();
+    SpriteBack back(cur_rt);
     box.Blit(cur_rt.x, cur_rt.y);
 
-    cur_rt = Rect(back.GetRect().x + 28 , back.GetRect().y + 12, 178, 140);
+    cur_rt = Rect(back.GetPos().x + 28 , back.GetPos().y + 12, 178, 140);
     Point dst_pt;
     Text text;
 
@@ -739,12 +736,10 @@ void Dialog::QuickInfo(const Heroes & hero)
 	cur_rt = Rect((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h());
     }
 
-    Background back(cur_rt);
-    back.Save();
-
+    SpriteBack back(cur_rt);
     box.Blit(cur_rt.x, cur_rt.y);
 
-    cur_rt = Rect(back.GetRect().x + 28 , back.GetRect().y + 10, 146, 144);
+    cur_rt = Rect(back.GetPos().x + 28 , back.GetPos().y + 10, 146, 144);
     Point dst_pt;
     Text text;
     std::string message;

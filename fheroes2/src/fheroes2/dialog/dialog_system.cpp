@@ -24,7 +24,6 @@
 #include "button.h"
 #include "cursor.h"
 #include "settings.h"
-#include "background.h"
 #include "dialog.h"
 
 namespace Dialog
@@ -57,9 +56,8 @@ u8 Dialog::SystemOptions(void)
     // image box
     const Sprite &box = AGG::GetICN(spanbkg, 0);
 
-    Rect rb((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h());
-    Background back(rb);
-    back.Save();
+    SpriteBack back(Rect((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h()));
+    const Rect & rb = back.GetArea();
     box.Blit(rb.x, rb.y);
 
     const Rect rect1(rb.x + 36,  rb.y + 47,  64, 64);

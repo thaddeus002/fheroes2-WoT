@@ -729,7 +729,7 @@ TextSprite::TextSprite(const std::string & msg, Font::type_t ft, u16 ax, u16 ay)
 
 void TextSprite::Show(void)
 {
-    Blit(back.GetRect().x, back.GetRect().y);
+    Blit(back.GetPos());
     hide = false;
 }
 
@@ -743,19 +743,19 @@ void TextSprite::SetText(const std::string & msg)
 {
     Hide();
     Set(msg);
-    back.Save(back.GetPos().x, back.GetPos().y, gw, gh + 5);
+    back.Save(Rect(back.GetPos(), gw, gh + 5));
 }
 
 void TextSprite::SetFont(Font::type_t ft)
 {
     Hide();
     Set(ft);
-    back.Save(back.GetPos().x, back.GetPos().y, gw, gh + 5);
+    back.Save(Rect(back.GetPos(), gw, gh + 5));
 }
 
 void TextSprite::SetPos(u16 ax, u16 ay)
 {
-    back.Save(ax, ay, gw, gh + 5);
+    back.Save(Rect(ax, ay, gw, gh + 5));
 }
 
 u16 TextSprite::w(void)
@@ -780,5 +780,5 @@ bool TextSprite::isShow(void) const
 
 const Rect & TextSprite::GetRect(void) const
 {
-    return back.GetRect();
+    return back.GetArea();
 }

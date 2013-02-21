@@ -92,8 +92,7 @@ Spell SpellBook::Open(const HeroBase & hero, const u8 filt, bool canselect) cons
     const Sprite & bookmark_clos = AGG::GetICN(ICN::BOOK, 5);
 
     const Rect pos((display.w() - (r_list.w() + l_list.w())) / 2, (display.h() - r_list.h()) / 2, r_list.w() + l_list.w(), r_list.h() + 70);
-    Background back(pos);
-    back.Save();
+    SpriteBack back(pos);
 
     const Rect prev_list(pos.x + (small ? 15 : 30), pos.y + (small ? 4 : 8), (small ? 15 : 30), (small ? 12 : 25));
     const Rect next_list(pos.x + (small ? 205 : 410), pos.y + (small ? 4: 8), (small ? 15 : 30), (small ? 12 :25));
@@ -256,8 +255,7 @@ void SpellBook::Edit(const HeroBase & hero)
     const Sprite & bookmark_clos = AGG::GetICN(ICN::BOOK, 5);
 
     const Rect pos((display.w() - (r_list.w() + l_list.w())) / 2, (display.h() - r_list.h()) / 2, r_list.w() + l_list.w(), r_list.h() + 70);
-    Background back(pos);
-    back.Save();
+    SpriteBack back(pos);
 
     const Rect prev_list(pos.x + 30, pos.y + 8, 30, 25);
     const Rect next_list(pos.x + 410, pos.y + 8, 30, 25);
