@@ -244,6 +244,7 @@ u32 AGG::Cache::ClearFreeObjects(void)
     DEBUG(DBG_ENGINE, DBG_INFO, "MID" << " " << "memory: " << total);
     total = 0;
 
+#ifdef WITH_TTF
     // fnt cache
     for(std::map<u16, fnt_cache_t>::iterator
 	it = obj.fnt_cache.begin(); it != obj.fnt_cache.end(); ++it)
@@ -256,6 +257,7 @@ u32 AGG::Cache::ClearFreeObjects(void)
 
     DEBUG(DBG_ENGINE, DBG_INFO, "FNT" << " " << "memory: " << total);
     total = 0;
+#endif
 
     // til cache
     if(obj.til_cache)
