@@ -119,3 +119,16 @@ void BoxRedraw(s16 posx, s16 posy, u8 count)
     pt.x = posx;
     AGG::GetICN(buybuild, 6).Blit(pt);
 }
+
+Dialog::RedrawableBox::RedrawableBox(u16 height, bool buttons)
+    : FrameBox(height, buttons)
+    , count_middle()
+{
+    if(buttons) height += BUTTON_HEIGHT;
+    count_middle = (height <= BOXAREA_TOP + BOXAREA_BOTTOM ? 0 : 1 + (height - BOXAREA_TOP - BOXAREA_BOTTOM) / BOXAREA_MIDDLE);
+}
+
+void Dialog::RedrawableBox::Redraw(void)
+{
+    BoxRedraw(GetArea().x, GetArea().y, count_middle);
+}

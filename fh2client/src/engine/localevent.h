@@ -242,6 +242,8 @@ public:
     KeySym KeyValue(void) const;
     u16	   KeyMod(void) const;
 
+    bool NetworkInputPending(void) const;
+
 #ifdef WITHOUT_MOUSE
     void ToggleEmulateMouse(void);
     void SetEmulateMouse(bool);
@@ -308,6 +310,7 @@ private:
     SDL::Time clock;
     u32 clock_delay;
     u8  loop_delay;
+    bool network_input_pending;
 
 #ifdef WITHOUT_MOUSE
     bool emulate_mouse;

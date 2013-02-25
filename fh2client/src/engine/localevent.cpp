@@ -25,12 +25,13 @@
 #include "audio_music.h"
 #include "audio_mixer.h"
 #include "localevent.h"
+#include "network.h"
 
 #define TAP_DELAY_EMULATE 1050
 
 LocalEvent::LocalEvent() : modes(0), key_value(KEY_NONE), mouse_state(0),
     mouse_button(0), mouse_st(0, 0), redraw_cursor_func(NULL), keyboard_filter_func(NULL),
-    clock_delay(TAP_DELAY_EMULATE), loop_delay(1)
+    clock_delay(TAP_DELAY_EMULATE), loop_delay(1), network_input_pending(false)
 {
 #ifdef WITHOUT_MOUSE
     emulate_mouse = false;
@@ -274,6 +275,14 @@ LocalEvent & LocalEvent::Get(void)
 bool LocalEvent::HandleEvents(bool delay)
 {
     SDL_Event event;
+
+    if(Network::Get().IsInputPending())
+    {
+        network_input_pending = true;
+        return true;
+    }
+
+    network_input_pending = false;
 
     ResetModes(MOUSE_MOTION);
     ResetModes(KEY_PRESSED);
@@ -683,6 +692,11 @@ bool LocalEvent::KeyPress(void) const
 bool LocalEvent::KeyPress(KeySym key) const
 {
     return key == key_value && (modes & KEY_PRESSED);
+}
+
+bool LocalEvent::NetworkInputPending(void) const
+{
+    return network_input_pending;
 }
 
 void LocalEvent::SetGlobalFilterMouseEvents(void (*pf)(u16, u16))

@@ -26,6 +26,7 @@
 
 #include "gamedefs.h"
 #include "engine.h"
+#include "network.h"
 #include "settings.h"
 #include "dir.h"
 #include "agg.h"
@@ -195,9 +196,7 @@ int main(int argc, char **argv)
 	    		case Game::NEWCAMPAIN:     rs = Game::NewCampain();		break;
 	    		case Game::NEWMULTI:       rs = Game::NewMulti();		break;
 			case Game::NEWHOTSEAT:     rs = Game::NewHotSeat();		break;
-#ifdef NETWORK_ENABLE
 		        case Game::NEWNETWORK:     rs = Game::NewNetwork();		break;
-#endif
 		        case Game::NEWBATTLEONLY:  rs = Game::NewBattleOnly();		break;
 	    		case Game::LOADSTANDARD:   rs = Game::LoadStandard();		break;
 	    		case Game::LOADCAMPAIN:    rs = Game::LoadCampain();		break;
@@ -217,6 +216,9 @@ int main(int argc, char **argv)
 	    VERBOSE(std::endl << conf.String());
 	}
 #endif
+
+    Network::Get().JoinNetworkThread();
+
 	return EXIT_SUCCESS;
 }
 

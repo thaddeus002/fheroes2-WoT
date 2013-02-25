@@ -35,8 +35,10 @@ class Castle;
 class Heroes;
 
 // control_t
-enum { CONTROL_NONE = 0, CONTROL_HUMAN = 1, CONTROL_AI = 4, CONTROL_REMOTE = 2 /*, CONTROL_LOCAL = CONTROL_AI | CONTROL_HUMAN */ };
+enum { CONTROL_NONE = 0, CONTROL_HUMAN = 1, CONTROL_AI = 4, CONTROL_REMOTE = 2, CONTROL_LOCAL = 5 };
 enum { FOCUS_UNSEL = 0, FOCUS_HEROES = 1, FOCUS_CASTLE = 2 };
+
+inline bool IsNetworkControl(int control) { return (control == CONTROL_LOCAL) || (control == CONTROL_REMOTE); };
 
 struct Focus : std::pair<u8, void*>
 {

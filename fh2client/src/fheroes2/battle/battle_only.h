@@ -26,6 +26,7 @@
 #include "army.h"
 #include "players.h"
 #include "heroes_recruits.h"
+#include "network.h"
 
 class ArmyBar;
 class PrimarySkillsBar;
@@ -107,11 +108,20 @@ namespace Battle
 	void		StartBattle(void);
 	void		UpdateHero1(const Point &);
 	void		UpdateHero2(const Point &);
+	bool        	WaitForPlayerAllocationFromServer(void); 
+	bool        	WaitForNetworkMessage(int); 
+	bool        	ProcessNetworkEvents(bool&, const Point&); 
+	bool        	ProcessNetworkStateChange(const NetworkEvent&);
 
 	static Only &	Get(void);
 	static Recruits GetHeroesFromStreamBuf(StreamBuf &);
 
 	Only();
+    private:
+	static void SendPrimarySkills(u8, u8, u8, u8);
+	static void SendSecondarySkills(const Skill::SecSkills&);
+	static void SendTroops(Army*);
+	static void SendArtifacts(BagArtifacts&);
     };
 }
 

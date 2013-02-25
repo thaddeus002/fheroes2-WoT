@@ -29,6 +29,8 @@
 #include "pocketpc.h"
 #include "world.h"
 #include "game.h"
+#include "network.h"
+#include "network_protocol.h"
 
 Game::menu_t Game::NewStandard(void)
 {
@@ -76,11 +78,11 @@ Game::menu_t Game::NewCampain(void)
     return Game::NEWGAME;
 }
 
-#ifdef NETWORK_ENABLE
 Game::menu_t Game::NewNetwork(void)
 {
     Settings & conf = Settings::Get();
     conf.SetGameType(conf.GameType() | Game::TYPE_NETWORK);
+	const ICN::icn_t system = (Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM);
 
     // cursor
     Cursor & cursor = Cursor::Get();
@@ -95,42 +97,103 @@ Game::menu_t Game::NewNetwork(void)
     const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
     back.Blit(top);
 
-    const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
-    panel.Blit(top.x + 405, top.y + 5);
-
     LocalEvent & le = LocalEvent::Get();
 
-    Button buttonHost(top.x + 455, top.y + 45, ICN::BTNNET, 0, 1);
-    Button buttonGuest(top.x + 455, top.y + 110, ICN::BTNNET, 2, 3);
-    Button buttonCancelGame(top.x + 455, top.y + 375, ICN::BTNMP, 8, 9);
+    Text text("Online Game", Font::BIG);
+    TextBox box2("Connecting to server...", Font::BIG, BOXAREA_WIDTH);
 
-    buttonHost.Draw();
-    buttonGuest.Draw();
-    buttonCancelGame.Draw();
+	Dialog::RedrawableBox box(text.h() + 10 + 13 + 20 + box2.h(), true);
+
+    const Rect & pos = box.GetArea();
+    Point dst_pt(pos.x, pos.y);
+
+    text.Blit(pos.x + (pos.w - text.w()) / 2, dst_pt.y);
+
+    dst_pt.x += 3;
+    dst_pt.y += 3;
+
+    box2.Blit(pos.x, dst_pt.y + 10 + 20);
+
+    // button cancel
+    const Sprite & s4 = AGG::GetICN(system, 5);
+    Button buttonCancel(pos.x + (pos.w - s4.w()) / 2, pos.y + pos.h - s4.h(), system, 3, 4);
+
+    buttonCancel.Draw();
 
     cursor.Show();
     display.Flip();
 
+    Network::Get().StartNetworkThread("fheroes2", Settings::GetVersion());
+
     // newgame loop
     while(le.HandleEvents())
     {
-	le.MousePressLeft(buttonHost) ? buttonHost.PressDraw() : buttonHost.ReleaseDraw();
-	le.MousePressLeft(buttonGuest) ? buttonGuest.PressDraw() : buttonGuest.ReleaseDraw();
-	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.PressDraw() : buttonCancelGame.ReleaseDraw();
+	bool redraw = false;
 
-	//if(le.MouseClickLeft(buttonHost) || HotKeyPress(EVENT_BUTTON_HOST)) return NetworkHost();
-	//if(le.MouseClickLeft(buttonGuest) || HotKeyPress(EVENT_BUTTON_GUEST)) return NetworkGuest();
-	if(HotKeyPress(EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonCancelGame)) return MAINMENU;
+	if(Network::Get().IsInputPending())
+	{
+	    NetworkEvent ev;
+	    Network::Get().DequeueInputEvent(ev);
 
-        // right info
-	if(le.MousePressRight(buttonHost)) Dialog::Message(_("Host"), _("The host sets up the game options. There can only be one host per network game."), Font::BIG);
-	if(le.MousePressRight(buttonGuest)) Dialog::Message(_("Guest"), _("The guest waits for the host to set up the game, then is automatically added in. There can be multiple guests for TCP/IP games."), Font::BIG);
-	if(le.MousePressRight(buttonCancelGame)) Dialog::Message(_("Cancel"), _("Cancel back to the main menu."), Font::BIG);
+	    if(ev.OldState != ev.NewState)
+	    {
+		switch(ev.NewState)
+		{
+		    case ST_CONNECTED:
+			box2.Set("Sending client version...", Font::BIG, BOXAREA_WIDTH);
+			break;
+		    case ST_IDENTIFIED:
+			box2.Set("Entering a battle-only game...", Font::BIG, BOXAREA_WIDTH);
+			{
+			    NetworkMessage Msg(HMM2_CREATEGAME_REQUEST);
+			    Network::Get().QueueOutputMessage(Msg);
+			}
+			break;
+		    case ST_INGAME:
+			conf.SetPreferablyCountPlayers(2);
+			world.NewMaps(10, 10);
+			return StartBattleOnly();
+		    case ST_DISCONNECTED:
+			box2.Set("Unable to connect to server", Font::BIG, BOXAREA_WIDTH);
+			break;
+		    case ST_ERROR:
+			text.Set("Error", Font::BIG);
+			box2.Set(ev.ErrorMessage, Font::BIG, BOXAREA_WIDTH);
+			break;
+		    case ST_CONNECTING:
+		    default:
+			box2.Set("Connecting to server...", Font::BIG, BOXAREA_WIDTH);
+			break;
+		}
+
+		redraw = true;
+	    }
+	}
+
+	if(redraw)
+	{
+	    const Rect & pos = box.GetArea();
+	    Point dst_pt(pos.x, pos.y);
+
+	    box.Redraw();
+
+	    text.Blit(pos.x + (pos.w - text.w()) / 2, dst_pt.y);
+
+	    dst_pt.x += 3;
+	    dst_pt.y += 3;
+
+	    box2.Blit(pos.x, dst_pt.y + 10 + 20);
+
+	    buttonCancel.Draw();
+	    display.Flip();
+	}
+
+	le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
+    	if(le.MouseClickLeft(buttonCancel) || HotKeyPress(EVENT_DEFAULT_EXIT)) break;
     }
 
     return Game::MAINMENU;
 }
-#endif
 
 Game::menu_t Game::NewGame(void)
 {
@@ -252,7 +315,7 @@ Game::menu_t Game::NewMulti(void)
 
     buttonHotSeat.Draw();
     buttonCancelGame.Draw();
-    buttonNetwork.SetDisable(true);
+    buttonNetwork.Draw();
 
     cursor.Show();
     display.Flip();
@@ -270,14 +333,9 @@ Game::menu_t Game::NewMulti(void)
 	if(le.MousePressRight(buttonHotSeat)) Dialog::Message(_("Hot Seat"), _("Play a Hot Seat game, where 2 to 4 players play around the same computer, switching into the 'Hot Seat' when it is their turn."), Font::BIG);
 	if(le.MousePressRight(buttonCancelGame)) Dialog::Message(_("Cancel"), _("Cancel back to the main menu."), Font::BIG);
 
-#ifdef NETWORK_ENABLE
-	if(buttonNetwork.isEnable())
-	{
-	    le.MousePressLeft(buttonNetwork) ? buttonNetwork.PressDraw() : buttonNetwork.ReleaseDraw();
-	    if(le.MouseClickLeft(buttonNetwork) || HotKeyPress(EVENT_BUTTON_NETWORK)) return NEWNETWORK;
-	    if(le.MousePressRight(buttonNetwork)) Dialog::Message(_("Network"), _("Play a network game, where 2 players use their own computers connected through a LAN (Local Area Network)."), Font::BIG);
-	}
-#endif
+	le.MousePressLeft(buttonNetwork) ? buttonNetwork.PressDraw() : buttonNetwork.ReleaseDraw();
+	if(le.MouseClickLeft(buttonNetwork) || HotKeyPress(EVENT_BUTTON_NETWORK)) return NEWNETWORK;
+	if(le.MousePressRight(buttonNetwork)) Dialog::Message(_("Network"), _("Play a network game, where 2 players use their own computers connected through a LAN (Local Area Network)."), Font::BIG);
     }
 
     return QUITGAME;

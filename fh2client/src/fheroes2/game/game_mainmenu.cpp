@@ -28,6 +28,7 @@
 #include "settings.h"
 #include "pocketpc.h"
 #include "game.h"
+#include "network.h"
 
 #define NEWGAME_DEFAULT 1
 #define LOADGAME_DEFAULT 5
@@ -37,6 +38,7 @@
 
 Game::menu_t Game::MainMenu(void)
 {
+    Network::Get().JoinNetworkThread();
     Mixer::Pause();
     AGG::PlayMusic(MUS::MAINMENU);
 

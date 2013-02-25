@@ -150,6 +150,16 @@ namespace Dialog
 	Rect		area;
     };
 
+    class RedrawableBox : public FrameBox
+    {
+    public:
+	RedrawableBox(u16 height, bool buttons = false);
+	void Redraw(void);
+
+    private:
+	u8 count_middle;
+    };
+
     class FrameBorder
     {
     public:
