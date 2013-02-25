@@ -51,7 +51,7 @@ Dialog::FrameBorder::FrameBorder(const Size & sz) : border(BORDERWIDTH)
     RedrawRegular(GetRect());
 }
 
-Dialog::FrameBorder::FrameBorder(s16 posx, s16 posy, u16 encw, u16 ench)
+Dialog::FrameBorder::FrameBorder(s16 posx, s16 posy, u16 encw, u16 ench) : border(BORDERWIDTH)
 {
     SetPosition(posx, posy, encw, ench);
     RedrawRegular(GetRect());
