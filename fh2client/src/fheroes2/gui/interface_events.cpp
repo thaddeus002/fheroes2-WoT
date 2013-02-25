@@ -561,18 +561,8 @@ void Interface::Basic::EventKeyArrowPress(Direction::vector_t dir)
     }
 }
 
-#if defined __MINGW32CE__
-#include <windows.h>
-#endif
-
 void Interface::Basic::EventDebug1(void)
 {
-#if defined __MINGW32CE__
-    MEMORYSTATUS pBuffer = { 0 };
-    GlobalMemoryStatus(& pBuffer);
-    VERBOSE("--------------------");
-    VERBOSE("available: " << pBuffer.dwAvailPhys / 1024 << " kb");
-#endif
     VERBOSE("free objects: " << AGG::Cache::ClearFreeObjects() / 1024 << " kb");
 }
 
