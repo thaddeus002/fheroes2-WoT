@@ -22,7 +22,7 @@
 
 #include <sys/eventfd.h>
 #include <errno.h>
-
+#include <unistd.h>
 #include <fcntl.h>
 
 #include <sys/socket.h>

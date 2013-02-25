@@ -25,6 +25,7 @@
 #include <sys/socket.h>
 #include <netinet/tcp.h>
 #include <sys/utsname.h>
+#include <unistd.h>
 
 #include "network.h"
 #include "network_protocol.h"
