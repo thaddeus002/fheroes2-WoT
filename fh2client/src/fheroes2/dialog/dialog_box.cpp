@@ -130,5 +130,5 @@ Dialog::RedrawableBox::RedrawableBox(u16 height, bool buttons)
 
 void Dialog::RedrawableBox::Redraw(void)
 {
-    BoxRedraw(GetArea().x, GetArea().y, count_middle);
+    BoxRedraw(GetRect().x, GetRect().y, count_middle);
 }
