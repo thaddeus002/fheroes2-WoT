@@ -574,7 +574,6 @@ void Interface::Basic::EventKeyArrowPress(Direction::vector_t dir)
 
 void Interface::Basic::EventDebug1(void)
 {
-    VERBOSE("free objects: " << AGG::Cache::ClearFreeObjects() / 1024 << " kb");
 }
 
 void Interface::Basic::EventDebug2(void)

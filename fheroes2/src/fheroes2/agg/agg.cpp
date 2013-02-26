@@ -324,6 +324,38 @@ u32 AGG::Cache::ClearFreeObjects(void)
     return total;
 }
 
+bool AGG::Cache::CheckMemoryLimit(void)
+{
+    Settings & conf = Settings::Get();
+
+    // memory limit trigger
+    if(conf.ExtPocketLowMemory() && 0 < conf.MemoryLimit())
+    {
+	u32 usage = GetMemoryUsage();
+
+	if(0 < usage && conf.MemoryLimit() < usage)
+	{
+    	    VERBOSE("MemoryLimit: " << "settings: " << conf.MemoryLimit() << ", game usage: " << usage);
+    	    const u32 freemem = ClearFreeObjects();
+    	    VERBOSE("MemoryLimit: " << "free " << freemem);
+
+    	    usage = GetMemoryUsage();
+
+    	    if(conf.MemoryLimit() < usage + (300 * 1024))
+    	    {
+        	VERBOSE("MemoryLimit: " << "settings: " << conf.MemoryLimit() << ", too small");
+        	// increase + 300Kb
+        	conf.SetMemoryLimit(usage + (300 * 1024));
+        	VERBOSE("MemoryLimit: " << "settings: " << "increase limit on 300kb, current value: " << conf.MemoryLimit());
+    	    }
+
+	    return true;
+	}
+    }
+
+    return false;
+}
+
 /* get AGG::Cache object */
 AGG::Cache & AGG::Cache::Get(void)
 {
@@ -920,6 +952,8 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u32 index, bool reflect)
 	    Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
 	    sp.ScaleMinifyByTwo();
 	}
+
+	CheckMemoryLimit();
     }
 }
 
@@ -1328,6 +1362,11 @@ const std::vector<u8> & AGG::Cache::GetMID(const XMI::xmi_t xmi)
 /* return FNT cache */
 const Surface & AGG::Cache::GetFNT(u16 c, u8 f)
 {
+    bool ttf_valid = font_small.isValid() && font_medium.isValid();
+
+    if(! ttf_valid)
+        return GetLetter(c, f);
+
     if(!fnt_cache[c].small_white.isValid()) LoadFNT(c);
 
     switch(f)
@@ -1351,14 +1390,6 @@ const SDL::Font & AGG::Cache::GetSmallFont(void) const
     return font_small;
 }
 #endif
-
-bool AGG::Cache::isValidFonts(void) const
-{
-#ifdef WITH_TTF
-    return Settings::Get().Unicode() ? font_small.isValid() && font_medium.isValid() : false;
-#endif
-    return false;
-}
 
 void AGG::Cache::PreloadPalette(void)
 {
@@ -1559,10 +1590,7 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 /* return letter sprite */
 const Surface & AGG::GetUnicodeLetter(u16 ch, u8 ft)
 {
-    if(AGG::Cache::Get().isValidFonts())
-	return AGG::Cache::Get().GetFNT(ch, ft);
-    else
-    return AGG::GetLetter(ch, ft);
+    return AGG::Cache::Get().GetFNT(ch, ft);
 }
 #endif
 

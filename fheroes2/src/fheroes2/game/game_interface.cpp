@@ -179,58 +179,9 @@ void Interface::Basic::Redraw(u8 force)
 
     if(conf.ExtGameHideInterface() && conf.ShowControlPanel() && (redraw & REDRAW_GAMEAREA)) controlPanel.Redraw();
 
-    u32 usage = GetMemoryUsage();
-
     // show system info
-    if(conf.ExtGameShowSystemInfo() && usage)
-	RedrawSystemInfo((conf.ExtGameHideInterface() ? 10 : 26), Display::Get().h() - (conf.ExtGameHideInterface() ? 14 : 30), usage);
-
-    // memory limit trigger
-    if(conf.ExtPocketLowMemory() && conf.MemoryLimit() && usage)
-    {
-	if(conf.MemoryLimit() < usage)
-	{
-	    Display & display = Display::Get();
-	    Cursor & cursor = Cursor::Get();
-
-	    cursor.Hide();
-	    AGG::ResetMixer();
-
-	    Rect rect((display.w() - 90) / 2, (display.h() - 30) / 2, 90, 45);
-	    TextBox text("memory limit\nclear cache\nwaiting...", Font::SMALL, rect.w);
-
-	    display.FillRect(0, 0, 0, rect);
-	    text.Blit(rect.x, rect.y);
-
-	    display.Flip();
-
-	    VERBOSE("MemoryLimit: " << "settings: " << conf.MemoryLimit() << ", game usage: " << usage);
-	    const u32 freemem = AGG::Cache::ClearFreeObjects();
-	    VERBOSE("MemoryLimit: " << "free " << freemem);
-
-	    redraw = 0xFF;
-	    if(conf.ExtGameHideInterface()) redraw &= ~REDRAW_BORDER;
-
-	    cursor.SetThemes(cursor.Themes(), true);
-	    cursor.Show();
-
-	    if(GetFocusType() != GameFocus::UNSEL)
-		AGG::PlayMusic(MUS::FromGround(world.GetTiles(GetFocusCenter()).GetGround()));
-	    Game::EnvironmentSoundMixer();
-	}
-
-	usage = GetMemoryUsage();
-
-	if(conf.MemoryLimit() < usage + (300 * 1024))
-	{
-	    VERBOSE("MemoryLimit: " << "settings: " << conf.MemoryLimit() << ", too small");
-
-	    // increase + 300Kb
-	    conf.SetMemoryLimit(usage + (300 * 1024));
-
-	    VERBOSE("MemoryLimit: " << "settings: " << "increase limit on 300kb, current value: " << conf.MemoryLimit());
-	}
-    }
+    if(conf.ExtGameShowSystemInfo())
+	RedrawSystemInfo((conf.ExtGameHideInterface() ? 10 : 26), Display::Get().h() - (conf.ExtGameHideInterface() ? 14 : 30), GetMemoryUsage());
 
     if((redraw | force) & REDRAW_BORDER)
 	    GameBorderRedraw();

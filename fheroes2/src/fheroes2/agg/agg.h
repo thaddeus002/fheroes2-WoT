@@ -130,14 +130,14 @@ namespace AGG
 	void LoadLOOPXXSounds(const u16*);
 	void ResetMixer(void);
 
-	bool isValidFonts(void) const;
-
-	static u32 ClearFreeObjects(void);
 	static void PreloadPalette(void);
 	static void PreloadFonts(void);
 
     private:
 	Cache();
+
+	static bool CheckMemoryLimit(void);
+	static u32  ClearFreeObjects(void);
 
 	const std::vector<u8> & ReadICNChunk(const ICN::icn_t, const u32);
 	const std::vector<u8> & ReadChunk(const std::string &);
