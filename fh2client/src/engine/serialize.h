@@ -30,10 +30,6 @@
 
 #include "types.h"
 
-#ifdef WITH_NET
-namespace Network { class Socket; }
-#endif
-
 struct Point;
 struct Rect;
 struct Size;
@@ -209,11 +205,6 @@ protected:
     friend std::ostream & operator<< (std::ostream &, StreamBuf &);
     friend std::istream & operator>> (std::istream &, StreamBuf &);
 
-#ifdef WITH_NET
-    friend Network::Socket & operator<< (Network::Socket &, StreamBuf &);
-    friend Network::Socket & operator>> (Network::Socket &, StreamBuf &);
-#endif
-
 #ifdef WITH_ZLIB
     friend class ZStreamBuf;
 #endif
@@ -227,10 +218,5 @@ protected:
 
 std::ostream & operator<< (std::ostream &, StreamBuf &);
 std::istream & operator>> (std::istream &, StreamBuf &);
-
-#ifdef WITH_NET
-Network::Socket & operator<< (Network::Socket &, StreamBuf &);
-Network::Socket & operator>> (Network::Socket &, StreamBuf &);
-#endif
 
 #endif

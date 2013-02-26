@@ -3,7 +3,7 @@
 #
 
 TARGET := fheroes2
-SDL_LIBS := $(shell sdl-config --libs)
+SDL_LIBS := $(shell sdl-config --libs) -lSDL_net
 SDL_FLAGS := $(shell sdl-config --cflags)
 
 CFLAGS := $(CFLAGS) -Wall -fsigned-char

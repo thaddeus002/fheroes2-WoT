@@ -21,11 +21,7 @@
  ***************************************************************************/
 
 #include <sstream>
-#include <errno.h>
-#include <sys/socket.h>
-#include <netinet/tcp.h>
 #include <sys/utsname.h>
-#include <unistd.h>
 
 #include "network.h"
 #include "network_protocol.h"
@@ -122,52 +118,10 @@ void (Network::*Network::StateHandlers[])(IOEvent&, const NetworkMessage&) = {
 
 void Network::ConnectedHandler(IOEvent &e)
 {
-    int error;
-    socklen_t optlen;
-    long opt;
-
-    if(e.error) {
-        if(::getsockopt(e.fd, SOL_SOCKET, SO_ERROR, &error, &optlen) >= 0) {
-            std::cout << "Network error occured: " << strerror(error) << std::endl;
-        }
-        else {
-            std::cout << "Network error occured" << std::endl;
-        }
-
-        SyncMutex.Lock();
-        InputQueue.push_back(NetworkEvent());
-
-        NetworkEvent &ne = InputQueue.back();
-
-        ne.OldState = State;
-        ne.NewState = ST_DISCONNECTED;
-        SyncMutex.Unlock();
-
-        SetState(ST_DISCONNECTED);
-
-        e.error = 0;
-        return;
-    }
-
     std::cout << "Connected" << std::endl;
 
     ParseState = ST_LEN_HI;
     MessageLen = 0;
-
-    opt = 1;
-    if(::setsockopt(e.fd, SOL_TCP, TCP_NODELAY, (const void*)&opt, sizeof(opt)) < 0) {
-        std::cout << "Unable to turn off Nagle algorithm for socket: " << strerror(errno) << std::endl;
-        return;
-    }
-
-    SyncMutex.Lock();
-    InputQueue.push_back(NetworkEvent());
-
-    NetworkEvent &ne = InputQueue.back();
-
-    ne.OldState = State;
-    ne.NewState = ST_CONNECTED;
-    SyncMutex.Unlock();
 
     SetState(ST_CONNECTED);
 
@@ -194,7 +148,7 @@ void Network::ConnectedHandler(IOEvent &e)
     e.read.handler = &Network::MessageReadHandler;
     e.write.handler = &Network::MessageWriteHandler;
 
-    RearmEvent(e);
+    ArmEvent(e);
 
     Network::MessageWriteHandler(e);
 }
@@ -202,89 +156,76 @@ void Network::ConnectedHandler(IOEvent &e)
 void Network::MessageReadHandler(IOEvent &e)
 {
     int rc;
-    u_char buf[1024];
-    u_char *p, *q;
+    u_char c;
 
-    do {
-        rc = ::read(e.fd, buf, sizeof(buf));
+    rc = SDLNet_TCP_Recv(e.socket, &c, 1);
 
-        std::cout << "read #" << e.fd << " " << rc << std::endl;
+    if(rc < 1) {
+        std::cout << "#" << e.socket << " input finished" << std::endl;
+        SetState(ST_DISCONNECTED);
+        e.read.armed = 0;
+        DisarmEvent(e);
+        return;
+    }
 
-        if(rc == -1) {
-            if(errno == EAGAIN || errno == EWOULDBLOCK) {
-                e.read.ready = 0;
-                RearmEvent(e);
-                break;
+    switch(ParseState) {
+        case ST_LEN_HI:
+            MessageLen = c << 8;
+            ParseState = ST_LEN_LO;
+            break;
+        case ST_LEN_LO:
+            MessageLen |= c;
+
+            Message = new u_char[MessageLen];
+
+            if(Message == NULL) {
+                return;
+            }
+
+            MessagePtr = Message;
+
+            *MessagePtr++ = MessageLen & 0xff;
+            *MessagePtr++ = MessageLen >> 8;
+
+            MessageLen -= 2;
+
+            ParseState = ST_BODY;
+            break;
+        case ST_BODY:
+            *MessagePtr++ = c;
+            MessageLen--;
+
+            if(MessageLen == 0) {
+                ParseState = ST_LEN_HI;
+
+                NetworkMessage Msg;
+
+                std::cout << "read #" << e.socket << " " << (MessagePtr - Message) << std::endl;
+
+                std::istringstream i(std::string((char*)Message, MessagePtr - Message));
+                i >> Msg;
+
+                std::cout << ">>> " << Msg.GetType() << std::endl;
+
+                delete Message;
+                Message = MessagePtr = 0;
+
+                if(i.good()) {
+                    (this->*StateHandlers[State])(e, Msg);
+                }
             }
             break;
-        }
-        else if(rc == 0) {
-            std::cout << "#" << e.fd << " input finished" << std::endl;
-            SetState(ST_DISCONNECTED);
-            e.read.armed = 0;
-            RearmEvent(e);
-            break;
-        }
-
-        p = buf;
-        q = p + rc;
-
-        while(p != q) {
-            switch(ParseState) {
-                case ST_LEN_HI:
-                    MessageLen = *p << 8;
-                    ParseState = ST_LEN_LO;
-                    break;
-                case ST_LEN_LO:
-                    MessageLen |= *p;
-
-                    Message = new u_char[MessageLen];
-
-                    if(Message == NULL) {
-                        return;
-                    }
-
-                    MessagePtr = Message;
-
-                    *MessagePtr++ = MessageLen & 0xff;
-                    *MessagePtr++ = MessageLen >> 8;
-
-                    MessageLen -= 2;
-
-                    ParseState = ST_BODY;
-                    break;
-                case ST_BODY:
-                    *MessagePtr++ = *p;
-                    MessageLen--;
-
-                    if(MessageLen == 0) {
-                        ParseState = ST_LEN_HI;
-
-                        NetworkMessage Msg;
-
-                        std::istringstream i(std::string((char*)Message, MessagePtr - Message));
-                        i >> Msg;
-
-                        std::cout << ">>> " << Msg.GetType() << std::endl;
-
-                        delete Message;
-                        Message = MessagePtr = 0;
-
-                        if(i.good()) {
-                            (this->*StateHandlers[State])(e, Msg);
-                        }
-                    }
-                    break;
-            }
-            p++;
-        }
-    }while(1);
+    }
 }
 
 void Network::MessageWriteHandler(IOEvent &e)
 {
     const char *pos, *last;
     ssize_t rc;
+
+    if(OutputQueue.empty()) {
+        return;
+    }
 
     if(OutputBuffer.string.get() == 0) {
         std::ostringstream message;
@@ -308,29 +249,17 @@ void Network::MessageWriteHandler(IOEvent &e)
             std::cout << "Removed output message " << &OutputQueue.front() << std::endl;
 
             OutputQueue.pop_front();
-
-            if(OutputQueue.empty()) {
-                e.write.armed = 0;
-                RearmEvent(e);
-            }
-
             break;
         }
 
-        rc = ::write(e.fd, pos, last - pos);
+        rc = SDLNet_TCP_Send(e.socket, pos, last - pos);
 
-        std::cout << "write #" << e.fd << " " << rc << std::endl;
+        std::cout << "write #" << e.socket << " " << rc << std::endl;
 
-        if(rc == -1 || rc == 0) {
-            if(errno == EAGAIN || errno == EWOULDBLOCK) {
-                e.write.ready = 0;
-                RearmEvent(e);
-                break;
-            }
+        if(rc < (last - pos)) {
             break;
         }
-        else {
-            OutputBuffer.pos += rc;
-        }
+
+        OutputBuffer.pos += rc;
     }while(1);
 }

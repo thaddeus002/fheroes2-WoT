@@ -26,8 +26,8 @@
 #include <string>
 #include <list>
 #include <memory>
-#include <sys/epoll.h>
-#include <signal.h>
+
+#include <SDL_net.h>
 
 #include "rect.h"
 #include "network_message.h"
@@ -94,7 +94,7 @@ class IOEvent
 {
 public:
     IOEvent()
-        : fd(-1)
+        : socket()
     {
         read.handler = NULL;
         read.armed = 0;
@@ -107,7 +107,7 @@ public:
         write.io_in_progress = 0;
     }
 
-    int                 fd;
+    TCPsocket           socket;
     channel_t           read;
     channel_t           write;
 
@@ -127,10 +127,8 @@ public:
     Network()
         : State(ST_INIT)
         , SocketEvent()
-        , EventFdEvent()
         , NEvents(100)
-        , EpollFd(-1)
-        , EpollEvents(0)
+        , SocketSet()
         , NetworkThread()
         , SyncMutex(true)
         , QuitFlag(false)
@@ -160,10 +158,8 @@ public:
     StateEnum                           State;
     ParseStateEnum                      ParseState;
     std::auto_ptr<IOEvent>              SocketEvent;
-    std::auto_ptr<IOEvent>              EventFdEvent;
     size_t                              NEvents;
-    int                                 EpollFd;
-    struct epoll_event                  *EpollEvents;
+    SDLNet_SocketSet                    SocketSet;
     SDL::Thread                         NetworkThread;
     SDL::Mutex                          SyncMutex;
     volatile bool                       QuitFlag;
@@ -202,16 +198,12 @@ private:
     void DisconnectedStateHandler(IOEvent&, const NetworkMessage&);
     void ErrorStateHandler(IOEvent&, const NetworkMessage&);
 
-    void EventFdReadHandler(IOEvent&);
     void ConnectedHandler(IOEvent&);
     void MessageReadHandler(IOEvent&);
     void MessageWriteHandler(IOEvent&);
 
-    void ArmEvent(IOEvent&, bool once = false);
-    void RearmEvent(IOEvent&, bool once = false);
-    void DisarmEvent(IOEvent&, bool once = false);
-
-    void WakeNetworkThread();
+    void ArmEvent(IOEvent&);
+    void DisarmEvent(IOEvent&);
 };
 
 #endif

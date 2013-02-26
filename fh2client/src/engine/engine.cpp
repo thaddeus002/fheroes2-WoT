@@ -20,10 +20,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <iostream>
 #include "error.h"
 #include "engine.h"
 #include "font.h"
-#include "sdlnet.h"
 
 namespace Mixer
 {
@@ -70,9 +70,6 @@ bool SDL::Init(const u32 system)
 #ifdef WITH_TTF
     SDL::Font::Init();
 #endif
-#ifdef WITH_NET
-    Network::Init();
-#endif
 
     SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
@@ -89,9 +86,6 @@ void SDL::Quit(void)
     WINCE::DeleteTrayIcon();
 #endif
 
-#ifdef WITH_NET
-    Network::Quit();
-#endif
 #ifdef WITH_TTF
     SDL::Font::Quit();
 #endif
