@@ -361,6 +361,17 @@ void Interface::Basic::EventDigArtifact(Game::menu_t & ret)
         	    std::string msg(_("After spending many hours digging here, you have uncovered the %{artifact}"));
         	    StringReplace(msg, "%{artifact}", ultimate.GetName());
         	    Dialog::ArtifactInfo(_("Congratulations!"), msg, ultimate());
+
+        	    // set all obelisks visited
+		    Kingdom & kingdom = world.GetKingdom(hero->GetColor());
+		    const MapsIndexes obelisks = Maps::GetObjectPositions(MP2::OBJ_OBELISK, true);
+    
+        	    for(MapsIndexes::const_iterator
+			it = obelisks.begin(); it != obelisks.end(); ++it)
+			if(!hero->isVisited(world.GetTiles(*it), Visit::GLOBAL))
+                	hero->SetVisited(*it, Visit::GLOBAL);
+
+    	            kingdom.PuzzleMaps().Update(kingdom.CountVisitedObjects(MP2::OBJ_OBELISK), world.CountObeliskOnMaps());
     		}
     		else
         	    Dialog::Message("", _("Nothing here. Where could it be?"), Font::BIG, Dialog::OK);
