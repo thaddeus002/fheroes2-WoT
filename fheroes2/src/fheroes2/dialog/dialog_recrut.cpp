@@ -264,7 +264,7 @@ Troop Dialog::RecruitMonster(const Monster & monster0, u16 available, bool ext)
 
     const Sprite & box = AGG::GetICN(ICN::RECRBKG, 0);
 
-    SpriteBack back(Rect((display.w() - box.w()) / 2, Settings::Get().QVGA() ? (display.h() - box.h()) / 2 - 15 : 0, box.w(), box.h()));
+    SpriteBack back(Rect((display.w() - box.w()) / 2, (display.h() - box.h()) / 2 - (Settings::Get().QVGA() ?  15 : 65), box.w(), box.h()));
     const Rect & pos = back.GetArea();
 
     const Rect rtChange(pos.x + 25, pos.y + 35, 85, 95);
