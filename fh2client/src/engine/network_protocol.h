@@ -24,33 +24,100 @@
 #define _NETWORK_PROTOCOL_H_
 
 // Basic messages
+
+/*
+ * Sent by the client to identify itself
+ */
 #define HMM2_CLIENT_INFO        1
+
+/*
+ * Sent by the server to identify itself with the server
+ */
 #define HMM2_SERVER_INFO        2
+
+/*
+ * Sent by the server to provide new server address
+ */
 #define HMM2_REDIRECT       3
+
+/*
+ * Sent by the client to login to the server
+ */
 #define HMM2_ACCESS_REQUEST 4
+
+/*
+ * Sent by client to create a new account
+ */
 #define HMM2_REGISTER_REQUEST   5
+
+/*
+ * Sent by client to change password
+ */
 #define HMM2_CHANGEPWD_REQUEST  6
+
+/*
+ * Sent by the server to reject client's credentials
+ */
 #define HMM2_ACCESS_REJECT  7
+
+/*
+ * Sent by the server to allow the client in
+ */
 #define HMM2_ACCESS_ACCEPT  8
+
+/*
+ * Sent by the client to request an upgrade
+ */
 #define HMM2_UPGRADE_REQUEST    9
+
+/*
+ * Sent by the server to initiate an upgrade
+ */
 #define HMM2_UPGRADE_RESPONSE   10
+
+/*
+ * Fetch profile from server
+ */
 #define HMM2_GET_PROFILE        11
+
+/*
+ * Change profile details on the server
+ */
 #define HMM2_SET_PROFILE        12
+
+/*
+ * Sent by the server to accept profile changes
+ */
 #define HMM2_PROFILE_RESPONSE   13
+
+/*
+ * Sent by the server to deny profile changes
+ */
 #define HMM2_PROFILE_REJECT 14
 
+/*
+ * Sent by the server to deny client's identification
+ */
 #define HMM2_CLIENT_UNKNOWN 20
-#define HMM2_UPGRADE_RECOMMENDED    21
-#define HMM2_UPGRADE_REQUIRED   22
-#define HMM2_INVALID_CDKEY  23
 
-// Channel messages
-#define HMM2_JOINCHANNEL_REQUEST    20
-#define HMM2_JOINCHANNEL_RESPONSE   21
-#define HMM2_JOINCHANNEL_REJECT 22
-#define HMM2_CHANNELLIST_REQUEST    23
-#define HMM2_CHANNELLIST_RESPONSE   24
-#define HMM2_CHANNELLIST_REJECT 25
+/*
+ * Sent by the server to propose resourses upgrade
+ */
+#define HMM2_UPGRADE_RECOMMENDED    21
+
+/*
+ * Sent by the server to insist on resourses upgrade
+ */
+#define HMM2_UPGRADE_REQUIRED   22
+#define HMM2_UNUSED_23  23
+
+// Chat messages
+#define HMM2_JOINCHAT_REQUEST    20
+#define HMM2_JOINCHAT_RESPONSE   21
+#define HMM2_JOINCHAT_REJECT 22
+#define HMM2_CHATLIST_REQUEST    23
+#define HMM2_CHATLIST_RESPONSE   24
+#define HMM2_CHATLIST_REJECT 25
 #define HMM2_MESSAGE        26
 
 // Game messages
@@ -70,6 +137,7 @@
 #define HMM2_JOIN_GAME_REJECT   38
 #define HMM2_START_GAME_RESPONSE    39
 #define HMM2_START_GAME_REJECT  40
+#define HMM2_START_GAME_NOTIFY  46
 #define HMM2_GAME_REPORT_RESPONSE   41
 #define HMM2_CLOSE_GAME_RESPONSE    42
 
@@ -143,6 +211,11 @@
 #define HMM2_GAME_PLAYER_YOU    0
 #define HMM2_GAME_PLAYER1_COLOR 1
 #define HMM2_GAME_PLAYER2_COLOR 2
+
+/*
+ * Used in HMM2_START_GAME_NOTIFY
+ */
+#define HMM2_GAME_SECONDS_TO_START    78
 
 #define HMM2_TTABLE_ID      80
 #define HMM2_TTABLE_PAGE        81

@@ -40,7 +40,7 @@ public:
     {
     }
 
-    NetworkMessage(u_char _type)
+    NetworkMessage(Uint8 _type)
         : str_chunks()
         , bin_chunks()
         , int_chunks()
@@ -56,34 +56,28 @@ public:
     {
     }
 
-    void add_str_chunk(u_char, const std::string&);
-    void add_bin_chunk(u_char, const std::string&);
-    void add_bin_chunk(u_char, const char*, size_t);
-    void add_int_chunk(u_char, int);
+    void add_str_chunk(Uint8, const std::string&);
+    void add_bin_chunk(Uint8, const std::string&);
+    void add_bin_chunk(Uint8, const char*, size_t);
+    void add_int_chunk(Uint8, int);
 
-    bool HasInt(u_char) const;
-    bool HasStr(u_char) const;
-    bool HasBin(u_char) const;
+    bool HasInt(Uint8) const;
+    bool HasStr(Uint8) const;
+    bool HasBin(Uint8) const;
 
     int GetType() const { return type; }
-    int GetInt(u_char) const;
-    std::string GetStr(u_char) const;
-    std::string GetBin(u_char) const;
-    void CopyBin(u_char, u_char*, size_t) const;
-
-private:
-    static void write_word(std::ostream &o, u_int16_t _value) {
-        o.put(_value >> 8);
-        o.put(_value & 0xff);
-    }
+    int GetInt(Uint8) const;
+    std::string GetStr(Uint8) const;
+    std::string GetBin(Uint8) const;
+    void CopyBin(Uint8, Uint8*, size_t) const;
 
 private:
     friend std::ostream& operator<<(std::ostream&, const NetworkMessage&);
     friend std::istream& operator>>(std::istream&, NetworkMessage&);
-    std::map<u_char, std::string> str_chunks;
-    std::map<u_char, std::string> bin_chunks;
-    std::map<u_char, int> int_chunks;
-    u_char type;
+    std::map<Uint8, std::string> str_chunks;
+    std::map<Uint8, std::string> bin_chunks;
+    std::map<Uint8, int> int_chunks;
+    Uint8 type;
 };
 
 std::ostream& operator<<(std::ostream&, const NetworkMessage&);

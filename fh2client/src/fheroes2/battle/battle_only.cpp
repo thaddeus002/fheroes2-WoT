@@ -230,15 +230,16 @@ bool Battle::Only::ProcessNetworkStateChange(const NetworkEvent &ev)
             return false;
 
         case ST_DISCONNECTED:
-        default:
             Dialog::Message("Error", "Disconnected from server", Font::BIG, Dialog::OK);
             return false;
+        default:
+			break;
     }
 
     return true;
 }
 
-bool Battle::Only::ProcessNetworkEvents(bool &redraw, const Point &cur_pt)
+bool Battle::Only::ProcessNetworkEvents(bool &redraw, const Point &cur_pt, bool &result, bool &exit, Button &buttonStart)
 {
     NetworkEvent ev;
     Network::Get().DequeueInputEvent(ev);
@@ -348,10 +349,28 @@ bool Battle::Only::ProcessNetworkEvents(bool &redraw, const Point &cur_pt)
             }
             break;
         case HMM2_START_GAME_RESPONSE:
+			/*
+             * The server has accepted our attempt to start the game,
+             */
             DEBUG(DBG_NETWORK, DBG_INFO, "HMM2_START_GAME_RESPONSE");
+			exit = true;
+			result = true;
+            break;
+        case HMM2_START_GAME_NOTIFY:
+			/*
+             * The server has accepted our attempt to start the game,
+             */
+            DEBUG(DBG_NETWORK, DBG_INFO, "HMM2_START_GAME_NOTIFY");
+			exit = true;
+			result = true;
             break;
         case HMM2_START_GAME_REJECT:
+			/*
+             * The server has rejected our attempt to start the game,
+			 * we need to enable the start button again
+             */
             DEBUG(DBG_NETWORK, DBG_INFO, "HMM2_START_GAME_REJECT");
+			buttonStart.SetDisable(false);
             break;
     }
 
@@ -451,8 +470,10 @@ bool Battle::Only::ChangeSettings(void)
     {
         if(Network::Get().IsInputPending())
 	{
-            if(!ProcessNetworkEvents(redraw, cur_pt))
-                return false;
+            if(!ProcessNetworkEvents(redraw, cur_pt, result, exit, buttonStart)) {
+				result = false;
+				exit = true;
+			}
         }
 
         buttonStart.isEnable() &&
@@ -734,14 +755,14 @@ bool Battle::Only::ChangeSettings(void)
       delete primskill_bar2;
       delete secskill_bar2;
       delete selectArtifacts2;
-      delete selectArmy2;
     }
+    delete selectArmy2;
 
     if(cinfo2) delete cinfo2;
 
     if(conf.GameType(Game::TYPE_NETWORK) && !result) {
         /*
-         * Ask server to close game and wait for a response
+         * Ask the server to disconnect
          */
         NetworkMessage Msg(HMM2_DISCONNECT_REQUEST);
         Network::Get().QueueOutputMessage(Msg);

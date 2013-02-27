@@ -21,8 +21,8 @@
  ***************************************************************************/
 
 #include <sstream>
-#include <sys/utsname.h>
 
+#include "system.h"
 #include "network.h"
 #include "network_protocol.h"
 
@@ -85,7 +85,13 @@ void Network::InChatStateHandler(IOEvent&, const NetworkMessage&)
 void Network::InGameStateHandler(IOEvent&, const NetworkMessage &Msg)
 {
     std::cout << "Network::InGameStateHandler" << std::endl;
-    QueueInputMessage(Msg);
+
+    if(Msg.GetType() == HMM2_START_GAME_RESPONSE || Msg.GetType() == HMM2_START_GAME_NOTIFY) {
+        SetState(ST_PLAYING, Msg);
+    }
+    else {
+        QueueInputMessage(Msg);
+    }
 }
 
 void Network::PlayingStateHandler(IOEvent&, const NetworkMessage&)
@@ -129,16 +135,12 @@ void Network::ConnectedHandler(IOEvent &e)
 
     NetworkEvent &one = OutputQueue.back();
 
-    struct utsname name;
-
-    ::uname(&name);
-
     one.Message.reset(new NetworkMessage(HMM2_CLIENT_INFO));
 
     one.Message->add_str_chunk(HMM2_CLIENT_TAG, "HMM2");
     one.Message->add_str_chunk(HMM2_CLIENT_VERSION, "0.1");
-    one.Message->add_str_chunk(HMM2_CLIENT_OSNAME, name.sysname);
-    one.Message->add_str_chunk(HMM2_CLIENT_OSVERSION, name.version);
+    one.Message->add_str_chunk(HMM2_CLIENT_OSNAME, System::GetOSName());
+    one.Message->add_str_chunk(HMM2_CLIENT_OSVERSION, System::GetOSVersion());
     one.Message->add_str_chunk(HMM2_CLIENT_SOFTNAME, SoftName);
     one.Message->add_str_chunk(HMM2_CLIENT_SOFTVERSION, SoftVersion);
 
@@ -156,7 +158,7 @@ void Network::ConnectedHandler(IOEvent &e)
 void Network::MessageReadHandler(IOEvent &e)
 {
     int rc;
-    u_char c;
+    Uint8 c;
 
     rc = SDLNet_TCP_Recv(e.socket, &c, 1);
 
@@ -176,7 +178,7 @@ void Network::MessageReadHandler(IOEvent &e)
         case ST_LEN_LO:
             MessageLen |= c;
 
-            Message = new u_char[MessageLen];
+            Message = new Uint8[MessageLen];
 
             if(Message == NULL) {
                 return;
@@ -207,7 +209,7 @@ void Network::MessageReadHandler(IOEvent &e)
 
                 std::cout << ">>> " << Msg.GetType() << std::endl;
 
-                delete Message;
+                delete [] Message;
                 Message = MessagePtr = 0;
 
                 if(i.good()) {

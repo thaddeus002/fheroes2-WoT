@@ -36,6 +36,9 @@ namespace System
     std::string GetDirname(const std::string &);
     std::string GetBasename(const std::string &);
 
+    std::string GetOSName(void);
+    std::string GetOSVersion(void);
+
     std::string GetTime(void);
 
     char*	SetLocale(int category, const char* locale);

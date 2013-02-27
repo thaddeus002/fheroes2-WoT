@@ -169,13 +169,11 @@ public:
 
     StrBuffer                           OutputBuffer;
 
-    sigset_t                            Sigmask;
-
     std::string                         SoftName;
     std::string                         SoftVersion;
 
     size_t                              MessageLen;
-    u_char                              *Message, *MessagePtr;
+    Uint8                               *Message, *MessagePtr;
 
 private:
     static int NetworkThreadWrapper(void*);

@@ -23,67 +23,69 @@
 #include <sstream>
 #include <iterator>
 
+#include <SDL_net.h>
+
 #include "network_message.h"
 
-void NetworkMessage::add_str_chunk(u_char type, const std::string &data)
+void NetworkMessage::add_str_chunk(Uint8 type, const std::string &data)
 {
     str_chunks.insert(std::make_pair(type, data));
 }
 
-void NetworkMessage::add_bin_chunk(u_char type, const std::string &data)
+void NetworkMessage::add_bin_chunk(Uint8 type, const std::string &data)
 {
     bin_chunks.insert(std::make_pair(type, data));
 }
 
-void NetworkMessage::add_bin_chunk(u_char Attribute, const char *data, size_t len)
+void NetworkMessage::add_bin_chunk(Uint8 Attribute, const char *data, size_t len)
 {
     bin_chunks.insert(std::make_pair(Attribute, std::string(data, len)));
 }
 
-void NetworkMessage::add_int_chunk(u_char type, int data)
+void NetworkMessage::add_int_chunk(Uint8 type, int data)
 {
     int_chunks.insert(std::make_pair(type, data));
 }
 
-bool NetworkMessage::HasInt(u_char Attribute) const
+bool NetworkMessage::HasInt(Uint8 Attribute) const
 {
-    std::map<u_char, int>::const_iterator i = int_chunks.find(Attribute);
+    std::map<Uint8, int>::const_iterator i = int_chunks.find(Attribute);
     return i != int_chunks.end();
 }
 
-bool NetworkMessage::HasStr(u_char Attribute) const
+bool NetworkMessage::HasStr(Uint8 Attribute) const
 {
-    std::map<u_char, std::string>::const_iterator i = str_chunks.find(Attribute);
+    std::map<Uint8, std::string>::const_iterator i = str_chunks.find(Attribute);
     return i != str_chunks.end();
 }
 
-bool NetworkMessage::HasBin(u_char Attribute) const
+bool NetworkMessage::HasBin(Uint8 Attribute) const
 {
-    std::map<u_char, std::string>::const_iterator i = bin_chunks.find(Attribute);
+    std::map<Uint8, std::string>::const_iterator i = bin_chunks.find(Attribute);
     return i != bin_chunks.end();
 }
 
-int NetworkMessage::GetInt(u_char Attribute) const
+int NetworkMessage::GetInt(Uint8 Attribute) const
 {
-    std::map<u_char, int>::const_iterator i = int_chunks.find(Attribute);
+    std::map<Uint8, int>::const_iterator i = int_chunks.find(Attribute);
     return i != int_chunks.end() ? i->second : 0;
 }
 
-std::string NetworkMessage::GetStr(u_char Attribute) const
+std::string NetworkMessage::GetStr(Uint8 Attribute) const
 {
-    std::map<u_char, std::string>::const_iterator i = str_chunks.find(Attribute);
+    std::map<Uint8, std::string>::const_iterator i = str_chunks.find(Attribute);
     return i != str_chunks.end() ? i->second : "";
 }
 
-std::string NetworkMessage::GetBin(u_char Attribute) const
+std::string NetworkMessage::GetBin(Uint8 Attribute) const
 {
-    std::map<u_char, std::string>::const_iterator i = bin_chunks.find(Attribute);
+    std::map<Uint8, std::string>::const_iterator i = bin_chunks.find(Attribute);
     return i != bin_chunks.end() ? i->second : "";
 }
 
-void NetworkMessage::CopyBin(u_char Attribute, u_char *data, size_t size) const
+void NetworkMessage::CopyBin(Uint8 Attribute, Uint8 *data, size_t size) const
 {
-    std::map<u_char, std::string>::const_iterator i = bin_chunks.find(Attribute);
+    std::map<Uint8, std::string>::const_iterator i = bin_chunks.find(Attribute);
     if(i != bin_chunks.end() && i->second.size() <= size) {
         std::copy(i->second.begin(), i->second.end(), data);
     }
@@ -93,42 +95,42 @@ std::ostream& operator<<(std::ostream& o, const NetworkMessage &Message)
 {
     std::ostringstream body;
 
-    for(std::map<u_char, int>::const_iterator i = Message.int_chunks.begin() ;
+    for(std::map<Uint8, int>::const_iterator i = Message.int_chunks.begin() ;
         i != Message.int_chunks.end() ; i++)
     {
-        u_int32_t data = i->second;
+        Uint32 data = i->second;
         body << '\000' << '\004' << '\001' << i->first
-            << (u_char)((data >> 24) & 0xff)
-            << (u_char)((data >> 16) & 0xff)
-            << (u_char)((data >> 8) & 0xff)
-            << (u_char)(data & 0xff);
+            << (Uint8)((data >> 24) & 0xff)
+            << (Uint8)((data >> 16) & 0xff)
+            << (Uint8)((data >> 8) & 0xff)
+            << (Uint8)(data & 0xff);
     }
 
-    for(std::map<u_char, std::string>::const_iterator i = Message.str_chunks.begin() ;
+    for(std::map<Uint8, std::string>::const_iterator i = Message.str_chunks.begin() ;
         i != Message.str_chunks.end() ; i++)
     {
-        u_int16_t length = i->second.size();
-        body << (u_char)((length >> 8) & 0xff) 
-            << (u_char)(length & 0xff)
+        Uint16 length = i->second.size();
+        body << (Uint8)((length >> 8) & 0xff) 
+            << (Uint8)(length & 0xff)
             << '\002' << i->first;
-        std::ostream_iterator<u_char> out_it(body);
+        std::ostream_iterator<Uint8> out_it(body);
         std::copy(i->second.begin(), i->second.end(), out_it);
     }
 
-    for(std::map<u_char, std::string>::const_iterator i = Message.bin_chunks.begin() ;
+    for(std::map<Uint8, std::string>::const_iterator i = Message.bin_chunks.begin() ;
         i != Message.bin_chunks.end() ; i++)
     {
-        u_int16_t length = i->second.size();
-        body << (u_char)((length >> 8) & 0xff) 
-            << (u_char)(length & 0xff)
+        Uint16 length = i->second.size();
+        body << (Uint8)((length >> 8) & 0xff) 
+            << (Uint8)(length & 0xff)
             << '\003' << i->first;
-        std::ostream_iterator<u_char> out_it(body);
+        std::ostream_iterator<Uint8> out_it(body);
         std::copy(i->second.begin(), i->second.end(), out_it);
     }
 
     std::string body_str(body.str());
 
-    u_int16_t length = body_str.size() + sizeof(u_int16_t) + 2;
+    Uint16 length = body_str.size() + sizeof(Uint16) + 2;
 
     o.put(length >> 8);
     o.put(length & 0xff);
@@ -136,7 +138,7 @@ std::ostream& operator<<(std::ostream& o, const NetworkMessage &Message)
     o.put(Message.type);
     o.put(Message.int_chunks.size() + Message.str_chunks.size() + Message.bin_chunks.size());
 
-    std::ostream_iterator<u_char> out_it(o);
+    std::ostream_iterator<Uint8> out_it(o);
     std::copy(body_str.begin(), body_str.end(), out_it);
 
     return o;
@@ -144,7 +146,7 @@ std::ostream& operator<<(std::ostream& o, const NetworkMessage &Message)
 
 std::istream& operator>>(std::istream& i, NetworkMessage &Message)
 {
-    u_char lo, hi, NumChunks, ChunkType, Attribute, hi32, lo32;
+    Uint8 lo, hi, NumChunks, ChunkType, Attribute, hi32, lo32;
     size_t len;
     std::string data;
     char c;

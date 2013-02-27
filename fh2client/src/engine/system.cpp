@@ -50,16 +50,21 @@ extern HINSTANCE SDL_Instance;
 extern HWND SDL_Window;
 #endif
 
-#if defined(__WIN32__)
+#if defined(__WIN32__) || defined(__WIN64__)
 #include <io.h>
 #endif
 
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#if defined(__LINUX__)
+#include <sys/utsname.h>
+#endif
+
+// define SEPARATOR
 #if defined(__SYMBIAN32__)
 #define SEPARATOR '\\'
-#elif defined(__WIN32__)
+#elif defined(__WIN32__) || defined(__WIN64__)
 #define SEPARATOR '\\'
 #else
 #define SEPARATOR '/'
@@ -69,7 +74,7 @@ int System::MakeDirectory(const std::string & path)
 {
 #if defined(__SYMBIAN32__)
     return mkdir(path.c_str(), S_IRWXU);
-#elif defined(__WIN32__)
+#elif defined(__WIN32__) || defined(__WIN64__)
     return mkdir(path.c_str());
 #else
     return mkdir(path.c_str(), S_IRWXU);
@@ -169,9 +174,9 @@ char* System::GetOptionsArgument(void)
 
 size_t System::GetMemoryUsage(void)
 {
-#if defined __SYMBIAN32__
+#if defined(__SYMBIAN32__)
     return 0;
-#elif defined __WIN32__
+#elif defined(__WIN32__) || defined(__WIN64__)
     static MEMORYSTATUS ms;
 
     ZeroMemory(&ms, sizeof(ms));
@@ -179,7 +184,7 @@ size_t System::GetMemoryUsage(void)
     GlobalMemoryStatus(&ms);
 
     return (ms.dwTotalVirtual - ms.dwAvailVirtual);
-#elif defined __LINUX__
+#elif defined(__LINUX__)
     unsigned int size = 0;
     std::ostringstream os;
     os << "/proc/" << getpid() << "/statm";
@@ -294,4 +299,39 @@ int System::ShellCommand(const char* cmd)
 #else
     return system(cmd);
 #endif
+}
+
+std::string System::GetOSVersion(void)
+{
+#if defined(__WIN32__) || defined(__WIN64__)
+    std::ostringstream version;
+    OSVERSIONINFO VersionInfo;
+    VersionInfo.dwOSVersionInfoSize = sizeof(VersionInfo);
+
+    ::GetVersionEx(&VersionInfo);
+
+    version << VersionInfo.dwMajorVersion << '.' << VersionInfo.dwMinorVersion;
+    return version.str();
+#elif defined(__LINUX__)
+    struct utsname name;
+    ::uname(&name);
+
+    return std::string(name.version);
+#endif
+
+    return "?";
+}
+
+std::string System::GetOSName(void)
+{
+#if defined(__WIN32__) || defined(__WIN64__)
+    return "Windows";
+#elif defined(__LINUX__)
+    struct utsname name;
+    ::uname(&name);
+
+    return std::string(name.sysname);
+#endif
+
+    return "unknown";
 }

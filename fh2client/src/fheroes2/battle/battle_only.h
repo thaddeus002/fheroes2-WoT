@@ -110,7 +110,7 @@ namespace Battle
 	void		UpdateHero2(const Point &);
 	bool        	WaitForPlayerAllocationFromServer(void); 
 	bool        	WaitForNetworkMessage(int); 
-	bool        	ProcessNetworkEvents(bool&, const Point&); 
+	bool        	ProcessNetworkEvents(bool&, const Point&, bool&, bool&, Button&); 
 	bool        	ProcessNetworkStateChange(const NetworkEvent&);
 
 	static Only &	Get(void);

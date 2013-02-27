@@ -172,7 +172,6 @@ Game::menu_t Game::NewNetwork(void)
 
 	if(redraw)
 	{
-	    const Rect & pos = box.GetArea();
 	    Point dst_pt(pos.x, pos.y);
 
 	    box.Redraw();
