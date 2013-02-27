@@ -84,11 +84,11 @@ namespace Game
 bool Game::Save(const std::string &fn)
 {
     DEBUG(DBG_GAME, DBG_INFO, fn);
-    const bool autosave = (GetBasename(fn) == "autosave.sav");
+    const bool autosave = (System::GetBasename(fn) == "autosave.sav");
     const Settings & conf = Settings::Get();
 
     // ask overwrite?
-    if(IsFile(fn) &&
+    if(System::IsFile(fn) &&
 	((!autosave && conf.ExtGameRewriteConfirm()) || (autosave && Settings::Get().ExtGameAutosaveConfirm())) &&
 	Dialog::NO == Dialog::Message("", _("Are you sure you want to overwrite the save with this name?"), Font::BIG, Dialog::YES|Dialog::NO))
     {

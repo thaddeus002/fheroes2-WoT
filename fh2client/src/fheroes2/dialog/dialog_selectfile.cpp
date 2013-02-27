@@ -20,12 +20,12 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <unistd.h> /* unlink usage */
-
 #include <algorithm>
 #include <ctime>
 #include <sstream>
 #include <string>
+
+#include "system.h"
 #include "dir.h"
 #include "agg.h"
 #include "button.h"
@@ -65,7 +65,7 @@ void FileInfoListBox::RedrawItem(const Maps::FileInfo & info, s16 dstx, s16 dsty
 
     std::fill(short_date, ARRAY_COUNT_END(short_date), 0);
     std::strftime(short_date, ARRAY_COUNT(short_date) - 1, "%b %d, %H:%M", std::localtime(&timeval));
-    std::string savname(GetBasename(info.file));
+    std::string savname(System::GetBasename(info.file));
 
     if(savname.size())
     {
@@ -117,7 +117,7 @@ void FileInfoListBox::ActionListSingleClick(Maps::FileInfo &)
 
 std::string ResizeToShortName(const std::string & str)
 {
-    std::string res = GetBasename(str);
+    std::string res = System::GetBasename(str);
     size_t it = res.find('.');
     if(std::string::npos != it) res.resize(it);
     return res;
@@ -173,7 +173,7 @@ bool Dialog::SelectFileSave(std::string & file)
 	std::replace_if(base.begin(), base.end(), ::isspace, '_');
 	std::ostringstream os;
 
-	os << Settings::GetSaveDir() << SEPARATOR << base <<
+	os << System::ConcatePath(Settings::GetSaveDir(), base) <<
 	    // add postfix:
 	    '_' << std::setw(4) << std::setfill('0') << world.CountDay() << ".sav";
 
@@ -275,7 +275,7 @@ bool SelectFileListSimple(const std::string & header, std::string & result, bool
         if((buttonOk.isEnable() && le.MouseClickLeft(buttonOk)) || Game::HotKeyPress(Game::EVENT_DEFAULT_READY))
         {
     	    if(filename.size())
-		result = Settings::GetSaveDir() + SEPARATOR + filename + ".sav";
+		result = System::ConcatePath(Settings::GetSaveDir(), filename + ".sav");
     	    else
     	    if(listbox.isSelected())
     		result = listbox.GetCurrent().file;
@@ -307,10 +307,10 @@ bool SelectFileListSimple(const std::string & header, std::string & result, bool
 	{
 	    std::string msg(_("Are you sure you want to delete file:"));
 	    msg.append("\n \n");
-	    msg.append(GetBasename(listbox.GetCurrent().file));
+	    msg.append(System::GetBasename(listbox.GetCurrent().file));
 	    if(Dialog::YES == Dialog::Message(_("Warning!"), msg, Font::BIG, Dialog::YES | Dialog::NO))
 	    {
-		unlink(listbox.GetCurrent().file.c_str());
+		System::Unlink(listbox.GetCurrent().file);
 		listbox.RemoveSelected();
 		if(lists.empty() || filename.empty()) buttonOk.SetDisable(true);
 		listbox.SetListContent(lists);

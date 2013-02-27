@@ -20,12 +20,12 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <unistd.h>
 #include <iostream>
 #include <string>
 
-#include "gamedefs.h"
 #include "engine.h"
+#include "system.h"
+#include "gamedefs.h"
 #include "network.h"
 #include "settings.h"
 #include "dir.h"
@@ -75,16 +75,16 @@ int main(int argc, char **argv)
 	// getopt
 	{
 	    int opt;
-	    while((opt = getopt(argc, argv, "hest:d:")) != -1)
+	    while((opt = System::GetCommandOptions(argc, argv, "hest:d:")) != -1)
     		switch(opt)
                 {
 #ifndef BUILD_RELEASE
                     case 't':
-			test = GetInt(optarg);
+			test = GetInt(System::GetOptionsArgument());
 			break;
 
                     case 'd':
-                	conf.SetDebug(optarg ? GetInt(optarg) : 0);
+                	conf.SetDebug(System::GetOptionsArgument() ? GetInt(System::GetOptionsArgument()) : 0);
                 	break;
 #endif
                     case '?':
@@ -277,7 +277,7 @@ void ReadConfigs(void)
 
     for(ListFiles::const_iterator
 	it = files.begin(); it != files.end(); ++it)
-    	if(IsFile(*it)) conf.Read(*it);
+    	if(System::IsFile(*it)) conf.Read(*it);
 }
 
 void InitHomeDir(void)
@@ -286,36 +286,36 @@ void InitHomeDir(void)
 
     if(! home.empty())
     {
-	const std::string home_maps  = home + SEPARATOR + std::string("maps");
-	const std::string home_files = home + SEPARATOR + std::string("files");
-	const std::string home_files_save = home_files + SEPARATOR + std::string("save");
+	const std::string home_maps  = System::ConcatePath(home, "maps");
+	const std::string home_files = System::ConcatePath(home, "files");
+	const std::string home_files_save = System::ConcatePath(home_files, "save");
 
-	if(! IsDirectory(home))
-	    MKDIR(home.c_str());
+	if(! System::IsDirectory(home))
+	    System::MakeDirectory(home);
 
-	if(IsDirectory(home, true) && ! IsDirectory(home_maps))
-	    MKDIR(home_maps.c_str());
+	if(System::IsDirectory(home, true) && ! System::IsDirectory(home_maps))
+	    System::MakeDirectory(home_maps);
 
-	if(IsDirectory(home, true) && ! IsDirectory(home_files))
-	    MKDIR(home_files.c_str());
+	if(System::IsDirectory(home, true) && ! System::IsDirectory(home_files))
+	    System::MakeDirectory(home_files);
 
-	if(IsDirectory(home_files, true) && ! IsDirectory(home_files_save))
-	    MKDIR(home_files_save.c_str());
+	if(System::IsDirectory(home_files, true) && ! System::IsDirectory(home_files_save))
+	    System::MakeDirectory(home_files_save);
     }
 }
 
 void SetVideoDriver(const std::string & driver)
 {
-    setenv("SDL_VIDEODRIVER", driver.c_str(), 1);
+    System::SetEnvironment("SDL_VIDEODRIVER", driver.c_str());
 }
 
 void SetTimidityEnvPath(const Settings & conf)
 {
-    const std::string prefix_timidity = std::string("files") + SEPARATOR + std::string("timidity");
+    const std::string prefix_timidity = System::ConcatePath("files", "timidity");
     const std::string result = Settings::GetLastFile(prefix_timidity, "timidity.cfg");
 
-    if(IsFile(result))
-	setenv("TIMIDITY_PATH", GetDirname(result).c_str(), 1);
+    if(System::IsFile(result))
+	System::SetEnvironment("TIMIDITY_PATH", System::GetDirname(result).c_str());
 }
 
 void SetLangEnvPath(const Settings & conf)
@@ -323,13 +323,13 @@ void SetLangEnvPath(const Settings & conf)
 #ifdef WITH_TTF
     if(conf.ForceLang().size())
     {
-	setenv("LANGUAGE", conf.ForceLang().c_str(), 1);
-	setenv("LANG", conf.ForceLang().c_str(), 1);
+	System::SetEnvironment("LANGUAGE", conf.ForceLang().c_str());
+	System::SetEnvironment("LANG", conf.ForceLang().c_str());
     }
 
     const std::string & strtmp = conf.GetLangDir();
 
-    setlocale(LC_ALL, "en_US.UTF8");
+    System::SetLocale(LC_ALL, "en_US.UTF8");
     bindtextdomain(GETTEXT_PACKAGE, strtmp.c_str());
     bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
     textdomain(GETTEXT_PACKAGE);

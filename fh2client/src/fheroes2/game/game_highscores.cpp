@@ -27,6 +27,8 @@
 #include <string>
 #include <cstring>
 #include <ctime>
+
+#include "system.h"
 #include "gamedefs.h"
 #include "agg.h"
 #include "cursor.h"
@@ -238,7 +240,7 @@ Game::menu_t Game::HighScores(void)
     HGSData hgs;
 
     std::ostringstream stream;
-    stream << conf.GetSaveDir() << SEPARATOR << "fheroes2.hgs";
+    stream << System::ConcatePath(conf.GetSaveDir(), "fheroes2.hgs");
 
     cursor.SetThemes(cursor.POINTER);
     Mixer::Pause();

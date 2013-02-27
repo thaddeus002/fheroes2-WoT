@@ -27,6 +27,7 @@
 #undef AI
 #endif
 
+#include "system.h"
 #include "ai.h"
 #include "agg.h"
 #include "engine.h"
@@ -679,7 +680,7 @@ Game::menu_t Interface::Basic::HumanTurn(bool isload)
 
 	// autosave
 	if(conf.ExtGameAutosaveOn() && conf.ExtGameAutosaveBeginOfDay())
-	    Game::Save(conf.GetSaveDir() + SEPARATOR + "autosave.sav");
+	    Game::Save(System::ConcatePath(conf.GetSaveDir(), "autosave.sav"));
     }
 
     // check game over
@@ -1000,7 +1001,7 @@ Game::menu_t Interface::Basic::HumanTurn(bool isload)
 	}
 
 	if(conf.ExtGameAutosaveOn() && !conf.ExtGameAutosaveBeginOfDay())
-	    Game::Save(conf.GetSaveDir() + SEPARATOR + "autosave.sav");
+	    Game::Save(System::ConcatePath(conf.GetSaveDir(), "autosave.sav"));
     }
 
     return res;

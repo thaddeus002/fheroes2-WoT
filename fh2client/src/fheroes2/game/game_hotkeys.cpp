@@ -22,9 +22,9 @@
 
 #include <sstream>
 #include <ctime>
-#include <cstdlib>
 #include <algorithm>
 
+#include "system.h"
 #include "gamedefs.h"
 #include "tinyconfig.h"
 #include "agg.h"
@@ -286,7 +286,7 @@ void Game::KeyboardGlobalFilter(int sym, u16 mod)
     if(sym == key_events[EVENT_SYSTEM_SCREENSHOT])
     {
         std::ostringstream stream;
-        stream << Settings::GetSaveDir() << SEPARATOR << "screenshot_" << std::time(0);
+        stream << System::ConcatePath(Settings::GetSaveDir(), "screenshot_") << std::time(0);
 
 #ifndef WITH_IMAGE
         stream << ".bmp";

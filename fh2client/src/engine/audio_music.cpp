@@ -21,6 +21,8 @@
  ***************************************************************************/
 
 #include <iostream>
+
+#include "system.h"
 #include "audio_mixer.h"
 #include "audio_music.h"
 
@@ -145,15 +147,15 @@ namespace Music
 
 int callbackPlayMusic(void *ptr)
 {
-    if(ptr && system(NULL))
+    if(ptr && System::ShellCommand(NULL))
     {
 	info_t & info = *reinterpret_cast<info_t *>(ptr);
 	if(info.loop)
 	{
-	    while(1){ system(info.run.c_str()); DELAY(10); }
+	    while(1){ System::ShellCommand(info.run.c_str()); DELAY(10); }
 	}
 	else
-	return system(info.run.c_str());
+	return System::ShellCommand(info.run.c_str());
     }
     return -1;
 }

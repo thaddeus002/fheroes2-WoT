@@ -134,7 +134,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	back.Blit(top);
     }
 
-    const bool reset_starting_settings = conf.MapsFile().empty() || ! IsFile(conf.MapsFile());
+    const bool reset_starting_settings = conf.MapsFile().empty() || ! System::IsFile(conf.MapsFile());
     Players & players = conf.GetPlayers();
     Interface::PlayersInfo playersInfo(true, !conf.QVGA(), !conf.QVGA());
 
