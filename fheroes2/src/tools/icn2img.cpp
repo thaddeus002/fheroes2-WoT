@@ -20,16 +20,16 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <sys/stat.h>
-#include <sys/types.h>
-
 #include <iostream>
 #include <iomanip>
 #include <fstream>
 #include <sstream>
 #include <cstring>
+#include <iomanip>
+
 #include "SDL.h"
 #include "engine.h"
+#include "system.h"
 
 void SpriteDrawICN(Surface & sf, const u8* cur, const u32 size,  bool debug);
 
@@ -109,9 +109,9 @@ int main(int argc, char **argv)
     
     shortname.replace(shortname.find(".icn"), 4, "");
     
-    prefix += SEPARATOR + shortname;
+    prefix = System::ConcatePath(prefix, shortname);
 
-    if(0 != MKDIR(prefix.c_str()))
+    if(0 != System::MakeDirectory(prefix))
     {
 	std::cout << "error mkdir: " << prefix << std::endl;
 	return EXIT_SUCCESS;
@@ -152,26 +152,10 @@ int main(int argc, char **argv)
 	SpriteDrawICN(sf, reinterpret_cast<const u8*>(buf), data_size, debug);
         delete [] buf;
 
-	std::string dstfile(prefix);
-	dstfile += SEPARATOR;
-
 	std::ostringstream stream;
-        stream << ii;
+        stream << std::setw(3) << std::setfill('0') << ii;
 
-        switch(stream.str().size())
-        {
-    	    case 1:
-    		dstfile += "00" + stream.str();
-    		break;
-
-    	    case 2:
-    		dstfile += "0" + stream.str();
-    		break;
-
-    	    default:
-    		dstfile += stream.str();
-    		break;
-        }
+	std::string dstfile = System::ConcatePath(prefix, stream.str());
 
 #ifndef WITH_IMAGE
 	dstfile += ".bmp";

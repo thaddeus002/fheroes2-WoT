@@ -20,15 +20,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <sys/stat.h>
-#include <sys/types.h>
-
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <cctype>
+
 #include "SDL.h"
-#include "types.h"
+#include "engine.h"
+#include "system.h"
 
 #define AGGSIZENAME	15
 
@@ -58,7 +57,7 @@ int main(int argc, char **argv)
 	return EXIT_SUCCESS;
     }
 
-    MKDIR(argv[2]);
+    System::MakeDirectory(argv[2]);
 
     u16 count;
     u16 total = 0;
@@ -93,9 +92,7 @@ int main(int argc, char **argv)
 	char *body = new char[fat.size];
         fd_data.read(body, fat.size);
 
-	std::string full_name(argv[2]);
-	full_name += SEPARATOR;
-	full_name += fat.name;
+	const std::string full_name = System::ConcatePath(argv[2], fat.name);
 
 	std::fstream fd_body(full_name.c_str(), std::ios::out | std::ios::binary);
 

@@ -24,6 +24,7 @@
 #include <fstream>
 #include <iostream>
 
+#include "system.h"
 #include "settings.h"
 #include "text.h"
 #include "engine.h"
@@ -177,7 +178,7 @@ AGG::Cache::Cache()
 {
 #ifdef WITH_TTF
     Settings & conf = Settings::Get();
-    const std::string prefix_fonts = std::string("files") + SEPARATOR + std::string("fonts");
+    const std::string prefix_fonts = System::ConcatePath("files", "fonts");
     const std::string font1 = Settings::GetLastFile(prefix_fonts, conf.FontsNormal());
     const std::string font2 = Settings::GetLastFile(prefix_fonts, conf.FontsSmall());
 
@@ -331,7 +332,7 @@ bool AGG::Cache::CheckMemoryLimit(void)
     // memory limit trigger
     if(conf.ExtPocketLowMemory() && 0 < conf.MemoryLimit())
     {
-	u32 usage = GetMemoryUsage();
+	u32 usage = System::GetMemoryUsage();
 
 	if(0 < usage && conf.MemoryLimit() < usage)
 	{
@@ -339,7 +340,7 @@ bool AGG::Cache::CheckMemoryLimit(void)
     	    const u32 freemem = ClearFreeObjects();
     	    VERBOSE("MemoryLimit: " << "free " << freemem);
 
-    	    usage = GetMemoryUsage();
+    	    usage = System::GetMemoryUsage();
 
     	    if(conf.MemoryLimit() < usage + (300 * 1024))
     	    {
@@ -715,7 +716,7 @@ bool AGG::Cache::LoadExtICN(const ICN::icn_t icn, const u32 index, bool reflect)
 bool AGG::Cache::LoadAltICN(const ICN::icn_t icn, const u32 index, bool reflect)
 {
 #ifdef WITH_XML
-    const std::string prefix_images_icn = std::string("files") + SEPARATOR + std::string("images") + SEPARATOR + StringLower(ICN::GetString(icn));
+    const std::string prefix_images_icn = System::ConcatePath(System::ConcatePath("files", "images"), StringLower(ICN::GetString(icn)));
     const std::string xml_spec = Settings::GetLastFile(prefix_images_icn, "spec.xml");
 
     // parse spec.xml
@@ -754,7 +755,7 @@ bool AGG::Cache::LoadAltICN(const ICN::icn_t icn, const u32 index, bool reflect)
 	    Sprite & sp1 = v.sprites[index];
 	    Sprite & sp2 = v.reflect[index];
 
-	    if(! sp1.isValid() && IsFile(name) && sp1.Load(name.c_str()))
+	    if(! sp1.isValid() && System::IsFile(name) && sp1.Load(name.c_str()))
 	    {
 		sp1.SetOffset(ox, oy);
 		DEBUG(DBG_ENGINE, DBG_TRACE, xml_spec << ", " << index);
@@ -786,14 +787,14 @@ void AGG::Cache::SaveICN(const ICN::icn_t icn)
 	icn_cache_t & v = icn_cache[icn];
 
         const std::string icn_lower = StringLower(ICN::GetString(icn));
-	const std::string icn_dir = images_dir + SEPARATOR + icn_lower;
+	const std::string icn_dir = System::ConcatePath(images_dir, icn_lower);
 
-	if(! IsDirectory(icn_dir))
-		MKDIR(icn_dir.c_str());
+	if(! System::IsDirectory(icn_dir))
+		System::MakeDirectory(icn_dir);
 
-	if(IsDirectory(icn_dir, true))
+	if(System::IsDirectory(icn_dir, true))
 	{
-	    const std::string stats_file = icn_dir + SEPARATOR + "stats.xml";
+	    const std::string stats_file = System::ConcatePath(icn_dir, "stats.xml");
 	    bool need_save = false;
 	    TiXmlDocument doc;
 	    TiXmlElement* icn_element = NULL;
@@ -828,9 +829,9 @@ void AGG::Cache::SaveICN(const ICN::icn_t icn)
 #else
     		    sp_name << ".png";
 #endif
-		    const std::string image_full = icn_dir + SEPARATOR + sp_name.str();
+		    const std::string image_full = System::ConcatePath(icn_dir, sp_name.str());
 
-		    if(! IsFile(image_full))
+		    if(! System::IsFile(image_full))
 		    {
 			sp.Save(image_full);
 
@@ -960,7 +961,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u32 index, bool reflect)
 bool AGG::Cache::LoadAltTIL(const TIL::til_t til, u32 max)
 {
 #ifdef WITH_XML
-    const std::string prefix_images_til = std::string("files") + SEPARATOR + std::string("images") + SEPARATOR + StringLower(TIL::GetString(til));
+    const std::string prefix_images_til = System::ConcatePath(System::ConcatePath("files", "images"), StringLower(TIL::GetString(til)));
     const std::string xml_spec = Settings::GetLastFile(prefix_images_til, "spec.xml");
 
     // parse spec.xml
@@ -992,7 +993,7 @@ bool AGG::Cache::LoadAltTIL(const TIL::til_t til, u32 max)
 		std::string name(xml_spec);
 		StringReplace(name, "spec.xml", xml_sprite->Attribute("name"));
 
-		if(IsFile(name))
+		if(System::IsFile(name))
 		    sf.Load(name.c_str());
 		else
 		    DEBUG(DBG_ENGINE, DBG_TRACE, "load til" << ": " << name);
@@ -1088,7 +1089,7 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
     if(conf.UseAltResource())
     {
        std::string name = StringLower(M82::GetString(m82));
-	const std::string prefix_sounds = std::string("files") + SEPARATOR + std::string("sounds");
+	const std::string prefix_sounds = System::ConcatePath("files", "sounds");
        // ogg
        StringReplace(name, ".82m", ".ogg");
        std::string sound = Settings::GetLastFile(prefix_sounds, name);
@@ -1519,8 +1520,8 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
     if(!conf.Music() || MUS::UNUSED == mus || MUS::UNKNOWN == mus || (Game::CurrentMusic() == mus && Music::isPlaying())) return;
 
     Game::SetCurrentMusic(mus);
-    const std::string prefix_music = std::string("files") + SEPARATOR + std::string("music");
-    
+    const std::string prefix_music = System::ConcatePath("files", "music");
+
     if(conf.MusicExt())
     {
 	const std::string musname = Settings::GetLastFile(prefix_music, MUS::GetString(mus));
@@ -1529,20 +1530,20 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 	std::string shortname = Settings::GetLastFile(prefix_music, MUS::GetString(mus, true));
 	const char* filename = NULL;
 
-	if(IsFile(musname))   filename = musname.c_str();
+	if(System::IsFile(musname))   filename = musname.c_str();
 	else
-	if(IsFile(shortname)) filename = shortname.c_str();
+	if(System::IsFile(shortname)) filename = shortname.c_str();
 	else
 	{
 	    StringReplace(shortname, ".ogg", ".mp3");
-	    if(IsFile(shortname)) filename = shortname.c_str();
+	    if(System::IsFile(shortname)) filename = shortname.c_str();
 	    else
 		DEBUG(DBG_ENGINE, DBG_WARN, "error read file: " << musname << ", skipping...");
 	}
 
 	if(filename) Music::Play(filename, loop);
 #else
-	if(IsFile(musname) && conf.PlayMusCommand().size())
+	if(System::IsFile(musname) && conf.PlayMusCommand().size())
 	{
 	    const std::string run = conf.PlayMusCommand() + " " + musname;
 	    Music::Play(run.c_str(), loop);
@@ -1572,7 +1573,7 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 	    {
 		const std::string file = Settings::GetLastFile(prefix_music, XMI::GetString(xmi));
 
-		if(IsFile(file))
+		if(System::IsFile(file))
 		{
 		    const std::string run = conf.PlayMusCommand() + " " + file;
 		    Music::Play(run.c_str(), loop);

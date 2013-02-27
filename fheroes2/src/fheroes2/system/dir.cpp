@@ -22,6 +22,7 @@
 
 #include <dirent.h>
 
+#include "system.h"
 #include "gamedefs.h"
 #include "settings.h"
 #include "dir.h"
@@ -46,10 +47,10 @@ void ListFiles::ReadDir(const std::string &path, const std::string &filter, bool
     {
 	while(NULL != (ep = readdir(dp)))
 	{
-	    const std::string fullname(path + SEPARATOR + ep->d_name);
+	    const std::string fullname = System::ConcatePath(path, ep->d_name);
 
     	    // if not regular file
-    	    if(! IsFile(fullname)) continue;
+    	    if(! System::IsFile(fullname)) continue;
 
 	    if(filter.size())
 	    {

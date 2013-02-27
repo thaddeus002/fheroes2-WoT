@@ -26,9 +26,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cstring>
-#include <locale>
 #include <climits>
-#include <cctype>
 #include "error.h"
 #include "types.h"
 #include "tools.h"
@@ -398,102 +396,10 @@ size_t InsertKeySym(std::string & res, size_t pos, KeySym sym, u16 mod)
     return pos;
 }
 
-std::string GetTime(void)
-{
-    time_t raw;
-    struct tm* tmi;
-    char buf [13] = { 0 };
-
-    std::time(&raw);
-    tmi = std::localtime(&raw);
-
-    std::strftime(buf, sizeof(buf) - 1, "%X", tmi);
-
-    return std::string(buf);
-}
-
 int Sign(int s)
 {
     return (s < 0 ? -1 : (s > 0 ? 1 : 0));
 }
-
-std::string GetDirname(const std::string & str)
-{
-    if(str.size())
-    {
-	size_t pos = str.rfind(SEPARATOR);
-
-	if(std::string::npos == pos)
-	    return std::string(".");
-        else
-	if(pos == 0)
-	    return std::string("./");
-	else
-	if(pos == str.size() - 1)
-	    return GetDirname(str.substr(0, str.size() - 1));
-        else
-	    return str.substr(0, pos);
-    }
-
-    return str;
-}
-
-std::string GetBasename(const std::string & str)
-{
-    if(str.size())
-    {
-	size_t pos = str.rfind(SEPARATOR);
-
-	if(std::string::npos == pos ||
-	    pos == 0) return str;
-	else
-	if(pos == str.size() - 1)
-	    return GetBasename(str.substr(0, str.size() - 1));
-	else
-	    return str.substr(pos + 1);
-    }
-
-    return str;
-}
-
-#if defined __SYMBIAN32__
-u32 GetMemoryUsage(void)
-{
-    return 0;
-}
-#elif defined __WIN32__
-#include "windows.h"
-u32 GetMemoryUsage(void)
-{
-    static MEMORYSTATUS ms;
-    ZeroMemory(&ms, sizeof(ms));
-    ms.dwLength = sizeof(MEMORYSTATUS);
-    GlobalMemoryStatus(&ms);
-    return (ms.dwTotalVirtual - ms.dwAvailVirtual);
-}
-#elif defined __LINUX__
-#include "unistd.h"
-u32 GetMemoryUsage(void)
-{
-    unsigned int size = 0;
-    std::ostringstream os;
-    os << "/proc/" << getpid() << "/statm";
-
-    std::ifstream fs(os.str().c_str());
-    if(fs.is_open())
-    {
-	fs >> size;
-        fs.close();
-    }
-
-    return size * getpagesize();
-}
-#else
-u32 GetMemoryUsage(void)
-{
-    return 0;
-}
-#endif
 
 KeySym KeySymFromChar(char c)
 {
@@ -737,42 +643,6 @@ std::string EncodeString(const std::string & str, const char* charset)
     return str;
 }
 #endif
-
-int sdl_putenv(const char *name, const char *value, int overwrite)
-{
-    std::string str(std::string(name) + "=" + std::string(value));
-    // SDL 1.2.12 (char *)
-    return SDL_putenv(const_cast<char *>(str.c_str()));
-}
-
-char* sdl_getenv(const char* env)
-{
-    return SDL_getenv(env);
-}
-
-bool IsFile(const std::string & name, bool writable)
-{
-    struct stat fs;
-
-    if(stat(name.c_str(), &fs) || !S_ISREG(fs.st_mode))
-	return false;
-
-#if defined(ANDROID)
-    return writable ? 0 == access(name.c_str(), W_OK) : true;
-#else
-    return writable ? 0 == access(name.c_str(), W_OK) : S_IRUSR & fs.st_mode;
-#endif
-}
-
-bool IsDirectory(const std::string & name, bool writable)
-{
-    struct stat fs;
-
-    if(stat(name.c_str(), &fs) || !S_ISDIR(fs.st_mode))
-	return false;
-
-    return writable ? 0 == access(name.c_str(), W_OK) : S_IRUSR & fs.st_mode;
-}
 
 Points GetLinePoints(const Point & pt1, const Point & pt2, u16 step)
 {

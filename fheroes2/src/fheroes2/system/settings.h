@@ -28,6 +28,8 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+
+#include "system.h"
 #include "gamedefs.h"
 #include "maps_fileinfo.h"
 #include "game.h"
@@ -108,12 +110,16 @@ namespace std
  static const char* android_endl = "\n";
 }
  #define endl android_endl
- #define VERBOSE(x) if(true) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "FHeroes", "%s", osss.str().c_str()); } else GetTime()
+ #define VERBOSE(x) if(true) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "FHeroes", "%s", osss.str().c_str()); } else System::GetTime()
 #else
  #define VERBOSE(x) std::cout << x << std::endl
 #endif
 
-#define DEBUG(x, y, z) if(IS_DEBUG(x, y)) VERBOSE(GetTime() << ": [" << StringDebug(x) << "]\t" << __FUNCTION__ << ":  " << z)
+#ifdef WITH_DEBUG
+#define DEBUG(x, y, z) if(IS_DEBUG(x, y)) VERBOSE(System::GetTime() << ": [" << StringDebug(x) << "]\t" << __FUNCTION__ << ":  " << z)
+#else
+#define DEBUG(x, y, z)
+#endif
 #define IS_DEVEL() IS_DEBUG(DBG_DEVEL, DBG_INFO)
 
 bool IS_DEBUG(int name, int level);

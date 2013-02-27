@@ -21,9 +21,9 @@
  ***************************************************************************/
 
 #include <map>
-#include <cstdlib>
 #include <algorithm>
 
+#include "system.h"
 #include "gamedefs.h"
 #include "tinyconfig.h"
 #include "settings.h"
@@ -371,66 +371,66 @@ u8 Game::GetWhirlpoolPercent(void)
 void Game::LoadExternalResource(const Settings & conf)
 {
     std::string spec;
-    const std::string prefix_stats = std::string("files") + SEPARATOR + std::string("stats");
+    const std::string prefix_stats = System::ConcatePath("files", "stats");
 
     // globals.xml
     spec = Settings::GetLastFile(prefix_stats, "globals.xml");
 
-    if(IsFile(spec))
+    if(System::IsFile(spec))
 	Game::UpdateGlobalDefines(spec);
 
     // animations.xml
     spec = Settings::GetLastFile(prefix_stats, "animations.xml");
 
-    if(IsFile(spec))
+    if(System::IsFile(spec))
 	Battle::UpdateMonsterSpriteAnimation(spec);
 
     // battle.xml
     spec = Settings::GetLastFile(prefix_stats, "battle.xml");
 
-    if(IsFile(spec))
+    if(System::IsFile(spec))
 	Battle::UpdateMonsterAttributes(spec);
 
     // monsters.xml
     spec = Settings::GetLastFile(prefix_stats, "monsters.xml");
 
-    if(IsFile(spec))
+    if(System::IsFile(spec))
 	Monster::UpdateStats(spec);
 
     // spells.xml
     spec = Settings::GetLastFile(prefix_stats, "spells.xml");
 
-    if(IsFile(spec))
+    if(System::IsFile(spec))
 	Spell::UpdateStats(spec);
 
     // artifacts.xml
     spec = Settings::GetLastFile(prefix_stats, "artifacts.xml");
 
-    if(IsFile(spec))
+    if(System::IsFile(spec))
 	Artifact::UpdateStats(spec);
 
     // buildings.xml
     spec = Settings::GetLastFile(prefix_stats, "buildings.xml");
 
-    if(IsFile(spec))
+    if(System::IsFile(spec))
 	BuildingInfo::UpdateCosts(spec);
 
     // payments.xml
     spec = Settings::GetLastFile(prefix_stats, "payments.xml");
 
-    if(IsFile(spec))
+    if(System::IsFile(spec))
 	PaymentConditions::UpdateCosts(spec);
 
     // profits.xml
     spec = Settings::GetLastFile(prefix_stats, "profits.xml");
 
-    if(IsFile(spec))
+    if(System::IsFile(spec))
 	ProfitConditions::UpdateCosts(spec);
 
     // skills.xml
     spec = Settings::GetLastFile(prefix_stats, "skills.xml");
 
-    if(IsFile(spec))
+    if(System::IsFile(spec))
 	Skill::UpdateStats(spec);
 }
 

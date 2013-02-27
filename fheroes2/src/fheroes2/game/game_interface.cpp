@@ -181,7 +181,7 @@ void Interface::Basic::Redraw(u8 force)
 
     // show system info
     if(conf.ExtGameShowSystemInfo())
-	RedrawSystemInfo((conf.ExtGameHideInterface() ? 10 : 26), Display::Get().h() - (conf.ExtGameHideInterface() ? 14 : 30), GetMemoryUsage());
+	RedrawSystemInfo((conf.ExtGameHideInterface() ? 10 : 26), Display::Get().h() - (conf.ExtGameHideInterface() ? 14 : 30), System::GetMemoryUsage());
 
     if((redraw | force) & REDRAW_BORDER)
 	    GameBorderRedraw();

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *   Copyright (C) 2013 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
@@ -19,44 +19,40 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2TOOLS_H
-#define H2TOOLS_H
+
+#ifndef H2SYSTEM_H
+#define H2SYSTEM_H
 
 #include <string>
-#include "localevent.h"
-#include "types.h"
 
-std::string		GetString(int);
-std::string		GetStringShort(int);
-std::string		GetString(const Point &);
-std::string		GetString(const Size &);
-std::string		GetString(const Rect &);
-std::string		GetString(double, u8);
+namespace System
+{
+    int		SetEnvironment(const char* name, const char* value);
+    const char*	GetEnvironment(const char* name);
 
-int			GetInt(const std::string &);
-int			Sign(int);
+    int		MakeDirectory(const std::string &);
+    std::string	ConcatePath(const std::string &, const std::string &);
 
-std::string		StringTrim(std::string);
-std::string		StringLower(std::string);
-std::string		StringUpper(std::string);
+    std::string GetDirname(const std::string &);
+    std::string GetBasename(const std::string &);
 
-void			StringReplace(std::string &, const char*, const std::string &);
-void			StringReplace(std::string &, const char*, int);
+    std::string GetTime(void);
 
-std::string		EncodeString(const std::string &, const char* charset);
-std::vector<u16>	StringUTF8_to_UNICODE(const std::string &);
-std::string		StringUNICODE_to_UTF8(const std::vector<u16> &);
+    char*	SetLocale(int category, const char* locale);
+    size_t	GetMemoryUsage(void);
 
-std::string	InsertString(const std::string &, size_t, const char*);
-size_t		InsertKeySym(std::string &, size_t, KeySym, u16 mod = 0);
-KeySym		KeySymFromChar(char);
-char		CharFromKeySym(KeySym, u16 mod = 0);
-bool		PressIntKey(u32 min, u32 max, u32 & result);
+    int		GetCommandOptions(int argc, char* const argv[], const char* optstring);
+    char*	GetOptionsArgument(void);
 
-bool		SaveMemToFile(const std::vector<u8> &, const std::string &);
-bool		LoadFileToMem(std::vector<u8> &, const std::string &);
+    bool	IsFile(const std::string & name, bool writable = false);
+    bool	IsDirectory(const std::string & name, bool writable = false);
+    int		Unlink(const std::string &);
 
-Points		GetLinePoints(const Point & pt1, const Point & pt2, u16 step);
-Points		GetArcPoints(const Point & from, const Point & to, const Point & max, u16 step);
+    bool	isRunning(void);
+    int		CreateTrayIcon(void);
+    void	DeleteTrayIcon(void);
+
+    int		ShellCommand(const char*);
+}
 
 #endif

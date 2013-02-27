@@ -20,9 +20,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <ctime>
 #include <algorithm>
 #include <fstream>
+
+#include "system.h"
 #include "maps.h"
 #include "race.h"
 #include "tinyconfig.h"
@@ -410,7 +411,7 @@ bool Settings::Read(const std::string & filename)
 
 	sval = config.StrParams("pointer rotate fix");
 	if(! sval.empty())
-    	    setenv("GAPI_POINTER_FIX", sval.c_str(), 1);
+    	    System::SetEnvironment("GAPI_POINTER_FIX", sval.c_str());
     }
 
     // videomode
@@ -660,11 +661,11 @@ std::string Settings::GetHomeDir(void)
 {
     std::string home;
 
-    if(getenv("HOME"))
-	home = std::string(getenv("HOME")) + SEPARATOR + std::string(".") + std::string("fheroes2");
+    if(System::GetEnvironment("HOME"))
+	home = System::ConcatePath(System::GetEnvironment("HOME"), ".fheroes2");
     else
-    if(getenv("APPDATA"))
-	home = std::string(getenv("APPDATA")) + SEPARATOR + std::string("fheroes2");
+    if(System::GetEnvironment("APPDATA"))
+	home = System::ConcatePath(System::GetEnvironment("APPDATA"), "fheroes2");
 
     return home;
 }
@@ -680,11 +681,11 @@ ListDirs Settings::GetRootDirs(void)
 #endif
 
     // from env
-    if(getenv("FHEROES2_DATA"))
-	dirs.push_back(getenv("FHEROES2_DATA"));
+    if(System::GetEnvironment("FHEROES2_DATA"))
+	dirs.push_back(System::GetEnvironment("FHEROES2_DATA"));
 
     // from dirname
-    dirs.push_back(GetDirname(conf.path_program));
+    dirs.push_back(System::GetDirname(conf.path_program));
 
     // from HOME
     const std::string & home = GetHomeDir();
@@ -705,7 +706,7 @@ ListFiles Settings::GetListFiles(const std::string & prefix, const std::string &
         std::string path = *it;
 
 	if(prefix.size())
-	    path = *it + SEPARATOR + prefix;
+	    path = System::ConcatePath(*it, prefix);
 
 	res.ReadDir(path, filter, false);
     }
@@ -730,8 +731,8 @@ std::string Settings::GetLangDir(void)
     for(ListDirs::const_reverse_iterator
 	it = dirs.rbegin(); it != dirs.rend(); ++it)
     {
-	res = *it + SEPARATOR + "files" + SEPARATOR + "lang";
-        if(IsDirectory(res)) return res;
+	res = System::ConcatePath(System::ConcatePath(*it, "files"), "lang");
+        if(System::IsDirectory(res)) return res;
     }
 #endif
 
@@ -746,8 +747,8 @@ std::string Settings::GetWriteableDir(const char* subdir)
     for(ListDirs::const_iterator
 	it = dirs.begin(); it != dirs.end(); ++it)
     {
-	res = *it + SEPARATOR + "files" + SEPARATOR + subdir;
-        if(IsDirectory(res, true)) return res;
+	res = System::ConcatePath(System::ConcatePath(*it, "files"), subdir);
+        if(System::IsDirectory(res, true)) return res;
     }
 
     DEBUG(DBG_GAME, DBG_WARN, "writable directory not found");
@@ -1493,7 +1494,7 @@ void Settings::SetPosStatus(const Point & pt) { pos_stat = pt; }
 
 void Settings::BinarySave(void) const
 {
-    const std::string binary = GetSaveDir() + SEPARATOR + "fheroes2.bin";
+    const std::string binary = System::ConcatePath(GetSaveDir(), "fheroes2.bin");
     std::ofstream fs(binary.c_str(), std::ios::binary);
 
     if(fs.is_open())
@@ -1512,9 +1513,9 @@ void Settings::BinarySave(void) const
 
 void Settings::BinaryLoad(void)
 {
-    std::string binary = GetSaveDir() + SEPARATOR + "fheroes2.bin";
+    std::string binary = System::ConcatePath(GetSaveDir(), "fheroes2.bin");
 
-    if(! IsFile(binary))
+    if(! System::IsFile(binary))
 	binary = GetLastFile("", "fheroes2.bin");
 
     std::ifstream fs(binary.c_str(), std::ios::binary);

@@ -22,10 +22,11 @@
 
 #include <iostream>
 #include <fstream>
-#include "midi_xmi.h"
-#include "midi_mid.h"
+
 #include "SDL.h"
 #include "engine.h"
+#include "midi_xmi.h"
+#include "midi_mid.h"
 
 int main(int argc, char **argv)
 {

@@ -23,8 +23,6 @@
 #ifndef H2TYPES_H
 #define H2TYPES_H
 
-#include <sys/stat.h>
-#include <sys/types.h>
 #include "SDL.h"
 
 typedef Sint8		s8;
@@ -41,18 +39,6 @@ typedef SDL_Color RGBColor;
 
 #define ARRAY_COUNT(A)       sizeof(A) / sizeof(A[0])
 #define ARRAY_COUNT_END(A)   A + ARRAY_COUNT(A)
-
-#if defined __SYMBIAN32__
-#define MKDIR(X)    mkdir(X, S_IRWXU)
-#define SEPARATOR       '\\'
-#elif defined __WIN32__
-#include <io.h>
-#define MKDIR(X)    mkdir(X)
-#define SEPARATOR       '\\'
-#else
-#define MKDIR(X)    mkdir(X, S_IRWXU)
-#define SEPARATOR       '/'
-#endif
 
 #define DELAY(X)	SDL_Delay(X)
 
@@ -91,23 +77,8 @@ using namespace std;
 #endif
 
 #if defined __MINGW32CE__
-#include <cstdlib>
-#ifndef PATH_MAX
+#undef PATH_MAX
 #define PATH_MAX 255
-#endif
-#define setlocale(x,y) 0
-#define system(x) 0
-#define setenv(x, y, z) sdl_putenv(x, y, z)
-#define getenv(x) sdl_getenv(x)
-#define getopt(x, y, z) -1
-#define optarg 0
-#else
-#include <cstdlib>
-#endif
-
-#if defined __MINGW32__
-#define setenv(x, y, z) sdl_putenv(x, y, z)
-#define getenv(x) sdl_getenv(x)
 #endif
 
 #endif

@@ -23,8 +23,10 @@ RES	:=
 ICOFILE	:= ../../image/fheroes2_32x32.ico
 
 ifdef WITH_SVNREV
-SVN	:= $(shell svnversion ..)
-CFLAGS	:= $(CFLAGS) -DSVN_REVISION="\"$(SVN)\""
+ifndef SVNVER
+SVNVER	:= $(shell svnversion ..)
+endif
+CFLAGS	:= $(CFLAGS) -DSVN_REVISION="\"$(SVNVER)\""
 endif
 
 ifdef WITH_ICONS
