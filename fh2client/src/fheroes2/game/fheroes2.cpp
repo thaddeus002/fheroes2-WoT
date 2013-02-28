@@ -113,7 +113,7 @@ int main(int argc, char **argv)
 	try
 #endif
 	{
-	    std::atexit(SDL::Quit);
+	    atexit(SDL::Quit);
 
 	    if(conf.Unicode()) SetLangEnvPath(conf);
 

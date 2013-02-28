@@ -94,9 +94,10 @@ void Network::InGameStateHandler(IOEvent&, const NetworkMessage &Msg)
     }
 }
 
-void Network::PlayingStateHandler(IOEvent&, const NetworkMessage&)
+void Network::PlayingStateHandler(IOEvent&, const NetworkMessage &Msg)
 {
     std::cout << "Network::PlayingStateHandler" << std::endl;
+    QueueInputMessage(Msg);
 }
 
 void Network::DisconnectedStateHandler(IOEvent&, const NetworkMessage&)

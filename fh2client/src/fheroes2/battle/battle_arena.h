@@ -26,6 +26,7 @@
 #include <list>
 
 #include "gamedefs.h"
+#include "network.h"
 #include "ai.h"
 #include "spell_storage.h"
 #include "battle_board.h"
@@ -58,8 +59,12 @@ namespace Battle
 	~Arena();
 
 	void		Turns(void);
-	bool		NetworkTurn(void);
+	void		NetworkTurns(void);
 	bool		BattleValid(void) const;
+
+	void        ProcessTurnStart(const NetworkEvent&);
+
+	void		SendActions(Actions&);
 
 	bool		CanBreakAutoBattle(void) const;
 	void		BreakAutoBattle(void);

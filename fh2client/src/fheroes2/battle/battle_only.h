@@ -109,9 +109,11 @@ namespace Battle
 	void		UpdateHero1(const Point &);
 	void		UpdateHero2(const Point &);
 	bool        	WaitForPlayerAllocationFromServer(void); 
+	bool        	WaitForArmyInfoFromServer(void); 
 	bool        	WaitForNetworkMessage(int); 
-	bool        	ProcessNetworkEvents(bool&, const Point&, bool&, bool&, Button&); 
 	bool        	ProcessNetworkStateChange(const NetworkEvent&);
+	void        	ProcessSetArmyEvent(const NetworkEvent&, bool, bool&, const Point&);
+	bool        	ProcessNetworkEvents(bool&, const Point&, bool&, bool&, Button&); 
 
 	static Only &	Get(void);
 	static Recruits GetHeroesFromStreamBuf(StreamBuf &);

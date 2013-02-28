@@ -186,6 +186,56 @@ bool Battle::Only::WaitForPlayerAllocationFromServer(void)
     return true;
 }
 
+bool Battle::Only::WaitForArmyInfoFromServer(void)
+{
+    bool army1_set = false;
+    bool army2_set = false;
+
+    LocalEvent & le = LocalEvent::Get();
+
+    // message loop
+    while((!army1_set || !army2_set) && le.HandleEvents())
+    {
+        if(Network::Get().IsInputPending())
+		{
+			NetworkEvent ev;
+			Network::Get().DequeueInputEvent(ev);
+
+			DEBUG(DBG_NETWORK, DBG_INFO, "Dequeued network event");
+
+			if(ev.OldState != ev.NewState)
+			{
+				if(!ProcessNetworkStateChange(ev)) 
+					return false;
+            }
+
+            if(ev.Message.get() == 0)
+                continue;
+
+            if(ev.Message->GetType() == HMM2_GAME_SETARMY_NOTIFY)
+			{
+				if(ev.Message->HasInt(HMM2_GAME_COLOR))
+				{
+					bool dummy1;
+					Point dummy2;
+
+					if(ev.Message->GetInt(HMM2_GAME_COLOR) == player1.color) {
+						army1_set = true;
+					}
+					else if(ev.Message->GetInt(HMM2_GAME_COLOR) == player2.color) {
+						army2_set = true;
+					}
+					ProcessSetArmyEvent(ev, false, dummy1, dummy2);
+				}
+			}
+        }
+
+        if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) return false;
+    }
+
+    return true;
+}
+
 bool Battle::Only::WaitForNetworkMessage(int MessageType)
 {
     bool exit = false;
@@ -239,6 +289,106 @@ bool Battle::Only::ProcessNetworkStateChange(const NetworkEvent &ev)
     return true;
 }
 
+void Battle::Only::ProcessSetArmyEvent(const NetworkEvent &ev, bool update, bool &redraw, const Point &cur_pt)
+{
+
+	DEBUG(DBG_NETWORK, DBG_INFO, "HMM2_GAME_SETARMY_NOTIFY");
+
+	if(!ev.Message->HasInt(HMM2_GAME_COLOR))
+	{
+		return;
+	}
+
+	u8 col = ev.Message->GetInt(HMM2_GAME_COLOR);
+
+	DEBUG(DBG_NETWORK, DBG_INFO, "HMM2_GAME_SETARMY_NOTIFY: col=" << (int)col);
+
+	if(ev.Message->HasInt(HMM2_GAME_HERO))
+	{
+		Heroes** hero = player1.color == col ? &hero1 : 
+			(player2.color == col ? &hero2 : NULL);
+
+		if(hero != NULL)
+		{
+			Heroes::heroes_t hid = static_cast<Heroes::heroes_t>(ev.Message->GetInt(HMM2_GAME_HERO));
+
+			if(hid != Heroes::UNKNOWN)
+			{
+				*hero = world.GetHeroes(hid);
+				if(*hero) (*hero)->GetSecondarySkills().FillMax(Skill::Secondary());
+			}
+			else
+			{
+				*hero = NULL;
+			}
+
+			if(update) {
+				bool side1 = player1.color == col;
+				side1 ? UpdateHero1(cur_pt) : UpdateHero2(cur_pt);
+			}
+			redraw = true;
+		}
+	}
+
+	Heroes* hero = player1.color == col ? hero1 : 
+		(player2.color == col ? hero2 : NULL);
+
+	if(hero != NULL && ev.Message->HasBin(HMM2_GAME_PRIMARY_SKILLS))
+	{
+		u8 skills[4];
+		ev.Message->CopyBin(HMM2_GAME_PRIMARY_SKILLS, skills, sizeof(skills));
+
+		hero->attack = skills[0];
+		hero->defense = skills[1];
+		hero->power = skills[2];
+		hero->knowledge = skills[3];
+
+		redraw = true;
+	}
+
+	if(hero != NULL && ev.Message->HasBin(HMM2_GAME_TROOPS))
+	{
+		u8 troops[5];
+		ev.Message->CopyBin(HMM2_GAME_TROOPS, troops, sizeof(troops));
+
+		for(size_t i = 0 ; i != 5 ; i++)
+			hero->army.GetTroop(i)->SetMonster(Monster(troops[i]));
+
+		redraw = true;
+	}
+
+	if(hero != NULL && ev.Message->HasBin(HMM2_GAME_COUNTS))
+	{
+		u8 counts[5];
+		ev.Message->CopyBin(HMM2_GAME_COUNTS, counts, sizeof(counts));
+
+		for(size_t i = 0 ; i != 5 ; i++)
+			hero->army.GetTroop(i)->SetCount(counts[i]);
+
+		redraw = true;
+	}
+
+	if(hero != NULL && ev.Message->HasBin(HMM2_GAME_ARTIFACTS))
+	{
+		std::string artifacts = ev.Message->GetBin(HMM2_GAME_ARTIFACTS);
+
+		for(size_t i = 0 ; i != HEROESMAXARTIFACT ; i++)
+		{
+			if(i < artifacts.size())
+				hero->GetBagArtifacts().at(i) = artifacts.at(i);
+		}
+
+		ArtifactsBar *selectArtifacts = player1.color == col ? selectArtifacts1 :
+			(player2.color == col ? selectArtifacts2 : NULL);
+
+		if(update) {
+			selectArtifacts->SetContent(hero->GetBagArtifacts());
+		}
+
+		redraw = true;
+	}
+}
+
 bool Battle::Only::ProcessNetworkEvents(bool &redraw, const Point &cur_pt, bool &result, bool &exit, Button &buttonStart)
 {
     NetworkEvent ev;
@@ -258,99 +408,11 @@ bool Battle::Only::ProcessNetworkEvents(bool &redraw, const Point &cur_pt, bool 
     switch(ev.Message->GetType())
     {
         case HMM2_GAME_SETARMY_NOTIFY:
-
-            DEBUG(DBG_NETWORK, DBG_INFO, "HMM2_GAME_SETARMY_NOTIFY");
-
-            if(ev.Message->HasInt(HMM2_GAME_COLOR))
-	    {
-                u8 col = ev.Message->GetInt(HMM2_GAME_COLOR);
-
-                DEBUG(DBG_NETWORK, DBG_INFO, "HMM2_GAME_SETARMY_NOTIFY: col=" << (int)col);
-
-                if(ev.Message->HasInt(HMM2_GAME_HERO))
-		{
-                    Heroes** hero = player1.color == col ? &hero1 : 
-                        (player2.color == col ? &hero2 : NULL);
-
-                    if(hero != NULL)
-		    {
-                        bool side1 = player1.color == col;
-                        Heroes::heroes_t hid = static_cast<Heroes::heroes_t>(ev.Message->GetInt(HMM2_GAME_HERO));
-
-                        if(hid != Heroes::UNKNOWN)
-			{
-                            *hero = world.GetHeroes(hid);
-                            if(*hero) (*hero)->GetSecondarySkills().FillMax(Skill::Secondary());
-                        }
-                        else
-			{
-                            *hero = NULL;
-                        }
-                        side1 ? UpdateHero1(cur_pt) : UpdateHero2(cur_pt);
-                        redraw = true;
-                    }
-                }
-
-                Heroes* hero = player1.color == col ? hero1 : 
-                    (player2.color == col ? hero2 : NULL);
-
-                if(hero != NULL && ev.Message->HasBin(HMM2_GAME_PRIMARY_SKILLS))
-		{
-                    u8 skills[4];
-                    ev.Message->CopyBin(HMM2_GAME_PRIMARY_SKILLS, skills, sizeof(skills));
-
-                    hero->attack = skills[0];
-                    hero->defense = skills[1];
-                    hero->power = skills[2];
-                    hero->knowledge = skills[3];
-
-                    redraw = true;
-                }
-
-                if(hero != NULL && ev.Message->HasBin(HMM2_GAME_TROOPS))
-		{
-                    u8 troops[5];
-                    ev.Message->CopyBin(HMM2_GAME_TROOPS, troops, sizeof(troops));
-
-                    for(size_t i = 0 ; i != 5 ; i++)
-                        hero->army.GetTroop(i)->SetMonster(Monster(troops[i]));
-
-                    redraw = true;
-                }
-
-                if(hero != NULL && ev.Message->HasBin(HMM2_GAME_COUNTS))
-		{
-                    u8 counts[5];
-                    ev.Message->CopyBin(HMM2_GAME_COUNTS, counts, sizeof(counts));
-
-                    for(size_t i = 0 ; i != 5 ; i++)
-                        hero->army.GetTroop(i)->SetCount(counts[i]);
-
-                    redraw = true;
-                }
-
-                if(hero != NULL && ev.Message->HasBin(HMM2_GAME_ARTIFACTS))
-		{
-                    std::string artifacts = ev.Message->GetBin(HMM2_GAME_ARTIFACTS);
-
-                    for(size_t i = 0 ; i != HEROESMAXARTIFACT ; i++)
-		    {
-                        if(i < artifacts.size())
-                            hero->GetBagArtifacts().at(i) = artifacts.at(i);
-                    }
-
-                    ArtifactsBar *selectArtifacts = player1.color == col ? selectArtifacts1 :
-                        (player2.color == col ? selectArtifacts2 : NULL);
-
-                    selectArtifacts->SetContent(hero->GetBagArtifacts());
-
-                    redraw = true;
-                }
-            }
+			ProcessSetArmyEvent(ev, true, redraw, cur_pt);
             break;
         case HMM2_START_GAME_RESPONSE:
 			/*
-             * The server has accepted our attempt to start the game,
+             * The server has accepted our attempt to start the game
              */
             DEBUG(DBG_NETWORK, DBG_INFO, "HMM2_START_GAME_RESPONSE");
 			exit = true;
@@ -358,7 +420,7 @@ bool Battle::Only::ProcessNetworkEvents(bool &redraw, const Point &cur_pt, bool 
             break;
         case HMM2_START_GAME_NOTIFY:
 			/*
-             * The server has accepted our attempt to start the game,
+             * The server informed us that the game has been started
              */
             DEBUG(DBG_NETWORK, DBG_INFO, "HMM2_START_GAME_NOTIFY");
 			exit = true;
@@ -370,6 +432,8 @@ bool Battle::Only::ProcessNetworkEvents(bool &redraw, const Point &cur_pt, bool 
 			 * we need to enable the start button again
              */
             DEBUG(DBG_NETWORK, DBG_INFO, "HMM2_START_GAME_REJECT");
+			Dialog::Message(std::string("Message from ") + ev.Message->GetStr(HMM2_MESSAGE_SOURCE),
+				ev.Message->GetStr(HMM2_MESSAGE_TEXT), Font::BIG, Dialog::OK);
 			buttonStart.SetDisable(false);
             break;
     }
@@ -935,7 +999,7 @@ void Battle::Only::RedrawBaseInfo(const Point & top)
     std::string message = "%{name1} vs %{name2}";
 
     StringReplace(message, "%{name1}", std::string(Race::String(hero1->GetRace())) + " " + hero1->GetName());
-    StringReplace(message, "%{name2}", (hero2 ? std::string(Race::String(hero2->GetRace())) + " " + hero2->GetName() : "Monsters"));
+    StringReplace(message, "%{name2}", (hero2 ? std::string(Race::String(hero2->GetRace())) + " " + hero2->GetName() : "N/A"));
 
     Text text(message, Font::BIG);
     text.Blit(top.x + 320 - text.w() / 2, top.y + 26);
@@ -960,6 +1024,16 @@ void Battle::Only::StartBattle(void)
 {
     Settings & conf = Settings::Get();
 
+    if(conf.GameType(Game::TYPE_NETWORK))
+    {
+		/*
+         * Server must send player allocation prior to the battle,
+		 * i.e. which side is which color and which side is yours (if there is such)
+         */
+        if(!WaitForPlayerAllocationFromServer())
+            return;
+    }
+
     Players & players = conf.GetPlayers();
     players.Init(player1.color | player2.color);
     world.GetKingdoms().Init();
@@ -971,6 +1045,15 @@ void Battle::Only::StartBattle(void)
 
     players.SetPlayerControl(player1.color, player1.control);
     players.SetPlayerControl(player2.color, player2.control);
+
+    if(conf.GameType(Game::TYPE_NETWORK))
+    {
+		/*
+         * Server must now send heroes and armies info
+         */
+        if(!WaitForArmyInfoFromServer())
+            return;
+    }
 
     if(hero1)
     {
@@ -1032,8 +1115,7 @@ void Battle::Only::SendSecondarySkills(const Skill::SecSkills &skills)
 
 void Battle::Only::SendTroops(Army *army)
 {
-    size_t size = army->Size() <= 5 ? army->Size() : 5;
-    char data[5], *p;
+    char data[ARMYMAXTROOPS], *p;
 
     NetworkMessage Msg(HMM2_GAME_SETARMY);
 
@@ -1041,7 +1123,7 @@ void Battle::Only::SendTroops(Army *army)
 
     p = data;
 
-    for(size_t i = 0 ; i != size ; i++) {
+    for(size_t i = 0 ; i != ARMYMAXTROOPS ; i++) {
         *p++ = army->GetTroop(i)->GetID();
     }
 
@@ -1051,7 +1133,7 @@ void Battle::Only::SendTroops(Army *army)
 
     p = data;
 
-    for(size_t i = 0 ; i != size ; i++) {
+    for(size_t i = 0 ; i != ARMYMAXTROOPS ; i++) {
         *p++ = army->GetTroop(i)->GetCount();
     }
 
@@ -1061,21 +1143,16 @@ void Battle::Only::SendTroops(Army *army)
 
 void Battle::Only::SendArtifacts(BagArtifacts &artifacts)
 {
-    size_t size = artifacts.size();
-    char *data, *p;
-
-    data = new char[size];
+    char data[HEROESMAXARTIFACT], *p;
 
     p = data;
 
-    for(size_t i = 0 ; i != size ; i++) {
+    for(size_t i = 0 ; i != HEROESMAXARTIFACT ; i++) {
         *p++ = artifacts.at(i).GetID();
     }
 
     NetworkMessage Msg(HMM2_GAME_SETARMY);
     Msg.add_bin_chunk(HMM2_GAME_ARTIFACTS, data, p - data);
     Network::Get().QueueOutputMessage(Msg);
-
-    delete data;
 }
 

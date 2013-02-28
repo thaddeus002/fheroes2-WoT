@@ -20,6 +20,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <iostream>
+
 #include "engine.h"
 #include "error.h"
 #include "system.h"

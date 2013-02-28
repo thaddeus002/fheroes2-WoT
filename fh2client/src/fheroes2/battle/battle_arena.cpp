@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include "settings.h"
+#include "network_protocol.h"
 #include "tools.h"
 #include "army.h"
 #include "cursor.h"
@@ -488,6 +489,86 @@ void Battle::Arena::Turns(void)
     }
 }
 
+void Battle::Arena::ProcessTurnStart(const NetworkEvent &ev) {
+    Actions actions;
+
+    bool tower_moved = false;
+    bool catapult_moved = false;
+
+    int color = ev.Message->GetInt(HMM2_TURN_COLOR);
+    int uid = ev.Message->GetInt(HMM2_TURN_UID);
+    int new_turn = ev.Message->GetInt(HMM2_TURN_NUMBER);
+
+    if(current_turn != new_turn) {
+        /*
+         * Start new turn
+         */
+        DEBUG(DBG_BATTLE, DBG_TRACE, current_turn);
+
+        army1->NewTurn();
+        army2->NewTurn();
+
+        current_turn = new_turn;
+    }
+
+    /*
+     * Find current troop
+     */
+    Unit* current_troop = Force::GetCurrentUnit(*army1, *army2, color, uid);
+//    current_color = current_troop->GetArmyColor();
+
+    DEBUG(DBG_BATTLE, DBG_TRACE, current_troop->String(true));
+
+    /*
+     * Focus specified troop and wait for user input
+     */
+    HumanTurn(*current_troop, actions);
+
+    /*
+     * Send actions to the server
+     */
+    SendActions(actions);
+}
+
+void Battle::Arena::NetworkTurns(void)
+{
+    const Settings & conf = Settings::Get();
+    LocalEvent & le = LocalEvent::Get();
+
+    if(interface && conf.Music() && !Music::isPlaying())
+            AGG::PlayMusic(MUS::GetBattleRandom(), false);
+
+    while(le.HandleEvents()) {
+        if(Network::Get().IsInputPending()) {
+            NetworkEvent ev;
+            Network::Get().DequeueInputEvent(ev);
+  
+            DEBUG(DBG_NETWORK, DBG_INFO, "ProcessNetworkEvents");
+
+            if(ev.OldState != ev.NewState)
+            {
+#if 0
+                if(!ProcessNetworkStateChange(ev))
+                    return;
+#endif
+            }
+
+            if(ev.Message.get() == 0) {
+                continue;;
+            }
+
+            switch(ev.Message->GetType()) {
+                case HMM2_TURN_START:
+                    ProcessTurnStart(ev);
+                    break;
+                case HMM2_TURN_ACTION:
+                    //PerformActions(ev);
+                    break;
+            } 
+        }
+    }
+}
+
 void Battle::Arena::RemoteTurn(const Unit & b, Actions & a)
 {
     DEBUG(DBG_BATTLE, DBG_WARN, "switch to AI turn");
@@ -900,11 +981,6 @@ const HeroBase* Battle::Arena::GetCurrentCommander(void) const
     return GetCommander(current_color);
 }
 
-bool Battle::Arena::NetworkTurn(void)
-{
-    return interface && interface->NetworkTurn(result_game);
-}
-
 Battle::Unit* Battle::Arena::CreateElemental(const Spell & spell)
 {
     const HeroBase* hero = GetCurrentCommander();
@@ -1139,3 +1215,23 @@ void Battle::Arena::BreakAutoBattle(void)
 {
     auto_battle &= ~current_color;
 }
+
+void Battle::Arena::SendActions(Actions &actions) {
+    std::ostringstream actions_data;
+    u8 length;
+
+    for(Actions::iterator i = actions.begin() ; i != actions.end() ; i++) {
+        length = i->GetStream().size();
+        actions_data << length;
+        actions_data << i->GetStream();
+    }
+
+    length = 0;
+
+    actions_data << length;
+
+    NetworkMessage Msg(HMM2_TURN_SUBMIT);
+    Msg.add_str_chunk(HMM2_TURN_ACTIONS, actions_data.str());
+    Network::Get().QueueOutputMessage(Msg);
+}
+

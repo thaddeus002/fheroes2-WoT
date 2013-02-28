@@ -31,7 +31,7 @@
 #define HMM2_CLIENT_INFO        1
 
 /*
- * Sent by the server to identify itself with the server
+ * Sent by the server to identify itself
  */
 #define HMM2_SERVER_INFO        2
 
@@ -51,7 +51,7 @@
 #define HMM2_REGISTER_REQUEST   5
 
 /*
- * Sent by client to change password
+ * Sent by client to change the password
  */
 #define HMM2_CHANGEPWD_REQUEST  6
 
@@ -145,6 +145,31 @@
 #define HMM2_GAMELIST_RESPONSE  44
 #define HMM2_GAMELIST_REJECT    45
 
+// Turn messages
+
+/*
+ * Sent by the server in order to indicate turn start to the corresponding client
+ * The client must focus specified troop and wait for user input
+ */
+#define HMM2_TURN_START         50
+
+/*
+ * Sent by the client in order to submit an action to the server.
+ */
+#define HMM2_TURN_SUBMIT        51
+
+/*
+ * Sent by the server in order to announce an action to the client.
+ * The client must perform specified action(s)
+ */
+#define HMM2_TURN_ACTION        52
+
+/*
+ * Sent by the client to the server in order to confirm that
+ * the action has been performed.
+ */
+#define HMM2_TURN_COMPLETED        53
+
 // Tournament table messages
 #define HMM2_TTABLE_REQUEST 60
 #define HMM2_TTABLE_RESPONSE    61
@@ -216,6 +241,12 @@
  * Used in HMM2_START_GAME_NOTIFY
  */
 #define HMM2_GAME_SECONDS_TO_START    78
+
+// Turn attributes
+#define HMM2_TURN_COLOR             0
+#define HMM2_TURN_UID               1
+#define HMM2_TURN_ACTIONS           2
+#define HMM2_TURN_NUMBER            3
 
 #define HMM2_TTABLE_ID      80
 #define HMM2_TTABLE_PAGE        81

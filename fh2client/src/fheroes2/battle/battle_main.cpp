@@ -45,6 +45,8 @@ namespace Battle
 
 Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
 {
+    const Settings & conf = Settings::Get();
+
     // pre battle army1
     if(army1.GetCommander())
     {
@@ -75,8 +77,14 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
     DEBUG(DBG_BATTLE, DBG_INFO, "army1 " << army1.String());
     DEBUG(DBG_BATTLE, DBG_INFO, "army2 " << army2.String());
 
-    while(arena.BattleValid())
-	arena.Turns();
+    if(!conf.GameType(Game::TYPE_NETWORK)) {
+        while(arena.BattleValid())
+            arena.Turns();
+    }
+    else {
+        while(arena.BattleValid())
+            arena.NetworkTurns();
+    }
 
     const Result & result = arena.GetResult();
     AGG::ResetMixer();

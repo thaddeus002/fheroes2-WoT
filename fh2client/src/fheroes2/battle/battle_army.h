@@ -76,6 +76,7 @@ namespace Battle
 
     static Unit*	GetCurrentUnit(const Force &, const Force &, Unit* last, Units* all, bool part1);
     static Unit*	GetCurrentUnit(const Force &, const Force &, Unit* last, bool part1);
+    static Unit*	GetCurrentUnit(const Force &, const Force &, int, int);
     static void		UpdateOrderUnits(const Force &, const Force &, Units &);
 
     private:

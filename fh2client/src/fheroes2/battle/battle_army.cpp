@@ -360,6 +360,13 @@ Battle::Unit* Battle::Force::GetCurrentUnit(const Force & army1, const Force & a
         result->GetSpeed() > Speed::STANDING ? result : NULL;
 }
 
+Battle::Unit* Battle::Force::GetCurrentUnit(const Force & army1, const Force & army2, int color, int position)
+{
+    const Force *f = army1.GetColor() == color ? &army1 :
+        (army2.GetColor() == color ? &army2 : NULL);
+    return f != NULL ? f->at(position) : NULL;
+}
+
 StreamBase & Battle::operator<< (StreamBase & msg, const Force & f)
 {
     msg << static_cast<const BitModes &>(f) << static_cast<u32>(f.size());
