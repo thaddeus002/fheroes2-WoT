@@ -261,6 +261,9 @@ bool Troops::JoinTroop(const Troop & troop)
 
 bool Troops::CanJoinTroops(const Troops & troops2) const
 {
+    if(this == &troops2)
+	return false;
+
     Army troops1;
     troops1.Insert(*this);
 
@@ -272,6 +275,9 @@ bool Troops::CanJoinTroops(const Troops & troops2) const
 
 void Troops::JoinTroops(Troops & troops2)
 {
+    if(this == &troops2)
+	return;
+
     for(iterator it = troops2.begin(); it != troops2.end(); ++it)
 	if((*it)->isValid())
     {
@@ -513,6 +519,9 @@ void Troops::ArrangeForBattle(bool upgrade)
 
 void Troops::JoinStrongest(Troops & troops2, bool save_last)
 {
+    if(this == &troops2)
+	return;
+
     Troops priority = GetOptimized();
     priority.reserve(ARMYMAXTROOPS * 2);
 
@@ -551,6 +560,9 @@ void Troops::JoinStrongest(Troops & troops2, bool save_last)
 
 void Troops::KeepOnlyWeakest(Troops & troops2, bool save_last)
 {
+    if(this == &troops2)
+	return;
+
     Troops priority = GetOptimized();
     priority.reserve(ARMYMAXTROOPS * 2);
 
