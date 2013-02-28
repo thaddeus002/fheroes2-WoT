@@ -948,7 +948,7 @@ Battle::Unit* Battle::Arena::CreateElemental(const Spell & spell)
     u8 acount = hero->HasArtifact(Artifact::BOOK_ELEMENTS);
     if(acount) count *= acount * 2;
 
-    elem = new Unit(Troop(mons, count), World::GetUniq(), pos, hero == army2->GetCommander());
+    elem = new Unit(Troop(mons, count), pos, hero == army2->GetCommander());
 
     if(elem)
     {
@@ -967,7 +967,7 @@ Battle::Unit* Battle::Arena::CreateElemental(const Spell & spell)
 
 Battle::Unit* Battle::Arena::CreateMirrorImage(Unit & b, s16 pos)
 {
-    Unit* image = new Unit(b, World::GetUniq(), pos, b.isReflect());
+    Unit* image = new Unit(b, pos, b.isReflect());
 
     if(image)
     {
