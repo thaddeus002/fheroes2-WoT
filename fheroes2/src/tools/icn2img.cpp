@@ -31,8 +31,6 @@
 #include "engine.h"
 #include "system.h"
 
-void SpriteDrawICN(Surface & sf, const u8* cur, const u32 size,  bool debug);
-
 class icnheader
 {
     public:
@@ -64,9 +62,12 @@ class icnheader
     s16 offsetY;
     u16 width;
     u16 height;
+    u8 type; // type of sprite : 0 = Normal, 32 = Monochromatic shape
     u32 offsetData;
 };
                                                 
+void SpriteDrawICN(Surface & sf, icnheader head, const u8* cur, const u32 size,  bool debug);
+
 int main(int argc, char **argv)
 {
     if(argc < 3)
@@ -117,6 +118,16 @@ int main(int argc, char **argv)
 	return EXIT_SUCCESS;
     }
 
+    // write file "spec.xml"
+    std::string name_spec_file = System::ConcatePath(prefix, "spec.xml");
+    
+    std::fstream fd_spec(name_spec_file.c_str(), std::ios::out);
+    if(fd_spec.fail())
+    {
+	std::cout << "error write file: " << shortname << std::endl;
+	return EXIT_SUCCESS;
+    }
+    fd_spec << "<?xml version=\"1.0\" ?>" << std::endl;
 
     SDL::Init();
 
@@ -145,34 +156,41 @@ int main(int argc, char **argv)
         std::memset(buf, 0x80, data_size + 100);
         fd_data.read(buf, data_size);
 
-	Surface sf(head.width, head.height, false);
+	Surface sf(head.width, head.height, /*false*/true); // accepting transparency
 	sf.SetDefaultColorKey();
-	sf.Fill(0xff, 0xff, 0xff);
+	//sf.Fill(0xff, 0xff, 0xff);
+	sf.Fill(0); // filling with transparent color
 
-	SpriteDrawICN(sf, reinterpret_cast<const u8*>(buf), data_size, debug);
+	SpriteDrawICN(sf, head, reinterpret_cast<const u8*>(buf), data_size, debug);
         delete [] buf;
 
 	std::ostringstream stream;
         stream << std::setw(3) << std::setfill('0') << ii;
 
 	std::string dstfile = System::ConcatePath(prefix, stream.str());
+	std::string shortdstfile(stream.str()); // the name of destfile without the path
 
 #ifndef WITH_IMAGE
 	dstfile += ".bmp";
+	shortdstfile += ".bmp";
 #else
 	dstfile += ".png";
+	shortdstfile += ".png";
 #endif
 	sf.Save(dstfile.c_str());
+	fd_spec << " <sprite index=\"" << ii+1 << "\" name=\"" << shortdstfile.c_str() << "\" ox=\"" << head.offsetX << "\" oy=\"" << head.offsetY << "\"/>" << std::endl; 
     }
 
     fd_data.close();
+    fd_spec << "</icn>" << std::endl;
+    fd_spec.close();
     std::cout << "expand to: " << prefix << std::endl;
 
     SDL::Quit();
     return EXIT_SUCCESS;
 }
 
-void SpriteDrawICN(Surface & sf, const u8* cur, const u32 size,  bool debug)
+void SpriteDrawICN(Surface & sf, icnheader head, const u8* cur, const u32 size,  bool debug)
 {
     if(NULL == cur || 0 == size) return;
 
@@ -183,6 +201,7 @@ void SpriteDrawICN(Surface & sf, const u8* cur, const u32 size,  bool debug)
     u16 y = 0;
 
     u32 shadow = sf.MapRGB(0, 0, 0, 0x40);
+    u32 opaque = sf.MapRGB(0, 0, 0, 0xff); // non-transparent mask
 
     // lock surface
     sf.Lock();
@@ -199,12 +218,25 @@ void SpriteDrawICN(Surface & sf, const u8* cur, const u32 size,  bool debug)
 	// 0x7F - count data
 	if(0x80 > *cur)
 	{
-	    c = *cur;
-	    ++cur;
-	    while(c-- && cur < max)
+	    if(!head.type)
 	    {
-		sf.SetPixel(x, y, sf.GetColorIndex(*cur));
-		++x;
+		c = *cur;
+		++cur;
+		while(c-- && cur < max)
+		{
+		    sf.SetPixel(x, y, sf.GetColorIndex(*cur) | opaque);
+		    ++x;
+		    ++cur;
+		}
+	    }
+	    else
+	    {
+		c = *cur;
+		while(c--)
+		{
+		    sf.SetPixel(x, y, sf.GetColorIndex(1) | opaque);
+		    ++x;
+		}
 		++cur;
 	    }
 	}
@@ -223,7 +255,7 @@ void SpriteDrawICN(Surface & sf, const u8* cur, const u32 size,  bool debug)
 	}
 	else
 	// 0xC0 - shadow
-	if(0xC0 == *cur)
+	if((!head.type)&&(0xC0 == *cur))
 	{
 	    ++cur;
 	    c = *cur % 4 ? *cur % 4 : *(++cur);
@@ -234,20 +266,27 @@ void SpriteDrawICN(Surface & sf, const u8* cur, const u32 size,  bool debug)
 	}
 	else
 	// 0xC1
-	if(0xC1 == *cur)
+	if((!head.type)&&(0xC1 == *cur))
 	{
 	    ++cur;
 	    c = *cur;
 	    ++cur;
-	    while(c--){ sf.SetPixel(x, y, sf.GetColorIndex(*cur)); ++x; }
+	    while(c--){ sf.SetPixel(x, y, sf.GetColorIndex(*cur) | opaque); ++x; }
 	    ++cur;
 	}
 	else
 	{
-	    c = *cur - 0xC0;
-	    ++cur;
-	    while(c--){ sf.SetPixel(x, y, sf.GetColorIndex(*cur)); ++x; }
-	    ++cur;
+	    if(!head.type)
+	    {
+		c = *cur - 0xC0;
+		++cur;
+		while(c--){ sf.SetPixel(x, y, sf.GetColorIndex(*cur) | opaque); ++x; }
+		++cur;
+	    }
+	    else // for type 32 - skipping data
+	    {
+		x += *cur - 0x80;
+	    }
 	}
 
 	if(cur >= max)

@@ -765,6 +765,7 @@ bool AGG::Cache::LoadAltICN(const ICN::icn_t icn, const u32 index, bool reflect)
 	    if(reflect && sp1.isValid() && ! sp2.isValid())
 	    {
 		sp2.Set(Surface::Reflect(sp1, 2));
+		sp2.SetOffset(ox, oy);
 		return sp2.isValid();
 	    }
 	}
