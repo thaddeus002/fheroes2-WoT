@@ -140,10 +140,10 @@ int System::SetEnvironment(const char* name, const char* value)
 #endif
 }
 
-char* System::SetLocale(int category, const char* locale)
+char* System::SetLocale(const char* locale)
 {
 #if ! defined(__MINGW32CE__)
-    return setlocale(category, locale);
+    return setlocale(LC_ALL, locale);
 #else
     return NULL;
 #endif
