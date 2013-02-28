@@ -63,6 +63,7 @@ namespace Battle
 	bool		BattleValid(void) const;
 
 	void        ProcessTurnStart(const NetworkEvent&);
+    void        PerformActions(const NetworkEvent&);
 
 	void		SendActions(Actions&);
 

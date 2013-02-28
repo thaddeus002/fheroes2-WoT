@@ -210,7 +210,11 @@ Battle::Force::Force(Army & parent, bool opposite) : army(parent)
 
 	if(troop && troop->isValid())
 	{
-	    push_back(new Unit(*troop, reinterpret_cast<intptr_t>(troop), (opposite ? position + 10 : position), opposite));
+#if 0
+        u32 uid = reinterpret_cast<intptr_t>(troop);
+#endif
+        u32 uid = opposite ? index | 0x80000000 : index;
+	    push_back(new Unit(*troop, uid, (opposite ? position + 10 : position), opposite));
 	    back()->SetArmy(army);
 	}
     }

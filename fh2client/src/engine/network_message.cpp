@@ -227,7 +227,7 @@ std::istream& operator>>(std::istream& i, NetworkMessage &Message)
                     }
                     data.append(1, c);
                 }
-                std::cout << "decaps attribute=" << (int)Attribute << " value=\"" << data << "\"" << std::endl;
+                std::cout << "decaps attribute=" << (int)Attribute << " <" << len << " bytes of binary data>" << std::endl;
                 Message.bin_chunks.insert(std::make_pair(Attribute, data));
                 break;
         }

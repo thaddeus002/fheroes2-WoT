@@ -514,8 +514,13 @@ void Battle::Arena::ProcessTurnStart(const NetworkEvent &ev) {
     /*
      * Find current troop
      */
-    Unit* current_troop = Force::GetCurrentUnit(*army1, *army2, color, uid);
-//    current_color = current_troop->GetArmyColor();
+    Unit* current_troop = army1->GetColor() == color ? army1->FindUID(uid) :
+        (army2->GetColor() == color ? army2->FindUID(0x80000000 | uid) : NULL);
+
+    if(current_troop == NULL) {
+        DEBUG(DBG_BATTLE, DBG_TRACE, "Cannot find troop color=" << color << " uid=" << uid);
+        return;
+    }
 
     DEBUG(DBG_BATTLE, DBG_TRACE, current_troop->String(true));
 
@@ -528,6 +533,32 @@ void Battle::Arena::ProcessTurnStart(const NetworkEvent &ev) {
      * Send actions to the server
      */
     SendActions(actions);
+}
+
+void Battle::Arena::PerformActions(const NetworkEvent &ev) {
+    std::istringstream Actions(ev.Message->GetBin(HMM2_TURN_ACTIONS));
+
+	// apply actions
+    while(1) {
+        StreamBuf Stream(1);
+        Actions >> Stream;
+
+        if(!Stream.fail()) {
+            // apply action
+            ApplyAction(Stream);
+
+            // rescan orders
+            if(armies_order) Force::UpdateOrderUnits(*army1, *army2, *armies_order);
+        }
+        else {
+            break;
+        }
+    }
+
+	board.Reset();
+
+    NetworkMessage Msg(HMM2_TURN_COMPLETED);
+    Network::Get().QueueOutputMessage(Msg);
 }
 
 void Battle::Arena::NetworkTurns(void)
@@ -562,7 +593,7 @@ void Battle::Arena::NetworkTurns(void)
                     ProcessTurnStart(ev);
                     break;
                 case HMM2_TURN_ACTION:
-                    //PerformActions(ev);
+                    PerformActions(ev);
                     break;
             } 
         }
@@ -1218,20 +1249,13 @@ void Battle::Arena::BreakAutoBattle(void)
 
 void Battle::Arena::SendActions(Actions &actions) {
     std::ostringstream actions_data;
-    u8 length;
 
     for(Actions::iterator i = actions.begin() ; i != actions.end() ; i++) {
-        length = i->GetStream().size();
-        actions_data << length;
         actions_data << i->GetStream();
     }
 
-    length = 0;
-
-    actions_data << length;
-
     NetworkMessage Msg(HMM2_TURN_SUBMIT);
-    Msg.add_str_chunk(HMM2_TURN_ACTIONS, actions_data.str());
+    Msg.add_bin_chunk(HMM2_TURN_ACTIONS, actions_data.str());
     Network::Get().QueueOutputMessage(Msg);
 }
 
