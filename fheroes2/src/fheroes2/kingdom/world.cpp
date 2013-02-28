@@ -544,9 +544,8 @@ void World::LoadMaps(const std::string &filename)
     DEBUG(DBG_GAME, DBG_INFO, "read coord other resource, tellg: " << fd.tellg());
     fd.seekg(endof_addons + (72 * 3) + (144 * 3), std::ios_base::beg);
 
-    // unknown byte
+    // byte: num obelisks (01 default)
     fd.read(reinterpret_cast<char *>(&byte8), 1);
-    DEBUG(DBG_GAME, DBG_TRACE, "dump unknown byte: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(byte8));
 
     // count final mp2 blocks
     u16 countblock = 0;
@@ -561,7 +560,7 @@ void World::LoadMaps(const std::string &filename)
 	fd.read(reinterpret_cast<char *>(&l), 1);
 	fd.read(reinterpret_cast<char *>(&h), 1);
 
-	DEBUG(DBG_GAME, DBG_TRACE, "dump final block: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(l) << \
+	VERBOSE("dump block: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(l) << \
 		std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(h));
 
 	if(0 == h && 0 == l) break;

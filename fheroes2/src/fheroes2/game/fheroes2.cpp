@@ -22,6 +22,7 @@
 
 #include <iostream>
 #include <string>
+#include <cstdlib>
 
 #include "engine.h"
 #include "system.h"
