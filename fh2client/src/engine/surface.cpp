@@ -1034,7 +1034,8 @@ void Surface::DrawLine(u16 x1, u16 y1, u16 x2, u16 y2, u32 c)
 
 Surface Surface::Stencil(const Surface & src, u32 col)
 {
-    Surface dst(src.surface->w, src.surface->h, false);
+    Surface dst;
+    dst.Set(src.surface->w,src.surface->h,src.depth(), false); // same depth for src and dst
     const u32 clkey = src.GetColorKey();
     u8 r, g, b, a;
 
@@ -1069,7 +1070,8 @@ Surface Surface::Stencil(const Surface & src, u32 col)
 Surface Surface::Contour(const Surface & src, u32 col)
 {
     const u32 fake = src.MapRGB(0x00, 0xFF, 0xFF);
-    Surface dst(src.surface->w + 2, src.surface->h + 2, false);
+    Surface dst;
+    dst.Set(src.surface->w + 2,src.surface->h + 2,src.depth(), false); // same depth for src and dst
     Surface trf = Stencil(src, fake);
     const u32 clkey = trf.GetColorKey();
 

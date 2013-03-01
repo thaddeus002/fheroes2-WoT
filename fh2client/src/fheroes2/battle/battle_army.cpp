@@ -21,10 +21,9 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "world.h"
 #include "speed.h"
 #include "settings.h"
-#include "heroes_base.h"
+#include "heroes.h"
 #include "battle_troop.h"
 #include "battle_army.h"
 
@@ -210,11 +209,7 @@ Battle::Force::Force(Army & parent, bool opposite) : army(parent)
 
 	if(troop && troop->isValid())
 	{
-#if 0
-        u32 uid = reinterpret_cast<intptr_t>(troop);
-#endif
-        u32 uid = opposite ? index | 0x80000000 : index;
-	    push_back(new Unit(*troop, uid, (opposite ? position + 10 : position), opposite));
+	    push_back(new Unit(*troop, (opposite ? position + 10 : position), opposite));
 	    back()->SetArmy(army);
 	}
     }

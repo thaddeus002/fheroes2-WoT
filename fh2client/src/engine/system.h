@@ -41,7 +41,7 @@ namespace System
 
     std::string GetTime(void);
 
-    char*	SetLocale(int category, const char* locale);
+    char*	SetLocale(const char* locale);
     size_t	GetMemoryUsage(void);
 
     int		GetCommandOptions(int argc, char* const argv[], const char* optstring);

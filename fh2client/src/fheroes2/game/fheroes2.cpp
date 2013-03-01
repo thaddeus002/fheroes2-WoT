@@ -22,6 +22,7 @@
 
 #include <iostream>
 #include <string>
+#include <cstdlib>
 
 #include "engine.h"
 #include "system.h"
@@ -329,7 +330,7 @@ void SetLangEnvPath(const Settings & conf)
 
     const std::string & strtmp = conf.GetLangDir();
 
-    System::SetLocale(LC_ALL, "en_US.UTF8");
+    System::SetLocale("en_US.UTF8");
     bindtextdomain(GETTEXT_PACKAGE, strtmp.c_str());
     bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
     textdomain(GETTEXT_PACKAGE);
