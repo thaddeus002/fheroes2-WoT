@@ -39,6 +39,12 @@
 #define ICONS_CURSOR_HEIGHT     32
 #define ICONS_CURSOR_COLOR      0x98
 
+bool Interface::IconsBar::IsVisible(void)
+{
+    const Settings & conf = Settings::Get();
+    return !conf.ExtGameHideInterface() || conf.ShowIcons();
+}
+
 u8 Interface::IconsBar::GetItemWidth(void)
 {
     return ICONS_WIDTH;
@@ -193,10 +199,13 @@ void Interface::CastleIcons::SetShow(bool f)
 {
     IconsBar::SetShow(f);
 
-    if(f)
-	GetSplitter().ShowCursor();
-    else
-	GetSplitter().HideCursor();
+    if(IconsBar::IsVisible())
+    {
+	if(f)
+	    GetSplitter().ShowCursor();
+	else
+	    GetSplitter().HideCursor();
+    }
 }
 
 void Interface::CastleIcons::SetPos(s16 px, s16 py)
@@ -289,10 +298,13 @@ void Interface::HeroesIcons::SetShow(bool f)
 {
     IconsBar::SetShow(f);
 
-    if(f)
-	GetSplitter().ShowCursor();
-    else
-	GetSplitter().HideCursor();
+    if(IconsBar::IsVisible())
+    {
+	if(f)
+	    GetSplitter().ShowCursor();
+	else
+	    GetSplitter().HideCursor();
+    }
 }
 
 void Interface::HeroesIcons::SetPos(s16 px, s16 py)
@@ -334,14 +346,18 @@ void Interface::IconsPanel::SavePosition(void)
 
 void Interface::IconsPanel::SetRedraw(icons_t icons) const
 {
-    switch(icons)
+    // is visible
+    if(IconsBar::IsVisible())
     {
-	case ICON_HEROES:	interface.SetRedraw(REDRAW_HEROES); break;
-	case ICON_CASTLES:	interface.SetRedraw(REDRAW_CASTLES); break;
-	default: break;
-    }
+	switch(icons)
+	{
+	    case ICON_HEROES:	interface.SetRedraw(REDRAW_HEROES); break;
+	    case ICON_CASTLES:	interface.SetRedraw(REDRAW_CASTLES); break;
+	    default: break;
+	}
 
-    interface.SetRedraw(REDRAW_ICONS);
+	interface.SetRedraw(REDRAW_ICONS);
+    }
 }
 
 void Interface::IconsPanel::SetRedraw(void) const
@@ -371,13 +387,11 @@ void Interface::IconsPanel::SetPos(s16 ox, s16 oy)
 
 void Interface::IconsPanel::Redraw(void)
 {
-    const Settings & conf = Settings::Get();
-
     // is visible
-    if(!conf.ExtGameHideInterface() || conf.ShowIcons())
+    if(IconsBar::IsVisible())
     {
 	// redraw border
-	if(conf.ExtGameHideInterface())
+	if(Settings::Get().ExtGameHideInterface())
 	    BorderWindow::Redraw();
 
 	heroesIcons.Redraw();
@@ -428,16 +442,19 @@ void Interface::IconsPanel::ResetIcons(icons_t icons)
 {
     Kingdom & kingdom = world.GetKingdom(Settings::Get().CurrentColor());
 
-    if(icons & ICON_HEROES)
+    if(CONTROL_AI != kingdom.GetControl())
     {
-	heroesIcons.SetListContent(kingdom.GetHeroes());
-	heroesIcons.Reset();
-    }
+	if(icons & ICON_HEROES)
+	{
+	    heroesIcons.SetListContent(kingdom.GetHeroes());
+	    heroesIcons.Reset();
+	}
 
-    if(icons & ICON_CASTLES)
-    {
-	castleIcons.SetListContent(kingdom.GetCastles());
-	castleIcons.Reset();
+	if(icons & ICON_CASTLES)
+	{
+	    castleIcons.SetListContent(kingdom.GetCastles());
+	    castleIcons.Reset();
+	}
     }
 }
 
