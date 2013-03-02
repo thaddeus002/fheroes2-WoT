@@ -40,11 +40,11 @@ namespace Interface
 
 	void SetShow(bool f) { show = f; };
 	bool IsShow(void) const { return show; };
-
 	void RedrawBackground(const Point &);
 
 	static u8 GetItemWidth(void);
 	static u8 GetItemHeight(void);
+	static bool IsVisible(void);
 
     protected:
 	const u8 & icons;
