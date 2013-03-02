@@ -80,6 +80,7 @@ namespace Battle
 
     private:
 	Army &		army;
+	std::vector<u32>uids;
     };
 
     StreamBase & operator<< (StreamBase &, const Force &);

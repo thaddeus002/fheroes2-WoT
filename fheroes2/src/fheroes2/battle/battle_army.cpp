@@ -202,16 +202,22 @@ Battle::Unit* Battle::Units::FindMode(u32 mod)
 
 Battle::Force::Force(Army & parent, bool opposite) : army(parent)
 {
+    uids.reserve(army.Size());
+
     for(u8 index = 0; index < army.Size(); ++index)
     {
 	const Troop* troop = army.GetTroop(index);
 	const u16 position = army.isSpreadFormat() ? index * 22 : 22 + index * 11;
+	u32 uid = 0;
 
 	if(troop && troop->isValid())
 	{
 	    push_back(new Unit(*troop, (opposite ? position + 10 : position), opposite));
 	    back()->SetArmy(army);
+	    uid = back()->GetUID();
 	}
+
+	uids.push_back(uid);
     }
 }
 
@@ -476,11 +482,12 @@ void Battle::Force::SyncArmyCount(void)
     for(u8 index = 0; index < army.Size(); ++index)
     {
 	Troop* troop = army.GetTroop(index);
-	const Unit* unit = FindUID(reinterpret_cast<intptr_t>(troop));
 
 	if(troop && troop->isValid())
 	{
-	    if(unit->GetDead())
+	    const Unit* unit = FindUID(uids.at(index));
+
+	    if(unit && unit->GetDead())
 		troop->SetCount(unit->GetDead() > troop->GetCount() ? 0 : troop->GetCount() - unit->GetDead());
 	}
     }
