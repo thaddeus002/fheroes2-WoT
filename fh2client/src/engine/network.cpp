@@ -22,6 +22,7 @@
 
 #include <stdexcept>
 
+#include "system.h"
 #include "network.h"
 
 void Network::Init()
@@ -46,7 +47,9 @@ void Network::Init()
         throw std::runtime_error("Unable to allocate socket set");
     }
 
-    if(SDLNet_ResolveHost(&ip,"localhost", 13536) == -1) {
+    const char* fh2serv = System::GetEnvironment("FH2SERVER");
+
+    if(SDLNet_ResolveHost(&ip, (fh2serv ? fh2serv : "localhost"), 13536) == -1) {
         std::cout << "Unable to resolve server address: " << SDLNet_GetError() << std::endl;
         throw std::runtime_error("Unable to resolve server address");
     }
