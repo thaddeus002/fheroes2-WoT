@@ -15,10 +15,6 @@ ifndef WITHOUT_AUDIOCD
 CFLAGS := $(CFLAGS) -DWITH_AUDIOCD
 endif
 
-ifndef WITHOUT_NETWORK
-LIBS := $(LIBS) -lwsock32
-endif
-
 ifdef WITH_ICONS
 IDICON := 1099
 CFLAGS := $(CFLAGS) -DID_ICON=$(IDICON)
@@ -29,4 +25,4 @@ AR := ar
 CXX := g++
 WINDRES := windres
 CFLAGS := $(CFLAGS) -O2 -static
-LIBS := -static -Wl,-Bstatic $(LIBS) -lwinmm -ldxguid
+LIBS := -static -Wl,-Bstatic $(LIBS) -lwinmm -lwsock32 -ldxguid
