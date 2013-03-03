@@ -276,13 +276,11 @@ bool LocalEvent::HandleEvents(bool delay)
 {
     SDL_Event event;
 
-    if(Network::Get().IsInputPending())
+    if(!network_input_pending && Network::Get().IsInputPending())
     {
         network_input_pending = true;
         return true;
     }
-
-    network_input_pending = false;
 
     ResetModes(MOUSE_MOTION);
     ResetModes(KEY_PRESSED);
@@ -697,6 +695,11 @@ bool LocalEvent::KeyPress(KeySym key) const
 bool LocalEvent::NetworkInputPending(void) const
 {
     return network_input_pending;
+}
+
+void LocalEvent::DequeueNetworkEvent(NetworkEvent &ev) {
+    Network::Get().DequeueInputEvent(ev);
+    network_input_pending = false;
 }
 
 void LocalEvent::SetGlobalFilterMouseEvents(void (*pf)(u16, u16))

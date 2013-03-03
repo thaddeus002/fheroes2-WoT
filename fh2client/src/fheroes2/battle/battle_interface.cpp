@@ -4243,7 +4243,6 @@ void Battle::Interface::NetworkRedraw()
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
     LocalEvent & le = LocalEvent::Get();
-    Settings & conf = Settings::Get();
 
     bool humanturn_redraw = false;
 

@@ -27,6 +27,8 @@
 #include "thread.h"
 #include "types.h"
 
+class NetworkEvent;
+
 enum KeyMod { MOD_NONE = KMOD_NONE, MOD_CTRL = KMOD_CTRL, MOD_SHIFT = KMOD_SHIFT, MOD_ALT = KMOD_ALT, MOD_CAPS = KMOD_CAPS, MOD_NUM = KMOD_NUM };
 
 enum KeySym
@@ -243,6 +245,7 @@ public:
     u16	   KeyMod(void) const;
 
     bool NetworkInputPending(void) const;
+    void DequeueNetworkEvent(NetworkEvent&);
 
 #ifdef WITHOUT_MOUSE
     void ToggleEmulateMouse(void);
