@@ -36,6 +36,7 @@
 #include "battle_arena.h"
 #include "battle_army.h"
 #include "network_protocol.h"
+#include "interface_network.h"
 
 namespace Battle
 {
@@ -205,13 +206,8 @@ void Battle::WaitForBattleReportResponseFromServer(void)
 
             if(ev.OldState != ev.NewState)
             {
-                switch(ev.NewState)
-                {
-                    case ST_DISCONNECTED:
-                    default:
-                        Dialog::Message("Error", "Disconnected from server", Font::BIG, Dialog::OK);
-                        return;
-                }
+                if(!::Interface::NetworkGui::ProcessStateChange(ev))
+                      return;
             }
 
             if(ev.Message.get() == 0)

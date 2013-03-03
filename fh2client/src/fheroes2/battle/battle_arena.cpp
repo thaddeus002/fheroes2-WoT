@@ -42,6 +42,7 @@
 #include "battle_bridge.h"
 #include "battle_command.h"
 #include "battle_interface.h"
+#include "interface_network.h"
 
 namespace Battle
 {
@@ -491,10 +492,10 @@ void Battle::Arena::Turns(void)
 
 void Battle::Arena::ProcessTurnStart(const NetworkEvent &ev) {
     Actions actions;
-
+#if 0
     bool tower_moved = false;
     bool catapult_moved = false;
-
+#endif
     int color = ev.Message->GetInt(HMM2_TURN_COLOR);
     int index = ev.Message->GetInt(HMM2_TURN_UID);
     int new_turn = ev.Message->GetInt(HMM2_TURN_NUMBER);
@@ -579,10 +580,8 @@ void Battle::Arena::NetworkTurns(void)
 
             if(ev.OldState != ev.NewState)
             {
-#if 0
-                if(!ProcessNetworkStateChange(ev))
+                if(!::Interface::NetworkGui::ProcessStateChange(ev))
                     return;
-#endif
             }
 
             if(ev.Message.get() == 0) {

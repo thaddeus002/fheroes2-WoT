@@ -38,6 +38,7 @@
 #include "army_bar.h"
 #include "battle_only.h"
 #include "network_protocol.h"
+#include "interface_network.h"
 
 #define PRIMARY_MAX_VALUE	20
 
@@ -139,15 +140,9 @@ bool Battle::Only::WaitForPlayerAllocationFromServer(void)
 
             DEBUG(DBG_NETWORK, DBG_INFO, "Dequeued network event");
 
-            if(ev.OldState != ev.NewState)
-	    {
-                switch(ev.NewState)
-		{
-                    case ST_DISCONNECTED:
-                    default:
-                        Dialog::Message("Error", "Disconnected from server", Font::BIG, Dialog::OK);
-                        return false;
-                }
+            if(ev.OldState != ev.NewState) {
+				if(!::Interface::NetworkGui::ProcessStateChange(ev)) 
+					return false;
             }
 
             if(ev.Message.get() == 0)
@@ -205,7 +200,7 @@ bool Battle::Only::WaitForArmyInfoFromServer(void)
 
 			if(ev.OldState != ev.NewState)
 			{
-				if(!ProcessNetworkStateChange(ev)) 
+				if(!::Interface::NetworkGui::ProcessStateChange(ev)) 
 					return false;
             }
 
@@ -252,10 +247,9 @@ bool Battle::Only::WaitForNetworkMessage(int MessageType)
 
             DEBUG(DBG_NETWORK, DBG_INFO, "Dequeued network event");
 
-            if(ev.OldState != ev.NewState)
-	    {
-                if(!ProcessNetworkStateChange(ev))
-                    return false;
+            if(ev.OldState != ev.NewState) {
+				if(!::Interface::NetworkGui::ProcessStateChange(ev)) 
+					return false;
             }
 
             if(ev.Message.get() == 0)
@@ -266,24 +260,6 @@ bool Battle::Only::WaitForNetworkMessage(int MessageType)
         }
 
         if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) return false;
-    }
-
-    return true;
-}
-
-bool Battle::Only::ProcessNetworkStateChange(const NetworkEvent &ev)
-{
-    switch(ev.NewState)
-    {
-        case ST_ERROR:
-            Dialog::Message("Error", ev.ErrorMessage, Font::BIG, Dialog::OK);
-            return false;
-
-        case ST_DISCONNECTED:
-            Dialog::Message("Error", "Disconnected from server", Font::BIG, Dialog::OK);
-            return false;
-        default:
-			break;
     }
 
     return true;
@@ -398,7 +374,7 @@ bool Battle::Only::ProcessNetworkEvents(bool &redraw, const Point &cur_pt, bool 
 
     if(ev.OldState != ev.NewState)
     {
-        if(!ProcessNetworkStateChange(ev))
+        if(!::Interface::NetworkGui::ProcessStateChange(ev)) 
             return false;
     }
 
