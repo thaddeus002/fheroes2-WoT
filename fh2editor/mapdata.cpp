@@ -35,7 +35,7 @@ bool MapTile::isValid(void) const
     return true;
 }
 
-MapTile::MapTile(const QPoint & inpos, const mp2tile_t & mp2, AGG::File & agg, const QPoint & offset)
+MapTile::MapTile(const QPoint & inpos, const mp2til_t & mp2, AGG::File & agg, const QPoint & offset)
     : pos(inpos), sprite(mp2.tileSprite), shape(mp2.tileShape)
 {
     QPixmap pixmap = agg.getImageTIL("GROUND32", sprite);
@@ -207,33 +207,114 @@ bool MapData::loadMP2Map(const QString & mapFile)
 	setSceneRect(QRect(QPoint(0, 0),
 		QSize(mapSize.width() * tilesetSize.width(), mapSize.height() * tilesetSize.height())));
 
-	// data map: tiles, part1
+	// data map: mp2tile, part1
+	// count blocks: width * heigth
+	QVector<mp2til_t> tilBlocks(mapSize.width() * mapSize.height());
+
+	for(QVector<mp2til_t>::iterator
+	    it = tilBlocks.begin(); it != tilBlocks.end(); ++it)
+	    (*it) = map.readMP2Til();
+
+	// data map: mp2ext, part2
+	// count blocks: 4 byte
+	QVector<mp2ext_t> extBlocks(map.readLE32());
+
+	for(QVector<mp2ext_t>::iterator
+	    it = extBlocks.begin(); it != extBlocks.end(); ++it)
+	    (*it) = map.readMP2Ext();
+
+	// cood castles
+	QVector<mp2pos_t> townPosBlocks;
+	townPosBlocks.reserve(72);
+
+	// 72 x 3 byte (px, py, id)
+	for(int ii = 0; ii < 72; ++ii)
+	{
+	    mp2pos_t twn;
+
+	    twn.posx = map.readByte();
+	    twn.posy = map.readByte();
+	    twn.type = map.readByte();
+
+	    if(0xFF != twn.posx && 0xFF != twn.posy)
+		townPosBlocks.push_back(twn);
+	}
+
+	// cood resource kingdoms
+	QVector<mp2pos_t> resourcePosBlocks;
+	resourcePosBlocks.reserve(144);
+
+	// 144 x 3 byte (px, py, id)
+	for(int ii = 0; ii < 144; ++ii)
+	{
+	    mp2pos_t res;
+
+	    res.posx = map.readByte();
+	    res.posy = map.readByte();
+	    res.type = map.readByte();
+
+	    if(0xFF != res.posx && 0xFF != res.posy)
+		resourcePosBlocks.push_back(res);
+	}
+
+	// byte: numObelisks
+	map.readByte();
+
+	// find count latest blocks: unknown byte ?? ?? ?? LO HI 00 00
+	int blocksCount = 0;
+
+	while(1)
+	{
+    	    quint8 lo = map.readByte();
+    	    quint8 hi = map.readByte();
+
+    	    if(0 == hi && 0 == lo)
+		break;
+    	    else
+    		blocksCount = 256 * hi + lo - 1;
+	}
+
+	// read latest blocks
+	for(int ii = 0; ii < blocksCount; ++ii)
+	{
+	    QByteArray block = map.readBlock(map.readLE16());
+
+	    // parse block
+	}
+
+	mapUniq = map.readLE32();
+
+	map.close();
+
+	// load tiles
 	for(int yy = 0; yy < mapSize.height(); ++yy)
 	{
 	    for(int xx = 0; xx < mapSize.width(); ++xx)
 	    {
-		mp2tile_t mp2;
-
-		mp2.tileSprite = map.readLE16();
-		mp2.objectName1 = map.readByte();
-		mp2.indexName1 = map.readByte();
-		mp2.quantity1 = map.readByte();
-		mp2.quantity2 = map.readByte();
-		mp2.objectName2 = map.readByte();
-		mp2.indexName2 = map.readByte();
-		mp2.tileShape = map.readByte();
-		mp2.tileObject = map.readByte();
-		mp2.offsetPart2 = map.readLE16();
-		mp2.uniq1 = map.readLE32();
-		mp2.uniq2 = map.readLE32();
+		const mp2til_t & mp2 = tilBlocks[xx + yy * mapSize.width()];
 
 		tilesetItems.push_back(new MapTile(QPoint(xx, yy), mp2, aggContent, QPoint(xx * tilesetSize.width(), yy * tilesetSize.height())));
+
+		quint16 ext = mp2.indexExt;
+
+		while(ext)
+		{
+		    if(ext >= extBlocks.size())
+		    {
+			qDebug() << "ext block: out of range" << ext;
+    			map.close();
+    			return false;
+		    }
+
+		    //loadLevel1(extBlocks[ext]);
+		    //loadLevel2(extBlocks[ext]);
+
+		    ext = extBlocks[ext].indexExt;
+		}
 
 		addItem(tilesetItems.back());
 	    }
 	}
-
-	map.close();
 
 	//
 	mapAuthors = "unknown";

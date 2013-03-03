@@ -24,7 +24,44 @@
 #define _EDITOR_ENGINE_H_
 
 #include <QFile>
+#include <QString>
 #include <QPixmap>
+#include <QByteArray>
+
+struct mp2til_t
+{
+    quint16     tileSprite;
+    quint8      objectName1;
+    quint8      indexName1;
+    quint8      quantity1;
+    quint8      quantity2;
+    quint8      objectName2;
+    quint8      indexName2;
+    quint8      tileShape;
+    quint8      tileObject;
+    quint16     indexExt;
+    quint32     uniq1;
+    quint32     uniq2;
+};
+
+struct mp2ext_t
+{
+    quint16     indexExt;
+    quint8      objectName1;
+    quint8      indexName1;
+    quint8      quantity;
+    quint8      objectName2;
+    quint8      indexName2;
+    quint32     uniq1;
+    quint32     uniq2;
+};
+
+struct mp2pos_t
+{
+    quint8	posx;
+    quint8	posy;
+    quint8	type;
+};
 
 namespace H2
 {
@@ -36,8 +73,14 @@ namespace H2
 
 	qint8	readByte(void);
 	QString	readString(size_t);
+	QByteArray
+		readBlock(size_t);
+
 	qint16	readLE16(void);
 	qint32	readLE32(void);
+
+	mp2til_t readMP2Til(void);
+	mp2ext_t readMP2Ext(void);
     };
 }
 

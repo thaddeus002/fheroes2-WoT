@@ -31,26 +31,10 @@
 
 #include "engine.h"
 
-struct mp2tile_t
-{
-    quint16	tileSprite;
-    quint8	objectName1;
-    quint8	indexName1;
-    quint8	quantity1;
-    quint8	quantity2;
-    quint8	objectName2;
-    quint8	indexName2;
-    quint8	tileShape;
-    quint8	tileObject;
-    quint16	offsetPart2;
-    quint32	uniq1;
-    quint32	uniq2;
-};
-
 class MapTile : public QGraphicsItem
 {
 public:
-    MapTile(const QPoint &, const mp2tile_t &, AGG::File &, const QPoint &);
+    MapTile(const QPoint &, const mp2til_t &, AGG::File &, const QPoint &);
 
     bool		isValid(void) const;
     static QString	indexString(int);
@@ -113,6 +97,7 @@ protected:
     quint16		mapConditionLossData2;
     bool		mapStartWithHero;
     quint8		mapRaceColor[6];
+    quint32		mapUniq;
 
     AGG::File		aggContent;
 

@@ -74,20 +74,54 @@ qint8 H2::File::readByte(void)
 
 QString H2::File::readString(size_t sz)
 {
-    QString res;
+    return QString(readBlock(sz));
+}
+
+QByteArray H2::File::readBlock(size_t sz)
+{
+    QByteArray res;
 
     if(pos() + sz <= size())
     {
-	QTextStream in(this);
-	QTextStream out(& res);
-
-	for(size_t ii = 0; ii < sz; ++ii)
-	{
-	    char ch;
-	    in >> ch;
-	    out << ch;
-	}
+	res.reserve(sz);
+	readData(res.data(), sz);
     }
+
+    return res;
+}
+
+mp2til_t H2::File::readMP2Til(void)
+{
+    mp2til_t res;
+
+    res.tileSprite = readLE16();
+    res.objectName1 = readByte();
+    res.indexName1 = readByte();
+    res.quantity1 = readByte();
+    res.quantity2 = readByte();
+    res.objectName2 = readByte();
+    res.indexName2 = readByte();
+    res.tileShape = readByte();
+    res.tileObject = readByte();
+    res.indexExt = readLE16();
+    res.uniq1 = readLE32();
+    res.uniq2 = readLE32();
+
+    return res;
+}
+
+mp2ext_t H2::File::readMP2Ext(void)
+{
+    mp2ext_t res;
+
+    res.indexExt = readLE16();
+    res.objectName1 = readByte();
+    res.indexName1 = readByte();
+    res.quantity = readByte();
+    res.objectName2 = readByte();
+    res.indexName2 = readByte();
+    res.uniq1 = readLE32();
+    res.uniq2 = readLE32();
 
     return res;
 }
