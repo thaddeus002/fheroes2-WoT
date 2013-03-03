@@ -23,33 +23,76 @@
 #ifndef _EDITOR_MAPDATA_H_
 #define _EDITOR_MAPDATA_H_
 
-#include <QString>
 #include <QVector>
 #include <QList>
+#include <QString>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
 
 #include "engine.h"
 
-class MapTile
+struct mp2tile_t
+{
+    quint16	tileSprite;
+    quint8	objectName1;
+    quint8	indexName1;
+    quint8	quantity1;
+    quint8	quantity2;
+    quint8	objectName2;
+    quint8	indexName2;
+    quint8	tileShape;
+    quint8	tileObject;
+    quint16	offsetPart2;
+    quint32	uniq1;
+    quint32	uniq2;
+};
+
+class MapTile : public QGraphicsItem
 {
 public:
-    int				index;
-    int				sprite;
-    int				shape;
+    MapTile(const QPoint &, const mp2tile_t &, AGG::File &, const QPoint &);
 
+    bool		isValid(void) const;
+    static QString	indexString(int);
 
-    MapTile();
-    MapTile(int, int, int);
+    QRectF		boundingRect(void) const;
+    void		paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget* = 0);
 
-    bool			isValid(void) const;
-    QGraphicsPixmapItem* 	loadItem(QPixmap, const QSize &, const QPoint &);
+protected:
+    void		mousePressEvent(QGraphicsSceneMouseEvent*);
+    void		mouseMoveEvent(QGraphicsSceneMouseEvent*);
 
-    static QString		indexString(int);
+    QPoint		pos;
+
+    int			sprite;
+    int			shape;
+
+    QPixmap		pixmapTile;
+    QRectF		area;
 };
 
 class MapData : public QGraphicsScene
 {
+    Q_OBJECT
+
+public:
+    MapData(){}
+
+    const QString &	Name(void) const;
+    const QString &	Description(void) const;
+    const QSize &	Size(void) const;
+    int			indexLimit(void) const;
+    bool		loadMap(const QString &);
+
+signals:
+    void		dataModified(void);
+
+protected:
+    bool		loadMP2Map(const QString &);
+
+    void		mousePressEvent(QGraphicsSceneMouseEvent*);
+    void		mouseMoveEvent(QGraphicsSceneMouseEvent*);
+
     QSize		mapSize;
 
     QString		mapName;
@@ -71,29 +114,10 @@ class MapData : public QGraphicsScene
     bool		mapStartWithHero;
     quint8		mapRaceColor[6];
 
-    QVector<MapTile>	tilesContent;
     AGG::File		aggContent;
 
-    QSize			tilesetSize;
-    QList<QGraphicsItem*>	tilesetItems;
-    QGraphicsItemGroup*		tilesetItemsGroup;
-
-public:
-    MapData();
-    ~MapData();
-
-    const QString &	Name(void) const;
-    const QString &	Description(void) const;
-    const QSize &	Size(void) const;
-    int			indexLimit(void) const;
-
-    bool		loadMap(const QString &);
-
-signals:
-    void		dataModified(void);
-
-protected:
-    bool		loadMP2Map(const QString &);
+    QSize		tilesetSize;
+    QList<MapTile*>	tilesetItems;
 };
 
 #endif

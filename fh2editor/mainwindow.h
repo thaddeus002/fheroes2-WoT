@@ -25,13 +25,13 @@
 
 #include <QMainWindow>
 
-class MapWindow;
 QT_BEGIN_NAMESPACE
 class QAction;
 class QMenu;
 class QMdiArea;
 class QMdiSubWindow;
 class QSignalMapper;
+class MapWindow;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow

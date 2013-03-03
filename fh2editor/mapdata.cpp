@@ -24,6 +24,7 @@
 #include <QDomDocument>
 #include <QDebug>
 #include <QMessageBox>
+#include <QGraphicsSceneMouseEvent>
 
 #include "engine.h"
 #include "program.h"
@@ -34,12 +35,23 @@ bool MapTile::isValid(void) const
     return true;
 }
 
-MapTile::MapTile() : index(-1), sprite(-1), shape(-1)
+MapTile::MapTile(const QPoint & inpos, const mp2tile_t & mp2, AGG::File & agg, const QPoint & offset)
+    : pos(inpos), sprite(mp2.tileSprite), shape(mp2.tileShape)
 {
-}
+    QPixmap pixmap = agg.getImageTIL("GROUND32", sprite);
 
-MapTile::MapTile(int p1, int p2, int p3) : index(p1), sprite(p2), shape(p3)
-{
+    area.setTopLeft(offset);
+    area.setSize(pixmap.size());
+
+    setFlags(QGraphicsItem::ItemIsSelectable);
+
+    switch(shape % 4)
+    {
+	case 1: pixmapTile = pixmap.transformed(QTransform().scale( 1, -1)); break;
+	case 2: pixmapTile = pixmap.transformed(QTransform().scale(-1,  1)); break;
+	case 3: pixmapTile = pixmap.transformed(QTransform().scale(-1, -1)); break;
+	default: pixmapTile= pixmap; break;
+    }
 }
 
 QString MapTile::indexString(int index)
@@ -55,36 +67,36 @@ QString MapTile::indexString(int index)
     return str;
 }
 
-QGraphicsPixmapItem* MapTile::loadItem(QPixmap pixmap, const QSize & size, const QPoint & offset)
+QRectF MapTile::boundingRect(void) const
 {
-    QGraphicsPixmapItem* item = new QGraphicsPixmapItem();
-    item->setOffset(offset);
-
-    if(!pixmap.isNull() && pixmap.size() != size)
-    {
-	QPixmap temp = pixmap.scaled(size);
-	qSwap(temp, pixmap);
-    }
-
-    item->setFlags(QGraphicsItem::ItemIsSelectable);
-
-    switch(shape % 4)
-    {
-	case 1: item->setPixmap(pixmap.transformed(QTransform().scale( 1, -1))); break;
-	case 2: item->setPixmap(pixmap.transformed(QTransform().scale(-1,  1))); break;
-	case 3: item->setPixmap(pixmap.transformed(QTransform().scale(-1, -1))); break;
-	default: item->setPixmap(pixmap); break;
-    }
-
-    return item;
+    return area;
 }
 
-MapData::MapData() : tilesetItemsGroup(NULL)
+void MapTile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
+    if(painter)
+	painter->drawPixmap(area.x(), area.y(), pixmapTile);
 }
 
-MapData::~MapData()
+void MapTile::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
+    if(event)
+    {
+	QString str, msg;
+	QTextStream ss1(& str), ss2(& msg);
+
+	ss1 << "Tile(" << pos.x() << "," << pos.y() << ")";
+	ss2 << "tile sprite: " << sprite << endl << "tile shape: " << shape << endl;
+
+	QMessageBox::information(NULL, str, msg);
+    }
+
+    QGraphicsItem::mousePressEvent(event);
+}
+
+void MapTile::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
+{
+    QGraphicsItem::mouseMoveEvent(event);
 }
 
 const QString & MapData::Name(void) const
@@ -109,64 +121,15 @@ int MapData::indexLimit(void) const
 
 bool MapData::loadMap(const QString & mapFile)
 {
-    mapSize.setWidth(0);
-    mapSize.setHeight(0);
-
-    mapName.clear();
-    mapDescription.clear();
-    mapAuthors.clear();
-    mapLicense.clear();
-
-    tilesContent.clear();
-    tilesetSize.setWidth(0);
-    tilesetSize.setHeight(0);
-
-    if(tilesetItemsGroup)
-    {
-	removeItem(tilesetItemsGroup);
-	destroyItemGroup(tilesetItemsGroup);
-	tilesetItemsGroup = NULL;
-    }
-
-    if(tilesetItems.size())
-    {
-	for(QList<QGraphicsItem*>::iterator
-		it = tilesetItems.begin(); it != tilesetItems.end(); ++it)
-	    delete *it;
-
-	tilesetItems.clear();
-    }
-
-    if(! loadMP2Map(mapFile))
-	return false;
-
-    // load scene
-    setSceneRect(QRect(QPoint(0, 0),
-		    QSize(mapSize.width() * tilesetSize.width(), mapSize.height() * tilesetSize.height())));
-
-    for(int yy = 0; yy < mapSize.height(); ++yy)
-    {
-	for(int xx = 0; xx < mapSize.width(); ++xx)
-	{
-	    const QPoint offset(xx * tilesetSize.width(), yy * tilesetSize.height());
-	    const int index = yy * mapSize.height() + xx;
-
-	    MapTile & tile = tilesContent[index];
-
-	    tilesetItems.push_back(
-		tile.loadItem(aggContent.getImageTIL("GROUND32", tile.sprite), tilesetSize, offset));
-	}
-    }
-
-    tilesetItemsGroup = createItemGroup(tilesetItems);
-    addItem(tilesetItemsGroup);
-
-    return true;
+    return loadMP2Map(mapFile);
 }
 
 bool MapData::loadMP2Map(const QString & mapFile)
 {
     H2::File map(mapFile);
+
+    tilesetSize.setWidth(32);
+    tilesetSize.setHeight(32);
 
     if(map.open(QIODevice::ReadOnly))
     {
@@ -241,28 +204,33 @@ bool MapData::loadMP2Map(const QString & mapFile)
 	map.readLE32();
 	map.readLE32();
 
-	tilesContent.reserve(indexLimit());
+	setSceneRect(QRect(QPoint(0, 0),
+		QSize(mapSize.width() * tilesetSize.width(), mapSize.height() * tilesetSize.height())));
 
 	// data map: tiles, part1
-	for(int ii = 0; ii < indexLimit(); ++ii)
+	for(int yy = 0; yy < mapSize.height(); ++yy)
 	{
-	    int tileSprite = map.readLE16();
-	    int objectName1 = map.readByte();
-	    int indexName1 = map.readByte();
-	    int quantity1 = map.readByte();
-	    int quantity2 = map.readByte();
-	    int objectName2 = map.readByte();
-	    int indexName2 = map.readByte();
-	    int tileShape = map.readByte();
-	    int tileObject = map.readByte();
+	    for(int xx = 0; xx < mapSize.width(); ++xx)
+	    {
+		mp2tile_t mp2;
 
-	    int offsetPart2 = map.readLE16();
-	    int uniq1 = map.readLE32();
-	    int uniq2 = map.readLE32();
+		mp2.tileSprite = map.readLE16();
+		mp2.objectName1 = map.readByte();
+		mp2.indexName1 = map.readByte();
+		mp2.quantity1 = map.readByte();
+		mp2.quantity2 = map.readByte();
+		mp2.objectName2 = map.readByte();
+		mp2.indexName2 = map.readByte();
+		mp2.tileShape = map.readByte();
+		mp2.tileObject = map.readByte();
+		mp2.offsetPart2 = map.readLE16();
+		mp2.uniq1 = map.readLE32();
+		mp2.uniq2 = map.readLE32();
 
-	    tilesContent.push_back(MapTile(ii, tileSprite, tileShape));
+		tilesetItems.push_back(new MapTile(QPoint(xx, yy), mp2, aggContent, QPoint(xx * tilesetSize.width(), yy * tilesetSize.height())));
 
-	    //qDebug() << "tile index=" << ii << "sprite=" << tileSprite << "shape=" << tileShape;
+		addItem(tilesetItems.back());
+	    }
 	}
 
 	map.close();
@@ -270,12 +238,19 @@ bool MapData::loadMP2Map(const QString & mapFile)
 	//
 	mapAuthors = "unknown";
 	mapLicense = "unknown";
-	//
-	tilesetSize.setWidth(32);
-	tilesetSize.setHeight(32);
 
 	return true;
     }
 
     return false;
+}
+
+void MapData::mousePressEvent(QGraphicsSceneMouseEvent* event)
+{
+    QGraphicsScene::mousePressEvent(event);
+}
+
+void MapData::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
+{
+    QGraphicsScene::mouseMoveEvent(event);
 }

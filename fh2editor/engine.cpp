@@ -124,12 +124,11 @@ bool AGG::File::loadFile(const QString & fn)
     setFileName(fn);
     if(open(QIODevice::ReadOnly))
     {
-	qDebug() << QString(__FUNCTION__) << qPrintable(fn);
+	qDebug() << "AGG::File::loadFile:" << qPrintable(fn);
 
 	quint16 countItems = readLE16();
 
-	qDebug() << size();
-	qDebug() << QString(__FUNCTION__) << "count items:" << countItems;
+	qDebug() << "AGG::File::loadFile:" << "count items:" << countItems;
 
 	const int sizeName = 15;
 	char buf[sizeName + 1];
@@ -172,7 +171,7 @@ bool AGG::File::loadFile(const QString & fn)
 		colors.push_back(qRgb(r << 2, g << 2, b << 2));
 	    }
 
-	    qDebug() << "loaded palette: " << colors.size();
+	    qDebug() << "AGG::File::loadFile:" << "loaded palette: " << colors.size();
 
 	    return true;
 	}

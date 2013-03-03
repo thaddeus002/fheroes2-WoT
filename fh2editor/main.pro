@@ -12,6 +12,6 @@ QT+= xml
 RESOURCES = resources.qrc
 
 # Input
-HEADERS += mainwindow.h mapwindow.h
+HEADERS += mainwindow.h mapwindow.h mapdata.h
 SOURCES += program.cpp engine.cpp mainwindow.cpp mapwindow.cpp mapdata.cpp
 CONFIG += qt debug

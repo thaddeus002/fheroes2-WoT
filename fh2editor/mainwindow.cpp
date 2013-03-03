@@ -372,7 +372,7 @@ QMdiSubWindow* MainWindow::findMapWindow(const QString &fileName)
     {
         MapWindow* child = qobject_cast<MapWindow*>(window->widget());
 
-        if(child->currentFile() == canonicalFilePath)
+        if(child && child->currentFile() == canonicalFilePath)
             return window;
     }
 
