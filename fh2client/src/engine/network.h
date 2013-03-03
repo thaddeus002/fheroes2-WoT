@@ -150,7 +150,7 @@ public:
     void DequeueInputEvent(NetworkEvent&);
     void QueueOutputMessage(const NetworkMessage&);
     
-    void StartNetworkThread(const std::string&, const std::string&);
+    void StartNetworkThread(const std::string&, int, int, int);
     void JoinNetworkThread();
 
     static Network &Get();
@@ -170,7 +170,9 @@ public:
     StrBuffer                           OutputBuffer;
 
     std::string                         SoftName;
-    std::string                         SoftVersion;
+    int                                 SoftVersionMajor;
+    int                                 SoftVersionMinor;
+    int                                 SoftVersionRevision;
 
     size_t                              MessageLen;
     Uint8                               *Message, *MessagePtr;

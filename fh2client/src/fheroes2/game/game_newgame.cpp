@@ -123,7 +123,11 @@ Game::menu_t Game::NewNetwork(void)
     cursor.Show();
     display.Flip();
 
-    Network::Get().StartNetworkThread("fheroes2", Settings::GetVersion());
+#ifdef SVN_REVISION
+    Network::Get().StartNetworkThread("fheroes2", MAJOR_VERSION, MINOR_VERSION, SVN_REVISION);
+#else
+    Network::Get().StartNetworkThread("fheroes2", MAJOR_VERSION, MINOR_VERSION, 0);
+#endif
 
     // newgame loop
     while(le.HandleEvents())
@@ -146,6 +150,7 @@ Game::menu_t Game::NewNetwork(void)
 			box2.Set("Entering a battle-only game...", Font::BIG, BOXAREA_WIDTH);
 			{
 			    NetworkMessage Msg(HMM2_CREATEGAME_REQUEST);
+                Msg.add_int_chunk(HMM2_GAME_VERSION, MAJOR_VERSION * 1000 + MINOR_VERSION);
 			    Network::Get().QueueOutputMessage(Msg);
 			}
 			break;

@@ -157,10 +157,12 @@ int Network::NetworkThreadWrapper(void *param)
     return 0;
 }
 
-void Network::StartNetworkThread(const std::string &_SoftName, const std::string &_SoftVersion)
+void Network::StartNetworkThread(const std::string &_SoftName, int Major, int Minor, int Revision)
 {
     Network::Get().SoftName = _SoftName;
-    Network::Get().SoftVersion = _SoftVersion;
+    Network::Get().SoftVersionMajor = Major;
+    Network::Get().SoftVersionMinor = Minor;
+    Network::Get().SoftVersionRevision = Revision;
 
     NetworkThread.Create(Network::NetworkThreadWrapper, (void*)this);
 }

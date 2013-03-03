@@ -158,11 +158,11 @@ void Network::ConnectedHandler(IOEvent &e)
     one.Message.reset(new NetworkMessage(HMM2_CLIENT_INFO));
 
     one.Message->add_str_chunk(HMM2_CLIENT_TAG, "HMM2");
-    one.Message->add_str_chunk(HMM2_CLIENT_VERSION, "0.1");
+    one.Message->add_int_chunk(HMM2_CLIENT_VERSION, SoftVersionRevision);
     one.Message->add_str_chunk(HMM2_CLIENT_OSNAME, System::GetOSName());
     one.Message->add_str_chunk(HMM2_CLIENT_OSVERSION, System::GetOSVersion());
     one.Message->add_str_chunk(HMM2_CLIENT_SOFTNAME, SoftName);
-    one.Message->add_str_chunk(HMM2_CLIENT_SOFTVERSION, SoftVersion);
+    one.Message->add_int_chunk(HMM2_CLIENT_SOFTVERSION, SoftVersionMajor * 1000 + SoftVersionMinor);
 
     std::cout << "Queued output message " << &one << std::endl;
 
