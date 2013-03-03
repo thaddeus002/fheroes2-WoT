@@ -1,0 +1,142 @@
+/***************************************************************************
+ *   Copyright (C) 2013 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *                                                                         *
+ *   Part of the Free Heroes2 Engine:                                      *
+ *   http://sourceforge.net/projects/fheroes2                              *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
+#include <QCoreApplication>
+#include <QProcessEnvironment>
+#include <QRegExp>
+#include <QDebug>
+#include <QDir>
+#include <QtGui>
+#include <QTextStream>
+
+#include "engine.h"
+#include "mainwindow.h"
+#include "program.h"
+
+#define PROGRAM_SHARE "fh2editor"
+
+struct ProgramShareEnv : QRegExp
+{
+    ProgramShareEnv() : QRegExp(QString(PROGRAM_SHARE).toUpper() + "=(.+)"){}
+
+    bool operator() (const QString & str) const { return exactMatch(str); }
+};
+
+namespace Resource
+{
+    QStringList shares;
+
+    const QStringList & ShareDirs(void)
+    {
+	return shares;
+    }
+
+    QString FindFile(const QString & dir, const QString & file)
+    {
+	for(QStringList::const_iterator
+	    it = shares.begin(); it != shares.end(); ++it)
+	{
+	    const QString path = *it + QDir::separator() + dir + QDir::separator() + file;
+	    if(QFile(path).exists()) return path;
+	}
+
+	return NULL;
+    }
+
+    QString Path(const char* str, ...)
+    {
+	QStringList list;
+
+	for(const char** ptr = &str; *ptr != NULL; ++ptr)
+	    list.push_back(*ptr);
+
+	QString shortres = list.join(QDir::separator());
+
+	for(QStringList::const_iterator
+	    it = shares.begin(); it != shares.end(); ++it)
+	{
+	    QString fullres = *it + QDir::separator() + shortres;
+	    if(QFile(fullres).exists()) return fullres;
+	}
+
+	return NULL;
+    }
+
+    void InitShares(void)
+    {
+	QStringList list;
+
+#ifdef BUILD_PROGRAM_SHARE
+	list.push_back(QString(BUILD_PROGRAM_SHARE));
+#endif
+
+	const QStringList & envs = QProcess::systemEnvironment();
+	struct ProgramShareEnv regExp;
+
+	for(QStringList::const_iterator
+	    it = envs.begin(); it != envs.end(); ++it)
+	if(regExp.exactMatch(*it)){ list.push_back(regExp.cap(1)); break; }
+
+	list.push_back(QCoreApplication::applicationDirPath());
+	list.push_back(QDir::homePath() + QDir::separator() + "." + QString(PROGRAM_SHARE).toLower());
+
+	Resource::shares.clear();
+
+	for(QStringList::const_iterator
+	    it = list.begin(); it != list.end(); ++it)
+	{
+	    qDebug() << "registry sharedir:" << *it;
+    	    Resource::shares.push_front(*it);
+	}
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    Resource::InitShares();
+
+    const QString resourceAgg = "HEROES2.AGG";
+    const QString subFolder = "data";
+
+    if(Resource::FindFile(subFolder, resourceAgg).isNull() &&
+	Resource::FindFile(subFolder, resourceAgg.toLower()).isNull())
+    {
+	QString str;
+	QTextStream ss(& str);
+	ss << "Cannot find resource file: " << resourceAgg << endl;
+	const QStringList & shareDirs = Resource::ShareDirs();
+	ss << endl << "Scan directories:" << endl;
+
+	for(QStringList::const_iterator
+	    it = shareDirs.begin(); it != shareDirs.end(); ++it)
+	    ss << (*it) << QDir::separator() << subFolder << endl;
+
+	QMessageBox::critical(NULL, "Error", str);
+	return 0;
+    }
+
+    MainWindow mainWin;
+    mainWin.show();
+
+    return app.exec();
+}
