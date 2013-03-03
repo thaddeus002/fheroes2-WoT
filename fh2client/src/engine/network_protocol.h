@@ -145,6 +145,11 @@
 #define HMM2_GAMELIST_RESPONSE  44
 #define HMM2_GAMELIST_REJECT    45
 
+// Battle messages
+#define HMM2_BATTLE_REPORT              134
+
+#define HMM2_BATTLE_REPORT_RESPONSE     141
+
 // Turn messages
 
 /*
@@ -169,6 +174,11 @@
  * the action has been performed.
  */
 #define HMM2_TURN_COMPLETED        53
+
+// Battle attributes
+#define HMM2_BATTLE_RESULT          0
+#define HMM2_BATTLE_ARMY1           1
+#define HMM2_BATTLE_ARMY2           2
 
 // Tournament table messages
 #define HMM2_TTABLE_REQUEST 60

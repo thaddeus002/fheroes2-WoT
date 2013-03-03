@@ -140,7 +140,7 @@ namespace Battle
 
 	void	Redraw(void);
 	void	HumanTurn(const Unit &, Actions &);
-	bool	NetworkTurn(Result &);
+	void	NetworkRedraw();
 
 	const Rect & GetArea(void) const;
 

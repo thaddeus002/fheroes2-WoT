@@ -342,6 +342,16 @@ void Battle::Force::UpdateOrderUnits(const Force & army1, const Force & army2, U
     }
 }
 
+Battle::Unit* Battle::Force::FindIndex(u32 index) const
+{
+    u32 uid = uids.at(index);
+
+    const_iterator it = std::find_if(begin(), end(),
+                        std::bind2nd(std::mem_fun(&Unit::isUID), uid));
+
+    return it == end() ? NULL : *it;
+}
+
 Battle::Unit* Battle::Force::GetCurrentUnit(const Force & army1, const Force & army2, Unit* last, bool part1)
 {
     Units units1(army1, true);

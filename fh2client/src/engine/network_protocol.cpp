@@ -72,21 +72,34 @@ void Network::IdentifiedStateHandler(IOEvent&, const NetworkMessage &Msg)
     }
 }
 
-void Network::AuthorizedStateHandler(IOEvent&, const NetworkMessage&)
+void Network::AuthorizedStateHandler(IOEvent&, const NetworkMessage &Msg)
 {
     std::cout << "Network::AuthorizedStateHandler" << std::endl;
+
+    if(Msg.GetType() == HMM2_PING_REQUEST) {
+        SendPong();
+        return;
+    }
 }
 
-void Network::InChatStateHandler(IOEvent&, const NetworkMessage&)
+void Network::InChatStateHandler(IOEvent&, const NetworkMessage &Msg)
 {
     std::cout << "Network::InChatStateHandler" << std::endl;
+
+    if(Msg.GetType() == HMM2_PING_REQUEST) {
+        SendPong();
+        return;
+    }
 }
 
 void Network::InGameStateHandler(IOEvent&, const NetworkMessage &Msg)
 {
     std::cout << "Network::InGameStateHandler" << std::endl;
 
-    if(Msg.GetType() == HMM2_START_GAME_RESPONSE || Msg.GetType() == HMM2_START_GAME_NOTIFY) {
+    if(Msg.GetType() == HMM2_PING_REQUEST) {
+        SendPong();
+    }
+    else if(Msg.GetType() == HMM2_START_GAME_RESPONSE || Msg.GetType() == HMM2_START_GAME_NOTIFY) {
         SetState(ST_PLAYING, Msg);
     }
     else {
@@ -97,7 +110,13 @@ void Network::InGameStateHandler(IOEvent&, const NetworkMessage &Msg)
 void Network::PlayingStateHandler(IOEvent&, const NetworkMessage &Msg)
 {
     std::cout << "Network::PlayingStateHandler" << std::endl;
-    QueueInputMessage(Msg);
+
+    if(Msg.GetType() == HMM2_PING_REQUEST) {
+        SendPong();
+    }
+    else {
+        QueueInputMessage(Msg);
+    }
 }
 
 void Network::DisconnectedStateHandler(IOEvent&, const NetworkMessage&)
@@ -265,4 +284,9 @@ void Network::MessageWriteHandler(IOEvent &e)
 
         OutputBuffer.pos += rc;
     }while(1);
+}
+
+void Network::SendPong() {
+    NetworkMessage Msg(HMM2_PING_RESPONSE);
+    Network::Get().QueueOutputMessage(Msg);
 }

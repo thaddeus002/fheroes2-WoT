@@ -496,7 +496,7 @@ void Battle::Arena::ProcessTurnStart(const NetworkEvent &ev) {
     bool catapult_moved = false;
 
     int color = ev.Message->GetInt(HMM2_TURN_COLOR);
-    int uid = ev.Message->GetInt(HMM2_TURN_UID);
+    int index = ev.Message->GetInt(HMM2_TURN_UID);
     int new_turn = ev.Message->GetInt(HMM2_TURN_NUMBER);
 
     if(current_turn != new_turn) {
@@ -514,11 +514,11 @@ void Battle::Arena::ProcessTurnStart(const NetworkEvent &ev) {
     /*
      * Find current troop
      */
-    Unit* current_troop = army1->GetColor() == color ? army1->FindUID(uid) :
-        (army2->GetColor() == color ? army2->FindUID(0x80000000 | uid) : NULL);
+    Unit* current_troop = army1->GetColor() == color ? army1->FindIndex(index) :
+        (army2->GetColor() == color ? army2->FindIndex(index) : NULL);
 
     if(current_troop == NULL) {
-        DEBUG(DBG_BATTLE, DBG_TRACE, "Cannot find troop color=" << color << " uid=" << uid);
+        DEBUG(DBG_BATTLE, DBG_TRACE, "Cannot find troop color=" << color << " index=" << index);
         return;
     }
 
@@ -565,11 +565,12 @@ void Battle::Arena::NetworkTurns(void)
 {
     const Settings & conf = Settings::Get();
     LocalEvent & le = LocalEvent::Get();
+    bool end_turn = false;
 
     if(interface && conf.Music() && !Music::isPlaying())
             AGG::PlayMusic(MUS::GetBattleRandom(), false);
 
-    while(le.HandleEvents()) {
+    while(!end_turn && le.HandleEvents()) {
         if(Network::Get().IsInputPending()) {
             NetworkEvent ev;
             Network::Get().DequeueInputEvent(ev);
@@ -585,7 +586,7 @@ void Battle::Arena::NetworkTurns(void)
             }
 
             if(ev.Message.get() == 0) {
-                continue;;
+                continue;
             }
 
             switch(ev.Message->GetType()) {
@@ -594,9 +595,26 @@ void Battle::Arena::NetworkTurns(void)
                     break;
                 case HMM2_TURN_ACTION:
                     PerformActions(ev);
+                    end_turn = true;
                     break;
             } 
         }
+
+        if(interface)
+            interface->NetworkRedraw();
+    }
+
+    // end turn: fix result
+    if(!army1->isValid() || (result_game.army1 & (RESULT_RETREAT | RESULT_SURRENDER)))
+    {
+        result_game.army1 |= RESULT_LOSS;
+        if(army2->isValid()) result_game.army2 = RESULT_WINS;
+    }
+
+    if(!army2->isValid() || (result_game.army2 & (RESULT_RETREAT | RESULT_SURRENDER)))
+    {
+        result_game.army2 |= RESULT_LOSS;
+        if(army1->isValid()) result_game.army1 = RESULT_WINS;
     }
 }
 
@@ -1258,4 +1276,3 @@ void Battle::Arena::SendActions(Actions &actions) {
     Msg.add_bin_chunk(HMM2_TURN_ACTIONS, actions_data.str());
     Network::Get().QueueOutputMessage(Msg);
 }
-

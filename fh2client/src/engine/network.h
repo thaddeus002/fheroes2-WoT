@@ -200,6 +200,8 @@ private:
     void MessageReadHandler(IOEvent&);
     void MessageWriteHandler(IOEvent&);
 
+    void SendPong();
+
     void ArmEvent(IOEvent&);
     void DisarmEvent(IOEvent&);
 };

@@ -35,6 +35,7 @@
 #include "ai.h"
 #include "battle_arena.h"
 #include "battle_army.h"
+#include "network_protocol.h"
 
 namespace Battle
 {
@@ -143,7 +144,7 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
 	    NecromancySkillAction(*hero_wins, result.killed, (CONTROL_HUMAN & hero_wins->GetControl()));
 
     DEBUG(DBG_BATTLE, DBG_INFO, "army1 " << army1.String());
-    DEBUG(DBG_BATTLE, DBG_INFO, "army2 " << army1.String());
+    DEBUG(DBG_BATTLE, DBG_INFO, "army2 " << army2.String());
 
     // update army
     if(army1.GetCommander() && Skill::Primary::HEROES == army1.GetCommander()->GetType())
@@ -161,7 +162,68 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
 
     DEBUG(DBG_BATTLE, DBG_INFO, "army1: " << (result.army1 & RESULT_WINS ? "wins" : "loss") << ", army2: " << (result.army2 & RESULT_WINS ? "wins" : "loss"));
 
+    if(conf.GameType(Game::TYPE_NETWORK)) {
+        SendBattleReport(result, army1, army2);
+        WaitForBattleReportResponseFromServer();
+    }
+
     return result;
+}
+
+void Battle::SendBattleReport(const Battle::Result &result, const Army &army1, const Army &army2)
+{
+    StreamBuf ResultData(1);
+    StreamBuf Army1Data(1);
+    StreamBuf Army2Data(1);
+
+    ResultData << result;
+    Army1Data << army1;
+    Army2Data << army2;
+
+    NetworkMessage Msg(HMM2_BATTLE_REPORT);
+    Msg.add_bin_chunk(HMM2_BATTLE_RESULT, ResultData.data(), ResultData.size());
+    Msg.add_bin_chunk(HMM2_BATTLE_ARMY1, Army1Data.data(), Army1Data.size());
+    Msg.add_bin_chunk(HMM2_BATTLE_ARMY2, Army2Data.data(), Army2Data.size());
+    Network::Get().QueueOutputMessage(Msg);
+}
+
+void Battle::WaitForBattleReportResponseFromServer(void)
+{
+    bool exit = false;
+
+    LocalEvent & le = LocalEvent::Get();
+
+    // message loop
+    while(!exit && le.HandleEvents())
+    {
+        if(Network::Get().IsInputPending())
+        {
+            NetworkEvent ev;
+            Network::Get().DequeueInputEvent(ev);
+
+            DEBUG(DBG_NETWORK, DBG_INFO, "Dequeued network event");
+
+            if(ev.OldState != ev.NewState)
+            {
+                switch(ev.NewState)
+                {
+                    case ST_DISCONNECTED:
+                    default:
+                        Dialog::Message("Error", "Disconnected from server", Font::BIG, Dialog::OK);
+                        return;
+                }
+            }
+
+            if(ev.Message.get() == 0)
+                continue;
+
+            if(ev.Message->GetType() == HMM2_BATTLE_REPORT_RESPONSE) {
+                exit = true;
+            }
+        }
+
+        if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
+    }
 }
 
 void Battle::PickupArtifactsAction(HeroBase & hero1, HeroBase & hero2, bool local)

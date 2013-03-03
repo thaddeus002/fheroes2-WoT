@@ -74,6 +74,8 @@ namespace Battle
     void		NewTurn(void);
     void		SyncArmyCount(void);
 
+    Unit*		FindIndex(u32) const;
+
     static Unit*	GetCurrentUnit(const Force &, const Force &, Unit* last, Units* all, bool part1);
     static Unit*	GetCurrentUnit(const Force &, const Force &, Unit* last, bool part1);
     static Unit*	GetCurrentUnit(const Force &, const Force &, int, int);

@@ -4238,7 +4238,33 @@ void Battle::PopupDamageInfo::Redraw(u16 maxw, u16 maxh)
     }
 }
 
-bool Battle::Interface::NetworkTurn(Result & result)
+void Battle::Interface::NetworkRedraw()
 {
-    return false;
+    Cursor & cursor = Cursor::Get();
+    Display & display = Display::Get();
+    LocalEvent & le = LocalEvent::Get();
+    Settings & conf = Settings::Get();
+
+    bool humanturn_redraw = false;
+
+	// animation troops
+	if(IdleTroopsAnimation()) humanturn_redraw = true;
+
+	CheckGlobalEvents(le);
+
+	// redraw arena
+	if(humanturn_redraw)
+	{
+	    cursor.Hide();
+	    Redraw();
+	    cursor.Show();
+	    display.Flip();
+	    humanturn_redraw = false;
+	}
+    else
+    if(!cursor.isVisible())
+    {
+        cursor.Show();
+        display.Flip();
+    }
 }

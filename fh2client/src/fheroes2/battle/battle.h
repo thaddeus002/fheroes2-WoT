@@ -67,6 +67,9 @@ namespace Battle
     void	UpdateMonsterSpriteAnimation(const std::string &);
     void	UpdateMonsterAttributes(const std::string &);
 
+	void    WaitForBattleReportResponseFromServer(void);
+	void	SendBattleReport(const Result&, const Army&, const Army&);
+
     enum { AS_NONE, AS_IDLE, AS_MOVE, AS_FLY1, AS_FLY2, AS_FLY3, AS_SHOT0, AS_SHOT1, AS_SHOT2, AS_SHOT3, AS_ATTK0, AS_ATTK1, AS_ATTK2, AS_ATTK3, AS_WNCE, AS_KILL };
 
     struct animframe_t
