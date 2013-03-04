@@ -99,17 +99,17 @@ void MapTile::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
     QGraphicsItem::mouseMoveEvent(event);
 }
 
-const QString & MapData::Name(void) const
+const QString & MapData::name(void) const
 {
     return mapName;
 }
 
-const QString & MapData::Description(void) const
+const QString & MapData::description(void) const
 {
     return mapDescription;
 }
 
-const QSize & MapData::Size(void) const
+const QSize & MapData::size(void) const
 {
     return mapSize;
 }
@@ -119,17 +119,63 @@ int MapData::indexLimit(void) const
     return mapSize.width() * mapSize.height();
 }
 
+void MapData::newMap(const QSize & msz, const QString &)
+{
+    tilesetSize = QSize(32, 32);
+
+    mapDifficulty = 1;
+
+    mapSize = QSize(msz);
+    mapStartWithHero = false;
+
+    mapName = "New Map";
+
+    for(int ii = 0; ii < 6; ++ii)
+    {
+	mapKingdomColor[ii] = 0;
+	mapHumanAllow[ii] = 0;
+	mapCompAllow[ii] = 0;
+	mapRaceColor[ii] = 0;
+    }
+
+/*
+    quint8              mapConditionWins;
+    quint8              mapConditionWinsData1;
+    quint8              mapConditionWinsData2;
+    quint16             mapConditionWinsData3;
+    quint16             mapConditionWinsData4;
+    quint8              mapConditionLoss;
+    quint16             mapConditionLossData1;
+    quint16             mapConditionLossData2;
+*/
+
+    mapUniq = 1;
+
+    mapAuthors = "unknown";
+    mapLicense = "unknown";
+
+    // fill tiles
+    for(int yy = 0; yy < mapSize.height(); ++yy)
+    {
+	for(int xx = 0; xx < mapSize.width(); ++xx)
+        {
+    	    tilesetItems.push_back(new MapTile(QPoint(xx, yy), mp2til_t(), aggContent, QPoint(xx * tilesetSize.width(), yy * tilesetSize.height())));
+	    addItem(tilesetItems.back());
+	}
+    }
+}
+
 bool MapData::loadMap(const QString & mapFile)
 {
     return loadMP2Map(mapFile);
+
 }
 
 bool MapData::loadMP2Map(const QString & mapFile)
 {
     H2::File map(mapFile);
 
-    tilesetSize.setWidth(32);
-    tilesetSize.setHeight(32);
+    tilesetSize = QSize(32, 32);
 
     if(map.open(QIODevice::ReadOnly))
     {
@@ -141,7 +187,7 @@ bool MapData::loadMP2Map(const QString & mapFile)
     	    return false;
 	}
 
-	// difficulty
+	// difficulty: 0: easy, 1: normal, 2: hard, 3: expert
 	mapDifficulty = map.readLE16();
 
 	// width, height
@@ -201,15 +247,15 @@ bool MapData::loadMP2Map(const QString & mapFile)
 
 	// data map: width, heigth
 	map.seek(0x01A4);
-	map.readLE32();
-	map.readLE32();
+	mapSize.setWidth(map.readLE32());
+	mapSize.setHeight(map.readLE32());
 
 	setSceneRect(QRect(QPoint(0, 0),
 		QSize(mapSize.width() * tilesetSize.width(), mapSize.height() * tilesetSize.height())));
 
 	// data map: mp2tile, part1
 	// count blocks: width * heigth
-	QVector<mp2til_t> tilBlocks(mapSize.width() * mapSize.height());
+	QVector<mp2til_t> tilBlocks(indexLimit());
 
 	for(QVector<mp2til_t>::iterator
 	    it = tilBlocks.begin(); it != tilBlocks.end(); ++it)

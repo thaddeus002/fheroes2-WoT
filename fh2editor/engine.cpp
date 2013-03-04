@@ -84,10 +84,27 @@ QByteArray H2::File::readBlock(size_t sz)
     if(pos() + sz <= size())
     {
 	res.reserve(sz);
+	res.fill(0, sz);
 	readData(res.data(), sz);
     }
 
     return res;
+}
+
+mp2til_t::mp2til_t()
+{
+    tileSprite = Rand(16, 19);
+    objectName1 = 0;
+    indexName1 = 0;
+    quantity1 = 0;
+    quantity2 = 0;
+    objectName2 = 0;
+    indexName2 = 0;
+    tileShape = 0;
+    tileObject = 0;
+    indexExt = 0;
+    uniq1 = 0;
+    uniq2 = 0;
 }
 
 mp2til_t H2::File::readMP2Til(void)
@@ -244,4 +261,15 @@ QPixmap AGG::File::getImageTIL(const QString & id, quint16 index)
     }
 
     return NULL;
+}
+
+quint32 Rand(quint32 min, quint32 max)
+{
+    if(min > max) qSwap(min, max);
+    return min + Rand(max - min);
+}
+
+quint32 Rand(quint32 max)
+{
+    return static_cast<quint32>((max + 1) * (qrand() / (RAND_MAX + 1.0)));
 }

@@ -32,9 +32,9 @@ class MapWindow : public QGraphicsView
     Q_OBJECT
 
 public:
-    MapWindow(void);
+    MapWindow(AGG::File &);
 
-    void	newFile(int);
+    void	newFile(const QSize &, int);
     bool	loadFile(const QString &);
     bool	save(void);
     bool	saveAs(void);

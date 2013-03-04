@@ -10,8 +10,9 @@ LIBPATH += $(QTLIB)
 QT+= xml
 
 RESOURCES = resources.qrc
+FORMS +=
 
 # Input
-HEADERS += mainwindow.h mapwindow.h mapdata.h
-SOURCES += program.cpp engine.cpp mainwindow.cpp mapwindow.cpp mapdata.cpp
+HEADERS += mainwindow.h mapwindow.h mapdata.h dialogs.h
+SOURCES += program.cpp engine.cpp mainwindow.cpp mapwindow.cpp mapdata.cpp dialogs.cpp
 CONFIG += qt debug

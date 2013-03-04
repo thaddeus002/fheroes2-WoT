@@ -20,84 +20,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _EDITOR_WINDOW_H_
-#define _EDITOR_WINDOW_H_
+#ifndef _EDITOR_DIALOGS_H_
+#define _EDITOR_DIALOGS_H_
 
-#include <QMainWindow>
+#include <QSize>
 
-QT_BEGIN_NAMESPACE
-class QAction;
-class QMenu;
-class QMdiArea;
-class QMdiSubWindow;
-class QSignalMapper;
-class MapWindow;
-QT_END_NAMESPACE
-
-#include "engine.h"
-
-class MainWindow : public QMainWindow
+namespace Dialog
 {
-    Q_OBJECT
-
-public:
-    MainWindow();
-
-protected:
-    void		closeEvent(QCloseEvent*);
-
-private slots:
-    void		newFile(void);
-    void		open(void);
-    void		save(void);
-    void		saveAs(void);
-    void		cut(void);
-    void		copy(void);
-    void		paste(void);
-    void		about(void);
-    void		updateMenus(void);
-    void		updateWindowMenu(void);
-    MapWindow*		createMapWindow(void);
-    void		setActiveSubWindow(QWidget*);
-
-private:
-    void		createActions(void);
-    void		createMenus(void);
-    void		createToolBars(void);
-    void		createStatusBar(void);
-    void		readSettings(void);
-    void		writeSettings(void);
-
-    MapWindow*		activeMapWindow(void);
-    QMdiSubWindow*	findMapWindow(const QString &);
-
-    QMdiArea*		mdiArea;
-    QSignalMapper*	windowMapper;
-
-    QMenu*		fileMenu;
-    QMenu*		editMenu;
-    QMenu*		windowMenu;
-    QToolBar*		fileToolBar;
-    QToolBar*		editToolBar;
-    QAction*		newAct;
-    QAction*		openAct;
-    QAction*		saveAct;
-    QAction*		saveAsAct;
-    QAction*		exitAct;
-    QAction*		cutAct;
-    QAction*		copyAct;
-    QAction*		pasteAct;
-    QAction*		closeAct;
-    QAction*		closeAllAct;
-    QAction*		tileAct;
-    QAction*		cascadeAct;
-    QAction*		nextAct;
-    QAction*		previousAct;
-    QAction*		separatorAct;
-    QAction*		aboutAct;
-
-    int			sequenceMapNumber;
-    AGG::File		aggContent;
-};
+    QSize SelectMapSize(void);
+}
 
 #endif

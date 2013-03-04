@@ -22,6 +22,7 @@
 
 #include <QtGui>
 
+#include "dialogs.h"
 #include "mainwindow.h"
 #include "mapwindow.h"
 
@@ -72,7 +73,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
 void MainWindow::newFile(void)
 {
     MapWindow* child = createMapWindow();
-    child->newFile(sequenceMapNumber++);
+    child->newFile(Dialog::SelectMapSize(), sequenceMapNumber++);
     child->show();
 }
 
@@ -199,7 +200,7 @@ void MainWindow::updateWindowMenu(void)
 
 MapWindow* MainWindow::createMapWindow(void)
 {
-    MapWindow* child = new MapWindow;
+    MapWindow* child = new MapWindow(aggContent);
     mdiArea->addSubWindow(child);
 
     connect(child, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));

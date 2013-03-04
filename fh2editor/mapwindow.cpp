@@ -24,18 +24,19 @@
 
 #include "mapwindow.h"
 
-MapWindow::MapWindow()
+MapWindow::MapWindow(AGG::File & agg) : mapData(agg)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     isUntitled = true;
     isModified = false;
 }
 
-void MapWindow::newFile(int sequenceNumber)
+void MapWindow::newFile(const QSize & sz, int sequenceNumber)
 {
     isUntitled = true;
 
-    QTextStream ss(& curFile);
+    QString fileName;
+    QTextStream ss(& fileName);
 
     ss << "map_";
     ss.setFieldWidth(4);
@@ -44,13 +45,19 @@ void MapWindow::newFile(int sequenceNumber)
     ss.setFieldWidth(0);
     ss << ".xml";
 
-/*
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+    mapData.newMap(sz, curFile);
+    setScene(& mapData);
+
+    QApplication::restoreOverrideCursor();
+    curFile = fileName;
+
     connect(&mapData, SIGNAL(selectionChanged(void)),
 		    this, SLOT(mapWasSelectionChanged(void)));
 
     connect(&mapData, SIGNAL(dataModified(void)),
         	    this, SLOT(mapWasModified(void)));
-*/
 
     mapWasModified();
 }
@@ -121,7 +128,7 @@ bool MapWindow::saveFile(const QString & fileName)
 
 QString MapWindow::userFriendlyCurrentFile(void)
 {
-    return strippedName(curFile);
+    return mapData.name() + " (" + strippedName(curFile) + ")";
 }
 
 QString MapWindow::currentFile(void)
@@ -145,7 +152,7 @@ void MapWindow::mapWasSelectionChanged(void)
 void MapWindow::mapWasModified(void)
 {
     isModified = true;
-    setWindowTitle(curFile + "[*]");
+    setWindowTitle(userFriendlyCurrentFile() + "[*]");
     setWindowModified(true);
 }
 

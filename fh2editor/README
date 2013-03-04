@@ -1,0 +1,8 @@
+Prerequisites:
+- Qt 4.6
+
+Create Makefile:
+qmake or qmake-4 or qmake-46
+
+Build:
+make

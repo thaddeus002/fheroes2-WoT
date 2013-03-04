@@ -20,100 +20,24 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _EDITOR_ENGINE_H_
-#define _EDITOR_ENGINE_H_
+#include <QtGui>
+#include "dialogs.h"
 
-#include <QFile>
-#include <QMap>
-#include <QString>
-#include <QPixmap>
-#include <QByteArray>
-
-struct mp2til_t
+QSize Dialog::SelectMapSize(void)
 {
-    mp2til_t();
+/*
+    Ui::FormRGB ui;
+    QDialog dialog; // = new QDialog();
 
-    quint16     tileSprite;
-    quint8      objectName1;
-    quint8      indexName1;
-    quint8      quantity1;
-    quint8      quantity2;
-    quint8      objectName2;
-    quint8      indexName2;
-    quint8      tileShape;
-    quint8      tileObject;
-    quint16     indexExt;
-    quint32     uniq1;
-    quint32     uniq2;
-};
+    ui.setupUi(& dialog);
+    int ret = dialog.exec();
 
-struct mp2ext_t
-{
-    quint16     indexExt;
-    quint8      objectName1;
-    quint8      indexName1;
-    quint8      quantity;
-    quint8      objectName2;
-    quint8      indexName2;
-    quint32     uniq1;
-    quint32     uniq2;
-};
-
-struct mp2pos_t
-{
-    quint8	posx;
-    quint8	posy;
-    quint8	type;
-};
-
-quint32 Rand(quint32 max);
-quint32 Rand(quint32 min, quint32 max);
-
-namespace H2
-{
-    class File : public QFile
+    if(QDialogButtonBox::Ok == ret)
     {
-    public:
-	File();
-	File(const QString &);
-
-	qint8	readByte(void);
-	QString	readString(size_t);
-	QByteArray
-		readBlock(size_t);
-
-	qint16	readLE16(void);
-	qint32	readLE32(void);
-
-	mp2til_t readMP2Til(void);
-	mp2ext_t readMP2Ext(void);
-    };
+	qDebug() << ui.spinBoxRed->value();
+	qDebug() << ui.spinBoxGreen->value();
+	qDebug() << ui.spinBoxBlue->value();
+    }
+*/
+    return QSize(36, 36);
 }
-
-namespace AGG
-{
-    struct Item
-    {
-	quint32 crc;
-	quint32 offset;
-	quint32 size;
-    };
-
-    class File : protected H2::File
-    {
-    protected:
-	QFile			file;
-	QMap<QString, Item>	items;
-	QVector<QRgb>		colors;
-
-	QByteArray	readRawData(const QString &);
-	bool		loadFile(const QString &);
-
-    public:
-	File();
-
-	QPixmap getImageTIL(const QString &, quint16);
-    };
-}
-
-#endif

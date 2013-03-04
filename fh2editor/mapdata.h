@@ -60,12 +60,14 @@ class MapData : public QGraphicsScene
     Q_OBJECT
 
 public:
-    MapData(){}
+    MapData(AGG::File & agg) : aggContent(agg) {}
 
-    const QString &	Name(void) const;
-    const QString &	Description(void) const;
-    const QSize &	Size(void) const;
+    const QString &	name(void) const;
+    const QString &	description(void) const;
+    const QSize &	size(void) const;
     int			indexLimit(void) const;
+
+    void		newMap(const QSize &, const QString &);
     bool		loadMap(const QString &);
 
 signals:
@@ -99,7 +101,7 @@ protected:
     quint8		mapRaceColor[6];
     quint32		mapUniq;
 
-    AGG::File		aggContent;
+    AGG::File &		aggContent;
 
     QSize		tilesetSize;
     QList<MapTile*>	tilesetItems;

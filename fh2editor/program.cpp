@@ -118,6 +118,8 @@ int main(int argc, char *argv[])
     const QString resourceAgg = "HEROES2.AGG";
     const QString subFolder = "data";
 
+    qsrand(std::time(0));
+
     if(Resource::FindFile(subFolder, resourceAgg).isNull() &&
 	Resource::FindFile(subFolder, resourceAgg.toLower()).isNull())
     {
