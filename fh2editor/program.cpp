@@ -31,6 +31,7 @@
 
 #include "engine.h"
 #include "mainwindow.h"
+#include "dialogs.h"
 #include "program.h"
 
 #define PROGRAM_SHARE "fh2editor"
@@ -114,31 +115,33 @@ namespace Resource
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+
     Resource::InitShares();
-
-    const QString resourceAgg = "HEROES2.AGG";
-    const QString subFolder = "data";
-
     qsrand(std::time(0));
 
-    if(Resource::FindFile(subFolder, resourceAgg).isNull() &&
-	Resource::FindFile(subFolder, resourceAgg.toLower()).isNull())
+    QSettings settings("fheroes2", "editor");
+    QString dataFile = settings.value("dataFile", "").toString();
+
+    if(! QFile(dataFile).exists())
     {
-	QString str;
-	QTextStream ss(& str);
-	ss << "Cannot find resource file: " << resourceAgg << endl;
-	const QStringList & shareDirs = Resource::ShareDirs();
-	ss << endl << "Scan directories:" << endl;
+	const QString resourceAgg = "HEROES2.AGG";
+	const QString subFolder = "data";
 
-	for(QStringList::const_iterator
-	    it = shareDirs.begin(); it != shareDirs.end(); ++it)
-	    ss << (*it) << QDir::separator() << subFolder << endl;
+	dataFile = Resource::FindFile(subFolder, resourceAgg);
 
-	QMessageBox::critical(NULL, "Error", str);
-	return 0;
+	if(dataFile.isNull())
+	    dataFile = Resource::FindFile(subFolder, resourceAgg.toLower());
+
+	if(dataFile.isNull())
+	{
+	    dataFile = Dialog::SelectDataFile(resourceAgg);
+	    if(dataFile.isEmpty()) return 0;
+	}
+
+	settings.setValue("dataFile", dataFile);
     }
 
-    MainWindow mainWin;
+    MainWindow mainWin(dataFile);
     mainWin.show();
 
     return app.exec();

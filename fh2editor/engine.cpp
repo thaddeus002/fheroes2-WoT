@@ -143,10 +143,9 @@ mp2ext_t H2::File::readMP2Ext(void)
     return res;
 }
 
-AGG::File::File()
+AGG::File::File(const QString & file)
 {
-    if(! loadFile(Resource::Path("data", "HEROES2.AGG", NULL)))
-	loadFile(Resource::Path("data", "heroes2.agg", NULL));
+    loadFile(file);
 }
 
 QByteArray AGG::File::readRawData(const QString & name)

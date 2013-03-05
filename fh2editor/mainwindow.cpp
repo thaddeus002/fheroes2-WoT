@@ -26,7 +26,7 @@
 #include "mainwindow.h"
 #include "mapwindow.h"
 
-MainWindow::MainWindow() : sequenceMapNumber(0)
+MainWindow::MainWindow(const QString & dataFile) : sequenceMapNumber(0), aggContent(dataFile)
 {
     mdiArea = new QMdiArea;
     mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -51,9 +51,6 @@ MainWindow::MainWindow() : sequenceMapNumber(0)
 
     setWindowTitle(tr("FHeroes2 Map Editor"));
     setUnifiedTitleAndToolBarOnMac(true);
-
-//    QMessageBox::critical(this, tr("Error"),
-//            tr("<b>File HEROES2.AGG not found!</b>"));
 }
 
 
@@ -117,14 +114,14 @@ void MainWindow::saveAs(void)
 
 void MainWindow::copy(void)
 {
-//    if(activeMapWindow())
-//        activeMapWindow()->copy();
+    if(activeMapWindow())
+	activeMapWindow()->copy();
 }
 
 void MainWindow::paste(void)
 {
-//    if(activeMapWindow())
-//        activeMapWindow()->paste();
+    if(activeMapWindow())
+        activeMapWindow()->paste();
 }
 
 void MainWindow::about(void)

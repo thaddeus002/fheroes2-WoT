@@ -218,3 +218,12 @@ void MapWindow::setModeView(int mode)
     mapData.setSceneModeView(mode);
     mapData.update();
 }
+
+void MapWindow::copy(void)
+{
+}
+
+void MapWindow::paste(void)
+{
+    isModified = true;
+}

@@ -42,6 +42,8 @@ public:
     QString	userFriendlyCurrentFile(void);
     QString	currentFile(void);
     int		modeView(void) const;
+    void	copy(void);
+    void	paste(void);
 
 signals:
     void	copyAvailable(bool);

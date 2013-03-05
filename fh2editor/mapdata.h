@@ -34,7 +34,7 @@
 class MapTile : public QGraphicsItem
 {
 public:
-    MapTile(const QPoint &, const mp2til_t &, AGG::File &, const QPoint &);
+    MapTile(const mp2til_t &, AGG::File &, const QPoint &);
 
     bool		isValid(void) const;
     void		showInfo(void) const;
@@ -48,8 +48,6 @@ protected:
     void		mousePressEvent(QGraphicsSceneMouseEvent*);
     void		mouseReleaseEvent(QGraphicsSceneMouseEvent*);
     void		mouseMoveEvent(QGraphicsSceneMouseEvent*);
-
-    QPoint		pos;
 
     int			sprite;
     int			shape;

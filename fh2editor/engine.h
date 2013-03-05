@@ -110,7 +110,7 @@ namespace AGG
 	bool		loadFile(const QString &);
 
     public:
-	File();
+	File(const QString &);
 
 	QPixmap getImageTIL(const QString &, quint16);
     };

@@ -28,7 +28,8 @@
 
 namespace Dialog
 {
-    QSize SelectMapSize(void);
+    QSize	SelectMapSize(void);
+    QString	SelectDataFile(const QString &);
 }
 
 class QVBoxLayout;
@@ -75,6 +76,31 @@ namespace Form
 
 	QSize			result;
     };    
+
+    class SelectDataFile : public QDialog
+    {
+	Q_OBJECT
+
+    public slots:
+	void			clickSelect(void);
+
+    public:
+	SelectDataFile(const QString &, const QString &);
+
+	QVBoxLayout		*verticalLayout;
+	QLabel			*labelHeader;
+	QHBoxLayout		*horizontalLayout2;
+	QLabel			*labelImage;
+	QLabel			*labelBody;
+	QSpacerItem		*verticalSpacer;
+	QHBoxLayout		*horizontalLayout1;
+	QPushButton		*pushButtonSelect;
+	QPushButton		*pushButtonSave;
+	QSpacerItem		*horizontalSpacer;
+	QPushButton		*pushButtonExit;
+
+	QString			result;
+    };
 }
 
 #endif

@@ -28,7 +28,9 @@
 #include <QSpacerItem>
 #include <QSpinBox>
 #include <QVBoxLayout>
+#include <QFileDialog>
 
+#include "program.h"
 #include "dialogs.h"
 
 QSize Dialog::SelectMapSize(void)
@@ -36,6 +38,22 @@ QSize Dialog::SelectMapSize(void)
     Form::SelectMapSize form;
     form.exec();
     return form.result;
+}
+
+QString Dialog::SelectDataFile(const QString & file)
+{
+    QString head = "Cannot find resource file: " + file;
+    QString body = "Scan directories:\n";
+
+    const QStringList & shareDirs = Resource::ShareDirs();
+
+    for(QStringList::const_iterator
+        it = shareDirs.begin(); it != shareDirs.end(); ++it)
+        body += (*it) + QDir::separator() + "data\n";
+
+    Form::SelectDataFile form(head, body);
+    int ret = form.exec();
+    return QDialog::Accepted == ret ? form.result : "";
 }
 
 Form::SelectMapSize::SelectMapSize()
@@ -218,4 +236,80 @@ void Form::SelectMapSize::clickOk(void)
     }
 
     accept();
+}
+
+Form::SelectDataFile::SelectDataFile(const QString & head, const QString & body)
+{
+    setObjectName(QString::fromUtf8("DialogSelectDataFile"));
+
+    verticalLayout = new QVBoxLayout(this);
+    verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+    labelHeader = new QLabel(this);
+    labelHeader->setObjectName(QString::fromUtf8("labelHeader"));
+    labelHeader->setAlignment(Qt::AlignCenter);
+
+    verticalLayout->addWidget(labelHeader);
+
+    horizontalLayout2 = new QHBoxLayout();
+    horizontalLayout2->setObjectName(QString::fromUtf8("horizontalLayout2"));
+    labelImage = new QLabel(this);
+    labelImage->setObjectName(QString::fromUtf8("labelImage"));
+    labelImage->setPixmap(QPixmap(QString::fromUtf8(":/images/cancel.png")));
+    labelImage->setScaledContents(false);
+
+    horizontalLayout2->addWidget(labelImage);
+
+    labelBody = new QLabel(this);
+    labelBody->setObjectName(QString::fromUtf8("label"));
+    labelBody->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
+
+    horizontalLayout2->addWidget(labelBody);
+    verticalLayout->addLayout(horizontalLayout2);
+
+    verticalSpacer = new QSpacerItem(288, 6, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    verticalLayout->addItem(verticalSpacer);
+
+    horizontalLayout1 = new QHBoxLayout();
+    horizontalLayout1->setObjectName(QString::fromUtf8("horizontalLayout1"));
+    pushButtonSelect = new QPushButton(this);
+    pushButtonSelect->setObjectName(QString::fromUtf8("pushButtonSelect"));
+
+    horizontalLayout1->addWidget(pushButtonSelect);
+
+    pushButtonSave = new QPushButton(this);
+    pushButtonSave->setObjectName(QString::fromUtf8("pushButtonSave"));
+    pushButtonSave->setEnabled(false);
+
+    horizontalLayout1->addWidget(pushButtonSave);
+
+    horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout1->addItem(horizontalSpacer);
+
+    pushButtonExit = new QPushButton(this);
+    pushButtonExit->setObjectName(QString::fromUtf8("pushButtonExit"));
+
+    horizontalLayout1->addWidget(pushButtonExit);
+    verticalLayout->addLayout(horizontalLayout1);
+
+
+    setWindowTitle(QApplication::translate("DialogSelectDataFile", "Warning", 0, QApplication::UnicodeUTF8));
+
+    pushButtonSelect->setText(QApplication::translate("DialogSelectDataFile", "Select", 0, QApplication::UnicodeUTF8));
+    pushButtonSave->setText(QApplication::translate("DialogSelectDataFile", "Save", 0, QApplication::UnicodeUTF8));
+    pushButtonExit->setText(QApplication::translate("DialogSelectDataFile", "Exit", 0, QApplication::UnicodeUTF8));
+    labelHeader->setText(head);
+    labelBody->setText(body);
+
+    resize(minimumSizeHint());
+
+    QObject::connect(pushButtonExit, SIGNAL(clicked()), this, SLOT(reject()));
+    QObject::connect(pushButtonSave, SIGNAL(clicked()), this, SLOT(accept()));
+    QObject::connect(pushButtonSelect, SIGNAL(clicked()), this, SLOT(clickSelect()));
+}
+
+void Form::SelectDataFile::clickSelect(void)
+{
+    result = QFileDialog::getOpenFileName(this, tr("Open data file"), "", "heroes2.agg");
+    pushButtonSave->setEnabled(true);
 }

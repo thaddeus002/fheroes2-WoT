@@ -36,8 +36,8 @@ bool MapTile::isValid(void) const
     return true;
 }
 
-MapTile::MapTile(const QPoint & inpos, const mp2til_t & mp2, AGG::File & agg, const QPoint & offset)
-    : pos(inpos), sprite(mp2.tileSprite), shape(mp2.tileShape)
+MapTile::MapTile(const mp2til_t & mp2, AGG::File & agg, const QPoint & offset)
+    : sprite(mp2.tileSprite), shape(mp2.tileShape)
 {
     QPixmap pixmap = agg.getImageTIL("GROUND32", sprite);
 
@@ -94,7 +94,7 @@ void MapTile::showInfo(void) const
     QString str, msg;
     QTextStream ss1(& str), ss2(& msg);
 
-    ss1 << "Tile(" << pos.x() << "," << pos.y() << ")";
+    ss1 << "Tile";
     ss2 << "tile sprite: " << sprite << endl << "tile shape: " << shape << endl;
 
     QMessageBox::information(NULL, str, msg);
@@ -180,7 +180,7 @@ void MapData::newMap(const QSize & msz, const QString &)
     {
 	for(int xx = 0; xx < mapSize.width(); ++xx)
         {
-    	    tilesetItems.push_back(new MapTile(QPoint(xx, yy), mp2til_t(), aggContent, QPoint(xx * tilesetSize.width(), yy * tilesetSize.height())));
+    	    tilesetItems.push_back(new MapTile(mp2til_t(), aggContent, QPoint(xx * tilesetSize.width(), yy * tilesetSize.height())));
 	    addItem(tilesetItems.back());
 	}
     }
@@ -360,7 +360,7 @@ bool MapData::loadMP2Map(const QString & mapFile)
 	    {
 		const mp2til_t & mp2 = tilBlocks[xx + yy * mapSize.width()];
 
-		tilesetItems.push_back(new MapTile(QPoint(xx, yy), mp2, aggContent, QPoint(xx * tilesetSize.width(), yy * tilesetSize.height())));
+		tilesetItems.push_back(new MapTile(mp2, aggContent, QPoint(xx * tilesetSize.width(), yy * tilesetSize.height())));
 
 		quint16 ext = mp2.indexExt;
 
