@@ -23,11 +23,58 @@
 #ifndef _EDITOR_DIALOGS_H_
 #define _EDITOR_DIALOGS_H_
 
+#include <QDialog>
 #include <QSize>
 
 namespace Dialog
 {
     QSize SelectMapSize(void);
+}
+
+class QVBoxLayout;
+class QComboBox;
+class QSpacerItem;
+class QHBoxLayout;
+class QLabel;
+class QSpinBox;
+class QPushButton;
+
+namespace Form
+{
+    class SelectMapSize : public QDialog
+    {
+	Q_OBJECT
+
+    public slots:
+	void			clickExpert(void);
+	void			clickOk(void);
+
+    public:
+	SelectMapSize();
+
+	QVBoxLayout		*vboxLayout;
+	QComboBox		*comboBoxSize;
+	QSpacerItem		*spacerItem;
+	QHBoxLayout		*hboxLayout;
+	QSpacerItem		*spacerItem1;
+	QLabel			*labelWidth;
+	QSpinBox		*spinBoxWidth;
+	QSpacerItem		*spacerItem2;
+	QHBoxLayout		*hboxLayout1;
+	QSpacerItem		*spacerItem3;
+	QLabel			*labelHeight;
+	QSpinBox		*spinBoxHeight;
+	QSpacerItem		*spacerItem4;
+	QSpacerItem		*spacerItem5;
+	QHBoxLayout		*hboxLayout2;
+	QSpacerItem		*spacerItem6;
+	QPushButton		*pushButtonOk;
+	QSpacerItem		*spacerItem7;
+	QPushButton		*pushButtonExpert;
+	QSpacerItem		*spacerItem8;
+
+	QSize			result;
+    };    
 }
 
 #endif

@@ -26,6 +26,7 @@
 #include <QMainWindow>
 
 QT_BEGIN_NAMESPACE
+class QActionGroup;
 class QAction;
 class QMenu;
 class QMdiArea;
@@ -59,6 +60,8 @@ private slots:
     void		updateWindowMenu(void);
     MapWindow*		createMapWindow(void);
     void		setActiveSubWindow(QWidget*);
+    void		switchExploreView(void);
+    void		switchSelectView(void);
 
 private:
     void		createActions(void);
@@ -76,9 +79,11 @@ private:
 
     QMenu*		fileMenu;
     QMenu*		editMenu;
+    QMenu*		modeMenu;
     QMenu*		windowMenu;
     QToolBar*		fileToolBar;
     QToolBar*		editToolBar;
+    QToolBar*		modeToolBar;
     QAction*		newAct;
     QAction*		openAct;
     QAction*		saveAct;
@@ -95,6 +100,10 @@ private:
     QAction*		previousAct;
     QAction*		separatorAct;
     QAction*		aboutAct;
+
+    QAction*		exploreAct;
+    QAction*		selectAct;
+    QActionGroup*	modeViewAct;
 
     int			sequenceMapNumber;
     AGG::File		aggContent;

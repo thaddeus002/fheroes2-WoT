@@ -103,6 +103,7 @@ bool MapWindow::saveAs(void)
 
 bool MapWindow::saveFile(const QString & fileName)
 {
+    Q_UNUSED(fileName);
 /*
     QFile file(fileName);
 
@@ -190,4 +191,30 @@ void MapWindow::setCurrentFile(const QString & fileName)
 QString MapWindow::strippedName(const QString & fullFileName)
 {
     return QFileInfo(fullFileName).fileName();
+}
+
+int MapWindow::modeView(void) const
+{
+    return mapData.sceneModeView();
+}
+
+void MapWindow::setModeView(int mode)
+{
+    mapData.clearSelection();
+
+    switch(mode)
+    {
+	// explore
+	case 1:
+	    break;
+
+	// select
+	case 2:
+	    break;
+
+	default: break;
+    }
+
+    mapData.setSceneModeView(mode);
+    mapData.update();
 }

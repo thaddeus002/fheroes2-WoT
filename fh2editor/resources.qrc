@@ -6,5 +6,7 @@
      <file>images/open.png</file>
      <file>images/paste.png</file>
      <file>images/save.png</file>
+     <file>images/explore.png</file>
+     <file>images/select.png</file>
 </qresource>
 </RCC>

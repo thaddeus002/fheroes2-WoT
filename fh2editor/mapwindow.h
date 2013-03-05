@@ -41,9 +41,13 @@ public:
     bool	saveFile(const QString &);
     QString	userFriendlyCurrentFile(void);
     QString	currentFile(void);
+    int		modeView(void) const;
 
 signals:
     void	copyAvailable(bool);
+
+public slots:
+    void	setModeView(int);
 
 protected:
     void	closeEvent(QCloseEvent*);

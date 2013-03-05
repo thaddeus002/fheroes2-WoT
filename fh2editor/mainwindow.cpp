@@ -159,6 +159,19 @@ void MainWindow::updateMenus(void)
 
     cutAct->setEnabled(hasSelection);
     copyAct->setEnabled(hasSelection);
+
+    exploreAct->setEnabled(hasMapWindow);
+    selectAct->setEnabled(hasMapWindow);
+
+    if(hasMapWindow)
+    {
+	switch(activeMapWindow()->modeView())
+	{
+	    case 1:	exploreAct->setChecked(true); break;
+	    case 2:	selectAct->setChecked(true); break;
+	    default:	break;
+	}
+    }
 }
 
 void MainWindow::updateWindowMenu(void)
@@ -230,6 +243,23 @@ void MainWindow::createActions(void)
     saveAsAct->setShortcuts(QKeySequence::SaveAs);
     saveAsAct->setStatusTip(tr("Save the map under a new name"));
     connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
+
+    exploreAct = new QAction(QIcon(":/images/explore.png"), tr("Ex&plore"), this);
+    //exploreAct->setShortcuts(QKeySequence::);
+    exploreAct->setStatusTip(tr("Switch to explore view"));
+    exploreAct->setCheckable(true);
+    connect(exploreAct, SIGNAL(triggered()), this, SLOT(switchExploreView()));
+
+    selectAct = new QAction(QIcon(":/images/select.png"), tr("Se&lect"), this);
+    //selectAct->setShortcuts(QKeySequence::);
+    selectAct->setStatusTip(tr("Switch to select view"));
+    selectAct->setCheckable(true);
+    connect(selectAct, SIGNAL(triggered()), this, SLOT(switchSelectView()));
+
+    modeViewAct = new QActionGroup(this);
+    modeViewAct->addAction(exploreAct);
+    modeViewAct->addAction(selectAct);
+    //connect(modeViewAct, SIGNAL(triggered(QAction*)), this, SLOT());
 
 //! [0]
     exitAct = new QAction(tr("E&xit"), this);
@@ -311,6 +341,11 @@ void MainWindow::createMenus(void)
     editMenu->addAction(copyAct);
     editMenu->addAction(pasteAct);
 
+    modeMenu = menuBar()->addMenu(tr("&Mode"));
+    modeMenu->addSeparator()->setText(tr("View"));
+    modeMenu->addAction(exploreAct);
+    modeMenu->addAction(selectAct);
+
     windowMenu = menuBar()->addMenu(tr("&Window"));
     updateWindowMenu();
     connect(windowMenu, SIGNAL(aboutToShow()), this, SLOT(updateWindowMenu()));
@@ -330,6 +365,10 @@ void MainWindow::createToolBars(void)
     editToolBar->addAction(cutAct);
     editToolBar->addAction(copyAct);
     editToolBar->addAction(pasteAct);
+
+    modeToolBar = addToolBar(tr("Mode"));
+    modeToolBar->addAction(exploreAct);
+    modeToolBar->addAction(selectAct);
 }
 
 void MainWindow::createStatusBar(void)
@@ -384,4 +423,16 @@ void MainWindow::setActiveSubWindow(QWidget* window)
 {
     if(window)
 	mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow*>(window));
+}
+
+void MainWindow::switchExploreView(void)
+{
+    if(activeMapWindow())
+	activeMapWindow()->setModeView(1);
+}
+
+void MainWindow::switchSelectView(void)
+{
+    if(activeMapWindow())
+	activeMapWindow()->setModeView(2);
 }

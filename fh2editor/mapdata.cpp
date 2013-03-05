@@ -25,6 +25,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QGraphicsSceneMouseEvent>
+#include <QStyleOptionGraphicsItem>
 
 #include "engine.h"
 #include "program.h"
@@ -74,24 +75,48 @@ QRectF MapTile::boundingRect(void) const
 
 void MapTile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
-    if(painter)
-	painter->drawPixmap(area.x(), area.y(), pixmapTile);
+    //Q_UNUSED(option);
+    Q_UNUSED(widget);
+
+
+    if(option->state & QStyle::State_Selected)
+    {
+	QPixmap pixmap(pixmapTile.size());
+	pixmap.fill(Qt::black);
+
+        QPainter paint(& pixmap);
+
+        paint.setPen(Qt::white);
+        paint.setFont(QFont("fixed", 8));
+        paint.drawText(pixmap.rect(), Qt::AlignCenter, indexString(sprite));
+
+	painter->drawPixmap((int) area.x(), (int) area.y(), pixmap);
+    }
+    else
+	painter->drawPixmap((int) area.x(), (int) area.y(), pixmapTile);
+}
+
+void MapTile::showInfo(void) const
+{
+    QString str, msg;
+    QTextStream ss1(& str), ss2(& msg);
+
+    ss1 << "Tile(" << pos.x() << "," << pos.y() << ")";
+    ss2 << "tile sprite: " << sprite << endl << "tile shape: " << shape << endl;
+
+    QMessageBox::information(NULL, str, msg);
 }
 
 void MapTile::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-    if(event)
-    {
-	QString str, msg;
-	QTextStream ss1(& str), ss2(& msg);
-
-	ss1 << "Tile(" << pos.x() << "," << pos.y() << ")";
-	ss2 << "tile sprite: " << sprite << endl << "tile shape: " << shape << endl;
-
-	QMessageBox::information(NULL, str, msg);
-    }
-
     QGraphicsItem::mousePressEvent(event);
+    update();
+}
+
+void MapTile::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+{
+    QGraphicsItem::mouseReleaseEvent(event);
+    update();
 }
 
 void MapTile::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
@@ -374,10 +399,108 @@ bool MapData::loadMP2Map(const QString & mapFile)
 
 void MapData::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
+    if(event->button() == Qt::LeftButton)
+	mousePressLeftEvent(event);
+    else
+    if(event->button() == Qt::RightButton)
+	mousePressRightEvent(event);
+    else
+	QGraphicsScene::mousePressEvent(event);
+}
+
+void MapData::mousePressLeftEvent(QGraphicsSceneMouseEvent* event)
+{
+    MapTile* item = qgraphicsitem_cast<MapTile*>(itemAt(event->scenePos()));
+
+    // explore
+    if(1 == modeView)
+    {
+	if(item) item->showInfo();
+    }
+    else
+    // select
+    if(2 == modeView)
+    {
+    }
+/*
+    clearSelection();
+
+    if(item)
+    {
+	if(item->isEnabled() &&
+	    item->flags() & QGraphicsItem::ItemIsSelectable)
+	    item->setSelected(true);
+    }
+*/
     QGraphicsScene::mousePressEvent(event);
+}
+
+void MapData::mousePressRightEvent(QGraphicsSceneMouseEvent* event)
+{
+    // explore
+    if(1 == modeView)
+    {
+    }
+    else
+    // select
+    if(2 == modeView)
+    {
+	clearSelection();
+	return;
+    }
+
+    QGraphicsScene::mousePressEvent(event);
+}
+
+void MapData::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+{
+    if(event->button() == Qt::LeftButton)
+	mouseReleaseLeftEvent(event);
+    else
+    if(event->button() == Qt::RightButton)
+	mouseReleaseRightEvent(event);
+    else
+	QGraphicsScene::mouseReleaseEvent(event);
+}
+
+void MapData::mouseReleaseLeftEvent(QGraphicsSceneMouseEvent* event)
+{
+    // explore
+    if(1 == modeView)
+    {
+    }
+    else
+    // select
+    if(2 == modeView)
+    {
+	const QPointF & ptdn = event->buttonDownScenePos(Qt::LeftButton);
+	const QPointF & ptup = event->scenePos();
+
+	QList<QGraphicsItem *> list = items(QRectF(ptdn, ptup), Qt::IntersectsItemShape, Qt::AscendingOrder);
+
+	qDebug() << list.size();
+	//qDebug() << event->lastScenePos();
+    }
+
+    QGraphicsScene::mouseReleaseEvent(event);
+}
+
+void MapData::mouseReleaseRightEvent(QGraphicsSceneMouseEvent* event)
+{
+    QGraphicsScene::mouseReleaseEvent(event);
 }
 
 void MapData::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
     QGraphicsScene::mouseMoveEvent(event);
+}
+
+int MapData::sceneModeView(void) const
+{
+    return modeView;
+}
+
+void MapData::setSceneModeView(int mode)
+{
+    modeView = mode;
 }

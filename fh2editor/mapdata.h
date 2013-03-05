@@ -37,6 +37,8 @@ public:
     MapTile(const QPoint &, const mp2til_t &, AGG::File &, const QPoint &);
 
     bool		isValid(void) const;
+    void		showInfo(void) const;
+
     static QString	indexString(int);
 
     QRectF		boundingRect(void) const;
@@ -44,6 +46,7 @@ public:
 
 protected:
     void		mousePressEvent(QGraphicsSceneMouseEvent*);
+    void		mouseReleaseEvent(QGraphicsSceneMouseEvent*);
     void		mouseMoveEvent(QGraphicsSceneMouseEvent*);
 
     QPoint		pos;
@@ -60,24 +63,33 @@ class MapData : public QGraphicsScene
     Q_OBJECT
 
 public:
-    MapData(AGG::File & agg) : aggContent(agg) {}
+    MapData(AGG::File & agg) : aggContent(agg), modeView(1) {}
 
     const QString &	name(void) const;
     const QString &	description(void) const;
     const QSize &	size(void) const;
+
     int			indexLimit(void) const;
+    int         	sceneModeView(void) const;
 
     void		newMap(const QSize &, const QString &);
     bool		loadMap(const QString &);
 
+    void         	setSceneModeView(int);
 signals:
     void		dataModified(void);
 
 protected:
-    bool		loadMP2Map(const QString &);
+    void                mousePressEvent(QGraphicsSceneMouseEvent*);
+    void                mouseReleaseEvent(QGraphicsSceneMouseEvent*);
+    void                mouseMoveEvent(QGraphicsSceneMouseEvent*);
 
-    void		mousePressEvent(QGraphicsSceneMouseEvent*);
-    void		mouseMoveEvent(QGraphicsSceneMouseEvent*);
+    void		mousePressLeftEvent(QGraphicsSceneMouseEvent*);
+    void		mousePressRightEvent(QGraphicsSceneMouseEvent*);
+    void		mouseReleaseLeftEvent(QGraphicsSceneMouseEvent*);
+    void		mouseReleaseRightEvent(QGraphicsSceneMouseEvent*);
+
+    bool		loadMP2Map(const QString &);
 
     QSize		mapSize;
 
@@ -105,6 +117,8 @@ protected:
 
     QSize		tilesetSize;
     QList<MapTile*>	tilesetItems;
+
+    int			modeView;
 };
 
 #endif
