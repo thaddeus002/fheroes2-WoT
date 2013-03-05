@@ -27,6 +27,7 @@
 #include <QDir>
 #include <QtGui>
 #include <QTextStream>
+#include <ctime>
 
 #include "engine.h"
 #include "mainwindow.h"

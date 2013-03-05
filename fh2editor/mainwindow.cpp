@@ -115,12 +115,6 @@ void MainWindow::saveAs(void)
         statusBar()->showMessage(tr("File saved"), 2000);
 }
 
-void MainWindow::cut(void)
-{
-//    if(activeMapWindow())
-//        activeMapWindow()->cut();
-}
-
 void MainWindow::copy(void)
 {
 //    if(activeMapWindow())
@@ -145,7 +139,6 @@ void MainWindow::updateMenus(void)
 
     saveAct->setEnabled(hasMapWindow);
     saveAsAct->setEnabled(hasMapWindow);
-    pasteAct->setEnabled(hasMapWindow);
     closeAct->setEnabled(hasMapWindow);
     closeAllAct->setEnabled(hasMapWindow);
     tileAct->setEnabled(hasMapWindow);
@@ -157,8 +150,8 @@ void MainWindow::updateMenus(void)
     bool hasSelection = false; /* activeMapWindow() &&
                          activeMapWindow()->textCursor().hasSelection()); */
 
-    cutAct->setEnabled(hasSelection);
     copyAct->setEnabled(hasSelection);
+    pasteAct->setEnabled(false);
 
     exploreAct->setEnabled(hasMapWindow);
     selectAct->setEnabled(hasMapWindow);
@@ -216,7 +209,6 @@ MapWindow* MainWindow::createMapWindow(void)
     MapWindow* child = new MapWindow(aggContent);
     mdiArea->addSubWindow(child);
 
-    connect(child, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
     connect(child, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
 
     return child;
@@ -267,12 +259,6 @@ void MainWindow::createActions(void)
     exitAct->setStatusTip(tr("Exit the application"));
     connect(exitAct, SIGNAL(triggered()), qApp, SLOT(closeAllWindows()));
 //! [0]
-
-    cutAct = new QAction(QIcon(":/images/cut.png"), tr("Cu&t"), this);
-    cutAct->setShortcuts(QKeySequence::Cut);
-    cutAct->setStatusTip(tr("Cut the current selection's contents to the "
-                            "clipboard"));
-    connect(cutAct, SIGNAL(triggered()), this, SLOT(cut()));
 
     copyAct = new QAction(QIcon(":/images/copy.png"), tr("&Copy"), this);
     copyAct->setShortcuts(QKeySequence::Copy);
@@ -337,7 +323,6 @@ void MainWindow::createMenus(void)
     fileMenu->addAction(exitAct);
 
     editMenu = menuBar()->addMenu(tr("&Edit"));
-    editMenu->addAction(cutAct);
     editMenu->addAction(copyAct);
     editMenu->addAction(pasteAct);
 
@@ -362,7 +347,6 @@ void MainWindow::createToolBars(void)
     fileToolBar->addAction(saveAct);
 
     editToolBar = addToolBar(tr("Edit"));
-    editToolBar->addAction(cutAct);
     editToolBar->addAction(copyAct);
     editToolBar->addAction(pasteAct);
 

@@ -75,25 +75,18 @@ QRectF MapTile::boundingRect(void) const
 
 void MapTile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
-    //Q_UNUSED(option);
     Q_UNUSED(widget);
 
+    painter->drawPixmap((int) area.x(), (int) area.y(), pixmapTile);
 
     if(option->state & QStyle::State_Selected)
     {
 	QPixmap pixmap(pixmapTile.size());
-	pixmap.fill(Qt::black);
+	pixmap.fill(QColor(40, 40, 100, 150));
 
         QPainter paint(& pixmap);
-
-        paint.setPen(Qt::white);
-        paint.setFont(QFont("fixed", 8));
-        paint.drawText(pixmap.rect(), Qt::AlignCenter, indexString(sprite));
-
 	painter->drawPixmap((int) area.x(), (int) area.y(), pixmap);
     }
-    else
-	painter->drawPixmap((int) area.x(), (int) area.y(), pixmapTile);
 }
 
 void MapTile::showInfo(void) const
@@ -109,19 +102,22 @@ void MapTile::showInfo(void) const
 
 void MapTile::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-    QGraphicsItem::mousePressEvent(event);
-    update();
+    Q_UNUSED(event);
+    //QGraphicsItem::mousePressEvent(event);
+    //update();
 }
 
 void MapTile::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
-    QGraphicsItem::mouseReleaseEvent(event);
-    update();
+    Q_UNUSED(event);
+    //QGraphicsItem::mouseReleaseEvent(event);
+    //update();
 }
 
 void MapTile::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
-    QGraphicsItem::mouseMoveEvent(event);
+    Q_UNUSED(event);
+    //QGraphicsItem::mouseMoveEvent(event);
 }
 
 const QString & MapData::name(void) const
@@ -421,17 +417,9 @@ void MapData::mousePressLeftEvent(QGraphicsSceneMouseEvent* event)
     // select
     if(2 == modeView)
     {
+	clearSelection();
     }
-/*
-    clearSelection();
 
-    if(item)
-    {
-	if(item->isEnabled() &&
-	    item->flags() & QGraphicsItem::ItemIsSelectable)
-	    item->setSelected(true);
-    }
-*/
     QGraphicsScene::mousePressEvent(event);
 }
 
@@ -445,7 +433,9 @@ void MapData::mousePressRightEvent(QGraphicsSceneMouseEvent* event)
     // select
     if(2 == modeView)
     {
-	clearSelection();
+	if(! (Qt::ControlModifier & event->modifiers()))
+	    clearSelection();
+
 	return;
     }
 
@@ -473,13 +463,28 @@ void MapData::mouseReleaseLeftEvent(QGraphicsSceneMouseEvent* event)
     // select
     if(2 == modeView)
     {
-	const QPointF & ptdn = event->buttonDownScenePos(Qt::LeftButton);
-	const QPointF & ptup = event->scenePos();
+	QPointF ptdn = event->buttonDownScenePos(Qt::LeftButton);
+	QPointF ptup = event->scenePos();
 
-	QList<QGraphicsItem *> list = items(QRectF(ptdn, ptup), Qt::IntersectsItemShape, Qt::AscendingOrder);
+	if(ptup.x() < ptdn.x())
+	    qSwap(ptup.rx(), ptdn.rx());
 
-	qDebug() << list.size();
-	//qDebug() << event->lastScenePos();
+	if(ptup.y() < ptdn.y())
+	    qSwap(ptup.ry(), ptdn.ry());
+
+	QList<QGraphicsItem*> list = items(QRectF(ptdn, ptup), Qt::IntersectsItemShape, Qt::AscendingOrder);
+
+	if(list.isEmpty() && ptdn == ptup)
+	{
+	    QGraphicsItem* item = itemAt(ptup);
+	    if(item) list << item;
+	}
+
+	for(QList<QGraphicsItem*>::Iterator
+	    it = list.begin(); it != list.end(); ++it)
+	    (*it)->setSelected(true);
+
+	return;
     }
 
     QGraphicsScene::mouseReleaseEvent(event);

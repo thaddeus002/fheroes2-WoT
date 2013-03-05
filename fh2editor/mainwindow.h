@@ -52,7 +52,6 @@ private slots:
     void		open(void);
     void		save(void);
     void		saveAs(void);
-    void		cut(void);
     void		copy(void);
     void		paste(void);
     void		about(void);
@@ -89,7 +88,6 @@ private:
     QAction*		saveAct;
     QAction*		saveAsAct;
     QAction*		exitAct;
-    QAction*		cutAct;
     QAction*		copyAct;
     QAction*		pasteAct;
     QAction*		closeAct;
