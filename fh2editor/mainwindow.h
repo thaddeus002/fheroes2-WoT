@@ -54,13 +54,14 @@ private slots:
     void		saveAs(void);
     void		copy(void);
     void		paste(void);
+    void		fill(void);
     void		about(void);
     void		updateMenus(void);
     void		updateWindowMenu(void);
     MapWindow*		createMapWindow(void);
     void		setActiveSubWindow(QWidget*);
-    void		switchExploreView(void);
-    void		switchSelectView(void);
+    void		switchModeViewGroup(void);
+    void		switchGroundGroup(void);
 
 private:
     void		createActions(void);
@@ -82,14 +83,15 @@ private:
     QMenu*		windowMenu;
     QToolBar*		fileToolBar;
     QToolBar*		editToolBar;
-    QToolBar*		modeToolBar;
-    QAction*		newAct;
-    QAction*		openAct;
-    QAction*		saveAct;
-    QAction*		saveAsAct;
-    QAction*		exitAct;
-    QAction*		copyAct;
-    QAction*		pasteAct;
+    QToolBar*		selectToolBar;
+    QAction*		fileNewAct;
+    QAction*		fileOpenAct;
+    QAction*		fileSaveAct;
+    QAction*		fileSaveAsAct;
+    QAction*		fileExitAct;
+    QAction*		editCopyAct;
+    QAction*		editPasteAct;
+    QAction*		editFillAct;
     QAction*		closeAct;
     QAction*		closeAllAct;
     QAction*		tileAct;
@@ -97,11 +99,22 @@ private:
     QAction*		nextAct;
     QAction*		previousAct;
     QAction*		separatorAct;
-    QAction*		aboutAct;
+    QAction*		menuAboutAct;
 
-    QAction*		exploreAct;
-    QAction*		selectAct;
-    QActionGroup*	modeViewAct;
+    QAction*		viewExploreModeAct;
+    QAction*		viewSelectModeAct;
+    QActionGroup*	switchViewAct;
+
+    QAction*		groundDesertAct;
+    QAction*		groundSnowAct;
+    QAction*		groundSwampAct;
+    QAction*		groundWastelandAct;
+    QAction*		groundBeachAct;
+    QAction*		groundLavaAct;
+    QAction*		groundDirtAct;
+    QAction*		groundGrassAct;
+    QAction*		groundWaterAct;
+    QActionGroup*	switchGroundAct;
 
     int			sequenceMapNumber;
     AGG::File		aggContent;

@@ -219,11 +219,26 @@ void MapWindow::setModeView(int mode)
     mapData.update();
 }
 
+int MapWindow::currentGround(void) const
+{
+    return mapData.sceneCurrentGround();
+}
+
+void MapWindow::setCurrentGround(int ground)
+{
+    mapData.setSceneCurrentGround(ground);
+}
+
 void MapWindow::copy(void)
 {
 }
 
 void MapWindow::paste(void)
+{
+    isModified = true;
+}
+
+void MapWindow::fill(void)
 {
     isModified = true;
 }

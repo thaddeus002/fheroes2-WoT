@@ -41,15 +41,17 @@ public:
     bool	saveFile(const QString &);
     QString	userFriendlyCurrentFile(void);
     QString	currentFile(void);
-    int		modeView(void) const;
     void	copy(void);
     void	paste(void);
+    void	fill(void);
+    int		modeView(void) const;
+    int		currentGround(void) const;
+
+    void	setModeView(int);
+    void	setCurrentGround(int);
 
 signals:
     void	copyAvailable(bool);
-
-public slots:
-    void	setModeView(int);
 
 protected:
     void	closeEvent(QCloseEvent*);

@@ -45,10 +45,6 @@ public:
     void		paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget* = 0);
 
 protected:
-    void		mousePressEvent(QGraphicsSceneMouseEvent*);
-    void		mouseReleaseEvent(QGraphicsSceneMouseEvent*);
-    void		mouseMoveEvent(QGraphicsSceneMouseEvent*);
-
     int			sprite;
     int			shape;
 
@@ -61,7 +57,7 @@ class MapData : public QGraphicsScene
     Q_OBJECT
 
 public:
-    MapData(AGG::File & agg) : aggContent(agg), modeView(1) {}
+    MapData(AGG::File & agg) : aggContent(agg), modeView(1), currentGround(9) {}
 
     const QString &	name(void) const;
     const QString &	description(void) const;
@@ -69,11 +65,13 @@ public:
 
     int			indexLimit(void) const;
     int         	sceneModeView(void) const;
+    int         	sceneCurrentGround(void) const;
 
     void		newMap(const QSize &, const QString &);
     bool		loadMap(const QString &);
 
     void         	setSceneModeView(int);
+    void         	setSceneCurrentGround(int);
 signals:
     void		dataModified(void);
 
@@ -82,11 +80,7 @@ protected:
     void                mouseReleaseEvent(QGraphicsSceneMouseEvent*);
     void                mouseMoveEvent(QGraphicsSceneMouseEvent*);
 
-    void		mousePressLeftEvent(QGraphicsSceneMouseEvent*);
-    void		mousePressRightEvent(QGraphicsSceneMouseEvent*);
-    void		mouseReleaseLeftEvent(QGraphicsSceneMouseEvent*);
-    void		mouseReleaseRightEvent(QGraphicsSceneMouseEvent*);
-
+    void		selectArea(QPointF, QPointF);
     bool		loadMP2Map(const QString &);
 
     QSize		mapSize;
@@ -116,7 +110,8 @@ protected:
     QSize		tilesetSize;
     QList<MapTile*>	tilesetItems;
 
-    int			modeView;
+    int			modeView; /* explore: 1, select: 2 */
+    int			currentGround; /* desert: 1, snow: 2, swamp: 3, wasteland: 4, beach: 5, lava: 6, dirt: 7, grass: 8, water: 9 */
 };
 
 #endif

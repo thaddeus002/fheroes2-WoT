@@ -100,26 +100,6 @@ void MapTile::showInfo(void) const
     QMessageBox::information(NULL, str, msg);
 }
 
-void MapTile::mousePressEvent(QGraphicsSceneMouseEvent* event)
-{
-    Q_UNUSED(event);
-    //QGraphicsItem::mousePressEvent(event);
-    //update();
-}
-
-void MapTile::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
-{
-    Q_UNUSED(event);
-    //QGraphicsItem::mouseReleaseEvent(event);
-    //update();
-}
-
-void MapTile::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
-{
-    Q_UNUSED(event);
-    //QGraphicsItem::mouseMoveEvent(event);
-}
-
 const QString & MapData::name(void) const
 {
     return mapName;
@@ -395,108 +375,44 @@ bool MapData::loadMP2Map(const QString & mapFile)
 
 void MapData::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-    if(event->button() == Qt::LeftButton)
-	mousePressLeftEvent(event);
-    else
-    if(event->button() == Qt::RightButton)
-	mousePressRightEvent(event);
-    else
-	QGraphicsScene::mousePressEvent(event);
-}
-
-void MapData::mousePressLeftEvent(QGraphicsSceneMouseEvent* event)
-{
-    MapTile* item = qgraphicsitem_cast<MapTile*>(itemAt(event->scenePos()));
-
-    // explore
+    // explore mode
     if(1 == modeView)
     {
-	if(item) item->showInfo();
+	// show tile info
+	if(event->buttons() & Qt::LeftButton)
+	{
+	    MapTile* item = qgraphicsitem_cast<MapTile*>(itemAt(event->scenePos()));
+	    if(item) item->showInfo();
+	}
     }
     else
-    // select
+    // select mode
     if(2 == modeView)
     {
 	clearSelection();
     }
 
-    QGraphicsScene::mousePressEvent(event);
-}
-
-void MapData::mousePressRightEvent(QGraphicsSceneMouseEvent* event)
-{
-    // explore
-    if(1 == modeView)
-    {
-    }
-    else
-    // select
-    if(2 == modeView)
-    {
-	if(! (Qt::ControlModifier & event->modifiers()))
-	    clearSelection();
-
-	return;
-    }
-
-    QGraphicsScene::mousePressEvent(event);
+    //QGraphicsScene::mousePressEvent(event);
 }
 
 void MapData::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
-{
-    if(event->button() == Qt::LeftButton)
-	mouseReleaseLeftEvent(event);
-    else
-    if(event->button() == Qt::RightButton)
-	mouseReleaseRightEvent(event);
-    else
-	QGraphicsScene::mouseReleaseEvent(event);
-}
-
-void MapData::mouseReleaseLeftEvent(QGraphicsSceneMouseEvent* event)
-{
-    // explore
-    if(1 == modeView)
-    {
-    }
-    else
-    // select
-    if(2 == modeView)
-    {
-	QPointF ptdn = event->buttonDownScenePos(Qt::LeftButton);
-	QPointF ptup = event->scenePos();
-
-	if(ptup.x() < ptdn.x())
-	    qSwap(ptup.rx(), ptdn.rx());
-
-	if(ptup.y() < ptdn.y())
-	    qSwap(ptup.ry(), ptdn.ry());
-
-	QList<QGraphicsItem*> list = items(QRectF(ptdn, ptup), Qt::IntersectsItemShape, Qt::AscendingOrder);
-
-	if(list.isEmpty() && ptdn == ptup)
-	{
-	    QGraphicsItem* item = itemAt(ptup);
-	    if(item) list << item;
-	}
-
-	for(QList<QGraphicsItem*>::Iterator
-	    it = list.begin(); it != list.end(); ++it)
-	    (*it)->setSelected(true);
-
-	return;
-    }
-
-    QGraphicsScene::mouseReleaseEvent(event);
-}
-
-void MapData::mouseReleaseRightEvent(QGraphicsSceneMouseEvent* event)
 {
     QGraphicsScene::mouseReleaseEvent(event);
 }
 
 void MapData::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
+    // select mode
+    if(2 == modeView)
+    {
+	// select area
+	if(event->buttons() & Qt::LeftButton)
+	{
+	    clearSelection();
+	    selectArea(event->buttonDownScenePos(Qt::LeftButton), event->scenePos());
+	}
+    }
+
     QGraphicsScene::mouseMoveEvent(event);
 }
 
@@ -508,4 +424,35 @@ int MapData::sceneModeView(void) const
 void MapData::setSceneModeView(int mode)
 {
     modeView = mode;
+}
+
+int MapData::sceneCurrentGround(void) const
+{
+    return currentGround;
+}
+
+void MapData::setSceneCurrentGround(int ground)
+{
+    currentGround = ground;
+}
+
+void MapData::selectArea(QPointF ptdn, QPointF ptup)
+{
+    if(ptup.x() < ptdn.x())
+	qSwap(ptup.rx(), ptdn.rx());
+
+    if(ptup.y() < ptdn.y())
+	qSwap(ptup.ry(), ptdn.ry());
+
+    QList<QGraphicsItem*> list = items(QRectF(ptdn, ptup), Qt::IntersectsItemShape, Qt::AscendingOrder);
+
+    if(list.isEmpty() && ptdn == ptup)
+    {
+	QGraphicsItem* item = itemAt(ptup);
+	if(item) list << item;
+    }
+
+    for(QList<QGraphicsItem*>::Iterator
+	it = list.begin(); it != list.end(); ++it)
+	(*it)->setSelected(true);
 }

@@ -20,8 +20,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <QDebug>
 #include <QtEndian>
+#include <QDebug>
+#include <QDir>
+#include <QFileInfo>
 
 #include "program.h"
 #include "engine.h"
@@ -146,6 +148,11 @@ mp2ext_t H2::File::readMP2Ext(void)
 AGG::File::File(const QString & file)
 {
     loadFile(file);
+
+    QStringList list = QFileInfo(file).absoluteDir().entryList(QStringList() << "heroes2x.agg", QDir::Files | QDir::Readable);
+
+    if(list.size())
+	qDebug() << "also found:" << QFileInfo(file).absolutePath() + QDir::separator() + list.front();
 }
 
 QByteArray AGG::File::readRawData(const QString & name)
@@ -169,7 +176,7 @@ QByteArray AGG::File::readRawData(const QString & name)
 bool AGG::File::loadFile(const QString & fn)
 {
     if(isOpen()) close();
-    if(fn.isNull()) return false;
+    if(fn.isEmpty()) return false;
 
     setFileName(fn);
     if(open(QIODevice::ReadOnly))

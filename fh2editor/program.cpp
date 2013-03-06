@@ -129,10 +129,10 @@ int main(int argc, char *argv[])
 
 	dataFile = Resource::FindFile(subFolder, resourceAgg);
 
-	if(dataFile.isNull())
+	if(dataFile.isEmpty())
 	    dataFile = Resource::FindFile(subFolder, resourceAgg.toLower());
 
-	if(dataFile.isNull())
+	if(dataFile.isEmpty())
 	{
 	    dataFile = Dialog::SelectDataFile(resourceAgg);
 	    if(dataFile.isEmpty()) return 0;
