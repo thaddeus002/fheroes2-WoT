@@ -91,7 +91,6 @@ void MainWindow::open(void)
     	    if(child->loadFile(fileName))
 	    {
         	statusBar()->showMessage(tr("File loaded"), 2000);
-		child->resize(QSize(640, 480));
         	child->show();
     	    }
 	    else
@@ -226,6 +225,7 @@ MapWindow* MainWindow::createMapWindow(void)
 {
     MapWindow* child = new MapWindow(aggContent);
     mdiArea->addSubWindow(child);
+    child->parentWidget()->setGeometry(0, 0, 640, 480);
 
     connect(child, SIGNAL(copyAvailable(bool)), editCopyAct, SLOT(setEnabled(bool)));
     connect(child, SIGNAL(copyAvailable(bool)), editFillAct, SLOT(setEnabled(bool)));

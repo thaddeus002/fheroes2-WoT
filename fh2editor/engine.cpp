@@ -94,20 +94,114 @@ QByteArray H2::File::readBlock(size_t sz)
     return res;
 }
 
+H2::ICNSprite::ICNSprite(const mp2icn_t & icn, const char* buf, quint32 size, const QVector<QRgb> & pals)
+    : QImage(icn.width, icn.height, QImage::Format_ARGB32)
+{
+    const quint8* ptr = (const quint8*) buf;
+    const quint8* outOfRange = ptr + size;
+
+    int col = 0;
+    int posX = 0;
+    int posY = 0;
+    QRgb shadow = qRgba(0, 0, 0, 0x40);
+
+    fill(qRgba(0, 0, 0, 0));
+
+    while(1)
+    {
+        // 0x00 - end line
+        if(0 == *ptr)
+        {
+            posY++;
+            posX = 0;
+            ptr++;
+        }
+        else
+        // 0x7F - count data
+        if(0x80 > *ptr)
+        {
+            col = *ptr;
+            ptr++;
+            while(col-- && ptr < outOfRange)
+            {
+                setPixel(posX, posY, pals[*ptr]);
+                posX++;
+                ptr++;
+            }
+        }
+        else
+        // 0x80 - end data
+        if(0x80 == *ptr)
+        {
+            break;
+        }
+        else
+        // 0xBF - skip data
+        if(0xC0 > *ptr)
+        {
+            posX += *ptr - 0x80;
+            ptr++;
+        }
+        else
+        // 0xC0 - shadow
+        if(0xC0 == *ptr)
+        {
+            ptr++;
+            col = *ptr % 4 ? *ptr % 4 : *(++ptr);
+            while(col--){ setPixel(posX, posY, shadow); posX++; }
+            ptr++;
+        }
+        else
+        // 0xC1
+        if(0xC1 == *ptr)
+        {
+            ptr++;
+            col = *ptr;
+            ptr++;
+            while(col--){ setPixel(posY, posY, pals[*ptr]); posX++; }
+            ptr++;
+        }
+        else
+        {
+            col = *ptr - 0xC0;
+            ptr++;
+            while(col--){ setPixel(posX, posY, pals[*ptr]); posX++; }
+            ptr++;
+        }
+
+        if(ptr >= outOfRange)
+        {
+            qWarning() << "H2::ICNSprite:" << "parse out of range";
+            break;
+        }
+    }
+}
+
+mp2icn_t::mp2icn_t(const char* buf)
+{
+    offsetX = qFromLittleEndian(*((quint16*) buf));
+    offsetY = qFromLittleEndian(*((quint16*) (buf + 2)));
+    width = qFromLittleEndian(*((quint16*) (buf + 4)));
+    height = qFromLittleEndian(*((quint16*) (buf + 6)));
+    type = *((quint8*) (buf + 8));
+    offsetData = qFromLittleEndian(*((quint32*) (buf + 9)));
+}
+
+mp2lev_t::mp2lev_t()
+{
+    object = 0;
+    index = 0;
+    uniq = 0;
+}
+
 mp2til_t::mp2til_t()
 {
     tileSprite = Rand(16, 19);
-    objectName1 = 0;
-    indexName1 = 0;
     quantity1 = 0;
     quantity2 = 0;
-    objectName2 = 0;
-    indexName2 = 0;
     tileShape = 0;
     tileObject = 0;
     indexExt = 0;
-    uniq1 = 0;
-    uniq2 = 0;
 }
 
 mp2til_t H2::File::readMP2Til(void)
@@ -115,19 +209,25 @@ mp2til_t H2::File::readMP2Til(void)
     mp2til_t res;
 
     res.tileSprite = readLE16();
-    res.objectName1 = readByte();
-    res.indexName1 = readByte();
+    res.level1.object = readByte();
+    res.level1.index = readByte();
     res.quantity1 = readByte();
     res.quantity2 = readByte();
-    res.objectName2 = readByte();
-    res.indexName2 = readByte();
+    res.level2.object = readByte();
+    res.level2.index = readByte();
     res.tileShape = readByte();
     res.tileObject = readByte();
     res.indexExt = readLE16();
-    res.uniq1 = readLE32();
-    res.uniq2 = readLE32();
+    res.level1.uniq = readLE32();
+    res.level2.uniq = readLE32();
 
     return res;
+}
+
+mp2ext_t::mp2ext_t()
+{
+    indexExt = 0;
+    quantity = 0;
 }
 
 mp2ext_t H2::File::readMP2Ext(void)
@@ -135,13 +235,13 @@ mp2ext_t H2::File::readMP2Ext(void)
     mp2ext_t res;
 
     res.indexExt = readLE16();
-    res.objectName1 = readByte();
-    res.indexName1 = readByte();
+    res.level1.object = 2 * readByte();
+    res.level1.index = readByte();
     res.quantity = readByte();
-    res.objectName2 = readByte();
-    res.indexName2 = readByte();
-    res.uniq1 = readLE32();
-    res.uniq2 = readLE32();
+    res.level2.object = readByte();
+    res.level2.index = readByte();
+    res.level1.uniq = readLE32();
+    res.level1.uniq = readLE32();
 
     return res;
 }
@@ -153,7 +253,7 @@ AGG::File::File(const QString & file)
     QStringList list = QFileInfo(file).absoluteDir().entryList(QStringList() << "heroes2x.agg", QDir::Files | QDir::Readable);
 
     if(list.size())
-	qDebug() << "also found:" << QFileInfo(file).absolutePath() + QDir::separator() + list.front();
+	qDebug() <<  "AGG::File:" << "also found:" << QFileInfo(file).absolutePath() + QDir::separator() + list.front();
 
     QPixmapCache::setCacheLimit(40000);
 }
@@ -171,7 +271,7 @@ QByteArray AGG::File::readRawData(const QString & name)
 	readData(res.data(), (*it).size);
     }
     else
-	qCritical() << "Item" << qPrintable(name) << "not found";
+	qCritical() << "AGG::File::readRawData:" << "item" << qPrintable(name) << "not found";
 
     return res;
 }
@@ -236,23 +336,21 @@ bool AGG::File::loadFile(const QString & fn)
 	    return true;
 	}
 	else
-	    qCritical() << "palette not found";
+	    qCritical() << "AGG::File::loadFile:" << "palette not found";
     }
     else
-	qCritical() << "Can not read file " << qPrintable(fn);
+	qCritical() << "AGG::File::loadFile:" << "Can not read file " << qPrintable(fn);
 
     return false;
 }
 
 QPixmap AGG::File::getImageTIL(const QString & id, quint16 index)
 {
-    if(items.isEmpty())
-	return NULL;
-
     QString key = id + QString::number(index);
     QPixmap result;
 
-    if(! QPixmapCache::find(key, & result))
+    if(! QPixmapCache::find(key, & result) &&
+	! items.isEmpty())
     {
 	QByteArray buf = readRawData(id + ".TIL");
 
@@ -269,15 +367,56 @@ QPixmap AGG::File::getImageTIL(const QString & id, quint16 index)
 		image.setColorTable(colors);
 
 		result = QPixmap::fromImage(image);
-
 		QPixmapCache::insert(key, result);
 	    }
 	    else
-		qCritical() << "Out of range: " << index;
+		qCritical() << "AGG::File::getImageTIL:" << "out of range" << index;
 	}
     }
 
     return result;
+}
+
+QPair<QPixmap, QPoint> AGG::File::getImageICN(const QString & id, quint16 index)
+{
+    QString key = id + QString::number(index);
+    QPixmap result;
+    QPoint offset;
+
+    if(! QPixmapCache::find(key, & result) &&
+	! items.isEmpty())
+    {
+	QByteArray buf = readRawData(id + ".ICN");
+
+	if(buf.size())
+	{
+	    quint16 icnCount = qFromLittleEndian(*((quint16*) buf.data()));
+
+	    if(index < icnCount)
+	    {
+		mp2icn_t header(buf.data() + 6 + index * mp2icn_t::sizeOf());
+		quint32 sizeData = 0;
+
+		if(index + 1 < icnCount)
+		{
+		    mp2icn_t headerNext(buf.data() + 6 + (index + 1) * mp2icn_t::sizeOf());
+		    sizeData = headerNext.offsetData - header.offsetData;
+		}
+		else
+		    sizeData = qFromLittleEndian(*((quint32*) (buf.data() + 2))) - header.offsetData;
+
+		H2::ICNSprite image(header, buf.data() + 6 + header.offsetData, sizeData, colors);
+
+		result = QPixmap::fromImage(image);
+		offset = QPoint(header.offsetX, header.offsetY);
+		QPixmapCache::insert(key, result);
+	    }
+	    else
+		qCritical() << "AGG::File::getImageICN:" << "out of range" << index;
+	}
+    }
+
+    return qMakePair<QPixmap, QPoint>(result, offset);
 }
 
 quint32 Rand(quint32 min, quint32 max)
@@ -289,4 +428,101 @@ quint32 Rand(quint32 min, quint32 max)
 quint32 Rand(quint32 max)
 {
     return static_cast<quint32>((max + 1) * (qrand() / (RAND_MAX + 1.0)));
+}
+
+QString H2::mapICN(int type)
+{
+    switch(type)
+    {
+	// artifact
+	case 0x2C: case 0x2D: case 0x2E: case 0x2F: return "OBJNARTI";
+	// monster
+	case 0x30: case 0x31: case 0x32: case 0x33: return "MONS32";
+	// castle flags
+	case 0x38: case 0x39: case 0x3A: case 0x3B: return "FLAG32";
+	// heroes
+	case 0x54: case 0x55: case 0x56: case 0x57: return "MINIHERO";
+	// relief: snow
+	case 0x58: case 0x59: case 0x5A: case 0x5B: return "MTNSNOW";
+	// relief: swamp
+	case 0x5C: case 0x5D: case 0x5E: case 0x5F: return "MTNSWMP";
+	// relief: lava
+	case 0x60: case 0x61: case 0x62: case 0x63: return "MTNLAVA";
+	// relief: desert
+	case 0x64: case 0x65: case 0x66: case 0x67: return "MTNDSRT";
+	// relief: dirt
+	case 0x68: case 0x69: case 0x6A: case 0x6B: return "MTNDIRT";
+	// relief: others
+	case 0x6C: case 0x6D: case 0x6E: case 0x6F: return "MTNMULT";
+	// mines
+	case 0x74: return "EXTRAOVR";
+	// road
+	case 0x78: case 0x79: case 0x7A: case 0x7B: return "ROAD";
+	// relief: crck
+	case 0x7C: case 0x7D: case 0x7E: case 0x7F: return "MTNCRCK";
+	// relief: gras
+	case 0x80: case 0x81: case 0x82: case 0x83: return "MTNGRAS";
+	// trees jungle
+	case 0x84: case 0x85: case 0x86: case 0x87: return "TREJNGL";
+	// trees evil
+	case 0x88: case 0x89: case 0x8A: case 0x8B: return "TREEVIL";
+	// castle and tower
+	case 0x8C: case 0x8D: case 0x8E: case 0x8F: return "OBJNTOWN";
+	// castle lands
+	case 0x90: case 0x91: case 0x92: case 0x93: return "OBJNTWBA";
+	// castle shadow
+	case 0x94: case 0x95: case 0x96: case 0x97: return "OBJNTWSH";
+	// random castle
+	case 0x98: case 0x99: case 0x9A: case 0x9B: return "OBJNTWRD";
+	// water object
+	case 0xA0: case 0xA1: case 0xA2: case 0xA3: return "OBJNWAT2";
+	// object other
+	case 0xA4: case 0xA5: case 0xA6: case 0xA7: return "OBJNMUL2";
+	// trees snow
+	case 0xA8: case 0xA9: case 0xAA: case 0xAB: return "TRESNOW";
+	// trees trefir
+	case 0xAC: case 0xAD: case 0xAE: case 0xAF: return "TREFIR";
+	// trees
+	case 0xB0: case 0xB1: case 0xB2: case 0xB3: return "TREFALL";
+	// river
+	case 0xB4: case 0xB5: case 0xB6: case 0xB7: return "STREAM";
+	// resource
+	case 0xB8: case 0xB9: case 0xBA: case 0xBB: return "OBJNRSRC";
+	// gras object
+	case 0xC0: case 0xC1: case 0xC2: case 0xC3: return "OBJNGRA2";
+	// trees tredeci
+	case 0xC4: case 0xC5: case 0xC6: case 0xC7: return "TREDECI";
+	// sea object
+	case 0xC8: case 0xC9: case 0xCA: case 0xCB: return "OBJNWATR";
+	// vegetation gras
+	case 0xCC: case 0xCD: case 0xCE: case 0xCF: return "OBJNGRAS";
+	// object on snow
+	case 0xD0: case 0xD1: case 0xD2: case 0xD3: return "OBJNSNOW";
+	// object on swamp
+	case 0xD4: case 0xD5: case 0xD6: case 0xD7: return "OBJNSWMP";
+	// object on lava
+	case 0xD8: case 0xD9: case 0xDA: case 0xDB: return "OBJNLAVA";
+	// object on desert
+	case 0xDC: case 0xDD: case 0xDE: case 0xDF: return "OBJNDSRT";
+	// object on dirt
+	case 0xE0: case 0xE1: case 0xE2: case 0xE3: return "OBJNDIRT";
+	// object on crck
+	case 0xE4: case 0xE5: case 0xE6: case 0xE7: return "OBJNCRCK";
+	// object on lava
+	case 0xE8: case 0xE9: case 0xEA: case 0xEB: return "OBJNLAV3";
+	// object on earth
+	case 0xEC: case 0xED: case 0xEE: case 0xEF: return "OBJNMULT";
+	//  object on lava
+	case 0xF0: case 0xF1: case 0xF2: case 0xF3: return "OBJNLAV2";
+	// extra objects for loyalty version
+	case 0xF4: case 0xF5: case 0xF6: case 0xF7: return "X_LOC1";
+	// extra objects for loyalty version
+	case 0xF8: case 0xF9: case 0xFA: case 0xFB: return "X_LOC2";
+	// extra objects for loyalty version
+	case 0xFC: case 0xFD: case 0xFE: case 0xFF: return "X_LOC3";
+	// unknown
+	default: qWarning() << "H2::mapICN: return NULL, object:" << type; break;
+    }
+
+    return NULL;
 }

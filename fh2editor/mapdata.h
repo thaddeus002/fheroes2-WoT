@@ -31,25 +31,46 @@
 
 #include "engine.h"
 
-class MapTile : public QGraphicsItem
+class MapTileExt : public QPair<QPixmap, QPoint>
+{
+public:
+    MapTileExt(const QPair<QPixmap, QPoint> & pair) : QPair<QPixmap, QPoint>(pair.first, pair.second),
+						    pixmap(first), offset(second), uniq(0), level(0), tmp(0) {}
+
+    static bool		sortLevel1(const MapTileExt*, const MapTileExt*);
+    static bool		sortLevel2(const MapTileExt*, const MapTileExt*);
+
+    QPixmap &	pixmap;
+    QPoint &	offset;
+
+    quint32	uniq;
+    quint8	level;
+    quint8	tmp;
+};
+
+class MapTile : public QGraphicsPixmapItem
 {
 public:
     MapTile(const mp2til_t &, AGG::File &, const QPoint &);
+    ~MapTile();
 
     bool		isValid(void) const;
     void		showInfo(void) const;
 
     static QString	indexString(int);
 
-    QRectF		boundingRect(void) const;
     void		paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget* = 0);
+    void		loadSpriteLevels(const mp2ext_t &, AGG::File &);
+    void		sortSpritesLevels(void);
 
 protected:
-    int			sprite;
+    void		loadSpritelevel(QList<MapTileExt*> &, const mp2lev_t &, AGG::File &);
+
+    int			spriteIndex;
     int			shape;
 
-    QPixmap		pixmapTile;
-    QRectF		area;
+    QList<MapTileExt*>	spritesLevel1;
+    QList<MapTileExt*>	spritesLevel2;
 };
 
 class MapData : public QGraphicsScene

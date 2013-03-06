@@ -28,35 +28,53 @@
 #include <QString>
 #include <QPixmap>
 #include <QByteArray>
+#include <QPair>
+
+struct mp2icn_t
+{
+    mp2icn_t(const char*);
+
+    quint16	offsetX;
+    quint16	offsetY;
+    quint16	width;
+    quint16	height;
+    quint8	type;
+    quint32	offsetData;
+
+    static int	sizeOf(void) { return 13; };
+};
+
+struct mp2lev_t
+{
+    mp2lev_t();
+
+    quint8	object;
+    quint8	index;
+    quint32	uniq;
+};
 
 struct mp2til_t
 {
     mp2til_t();
 
     quint16     tileSprite;
-    quint8      objectName1;
-    quint8      indexName1;
     quint8      quantity1;
     quint8      quantity2;
-    quint8      objectName2;
-    quint8      indexName2;
     quint8      tileShape;
     quint8      tileObject;
     quint16     indexExt;
-    quint32     uniq1;
-    quint32     uniq2;
+    mp2lev_t	level1;
+    mp2lev_t	level2;
 };
 
 struct mp2ext_t
 {
+    mp2ext_t();
+
     quint16     indexExt;
-    quint8      objectName1;
-    quint8      indexName1;
     quint8      quantity;
-    quint8      objectName2;
-    quint8      indexName2;
-    quint32     uniq1;
-    quint32     uniq2;
+    mp2lev_t	level1;
+    mp2lev_t	level2;
 };
 
 struct mp2pos_t
@@ -88,6 +106,14 @@ namespace H2
 	mp2til_t readMP2Til(void);
 	mp2ext_t readMP2Ext(void);
     };
+
+    class ICNSprite : public QImage
+    {
+    public:
+	ICNSprite(const mp2icn_t &, const char*, quint32, const QVector<QRgb> &);
+    };
+
+    QString mapICN(int);
 }
 
 namespace AGG
@@ -113,6 +139,7 @@ namespace AGG
 	File(const QString &);
 
 	QPixmap getImageTIL(const QString &, quint16);
+	QPair<QPixmap, QPoint> getImageICN(const QString &, quint16);
     };
 }
 
