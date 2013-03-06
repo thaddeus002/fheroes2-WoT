@@ -6,7 +6,7 @@ TEMPLATE = app
 TARGET = 
 DEPENDPATH += .
 INCLUDEPATH += .
-LIBPATH += $(QTLIB)
+QMAKE_LIBDIR += $(QTLIB)
 QT+= xml
 
 RESOURCES = resources.qrc

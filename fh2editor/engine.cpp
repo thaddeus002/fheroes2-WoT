@@ -24,6 +24,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
+#include <QPixmapCache>
 
 #include "program.h"
 #include "engine.h"
@@ -153,6 +154,8 @@ AGG::File::File(const QString & file)
 
     if(list.size())
 	qDebug() << "also found:" << QFileInfo(file).absolutePath() + QDir::separator() + list.front();
+
+    QPixmapCache::setCacheLimit(40000);
 }
 
 QByteArray AGG::File::readRawData(const QString & name)
@@ -246,27 +249,35 @@ QPixmap AGG::File::getImageTIL(const QString & id, quint16 index)
     if(items.isEmpty())
 	return NULL;
 
-    QByteArray buf = readRawData(id + ".TIL");
+    QString key = id + QString::number(index);
+    QPixmap result;
 
-    if(buf.size())
+    if(! QPixmapCache::find(key, & result))
     {
-	quint16 tileCount = qFromLittleEndian(*((quint16*) buf.data()));
+	QByteArray buf = readRawData(id + ".TIL");
 
-	if(index < tileCount)
+	if(buf.size())
 	{
-	    quint16 tileWidth = qFromLittleEndian(*((quint16*) (buf.data() + 2)));
-	    quint16 tileHeight = qFromLittleEndian(*((quint16*) (buf.data() + 4)));
+	    quint16 tileCount = qFromLittleEndian(*((quint16*) buf.data()));
 
-	    QImage image((uchar*) buf.data() + 6 + index * tileWidth * tileHeight, tileWidth, tileHeight, QImage::Format_Indexed8);
-	    image.setColorTable(colors);
+	    if(index < tileCount)
+	    {
+		quint16 tileWidth = qFromLittleEndian(*((quint16*) (buf.data() + 2)));
+		quint16 tileHeight = qFromLittleEndian(*((quint16*) (buf.data() + 4)));
 
-	    return QPixmap::fromImage(image);
+		QImage image((uchar*) buf.data() + 6 + index * tileWidth * tileHeight, tileWidth, tileHeight, QImage::Format_Indexed8);
+		image.setColorTable(colors);
+
+		result = QPixmap::fromImage(image);
+
+		QPixmapCache::insert(key, result);
+	    }
+	    else
+		qCritical() << "Out of range: " << index;
 	}
-	else
-	    qCritical() << "Out of range: " << index;
     }
 
-    return NULL;
+    return result;
 }
 
 quint32 Rand(quint32 min, quint32 max)
