@@ -43,7 +43,7 @@ qint16 H2::File::readLE16(void)
 
     if(pos() + sizeof(res) <= size())
     {
-	readData((char*) &res, sizeof(res));
+	read((char*) &res, sizeof(res));
 	res = qFromLittleEndian(res);
     }
 
@@ -56,7 +56,7 @@ qint32 H2::File::readLE32(void)
 
     if(pos() + sizeof(res) <= size())
     {
-	readData((char*) &res, sizeof(res));
+	read((char*) &res, sizeof(res));
 	res = qFromLittleEndian(res);
     }
 
@@ -69,7 +69,7 @@ qint8 H2::File::readByte(void)
 
     if(pos() + sizeof(res) <= size())
     {
-	readData((char*) &res, sizeof(res));
+	read((char*) &res, sizeof(res));
     }
 
     return res;
@@ -92,7 +92,7 @@ QByteArray H2::File::readBlock(size_t sz, int ps)
 	res.reserve(sz);
 	res.resize(sz);
 
-	readData(res.data(), sz);
+	read(res.data(), sz);
     }
 
     return res;

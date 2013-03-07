@@ -137,7 +137,7 @@ void MapTile::loadSpritelevel(QList<MapTileExt*> & list, const mp2lev_t & level,
 	{
 	    list << new MapTileExt(agg.getImageICN(icn, level.index));
 
-	    if(list.back()->pixmap.isNull())
+	    if(! list.back() || list.back()->pixmap.isNull())
 		qWarning() << "MapTile::loadSpriteLevel: pixmap is null" << level.object << level.index;
 	}
     }
