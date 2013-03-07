@@ -80,14 +80,18 @@ QString H2::File::readString(size_t sz)
     return QString(readBlock(sz));
 }
 
-QByteArray H2::File::readBlock(size_t sz)
+QByteArray H2::File::readBlock(size_t sz, int ps)
 {
     QByteArray res;
+
+    if(0 <= ps)
+	seek(ps);
 
     if(pos() + sz <= size())
     {
 	res.reserve(sz);
-	res.fill(0, sz);
+	res.resize(sz);
+
 	readData(res.data(), sz);
     }
 
@@ -253,27 +257,21 @@ AGG::File::File(const QString & file)
     QStringList list = QFileInfo(file).absoluteDir().entryList(QStringList() << "heroes2x.agg", QDir::Files | QDir::Readable);
 
     if(list.size())
-	qDebug() <<  "AGG::File:" << "also found:" << QFileInfo(file).absolutePath() + QDir::separator() + list.front();
+	qDebug() <<  "AGG::File:" << "also found:" << QDir::toNativeSeparators(QFileInfo(file).absolutePath() + QDir::separator() + list.front());
 
     QPixmapCache::setCacheLimit(40000);
 }
 
 QByteArray AGG::File::readRawData(const QString & name)
 {
-    QByteArray res;
     QMap<QString, Item>::const_iterator it = items.find(name);
 
     if(items.end() != it)
-    {
-	res.resize((*it).size);
-
-	seek((*it).offset);
-	readData(res.data(), (*it).size);
-    }
+	return readBlock((*it).size, (*it).offset);
     else
 	qCritical() << "AGG::File::readRawData:" << "item" << qPrintable(name) << "not found";
 
-    return res;
+    return NULL;
 }
 
 bool AGG::File::loadFile(const QString & fn)
@@ -285,22 +283,16 @@ bool AGG::File::loadFile(const QString & fn)
     if(open(QIODevice::ReadOnly))
     {
 	qDebug() << "AGG::File::loadFile:" << qPrintable(fn);
-
 	quint16 countItems = readLE16();
 
 	qDebug() << "AGG::File::loadFile:" << "count items:" << countItems;
-
 	const int sizeName = 15;
-	char buf[sizeName + 1];
 
 	for(int it = 0; it < countItems; ++it)
 	{
-	    seek(size() - sizeName * (countItems - it));
+	    int posname = size() - sizeName * (countItems - it);
 
-	    qFill(buf, buf + sizeName + 1, 0);
-	    readData(buf, sizeName);
-
-	    Item & item = items[QString(buf)];
+	    Item & item = items[QString(readBlock(sizeName, posname))];
 
 	    seek(sizeof(countItems) + it * (3 * sizeof(quint32) /* crcItem + offsetItem + sizeItem */)); 
 
@@ -316,7 +308,7 @@ bool AGG::File::loadFile(const QString & fn)
 
 	if(items.end() != pal)
 	{
-	    char r, g, b;
+	    qint8 r, g, b;
 	    const quint32 palSize = (*pal).size / 3;
 	    colors.reserve(palSize);
 
@@ -324,9 +316,9 @@ bool AGG::File::loadFile(const QString & fn)
 
 	    for(quint32 num = 0; num < palSize; ++num)
 	    {
-		readData(& r, 1);
-		readData(& g, 1);
-		readData(& b, 1);
+		r = readByte();
+		g = readByte();
+		b = readByte();
 
 		colors.push_back(qRgb(r << 2, g << 2, b << 2));
 	    }

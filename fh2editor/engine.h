@@ -98,7 +98,7 @@ namespace H2
 	qint8	readByte(void);
 	QString	readString(size_t);
 	QByteArray
-		readBlock(size_t);
+		readBlock(size_t, int = -1);
 
 	qint16	readLE16(void);
 	qint32	readLE32(void);

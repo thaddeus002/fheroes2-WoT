@@ -51,7 +51,7 @@ QString Dialog::SelectDataFile(const QString & file)
         it = shareDirs.begin(); it != shareDirs.end(); ++it)
         body += (*it) + QDir::separator() + "data\n";
 
-    Form::SelectDataFile form(head, body);
+    Form::SelectDataFile form(head, QDir::toNativeSeparators(body));
     int ret = form.exec();
     return QDialog::Accepted == ret ? form.result : "";
 }

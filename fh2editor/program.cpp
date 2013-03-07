@@ -57,7 +57,7 @@ namespace Resource
 	for(QStringList::const_iterator
 	    it = shares.begin(); it != shares.end(); ++it)
 	{
-	    const QString path = *it + QDir::separator() + dir + QDir::separator() + file;
+	    const QString path = QDir::toNativeSeparators(*it + QDir::separator() + dir + QDir::separator() + file);
 	    if(QFile(path).exists()) return path;
 	}
 
@@ -76,7 +76,7 @@ namespace Resource
 	for(QStringList::const_iterator
 	    it = shares.begin(); it != shares.end(); ++it)
 	{
-	    QString fullres = *it + QDir::separator() + shortres;
+	    QString fullres = QDir::toNativeSeparators(*it + QDir::separator() + shortres);
 	    if(QFile(fullres).exists()) return fullres;
 	}
 
@@ -99,7 +99,7 @@ namespace Resource
 	if(regExp.exactMatch(*it)){ list.push_back(regExp.cap(1)); break; }
 
 	list.push_back(QCoreApplication::applicationDirPath());
-	list.push_back(QDir::homePath() + QDir::separator() + "." + QString(PROGRAM_SHARE).toLower());
+	list.push_back(QDir::toNativeSeparators(QDir::homePath() + QDir::separator() + "." + QString(PROGRAM_SHARE).toLower()));
 
 	Resource::shares.clear();
 
