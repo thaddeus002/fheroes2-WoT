@@ -34,8 +34,7 @@
 class MapTileExt : public QPair<QPixmap, QPoint>
 {
 public:
-    MapTileExt(const QPair<QPixmap, QPoint> & pair) : QPair<QPixmap, QPoint>(pair.first, pair.second),
-						    pixmap(first), offset(second), uniq(0), level(0), tmp(0) {}
+    MapTileExt(quint8 lv, quint32 uid, const QPair<QPixmap, QPoint> & pair);
 
     static bool		sortLevel1(const MapTileExt*, const MapTileExt*);
     static bool		sortLevel2(const MapTileExt*, const MapTileExt*);
@@ -64,7 +63,7 @@ public:
     void		sortSpritesLevels(void);
 
 protected:
-    void		loadSpritelevel(QList<MapTileExt*> &, const mp2lev_t &, AGG::File &);
+    void		loadSpritelevel(QList<MapTileExt*> &, const mp2lev_t &, quint8, AGG::File &);
 
     int			spriteIndex;
     int			shape;

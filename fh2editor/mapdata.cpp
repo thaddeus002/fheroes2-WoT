@@ -31,6 +31,11 @@
 #include "program.h"
 #include "mapdata.h"
 
+MapTileExt::MapTileExt(quint8 lv, quint32 uid, const QPair<QPixmap, QPoint> & pair)
+    : QPair<QPixmap, QPoint>(pair.first, pair.second), pixmap(first), offset(second), uniq(uid), level(lv), tmp(0)
+{
+}
+
 bool MapTileExt::sortLevel1(const MapTileExt* mte1, const MapTileExt* mte2)
 {
     return (mte1->level % 4) > (mte2->level % 4);
@@ -64,10 +69,10 @@ MapTile::MapTile(const mp2til_t & mp2, AGG::File & agg, const QPoint & offset)
     }
 
     // level1
-    loadSpritelevel(spritesLevel1, mp2.level1, agg);
+    loadSpritelevel(spritesLevel1, mp2.level1, 0, agg);
 
     // level2
-    loadSpritelevel(spritesLevel2, mp2.level2, agg);
+    loadSpritelevel(spritesLevel2, mp2.level2, 0, agg);
 }
 
 MapTile::~MapTile()
@@ -99,12 +104,12 @@ void MapTile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, Q
     // draw level1
     for(QList<MapTileExt*>::const_iterator
 	it = spritesLevel1.begin(); it != spritesLevel1.end(); ++it)
-	painter->drawPixmap(offset() + (*it)->offset, (*it)->pixmap);
+	painter->drawPixmap(offset().x() + (*it)->offset.x(), offset().y() + (*it)->offset.y(), (*it)->pixmap);
 
     // draw level2
     for(QList<MapTileExt*>::const_iterator
 	it = spritesLevel2.begin(); it != spritesLevel2.end(); ++it)
-	painter->drawPixmap(offset() + (*it)->offset, (*it)->pixmap);
+	painter->drawPixmap(offset().x() + (*it)->offset.x(), offset().y() + (*it)->offset.y(), (*it)->pixmap);
 
     if(option->state & QStyle::State_Selected)
     {
@@ -124,21 +129,44 @@ void MapTile::showInfo(void) const
     ss1 << "Tile";
     ss2 << "tile sprite: " << spriteIndex << endl << "tile shape: " << shape << endl;
 
+    ss2 << "----------------------" << endl;
+
+    for(QList<MapTileExt*>::const_iterator
+	it = spritesLevel1.begin(); it != spritesLevel1.end(); ++it)
+    {
+    	ss2 << "offset:" << (*it)->offset.x() << "," << (*it)->offset.y() << endl;
+	ss2 << "level:" << (*it)->level << endl;
+	ss2 << "uniq:" << (*it)->uniq << endl;
+    }
+
+    ss2 << "----------------------" << endl;
+
+    // draw level2
+    for(QList<MapTileExt*>::const_iterator
+	it = spritesLevel2.begin(); it != spritesLevel2.end(); ++it)
+    {
+    	ss2 << "offset:" << (*it)->offset.x() << "," << (*it)->offset.y() << endl;
+	ss2 << "level:" << (*it)->level << endl;
+	ss2 << "uniq:" << (*it)->uniq << endl;
+    }
+
+    ss2 << "----------------------" << endl;
+
     QMessageBox::information(NULL, str, msg);
 }
 
-void MapTile::loadSpritelevel(QList<MapTileExt*> & list, const mp2lev_t & level, AGG::File & agg)
+void MapTile::loadSpritelevel(QList<MapTileExt*> & list, const mp2lev_t & lev, quint8 value, AGG::File & agg)
 {
-    if(level.object && level.index < 0xFF)
+    if(lev.object && lev.index < 0xFF)
     {
-	const QString & icn = H2::mapICN(level.object);
+	const QString & icn = H2::mapICN(lev.object);
 
 	if(! icn.isEmpty())
 	{
-	    list << new MapTileExt(agg.getImageICN(icn, level.index));
+	    list << new MapTileExt(value, lev.uniq, agg.getImageICN(icn, lev.index));
 
 	    if(! list.back() || list.back()->pixmap.isNull())
-		qWarning() << "MapTile::loadSpriteLevel: pixmap is null" << level.object << level.index;
+		qWarning() << "MapTile::loadSpriteLevel: pixmap is null" << lev.object << lev.index;
 	}
     }
 }
@@ -146,15 +174,18 @@ void MapTile::loadSpritelevel(QList<MapTileExt*> & list, const mp2lev_t & level,
 void MapTile::loadSpriteLevels(const mp2ext_t & mp2, AGG::File & agg)
 {
     // level1
-    loadSpritelevel(spritesLevel1, mp2.level1, agg);
+    loadSpritelevel(spritesLevel1, mp2.level1, mp2.quantity, agg);
 
     // level2
-    loadSpritelevel(spritesLevel2, mp2.level2, agg);
+    loadSpritelevel(spritesLevel2, mp2.level2, mp2.quantity, agg);
 }
 
 void MapTile::sortSpritesLevels(void)
 {
+    //if(spritesLevel1.size())
     qSort(spritesLevel1.begin(), spritesLevel1.end(), MapTileExt::sortLevel1);
+
+    //if(spritesLevel2.size())
     qSort(spritesLevel2.begin(), spritesLevel2.end(), MapTileExt::sortLevel2);
 }
 

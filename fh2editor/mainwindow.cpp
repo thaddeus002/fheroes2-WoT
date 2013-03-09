@@ -225,7 +225,7 @@ MapWindow* MainWindow::createMapWindow(void)
 {
     MapWindow* child = new MapWindow(aggContent);
     mdiArea->addSubWindow(child);
-    child->parentWidget()->setGeometry(0, 0, 640, 480);
+    child->parentWidget()->setGeometry(child->parentWidget()->pos().x(), child->parentWidget()->pos().y(), 480, 320);
 
     connect(child, SIGNAL(copyAvailable(bool)), editCopyAct, SLOT(setEnabled(bool)));
     connect(child, SIGNAL(copyAvailable(bool)), editFillAct, SLOT(setEnabled(bool)));

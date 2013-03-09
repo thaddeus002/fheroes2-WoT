@@ -46,6 +46,8 @@ qint16 H2::File::readLE16(void)
 	read((char*) &res, sizeof(res));
 	res = qFromLittleEndian(res);
     }
+    else
+	qWarning() << "H2::File::readLE16:" << "out of range";
 
     return res;
 }
@@ -59,6 +61,8 @@ qint32 H2::File::readLE32(void)
 	read((char*) &res, sizeof(res));
 	res = qFromLittleEndian(res);
     }
+    else
+	qWarning() << "H2::File::readLE32:" << "out of range";
 
     return res;
 }
@@ -69,8 +73,10 @@ qint8 H2::File::readByte(void)
 
     if(pos() + sizeof(res) <= size())
     {
-	read((char*) &res, sizeof(res));
+	read((char*) &res, 1);
     }
+    else
+	qWarning() << "H2::File::readByte:" << "out of range";
 
     return res;
 }
@@ -94,6 +100,8 @@ QByteArray H2::File::readBlock(size_t sz, int ps)
 
 	read(res.data(), sz);
     }
+    else
+	qWarning() << "H2::File::readBlock:" << "out of range";
 
     return res;
 }
@@ -245,7 +253,7 @@ mp2ext_t H2::File::readMP2Ext(void)
     res.level2.object = readByte();
     res.level2.index = readByte();
     res.level1.uniq = readLE32();
-    res.level1.uniq = readLE32();
+    res.level2.uniq = readLE32();
 
     return res;
 }
@@ -362,7 +370,7 @@ QPixmap AGG::File::getImageTIL(const QString & id, quint16 index)
 		QPixmapCache::insert(key, result);
 	    }
 	    else
-		qCritical() << "AGG::File::getImageTIL:" << "out of range" << index;
+	    qCritical() << "AGG::File::getImageTIL:" << "out of range" << index;
 	}
     }
 
@@ -375,18 +383,19 @@ QPair<QPixmap, QPoint> AGG::File::getImageICN(const QString & id, quint16 index)
     QPixmap result;
     QPoint offset;
 
-    if(! QPixmapCache::find(key, & result) &&
-	! items.isEmpty())
+    QByteArray buf = readRawData(id + ".ICN");
+
+    if(buf.size())
     {
-	QByteArray buf = readRawData(id + ".ICN");
+	quint16 icnCount = qFromLittleEndian(*((quint16*) buf.data()));
 
-	if(buf.size())
+	if(index < icnCount)
 	{
-	    quint16 icnCount = qFromLittleEndian(*((quint16*) buf.data()));
+	    mp2icn_t header(buf.data() + 6 + index * mp2icn_t::sizeOf());
 
-	    if(index < icnCount)
+	    if(! QPixmapCache::find(key, & result) &&
+		! items.isEmpty())
 	    {
-		mp2icn_t header(buf.data() + 6 + index * mp2icn_t::sizeOf());
 		quint32 sizeData = 0;
 
 		if(index + 1 < icnCount)
@@ -400,12 +409,13 @@ QPair<QPixmap, QPoint> AGG::File::getImageICN(const QString & id, quint16 index)
 		H2::ICNSprite image(header, buf.data() + 6 + header.offsetData, sizeData, colors);
 
 		result = QPixmap::fromImage(image);
-		offset = QPoint(header.offsetX, header.offsetY);
 		QPixmapCache::insert(key, result);
 	    }
-	    else
-		qCritical() << "AGG::File::getImageICN:" << "out of range" << index;
+
+	    offset = QPoint(header.offsetX, header.offsetY);
 	}
+	else
+	    qCritical() << "AGG::File::getImageICN:" << "out of range" << index;
     }
 
     return qMakePair<QPixmap, QPoint>(result, offset);
