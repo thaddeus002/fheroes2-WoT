@@ -322,6 +322,30 @@ void Battle::Only::ProcessSetArmyEvent(const NetworkEvent &ev, bool update, bool
 		redraw = true;
 	}
 
+	if(hero != NULL && ev.Message->HasBin(HMM2_GAME_SECONDARY_SKILLS) &&
+        ev.Message->HasBin(HMM2_GAME_SECONDARY_SKILL_LEVELS))
+	{
+		u8 skills[HEROESMAXSKILL];
+		u8 levels[HEROESMAXSKILL];
+		ev.Message->CopyBin(HMM2_GAME_SECONDARY_SKILLS, skills, sizeof(skills));
+		ev.Message->CopyBin(HMM2_GAME_SECONDARY_SKILL_LEVELS, levels, sizeof(levels));
+
+        Skill::SecSkills &SecSkills = hero->GetSecondarySkills();
+
+        for(u8 i = 0 ; i != HEROESMAXSKILL ; i++) {
+            SecSkills[i].first = skills[i];
+            SecSkills[i].second = levels[i];
+        }
+
+        if(update) {
+            SecondarySkillsBar *secskill_bar = player1.color == col ? secskill_bar1 :
+                (player2.color == col ? secskill_bar2 : NULL);
+            secskill_bar->SetContent(SecSkills);
+        }
+
+		redraw = true;
+	}
+
 	if(hero != NULL && ev.Message->HasBin(HMM2_GAME_TROOPS))
 	{
 		u8 troops[5];
@@ -651,16 +675,16 @@ bool Battle::Only::ChangeSettings(void)
 	    }
 	}
 
-	if(allow1 && le.MouseCursor(selectArmy1->GetArea()) &&
-	    selectArmy1->QueueEventProcessing())
-	{
-	    if(selectArtifacts1->isSelected()) selectArtifacts1->ResetSelected();
-	    else
-	    if(selectArtifacts2 && selectArtifacts2->isSelected()) selectArtifacts2->ResetSelected();
+	if(allow1 && le.MouseCursor(selectArmy1->GetArea())) {
+	    if(selectArmy1->QueueEventProcessing()) {
+            if(selectArtifacts1->isSelected()) selectArtifacts1->ResetSelected();
+            else
+            if(selectArtifacts2 && selectArtifacts2->isSelected()) selectArtifacts2->ResetSelected();
 
-	    if(selectArmy2->isSelected()) selectArmy2->ResetSelected();
+            if(selectArmy2->isSelected()) selectArmy2->ResetSelected();
 
             SendTroops(army1);
+        }
 	}
 
 	if(allow2 && le.MouseCursor(selectArmy2->GetArea()) &&
@@ -675,34 +699,40 @@ bool Battle::Only::ChangeSettings(void)
             SendTroops(army2);
 	}
 
-	if(allow1 && le.MouseCursor(selectArtifacts1->GetArea()) &&
-	    selectArtifacts1->QueueEventProcessing())
-	{
-	    if(selectArmy1->isSelected()) selectArmy1->ResetSelected();
-	    else
-	    if(selectArmy2->isSelected()) selectArmy2->ResetSelected();
+	if(allow1 && le.MouseCursor(selectArtifacts1->GetArea())) {
+        BagArtifacts TmpArtifacts(hero1->GetBagArtifacts());
 
-	    if(selectArtifacts2 && selectArtifacts2->isSelected()) selectArtifacts2->ResetSelected();
+        selectArtifacts1->SetContent(TmpArtifacts);
 
-            BagArtifacts NewArtifacts;
-            hero1->GetBagArtifacts().swap(NewArtifacts);
-            SendArtifacts(NewArtifacts);
-            selectArtifacts1->SetContent(hero1->GetBagArtifacts());
+	    if(selectArtifacts1->QueueEventProcessing()) {
+            if(selectArmy1->isSelected()) selectArmy1->ResetSelected();
+            else
+            if(selectArmy2->isSelected()) selectArmy2->ResetSelected();
+
+            if(selectArtifacts2 && selectArtifacts2->isSelected()) selectArtifacts2->ResetSelected();
+
+            SendArtifacts(TmpArtifacts);
+        }
+
+        selectArtifacts1->SetContent(hero1->GetBagArtifacts());
 	}
 
-	if(allow2 && selectArtifacts2 && le.MouseCursor(selectArtifacts2->GetArea()) &&
-	    selectArtifacts2->QueueEventProcessing())
-	{
-	    if(selectArmy1->isSelected()) selectArmy1->ResetSelected();
-	    else
-	    if(selectArmy2->isSelected()) selectArmy2->ResetSelected();
+	if(allow2 && selectArtifacts2 && le.MouseCursor(selectArtifacts2->GetArea())) {
+        BagArtifacts TmpArtifacts(hero2->GetBagArtifacts());
 
-	    if(selectArtifacts1->isSelected()) selectArtifacts1->ResetSelected();
+        selectArtifacts2->SetContent(TmpArtifacts);
 
-            BagArtifacts NewArtifacts;
-            hero2->GetBagArtifacts().swap(NewArtifacts);
-            SendArtifacts(NewArtifacts);
-            selectArtifacts2->SetContent(hero2->GetBagArtifacts());
+	    if(selectArtifacts2->QueueEventProcessing()) {
+            if(selectArmy1->isSelected()) selectArmy1->ResetSelected();
+            else
+            if(selectArmy2->isSelected()) selectArmy2->ResetSelected();
+
+            if(selectArtifacts1->isSelected()) selectArtifacts1->ResetSelected();
+
+            SendArtifacts(TmpArtifacts);
+        }
+
+        selectArtifacts2->SetContent(hero2->GetBagArtifacts());
 	}
 
 	if(hero1 && allow1)
@@ -714,13 +744,18 @@ bool Battle::Only::ChangeSettings(void)
 	    if(le.MouseCursor(primskill_bar1->GetArea()) && primskill_bar1->QueueEventProcessing())
 	      redraw = true;
             else
-	    if(le.MouseCursor(secskill_bar1->GetArea()) && secskill_bar1->QueueEventProcessing())
-	    {
-                Skill::SecSkills NewSecSkills;
-                hero1->GetSecondarySkills().swap(NewSecSkills);
-                SendSecondarySkills(NewSecSkills);
-                secskill_bar1->SetContent(hero1->GetSecondarySkills());
+	    if(le.MouseCursor(secskill_bar1->GetArea())) {
+            Skill::SecSkills TmpSecSkills(hero1->GetSecondarySkills());
+
+            secskill_bar1->SetContent(TmpSecSkills);
+
+            if(secskill_bar1->QueueEventProcessing())
+            {
+                SendSecondarySkills(TmpSecSkills);
             }
+
+            secskill_bar1->SetContent(hero1->GetSecondarySkills());
+        }
 	}
 
 	if(hero2 && allow2)
@@ -732,13 +767,18 @@ bool Battle::Only::ChangeSettings(void)
 	    if(le.MouseCursor(primskill_bar2->GetArea()) && primskill_bar2->QueueEventProcessing())
 	      redraw = true;
 	    else
-	    if(le.MouseCursor(secskill_bar2->GetArea()) && secskill_bar2->QueueEventProcessing())
-	    {
-                Skill::SecSkills NewSecSkills;
-                hero2->GetSecondarySkills().swap(NewSecSkills);
-                SendSecondarySkills(NewSecSkills);
-                secskill_bar2->SetContent(hero2->GetSecondarySkills());
+	    if(le.MouseCursor(secskill_bar2->GetArea())) {
+            Skill::SecSkills TmpSecSkills(hero2->GetSecondarySkills());
+
+            secskill_bar2->SetContent(TmpSecSkills);
+
+            if(secskill_bar2->QueueEventProcessing())
+            {
+                SendSecondarySkills(TmpSecSkills);
             }
+
+            secskill_bar2->SetContent(hero2->GetSecondarySkills());
+        }
 	}
 
 	if(cinfo2 && allow1)
