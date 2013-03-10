@@ -49,7 +49,6 @@ public:
 
     void	setModeView(int);
     void	setCurrentGround(int);
-
 signals:
     void	copyAvailable(bool);
 
@@ -61,6 +60,8 @@ private slots:
     void	mapWasModified(void);
 
 private:
+    friend class MainWindow;
+
     bool	maybeSave(void);
     void	setCurrentFile(const QString &);
     QString	strippedName(const QString &);

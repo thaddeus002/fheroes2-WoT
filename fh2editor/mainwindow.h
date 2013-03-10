@@ -62,6 +62,7 @@ private slots:
     void		setActiveSubWindow(QWidget*);
     void		switchModeViewGroup(void);
     void		switchGroundGroup(void);
+    void		mapOptions(void);
 
 private:
     void		createActions(void);
@@ -79,7 +80,7 @@ private:
 
     QMenu*		fileMenu;
     QMenu*		editMenu;
-    QMenu*		modeMenu;
+    QMenu*		mapMenu;
     QMenu*		windowMenu;
     QToolBar*		fileToolBar;
     QToolBar*		editToolBar;
@@ -100,6 +101,8 @@ private:
     QAction*		previousAct;
     QAction*		separatorAct;
     QAction*		menuAboutAct;
+
+    QAction*		mapOptionsAct;
 
     QAction*		viewExploreModeAct;
     QAction*		viewSelectModeAct;

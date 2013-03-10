@@ -231,6 +231,7 @@ void MapWindow::setCurrentGround(int ground)
 
 void MapWindow::copy(void)
 {
+    //QList<QGraphicsItem*> = mapData.selectedItems();
 }
 
 void MapWindow::paste(void)

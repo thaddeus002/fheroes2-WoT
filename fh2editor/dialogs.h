@@ -26,11 +26,6 @@
 #include <QDialog>
 #include <QSize>
 
-namespace Dialog
-{
-    QSize	SelectMapSize(void);
-    QString	SelectDataFile(const QString &);
-}
 
 class QVBoxLayout;
 class QComboBox;
@@ -39,6 +34,20 @@ class QHBoxLayout;
 class QLabel;
 class QSpinBox;
 class QPushButton;
+class QTabWidget;
+class QWidget;
+class QLineEdit;
+class QPlainTextEdit;
+class QGroupBox;
+class QSpacerItem;
+class MapData;
+
+namespace Dialog
+{
+    QSize	SelectMapSize(void);
+    QString	SelectDataFile(const QString &);
+    void	MapOptions(MapData &);
+}
 
 namespace Form
 {
@@ -53,26 +62,26 @@ namespace Form
     public:
 	SelectMapSize();
 
-	QVBoxLayout		*vboxLayout;
-	QComboBox		*comboBoxSize;
-	QSpacerItem		*spacerItem;
-	QHBoxLayout		*hboxLayout;
-	QSpacerItem		*spacerItem1;
-	QLabel			*labelWidth;
-	QSpinBox		*spinBoxWidth;
-	QSpacerItem		*spacerItem2;
-	QHBoxLayout		*hboxLayout1;
-	QSpacerItem		*spacerItem3;
-	QLabel			*labelHeight;
-	QSpinBox		*spinBoxHeight;
-	QSpacerItem		*spacerItem4;
-	QSpacerItem		*spacerItem5;
-	QHBoxLayout		*hboxLayout2;
-	QSpacerItem		*spacerItem6;
-	QPushButton		*pushButtonOk;
-	QSpacerItem		*spacerItem7;
-	QPushButton		*pushButtonExpert;
-	QSpacerItem		*spacerItem8;
+	QVBoxLayout*		vboxLayout;
+	QComboBox*		comboBoxSize;
+	QSpacerItem*		spacerItem;
+	QHBoxLayout*		hboxLayout;
+	QSpacerItem*		spacerItem1;
+	QLabel*			labelWidth;
+	QSpinBox*		spinBoxWidth;
+	QSpacerItem*		spacerItem2;
+	QHBoxLayout*		hboxLayout1;
+	QSpacerItem*		spacerItem3;
+	QLabel*			labelHeight;
+	QSpinBox*		spinBoxHeight;
+	QSpacerItem*		spacerItem4;
+	QSpacerItem*		spacerItem5;
+	QHBoxLayout*		hboxLayout2;
+	QSpacerItem*		spacerItem6;
+	QPushButton*		pushButtonOk;
+	QSpacerItem*		spacerItem7;
+	QPushButton*		pushButtonExpert;
+	QSpacerItem*		spacerItem8;
 
 	QSize			result;
     };    
@@ -87,19 +96,47 @@ namespace Form
     public:
 	SelectDataFile(const QString &, const QString &);
 
-	QVBoxLayout		*verticalLayout;
-	QLabel			*labelHeader;
-	QHBoxLayout		*horizontalLayout2;
-	QLabel			*labelImage;
-	QLabel			*labelBody;
-	QSpacerItem		*verticalSpacer;
-	QHBoxLayout		*horizontalLayout1;
-	QPushButton		*pushButtonSelect;
-	QPushButton		*pushButtonSave;
-	QSpacerItem		*horizontalSpacer;
-	QPushButton		*pushButtonExit;
+	QVBoxLayout*		verticalLayout;
+	QLabel*			labelHeader;
+	QHBoxLayout*		horizontalLayout2;
+	QLabel*			labelImage;
+	QLabel*			labelBody;
+	QSpacerItem*		verticalSpacer;
+	QHBoxLayout*		horizontalLayout1;
+	QPushButton*		pushButtonSelect;
+	QPushButton*		pushButtonSave;
+	QSpacerItem*		horizontalSpacer;
+	QPushButton*		pushButtonExit;
 
 	QString			result;
+    };
+
+    class MapOptions : public QDialog
+    {
+	Q_OBJECT
+
+    public:
+	MapOptions(MapData &);
+
+	QVBoxLayout*		verticalLayout2;
+	QTabWidget*		tabWidget;
+	QWidget*		tabInfo;
+	QVBoxLayout*		verticalLayout;
+	QLabel*			labelName;
+	QLineEdit*		lineEditName;
+	QLabel*			labelDifficulty;
+	QComboBox*		comboBoxDifficulty;
+	QLabel*			labelDescription;
+	QPlainTextEdit*		plainTextEditDescription;
+	QWidget*		tabCondition;
+	QGroupBox*		groupBoxWinsCond;
+	QComboBox*		comboBoxWinsCond;
+        QGroupBox*		groupBox;
+	QComboBox*		comboBoxLossCond;
+	QHBoxLayout*		horizontalLayout;
+	QPushButton*		pushButtonOk;
+	QSpacerItem*		horizontalSpacer;
+	QPushButton*		pushButtonCancel;
     };
 }
 

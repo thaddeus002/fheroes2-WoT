@@ -29,15 +29,19 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 #include <QFileDialog>
+#include <QLineEdit>
+#include <QGroupBox>
+#include <QPlainTextEdit>
 
 #include "program.h"
+#include "mapdata.h"
 #include "dialogs.h"
 
 QSize Dialog::SelectMapSize(void)
 {
     Form::SelectMapSize form;
-    form.exec();
-    return form.result;
+    int ret = form.exec();
+    return QDialog::Accepted == ret ? form.result : QSize(0, 0);
 }
 
 QString Dialog::SelectDataFile(const QString & file)
@@ -54,6 +58,12 @@ QString Dialog::SelectDataFile(const QString & file)
     Form::SelectDataFile form(head, QDir::toNativeSeparators(body));
     int ret = form.exec();
     return QDialog::Accepted == ret ? form.result : "";
+}
+
+void Dialog::MapOptions(MapData & map)
+{
+    Form::MapOptions form(map);
+    form.exec();
 }
 
 Form::SelectMapSize::SelectMapSize()
@@ -312,4 +322,128 @@ void Form::SelectDataFile::clickSelect(void)
 {
     result = QFileDialog::getOpenFileName(this, tr("Open data file"), "", "heroes2.agg");
     pushButtonSave->setEnabled(true);
+}
+
+Form::MapOptions::MapOptions(MapData & map)
+{
+    setObjectName(QString::fromUtf8("DialogMapOptions"));
+
+    verticalLayout2 = new QVBoxLayout(this);
+    verticalLayout2->setObjectName(QString::fromUtf8("verticalLayout2"));
+
+    tabWidget = new QTabWidget(this);
+    tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
+    tabWidget->setMinimumSize(QSize(451, 322));
+    tabWidget->setMaximumSize(QSize(451, 322));
+
+    tabInfo = new QWidget();
+    tabInfo->setObjectName(QString::fromUtf8("tabInfo"));
+
+    verticalLayout = new QVBoxLayout(tabInfo);
+    verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+
+    labelName = new QLabel(tabInfo);
+    labelName->setObjectName(QString::fromUtf8("labelName"));
+    labelName->setAlignment(Qt::AlignCenter);
+    verticalLayout->addWidget(labelName);
+
+    lineEditName = new QLineEdit(tabInfo);
+    lineEditName->setObjectName(QString::fromUtf8("lineEditName"));
+    verticalLayout->addWidget(lineEditName);
+
+    labelDifficulty = new QLabel(tabInfo);
+    labelDifficulty->setObjectName(QString::fromUtf8("labelDifficulty"));
+    labelDifficulty->setAlignment(Qt::AlignCenter);
+    verticalLayout->addWidget(labelDifficulty);
+
+    comboBoxDifficulty = new QComboBox(tabInfo);
+    comboBoxDifficulty->setObjectName(QString::fromUtf8("comboBoxDifficulty"));
+    verticalLayout->addWidget(comboBoxDifficulty);
+
+    labelDescription = new QLabel(tabInfo);
+    labelDescription->setObjectName(QString::fromUtf8("labelDescription"));
+    labelDescription->setAlignment(Qt::AlignCenter);
+    verticalLayout->addWidget(labelDescription);
+
+    plainTextEditDescription = new QPlainTextEdit(tabInfo);
+    plainTextEditDescription->setObjectName(QString::fromUtf8("plainTextEditDescription"));
+    verticalLayout->addWidget(plainTextEditDescription);
+
+    tabWidget->addTab(tabInfo, "Info");
+    tabCondition = new QWidget();
+    tabCondition->setObjectName(QString::fromUtf8("tabCondition"));
+    groupBoxWinsCond = new QGroupBox(tabCondition);
+    groupBoxWinsCond->setObjectName(QString::fromUtf8("groupBoxWinsCond"));
+    groupBoxWinsCond->setGeometry(QRect(10, 10, 421, 141));
+    comboBoxWinsCond = new QComboBox(groupBoxWinsCond);
+    comboBoxWinsCond->setObjectName(QString::fromUtf8("comboBoxWinsCond"));
+    comboBoxWinsCond->setGeometry(QRect(10, 30, 141, 27));
+    groupBox = new QGroupBox(tabCondition);
+    groupBox->setObjectName(QString::fromUtf8("groupBox"));
+    groupBox->setGeometry(QRect(10, 190, 421, 81));
+    comboBoxLossCond = new QComboBox(groupBox);
+    comboBoxLossCond->setObjectName(QString::fromUtf8("comboBoxLossCond"));
+    comboBoxLossCond->setGeometry(QRect(10, 30, 141, 27));
+    tabWidget->addTab(tabCondition, "Conditions");
+    verticalLayout2->addWidget(tabWidget);
+
+    horizontalLayout = new QHBoxLayout();
+    horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+    pushButtonOk = new QPushButton(this);
+    pushButtonOk->setObjectName(QString::fromUtf8("pushButtonOk"));
+    horizontalLayout->addWidget(pushButtonOk);
+
+    horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    horizontalLayout->addItem(horizontalSpacer);
+
+    pushButtonCancel = new QPushButton(this);
+    pushButtonCancel->setObjectName(QString::fromUtf8("pushButtonCancel"));
+    horizontalLayout->addWidget(pushButtonCancel);
+
+    verticalLayout2->addLayout(horizontalLayout);
+
+
+    resize(470, 394);
+    setMinimumSize(QSize(470, 394));
+    setMaximumSize(QSize(470, 394));
+
+    setWindowTitle(QApplication::translate("DialogMapOptions", "Dialog", 0, QApplication::UnicodeUTF8));
+    labelName->setText(QApplication::translate("DialogMapOptions", "Map Name:", 0, QApplication::UnicodeUTF8));
+    labelDifficulty->setText(QApplication::translate("DialogMapOptions", "Map Difficulty:", 0, QApplication::UnicodeUTF8));
+    comboBoxDifficulty->clear();
+    comboBoxDifficulty->insertItems(0, QStringList()
+         << QApplication::translate("DialogMapOptions", "Easy", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("DialogMapOptions", "Normal", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("DialogMapOptions", "Tough", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("DialogMapOptions", "Expert", 0, QApplication::UnicodeUTF8)
+    );
+    labelDescription->setText(QApplication::translate("DialogMapOptions", "Map Description:", 0, QApplication::UnicodeUTF8));
+    tabWidget->setTabText(tabWidget->indexOf(tabInfo), QApplication::translate("DialogMapOptions", "Page", 0, QApplication::UnicodeUTF8));
+    groupBoxWinsCond->setTitle(QApplication::translate("DialogMapOptions", "Victory Condition", 0, QApplication::UnicodeUTF8));
+    comboBoxWinsCond->clear();
+    comboBoxWinsCond->insertItems(0, QStringList()
+         << QApplication::translate("DialogMapOptions", "None", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("DialogMapOptions", "Capture a particular castle", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("DialogMapOptions", "Defeat a particular hero", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("DialogMapOptions", "Find a particular artifact", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("DialogMapOptions", "One side defeats another", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("DialogMapOptions", "Accumulate gold", 0, QApplication::UnicodeUTF8)
+    );
+    groupBox->setTitle(QApplication::translate("DialogMapOptions", "Loss Condition", 0, QApplication::UnicodeUTF8));
+    comboBoxLossCond->clear();
+    comboBoxLossCond->insertItems(0, QStringList()
+         << QApplication::translate("DialogMapOptions", "None", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("DialogMapOptions", "Lose a particuclar castle", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("DialogMapOptions", "Lose a particular hero", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("DialogMapOptions", "Run out of time", 0, QApplication::UnicodeUTF8)
+    );
+    tabWidget->setTabText(tabWidget->indexOf(tabCondition), QApplication::translate("DialogMapOptions", "Page", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setText(QApplication::translate("DialogMapOptions", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonCancel->setText(QApplication::translate("DialogMapOptions", "Cancel", 0, QApplication::UnicodeUTF8));
+
+    tabWidget->setCurrentIndex(0);
+    comboBoxDifficulty->setCurrentIndex(1);
+
+    QObject::connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
+    QObject::connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
 }

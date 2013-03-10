@@ -31,26 +31,28 @@
 
 #include "engine.h"
 
-class MapTileExt : public QPair<QPixmap, QPoint>
+class MapData;
+
+class MapTileExt : protected QPair<QPixmap, QPoint>
 {
 public:
-    MapTileExt(quint8 lv, quint32 uid, const QPair<QPixmap, QPoint> & pair);
+    MapTileExt(quint8 lv, const mp2lev_t &, const QPair<QPixmap, QPoint> & pair);
 
     static bool		sortLevel1(const MapTileExt*, const MapTileExt*);
     static bool		sortLevel2(const MapTileExt*, const MapTileExt*);
 
-    QPixmap &	pixmap;
-    QPoint &	offset;
+    QPixmap &		pixmap(void) { return first; };
+    QPoint &		offset(void) { return second; };
 
-    quint32	uniq;
-    quint8	level;
-    quint8	tmp;
+    mp2lev_t		ext;
+    quint8		level;
+    quint8		tmp;
 };
 
 class MapTile : public QGraphicsPixmapItem
 {
 public:
-    MapTile(const mp2til_t &, AGG::File &, const QPoint &);
+    MapTile(const mp2til_t &, const QPoint &, const MapData &);
     ~MapTile();
 
     bool		isValid(void) const;
@@ -59,17 +61,17 @@ public:
     static QString	indexString(int);
 
     void		paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget* = 0);
-    void		loadSpriteLevels(const mp2ext_t &, AGG::File &);
+    void		loadSpriteLevels(const mp2ext_t &);
+    void		loadSpritelevel(QList<MapTileExt*> &, quint8, const mp2lev_t &);
     void		sortSpritesLevels(void);
-
-protected:
-    void		loadSpritelevel(QList<MapTileExt*> &, const mp2lev_t &, quint8, AGG::File &);
 
     int			spriteIndex;
     int			shape;
 
     QList<MapTileExt*>	spritesLevel1;
     QList<MapTileExt*>	spritesLevel2;
+
+    const MapData &     mapData;
 };
 
 class MapData : public QGraphicsScene
@@ -103,6 +105,8 @@ protected:
     void		selectArea(QPointF, QPointF);
     bool		loadMP2Map(const QString &);
 
+    friend class	MapTile;
+
     QSize		mapSize;
 
     QString		mapName;
@@ -131,7 +135,7 @@ protected:
     QList<MapTile*>	tilesetItems;
 
     int			modeView; /* explore: 1, select: 2 */
-    int			currentGround; /* desert: 1, snow: 2, swamp: 3, wasteland: 4, beach: 5, lava: 6, dirt: 7, grass: 8, water: 9 */
+    int			currentGround;
 };
 
 #endif

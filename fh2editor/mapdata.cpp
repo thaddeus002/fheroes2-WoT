@@ -31,14 +31,15 @@
 #include "program.h"
 #include "mapdata.h"
 
-MapTileExt::MapTileExt(quint8 lv, quint32 uid, const QPair<QPixmap, QPoint> & pair)
-    : QPair<QPixmap, QPoint>(pair.first, pair.second), pixmap(first), offset(second), uniq(uid), level(lv), tmp(0)
+MapTileExt::MapTileExt(quint8 lv, const mp2lev_t & lvl, const QPair<QPixmap, QPoint> & pair)
+    : QPair<QPixmap, QPoint>(pair.first, pair.second), ext(lvl), level(lv), tmp(0)
 {
 }
 
 bool MapTileExt::sortLevel1(const MapTileExt* mte1, const MapTileExt* mte2)
 {
-    return (mte1->level % 4) > (mte2->level % 4);
+    return (mte1->level % 4) > (mte2->level % 4) ||
+	((mte1->level % 4) == (mte2->level % 4) && mte1->level < mte2->level);
 }
 
 bool MapTileExt::sortLevel2(const MapTileExt* mte1, const MapTileExt* mte2)
@@ -51,14 +52,14 @@ bool MapTile::isValid(void) const
     return true;
 }
 
-MapTile::MapTile(const mp2til_t & mp2, AGG::File & agg, const QPoint & offset)
-    : spriteIndex(mp2.tileSprite), shape(mp2.tileShape)
+MapTile::MapTile(const mp2til_t & mp2, const QPoint & offset, const MapData & data)
+    : spriteIndex(mp2.tileSprite), shape(mp2.tileShape), mapData(data)
 {
 
     setOffset(offset);
     setFlags(QGraphicsItem::ItemIsSelectable);
 
-    QPixmap sprite = agg.getImageTIL("GROUND32", spriteIndex);
+    QPixmap sprite = mapData.aggContent.getImageTIL("GROUND32", spriteIndex);
 
     switch(shape % 4)
     {
@@ -69,10 +70,10 @@ MapTile::MapTile(const mp2til_t & mp2, AGG::File & agg, const QPoint & offset)
     }
 
     // level1
-    loadSpritelevel(spritesLevel1, mp2.level1, 0, agg);
+    loadSpritelevel(spritesLevel1, 0, mp2.level1);
 
     // level2
-    loadSpritelevel(spritesLevel2, mp2.level2, 0, agg);
+    loadSpritelevel(spritesLevel2, 0, mp2.level2);
 }
 
 MapTile::~MapTile()
@@ -94,6 +95,19 @@ QString MapTile::indexString(int index)
     return str;
 }
 
+const double kR = 0.3;
+const double kG = 0.59;
+const double kB = 0.11;
+
+int colourGray(QColor colour)
+{
+    double red = (double) colour.red();
+    double green = (double) colour.green();
+    double blue = (double) colour.blue();
+
+    return static_cast<int>(((red * kR) + (green * kG) + (blue * kB)) * 100);
+}
+
 void MapTile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     Q_UNUSED(widget);
@@ -104,12 +118,57 @@ void MapTile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, Q
     // draw level1
     for(QList<MapTileExt*>::const_iterator
 	it = spritesLevel1.begin(); it != spritesLevel1.end(); ++it)
-	painter->drawPixmap(offset().x() + (*it)->offset.x(), offset().y() + (*it)->offset.y(), (*it)->pixmap);
+    {
+	painter->drawPixmap(offset() + (*it)->offset(), (*it)->pixmap());
+
+	int anim = H2::isAnimationICN((*it)->ext, 0);
+	const QString & icn = H2::mapICN((*it)->ext.object);
+
+	if(! icn.isEmpty() && 0 < anim)
+	{
+	    QPair<QPixmap, QPoint> p = mapData.aggContent.getImageICN(icn, anim);
+	    painter->drawPixmap(offset() + p.second, p.first);
+	}
+
+/*
+	if((*it)->ext.uniq == 29)
+	{
+	    QImage image  = (*it)->pixmap().toImage();
+	    QImage image2(image.width(), image.height(), QImage::Format_ARGB32);
+	    image2.fill(qRgba(0, 0, 0, 0));
+
+	    for(int py = 0; py < image.height() - 1; py++)
+    		for(int px = 0; px < image.width() - 1; px++)
+	    {
+		QRgb col = image.pixel(px, py);
+
+		if(0xFF == qAlpha(col))
+		{
+		    int gray = qGray(col);
+        	    image2.setPixel(px, py, qRgb(gray, gray, gray));
+		}
+	    }
+
+	    painter->drawPixmap(offset() + (*it)->offset(), QPixmap::fromImage(image2));
+	}
+*/
+    }
 
     // draw level2
     for(QList<MapTileExt*>::const_iterator
 	it = spritesLevel2.begin(); it != spritesLevel2.end(); ++it)
-	painter->drawPixmap(offset().x() + (*it)->offset.x(), offset().y() + (*it)->offset.y(), (*it)->pixmap);
+    {
+	painter->drawPixmap(offset() + (*it)->offset(), (*it)->pixmap());
+
+	int anim = H2::isAnimationICN((*it)->ext, 0);
+	const QString & icn = H2::mapICN((*it)->ext.object);
+
+	if(! icn.isEmpty() && 0 < anim)
+	{
+	    QPair<QPixmap, QPoint> p = mapData.aggContent.getImageICN(icn, anim);
+	    painter->drawPixmap(offset() + p.second, p.first);
+	}
+    }
 
     if(option->state & QStyle::State_Selected)
     {
@@ -127,65 +186,73 @@ void MapTile::showInfo(void) const
     QTextStream ss1(& str), ss2(& msg);
 
     ss1 << "Tile";
-    ss2 << "tile sprite: " << spriteIndex << endl << "tile shape: " << shape << endl;
-
-    ss2 << "----------------------" << endl;
-
-    for(QList<MapTileExt*>::const_iterator
-	it = spritesLevel1.begin(); it != spritesLevel1.end(); ++it)
-    {
-    	ss2 << "offset:" << (*it)->offset.x() << "," << (*it)->offset.y() << endl;
-	ss2 << "level:" << (*it)->level << endl;
-	ss2 << "uniq:" << (*it)->uniq << endl;
-    }
+    ss2 << "tile sprite: " << spriteIndex << endl \
+	<< "tile shape:  " << shape << endl;
 
     ss2 << "----------------------" << endl;
 
     // draw level2
-    for(QList<MapTileExt*>::const_iterator
-	it = spritesLevel2.begin(); it != spritesLevel2.end(); ++it)
+    if(spritesLevel1.size())
     {
-    	ss2 << "offset:" << (*it)->offset.x() << "," << (*it)->offset.y() << endl;
-	ss2 << "level:" << (*it)->level << endl;
-	ss2 << "uniq:" << (*it)->uniq << endl;
+	for(QList<MapTileExt*>::const_iterator
+	    it = spritesLevel1.begin(); it != spritesLevel1.end(); ++it)
+	{
+	    ss2 <<
+		"uniq:   " << (*it)->ext.uniq << endl <<
+		"object: " << (*it)->ext.object << endl <<
+		"index:  " << (*it)->ext.index << endl <<
+		"level:  " << (*it)->level << endl <<
+		"----------------------" << endl;
+	}
+
     }
 
-    ss2 << "----------------------" << endl;
+    // draw level2
+    if(spritesLevel2.size())
+    {
+	for(QList<MapTileExt*>::const_iterator
+	    it = spritesLevel2.begin(); it != spritesLevel2.end(); ++it)
+	{
+	    ss2 <<
+		"uniq:   " << (*it)->ext.uniq << endl <<
+		"object: " << (*it)->ext.object << endl <<
+		"index:  " << (*it)->ext.index << endl <<
+		"level:  " << (*it)->level << endl <<
+		"----------------------" << endl;
+	}
+    }
 
     QMessageBox::information(NULL, str, msg);
 }
 
-void MapTile::loadSpritelevel(QList<MapTileExt*> & list, const mp2lev_t & lev, quint8 value, AGG::File & agg)
+void MapTile::loadSpritelevel(QList<MapTileExt*> & list, quint8 level, const mp2lev_t & ext)
 {
-    if(lev.object && lev.index < 0xFF)
+    if(ext.object && ext.index < 0xFF)
     {
-	const QString & icn = H2::mapICN(lev.object);
+	const QString & icn = H2::mapICN(ext.object);
 
 	if(! icn.isEmpty())
 	{
-	    list << new MapTileExt(value, lev.uniq, agg.getImageICN(icn, lev.index));
+	    list << new MapTileExt(level, ext, mapData.aggContent.getImageICN(icn, ext.index));
 
-	    if(! list.back() || list.back()->pixmap.isNull())
-		qWarning() << "MapTile::loadSpriteLevel: pixmap is null" << lev.object << lev.index;
+	    if(! list.back() || list.back()->pixmap().isNull())
+		qWarning() << "MapTile::loadSpriteLevel: pixmap is null" << ext.object << ext.index;
 	}
     }
 }
 
-void MapTile::loadSpriteLevels(const mp2ext_t & mp2, AGG::File & agg)
+void MapTile::loadSpriteLevels(const mp2ext_t & mp2)
 {
     // level1
-    loadSpritelevel(spritesLevel1, mp2.level1, mp2.quantity, agg);
+    loadSpritelevel(spritesLevel1, mp2.quantity, mp2.level1);
 
     // level2
-    loadSpritelevel(spritesLevel2, mp2.level2, mp2.quantity, agg);
+    loadSpritelevel(spritesLevel2, mp2.quantity, mp2.level2);
 }
 
 void MapTile::sortSpritesLevels(void)
 {
-    //if(spritesLevel1.size())
     qSort(spritesLevel1.begin(), spritesLevel1.end(), MapTileExt::sortLevel1);
-
-    //if(spritesLevel2.size())
     qSort(spritesLevel2.begin(), spritesLevel2.end(), MapTileExt::sortLevel2);
 }
 
@@ -249,7 +316,7 @@ void MapData::newMap(const QSize & msz, const QString &)
     {
 	for(int xx = 0; xx < mapSize.width(); ++xx)
         {
-    	    tilesetItems.push_back(new MapTile(mp2til_t(), aggContent, QPoint(xx * tilesetSize.width(), yy * tilesetSize.height())));
+    	    tilesetItems.push_back(new MapTile(mp2til_t(), QPoint(xx * tilesetSize.width(), yy * tilesetSize.height()), *this));
 	    addItem(tilesetItems.back());
 	}
     }
@@ -431,7 +498,7 @@ bool MapData::loadMP2Map(const QString & mapFile)
 	    {
 		const mp2til_t & mp2 = tilBlocks[xx + yy * mapSize.width()];
 
-		tilesetItems.push_back(new MapTile(mp2, aggContent, QPoint(xx * tilesetSize.width(), yy * tilesetSize.height())));
+		tilesetItems.push_back(new MapTile(mp2, QPoint(xx * tilesetSize.width(), yy * tilesetSize.height()), *this));
 
 		quint16 ext = mp2.indexExt;
 
@@ -444,8 +511,7 @@ bool MapData::loadMP2Map(const QString & mapFile)
     			return false;
 		    }
 
-		    tilesetItems.back()->loadSpriteLevels(extBlocks[ext], aggContent);
-
+		    tilesetItems.back()->loadSpriteLevels(extBlocks[ext]);
 		    ext = extBlocks[ext].indexExt;
 		}
 

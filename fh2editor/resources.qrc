@@ -18,5 +18,6 @@
      <file>images/ground_grass.png</file>
      <file>images/ground_water.png</file>
      <file>images/menu_fill.png</file>
+     <file>images/map_options.png</file>
 </qresource>
 </RCC>

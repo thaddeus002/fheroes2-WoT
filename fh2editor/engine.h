@@ -30,6 +30,11 @@
 #include <QByteArray>
 #include <QPair>
 
+namespace Ground
+{
+    enum { Desert = 0x01, Snow = 0x02, Swamp = 0x04, Wasteland = 0x08, Beach = 0x10, Lava = 0x20, Dirt = 0x40, Grass = 0x80, Water = 0x100 };
+}
+
 struct mp2icn_t
 {
     mp2icn_t(const char*);
@@ -113,7 +118,8 @@ namespace H2
 	ICNSprite(const mp2icn_t &, const char*, quint32, const QVector<QRgb> &);
     };
 
-    QString mapICN(int);
+    QString      mapICN(int);
+    int          isAnimationICN(const mp2lev_t &, int);
 }
 
 namespace AGG

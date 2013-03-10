@@ -496,17 +496,17 @@ QString H2::mapICN(int type)
 	case 0xC4: case 0xC5: case 0xC6: case 0xC7: return "TREDECI";
 	// sea object
 	case 0xC8: case 0xC9: case 0xCA: case 0xCB: return "OBJNWATR";
-	// vegetation gras
-	case 0xCC: case 0xCD: case 0xCE: case 0xCF: return "OBJNGRAS";
-	// object on snow
+        // vegetation gras                                            
+        case 0xCC: case 0xCD: case 0xCE: case 0xCF: return "OBJNGRAS";
+	// object on snow                                             
 	case 0xD0: case 0xD1: case 0xD2: case 0xD3: return "OBJNSNOW";
-	// object on swamp
-	case 0xD4: case 0xD5: case 0xD6: case 0xD7: return "OBJNSWMP";
-	// object on lava
+        // object on swamp                                            
+        case 0xD4: case 0xD5: case 0xD6: case 0xD7: return "OBJNSWMP";
+	// object on lava                                             
 	case 0xD8: case 0xD9: case 0xDA: case 0xDB: return "OBJNLAVA";
-	// object on desert
-	case 0xDC: case 0xDD: case 0xDE: case 0xDF: return "OBJNDSRT";
-	// object on dirt
+        // object on desert                                           
+        case 0xDC: case 0xDD: case 0xDE: case 0xDF: return "OBJNDSRT";
+        // object on dirt                                             
 	case 0xE0: case 0xE1: case 0xE2: case 0xE3: return "OBJNDIRT";
 	// object on crck
 	case 0xE4: case 0xE5: case 0xE6: case 0xE7: return "OBJNCRCK";
@@ -514,7 +514,7 @@ QString H2::mapICN(int type)
 	case 0xE8: case 0xE9: case 0xEA: case 0xEB: return "OBJNLAV3";
 	// object on earth
 	case 0xEC: case 0xED: case 0xEE: case 0xEF: return "OBJNMULT";
-	//  object on lava
+	//  object on lava                                            
 	case 0xF0: case 0xF1: case 0xF2: case 0xF3: return "OBJNLAV2";
 	// extra objects for loyalty version
 	case 0xF4: case 0xF5: case 0xF6: case 0xF7: return "X_LOC1";
@@ -527,4 +527,377 @@ QString H2::mapICN(int type)
     }
 
     return NULL;
+}
+
+int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
+{
+    switch(ext.object)
+    {
+	// object on lava, OBJNLAVA
+	case 0xD8: case 0xD9: case 0xDA: case 0xDB:
+	    switch(ext.index)
+	    {
+		// shadow of lava
+		case 0x4F: case 0x58: case 0x62:
+		    return ext.index + (ticket % 9) + 1;
+
+		default:
+		    return 0;
+	    }
+	    break;
+
+	//  object on lava, OBJNLAV2
+	case 0xF0: case 0xF1: case 0xF2: case 0xF3:
+	    switch(ext.index)
+	    {
+		// middle volcano
+		case 0x00:
+		// shadow
+		case 0x07: case 0x0E:
+		// lava
+		case 0x15:
+		    return ext.index + (ticket % 6) + 1;
+
+		// small volcano
+		// shadow
+		case 0x21: case 0x2C:
+		// lava
+		case 0x37: case 0x43:
+		    return ext.index + (ticket % 10) + 1;
+
+		default:
+		    return 0;
+	    }
+	    break;
+
+	// object on lava, OBJNLAV3
+	case 0xE8: case 0xE9: case 0xEA: case 0xEB:
+	    // big volcano
+	    switch(ext.index)
+	    {
+		// smoke
+		case 0x00: case 0x0F: case 0x1E: case 0x2D: case 0x3C: case 0x4B: case 0x5A: case 0x69: case 0x87: case 0x96: case 0xA5:
+		// shadow
+		case 0x78: case 0xB4: case 0xC3: case 0xD2: case 0xE1:
+		    return ext.index + (ticket % 14) + 1;
+
+		default:
+		    return 0;
+	    }
+	    break;
+
+	// object other, OBJNMUL2
+	case 0xA4: case 0xA5: case 0xA6: case 0xA7:
+	    switch(ext.index)
+	    {
+		// lighthouse
+		case 0x3D:
+		    return ext.index + (ticket % 9) + 1;
+
+		// alchemytower
+		case 0x1B:
+		// watermill
+		case 0x53: case 0x5A: case 0x62: case 0x69:
+		// fire in wagoncamp
+		case 0x81:
+		// smoke smithy (2 chimney)
+		case 0xA6:
+		// smoke smithy (1 chimney)
+		case 0xAD:
+		// shadow smoke
+		case 0xB4:
+		    return ext.index + (ticket % 6) + 1;
+
+		// magic garden
+		case 0xBE:
+		    return ext.index + (ticket % 6) + 1;
+
+		default:
+		    return 0;
+	    }
+	    break;
+
+	// object on snow, OBJNSNOW
+	case 0xD0: case 0xD1: case 0xD2: case 0xD3:
+	    switch(ext.index)
+	    {
+		// firecamp
+		case 0x04:
+		// alchemytower
+		case 0x97:
+		// watermill
+		case 0xA2: case 0xA9: case 0xB1: case 0xB8:
+		    return ext.index + (ticket % 6) + 1;
+
+		// mill
+		case 0x60: case 0x64: case 0x68: case 0x6C: case 0x70: case 0x74: case 0x78: case 0x7C: case 0x80: case 0x84:
+		    return ext.index + (ticket % 3) + 1;
+
+		default:
+		    return 0;
+	    }
+	    break;
+
+	// object on swamp, OBJNSWMP
+	case 0xD4: case 0xD5: case 0xD6: case 0xD7:
+	    switch(ext.index)
+	    {
+		// shadow
+		case 0x00: case 0x0E: case 0x2B:
+		// smoke
+		case 0x07: case 0x22: case 0x33:
+		// light in window
+		case 0x16: case 0x3A: case 0x43: case 0x4A:
+		    return ext.index + (ticket % 6) + 1;
+    
+		default:
+		    return 0;
+	    }
+	    break;
+
+	// object on desert, OBJNDSRT
+	case 0xDC: case 0xDD: case 0xDE: case 0xDF:
+	    switch(ext.index)
+	    {
+		// campfire
+		case 0x36: case 0x3D:
+		    return ext.index + (ticket % 6) + 1;
+
+		default:
+		    return 0;
+	    }
+	    break;
+
+	// gras object, OBJNGRA2
+	case 0xC0: case 0xC1: case 0xC2: case 0xC3:
+	    switch(ext.index)
+	    {
+		// mill
+		case 0x17: case 0x1B: case 0x1F: case 0x23: case 0x27: case 0x2B: case 0x2F: case 0x33: case 0x37: case 0x3B:
+		    return ext.index + (ticket % 3) + 1;
+
+		// smoke from chimney
+		case 0x3F: case 0x46: case 0x4D:
+		// archerhouse
+		case 0x54:
+		// smoke from chimney
+		case 0x5D: case 0x64:
+		// shadow smoke
+		case 0x6B:
+		// peasanthunt
+		case 0x72:
+		    return ext.index + (ticket % 6) + 1;
+
+		default:
+		    return 0;
+	    }
+	    break;
+	// object on crck, OBJNCRCK
+	case 0xE4: case 0xE5: case 0xE6: case 0xE7:
+	    switch(ext.index)
+	    {
+		// pool of oil
+		case 0x50: case 0x5B: case 0x66: case 0x71: case 0x7C: case 0x89: case 0x94: case 0x9F: case 0xAA:
+		// smoke from chimney
+		case 0xBE:
+		// shadow smoke
+		case 0xCA:
+		    return ext.index + (ticket % 10) + 1;
+
+		default:
+		    return 0;
+	    }
+	    break;
+
+	// object on dirt, OBJNDIRT
+	case 0xE0: case 0xE1: case 0xE2: case 0xE3:
+	    switch(ext.index)
+	    {
+		// mill
+		case 0x99: case 0x9D: case 0xA1: case 0xA5: case 0xA9: case 0xAD: case 0xB1: case 0xB5: case 0xB9: case 0xBD:
+		    return ext.index + (ticket % 3) + 1;
+
+		default:
+		    return 0;
+	    }
+	    break;
+
+	// object on earth, OBJNMULT
+	case 0xEC: case 0xED: case 0xEE: case 0xEF:
+	    switch(ext.index)
+	    {
+		// smoke
+		case 0x05:
+		// shadow
+		case 0x0F: case 0x19:
+		    return ext.index + (ticket % 9) + 1;
+
+		// smoke
+		case 0x24:
+		// shadow
+		case 0x2D:
+		    return ext.index + (ticket % 8) + 1;
+
+		// smoke
+		case 0x5A:
+		// shadow
+		case 0x61: case 0x68: case 0x7C:
+		// campfire
+		case 0x83:
+		    return ext.index + (ticket % 6) + 1;
+
+		default:
+		    return 0;
+	    }
+	    break;
+
+	// sea object, OBJNWATR
+	case 0xC8: case 0xC9: case 0xCA: case 0xCB:
+	    switch(ext.index)
+	    {
+		// buttle
+		case 0x00:
+		    return ext.index + (ticket % 11) + 1;
+
+		// shadow
+		case 0x0C:
+		// chest
+		case 0x13:
+		// shadow
+		case 0x26:
+		// flotsam
+		case 0x2D:
+		// unkn
+		case 0x37:
+		// boat
+		case 0x3E:
+		// waves
+		case 0x45:
+		// seaweed
+		case 0x4C: case 0x53: case 0x5A: case 0x61: case 0x68:
+		// sailor-man
+		case 0x6F:
+		// shadow
+		case 0xBC:
+		// buoy
+		case 0xC3:
+		// broken ship (right)
+		case 0xE2: case 0xE9: case 0xF1: case 0xF8:
+		    return ext.index + (ticket % 6) + 1;
+
+		// seagull on stones
+		case 0x76: case 0x86: case 0x96:
+		    return ext.index + (ticket % 15) + 1;
+
+		// whirlpool
+		case 0xCA: case 0xCE: case 0xD2: case 0xD6: case 0xDA: case 0xDE:
+		    return ext.index + (ticket % 3) + 1;
+
+		default:
+		    return 0;
+	    }
+	    break;
+
+	// water object, OBJNWAT2
+	case 0xA0: case 0xA1: case 0xA2: case 0xA3:
+	    switch(ext.index)
+	    {
+		// sail broken ship (left)
+		case 0x03: case 0x0C:
+		    return ext.index + (ticket % 6) + 1;
+
+		default:
+		    return 0;
+	    }
+	    break;
+
+/*
+	// extra objects for loyalty version
+	case X_LOC1:
+
+	    if(Settings::Get().PriceLoyaltyVersion())
+		switch(ext.index)
+		{
+		    // alchemist tower
+		    case 0x04:
+	    	    case 0x0D:
+		    case 0x16:
+		    // arena
+		    case 0x1F:
+		    case 0x28:
+		    case 0x32:
+		    case 0x3B:
+		    // earth altar
+		    case 0x55:
+		    case 0x5E:
+		    case 0x67:
+			return ext.index + (ticket % 8) + 1;
+
+		    default:
+			return 0;
+		}
+	    break;
+
+	// extra objects for loyalty version
+	case X_LOC2:
+
+	    if(Settings::Get().PriceLoyaltyVersion())
+		switch(ext.index)
+		{
+		    // mermaid
+		    case 0x0A:
+		    case 0x13:
+		    case 0x1C:
+		    case 0x25:
+		    // sirens
+		    case 0x2F:
+		    case 0x38:
+		    case 0x41:
+		    case 0x4A:
+		    case 0x53:
+		    case 0x5C:
+		    case 0x66:
+		        return ext.index + (ticket % 8) + 1;
+
+		    default:
+			return 0;
+		}
+	    break;
+
+	// extra objects for loyalty version
+	case X_LOC3:
+
+	    if(Settings::Get().PriceLoyaltyVersion())
+		switch(ext.index)
+	        {
+		    // hut magi
+		    case 0x00:
+		    case 0x0A:
+		    case 0x14:
+		    // eye magi
+		    case 0x20:
+		    case 0x29:
+		    case 0x32:
+		        return ext.index + (ticket % 8) + 1;
+
+		    // barrier
+		    case 0x3C:
+		    case 0x42:
+		    case 0x48:
+		    case 0x4E:
+		    case 0x54:
+		    case 0x5A:
+		    case 0x60:
+		    case 0x66:
+		        return ext.index + (ticket % 4) + 1;
+
+		    default:
+			return 0;
+		}
+	    break;
+*/
+	default: break;
+    }
+
+    return 0;
 }
