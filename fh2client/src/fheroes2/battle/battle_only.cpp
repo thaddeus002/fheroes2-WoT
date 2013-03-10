@@ -531,6 +531,11 @@ bool Battle::Only::ChangeSettings(void)
     monsters.GetTroop(0)->Set(Monster::PEASANT, 100);
     army2 = hero2 ? &hero2->GetArmy() : &monsters;
 
+    if(conf.GameType(Game::TYPE_NETWORK) && player1.control == CONTROL_LOCAL)
+    {
+        SendNewHero(hero1);
+    }
+
     selectArmy2 = new ArmyBar(army2, true, false, true);
     selectArmy2->SetColRows(5, 1);
     selectArmy2->SetPos(cur_pt.x + 381, cur_pt.y + 267);
