@@ -68,7 +68,7 @@ namespace Battle
     class Unit : public ArmyTroop, public BitModes
     {
     public:
-	Unit(const Troop &, s16 pos, bool reflect);
+	Unit(const Troop &, u32, s16 pos, bool reflect);
 	~Unit();
 
 	bool		isModes(u32) const;

@@ -200,7 +200,7 @@ Battle::Unit* Battle::Units::FindMode(u32 mod)
 
 
 
-Battle::Force::Force(Army & parent, bool opposite) : army(parent)
+Battle::Force::Force(Army & parent, UnitNumerator &numerator, bool opposite) : army(parent)
 {
     uids.reserve(army.Size());
 
@@ -212,7 +212,7 @@ Battle::Force::Force(Army & parent, bool opposite) : army(parent)
 
 	if(troop && troop->isValid())
 	{
-	    push_back(new Unit(*troop, (opposite ? position + 10 : position), opposite));
+	    push_back(new Unit(*troop, numerator.GetUID(), (opposite ? position + 10 : position), opposite));
 	    back()->SetArmy(army);
 	    uid = back()->GetUID();
 	}

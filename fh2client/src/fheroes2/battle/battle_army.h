@@ -30,6 +30,12 @@ namespace Battle
 {
     class Unit;
 
+    class UnitNumerator {
+    public:
+        virtual ~UnitNumerator() {};
+        virtual u32 GetUID() = 0;
+    };
+
     class Units : public std::vector<Unit*>
     {
     public:
@@ -54,7 +60,7 @@ namespace Battle
     class Force : public Units, public BitModes
     {
     public:
-	Force(Army &, bool);
+	Force(Army &, UnitNumerator&, bool);
 	~Force();
 
     HeroBase*		GetCommander(void);

@@ -26,7 +26,7 @@
 #include "battle_troop.h"
 #include "battle_tower.h"
 
-Battle::Tower::Tower(const Castle & castle, u8 twr) : Unit(Troop(Monster::ARCHER, 0), -1, false),
+Battle::Tower::Tower(const Castle & castle, u8 twr, u32 uid) : Unit(Troop(Monster::ARCHER, 0), uid, -1, false),
     type(twr), color(castle.GetColor()), bonus(0), valid(true)
 {
     count += castle.CountBuildings();
@@ -128,7 +128,7 @@ std::string Battle::Tower::GetInfo(const Castle & cstl)
 	for(std::vector<u8>::const_iterator
 	    it = towers.begin(); it != towers.end(); ++it)
 	{
-    	    Tower twr = Tower(cstl, *it);
+    	    Tower twr = Tower(cstl, *it, 0);
 
     	    msg.append(tmpl);
     	    StringReplace(msg, "%{name}", twr.GetName());

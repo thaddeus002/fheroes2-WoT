@@ -35,7 +35,7 @@ namespace Battle
     class Tower : public Unit
     {
     public:
-	Tower(const Castle &, u8);
+	Tower(const Castle &, u8, u32);
 
 	bool	isValid(void) const;
 	u8	GetColor(void) const;

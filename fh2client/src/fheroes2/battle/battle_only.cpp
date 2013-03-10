@@ -710,7 +710,7 @@ bool Battle::Only::ChangeSettings(void)
             else
             if(selectArtifacts2 && selectArtifacts2->isSelected()) selectArtifacts2->ResetSelected();
 
-            if(selectArmy2->isSelected()) selectArmy2->ResetSelected();
+            if(selectArmy2 && selectArmy2->isSelected()) selectArmy2->ResetSelected();
 
             SendTroops(*army1);
         }

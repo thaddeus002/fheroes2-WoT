@@ -31,6 +31,7 @@
 #include "spell_storage.h"
 #include "battle_board.h"
 #include "battle_grave.h"
+#include "battle_army.h"
 
 #define ARENAW 11
 #define ARENAH 9
@@ -51,6 +52,18 @@ namespace Battle
     public:
 	bool		HaveCommand(u16) const;
     };
+
+	class ArenaUnitNumerator : public UnitNumerator {
+	public:
+	    ArenaUnitNumerator()
+	  	  : CurrentUID(0)
+	    {}
+	
+	    virtual u32 GetUID();
+	
+	private:
+	    u32 CurrentUID;
+	};
 
     class Arena
     {
@@ -197,6 +210,8 @@ namespace Battle
 	u8		auto_battle;
 
 	bool		end_turn;
+
+	ArenaUnitNumerator numerator;
     };
 
     Arena*	GetArena(void);

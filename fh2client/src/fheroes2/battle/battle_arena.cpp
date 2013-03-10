@@ -188,16 +188,21 @@ Battle::Tower* Battle::Arena::GetTower(u8 type)
     return NULL;
 }
 
+u32 Battle::ArenaUnitNumerator::GetUID() {
+    return CurrentUID++;
+}
+
 Battle::Arena::Arena(Army & a1, Army & a2, s32 index, bool local) :
 	army1(NULL), army2(NULL), armies_order(NULL), castle(NULL), current_color(0), catapult(NULL),
-	bridge(NULL), interface(NULL), icn_covr(ICN::UNKNOWN), current_turn(0), auto_battle(0), end_turn(false)
+	bridge(NULL), interface(NULL), icn_covr(ICN::UNKNOWN), current_turn(0), auto_battle(0), end_turn(false),
+    numerator()
 {
     const Settings & conf = Settings::Get();
     usage_spells.reserve(20);
 
     arena = this;
-    army1 = new Force(a1, false);
-    army2 = new Force(a2, true);
+    army1 = new Force(a1, numerator, false);
+    army2 = new Force(a2, numerator, true);
 
     // init castle (interface ahead)
     castle = world.GetCastle(index);
@@ -238,9 +243,9 @@ Battle::Arena::Arena(Army & a1, Army & a2, s32 index, bool local) :
     if(castle)
     {
 	// init
-	towers[0] = castle->isBuild(BUILD_LEFTTURRET) ? new Tower(*castle, TWR_LEFT) : NULL;
-	towers[1] = new Tower(*castle, TWR_CENTER);
-	towers[2] = castle->isBuild(BUILD_RIGHTTURRET) ? new Tower(*castle, TWR_RIGHT) : NULL;
+	towers[0] = castle->isBuild(BUILD_LEFTTURRET) ? new Tower(*castle, TWR_LEFT, numerator.GetUID()) : NULL;
+	towers[1] = new Tower(*castle, TWR_CENTER, numerator.GetUID());
+	towers[2] = castle->isBuild(BUILD_RIGHTTURRET) ? new Tower(*castle, TWR_RIGHT, numerator.GetUID()) : NULL;
 	bool fortification = (Race::KNGT == castle->GetRace()) && castle->isBuild(BUILD_SPEC);
 	catapult = army1->GetCommander() ? new Catapult(*army1->GetCommander(), fortification) : NULL;
 	bridge = new Bridge();
@@ -1072,7 +1077,7 @@ Battle::Unit* Battle::Arena::CreateElemental(const Spell & spell)
     u8 acount = hero->HasArtifact(Artifact::BOOK_ELEMENTS);
     if(acount) count *= acount * 2;
 
-    elem = new Unit(Troop(mons, count), pos, hero == army2->GetCommander());
+    elem = new Unit(Troop(mons, count), numerator.GetUID(), pos, hero == army2->GetCommander());
 
     if(elem)
     {
@@ -1091,7 +1096,7 @@ Battle::Unit* Battle::Arena::CreateElemental(const Spell & spell)
 
 Battle::Unit* Battle::Arena::CreateMirrorImage(Unit & b, s16 pos)
 {
-    Unit* image = new Unit(b, pos, b.isReflect());
+    Unit* image = new Unit(b, numerator.GetUID(), pos, b.isReflect());
 
     if(image)
     {

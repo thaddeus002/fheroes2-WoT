@@ -303,8 +303,8 @@ u32 Battle::ModesAffected::FindZeroDuration(void) const
     return it == end() ? 0 : (*it).first;
 }
 
-Battle::Unit::Unit(const Troop & t, s16 pos, bool ref) : ArmyTroop(NULL, t),
-    uid(World::GetUniq()), hp(t.GetHitPoints()), count0(t.GetCount()), dead(0), shots(t.GetShots()),
+Battle::Unit::Unit(const Troop & t, u32 _uid, s16 pos, bool ref) : ArmyTroop(NULL, t),
+    uid(_uid), hp(t.GetHitPoints()), count0(t.GetCount()), dead(0), shots(t.GetShots()),
     disruptingray(0), reflect(ref), animstate(0), animframe(0), animstep(1), mirror(NULL), blindanswer(false)
 {
     // set position

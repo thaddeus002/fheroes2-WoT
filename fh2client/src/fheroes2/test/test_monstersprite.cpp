@@ -41,7 +41,7 @@ void TestMonsterSprite(void)
     cursor.SetThemes(Cursor::POINTER);
 
     //Monster monster(Monster::PEASANT);
-    Battle::Unit troop(Troop(Monster::PEASANT, 1), -1, false);
+    Battle::Unit troop(Troop(Monster::PEASANT, 1), 0, -1, false);
     SpriteBack back;
     Rect pos;
 
