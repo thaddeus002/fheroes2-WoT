@@ -1107,6 +1107,11 @@ Skill::SecSkills & Heroes::GetSecondarySkills(void)
     return secondary_skills;
 }
 
+const Skill::SecSkills & Heroes::GetSecondarySkills(void) const
+{
+    return secondary_skills;
+}
+
 bool Heroes::HasSecondarySkill(u8 skill) const
 {
     return Skill::Level::NONE != secondary_skills.GetLevel(skill);

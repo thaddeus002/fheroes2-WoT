@@ -298,6 +298,8 @@ void Battle::Only::ProcessSetArmyEvent(const NetworkEvent &ev, bool update, bool
 				*hero = NULL;
 			}
 
+            army2 = hero2 ? &hero2->GetArmy() : &monsters;
+
 			if(update) {
 				bool side1 = player1.color == col;
 				side1 ? UpdateHero1(cur_pt) : UpdateHero2(cur_pt);
@@ -575,9 +577,11 @@ bool Battle::Only::ChangeSettings(void)
 	    else
 	    if(Heroes::UNKNOWN != hid)
 	    {
-            	NetworkMessage Msg(HMM2_GAME_SETARMY);
-            	Msg.add_int_chunk(HMM2_GAME_HERO, hid);
-            	Network::Get().QueueOutputMessage(Msg);
+            Heroes *hero = world.GetHeroes(hid);
+            if(hero != NULL) {
+                hero->GetSecondarySkills().FillMax(Skill::Secondary());
+                SendNewHero(hero);
+            }
 	    }
 	}
 	else
@@ -591,9 +595,11 @@ bool Battle::Only::ChangeSettings(void)
 	    else
 	    if(Heroes::UNKNOWN != hid)
 	    {
-            	NetworkMessage Msg(HMM2_GAME_SETARMY);
-            	Msg.add_int_chunk(HMM2_GAME_HERO, hid);
-            	Network::Get().QueueOutputMessage(Msg);
+            Heroes *hero = world.GetHeroes(hid);
+            if(hero != NULL) {
+                hero->GetSecondarySkills().FillMax(Skill::Secondary());
+                SendNewHero(hero);
+            }
 	    }
 	}
 
@@ -683,7 +689,7 @@ bool Battle::Only::ChangeSettings(void)
 
             if(selectArmy2->isSelected()) selectArmy2->ResetSelected();
 
-            SendTroops(army1);
+            SendTroops(*army1);
         }
 	}
 
@@ -696,7 +702,7 @@ bool Battle::Only::ChangeSettings(void)
 
 	    if(selectArmy1->isSelected()) selectArmy1->ResetSelected();
 
-            SendTroops(army2);
+            SendTroops(*army2);
 	}
 
 	if(allow1 && le.MouseCursor(selectArtifacts1->GetArea())) {
@@ -1086,25 +1092,9 @@ void Battle::Only::StartBattle(void)
     Battle::Loader(hero1->GetArmy(), (hero2 ? hero2->GetArmy() : monsters), hero1->GetIndex() + 1);
 }
 
-void Battle::Only::SendPrimarySkills(u8 attack, u8 defense, u8 power, u8 knowledge)
-{
-    char data[4];
-
-    data[0] = attack;
-    data[1] = defense;
-    data[2] = power;
-    data[3] = knowledge;
-
-    NetworkMessage Msg(HMM2_GAME_SETARMY);
-    Msg.add_bin_chunk(HMM2_GAME_PRIMARY_SKILLS, data, 4);
-    Network::Get().QueueOutputMessage(Msg);
-}
-
-void Battle::Only::SendSecondarySkills(const Skill::SecSkills &skills)
+void Battle::Only::PackSecondarySkills(NetworkMessage &Msg, const Skill::SecSkills &skills)
 {
     char data[HEROESMAXSKILL], *p;
-
-    NetworkMessage Msg(HMM2_GAME_SETARMY);
 
     memset(data, 0, sizeof(data));
 
@@ -1125,22 +1115,18 @@ void Battle::Only::SendSecondarySkills(const Skill::SecSkills &skills)
     }
 
     Msg.add_bin_chunk(HMM2_GAME_SECONDARY_SKILL_LEVELS, data, p - data);
-
-    Network::Get().QueueOutputMessage(Msg);
 }
 
-void Battle::Only::SendTroops(Army *army)
+void Battle::Only::PackTroops(NetworkMessage &Msg, const Army &army)
 {
     char data[ARMYMAXTROOPS], *p;
-
-    NetworkMessage Msg(HMM2_GAME_SETARMY);
 
     memset(data, 0, sizeof(data));
 
     p = data;
 
     for(size_t i = 0 ; i != ARMYMAXTROOPS ; i++) {
-        *p++ = army->GetTroop(i)->GetID();
+        *p++ = army.GetTroop(i)->GetID();
     }
 
     Msg.add_bin_chunk(HMM2_GAME_TROOPS, data, p - data);
@@ -1150,10 +1136,46 @@ void Battle::Only::SendTroops(Army *army)
     p = data;
 
     for(size_t i = 0 ; i != ARMYMAXTROOPS ; i++) {
-        *p++ = army->GetTroop(i)->GetCount();
+        *p++ = army.GetTroop(i)->GetCount();
     }
 
     Msg.add_bin_chunk(HMM2_GAME_COUNTS, data, p - data);
+}
+
+void Battle::Only::SendNewHero(const Heroes *hero)
+{
+    NetworkMessage Msg(HMM2_GAME_SETARMY);
+    Msg.add_int_chunk(HMM2_GAME_HERO, hero->hid);
+    PackSecondarySkills(Msg, hero->GetSecondarySkills());
+    PackTroops(Msg, hero->GetArmy());
+    Network::Get().QueueOutputMessage(Msg);
+}
+
+void Battle::Only::SendPrimarySkills(u8 attack, u8 defense, u8 power, u8 knowledge)
+{
+    char data[4];
+
+    data[0] = attack;
+    data[1] = defense;
+    data[2] = power;
+    data[3] = knowledge;
+
+    NetworkMessage Msg(HMM2_GAME_SETARMY);
+    Msg.add_bin_chunk(HMM2_GAME_PRIMARY_SKILLS, data, 4);
+    Network::Get().QueueOutputMessage(Msg);
+}
+
+void Battle::Only::SendSecondarySkills(const Skill::SecSkills &skills)
+{
+    NetworkMessage Msg(HMM2_GAME_SETARMY);
+    PackSecondarySkills(Msg, skills);
+    Network::Get().QueueOutputMessage(Msg);
+}
+
+void Battle::Only::SendTroops(const Army &army)
+{
+    NetworkMessage Msg(HMM2_GAME_SETARMY);
+    PackTroops(Msg, army);
     Network::Get().QueueOutputMessage(Msg);
 }
 

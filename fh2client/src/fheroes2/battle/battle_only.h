@@ -120,9 +120,12 @@ namespace Battle
 
 	Only();
     private:
+    static void PackSecondarySkills(NetworkMessage&, const Skill::SecSkills&);
+    static void PackTroops(NetworkMessage&, const Army&);
+    static void SendNewHero(const Heroes*);
 	static void SendPrimarySkills(u8, u8, u8, u8);
 	static void SendSecondarySkills(const Skill::SecSkills&);
-	static void SendTroops(Army*);
+	static void SendTroops(const Army&);
 	static void SendArtifacts(BagArtifacts&);
     };
 }

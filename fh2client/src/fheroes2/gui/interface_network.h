@@ -9,6 +9,6 @@ namespace Interface
     public:
         static bool ProcessStateChange(const NetworkEvent&);
     };
-};
+}
 
 #endif
