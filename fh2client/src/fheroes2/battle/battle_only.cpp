@@ -241,7 +241,7 @@ bool Battle::Only::WaitForNetworkMessage(int MessageType)
     while(!exit && le.HandleEvents())
     {
         if(Network::Get().IsInputPending())
-	{
+        {
             NetworkEvent ev;
             Network::Get().DequeueInputEvent(ev);
 
@@ -277,7 +277,7 @@ void Battle::Only::ProcessSetArmyEvent(const NetworkEvent &ev, bool update, bool
 
 	u8 col = ev.Message->GetInt(HMM2_GAME_COLOR);
 
-	DEBUG(DBG_NETWORK, DBG_INFO, "HMM2_GAME_SETARMY_NOTIFY: col=" << (int)col);
+	DEBUG(DBG_NETWORK, DBG_INFO, "HMM2_GAME_SETARMY_NOTIFY: color=" << (int)col);
 
 	if(ev.Message->HasInt(HMM2_GAME_HERO))
 	{
@@ -298,7 +298,9 @@ void Battle::Only::ProcessSetArmyEvent(const NetworkEvent &ev, bool update, bool
 				*hero = NULL;
 			}
 
-            army2 = hero2 ? &hero2->GetArmy() : &monsters;
+            if(*hero == hero2) {
+                army2 = hero2 ? &hero2->GetArmy() : &monsters;
+            }
 
 			if(update) {
 				bool side1 = player1.color == col;
@@ -434,9 +436,25 @@ bool Battle::Only::ProcessNetworkEvents(bool &redraw, const Point &cur_pt, bool 
 			 * we need to enable the start button again
              */
             DEBUG(DBG_NETWORK, DBG_INFO, "HMM2_START_GAME_REJECT");
-			Dialog::Message(std::string("Message from ") + ev.Message->GetStr(HMM2_MESSAGE_SOURCE),
-				ev.Message->GetStr(HMM2_MESSAGE_TEXT), Font::BIG, Dialog::OK);
+            if(ev.Message->HasStr(HMM2_MESSAGE_TEXT)) {
+                Dialog::Message(std::string("Message from ") + ev.Message->GetStr(HMM2_MESSAGE_SOURCE),
+                    ev.Message->GetStr(HMM2_MESSAGE_TEXT), Font::BIG, Dialog::OK);
+            }
 			buttonStart.SetDisable(false);
+            break;
+        case HMM2_ABORT_GAME_NOTIFY:
+			/*
+             * The server informed us that the game has been aborted (e.g. host has left).
+             */
+            DEBUG(DBG_NETWORK, DBG_INFO, "HMM2_ABORT_GAME_NOTIFY");
+            if(ev.Message->HasStr(HMM2_MESSAGE_TEXT)) {
+                std::string from(ev.Message->HasStr(HMM2_MESSAGE_SOURCE) ?
+                    ev.Message->GetStr(HMM2_MESSAGE_SOURCE) : "Server");
+                Dialog::Message(std::string("Message from ") + from,
+                    ev.Message->GetStr(HMM2_MESSAGE_TEXT), Font::BIG, Dialog::OK);
+            }
+			exit = true;
+			result = false;
             break;
     }
 
