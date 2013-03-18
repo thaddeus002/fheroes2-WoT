@@ -636,10 +636,10 @@ void Game::SkillUpdateStatic(const TiXmlElement* xml)
             }
         }
 
-        const TiXmlElement* xml_witchs_hut = xml->FirstChildElement("witchs_hut");
+        const TiXmlElement* xml_witch_huts = xml->FirstChildElement("witch_huts");
 
-        if(xml_witchs_hut)
-            LoadSecondarySection(xml_witchs_hut, Skill::_from_witchs_hut);
+        if(xml_witch_huts)
+            LoadSecondarySection(xml_witch_huts, Skill::_from_witchs_hut);
     }
 }
 
