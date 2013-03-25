@@ -560,8 +560,8 @@ void World::LoadMaps(const std::string &filename)
 	fd.read(reinterpret_cast<char *>(&l), 1);
 	fd.read(reinterpret_cast<char *>(&h), 1);
 
-	VERBOSE("dump block: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(l) << \
-		std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(h));
+	//VERBOSE("dump block: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(l) <<
+	//	std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(h));
 
 	if(0 == h && 0 == l) break;
 	else

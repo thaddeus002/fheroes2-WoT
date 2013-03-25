@@ -767,6 +767,7 @@ void CastlePackOrdersBuildings(const Castle & castle, std::vector<building_t> & 
 	    ordersBuildings.push_back(DWELLING_MONSTER1);
 	    ordersBuildings.push_back(BUILD_WEL2);
 	    ordersBuildings.push_back(BUILD_SPEC);
+	    ordersBuildings.push_back(DWELLING_UPGRADE4);
 	    ordersBuildings.push_back(DWELLING_MONSTER4);
 	    ordersBuildings.push_back(DWELLING_MONSTER2);
 	    ordersBuildings.push_back(DWELLING_UPGRADE7);
