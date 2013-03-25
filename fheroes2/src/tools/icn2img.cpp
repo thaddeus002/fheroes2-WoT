@@ -52,7 +52,7 @@ class icnheader
 	fd.read(reinterpret_cast<char *>(& height), sizeof(u16));
 	SwapLE16(height);
 
-	fd.ignore();
+	fd.read(reinterpret_cast<char *>(& type), 1);
 
 	fd.read(reinterpret_cast<char *>(& offsetData), sizeof(u32));
 	SwapLE32(offsetData);
@@ -127,7 +127,6 @@ int main(int argc, char **argv)
 	std::cout << "error write file: " << shortname << std::endl;
 	return EXIT_SUCCESS;
     }
-    fd_spec << "<?xml version=\"1.0\" ?>" << std::endl;
 
     SDL::Init();
 
@@ -139,6 +138,9 @@ int main(int argc, char **argv)
 
     fd_data.read(reinterpret_cast<char *>(& total_size), sizeof(u32));
     SwapLE32(total_size);
+
+    fd_spec << "<?xml version=\"1.0\" ?>" << std::endl <<
+		"<icn name=\"" << shortname << ".icn\" count=\"" << count_sprite << "\">" << std::endl;
 
     u32 save_pos = fd_data.tellg();
 
@@ -203,10 +205,16 @@ void SpriteDrawICN(Surface & sf, icnheader head, const u8* cur, const u32 size, 
     u32 shadow = sf.MapRGB(0, 0, 0, 0x40);
     u32 opaque = sf.MapRGB(0, 0, 0, 0xff); // non-transparent mask
 
+    if(debug)
+	std::cerr << "TYPE:" << "0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(head.type) << std::endl;
+
     // lock surface
     sf.Lock();
     while(1)
     {
+	if(debug)
+	    std::cerr << "CMD:" << "0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(*cur);
+
 	// 0x00 - end line
 	if(0 == *cur)
 	{
@@ -244,6 +252,9 @@ void SpriteDrawICN(Surface & sf, icnheader head, const u8* cur, const u32 size, 
 	// 0x80 - end data
 	if(0x80 == *cur)
 	{
+	    if(debug)
+		std::cerr << std::endl;
+
 	    break;
 	}
 	else
@@ -286,6 +297,7 @@ void SpriteDrawICN(Surface & sf, icnheader head, const u8* cur, const u32 size, 
 	    else // for type 32 - skipping data
 	    {
 		x += *cur - 0x80;
+		++cur;
 	    }
 	}
 
@@ -294,6 +306,9 @@ void SpriteDrawICN(Surface & sf, icnheader head, const u8* cur, const u32 size, 
 	    std::cerr << "out of range" << std::endl;
 	    break;
 	}
+
+	if(debug)
+	    std::cerr << std::endl;
     }
 
     // unlock surface
