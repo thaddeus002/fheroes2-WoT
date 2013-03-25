@@ -211,4 +211,5 @@ const Surface & Captain::GetPortrait(u8 type) const
 
 void Captain::PortraitRedraw(s16 px, s16 py, u8 type, Surface & dstsf) const
 {
+    GetPortrait(type).Blit(px, py, dstsf);
 }

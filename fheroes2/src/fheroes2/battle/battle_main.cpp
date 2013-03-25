@@ -48,6 +48,9 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
     // pre battle army1
     if(army1.GetCommander())
     {
+	if(Skill::Primary::CAPTAIN == army1.GetCommander()->GetType())
+	    army1.GetCommander()->ActionPreBattle();
+	else
 	if(CONTROL_AI & army1.GetControl())
     	    AI::HeroesPreBattle(*army1.GetCommander());
         else
@@ -57,6 +60,9 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
     // pre battle army2
     if(army2.GetCommander())
     {
+	if(Skill::Primary::CAPTAIN == army2.GetCommander()->GetType())
+	    army2.GetCommander()->ActionPreBattle();
+	else
 	if(CONTROL_AI & army2.GetControl())
     	    AI::HeroesPreBattle(*army2.GetCommander());
         else

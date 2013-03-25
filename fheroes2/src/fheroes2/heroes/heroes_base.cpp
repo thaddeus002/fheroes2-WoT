@@ -158,6 +158,16 @@ void HeroBase::LoadDefaults(u8 type, u8 race)
 	switch(type)
 	{
 	    case Skill::Primary::CAPTAIN:
+	    {
+		// force add spell book
+		SpellBookActivate();
+
+		Spell spell = Skill::Primary::GetInitialSpell(race);
+		if(spell.isValid())
+		    AppendSpellToBook(spell, true);
+	    }
+    	    break;
+
 	    case Skill::Primary::HEROES:
 	    {
 		Spell spell = Skill::Primary::GetInitialSpell(race);
