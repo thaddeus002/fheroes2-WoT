@@ -65,8 +65,9 @@ class icnheader
     u8 type; // type of sprite : 0 = Normal, 32 = Monochromatic shape
     u32 offsetData;
 };
-                                                
-void SpriteDrawICN(Surface & sf, icnheader head, const u8* cur, const u32 size,  bool debug);
+
+void SpriteDrawICNv1(Surface & sf, const u8* cur, const u32 size,  bool debug);
+void SpriteDrawICNv2(Surface & sf, const u8* cur, const u32 size,  bool debug);
 
 int main(int argc, char **argv)
 {
@@ -163,7 +164,10 @@ int main(int argc, char **argv)
 	//sf.Fill(0xff, 0xff, 0xff);
 	sf.Fill(0); // filling with transparent color
 
-	SpriteDrawICN(sf, head, reinterpret_cast<const u8*>(buf), data_size, debug);
+	if(0x20 == head.type)
+	    SpriteDrawICNv2(sf, reinterpret_cast<const u8*>(buf), data_size, debug);
+	else
+	    SpriteDrawICNv1(sf, reinterpret_cast<const u8*>(buf), data_size, debug);
         delete [] buf;
 
 	std::ostringstream stream;
@@ -192,10 +196,8 @@ int main(int argc, char **argv)
     return EXIT_SUCCESS;
 }
 
-void SpriteDrawICN(Surface & sf, icnheader head, const u8* cur, const u32 size,  bool debug)
+void SpriteDrawICNv1(Surface & sf, const u8* cur, const u32 size,  bool debug)
 {
-    if(NULL == cur || 0 == size) return;
-
     const u8 *max = cur + size;
 
     u8  c = 0;
@@ -204,9 +206,6 @@ void SpriteDrawICN(Surface & sf, icnheader head, const u8* cur, const u32 size, 
 
     u32 shadow = sf.MapRGB(0, 0, 0, 0x40);
     u32 opaque = sf.MapRGB(0, 0, 0, 0xff); // non-transparent mask
-
-    if(debug)
-	std::cerr << "TYPE:" << "0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(head.type) << std::endl;
 
     // lock surface
     sf.Lock();
@@ -226,25 +225,12 @@ void SpriteDrawICN(Surface & sf, icnheader head, const u8* cur, const u32 size, 
 	// 0x7F - count data
 	if(0x80 > *cur)
 	{
-	    if(!head.type)
+	    c = *cur;
+	    ++cur;
+	    while(c-- && cur < max)
 	    {
-		c = *cur;
-		++cur;
-		while(c-- && cur < max)
-		{
-		    sf.SetPixel(x, y, sf.GetColorIndex(*cur) | opaque);
-		    ++x;
-		    ++cur;
-		}
-	    }
-	    else
-	    {
-		c = *cur;
-		while(c--)
-		{
-		    sf.SetPixel(x, y, sf.GetColorIndex(1) | opaque);
-		    ++x;
-		}
+		sf.SetPixel(x, y, sf.GetColorIndex(*cur) | opaque);
+		++x;
 		++cur;
 	    }
 	}
@@ -266,7 +252,7 @@ void SpriteDrawICN(Surface & sf, icnheader head, const u8* cur, const u32 size, 
 	}
 	else
 	// 0xC0 - shadow
-	if((!head.type)&&(0xC0 == *cur))
+	if(0xC0 == *cur)
 	{
 	    ++cur;
 	    c = *cur % 4 ? *cur % 4 : *(++cur);
@@ -277,7 +263,7 @@ void SpriteDrawICN(Surface & sf, icnheader head, const u8* cur, const u32 size, 
 	}
 	else
 	// 0xC1
-	if((!head.type)&&(0xC1 == *cur))
+	if(0xC1 == *cur)
 	{
 	    ++cur;
 	    c = *cur;
@@ -287,18 +273,76 @@ void SpriteDrawICN(Surface & sf, icnheader head, const u8* cur, const u32 size, 
 	}
 	else
 	{
-	    if(!head.type)
+	    c = *cur - 0xC0;
+	    ++cur;
+	    while(c--){ sf.SetPixel(x, y, sf.GetColorIndex(*cur) | opaque); ++x; }
+	    ++cur;
+	}
+
+	if(cur >= max)
+	{
+	    std::cerr << "out of range" << std::endl;
+	    break;
+	}
+
+	if(debug)
+	    std::cerr << std::endl;
+    }
+
+    // unlock surface
+    sf.Unlock();
+}
+
+void SpriteDrawICNv2(Surface & sf, const u8* cur, const u32 size,  bool debug)
+{
+    const u8 *max = cur + size;
+
+    u8  c = 0;
+    u16 x = 0;
+    u16 y = 0;
+
+    u32 opaque = sf.MapRGB(0, 0, 0, 0xff); // non-transparent mask
+
+    // lock surface
+    sf.Lock();
+    while(1)
+    {
+	if(debug)
+	    std::cerr << "CMD:" << "0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(*cur);
+
+	// 0x00 - end line
+	if(0 == *cur)
+	{
+	    ++y;
+	    x = 0;
+	    ++cur;
+	}
+	else
+	// 0x7F - count data
+	if(0x80 > *cur)
+	{
+	    c = *cur;
+	    while(c--)
 	    {
-		c = *cur - 0xC0;
-		++cur;
-		while(c--){ sf.SetPixel(x, y, sf.GetColorIndex(*cur) | opaque); ++x; }
-		++cur;
+		sf.SetPixel(x, y, sf.GetColorIndex(1) | opaque);
+		++x;
 	    }
-	    else // for type 32 - skipping data
-	    {
-		x += *cur - 0x80;
-		++cur;
-	    }
+	    ++cur;
+	}
+	else
+	// 0x80 - end data
+	if(0x80 == *cur)
+	{
+	    if(debug)
+		std::cerr << std::endl;
+
+	    break;
+	}
+	else
+	// other - skip data
+	{
+	    x += *cur - 0x80;
+	    ++cur;
 	}
 
 	if(cur >= max)
