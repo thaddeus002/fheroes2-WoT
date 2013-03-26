@@ -61,7 +61,7 @@ MapTile::MapTile(const mp2til_t & mp2, const QPoint & offset, H2::Theme & theme)
     setOffset(offset);
     setFlags(QGraphicsItem::ItemIsSelectable);
 
-    QPixmap sprite = themeContent.getImageTIL("GROUND32", spriteIndex);
+    QPixmap sprite = themeContent.getImageTIL("GROUND32.TIL", spriteIndex);
 
     switch(tileRotate % 4)
     {
