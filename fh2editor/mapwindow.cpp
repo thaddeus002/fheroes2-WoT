@@ -21,14 +21,83 @@
  ***************************************************************************/
 
 #include <QtGui>
+#include <QContextMenuEvent>
 
+#include "mainwindow.h"
 #include "mapwindow.h"
 
-MapWindow::MapWindow(AGG::File & agg) : mapData(agg)
+ActionGround::ActionGround(int ground, QObject* parent) : QAction(parent), type(ground)
+{
+    switch(ground)
+    {
+	case Ground::Desert:
+	    setIcon(QIcon(":/images/ground_desert.png"));
+	    setText(tr("Desert"));
+	    setStatusTip(tr("Select desert ground"));
+	    break;
+	case Ground::Snow:
+	    setIcon(QIcon(":/images/ground_snow.png"));
+	    setText(tr("Snow"));
+	    setStatusTip(tr("Select snow ground"));
+	    break;
+	case Ground::Swamp:
+	    setIcon(QIcon(":/images/ground_swamp.png"));
+	    setText(tr("Swamp"));
+	    setStatusTip(tr("Select swamp ground"));
+	    break;
+	case Ground::Wasteland:
+	    setIcon(QIcon(":/images/ground_wasteland.png"));
+	    setText(tr("Wasteland"));
+	    setStatusTip(tr("Select wasteland ground"));
+	    break;
+	case Ground::Beach:
+	    setIcon(QIcon(":/images/ground_beach.png"));
+	    setText(tr("Beach"));
+	    setStatusTip(tr("Select beach ground"));
+	    break;
+	case Ground::Lava:
+	    setIcon(QIcon(":/images/ground_lava.png"));
+	    setText(tr("Lava"));
+	    setStatusTip(tr("Select lava ground"));
+	    break;
+	case Ground::Dirt:
+	    setIcon(QIcon(":/images/ground_dirt.png"));
+	    setText(tr("Dirt"));
+	    setStatusTip(tr("Select dirt ground"));
+	    break;
+	case Ground::Grass:
+	    setIcon(QIcon(":/images/ground_grass.png"));
+	    setText(tr("Grass"));
+	    setStatusTip(tr("Select grass ground"));
+	    break;
+	case Ground::Water:
+	    setIcon(QIcon(":/images/ground_water.png"));
+	    setText(tr("Water"));
+	    setStatusTip(tr("Select water"));
+	    break;
+    }
+}
+
+MapWindow::MapWindow(MainWindow* parent) : mainWindow(parent), mapData(this)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     isUntitled = true;
     isModified = false;
+
+    // init: fill ground
+    fillGroundAct = new QActionGroup(this);
+
+    fillGroundAct->addAction(new ActionGround(Ground::Desert, fillGroundAct));
+    fillGroundAct->addAction(new ActionGround(Ground::Snow, fillGroundAct));
+    fillGroundAct->addAction(new ActionGround(Ground::Swamp, fillGroundAct));
+    fillGroundAct->addAction(new ActionGround(Ground::Wasteland, fillGroundAct));
+    fillGroundAct->addAction(new ActionGround(Ground::Beach, fillGroundAct));
+    fillGroundAct->addAction(new ActionGround(Ground::Lava, fillGroundAct));
+    fillGroundAct->addAction(new ActionGround(Ground::Dirt, fillGroundAct));
+    fillGroundAct->addAction(new ActionGround(Ground::Grass, fillGroundAct));
+    fillGroundAct->addAction(new ActionGround(Ground::Water, fillGroundAct));
+
+    connect(fillGroundAct, SIGNAL(triggered(QAction*)), this, SLOT(fillGroundAction(QAction*)));
 }
 
 void MapWindow::newFile(const QSize & sz, int sequenceNumber)
@@ -219,14 +288,37 @@ void MapWindow::setModeView(int mode)
     mapData.update();
 }
 
-int MapWindow::currentGround(void) const
+void MapWindow::contextMenuEvent(QContextMenuEvent* event)
 {
-    return mapData.sceneCurrentGround();
+    if(mapData.selectedItems().size())
+    {
+	QMenu menu(this);
+
+	menu.addAction(mainWindow->editCopyAct);
+	menu.addAction(mainWindow->editPasteAct);
+	menu.addSeparator();
+
+	QMenu* ground = menu.addMenu(QIcon(":/images/menu_fill.png"), tr("&Fill Ground"));
+	QList<QAction*> actions = fillGroundAct->actions();
+
+	for(QList<QAction*>::const_iterator
+	    it = actions.begin(); it != actions.end(); ++it)
+	    ground->addAction(*it);
+
+	menu.exec(event->globalPos());
+	mapData.clearSelection();
+    }
 }
 
-void MapWindow::setCurrentGround(int ground)
+void MapWindow::fillGroundAction(QAction* act)
 {
-    mapData.setSceneCurrentGround(ground);
+    ActionGround* groundAct = qobject_cast<ActionGround*>(act);
+
+    if(groundAct)
+    {
+	isModified = true;
+	qDebug() << "fill ground: " << groundAct->ground();
+    }
 }
 
 void MapWindow::copy(void)
@@ -235,11 +327,6 @@ void MapWindow::copy(void)
 }
 
 void MapWindow::paste(void)
-{
-    isModified = true;
-}
-
-void MapWindow::fill(void)
 {
     isModified = true;
 }

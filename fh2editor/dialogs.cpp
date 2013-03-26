@@ -37,29 +37,6 @@
 #include "mapdata.h"
 #include "dialogs.h"
 
-QSize Dialog::SelectMapSize(void)
-{
-    Form::SelectMapSize form;
-    int ret = form.exec();
-    return QDialog::Accepted == ret ? form.result : QSize(0, 0);
-}
-
-QString Dialog::SelectDataFile(const QString & file)
-{
-    QString head = "Cannot find resource file: " + file;
-    QString body = "Scan directories:\n";
-
-    const QStringList & shareDirs = Resource::ShareDirs();
-
-    for(QStringList::const_iterator
-        it = shareDirs.begin(); it != shareDirs.end(); ++it)
-        body += (*it) + QDir::separator() + "data\n";
-
-    Form::SelectDataFile form(head, QDir::toNativeSeparators(body));
-    int ret = form.exec();
-    return QDialog::Accepted == ret ? form.result : "";
-}
-
 void Dialog::MapOptions(MapData & map)
 {
     Form::MapOptions form(map);
@@ -74,27 +51,25 @@ Form::SelectMapSize::SelectMapSize()
     vboxLayout->setSpacing(6);
     vboxLayout->setMargin(9);
     vboxLayout->setObjectName(QString::fromUtf8("vboxLayout"));
+
     comboBoxSize = new QComboBox(this);
     comboBoxSize->setObjectName(QString::fromUtf8("comboBoxSize"));
-
     vboxLayout->addWidget(comboBoxSize);
 
     spacerItem = new QSpacerItem(20, 16, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
     vboxLayout->addItem(spacerItem);
 
     hboxLayout = new QHBoxLayout();
     hboxLayout->setSpacing(6);
     hboxLayout->setMargin(0);
     hboxLayout->setObjectName(QString::fromUtf8("hboxLayout"));
-    spacerItem1 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
+    spacerItem1 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     hboxLayout->addItem(spacerItem1);
 
     labelWidth = new QLabel(this);
     labelWidth->setObjectName(QString::fromUtf8("labelWidth"));
     labelWidth->setEnabled(true);
-
     hboxLayout->addWidget(labelWidth);
 
     spinBoxWidth = new QSpinBox(this);
@@ -102,27 +77,22 @@ Form::SelectMapSize::SelectMapSize()
     spinBoxWidth->setMaximum(254);
     spinBoxWidth->setMinimum(36);
     spinBoxWidth->setSingleStep(2);
-
     hboxLayout->addWidget(spinBoxWidth);
 
     spacerItem2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
     hboxLayout->addItem(spacerItem2);
-
-
     vboxLayout->addLayout(hboxLayout);
 
     hboxLayout1 = new QHBoxLayout();
     hboxLayout1->setSpacing(6);
     hboxLayout1->setMargin(0);
     hboxLayout1->setObjectName(QString::fromUtf8("hboxLayout1"));
-    spacerItem3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
+    spacerItem3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     hboxLayout1->addItem(spacerItem3);
 
     labelHeight = new QLabel(this);
     labelHeight->setObjectName(QString::fromUtf8("labelHeight"));
-
     hboxLayout1->addWidget(labelHeight);
 
     spinBoxHeight = new QSpinBox(this);
@@ -130,47 +100,36 @@ Form::SelectMapSize::SelectMapSize()
     spinBoxHeight->setMaximum(254);
     spinBoxHeight->setMinimum(36);
     spinBoxHeight->setSingleStep(2);
-
     hboxLayout1->addWidget(spinBoxHeight);
 
     spacerItem4 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
     hboxLayout1->addItem(spacerItem4);
-
-
     vboxLayout->addLayout(hboxLayout1);
 
     spacerItem5 = new QSpacerItem(20, 16, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
     vboxLayout->addItem(spacerItem5);
 
     hboxLayout2 = new QHBoxLayout();
     hboxLayout2->setSpacing(6);
     hboxLayout2->setMargin(0);
     hboxLayout2->setObjectName(QString::fromUtf8("hboxLayout2"));
-    spacerItem6 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
+    spacerItem6 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     hboxLayout2->addItem(spacerItem6);
 
     pushButtonOk = new QPushButton(this);
     pushButtonOk->setObjectName(QString::fromUtf8("pushButtonOk"));
-
     hboxLayout2->addWidget(pushButtonOk);
 
     spacerItem7 = new QSpacerItem(61, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
     hboxLayout2->addItem(spacerItem7);
 
     pushButtonExpert = new QPushButton(this);
     pushButtonExpert->setObjectName(QString::fromUtf8("pushButtonExpert"));
-
     hboxLayout2->addWidget(pushButtonExpert);
 
     spacerItem8 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
     hboxLayout2->addItem(spacerItem8);
-
-
     vboxLayout->addLayout(hboxLayout2);
 
     labelWidth->setBuddy(spinBoxWidth);
@@ -192,7 +151,11 @@ Form::SelectMapSize::SelectMapSize()
     spinBoxHeight->setVisible(false);
     comboBoxSize->setCurrentIndex(1);
 
-    resize(minimumSizeHint());
+    QSize minSize = minimumSizeHint();
+
+    resize(minSize);
+    setMinimumSize(minSize);
+    setMaximumSize(minSize);
 
     QObject::connect(pushButtonExpert, SIGNAL(clicked()), this, SLOT(clickExpert()));
     QObject::connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(clickOk()));
@@ -248,31 +211,30 @@ void Form::SelectMapSize::clickOk(void)
     accept();
 }
 
-Form::SelectDataFile::SelectDataFile(const QString & head, const QString & body)
+Form::SelectDataFile::SelectDataFile(const QString & dataFile, const QStringList & dirList)
 {
     setObjectName(QString::fromUtf8("DialogSelectDataFile"));
 
     verticalLayout = new QVBoxLayout(this);
     verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+
     labelHeader = new QLabel(this);
     labelHeader->setObjectName(QString::fromUtf8("labelHeader"));
     labelHeader->setAlignment(Qt::AlignCenter);
-
     verticalLayout->addWidget(labelHeader);
 
     horizontalLayout2 = new QHBoxLayout();
     horizontalLayout2->setObjectName(QString::fromUtf8("horizontalLayout2"));
+
     labelImage = new QLabel(this);
     labelImage->setObjectName(QString::fromUtf8("labelImage"));
     labelImage->setPixmap(QPixmap(QString::fromUtf8(":/images/cancel.png")));
     labelImage->setScaledContents(false);
-
     horizontalLayout2->addWidget(labelImage);
 
     labelBody = new QLabel(this);
     labelBody->setObjectName(QString::fromUtf8("label"));
     labelBody->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
-
     horizontalLayout2->addWidget(labelBody);
     verticalLayout->addLayout(horizontalLayout2);
 
@@ -281,37 +243,37 @@ Form::SelectDataFile::SelectDataFile(const QString & head, const QString & body)
 
     horizontalLayout1 = new QHBoxLayout();
     horizontalLayout1->setObjectName(QString::fromUtf8("horizontalLayout1"));
+
     pushButtonSelect = new QPushButton(this);
     pushButtonSelect->setObjectName(QString::fromUtf8("pushButtonSelect"));
-
     horizontalLayout1->addWidget(pushButtonSelect);
 
     pushButtonSave = new QPushButton(this);
     pushButtonSave->setObjectName(QString::fromUtf8("pushButtonSave"));
     pushButtonSave->setEnabled(false);
-
     horizontalLayout1->addWidget(pushButtonSave);
 
     horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
     horizontalLayout1->addItem(horizontalSpacer);
 
     pushButtonExit = new QPushButton(this);
     pushButtonExit->setObjectName(QString::fromUtf8("pushButtonExit"));
-
     horizontalLayout1->addWidget(pushButtonExit);
     verticalLayout->addLayout(horizontalLayout1);
-
 
     setWindowTitle(QApplication::translate("DialogSelectDataFile", "Warning", 0, QApplication::UnicodeUTF8));
 
     pushButtonSelect->setText(QApplication::translate("DialogSelectDataFile", "Select", 0, QApplication::UnicodeUTF8));
     pushButtonSave->setText(QApplication::translate("DialogSelectDataFile", "Save", 0, QApplication::UnicodeUTF8));
     pushButtonExit->setText(QApplication::translate("DialogSelectDataFile", "Exit", 0, QApplication::UnicodeUTF8));
-    labelHeader->setText(head);
-    labelBody->setText(body);
+    labelHeader->setText(QApplication::translate("DialogSelectDataFile", "Cannot find resource file: ", 0, QApplication::UnicodeUTF8) + dataFile);
+    labelBody->setText(QApplication::translate("DialogSelectDataFile", "Scan directories: ", 0, QApplication::UnicodeUTF8) + "\n" + dirList.join("\n"));
 
-    resize(minimumSizeHint());
+    QSize minSize = minimumSizeHint();
+
+    resize(minSize);
+    setMinimumSize(minSize);
+    setMaximumSize(minSize);
 
     QObject::connect(pushButtonExit, SIGNAL(clicked()), this, SLOT(reject()));
     QObject::connect(pushButtonSave, SIGNAL(clicked()), this, SLOT(accept()));
@@ -333,8 +295,6 @@ Form::MapOptions::MapOptions(MapData & map)
 
     tabWidget = new QTabWidget(this);
     tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
-    tabWidget->setMinimumSize(QSize(451, 322));
-    tabWidget->setMaximumSize(QSize(451, 322));
 
     tabInfo = new QWidget();
     tabInfo->setObjectName(QString::fromUtf8("tabInfo"));
@@ -370,25 +330,32 @@ Form::MapOptions::MapOptions(MapData & map)
     verticalLayout->addWidget(plainTextEditDescription);
 
     tabWidget->addTab(tabInfo, "Info");
+
     tabCondition = new QWidget();
     tabCondition->setObjectName(QString::fromUtf8("tabCondition"));
+
     groupBoxWinsCond = new QGroupBox(tabCondition);
     groupBoxWinsCond->setObjectName(QString::fromUtf8("groupBoxWinsCond"));
     groupBoxWinsCond->setGeometry(QRect(10, 10, 421, 141));
+
     comboBoxWinsCond = new QComboBox(groupBoxWinsCond);
     comboBoxWinsCond->setObjectName(QString::fromUtf8("comboBoxWinsCond"));
     comboBoxWinsCond->setGeometry(QRect(10, 30, 141, 27));
+
     groupBox = new QGroupBox(tabCondition);
     groupBox->setObjectName(QString::fromUtf8("groupBox"));
     groupBox->setGeometry(QRect(10, 190, 421, 81));
+
     comboBoxLossCond = new QComboBox(groupBox);
     comboBoxLossCond->setObjectName(QString::fromUtf8("comboBoxLossCond"));
     comboBoxLossCond->setGeometry(QRect(10, 30, 141, 27));
+
     tabWidget->addTab(tabCondition, "Conditions");
     verticalLayout2->addWidget(tabWidget);
 
     horizontalLayout = new QHBoxLayout();
     horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+
     pushButtonOk = new QPushButton(this);
     pushButtonOk->setObjectName(QString::fromUtf8("pushButtonOk"));
     horizontalLayout->addWidget(pushButtonOk);
@@ -399,9 +366,7 @@ Form::MapOptions::MapOptions(MapData & map)
     pushButtonCancel = new QPushButton(this);
     pushButtonCancel->setObjectName(QString::fromUtf8("pushButtonCancel"));
     horizontalLayout->addWidget(pushButtonCancel);
-
     verticalLayout2->addLayout(horizontalLayout);
-
 
     resize(470, 394);
     setMinimumSize(QSize(470, 394));

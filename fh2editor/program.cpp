@@ -88,7 +88,7 @@ namespace Resource
 	QStringList list;
 
 #ifdef BUILD_PROGRAM_SHARE
-	list.push_back(QString(BUILD_PROGRAM_SHARE));
+	list.push_back(QDir::toNativeSeparators(QString(BUILD_PROGRAM_SHARE)));
 #endif
 
 	const QStringList & envs = QProcess::systemEnvironment();
@@ -96,9 +96,9 @@ namespace Resource
 
 	for(QStringList::const_iterator
 	    it = envs.begin(); it != envs.end(); ++it)
-	if(regExp.exactMatch(*it)){ list.push_back(regExp.cap(1)); break; }
+	if(regExp.exactMatch(*it)){ list.push_back(QDir::toNativeSeparators(regExp.cap(1))); break; }
 
-	list.push_back(QCoreApplication::applicationDirPath());
+	list.push_back(QDir::toNativeSeparators(QCoreApplication::applicationDirPath()));
 	list.push_back(QDir::toNativeSeparators(QDir::homePath() + QDir::separator() + "." + QString(PROGRAM_SHARE).toLower()));
 
 	Resource::shares.clear();
@@ -118,6 +118,7 @@ int main(int argc, char *argv[])
 
     Resource::InitShares();
     qsrand(std::time(0));
+    QPixmapCache::setCacheLimit(40000);
 
     QSettings settings("fheroes2", "editor");
     QString dataFile = settings.value("dataFile", "").toString();
@@ -134,8 +135,12 @@ int main(int argc, char *argv[])
 
 	if(dataFile.isEmpty())
 	{
-	    dataFile = Dialog::SelectDataFile(resourceAgg);
-	    if(dataFile.isEmpty()) return 0;
+	    QStringList list = Resource::ShareDirs();
+	    Form::SelectDataFile form(resourceAgg, list.replaceInStrings(QRegExp("$"),
+					    QDir::toNativeSeparators(QDir::separator() + subFolder)));
+
+	    if(QDialog::Accepted != form.exec())
+		return 0;
 	}
 
 	settings.setValue("dataFile", dataFile);

@@ -24,15 +24,36 @@
 #define _EDITOR_MAPWINDOW_H_
 
 #include <QGraphicsView>
+#include <QAction>
 
 #include "mapdata.h"
+
+class MainWindow;
+
+QT_BEGIN_NAMESPACE
+class QContextMenuEvent;
+class QActionGroup;
+QT_END_NAMESPACE
+
+class ActionGround : public QAction
+{
+    Q_OBJECT
+
+public:
+    ActionGround(int, QObject*);
+
+    int ground(void) const { return type; }
+
+protected:
+    int type;
+};
 
 class MapWindow : public QGraphicsView
 {
     Q_OBJECT
 
 public:
-    MapWindow(AGG::File &);
+    MapWindow(MainWindow*);
 
     void	newFile(const QSize &, int);
     bool	loadFile(const QString &);
@@ -43,24 +64,25 @@ public:
     QString	currentFile(void);
     void	copy(void);
     void	paste(void);
-    void	fill(void);
-    int		modeView(void) const;
-    int		currentGround(void) const;
 
+    int		modeView(void) const;
     void	setModeView(int);
-    void	setCurrentGround(int);
+
 signals:
     void	copyAvailable(bool);
 
 protected:
     void	closeEvent(QCloseEvent*);
+    void	contextMenuEvent(QContextMenuEvent*);
 
 private slots:
     void	mapWasSelectionChanged(void);
     void	mapWasModified(void);
+    void	fillGroundAction(QAction*);
 
 private:
     friend class MainWindow;
+    friend class MapData;
 
     bool	maybeSave(void);
     void	setCurrentFile(const QString &);
@@ -70,9 +92,12 @@ private:
     bool	isUntitled;
     bool	isModified;
 
-    MapData	mapData;
+    MainWindow*		mainWindow;
+    MapData		mapData;
 
-    static int sequenceNumber;
+    QActionGroup*	fillGroundAct;
+
+    static int 		sequenceNumber;
 };
 
 #endif

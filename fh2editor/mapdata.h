@@ -32,6 +32,7 @@
 #include "engine.h"
 
 class MapData;
+class MapWindow;
 
 class MapTileExt : protected QPair<QPixmap, QPoint>
 {
@@ -52,8 +53,10 @@ public:
 class MapTile : public QGraphicsPixmapItem
 {
 public:
-    MapTile(const mp2til_t &, const QPoint &, const MapData &);
+    MapTile(const mp2til_t &, const QPoint &, H2::Theme &);
     ~MapTile();
+
+    QRectF		boundingRect(void) const;
 
     bool		isValid(void) const;
     void		showInfo(void) const;
@@ -62,16 +65,16 @@ public:
 
     void		paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget* = 0);
     void		loadSpriteLevels(const mp2ext_t &);
-    void		loadSpritelevel(QList<MapTileExt*> &, quint8, const mp2lev_t &);
+    void		loadSpriteLevel(QList<MapTileExt*> &, quint8, const mp2lev_t &);
     void		sortSpritesLevels(void);
 
     int			spriteIndex;
-    int			shape;
+    int			tileRotate;
 
     QList<MapTileExt*>	spritesLevel1;
     QList<MapTileExt*>	spritesLevel2;
 
-    const MapData &     mapData;
+    H2::Theme &		themeContent;
 };
 
 class MapData : public QGraphicsScene
@@ -79,21 +82,22 @@ class MapData : public QGraphicsScene
     Q_OBJECT
 
 public:
-    MapData(AGG::File & agg) : aggContent(agg), modeView(1), currentGround(9) {}
+    MapData(MapWindow*);
 
     const QString &	name(void) const;
     const QString &	description(void) const;
     const QSize &	size(void) const;
 
     int			indexLimit(void) const;
-    int         	sceneModeView(void) const;
-    int         	sceneCurrentGround(void) const;
 
     void		newMap(const QSize &, const QString &);
     bool		loadMap(const QString &);
 
+    int         	sceneModeView(void) const;
     void         	setSceneModeView(int);
-    void         	setSceneCurrentGround(int);
+
+    H2::Theme &		theme(void);
+
 signals:
     void		dataModified(void);
 
@@ -107,6 +111,7 @@ protected:
 
     friend class	MapTile;
 
+    H2::Theme		themeContent;
     QSize		mapSize;
 
     QString		mapName;
@@ -129,13 +134,10 @@ protected:
     quint8		mapRaceColor[6];
     quint32		mapUniq;
 
-    AGG::File &		aggContent;
-
     QSize		tilesetSize;
     QList<MapTile*>	tilesetItems;
 
     int			modeView; /* explore: 1, select: 2 */
-    int			currentGround;
 };
 
 #endif

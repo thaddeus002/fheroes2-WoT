@@ -69,9 +69,14 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
 void MainWindow::newFile(void)
 {
-    MapWindow* child = createMapWindow();
-    child->newFile(Dialog::SelectMapSize(), sequenceMapNumber++);
-    child->show();
+    Form::SelectMapSize form;
+
+    if(QDialog::Accepted == form.exec())
+    {
+	MapWindow* child = createMapWindow();
+	child->newFile(form.result, sequenceMapNumber++);
+	child->show();
+    }
 }
 
 void MainWindow::open(void)
@@ -123,12 +128,6 @@ void MainWindow::paste(void)
         activeMapWindow()->paste();
 }
 
-void MainWindow::fill(void)
-{
-    if(activeMapWindow())
-        activeMapWindow()->fill();
-}
-
 void MainWindow::about(void)
 {
    QMessageBox::about(this, tr("Map Editor"),
@@ -151,7 +150,6 @@ void MainWindow::updateMenus(void)
 
     editCopyAct->setEnabled(false);
     editPasteAct->setEnabled(false);
-    editFillAct->setEnabled(false);
 
     if(hasMapWindow)
     {
@@ -161,24 +159,9 @@ void MainWindow::updateMenus(void)
 	    case 2:	viewSelectModeAct->setChecked(true); break;
 	    default:	break;
 	}
-
-	switch(activeMapWindow()->currentGround())
-	{
-	    case Ground::Desert:	groundDesertAct->setChecked(true); break;
-	    case Ground::Snow:		groundSnowAct->setChecked(true); break;
-	    case Ground::Swamp:		groundSwampAct->setChecked(true); break;
-	    case Ground::Wasteland:	groundWastelandAct->setChecked(true); break;
-	    case Ground::Beach:		groundBeachAct->setChecked(true); break;
-	    case Ground::Lava:		groundLavaAct->setChecked(true); break;
-	    case Ground::Dirt:		groundDirtAct->setChecked(true); break;
-	    case Ground::Grass:		groundGrassAct->setChecked(true); break;
-	    case Ground::Water:		groundWaterAct->setChecked(true); break;
-	    default:	break;
-	}
     }
 
     switchViewAct->setEnabled(hasMapWindow);
-    switchGroundAct->setEnabled(hasMapWindow);
     mapOptionsAct->setEnabled(hasMapWindow);
 }
 
@@ -221,12 +204,11 @@ void MainWindow::updateWindowMenu(void)
 
 MapWindow* MainWindow::createMapWindow(void)
 {
-    MapWindow* child = new MapWindow(aggContent);
+    MapWindow* child = new MapWindow(this);
     mdiArea->addSubWindow(child);
     child->parentWidget()->setGeometry(child->parentWidget()->pos().x(), child->parentWidget()->pos().y(), 480, 320);
 
     connect(child, SIGNAL(copyAvailable(bool)), editCopyAct, SLOT(setEnabled(bool)));
-    connect(child, SIGNAL(copyAvailable(bool)), editFillAct, SLOT(setEnabled(bool)));
 
     return child;
 }
@@ -262,74 +244,17 @@ void MainWindow::createActions(void)
     //viewExploreModeAct->setShortcuts(QKeySequence::);
     viewExploreModeAct->setStatusTip(tr("Switch to explore view"));
     viewExploreModeAct->setCheckable(true);
-    connect(viewExploreModeAct, SIGNAL(triggered()), this, SLOT(switchModeViewGroup()));
 
     viewSelectModeAct = new QAction(QIcon(":/images/mode_select.png"), tr("Se&lect"), this);
     //viewSelectModeAct->setShortcuts(QKeySequence::);
     viewSelectModeAct->setStatusTip(tr("Switch to select view"));
     viewSelectModeAct->setCheckable(true);
-    connect(viewSelectModeAct, SIGNAL(triggered()), this, SLOT(switchModeViewGroup()));
 
     switchViewAct = new QActionGroup(this);
     switchViewAct->addAction(viewExploreModeAct);
     switchViewAct->addAction(viewSelectModeAct);
 
-    // select ground
-    groundDesertAct = new QAction(QIcon(":/images/ground_desert.png"), tr("Desert"), this);
-    groundDesertAct->setStatusTip(tr("Select desert ground"));
-    groundDesertAct->setCheckable(true);
-    connect(groundDesertAct, SIGNAL(triggered()), this, SLOT(switchGroundGroup()));
-
-    groundSnowAct = new QAction(QIcon(":/images/ground_snow.png"), tr("Snow"), this);
-    groundSnowAct->setStatusTip(tr("Select snow ground"));
-    groundSnowAct->setCheckable(true);
-    connect(groundSnowAct, SIGNAL(triggered()), this, SLOT(switchGroundGroup()));
-
-    groundSwampAct = new QAction(QIcon(":/images/ground_swamp.png"), tr("Swamp"), this);
-    groundSwampAct->setStatusTip(tr("Select swamp ground"));
-    groundSwampAct->setCheckable(true);
-    connect(groundSwampAct, SIGNAL(triggered()), this, SLOT(switchGroundGroup()));
-
-    groundWastelandAct = new QAction(QIcon(":/images/ground_wasteland.png"), tr("Wasteland"), this);
-    groundWastelandAct->setStatusTip(tr("Select wasteland ground"));
-    groundWastelandAct->setCheckable(true);
-    connect(groundWastelandAct, SIGNAL(triggered()), this, SLOT(switchGroundGroup()));
-
-    groundBeachAct = new QAction(QIcon(":/images/ground_beach.png"), tr("Beach"), this);
-    groundBeachAct->setStatusTip(tr("Select beach ground"));
-    groundBeachAct->setCheckable(true);
-    connect(groundBeachAct, SIGNAL(triggered()), this, SLOT(switchGroundGroup()));
-
-    groundLavaAct = new QAction(QIcon(":/images/ground_lava.png"), tr("Lava"), this);
-    groundLavaAct->setStatusTip(tr("Select lava ground"));
-    groundLavaAct->setCheckable(true);
-    connect(groundLavaAct, SIGNAL(triggered()), this, SLOT(switchGroundGroup()));
-
-    groundDirtAct = new QAction(QIcon(":/images/ground_dirt.png"), tr("Dirt"), this);
-    groundDirtAct->setStatusTip(tr("Select dirt ground"));
-    groundDirtAct->setCheckable(true);
-    connect(groundDirtAct, SIGNAL(triggered()), this, SLOT(switchGroundGroup()));
-
-    groundGrassAct = new QAction(QIcon(":/images/ground_grass.png"), tr("Grass"), this);
-    groundGrassAct->setStatusTip(tr("Select grass ground"));
-    groundGrassAct->setCheckable(true);
-    connect(groundGrassAct, SIGNAL(triggered()), this, SLOT(switchGroundGroup()));
-
-    groundWaterAct = new QAction(QIcon(":/images/ground_water.png"), tr("Water"), this);
-    groundWaterAct->setStatusTip(tr("Select water"));
-    groundWaterAct->setCheckable(true);
-    connect(groundWaterAct, SIGNAL(triggered()), this, SLOT(switchGroundGroup()));
-
-    switchGroundAct = new QActionGroup(this);
-    switchGroundAct->addAction(groundDesertAct);
-    switchGroundAct->addAction(groundSnowAct);
-    switchGroundAct->addAction(groundSwampAct);
-    switchGroundAct->addAction(groundWastelandAct);
-    switchGroundAct->addAction(groundBeachAct);
-    switchGroundAct->addAction(groundLavaAct);
-    switchGroundAct->addAction(groundDirtAct);
-    switchGroundAct->addAction(groundGrassAct);
-    switchGroundAct->addAction(groundWaterAct);
+    connect(switchViewAct, SIGNAL(triggered(QAction*)), this, SLOT(switchModeViewGroup()));
 
 //! [0]
     fileExitAct = new QAction(tr("E&xit"), this);
@@ -349,10 +274,6 @@ void MainWindow::createActions(void)
     editPasteAct->setStatusTip(tr("Paste the clipboard's contents into the current "
                               "selection"));
     connect(editPasteAct, SIGNAL(triggered()), this, SLOT(paste()));
-
-    editFillAct = new QAction(QIcon(":/images/menu_fill.png"), tr("&Fill"), this);
-    editFillAct->setStatusTip(tr("Fill the ground into the current selection"));
-    connect(editFillAct, SIGNAL(triggered()), this, SLOT(fill()));
 
     closeAct = new QAction(tr("Cl&ose"), this);
     closeAct->setStatusTip(tr("Close the active window"));
@@ -407,23 +328,12 @@ void MainWindow::createMenus(void)
     editMenu = menuBar()->addMenu(tr("&Edit"));
     editMenu->addAction(editCopyAct);
     editMenu->addAction(editPasteAct);
-    editMenu->addAction(editFillAct);
 
     mapMenu = menuBar()->addMenu(tr("&Map"));
     mapMenu->addAction(mapOptionsAct);
     mapMenu->addSeparator()->setText(tr("View Mode"));
     mapMenu->addAction(viewExploreModeAct);
     mapMenu->addAction(viewSelectModeAct);
-    mapMenu->addSeparator()->setText(tr("Fill Ground"));
-    mapMenu->addAction(groundDesertAct);
-    mapMenu->addAction(groundSnowAct);
-    mapMenu->addAction(groundSwampAct);
-    mapMenu->addAction(groundWastelandAct);
-    mapMenu->addAction(groundBeachAct);
-    mapMenu->addAction(groundLavaAct);
-    mapMenu->addAction(groundDirtAct);
-    mapMenu->addAction(groundGrassAct);
-    mapMenu->addAction(groundWaterAct);
 
     windowMenu = menuBar()->addMenu(tr("&Window"));
     updateWindowMenu();
@@ -443,21 +353,10 @@ void MainWindow::createToolBars(void)
     editToolBar = addToolBar(tr("Edit"));
     editToolBar->addAction(editCopyAct);
     editToolBar->addAction(editPasteAct);
-    editToolBar->addAction(editFillAct);
 
     selectToolBar = addToolBar(tr("Mode"));
     selectToolBar->addAction(viewExploreModeAct);
     selectToolBar->addAction(viewSelectModeAct);
-    selectToolBar->addSeparator();
-    selectToolBar->addAction(groundDesertAct);
-    selectToolBar->addAction(groundSnowAct);
-    selectToolBar->addAction(groundSwampAct);
-    selectToolBar->addAction(groundWastelandAct);
-    selectToolBar->addAction(groundBeachAct);
-    selectToolBar->addAction(groundLavaAct);
-    selectToolBar->addAction(groundDirtAct);
-    selectToolBar->addAction(groundGrassAct);
-    selectToolBar->addAction(groundWaterAct);
 }
 
 void MainWindow::createStatusBar(void)
@@ -514,7 +413,7 @@ void MainWindow::setActiveSubWindow(QWidget* window)
 	mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow*>(window));
 }
 
-void MainWindow::switchModeViewGroup(void)
+void MainWindow::switchModeViewGroup()
 {
     if(activeMapWindow())
     {
@@ -523,39 +422,6 @@ void MainWindow::switchModeViewGroup(void)
 	else
 	if(viewSelectModeAct->isChecked())
 	    activeMapWindow()->setModeView(2);
-    }
-}
-
-void MainWindow::switchGroundGroup(void)
-{
-    if(activeMapWindow())
-    {
-	if(groundDesertAct->isChecked())
-	    activeMapWindow()->setCurrentGround(Ground::Desert);
-	else
-	if(groundSnowAct->isChecked())
-	    activeMapWindow()->setCurrentGround(Ground::Snow);
-	else
-	if(groundSwampAct->isChecked())
-	    activeMapWindow()->setCurrentGround(Ground::Swamp);
-	else
-	if(groundWastelandAct->isChecked())
-	    activeMapWindow()->setCurrentGround(Ground::Wasteland);
-	else
-	if(groundBeachAct->isChecked())
-	    activeMapWindow()->setCurrentGround(Ground::Beach);
-	else
-	if(groundLavaAct->isChecked())
-	    activeMapWindow()->setCurrentGround(Ground::Lava);
-	else
-	if(groundDirtAct->isChecked())
-	    activeMapWindow()->setCurrentGround(Ground::Dirt);
-	else
-	if(groundGrassAct->isChecked())
-	    activeMapWindow()->setCurrentGround(Ground::Grass);
-	else
-	if(groundWaterAct->isChecked())
-	    activeMapWindow()->setCurrentGround(Ground::Water);
     }
 }
 

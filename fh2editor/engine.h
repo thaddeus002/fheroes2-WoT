@@ -131,21 +131,50 @@ namespace AGG
 	quint32 size;
     };
 
-    class File : protected H2::File
+    class File : public H2::File
     {
     protected:
-	QFile			file;
 	QMap<QString, Item>	items;
-	QVector<QRgb>		colors;
-
-	QByteArray	readRawData(const QString &);
-	bool		loadFile(const QString &);
 
     public:
-	File(const QString &);
+	File(){}
 
-	QPixmap getImageTIL(const QString &, quint16);
-	QPair<QPixmap, QPoint> getImageICN(const QString &, quint16);
+	QByteArray		readRawData(const QString &);
+
+	bool			loadFile(const QString &);
+	bool			exists(const QString &) const;
+
+	QPixmap			getImageTIL(const QString &, quint16, QVector<QRgb> &);
+	QPair<QPixmap, QPoint>	getImageICN(const QString &, quint16, QVector<QRgb> &);
+    };
+
+    class Spool
+    {
+	AGG::File		first;
+	AGG::File		second; /* first: heroes2.agg, second: heroes2x.agg */
+	QVector<QRgb>           colors;
+
+    public:
+	Spool(const QString &);
+
+	QPixmap			getImageTIL(const QString &, quint16);
+	QPair<QPixmap, QPoint>	getImageICN(const QString &, quint16);
+    };
+}
+
+namespace H2
+{
+    class Theme
+    {
+    protected:
+	AGG::Spool &		aggSpool;
+	QString			theme;
+
+    public:
+	Theme(AGG::Spool & spool) : aggSpool(spool), theme("original") {}
+
+	QPixmap			getImageTIL(const QString & til, quint16 index) { return aggSpool.getImageTIL(til, index); }
+	QPair<QPixmap, QPoint>	getImageICN(const QString & icn, quint16 index) { return aggSpool.getImageICN(icn, index); }
     };
 }
 

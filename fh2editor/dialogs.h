@@ -26,7 +26,7 @@
 #include <QDialog>
 #include <QSize>
 
-
+QT_BEGIN_NAMESPACE
 class QVBoxLayout;
 class QComboBox;
 class QSpacerItem;
@@ -41,11 +41,10 @@ class QPlainTextEdit;
 class QGroupBox;
 class QSpacerItem;
 class MapData;
+QT_END_NAMESPACE
 
 namespace Dialog
 {
-    QSize	SelectMapSize(void);
-    QString	SelectDataFile(const QString &);
     void	MapOptions(MapData &);
 }
 
@@ -94,7 +93,7 @@ namespace Form
 	void			clickSelect(void);
 
     public:
-	SelectDataFile(const QString &, const QString &);
+	SelectDataFile(const QString &, const QStringList &);
 
 	QVBoxLayout*		verticalLayout;
 	QLabel*			labelHeader;

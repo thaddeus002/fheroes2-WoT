@@ -258,16 +258,9 @@ mp2ext_t H2::File::readMP2Ext(void)
     return res;
 }
 
-AGG::File::File(const QString & file)
+bool AGG::File::exists(const QString & str) const
 {
-    loadFile(file);
-
-    QStringList list = QFileInfo(file).absoluteDir().entryList(QStringList() << "heroes2x.agg", QDir::Files | QDir::Readable);
-
-    if(list.size())
-	qDebug() <<  "AGG::File:" << "also found:" << QDir::toNativeSeparators(QFileInfo(file).absolutePath() + QDir::separator() + list.front());
-
-    QPixmapCache::setCacheLimit(40000);
+    return items.end() != items.find(str);
 }
 
 QByteArray AGG::File::readRawData(const QString & name)
@@ -307,36 +300,9 @@ bool AGG::File::loadFile(const QString & fn)
 	    item.crc = readLE32();
 	    item.offset = readLE32();
 	    item.size = readLE32();
-
-	    //qDebug() << "parse: " << buf << ", size: " << item.size;
 	}
 
-	// load palette
-	QMap<QString, Item>::const_iterator pal = items.find("KB.PAL");
-
-	if(items.end() != pal)
-	{
-	    qint8 r, g, b;
-	    const quint32 palSize = (*pal).size / 3;
-	    colors.reserve(palSize);
-
-	    seek((*pal).offset);
-
-	    for(quint32 num = 0; num < palSize; ++num)
-	    {
-		r = readByte();
-		g = readByte();
-		b = readByte();
-
-		colors.push_back(qRgb(r << 2, g << 2, b << 2));
-	    }
-
-	    qDebug() << "AGG::File::loadFile:" << "loaded palette: " << colors.size();
-
-	    return true;
-	}
-	else
-	    qCritical() << "AGG::File::loadFile:" << "palette not found";
+	return true;
     }
     else
 	qCritical() << "AGG::File::loadFile:" << "Can not read file " << qPrintable(fn);
@@ -344,10 +310,10 @@ bool AGG::File::loadFile(const QString & fn)
     return false;
 }
 
-QPixmap AGG::File::getImageTIL(const QString & id, quint16 index)
+QPixmap AGG::File::getImageTIL(const QString & id, quint16 index, QVector<QRgb> & colors)
 {
     QString key = id + QString::number(index);
-    QPixmap result;
+    QPixmap result = NULL;
 
     if(! QPixmapCache::find(key, & result) &&
 	! items.isEmpty())
@@ -370,14 +336,14 @@ QPixmap AGG::File::getImageTIL(const QString & id, quint16 index)
 		QPixmapCache::insert(key, result);
 	    }
 	    else
-	    qCritical() << "AGG::File::getImageTIL:" << "out of range" << index;
+		qCritical() << "AGG::File::getImageTIL:" << "out of range" << index;
 	}
     }
 
     return result;
 }
 
-QPair<QPixmap, QPoint> AGG::File::getImageICN(const QString & id, quint16 index)
+QPair<QPixmap, QPoint> AGG::File::getImageICN(const QString & id, quint16 index, QVector<QRgb> & colors)
 {
     QString key = id + QString::number(index);
     QPixmap result;
@@ -419,6 +385,52 @@ QPair<QPixmap, QPoint> AGG::File::getImageICN(const QString & id, quint16 index)
     }
 
     return qMakePair<QPixmap, QPoint>(result, offset);
+}
+
+AGG::Spool::Spool(const QString & file)
+{
+    if(first.loadFile(file))
+    {
+	QStringList list = QFileInfo(file).absoluteDir().entryList(QStringList() << "heroes2x.agg", QDir::Files | QDir::Readable);
+
+	if(list.size())
+	    second.loadFile(QDir::toNativeSeparators(QFileInfo(file).absolutePath() + QDir::separator() + list.front()));
+
+	// load palette
+	QByteArray array = first.readRawData("KB.PAL");
+
+	if(array.size())
+	{
+	    qint8 r, g, b;
+	    const quint32 palSize = array.size() / 3;
+	    colors.reserve(palSize);
+
+	    for(quint32 num = 0; num < palSize; ++num)
+	    {
+		r = array[num * 3];
+		g = array[num * 3 + 1];
+		b = array[num * 3 + 2];
+
+		colors.push_back(qRgb(r << 2, g << 2, b << 2));
+	    }
+
+	    qDebug() << "AGG::Spool:" << "loaded palette: " << colors.size();
+	}
+	else
+	    qCritical() << "AGG::Spool:" << "palette not found";
+    }
+}
+
+QPixmap AGG::Spool::getImageTIL(const QString & til, quint16 index)
+{
+    return second.isReadable() && second.exists(til) ?
+	second.getImageTIL(til, index, colors) : first.getImageTIL(til, index, colors);
+}
+
+QPair<QPixmap, QPoint> AGG::Spool::getImageICN(const QString & icn, quint16 index)
+{
+    return second.isReadable() && second.exists(icn) ?
+	second.getImageICN(icn, index, colors) : first.getImageICN(icn, index, colors);
 }
 
 quint32 Rand(quint32 min, quint32 max)
@@ -540,9 +552,7 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		// shadow of lava
 		case 0x4F: case 0x58: case 0x62:
 		    return ext.index + (ticket % 9) + 1;
-
-		default:
-		    return 0;
+		default: break;
 	    }
 	    break;
 
@@ -557,16 +567,13 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		// lava
 		case 0x15:
 		    return ext.index + (ticket % 6) + 1;
-
 		// small volcano
 		// shadow
 		case 0x21: case 0x2C:
 		// lava
 		case 0x37: case 0x43:
 		    return ext.index + (ticket % 10) + 1;
-
-		default:
-		    return 0;
+		default: break;
 	    }
 	    break;
 
@@ -580,9 +587,7 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		// shadow
 		case 0x78: case 0xB4: case 0xC3: case 0xD2: case 0xE1:
 		    return ext.index + (ticket % 14) + 1;
-
-		default:
-		    return 0;
+		default: break;
 	    }
 	    break;
 
@@ -593,7 +598,6 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		// lighthouse
 		case 0x3D:
 		    return ext.index + (ticket % 9) + 1;
-
 		// alchemytower
 		case 0x1B:
 		// watermill
@@ -607,13 +611,10 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		// shadow smoke
 		case 0xB4:
 		    return ext.index + (ticket % 6) + 1;
-
 		// magic garden
 		case 0xBE:
 		    return ext.index + (ticket % 6) + 1;
-
-		default:
-		    return 0;
+		default: break;
 	    }
 	    break;
 
@@ -628,13 +629,10 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		// watermill
 		case 0xA2: case 0xA9: case 0xB1: case 0xB8:
 		    return ext.index + (ticket % 6) + 1;
-
 		// mill
 		case 0x60: case 0x64: case 0x68: case 0x6C: case 0x70: case 0x74: case 0x78: case 0x7C: case 0x80: case 0x84:
 		    return ext.index + (ticket % 3) + 1;
-
-		default:
-		    return 0;
+		default: break;
 	    }
 	    break;
 
@@ -649,9 +647,7 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		// light in window
 		case 0x16: case 0x3A: case 0x43: case 0x4A:
 		    return ext.index + (ticket % 6) + 1;
-    
-		default:
-		    return 0;
+		default: break;
 	    }
 	    break;
 
@@ -662,9 +658,7 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		// campfire
 		case 0x36: case 0x3D:
 		    return ext.index + (ticket % 6) + 1;
-
-		default:
-		    return 0;
+		default: break;
 	    }
 	    break;
 
@@ -675,7 +669,6 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		// mill
 		case 0x17: case 0x1B: case 0x1F: case 0x23: case 0x27: case 0x2B: case 0x2F: case 0x33: case 0x37: case 0x3B:
 		    return ext.index + (ticket % 3) + 1;
-
 		// smoke from chimney
 		case 0x3F: case 0x46: case 0x4D:
 		// archerhouse
@@ -687,9 +680,7 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		// peasanthunt
 		case 0x72:
 		    return ext.index + (ticket % 6) + 1;
-
-		default:
-		    return 0;
+		default: break;
 	    }
 	    break;
 	// object on crck, OBJNCRCK
@@ -703,9 +694,7 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		// shadow smoke
 		case 0xCA:
 		    return ext.index + (ticket % 10) + 1;
-
-		default:
-		    return 0;
+		default: break;
 	    }
 	    break;
 
@@ -716,9 +705,7 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		// mill
 		case 0x99: case 0x9D: case 0xA1: case 0xA5: case 0xA9: case 0xAD: case 0xB1: case 0xB5: case 0xB9: case 0xBD:
 		    return ext.index + (ticket % 3) + 1;
-
-		default:
-		    return 0;
+		default: break;
 	    }
 	    break;
 
@@ -731,13 +718,11 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		// shadow
 		case 0x0F: case 0x19:
 		    return ext.index + (ticket % 9) + 1;
-
 		// smoke
 		case 0x24:
 		// shadow
 		case 0x2D:
 		    return ext.index + (ticket % 8) + 1;
-
 		// smoke
 		case 0x5A:
 		// shadow
@@ -745,9 +730,7 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		// campfire
 		case 0x83:
 		    return ext.index + (ticket % 6) + 1;
-
-		default:
-		    return 0;
+		default: break;
 	    }
 	    break;
 
@@ -758,7 +741,6 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		// buttle
 		case 0x00:
 		    return ext.index + (ticket % 11) + 1;
-
 		// shadow
 		case 0x0C:
 		// chest
@@ -784,17 +766,14 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		// broken ship (right)
 		case 0xE2: case 0xE9: case 0xF1: case 0xF8:
 		    return ext.index + (ticket % 6) + 1;
-
 		// seagull on stones
 		case 0x76: case 0x86: case 0x96:
 		    return ext.index + (ticket % 15) + 1;
-
 		// whirlpool
 		case 0xCA: case 0xCE: case 0xD2: case 0xD6: case 0xDA: case 0xDE:
 		    return ext.index + (ticket % 3) + 1;
+		default: break;
 
-		default:
-		    return 0;
 	    }
 	    break;
 
@@ -805,97 +784,53 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		// sail broken ship (left)
 		case 0x03: case 0x0C:
 		    return ext.index + (ticket % 6) + 1;
-
-		default:
-		    return 0;
+		default: break;
 	    }
 	    break;
 
-/*
-	// extra objects for loyalty version
-	case X_LOC1:
-
-	    if(Settings::Get().PriceLoyaltyVersion())
-		switch(ext.index)
-		{
-		    // alchemist tower
-		    case 0x04:
-	    	    case 0x0D:
-		    case 0x16:
-		    // arena
-		    case 0x1F:
-		    case 0x28:
-		    case 0x32:
-		    case 0x3B:
-		    // earth altar
-		    case 0x55:
-		    case 0x5E:
-		    case 0x67:
-			return ext.index + (ticket % 8) + 1;
-
-		    default:
-			return 0;
-		}
+	// extra objects, X_LOC1
+	case 0xF4: case 0xF5: case 0xF6: case 0xF7:
+	    switch(ext.index)
+	    {
+		// alchemist tower
+		case 0x04: case 0x0D: case 0x16:
+		// arena
+		case 0x1F: case 0x28: case 0x32: case 0x3B:
+		// earth altar
+		case 0x55: case 0x5E: case 0x67:
+		    return ext.index + (ticket % 8) + 1;
+		default: break;
+	    }
 	    break;
 
-	// extra objects for loyalty version
-	case X_LOC2:
-
-	    if(Settings::Get().PriceLoyaltyVersion())
-		switch(ext.index)
-		{
-		    // mermaid
-		    case 0x0A:
-		    case 0x13:
-		    case 0x1C:
-		    case 0x25:
-		    // sirens
-		    case 0x2F:
-		    case 0x38:
-		    case 0x41:
-		    case 0x4A:
-		    case 0x53:
-		    case 0x5C:
-		    case 0x66:
-		        return ext.index + (ticket % 8) + 1;
-
-		    default:
-			return 0;
-		}
+	// extra objects, X_LOC2
+	case 0xF8: case 0xF9: case 0xFA: case 0xFB:
+	    switch(ext.index)
+	    {
+		// mermaid
+		case 0x0A: case 0x13: case 0x1C: case 0x25: 
+		// sirens
+		case 0x2F: case 0x38: case 0x41: case 0x4A: case 0x53: case 0x5C: case 0x66:
+		    return ext.index + (ticket % 8) + 1;
+		default: break;
+	    }
 	    break;
 
-	// extra objects for loyalty version
-	case X_LOC3:
+	// extra objects, X_LOC3
+	case 0xFC: case 0xFD: case 0xFE: case 0xFF:
+	    switch(ext.index)
+	    {
+		// hut magi
+		case 0x00: case 0x0A: case 0x14:
+		// eye magi
+		case 0x20: case 0x29: case 0x32:
+		    return ext.index + (ticket % 8) + 1;
+		// barrier
+		case 0x3C: case 0x42: case 0x48: case 0x4E: case 0x54: case 0x5A: case 0x60: case 0x66:
+		    return ext.index + (ticket % 4) + 1;
+		default: break;
+	    }
 
-	    if(Settings::Get().PriceLoyaltyVersion())
-		switch(ext.index)
-	        {
-		    // hut magi
-		    case 0x00:
-		    case 0x0A:
-		    case 0x14:
-		    // eye magi
-		    case 0x20:
-		    case 0x29:
-		    case 0x32:
-		        return ext.index + (ticket % 8) + 1;
-
-		    // barrier
-		    case 0x3C:
-		    case 0x42:
-		    case 0x48:
-		    case 0x4E:
-		    case 0x54:
-		    case 0x5A:
-		    case 0x60:
-		    case 0x66:
-		        return ext.index + (ticket % 4) + 1;
-
-		    default:
-			return 0;
-		}
-	    break;
-*/
 	default: break;
     }
 

@@ -54,17 +54,18 @@ private slots:
     void		saveAs(void);
     void		copy(void);
     void		paste(void);
-    void		fill(void);
     void		about(void);
     void		updateMenus(void);
     void		updateWindowMenu(void);
     MapWindow*		createMapWindow(void);
     void		setActiveSubWindow(QWidget*);
     void		switchModeViewGroup(void);
-    void		switchGroundGroup(void);
     void		mapOptions(void);
 
 private:
+    friend class	MapWindow;
+    friend class	MapData;
+
     void		createActions(void);
     void		createMenus(void);
     void		createToolBars(void);
@@ -92,7 +93,6 @@ private:
     QAction*		fileExitAct;
     QAction*		editCopyAct;
     QAction*		editPasteAct;
-    QAction*		editFillAct;
     QAction*		closeAct;
     QAction*		closeAllAct;
     QAction*		tileAct;
@@ -108,19 +108,8 @@ private:
     QAction*		viewSelectModeAct;
     QActionGroup*	switchViewAct;
 
-    QAction*		groundDesertAct;
-    QAction*		groundSnowAct;
-    QAction*		groundSwampAct;
-    QAction*		groundWastelandAct;
-    QAction*		groundBeachAct;
-    QAction*		groundLavaAct;
-    QAction*		groundDirtAct;
-    QAction*		groundGrassAct;
-    QAction*		groundWaterAct;
-    QActionGroup*	switchGroundAct;
-
     int			sequenceMapNumber;
-    AGG::File		aggContent;
+    AGG::Spool		aggContent;
 };
 
 #endif
