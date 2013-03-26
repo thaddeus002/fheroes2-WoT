@@ -116,6 +116,10 @@ namespace H2
     {
     public:
 	ICNSprite(const mp2icn_t &, const char*, quint32, const QVector<QRgb> &);
+
+    private:
+	void DrawVariant1(const quint8*, const quint8*, const QVector<QRgb> &);
+	void DrawVariant2(const quint8*, const quint8*, const QVector<QRgb> &);
     };
 
     QString      mapICN(int);

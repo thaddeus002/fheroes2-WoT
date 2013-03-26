@@ -79,6 +79,7 @@ private slots:
     void	mapWasSelectionChanged(void);
     void	mapWasModified(void);
     void	fillGroundAction(QAction*);
+    void	clearObjectsAction(void);
 
 private:
     friend class MainWindow;
@@ -96,6 +97,7 @@ private:
     MapData		mapData;
 
     QActionGroup*	fillGroundAct;
+    QAction*		clearObjectsAct;
 
     static int 		sequenceNumber;
 };

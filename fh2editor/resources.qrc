@@ -19,5 +19,6 @@
      <file>images/ground_water.png</file>
      <file>images/menu_fill.png</file>
      <file>images/map_options.png</file>
+     <file>images/clear_objects.png</file>
 </qresource>
 </RCC>

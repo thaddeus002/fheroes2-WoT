@@ -112,12 +112,21 @@ H2::ICNSprite::ICNSprite(const mp2icn_t & icn, const char* buf, quint32 size, co
     const quint8* ptr = (const quint8*) buf;
     const quint8* outOfRange = ptr + size;
 
+    fill(qRgba(0, 0, 0, 0));
+
+    if(0x20 == icn.type)
+	DrawVariant2(ptr, outOfRange, pals);
+    else
+	DrawVariant1(ptr, outOfRange, pals);
+}
+
+void H2::ICNSprite::DrawVariant1(const quint8* ptr, const quint8* outOfRange, const QVector<QRgb> & pals)
+{
     int col = 0;
     int posX = 0;
     int posY = 0;
-    QRgb shadow = qRgba(0, 0, 0, 0x40);
 
-    fill(qRgba(0, 0, 0, 0));
+    QRgb shadow = qRgba(0, 0, 0, 0x40);
 
     while(1)
     {
@@ -183,7 +192,51 @@ H2::ICNSprite::ICNSprite(const mp2icn_t & icn, const char* buf, quint32 size, co
 
         if(ptr >= outOfRange)
         {
-            qWarning() << "H2::ICNSprite:" << "parse out of range";
+            qWarning() << "H2::ICNSprite:DrawVariant1:" << "parse out of range";
+            break;
+        }
+    }
+}
+
+void H2::ICNSprite::DrawVariant2(const quint8* ptr, const quint8* outOfRange, const QVector<QRgb> & pals)
+{
+    int col = 0;
+    int posX = 0;
+    int posY = 0;
+
+    while(1)
+    {
+        // 0x00 - end line
+        if(0 == *ptr)
+        {
+            posY++;
+            posX = 0;
+            ptr++;
+        }
+        else
+        // 0x7F - count data
+        if(0x80 > *ptr)
+        {
+	    col = *ptr;
+            while(col--) { setPixel(posX, posY, pals[1]); posX++; }
+            ptr++;
+        }
+        else
+        // 0x80 - end data
+        if(0x80 == *ptr)
+        {
+            break;
+        }
+        else
+        // other - skip data
+        {
+	    posX += *ptr - 0x80;
+            ptr++;
+        }
+
+        if(ptr >= outOfRange)
+        {
+            qWarning() << "H2::ICNSprite:DrawVariant2:" << "parse out of range";
             break;
         }
     }

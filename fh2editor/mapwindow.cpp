@@ -96,8 +96,12 @@ MapWindow::MapWindow(MainWindow* parent) : mainWindow(parent), mapData(this)
     fillGroundAct->addAction(new ActionGround(Ground::Dirt, fillGroundAct));
     fillGroundAct->addAction(new ActionGround(Ground::Grass, fillGroundAct));
     fillGroundAct->addAction(new ActionGround(Ground::Water, fillGroundAct));
-
     connect(fillGroundAct, SIGNAL(triggered(QAction*)), this, SLOT(fillGroundAction(QAction*)));
+
+    // clear objects acvtion
+    clearObjectsAct = new QAction(QIcon(":/images/clear_objects.png"), tr("&Remove Objects"), this);
+    clearObjectsAct->setStatusTip(tr("Clear objects"));
+    connect(clearObjectsAct, SIGNAL(triggered()), this, SLOT(clearObjectsAction()));
 }
 
 void MapWindow::newFile(const QSize & sz, int sequenceNumber)
@@ -305,6 +309,9 @@ void MapWindow::contextMenuEvent(QContextMenuEvent* event)
 	    it = actions.begin(); it != actions.end(); ++it)
 	    ground->addAction(*it);
 
+	menu.addSeparator();
+	menu.addAction(clearObjectsAct);
+
 	menu.exec(event->globalPos());
 	mapData.clearSelection();
     }
@@ -318,6 +325,15 @@ void MapWindow::fillGroundAction(QAction* act)
     {
 	isModified = true;
 	qDebug() << "fill ground: " << groundAct->ground();
+    }
+}
+
+void MapWindow::clearObjectsAction(void)
+{
+    QList<QGraphicsItem*> selected = mapData.selectedItems();
+
+    if(selected.size())
+    {
     }
 }
 
