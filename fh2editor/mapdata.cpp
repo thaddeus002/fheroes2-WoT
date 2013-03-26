@@ -106,6 +106,7 @@ QString MapTile::indexString(int index)
 void MapTile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     Q_UNUSED(widget);
+    Q_UNUSED(option);
 
     // draw tile
     painter->drawPixmap(offset(), pixmap());
@@ -140,16 +141,6 @@ void MapTile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, Q
 	    QPair<QPixmap, QPoint> p = themeContent.getImageICN(icn, anim);
 	    painter->drawPixmap(offset() + p.second, p.first);
 	}
-    }
-
-    // state: selected
-    if(option->state & QStyle::State_Selected)
-    {
-	QPixmap selPixmap(pixmap().size());
-	selPixmap.fill(QColor(40, 40, 100, 150));
-
-        QPainter paint(& selPixmap);
-	painter->drawPixmap(offset(), selPixmap);
     }
 }
 
@@ -530,12 +521,13 @@ void MapData::mousePressEvent(QGraphicsSceneMouseEvent* event)
     {
 	if(selectedItems().size())
 	{
-	    //if((event->buttons() & Qt::RightButton) ||
-	    //	! selectionArea().contains(event->scenePos()))
-	    //	clearSelection();
+	    if((event->buttons() & Qt::LeftButton) ||
+		((event->buttons() & Qt::RightButton) && ! selectionArea().contains(event->scenePos())))
+		clearSelection();
 	}
     }
 
+    // skip
     //QGraphicsScene::mousePressEvent(event);
 }
 
@@ -568,6 +560,7 @@ int MapData::sceneModeView(void) const
 void MapData::setSceneModeView(int mode)
 {
     modeView = mode;
+    clearSelection();
 }
 
 void MapData::selectArea(QPointF ptdn, QPointF ptup)
@@ -593,4 +586,17 @@ void MapData::selectArea(QPointF ptdn, QPointF ptup)
     	path.addRect((*it)->boundingRect());
 
     setSelectionArea(path);
+}
+
+void MapData::drawForeground(QPainter* painter, const QRectF & rect)
+{
+    Q_UNUSED(rect);
+
+    // paint selected area
+    if(selectedItems().size())
+    {
+	painter->setPen(QPen(QColor(40, 40, 100), 1));
+        painter->setBrush(QBrush(QColor(40, 40, 100, 150), Qt::Dense4Pattern));
+        painter->drawRoundedRect(selectionArea().boundingRect(), 6.0, 6.0);
+    }
 }

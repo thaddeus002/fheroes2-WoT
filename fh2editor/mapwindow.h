@@ -69,7 +69,7 @@ public:
     void	setModeView(int);
 
 signals:
-    void	copyAvailable(bool);
+    void	selectedItems(bool);
 
 protected:
     void	closeEvent(QCloseEvent*);

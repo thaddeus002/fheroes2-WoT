@@ -126,11 +126,8 @@ void MapWindow::newFile(const QSize & sz, int sequenceNumber)
     QApplication::restoreOverrideCursor();
     curFile = fileName;
 
-    connect(&mapData, SIGNAL(selectionChanged(void)),
-		    this, SLOT(mapWasSelectionChanged(void)));
-
-    connect(&mapData, SIGNAL(dataModified(void)),
-        	    this, SLOT(mapWasModified(void)));
+    connect(&mapData, SIGNAL(selectionChanged(void)), this, SLOT(mapWasSelectionChanged(void)));
+    connect(&mapData, SIGNAL(dataModified(void)), this, SLOT(mapWasModified(void)));
 
     mapWasModified();
 }
@@ -153,11 +150,8 @@ bool MapWindow::loadFile(const QString & fileName)
     QApplication::restoreOverrideCursor();
     setCurrentFile(fileName);
 
-    connect(&mapData, SIGNAL(selectionChanged(void)),
-		    this, SLOT(mapWasSelectionChanged(void)));
-
-    connect(&mapData, SIGNAL(dataModified(void)),
-        	    this, SLOT(mapWasModified(void)));
+    connect(&mapData, SIGNAL(selectionChanged(void)), this, SLOT(mapWasSelectionChanged(void)));
+    connect(&mapData, SIGNAL(dataModified(void)), this, SLOT(mapWasModified(void)));
 
     return true;
 }
@@ -220,7 +214,7 @@ void MapWindow::closeEvent(QCloseEvent* event)
 
 void MapWindow::mapWasSelectionChanged(void)
 {
-    emit copyAvailable(mapData.selectedItems().size());
+    emit selectedItems(mapData.selectedItems().size());
 }
 
 void MapWindow::mapWasModified(void)

@@ -105,6 +105,7 @@ protected:
     void                mousePressEvent(QGraphicsSceneMouseEvent*);
     void                mouseReleaseEvent(QGraphicsSceneMouseEvent*);
     void                mouseMoveEvent(QGraphicsSceneMouseEvent*);
+    void		drawForeground(QPainter*, const QRectF &);
 
     void		selectArea(QPointF, QPointF);
     bool		loadMP2Map(const QString &);
