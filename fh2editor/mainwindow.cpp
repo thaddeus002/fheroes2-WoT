@@ -32,14 +32,10 @@ MainWindow::MainWindow(const QString & dataFile) : sequenceMapNumber(0), aggCont
     mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     setCentralWidget(mdiArea);
-
-    connect(mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)),
-            this, SLOT(updateMenus()));
+    connect(mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(updateMenus()));
 
     windowMapper = new QSignalMapper(this);
-
-    connect(windowMapper, SIGNAL(mapped(QWidget*)),
-            this, SLOT(setActiveSubWindow(QWidget*)));
+    connect(windowMapper, SIGNAL(mapped(QWidget*)), this, SLOT(setActiveSubWindow(QWidget*)));
 
     createActions();
     createMenus();
@@ -116,22 +112,9 @@ void MainWindow::saveAs(void)
         statusBar()->showMessage(tr("File saved"), 2000);
 }
 
-void MainWindow::copy(void)
-{
-    if(activeMapWindow())
-	activeMapWindow()->copy();
-}
-
-void MainWindow::paste(void)
-{
-    if(activeMapWindow())
-        activeMapWindow()->paste();
-}
-
 void MainWindow::about(void)
 {
-   QMessageBox::about(this, tr("Map Editor"),
-            tr("<b>Version 0.1.</b>"));
+   QMessageBox::about(this, tr("Map Editor"), tr("<b>Version 0.1.</b>"));
 }
 
 void MainWindow::updateMenus(void)
@@ -147,21 +130,6 @@ void MainWindow::updateMenus(void)
     nextAct->setEnabled(hasMapWindow);
     previousAct->setEnabled(hasMapWindow);
     separatorAct->setVisible(hasMapWindow);
-
-    editCopyAct->setEnabled(false);
-    editPasteAct->setEnabled(false);
-
-    if(hasMapWindow)
-    {
-	switch(activeMapWindow()->modeView())
-	{
-	    case 1:	viewExploreModeAct->setChecked(true); break;
-	    case 2:	viewSelectModeAct->setChecked(true); break;
-	    default:	break;
-	}
-    }
-
-    switchViewAct->setEnabled(hasMapWindow);
     mapOptionsAct->setEnabled(hasMapWindow);
 }
 
@@ -188,11 +156,9 @@ void MainWindow::updateWindowMenu(void)
         QString text;
 
         if(i < 9)
-            text = tr("&%1 %2").arg(i + 1)
-                               .arg(child->userFriendlyCurrentFile());
+            text = tr("&%1 %2").arg(i + 1).arg(child->userFriendlyCurrentFile());
 	else
-            text = tr("%1 %2").arg(i + 1)
-                              .arg(child->userFriendlyCurrentFile());
+            text = tr("%1 %2").arg(i + 1).arg(child->userFriendlyCurrentFile());
 
         QAction* action  = windowMenu->addAction(text);
         action->setCheckable(true);
@@ -207,8 +173,6 @@ MapWindow* MainWindow::createMapWindow(void)
     MapWindow* child = new MapWindow(this);
     mdiArea->addSubWindow(child);
     child->parentWidget()->setGeometry(child->parentWidget()->pos().x(), child->parentWidget()->pos().y(), 480, 320);
-
-    connect(child, SIGNAL(selectedItems(bool)), editCopyAct, SLOT(setEnabled(bool)));
     return child;
 }
 
@@ -238,51 +202,18 @@ void MainWindow::createActions(void)
     mapOptionsAct->setStatusTip(tr("Show map options"));
     connect(mapOptionsAct, SIGNAL(triggered()), this, SLOT(mapOptions()));
 
-    // select view mode
-    viewExploreModeAct = new QAction(QIcon(":/images/mode_explore.png"), tr("Ex&plore"), this);
-    //viewExploreModeAct->setShortcuts(QKeySequence::);
-    viewExploreModeAct->setStatusTip(tr("Switch to explore view"));
-    viewExploreModeAct->setCheckable(true);
-
-    viewSelectModeAct = new QAction(QIcon(":/images/mode_select.png"), tr("Se&lect"), this);
-    //viewSelectModeAct->setShortcuts(QKeySequence::);
-    viewSelectModeAct->setStatusTip(tr("Switch to select view"));
-    viewSelectModeAct->setCheckable(true);
-
-    switchViewAct = new QActionGroup(this);
-    switchViewAct->addAction(viewExploreModeAct);
-    switchViewAct->addAction(viewSelectModeAct);
-
-    connect(switchViewAct, SIGNAL(triggered(QAction*)), this, SLOT(switchModeViewGroup()));
-
-//! [0]
     fileExitAct = new QAction(tr("E&xit"), this);
     fileExitAct->setShortcuts(QKeySequence::Quit);
     fileExitAct->setStatusTip(tr("Exit the application"));
     connect(fileExitAct, SIGNAL(triggered()), qApp, SLOT(closeAllWindows()));
-//! [0]
-
-    editCopyAct = new QAction(QIcon(":/images/menu_copy.png"), tr("&Copy"), this);
-    editCopyAct->setShortcuts(QKeySequence::Copy);
-    editCopyAct->setStatusTip(tr("Copy the current selection's contents to the "
-                             "clipboard"));
-    connect(editCopyAct, SIGNAL(triggered()), this, SLOT(copy()));
-
-    editPasteAct = new QAction(QIcon(":/images/menu_paste.png"), tr("&Paste"), this);
-    editPasteAct->setShortcuts(QKeySequence::Paste);
-    editPasteAct->setStatusTip(tr("Paste the clipboard's contents into the current "
-                              "selection"));
-    connect(editPasteAct, SIGNAL(triggered()), this, SLOT(paste()));
 
     closeAct = new QAction(tr("Cl&ose"), this);
     closeAct->setStatusTip(tr("Close the active window"));
-    connect(closeAct, SIGNAL(triggered()),
-            mdiArea, SLOT(closeActiveSubWindow()));
+    connect(closeAct, SIGNAL(triggered()), mdiArea, SLOT(closeActiveSubWindow()));
 
     closeAllAct = new QAction(tr("Close &All"), this);
     closeAllAct->setStatusTip(tr("Close all the windows"));
-    connect(closeAllAct, SIGNAL(triggered()),
-            mdiArea, SLOT(closeAllSubWindows()));
+    connect(closeAllAct, SIGNAL(triggered()), mdiArea, SLOT(closeAllSubWindows()));
 
     tileAct = new QAction(tr("&Tile"), this);
     tileAct->setStatusTip(tr("Tile the windows"));
@@ -295,15 +226,12 @@ void MainWindow::createActions(void)
     nextAct = new QAction(tr("Ne&xt"), this);
     nextAct->setShortcuts(QKeySequence::NextChild);
     nextAct->setStatusTip(tr("Move the focus to the next window"));
-    connect(nextAct, SIGNAL(triggered()),
-            mdiArea, SLOT(activateNextSubWindow()));
+    connect(nextAct, SIGNAL(triggered()), mdiArea, SLOT(activateNextSubWindow()));
 
     previousAct = new QAction(tr("Pre&vious"), this);
     previousAct->setShortcuts(QKeySequence::PreviousChild);
-    previousAct->setStatusTip(tr("Move the focus to the previous "
-                                 "window"));
-    connect(previousAct, SIGNAL(triggered()),
-            mdiArea, SLOT(activatePreviousSubWindow()));
+    previousAct->setStatusTip(tr("Move the focus to the previous window"));
+    connect(previousAct, SIGNAL(triggered()), mdiArea, SLOT(activatePreviousSubWindow()));
 
     separatorAct = new QAction(this);
     separatorAct->setSeparator(true);
@@ -324,15 +252,9 @@ void MainWindow::createMenus(void)
 
     fileMenu->addAction(fileExitAct);
 
-    editMenu = menuBar()->addMenu(tr("&Edit"));
-    editMenu->addAction(editCopyAct);
-    editMenu->addAction(editPasteAct);
-
     mapMenu = menuBar()->addMenu(tr("&Map"));
     mapMenu->addAction(mapOptionsAct);
     mapMenu->addSeparator()->setText(tr("View Mode"));
-    mapMenu->addAction(viewExploreModeAct);
-    mapMenu->addAction(viewSelectModeAct);
 
     windowMenu = menuBar()->addMenu(tr("&Window"));
     updateWindowMenu();
@@ -348,14 +270,6 @@ void MainWindow::createToolBars(void)
     fileToolBar->addAction(fileNewAct);
     fileToolBar->addAction(fileOpenAct);
     fileToolBar->addAction(fileSaveAct);
-
-    editToolBar = addToolBar(tr("Edit"));
-    editToolBar->addAction(editCopyAct);
-    editToolBar->addAction(editPasteAct);
-
-    selectToolBar = addToolBar(tr("Mode"));
-    selectToolBar->addAction(viewExploreModeAct);
-    selectToolBar->addAction(viewSelectModeAct);
 }
 
 void MainWindow::createStatusBar(void)
@@ -410,18 +324,6 @@ void MainWindow::setActiveSubWindow(QWidget* window)
 {
     if(window)
 	mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow*>(window));
-}
-
-void MainWindow::switchModeViewGroup()
-{
-    if(activeMapWindow())
-    {
-	if(viewExploreModeAct->isChecked())
-	    activeMapWindow()->setModeView(1);
-	else
-	if(viewSelectModeAct->isChecked())
-	    activeMapWindow()->setModeView(2);
-    }
 }
 
 void MainWindow::mapOptions(void)

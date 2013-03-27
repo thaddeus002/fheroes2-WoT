@@ -35,12 +35,12 @@ class QContextMenuEvent;
 class QActionGroup;
 QT_END_NAMESPACE
 
-class ActionGround : public QAction
+class ActionFillGround : public QAction
 {
     Q_OBJECT
 
 public:
-    ActionGround(int, QObject*);
+    ActionFillGround(int, QObject*);
 
     int ground(void) const { return type; }
 
@@ -62,14 +62,10 @@ public:
     bool	saveFile(const QString &);
     QString	userFriendlyCurrentFile(void);
     QString	currentFile(void);
-    void	copy(void);
-    void	paste(void);
-
-    int		modeView(void) const;
-    void	setModeView(int);
 
 signals:
     void	selectedItems(bool);
+    void	validBuffer(bool);
 
 protected:
     void	closeEvent(QCloseEvent*);
@@ -79,7 +75,11 @@ private slots:
     void	mapWasSelectionChanged(void);
     void	mapWasModified(void);
     void	fillGroundAction(QAction*);
-    void	clearObjectsAction(void);
+    void	clearObjectsAction(QAction*);
+    void	copyToBuffer(void);
+    void	pasteFromBuffer(void);
+    void	editPassableDialog(void);
+    void	cellInfoDialog(void);
 
 private:
     friend class MainWindow;
@@ -96,10 +96,13 @@ private:
     MainWindow*		mainWindow;
     MapData		mapData;
 
-    QActionGroup*	fillGroundAct;
-    QAction*		clearObjectsAct;
+    QAction*            editCopyAct;
+    QAction*            editPasteAct;
+    QAction*            editPassableAct;
+    QAction*            cellInfoAct;
 
-    static int 		sequenceNumber;
+    QActionGroup*	fillGroundAct;
+    QActionGroup*	clearObjectsAct;
 };
 
 #endif

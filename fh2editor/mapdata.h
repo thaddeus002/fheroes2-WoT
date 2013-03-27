@@ -93,8 +93,7 @@ public:
     void		newMap(const QSize &, const QString &);
     bool		loadMap(const QString &);
 
-    int         	sceneModeView(void) const;
-    void         	setSceneModeView(int);
+    void		fillGroundSelected(int);
 
     H2::Theme &		theme(void);
 
@@ -137,8 +136,7 @@ protected:
 
     QSize		tilesetSize;
     QList<MapTile*>	tilesetItems;
-
-    int			modeView; /* explore: 1, select: 2 */
+    QGraphicsItem*	itemOverMouse;
 };
 
 #endif

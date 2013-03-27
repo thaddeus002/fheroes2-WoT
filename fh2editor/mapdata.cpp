@@ -142,6 +142,16 @@ void MapTile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, Q
 	    painter->drawPixmap(offset() + p.second, p.first);
 	}
     }
+
+    if(isUnderMouse() && ! isSelected())
+    {
+/*
+	painter->setPen(QPen(QColor(255, 255, 0), 1));
+	painter->setBrush(QBrush(QColor(0, 0, 0, 0)));
+	const QRectF & rt = boundingRect();
+	painter->drawRect(rt.x() + 1, rt.y() + 1, rt.width() - 2, rt.height() - 2);
+*/
+    }
 }
 
 void MapTile::showInfo(void) const
@@ -220,7 +230,7 @@ void MapTile::sortSpritesLevels(void)
     qSort(spritesLevel2.begin(), spritesLevel2.end(), MapTileExt::sortLevel2);
 }
 
-MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), themeContent(parent->mainWindow->aggContent), modeView(1)
+MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), themeContent(parent->mainWindow->aggContent), itemOverMouse(NULL)
 {
 }
 
@@ -505,26 +515,12 @@ bool MapData::loadMP2Map(const QString & mapFile)
 
 void MapData::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-    // explore mode
-    if(1 == modeView)
+    // clear selected
+    if(selectedItems().size())
     {
-	// show tile info
-	if(event->buttons() & Qt::LeftButton)
-	{
-	    MapTile* item = qgraphicsitem_cast<MapTile*>(itemAt(event->scenePos()));
-	    if(item) item->showInfo();
-	}
-    }
-    else
-    // select mode
-    if(2 == modeView)
-    {
-	if(selectedItems().size())
-	{
-	    if((event->buttons() & Qt::LeftButton) ||
-		((event->buttons() & Qt::RightButton) && ! selectionArea().contains(event->scenePos())))
-		clearSelection();
-	}
+	if((event->buttons() & Qt::LeftButton) ||
+	    ((event->buttons() & Qt::RightButton) && ! selectionArea().contains(event->scenePos())))
+	    clearSelection();
     }
 
     // skip
@@ -538,29 +534,23 @@ void MapData::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 
 void MapData::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
-    // select mode
-    if(2 == modeView)
+    // select area
+    if(event->buttons() & Qt::LeftButton)
     {
-	// select area
-	if(event->buttons() & Qt::LeftButton)
-	{
+	if(selectedItems().size())
 	    clearSelection();
-	    selectArea(event->buttonDownScenePos(Qt::LeftButton), event->scenePos());
-	}
+
+	selectArea(event->buttonDownScenePos(Qt::LeftButton), event->scenePos());
     }
 
-    QGraphicsScene::mouseMoveEvent(event);
-}
+    // update select item over cursor
+    if(itemOverMouse)
+	update(itemOverMouse->boundingRect());
 
-int MapData::sceneModeView(void) const
-{
-    return modeView;
-}
+    itemOverMouse = itemAt(event->scenePos());
 
-void MapData::setSceneModeView(int mode)
-{
-    modeView = mode;
-    clearSelection();
+    if(itemOverMouse)
+	update(itemOverMouse->boundingRect());
 }
 
 void MapData::selectArea(QPointF ptdn, QPointF ptup)
@@ -588,15 +578,34 @@ void MapData::selectArea(QPointF ptdn, QPointF ptup)
     setSelectionArea(path);
 }
 
+void MapData::fillGroundSelected(int ground)
+{
+    QList<QGraphicsItem*> selected = selectedItems();
+
+    if(selected.size())
+    {
+	qDebug() << "fill ground action: " << ground;
+    }
+}
+
 void MapData::drawForeground(QPainter* painter, const QRectF & rect)
 {
     Q_UNUSED(rect);
 
-    // paint selected area
+    // paint: selected area
     if(selectedItems().size())
     {
 	painter->setPen(QPen(QColor(40, 40, 100), 1));
-        painter->setBrush(QBrush(QColor(40, 40, 100, 150), Qt::Dense4Pattern));
-        painter->drawRoundedRect(selectionArea().boundingRect(), 6.0, 6.0);
+	painter->setBrush(QBrush(QColor(40, 40, 100, 150), Qt::Dense4Pattern));
+	painter->drawRoundedRect(selectionArea().boundingRect(), 6.0, 6.0);
+    }
+    else
+    // paint: selected item over mouse
+    if(itemOverMouse)
+    {
+	painter->setPen(QPen(QColor(255, 255, 0), 1));
+	painter->setBrush(QBrush(QColor(0, 0, 0, 0)));
+	const QRectF & rt = itemOverMouse->boundingRect();
+	painter->drawRect(QRectF(rt.x() + 1, rt.y() + 1, rt.width() - 2, rt.height() - 2));
     }
 }

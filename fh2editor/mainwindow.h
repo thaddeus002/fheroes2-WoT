@@ -52,14 +52,11 @@ private slots:
     void		open(void);
     void		save(void);
     void		saveAs(void);
-    void		copy(void);
-    void		paste(void);
     void		about(void);
     void		updateMenus(void);
     void		updateWindowMenu(void);
     MapWindow*		createMapWindow(void);
     void		setActiveSubWindow(QWidget*);
-    void		switchModeViewGroup(void);
     void		mapOptions(void);
 
 private:
@@ -80,12 +77,9 @@ private:
     QSignalMapper*	windowMapper;
 
     QMenu*		fileMenu;
-    QMenu*		editMenu;
     QMenu*		mapMenu;
     QMenu*		windowMenu;
     QToolBar*		fileToolBar;
-    QToolBar*		editToolBar;
-    QToolBar*		selectToolBar;
     QAction*		fileNewAct;
     QAction*		fileOpenAct;
     QAction*		fileSaveAct;
@@ -103,10 +97,6 @@ private:
     QAction*		menuAboutAct;
 
     QAction*		mapOptionsAct;
-
-    QAction*		viewExploreModeAct;
-    QAction*		viewSelectModeAct;
-    QActionGroup*	switchViewAct;
 
     int			sequenceMapNumber;
     AGG::Spool		aggContent;

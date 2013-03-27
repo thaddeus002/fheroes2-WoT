@@ -26,7 +26,7 @@
 #include "mainwindow.h"
 #include "mapwindow.h"
 
-ActionGround::ActionGround(int ground, QObject* parent) : QAction(parent), type(ground)
+ActionFillGround::ActionFillGround(int ground, QObject* parent) : QAction(parent), type(ground)
 {
     switch(ground)
     {
@@ -81,27 +81,61 @@ ActionGround::ActionGround(int ground, QObject* parent) : QAction(parent), type(
 MapWindow::MapWindow(MainWindow* parent) : mainWindow(parent), mapData(this)
 {
     setAttribute(Qt::WA_DeleteOnClose);
+    setMouseTracking(true);
+
     isUntitled = true;
     isModified = false;
 
+    // init: copy, paste
+    editCopyAct = new QAction(QIcon(":/images/menu_copy.png"), tr("&Copy"), this);
+    editCopyAct->setStatusTip(tr("Copy the current selection's contents to the clipboard"));
+    editCopyAct->setEnabled(false);
+    connect(editCopyAct, SIGNAL(triggered()), this, SLOT(copyToBuffer()));
+
+    editPasteAct = new QAction(QIcon(":/images/menu_paste.png"), tr("&Paste"), this);
+    editPasteAct->setStatusTip(tr("Paste the clipboard's contents into the current selection"));
+    editPasteAct->setEnabled(false);
+    connect(editPasteAct, SIGNAL(triggered()), this, SLOT(pasteFromBuffer()));
+
+    connect(this, SIGNAL(validBuffer(bool)), editPasteAct, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(selectedItems(bool)), editCopyAct, SLOT(setEnabled(bool)));
+
     // init: fill ground
     fillGroundAct = new QActionGroup(this);
-
-    fillGroundAct->addAction(new ActionGround(Ground::Desert, fillGroundAct));
-    fillGroundAct->addAction(new ActionGround(Ground::Snow, fillGroundAct));
-    fillGroundAct->addAction(new ActionGround(Ground::Swamp, fillGroundAct));
-    fillGroundAct->addAction(new ActionGround(Ground::Wasteland, fillGroundAct));
-    fillGroundAct->addAction(new ActionGround(Ground::Beach, fillGroundAct));
-    fillGroundAct->addAction(new ActionGround(Ground::Lava, fillGroundAct));
-    fillGroundAct->addAction(new ActionGround(Ground::Dirt, fillGroundAct));
-    fillGroundAct->addAction(new ActionGround(Ground::Grass, fillGroundAct));
-    fillGroundAct->addAction(new ActionGround(Ground::Water, fillGroundAct));
+    fillGroundAct->addAction(new ActionFillGround(Ground::Desert, fillGroundAct));
+    fillGroundAct->addAction(new ActionFillGround(Ground::Snow, fillGroundAct));
+    fillGroundAct->addAction(new ActionFillGround(Ground::Swamp, fillGroundAct));
+    fillGroundAct->addAction(new ActionFillGround(Ground::Wasteland, fillGroundAct));
+    fillGroundAct->addAction(new ActionFillGround(Ground::Beach, fillGroundAct));
+    fillGroundAct->addAction(new ActionFillGround(Ground::Lava, fillGroundAct));
+    fillGroundAct->addAction(new ActionFillGround(Ground::Dirt, fillGroundAct));
+    fillGroundAct->addAction(new ActionFillGround(Ground::Grass, fillGroundAct));
+    fillGroundAct->addAction(new ActionFillGround(Ground::Water, fillGroundAct));
     connect(fillGroundAct, SIGNAL(triggered(QAction*)), this, SLOT(fillGroundAction(QAction*)));
 
-    // clear objects acvtion
-    clearObjectsAct = new QAction(QIcon(":/images/clear_objects.png"), tr("&Remove Objects"), this);
-    clearObjectsAct->setStatusTip(tr("Clear objects"));
-    connect(clearObjectsAct, SIGNAL(triggered()), this, SLOT(clearObjectsAction()));
+    // init: clear objects
+    clearObjectsAct = new QActionGroup(this);
+    clearObjectsAct->addAction(new QAction(tr("Buildings"), clearObjectsAct));
+    clearObjectsAct->addAction(new QAction(tr("Mounts/Rocs"), clearObjectsAct));
+    clearObjectsAct->addAction(new QAction(tr("Trees/Shrubs"), clearObjectsAct));
+    clearObjectsAct->addAction(new QAction(tr("Pickup resources"), clearObjectsAct));
+    clearObjectsAct->addAction(new QAction(tr("Artifacts"), clearObjectsAct));
+    clearObjectsAct->addAction(new QAction(tr("Monsters"), clearObjectsAct));
+    clearObjectsAct->addAction(new QAction(tr("Heroes"), clearObjectsAct));
+    QAction* separator = new QAction(clearObjectsAct);
+    separator->setSeparator(true);
+    clearObjectsAct->addAction(separator);
+    clearObjectsAct->addAction(new QAction(tr("All"), clearObjectsAct));
+    connect(clearObjectsAct, SIGNAL(triggered(QAction*)), this, SLOT(clearObjectsAction(QAction*)));
+
+    // init
+    editPassableAct = new QAction(tr("Edit passable"), this);
+    editPassableAct->setStatusTip(tr("Edit cell passable"));
+    connect(editPassableAct, SIGNAL(triggered()), this, SLOT(editPassableDialog()));
+
+    cellInfoAct = new QAction(tr("Cell info"), this);
+    cellInfoAct->setStatusTip(tr("Show cell info"));
+    connect(cellInfoAct, SIGNAL(triggered()), this, SLOT(cellInfoDialog()));
 }
 
 void MapWindow::newFile(const QSize & sz, int sequenceNumber)
@@ -139,9 +173,7 @@ bool MapWindow::loadFile(const QString & fileName)
     if(! mapData.loadMap(fileName))
     {
 	QApplication::restoreOverrideCursor();
-        QMessageBox::warning(this, tr("Map Editor"),
-                             tr("Cannot read file %1.")
-                             .arg(fileName));
+        QMessageBox::warning(this, tr("Map Editor"), tr("Cannot read file %1.").arg(fileName));
         return false;
     }
 
@@ -260,83 +292,94 @@ QString MapWindow::strippedName(const QString & fullFileName)
     return QFileInfo(fullFileName).fileName();
 }
 
-int MapWindow::modeView(void) const
-{
-    return mapData.sceneModeView();
-}
-
-void MapWindow::setModeView(int mode)
-{
-    mapData.clearSelection();
-
-    switch(mode)
-    {
-	// explore
-	case 1:
-	    break;
-
-	// select
-	case 2:
-	    break;
-
-	default: break;
-    }
-
-    mapData.setSceneModeView(mode);
-    mapData.update();
-}
-
 void MapWindow::contextMenuEvent(QContextMenuEvent* event)
 {
+    QMenu menu(this);
+
     if(mapData.selectedItems().size())
     {
-	QMenu menu(this);
-
-	menu.addAction(mainWindow->editCopyAct);
-	menu.addAction(mainWindow->editPasteAct);
+	menu.addAction(editCopyAct);
 	menu.addSeparator();
 
-	QMenu* ground = menu.addMenu(QIcon(":/images/menu_fill.png"), tr("&Fill Ground"));
+	QMenu* groundSubMenu = menu.addMenu(QIcon(":/images/menu_fill.png"), tr("&Fill Ground"));
+	groundSubMenu->setStatusTip(tr("Fill ground"));
 	QList<QAction*> actions = fillGroundAct->actions();
 
 	for(QList<QAction*>::const_iterator
 	    it = actions.begin(); it != actions.end(); ++it)
-	    ground->addAction(*it);
+	    groundSubMenu->addAction(*it);
 
 	menu.addSeparator();
-	menu.addAction(clearObjectsAct);
 
-	menu.exec(event->globalPos());
-	mapData.clearSelection();
+	QMenu* clearSubMenu = menu.addMenu(QIcon(":/images/clear_objects.png"), tr("&Remove Objects"));
+	clearSubMenu->setStatusTip(tr("Remove objects"));
+	actions = clearObjectsAct->actions();
+
+	for(QList<QAction*>::const_iterator
+	    it = actions.begin(); it != actions.end(); ++it)
+	    clearSubMenu->addAction(*it);
     }
+    else
+    {
+	menu.addAction(editPasteAct);
+	menu.addSeparator();
+
+	QMenu* addSubMenu = menu.addMenu(QIcon(":/images/menu_fill.png"), tr("&Add Objects"));
+	addSubMenu->setStatusTip(tr("add objects"));
+
+	menu.addSeparator();
+	menu.addAction(editPassableAct);
+	menu.addAction(cellInfoAct);
+    }
+
+    menu.exec(event->globalPos());
+    mapData.clearSelection();
 }
 
 void MapWindow::fillGroundAction(QAction* act)
 {
-    ActionGround* groundAct = qobject_cast<ActionGround*>(act);
+    ActionFillGround* groundAct = qobject_cast<ActionFillGround*>(act);
 
     if(groundAct)
     {
 	isModified = true;
-	qDebug() << "fill ground: " << groundAct->ground();
+	mapData.fillGroundSelected(groundAct->ground());
     }
 }
 
-void MapWindow::clearObjectsAction(void)
+void MapWindow::clearObjectsAction(QAction*)
 {
     QList<QGraphicsItem*> selected = mapData.selectedItems();
 
     if(selected.size())
     {
+	qDebug() << "clear objects action";
     }
 }
 
-void MapWindow::copy(void)
+void MapWindow::copyToBuffer(void)
 {
-    //QList<QGraphicsItem*> = mapData.selectedItems();
+    QList<QGraphicsItem*> selected = mapData.selectedItems();
+
+    if(selected.size())
+    {
+	qDebug() << "copy action";
+	emit validBuffer(true);
+    }
 }
 
-void MapWindow::paste(void)
+void MapWindow::pasteFromBuffer(void)
 {
+    qDebug() << "paste action";
     isModified = true;
+}
+
+void MapWindow::editPassableDialog(void)
+{
+    qDebug() << "edit passable dialog";
+}
+
+void MapWindow::cellInfoDialog(void)
+{
+    qDebug() << "cell info dialog";
 }
