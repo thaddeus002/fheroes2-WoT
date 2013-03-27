@@ -131,6 +131,8 @@ void MainWindow::updateMenus(void)
     previousAct->setEnabled(hasMapWindow);
     separatorAct->setVisible(hasMapWindow);
     mapOptionsAct->setEnabled(hasMapWindow);
+    showRadarAct->setEnabled(hasMapWindow);
+    showPassableAct->setEnabled(hasMapWindow);
 }
 
 void MainWindow::updateWindowMenu(void)
@@ -239,6 +241,12 @@ void MainWindow::createActions(void)
     menuAboutAct = new QAction(tr("&About"), this);
     menuAboutAct->setStatusTip(tr("Show the application's About box"));
     connect(menuAboutAct, SIGNAL(triggered()), this, SLOT(about()));
+
+    showRadarAct = new QAction(tr("Radar"), this);
+    showRadarAct->setStatusTip(tr("Show the mini map"));
+
+    showPassableAct = new QAction(tr("Passable Mode"), this);
+    showPassableAct->setStatusTip(tr("Show the passable mode"));
 }
 
 void MainWindow::createMenus(void)
@@ -255,6 +263,8 @@ void MainWindow::createMenus(void)
     mapMenu = menuBar()->addMenu(tr("&Map"));
     mapMenu->addAction(mapOptionsAct);
     mapMenu->addSeparator()->setText(tr("View Mode"));
+    mapMenu->addAction(showRadarAct);
+    mapMenu->addAction(showPassableAct);
 
     windowMenu = menuBar()->addMenu(tr("&Window"));
     updateWindowMenu();

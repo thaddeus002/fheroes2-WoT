@@ -20,6 +20,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <QtGui>
 #include <QPainter>
 #include <QDomDocument>
 #include <QDebug>
@@ -55,7 +56,8 @@ bool MapTile::isValid(void) const
 }
 
 MapTile::MapTile(const mp2til_t & mp2, const QPoint & offset, H2::Theme & theme)
-    : spriteIndex(mp2.tileSprite), tileRotate(mp2.tileShape), themeContent(theme)
+    : spriteIndex(mp2.tileSprite), tileRotate(mp2.tileShape), themeContent(theme),
+    passableBase(0), passableLocal(0xFF)
 {
 
     setOffset(offset);
@@ -230,7 +232,7 @@ void MapTile::sortSpritesLevels(void)
     qSort(spritesLevel2.begin(), spritesLevel2.end(), MapTileExt::sortLevel2);
 }
 
-MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), themeContent(parent->mainWindow->aggContent), itemOverMouse(NULL)
+MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), themeContent(parent->mainWindow->aggContent), tileOverMouse(NULL)
 {
 }
 
@@ -544,13 +546,13 @@ void MapData::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
     }
 
     // update select item over cursor
-    if(itemOverMouse)
-	update(itemOverMouse->boundingRect());
+    if(tileOverMouse)
+	update(tileOverMouse->boundingRect());
 
-    itemOverMouse = itemAt(event->scenePos());
+    tileOverMouse = qgraphicsitem_cast<MapTile*>(itemAt(event->scenePos()));
 
-    if(itemOverMouse)
-	update(itemOverMouse->boundingRect());
+    if(tileOverMouse)
+	update(tileOverMouse->boundingRect());
 }
 
 void MapData::selectArea(QPointF ptdn, QPointF ptup)
@@ -578,14 +580,12 @@ void MapData::selectArea(QPointF ptdn, QPointF ptup)
     setSelectionArea(path);
 }
 
-void MapData::fillGroundSelected(int ground)
+void MapData::selectAllTiles(void)
 {
-    QList<QGraphicsItem*> selected = selectedItems();
-
-    if(selected.size())
-    {
-	qDebug() << "fill ground action: " << ground;
-    }
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    const QSize & sz = themeContent.tileSize();
+    selectArea(QPointF(0, 0), QPointF(sz.width() * mapSize.width(), sz.height() * mapSize.height()));
+    QApplication::restoreOverrideCursor();
 }
 
 void MapData::drawForeground(QPainter* painter, const QRectF & rect)
@@ -601,11 +601,75 @@ void MapData::drawForeground(QPainter* painter, const QRectF & rect)
     }
     else
     // paint: selected item over mouse
-    if(itemOverMouse)
+    if(tileOverMouse)
     {
 	painter->setPen(QPen(QColor(255, 255, 0), 1));
 	painter->setBrush(QBrush(QColor(0, 0, 0, 0)));
-	const QRectF & rt = itemOverMouse->boundingRect();
+	const QRectF & rt = tileOverMouse->boundingRect();
 	painter->drawRect(QRectF(rt.x() + 1, rt.y() + 1, rt.width() - 2, rt.height() - 2));
+    }
+}
+
+void MapData::editPassableDialog(void)
+{
+    qDebug() << "edit passable dialog";
+}
+
+void MapData::cellInfoDialog(void)
+{
+    if(tileOverMouse)
+	tileOverMouse->showInfo();
+}
+
+void MapData::copyToBuffer(void)
+{
+    QList<QGraphicsItem*> selected = selectedItems();
+
+    if(selected.size())
+    {
+        qDebug() << "copy action";
+        emit validBuffer(true);
+    }
+}
+
+void MapData::pasteFromBuffer(void)
+{
+    emit dataModified();
+    qDebug() << "paste action";
+}
+
+void MapData::fillGroundAction(QAction* act)
+{
+    if(act)
+    {
+	int ground = act->data().toInt();
+	QList<QGraphicsItem*> selected = selectedItems();
+
+	for(QList<QGraphicsItem*>::iterator
+	    it = selected.begin(); it != selected.end(); ++it)
+	{
+	    // code: fill ground
+	}
+
+	emit dataModified();
+    }
+}
+
+void MapData::removeObjectsAction(QAction* act)
+{
+    QList<QGraphicsItem*> selected = selectedItems();
+
+    if(act)
+    {
+        int type = act->data().toInt();
+	QList<QGraphicsItem*> selected = selectedItems();
+
+	for(QList<QGraphicsItem*>::iterator
+	    it = selected.begin(); it != selected.end(); ++it)
+	{
+	    // code: remove objects
+	}
+
+	emit dataModified();
     }
 }

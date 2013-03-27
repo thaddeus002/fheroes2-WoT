@@ -51,7 +51,6 @@ public:
 
 signals:
     void	selectedItems(bool);
-    void	validBuffer(bool);
 
 protected:
     void	closeEvent(QCloseEvent*);
@@ -60,12 +59,6 @@ protected:
 private slots:
     void	mapWasSelectionChanged(void);
     void	mapWasModified(void);
-    void	fillGroundAction(QAction*);
-    void	removeObjectsAction(QAction*);
-    void	copyToBuffer(void);
-    void	pasteFromBuffer(void);
-    void	editPassableDialog(void);
-    void	cellInfoDialog(void);
 
 private:
     friend class MainWindow;
@@ -86,6 +79,7 @@ private:
     QAction*            editPasteAct;
     QAction*            editPassableAct;
     QAction*            cellInfoAct;
+    QAction*            selectAllAct;
 
     QActionGroup*	fillGroundAct;
     QActionGroup*	clearObjectsAct;

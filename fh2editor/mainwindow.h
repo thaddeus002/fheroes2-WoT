@@ -97,6 +97,8 @@ private:
     QAction*		menuAboutAct;
 
     QAction*		mapOptionsAct;
+    QAction*		showRadarAct;
+    QAction*		showPassableAct;
 
     int			sequenceMapNumber;
     AGG::Spool		aggContent;

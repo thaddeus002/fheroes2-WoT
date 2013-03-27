@@ -20,5 +20,8 @@
      <file>images/menu_fill.png</file>
      <file>images/map_options.png</file>
      <file>images/clear_objects.png</file>
+     <file>images/add_objects.png</file>
+     <file>images/edit_cell.png</file>
+     <file>images/cell_info.png</file>
 </qresource>
 </RCC>

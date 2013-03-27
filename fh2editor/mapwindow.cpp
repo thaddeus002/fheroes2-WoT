@@ -35,17 +35,18 @@ MapWindow::MapWindow(MainWindow* parent) : mainWindow(parent), mapData(this)
     isModified = false;
 
     // init: copy, paste
-    editCopyAct = new QAction(QIcon(":/images/menu_copy.png"), tr("&Copy"), this);
+    editCopyAct = new QAction(QIcon(":/images/menu_copy.png"), tr("Copy"), this);
     editCopyAct->setStatusTip(tr("Copy the current selection's contents to the clipboard"));
     editCopyAct->setEnabled(false);
-    connect(editCopyAct, SIGNAL(triggered()), this, SLOT(copyToBuffer()));
+    connect(editCopyAct, SIGNAL(triggered()), &mapData, SLOT(copyToBuffer()));
 
-    editPasteAct = new QAction(QIcon(":/images/menu_paste.png"), tr("&Paste"), this);
+    editPasteAct = new QAction(QIcon(":/images/menu_paste.png"), tr("Paste"), this);
     editPasteAct->setStatusTip(tr("Paste the clipboard's contents into the current selection"));
     editPasteAct->setEnabled(false);
-    connect(editPasteAct, SIGNAL(triggered()), this, SLOT(pasteFromBuffer()));
+    connect(editPasteAct, SIGNAL(triggered()), this, SLOT(mapWasModified()));
+    connect(editPasteAct, SIGNAL(triggered()), &mapData, SLOT(pasteFromBuffer()));
 
-    connect(this, SIGNAL(validBuffer(bool)), editPasteAct, SLOT(setEnabled(bool)));
+    connect(&mapData, SIGNAL(validBuffer(bool)), editPasteAct, SLOT(setEnabled(bool)));
     connect(this, SIGNAL(selectedItems(bool)), editCopyAct, SLOT(setEnabled(bool)));
 
     QAction* curAct;
@@ -98,7 +99,7 @@ MapWindow::MapWindow(MainWindow* parent) : mainWindow(parent), mapData(this)
     curAct->setData(Ground::Water);
     fillGroundAct->addAction(curAct);
 
-    connect(fillGroundAct, SIGNAL(triggered(QAction*)), this, SLOT(fillGroundAction(QAction*)));
+    connect(fillGroundAct, SIGNAL(triggered(QAction*)), &mapData, SLOT(fillGroundAction(QAction*)));
 
     // init: clear objects
     clearObjectsAct = new QActionGroup(this);
@@ -144,19 +145,23 @@ MapWindow::MapWindow(MainWindow* parent) : mainWindow(parent), mapData(this)
 
     curAct = new QAction(tr("All"), this);
     curAct->setStatusTip(tr("Remove all objects"));
-    curAct->setData(8);
+    curAct->setData(10);
     clearObjectsAct->addAction(curAct);
 
-    connect(clearObjectsAct, SIGNAL(triggered(QAction*)), this, SLOT(removeObjectsAction(QAction*)));
+    connect(clearObjectsAct, SIGNAL(triggered(QAction*)), &mapData, SLOT(removeObjectsAction(QAction*)));
 
     // init other
-    editPassableAct = new QAction(tr("Edit passable"), this);
+    editPassableAct = new QAction(QIcon(":/images/edit_cell.png"), tr("Edit passable"), this);
     editPassableAct->setStatusTip(tr("Edit cell passable"));
-    connect(editPassableAct, SIGNAL(triggered()), this, SLOT(editPassableDialog()));
+    connect(editPassableAct, SIGNAL(triggered()), &mapData, SLOT(editPassableDialog()));
 
-    cellInfoAct = new QAction(tr("Cell info"), this);
+    cellInfoAct = new QAction(QIcon(":/images/cell_info.png"), tr("Cell info"), this);
     cellInfoAct->setStatusTip(tr("Show cell info"));
-    connect(cellInfoAct, SIGNAL(triggered()), this, SLOT(cellInfoDialog()));
+    connect(cellInfoAct, SIGNAL(triggered()), &mapData, SLOT(cellInfoDialog()));
+
+    selectAllAct = new QAction(QIcon(":/images/menu_fill.png"), tr("Select All"), this);
+    selectAllAct->setStatusTip(tr("Select all tiles"));
+    connect(selectAllAct, SIGNAL(triggered()), &mapData, SLOT(selectAllTiles()));
 }
 
 void MapWindow::newFile(const QSize & sz, int sequenceNumber)
@@ -322,7 +327,7 @@ void MapWindow::contextMenuEvent(QContextMenuEvent* event)
 	menu.addAction(editCopyAct);
 	menu.addSeparator();
 
-	QMenu* groundSubMenu = menu.addMenu(QIcon(":/images/menu_fill.png"), tr("&Fill Ground"));
+	QMenu* groundSubMenu = menu.addMenu(QIcon(":/images/menu_fill.png"), tr("Fill Ground"));
 	QList<QAction*> actions = fillGroundAct->actions();
 
 	for(QList<QAction*>::const_iterator
@@ -331,7 +336,7 @@ void MapWindow::contextMenuEvent(QContextMenuEvent* event)
 
 	menu.addSeparator();
 
-	QMenu* clearSubMenu = menu.addMenu(QIcon(":/images/clear_objects.png"), tr("&Remove Objects"));
+	QMenu* clearSubMenu = menu.addMenu(QIcon(":/images/clear_objects.png"), tr("Remove Objects"));
 	actions = clearObjectsAct->actions();
 
 	for(QList<QAction*>::const_iterator
@@ -343,60 +348,16 @@ void MapWindow::contextMenuEvent(QContextMenuEvent* event)
 	menu.addAction(editPasteAct);
 	menu.addSeparator();
 
-	QMenu* addSubMenu = menu.addMenu(QIcon(":/images/menu_fill.png"), tr("&Add Objects"));
+	QMenu* addSubMenu = menu.addMenu(QIcon(":/images/add_objects.png"), tr("Add Objects"));
 
 	menu.addSeparator();
 	menu.addAction(editPassableAct);
 	menu.addAction(cellInfoAct);
+
+	menu.addSeparator();
+	menu.addAction(selectAllAct);
     }
 
-    menu.exec(event->globalPos());
-    mapData.clearSelection();
-}
-
-void MapWindow::fillGroundAction(QAction* act)
-{
-    if(act)
-    {
-	isModified = true;
-	mapData.fillGroundSelected(act->data().toInt());
-    }
-}
-
-void MapWindow::removeObjectsAction(QAction* act)
-{
-    QList<QGraphicsItem*> selected = mapData.selectedItems();
-
-    if(act)
-    {
-	//act->data().toInt()
-	qDebug() << "remove objects action";
-    }
-}
-
-void MapWindow::copyToBuffer(void)
-{
-    QList<QGraphicsItem*> selected = mapData.selectedItems();
-
-    if(selected.size())
-    {
-	qDebug() << "copy action";
-	emit validBuffer(true);
-    }
-}
-
-void MapWindow::pasteFromBuffer(void)
-{
-    qDebug() << "paste action";
-    isModified = true;
-}
-
-void MapWindow::editPassableDialog(void)
-{
-    qDebug() << "edit passable dialog";
-}
-
-void MapWindow::cellInfoDialog(void)
-{
-    qDebug() << "cell info dialog";
+    if(selectAllAct != menu.exec(event->globalPos()))
+	mapData.clearSelection();
 }

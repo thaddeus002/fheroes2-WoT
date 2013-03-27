@@ -173,12 +173,15 @@ namespace H2
     protected:
 	AGG::Spool &		aggSpool;
 	QString			theme;
+	QSize			tile;
 
     public:
-	Theme(AGG::Spool & spool) : aggSpool(spool), theme("original") {}
+	Theme(AGG::Spool & spool) : aggSpool(spool), theme("original"), tile(32, 32) {}
 
 	QPixmap			getImageTIL(const QString & til, quint16 index) { return aggSpool.getImageTIL(til, index); }
 	QPair<QPixmap, QPoint>	getImageICN(const QString & icn, quint16 index) { return aggSpool.getImageICN(icn, index); }
+
+	const QSize &		tileSize(void) const { return tile; }
     };
 }
 

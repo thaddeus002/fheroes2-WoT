@@ -28,6 +28,7 @@
 #include <QString>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
+#include <QAction>
 
 #include "engine.h"
 
@@ -75,6 +76,9 @@ public:
     QList<MapTileExt*>	spritesLevel2;
 
     H2::Theme &		themeContent;
+
+    quint8		passableBase;
+    quint8		passableLocal;
 };
 
 class MapData : public QGraphicsScene
@@ -93,12 +97,20 @@ public:
     void		newMap(const QSize &, const QString &);
     bool		loadMap(const QString &);
 
-    void		fillGroundSelected(int);
-
     H2::Theme &		theme(void);
 
 signals:
     void		dataModified(void);
+    void		validBuffer(bool);
+
+protected slots:
+    void		selectAllTiles(void);
+    void		editPassableDialog(void);
+    void		cellInfoDialog(void);
+    void		copyToBuffer(void);
+    void		pasteFromBuffer(void);
+    void		fillGroundAction(QAction*);
+    void		removeObjectsAction(QAction*);
 
 protected:
     void                mousePressEvent(QGraphicsSceneMouseEvent*);
@@ -136,7 +148,7 @@ protected:
 
     QSize		tilesetSize;
     QList<MapTile*>	tilesetItems;
-    QGraphicsItem*	itemOverMouse;
+    MapTile*		tileOverMouse;
 };
 
 #endif
