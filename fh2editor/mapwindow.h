@@ -24,7 +24,6 @@
 #define _EDITOR_MAPWINDOW_H_
 
 #include <QGraphicsView>
-#include <QAction>
 
 #include "mapdata.h"
 
@@ -34,19 +33,6 @@ QT_BEGIN_NAMESPACE
 class QContextMenuEvent;
 class QActionGroup;
 QT_END_NAMESPACE
-
-class ActionFillGround : public QAction
-{
-    Q_OBJECT
-
-public:
-    ActionFillGround(int, QObject*);
-
-    int ground(void) const { return type; }
-
-protected:
-    int type;
-};
 
 class MapWindow : public QGraphicsView
 {
@@ -75,7 +61,7 @@ private slots:
     void	mapWasSelectionChanged(void);
     void	mapWasModified(void);
     void	fillGroundAction(QAction*);
-    void	clearObjectsAction(QAction*);
+    void	removeObjectsAction(QAction*);
     void	copyToBuffer(void);
     void	pasteFromBuffer(void);
     void	editPassableDialog(void);

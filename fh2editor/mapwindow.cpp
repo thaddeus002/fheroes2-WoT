@@ -26,58 +26,6 @@
 #include "mainwindow.h"
 #include "mapwindow.h"
 
-ActionFillGround::ActionFillGround(int ground, QObject* parent) : QAction(parent), type(ground)
-{
-    switch(ground)
-    {
-	case Ground::Desert:
-	    setIcon(QIcon(":/images/ground_desert.png"));
-	    setText(tr("Desert"));
-	    setStatusTip(tr("Select desert ground"));
-	    break;
-	case Ground::Snow:
-	    setIcon(QIcon(":/images/ground_snow.png"));
-	    setText(tr("Snow"));
-	    setStatusTip(tr("Select snow ground"));
-	    break;
-	case Ground::Swamp:
-	    setIcon(QIcon(":/images/ground_swamp.png"));
-	    setText(tr("Swamp"));
-	    setStatusTip(tr("Select swamp ground"));
-	    break;
-	case Ground::Wasteland:
-	    setIcon(QIcon(":/images/ground_wasteland.png"));
-	    setText(tr("Wasteland"));
-	    setStatusTip(tr("Select wasteland ground"));
-	    break;
-	case Ground::Beach:
-	    setIcon(QIcon(":/images/ground_beach.png"));
-	    setText(tr("Beach"));
-	    setStatusTip(tr("Select beach ground"));
-	    break;
-	case Ground::Lava:
-	    setIcon(QIcon(":/images/ground_lava.png"));
-	    setText(tr("Lava"));
-	    setStatusTip(tr("Select lava ground"));
-	    break;
-	case Ground::Dirt:
-	    setIcon(QIcon(":/images/ground_dirt.png"));
-	    setText(tr("Dirt"));
-	    setStatusTip(tr("Select dirt ground"));
-	    break;
-	case Ground::Grass:
-	    setIcon(QIcon(":/images/ground_grass.png"));
-	    setText(tr("Grass"));
-	    setStatusTip(tr("Select grass ground"));
-	    break;
-	case Ground::Water:
-	    setIcon(QIcon(":/images/ground_water.png"));
-	    setText(tr("Water"));
-	    setStatusTip(tr("Select water"));
-	    break;
-    }
-}
-
 MapWindow::MapWindow(MainWindow* parent) : mainWindow(parent), mapData(this)
 {
     setAttribute(Qt::WA_DeleteOnClose);
@@ -100,35 +48,108 @@ MapWindow::MapWindow(MainWindow* parent) : mainWindow(parent), mapData(this)
     connect(this, SIGNAL(validBuffer(bool)), editPasteAct, SLOT(setEnabled(bool)));
     connect(this, SIGNAL(selectedItems(bool)), editCopyAct, SLOT(setEnabled(bool)));
 
+    QAction* curAct;
+
     // init: fill ground
     fillGroundAct = new QActionGroup(this);
-    fillGroundAct->addAction(new ActionFillGround(Ground::Desert, fillGroundAct));
-    fillGroundAct->addAction(new ActionFillGround(Ground::Snow, fillGroundAct));
-    fillGroundAct->addAction(new ActionFillGround(Ground::Swamp, fillGroundAct));
-    fillGroundAct->addAction(new ActionFillGround(Ground::Wasteland, fillGroundAct));
-    fillGroundAct->addAction(new ActionFillGround(Ground::Beach, fillGroundAct));
-    fillGroundAct->addAction(new ActionFillGround(Ground::Lava, fillGroundAct));
-    fillGroundAct->addAction(new ActionFillGround(Ground::Dirt, fillGroundAct));
-    fillGroundAct->addAction(new ActionFillGround(Ground::Grass, fillGroundAct));
-    fillGroundAct->addAction(new ActionFillGround(Ground::Water, fillGroundAct));
+
+    curAct = new QAction(QIcon(":/images/ground_desert.png"), tr("Desert"), this);
+    curAct->setStatusTip(tr("Fill desert ground"));
+    curAct->setData(Ground::Desert);
+    fillGroundAct->addAction(curAct);
+
+    curAct = new QAction(QIcon(":/images/ground_snow.png"), tr("Snow"), this);
+    curAct->setStatusTip(tr("Fill snow ground"));
+    curAct->setData(Ground::Snow);
+    fillGroundAct->addAction(curAct);
+
+    curAct = new QAction(QIcon(":/images/ground_swamp.png"), tr("Swamp"), this);
+    curAct->setStatusTip(tr("Fill swamp ground"));
+    curAct->setData(Ground::Swamp);
+    fillGroundAct->addAction(curAct);
+
+    curAct = new QAction(QIcon(":/images/ground_wasteland.png"), tr("Wasteland"), this);
+    curAct->setStatusTip(tr("Fill wasteland ground"));
+    curAct->setData(Ground::Wasteland);
+    fillGroundAct->addAction(curAct);
+
+    curAct = new QAction(QIcon(":/images/ground_beach.png"), tr("Beach"), this);
+    curAct->setStatusTip(tr("Fill beach ground"));
+    curAct->setData(Ground::Beach);
+    fillGroundAct->addAction(curAct);
+
+    curAct = new QAction(QIcon(":/images/ground_lava.png"), tr("Lava"), this);
+    curAct->setStatusTip(tr("Fill lava ground"));
+    curAct->setData(Ground::Lava);
+    fillGroundAct->addAction(curAct);
+
+    curAct = new QAction(QIcon(":/images/ground_dirt.png"), tr("Dirt"), this);
+    curAct->setStatusTip(tr("Fill dirt ground"));
+    curAct->setData(Ground::Dirt);
+    fillGroundAct->addAction(curAct);
+
+    curAct = new QAction(QIcon(":/images/ground_grass.png"), tr("Grass"), this);
+    curAct->setStatusTip(tr("Fill grass ground"));
+    curAct->setData(Ground::Grass);
+    fillGroundAct->addAction(curAct);
+
+    curAct = new QAction(QIcon(":/images/ground_water.png"), tr("Water"), this);
+    curAct->setStatusTip(tr("Fill water"));
+    curAct->setData(Ground::Water);
+    fillGroundAct->addAction(curAct);
+
     connect(fillGroundAct, SIGNAL(triggered(QAction*)), this, SLOT(fillGroundAction(QAction*)));
 
     // init: clear objects
     clearObjectsAct = new QActionGroup(this);
-    clearObjectsAct->addAction(new QAction(tr("Buildings"), clearObjectsAct));
-    clearObjectsAct->addAction(new QAction(tr("Mounts/Rocs"), clearObjectsAct));
-    clearObjectsAct->addAction(new QAction(tr("Trees/Shrubs"), clearObjectsAct));
-    clearObjectsAct->addAction(new QAction(tr("Pickup resources"), clearObjectsAct));
-    clearObjectsAct->addAction(new QAction(tr("Artifacts"), clearObjectsAct));
-    clearObjectsAct->addAction(new QAction(tr("Monsters"), clearObjectsAct));
-    clearObjectsAct->addAction(new QAction(tr("Heroes"), clearObjectsAct));
-    QAction* separator = new QAction(clearObjectsAct);
-    separator->setSeparator(true);
-    clearObjectsAct->addAction(separator);
-    clearObjectsAct->addAction(new QAction(tr("All"), clearObjectsAct));
-    connect(clearObjectsAct, SIGNAL(triggered(QAction*)), this, SLOT(clearObjectsAction(QAction*)));
 
-    // init
+    curAct = new QAction(tr("Buildings"), this);
+    curAct->setStatusTip(tr("Remove buildings"));
+    curAct->setData(1);
+    clearObjectsAct->addAction(curAct);
+
+    curAct = new QAction(tr("Mounts/Rocs"), this);
+    curAct->setStatusTip(tr("Remove mounts/rocs"));
+    curAct->setData(2);
+    clearObjectsAct->addAction(curAct);
+
+    curAct = new QAction(tr("Trees/Shrubs"), this);
+    curAct->setStatusTip(tr("Remove trees/shrubs"));
+    curAct->setData(3);
+    clearObjectsAct->addAction(curAct);
+
+    curAct = new QAction(tr("Pickup resources"), this);
+    curAct->setStatusTip(tr("Remove resources"));
+    curAct->setData(4);
+    clearObjectsAct->addAction(curAct);
+
+    curAct = new QAction(tr("Artifacts"), this);
+    curAct->setStatusTip(tr("Remove artifacts"));
+    curAct->setData(5);
+    clearObjectsAct->addAction(curAct);
+
+    curAct = new QAction(tr("Monsters"), this);
+    curAct->setStatusTip(tr("Remove monsters"));
+    curAct->setData(6);
+    clearObjectsAct->addAction(curAct);
+
+    curAct = new QAction(tr("Heroes"), this);
+    curAct->setStatusTip(tr("Remove heroes"));
+    curAct->setData(7);
+    clearObjectsAct->addAction(curAct);
+
+    curAct = new QAction(this);
+    curAct->setSeparator(true);
+    clearObjectsAct->addAction(curAct);
+
+    curAct = new QAction(tr("All"), this);
+    curAct->setStatusTip(tr("Remove all objects"));
+    curAct->setData(8);
+    clearObjectsAct->addAction(curAct);
+
+    connect(clearObjectsAct, SIGNAL(triggered(QAction*)), this, SLOT(removeObjectsAction(QAction*)));
+
+    // init other
     editPassableAct = new QAction(tr("Edit passable"), this);
     editPassableAct->setStatusTip(tr("Edit cell passable"));
     connect(editPassableAct, SIGNAL(triggered()), this, SLOT(editPassableDialog()));
@@ -302,7 +323,6 @@ void MapWindow::contextMenuEvent(QContextMenuEvent* event)
 	menu.addSeparator();
 
 	QMenu* groundSubMenu = menu.addMenu(QIcon(":/images/menu_fill.png"), tr("&Fill Ground"));
-	groundSubMenu->setStatusTip(tr("Fill ground"));
 	QList<QAction*> actions = fillGroundAct->actions();
 
 	for(QList<QAction*>::const_iterator
@@ -312,7 +332,6 @@ void MapWindow::contextMenuEvent(QContextMenuEvent* event)
 	menu.addSeparator();
 
 	QMenu* clearSubMenu = menu.addMenu(QIcon(":/images/clear_objects.png"), tr("&Remove Objects"));
-	clearSubMenu->setStatusTip(tr("Remove objects"));
 	actions = clearObjectsAct->actions();
 
 	for(QList<QAction*>::const_iterator
@@ -325,7 +344,6 @@ void MapWindow::contextMenuEvent(QContextMenuEvent* event)
 	menu.addSeparator();
 
 	QMenu* addSubMenu = menu.addMenu(QIcon(":/images/menu_fill.png"), tr("&Add Objects"));
-	addSubMenu->setStatusTip(tr("add objects"));
 
 	menu.addSeparator();
 	menu.addAction(editPassableAct);
@@ -338,22 +356,21 @@ void MapWindow::contextMenuEvent(QContextMenuEvent* event)
 
 void MapWindow::fillGroundAction(QAction* act)
 {
-    ActionFillGround* groundAct = qobject_cast<ActionFillGround*>(act);
-
-    if(groundAct)
+    if(act)
     {
 	isModified = true;
-	mapData.fillGroundSelected(groundAct->ground());
+	mapData.fillGroundSelected(act->data().toInt());
     }
 }
 
-void MapWindow::clearObjectsAction(QAction*)
+void MapWindow::removeObjectsAction(QAction* act)
 {
     QList<QGraphicsItem*> selected = mapData.selectedItems();
 
-    if(selected.size())
+    if(act)
     {
-	qDebug() << "clear objects action";
+	//act->data().toInt()
+	qDebug() << "remove objects action";
     }
 }
 
