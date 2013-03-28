@@ -889,3 +889,359 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 
     return 0;
 }
+
+
+/*Themes section */
+H2::Theme::Theme(AGG::Spool & spool) : aggSpool(spool), name("original"), tile(32, 32)
+{
+}
+
+QPixmap H2::Theme::getImageTIL(const QString & til, quint16 index)
+{
+    return aggSpool.getImageTIL(til, index);
+}
+
+QPair<QPixmap, QPoint> H2::Theme::getImageICN(const QString & icn, quint16 index)
+{
+    return aggSpool.getImageICN(icn, index);
+}
+
+const QSize & H2::Theme::tileSize(void) const
+{
+    return tile;
+}
+
+int H2::Theme::startFilledTile(int ground) const
+{
+    // 30%
+    if(0 == Rand(6))
+        return startFilledOriginalTile(ground);
+
+    int res = 0;
+
+    switch(ground)
+    {
+        case Ground::Desert:      res = 300; break;
+        case Ground::Snow:        res = 130; break;
+        case Ground::Swamp:       res = 184; break;
+        case Ground::Wasteland:   res = 399; break;
+        case Ground::Beach:       res = 415; break;
+        case Ground::Lava:        res = 246; break;
+        case Ground::Dirt:        res = 337; break;
+        case Ground::Grass:       res = 68;  break;
+        case Ground::Water:       res = 16;  break;
+        default: qCritical() << "H2::Theme::startFilledTile:" << "unknown ground"; break;
+    }
+
+    return res + Rand(7);
+}
+
+int H2::Theme::startFilledOriginalTile(int ground) const
+{
+    int res = 0;
+    int count = 8;
+
+    switch(ground)
+    {
+        case Ground::Desert:      res = 308; count = 13; break;
+        case Ground::Snow:        res = 138; break;
+        case Ground::Swamp:       res = 192; count = 16; break;
+        case Ground::Wasteland:   res = 407; break;
+        case Ground::Beach:       res = 423; count = 9; break;
+        case Ground::Lava:        res = 254; break;
+        case Ground::Dirt:        res = 345; count = 16; break;
+        case Ground::Grass:       res = 76; count = 16; break;
+        case Ground::Water:       res = 24; count = 6; break;
+        default: qCritical() << "H2::Theme::startFilledOriginalTile:" << "unknown ground"; break;
+    }
+
+    return res + Rand(count - 1);
+}
+
+int H2::Theme::ground(int index) const
+{
+    // list grounds from GROUND32.TIL
+    if(30 > index)
+        return Ground::Water;
+    else
+    if(92 > index)
+        return Ground::Grass;
+    else
+    if(146 > index)
+        return Ground::Snow;
+    else
+    if(208 > index)
+        return Ground::Swamp;
+    else
+    if(262 > index)
+        return Ground::Lava;
+    else
+    if(321 > index)
+        return Ground::Desert;
+    else
+    if(361 > index)
+        return Ground::Dirt;
+    else
+    if(415 > index)
+        return Ground::Wasteland;
+    else
+    if(432 > index)
+        return Ground::Beach;
+
+    return Ground::Unknown;
+}
+
+int H2::Theme::startGroundTile(int ground) const
+{
+    int res = 0;
+
+    // from GROUND32.TIL
+    switch(ground)
+    {
+        case Ground::Desert:    return 262;
+        case Ground::Snow:      return 92;
+        case Ground::Swamp:     return 146;
+        case Ground::Wasteland: return 361;
+        case Ground::Beach:     return 415;
+        case Ground::Lava:      return 208;
+        case Ground::Dirt:      return 321;
+        case Ground::Grass:     return 30;
+        case Ground::Water:     return 0;
+        default: break;
+    }
+
+    return res;
+}
+
+int H2::Theme::startGroundOriginalTile(int ground) const
+{
+    return startGroundTile(ground) + Rand(3);
+}
+
+int AroundGrounds::operator() (void) const
+{
+    int res = 0;
+
+    for(QVector<int>::const_iterator
+        it = begin(); it != end(); ++it)
+        res |= *it;
+
+    return res;
+}
+
+int AroundGrounds::groundsDirects(int directs) const
+{
+    int res = Ground::Unknown;
+    const QVector<int> & v = *this;
+
+    if(Direction::TopLeft & directs)     res |= v[0];
+    if(Direction::Top & directs)         res |= v[1];
+    if(Direction::TopRight & directs)    res |= v[2];
+    if(Direction::Right & directs)       res |= v[3];
+    if(Direction::BottomRight & directs) res |= v[4];
+    if(Direction::Bottom & directs)      res |= v[5];
+    if(Direction::BottomLeft & directs)  res |= v[6];
+    if(Direction::Left & directs)        res |= v[7];
+    if(Direction::Center & directs)      res |= v[8];
+
+    return res;
+}
+
+int AroundGrounds::aroundGround(int ground) const
+{
+    int res = 0;
+    const QVector<int> & v = *this;
+
+    if(v[0] & ground) res |= Direction::TopLeft;
+    if(v[1] & ground) res |= Direction::Top;
+    if(v[2] & ground) res |= Direction::TopRight;
+    if(v[3] & ground) res |= Direction::Right;
+    if(v[4] & ground) res |= Direction::BottomRight;
+    if(v[5] & ground) res |= Direction::Bottom;
+    if(v[6] & ground) res |= Direction::BottomLeft;
+    if(v[7] & ground) res |= Direction::Left;
+
+    return res;
+}
+
+inline bool IS_EQUAL_VALS(int A, int B)
+{
+    return (A & B) == A;
+}
+
+/* return pair, first: index tile, second: shape - 0: none, 1: vert, 2: horz, 3: both */
+QPair<int, int> H2::Theme::indexGroundRotateFix(const AroundGrounds & around, int ground) const
+{
+    QPair<int, int> res(-1, 0);
+
+    if(ground == Ground::Beach) return res;
+
+    /*
+	1. water - any ground (startGroundTile(ground))
+	2. ground - other ground (startGroundTile(ground))
+	3. ground - water (+16)
+    */
+
+    const int ground_and = around.aroundGround(ground);
+    const int ground_not = ground == Ground::Water ? around.aroundGround(Ground::All) :
+				around.aroundGround(Ground::Water | (Ground::All & ~ground));
+    int marker_id = 0;
+
+    // top
+    if(IS_EQUAL_VALS(Direction::Left | Direction::Right | Direction::Bottom, ground_and) &&
+	IS_EQUAL_VALS(Direction::Top, ground_not))
+    {
+	marker_id = around.groundsDirects(Direction::Top);
+	res = qMakePair(startGroundOriginalTile(ground), 0);
+    }
+    else
+    // bottom
+    if(IS_EQUAL_VALS(Direction::Left | Direction::Right | Direction::Top, ground_and) &&
+	IS_EQUAL_VALS(Direction::Bottom, ground_not))
+    {
+	marker_id = around.groundsDirects(Direction::Bottom);
+	res = qMakePair(startGroundOriginalTile(ground), 1);
+    }
+    else
+    // right
+    if(IS_EQUAL_VALS(Direction::Left | Direction::Top | Direction::Bottom, ground_and) &&
+	IS_EQUAL_VALS(Direction::Right, ground_not))
+    {
+	marker_id = around.groundsDirects(Direction::Right);
+	res = qMakePair(startGroundOriginalTile(ground) + 8, 0);
+    }
+    else
+    // left
+    if(IS_EQUAL_VALS(Direction::Right | Direction::Top | Direction::Bottom, ground_and) &&
+	IS_EQUAL_VALS(Direction::Left, ground_not))
+    {
+	marker_id = around.groundsDirects(Direction::Left);
+	res = qMakePair(startGroundOriginalTile(ground) + 8, 2);
+    }
+    else
+    // corner: top + top right + right
+    if(IS_EQUAL_VALS(Direction::Left | Direction::Bottom | Direction::BottomLeft, ground_and) &&
+	IS_EQUAL_VALS(Direction::Top | Direction::Right, ground_not))
+    {
+	if(Ground::Water != ground &&
+	    around.groundsDirects(Direction::Top) != around.groundsDirects(Direction::Right))
+	{
+	    res = Ground::Water == around.groundsDirects(Direction::Top) ?
+		    qMakePair(startGroundTile(ground) + 36, 0) :
+		    qMakePair(startGroundTile(ground) + 37, 0);
+	}
+	else
+	{
+	    marker_id = around.groundsDirects(Direction::Top | Direction::Right);
+	    res = qMakePair(startGroundOriginalTile(ground) + 4, 0);
+	}
+    }
+    else
+    // corner: top + top left + left
+    if(IS_EQUAL_VALS(Direction::Right | Direction::Bottom | Direction::BottomRight, ground_and) &&
+	IS_EQUAL_VALS(Direction::Top | Direction::Left, ground_not))
+    {
+	if(Ground::Water != ground &&
+	    around.groundsDirects(Direction::Top) != around.groundsDirects(Direction::Left))
+	{
+	    res = Ground::Water == around.groundsDirects(Direction::Top) ?
+		    qMakePair(startGroundTile(ground) + 36, 2) :
+		    qMakePair(startGroundTile(ground) + 37, 2);
+	}
+	else
+	{
+	    marker_id = around.groundsDirects(Direction::Top | Direction::Left);
+	    res = qMakePair(startGroundOriginalTile(ground) + 4, 2);
+	}
+    }
+    else
+    // corner: bottom + bottom right + right
+    if(IS_EQUAL_VALS(Direction::Left | Direction::Top | Direction::TopLeft, ground_and) &&
+	IS_EQUAL_VALS(Direction::Bottom | Direction::Right, ground_not))
+    {
+	if(Ground::Water != ground &&
+	    around.groundsDirects(Direction::Bottom) != around.groundsDirects(Direction::Right))
+	{
+	    res = Ground::Water == around.groundsDirects(Direction::Bottom) ?
+		    qMakePair(startGroundTile(ground) + 36, 1) :
+		    qMakePair(startGroundTile(ground) + 37, 1);
+	}
+	else
+	{
+	    marker_id = around.groundsDirects(Direction::Bottom | Direction::Right);
+	    res = qMakePair(startGroundOriginalTile(ground) + 4, 1);
+	}
+    }
+    else
+    // corner: bottom + bottom left + left
+    if(IS_EQUAL_VALS(Direction::Right | Direction::Top | Direction::TopRight, ground_and) &&
+	IS_EQUAL_VALS(Direction::Bottom | Direction::Left, ground_not))
+    {
+	if(Ground::Water != ground &&
+	    around.groundsDirects(Direction::Bottom) != around.groundsDirects(Direction::Left))
+	{
+	    res = Ground::Water == around.groundsDirects(Direction::Bottom) ?
+		    qMakePair(startGroundTile(ground) + 36, 3) :
+		    qMakePair(startGroundTile(ground) + 37, 3);
+	}
+	else
+	{
+	    marker_id = around.groundsDirects(Direction::Bottom | Direction::Left);
+	    res = qMakePair(startGroundOriginalTile(ground) + 4, 3);
+	}
+    }
+    else
+    // corner: top right
+    if(IS_EQUAL_VALS(Direction::All & ~(Direction::TopRight | Direction::Center), ground_and) &&
+	IS_EQUAL_VALS(Direction::TopRight, ground_not))
+    {
+	marker_id = around.groundsDirects(Direction::TopRight);
+	res = qMakePair(startGroundOriginalTile(ground) + 12, 0);
+    }
+    else
+    // corner: top left
+    if(IS_EQUAL_VALS(Direction::All & ~(Direction::TopLeft | Direction::Center), ground_and) &&
+	IS_EQUAL_VALS(Direction::TopLeft, ground_not))
+    {
+	marker_id = around.groundsDirects(Direction::TopLeft);
+	res = qMakePair(startGroundOriginalTile(ground) + 12, 2);
+    }
+    else
+    // corner: bottom right
+    if(IS_EQUAL_VALS(Direction::All & ~(Direction::BottomRight | Direction::Center), ground_and) &&
+	IS_EQUAL_VALS(Direction::BottomRight, ground_not))
+    {
+	marker_id = around.groundsDirects(Direction::BottomRight);
+	res = qMakePair(startGroundOriginalTile(ground) + 12, 1);
+    }
+    else
+    // corner: bottom left
+    if(IS_EQUAL_VALS(Direction::All & ~(Direction::BottomLeft | Direction::Center), ground_and) &&
+	IS_EQUAL_VALS(Direction::BottomLeft, ground_not))
+    {
+	marker_id = around.groundsDirects(Direction::BottomLeft);
+	res = qMakePair(startGroundOriginalTile(ground) + 12, 3);
+    }
+    else
+    // filled
+    if(IS_EQUAL_VALS(Direction::All & ~Direction::Center, ground_and))
+    {
+	res = qMakePair(startFilledTile(ground), 0);
+    }
+    else
+    // false
+	return qMakePair(-1, 0);
+
+    // dirt fixed
+    if(Ground::Dirt == ground)
+    {
+	if(Ground::Water != marker_id)
+	    res.first = startFilledTile(ground);
+    }
+    else
+    // coast fixed
+    if(Ground::Water != ground && Ground::Water == marker_id)
+	res.first += 16;
+
+    return res;
+}

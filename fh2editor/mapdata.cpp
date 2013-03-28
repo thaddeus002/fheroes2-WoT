@@ -34,7 +34,7 @@
 #include "mapwindow.h"
 #include "mapdata.h"
 
-MapTileExt::MapTileExt(quint8 lv, const mp2lev_t & lvl, const QPair<QPixmap, QPoint> & pair)
+MapTileExt::MapTileExt(int lv, const mp2lev_t & lvl, const QPair<QPixmap, QPoint> & pair)
     : QPair<QPixmap, QPoint>(pair.first, pair.second), ext(lvl), level(lv), tmp(0)
 {
 }
@@ -55,13 +55,21 @@ bool MapTile::isValid(void) const
     return true;
 }
 
-MapTile::MapTile(const mp2til_t & mp2, const QPoint & offset, H2::Theme & theme)
-    : spriteIndex(mp2.tileSprite), tileRotate(mp2.tileShape), themeContent(theme),
-    passableBase(0), passableLocal(0xFF)
+MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos, H2::Theme & theme)
+    : themeContent(theme), mpos(pos), passableBase(0), passableLocal(0xFFFF)
 {
-
+    QPoint offset(mpos.x() * theme.tileSize().width(), mpos.y() * theme.tileSize().height());
     setOffset(offset);
     setFlags(QGraphicsItem::ItemIsSelectable);
+    setTileSprite(mp2.tileSprite, tileRotate);
+    loadSpriteLevel(spritesLevel1, 0, mp2.level1);
+    loadSpriteLevel(spritesLevel2, 0, mp2.level2);
+}
+
+void MapTile::setTileSprite(int index, int rotate)
+{
+    spriteIndex = index;
+    tileRotate = rotate;
 
     QPixmap sprite = themeContent.getImageTIL("GROUND32.TIL", spriteIndex);
 
@@ -72,14 +80,7 @@ MapTile::MapTile(const mp2til_t & mp2, const QPoint & offset, H2::Theme & theme)
 	case 3: setPixmap(sprite.transformed(QTransform().scale(-1, -1))); break;
 	default: setPixmap(sprite); break;
     }
-
-    // level1
-    loadSpriteLevel(spritesLevel1, 0, mp2.level1);
-
-    // level2
-    loadSpriteLevel(spritesLevel2, 0, mp2.level2);
 }
-
 
 QRectF MapTile::boundingRect(void) const
 {
@@ -90,6 +91,16 @@ MapTile::~MapTile()
 {
     qDeleteAll(spritesLevel1.begin(), spritesLevel1.end());
     qDeleteAll(spritesLevel2.begin(), spritesLevel2.end());
+}
+
+int MapTile::groundType(void) const
+{
+    return themeContent.ground(spriteIndex);
+}
+
+int MapTile::tileSpriteIndex(void) const
+{
+    return spriteIndex;
 }
 
 QString MapTile::indexString(int index)
@@ -201,7 +212,7 @@ void MapTile::showInfo(void) const
     QMessageBox::information(NULL, str, msg);
 }
 
-void MapTile::loadSpriteLevel(QList<MapTileExt*> & list, quint8 level, const mp2lev_t & ext)
+void MapTile::loadSpriteLevel(QList<MapTileExt*> & list, int level, const mp2lev_t & ext)
 {
     if(ext.object && ext.index < 0xFF)
     {
@@ -263,8 +274,6 @@ int MapData::indexLimit(void) const
 
 void MapData::newMap(const QSize & msz, const QString &)
 {
-    tilesetSize = QSize(32, 32);
-
     mapDifficulty = 1;
 
     mapSize = QSize(msz);
@@ -301,7 +310,7 @@ void MapData::newMap(const QSize & msz, const QString &)
     {
 	for(int xx = 0; xx < mapSize.width(); ++xx)
         {
-    	    tilesetItems.push_back(new MapTile(mp2til_t(), QPoint(xx * tilesetSize.width(), yy * tilesetSize.height()), themeContent));
+    	    tilesetItems.push_back(new MapTile(mp2til_t(), QPoint(xx, yy), themeContent));
 	    addItem(tilesetItems.back());
 	}
     }
@@ -316,8 +325,6 @@ bool MapData::loadMap(const QString & mapFile)
 bool MapData::loadMP2Map(const QString & mapFile)
 {
     H2::File map(mapFile);
-
-    tilesetSize = QSize(32, 32);
 
     if(map.open(QIODevice::ReadOnly))
     {
@@ -394,8 +401,10 @@ bool MapData::loadMP2Map(const QString & mapFile)
 	if(map.readLE32() != mapSize.height())
 	    qDebug() << "MapData::loadMP2Map:" << "incorrect size";
 
+	const QSize & tileSize = themeContent.tileSize();
+
 	setSceneRect(QRect(QPoint(0, 0),
-		QSize(mapSize.width() * tilesetSize.width(), mapSize.height() * tilesetSize.height())));
+		QSize(mapSize.width() * tileSize.width(), mapSize.height() * tileSize.height())));
 
 	// data map: mp2tile, part1
 	// count blocks: width * heigth
@@ -483,7 +492,7 @@ bool MapData::loadMP2Map(const QString & mapFile)
 	    {
 		const mp2til_t & mp2 = tilBlocks[xx + yy * mapSize.width()];
 
-		tilesetItems.push_back(new MapTile(mp2, QPoint(xx * tilesetSize.width(), yy * tilesetSize.height()), themeContent));
+		tilesetItems.push_back(new MapTile(mp2, QPoint(xx, yy), themeContent));
 
 		quint16 ext = mp2.indexExt;
 
@@ -645,10 +654,39 @@ void MapData::fillGroundAction(QAction* act)
 	int ground = act->data().toInt();
 	QList<QGraphicsItem*> selected = selectedItems();
 
+
+	// fill default
 	for(QList<QGraphicsItem*>::iterator
 	    it = selected.begin(); it != selected.end(); ++it)
 	{
-	    // code: fill ground
+	    MapTile* tile = qgraphicsitem_cast<MapTile*>(*it);
+
+    	    if(tile)
+		tile->setTileSprite(themeContent.startFilledTile(ground), 0);
+	}
+
+	// fixed border
+	QSize tileSize = themeContent.tileSize();
+        QRectF rectArea = selectionArea().boundingRect();
+
+	rectArea.setTopLeft(rectArea.topLeft() - QPoint(tileSize.width() / 2, tileSize.height() / 2));
+	rectArea.setBottomRight(rectArea.bottomRight() + QPoint(tileSize.width() / 2, tileSize.height() / 2));
+
+	QList<QGraphicsItem*> listItems = items(rectArea);
+
+	for(QList<QGraphicsItem*>::iterator
+	    it = listItems.begin(); it != listItems.end(); ++it)
+	{
+	    MapTile* tile = qgraphicsitem_cast<MapTile*>(*it);
+
+    	    if(tile)
+	    {
+		int tileGround = tile->groundType();
+		QPair<int, int> indexGroundRotate = themeContent.indexGroundRotateFix(aroundGrounds(tile), tile->groundType());
+
+		if(0 <= indexGroundRotate.first)
+            	    tile->setTileSprite(indexGroundRotate.first, indexGroundRotate.second);
+	    }
 	}
 
 	emit dataModified();
@@ -673,3 +711,76 @@ void MapData::removeObjectsAction(QAction* act)
 	emit dataModified();
     }
 }
+
+const MapTile* MapData::mapTileFromDirectionConst(const MapTile* center, int direct) const
+{
+    if(center)
+    {
+	QPoint directPos = center->mapPos();
+
+	switch(direct)
+	{
+    	    case Direction::Top:         if(directPos.y()) directPos.setY(directPos.y() - 1); break;
+    	    case Direction::Bottom:      if(directPos.y() < mapSize.height()) directPos.setY(directPos.y() + 1); break;
+    	    case Direction::Left:        if(directPos.x()) directPos.setX(directPos.x() - 1); break;
+    	    case Direction::Right:       if(directPos.x() < mapSize.width()) directPos.setX(directPos.x() + 1); break;
+
+    	    case Direction::TopRight:    return mapTileFromDirectionConst(mapTileFromDirectionConst(center, Direction::Top), Direction::Right);
+    	    case Direction::BottomRight: return mapTileFromDirectionConst(mapTileFromDirectionConst(center, Direction::Bottom), Direction::Right);
+    	    case Direction::BottomLeft:  return mapTileFromDirectionConst(mapTileFromDirectionConst(center, Direction::Bottom), Direction::Left);
+    	    case Direction::TopLeft:     return mapTileFromDirectionConst(mapTileFromDirectionConst(center, Direction::Top), Direction::Left);
+    	    default: break;
+	}
+
+	QList<MapTile*>::const_iterator it = tilesetItems.begin();
+	for(; it != tilesetItems.end(); ++it) if((*it)->mapPos() == directPos) break;
+
+	return it != tilesetItems.end() ? *it : NULL;
+    }
+
+    return NULL;
+}
+
+MapTile* MapData::mapTileFromDirection(const MapTile* center, int direct)
+{
+    return const_cast<MapTile*>(mapTileFromDirectionConst(center, direct));
+}
+
+AroundGrounds MapData::aroundGrounds(const MapTile* center) const
+{
+    AroundGrounds res;
+
+    if(center)
+    {
+	const MapTile* tile = NULL;
+
+	tile = mapTileFromDirectionConst(center, Direction::TopLeft);
+	if(tile) res[0] = tile->groundType();
+
+	tile = mapTileFromDirectionConst(center, Direction::Top);
+	if(tile) res[1] = tile->groundType();
+
+	tile = mapTileFromDirectionConst(center, Direction::TopRight);
+	if(tile) res[2] = tile->groundType();
+
+	tile = mapTileFromDirectionConst(center, Direction::Right);
+	if(tile) res[3] = tile->groundType();
+
+	tile = mapTileFromDirectionConst(center, Direction::BottomRight);
+	if(tile) res[4] = tile->groundType();
+
+	tile = mapTileFromDirectionConst(center, Direction::Bottom);
+	if(tile) res[5] = tile->groundType();
+
+	tile = mapTileFromDirectionConst(center, Direction::BottomLeft);
+	if(tile) res[6] = tile->groundType();
+
+	tile = mapTileFromDirectionConst(center, Direction::Left);
+	if(tile) res[7] = tile->groundType();
+
+	res[8] = center->groundType();
+    }
+
+    return res;
+}
+

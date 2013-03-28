@@ -34,11 +34,12 @@
 
 class MapData;
 class MapWindow;
+class AroundGrounds;
 
 class MapTileExt : protected QPair<QPixmap, QPoint>
 {
 public:
-    MapTileExt(quint8 lv, const mp2lev_t &, const QPair<QPixmap, QPoint> & pair);
+    MapTileExt(int lv, const mp2lev_t &, const QPair<QPixmap, QPoint> & pair);
 
     static bool		sortLevel1(const MapTileExt*, const MapTileExt*);
     static bool		sortLevel2(const MapTileExt*, const MapTileExt*);
@@ -61,24 +62,32 @@ public:
 
     bool		isValid(void) const;
     void		showInfo(void) const;
+    int			tileSpriteIndex(void) const;
+    int			groundType(void) const;
 
     static QString	indexString(int);
 
+    const QPoint &	mapPos(void) const { return mpos; }
     void		paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget* = 0);
     void		loadSpriteLevels(const mp2ext_t &);
-    void		loadSpriteLevel(QList<MapTileExt*> &, quint8, const mp2lev_t &);
+    void		loadSpriteLevel(QList<MapTileExt*> &, int, const mp2lev_t &);
     void		sortSpritesLevels(void);
 
-    int			spriteIndex;
-    int			tileRotate;
+    void		setTileSprite(int, int);
+
+protected:
+    H2::Theme &		themeContent;
+
+    QPoint		mpos;
 
     QList<MapTileExt*>	spritesLevel1;
     QList<MapTileExt*>	spritesLevel2;
 
-    H2::Theme &		themeContent;
+    quint16		spriteIndex;
+    quint8		tileRotate;
 
-    quint8		passableBase;
-    quint8		passableLocal;
+    quint16		passableBase;
+    quint16		passableLocal;
 };
 
 class MapData : public QGraphicsScene
@@ -121,6 +130,11 @@ protected:
     void		selectArea(QPointF, QPointF);
     bool		loadMP2Map(const QString &);
 
+    const MapTile*	mapTileFromDirectionConst(const MapTile*, int) const;
+    MapTile*		mapTileFromDirection(const MapTile*, int);
+
+    AroundGrounds	aroundGrounds(const MapTile*) const;
+
     friend class	MapTile;
 
     H2::Theme		themeContent;
@@ -146,7 +160,6 @@ protected:
     quint8		mapRaceColor[6];
     quint32		mapUniq;
 
-    QSize		tilesetSize;
     QList<MapTile*>	tilesetItems;
     MapTile*		tileOverMouse;
 };

@@ -29,10 +29,18 @@
 #include <QPixmap>
 #include <QByteArray>
 #include <QPair>
+#include <QVector>
 
 namespace Ground
 {
-    enum { Desert = 0x01, Snow = 0x02, Swamp = 0x04, Wasteland = 0x08, Beach = 0x10, Lava = 0x20, Dirt = 0x40, Grass = 0x80, Water = 0x100 };
+    enum { Unknown = 0, Desert = 0x01, Snow = 0x02, Swamp = 0x04, Wasteland = 0x08, Beach = 0x10, Lava = 0x20, Dirt = 0x40, Grass = 0x80, Water = 0x100,
+	    All = Desert | Snow | Swamp | Wasteland | Beach | Lava | Dirt | Grass | Water };
+}
+
+namespace Direction
+{
+    enum { Unknown = 0x0000, TopLeft = 0x0001, Top = 0x0002, TopRight = 0x0004, Right = 0x0008, BottomRight = 0x0010, Bottom = 0x0020, BottomLeft = 0x0040, Left = 0x0080, Center = 0x0100,
+	    TopRow = TopLeft | Top | TopRight, BottomRow = BottomLeft | Bottom | BottomRight, CenterRow = Left | Center | Right, All = TopRow | CenterRow | BottomRow };
 }
 
 struct mp2icn_t
@@ -166,22 +174,40 @@ namespace AGG
     };
 }
 
+class AroundGrounds: public QVector<int>
+{
+public:
+    AroundGrounds() : QVector<int>(9, Ground::Unknown){} /* ground: top left, top, top right, right, bottom right, bottom, bottom left, left, center */
+
+    int operator() (void) const;
+    int groundsDirects(int) const;
+    int aroundGround(int) const;
+};
+
 namespace H2
 {
     class Theme
     {
     protected:
 	AGG::Spool &		aggSpool;
-	QString			theme;
+	QString			name;
 	QSize			tile;
 
     public:
-	Theme(AGG::Spool & spool) : aggSpool(spool), theme("original"), tile(32, 32) {}
+	Theme(AGG::Spool &);
 
-	QPixmap			getImageTIL(const QString & til, quint16 index) { return aggSpool.getImageTIL(til, index); }
-	QPair<QPixmap, QPoint>	getImageICN(const QString & icn, quint16 index) { return aggSpool.getImageICN(icn, index); }
+	QPixmap			getImageTIL(const QString &, quint16);
+	QPair<QPixmap, QPoint>	getImageICN(const QString &, quint16);
 
-	const QSize &		tileSize(void) const { return tile; }
+	const QSize &		tileSize(void) const;
+
+	int			startFilledTile(int) const;
+	int			startGroundTile(int) const;
+	int			startFilledOriginalTile(int) const;
+	int			startGroundOriginalTile(int) const;
+
+	int			ground(int) const;
+	QPair<int, int>		indexGroundRotateFix(const AroundGrounds &, int) const;
     };
 }
 
