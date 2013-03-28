@@ -534,13 +534,7 @@ void MapData::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	    clearSelection();
     }
 
-    // skip
-    //QGraphicsScene::mousePressEvent(event);
-}
-
-void MapData::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
-{
-    QGraphicsScene::mouseReleaseEvent(event);
+    event->accept();
 }
 
 void MapData::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
@@ -562,31 +556,46 @@ void MapData::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 
     if(tileOverMouse)
 	update(tileOverMouse->boundingRect());
+
+    event->accept();
 }
 
 void MapData::selectArea(QPointF ptdn, QPointF ptup)
 {
-    if(ptup.x() < ptdn.x())
-	qSwap(ptup.rx(), ptdn.rx());
-
-    if(ptup.y() < ptdn.y())
-	qSwap(ptup.ry(), ptdn.ry());
-
-    QList<QGraphicsItem*> list = items(QRectF(ptdn, ptup), Qt::IntersectsItemShape, Qt::AscendingOrder);
-
-    if(list.isEmpty() && ptdn == ptup)
+    if(ptup != ptdn)
     {
-	QGraphicsItem* item = itemAt(ptup);
-	if(item) list << item;
+	if(ptup.x() < ptdn.x())
+	    qSwap(ptup.rx(), ptdn.rx());
+
+	if(ptup.y() < ptdn.y())
+	    qSwap(ptup.ry(), ptdn.ry());
+
+	QRectF selRect(ptdn, ptup);
+
+	const QSize & tileSize = themeContent.tileSize();
+
+	int sl = selRect.left() / tileSize.width();
+	int st = selRect.top() / tileSize.height();
+	int sr = selRect.right() / tileSize.width();
+	int sb = selRect.bottom() / tileSize.height();
+
+	if(selRect.left() > sl * tileSize.width())
+	    selRect.setLeft(sl * tileSize.width());
+
+	if(selRect.top() > st * tileSize.height())
+	    selRect.setTop(st * tileSize.height());
+
+	if(selRect.right() > sr * tileSize.width())
+	    selRect.setRight((sr + 1) * tileSize.width());
+
+	if(selRect.bottom() > sb * tileSize.height())
+	    selRect.setBottom((sb + 1) * tileSize.height());
+
+	QPainterPath path;
+	path.addRect(selRect);
+
+	setSelectionArea(path);
     }
-
-    QPainterPath path;
-
-    for(QList<QGraphicsItem*>::iterator
-	it = list.begin(); it != list.end(); ++it)
-    	path.addRect((*it)->boundingRect());
-
-    setSelectionArea(path);
 }
 
 void MapData::selectAllTiles(void)

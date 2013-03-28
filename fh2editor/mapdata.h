@@ -123,7 +123,6 @@ protected slots:
 
 protected:
     void                mousePressEvent(QGraphicsSceneMouseEvent*);
-    void                mouseReleaseEvent(QGraphicsSceneMouseEvent*);
     void                mouseMoveEvent(QGraphicsSceneMouseEvent*);
     void		drawForeground(QPainter*, const QRectF &);
 

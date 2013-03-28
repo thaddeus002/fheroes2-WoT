@@ -264,6 +264,9 @@ QString MapWindow::currentFile(void)
 
 void MapWindow::closeEvent(QCloseEvent* event)
 {
+    if(mapData.selectedItems().size())
+	mapData.clearSelection();
+
     if(maybeSave())
         event->accept();
     else
