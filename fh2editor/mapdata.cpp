@@ -61,7 +61,7 @@ MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos, H2::Theme & theme)
     QPoint offset(mpos.x() * theme.tileSize().width(), mpos.y() * theme.tileSize().height());
     setOffset(offset);
     setFlags(QGraphicsItem::ItemIsSelectable);
-    setTileSprite(mp2.tileSprite, tileRotate);
+    setTileSprite(mp2.tileSprite, mp2.tileShape);
     loadSpriteLevel(spritesLevel1, 0, mp2.level1);
     loadSpriteLevel(spritesLevel2, 0, mp2.level2);
 }
