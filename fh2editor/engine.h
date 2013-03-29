@@ -185,6 +185,9 @@ struct mp2sphinx_t
     QString	text;
 };
 
+QDataStream & operator>> (QDataStream &, mp2icn_t &);
+QDataStream & operator>> (QDataStream &, mp2til_t &);
+QDataStream & operator>> (QDataStream &, mp2ext_t &);
 QDataStream & operator>> (QDataStream &, mp2castle_t &);
 QDataStream & operator>> (QDataStream &, mp2hero_t &);
 QDataStream & operator>> (QDataStream &, mp2sign_t &);
@@ -211,9 +214,6 @@ namespace H2
 
 	qint16	readLE16(void);
 	qint32	readLE32(void);
-
-	mp2til_t readMP2Til(void);
-	mp2ext_t readMP2Ext(void);
     };
 
     class ICNSprite : public QImage

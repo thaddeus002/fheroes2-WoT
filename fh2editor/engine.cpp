@@ -29,6 +29,36 @@
 #include "program.h"
 #include "engine.h"
 
+QString readStringFromStream(QDataStream & ds, int count = 0)
+{
+    QString str;
+    quint8 byte;
+
+    if(count)
+    {
+	str.reserve(128);
+
+	for(int ii = 0; ii < count; ++ii)
+	{
+	    ds >> byte;
+	    str.push_back(byte);
+	}
+    }
+    else
+    {
+	str.reserve(512);
+
+	while(! ds.atEnd())
+	{
+	    ds >> byte;
+	    str.push_back(byte);
+	    if(0 == byte) break;
+	}
+    }
+
+    return str;
+}
+
 H2::File::File()
 {
 }
@@ -88,22 +118,15 @@ QString H2::File::readString(size_t sz)
 
 QByteArray H2::File::readBlock(size_t sz, int ps)
 {
-    QByteArray res;
-
     if(0 <= ps)
 	seek(ps);
 
     if(pos() + sz <= size())
-    {
-	res.reserve(sz);
-	res.resize(sz);
-
-	read(res.data(), sz);
-    }
+	return read(sz);
     else
 	qWarning() << "H2::File::readBlock:" << "out of range";
 
-    return res;
+    return NULL;
 }
 
 H2::ICNSprite::ICNSprite(const mp2icn_t & icn, const char* buf, quint32 size, const QVector<QRgb> & pals)
@@ -242,14 +265,19 @@ void H2::ICNSprite::DrawVariant2(const quint8* ptr, const quint8* outOfRange, co
     }
 }
 
-mp2icn_t::mp2icn_t(const char* buf)
+mp2icn_t::mp2icn_t(const char* data)
 {
-    offsetX = qFromLittleEndian(*((quint16*) buf));
-    offsetY = qFromLittleEndian(*((quint16*) (buf + 2)));
-    width = qFromLittleEndian(*((quint16*) (buf + 4)));
-    height = qFromLittleEndian(*((quint16*) (buf + 6)));
-    type = *((quint8*) (buf + 8));
-    offsetData = qFromLittleEndian(*((quint32*) (buf + 9)));
+    QByteArray buf(data, sizeOf());
+    QDataStream ds(buf);
+    ds >> *this;
+}
+
+QDataStream & operator>> (QDataStream & ds, mp2icn_t & icn)
+{
+    ds.setByteOrder(QDataStream::LittleEndian);
+    ds >> icn.offsetX >> icn.offsetY >>
+	icn.width >> icn.height >> icn.type >> icn.offsetData;
+    return ds;
 }
 
 mp2lev_t::mp2lev_t()
@@ -269,80 +297,35 @@ mp2til_t::mp2til_t()
     indexExt = 0;
 }
 
-mp2til_t H2::File::readMP2Til(void)
-{
-    mp2til_t res;
-
-    res.tileSprite = readLE16();
-    res.level1.object = readByte();
-    res.level1.index = readByte();
-    res.quantity1 = readByte();
-    res.quantity2 = readByte();
-    res.level2.object = readByte();
-    res.level2.index = readByte();
-    res.tileShape = readByte();
-    res.tileObject = readByte();
-    res.indexExt = readLE16();
-    res.level1.uniq = readLE32();
-    res.level2.uniq = readLE32();
-
-    return res;
-}
-
 mp2ext_t::mp2ext_t()
 {
     indexExt = 0;
     quantity = 0;
 }
 
-mp2ext_t H2::File::readMP2Ext(void)
+QDataStream & operator>> (QDataStream & ds, mp2til_t & til)
 {
-    mp2ext_t res;
-
-    res.indexExt = readLE16();
-    res.level1.object = 2 * readByte();
-    res.level1.index = readByte();
-    res.quantity = readByte();
-    res.level2.object = readByte();
-    res.level2.index = readByte();
-    res.level1.uniq = readLE32();
-    res.level2.uniq = readLE32();
-
-    return res;
+    ds.setByteOrder(QDataStream::LittleEndian);
+    return ds >> til.tileSprite >>
+	til.level1.object >> til.level1.index >>
+	til.quantity1 >> til.quantity2 >>
+	til.level2.object >> til.level2.index >>
+	til.tileShape >> til.tileObject >>
+	til.indexExt >> til.level1.uniq >> til.level2.uniq;
 }
 
-QString readStringFromStream(QDataStream & ds, int count = 0)
+QDataStream & operator>> (QDataStream & ds, mp2ext_t & ext)
 {
-    QString str;
-    quint8 byte;
-
-    if(count)
-    {
-	str.reserve(128);
-
-	for(int ii = 0; ii < count; ++ii)
-	{
-	    ds >> byte;
-	    str.push_back(byte);
-	}
-    }
-    else
-    {
-	str.reserve(512);
-
-	while(! ds.atEnd())
-	{
-	    ds >> byte;
-	    str.push_back(byte);
-	    if(0 == byte) break;
-	}
-    }
-
-    return str;
+    ds.setByteOrder(QDataStream::LittleEndian);
+    ds >> ext.indexExt >> ext.level1.object >> ext.level1.index >>
+	ext.quantity >> ext.level2.object >> ext.level2.index >> ext.level1.uniq >> ext.level2.uniq;
+    ext.level1.object *= 2;
+    return ds;
 }
 
 QDataStream & operator>> (QDataStream & ds, mp2castle_t & cstl)
 {
+    ds.setByteOrder(QDataStream::LittleEndian);
     ds >> cstl.color >> cstl.customBuilding >> cstl.building >> cstl.magicTower >> cstl.customTroops;
 
     for(int ii = 0; ii < 5; ++ii)
@@ -361,6 +344,7 @@ QDataStream & operator>> (QDataStream & ds, mp2castle_t & cstl)
 
 QDataStream & operator>> (QDataStream & ds, mp2hero_t & hero)
 {
+    ds.setByteOrder(QDataStream::LittleEndian);
     ds >> hero.unknown1 >> hero.customTroops;
 
     for(int ii = 0; ii < 5; ++ii)
@@ -392,6 +376,7 @@ QDataStream & operator>> (QDataStream & ds, mp2hero_t & hero)
 
 QDataStream & operator>> (QDataStream & ds, mp2sign_t & sign)
 {
+    ds.setByteOrder(QDataStream::LittleEndian);
     ds >> sign.id;
 
     for(int ii = 0; ii < 8; ++ii)
@@ -403,6 +388,7 @@ QDataStream & operator>> (QDataStream & ds, mp2sign_t & sign)
 
 QDataStream & operator>> (QDataStream & ds, mp2mapevent_t & evnt)
 {
+    ds.setByteOrder(QDataStream::LittleEndian);
     ds >> evnt.id;
 
     for(int ii = 0; ii < 7; ++ii)
@@ -422,6 +408,7 @@ QDataStream & operator>> (QDataStream & ds, mp2mapevent_t & evnt)
 
 QDataStream & operator>> (QDataStream & ds, mp2dayevent_t & evnt)
 {
+    ds.setByteOrder(QDataStream::LittleEndian);
     ds >> evnt.id;
 
     for(int ii = 0; ii < 7; ++ii)
@@ -441,6 +428,7 @@ QDataStream & operator>> (QDataStream & ds, mp2dayevent_t & evnt)
 
 QDataStream & operator>> (QDataStream & ds, mp2rumor_t & rumor)
 {
+    ds.setByteOrder(QDataStream::LittleEndian);
     ds >> rumor.id;
 
     for(int ii = 0; ii < 7; ++ii)
@@ -452,6 +440,7 @@ QDataStream & operator>> (QDataStream & ds, mp2rumor_t & rumor)
 
 QDataStream & operator>> (QDataStream & ds, mp2sphinx_t & sphinx)
 {
+    ds.setByteOrder(QDataStream::LittleEndian);
     ds >> sphinx.id;
 
     for(int ii = 0; ii < 7; ++ii)

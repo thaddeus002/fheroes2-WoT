@@ -407,7 +407,10 @@ bool MapData::loadMP2Map(const QString & mapFile)
 
 	for(QVector<mp2til_t>::iterator
 	    it = tilBlocks.begin(); it != tilBlocks.end(); ++it)
-	    (*it) = map.readMP2Til();
+	{
+	    QDataStream ds(map.read(20));
+	    ds >> (*it);
+	}
 
 	// data map: mp2ext, part2
 	// count blocks: 4 byte
@@ -415,7 +418,10 @@ bool MapData::loadMP2Map(const QString & mapFile)
 
 	for(QVector<mp2ext_t>::iterator
 	    it = extBlocks.begin(); it != extBlocks.end(); ++it)
-	    (*it) = map.readMP2Ext();
+	{
+	    QDataStream ds(map.read(15));
+	    ds >> (*it);
+	}
 
 	// cood castles
 	QVector<mp2pos_t> townPosBlocks;
