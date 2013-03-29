@@ -311,6 +311,166 @@ mp2ext_t H2::File::readMP2Ext(void)
     return res;
 }
 
+QString readStringFromStream(QDataStream & ds, int count = 0)
+{
+    QString str;
+    quint8 byte;
+
+    if(count)
+    {
+	str.reserve(128);
+
+	for(int ii = 0; ii < count; ++ii)
+	{
+	    ds >> byte;
+	    str.push_back(byte);
+	}
+    }
+    else
+    {
+	str.reserve(512);
+
+	while(! ds.atEnd())
+	{
+	    ds >> byte;
+	    str.push_back(byte);
+	    if(0 == byte) break;
+	}
+    }
+
+    return str;
+}
+
+QDataStream & operator>> (QDataStream & ds, mp2castle_t & cstl)
+{
+    ds >> cstl.color >> cstl.customBuilding >> cstl.building >> cstl.magicTower >> cstl.customTroops;
+
+    for(int ii = 0; ii < 5; ++ii)
+	ds >> cstl.troopId[ii];
+
+    for(int ii = 0; ii < 5; ++ii)
+	ds >> cstl.troopCount[ii];
+
+    ds >> cstl.captainPresent >> cstl.customName;
+
+    cstl.name = readStringFromStream(ds, 13);
+
+    ds >> cstl.race >> cstl.forceTown;
+    return ds;
+}
+
+QDataStream & operator>> (QDataStream & ds, mp2hero_t & hero)
+{
+    ds >> hero.unknown1 >> hero.customTroops;
+
+    for(int ii = 0; ii < 5; ++ii)
+	ds >> hero.troopId[ii];
+
+    for(int ii = 0; ii < 5; ++ii)
+	ds >> hero.troopCount[ii];
+
+    ds >> hero.customPortrate >> hero.portrateType;
+
+    for(int ii = 0; ii < 3; ++ii)
+	ds >> hero.artifacts[ii];
+
+    ds >> hero.unknown2 >> hero.exerience >> hero.customSkills;
+
+    for(int ii = 0; ii < 8; ++ii)
+	ds >> hero.skillId[ii];
+
+    for(int ii = 0; ii < 8; ++ii)
+	ds >> hero.skillLevel[ii];
+
+    ds >> hero.unknown3 >> hero.customName;
+
+    hero.name = readStringFromStream(ds, 13);
+
+    ds >> hero.patrol >> hero.patrolSquare;
+    return ds;
+}
+
+QDataStream & operator>> (QDataStream & ds, mp2sign_t & sign)
+{
+    ds >> sign.id;
+
+    for(int ii = 0; ii < 8; ++ii)
+	ds >> sign.zero[ii];
+
+    sign.text = readStringFromStream(ds);
+    return ds;
+}
+
+QDataStream & operator>> (QDataStream & ds, mp2mapevent_t & evnt)
+{
+    ds >> evnt.id;
+
+    for(int ii = 0; ii < 7; ++ii)
+	ds >> evnt.resources[ii];
+
+    ds >> evnt.artifact >> evnt.allowComputer >> evnt.cancelAfterFirstVisit;
+
+    for(int ii = 0; ii < 10; ++ii)
+	ds >> evnt.zero[ii];
+
+    for(int ii = 0; ii < 6; ++ii)
+	ds >> evnt.colors[ii];
+
+    evnt.text = readStringFromStream(ds);
+    return ds;
+}
+
+QDataStream & operator>> (QDataStream & ds, mp2dayevent_t & evnt)
+{
+    ds >> evnt.id;
+
+    for(int ii = 0; ii < 7; ++ii)
+	ds >> evnt.resources[ii];
+
+    ds >> evnt.artifact >> evnt.allowComputer >> evnt.dayFirstOccurent >> evnt.subsequentOccurrences;
+
+    for(int ii = 0; ii < 6; ++ii)
+	ds >> evnt.zero[ii];
+
+    for(int ii = 0; ii < 6; ++ii)
+	ds >> evnt.colors[ii];
+
+    evnt.text = readStringFromStream(ds);
+    return ds;
+}
+
+QDataStream & operator>> (QDataStream & ds, mp2rumor_t & rumor)
+{
+    ds >> rumor.id;
+
+    for(int ii = 0; ii < 7; ++ii)
+	ds >> rumor.zero[ii];
+
+    rumor.text = readStringFromStream(ds);
+    return ds;
+}
+
+QDataStream & operator>> (QDataStream & ds, mp2sphinx_t & sphinx)
+{
+    ds >> sphinx.id;
+
+    for(int ii = 0; ii < 7; ++ii)
+	ds >> sphinx.resources[ii];
+
+    ds >> sphinx.artifact >> sphinx.answersCount;
+
+    for(int ii = 0; ii < 8; ++ii)
+    {
+	QString str = readStringFromStream(ds, 13);
+
+	if(! str.isEmpty())
+	    sphinx.answers.push_back(str);
+    }
+
+    sphinx.text = readStringFromStream(ds);
+    return ds;
+}
+
 bool AGG::File::exists(const QString & str) const
 {
     return items.end() != items.find(str);

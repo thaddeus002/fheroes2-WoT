@@ -35,7 +35,7 @@
 #include "mapdata.h"
 
 MapTileExt::MapTileExt(int lv, const mp2lev_t & lvl, const QPair<QPixmap, QPoint> & pair)
-    : QPair<QPixmap, QPoint>(pair.first, pair.second), ext(lvl), level(lv), tmp(0)
+    : QPair<QPixmap, QPoint>(pair.first, pair.second), ext(lvl), level(lv)
 {
 }
 
@@ -56,7 +56,7 @@ bool MapTile::isValid(void) const
 }
 
 MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos, H2::Theme & theme)
-    : themeContent(theme), mpos(pos), passableBase(0), passableLocal(0xFFFF)
+    : themeContent(theme), til(mp2), mpos(pos), passableBase(0), passableLocal(0xFFFF)
 {
     QPoint offset(mpos.x() * theme.tileSize().width(), mpos.y() * theme.tileSize().height());
     setOffset(offset);
@@ -68,12 +68,12 @@ MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos, H2::Theme & theme)
 
 void MapTile::setTileSprite(int index, int rotate)
 {
-    spriteIndex = index;
-    tileRotate = rotate;
+    til.tileSprite = index;
+    til.tileShape = rotate;
 
-    QPixmap sprite = themeContent.getImageTIL("GROUND32.TIL", spriteIndex);
+    QPixmap sprite = themeContent.getImageTIL("GROUND32.TIL", til.tileSprite);
 
-    switch(tileRotate % 4)
+    switch(til.tileShape % 4)
     {
 	case 1: setPixmap(sprite.transformed(QTransform().scale( 1, -1))); break;
 	case 2: setPixmap(sprite.transformed(QTransform().scale(-1,  1))); break;
@@ -95,12 +95,7 @@ MapTile::~MapTile()
 
 int MapTile::groundType(void) const
 {
-    return themeContent.ground(spriteIndex);
-}
-
-int MapTile::tileSpriteIndex(void) const
-{
-    return spriteIndex;
+    return themeContent.ground(til.tileSprite);
 }
 
 QString MapTile::indexString(int index)
@@ -172,9 +167,9 @@ void MapTile::showInfo(void) const
     QString str, msg;
     QTextStream ss1(& str), ss2(& msg);
 
-    ss1 << "Tile";
-    ss2 << "tile sprite: " << spriteIndex << endl \
-	<< "tile rotate:  " << tileRotate << endl;
+    ss1 << "Tile" << "(" << mpos.x() << "," << mpos.y() << ")";
+    ss2 << "tile sprite: " << til.tileSprite << endl \
+	<< "tile rotate:  " << til.tileShape << endl;
 
     ss2 << "----------------------" << endl;
 
@@ -476,13 +471,83 @@ bool MapData::loadMP2Map(const QString & mapFile)
 	// read latest blocks
 	for(int ii = 0; ii < blocksCount; ++ii)
 	{
-	    QByteArray block = map.readBlock(map.readLE16());
-
 	    // parse block
+	    QByteArray block = map.readBlock(map.readLE16());
+	    QDataStream data(block);
+	    data.setByteOrder(QDataStream::LittleEndian);
+
+	    QPoint posBlock = positionExtBlockFromNumber(tilBlocks, ii + 1);
+
+	    if(0 <= posBlock.x() && 0 <= posBlock.y())
+	    {
+		switch(block.size())
+		{
+		    // castle block /* 70 byte */
+		    case 70:
+		    {
+			mp2castle_t castle;
+			data >> castle;
+		    }
+			break;
+
+		    // hero block /* 76 byte */
+		    case 76:
+		    {
+			mp2hero_t hero;
+			data >> hero;
+		    }
+			break;
+
+		    default:
+			// sign block /* 10 byte */
+			if(10 <= block.size() && 0x01 == block.at(0))
+			{
+			    mp2sign_t sign;
+			    data >> sign;
+			}
+			else
+			// map event block /* 50 byte */
+			if(50 <= block.size() && 0x01 == block.at(0))
+			{
+			    mp2mapevent_t event;
+			    data >> event;
+			}
+			else
+			// sphinx block /* 138 byte */
+			if(138 <= block.size() && 0 == block.at(0))
+			{
+			    qDebug() << "sphinx block";
+			}
+			else
+			    qCritical() << "unknown block: " << ii << ", size: " << block.size() << ", pos: " << posBlock;
+			break;
+		}
+
+	    }
+	    else
+	    if(block.at(0) == 0)
+	    {
+		// rumor block /* 9 byte */
+		if(9 <= block.size() && block.at(8))
+		{
+		    mp2rumor_t rumor;
+		    data >> rumor;
+		}
+		else
+		// day event block /* 50 byte */
+		if(50 <= block.size() && 0x01 == block.at(42))
+		{
+		    mp2dayevent_t event;
+		    data >> event;
+		}
+		else
+    		    qCritical() << "unknown block: " << ii << ", size: " << block.size();
+	    }
+	    else
+	     qCritical() << "unknown block: " << ii << ", size: " << block.size() << ", byte: " << block[0];
 	}
 
 	mapUniq = map.readLE32();
-
 	map.close();
 
 	// load tiles
@@ -522,6 +587,26 @@ bool MapData::loadMP2Map(const QString & mapFile)
     }
 
     return false;
+}
+
+QPoint MapData::positionExtBlockFromNumber(const QVector<mp2til_t> & tilBlocks, int num) const
+{
+    for(int yy = 0; yy < mapSize.height(); ++yy)
+    {
+        for(int xx = 0; xx < mapSize.width(); ++xx)
+        {
+            const mp2til_t & mp2 = tilBlocks[xx + yy * mapSize.width()];
+
+            quint16 orders = (mp2.quantity2 ? mp2.quantity2 : 0);
+            orders <<= 8;
+            orders |= mp2.quantity1;
+
+            if(orders && !(orders % 0x08) && (num == orders / 0x08))
+		return QPoint(xx, yy);
+        }
+    }
+
+    return QPoint(-1, -1);
 }
 
 void MapData::mousePressEvent(QGraphicsSceneMouseEvent* event)
@@ -570,7 +655,7 @@ void MapData::selectArea(QPointF ptdn, QPointF ptup)
 	if(ptup.y() < ptdn.y())
 	    qSwap(ptup.ry(), ptdn.ry());
 
-	QRectF selRect(ptdn, ptup);
+	QRect selRect = QRectF(ptdn, ptup).toRect();
 
 	const QSize & tileSize = themeContent.tileSize();
 
@@ -690,7 +775,6 @@ void MapData::fillGroundAction(QAction* act)
 
     	    if(tile)
 	    {
-		int tileGround = tile->groundType();
 		QPair<int, int> indexGroundRotate = themeContent.indexGroundRotateFix(aroundGrounds(tile), tile->groundType());
 
 		if(0 <= indexGroundRotate.first)
@@ -708,7 +792,7 @@ void MapData::removeObjectsAction(QAction* act)
 
     if(act)
     {
-        int type = act->data().toInt();
+        //int type = act->data().toInt();
 	QList<QGraphicsItem*> selected = selectedItems();
 
 	for(QList<QGraphicsItem*>::iterator

@@ -49,7 +49,6 @@ public:
 
     mp2lev_t		ext;
     quint8		level;
-    quint8		tmp;
 };
 
 class MapTile : public QGraphicsPixmapItem
@@ -62,7 +61,6 @@ public:
 
     bool		isValid(void) const;
     void		showInfo(void) const;
-    int			tileSpriteIndex(void) const;
     int			groundType(void) const;
 
     static QString	indexString(int);
@@ -76,15 +74,14 @@ public:
     void		setTileSprite(int, int);
 
 protected:
-    H2::Theme &		themeContent;
+    friend class MapData;
 
+    H2::Theme &		themeContent;
+    mp2til_t		til;
     QPoint		mpos;
 
     QList<MapTileExt*>	spritesLevel1;
     QList<MapTileExt*>	spritesLevel2;
-
-    quint16		spriteIndex;
-    quint8		tileRotate;
 
     quint16		passableBase;
     quint16		passableLocal;
@@ -131,6 +128,7 @@ protected:
 
     const MapTile*	mapTileFromDirectionConst(const MapTile*, int) const;
     MapTile*		mapTileFromDirection(const MapTile*, int);
+    QPoint		positionExtBlockFromNumber(const QVector<mp2til_t> &, int) const;
 
     AroundGrounds	aroundGrounds(const MapTile*) const;
 

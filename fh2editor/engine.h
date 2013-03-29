@@ -97,6 +97,102 @@ struct mp2pos_t
     quint8	type;
 };
 
+struct mp2castle_t
+{
+    quint8	color;
+    quint8	customBuilding;
+    quint32	building;
+    quint8	magicTower;
+    quint8	customTroops;
+    quint8	troopId[5];
+    quint16	troopCount[5];
+    quint8	captainPresent;
+    quint8	customName;
+    QString	name; /* string: 13 byte */
+    quint8	race;
+    quint8	forceTown;
+    quint8      unknown1[29];
+};
+
+struct mp2hero_t
+{
+    quint8	unknown1;
+    quint8	customTroops;
+    quint8	troopId[5];
+    quint16	troopCount[5];
+    quint8	customPortrate;
+    quint8	portrateType;
+    quint8	artifacts[3];
+    quint8	unknown2;
+    quint32	exerience;
+    quint8	customSkills;
+    quint8	skillId[8];
+    quint8	skillLevel[8];
+    quint8	unknown3;
+    quint8	customName;
+    QString	name; /* string: 13 byte */
+    quint8	patrol;
+    quint8	patrolSquare;
+    quint8      unknown4[15];
+};
+
+struct mp2sign_t
+{
+    quint8	id; /* 0x01 */
+    quint8	zero[8];
+    QString	text;
+};
+
+struct mp2mapevent_t
+{
+    quint8	id; /* 0x01 */
+    quint32	resources[7]; /* wood, mercury, ore, sulfur, crystal, gems, golds */
+    quint16	artifact; /* 0xffff - none */
+    quint8	allowComputer;
+    quint8	cancelAfterFirstVisit;
+    quint8	zero[10];
+    quint8	colors[6]; /* blue, green, red, yellow, orange, purple */
+    QString	text;
+};
+
+struct mp2dayevent_t
+{
+    quint8	id; /* 0 */
+    quint32	resources[7]; /* wood, mercury, ore, sulfur, crystal, gems, golds */
+    quint16	artifact; /* always 0xffff - none */
+    quint16	allowComputer;
+    quint16	dayFirstOccurent;
+    quint16	subsequentOccurrences;
+    quint8	zero[6];
+    quint8	colors[6]; /* blue, green, red, yellow, orange, purple */
+    QString	text;
+};
+
+struct mp2rumor_t
+{
+    quint8	id; /* 0 */
+    quint8	zero[7];
+    QString	text;
+};
+
+struct mp2sphinx_t
+{
+    quint8	id; /* 0x00 */
+    quint32	resources[7]; /* wood, mercury, ore, sulfur, crystal, gems, golds */
+    quint16	artifact; /* 0xffff - none */
+    quint8	answersCount;
+    QVector<QString> answers; /* 8 blocks, 13 byte string */
+    QString	text;
+};
+
+QDataStream & operator>> (QDataStream &, mp2castle_t &);
+QDataStream & operator>> (QDataStream &, mp2hero_t &);
+QDataStream & operator>> (QDataStream &, mp2sign_t &);
+QDataStream & operator>> (QDataStream &, mp2mapevent_t &);
+QDataStream & operator>> (QDataStream &, mp2dayevent_t &);
+QDataStream & operator>> (QDataStream &, mp2rumor_t &);
+QDataStream & operator>> (QDataStream &, mp2sphinx_t &);
+
 quint32 Rand(quint32 max);
 quint32 Rand(quint32 min, quint32 max);
 
@@ -209,6 +305,7 @@ namespace H2
 	int			ground(int) const;
 	QPair<int, int>		indexGroundRotateFix(const AroundGrounds &, int) const;
     };
+
 }
 
 #endif
