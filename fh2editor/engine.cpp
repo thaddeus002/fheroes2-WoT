@@ -512,7 +512,7 @@ bool AGG::File::loadFile(const QString & fn)
     return false;
 }
 
-QPixmap AGG::File::getImageTIL(const QString & id, quint16 index, QVector<QRgb> & colors)
+QPixmap AGG::File::getImageTIL(const QString & id, int index, QVector<QRgb> & colors)
 {
     QString key = id + QString::number(index);
     QPixmap result = NULL;
@@ -545,7 +545,7 @@ QPixmap AGG::File::getImageTIL(const QString & id, quint16 index, QVector<QRgb> 
     return result;
 }
 
-QPair<QPixmap, QPoint> AGG::File::getImageICN(const QString & id, quint16 index, QVector<QRgb> & colors)
+QPair<QPixmap, QPoint> AGG::File::getImageICN(const QString & id, int index, QVector<QRgb> & colors)
 {
     QString key = id + QString::number(index);
     QPixmap result;
@@ -646,121 +646,173 @@ quint32 Rand(quint32 max)
     return static_cast<quint32>((max + 1) * (qrand() / (RAND_MAX + 1.0)));
 }
 
-QString H2::mapICN(int type)
+int H2::mapICN(int type)
 {
     switch(type)
     {
 	// artifact
-	case 0x2C: case 0x2D: case 0x2E: case 0x2F: return "OBJNARTI.ICN";
+	case 0x2C: case 0x2D: case 0x2E: case 0x2F: return ICN::OBJNARTI;
 	// monster
-	case 0x30: case 0x31: case 0x32: case 0x33: return "MONS32.ICN";
+	case 0x30: case 0x31: case 0x32: case 0x33: return ICN::MONS32;
 	// castle flags
-	case 0x38: case 0x39: case 0x3A: case 0x3B: return "FLAG32.ICN";
+	case 0x38: case 0x39: case 0x3A: case 0x3B: return ICN::FLAG32;
 	// heroes
-	case 0x54: case 0x55: case 0x56: case 0x57: return "MINIHERO.ICN";
+	case 0x54: case 0x55: case 0x56: case 0x57: return ICN::MINIHERO;
 	// relief: snow
-	case 0x58: case 0x59: case 0x5A: case 0x5B: return "MTNSNOW.ICN";
+	case 0x58: case 0x59: case 0x5A: case 0x5B: return ICN::MTNSNOW;
 	// relief: swamp
-	case 0x5C: case 0x5D: case 0x5E: case 0x5F: return "MTNSWMP.ICN";
+	case 0x5C: case 0x5D: case 0x5E: case 0x5F: return ICN::MTNSWMP;
 	// relief: lava
-	case 0x60: case 0x61: case 0x62: case 0x63: return "MTNLAVA.ICN";
+	case 0x60: case 0x61: case 0x62: case 0x63: return ICN::MTNLAVA;
 	// relief: desert
-	case 0x64: case 0x65: case 0x66: case 0x67: return "MTNDSRT.ICN";
+	case 0x64: case 0x65: case 0x66: case 0x67: return ICN::MTNDSRT;
 	// relief: dirt
-	case 0x68: case 0x69: case 0x6A: case 0x6B: return "MTNDIRT.ICN";
+	case 0x68: case 0x69: case 0x6A: case 0x6B: return ICN::MTNDIRT;
 	// relief: others
-	case 0x6C: case 0x6D: case 0x6E: case 0x6F: return "MTNMULT.ICN";
+	case 0x6C: case 0x6D: case 0x6E: case 0x6F: return ICN::MTNMULT;
 	// mines
-	case 0x74: return "EXTRAOVR.ICN";
+	case 0x74: return ICN::EXTRAOVR;
 	// road
-	case 0x78: case 0x79: case 0x7A: case 0x7B: return "ROAD.ICN";
+	case 0x78: case 0x79: case 0x7A: case 0x7B: return ICN::ROAD;
 	// relief: crck
-	case 0x7C: case 0x7D: case 0x7E: case 0x7F: return "MTNCRCK.ICN";
+	case 0x7C: case 0x7D: case 0x7E: case 0x7F: return ICN::MTNCRCK;
 	// relief: gras
-	case 0x80: case 0x81: case 0x82: case 0x83: return "MTNGRAS.ICN";
+	case 0x80: case 0x81: case 0x82: case 0x83: return ICN::MTNGRAS;
 	// trees jungle
-	case 0x84: case 0x85: case 0x86: case 0x87: return "TREJNGL.ICN";
+	case 0x84: case 0x85: case 0x86: case 0x87: return ICN::TREJNGL;
 	// trees evil
-	case 0x88: case 0x89: case 0x8A: case 0x8B: return "TREEVIL.ICN";
+	case 0x88: case 0x89: case 0x8A: case 0x8B: return ICN::TREEVIL;
 	// castle and tower
-	case 0x8C: case 0x8D: case 0x8E: case 0x8F: return "OBJNTOWN.ICN";
+	case 0x8C: case 0x8D: case 0x8E: case 0x8F: return ICN::OBJNTOWN;
 	// castle lands
-	case 0x90: case 0x91: case 0x92: case 0x93: return "OBJNTWBA.ICN";
+	case 0x90: case 0x91: case 0x92: case 0x93: return ICN::OBJNTWBA;
 	// castle shadow
-	case 0x94: case 0x95: case 0x96: case 0x97: return "OBJNTWSH.ICN";
+	case 0x94: case 0x95: case 0x96: case 0x97: return ICN::OBJNTWSH;
 	// random castle
-	case 0x98: case 0x99: case 0x9A: case 0x9B: return "OBJNTWRD.ICN";
+	case 0x98: case 0x99: case 0x9A: case 0x9B: return ICN::OBJNTWRD;
 	// water object
-	case 0xA0: case 0xA1: case 0xA2: case 0xA3: return "OBJNWAT2.ICN";
+	case 0xA0: case 0xA1: case 0xA2: case 0xA3: return ICN::OBJNWAT2;
 	// object other
-	case 0xA4: case 0xA5: case 0xA6: case 0xA7: return "OBJNMUL2.ICN";
+	case 0xA4: case 0xA5: case 0xA6: case 0xA7: return ICN::OBJNMUL2;
 	// trees snow
-	case 0xA8: case 0xA9: case 0xAA: case 0xAB: return "TRESNOW.ICN";
+	case 0xA8: case 0xA9: case 0xAA: case 0xAB: return ICN::TRESNOW;
 	// trees trefir
-	case 0xAC: case 0xAD: case 0xAE: case 0xAF: return "TREFIR.ICN";
+	case 0xAC: case 0xAD: case 0xAE: case 0xAF: return ICN::TREFIR;
 	// trees
-	case 0xB0: case 0xB1: case 0xB2: case 0xB3: return "TREFALL.ICN";
+	case 0xB0: case 0xB1: case 0xB2: case 0xB3: return ICN::TREFALL;
 	// river
-	case 0xB4: case 0xB5: case 0xB6: case 0xB7: return "STREAM.ICN";
+	case 0xB4: case 0xB5: case 0xB6: case 0xB7: return ICN::STREAM;
 	// resource
-	case 0xB8: case 0xB9: case 0xBA: case 0xBB: return "OBJNRSRC.ICN";
+	case 0xB8: case 0xB9: case 0xBA: case 0xBB: return ICN::OBJNRSRC;
 	// gras object
-	case 0xC0: case 0xC1: case 0xC2: case 0xC3: return "OBJNGRA2.ICN";
+	case 0xC0: case 0xC1: case 0xC2: case 0xC3: return ICN::OBJNGRA2;
 	// trees tredeci
-	case 0xC4: case 0xC5: case 0xC6: case 0xC7: return "TREDECI.ICN";
+	case 0xC4: case 0xC5: case 0xC6: case 0xC7: return ICN::TREDECI;
 	// sea object
-	case 0xC8: case 0xC9: case 0xCA: case 0xCB: return "OBJNWATR.ICN";
+	case 0xC8: case 0xC9: case 0xCA: case 0xCB: return ICN::OBJNWATR;
         // vegetation gras                                            
-        case 0xCC: case 0xCD: case 0xCE: case 0xCF: return "OBJNGRAS.ICN";
+        case 0xCC: case 0xCD: case 0xCE: case 0xCF: return ICN::OBJNGRAS;
 	// object on snow                                             
-	case 0xD0: case 0xD1: case 0xD2: case 0xD3: return "OBJNSNOW.ICN";
+	case 0xD0: case 0xD1: case 0xD2: case 0xD3: return ICN::OBJNSNOW;
         // object on swamp                                            
-        case 0xD4: case 0xD5: case 0xD6: case 0xD7: return "OBJNSWMP.ICN";
+        case 0xD4: case 0xD5: case 0xD6: case 0xD7: return ICN::OBJNSWMP;
 	// object on lava                                             
-	case 0xD8: case 0xD9: case 0xDA: case 0xDB: return "OBJNLAVA.ICN";
+	case 0xD8: case 0xD9: case 0xDA: case 0xDB: return ICN::OBJNLAVA;
         // object on desert                                           
-        case 0xDC: case 0xDD: case 0xDE: case 0xDF: return "OBJNDSRT.ICN";
+        case 0xDC: case 0xDD: case 0xDE: case 0xDF: return ICN::OBJNDSRT;
         // object on dirt                                             
-	case 0xE0: case 0xE1: case 0xE2: case 0xE3: return "OBJNDIRT.ICN";
+	case 0xE0: case 0xE1: case 0xE2: case 0xE3: return ICN::OBJNDIRT;
 	// object on crck
-	case 0xE4: case 0xE5: case 0xE6: case 0xE7: return "OBJNCRCK.ICN";
+	case 0xE4: case 0xE5: case 0xE6: case 0xE7: return ICN::OBJNCRCK;
 	// object on lava
-	case 0xE8: case 0xE9: case 0xEA: case 0xEB: return "OBJNLAV3.ICN";
+	case 0xE8: case 0xE9: case 0xEA: case 0xEB: return ICN::OBJNLAV3;
 	// object on earth
-	case 0xEC: case 0xED: case 0xEE: case 0xEF: return "OBJNMULT.ICN";
+	case 0xEC: case 0xED: case 0xEE: case 0xEF: return ICN::OBJNMULT;
 	//  object on lava                                            
-	case 0xF0: case 0xF1: case 0xF2: case 0xF3: return "OBJNLAV2.ICN";
+	case 0xF0: case 0xF1: case 0xF2: case 0xF3: return ICN::OBJNLAV2;
 	// extra objects for loyalty version
-	case 0xF4: case 0xF5: case 0xF6: case 0xF7: return "X_LOC1.ICN";
+	case 0xF4: case 0xF5: case 0xF6: case 0xF7: return ICN::X_LOC1;
 	// extra objects for loyalty version
-	case 0xF8: case 0xF9: case 0xFA: case 0xFB: return "X_LOC2.ICN";
+	case 0xF8: case 0xF9: case 0xFA: case 0xFB: return ICN::X_LOC2;
 	// extra objects for loyalty version
-	case 0xFC: case 0xFD: case 0xFE: case 0xFF: return "X_LOC3.ICN";
+	case 0xFC: case 0xFD: case 0xFE: case 0xFF: return ICN::X_LOC3;
 	// unknown
-	default: qWarning() << "H2::mapICN: return NULL, object:" << type; break;
+	default: qWarning() << "H2::mapICN:unknown object:" << type; break;
+    }
+
+    return ICN::UNKNOWN;
+}
+
+QString H2::icnString(int type)
+{
+    switch(type)
+    {
+	case ICN::OBJNARTI: return "OBJNARTI.ICN";
+	case ICN::MONS32: return "MONS32.ICN";
+	case ICN::FLAG32: return "FLAG32.ICN";
+	case ICN::MINIHERO: return "MINIHERO.ICN";
+	case ICN::MTNSNOW: return "MTNSNOW.ICN";
+	case ICN::MTNSWMP: return "MTNSWMP.ICN";
+	case ICN::MTNLAVA: return "MTNLAVA.ICN";
+	case ICN::MTNDSRT: return "MTNDSRT.ICN";
+	case ICN::MTNDIRT: return "MTNDIRT.ICN";
+	case ICN::MTNMULT: return "MTNMULT.ICN";
+	case ICN::EXTRAOVR: return "EXTRAOVR.ICN";
+	case ICN::ROAD: return "ROAD.ICN";
+	case ICN::MTNCRCK: return "MTNCRCK.ICN";
+	case ICN::MTNGRAS: return "MTNGRAS.ICN";
+	case ICN::TREJNGL: return "TREJNGL.ICN";
+	case ICN::TREEVIL: return "TREEVIL.ICN";
+	case ICN::OBJNTOWN: return "OBJNTOWN.ICN";
+	case ICN::OBJNTWBA: return "OBJNTWBA.ICN";
+	case ICN::OBJNTWSH: return "OBJNTWSH.ICN";
+	case ICN::OBJNTWRD: return "OBJNTWRD.ICN";
+	case ICN::OBJNWAT2: return "OBJNWAT2.ICN";
+	case ICN::OBJNMUL2: return "OBJNMUL2.ICN";
+	case ICN::TRESNOW: return "TRESNOW.ICN";
+	case ICN::TREFIR: return "TREFIR.ICN";
+	case ICN::TREFALL: return "TREFALL.ICN";
+	case ICN::STREAM: return "STREAM.ICN";
+	case ICN::OBJNRSRC: return "OBJNRSRC.ICN";
+	case ICN::OBJNGRA2: return "OBJNGRA2.ICN";
+	case ICN::TREDECI: return "TREDECI.ICN";
+	case ICN::OBJNWATR: return "OBJNWATR.ICN";
+        case ICN::OBJNGRAS: return "OBJNGRAS.ICN";
+	case ICN::OBJNSNOW: return "OBJNSNOW.ICN";
+        case ICN::OBJNSWMP: return "OBJNSWMP.ICN";
+	case ICN::OBJNLAVA: return "OBJNLAVA.ICN";
+        case ICN::OBJNDSRT: return "OBJNDSRT.ICN";
+	case ICN::OBJNDIRT: return "OBJNDIRT.ICN";
+	case ICN::OBJNCRCK: return "OBJNCRCK.ICN";
+	case ICN::OBJNLAV3: return "OBJNLAV3.ICN";
+	case ICN::OBJNMULT: return "OBJNMULT.ICN";
+	case ICN::OBJNLAV2: return "OBJNLAV2.ICN";
+	case ICN::X_LOC1: return "X_LOC1.ICN";
+	case ICN::X_LOC2: return "X_LOC2.ICN";
+	case ICN::X_LOC3: return "X_LOC3.ICN";
+	// unknown
+	default: qWarning() << "H2::icnString: return NULL, object:" << type; break;
     }
 
     return NULL;
 }
 
-int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
+int H2::isAnimationICN(int spriteClass, int spriteIndex, int ticket)
 {
-    switch(ext.object)
+    switch(spriteClass)
     {
-	// object on lava, OBJNLAVA
-	case 0xD8: case 0xD9: case 0xDA: case 0xDB:
-	    switch(ext.index)
+	case ICN::OBJNLAVA:
+	    switch(spriteIndex)
 	    {
 		// shadow of lava
 		case 0x4F: case 0x58: case 0x62:
-		    return ext.index + (ticket % 9) + 1;
+		    return spriteIndex + (ticket % 9) + 1;
 		default: break;
 	    }
 	    break;
 
-	//  object on lava, OBJNLAV2
-	case 0xF0: case 0xF1: case 0xF2: case 0xF3:
-	    switch(ext.index)
+	case ICN::OBJNLAV2:
+	    switch(spriteIndex)
 	    {
 		// middle volcano
 		case 0x00:
@@ -768,38 +820,36 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		case 0x07: case 0x0E:
 		// lava
 		case 0x15:
-		    return ext.index + (ticket % 6) + 1;
+		    return spriteIndex + (ticket % 6) + 1;
 		// small volcano
 		// shadow
 		case 0x21: case 0x2C:
 		// lava
 		case 0x37: case 0x43:
-		    return ext.index + (ticket % 10) + 1;
+		    return spriteIndex + (ticket % 10) + 1;
 		default: break;
 	    }
 	    break;
 
-	// object on lava, OBJNLAV3
-	case 0xE8: case 0xE9: case 0xEA: case 0xEB:
+	case ICN::OBJNLAV3:
 	    // big volcano
-	    switch(ext.index)
+	    switch(spriteIndex)
 	    {
 		// smoke
 		case 0x00: case 0x0F: case 0x1E: case 0x2D: case 0x3C: case 0x4B: case 0x5A: case 0x69: case 0x87: case 0x96: case 0xA5:
 		// shadow
 		case 0x78: case 0xB4: case 0xC3: case 0xD2: case 0xE1:
-		    return ext.index + (ticket % 14) + 1;
+		    return spriteIndex + (ticket % 14) + 1;
 		default: break;
 	    }
 	    break;
 
-	// object other, OBJNMUL2
-	case 0xA4: case 0xA5: case 0xA6: case 0xA7:
-	    switch(ext.index)
+	case ICN::OBJNMUL2:
+	    switch(spriteIndex)
 	    {
 		// lighthouse
 		case 0x3D:
-		    return ext.index + (ticket % 9) + 1;
+		    return spriteIndex + (ticket % 9) + 1;
 		// alchemytower
 		case 0x1B:
 		// watermill
@@ -812,17 +862,16 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		case 0xAD:
 		// shadow smoke
 		case 0xB4:
-		    return ext.index + (ticket % 6) + 1;
+		    return spriteIndex + (ticket % 6) + 1;
 		// magic garden
 		case 0xBE:
-		    return ext.index + (ticket % 6) + 1;
+		    return spriteIndex + (ticket % 6) + 1;
 		default: break;
 	    }
 	    break;
 
-	// object on snow, OBJNSNOW
-	case 0xD0: case 0xD1: case 0xD2: case 0xD3:
-	    switch(ext.index)
+	case ICN::OBJNSNOW:
+	    switch(spriteIndex)
 	    {
 		// firecamp
 		case 0x04:
@@ -830,17 +879,16 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		case 0x97:
 		// watermill
 		case 0xA2: case 0xA9: case 0xB1: case 0xB8:
-		    return ext.index + (ticket % 6) + 1;
+		    return spriteIndex + (ticket % 6) + 1;
 		// mill
 		case 0x60: case 0x64: case 0x68: case 0x6C: case 0x70: case 0x74: case 0x78: case 0x7C: case 0x80: case 0x84:
-		    return ext.index + (ticket % 3) + 1;
+		    return spriteIndex + (ticket % 3) + 1;
 		default: break;
 	    }
 	    break;
 
-	// object on swamp, OBJNSWMP
-	case 0xD4: case 0xD5: case 0xD6: case 0xD7:
-	    switch(ext.index)
+	case ICN::OBJNSWMP:
+	    switch(spriteIndex)
 	    {
 		// shadow
 		case 0x00: case 0x0E: case 0x2B:
@@ -848,29 +896,27 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		case 0x07: case 0x22: case 0x33:
 		// light in window
 		case 0x16: case 0x3A: case 0x43: case 0x4A:
-		    return ext.index + (ticket % 6) + 1;
+		    return spriteIndex + (ticket % 6) + 1;
 		default: break;
 	    }
 	    break;
 
-	// object on desert, OBJNDSRT
-	case 0xDC: case 0xDD: case 0xDE: case 0xDF:
-	    switch(ext.index)
+	case ICN::OBJNDSRT:
+	    switch(spriteIndex)
 	    {
 		// campfire
 		case 0x36: case 0x3D:
-		    return ext.index + (ticket % 6) + 1;
+		    return spriteIndex + (ticket % 6) + 1;
 		default: break;
 	    }
 	    break;
 
-	// gras object, OBJNGRA2
-	case 0xC0: case 0xC1: case 0xC2: case 0xC3:
-	    switch(ext.index)
+	case ICN::OBJNGRA2:
+	    switch(spriteIndex)
 	    {
 		// mill
 		case 0x17: case 0x1B: case 0x1F: case 0x23: case 0x27: case 0x2B: case 0x2F: case 0x33: case 0x37: case 0x3B:
-		    return ext.index + (ticket % 3) + 1;
+		    return spriteIndex + (ticket % 3) + 1;
 		// smoke from chimney
 		case 0x3F: case 0x46: case 0x4D:
 		// archerhouse
@@ -881,13 +927,13 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		case 0x6B:
 		// peasanthunt
 		case 0x72:
-		    return ext.index + (ticket % 6) + 1;
+		    return spriteIndex + (ticket % 6) + 1;
 		default: break;
 	    }
 	    break;
-	// object on crck, OBJNCRCK
-	case 0xE4: case 0xE5: case 0xE6: case 0xE7:
-	    switch(ext.index)
+
+	case ICN::OBJNCRCK:
+	    switch(spriteIndex)
 	    {
 		// pool of oil
 		case 0x50: case 0x5B: case 0x66: case 0x71: case 0x7C: case 0x89: case 0x94: case 0x9F: case 0xAA:
@@ -895,54 +941,51 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		case 0xBE:
 		// shadow smoke
 		case 0xCA:
-		    return ext.index + (ticket % 10) + 1;
+		    return spriteIndex + (ticket % 10) + 1;
 		default: break;
 	    }
 	    break;
 
-	// object on dirt, OBJNDIRT
-	case 0xE0: case 0xE1: case 0xE2: case 0xE3:
-	    switch(ext.index)
+	case ICN::OBJNDIRT:
+	    switch(spriteIndex)
 	    {
 		// mill
 		case 0x99: case 0x9D: case 0xA1: case 0xA5: case 0xA9: case 0xAD: case 0xB1: case 0xB5: case 0xB9: case 0xBD:
-		    return ext.index + (ticket % 3) + 1;
+		    return spriteIndex + (ticket % 3) + 1;
 		default: break;
 	    }
 	    break;
 
-	// object on earth, OBJNMULT
-	case 0xEC: case 0xED: case 0xEE: case 0xEF:
-	    switch(ext.index)
+	case ICN::OBJNMULT:
+	    switch(spriteIndex)
 	    {
 		// smoke
 		case 0x05:
 		// shadow
 		case 0x0F: case 0x19:
-		    return ext.index + (ticket % 9) + 1;
+		    return spriteIndex + (ticket % 9) + 1;
 		// smoke
 		case 0x24:
 		// shadow
 		case 0x2D:
-		    return ext.index + (ticket % 8) + 1;
+		    return spriteIndex + (ticket % 8) + 1;
 		// smoke
 		case 0x5A:
 		// shadow
 		case 0x61: case 0x68: case 0x7C:
 		// campfire
 		case 0x83:
-		    return ext.index + (ticket % 6) + 1;
+		    return spriteIndex + (ticket % 6) + 1;
 		default: break;
 	    }
 	    break;
 
-	// sea object, OBJNWATR
-	case 0xC8: case 0xC9: case 0xCA: case 0xCB:
-	    switch(ext.index)
+	case ICN::OBJNWATR:
+	    switch(spriteIndex)
 	    {
 		// buttle
 		case 0x00:
-		    return ext.index + (ticket % 11) + 1;
+		    return spriteIndex + (ticket % 11) + 1;
 		// shadow
 		case 0x0C:
 		// chest
@@ -967,32 +1010,30 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		case 0xC3:
 		// broken ship (right)
 		case 0xE2: case 0xE9: case 0xF1: case 0xF8:
-		    return ext.index + (ticket % 6) + 1;
+		    return spriteIndex + (ticket % 6) + 1;
 		// seagull on stones
 		case 0x76: case 0x86: case 0x96:
-		    return ext.index + (ticket % 15) + 1;
+		    return spriteIndex + (ticket % 15) + 1;
 		// whirlpool
 		case 0xCA: case 0xCE: case 0xD2: case 0xD6: case 0xDA: case 0xDE:
-		    return ext.index + (ticket % 3) + 1;
+		    return spriteIndex + (ticket % 3) + 1;
 		default: break;
 
 	    }
 	    break;
 
-	// water object, OBJNWAT2
-	case 0xA0: case 0xA1: case 0xA2: case 0xA3:
-	    switch(ext.index)
+	case ICN::OBJNWAT2:
+	    switch(spriteIndex)
 	    {
 		// sail broken ship (left)
 		case 0x03: case 0x0C:
-		    return ext.index + (ticket % 6) + 1;
+		    return spriteIndex + (ticket % 6) + 1;
 		default: break;
 	    }
 	    break;
 
-	// extra objects, X_LOC1
-	case 0xF4: case 0xF5: case 0xF6: case 0xF7:
-	    switch(ext.index)
+	case ICN::X_LOC1:
+	    switch(spriteIndex)
 	    {
 		// alchemist tower
 		case 0x04: case 0x0D: case 0x16:
@@ -1000,36 +1041,34 @@ int H2::isAnimationICN(const mp2lev_t & ext, int ticket)
 		case 0x1F: case 0x28: case 0x32: case 0x3B:
 		// earth altar
 		case 0x55: case 0x5E: case 0x67:
-		    return ext.index + (ticket % 8) + 1;
+		    return spriteIndex + (ticket % 8) + 1;
 		default: break;
 	    }
 	    break;
 
-	// extra objects, X_LOC2
-	case 0xF8: case 0xF9: case 0xFA: case 0xFB:
-	    switch(ext.index)
+	case ICN::X_LOC2:
+	    switch(spriteIndex)
 	    {
 		// mermaid
 		case 0x0A: case 0x13: case 0x1C: case 0x25: 
 		// sirens
 		case 0x2F: case 0x38: case 0x41: case 0x4A: case 0x53: case 0x5C: case 0x66:
-		    return ext.index + (ticket % 8) + 1;
+		    return spriteIndex + (ticket % 8) + 1;
 		default: break;
 	    }
 	    break;
 
-	// extra objects, X_LOC3
-	case 0xFC: case 0xFD: case 0xFE: case 0xFF:
-	    switch(ext.index)
+	case ICN::X_LOC3:
+	    switch(spriteIndex)
 	    {
 		// hut magi
 		case 0x00: case 0x0A: case 0x14:
 		// eye magi
 		case 0x20: case 0x29: case 0x32:
-		    return ext.index + (ticket % 8) + 1;
+		    return spriteIndex + (ticket % 8) + 1;
 		// barrier
 		case 0x3C: case 0x42: case 0x48: case 0x4E: case 0x54: case 0x5A: case 0x60: case 0x66:
-		    return ext.index + (ticket % 4) + 1;
+		    return spriteIndex + (ticket % 4) + 1;
 		default: break;
 	    }
 
@@ -1393,4 +1432,37 @@ QPair<int, int> H2::Theme::indexGroundRotateFix(const AroundGrounds & around, in
 	res.first += 16;
 
     return res;
+}
+
+H2::Town::Town(const QPoint & pos, quint32 id, const mp2castle_t &)
+    : Object(pos, id)
+{
+}
+
+H2::Hero::Hero(const QPoint & pos, quint32 id, const mp2hero_t &)
+    : Object(pos, id)
+{
+}
+
+H2::Sign::Sign(const QPoint & pos, quint32 id, const mp2sign_t &)
+    : Object(pos, id)
+{
+}
+
+H2::MapEvent::MapEvent(const QPoint & pos, quint32 id, const mp2mapevent_t &)
+    : Object(pos, id)
+{
+}
+
+H2::Sphinx::Sphinx(const QPoint & pos, quint32 id, const mp2sphinx_t &)
+    : Object(pos, id)
+{
+}
+
+H2::DayEvent::DayEvent(const mp2dayevent_t &)
+{
+}
+
+H2::Rumor::Rumor(const mp2rumor_t &)
+{
 }

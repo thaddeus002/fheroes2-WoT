@@ -43,6 +43,13 @@ namespace Direction
 	    TopRow = TopLeft | Top | TopRight, BottomRow = BottomLeft | Bottom | BottomRight, CenterRow = Left | Center | Right, All = TopRow | CenterRow | BottomRow };
 }
 
+namespace ICN
+{
+    enum { UNKNOWN = 0, EXTRAOVR, FLAG32, MINIHERO, MONS32, MTNCRCK, MTNDIRT, MTNDSRT, MTNGRAS, MTNLAVA, MTNMULT, MTNSNOW, MTNSWMP, OBJNARTI, OBJNCRCK, OBJNDIRT, OBJNDSRT,
+	    OBJNGRA2, OBJNGRAS, OBJNLAV2, OBJNLAV3, OBJNLAVA, OBJNMUL2, OBJNMULT, OBJNRSRC, OBJNSNOW, OBJNSWMP, OBJNTOWN, OBJNTWBA, OBJNTWRD, OBJNTWSH, OBJNWAT2, OBJNWATR,
+	    ROAD, STREAM, TREDECI, TREEVIL, TREFALL, TREFIR, TREJNGL, TRESNOW, X_LOC1, X_LOC2, X_LOC3 };
+}
+
 struct mp2icn_t
 {
     mp2icn_t(const char*);
@@ -155,6 +162,16 @@ struct mp2mapevent_t
     QString	text;
 };
 
+struct mp2sphinx_t
+{
+    quint8	id; /* 0x00 */
+    quint32	resources[7]; /* wood, mercury, ore, sulfur, crystal, gems, golds */
+    quint16	artifact; /* 0xffff - none */
+    quint8	answersCount;
+    QVector<QString> answers; /* 8 blocks, 13 byte string */
+    QString	text;
+};
+
 struct mp2dayevent_t
 {
     quint8	id; /* 0 */
@@ -172,16 +189,6 @@ struct mp2rumor_t
 {
     quint8	id; /* 0 */
     quint8	zero[7];
-    QString	text;
-};
-
-struct mp2sphinx_t
-{
-    quint8	id; /* 0x00 */
-    quint32	resources[7]; /* wood, mercury, ore, sulfur, crystal, gems, golds */
-    quint16	artifact; /* 0xffff - none */
-    quint8	answersCount;
-    QVector<QString> answers; /* 8 blocks, 13 byte string */
     QString	text;
 };
 
@@ -226,8 +233,9 @@ namespace H2
 	void DrawVariant2(const quint8*, const quint8*, const QVector<QRgb> &);
     };
 
-    QString      mapICN(int);
-    int          isAnimationICN(const mp2lev_t &, int);
+    int          mapICN(int);
+    QString      icnString(int);
+    int          isAnimationICN(int, int, int);
 }
 
 namespace AGG
@@ -252,8 +260,8 @@ namespace AGG
 	bool			loadFile(const QString &);
 	bool			exists(const QString &) const;
 
-	QPixmap			getImageTIL(const QString &, quint16, QVector<QRgb> &);
-	QPair<QPixmap, QPoint>	getImageICN(const QString &, quint16, QVector<QRgb> &);
+	QPixmap			getImageTIL(const QString &, int, QVector<QRgb> &);
+	QPair<QPixmap, QPoint>	getImageICN(const QString &, int, QVector<QRgb> &);
     };
 
     class Spool
@@ -306,6 +314,58 @@ namespace H2
 	QPair<int, int>		indexGroundRotateFix(const AroundGrounds &, int) const;
     };
 
+    class Object : public QPoint
+    {
+	int	uniq;
+
+    public:
+	Object(const QPoint & pos, int id) : QPoint(pos), uniq(id) {}
+	virtual ~Object() {}
+
+	const int & uid(void) const { return uniq; }
+    };
+
+    class Town : public Object
+    {
+    public:
+	Town(const QPoint & pos, quint32 id, const mp2castle_t &);
+    };
+
+    class Hero : public Object
+    {
+    public:
+	Hero(const QPoint & pos, quint32 id, const mp2hero_t &);
+    };
+
+    class Sign : public Object
+    {
+    public:
+	Sign(const QPoint & pos, quint32 id, const mp2sign_t &);
+    };
+
+    class MapEvent : public Object
+    {
+    public:
+	MapEvent(const QPoint & pos, quint32 id, const mp2mapevent_t &);
+    };
+
+    class Sphinx : public Object
+    {
+    public:
+	Sphinx(const QPoint & pos, quint32 id, const mp2sphinx_t &);
+    };
+
+    class DayEvent
+    {
+    public:
+	DayEvent(const mp2dayevent_t &);
+    };
+
+    class Rumor : public QString
+    {
+    public:
+	Rumor(const mp2rumor_t &);
+    };
 }
 
 #endif

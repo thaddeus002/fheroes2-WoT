@@ -20,6 +20,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <algorithm>
 #include <QtGui>
 #include <QPainter>
 #include <QDomDocument>
@@ -34,8 +35,8 @@
 #include "mapwindow.h"
 #include "mapdata.h"
 
-MapTileExt::MapTileExt(int lv, const mp2lev_t & lvl, const QPair<QPixmap, QPoint> & pair)
-    : QPair<QPixmap, QPoint>(pair.first, pair.second), ext(lvl), level(lv)
+MapTileExt::MapTileExt(int lvl, const mp2lev_t & ext, const QPair<QPixmap, QPoint> & pair)
+    : QPair<QPixmap, QPoint>(pair.first, pair.second), spriteICN(H2::mapICN(ext.object)), spriteIndex(ext.index), level(lvl), tmp(0), spriteUID(ext.uniq)
 {
 }
 
@@ -50,9 +51,43 @@ bool MapTileExt::sortLevel2(const MapTileExt* mte1, const MapTileExt* mte2)
     return (mte1->level % 4) < (mte2->level % 4);
 }
 
-bool MapTile::isValid(void) const
+bool MapTileExt::isTown(const MapTileExt* te)
 {
-    return true;
+    return ICN::OBJNTOWN == te->spriteICN ? true : isRandomTown(te);
+}
+
+bool MapTileExt::isRandomTown(const MapTileExt* te)
+{
+    return ICN::OBJNTWRD == te->spriteICN && 32 > te->spriteIndex;
+}
+
+bool MapTileExt::isMiniHero(const MapTileExt* te)
+{
+    return ICN::MINIHERO == te->spriteICN;
+}
+
+bool MapTileExt::isSign(const MapTileExt* te)
+{
+    return (ICN::OBJNMUL2 == te->spriteICN && 114 == te->spriteIndex) ||
+	    (ICN::OBJNDSRT == te->spriteICN && 119 == te->spriteIndex) ||
+	    (ICN::OBJNLAVA == te->spriteICN && 117 == te->spriteIndex) ||
+	    (ICN::OBJNSNOW == te->spriteICN && 143 == te->spriteIndex) ||
+	    (ICN::OBJNSWMP == te->spriteICN && 140 == te->spriteIndex);
+}
+
+bool MapTileExt::isButtle(const MapTileExt* te)
+{
+    return ICN::OBJNWATR == te->spriteICN && 0 == te->spriteIndex;
+}
+
+bool MapTileExt::isSphinx(const MapTileExt* te)
+{
+    return ICN::OBJNDSRT == te->spriteICN && (85 <= te->spriteIndex || 88 <= te->spriteIndex);
+}
+
+bool MapTileExt::isMapEvent(const MapTileExt* te)
+{
+    return ICN::OBJNMUL2 == te->spriteICN && 163 == te->spriteIndex;
 }
 
 MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos, H2::Theme & theme)
@@ -125,13 +160,15 @@ void MapTile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, Q
     {
 	painter->drawPixmap(offset() + (*it)->offset(), (*it)->pixmap());
 
-	int anim = H2::isAnimationICN((*it)->ext, 0);
-	const QString & icn = H2::mapICN((*it)->ext.object);
-
-	if(! icn.isEmpty() && 0 < anim)
+	if(ICN::UNKNOWN != (*it)->spriteICN)
 	{
-	    QPair<QPixmap, QPoint> p = themeContent.getImageICN(icn, anim);
-	    painter->drawPixmap(offset() + p.second, p.first);
+	    int anim = H2::isAnimationICN((*it)->spriteICN, (*it)->spriteIndex, 0);
+
+	    if(0 < anim)
+	    {
+		QPair<QPixmap, QPoint> p = themeContent.getImageICN(H2::icnString((*it)->spriteICN), anim);
+		painter->drawPixmap(offset() + p.second, p.first);
+	    }
 	}
     }
 
@@ -141,25 +178,27 @@ void MapTile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, Q
     {
 	painter->drawPixmap(offset() + (*it)->offset(), (*it)->pixmap());
 
-	int anim = H2::isAnimationICN((*it)->ext, 0);
-	const QString & icn = H2::mapICN((*it)->ext.object);
-
-	if(! icn.isEmpty() && 0 < anim)
+	if(ICN::UNKNOWN != (*it)->spriteICN)
 	{
-	    QPair<QPixmap, QPoint> p = themeContent.getImageICN(icn, anim);
-	    painter->drawPixmap(offset() + p.second, p.first);
+	    int anim = H2::isAnimationICN((*it)->spriteICN, (*it)->spriteIndex, 0);
+
+	    if(0 < anim)
+	    {
+		QPair<QPixmap, QPoint> p = themeContent.getImageICN(H2::icnString((*it)->spriteICN), anim);
+		painter->drawPixmap(offset() + p.second, p.first);
+	    }
 	}
     }
 
+/*
     if(isUnderMouse() && ! isSelected())
     {
-/*
 	painter->setPen(QPen(QColor(255, 255, 0), 1));
 	painter->setBrush(QBrush(QColor(0, 0, 0, 0)));
 	const QRectF & rt = boundingRect();
 	painter->drawRect(rt.x() + 1, rt.y() + 1, rt.width() - 2, rt.height() - 2);
-*/
     }
+*/
 }
 
 void MapTile::showInfo(void) const
@@ -180,9 +219,9 @@ void MapTile::showInfo(void) const
 	    it = spritesLevel1.begin(); it != spritesLevel1.end(); ++it)
 	{
 	    ss2 <<
-		"uniq:   " << (*it)->ext.uniq << endl <<
-		"object: " << (*it)->ext.object << endl <<
-		"index:  " << (*it)->ext.index << endl <<
+		"uniq:   " << (*it)->spriteUID << endl <<
+		"object: " << H2::icnString((*it)->spriteICN) << endl <<
+		"index:  " << (*it)->spriteIndex << endl <<
 		"level:  " << (*it)->level << endl <<
 		"----------------------" << endl;
 	}
@@ -196,9 +235,9 @@ void MapTile::showInfo(void) const
 	    it = spritesLevel2.begin(); it != spritesLevel2.end(); ++it)
 	{
 	    ss2 <<
-		"uniq:   " << (*it)->ext.uniq << endl <<
-		"object: " << (*it)->ext.object << endl <<
-		"index:  " << (*it)->ext.index << endl <<
+		"uniq:   " << (*it)->spriteUID << endl <<
+		"object: " << H2::icnString((*it)->spriteICN) << endl <<
+		"index:  " << (*it)->spriteIndex << endl <<
 		"level:  " << (*it)->level << endl <<
 		"----------------------" << endl;
 	}
@@ -211,7 +250,7 @@ void MapTile::loadSpriteLevel(QList<MapTileExt*> & list, int level, const mp2lev
 {
     if(ext.object && ext.index < 0xFF)
     {
-	const QString & icn = H2::mapICN(ext.object);
+	const QString & icn = H2::icnString(H2::mapICN(ext.object));
 
 	if(! icn.isEmpty())
 	{
@@ -423,6 +462,13 @@ bool MapData::loadMP2Map(const QString & mapFile)
 	    ds >> (*it);
 	}
 
+	// load map tiles
+	if(! loadMapTiles(tilBlocks, extBlocks))
+	{
+    	    map.close();
+    	    return false;
+	}
+
 	// cood castles
 	QVector<mp2pos_t> townPosBlocks;
 	townPosBlocks.reserve(72);
@@ -482,9 +528,10 @@ bool MapData::loadMP2Map(const QString & mapFile)
 	    QDataStream data(block);
 	    data.setByteOrder(QDataStream::LittleEndian);
 
-	    QPoint posBlock = positionExtBlockFromNumber(tilBlocks, ii + 1);
+	    const QPoint posBlock = positionExtBlockFromNumber(tilBlocks, ii + 1);
+	    const MapTile* tile = mapTileConst(posBlock);
 
-	    if(0 <= posBlock.x() && 0 <= posBlock.y())
+	    if(tile && 0 <= posBlock.x() && 0 <= posBlock.y())
 	    {
 		switch(block.size())
 		{
@@ -493,6 +540,9 @@ bool MapData::loadMP2Map(const QString & mapFile)
 		    {
 			mp2castle_t castle;
 			data >> castle;
+			QList<MapTileExt*>::const_iterator ext = std::find_if(tile->spritesLevel1.begin(), tile->spritesLevel1.end(), MapTileExt::isTown);
+			int uid = ext != tile->spritesLevel1.end() ? (*ext)->spriteUID : -1;
+			mapObjects[posBlock] = QSharedPointer<H2::Object>(new H2::Town(posBlock, uid, castle));
 		    }
 			break;
 
@@ -501,6 +551,9 @@ bool MapData::loadMP2Map(const QString & mapFile)
 		    {
 			mp2hero_t hero;
 			data >> hero;
+			QList<MapTileExt*>::const_iterator ext = std::find_if(tile->spritesLevel1.begin(), tile->spritesLevel1.end(), MapTileExt::isMiniHero);
+			int uid = ext != tile->spritesLevel1.end() ? (*ext)->spriteUID : -1;
+			mapObjects[posBlock] = QSharedPointer<H2::Object>(new H2::Hero(posBlock, uid, hero));
 		    }
 			break;
 
@@ -510,6 +563,9 @@ bool MapData::loadMP2Map(const QString & mapFile)
 			{
 			    mp2sign_t sign;
 			    data >> sign;
+			    QList<MapTileExt*>::const_iterator ext = std::find_if(tile->spritesLevel1.begin(), tile->spritesLevel1.end(), MapTileExt::isSign);
+			    int uid = ext != tile->spritesLevel1.end() ? (*ext)->spriteUID : -1;
+			    mapObjects[posBlock] = QSharedPointer<H2::Object>(new H2::Sign(posBlock, uid, sign));
 			}
 			else
 			// map event block /* 50 byte */
@@ -517,12 +573,19 @@ bool MapData::loadMP2Map(const QString & mapFile)
 			{
 			    mp2mapevent_t event;
 			    data >> event;
+			    QList<MapTileExt*>::const_iterator ext = std::find_if(tile->spritesLevel1.begin(), tile->spritesLevel1.end(), MapTileExt::isMapEvent);
+			    int uid = ext != tile->spritesLevel1.end() ? (*ext)->spriteUID : -1;
+			    mapObjects[posBlock] = QSharedPointer<H2::Object>(new H2::MapEvent(posBlock, uid, event));
 			}
 			else
 			// sphinx block /* 138 byte */
 			if(138 <= block.size() && 0 == block.at(0))
 			{
-			    qDebug() << "sphinx block";
+			    mp2sphinx_t sphinx;
+			    data >> sphinx;
+			    QList<MapTileExt*>::const_iterator ext = std::find_if(tile->spritesLevel1.begin(), tile->spritesLevel1.end(), MapTileExt::isSphinx);
+			    int uid = ext != tile->spritesLevel1.end() ? (*ext)->spriteUID : -1;
+			    mapObjects[posBlock] = QSharedPointer<H2::Object>(new H2::Sphinx(posBlock, uid, sphinx));
 			}
 			else
 			    qCritical() << "unknown block: " << ii << ", size: " << block.size() << ", pos: " << posBlock;
@@ -538,6 +601,7 @@ bool MapData::loadMP2Map(const QString & mapFile)
 		{
 		    mp2rumor_t rumor;
 		    data >> rumor;
+		    tavernRumors.push_back(QSharedPointer<H2::Rumor>(new H2::Rumor(rumor)));
 		}
 		else
 		// day event block /* 50 byte */
@@ -545,6 +609,7 @@ bool MapData::loadMP2Map(const QString & mapFile)
 		{
 		    mp2dayevent_t event;
 		    data >> event;
+		    dayEvents.push_back(QSharedPointer<H2::DayEvent>(new H2::DayEvent(event)));
 		}
 		else
     		    qCritical() << "unknown block: " << ii << ", size: " << block.size();
@@ -556,35 +621,6 @@ bool MapData::loadMP2Map(const QString & mapFile)
 	mapUniq = map.readLE32();
 	map.close();
 
-	// load tiles
-	for(int yy = 0; yy < mapSize.height(); ++yy)
-	{
-	    for(int xx = 0; xx < mapSize.width(); ++xx)
-	    {
-		const mp2til_t & mp2 = tilBlocks[xx + yy * mapSize.width()];
-
-		tilesetItems.push_back(new MapTile(mp2, QPoint(xx, yy), themeContent));
-
-		quint16 ext = mp2.indexExt;
-
-		while(ext)
-		{
-		    if(ext >= extBlocks.size())
-		    {
-			qDebug() << "ext block: out of range" << ext;
-    			map.close();
-    			return false;
-		    }
-
-		    tilesetItems.back()->loadSpriteLevels(extBlocks[ext]);
-		    ext = extBlocks[ext].indexExt;
-		}
-
-		tilesetItems.back()->sortSpritesLevels();
-		addItem(tilesetItems.back());
-	    }
-	}
-
 	//
 	mapAuthors = "unknown";
 	mapLicense = "unknown";
@@ -593,6 +629,36 @@ bool MapData::loadMP2Map(const QString & mapFile)
     }
 
     return false;
+}
+
+bool MapData::loadMapTiles(const QVector<mp2til_t> & tilBlocks, const QVector<mp2ext_t> & extBlocks)
+{
+    for(int yy = 0; yy < mapSize.height(); ++yy)
+    {
+	for(int xx = 0; xx < mapSize.width(); ++xx)
+	{
+	    const mp2til_t & mp2 = tilBlocks[xx + yy * mapSize.width()];
+	    tilesetItems.push_back(new MapTile(mp2, QPoint(xx, yy), themeContent));
+	    int ext = mp2.indexExt;
+
+	    while(ext)
+	    {
+		if(ext >= extBlocks.size())
+		{
+		    qDebug() << "ext block: out of range" << ext;
+    		    return false;
+		}
+
+		tilesetItems.back()->loadSpriteLevels(extBlocks[ext]);
+		ext = extBlocks[ext].indexExt;
+	    }
+
+	    tilesetItems.back()->sortSpritesLevels();
+	    addItem(tilesetItems.back());
+	}
+    }
+
+    return true;
 }
 
 QPoint MapData::positionExtBlockFromNumber(const QVector<mp2til_t> & tilBlocks, int num) const
@@ -717,6 +783,11 @@ void MapData::drawForeground(QPainter* painter, const QRectF & rect)
 	const QRectF & rt = tileOverMouse->boundingRect();
 	painter->drawRect(QRectF(rt.x() + 1, rt.y() + 1, rt.width() - 2, rt.height() - 2));
     }
+}
+
+quint32 MapData::uniq(void)
+{
+    return mapUniq++;
 }
 
 void MapData::editPassableDialog(void)
@@ -845,6 +916,17 @@ MapTile* MapData::mapTileFromDirection(const MapTile* center, int direct)
     return const_cast<MapTile*>(mapTileFromDirectionConst(center, direct));
 }
 
+const MapTile* MapData::mapTileConst(const QPoint & pos) const
+{
+    int index = pos.x() + pos.y() * mapSize.width();
+    return 0 <= index && index < tilesetItems.size() ? tilesetItems[index] : NULL;
+}
+
+MapTile* MapData::mapTile(const QPoint & pos)
+{
+    return const_cast<MapTile*>(mapTileConst(pos));
+}
+
 AroundGrounds MapData::aroundGrounds(const MapTile* center) const
 {
     AroundGrounds res;
@@ -882,4 +964,3 @@ AroundGrounds MapData::aroundGrounds(const MapTile* center) const
 
     return res;
 }
-

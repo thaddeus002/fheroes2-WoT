@@ -25,6 +25,7 @@
 
 #include <QVector>
 #include <QList>
+#include <QMap>
 #include <QString>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
@@ -32,12 +33,22 @@
 
 #include "engine.h"
 
+class MapTile;
 class MapData;
 class MapWindow;
 class AroundGrounds;
 
 class MapTileExt : protected QPair<QPixmap, QPoint>
 {
+    friend class MapTile;
+    friend class MapData;
+
+    quint8		spriteICN;
+    quint8		spriteIndex;
+    quint8		level;
+    quint8		tmp;
+    quint32		spriteUID;
+
 public:
     MapTileExt(int lv, const mp2lev_t &, const QPair<QPixmap, QPoint> & pair);
 
@@ -47,8 +58,13 @@ public:
     QPixmap &		pixmap(void) { return first; };
     QPoint &		offset(void) { return second; };
 
-    mp2lev_t		ext;
-    quint8		level;
+    static bool		isMapEvent(const MapTileExt*);
+    static bool		isSphinx(const MapTileExt*);
+    static bool		isSign(const MapTileExt*);
+    static bool		isButtle(const MapTileExt*);
+    static bool		isMiniHero(const MapTileExt*);
+    static bool		isTown(const MapTileExt*);
+    static bool		isRandomTown(const MapTileExt*);
 };
 
 class MapTile : public QGraphicsPixmapItem
@@ -59,7 +75,6 @@ public:
 
     QRectF		boundingRect(void) const;
 
-    bool		isValid(void) const;
     void		showInfo(void) const;
     int			groundType(void) const;
 
@@ -87,6 +102,14 @@ protected:
     quint16		passableLocal;
 };
 
+class MapKey : public QPoint
+{
+public:
+    MapKey(const QPoint & pos) : QPoint(pos) {}
+
+    bool operator< (const QPoint & pt) const { return x() + y() < pt.x() + pt.y(); }
+};
+
 class MapData : public QGraphicsScene
 {
     Q_OBJECT
@@ -99,6 +122,7 @@ public:
     const QSize &	size(void) const;
 
     int			indexLimit(void) const;
+    quint32		uniq(void);
 
     void		newMap(const QSize &, const QString &);
     bool		loadMap(const QString &);
@@ -125,7 +149,10 @@ protected:
 
     void		selectArea(QPointF, QPointF);
     bool		loadMP2Map(const QString &);
+    bool		loadMapTiles(const QVector<mp2til_t> &, const QVector<mp2ext_t> &);
 
+    const MapTile*	mapTileConst(const QPoint &) const;
+    MapTile*		mapTile(const QPoint &);
     const MapTile*	mapTileFromDirectionConst(const MapTile*, int) const;
     MapTile*		mapTileFromDirection(const MapTile*, int);
     QPoint		positionExtBlockFromNumber(const QVector<mp2til_t> &, int) const;
@@ -159,6 +186,13 @@ protected:
 
     QList<MapTile*>	tilesetItems;
     MapTile*		tileOverMouse;
+
+    QMap<MapKey, QSharedPointer<H2::Object> >
+			mapObjects;
+    QVector<QSharedPointer<H2::DayEvent> >
+			dayEvents;
+    QVector<QSharedPointer<H2::Rumor> >
+			tavernRumors;
 };
 
 #endif
