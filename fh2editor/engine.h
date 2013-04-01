@@ -30,6 +30,7 @@
 #include <QByteArray>
 #include <QPair>
 #include <QVector>
+#include <QMap>
 
 namespace Ground
 {
@@ -104,7 +105,7 @@ struct mp2pos_t
     quint8	type;
 };
 
-struct mp2castle_t
+struct mp2town_t
 {
     quint8	color;
     quint8	customBuilding;
@@ -195,7 +196,7 @@ struct mp2rumor_t
 QDataStream & operator>> (QDataStream &, mp2icn_t &);
 QDataStream & operator>> (QDataStream &, mp2til_t &);
 QDataStream & operator>> (QDataStream &, mp2ext_t &);
-QDataStream & operator>> (QDataStream &, mp2castle_t &);
+QDataStream & operator>> (QDataStream &, mp2town_t &);
 QDataStream & operator>> (QDataStream &, mp2hero_t &);
 QDataStream & operator>> (QDataStream &, mp2sign_t &);
 QDataStream & operator>> (QDataStream &, mp2mapevent_t &);
@@ -236,6 +237,51 @@ namespace H2
     int          mapICN(int);
     QString      icnString(int);
     int          isAnimationICN(int, int, int);
+
+    struct TownPos : QPair<mp2town_t, QPoint>
+    {
+	TownPos() {}
+	TownPos(const mp2town_t & t, const QPoint & p) : QPair<mp2town_t, QPoint>(t, p) {}
+
+	const mp2town_t & town(void) const { return first; }
+	const QPoint & pos(void) const { return second; }
+    };
+
+    struct HeroPos : QPair<mp2hero_t, QPoint>
+    {
+	HeroPos() {}
+	HeroPos(const mp2hero_t & t, const QPoint & p) : QPair<mp2hero_t, QPoint>(t, p) {}
+
+	const mp2hero_t & hero(void) const { return first; }
+	const QPoint & pos(void) const { return second; }
+    };
+
+    struct SignPos : QPair<mp2sign_t, QPoint>
+    {
+	SignPos() {}
+	SignPos(const mp2sign_t & t, const QPoint & p) : QPair<mp2sign_t, QPoint>(t, p) {}
+
+	const mp2sign_t & sign(void) const { return first; }
+	const QPoint & pos(void) const { return second; }
+    };
+
+    struct EventPos : QPair<mp2mapevent_t, QPoint>
+    {
+	EventPos() {}
+	EventPos(const mp2mapevent_t & t, const QPoint & p) : QPair<mp2mapevent_t, QPoint>(t, p) {}
+
+	const mp2mapevent_t & event(void) const { return first; }
+	const QPoint & pos(void) const { return second; }
+    };
+
+    struct SphinxPos : QPair<mp2sphinx_t, QPoint>
+    {
+	SphinxPos() {}
+	SphinxPos(const mp2sphinx_t & t, const QPoint & p) : QPair<mp2sphinx_t, QPoint>(t, p) {}
+
+	const mp2sphinx_t & sphinx(void) const { return first; }
+	const QPoint & pos(void) const { return second; }
+    };
 }
 
 namespace AGG
@@ -288,7 +334,9 @@ public:
     int aroundGround(int) const;
 };
 
-namespace H2
+class MapData;
+
+namespace Editor
 {
     class Theme
     {
@@ -328,7 +376,7 @@ namespace H2
     class Town : public Object
     {
     public:
-	Town(const QPoint & pos, quint32 id, const mp2castle_t &);
+	Town(const QPoint & pos, quint32 id, const mp2town_t &);
     };
 
     class Hero : public Object
@@ -365,6 +413,32 @@ namespace H2
     {
     public:
 	Rumor(const mp2rumor_t &);
+    };
+
+    class MapKey : public QPoint
+    {
+    public:
+	MapKey(const QPoint & pos) : QPoint(pos) {}
+
+	bool operator< (const QPoint & pt) const { return x() + y() < pt.x() + pt.y(); }
+    };
+
+    class MapObjects : public QMap<MapKey, QSharedPointer<Editor::Object> >
+    {
+    public:
+        MapObjects();
+    };
+
+    class DayEvents : public QVector<QSharedPointer<Editor::DayEvent> >
+    {
+    public:
+	DayEvents();
+    };
+
+    class TavernRumors : public QVector<QSharedPointer<Editor::Rumor> >
+    {
+    public:
+	TavernRumors();
     };
 }
 

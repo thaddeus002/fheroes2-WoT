@@ -90,7 +90,7 @@ bool MapTileExt::isMapEvent(const MapTileExt* te)
     return ICN::OBJNMUL2 == te->spriteICN && 163 == te->spriteIndex;
 }
 
-MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos, H2::Theme & theme)
+MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos, Editor::Theme & theme)
     : themeContent(theme), til(mp2), mpos(pos), passableBase(0), passableLocal(0xFFFF)
 {
     QPoint offset(mpos.x() * theme.tileSize().width(), mpos.y() * theme.tileSize().height());
@@ -189,16 +189,6 @@ void MapTile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, Q
 	    }
 	}
     }
-
-/*
-    if(isUnderMouse() && ! isSelected())
-    {
-	painter->setPen(QPen(QColor(255, 255, 0), 1));
-	painter->setBrush(QBrush(QColor(0, 0, 0, 0)));
-	const QRectF & rt = boundingRect();
-	painter->drawRect(rt.x() + 1, rt.y() + 1, rt.width() - 2, rt.height() - 2);
-    }
-*/
 }
 
 void MapTile::showInfo(void) const
@@ -281,7 +271,7 @@ MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), themeContent(paren
 {
 }
 
-H2::Theme & MapData::theme(void)
+Editor::Theme & MapData::theme(void)
 {
     return themeContent;
 }
@@ -301,384 +291,14 @@ const QSize & MapData::size(void) const
     return mapSize;
 }
 
+quint32 MapData::uniq(void)
+{
+    return mapUniq++;
+}
+
 int MapData::indexLimit(void) const
 {
-    return mapSize.width() * mapSize.height();
-}
-
-void MapData::newMap(const QSize & msz, const QString &)
-{
-    mapDifficulty = 1;
-
-    mapSize = QSize(msz);
-    mapStartWithHero = false;
-
-    mapName = "New Map";
-
-    for(int ii = 0; ii < 6; ++ii)
-    {
-	mapKingdomColor[ii] = 0;
-	mapHumanAllow[ii] = 0;
-	mapCompAllow[ii] = 0;
-	mapRaceColor[ii] = 0;
-    }
-
-/*
-    quint8              mapConditionWins;
-    quint8              mapConditionWinsData1;
-    quint8              mapConditionWinsData2;
-    quint16             mapConditionWinsData3;
-    quint16             mapConditionWinsData4;
-    quint8              mapConditionLoss;
-    quint16             mapConditionLossData1;
-    quint16             mapConditionLossData2;
-*/
-
-    mapUniq = 1;
-
-    mapAuthors = "unknown";
-    mapLicense = "unknown";
-
-    // fill tiles
-    for(int yy = 0; yy < mapSize.height(); ++yy)
-    {
-	for(int xx = 0; xx < mapSize.width(); ++xx)
-        {
-    	    tilesetItems.push_back(new MapTile(mp2til_t(), QPoint(xx, yy), themeContent));
-	    addItem(tilesetItems.back());
-	}
-    }
-}
-
-bool MapData::loadMap(const QString & mapFile)
-{
-    return loadMP2Map(mapFile);
-
-}
-
-bool MapData::loadMP2Map(const QString & mapFile)
-{
-    H2::File map(mapFile);
-
-    if(map.open(QIODevice::ReadOnly))
-    {
-	// 4 byte: orig ver
-	if(map.readLE32() != 0x0000005C)
-	{
-	    qDebug() << "Incorrect map file: " << mapFile;
-    	    map.close();
-    	    return false;
-	}
-
-	// difficulty: 0: easy, 1: normal, 2: hard, 3: expert
-	mapDifficulty = map.readLE16();
-
-	// width, height
-	mapSize.setWidth(map.readByte());
-	mapSize.setHeight(map.readByte());
-
-	// kingdom color: blue, gree, red, yellow, orange, purple
-	for(int ii = 0; ii < 6; ++ii)
-	    mapKingdomColor[ii] = map.readByte();
-
-	// allow human blue
-	for(int ii = 0; ii < 6; ++ii)
-	    mapKingdomColor[ii] = map.readByte();
-
-	// allow human: blue, gree, red, yellow, orange, purple
-	for(int ii = 0; ii < 6; ++ii)
-	    mapHumanAllow[ii] = map.readByte();
-
-	// allow comp: blue, gree, red, yellow, orange, purple
-	for(int ii = 0; ii < 6; ++ii)
-	    mapCompAllow[ii] = map.readByte();
-
-	// wins
-	map.seek(0x1D);
-	mapConditionWins = map.readByte();
-
-	// data wins
-	mapConditionWinsData1 = map.readByte();
-	mapConditionWinsData2 = map.readByte();
-	mapConditionWinsData3 = map.readLE16();
-	map.seek(0x2C);
-	mapConditionWinsData4 = map.readLE16();
-
-	// loss
-	map.seek(0x22);
-	mapConditionLoss = map.readByte();
-	// data loss
-	mapConditionLossData1 = map.readLE16();
-	map.seek(0x2E);
-	mapConditionLossData2 = map.readLE16();
-
-	// start with hero
-	map.seek(0x25);
-	mapStartWithHero = (0 == map.readByte());
-
-	// race color
-	for(int ii = 0; ii < 6; ++ii)
-	    mapRaceColor[ii] = map.readByte();
-
-	// name
-	map.seek(0x3A);
-	mapName = map.readString(16);
-
-	// description
-	map.seek(0x76);
-	mapDescription = map.readString(143);
-
-	// data map: width, heigth
-	map.seek(0x01A4);
-	if(map.readLE32() != mapSize.width())
-	    qDebug() << "MapData::loadMP2Map:" << "incorrect size";
-	if(map.readLE32() != mapSize.height())
-	    qDebug() << "MapData::loadMP2Map:" << "incorrect size";
-
-	const QSize & tileSize = themeContent.tileSize();
-
-	setSceneRect(QRect(QPoint(0, 0),
-		QSize(mapSize.width() * tileSize.width(), mapSize.height() * tileSize.height())));
-
-	// data map: mp2tile, part1
-	// count blocks: width * heigth
-	QVector<mp2til_t> tilBlocks(indexLimit());
-
-	for(QVector<mp2til_t>::iterator
-	    it = tilBlocks.begin(); it != tilBlocks.end(); ++it)
-	{
-	    QDataStream ds(map.read(20));
-	    ds >> (*it);
-	}
-
-	// data map: mp2ext, part2
-	// count blocks: 4 byte
-	QVector<mp2ext_t> extBlocks(map.readLE32());
-
-	for(QVector<mp2ext_t>::iterator
-	    it = extBlocks.begin(); it != extBlocks.end(); ++it)
-	{
-	    QDataStream ds(map.read(15));
-	    ds >> (*it);
-	}
-
-	// load map tiles
-	if(! loadMapTiles(tilBlocks, extBlocks))
-	{
-    	    map.close();
-    	    return false;
-	}
-
-	// cood castles
-	QVector<mp2pos_t> townPosBlocks;
-	townPosBlocks.reserve(72);
-
-	// 72 x 3 byte (px, py, id)
-	for(int ii = 0; ii < 72; ++ii)
-	{
-	    mp2pos_t twn;
-
-	    twn.posx = map.readByte();
-	    twn.posy = map.readByte();
-	    twn.type = map.readByte();
-
-	    if(0xFF != twn.posx && 0xFF != twn.posy)
-		townPosBlocks.push_back(twn);
-	}
-
-	// cood resource kingdoms
-	QVector<mp2pos_t> resourcePosBlocks;
-	resourcePosBlocks.reserve(144);
-
-	// 144 x 3 byte (px, py, id)
-	for(int ii = 0; ii < 144; ++ii)
-	{
-	    mp2pos_t res;
-
-	    res.posx = map.readByte();
-	    res.posy = map.readByte();
-	    res.type = map.readByte();
-
-	    if(0xFF != res.posx && 0xFF != res.posy)
-		resourcePosBlocks.push_back(res);
-	}
-
-	// byte: numObelisks
-	map.readByte();
-
-	// find count latest blocks: unknown byte ?? ?? ?? LO HI 00 00
-	int blocksCount = 0;
-
-	while(1)
-	{
-    	    quint8 lo = map.readByte();
-    	    quint8 hi = map.readByte();
-
-    	    if(0 == hi && 0 == lo)
-		break;
-    	    else
-    		blocksCount = 256 * hi + lo - 1;
-	}
-
-	// read latest blocks
-	for(int ii = 0; ii < blocksCount; ++ii)
-	{
-	    // parse block
-	    QByteArray block = map.readBlock(map.readLE16());
-	    QDataStream data(block);
-	    data.setByteOrder(QDataStream::LittleEndian);
-
-	    const QPoint posBlock = positionExtBlockFromNumber(tilBlocks, ii + 1);
-	    const MapTile* tile = mapTileConst(posBlock);
-
-	    if(tile && 0 <= posBlock.x() && 0 <= posBlock.y())
-	    {
-		switch(block.size())
-		{
-		    // castle block /* 70 byte */
-		    case 70:
-		    {
-			mp2castle_t castle;
-			data >> castle;
-			QList<MapTileExt*>::const_iterator ext = std::find_if(tile->spritesLevel1.begin(), tile->spritesLevel1.end(), MapTileExt::isTown);
-			int uid = ext != tile->spritesLevel1.end() ? (*ext)->spriteUID : -1;
-			mapObjects[posBlock] = QSharedPointer<H2::Object>(new H2::Town(posBlock, uid, castle));
-		    }
-			break;
-
-		    // hero block /* 76 byte */
-		    case 76:
-		    {
-			mp2hero_t hero;
-			data >> hero;
-			QList<MapTileExt*>::const_iterator ext = std::find_if(tile->spritesLevel1.begin(), tile->spritesLevel1.end(), MapTileExt::isMiniHero);
-			int uid = ext != tile->spritesLevel1.end() ? (*ext)->spriteUID : -1;
-			mapObjects[posBlock] = QSharedPointer<H2::Object>(new H2::Hero(posBlock, uid, hero));
-		    }
-			break;
-
-		    default:
-			// sign block /* 10 byte */
-			if(10 <= block.size() && 0x01 == block.at(0))
-			{
-			    mp2sign_t sign;
-			    data >> sign;
-			    QList<MapTileExt*>::const_iterator ext = std::find_if(tile->spritesLevel1.begin(), tile->spritesLevel1.end(), MapTileExt::isSign);
-			    int uid = ext != tile->spritesLevel1.end() ? (*ext)->spriteUID : -1;
-			    mapObjects[posBlock] = QSharedPointer<H2::Object>(new H2::Sign(posBlock, uid, sign));
-			}
-			else
-			// map event block /* 50 byte */
-			if(50 <= block.size() && 0x01 == block.at(0))
-			{
-			    mp2mapevent_t event;
-			    data >> event;
-			    QList<MapTileExt*>::const_iterator ext = std::find_if(tile->spritesLevel1.begin(), tile->spritesLevel1.end(), MapTileExt::isMapEvent);
-			    int uid = ext != tile->spritesLevel1.end() ? (*ext)->spriteUID : -1;
-			    mapObjects[posBlock] = QSharedPointer<H2::Object>(new H2::MapEvent(posBlock, uid, event));
-			}
-			else
-			// sphinx block /* 138 byte */
-			if(138 <= block.size() && 0 == block.at(0))
-			{
-			    mp2sphinx_t sphinx;
-			    data >> sphinx;
-			    QList<MapTileExt*>::const_iterator ext = std::find_if(tile->spritesLevel1.begin(), tile->spritesLevel1.end(), MapTileExt::isSphinx);
-			    int uid = ext != tile->spritesLevel1.end() ? (*ext)->spriteUID : -1;
-			    mapObjects[posBlock] = QSharedPointer<H2::Object>(new H2::Sphinx(posBlock, uid, sphinx));
-			}
-			else
-			    qCritical() << "unknown block: " << ii << ", size: " << block.size() << ", pos: " << posBlock;
-			break;
-		}
-
-	    }
-	    else
-	    if(block.at(0) == 0)
-	    {
-		// rumor block /* 9 byte */
-		if(9 <= block.size() && block.at(8))
-		{
-		    mp2rumor_t rumor;
-		    data >> rumor;
-		    tavernRumors.push_back(QSharedPointer<H2::Rumor>(new H2::Rumor(rumor)));
-		}
-		else
-		// day event block /* 50 byte */
-		if(50 <= block.size() && 0x01 == block.at(42))
-		{
-		    mp2dayevent_t event;
-		    data >> event;
-		    dayEvents.push_back(QSharedPointer<H2::DayEvent>(new H2::DayEvent(event)));
-		}
-		else
-    		    qCritical() << "unknown block: " << ii << ", size: " << block.size();
-	    }
-	    else
-	     qCritical() << "unknown block: " << ii << ", size: " << block.size() << ", byte: " << block[0];
-	}
-
-	mapUniq = map.readLE32();
-	map.close();
-
-	//
-	mapAuthors = "unknown";
-	mapLicense = "unknown";
-
-	return true;
-    }
-
-    return false;
-}
-
-bool MapData::loadMapTiles(const QVector<mp2til_t> & tilBlocks, const QVector<mp2ext_t> & extBlocks)
-{
-    for(int yy = 0; yy < mapSize.height(); ++yy)
-    {
-	for(int xx = 0; xx < mapSize.width(); ++xx)
-	{
-	    const mp2til_t & mp2 = tilBlocks[xx + yy * mapSize.width()];
-	    tilesetItems.push_back(new MapTile(mp2, QPoint(xx, yy), themeContent));
-	    int ext = mp2.indexExt;
-
-	    while(ext)
-	    {
-		if(ext >= extBlocks.size())
-		{
-		    qDebug() << "ext block: out of range" << ext;
-    		    return false;
-		}
-
-		tilesetItems.back()->loadSpriteLevels(extBlocks[ext]);
-		ext = extBlocks[ext].indexExt;
-	    }
-
-	    tilesetItems.back()->sortSpritesLevels();
-	    addItem(tilesetItems.back());
-	}
-    }
-
-    return true;
-}
-
-QPoint MapData::positionExtBlockFromNumber(const QVector<mp2til_t> & tilBlocks, int num) const
-{
-    for(int yy = 0; yy < mapSize.height(); ++yy)
-    {
-        for(int xx = 0; xx < mapSize.width(); ++xx)
-        {
-            const mp2til_t & mp2 = tilBlocks[xx + yy * mapSize.width()];
-
-            quint16 orders = (mp2.quantity2 ? mp2.quantity2 : 0);
-            orders <<= 8;
-            orders |= mp2.quantity1;
-
-            if(orders && !(orders % 0x08) && (num == orders / 0x08))
-		return QPoint(xx, yy);
-        }
-    }
-
-    return QPoint(-1, -1);
+    return size().width() * size().height();
 }
 
 void MapData::mousePressEvent(QGraphicsSceneMouseEvent* event)
@@ -759,7 +379,7 @@ void MapData::selectAllTiles(void)
 {
     QApplication::setOverrideCursor(Qt::WaitCursor);
     const QSize & sz = themeContent.tileSize();
-    selectArea(QPointF(0, 0), QPointF(sz.width() * mapSize.width(), sz.height() * mapSize.height()));
+    selectArea(QPointF(0, 0), QPointF(sz.width() * size().width(), sz.height() * size().height()));
     QApplication::restoreOverrideCursor();
 }
 
@@ -783,11 +403,6 @@ void MapData::drawForeground(QPainter* painter, const QRectF & rect)
 	const QRectF & rt = tileOverMouse->boundingRect();
 	painter->drawRect(QRectF(rt.x() + 1, rt.y() + 1, rt.width() - 2, rt.height() - 2));
     }
-}
-
-quint32 MapData::uniq(void)
-{
-    return mapUniq++;
 }
 
 void MapData::editPassableDialog(void)
@@ -882,6 +497,12 @@ void MapData::removeObjectsAction(QAction* act)
     }
 }
 
+bool MapData::isValidPoint(const QPoint & pos) const
+{
+    int index = pos.x() + pos.y() * size().width();
+    return 0 <= index && index < mapTiles.size();
+}
+
 const MapTile* MapData::mapTileFromDirectionConst(const MapTile* center, int direct) const
 {
     if(center)
@@ -891,9 +512,9 @@ const MapTile* MapData::mapTileFromDirectionConst(const MapTile* center, int dir
 	switch(direct)
 	{
     	    case Direction::Top:         if(directPos.y()) directPos.setY(directPos.y() - 1); break;
-    	    case Direction::Bottom:      if(directPos.y() < mapSize.height()) directPos.setY(directPos.y() + 1); break;
+    	    case Direction::Bottom:      if(directPos.y() < size().height()) directPos.setY(directPos.y() + 1); break;
     	    case Direction::Left:        if(directPos.x()) directPos.setX(directPos.x() - 1); break;
-    	    case Direction::Right:       if(directPos.x() < mapSize.width()) directPos.setX(directPos.x() + 1); break;
+    	    case Direction::Right:       if(directPos.x() < size().width()) directPos.setX(directPos.x() + 1); break;
 
     	    case Direction::TopRight:    return mapTileFromDirectionConst(mapTileFromDirectionConst(center, Direction::Top), Direction::Right);
     	    case Direction::BottomRight: return mapTileFromDirectionConst(mapTileFromDirectionConst(center, Direction::Bottom), Direction::Right);
@@ -902,10 +523,10 @@ const MapTile* MapData::mapTileFromDirectionConst(const MapTile* center, int dir
     	    default: break;
 	}
 
-	QList<MapTile*>::const_iterator it = tilesetItems.begin();
-	for(; it != tilesetItems.end(); ++it) if((*it)->mapPos() == directPos) break;
+	QList<MapTile*>::const_iterator it = mapTiles.begin();
+	for(; it != mapTiles.end(); ++it) if((*it)->mapPos() == directPos) break;
 
-	return it != tilesetItems.end() ? *it : NULL;
+	return it != mapTiles.end() ? *it : NULL;
     }
 
     return NULL;
@@ -918,13 +539,146 @@ MapTile* MapData::mapTileFromDirection(const MapTile* center, int direct)
 
 const MapTile* MapData::mapTileConst(const QPoint & pos) const
 {
-    int index = pos.x() + pos.y() * mapSize.width();
-    return 0 <= index && index < tilesetItems.size() ? tilesetItems[index] : NULL;
+    return isValidPoint(pos) ? mapTiles[pos.x() + pos.y() * size().width()] : NULL;
 }
 
 MapTile* MapData::mapTile(const QPoint & pos)
 {
     return const_cast<MapTile*>(mapTileConst(pos));
+}
+
+
+void MapData::newMap(const QSize & msz, const QString &)
+{
+    mapDifficulty = 1;
+    mapUniq = 1;
+
+    mapSize = QSize(msz);
+
+    mapName = "New Map";
+    mapAuthors = "unknown";
+    mapLicense = "unknown";
+
+    // fill tiles
+    for(int yy = 0; yy < size().height(); ++yy)
+    {
+	for(int xx = 0; xx < size().width(); ++xx)
+        {
+    	    mapTiles.push_back(new MapTile(mp2til_t(), QPoint(xx, yy), themeContent));
+	    addItem(mapTiles.back());
+	}
+    }
+}
+
+bool MapData::loadMap(const QString & mapFile)
+{
+    const QSize & tileSize = themeContent.tileSize();
+
+    MP2Format mp2;
+
+    if(mp2.loadMap(mapFile))
+    {
+	mapSize = mp2.size;
+	mapName = mp2.name;
+	mapDescription = mp2.description;
+
+	setSceneRect(QRect(QPoint(0, 0),
+		QSize(size().width() * tileSize.width(), size().height() * tileSize.height())));
+
+	// import tiles
+	for(int yy = 0; yy < size().height(); ++yy)
+	{
+	    for(int xx = 0; xx < size().width(); ++xx)
+	    {
+		const mp2til_t & mp2til = mp2.tiles[xx + yy * size().width()];
+		mapTiles.push_back(new MapTile(mp2til, QPoint(xx, yy), themeContent));
+		int ext = mp2til.indexExt;
+
+		while(ext)
+		{
+		    if(ext >= mp2.sprites.size())
+		    {
+			qDebug() << "ext block: out of range" << ext;
+    			return false;
+		    }
+
+		    mapTiles.back()->loadSpriteLevels(mp2.sprites[ext]);
+		    ext = mp2.sprites[ext].indexExt;
+		}
+
+		mapTiles.back()->sortSpritesLevels();
+		addItem(mapTiles.back());
+	    }
+
+	}
+
+	// import towns
+	for(QVector<H2::TownPos>::const_iterator
+	    it = mp2.castles.begin(); it != mp2.castles.end(); ++it) if(isValidPoint((*it).pos()))
+	{
+	    const MapTile* tile = mapTileConst((*it).pos());
+	    QList<MapTileExt*>::const_iterator ext = std::find_if(tile->spritesLevel1.begin(), tile->spritesLevel1.end(), MapTileExt::isTown);
+	    int uid = ext != tile->spritesLevel1.end() ? (*ext)->spriteUID : -1;
+	    mapObjects[(*it).pos()] = QSharedPointer<Editor::Object>(new Editor::Town((*it).pos(), uid, (*it).town()));
+	}
+
+	// import heroes
+	for(QVector<H2::HeroPos>::const_iterator
+	    it = mp2.heroes.begin(); it != mp2.heroes.end(); ++it) if(isValidPoint((*it).pos()))
+	{
+	    const MapTile* tile = mapTileConst((*it).pos());
+	    QList<MapTileExt*>::const_iterator ext = std::find_if(tile->spritesLevel1.begin(), tile->spritesLevel1.end(), MapTileExt::isMiniHero);
+	    int uid = ext != tile->spritesLevel1.end() ? (*ext)->spriteUID : -1;
+	    mapObjects[(*it).pos()] = QSharedPointer<Editor::Object>(new Editor::Hero((*it).pos(), uid, (*it).hero()));
+	}
+
+	// import signs
+	for(QVector<H2::SignPos>::const_iterator
+	    it = mp2.signs.begin(); it != mp2.signs.end(); ++it) if(isValidPoint((*it).pos()))
+	{
+	    const MapTile* tile = mapTileConst((*it).pos());
+	    QList<MapTileExt*>::const_iterator ext = std::find_if(tile->spritesLevel1.begin(), tile->spritesLevel1.end(), MapTileExt::isSign);
+	    int uid = ext != tile->spritesLevel1.end() ? (*ext)->spriteUID : -1;
+	    mapObjects[(*it).pos()] = QSharedPointer<Editor::Object>(new Editor::Sign((*it).pos(), uid, (*it).sign()));
+	}
+
+	// import map events
+	for(QVector<H2::EventPos>::const_iterator
+	    it = mp2.mapEvents.begin(); it != mp2.mapEvents.end(); ++it) if(isValidPoint((*it).pos()))
+	{
+	    const MapTile* tile = mapTileConst((*it).pos());
+	    QList<MapTileExt*>::const_iterator ext = std::find_if(tile->spritesLevel1.begin(), tile->spritesLevel1.end(), MapTileExt::isMapEvent);
+	    int uid = ext != tile->spritesLevel1.end() ? (*ext)->spriteUID : -1;
+	    mapObjects[(*it).pos()] = QSharedPointer<Editor::Object>(new Editor::MapEvent((*it).pos(), uid, (*it).event()));
+	}
+
+	// import sphinx riddles
+	for(QVector<H2::SphinxPos>::const_iterator
+	    it = mp2.sphinxes.begin(); it != mp2.sphinxes.end(); ++it) if(isValidPoint((*it).pos()))
+	{
+	    const MapTile* tile = mapTileConst((*it).pos());
+	    QList<MapTileExt*>::const_iterator ext = std::find_if(tile->spritesLevel1.begin(), tile->spritesLevel1.end(), MapTileExt::isSphinx);
+	    int uid = ext != tile->spritesLevel1.end() ? (*ext)->spriteUID : -1;
+	    mapObjects[(*it).pos()] = QSharedPointer<Editor::Object>(new Editor::Sphinx((*it).pos(), uid, (*it).sphinx()));
+	}
+
+	// import day events
+	for(QVector<mp2dayevent_t>::const_iterator
+	    it = mp2.dayEvents.begin(); it != mp2.dayEvents.end(); ++it)
+	{
+	    dayEvents.push_back(QSharedPointer<Editor::DayEvent>(new Editor::DayEvent(*it)));
+	}
+
+	// import rumors
+	for(QVector<mp2rumor_t>::const_iterator
+	    it = mp2.rumors.begin(); it != mp2.rumors.end(); ++it)
+	{
+	    tavernRumors.push_back(QSharedPointer<Editor::Rumor>(new Editor::Rumor(*it)));
+	}
+	return true;
+    }
+
+    return false;
 }
 
 AroundGrounds MapData::aroundGrounds(const MapTile* center) const
@@ -963,4 +717,261 @@ AroundGrounds MapData::aroundGrounds(const MapTile* center) const
     }
 
     return res;
+}
+
+bool MP2Format::loadMap(const QString & mapFile)
+{
+    H2::File map(mapFile);
+
+    if(map.open(QIODevice::ReadOnly))
+    {
+	// 4 byte: orig ver
+	if(map.readLE32() != 0x0000005C)
+	{
+	    qDebug() << "Incorrect map file: " << mapFile;
+    	    map.close();
+    	    return false;
+	}
+
+	// difficulty: 0: easy, 1: normal, 2: hard, 3: expert
+	difficulty = map.readLE16();
+
+	// width, height
+	size.setWidth(map.readByte());
+	size.setHeight(map.readByte());
+
+	// kingdom color: blue, gree, red, yellow, orange, purple
+	for(int ii = 0; ii < 6; ++ii)
+	    kingdomColor[ii] = map.readByte();
+
+	// allow human: blue, gree, red, yellow, orange, purple
+	for(int ii = 0; ii < 6; ++ii)
+	    humanAllow[ii] = map.readByte();
+
+	// allow comp: blue, gree, red, yellow, orange, purple
+	for(int ii = 0; ii < 6; ++ii)
+	    compAllow[ii] = map.readByte();
+
+	// wins
+	map.seek(0x1D);
+	conditionWins = map.readByte();
+
+	// data wins
+	conditionWinsData1 = map.readByte();
+	conditionWinsData2 = map.readByte();
+	conditionWinsData3 = map.readLE16();
+	map.seek(0x2C);
+	conditionWinsData4 = map.readLE16();
+
+	// loss
+	map.seek(0x22);
+	conditionLoss = map.readByte();
+	// data loss
+	conditionLossData1 = map.readLE16();
+	map.seek(0x2E);
+	conditionLossData2 = map.readLE16();
+
+	// start with hero
+	map.seek(0x25);
+	startWithHero = (0 == map.readByte());
+
+	// race color
+	for(int ii = 0; ii < 6; ++ii)
+	    raceColor[ii] = map.readByte();
+
+	// name
+	map.seek(0x3A);
+	name = map.readString(16);
+
+	// description
+	map.seek(0x76);
+	description = map.readString(143);
+
+	// data map: width, heigth
+	map.seek(0x01A4);
+	if(map.readLE32() != size.width())
+	    qDebug() << "MP2Format::loadMap:" << "incorrect size";
+	if(map.readLE32() != size.height())
+	    qDebug() << "MP2Format::loadMap:" << "incorrect size";
+
+
+	// data map: mp2tile, part1
+	// count blocks: width * heigth
+	tiles.resize(size.width() * size.height());
+
+	for(QVector<mp2til_t>::iterator
+	    it = tiles.begin(); it != tiles.end(); ++it)
+	{
+	    QDataStream ds(map.read(20));
+	    ds >> (*it);
+	}
+
+	// data map: mp2ext, part2
+	// count blocks: 4 byte
+	sprites.resize(map.readLE32());
+
+	for(QVector<mp2ext_t>::iterator
+	    it = sprites.begin(); it != sprites.end(); ++it)
+	{
+	    QDataStream ds(map.read(15));
+	    ds >> (*it);
+	}
+
+	// cood castles
+	QVector<mp2pos_t> townPosBlocks;
+	townPosBlocks.reserve(72);
+
+	// 72 x 3 byte (px, py, id)
+	for(int ii = 0; ii < 72; ++ii)
+	{
+	    mp2pos_t twn;
+
+	    twn.posx = map.readByte();
+	    twn.posy = map.readByte();
+	    twn.type = map.readByte();
+
+	    if(0xFF != twn.posx && 0xFF != twn.posy)
+		townPosBlocks.push_back(twn);
+	}
+
+	// cood resource kingdoms
+	QVector<mp2pos_t> resourcePosBlocks;
+	resourcePosBlocks.reserve(144);
+
+	// 144 x 3 byte (px, py, id)
+	for(int ii = 0; ii < 144; ++ii)
+	{
+	    mp2pos_t res;
+
+	    res.posx = map.readByte();
+	    res.posy = map.readByte();
+	    res.type = map.readByte();
+
+	    if(0xFF != res.posx && 0xFF != res.posy)
+		resourcePosBlocks.push_back(res);
+	}
+
+	// byte: numObelisks
+	map.readByte();
+
+	// find count latest blocks: unknown byte ?? ?? ?? LO HI 00 00
+	int blocksCount = 0;
+
+	while(1)
+	{
+    	    quint8 lo = map.readByte();
+    	    quint8 hi = map.readByte();
+
+    	    if(0 == hi && 0 == lo)
+		break;
+    	    else
+    		blocksCount = 256 * hi + lo - 1;
+	}
+
+	// read latest blocks
+	for(int ii = 0; ii < blocksCount; ++ii)
+	{
+	    // parse block
+	    QByteArray block = map.readBlock(map.readLE16());
+	    QDataStream data(block);
+	    data.setByteOrder(QDataStream::LittleEndian);
+	    const QPoint posBlock = positionExtBlockFromNumber(ii + 1);
+
+	    if(0 <= posBlock.x() && 0 <= posBlock.y())
+	    {
+		switch(block.size())
+		{
+		    // castle block: 70 byte
+		    case 70:
+		    {
+			mp2town_t castle; data >> castle;
+			castles.push_back(H2::TownPos(castle, posBlock));
+		    }
+			break;
+
+		    // hero block: 76 byte
+		    case 76:
+		    {
+			mp2hero_t hero; data >> hero;
+			heroes.push_back(H2::HeroPos(hero, posBlock));
+		    }
+			break;
+
+		    default:
+			// sign block: 10 byte
+			if(10 <= block.size() && 0x01 == block.at(0))
+			{
+			    mp2sign_t sign; data >> sign;
+			    signs.push_back(H2::SignPos(sign, posBlock));
+			}
+			else
+			// map event block: 50 byte
+			if(50 <= block.size() && 0x01 == block.at(0))
+			{
+			    mp2mapevent_t event; data >> event;
+			    mapEvents.push_back(H2::EventPos(event, posBlock));
+			}
+			else
+			// sphinx block: 138 byte
+			if(138 <= block.size() && 0 == block.at(0))
+			{
+			    mp2sphinx_t sphinx; data >> sphinx;
+			    sphinxes.push_back(H2::SphinxPos(sphinx, posBlock));
+			}
+			else
+			    qCritical() << "unknown block: " << ii << ", size: " << block.size() << ", pos: " << posBlock;
+			break;
+		}
+	    }
+	    else
+	    if(block.at(0) == 0)
+	    {
+		// rumor block: 9 byte
+		if(9 <= block.size() && block.at(8))
+		{
+		    mp2rumor_t rumor; data >> rumor;
+		    rumors.push_back(rumor);
+		}
+		else
+		// day event block: 50 byte
+		if(50 <= block.size() && 0x01 == block.at(42))
+		{
+		    mp2dayevent_t event; data >> event;
+		    dayEvents.push_back(event);
+		}
+		else
+    		    qCritical() << "unknown block: " << ii << ", size: " << block.size();
+	    }
+	    else
+	     qCritical() << "unknown block: " << ii << ", size: " << block.size() << ", byte: " << block[0];
+	}
+
+	uniq = map.readLE32();
+	map.close();
+
+	//
+	return true;
+    }
+
+    return false;
+}
+
+QPoint MP2Format::positionExtBlockFromNumber(int num) const
+{
+    for(int yy = 0; yy < size.height(); ++yy)
+    {
+        for(int xx = 0; xx < size.width(); ++xx)
+        {
+            const mp2til_t & mp2 = tiles[xx + yy * size.width()];
+
+            quint16 orders = (mp2.quantity2 ? mp2.quantity2 : 0);
+            orders <<= 8;
+            orders |= mp2.quantity1;
+
+            if(orders && !(orders % 0x08) && (num == orders / 0x08))
+		return QPoint(xx, yy);
+        }
+    }
+
+    return QPoint(-1, -1);
 }

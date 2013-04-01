@@ -28,6 +28,7 @@
 
 #include "program.h"
 #include "engine.h"
+#include "mapdata.h"
 
 QString readStringFromStream(QDataStream & ds, int count = 0)
 {
@@ -323,7 +324,7 @@ QDataStream & operator>> (QDataStream & ds, mp2ext_t & ext)
     return ds;
 }
 
-QDataStream & operator>> (QDataStream & ds, mp2castle_t & cstl)
+QDataStream & operator>> (QDataStream & ds, mp2town_t & cstl)
 {
     ds.setByteOrder(QDataStream::LittleEndian);
     ds >> cstl.color >> cstl.customBuilding >> cstl.building >> cstl.magicTower >> cstl.customTroops;
@@ -1080,26 +1081,26 @@ int H2::isAnimationICN(int spriteClass, int spriteIndex, int ticket)
 
 
 /*Themes section */
-H2::Theme::Theme(AGG::Spool & spool) : aggSpool(spool), name("original"), tile(32, 32)
+Editor::Theme::Theme(AGG::Spool & spool) : aggSpool(spool), name("original"), tile(32, 32)
 {
 }
 
-QPixmap H2::Theme::getImageTIL(const QString & til, quint16 index)
+QPixmap Editor::Theme::getImageTIL(const QString & til, quint16 index)
 {
     return aggSpool.getImageTIL(til, index);
 }
 
-QPair<QPixmap, QPoint> H2::Theme::getImageICN(const QString & icn, quint16 index)
+QPair<QPixmap, QPoint> Editor::Theme::getImageICN(const QString & icn, quint16 index)
 {
     return aggSpool.getImageICN(icn, index);
 }
 
-const QSize & H2::Theme::tileSize(void) const
+const QSize & Editor::Theme::tileSize(void) const
 {
     return tile;
 }
 
-int H2::Theme::startFilledTile(int ground) const
+int Editor::Theme::startFilledTile(int ground) const
 {
     // 30%
     if(0 == Rand(6))
@@ -1118,13 +1119,13 @@ int H2::Theme::startFilledTile(int ground) const
         case Ground::Dirt:        res = 337; break;
         case Ground::Grass:       res = 68;  break;
         case Ground::Water:       res = 16;  break;
-        default: qCritical() << "H2::Theme::startFilledTile:" << "unknown ground"; break;
+        default: qCritical() << "Editor::Theme::startFilledTile:" << "unknown ground"; break;
     }
 
     return res + Rand(7);
 }
 
-int H2::Theme::startFilledOriginalTile(int ground) const
+int Editor::Theme::startFilledOriginalTile(int ground) const
 {
     int res = 0;
     int count = 8;
@@ -1140,13 +1141,13 @@ int H2::Theme::startFilledOriginalTile(int ground) const
         case Ground::Dirt:        res = 345; count = 16; break;
         case Ground::Grass:       res = 76; count = 16; break;
         case Ground::Water:       res = 24; count = 6; break;
-        default: qCritical() << "H2::Theme::startFilledOriginalTile:" << "unknown ground"; break;
+        default: qCritical() << "Editor::Theme::startFilledOriginalTile:" << "unknown ground"; break;
     }
 
     return res + Rand(count - 1);
 }
 
-int H2::Theme::ground(int index) const
+int Editor::Theme::ground(int index) const
 {
     // list grounds from GROUND32.TIL
     if(30 > index)
@@ -1179,7 +1180,7 @@ int H2::Theme::ground(int index) const
     return Ground::Unknown;
 }
 
-int H2::Theme::startGroundTile(int ground) const
+int Editor::Theme::startGroundTile(int ground) const
 {
     int res = 0;
 
@@ -1201,7 +1202,7 @@ int H2::Theme::startGroundTile(int ground) const
     return res;
 }
 
-int H2::Theme::startGroundOriginalTile(int ground) const
+int Editor::Theme::startGroundOriginalTile(int ground) const
 {
     return startGroundTile(ground) + Rand(3);
 }
@@ -1258,7 +1259,7 @@ inline bool IS_EQUAL_VALS(int A, int B)
 }
 
 /* return pair, first: index tile, second: shape - 0: none, 1: vert, 2: horz, 3: both */
-QPair<int, int> H2::Theme::indexGroundRotateFix(const AroundGrounds & around, int ground) const
+QPair<int, int> Editor::Theme::indexGroundRotateFix(const AroundGrounds & around, int ground) const
 {
     QPair<int, int> res(-1, 0);
 
@@ -1434,35 +1435,48 @@ QPair<int, int> H2::Theme::indexGroundRotateFix(const AroundGrounds & around, in
     return res;
 }
 
-H2::Town::Town(const QPoint & pos, quint32 id, const mp2castle_t &)
+Editor::Town::Town(const QPoint & pos, quint32 id, const mp2town_t &)
     : Object(pos, id)
 {
 }
 
-H2::Hero::Hero(const QPoint & pos, quint32 id, const mp2hero_t &)
+Editor::Hero::Hero(const QPoint & pos, quint32 id, const mp2hero_t &)
     : Object(pos, id)
 {
 }
 
-H2::Sign::Sign(const QPoint & pos, quint32 id, const mp2sign_t &)
+Editor::Sign::Sign(const QPoint & pos, quint32 id, const mp2sign_t &)
     : Object(pos, id)
 {
 }
 
-H2::MapEvent::MapEvent(const QPoint & pos, quint32 id, const mp2mapevent_t &)
+Editor::MapEvent::MapEvent(const QPoint & pos, quint32 id, const mp2mapevent_t &)
     : Object(pos, id)
 {
 }
 
-H2::Sphinx::Sphinx(const QPoint & pos, quint32 id, const mp2sphinx_t &)
+Editor::Sphinx::Sphinx(const QPoint & pos, quint32 id, const mp2sphinx_t &)
     : Object(pos, id)
 {
 }
 
-H2::DayEvent::DayEvent(const mp2dayevent_t &)
+Editor::DayEvent::DayEvent(const mp2dayevent_t &)
 {
 }
 
-H2::Rumor::Rumor(const mp2rumor_t &)
+Editor::Rumor::Rumor(const mp2rumor_t &)
 {
 }
+
+Editor::MapObjects::MapObjects()
+{
+}
+
+Editor::DayEvents::DayEvents()
+{
+}
+
+Editor::TavernRumors::TavernRumors()
+{
+}
+
