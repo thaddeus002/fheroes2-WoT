@@ -1081,26 +1081,26 @@ int H2::isAnimationICN(int spriteClass, int spriteIndex, int ticket)
 
 
 /*Themes section */
-Editor::Theme::Theme(AGG::Spool & spool) : aggSpool(spool), name("original"), tile(32, 32)
+EditorTheme::EditorTheme(AGG::Spool & spool) : aggSpool(spool), name("original"), tile(32, 32)
 {
 }
 
-QPixmap Editor::Theme::getImageTIL(const QString & til, quint16 index)
+QPixmap EditorTheme::getImageTIL(const QString & til, quint16 index)
 {
     return aggSpool.getImageTIL(til, index);
 }
 
-QPair<QPixmap, QPoint> Editor::Theme::getImageICN(const QString & icn, quint16 index)
+QPair<QPixmap, QPoint> EditorTheme::getImageICN(const QString & icn, quint16 index)
 {
     return aggSpool.getImageICN(icn, index);
 }
 
-const QSize & Editor::Theme::tileSize(void) const
+const QSize & EditorTheme::tileSize(void) const
 {
     return tile;
 }
 
-int Editor::Theme::startFilledTile(int ground) const
+int EditorTheme::startFilledTile(int ground) const
 {
     // 30%
     if(0 == Rand(6))
@@ -1119,13 +1119,13 @@ int Editor::Theme::startFilledTile(int ground) const
         case Ground::Dirt:        res = 337; break;
         case Ground::Grass:       res = 68;  break;
         case Ground::Water:       res = 16;  break;
-        default: qCritical() << "Editor::Theme::startFilledTile:" << "unknown ground"; break;
+        default: qCritical() << "EditorTheme::startFilledTile:" << "unknown ground"; break;
     }
 
     return res + Rand(7);
 }
 
-int Editor::Theme::startFilledOriginalTile(int ground) const
+int EditorTheme::startFilledOriginalTile(int ground) const
 {
     int res = 0;
     int count = 8;
@@ -1141,13 +1141,13 @@ int Editor::Theme::startFilledOriginalTile(int ground) const
         case Ground::Dirt:        res = 345; count = 16; break;
         case Ground::Grass:       res = 76; count = 16; break;
         case Ground::Water:       res = 24; count = 6; break;
-        default: qCritical() << "Editor::Theme::startFilledOriginalTile:" << "unknown ground"; break;
+        default: qCritical() << "EditorTheme::startFilledOriginalTile:" << "unknown ground"; break;
     }
 
     return res + Rand(count - 1);
 }
 
-int Editor::Theme::ground(int index) const
+int EditorTheme::ground(int index) const
 {
     // list grounds from GROUND32.TIL
     if(30 > index)
@@ -1180,7 +1180,7 @@ int Editor::Theme::ground(int index) const
     return Ground::Unknown;
 }
 
-int Editor::Theme::startGroundTile(int ground) const
+int EditorTheme::startGroundTile(int ground) const
 {
     int res = 0;
 
@@ -1202,7 +1202,7 @@ int Editor::Theme::startGroundTile(int ground) const
     return res;
 }
 
-int Editor::Theme::startGroundOriginalTile(int ground) const
+int EditorTheme::startGroundOriginalTile(int ground) const
 {
     return startGroundTile(ground) + Rand(3);
 }
@@ -1259,7 +1259,7 @@ inline bool IS_EQUAL_VALS(int A, int B)
 }
 
 /* return pair, first: index tile, second: shape - 0: none, 1: vert, 2: horz, 3: both */
-QPair<int, int> Editor::Theme::indexGroundRotateFix(const AroundGrounds & around, int ground) const
+QPair<int, int> EditorTheme::indexGroundRotateFix(const AroundGrounds & around, int ground) const
 {
     QPair<int, int> res(-1, 0);
 
@@ -1435,48 +1435,47 @@ QPair<int, int> Editor::Theme::indexGroundRotateFix(const AroundGrounds & around
     return res;
 }
 
-Editor::Town::Town(const QPoint & pos, quint32 id, const mp2town_t &)
-    : Object(pos, id)
+MapTown::MapTown(const QPoint & pos, quint32 id, const mp2town_t &)
+    : MapObject(pos, id)
 {
 }
 
-Editor::Hero::Hero(const QPoint & pos, quint32 id, const mp2hero_t &)
-    : Object(pos, id)
+MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t &)
+    : MapObject(pos, id)
 {
 }
 
-Editor::Sign::Sign(const QPoint & pos, quint32 id, const mp2sign_t &)
-    : Object(pos, id)
+MapSign::MapSign(const QPoint & pos, quint32 id, const mp2sign_t &)
+    : MapObject(pos, id)
 {
 }
 
-Editor::MapEvent::MapEvent(const QPoint & pos, quint32 id, const mp2mapevent_t &)
-    : Object(pos, id)
+MapEvent::MapEvent(const QPoint & pos, quint32 id, const mp2mapevent_t &)
+    : MapObject(pos, id)
 {
 }
 
-Editor::Sphinx::Sphinx(const QPoint & pos, quint32 id, const mp2sphinx_t &)
-    : Object(pos, id)
+MapSphinx::MapSphinx(const QPoint & pos, quint32 id, const mp2sphinx_t &)
+    : MapObject(pos, id)
 {
 }
 
-Editor::DayEvent::DayEvent(const mp2dayevent_t &)
+DayEvent::DayEvent(const mp2dayevent_t &)
 {
 }
 
-Editor::Rumor::Rumor(const mp2rumor_t &)
+Rumor::Rumor(const mp2rumor_t &)
 {
 }
 
-Editor::MapObjects::MapObjects()
+MapObjects::MapObjects()
 {
 }
 
-Editor::DayEvents::DayEvents()
+DayEvents::DayEvents()
 {
 }
 
-Editor::TavernRumors::TavernRumors()
+TavernRumors::TavernRumors()
 {
 }
-

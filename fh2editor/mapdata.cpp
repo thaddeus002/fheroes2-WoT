@@ -35,6 +35,14 @@
 #include "mapwindow.h"
 #include "mapdata.h"
 
+MapSelectedArea::MapSelectedArea(const MapArea & area, const QRect & rt)
+{
+    if(area.tiles.isValidPoint(rt.topLeft()) &&
+	    area.tiles.isValidPoint(rt.bottomRight()))
+    {
+    }
+}
+
 MapTileExt::MapTileExt(int lvl, const mp2lev_t & ext, const QPair<QPixmap, QPoint> & pair)
     : QPair<QPixmap, QPoint>(pair.first, pair.second), spriteICN(H2::mapICN(ext.object)), spriteIndex(ext.index), level(lvl), tmp(0), spriteUID(ext.uniq)
 {
@@ -90,7 +98,7 @@ bool MapTileExt::isMapEvent(const MapTileExt* te)
     return ICN::OBJNMUL2 == te->spriteICN && 163 == te->spriteIndex;
 }
 
-MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos, Editor::Theme & theme)
+MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos, EditorTheme & theme)
     : themeContent(theme), til(mp2), mpos(pos), passableBase(0), passableLocal(0xFFFF)
 {
     QPoint offset(mpos.x() * theme.tileSize().width(), mpos.y() * theme.tileSize().height());
@@ -267,11 +275,116 @@ void MapTile::sortSpritesLevels(void)
     qSort(spritesLevel2.begin(), spritesLevel2.end(), MapTileExt::sortLevel2);
 }
 
-MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), themeContent(parent->mainWindow->aggContent), tileOverMouse(NULL)
+void MapTiles::newMap(const QSize & sz, EditorTheme & theme)
+{
+    size = sz;
+
+    for(int yy = 0; yy < size.height(); ++yy)
+    {
+	for(int xx = 0; xx < size.width(); ++xx)
+    	    push_back(new MapTile(mp2til_t(), QPoint(xx, yy), theme));
+    }
+}
+
+bool MapTiles::importMap(const QSize & sz, const QVector<mp2til_t> & mp2Tiles, const QVector<mp2ext_t> & mp2Sprites, EditorTheme & theme)
+{
+    size = sz;
+
+    for(int yy = 0; yy < size.height(); ++yy)
+    {
+	for(int xx = 0; xx < size.width(); ++xx)
+	{
+	    const mp2til_t & mp2til = mp2Tiles[indexPoint(QPoint(xx, yy))];
+	    push_back(new MapTile(mp2til, QPoint(xx, yy), theme));
+	    int ext = mp2til.indexExt;
+
+	    while(ext)
+	    {
+		if(ext >= mp2Sprites.size())
+		{
+		    qDebug() << "ext block: out of range" << ext;
+    		    return false;
+		}
+
+		back()->loadSpriteLevels(mp2Sprites[ext]);
+		ext = mp2Sprites[ext].indexExt;
+	    }
+
+	    back()->sortSpritesLevels();
+	}
+    }
+
+    return true;
+}
+
+const MapTile* MapTiles::tileConst(const QPoint & pos) const
+{
+    const QList<MapTile*> & mapTiles = *this;
+    return isValidPoint(pos) ? mapTiles[indexPoint(pos)] : NULL;
+}
+
+MapTile* MapTiles::tile(const QPoint & pos)
+{
+    return const_cast<MapTile*>(tileConst(pos));
+}
+
+const MapTile* MapTiles::tileFromDirectionConst(const MapTile* tile, int direct) const
+{
+    return tile ? tileFromDirectionConst(tile->mapPos(), direct) : NULL;
+}
+
+MapTile* MapTiles::tileFromDirection(const MapTile* tile, int direct)
+{
+    return const_cast<MapTile*>(tileFromDirectionConst(tile, direct));
+}
+
+const MapTile* MapTiles::tileFromDirectionConst(const QPoint & center, int direct) const
+{
+    QPoint next(center);
+
+    switch(direct)
+    {
+	case Direction::Top:         if(center.y()) next.setY(center.y() - 1); break;
+    	case Direction::Bottom:      if(center.y() < size.height()) next.setY(center.y() + 1); break;
+    	case Direction::Left:        if(center.x()) next.setX(center.x() - 1); break;
+    	case Direction::Right:       if(center.x() < size.width()) next.setX(center.x() + 1); break;
+
+    	case Direction::TopRight:    return tileFromDirectionConst(tileFromDirectionConst(center, Direction::Top), Direction::Right);
+    	case Direction::BottomRight: return tileFromDirectionConst(tileFromDirectionConst(center, Direction::Bottom), Direction::Right);
+    	case Direction::BottomLeft:  return tileFromDirectionConst(tileFromDirectionConst(center, Direction::Bottom), Direction::Left);
+    	case Direction::TopLeft:     return tileFromDirectionConst(tileFromDirectionConst(center, Direction::Top), Direction::Left);
+    	default: break;
+    }
+
+    return tileConst(next);
+}
+
+MapTile* MapTiles::tileFromDirection(const QPoint & center, int direct)
+{
+    return const_cast<MapTile*>(tileFromDirectionConst(center, direct));
+}
+
+int MapTiles::indexPoint(const QPoint & pos) const
+{
+    return pos.x() + pos.y() * size.width();
+}
+
+bool MapTiles::isValidPoint(const QPoint & pos) const
+{
+    return QRect(QPoint(0, 0), size).contains(pos);
+}
+
+const QList<QGraphicsItem*> & MapTiles::groupList(void) const
+{
+    return reinterpret_cast<const QList<QGraphicsItem*> &>(*this);
+}
+
+MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), themeContent(parent->mainWindow->aggContent),
+    tileOverMouse(NULL), groupTiles(NULL), mapArea(), mapTiles(mapArea.tiles), mapObjects(mapArea.objects)
 {
 }
 
-Editor::Theme & MapData::theme(void)
+EditorTheme & MapData::theme(void)
 {
     return themeContent;
 }
@@ -288,17 +401,12 @@ const QString & MapData::description(void) const
 
 const QSize & MapData::size(void) const
 {
-    return mapSize;
+    return mapTiles.mapSize();
 }
 
 quint32 MapData::uniq(void)
 {
     return mapUniq++;
-}
-
-int MapData::indexLimit(void) const
-{
-    return size().width() * size().height();
 }
 
 void MapData::mousePressEvent(QGraphicsSceneMouseEvent* event)
@@ -467,7 +575,7 @@ void MapData::fillGroundAction(QAction* act)
 
     	    if(tile)
 	    {
-		QPair<int, int> indexGroundRotate = themeContent.indexGroundRotateFix(aroundGrounds(tile), tile->groundType());
+		QPair<int, int> indexGroundRotate = themeContent.indexGroundRotateFix(aroundGrounds(tile->mapPos()), tile->groundType());
 
 		if(0 <= indexGroundRotate.first)
             	    tile->setTileSprite(indexGroundRotate.first, indexGroundRotate.second);
@@ -497,77 +605,22 @@ void MapData::removeObjectsAction(QAction* act)
     }
 }
 
-bool MapData::isValidPoint(const QPoint & pos) const
-{
-    int index = pos.x() + pos.y() * size().width();
-    return 0 <= index && index < mapTiles.size();
-}
-
-const MapTile* MapData::mapTileFromDirectionConst(const MapTile* center, int direct) const
-{
-    if(center)
-    {
-	QPoint directPos = center->mapPos();
-
-	switch(direct)
-	{
-    	    case Direction::Top:         if(directPos.y()) directPos.setY(directPos.y() - 1); break;
-    	    case Direction::Bottom:      if(directPos.y() < size().height()) directPos.setY(directPos.y() + 1); break;
-    	    case Direction::Left:        if(directPos.x()) directPos.setX(directPos.x() - 1); break;
-    	    case Direction::Right:       if(directPos.x() < size().width()) directPos.setX(directPos.x() + 1); break;
-
-    	    case Direction::TopRight:    return mapTileFromDirectionConst(mapTileFromDirectionConst(center, Direction::Top), Direction::Right);
-    	    case Direction::BottomRight: return mapTileFromDirectionConst(mapTileFromDirectionConst(center, Direction::Bottom), Direction::Right);
-    	    case Direction::BottomLeft:  return mapTileFromDirectionConst(mapTileFromDirectionConst(center, Direction::Bottom), Direction::Left);
-    	    case Direction::TopLeft:     return mapTileFromDirectionConst(mapTileFromDirectionConst(center, Direction::Top), Direction::Left);
-    	    default: break;
-	}
-
-	QList<MapTile*>::const_iterator it = mapTiles.begin();
-	for(; it != mapTiles.end(); ++it) if((*it)->mapPos() == directPos) break;
-
-	return it != mapTiles.end() ? *it : NULL;
-    }
-
-    return NULL;
-}
-
-MapTile* MapData::mapTileFromDirection(const MapTile* center, int direct)
-{
-    return const_cast<MapTile*>(mapTileFromDirectionConst(center, direct));
-}
-
-const MapTile* MapData::mapTileConst(const QPoint & pos) const
-{
-    return isValidPoint(pos) ? mapTiles[pos.x() + pos.y() * size().width()] : NULL;
-}
-
-MapTile* MapData::mapTile(const QPoint & pos)
-{
-    return const_cast<MapTile*>(mapTileConst(pos));
-}
-
-
 void MapData::newMap(const QSize & msz, const QString &)
 {
     mapDifficulty = 1;
     mapUniq = 1;
 
-    mapSize = QSize(msz);
-
     mapName = "New Map";
     mapAuthors = "unknown";
     mapLicense = "unknown";
 
-    // fill tiles
-    for(int yy = 0; yy < size().height(); ++yy)
-    {
-	for(int xx = 0; xx < size().width(); ++xx)
-        {
-    	    mapTiles.push_back(new MapTile(mp2til_t(), QPoint(xx, yy), themeContent));
-	    addItem(mapTiles.back());
-	}
-    }
+    const QSize & tileSize = themeContent.tileSize();
+
+    mapTiles.newMap(msz, themeContent);
+    groupTiles = createItemGroup(mapTiles.groupList());
+
+    setSceneRect(QRect(QPoint(0, 0),
+	QSize(size().width() * tileSize.width(), size().height() * tileSize.height())));
 }
 
 bool MapData::loadMap(const QString & mapFile)
@@ -578,143 +631,120 @@ bool MapData::loadMap(const QString & mapFile)
 
     if(mp2.loadMap(mapFile))
     {
-	mapSize = mp2.size;
+	// import tiles
+	if(! mapTiles.importMap(mp2.size, mp2.tiles, mp2.sprites, themeContent))
+	    return false;
+
+	groupTiles = createItemGroup(mapTiles.groupList());
+
 	mapName = mp2.name;
 	mapDescription = mp2.description;
 
 	setSceneRect(QRect(QPoint(0, 0),
 		QSize(size().width() * tileSize.width(), size().height() * tileSize.height())));
 
-	// import tiles
-	for(int yy = 0; yy < size().height(); ++yy)
-	{
-	    for(int xx = 0; xx < size().width(); ++xx)
-	    {
-		const mp2til_t & mp2til = mp2.tiles[xx + yy * size().width()];
-		mapTiles.push_back(new MapTile(mp2til, QPoint(xx, yy), themeContent));
-		int ext = mp2til.indexExt;
-
-		while(ext)
-		{
-		    if(ext >= mp2.sprites.size())
-		    {
-			qDebug() << "ext block: out of range" << ext;
-    			return false;
-		    }
-
-		    mapTiles.back()->loadSpriteLevels(mp2.sprites[ext]);
-		    ext = mp2.sprites[ext].indexExt;
-		}
-
-		mapTiles.back()->sortSpritesLevels();
-		addItem(mapTiles.back());
-	    }
-
-	}
-
 	// import towns
 	for(QVector<H2::TownPos>::const_iterator
-	    it = mp2.castles.begin(); it != mp2.castles.end(); ++it) if(isValidPoint((*it).pos()))
+	    it = mp2.castles.begin(); it != mp2.castles.end(); ++it) if(mapTiles.isValidPoint((*it).pos()))
 	{
-	    const MapTile* tile = mapTileConst((*it).pos());
+	    const MapTile* tile = mapTiles.tileConst((*it).pos());
 	    QList<MapTileExt*>::const_iterator ext = std::find_if(tile->spritesLevel1.begin(), tile->spritesLevel1.end(), MapTileExt::isTown);
 	    int uid = ext != tile->spritesLevel1.end() ? (*ext)->spriteUID : -1;
-	    mapObjects[(*it).pos()] = QSharedPointer<Editor::Object>(new Editor::Town((*it).pos(), uid, (*it).town()));
+	    mapObjects[(*it).pos()] = QSharedPointer<MapObject>(new MapTown((*it).pos(), uid, (*it).town()));
 	}
 
 	// import heroes
 	for(QVector<H2::HeroPos>::const_iterator
-	    it = mp2.heroes.begin(); it != mp2.heroes.end(); ++it) if(isValidPoint((*it).pos()))
+	    it = mp2.heroes.begin(); it != mp2.heroes.end(); ++it) if(mapTiles.isValidPoint((*it).pos()))
 	{
-	    const MapTile* tile = mapTileConst((*it).pos());
+	    const MapTile* tile = mapTiles.tileConst((*it).pos());
 	    QList<MapTileExt*>::const_iterator ext = std::find_if(tile->spritesLevel1.begin(), tile->spritesLevel1.end(), MapTileExt::isMiniHero);
 	    int uid = ext != tile->spritesLevel1.end() ? (*ext)->spriteUID : -1;
-	    mapObjects[(*it).pos()] = QSharedPointer<Editor::Object>(new Editor::Hero((*it).pos(), uid, (*it).hero()));
+	    mapObjects[(*it).pos()] = QSharedPointer<MapObject>(new MapHero((*it).pos(), uid, (*it).hero()));
 	}
 
 	// import signs
 	for(QVector<H2::SignPos>::const_iterator
-	    it = mp2.signs.begin(); it != mp2.signs.end(); ++it) if(isValidPoint((*it).pos()))
+	    it = mp2.signs.begin(); it != mp2.signs.end(); ++it) if(mapTiles.isValidPoint((*it).pos()))
 	{
-	    const MapTile* tile = mapTileConst((*it).pos());
+	    const MapTile* tile = mapTiles.tileConst((*it).pos());
 	    QList<MapTileExt*>::const_iterator ext = std::find_if(tile->spritesLevel1.begin(), tile->spritesLevel1.end(), MapTileExt::isSign);
 	    int uid = ext != tile->spritesLevel1.end() ? (*ext)->spriteUID : -1;
-	    mapObjects[(*it).pos()] = QSharedPointer<Editor::Object>(new Editor::Sign((*it).pos(), uid, (*it).sign()));
+	    mapObjects[(*it).pos()] = QSharedPointer<MapObject>(new MapSign((*it).pos(), uid, (*it).sign()));
 	}
 
 	// import map events
 	for(QVector<H2::EventPos>::const_iterator
-	    it = mp2.mapEvents.begin(); it != mp2.mapEvents.end(); ++it) if(isValidPoint((*it).pos()))
+	    it = mp2.mapEvents.begin(); it != mp2.mapEvents.end(); ++it) if(mapTiles.isValidPoint((*it).pos()))
 	{
-	    const MapTile* tile = mapTileConst((*it).pos());
+	    const MapTile* tile = mapTiles.tileConst((*it).pos());
 	    QList<MapTileExt*>::const_iterator ext = std::find_if(tile->spritesLevel1.begin(), tile->spritesLevel1.end(), MapTileExt::isMapEvent);
 	    int uid = ext != tile->spritesLevel1.end() ? (*ext)->spriteUID : -1;
-	    mapObjects[(*it).pos()] = QSharedPointer<Editor::Object>(new Editor::MapEvent((*it).pos(), uid, (*it).event()));
+	    mapObjects[(*it).pos()] = QSharedPointer<MapObject>(new MapEvent((*it).pos(), uid, (*it).event()));
 	}
 
 	// import sphinx riddles
 	for(QVector<H2::SphinxPos>::const_iterator
-	    it = mp2.sphinxes.begin(); it != mp2.sphinxes.end(); ++it) if(isValidPoint((*it).pos()))
+	    it = mp2.sphinxes.begin(); it != mp2.sphinxes.end(); ++it) if(mapTiles.isValidPoint((*it).pos()))
 	{
-	    const MapTile* tile = mapTileConst((*it).pos());
+	    const MapTile* tile = mapTiles.tileConst((*it).pos());
 	    QList<MapTileExt*>::const_iterator ext = std::find_if(tile->spritesLevel1.begin(), tile->spritesLevel1.end(), MapTileExt::isSphinx);
 	    int uid = ext != tile->spritesLevel1.end() ? (*ext)->spriteUID : -1;
-	    mapObjects[(*it).pos()] = QSharedPointer<Editor::Object>(new Editor::Sphinx((*it).pos(), uid, (*it).sphinx()));
+	    mapObjects[(*it).pos()] = QSharedPointer<MapObject>(new MapSphinx((*it).pos(), uid, (*it).sphinx()));
 	}
 
 	// import day events
 	for(QVector<mp2dayevent_t>::const_iterator
 	    it = mp2.dayEvents.begin(); it != mp2.dayEvents.end(); ++it)
 	{
-	    dayEvents.push_back(QSharedPointer<Editor::DayEvent>(new Editor::DayEvent(*it)));
+	    dayEvents.push_back(QSharedPointer<DayEvent>(new DayEvent(*it)));
 	}
 
 	// import rumors
 	for(QVector<mp2rumor_t>::const_iterator
 	    it = mp2.rumors.begin(); it != mp2.rumors.end(); ++it)
 	{
-	    tavernRumors.push_back(QSharedPointer<Editor::Rumor>(new Editor::Rumor(*it)));
+	    tavernRumors.push_back(QSharedPointer<Rumor>(new Rumor(*it)));
 	}
+
 	return true;
     }
 
     return false;
 }
 
-AroundGrounds MapData::aroundGrounds(const MapTile* center) const
+AroundGrounds MapData::aroundGrounds(const QPoint & center) const
 {
     AroundGrounds res;
 
-    if(center)
-    {
-	const MapTile* tile = NULL;
+    const MapTile* tile = NULL;
 
-	tile = mapTileFromDirectionConst(center, Direction::TopLeft);
-	if(tile) res[0] = tile->groundType();
+    tile = mapTiles.tileFromDirectionConst(center, Direction::TopLeft);
+    if(tile) res[0] = tile->groundType();
 
-	tile = mapTileFromDirectionConst(center, Direction::Top);
-	if(tile) res[1] = tile->groundType();
+    tile = mapTiles.tileFromDirectionConst(center, Direction::Top);
+    if(tile) res[1] = tile->groundType();
 
-	tile = mapTileFromDirectionConst(center, Direction::TopRight);
-	if(tile) res[2] = tile->groundType();
+    tile = mapTiles.tileFromDirectionConst(center, Direction::TopRight);
+    if(tile) res[2] = tile->groundType();
 
-	tile = mapTileFromDirectionConst(center, Direction::Right);
-	if(tile) res[3] = tile->groundType();
+    tile = mapTiles.tileFromDirectionConst(center, Direction::Right);
+    if(tile) res[3] = tile->groundType();
 
-	tile = mapTileFromDirectionConst(center, Direction::BottomRight);
-	if(tile) res[4] = tile->groundType();
+    tile = mapTiles.tileFromDirectionConst(center, Direction::BottomRight);
+    if(tile) res[4] = tile->groundType();
 
-	tile = mapTileFromDirectionConst(center, Direction::Bottom);
-	if(tile) res[5] = tile->groundType();
+    tile = mapTiles.tileFromDirectionConst(center, Direction::Bottom);
+    if(tile) res[5] = tile->groundType();
 
-	tile = mapTileFromDirectionConst(center, Direction::BottomLeft);
-	if(tile) res[6] = tile->groundType();
+    tile = mapTiles.tileFromDirectionConst(center, Direction::BottomLeft);
+    if(tile) res[6] = tile->groundType();
 
-	tile = mapTileFromDirectionConst(center, Direction::Left);
-	if(tile) res[7] = tile->groundType();
+    tile = mapTiles.tileFromDirectionConst(center, Direction::Left);
+    if(tile) res[7] = tile->groundType();
 
-	res[8] = center->groundType();
-    }
+    tile = mapTiles.tileConst(center);
+    if(tile) res[8] = tile->groundType();
 
     return res;
 }

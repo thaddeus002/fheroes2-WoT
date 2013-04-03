@@ -336,110 +336,107 @@ public:
 
 class MapData;
 
-namespace Editor
+class EditorTheme
 {
-    class Theme
-    {
-    protected:
-	AGG::Spool &		aggSpool;
-	QString			name;
-	QSize			tile;
+protected:
+    AGG::Spool &		aggSpool;
+    QString			name;
+    QSize			tile;
 
-    public:
-	Theme(AGG::Spool &);
+public:
+    EditorTheme(AGG::Spool &);
 
-	QPixmap			getImageTIL(const QString &, quint16);
-	QPair<QPixmap, QPoint>	getImageICN(const QString &, quint16);
+    QPixmap			getImageTIL(const QString &, quint16);
+    QPair<QPixmap, QPoint>	getImageICN(const QString &, quint16);
 
-	const QSize &		tileSize(void) const;
+    const QSize &		tileSize(void) const;
 
-	int			startFilledTile(int) const;
-	int			startGroundTile(int) const;
-	int			startFilledOriginalTile(int) const;
-	int			startGroundOriginalTile(int) const;
+    int				startFilledTile(int) const;
+    int				startGroundTile(int) const;
+    int				startFilledOriginalTile(int) const;
+    int				startGroundOriginalTile(int) const;
 
-	int			ground(int) const;
-	QPair<int, int>		indexGroundRotateFix(const AroundGrounds &, int) const;
-    };
+    int				ground(int) const;
+    QPair<int, int>		indexGroundRotateFix(const AroundGrounds &, int) const;
+};
 
-    class Object : public QPoint
-    {
-	int	uniq;
+class MapObject : public QPoint
+{
+    int	uniq;
 
-    public:
-	Object(const QPoint & pos, int id) : QPoint(pos), uniq(id) {}
-	virtual ~Object() {}
+public:
+    MapObject(const QPoint & pos, int id) : QPoint(pos), uniq(id) {}
+    virtual ~MapObject() {}
 
-	const int & uid(void) const { return uniq; }
-    };
+    const int & uid(void) const { return uniq; }
+};
 
-    class Town : public Object
-    {
-    public:
-	Town(const QPoint & pos, quint32 id, const mp2town_t &);
-    };
+class MapTown : public MapObject
+{
+public:
+    MapTown(const QPoint & pos, quint32 id, const mp2town_t &);
+};
 
-    class Hero : public Object
-    {
-    public:
-	Hero(const QPoint & pos, quint32 id, const mp2hero_t &);
-    };
+class MapHero : public MapObject
+{
+public:
+    MapHero(const QPoint & pos, quint32 id, const mp2hero_t &);
+};
 
-    class Sign : public Object
-    {
-    public:
-	Sign(const QPoint & pos, quint32 id, const mp2sign_t &);
-    };
+class MapSign : public MapObject
+{
+public:
+    MapSign(const QPoint & pos, quint32 id, const mp2sign_t &);
+};
 
-    class MapEvent : public Object
-    {
-    public:
-	MapEvent(const QPoint & pos, quint32 id, const mp2mapevent_t &);
-    };
+class MapEvent : public MapObject
+{
+public:
+    MapEvent(const QPoint & pos, quint32 id, const mp2mapevent_t &);
+};
 
-    class Sphinx : public Object
-    {
-    public:
-	Sphinx(const QPoint & pos, quint32 id, const mp2sphinx_t &);
-    };
+class MapSphinx : public MapObject
+{
+public:
+    MapSphinx(const QPoint & pos, quint32 id, const mp2sphinx_t &);
+};
 
-    class DayEvent
-    {
-    public:
-	DayEvent(const mp2dayevent_t &);
-    };
+class DayEvent
+{
+public:
+    DayEvent(const mp2dayevent_t &);
+};
 
-    class Rumor : public QString
-    {
-    public:
-	Rumor(const mp2rumor_t &);
-    };
+class Rumor : public QString
+{
+public:
+    Rumor(const mp2rumor_t &);
+};
 
-    class MapKey : public QPoint
-    {
-    public:
-	MapKey(const QPoint & pos) : QPoint(pos) {}
+class MapKey : public QPoint
+{
+public:
+    MapKey(const QPoint & pos) : QPoint(pos) {}
 
-	bool operator< (const QPoint & pt) const { return x() + y() < pt.x() + pt.y(); }
-    };
+    bool operator< (const QPoint & pt) const { return x() + y() < pt.x() + pt.y(); }
+};
 
-    class MapObjects : public QMap<MapKey, QSharedPointer<Editor::Object> >
-    {
-    public:
-        MapObjects();
-    };
+class MapObjects : public QMap<MapKey, QSharedPointer<MapObject> >
+{
+public:
+    MapObjects();
+};
 
-    class DayEvents : public QVector<QSharedPointer<Editor::DayEvent> >
-    {
-    public:
-	DayEvents();
-    };
+class DayEvents : public QVector<QSharedPointer<DayEvent> >
+{
+public:
+    DayEvents();
+};
 
-    class TavernRumors : public QVector<QSharedPointer<Editor::Rumor> >
-    {
-    public:
-	TavernRumors();
-    };
-}
+class TavernRumors : public QVector<QSharedPointer<Rumor> >
+{
+public:
+    TavernRumors();
+};
 
 #endif

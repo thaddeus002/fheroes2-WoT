@@ -110,7 +110,7 @@ public:
 class MapTile : public QGraphicsPixmapItem
 {
 public:
-    MapTile(const mp2til_t &, const QPoint &, Editor::Theme &);
+    MapTile(const mp2til_t &, const QPoint &, EditorTheme &);
     ~MapTile();
 
     QRectF		boundingRect(void) const;
@@ -130,7 +130,7 @@ public:
 protected:
     friend class MapData;
 
-    Editor::Theme &	themeContent;
+    EditorTheme &	themeContent;
     mp2til_t		til;
     QPoint		mpos;
 
@@ -139,6 +139,42 @@ protected:
 
     quint16		passableBase;
     quint16		passableLocal;
+};
+
+class MapTiles : protected QList<MapTile*>
+{
+    QSize		size;
+
+public:
+    MapTiles() {}
+
+    void		newMap(const QSize &, EditorTheme &);
+    bool		importMap(const QSize &, const QVector<mp2til_t> &, const QVector<mp2ext_t> &, EditorTheme &);
+
+    const QSize &	mapSize(void) const { return size; }
+    int			indexPoint(const QPoint &) const;
+    bool		isValidPoint(const QPoint &) const;
+
+    const MapTile*	tileConst(const QPoint &) const;
+    MapTile*		tile(const QPoint &);
+
+    const MapTile*	tileFromDirectionConst(const MapTile*, int direct) const;
+    MapTile*		tileFromDirection(const MapTile*, int direct);
+    const MapTile*	tileFromDirectionConst(const QPoint &, int direct) const;
+    MapTile*		tileFromDirection(const QPoint &, int direct);
+
+    const QList<QGraphicsItem*> & groupList(void) const;
+};
+
+struct MapArea
+{
+    MapTiles		tiles;
+    MapObjects		objects;
+};
+
+struct MapSelectedArea : public MapArea
+{
+    MapSelectedArea(const MapArea &, const QRect &);
 };
 
 class MapData : public QGraphicsScene
@@ -152,19 +188,12 @@ public:
     const QString &	description(void) const;
     const QSize &	size(void) const;
 
-    int			indexLimit(void) const;
-    bool		isValidPoint(const QPoint &) const;
     quint32		uniq(void);
-
-    const MapTile*	mapTileConst(const QPoint &) const;
-    MapTile*		mapTile(const QPoint &);
-    const MapTile*	mapTileFromDirectionConst(const MapTile*, int) const;
-    MapTile*		mapTileFromDirection(const MapTile*, int);
 
     void		newMap(const QSize &, const QString &);
     bool		loadMap(const QString &);
 
-    Editor::Theme &	theme(void);
+    EditorTheme &	theme(void);
 
 signals:
     void		dataModified(void);
@@ -185,15 +214,15 @@ protected:
     void		drawForeground(QPainter*, const QRectF &);
 
     void		selectArea(QPointF, QPointF);
-    AroundGrounds	aroundGrounds(const MapTile*) const;
+    AroundGrounds	aroundGrounds(const QPoint & center) const;
 
     friend class	MP2Format;
     friend class	MapTile;
 
-    Editor::Theme	themeContent;
+    EditorTheme		themeContent;
     MapTile*		tileOverMouse;
+    QGraphicsItemGroup* groupTiles;
 
-    QSize		mapSize;
     QString		mapName;
     QString		mapDescription;
     QString		mapAuthors;
@@ -201,11 +230,12 @@ protected:
     int			mapDifficulty;
     quint32		mapUniq;
 
-    QList<MapTile*>	mapTiles;
+    MapArea		mapArea;
+    MapTiles &		mapTiles;
+    MapObjects &	mapObjects;
 
-    Editor::MapObjects		mapObjects;
-    Editor::DayEvents		dayEvents;
-    Editor::TavernRumors	tavernRumors;
+    DayEvents		dayEvents;
+    TavernRumors	tavernRumors;
 };
 
 #endif
