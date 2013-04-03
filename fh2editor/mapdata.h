@@ -34,7 +34,9 @@
 #include "engine.h"
 
 class MapTile;
+class MapTileLevels;
 class MapData;
+class MapArea;
 class MapWindow;
 class AroundGrounds;
 
@@ -80,12 +82,9 @@ public:
 
 class MapTileExt : protected QPair<QPixmap, QPoint>
 {
-    friend class MapTile;
-    friend class MapData;
-
     quint8		spriteICN;
     quint8		spriteIndex;
-    quint8		level;
+    quint8		spriteLevel;
     quint8		tmp;
     quint32		spriteUID;
 
@@ -98,6 +97,11 @@ public:
     QPixmap &		pixmap(void) { return first; };
     QPoint &		offset(void) { return second; };
 
+    int			uid(void) const { return spriteUID; }
+    int			icn(void) const { return spriteICN; }
+    int			index(void) const { return spriteIndex; }
+    int			level(void) const { return spriteLevel; }
+
     static bool		isMapEvent(const MapTileExt*);
     static bool		isSphinx(const MapTileExt*);
     static bool		isSign(const MapTileExt*);
@@ -107,11 +111,23 @@ public:
     static bool		isRandomTown(const MapTileExt*);
 };
 
+class MapTileLevels : public QList<MapTileExt*>
+{
+public:
+    MapTileLevels() {}
+    MapTileLevels(const MapTileLevels &);
+    ~MapTileLevels();
+
+    const MapTileExt*	find(bool (*pf)(const MapTileExt*)) const;
+    void		paint(QPainter &, const QPoint &, EditorTheme &) const;
+    QString		infoString(void) const;
+};
+
 class MapTile : public QGraphicsPixmapItem
 {
 public:
     MapTile(const mp2til_t &, const QPoint &, EditorTheme &);
-    ~MapTile();
+    MapTile(const MapTile &);
 
     QRectF		boundingRect(void) const;
 
@@ -123,19 +139,21 @@ public:
     const QPoint &	mapPos(void) const { return mpos; }
     void		paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget* = 0);
     void		loadSpriteLevels(const mp2ext_t &);
-    void		loadSpriteLevel(QList<MapTileExt*> &, int, const mp2lev_t &);
     void		sortSpritesLevels(void);
     void		setTileSprite(int, int);
 
+    const MapTileLevels & levels1(void) const { return spritesLevel1; }
+    const MapTileLevels & levels2(void) const { return spritesLevel2; }
+
 protected:
-    friend class MapData;
+    static void		loadSpriteLevel(MapTileLevels &, int, const mp2lev_t &, EditorTheme &);
 
     EditorTheme &	themeContent;
     mp2til_t		til;
     QPoint		mpos;
 
-    QList<MapTileExt*>	spritesLevel1;
-    QList<MapTileExt*>	spritesLevel2;
+    MapTileLevels	spritesLevel1;
+    MapTileLevels	spritesLevel2;
 
     quint16		passableBase;
     quint16		passableLocal;
@@ -163,17 +181,25 @@ public:
     const MapTile*	tileFromDirectionConst(const QPoint &, int direct) const;
     MapTile*		tileFromDirection(const QPoint &, int direct);
 
-    const QList<QGraphicsItem*> & groupList(void) const;
+    void		insertToScene(QGraphicsScene &) const;
 };
 
-struct MapArea
+class MapArea
 {
+public:
     MapTiles		tiles;
     MapObjects		objects;
+
+    void		importMP2Towns(const QVector<H2::TownPos> &);
+    void		importMP2Heroes(const QVector<H2::HeroPos> &);
+    void		importMP2Signs(const QVector<H2::SignPos> &);
+    void		importMP2MapEvents(const QVector<H2::EventPos> &);
+    void		importMP2SphinxRiddles(const QVector<H2::SphinxPos> &);
 };
 
-struct MapSelectedArea : public MapArea
+class MapSelectedArea : public MapArea
 {
+public:
     MapSelectedArea(const MapArea &, const QRect &);
 };
 
@@ -192,6 +218,9 @@ public:
 
     void		newMap(const QSize &, const QString &);
     bool		loadMap(const QString &);
+
+    QPoint		mapToTile(const QPoint &) const;
+    QRect		mapToTile(const QRect &) const;
 
     EditorTheme &	theme(void);
 
@@ -212,16 +241,13 @@ protected:
     void                mousePressEvent(QGraphicsSceneMouseEvent*);
     void                mouseMoveEvent(QGraphicsSceneMouseEvent*);
     void		drawForeground(QPainter*, const QRectF &);
-
     void		selectArea(QPointF, QPointF);
-    AroundGrounds	aroundGrounds(const QPoint & center) const;
 
     friend class	MP2Format;
     friend class	MapTile;
 
     EditorTheme		themeContent;
     MapTile*		tileOverMouse;
-    QGraphicsItemGroup* groupTiles;
 
     QString		mapName;
     QString		mapDescription;

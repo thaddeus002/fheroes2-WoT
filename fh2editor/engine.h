@@ -324,17 +324,19 @@ namespace AGG
     };
 }
 
+class MapData;
+class MapTiles;
+
 class AroundGrounds: public QVector<int>
 {
 public:
     AroundGrounds() : QVector<int>(9, Ground::Unknown){} /* ground: top left, top, top right, right, bottom right, bottom, bottom left, left, center */
+    AroundGrounds(const MapTiles &, const QPoint &);
 
     int operator() (void) const;
     int groundsDirects(int) const;
     int aroundGround(int) const;
 };
-
-class MapData;
 
 class EditorTheme
 {

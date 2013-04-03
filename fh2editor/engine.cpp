@@ -1207,6 +1207,39 @@ int EditorTheme::startGroundOriginalTile(int ground) const
     return startGroundTile(ground) + Rand(3);
 }
 
+AroundGrounds::AroundGrounds(const MapTiles & tiles, const QPoint & center) : QVector<int>(9, Ground::Unknown)
+{
+    QVector<int> & v = *this;
+    const MapTile* tile = NULL;
+
+    tile = tiles.tileFromDirectionConst(center, Direction::TopLeft);
+    if(tile) v[0] = tile->groundType();
+
+    tile = tiles.tileFromDirectionConst(center, Direction::Top);
+    if(tile) v[1] = tile->groundType();
+
+    tile = tiles.tileFromDirectionConst(center, Direction::TopRight);
+    if(tile) v[2] = tile->groundType();
+
+    tile = tiles.tileFromDirectionConst(center, Direction::Right);
+    if(tile) v[3] = tile->groundType();
+
+    tile = tiles.tileFromDirectionConst(center, Direction::BottomRight);
+    if(tile) v[4] = tile->groundType();
+
+    tile = tiles.tileFromDirectionConst(center, Direction::Bottom);
+    if(tile) v[5] = tile->groundType();
+
+    tile = tiles.tileFromDirectionConst(center, Direction::BottomLeft);
+    if(tile) v[6] = tile->groundType();
+
+    tile = tiles.tileFromDirectionConst(center, Direction::Left);
+    if(tile) v[7] = tile->groundType();
+
+    tile = tiles.tileConst(center);
+    if(tile) v[8] = tile->groundType();
+}
+
 int AroundGrounds::operator() (void) const
 {
     int res = 0;
