@@ -49,6 +49,7 @@ s8 ArtifactsModifiersResult(u8 type, const u8* arts, u8 size, const HeroBase & b
 
 		    switch(art())
 		    {
+			case Artifact::SWORD_BREAKER:		if(type == MDF_ATTACK); mod = 1; break;
 			// power
 			case Artifact::BROACH_SHIELDING:	if(type == MDF_POWER) mod = -2; break;
 			// morale/luck
