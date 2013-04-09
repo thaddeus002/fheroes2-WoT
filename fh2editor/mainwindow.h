@@ -28,6 +28,7 @@
 QT_BEGIN_NAMESPACE
 class QActionGroup;
 class QAction;
+class QLabel;
 class QMenu;
 class QMdiArea;
 class QMdiSubWindow;
@@ -54,6 +55,7 @@ private slots:
     void		saveAs(void);
     void		about(void);
     void		updateMenus(void);
+    void		updateStatusBar(void);
     void		updateWindowMenu(void);
     MapWindow*		createMapWindow(void);
     void		setActiveSubWindow(QWidget*);
@@ -99,6 +101,9 @@ private:
     QAction*		mapOptionsAct;
     QAction*		showRadarAct;
     QAction*		showPassableAct;
+
+    QLabel*		labelTileX;
+    QLabel*		labelTileY;
 
     int			sequenceMapNumber;
     AGG::Spool		aggContent;

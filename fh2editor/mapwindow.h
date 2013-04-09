@@ -51,6 +51,8 @@ public:
 
 signals:
     void	selectedItems(bool);
+    void	cursorTileXPosChanged(int);
+    void	cursorTileYPosChanged(int);
 
 protected:
     void	closeEvent(QCloseEvent*);

@@ -503,7 +503,23 @@ void MapData::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
     if(tileOverMouse)
 	update(tileOverMouse->boundingRect());
 
-    tileOverMouse = qgraphicsitem_cast<MapTile*>(itemAt(event->scenePos()));
+    MapTile* newTileOverMouse = qgraphicsitem_cast<MapTile*>(itemAt(event->scenePos()));
+
+    if(tileOverMouse != newTileOverMouse)
+    {
+	MapWindow* mapWindow = qobject_cast<MapWindow*>(parent());
+
+	if(mapWindow &&
+	    (!tileOverMouse || tileOverMouse->mapPos().x() != newTileOverMouse->mapPos().x()))
+		emit mapWindow->cursorTileXPosChanged(newTileOverMouse->mapPos().x());
+
+	if(mapWindow &&
+	    (!tileOverMouse || tileOverMouse->mapPos().y() != newTileOverMouse->mapPos().y()))
+		emit mapWindow->cursorTileYPosChanged(newTileOverMouse->mapPos().y());
+
+	tileOverMouse = newTileOverMouse;
+
+    }
 
     if(tileOverMouse)
 	update(tileOverMouse->boundingRect());

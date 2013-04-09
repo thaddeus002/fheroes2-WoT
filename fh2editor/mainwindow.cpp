@@ -33,6 +33,7 @@ MainWindow::MainWindow(const QString & dataFile) : sequenceMapNumber(0), aggCont
     mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     setCentralWidget(mdiArea);
     connect(mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(updateMenus()));
+    connect(mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(updateStatusBar()));
 
     windowMapper = new QSignalMapper(this);
     connect(windowMapper, SIGNAL(mapped(QWidget*)), this, SLOT(setActiveSubWindow(QWidget*)));
@@ -41,7 +42,9 @@ MainWindow::MainWindow(const QString & dataFile) : sequenceMapNumber(0), aggCont
     createMenus();
     createToolBars();
     createStatusBar();
+
     updateMenus();
+    updateStatusBar();
 
     readSettings();
 
@@ -284,7 +287,28 @@ void MainWindow::createToolBars(void)
 
 void MainWindow::createStatusBar(void)
 {
+    labelTileX = new QLabel(this);
+    labelTileY = new QLabel(this);
+
+    statusBar()->addPermanentWidget(new QLabel("tile x:", this));
+    statusBar()->addPermanentWidget(labelTileX);
+    statusBar()->addPermanentWidget(new QLabel("tile y:", this));
+    statusBar()->addPermanentWidget(labelTileY);
     statusBar()->showMessage(tr("Ready"));
+}
+
+void MainWindow::updateStatusBar(void)
+{
+    MapWindow* mapWindow = activeMapWindow();
+
+    disconnect(labelTileX);
+    disconnect(labelTileY);
+
+    if(mapWindow)
+    {
+	connect(mapWindow, SIGNAL(cursorTileXPosChanged(int)), labelTileX, SLOT(setNum(int)));
+	connect(mapWindow, SIGNAL(cursorTileYPosChanged(int)), labelTileY, SLOT(setNum(int)));
+    }
 }
 
 void MainWindow::readSettings(void)

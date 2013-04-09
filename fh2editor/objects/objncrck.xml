@@ -1,8 +1,157 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects icn="objncrck">
+    <object name="Artesian Spring" width="3" height="2">
+	<sprite px="1" py="0" index="0" level="top" />
+	<sprite px="2" py="0" index="1" level="top" />
+	<sprite px="0" py="1" index="2" level="shadow" />
+	<sprite px="1" py="1" index="3" level="action" passable="0x01F0" />
+	<sprite px="2" py="1" index="4" level="action" passable="0x01F0" />
+    </object>
+    <object name="Ground Object 5" width="2" height="1">
+	<sprite px="0" py="0" index="5" level="bottom" passable="0x01FF" />
+	<sprite px="1" py="0" index="6" level="bottom" passable="0x01FF" />
+    </object>
+    <object name="Rock 7" width="3" height="2">
+	<sprite px="1" py="0" index="7" level="top" />
+	<sprite px="2" py="0" index="8" level="top" />
+	<sprite px="0" py="1" index="9" level="shadow" />
+	<sprite px="1" py="1" index="10" level="bottom" passable="0x01F0" />
+	<sprite px="2" py="1" index="11" level="bottom" passable="0x01F0" />
+    </object>
+    <object name="Cactus 12" width="2" height="2">
+	<sprite px="1" py="0" index="12" level="top" />
+	<sprite px="0" py="1" index="13" level="shadow" />
+	<sprite px="1" py="1" index="14" level="bottom" passable="0x01F0" />
+    </object>
+    <object name="Cactus 15" width="2" height="1">
+	<sprite px="0" py="0" index="15" level="shadow" />
+	<sprite px="1" py="0" index="16" level="bottom" passable="0x01F0" />
+    </object>
+    <object name="Skull" width="1" height="1">
+	<sprite px="0" py="0" index="17" level="bottom" passable="0x01FF" />
+    </object>
+    <object name="Rock 18" width="1" height="1">
+	<sprite px="0" py="0" index="18" level="bottom" passable="0x01F0" />
+    </object>
+    <object name="Rock 19" width="3" height="2">
+	<sprite px="1" py="0" index="19" level="top" />
+	<sprite px="0" py="1" index="20" level="shadow" />
+	<sprite px="1" py="1" index="21" level="bottom" passable="0x01F0" />
+	<sprite px="2" py="1" index="22" level="bottom" passable="0x01F0" />
+    </object>
+    <object name="Rock 23" width="3" height="1">
+	<sprite px="0" py="0" index="23" level="shadow" />
+	<sprite px="1" py="0" index="24" level="bottom" passable="0x01F0" />
+	<sprite px="2" py="0" index="25" level="bottom" passable="0x01F0" />
+    </object>
+    <object name="Rock 26" width="3" height="2">
+	<sprite px="1" py="0" index="26" level="top" />
+	<sprite px="2" py="0" index="27" level="top" />
+	<sprite px="0" py="1" index="28" level="shadow" />
+	<sprite px="1" py="1" index="29" level="bottom" passable="0x01F0" />
+	<sprite px="2" py="1" index="30" level="bottom" passable="0x01F0" />
+    </object>
+    <object name="Rock 31" width="2" height="1">
+	<sprite px="0" py="0" index="31" level="bottom" passable="0x01F0" />
+	<sprite px="1" py="0" index="32" level="bottom" passable="0x01F0" />
+    </object>
+    <object name="Rock 33" width="3" height="1">
+	<sprite px="0" py="0" index="33" level="shadow" />
+	<sprite px="1" py="0" index="34" level="bottom" passable="0x01F0" />
+	<sprite px="2" py="0" index="35" level="bottom" passable="0x01F0" />
+    </object>
+    <object name="Rock 36" width="3" height="1">
+	<sprite px="0" py="0" index="36" level="shadow" />
+	<sprite px="1" py="0" index="37" level="bottom" passable="0x01F0" />
+	<sprite px="2" py="0" index="38" level="bottom" passable="0x01F0" />
+    </object>
+    <object name="Rock 39" width="3" height="1">
+	<sprite px="0" py="0" index="39" level="shadow" />
+	<sprite px="1" py="0" index="40" level="bottom" passable="0x01F0" />
+	<sprite px="2" py="0" index="41" level="bottom" passable="0x01F0" />
+    </object>
+    <object name="Rock 42" width="2" height="1">
+	<sprite px="0" py="0" index="42" level="bottom" passable="0x01F0" />
+	<sprite px="1" py="0" index="43" level="bottom" passable="0x01F0" />
+    </object>
+    <object name="Rock 44" width="2" height="2">
+	<sprite px="1" py="0" index="44" level="top" />
+	<sprite px="0" py="1" index="45" level="shadow" />
+	<sprite px="1" py="1" index="46" level="bottom" passable="0x01F0" />
+    </object>
+    <object name="Rock 47" width="2" height="2">
+	<sprite px="1" py="0" index="47" level="top" />
+	<sprite px="0" py="1" index="48" level="shadow" />
+	<sprite px="1" py="1" index="49" level="bottom" passable="0x01F0" />
+    </object>
+    <object name="Rock 50" width="2" height="2">
+	<sprite px="1" py="0" index="50" level="top" />
+	<sprite px="0" py="1" index="51" level="shadow" />
+	<sprite px="1" py="1" index="52" level="bottom" passable="0x01F0" />
+    </object>
+    <object name="Rock 53" width="2" height="2">
+	<sprite px="1" py="0" index="53" level="top" />
+	<sprite px="0" py="1" index="54" level="shadow" />
+	<sprite px="1" py="1" index="55" level="bottom" passable="0x01F0" />
+    </object>
+    <object name="Shrub 56" width="2" height="1">
+	<sprite px="0" py="0" index="56" level="shadow" />
+	<sprite px="1" py="0" index="57" level="bottom" passable="0x01F0" />
+    </object>
+    <object name="Crater 58" width="4" height="3">
+	<sprite px="0" py="0" index="58" level="bottom" passable="0x01F0" />
+	<sprite px="1" py="0" index="59" level="bottom" passable="0x01F0" />
+	<sprite px="2" py="0" index="60" level="bottom" passable="0x01F0" />
+	<sprite px="3" py="0" index="61" level="bottom" passable="0x01F0" />
+	<sprite px="0" py="1" index="62" level="bottom" passable="0x01F0" />
+	<sprite px="1" py="1" index="63" level="bottom" passable="0x01F0" />
+	<sprite px="2" py="1" index="64" level="bottom" passable="0x01F0" />
+	<sprite px="3" py="1" index="65" level="bottom" passable="0x01F0" />
+	<sprite px="0" py="2" index="66" level="bottom" passable="0x01F0" />
+	<sprite px="1" py="2" index="67" level="bottom" passable="0x01F0" />
+	<sprite px="2" py="2" index="68" level="bottom" passable="0x01F0" />
+	<sprite px="3" py="2" index="69" level="bottom" passable="0x01F0" />
+    </object>
+    <object name="Ground Object 70" width="1" height="1">
+	<sprite px="0" py="0" index="70" level="bottom" passable="0x01FF" />
+    </object>
+    <object name="Shrub 71" width="1" height="1">
+	<sprite px="0" py="0" index="71" level="bottom" passable="0x01F0" />
+    </object>
+    <object name="Shrub 72" width="1" height="1">
+	<sprite px="0" py="0" index="72" level="bottom" passable="0x01F0" />
+    </object>
     <object name="Wagon" width="2" height="1">
 	<sprite px="0" py="0" index="73" level="shadow" />
-        <sprite px="1" py="0" index="74" level="action" />
+        <sprite px="1" py="0" index="74" level="action" passable="0x01F8" />
+    </object>
+    <object name="Tar Pit" width="6" height="3">
+        <sprite px="0" py="0" index="75" level="bottom" passable="0x01FF" />
+        <sprite px="1" py="0" index="76" level="bottom" passable="0" />
+        <sprite px="2" py="0" index="77" level="bottom" passable="0" />
+        <sprite px="3" py="0" index="78" level="bottom" passable="0" />
+        <sprite px="4" py="0" index="79" level="bottom" passable="0x01FF" />
+        <sprite px="0" py="1" index="80" level="bottom" passable="0" />
+        <sprite px="0" py="1" index="81" level="bottom" />
+        <sprite px="1" py="1" index="91" level="bottom" passable="0" />
+        <sprite px="1" py="1" index="92" level="bottom" />
+        <sprite px="2" py="1" index="102" level="bottom" passable="0" />
+        <sprite px="2" py="1" index="103" level="bottom" />
+        <sprite px="3" py="1" index="113" level="bottom" passable="0" />
+        <sprite px="3" py="1" index="114" level="bottom" />
+        <sprite px="4" py="1" index="124" level="bottom" passable="0" />
+        <sprite px="4" py="1" index="125" level="bottom" />
+        <sprite px="5" py="1" index="135" level="bottom" passable="0" />
+        <sprite px="0" py="2" index="136" level="bottom" passable="0x01F8" />
+        <sprite px="1" py="2" index="137" level="bottom" passable="0x01F8" />
+        <sprite px="1" py="2" index="138" level="bottom" />
+        <sprite px="2" py="2" index="148" level="bottom" passable="0x01F8" />
+        <sprite px="2" py="2" index="149" level="bottom" />
+        <sprite px="3" py="2" index="159" level="bottom" passable="0x01F8" />
+        <sprite px="3" py="2" index="160" level="bottom" />
+        <sprite px="4" py="2" index="170" level="bottom" passable="0x01F8" />
+        <sprite px="4" py="2" index="171" level="bottom" />
+        <sprite px="5" py="2" index="181" level="bottom" passable="0x01F8" />
     </object>
     <object name="Troll Bridge" width="4" height="2">
 	<sprite px="0" py="0" index="182" level="bottom" passable="0" />
@@ -12,18 +161,19 @@
         <sprite px="0" py="1" index="186" level="bottom" passable="0x01F8" />
         <sprite px="1" py="1" index="187" level="bottom" passable="0x01F8" />
         <sprite px="2" py="1" index="188" level="bottom" passable="0x01F8" />
-        <sprite px="3" py="1" index="189" level="action" />
+        <sprite px="3" py="1" index="189" level="action" passable="0x01F8" />
     </object>
     <object name="Market" width="3" height="2">
 	<sprite px="2" py="0" index="190" level="top" />
         <sprite px="0" py="1" index="201" level="shadow" />
         <sprite px="1" py="1" index="202" level="bottom" passable="0x01F8" />
-        <sprite px="2" py="1" index="213" level="action" />
+        <sprite px="1" py="1" index="203" level="bottom" />
+        <sprite px="2" py="1" index="213" level="action" passable="0x01F8" />
     </object>
     <object name="Obelisk" width="2" height="2">
         <sprite px="1" py="0" index="236" level="top" />
         <sprite px="0" py="1" index="237" level="shadow" />
-        <sprite px="1" py="1" index="238" level="action" />
+        <sprite px="1" py="1" index="238" level="action" passable="0x01F8" />
     </object>
     <object name="SawMill" width="4" height="2">
 	<sprite px="0" py="0" index="239" level="top" />
@@ -32,7 +182,7 @@
         <sprite px="3" py="0" index="242" level="top" />
         <sprite px="0" py="1" index="243" level="bottom" passable="0x01F8" />
         <sprite px="1" py="1" index="244" level="bottom" passable="0x01F8" />
-        <sprite px="2" py="1" index="245" level="action" />
+        <sprite px="2" py="1" index="245" level="action" passable="0x01F8" />
         <sprite px="3" py="1" index="246" level="bottom" passable="0x01F8" />
     </object>
 </objects>

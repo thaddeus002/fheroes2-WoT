@@ -1603,7 +1603,7 @@ bool CompositeObject::isValid() const
     return ! name.isEmpty();
 }
 
-Editor::MenuObjects::MenuObjects(QWidget & parent, EditorTheme & theme) : QMenu(tr("Add Objects"), &parent)
+Editor::MenuObjects::MenuObjects(QWidget & parent, EditorTheme & theme) : QMenu(tr("Add..."), &parent)
 {
     setIcon(QIcon(":/images/add_objects.png"));
 

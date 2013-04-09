@@ -4,3 +4,4 @@ passable:
     BottomRight = 0x0010, Bottom = 0x0020, BottomLeft = 0x0040, BottomRow = 0x0070
 
     CenterRow + BottomRow = 0x01F8
+    All = 0x01FF

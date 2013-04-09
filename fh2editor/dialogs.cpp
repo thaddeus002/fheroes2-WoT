@@ -74,7 +74,7 @@ Form::SelectMapSize::SelectMapSize()
 
     spinBoxWidth = new QSpinBox(this);
     spinBoxWidth->setObjectName(QString::fromUtf8("spinBoxWidth"));
-    spinBoxWidth->setMaximum(254);
+    spinBoxWidth->setMaximum(1024);
     spinBoxWidth->setMinimum(36);
     spinBoxWidth->setSingleStep(2);
     hboxLayout->addWidget(spinBoxWidth);
@@ -97,7 +97,7 @@ Form::SelectMapSize::SelectMapSize()
 
     spinBoxHeight = new QSpinBox(this);
     spinBoxHeight->setObjectName(QString::fromUtf8("spinBoxHeight"));
-    spinBoxHeight->setMaximum(254);
+    spinBoxHeight->setMaximum(1024);
     spinBoxHeight->setMinimum(36);
     spinBoxHeight->setSingleStep(2);
     hboxLayout1->addWidget(spinBoxHeight);
