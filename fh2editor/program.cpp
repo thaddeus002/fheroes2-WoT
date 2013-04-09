@@ -20,6 +20,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <QCleanlooksStyle>
 #include <QCoreApplication>
 #include <QProcessEnvironment>
 #include <QRegExp>
@@ -112,16 +113,27 @@ namespace Resource
     }
 }
 
+class MyStyle: public QCleanlooksStyle
+{
+public:
+    int pixelMetric(PixelMetric metric, const QStyleOption * option = 0, const QWidget * widget = 0) const
+    {
+	return metric == QStyle::PM_SmallIconSize ?
+	    48 : QCleanlooksStyle::pixelMetric(metric, option, widget);
+    }
+};
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-
     Resource::InitShares();
     qsrand(std::time(0));
     QPixmapCache::setCacheLimit(40000);
 
     QSettings settings("fheroes2", "editor");
     QString dataFile = settings.value("dataFile", "").toString();
+
+    app.setStyle(new MyStyle);
 
     if(! QFile(dataFile).exists())
     {
@@ -141,6 +153,8 @@ int main(int argc, char *argv[])
 
 	    if(QDialog::Accepted != form.exec())
 		return 0;
+
+	    dataFile = form.result;
 	}
 
 	settings.setValue("dataFile", dataFile);

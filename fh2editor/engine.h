@@ -31,6 +31,8 @@
 #include <QPair>
 #include <QVector>
 #include <QMap>
+#include <QDomElement>
+#include <QMenu>
 
 namespace Ground
 {
@@ -204,8 +206,41 @@ QDataStream & operator>> (QDataStream &, mp2dayevent_t &);
 QDataStream & operator>> (QDataStream &, mp2rumor_t &);
 QDataStream & operator>> (QDataStream &, mp2sphinx_t &);
 
-quint32 Rand(quint32 max);
-quint32 Rand(quint32 min, quint32 max);
+struct IndexPoint : public QPair<int, QPoint>
+{
+    IndexPoint() : QPair<int, QPoint>() {}
+    IndexPoint(int i, const QPoint & p) : QPair<int, QPoint>(i, p) {}
+
+    int index(void) const { return first; }
+    const QPoint & point(void) const { return second; }
+};
+
+struct CompositeObject
+{
+    QString		name;
+    QSize		size;
+    QString		icn;
+    QVector<IndexPoint> points;
+
+    CompositeObject(){}
+    CompositeObject(const QString &, const QDomElement &);
+
+    bool isValid(void) const;
+};
+
+Q_DECLARE_METATYPE(CompositeObject);
+
+namespace Editor
+{
+    quint32 Rand(quint32 max);
+    quint32 Rand(quint32 min, quint32 max);
+
+    class MyXML : public QDomElement
+    {
+    public:
+	MyXML(const QString &, const QString &);
+    };
+}
 
 namespace H2
 {
@@ -321,6 +356,7 @@ namespace AGG
 
 	QPixmap			getImageTIL(const QString &, quint16);
 	QPair<QPixmap, QPoint>	getImageICN(const QString &, quint16);
+	QPixmap			getImage(const CompositeObject &);
     };
 }
 
@@ -350,6 +386,7 @@ public:
 
     QPixmap			getImageTIL(const QString &, quint16);
     QPair<QPixmap, QPoint>	getImageICN(const QString &, quint16);
+    QPixmap			getImage(const CompositeObject &);
 
     const QSize &		tileSize(void) const;
 
@@ -427,6 +464,7 @@ class MapObjects : public QMap<MapKey, QSharedPointer<MapObject> >
 {
 public:
     MapObjects();
+    MapObjects(const MapObjects &, const QRect &);
 };
 
 class DayEvents : public QVector<QSharedPointer<DayEvent> >
@@ -440,5 +478,14 @@ class TavernRumors : public QVector<QSharedPointer<Rumor> >
 public:
     TavernRumors();
 };
+
+namespace Editor
+{
+    class MenuObjects : public QMenu
+    {
+    public:
+	MenuObjects(QWidget &, EditorTheme &);
+    };
+}
 
 #endif

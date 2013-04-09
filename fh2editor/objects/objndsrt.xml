@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects icn="objndsrt">
+    <object name="Piramid" width="3" height="2">
+        <sprite px="0" py="0" index="77" level="shadow" />
+        <sprite px="1" py="0" index="78" level="top" />
+        <sprite px="2" py="0" index="79" level="top" />
+        <sprite px="0" py="1" index="80" level="shadow" />
+        <sprite px="1" py="1" index="81" level="bottom" passable="0x01F8" />
+        <sprite px="2" py="1" index="82" level="action" passable="0x01F8" />
+    </object>
+    <object name="Sphinx" width="3" height="2">
+	<sprite px="1" py="0" index="85" level="top" />
+        <sprite px="0" py="1" index="86" level="shadow" />
+        <sprite px="1" py="1" index="87" level="action" passable="0x01F8" />
+        <sprite px="2" py="1" index="88" level="bottom" passable="0x01F8" />
+    </object>
+</objects>

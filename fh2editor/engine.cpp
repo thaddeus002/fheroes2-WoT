@@ -25,6 +25,8 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QPixmapCache>
+#include <QDomDocument>
+#include <QPainter>
 
 #include "program.h"
 #include "engine.h"
@@ -266,6 +268,7 @@ void H2::ICNSprite::DrawVariant2(const quint8* ptr, const quint8* outOfRange, co
     }
 }
 
+
 mp2icn_t::mp2icn_t(const char* data)
 {
     QByteArray buf(data, sizeOf());
@@ -290,7 +293,7 @@ mp2lev_t::mp2lev_t()
 
 mp2til_t::mp2til_t()
 {
-    tileSprite = Rand(16, 19);
+    tileSprite = Editor::Rand(16, 19);
     quantity1 = 0;
     quantity2 = 0;
     tileShape = 0;
@@ -461,6 +464,7 @@ QDataStream & operator>> (QDataStream & ds, mp2sphinx_t & sphinx)
     return ds;
 }
 
+
 bool AGG::File::exists(const QString & str) const
 {
     return items.end() != items.find(str);
@@ -590,6 +594,7 @@ QPair<QPixmap, QPoint> AGG::File::getImageICN(const QString & id, int index, QVe
     return qMakePair<QPixmap, QPoint>(result, offset);
 }
 
+
 AGG::Spool::Spool(const QString & file)
 {
     if(first.loadFile(file))
@@ -636,15 +641,70 @@ QPair<QPixmap, QPoint> AGG::Spool::getImageICN(const QString & icn, quint16 inde
 	second.getImageICN(icn, index, colors) : first.getImageICN(icn, index, colors);
 }
 
-quint32 Rand(quint32 min, quint32 max)
+QPixmap AGG::Spool::getImage(const CompositeObject & obj)
+{
+    const QString & key = obj.name;
+    QPixmap result = NULL;
+
+    if(! QPixmapCache::find(key, & result))
+    {
+	int width = obj.size.width() * 32;
+	int height = obj.size.height() * 32;
+
+	result = QPixmap(width, height);
+	result.fill(qRgba(0, 0, 0, 0));
+	QPainter paint(& result);
+
+	for(QVector<IndexPoint>::const_iterator
+	    it = obj.points.begin(); it != obj.points.end(); ++it)
+	{
+	    QPair<QPixmap, QPoint> sprite = getImageICN(obj.icn, (*it).index());
+	    paint.drawPixmap((*it).point().x() * 32 + sprite.second.x(), (*it).point().y() * 32 + sprite.second.y(), sprite.first);
+	}
+
+	QPixmapCache::insert(key, result);
+    }
+
+    return result;
+}
+
+quint32 Editor::Rand(quint32 min, quint32 max)
 {
     if(min > max) qSwap(min, max);
     return min + Rand(max - min);
 }
 
-quint32 Rand(quint32 max)
+quint32 Editor::Rand(quint32 max)
 {
     return static_cast<quint32>((max + 1) * (qrand() / (RAND_MAX + 1.0)));
+}
+
+Editor::MyXML::MyXML(const QString & xml, const QString & root)
+{
+    QDomDocument dom;
+    QFile file(xml);
+
+    if(file.open(QIODevice::ReadOnly))
+    {
+        QString errorStr;
+        int errorLine;
+        int errorColumn;
+
+	if(! dom.setContent(&file, false, &errorStr, &errorLine, &errorColumn))
+    	    qDebug() << "MyXML:" << xml << errorStr << errorLine << errorColumn;
+    }
+    else
+	qDebug() << "MyXML:" << "error open:" << xml;
+
+    file.close();
+
+    static_cast<QDomElement &>(*this) = dom.documentElement();
+
+    if(tagName() != root)
+    {
+	qDebug() << "MyXML:" << xml << "unknown tag:" << tagName();
+	clear();
+    }
 }
 
 int H2::mapICN(int type)
@@ -1095,6 +1155,11 @@ QPair<QPixmap, QPoint> EditorTheme::getImageICN(const QString & icn, quint16 ind
     return aggSpool.getImageICN(icn, index);
 }
 
+QPixmap EditorTheme::getImage(const CompositeObject & obj)
+{
+    return aggSpool.getImage(obj);
+}
+
 const QSize & EditorTheme::tileSize(void) const
 {
     return tile;
@@ -1103,7 +1168,7 @@ const QSize & EditorTheme::tileSize(void) const
 int EditorTheme::startFilledTile(int ground) const
 {
     // 30%
-    if(0 == Rand(6))
+    if(0 == Editor::Rand(6))
         return startFilledOriginalTile(ground);
 
     int res = 0;
@@ -1122,7 +1187,7 @@ int EditorTheme::startFilledTile(int ground) const
         default: qCritical() << "EditorTheme::startFilledTile:" << "unknown ground"; break;
     }
 
-    return res + Rand(7);
+    return res + Editor::Rand(7);
 }
 
 int EditorTheme::startFilledOriginalTile(int ground) const
@@ -1144,7 +1209,7 @@ int EditorTheme::startFilledOriginalTile(int ground) const
         default: qCritical() << "EditorTheme::startFilledOriginalTile:" << "unknown ground"; break;
     }
 
-    return res + Rand(count - 1);
+    return res + Editor::Rand(count - 1);
 }
 
 int EditorTheme::ground(int index) const
@@ -1204,7 +1269,7 @@ int EditorTheme::startGroundTile(int ground) const
 
 int EditorTheme::startGroundOriginalTile(int ground) const
 {
-    return startGroundTile(ground) + Rand(3);
+    return startGroundTile(ground) + Editor::Rand(3);
 }
 
 AroundGrounds::AroundGrounds(const MapTiles & tiles, const QPoint & center) : QVector<int>(9, Ground::Unknown)
@@ -1505,10 +1570,78 @@ MapObjects::MapObjects()
 {
 }
 
+MapObjects::MapObjects(const MapObjects & mo, const QRect & rt)
+{
+    //QMap<MapKey, QSharedPointer<MapObject> >
+}
+
 DayEvents::DayEvents()
 {
 }
 
 TavernRumors::TavernRumors()
 {
+}
+
+CompositeObject::CompositeObject(const QString & obj, const QDomElement & elem)
+    : name(elem.attribute("name")), size(elem.attribute("width").toInt(), elem.attribute("height").toInt()), icn(obj.toUpper())
+{
+    if(0 > icn.lastIndexOf(".ICN")) icn.append(".ICN");
+
+    QDomNodeList list = elem.elementsByTagName("sprite");
+
+    for(int pos = 0; pos < list.size(); ++pos)
+    {
+	QDomElement sprite = list.item(pos).toElement();
+	points.push_back(IndexPoint(sprite.attribute("index").toInt(),
+			    QPoint(sprite.attribute("px").toInt(), sprite.attribute("py").toInt())));
+    }
+}
+
+bool CompositeObject::isValid() const
+{
+    return ! name.isEmpty();
+}
+
+Editor::MenuObjects::MenuObjects(QWidget & parent, EditorTheme & theme) : QMenu(tr("Add Objects"), &parent)
+{
+    setIcon(QIcon(":/images/add_objects.png"));
+
+    const QString dataFolder("objects");
+    MyXML groupsElem(Resource::FindFile(dataFolder, "groups.xml"), "groups");
+
+    if(! groupsElem.isNull())
+    {
+	QDomNodeList groupsList = groupsElem.elementsByTagName("group");
+
+	for(int pos1 = 0; pos1 < groupsList.size(); ++pos1)
+	{
+	    QDomElement groupElem = groupsList.item(pos1).toElement();
+	    QString name = groupElem.attribute("name");
+
+	    if(! name.isEmpty())
+	    {
+		QMenu* subMenu = addMenu(name);
+		MyXML objectsElem(Resource::FindFile(dataFolder, groupElem.attribute("file")), "objects");
+		QString icn = objectsElem.attribute("icn");
+
+		if(! objectsElem.isNull())
+		{
+		    QDomNodeList objectsList = objectsElem.elementsByTagName("object");
+
+		    for(int pos2 = 0; pos2 < objectsList.size(); ++pos2)
+		    {
+			CompositeObject obj(icn, objectsList.item(pos2).toElement());
+
+			if(obj.isValid())
+			{
+			    QAction* objectAct = subMenu->addAction(obj.name);
+			    objectAct->setData(QVariant::fromValue(obj));
+			    objectAct->setIcon(theme.getImage(obj));
+			}
+		    }
+		}
+	    }
+	}
+    }
 }

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<groups>
+    <group name="Desert" file="objndsrt.xml" />
+    <group name="Waste Land" file="objncrck.xml" />
+</groups>

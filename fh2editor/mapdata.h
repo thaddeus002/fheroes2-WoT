@@ -165,6 +165,7 @@ class MapTiles : protected QList<MapTile*>
 
 public:
     MapTiles() {}
+    MapTiles(const MapTiles &, const QRect &);
 
     void		newMap(const QSize &, EditorTheme &);
     bool		importMap(const QSize &, const QVector<mp2til_t> &, const QVector<mp2ext_t> &, EditorTheme &);
@@ -190,6 +191,9 @@ public:
     MapTiles		tiles;
     MapObjects		objects;
 
+    MapArea(){}
+    MapArea(const MapArea & ma, const QRect & rt) : tiles(ma.tiles, rt), objects(ma.objects, rt) {}
+
     void		importMP2Towns(const QVector<H2::TownPos> &);
     void		importMP2Heroes(const QVector<H2::HeroPos> &);
     void		importMP2Signs(const QVector<H2::SignPos> &);
@@ -200,7 +204,7 @@ public:
 class MapSelectedArea : public MapArea
 {
 public:
-    MapSelectedArea(const MapArea &, const QRect &);
+    MapSelectedArea(const MapArea & ma, const QRect & rt) : MapArea(ma, rt) {}
 };
 
 class MapData : public QGraphicsScene
@@ -223,6 +227,7 @@ public:
     QRect		mapToTile(const QRect &) const;
 
     EditorTheme &	theme(void);
+    void		SaveTest(void) const;
 
 signals:
     void		dataModified(void);
@@ -242,6 +247,7 @@ protected:
     void                mouseMoveEvent(QGraphicsSceneMouseEvent*);
     void		drawForeground(QPainter*, const QRectF &);
     void		selectArea(QPointF, QPointF);
+
 
     friend class	MP2Format;
     friend class	MapTile;

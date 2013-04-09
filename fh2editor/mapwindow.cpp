@@ -229,6 +229,7 @@ bool MapWindow::saveAs(void)
 bool MapWindow::saveFile(const QString & fileName)
 {
     Q_UNUSED(fileName);
+    mapData.SaveTest();
 /*
     QFile file(fileName);
 
@@ -351,7 +352,7 @@ void MapWindow::contextMenuEvent(QContextMenuEvent* event)
 	menu.addAction(editPasteAct);
 	menu.addSeparator();
 
-	QMenu* addSubMenu = menu.addMenu(QIcon(":/images/add_objects.png"), tr("Add Objects"));
+	menu.addMenu(new Editor::MenuObjects(menu, mapData.theme()));
 
 	menu.addSeparator();
 	menu.addAction(editPassableAct);

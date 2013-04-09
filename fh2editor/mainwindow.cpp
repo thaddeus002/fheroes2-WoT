@@ -114,7 +114,7 @@ void MainWindow::saveAs(void)
 
 void MainWindow::about(void)
 {
-   QMessageBox::about(this, tr("Map Editor"), tr("<b>Version 0.1.</b>"));
+   QMessageBox::about(this, tr("Map Editor"), tr("<b>Demo version 0.1.</b>"));
 }
 
 void MainWindow::updateMenus(void)

@@ -35,32 +35,6 @@
 #include "mapwindow.h"
 #include "mapdata.h"
 
-MapSelectedArea::MapSelectedArea(const MapArea & area, const QRect & rt)
-{
-/*
-    size = sz;
-
-    for(int yy = 0; yy < size.height(); ++yy)
-    {
-	for(int xx = 0; xx < size.width(); ++xx)
-    	    push_back(new MapTile(mp2til_t(), QPoint(xx, yy), theme));
-    }
-
-    if(area.tiles.isValidPoint(rt.topLeft()) &&
-	    area.tiles.isValidPoint(rt.bottomRight()))
-    {
-	for(int yy = rt.y(); yy < rt.y() + rt.height(); ++yy)
-	{
-	    for(int xx = rt.x(); xx < rt.x() + rt.width(); ++xx)
-	    {
-		const MapTile* tile = area.tiles.tileConst(QPoint(xx, yy));
-
-	    }
-	}
-    }
-*/
-}
-
 MapTileExt::MapTileExt(int lvl, const mp2lev_t & ext, const QPair<QPixmap, QPoint> & pair)
     : QPair<QPixmap, QPoint>(pair.first, pair.second), spriteICN(H2::mapICN(ext.object)), spriteIndex(ext.index), spriteLevel(lvl), tmp(0), spriteUID(ext.uniq)
 {
@@ -297,6 +271,18 @@ void MapTile::sortSpritesLevels(void)
 {
     qSort(spritesLevel1.begin(), spritesLevel1.end(), MapTileExt::sortLevel1);
     qSort(spritesLevel2.begin(), spritesLevel2.end(), MapTileExt::sortLevel2);
+}
+
+MapTiles::MapTiles(const MapTiles & tiles, const QRect & area) : size(area.size())
+{
+    for(int yy = area.y(); yy < area.y() + area.height(); ++yy)
+    {
+	for(int xx = area.x(); xx < area.x() + area.width(); ++xx)
+        {
+	    const MapTile* tile = tiles.tileConst(QPoint(xx, yy));
+	    if(tile) *this << new MapTile(*tile);
+        }
+    }
 }
 
 void MapTiles::newMap(const QSize & sz, EditorTheme & theme)
@@ -1020,4 +1006,33 @@ QPoint MP2Format::positionExtBlockFromNumber(int num) const
     }
 
     return QPoint(-1, -1);
+}
+
+void MapData::SaveTest(void) const
+{
+    QDomDocument doc;
+
+    QDomElement emap = doc.createElement("map");
+    doc.appendChild(emap);
+
+    QDomElement eheader = doc.createElement("header");
+    emap.appendChild(eheader);
+
+    eheader.setAttribute("version", 12345);
+    eheader.setAttribute("localtime", 123456789);
+
+    eheader.appendChild(doc.createElement("name")).appendChild(doc.createTextNode("BeltWay"));
+    eheader.appendChild(doc.createElement("description")).appendChild(doc.createTextNode("BeltWay BeltWay BeltWay BeltWay BeltWay"));
+    eheader.appendChild(doc.createElement("authors")).appendChild(doc.createTextNode("I'm"));
+    eheader.appendChild(doc.createElement("license")).appendChild(doc.createTextNode("Creative"));
+
+    doc.insertBefore(doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\""), doc.firstChild());
+
+    QFile file("out.xml");
+    file.open(QIODevice::WriteOnly);
+
+    QTextStream out(&file);
+    out.setCodec(QTextCodec::codecForName("UTF-8"));
+
+    doc.save(out, 5, QDomNode::EncodingFromTextStream);
 }

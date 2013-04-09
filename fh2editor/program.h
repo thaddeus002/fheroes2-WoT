@@ -23,13 +23,13 @@
 #ifndef _EDITOR_PROGRAM_H_
 #define _EDITOR_PROGRAM_H_
 
-#include <QString>
-#include <QStringList>
+QT_BEGIN_NAMESPACE
+class QString;
+QT_END_NAMESPACE
 
 namespace Resource
 {
-    const QStringList &	ShareDirs(void);
-    QString		Path(const char* str, ...);
+    QString FindFile(const QString & dir, const QString & file);
 }
 
 #endif

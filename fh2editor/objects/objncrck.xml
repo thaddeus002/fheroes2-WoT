@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects icn="objncrck">
+    <object name="Wagon" width="2" height="1">
+	<sprite px="0" py="0" index="73" level="shadow" />
+        <sprite px="1" py="0" index="74" level="action" />
+    </object>
+    <object name="Troll Bridge" width="4" height="2">
+	<sprite px="0" py="0" index="182" level="bottom" passable="0" />
+	<sprite px="1" py="0" index="183" level="bottom" passable="0" />
+        <sprite px="2" py="0" index="184" level="bottom" passable="0x0117" /> <!-- center, bottom right, top row -->
+        <sprite px="3" py="0" index="185" level="bottom" passable="0" />
+        <sprite px="0" py="1" index="186" level="bottom" passable="0x01F8" />
+        <sprite px="1" py="1" index="187" level="bottom" passable="0x01F8" />
+        <sprite px="2" py="1" index="188" level="bottom" passable="0x01F8" />
+        <sprite px="3" py="1" index="189" level="action" />
+    </object>
+    <object name="Market" width="3" height="2">
+	<sprite px="2" py="0" index="190" level="top" />
+        <sprite px="0" py="1" index="201" level="shadow" />
+        <sprite px="1" py="1" index="202" level="bottom" passable="0x01F8" />
+        <sprite px="2" py="1" index="213" level="action" />
+    </object>
+    <object name="Obelisk" width="2" height="2">
+        <sprite px="1" py="0" index="236" level="top" />
+        <sprite px="0" py="1" index="237" level="shadow" />
+        <sprite px="1" py="1" index="238" level="action" />
+    </object>
+    <object name="SawMill" width="4" height="2">
+	<sprite px="0" py="0" index="239" level="top" />
+	<sprite px="1" py="0" index="240" level="top" />
+        <sprite px="2" py="0" index="241" level="top" />
+        <sprite px="3" py="0" index="242" level="top" />
+        <sprite px="0" py="1" index="243" level="bottom" passable="0x01F8" />
+        <sprite px="1" py="1" index="244" level="bottom" passable="0x01F8" />
+        <sprite px="2" py="1" index="245" level="action" />
+        <sprite px="3" py="1" index="246" level="bottom" passable="0x01F8" />
+    </object>
+</objects>
