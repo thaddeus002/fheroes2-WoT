@@ -80,25 +80,24 @@ public:
     QVector<mp2rumor_t>		rumors;
 };
 
-class MapTileExt : protected QPair<QPixmap, QPoint>
+class MapTileExt
 {
     quint8		spriteICN;
+    quint8		spriteExt;
     quint8		spriteIndex;
     quint8		spriteLevel;
     quint8		tmp;
     quint32		spriteUID;
 
 public:
-    MapTileExt(int lv, const mp2lev_t &, const QPair<QPixmap, QPoint> & pair);
+    MapTileExt(int lv, const mp2lev_t &);
 
     static bool		sortLevel1(const MapTileExt*, const MapTileExt*);
     static bool		sortLevel2(const MapTileExt*, const MapTileExt*);
 
-    QPixmap &		pixmap(void) { return first; };
-    QPoint &		offset(void) { return second; };
-
     int			uid(void) const { return spriteUID; }
     int			icn(void) const { return spriteICN; }
+    int			ext(void) const { return spriteExt; }
     int			index(void) const { return spriteIndex; }
     int			level(void) const { return spriteLevel; }
 
@@ -146,7 +145,7 @@ public:
     const MapTileLevels & levels2(void) const { return spritesLevel2; }
 
 protected:
-    static void		loadSpriteLevel(MapTileLevels &, int, const mp2lev_t &, EditorTheme &);
+    static void		loadSpriteLevel(MapTileLevels &, int, const mp2lev_t &);
 
     EditorTheme &	themeContent;
     mp2til_t		til;

@@ -519,43 +519,32 @@ bool AGG::File::loadFile(const QString & fn)
 
 QPixmap AGG::File::getImageTIL(const QString & id, int index, QVector<QRgb> & colors)
 {
-    QString key = id + QString::number(index);
-    QPixmap result = NULL;
+    QByteArray buf = readRawData(id);
 
-    if(! QPixmapCache::find(key, & result) &&
-	! items.isEmpty())
+    if(buf.size())
     {
-	QByteArray buf = readRawData(id);
+	quint16 tileCount = qFromLittleEndian(*((quint16*) buf.data()));
 
-	if(buf.size())
+	if(index < tileCount)
 	{
-	    quint16 tileCount = qFromLittleEndian(*((quint16*) buf.data()));
+	    quint16 tileWidth = qFromLittleEndian(*((quint16*) (buf.data() + 2)));
+	    quint16 tileHeight = qFromLittleEndian(*((quint16*) (buf.data() + 4)));
 
-	    if(index < tileCount)
-	    {
-		quint16 tileWidth = qFromLittleEndian(*((quint16*) (buf.data() + 2)));
-		quint16 tileHeight = qFromLittleEndian(*((quint16*) (buf.data() + 4)));
+	    QImage image((uchar*) buf.data() + 6 + index * tileWidth * tileHeight, tileWidth, tileHeight, QImage::Format_Indexed8);
+	    image.setColorTable(colors);
 
-		QImage image((uchar*) buf.data() + 6 + index * tileWidth * tileHeight, tileWidth, tileHeight, QImage::Format_Indexed8);
-		image.setColorTable(colors);
-
-		result = QPixmap::fromImage(image);
-		QPixmapCache::insert(key, result);
-	    }
-	    else
-		qCritical() << "AGG::File::getImageTIL:" << "out of range" << index;
+	    return QPixmap::fromImage(image);
 	}
+	else
+	    qCritical() << "AGG::File::getImageTIL:" << "out of range" << index;
     }
 
-    return result;
+    return NULL;
 }
 
 QPair<QPixmap, QPoint> AGG::File::getImageICN(const QString & id, int index, QVector<QRgb> & colors)
 {
-    QString key = id + QString::number(index);
-    QPixmap result;
-    QPoint offset;
-
+    QPair<QPixmap, QPoint> result;
     QByteArray buf = readRawData(id);
 
     if(buf.size())
@@ -565,33 +554,26 @@ QPair<QPixmap, QPoint> AGG::File::getImageICN(const QString & id, int index, QVe
 	if(index < icnCount)
 	{
 	    mp2icn_t header(buf.data() + 6 + index * mp2icn_t::sizeOf());
+	    quint32 sizeData = 0;
 
-	    if(! QPixmapCache::find(key, & result) &&
-		! items.isEmpty())
+	    if(index + 1 < icnCount)
 	    {
-		quint32 sizeData = 0;
-
-		if(index + 1 < icnCount)
-		{
-		    mp2icn_t headerNext(buf.data() + 6 + (index + 1) * mp2icn_t::sizeOf());
-		    sizeData = headerNext.offsetData - header.offsetData;
-		}
-		else
-		    sizeData = qFromLittleEndian(*((quint32*) (buf.data() + 2))) - header.offsetData;
-
-		H2::ICNSprite image(header, buf.data() + 6 + header.offsetData, sizeData, colors);
-
-		result = QPixmap::fromImage(image);
-		QPixmapCache::insert(key, result);
+		mp2icn_t headerNext(buf.data() + 6 + (index + 1) * mp2icn_t::sizeOf());
+		sizeData = headerNext.offsetData - header.offsetData;
 	    }
+	    else
+		sizeData = qFromLittleEndian(*((quint32*) (buf.data() + 2))) - header.offsetData;
 
-	    offset = QPoint(header.offsetX, header.offsetY);
+	    H2::ICNSprite image(header, buf.data() + 6 + header.offsetData, sizeData, colors);
+
+	    result.first = QPixmap::fromImage(image);
+	    result.second = QPoint(header.offsetX, header.offsetY);
 	}
 	else
 	    qCritical() << "AGG::File::getImageICN:" << "out of range" << index;
     }
 
-    return qMakePair<QPixmap, QPoint>(result, offset);
+    return result;
 }
 
 
@@ -629,16 +611,39 @@ AGG::Spool::Spool(const QString & file)
     }
 }
 
-QPixmap AGG::Spool::getImageTIL(const QString & til, quint16 index)
+QPixmap AGG::Spool::getImageTIL(const QString & til, int index)
 {
-    return second.isReadable() && second.exists(til) ?
-	second.getImageTIL(til, index, colors) : first.getImageTIL(til, index, colors);
+    QString key = til + QString::number(index);
+    QPixmap result = NULL;
+
+    if(! QPixmapCache::find(key, & result))
+    {
+	result = second.isReadable() && second.exists(til) ?
+		second.getImageTIL(til, index, colors) : first.getImageTIL(til, index, colors);
+	QPixmapCache::insert(key, result);
+    }
+
+    return result;
 }
 
-QPair<QPixmap, QPoint> AGG::Spool::getImageICN(const QString & icn, quint16 index)
+QPair<QPixmap, QPoint> AGG::Spool::getImageICN(const QString & icn, int index)
 {
-    return second.isReadable() && second.exists(icn) ?
-	second.getImageICN(icn, index, colors) : first.getImageICN(icn, index, colors);
+    QString key = icn + QString::number(index);
+    QPair<QPixmap, QPoint> result;
+
+    if(! QPixmapCache::find(key, & result.first))
+    {
+	result = second.isReadable() && second.exists(icn) ?
+		second.getImageICN(icn, index, colors) : first.getImageICN(icn, index, colors);
+	QPixmapCache::insert(key, result.first);
+	icnOffsetCache[key] = result.second;
+    }
+    else
+    {
+	result.second = icnOffsetCache[key];
+    }
+
+    return result;
 }
 
 QPixmap AGG::Spool::getImage(const CompositeObject & obj)
@@ -709,94 +714,94 @@ Editor::MyXML::MyXML(const QString & xml, const QString & root)
 
 int H2::mapICN(int type)
 {
-    switch(type)
+    switch(type & 0xFC)
     {
 	// artifact
-	case 0x2C: case 0x2D: case 0x2E: case 0x2F: return ICN::OBJNARTI;
+	case 0x2C: return ICN::OBJNARTI;
 	// monster
-	case 0x30: case 0x31: case 0x32: case 0x33: return ICN::MONS32;
+	case 0x30: return ICN::MONS32;
 	// castle flags
-	case 0x38: case 0x39: case 0x3A: case 0x3B: return ICN::FLAG32;
+	case 0x38: return ICN::FLAG32;
 	// heroes
-	case 0x54: case 0x55: case 0x56: case 0x57: return ICN::MINIHERO;
+	case 0x54: return ICN::MINIHERO;
 	// relief: snow
-	case 0x58: case 0x59: case 0x5A: case 0x5B: return ICN::MTNSNOW;
+	case 0x58: return ICN::MTNSNOW;
 	// relief: swamp
-	case 0x5C: case 0x5D: case 0x5E: case 0x5F: return ICN::MTNSWMP;
+	case 0x5C: return ICN::MTNSWMP;
 	// relief: lava
-	case 0x60: case 0x61: case 0x62: case 0x63: return ICN::MTNLAVA;
+	case 0x60: return ICN::MTNLAVA;
 	// relief: desert
-	case 0x64: case 0x65: case 0x66: case 0x67: return ICN::MTNDSRT;
+	case 0x64: return ICN::MTNDSRT;
 	// relief: dirt
-	case 0x68: case 0x69: case 0x6A: case 0x6B: return ICN::MTNDIRT;
+	case 0x68: return ICN::MTNDIRT;
 	// relief: others
-	case 0x6C: case 0x6D: case 0x6E: case 0x6F: return ICN::MTNMULT;
+	case 0x6C: return ICN::MTNMULT;
 	// mines
 	case 0x74: return ICN::EXTRAOVR;
 	// road
-	case 0x78: case 0x79: case 0x7A: case 0x7B: return ICN::ROAD;
+	case 0x78: return ICN::ROAD;
 	// relief: crck
-	case 0x7C: case 0x7D: case 0x7E: case 0x7F: return ICN::MTNCRCK;
+	case 0x7C: return ICN::MTNCRCK;
 	// relief: gras
-	case 0x80: case 0x81: case 0x82: case 0x83: return ICN::MTNGRAS;
+	case 0x80: return ICN::MTNGRAS;
 	// trees jungle
-	case 0x84: case 0x85: case 0x86: case 0x87: return ICN::TREJNGL;
+	case 0x84: return ICN::TREJNGL;
 	// trees evil
-	case 0x88: case 0x89: case 0x8A: case 0x8B: return ICN::TREEVIL;
+	case 0x88: return ICN::TREEVIL;
 	// castle and tower
-	case 0x8C: case 0x8D: case 0x8E: case 0x8F: return ICN::OBJNTOWN;
+	case 0x8C: return ICN::OBJNTOWN;
 	// castle lands
-	case 0x90: case 0x91: case 0x92: case 0x93: return ICN::OBJNTWBA;
+	case 0x90: return ICN::OBJNTWBA;
 	// castle shadow
-	case 0x94: case 0x95: case 0x96: case 0x97: return ICN::OBJNTWSH;
+	case 0x94: return ICN::OBJNTWSH;
 	// random castle
-	case 0x98: case 0x99: case 0x9A: case 0x9B: return ICN::OBJNTWRD;
+	case 0x98: return ICN::OBJNTWRD;
 	// water object
-	case 0xA0: case 0xA1: case 0xA2: case 0xA3: return ICN::OBJNWAT2;
+	case 0xA0: return ICN::OBJNWAT2;
 	// object other
-	case 0xA4: case 0xA5: case 0xA6: case 0xA7: return ICN::OBJNMUL2;
+	case 0xA4: return ICN::OBJNMUL2;
 	// trees snow
-	case 0xA8: case 0xA9: case 0xAA: case 0xAB: return ICN::TRESNOW;
+	case 0xA8: return ICN::TRESNOW;
 	// trees trefir
-	case 0xAC: case 0xAD: case 0xAE: case 0xAF: return ICN::TREFIR;
+	case 0xAC: return ICN::TREFIR;
 	// trees
-	case 0xB0: case 0xB1: case 0xB2: case 0xB3: return ICN::TREFALL;
+	case 0xB0: return ICN::TREFALL;
 	// river
-	case 0xB4: case 0xB5: case 0xB6: case 0xB7: return ICN::STREAM;
+	case 0xB4: return ICN::STREAM;
 	// resource
-	case 0xB8: case 0xB9: case 0xBA: case 0xBB: return ICN::OBJNRSRC;
+	case 0xB8: return ICN::OBJNRSRC;
 	// gras object
-	case 0xC0: case 0xC1: case 0xC2: case 0xC3: return ICN::OBJNGRA2;
+	case 0xC0: return ICN::OBJNGRA2;
 	// trees tredeci
-	case 0xC4: case 0xC5: case 0xC6: case 0xC7: return ICN::TREDECI;
+	case 0xC4: return ICN::TREDECI;
 	// sea object
-	case 0xC8: case 0xC9: case 0xCA: case 0xCB: return ICN::OBJNWATR;
+	case 0xC8: return ICN::OBJNWATR;
         // vegetation gras                                            
-        case 0xCC: case 0xCD: case 0xCE: case 0xCF: return ICN::OBJNGRAS;
+        case 0xCC: return ICN::OBJNGRAS;
 	// object on snow                                             
-	case 0xD0: case 0xD1: case 0xD2: case 0xD3: return ICN::OBJNSNOW;
+	case 0xD0: return ICN::OBJNSNOW;
         // object on swamp                                            
-        case 0xD4: case 0xD5: case 0xD6: case 0xD7: return ICN::OBJNSWMP;
+        case 0xD4: return ICN::OBJNSWMP;
 	// object on lava                                             
-	case 0xD8: case 0xD9: case 0xDA: case 0xDB: return ICN::OBJNLAVA;
+	case 0xD8: return ICN::OBJNLAVA;
         // object on desert                                           
-        case 0xDC: case 0xDD: case 0xDE: case 0xDF: return ICN::OBJNDSRT;
+        case 0xDC: return ICN::OBJNDSRT;
         // object on dirt                                             
-	case 0xE0: case 0xE1: case 0xE2: case 0xE3: return ICN::OBJNDIRT;
+	case 0xE0: return ICN::OBJNDIRT;
 	// object on crck
-	case 0xE4: case 0xE5: case 0xE6: case 0xE7: return ICN::OBJNCRCK;
+	case 0xE4: return ICN::OBJNCRCK;
 	// object on lava
-	case 0xE8: case 0xE9: case 0xEA: case 0xEB: return ICN::OBJNLAV3;
+	case 0xE8: return ICN::OBJNLAV3;
 	// object on earth
-	case 0xEC: case 0xED: case 0xEE: case 0xEF: return ICN::OBJNMULT;
+	case 0xEC: return ICN::OBJNMULT;
 	//  object on lava                                            
-	case 0xF0: case 0xF1: case 0xF2: case 0xF3: return ICN::OBJNLAV2;
+	case 0xF0: return ICN::OBJNLAV2;
 	// extra objects for loyalty version
-	case 0xF4: case 0xF5: case 0xF6: case 0xF7: return ICN::X_LOC1;
+	case 0xF4: return ICN::X_LOC1;
 	// extra objects for loyalty version
-	case 0xF8: case 0xF9: case 0xFA: case 0xFB: return ICN::X_LOC2;
+	case 0xF8: return ICN::X_LOC2;
 	// extra objects for loyalty version
-	case 0xFC: case 0xFD: case 0xFE: case 0xFF: return ICN::X_LOC3;
+	case 0xFC: return ICN::X_LOC3;
 	// unknown
 	default: qWarning() << "H2::mapICN:unknown object:" << type; break;
     }
@@ -1145,14 +1150,14 @@ EditorTheme::EditorTheme(AGG::Spool & spool) : aggSpool(spool), name("original")
 {
 }
 
-QPixmap EditorTheme::getImageTIL(const QString & til, quint16 index)
+QPixmap EditorTheme::getImageTIL(const QString & til, int index)
 {
     return aggSpool.getImageTIL(til, index);
 }
 
-QPair<QPixmap, QPoint> EditorTheme::getImageICN(const QString & icn, quint16 index)
+QPair<QPixmap, QPoint> EditorTheme::getImageICN(int icn, int index)
 {
-    return aggSpool.getImageICN(icn, index);
+    return aggSpool.getImageICN(H2::icnString(icn), index);
 }
 
 QPixmap EditorTheme::getImage(const CompositeObject & obj)
@@ -1334,7 +1339,7 @@ int AroundGrounds::groundsDirects(int directs) const
     return res;
 }
 
-int AroundGrounds::aroundGround(int ground) const
+int AroundGrounds::directionsAroundGround(int ground) const
 {
     int res = 0;
     const QVector<int> & v = *this;
@@ -1357,11 +1362,15 @@ inline bool IS_EQUAL_VALS(int A, int B)
 }
 
 /* return pair, first: index tile, second: shape - 0: none, 1: vert, 2: horz, 3: both */
-QPair<int, int> EditorTheme::indexGroundRotateFix(const AroundGrounds & around, int ground) const
+QPair<int, int> EditorTheme::groundBoundariesFix(const MapTile & tile, const MapTiles & tiles) const
 {
     QPair<int, int> res(-1, 0);
+    const int & ground = tile.groundType();
 
     if(ground == Ground::Beach) return res;
+    AroundGrounds around(tiles, tile.mapPos());
+
+    qDebug() << "groundBoundariesFix: " << tile.mapPos();
 
     /*
 	1. water - any ground (startGroundTile(ground))
@@ -1369,11 +1378,43 @@ QPair<int, int> EditorTheme::indexGroundRotateFix(const AroundGrounds & around, 
 	3. ground - water (+16)
     */
 
-    const int ground_and = around.aroundGround(ground);
-    const int ground_not = ground == Ground::Water ? around.aroundGround(Ground::All) :
-				around.aroundGround(Ground::Water | (Ground::All & ~ground));
+    const int ground_and = around.directionsAroundGround(ground);
+    const int ground_not = ground == Ground::Water ? around.directionsAroundGround(Ground::All) :
+				around.directionsAroundGround(Ground::Water | (Ground::All & ~ground));
     int marker_id = 0;
 
+    // corner: top right
+    if(IS_EQUAL_VALS(Direction::All & ~(Direction::TopRight | Direction::Center), ground_and) &&
+	IS_EQUAL_VALS(Direction::TopRight, ground_not))
+    {
+	marker_id = around.groundsDirects(Direction::TopRight);
+	res = qMakePair(startGroundOriginalTile(ground) + 12, 0);
+    }
+    else
+    // corner: top left
+    if(IS_EQUAL_VALS(Direction::All & ~(Direction::TopLeft | Direction::Center), ground_and) &&
+	IS_EQUAL_VALS(Direction::TopLeft, ground_not))
+    {
+	marker_id = around.groundsDirects(Direction::TopLeft);
+	res = qMakePair(startGroundOriginalTile(ground) + 12, 2);
+    }
+    else
+    // corner: bottom right
+    if(IS_EQUAL_VALS(Direction::All & ~(Direction::BottomRight | Direction::Center), ground_and) &&
+	IS_EQUAL_VALS(Direction::BottomRight, ground_not))
+    {
+	marker_id = around.groundsDirects(Direction::BottomRight);
+	res = qMakePair(startGroundOriginalTile(ground) + 12, 1);
+    }
+    else
+    // corner: bottom left
+    if(IS_EQUAL_VALS(Direction::All & ~(Direction::BottomLeft | Direction::Center), ground_and) &&
+	IS_EQUAL_VALS(Direction::BottomLeft, ground_not))
+    {
+	marker_id = around.groundsDirects(Direction::BottomLeft);
+	res = qMakePair(startGroundOriginalTile(ground) + 12, 3);
+    }
+    else
     // top
     if(IS_EQUAL_VALS(Direction::Left | Direction::Right | Direction::Bottom, ground_and) &&
 	IS_EQUAL_VALS(Direction::Top, ground_not))
@@ -1476,38 +1517,6 @@ QPair<int, int> EditorTheme::indexGroundRotateFix(const AroundGrounds & around, 
 	    marker_id = around.groundsDirects(Direction::Bottom | Direction::Left);
 	    res = qMakePair(startGroundOriginalTile(ground) + 4, 3);
 	}
-    }
-    else
-    // corner: top right
-    if(IS_EQUAL_VALS(Direction::All & ~(Direction::TopRight | Direction::Center), ground_and) &&
-	IS_EQUAL_VALS(Direction::TopRight, ground_not))
-    {
-	marker_id = around.groundsDirects(Direction::TopRight);
-	res = qMakePair(startGroundOriginalTile(ground) + 12, 0);
-    }
-    else
-    // corner: top left
-    if(IS_EQUAL_VALS(Direction::All & ~(Direction::TopLeft | Direction::Center), ground_and) &&
-	IS_EQUAL_VALS(Direction::TopLeft, ground_not))
-    {
-	marker_id = around.groundsDirects(Direction::TopLeft);
-	res = qMakePair(startGroundOriginalTile(ground) + 12, 2);
-    }
-    else
-    // corner: bottom right
-    if(IS_EQUAL_VALS(Direction::All & ~(Direction::BottomRight | Direction::Center), ground_and) &&
-	IS_EQUAL_VALS(Direction::BottomRight, ground_not))
-    {
-	marker_id = around.groundsDirects(Direction::BottomRight);
-	res = qMakePair(startGroundOriginalTile(ground) + 12, 1);
-    }
-    else
-    // corner: bottom left
-    if(IS_EQUAL_VALS(Direction::All & ~(Direction::BottomLeft | Direction::Center), ground_and) &&
-	IS_EQUAL_VALS(Direction::BottomLeft, ground_not))
-    {
-	marker_id = around.groundsDirects(Direction::BottomLeft);
-	res = qMakePair(startGroundOriginalTile(ground) + 12, 3);
     }
     else
     // filled

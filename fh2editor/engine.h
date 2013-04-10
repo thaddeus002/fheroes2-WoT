@@ -48,9 +48,10 @@ namespace Direction
 
 namespace ICN
 {
-    enum { UNKNOWN = 0, EXTRAOVR, FLAG32, MINIHERO, MONS32, MTNCRCK, MTNDIRT, MTNDSRT, MTNGRAS, MTNLAVA, MTNMULT, MTNSNOW, MTNSWMP, OBJNARTI, OBJNCRCK, OBJNDIRT, OBJNDSRT,
-	    OBJNGRA2, OBJNGRAS, OBJNLAV2, OBJNLAV3, OBJNLAVA, OBJNMUL2, OBJNMULT, OBJNRSRC, OBJNSNOW, OBJNSWMP, OBJNTOWN, OBJNTWBA, OBJNTWRD, OBJNTWSH, OBJNWAT2, OBJNWATR,
-	    ROAD, STREAM, TREDECI, TREEVIL, TREFALL, TREFIR, TREJNGL, TRESNOW, X_LOC1, X_LOC2, X_LOC3 };
+    enum { UNKNOWN = 0, OBJNARTI = 0x2C, MONS32 = 0x30, FLAG32 = 0x38, MINIHERO = 0x54, MTNSNOW = 0x58, MTNSWMP = 0x5C, MTNLAVA = 0x60, MTNDSRT = 0x64, MTNDIRT = 0x68, MTNMULT = 0x6C,
+	    EXTRAOVR = 0x74, ROAD = 0x78, MTNCRCK = 0x7C, MTNGRAS = 0x80, TREJNGL = 0x84, TREEVIL = 0x88, OBJNTOWN = 0x8C, OBJNTWBA = 0x90, OBJNTWSH = 0x94, OBJNTWRD = 0x98, OBJNWAT2 = 0xA0,
+	    OBJNMUL2 = 0xA4, TRESNOW = 0xA8, TREFIR = 0xAC, TREFALL = 0xB0, STREAM = 0xB4, OBJNRSRC = 0xB8, OBJNGRA2 = 0xC0, TREDECI = 0xC4, OBJNWATR = 0xC8, OBJNGRAS = 0xCC, OBJNSNOW = 0xD0,
+	    OBJNSWMP = 0xD4, OBJNLAVA = 0xD8, OBJNDSRT = 0xDC, OBJNDIRT = 0xE0, OBJNCRCK = 0xE4, OBJNLAV3 = 0xE8, OBJNMULT = 0xEC, OBJNLAV2 = 0xF0, X_LOC1 = 0xF4, X_LOC2 = 0xF8, X_LOC3 = 0xFC };
 }
 
 struct mp2icn_t
@@ -61,7 +62,7 @@ struct mp2icn_t
     quint16	offsetY;
     quint16	width;
     quint16	height;
-    quint8	type;
+    quint8	type;	/* animation: 0x01, */
     quint32	offsetData;
 
     static int	sizeOf(void) { return 13; };
@@ -350,17 +351,19 @@ namespace AGG
 	AGG::File		first;
 	AGG::File		second; /* first: heroes2.agg, second: heroes2x.agg */
 	QVector<QRgb>           colors;
+	QMap<QString, QPoint>	icnOffsetCache;
 
     public:
 	Spool(const QString &);
 
-	QPixmap			getImageTIL(const QString &, quint16);
-	QPair<QPixmap, QPoint>	getImageICN(const QString &, quint16);
+	QPixmap			getImageTIL(const QString &, int);
+	QPair<QPixmap, QPoint>	getImageICN(const QString &, int);
 	QPixmap			getImage(const CompositeObject &);
     };
 }
 
 class MapData;
+class MapTile;
 class MapTiles;
 
 class AroundGrounds: public QVector<int>
@@ -371,7 +374,7 @@ public:
 
     int operator() (void) const;
     int groundsDirects(int) const;
-    int aroundGround(int) const;
+    int directionsAroundGround(int) const;
 };
 
 class EditorTheme
@@ -384,8 +387,8 @@ protected:
 public:
     EditorTheme(AGG::Spool &);
 
-    QPixmap			getImageTIL(const QString &, quint16);
-    QPair<QPixmap, QPoint>	getImageICN(const QString &, quint16);
+    QPixmap			getImageTIL(const QString &, int);
+    QPair<QPixmap, QPoint>	getImageICN(int, int);
     QPixmap			getImage(const CompositeObject &);
 
     const QSize &		tileSize(void) const;
@@ -396,7 +399,7 @@ public:
     int				startGroundOriginalTile(int) const;
 
     int				ground(int) const;
-    QPair<int, int>		indexGroundRotateFix(const AroundGrounds &, int) const;
+    QPair<int, int>		groundBoundariesFix(const MapTile &, const MapTiles &) const;
 };
 
 class MapObject : public QPoint
