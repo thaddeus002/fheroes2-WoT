@@ -40,8 +40,13 @@ class QLineEdit;
 class QPlainTextEdit;
 class QGroupBox;
 class QSpacerItem;
-class MapData;
+class QTabWidget;
+class QListWidget;
+class QDomElement;
 QT_END_NAMESPACE
+
+class MapData;
+class EditorTheme;
 
 namespace Dialog
 {
@@ -137,6 +142,41 @@ namespace Form
 	QSpacerItem*		horizontalSpacer;
 	QPushButton*		pushButtonCancel;
     };
+
+    class SelectImage : public QDialog
+    {
+        Q_OBJECT
+
+    public:
+        SelectImage(EditorTheme &);
+
+        QVBoxLayout*		verticalLayout;
+        QTabWidget*		tabWidget;
+        QHBoxLayout*		horizontalLayout;
+        QPushButton*		pushButtonSelect;
+        QSpacerItem*		horizontalSpacer;
+        QPushButton*		pushButtonClose;
+
+    protected slots:
+	void			tabSwitched(int);
+    };
+
+    class SelectImageTab : public QWidget
+    {
+        Q_OBJECT
+
+	QVBoxLayout*        	verticalLayout;
+	QListWidget*        	listWidget;
+
+    public:
+	SelectImageTab(const QDomElement &, const QString &, EditorTheme &);
+
+	bool 			isSelected(void) const;
+
+    protected slots:
+	void			selectionChanged(void);
+    };
+
 }
 
 #endif

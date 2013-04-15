@@ -61,6 +61,7 @@ protected:
 private slots:
     void	mapWasSelectionChanged(void);
     void	mapWasModified(void);
+    void	selectObjectImage(void);
 
 private:
     friend class MainWindow;
@@ -82,6 +83,7 @@ private:
     QAction*            editPassableAct;
     QAction*            cellInfoAct;
     QAction*            selectAllAct;
+    QAction*            addObjectAct;
 
     QActionGroup*	fillGroundAct;
     QActionGroup*	clearObjectsAct;

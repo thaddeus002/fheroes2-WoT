@@ -491,13 +491,4 @@ public:
     TavernRumors();
 };
 
-namespace Editor
-{
-    class MenuObjects : public QMenu
-    {
-    public:
-	MenuObjects(QWidget &, EditorTheme &);
-    };
-}
-
 #endif

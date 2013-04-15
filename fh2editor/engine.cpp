@@ -138,7 +138,7 @@ H2::ICNSprite::ICNSprite(const mp2icn_t & icn, const char* buf, quint32 size, co
     const quint8* ptr = (const quint8*) buf;
     const quint8* outOfRange = ptr + size;
 
-    fill(qRgba(0, 0, 0, 0));
+    fill(qRgba(255, 255, 255, 0));
 
     if(0x20 == icn.type)
 	DrawVariant2(ptr, outOfRange, pals);
@@ -657,7 +657,7 @@ QPixmap AGG::Spool::getImage(const CompositeObject & obj)
 	int height = obj.size.height() * 32;
 
 	result = QPixmap(width, height);
-	result.fill(qRgba(0, 0, 0, 0));
+	result.fill(qRgba(255, 255, 255, 0));
 	QPainter paint(& result);
 
 	for(QVector<CompositeSprite>::const_iterator
@@ -1376,8 +1376,6 @@ QPair<int, int> EditorTheme::groundBoundariesFix(const MapTile & tile, const Map
     if(ground == Ground::Beach) return res;
     AroundGrounds around(tiles, tile.mapPos());
 
-    qDebug() << "groundBoundariesFix: " << tile.mapPos();
-
     /*
 	1. water - any ground (startGroundTile(ground))
 	2. ground - other ground (startGroundTile(ground))
@@ -1648,76 +1646,4 @@ CompositeObject::CompositeObject(const QString & obj, const QDomElement & elem, 
 bool CompositeObject::isValid() const
 {
     return ! name.isEmpty();
-}
-
-Editor::MenuObjects::MenuObjects(QWidget & parent, EditorTheme & theme) : QMenu(tr("Add..."), &parent)
-{
-    setIcon(QIcon(":/images/add_objects.png"));
-
-    const QString dataFolder("objects");
-    MyXML groupsElem(Resource::FindFile(dataFolder, "groups.xml"), "groups");
-
-    if(! groupsElem.isNull())
-    {
-	MyXML templateObjects(Resource::FindFile(dataFolder, "template.xml"), "template");
-
-	QDomNodeList groupsList = groupsElem.elementsByTagName("group");
-
-	for(int pos1 = 0; pos1 < groupsList.size(); ++pos1)
-	{
-	    QDomElement groupElem = groupsList.item(pos1).toElement();
-	    QString name = groupElem.attribute("name");
-
-	    if(! name.isEmpty())
-	    {
-		QMenu* subMenu = addMenu(name);
-		MyXML objectsElem(Resource::FindFile(dataFolder, groupElem.attribute("file")), "objects");
-		QString icn = objectsElem.attribute("icn");
-
-		if(! objectsElem.isNull())
-		{
-		    // parse element: object
-		    QDomNodeList objectsList = objectsElem.elementsByTagName("object");
-
-		    for(int pos2 = 0; pos2 < objectsList.size(); ++pos2)
-		    {
-			CompositeObject obj(icn, objectsList.item(pos2).toElement());
-
-			if(obj.isValid())
-			{
-			    QAction* objectAct = subMenu->addAction(obj.name);
-			    objectAct->setData(QVariant::fromValue(obj));
-			    objectAct->setIcon(theme.getImage(obj));
-			}
-		    }
-
-		    // parse element: template
-		    objectsList = objectsElem.elementsByTagName("template");
-
-		    for(int pos2 = 0; pos2 < objectsList.size(); ++pos2)
-		    {
-			QDomElement tmplElem = objectsList.item(pos2).toElement();
-
-			if(! templateObjects.isNull() && tmplElem.hasAttribute("section"))
-			{
-			    QDomElement objElem = templateObjects.firstChildElement(tmplElem.attribute("section"));
-			    int startIndex = tmplElem.attribute("index").toInt();
-			    CompositeObject obj(icn, objElem, startIndex);
-
-			    // override name tag
-			    if(tmplElem.hasAttribute("name"))
-				obj.name = tmplElem.attribute("name");
-
-			    if(obj.isValid())
-			    {
-				QAction* objectAct = subMenu->addAction(obj.name);
-				objectAct->setData(QVariant::fromValue(obj));
-				objectAct->setIcon(theme.getImage(obj));
-			    }
-			}
-		    }
-		}
-	    }
-	}
-    }
 }

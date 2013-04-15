@@ -506,24 +506,26 @@ void MapData::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 
     MapTile* newTileOverMouse = qgraphicsitem_cast<MapTile*>(itemAt(event->scenePos()));
 
-    if(tileOverMouse != newTileOverMouse)
+    if(newTileOverMouse)
     {
-	MapWindow* mapWindow = qobject_cast<MapWindow*>(parent());
+	if(tileOverMouse != newTileOverMouse)
+	{
+	    MapWindow* mapWindow = qobject_cast<MapWindow*>(parent());
 
-	if(mapWindow &&
-	    (!tileOverMouse || tileOverMouse->mapPos().x() != newTileOverMouse->mapPos().x()))
-		emit mapWindow->cursorTileXPosChanged(newTileOverMouse->mapPos().x());
+	    if(mapWindow &&
+		(!tileOverMouse || tileOverMouse->mapPos().x() != newTileOverMouse->mapPos().x()))
+		    emit mapWindow->cursorTileXPosChanged(newTileOverMouse->mapPos().x());
 
-	if(mapWindow &&
-	    (!tileOverMouse || tileOverMouse->mapPos().y() != newTileOverMouse->mapPos().y()))
-		emit mapWindow->cursorTileYPosChanged(newTileOverMouse->mapPos().y());
+	    if(mapWindow &&
+		(!tileOverMouse || tileOverMouse->mapPos().y() != newTileOverMouse->mapPos().y()))
+		    emit mapWindow->cursorTileYPosChanged(newTileOverMouse->mapPos().y());
 
-	tileOverMouse = newTileOverMouse;
+	    tileOverMouse = newTileOverMouse;
+	}
 
+	if(tileOverMouse)
+	    update(tileOverMouse->boundingRect());
     }
-
-    if(tileOverMouse)
-	update(tileOverMouse->boundingRect());
 
     event->accept();
 }

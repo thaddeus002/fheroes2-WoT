@@ -113,16 +113,6 @@ namespace Resource
     }
 }
 
-class MyStyle: public QCleanlooksStyle
-{
-public:
-    int pixelMetric(PixelMetric metric, const QStyleOption * option = 0, const QWidget * widget = 0) const
-    {
-	return metric == QStyle::PM_SmallIconSize ?
-	    48 : QCleanlooksStyle::pixelMetric(metric, option, widget);
-    }
-};
-
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -132,8 +122,6 @@ int main(int argc, char *argv[])
 
     QSettings settings("fheroes2", "editor");
     QString dataFile = settings.value("dataFile", "").toString();
-
-    app.setStyle(new MyStyle);
 
     if(! QFile(dataFile).exists())
     {

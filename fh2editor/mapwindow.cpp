@@ -23,6 +23,7 @@
 #include <QtGui>
 #include <QContextMenuEvent>
 
+#include "dialogs.h"
 #include "mainwindow.h"
 #include "mapwindow.h"
 
@@ -48,6 +49,11 @@ MapWindow::MapWindow(MainWindow* parent) : mainWindow(parent), mapData(this)
 
     connect(&mapData, SIGNAL(validBuffer(bool)), editPasteAct, SLOT(setEnabled(bool)));
     connect(this, SIGNAL(selectedItems(bool)), editCopyAct, SLOT(setEnabled(bool)));
+
+    //
+    addObjectAct = new QAction(QIcon(":/images/add_objects.png"), tr("Add object..."), this);
+    addObjectAct->setStatusTip(tr("Select map object"));
+    connect(addObjectAct, SIGNAL(triggered()), this, SLOT(selectObjectImage()));
 
     QAction* curAct;
 
@@ -352,7 +358,8 @@ void MapWindow::contextMenuEvent(QContextMenuEvent* event)
 	menu.addAction(editPasteAct);
 	menu.addSeparator();
 
-	menu.addMenu(new Editor::MenuObjects(menu, mapData.theme()));
+	menu.addAction(addObjectAct);
+	//menu.addMenu(new Editor::MenuObjects(menu, mapData.theme()));
 
 	menu.addSeparator();
 	menu.addAction(editPassableAct);
@@ -364,4 +371,13 @@ void MapWindow::contextMenuEvent(QContextMenuEvent* event)
 
     if(selectAllAct != menu.exec(event->globalPos()))
 	mapData.clearSelection();
+}
+
+void MapWindow::selectObjectImage(void)
+{
+    Form::SelectImage form(mapData.theme());
+
+    if(QDialog::Accepted == form.exec())
+    {
+    }
 }
