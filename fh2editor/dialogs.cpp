@@ -210,7 +210,6 @@ Form::SelectDataFile::SelectDataFile(const QString & dataFile, const QStringList
     verticalLayout = new QVBoxLayout(this);
 
     labelHeader = new QLabel(this);
-    labelHeader->setObjectName(QString::fromUtf8("labelHeader"));
     labelHeader->setAlignment(Qt::AlignCenter);
     labelHeader->setText(QApplication::translate("DialogSelectDataFile", "Cannot find resource file: ", 0, QApplication::UnicodeUTF8) + dataFile);
     verticalLayout->addWidget(labelHeader);
@@ -377,6 +376,7 @@ public:
 	setData(Qt::UserRole, QVariant::fromValue(obj));
 	setIcon(theme.getImage(obj));
 	setText(obj.name);
+	setSizeHint(QSize(132, 80));
     }
 };
 
@@ -385,12 +385,12 @@ Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QStrin
     verticalLayout = new QVBoxLayout(this);
     listWidget = new QListWidget(this);
     verticalLayout->addWidget(listWidget);
-    listWidget->setIconSize(QSize(48, 48));
+    listWidget->setIconSize(QSize(64, 64));
     listWidget->setViewMode(QListView::IconMode);
     listWidget->setWrapping(true);
 
-    Editor::MyXML templateObjects(Resource::FindFile(dataFolder, "template.xml"), "template");
-    Editor::MyXML objectsElem(Resource::FindFile(dataFolder, groupElem.attribute("file")), "objects");
+    Editor::MyXML templateObjects(theme.resourceFile(dataFolder, "template.xml"), "template");
+    Editor::MyXML objectsElem(theme.resourceFile(dataFolder, groupElem.attribute("file")), "objects");
     QString icn = objectsElem.attribute("icn");
 
     if(! objectsElem.isNull())
@@ -457,17 +457,12 @@ void Form::SelectImageTab::selectionChanged(void)
 
 Form::SelectImage::SelectImage(EditorTheme & theme)
 {
-    setObjectName(QString::fromUtf8("SelectImage"));
     setWindowTitle(QApplication::translate("SelectImage", "Dialog", 0, QApplication::UnicodeUTF8));
 
-    verticalLayout = new QVBoxLayout(this);
-    verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-
     tabWidget = new QTabWidget(this);
-    tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
 
     const QString dataFolder("objects");
-    Editor::MyXML groupsElem(Resource::FindFile(dataFolder, "groups.xml"), "groups");
+    Editor::MyXML groupsElem(theme.resourceFile(dataFolder, "groups.xml"), "groups");
 
     if(! groupsElem.isNull())
     {
@@ -487,23 +482,22 @@ Form::SelectImage::SelectImage(EditorTheme & theme)
 	tabWidget->setCurrentIndex(0);
     }
 
+    verticalLayout = new QVBoxLayout(this);
     verticalLayout->addWidget(tabWidget);
 
-    horizontalLayout = new QHBoxLayout();
-    horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-
     pushButtonSelect = new QPushButton(this);
-    pushButtonSelect->setObjectName(QString::fromUtf8("pushButtonSelect"));
     pushButtonSelect->setText(QApplication::translate("SelectImage", "Select", 0, QApplication::UnicodeUTF8));
     pushButtonSelect->setEnabled(false);
+
+    horizontalLayout = new QHBoxLayout();
     horizontalLayout->addWidget(pushButtonSelect);
 
     horizontalSpacer = new QSpacerItem(268, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     horizontalLayout->addItem(horizontalSpacer);
 
     pushButtonClose = new QPushButton(this);
-    pushButtonClose->setObjectName(QString::fromUtf8("pushButtonClose"));
     pushButtonClose->setText(QApplication::translate("SelectImage", "Close", 0, QApplication::UnicodeUTF8));
+
     horizontalLayout->addWidget(pushButtonClose);
     verticalLayout->addLayout(horizontalLayout);
 

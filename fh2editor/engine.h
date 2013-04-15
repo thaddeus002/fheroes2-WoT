@@ -368,6 +368,8 @@ namespace AGG
 	QPixmap			getImageTIL(const QString &, int);
 	QPair<QPixmap, QPoint>	getImageICN(const QString &, int);
 	QPixmap			getImage(const CompositeObject &);
+
+	bool			isHeroes2XMode(void) const;
     };
 }
 
@@ -409,6 +411,8 @@ public:
 
     int				ground(int) const;
     QPair<int, int>		groundBoundariesFix(const MapTile &, const MapTiles &) const;
+
+    QString			resourceFile(const QString & dir, const QString & file) const;
 };
 
 class MapObject : public QPoint

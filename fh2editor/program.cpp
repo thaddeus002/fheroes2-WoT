@@ -64,7 +64,7 @@ namespace Resource
 
 	return NULL;
     }
-
+/*
     QString Path(const char* str, ...)
     {
 	QStringList list;
@@ -83,7 +83,7 @@ namespace Resource
 
 	return NULL;
     }
-
+*/
     void InitShares(void)
     {
 	QStringList list;

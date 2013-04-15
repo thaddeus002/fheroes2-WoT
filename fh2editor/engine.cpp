@@ -611,6 +611,11 @@ AGG::Spool::Spool(const QString & file)
     }
 }
 
+bool AGG::Spool::isHeroes2XMode(void) const
+{
+    return second.isReadable();
+}
+
 QPixmap AGG::Spool::getImageTIL(const QString & til, int index)
 {
     QString key = til + QString::number(index);
@@ -1152,8 +1157,14 @@ int H2::isAnimationICN(int spriteClass, int spriteIndex, int ticket)
 
 
 /*Themes section */
-EditorTheme::EditorTheme(AGG::Spool & spool) : aggSpool(spool), name("original"), tile(32, 32)
+EditorTheme::EditorTheme(AGG::Spool & spool) : aggSpool(spool), name("agg"), tile(32, 32)
 {
+}
+
+QString EditorTheme::resourceFile(const QString & dir, const QString & file) const
+{
+    return Resource::FindFile("themes",
+	    QDir::toNativeSeparators(name + QDir::separator() + dir + QDir::separator() + file));
 }
 
 QPixmap EditorTheme::getImageTIL(const QString & til, int index)
