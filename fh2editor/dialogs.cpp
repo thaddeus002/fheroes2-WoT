@@ -386,6 +386,8 @@ Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QStrin
     listWidget = new QListWidget(this);
     verticalLayout->addWidget(listWidget);
     listWidget->setIconSize(QSize(48, 48));
+    listWidget->setViewMode(QListView::IconMode);
+    listWidget->setWrapping(true);
 
     Editor::MyXML templateObjects(Resource::FindFile(dataFolder, "template.xml"), "template");
     Editor::MyXML objectsElem(Resource::FindFile(dataFolder, groupElem.attribute("file")), "objects");

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects icn="objndsrt">
-    <template section="bottom_2x1" name="Ground Object 0" index="5" />
+    <template section="bottom_2x1" name="Ground Object 0" index="0" />
     <template section="trees_2x1" name="Trees 2" index="2" />
     <template section="trees_2x2" name="Trees 4" index="4" />
     <template section="trees_2x2" name="Trees 7" index="7" />
