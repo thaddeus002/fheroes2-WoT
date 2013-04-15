@@ -54,6 +54,13 @@ namespace ICN
 	    OBJNSWMP = 0xD4, OBJNLAVA = 0xD8, OBJNDSRT = 0xDC, OBJNDIRT = 0xE0, OBJNCRCK = 0xE4, OBJNLAV3 = 0xE8, OBJNMULT = 0xEC, OBJNLAV2 = 0xF0, X_LOC1 = 0xF4, X_LOC2 = 0xF8, X_LOC3 = 0xFC };
 }
 
+namespace SpriteLevel
+{
+    enum { Uknown, Bottom, Action, Shadow, Top };
+
+    int fromString(const QString &);
+}
+
 struct mp2icn_t
 {
     mp2icn_t(const char*);
@@ -207,24 +214,26 @@ QDataStream & operator>> (QDataStream &, mp2dayevent_t &);
 QDataStream & operator>> (QDataStream &, mp2rumor_t &);
 QDataStream & operator>> (QDataStream &, mp2sphinx_t &);
 
-struct IndexPoint : public QPair<int, QPoint>
+struct CompositeSprite
 {
-    IndexPoint() : QPair<int, QPoint>() {}
-    IndexPoint(int i, const QPoint & p) : QPair<int, QPoint>(i, p) {}
+    int		spriteIndex;
+    QPoint	spritePos;
+    int		spriteLevel;
+    int		spritePassable;
+    int		spriteAnimation;
 
-    int index(void) const { return first; }
-    const QPoint & point(void) const { return second; }
+    CompositeSprite(){}
+    CompositeSprite(const QDomElement &, int = -1);
 };
 
-struct CompositeObject
+struct CompositeObject : public QVector<CompositeSprite>
 {
     QString		name;
     QSize		size;
     QString		icn;
-    QVector<IndexPoint> points;
 
     CompositeObject(){}
-    CompositeObject(const QString &, const QDomElement &);
+    CompositeObject(const QString &, const QDomElement &, int = -1);
 
     bool isValid(void) const;
 };

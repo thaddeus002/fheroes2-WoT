@@ -648,7 +648,7 @@ QPair<QPixmap, QPoint> AGG::Spool::getImageICN(const QString & icn, int index)
 
 QPixmap AGG::Spool::getImage(const CompositeObject & obj)
 {
-    const QString & key = obj.name;
+    const QString key = obj.icn + obj.name;
     QPixmap result = NULL;
 
     if(! QPixmapCache::find(key, & result))
@@ -660,11 +660,17 @@ QPixmap AGG::Spool::getImage(const CompositeObject & obj)
 	result.fill(qRgba(0, 0, 0, 0));
 	QPainter paint(& result);
 
-	for(QVector<IndexPoint>::const_iterator
-	    it = obj.points.begin(); it != obj.points.end(); ++it)
+	for(QVector<CompositeSprite>::const_iterator
+	    it = obj.begin(); it != obj.end(); ++it)
 	{
-	    QPair<QPixmap, QPoint> sprite = getImageICN(obj.icn, (*it).index());
-	    paint.drawPixmap((*it).point().x() * 32 + sprite.second.x(), (*it).point().y() * 32 + sprite.second.y(), sprite.first);
+	    QPair<QPixmap, QPoint> sprite = getImageICN(obj.icn, (*it).spriteIndex);
+	    paint.drawPixmap((*it).spritePos.x() * 32 + sprite.second.x(), (*it).spritePos.y() * 32 + sprite.second.y(), sprite.first);
+
+	    if((*it).spriteAnimation)
+	    {
+		sprite = getImageICN(obj.icn, (*it).spriteIndex + 1);
+		paint.drawPixmap((*it).spritePos.x() * 32 + sprite.second.x(), (*it).spritePos.y() * 32 + sprite.second.y(), sprite.first);
+	    }
 	}
 
 	QPixmapCache::insert(key, result);
@@ -1592,7 +1598,43 @@ TavernRumors::TavernRumors()
 {
 }
 
-CompositeObject::CompositeObject(const QString & obj, const QDomElement & elem)
+int SpriteLevel::fromString(const QString & level)
+{
+    if(level == "bottom")
+	return Bottom;
+    else
+    if(level == "action")
+	return Action;
+    else
+    if(level == "shadow")
+	return Shadow;
+    else
+    if(level == "top")
+	return Top;
+
+    qDebug() << "SpriteLevel::fromString:" << "unknown sprite level";
+    return Uknown;
+}
+
+CompositeSprite::CompositeSprite(const QDomElement & elem, int templateIndex)
+    : spriteIndex(elem.attribute("index").toInt()), spriteLevel(0), spritePassable(Direction::All), spriteAnimation(0)
+{
+    spritePos.setX(elem.attribute("px").toInt());
+    spritePos.setY(elem.attribute("py").toInt());
+
+    if(0 <= templateIndex)
+	spriteIndex += templateIndex;
+
+    spriteLevel = SpriteLevel::fromString(elem.attribute("level").toLower());
+
+    if(elem.hasAttribute("passable"))
+	spritePassable = elem.attribute("passable").toInt();
+
+    if(elem.hasAttribute("animation"))
+	spriteAnimation = elem.attribute("animation").toInt();
+}
+
+CompositeObject::CompositeObject(const QString & obj, const QDomElement & elem, int templateIndex)
     : name(elem.attribute("name")), size(elem.attribute("width").toInt(), elem.attribute("height").toInt()), icn(obj.toUpper())
 {
     if(0 > icn.lastIndexOf(".ICN")) icn.append(".ICN");
@@ -1600,11 +1642,7 @@ CompositeObject::CompositeObject(const QString & obj, const QDomElement & elem)
     QDomNodeList list = elem.elementsByTagName("sprite");
 
     for(int pos = 0; pos < list.size(); ++pos)
-    {
-	QDomElement sprite = list.item(pos).toElement();
-	points.push_back(IndexPoint(sprite.attribute("index").toInt(),
-			    QPoint(sprite.attribute("px").toInt(), sprite.attribute("py").toInt())));
-    }
+	push_back(CompositeSprite(list.item(pos).toElement(), templateIndex));
 }
 
 bool CompositeObject::isValid() const
@@ -1621,6 +1659,8 @@ Editor::MenuObjects::MenuObjects(QWidget & parent, EditorTheme & theme) : QMenu(
 
     if(! groupsElem.isNull())
     {
+	MyXML templateObjects(Resource::FindFile(dataFolder, "template.xml"), "template");
+
 	QDomNodeList groupsList = groupsElem.elementsByTagName("group");
 
 	for(int pos1 = 0; pos1 < groupsList.size(); ++pos1)
@@ -1636,6 +1676,7 @@ Editor::MenuObjects::MenuObjects(QWidget & parent, EditorTheme & theme) : QMenu(
 
 		if(! objectsElem.isNull())
 		{
+		    // parse element: object
 		    QDomNodeList objectsList = objectsElem.elementsByTagName("object");
 
 		    for(int pos2 = 0; pos2 < objectsList.size(); ++pos2)
@@ -1647,6 +1688,32 @@ Editor::MenuObjects::MenuObjects(QWidget & parent, EditorTheme & theme) : QMenu(
 			    QAction* objectAct = subMenu->addAction(obj.name);
 			    objectAct->setData(QVariant::fromValue(obj));
 			    objectAct->setIcon(theme.getImage(obj));
+			}
+		    }
+
+		    // parse element: template
+		    objectsList = objectsElem.elementsByTagName("template");
+
+		    for(int pos2 = 0; pos2 < objectsList.size(); ++pos2)
+		    {
+			QDomElement tmplElem = objectsList.item(pos2).toElement();
+
+			if(! templateObjects.isNull() && tmplElem.hasAttribute("section"))
+			{
+			    QDomElement objElem = templateObjects.firstChildElement(tmplElem.attribute("section"));
+			    int startIndex = tmplElem.attribute("index").toInt();
+			    CompositeObject obj(icn, objElem, startIndex);
+
+			    // override name tag
+			    if(tmplElem.hasAttribute("name"))
+				obj.name = tmplElem.attribute("name");
+
+			    if(obj.isValid())
+			    {
+				QAction* objectAct = subMenu->addAction(obj.name);
+				objectAct->setData(QVariant::fromValue(obj));
+				objectAct->setIcon(theme.getImage(obj));
+			    }
 			}
 		    }
 		}
