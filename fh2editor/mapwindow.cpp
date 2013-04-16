@@ -359,7 +359,6 @@ void MapWindow::contextMenuEvent(QContextMenuEvent* event)
 	menu.addSeparator();
 
 	menu.addAction(addObjectAct);
-	//menu.addMenu(new Editor::MenuObjects(menu, mapData.theme()));
 
 	menu.addSeparator();
 	menu.addAction(editPassableAct);
@@ -379,5 +378,6 @@ void MapWindow::selectObjectImage(void)
 
     if(QDialog::Accepted == form.exec())
     {
+	qDebug() << form.result.name;
     }
 }

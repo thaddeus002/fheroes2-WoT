@@ -1163,8 +1163,8 @@ EditorTheme::EditorTheme(AGG::Spool & spool) : aggSpool(spool), name("agg"), til
 
 QString EditorTheme::resourceFile(const QString & dir, const QString & file) const
 {
-    return Resource::FindFile("themes",
-	    QDir::toNativeSeparators(name + QDir::separator() + dir + QDir::separator() + file));
+    return Resource::FindFile(QDir::toNativeSeparators(QString("themes") + QDir::separator() + name),
+	    QDir::toNativeSeparators(dir + QDir::separator() + file));
 }
 
 QPixmap EditorTheme::getImageTIL(const QString & til, int index)

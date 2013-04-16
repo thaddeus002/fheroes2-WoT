@@ -25,6 +25,7 @@
 
 #include <QDialog>
 #include <QSize>
+#include "engine.h"
 
 QT_BEGIN_NAMESPACE
 class QVBoxLayout;
@@ -42,11 +43,13 @@ class QGroupBox;
 class QSpacerItem;
 class QTabWidget;
 class QListWidget;
+class QListWidgetItem;
 class QDomElement;
 QT_END_NAMESPACE
 
 class MapData;
 class EditorTheme;
+class CompositeObject;
 
 namespace Dialog
 {
@@ -157,26 +160,27 @@ namespace Form
         QSpacerItem*		horizontalSpacer;
         QPushButton*		pushButtonClose;
 
+	CompositeObject		result;
+
     protected slots:
 	void			tabSwitched(int);
+	void			clickSelect(void);
+	void			accept(QListWidgetItem*);
+	void			selectionChanged(void);
     };
 
     class SelectImageTab : public QWidget
     {
         Q_OBJECT
 
-	QVBoxLayout*        	verticalLayout;
-	QListWidget*        	listWidget;
-
     public:
 	SelectImageTab(const QDomElement &, const QString &, EditorTheme &);
 
+	QVBoxLayout*        	verticalLayout;
+	QListWidget*        	listWidget;
+
 	bool 			isSelected(void) const;
-
-    protected slots:
-	void			selectionChanged(void);
     };
-
 }
 
 #endif

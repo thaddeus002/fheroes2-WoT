@@ -301,8 +301,8 @@ void MainWindow::updateStatusBar(void)
 {
     MapWindow* mapWindow = activeMapWindow();
 
-    disconnect(labelTileX);
-    disconnect(labelTileY);
+    disconnect(labelTileX, SLOT(setNum(int)));
+    disconnect(labelTileY, SLOT(setNum(int)));
 
     if(mapWindow)
     {

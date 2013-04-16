@@ -388,6 +388,7 @@ Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QStrin
     listWidget->setIconSize(QSize(64, 64));
     listWidget->setViewMode(QListView::IconMode);
     listWidget->setWrapping(true);
+    listWidget->setResizeMode(QListView::Adjust);
 
     Editor::MyXML templateObjects(theme.resourceFile(dataFolder, "template.xml"), "template");
     Editor::MyXML objectsElem(theme.resourceFile(dataFolder, groupElem.attribute("file")), "objects");
@@ -428,31 +429,11 @@ Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QStrin
             }
         }
     }
-
-    QObject::connect(listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
 }
 
 bool Form::SelectImageTab::isSelected(void) const
 {
     return listWidget->selectedItems().size();
-}
-
-void Form::SelectImageTab::selectionChanged(void)
-{
-    QStackedWidget* stackWidget = qobject_cast<QStackedWidget*>(parent());
-
-    if(stackWidget)
-    {
-	QTabWidget* tabWidget = qobject_cast<QTabWidget*>(stackWidget->parent());
-
-	if(tabWidget)
-	{
-	    Form::SelectImage* form = qobject_cast<Form::SelectImage*>(tabWidget->parent());
-
-	    if(form)
-		form->pushButtonSelect->setEnabled(isSelected());
-	}
-    }
 }
 
 Form::SelectImage::SelectImage(EditorTheme & theme)
@@ -478,8 +459,6 @@ Form::SelectImage::SelectImage(EditorTheme & theme)
 		tabWidget->addTab(new SelectImageTab(groupElem, dataFolder, theme), name);
 	    }
 	}
-
-	tabWidget->setCurrentIndex(0);
     }
 
     verticalLayout = new QVBoxLayout(this);
@@ -502,14 +481,51 @@ Form::SelectImage::SelectImage(EditorTheme & theme)
     verticalLayout->addLayout(horizontalLayout);
 
     resize(540, 410);
+    tabSwitched(0);
 
     QObject::connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabSwitched(int)));
     QObject::connect(pushButtonClose, SIGNAL(clicked()), this, SLOT(reject()));
-    QObject::connect(pushButtonSelect, SIGNAL(clicked()), this, SLOT(accept()));
+    QObject::connect(pushButtonSelect, SIGNAL(clicked()), this, SLOT(clickSelect()));
 }
 
 void Form::SelectImage::tabSwitched(int num)
 {
     SelectImageTab* tab = qobject_cast<SelectImageTab*>(tabWidget->widget(num));
-    pushButtonSelect->setEnabled(tab && tab->isSelected());
+
+    disconnect(this, SLOT(accept(QListWidgetItem*)));
+    disconnect(this, SLOT(selectionChanged()));
+
+    if(tab)
+    {
+	pushButtonSelect->setEnabled(tab->isSelected());
+
+	QObject::connect(tab->listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(accept(QListWidgetItem*)));
+	QObject::connect(tab->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
+    }
+}
+
+void Form::SelectImage::selectionChanged(void)
+{
+    SelectImageTab* tab = qobject_cast<SelectImageTab*>(tabWidget->currentWidget());
+
+    if(tab)
+	pushButtonSelect->setEnabled(tab->isSelected());
+}
+
+
+void Form::SelectImage::clickSelect(void)
+{
+    SelectImageTab* tab = qobject_cast<SelectImageTab*>(tabWidget->currentWidget());
+
+    if(tab)
+	accept(tab->listWidget->currentItem());
+}
+
+void Form::SelectImage::accept(QListWidgetItem* item)
+{
+    if(item)
+    {
+	result = qvariant_cast<CompositeObject>(item->data(Qt::UserRole));
+	QDialog::accept();
+    }
 }
