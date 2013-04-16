@@ -53,7 +53,7 @@ MapWindow::MapWindow(MainWindow* parent) : mainWindow(parent), mapData(this)
     //
     addObjectAct = new QAction(QIcon(":/images/add_objects.png"), tr("Add object..."), this);
     addObjectAct->setStatusTip(tr("Select map object"));
-    connect(addObjectAct, SIGNAL(triggered()), this, SLOT(selectObjectImage()));
+    connect(addObjectAct, SIGNAL(triggered()), &mapData, SLOT(selectObjectImage()));
 
     QAction* curAct;
 
@@ -370,14 +370,4 @@ void MapWindow::contextMenuEvent(QContextMenuEvent* event)
 
     if(selectAllAct != menu.exec(event->globalPos()))
 	mapData.clearSelection();
-}
-
-void MapWindow::selectObjectImage(void)
-{
-    Form::SelectImage form(mapData.theme());
-
-    if(QDialog::Accepted == form.exec())
-    {
-	qDebug() << form.result.name;
-    }
 }

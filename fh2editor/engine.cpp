@@ -138,7 +138,7 @@ H2::ICNSprite::ICNSprite(const mp2icn_t & icn, const char* buf, quint32 size, co
     const quint8* ptr = (const quint8*) buf;
     const quint8* outOfRange = ptr + size;
 
-    fill(qRgba(255, 255, 255, 0));
+    fill(Qt::transparent);
 
     if(0x20 == icn.type)
 	DrawVariant2(ptr, outOfRange, pals);
@@ -651,30 +651,30 @@ QPair<QPixmap, QPoint> AGG::Spool::getImageICN(const QString & icn, int index)
     return result;
 }
 
-QPixmap AGG::Spool::getImage(const CompositeObject & obj)
+QPixmap AGG::Spool::getImage(const CompositeObject & obj, const QSize & tileSize)
 {
     const QString key = obj.icn + obj.name;
     QPixmap result = NULL;
 
     if(! QPixmapCache::find(key, & result))
     {
-	int width = obj.size.width() * 32;
-	int height = obj.size.height() * 32;
+	int width = obj.size.width() * tileSize.width();
+	int height = obj.size.height() * tileSize.height();
 
 	result = QPixmap(width, height);
-	result.fill(qRgba(255, 255, 255, 0));
+	result.fill(Qt::transparent);
 	QPainter paint(& result);
 
 	for(QVector<CompositeSprite>::const_iterator
 	    it = obj.begin(); it != obj.end(); ++it)
 	{
 	    QPair<QPixmap, QPoint> sprite = getImageICN(obj.icn, (*it).spriteIndex);
-	    paint.drawPixmap((*it).spritePos.x() * 32 + sprite.second.x(), (*it).spritePos.y() * 32 + sprite.second.y(), sprite.first);
+	    paint.drawPixmap((*it).spritePos.x() * tileSize.width() + sprite.second.x(), (*it).spritePos.y() * tileSize.height() + sprite.second.y(), sprite.first);
 
 	    if((*it).spriteAnimation)
 	    {
 		sprite = getImageICN(obj.icn, (*it).spriteIndex + 1);
-		paint.drawPixmap((*it).spritePos.x() * 32 + sprite.second.x(), (*it).spritePos.y() * 32 + sprite.second.y(), sprite.first);
+		paint.drawPixmap((*it).spritePos.x() * tileSize.width() + sprite.second.x(), (*it).spritePos.y() * tileSize.height() + sprite.second.y(), sprite.first);
 	    }
 	}
 
@@ -693,6 +693,19 @@ quint32 Editor::Rand(quint32 min, quint32 max)
 quint32 Editor::Rand(quint32 max)
 {
     return static_cast<quint32>((max + 1) * (qrand() / (RAND_MAX + 1.0)));
+}
+
+QPixmap Editor::pixmapBorder(const QSize & size, const QColor & color, int offset)
+{
+    QPixmap result(size);
+    result.fill(Qt::transparent);
+
+    QPainter paint(& result);
+    paint.setPen(QPen(color, 1));
+    paint.setBrush(QBrush(QColor(0, 0, 0, 0)));
+    paint.drawRect(offset, offset, size.width() - 2 * offset - 1, size.height() - 2 * offset - 1);
+
+    return result;
 }
 
 Editor::MyXML::MyXML(const QString & xml, const QString & root)
@@ -1179,7 +1192,7 @@ QPair<QPixmap, QPoint> EditorTheme::getImageICN(int icn, int index)
 
 QPixmap EditorTheme::getImage(const CompositeObject & obj)
 {
-    return aggSpool.getImage(obj);
+    return aggSpool.getImage(obj, tile);
 }
 
 const QSize & EditorTheme::tileSize(void) const
@@ -1654,7 +1667,76 @@ CompositeObject::CompositeObject(const QString & obj, const QDomElement & elem, 
 	push_back(CompositeSprite(list.item(pos).toElement(), templateIndex));
 }
 
-bool CompositeObject::isValid() const
+bool CompositeObject::isValid(void) const
 {
     return ! name.isEmpty();
+}
+
+CompositeObjectPixmap::CompositeObjectPixmap(const CompositeObject & obj, EditorTheme & theme) : object(obj), valid(true)
+{
+    const QSize & tile = theme.tileSize();
+
+    area = theme.getImage(obj);
+    borderRed = Editor::pixmapBorder(QSize(tile.width() * obj.size.width(), tile.height() * obj.size.height()), QColor(255, 0, 0), 0);
+    borderGreen = Editor::pixmapBorder(QSize(tile.width() * obj.size.width(), tile.height() * obj.size.height()), QColor(0, 255, 0), 0);
+
+    // generate passable color map
+    passableMap = QPixmap(tile.width() * obj.size.width(), tile.height() * obj.size.height());
+    passableMap.fill(Qt::transparent);
+
+    QPixmap tileR = Editor::pixmapBorder(tile, QColor(255, 0, 0), 1);
+    QPixmap tileG = Editor::pixmapBorder(tile, QColor(0, 255, 0), 1);
+    QPixmap tileY = Editor::pixmapBorder(tile, QColor(255, 255, 0), 1);
+
+    QPainter paint(& passableMap);
+
+    for(int yy = 0; yy < obj.size.height(); ++yy)
+	for(int xx = 0; xx < obj.size.width(); ++xx)
+	    paint.drawPixmap(xx * tile.width(), yy * tile.height(), tileG);
+
+    for(CompositeObject::const_iterator
+	it = obj.begin(); it != obj.end(); ++it)
+    {
+	const QPoint offset((*it).spritePos.x() * tile.width(),
+				(*it).spritePos.y() * tile.height());
+
+	switch((*it).spriteLevel)
+	{
+	    case SpriteLevel::Bottom:
+	    case SpriteLevel::Action:
+		paint.drawPixmap(offset, tileR);
+		break;
+
+// int spritePassable
+
+	    case SpriteLevel::Shadow:
+	    case SpriteLevel::Top:
+		paint.drawPixmap(offset, tileY);
+		break;
+
+	    default:
+		paint.drawPixmap(offset, tileG);
+		break;
+	}
+    }
+}
+
+void CompositeObjectPixmap::paint(QPainter & painter, const QPoint & pos, bool allow) const
+{
+    if(valid)
+    {
+	painter.drawPixmap(pos, area);
+	painter.drawPixmap(pos, passableMap);
+	painter.drawPixmap(pos, (allow ? borderGreen : borderRed));
+    }
+}
+
+void CompositeObjectPixmap::reset(void)
+{
+    valid = false;
+}
+
+bool CompositeObjectPixmap::isValid(void) const
+{
+    return valid;
 }

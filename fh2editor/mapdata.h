@@ -240,6 +240,7 @@ protected slots:
     void		pasteFromBuffer(void);
     void		fillGroundAction(QAction*);
     void		removeObjectsAction(QAction*);
+    void		selectObjectImage(void);
 
 protected:
     void                mousePressEvent(QGraphicsSceneMouseEvent*);
@@ -267,6 +268,9 @@ protected:
 
     DayEvents		dayEvents;
     TavernRumors	tavernRumors;
+
+    CompositeObjectPixmap
+                        currentObject;
 };
 
 #endif

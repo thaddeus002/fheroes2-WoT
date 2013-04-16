@@ -228,22 +228,24 @@ struct CompositeSprite
 
 struct CompositeObject : public QVector<CompositeSprite>
 {
-    QString		name;
-    QSize		size;
-    QString		icn;
+    QString	name;
+    QSize	size;
+    QString	icn;
 
     CompositeObject(){}
     CompositeObject(const QString &, const QDomElement &, int = -1);
 
-    bool isValid(void) const;
+    bool	isValid(void) const;
 };
 
 Q_DECLARE_METATYPE(CompositeObject);
+
 
 namespace Editor
 {
     quint32 Rand(quint32 max);
     quint32 Rand(quint32 min, quint32 max);
+    QPixmap pixmapBorder(const QSize &, const QColor &, int offset = 0);
 
     class MyXML : public QDomElement
     {
@@ -367,7 +369,7 @@ namespace AGG
 
 	QPixmap			getImageTIL(const QString &, int);
 	QPair<QPixmap, QPoint>	getImageICN(const QString &, int);
-	QPixmap			getImage(const CompositeObject &);
+	QPixmap			getImage(const CompositeObject &, const QSize &);
 
 	bool			isHeroes2XMode(void) const;
     };
@@ -493,6 +495,23 @@ class TavernRumors : public QVector<QSharedPointer<Rumor> >
 {
 public:
     TavernRumors();
+};
+
+struct CompositeObjectPixmap
+{
+    CompositeObject	object;
+    QPixmap		area;
+    QPixmap		passableMap;
+    QPixmap		borderRed;
+    QPixmap		borderGreen;
+    bool		valid;
+
+    CompositeObjectPixmap() : valid(false) {}
+    CompositeObjectPixmap(const CompositeObject &, EditorTheme &);
+
+    void		reset(void);
+    bool		isValid(void) const;
+    void		paint(QPainter &, const QPoint & pos, bool allow) const;
 };
 
 #endif

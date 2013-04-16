@@ -61,7 +61,6 @@ protected:
 private slots:
     void	mapWasSelectionChanged(void);
     void	mapWasModified(void);
-    void	selectObjectImage(void);
 
 private:
     friend class MainWindow;

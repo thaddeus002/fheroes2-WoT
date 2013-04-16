@@ -31,6 +31,7 @@
 
 #include "engine.h"
 #include "program.h"
+#include "dialogs.h"
 #include "mainwindow.h"
 #include "mapwindow.h"
 #include "mapdata.h"
@@ -485,12 +486,22 @@ void MapData::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	    ((event->buttons() & Qt::RightButton) && ! selectionArea().contains(event->scenePos())))
 	    clearSelection();
     }
+    else
+    if(currentObject.isValid())
+    {
+	currentObject.reset();
+	update();
+    }
 
     event->accept();
 }
 
 void MapData::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
+    if(currentObject.isValid())
+    {
+    }
+    else
     // select area
     if(event->buttons() & Qt::LeftButton)
     {
@@ -588,13 +599,20 @@ void MapData::drawForeground(QPainter* painter, const QRectF & rect)
 	painter->drawRoundedRect(selectionArea().boundingRect(), 6.0, 6.0);
     }
     else
+    // paint: selected new object place
+    if(currentObject.isValid())
+    {
+	currentObject.paint(*painter, tileOverMouse->boundingRect().topLeft().toPoint(), true);
+	update();
+    }
+    else
     // paint: selected item over mouse
     if(tileOverMouse)
     {
 	painter->setPen(QPen(QColor(255, 255, 0), 1));
 	painter->setBrush(QBrush(QColor(0, 0, 0, 0)));
 	const QRectF & rt = tileOverMouse->boundingRect();
-	painter->drawRect(QRectF(rt.x() + 1, rt.y() + 1, rt.width() - 2, rt.height() - 2));
+	painter->drawRect(QRectF(rt.x(), rt.y(), rt.width() - 1, rt.height() - 1));
     }
 }
 
@@ -1053,4 +1071,15 @@ void MapData::SaveTest(void) const
     out.setCodec(QTextCodec::codecForName("UTF-8"));
 
     doc.save(out, 5, QDomNode::EncodingFromTextStream);
+}
+
+void MapData::selectObjectImage(void)
+{
+    Form::SelectImage form(themeContent);
+
+    if(QDialog::Accepted == form.exec())
+    {
+        currentObject = CompositeObjectPixmap(form.result, themeContent);
+	update();
+    }
 }
