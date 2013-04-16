@@ -1672,39 +1672,46 @@ bool CompositeObject::isValid(void) const
     return ! name.isEmpty();
 }
 
-CompositeObjectPixmap::CompositeObjectPixmap(const CompositeObject & obj, EditorTheme & theme) : object(obj), valid(true)
+CompositeObjectCursor::CompositeObjectCursor(const CompositeObject & obj, EditorTheme & theme) : CompositeObject(obj), valid(true)
 {
-    const QSize & tile = theme.tileSize();
+    const QSize areaSize(theme.tileSize().width() * size.width(), theme.tileSize().height() * size.height());
 
-    area = theme.getImage(obj);
-    borderRed = Editor::pixmapBorder(QSize(tile.width() * obj.size.width(), tile.height() * obj.size.height()), QColor(255, 0, 0), 0);
-    borderGreen = Editor::pixmapBorder(QSize(tile.width() * obj.size.width(), tile.height() * obj.size.height()), QColor(0, 255, 0), 0);
+    objectArea = theme.getImage(obj);
+    borderRed = Editor::pixmapBorder(areaSize, QColor(255, 0, 0), 0);
+    borderGreen = Editor::pixmapBorder(areaSize, QColor(0, 255, 0), 0);
+
+    centerOffset = QPoint(areaSize.width() - theme.tileSize().width(),
+				areaSize.height() - theme.tileSize().height());
 
     // generate passable color map
-    passableMap = QPixmap(tile.width() * obj.size.width(), tile.height() * obj.size.height());
+    passableMap = QPixmap(areaSize);
     passableMap.fill(Qt::transparent);
 
-    QPixmap tileR = Editor::pixmapBorder(tile, QColor(255, 0, 0), 1);
-    QPixmap tileG = Editor::pixmapBorder(tile, QColor(0, 255, 0), 1);
-    QPixmap tileY = Editor::pixmapBorder(tile, QColor(255, 255, 0), 1);
+    QPixmap tileR = Editor::pixmapBorder(theme.tileSize(), QColor(255, 0, 0), 1);
+    QPixmap tileG = Editor::pixmapBorder(theme.tileSize(), QColor(0, 255, 0), 1);
+    QPixmap tileY = Editor::pixmapBorder(theme.tileSize(), QColor(255, 255, 0), 1);
 
     QPainter paint(& passableMap);
 
-    for(int yy = 0; yy < obj.size.height(); ++yy)
-	for(int xx = 0; xx < obj.size.width(); ++xx)
-	    paint.drawPixmap(xx * tile.width(), yy * tile.height(), tileG);
+    for(int yy = 0; yy < size.height(); ++yy)
+	for(int xx = 0; xx < size.width(); ++xx)
+	    paint.drawPixmap(xx * theme.tileSize().width(), yy * theme.tileSize().height(), tileG);
 
     for(CompositeObject::const_iterator
-	it = obj.begin(); it != obj.end(); ++it)
+	it = begin(); it != end(); ++it)
     {
-	const QPoint offset((*it).spritePos.x() * tile.width(),
-				(*it).spritePos.y() * tile.height());
+	const QPoint offset((*it).spritePos.x() * theme.tileSize().width(),
+				(*it).spritePos.y() * theme.tileSize().height());
 
 	switch((*it).spriteLevel)
 	{
 	    case SpriteLevel::Bottom:
+		paint.drawPixmap(offset, tileR);
+		break;
+
 	    case SpriteLevel::Action:
 		paint.drawPixmap(offset, tileR);
+		centerOffset = offset;
 		break;
 
 // int spritePassable
@@ -1721,22 +1728,31 @@ CompositeObjectPixmap::CompositeObjectPixmap(const CompositeObject & obj, Editor
     }
 }
 
-void CompositeObjectPixmap::paint(QPainter & painter, const QPoint & pos, bool allow) const
+void CompositeObjectCursor::paint(QPainter & painter, const QPoint & pos, bool allow)
 {
-    if(valid)
-    {
-	painter.drawPixmap(pos, area);
-	painter.drawPixmap(pos, passableMap);
-	painter.drawPixmap(pos, (allow ? borderGreen : borderRed));
-    }
+    scenePos = pos;
+
+    painter.drawPixmap(pos, objectArea);
+    painter.drawPixmap(pos, passableMap);
+    painter.drawPixmap(pos, (allow ? borderGreen : borderRed));
 }
 
-void CompositeObjectPixmap::reset(void)
+QRect CompositeObjectCursor::area(void) const
+{
+    return QRect(scenePos, objectArea.size());
+}
+
+QPoint CompositeObjectCursor::center(void) const
+{
+    return centerOffset;
+}
+
+void CompositeObjectCursor::reset(void)
 {
     valid = false;
 }
 
-bool CompositeObjectPixmap::isValid(void) const
+bool CompositeObjectCursor::isValid(void) const
 {
     return valid;
 }

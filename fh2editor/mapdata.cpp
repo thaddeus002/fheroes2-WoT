@@ -487,10 +487,16 @@ void MapData::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	    clearSelection();
     }
     else
+    // place object
     if(currentObject.isValid())
     {
+	if(event->buttons() & Qt::LeftButton)
+	{
+	    qDebug() << "place:" << currentObject.name;
+	}
+
 	currentObject.reset();
-	update();
+	update(currentObject.area());
     }
 
     event->accept();
@@ -500,6 +506,7 @@ void MapData::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
     if(currentObject.isValid())
     {
+	update(currentObject.area());
     }
     else
     // select area
@@ -602,8 +609,8 @@ void MapData::drawForeground(QPainter* painter, const QRectF & rect)
     // paint: selected new object place
     if(currentObject.isValid())
     {
-	currentObject.paint(*painter, tileOverMouse->boundingRect().topLeft().toPoint(), true);
-	update();
+	QPoint pos = tileOverMouse->boundingRect().topLeft().toPoint() - currentObject.center();
+	currentObject.paint(*painter, pos, true);
     }
     else
     // paint: selected item over mouse
@@ -1079,7 +1086,7 @@ void MapData::selectObjectImage(void)
 
     if(QDialog::Accepted == form.exec())
     {
-        currentObject = CompositeObjectPixmap(form.result, themeContent);
+        currentObject = CompositeObjectCursor(form.result, themeContent);
 	update();
     }
 }

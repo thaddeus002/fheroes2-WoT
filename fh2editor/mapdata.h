@@ -269,7 +269,7 @@ protected:
     DayEvents		dayEvents;
     TavernRumors	tavernRumors;
 
-    CompositeObjectPixmap
+    CompositeObjectCursor
                         currentObject;
 };
 

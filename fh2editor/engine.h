@@ -497,21 +497,24 @@ public:
     TavernRumors();
 };
 
-struct CompositeObjectPixmap
+struct CompositeObjectCursor : public CompositeObject
 {
-    CompositeObject	object;
-    QPixmap		area;
+    QPoint		scenePos;
+    QPoint		centerOffset;
+    QPixmap		objectArea;
     QPixmap		passableMap;
     QPixmap		borderRed;
     QPixmap		borderGreen;
     bool		valid;
 
-    CompositeObjectPixmap() : valid(false) {}
-    CompositeObjectPixmap(const CompositeObject &, EditorTheme &);
+    CompositeObjectCursor() : valid(false) {}
+    CompositeObjectCursor(const CompositeObject &, EditorTheme &);
 
     void		reset(void);
     bool		isValid(void) const;
-    void		paint(QPainter &, const QPoint & pos, bool allow) const;
+    void		paint(QPainter &, const QPoint &, bool allow);
+    QRect		area(void) const;
+    QPoint		center(void) const;
 };
 
 #endif
