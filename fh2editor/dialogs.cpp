@@ -418,11 +418,17 @@ Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QStrin
             {
                 QDomElement objElem = templateObjects.firstChildElement(tmplElem.attribute("section"));
                 int startIndex = tmplElem.attribute("index").toInt();
+
+                // override tags: icn
+                if(tmplElem.hasAttribute("icn"))
+                    icn = tmplElem.attribute("icn");
+
                 CompositeObject obj(icn, objElem, startIndex);
 
-                // override tags
+                // override tags: name
                 if(tmplElem.hasAttribute("name"))
                     obj.name = tmplElem.attribute("name");
+
 
             	if(obj.isValid())
 		    listWidget->addItem(new SelectImageItem(obj, theme));

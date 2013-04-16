@@ -2,4 +2,9 @@
 <groups>
     <group name="Desert" file="objndsrt.xml" />
     <group name="Waste Land" file="objncrck.xml" />
+    <group name="Dirt" file="objndirt.xml" />
+    <group name="Mounts" file="mounts.xml" />
+    <group name="Mines" file="mines.xml" />
+    <group name="Pickup Resources" file="resources.xml" />
+    <group name="Pickup Artifacts" file="artifacts.xml" />
 </groups>
