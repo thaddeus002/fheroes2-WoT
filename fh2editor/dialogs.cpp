@@ -266,107 +266,6 @@ void Form::SelectDataFile::clickSelect(void)
     pushButtonSave->setEnabled(true);
 }
 
-Form::MapOptions::MapOptions(MapData & map)
-{
-    setWindowTitle(QApplication::translate("DialogMapOptions", "Dialog", 0, QApplication::UnicodeUTF8));
-
-    verticalLayout2 = new QVBoxLayout(this);
-    tabWidget = new QTabWidget(this);
-    tabInfo = new QWidget();
-    verticalLayout = new QVBoxLayout(tabInfo);
-
-    labelName = new QLabel(tabInfo);
-    labelName->setAlignment(Qt::AlignCenter);
-    labelName->setText(QApplication::translate("DialogMapOptions", "Map Name:", 0, QApplication::UnicodeUTF8));
-    verticalLayout->addWidget(labelName);
-
-    lineEditName = new QLineEdit(tabInfo);
-    verticalLayout->addWidget(lineEditName);
-
-    labelDifficulty = new QLabel(tabInfo);
-    labelDifficulty->setAlignment(Qt::AlignCenter);
-    labelDifficulty->setText(QApplication::translate("DialogMapOptions", "Map Difficulty:", 0, QApplication::UnicodeUTF8));
-    verticalLayout->addWidget(labelDifficulty);
-
-    comboBoxDifficulty = new QComboBox(tabInfo);
-    comboBoxDifficulty->insertItems(0, QStringList()
-         << QApplication::translate("DialogMapOptions", "Easy", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("DialogMapOptions", "Normal", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("DialogMapOptions", "Tough", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("DialogMapOptions", "Expert", 0, QApplication::UnicodeUTF8)
-    );
-    comboBoxDifficulty->setCurrentIndex(1);
-    verticalLayout->addWidget(comboBoxDifficulty);
-
-    labelDescription = new QLabel(tabInfo);
-    labelDescription->setAlignment(Qt::AlignCenter);
-    labelDescription->setText(QApplication::translate("DialogMapOptions", "Map Description:", 0, QApplication::UnicodeUTF8));
-    verticalLayout->addWidget(labelDescription);
-
-    plainTextEditDescription = new QPlainTextEdit(tabInfo);
-    verticalLayout->addWidget(plainTextEditDescription);
-
-    tabWidget->addTab(tabInfo, "Info");
-
-    tabCondition = new QWidget();
-
-    groupBoxWinsCond = new QGroupBox(tabCondition);
-    groupBoxWinsCond->setGeometry(QRect(10, 10, 421, 141));
-    groupBoxWinsCond->setTitle(QApplication::translate("DialogMapOptions", "Victory Condition", 0, QApplication::UnicodeUTF8));
-
-    comboBoxWinsCond = new QComboBox(groupBoxWinsCond);
-    comboBoxWinsCond->setGeometry(QRect(10, 30, 141, 27));
-    comboBoxWinsCond->insertItems(0, QStringList()
-         << QApplication::translate("DialogMapOptions", "None", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("DialogMapOptions", "Capture a particular castle", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("DialogMapOptions", "Defeat a particular hero", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("DialogMapOptions", "Find a particular artifact", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("DialogMapOptions", "One side defeats another", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("DialogMapOptions", "Accumulate gold", 0, QApplication::UnicodeUTF8)
-    );
-
-    groupBox = new QGroupBox(tabCondition);
-    groupBox->setGeometry(QRect(10, 190, 421, 81));
-    groupBox->setTitle(QApplication::translate("DialogMapOptions", "Loss Condition", 0, QApplication::UnicodeUTF8));
-
-    comboBoxLossCond = new QComboBox(groupBox);
-    comboBoxLossCond->setGeometry(QRect(10, 30, 141, 27));
-    comboBoxLossCond->insertItems(0, QStringList()
-         << QApplication::translate("DialogMapOptions", "None", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("DialogMapOptions", "Lose a particuclar castle", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("DialogMapOptions", "Lose a particular hero", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("DialogMapOptions", "Run out of time", 0, QApplication::UnicodeUTF8)
-    );
-
-    tabWidget->addTab(tabCondition, "Conditions");
-    verticalLayout2->addWidget(tabWidget);
-
-    horizontalLayout = new QHBoxLayout();
-
-    pushButtonOk = new QPushButton(this);
-    pushButtonOk->setText(QApplication::translate("DialogMapOptions", "Ok", 0, QApplication::UnicodeUTF8));
-    horizontalLayout->addWidget(pushButtonOk);
-
-    horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-    horizontalLayout->addItem(horizontalSpacer);
-
-    pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("DialogMapOptions", "Cancel", 0, QApplication::UnicodeUTF8));
-    horizontalLayout->addWidget(pushButtonCancel);
-    verticalLayout2->addLayout(horizontalLayout);
-
-    resize(470, 394);
-    setMinimumSize(QSize(470, 394));
-    setMaximumSize(QSize(470, 394));
-
-    tabWidget->setCurrentIndex(0);
-    tabWidget->setTabText(tabWidget->indexOf(tabInfo), QApplication::translate("DialogMapOptions", "Page", 0, QApplication::UnicodeUTF8));
-    tabWidget->setTabText(tabWidget->indexOf(tabCondition), QApplication::translate("DialogMapOptions", "Page", 0, QApplication::UnicodeUTF8));
-
-    QObject::connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
-    QObject::connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
-}
-
 class SelectImageItem : public QListWidgetItem
 {
 public:
@@ -541,4 +440,206 @@ void Form::SelectImage::accept(QListWidgetItem* item)
 	result = qvariant_cast<CompositeObject>(item->data(Qt::UserRole));
 	QDialog::accept();
     }
+}
+
+Form::MapOptions::MapOptions(const MapData & map)
+{
+    setWindowTitle(QApplication::translate("MapOptions", "Dialog", 0, QApplication::UnicodeUTF8));
+
+    /* tab info block */
+    tabInfo = new QWidget();
+    verticalLayout = new QVBoxLayout(tabInfo);
+
+    labelName = new QLabel(tabInfo);
+    labelName->setAlignment(Qt::AlignCenter);
+    labelName->setText(QApplication::translate("MapOptions", "Map Name:", 0, QApplication::UnicodeUTF8));
+
+    lineEditName = new QLineEdit(tabInfo);
+    lineEditName->setText(map.name());
+
+    labelDifficulty = new QLabel(tabInfo);
+    labelDifficulty->setAlignment(Qt::AlignCenter);
+    labelDifficulty->setText(QApplication::translate("MapOptions", "Map Difficulty:", 0, QApplication::UnicodeUTF8));
+
+    comboBoxDifficulty = new QComboBox(tabInfo);
+    comboBoxDifficulty->insertItems(0, QStringList()
+         << QApplication::translate("MapOptions", "Easy", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MapOptions", "Normal", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MapOptions", "Tough", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MapOptions", "Expert", 0, QApplication::UnicodeUTF8)
+    );
+    comboBoxDifficulty->setCurrentIndex(map.difficulty());
+
+    labelDescription = new QLabel(tabInfo);
+    labelDescription->setAlignment(Qt::AlignCenter);
+    labelDescription->setText(QApplication::translate("MapOptions", "Map Description:", 0, QApplication::UnicodeUTF8));
+
+    plainTextEditDescription = new QPlainTextEdit(tabInfo);
+    plainTextEditDescription->setPlainText(map.description());
+
+    verticalLayout->addWidget(labelName);
+    verticalLayout->addWidget(lineEditName);
+    verticalLayout->addWidget(labelDifficulty);
+    verticalLayout->addWidget(comboBoxDifficulty);
+    verticalLayout->addWidget(labelDescription);
+    verticalLayout->addWidget(plainTextEditDescription);
+
+    /* tab condition block */
+    tabConditions = new QWidget();
+
+    groupBoxWinsCond = new QGroupBox(tabConditions);
+    groupBoxWinsCond->setTitle(QApplication::translate("MapOptions", "Victory Condition", 0, QApplication::UnicodeUTF8));
+
+    comboBoxWinsCond = new QComboBox(groupBoxWinsCond);
+    comboBoxWinsCond->insertItems(0, QStringList()
+         << QApplication::translate("MapOptions", "None", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MapOptions", "Capture a particular castle", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MapOptions", "Defeat a particular hero", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MapOptions", "Find a particular artifact", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MapOptions", "One side defeats another", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MapOptions", "Accumulate gold", 0, QApplication::UnicodeUTF8)
+    );
+
+    comboBoxWinsCondExt = new QComboBox(groupBoxWinsCond);
+    comboBoxWinsCondExt->insertItems(0, QStringList()
+         << QApplication::translate("MapOptions", "None", 0, QApplication::UnicodeUTF8)
+    );
+    comboBoxWinsCondExt->setEnabled(false);
+
+    horizontalLayoutVictorySlct = new QHBoxLayout();
+    horizontalLayoutVictorySlct->addWidget(comboBoxWinsCond);
+    horizontalLayoutVictorySlct->addWidget(comboBoxWinsCondExt);
+
+    checkBoxAllowNormalVicory = new QCheckBox(groupBoxWinsCond);
+    checkBoxAllowNormalVicory->setEnabled(false);
+    checkBoxAllowNormalVicory->setText(QApplication::translate("MapOptions", "Allow normal victory condition", 0, QApplication::UnicodeUTF8));
+
+    checkBoxCompAlsoWins = new QCheckBox(groupBoxWinsCond);
+    checkBoxCompAlsoWins->setEnabled(false);
+    checkBoxCompAlsoWins->setText(QApplication::translate("MapOptions", "Comp also wins via Special VC", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutVictoryCheck = new QHBoxLayout();
+    horizontalLayoutVictoryCheck->addWidget(checkBoxAllowNormalVicory);
+    horizontalLayoutVictoryCheck->addWidget(checkBoxCompAlsoWins);
+
+    verticalLayout3 = new QVBoxLayout(groupBoxWinsCond);
+    verticalLayout3->addLayout(horizontalLayoutVictorySlct);
+    verticalLayout3->addLayout(horizontalLayoutVictoryCheck);
+
+    groupBoxLossCond = new QGroupBox(tabConditions);
+    groupBoxLossCond->setTitle(QApplication::translate("MapOptions", "Loss Condition", 0, QApplication::UnicodeUTF8));
+
+    comboBoxLossCond = new QComboBox(groupBoxLossCond);
+    comboBoxLossCond->insertItems(0, QStringList()
+         << QApplication::translate("MapOptions", "None", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MapOptions", "Lose a particuclar castle", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MapOptions", "Lose a particular hero", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MapOptions", "Run out of time", 0, QApplication::UnicodeUTF8)
+    );
+
+    horizontalLayoutLossCond = new QHBoxLayout();
+    horizontalLayoutLossCond->addWidget(comboBoxLossCond);
+
+    comboBoxLossCondExt = new QComboBox(groupBoxLossCond);
+    comboBoxLossCondExt->insertItems(0, QStringList()
+         << QApplication::translate("MapOptions", "None", 0, QApplication::UnicodeUTF8)
+    );
+    comboBoxLossCondExt->setEnabled(false);
+
+    horizontalLayoutLossCond = new QHBoxLayout();
+    horizontalLayoutLossCond->addWidget(comboBoxLossCond);
+    horizontalLayoutLossCond->addWidget(comboBoxLossCondExt);
+
+    verticalLayout4 = new QVBoxLayout(groupBoxLossCond);
+    verticalLayout4->addLayout(horizontalLayoutLossCond);
+    groupBoxPlayers = new QGroupBox(tabConditions);
+    groupBoxPlayers->setTitle(QApplication::translate("MapOptions", "Players", 0, QApplication::UnicodeUTF8));
+
+    horizontalSpacerPlayersLeft = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    horizontalSpacerPlayersRight = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    verticalSpacerPage2 = new QSpacerItem(20, 17, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    labelPlayer1 = new QLabel(groupBoxPlayers);
+    labelPlayer2 = new QLabel(groupBoxPlayers);
+    labelPlayer3 = new QLabel(groupBoxPlayers);
+    labelPlayer1->setText(QApplication::translate("MapOptions", "player 1", 0, QApplication::UnicodeUTF8));
+    labelPlayer2->setText(QApplication::translate("MapOptions", "player 2", 0, QApplication::UnicodeUTF8));
+    labelPlayer3->setText(QApplication::translate("MapOptions", "player 3", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutPlayers = new QHBoxLayout();
+    horizontalLayoutPlayers->addItem(horizontalSpacerPlayersLeft);
+    horizontalLayoutPlayers->addWidget(labelPlayer1);
+    horizontalLayoutPlayers->addWidget(labelPlayer2);
+    horizontalLayoutPlayers->addWidget(labelPlayer3);
+    horizontalLayoutPlayers->addItem(horizontalSpacerPlayersRight);
+
+    checkBoxStartWithHero = new QCheckBox(groupBoxPlayers);
+    checkBoxStartWithHero->setText(QApplication::translate("MapOptions", "Start with hero in each player's main castle", 0, QApplication::UnicodeUTF8));
+
+    verticalLayout5 = new QVBoxLayout(groupBoxPlayers);
+    verticalLayout5->addLayout(horizontalLayoutPlayers);
+    verticalLayout5->addWidget(checkBoxStartWithHero);
+
+    verticalLayout6 = new QVBoxLayout(tabConditions);
+    verticalLayout6->addWidget(groupBoxWinsCond);
+    verticalLayout6->addWidget(groupBoxLossCond);
+    verticalLayout6->addWidget(groupBoxPlayers);
+    verticalLayout6->addItem(verticalSpacerPage2);
+
+    /* tab rumors/events block */
+    tabRumorsEvents = new QWidget();
+
+    groupBoxRumors = new QGroupBox(tabRumorsEvents);
+    groupBoxRumors->setTitle(QApplication::translate("MapOptions", "Rumors", 0, QApplication::UnicodeUTF8));
+
+    groupBoxEvents = new QGroupBox(tabRumorsEvents);
+    groupBoxEvents->setTitle(QApplication::translate("MapOptions", "Events", 0, QApplication::UnicodeUTF8));
+
+    listWidgetRumors = new QListWidget(groupBoxRumors);
+    listWidgetEvents = new QListWidget(groupBoxEvents);
+
+    verticalLayout7 = new QVBoxLayout(groupBoxRumors);
+    verticalLayout7->addWidget(listWidgetRumors);
+
+    verticalLayout8 = new QVBoxLayout(groupBoxEvents);
+    verticalLayout8->addWidget(listWidgetEvents);
+
+    horizontalLayout6 = new QHBoxLayout(tabRumorsEvents);
+    horizontalLayout6->addWidget(groupBoxRumors);
+    horizontalLayout6->addWidget(groupBoxEvents);
+
+    /* end */
+    tabWidget = new QTabWidget(this);
+    tabWidget->addTab(tabInfo, QApplication::translate("MapOptions", "General Info", 0, QApplication::UnicodeUTF8));
+    tabWidget->addTab(tabConditions, QApplication::translate("MapOptions", "Wins/Loss Condition", 0, QApplication::UnicodeUTF8));
+    tabWidget->addTab(tabRumorsEvents, QApplication::translate("MapOptions", "Rumors and Events", 0, QApplication::UnicodeUTF8));
+
+    pushButtonOk = new QPushButton(this);
+    pushButtonOk->setText(QApplication::translate("MapOptions", "Save", 0, QApplication::UnicodeUTF8));
+
+    pushButtonCancel = new QPushButton(this);
+    pushButtonCancel->setText(QApplication::translate("MapOptions", "Cancel", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutButton = new QHBoxLayout();
+    horizontalLayoutButton->addWidget(pushButtonOk);
+    horizontalSpacerButton = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    horizontalLayoutButton->addItem(horizontalSpacerButton);
+    horizontalLayoutButton->addWidget(pushButtonCancel);
+
+    verticalLayout2 = new QVBoxLayout(this);
+    verticalLayout2->addWidget(tabWidget);
+    verticalLayout2->addLayout(horizontalLayoutButton);
+
+    QSize minSize = minimumSizeHint();
+
+    resize(minSize);
+    setMinimumSize(minSize);
+
+    QObject::connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
+    QObject::connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(clickSave()));
+}
+
+void Form::MapOptions::clickSave(void)
+{
+    accept();
 }

@@ -42,6 +42,7 @@ class QPlainTextEdit;
 class QGroupBox;
 class QSpacerItem;
 class QTabWidget;
+class QCheckBox;
 class QListWidget;
 class QListWidgetItem;
 class QDomElement;
@@ -118,34 +119,6 @@ namespace Form
 	QString			result;
     };
 
-    class MapOptions : public QDialog
-    {
-	Q_OBJECT
-
-    public:
-	MapOptions(MapData &);
-
-	QVBoxLayout*		verticalLayout2;
-	QTabWidget*		tabWidget;
-	QWidget*		tabInfo;
-	QVBoxLayout*		verticalLayout;
-	QLabel*			labelName;
-	QLineEdit*		lineEditName;
-	QLabel*			labelDifficulty;
-	QComboBox*		comboBoxDifficulty;
-	QLabel*			labelDescription;
-	QPlainTextEdit*		plainTextEditDescription;
-	QWidget*		tabCondition;
-	QGroupBox*		groupBoxWinsCond;
-	QComboBox*		comboBoxWinsCond;
-        QGroupBox*		groupBox;
-	QComboBox*		comboBoxLossCond;
-	QHBoxLayout*		horizontalLayout;
-	QPushButton*		pushButtonOk;
-	QSpacerItem*		horizontalSpacer;
-	QPushButton*		pushButtonCancel;
-    };
-
     class SelectImage : public QDialog
     {
         Q_OBJECT
@@ -181,6 +154,65 @@ namespace Form
 	QListWidget*        	listWidget;
 
 	bool 			isSelected(void) const;
+    };
+
+    class MapOptions : public QDialog
+    {
+	Q_OBJECT
+
+    public:
+	MapOptions(const MapData &);
+
+	QVBoxLayout*		verticalLayout2;
+	QTabWidget*		tabWidget;
+	QWidget*		tabInfo;
+	QVBoxLayout*		verticalLayout;
+	QLabel*			labelName;
+	QLineEdit*		lineEditName;
+	QLabel*			labelDifficulty;
+	QComboBox*		comboBoxDifficulty;
+	QLabel*			labelDescription;
+	QPlainTextEdit*		plainTextEditDescription;
+	QWidget*		tabConditions;
+	QVBoxLayout*		verticalLayout6;
+	QGroupBox*		groupBoxWinsCond;
+	QVBoxLayout*		verticalLayout3;
+	QHBoxLayout*		horizontalLayoutVictorySlct;
+	QComboBox*		comboBoxWinsCond;
+	QComboBox*		comboBoxWinsCondExt;
+	QHBoxLayout*		horizontalLayoutVictoryCheck;
+	QCheckBox*		checkBoxAllowNormalVicory;
+	QCheckBox*		checkBoxCompAlsoWins;
+	QGroupBox*		groupBoxLossCond;
+	QVBoxLayout*		verticalLayout4;
+	QHBoxLayout*		horizontalLayoutLossCond;
+	QComboBox*		comboBoxLossCond;
+	QComboBox*		comboBoxLossCondExt;
+	QGroupBox*		groupBoxPlayers;
+	QVBoxLayout*		verticalLayout5;
+	QHBoxLayout*		horizontalLayoutPlayers;
+	QSpacerItem*		horizontalSpacerPlayersLeft;
+	QLabel*			labelPlayer1;
+	QLabel*			labelPlayer2;
+	QLabel*			labelPlayer3;
+	QSpacerItem*		horizontalSpacerPlayersRight;
+	QCheckBox*		checkBoxStartWithHero;
+	QSpacerItem*		verticalSpacerPage2;
+	QWidget*		tabRumorsEvents;
+	QHBoxLayout*		horizontalLayout6;
+	QGroupBox*		groupBoxRumors;
+	QVBoxLayout*		verticalLayout7;
+	QListWidget*		listWidgetRumors;
+	QGroupBox*		groupBoxEvents;
+        QVBoxLayout*		verticalLayout8;
+        QListWidget*		listWidgetEvents;
+        QHBoxLayout*		horizontalLayoutButton;
+	QPushButton*		pushButtonOk;
+        QSpacerItem*		horizontalSpacerButton;
+	QPushButton*		pushButtonCancel;
+
+    protected slots:
+	void			clickSave(void);
     };
 }
 

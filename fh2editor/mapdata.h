@@ -222,6 +222,7 @@ public:
     const QString &	name(void) const;
     const QString &	description(void) const;
     const QSize &	size(void) const;
+    int			difficulty(void) const;
 
     quint32		uniq(void);
 

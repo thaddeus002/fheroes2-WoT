@@ -503,6 +503,11 @@ const QString & MapData::description(void) const
     return mapDescription;
 }
 
+int MapData::difficulty(void) const
+{
+    return mapDifficulty;
+}
+
 const QSize & MapData::size(void) const
 {
     return mapTiles.mapSize();
@@ -750,7 +755,7 @@ void MapData::removeObjectsAction(QAction* act)
 
 void MapData::newMap(const QSize & msz, const QString &)
 {
-    mapDifficulty = 1;
+    mapDifficulty = Difficulty::Normal;
     mapUniq = 1;
 
     mapName = "New Map";
@@ -782,6 +787,14 @@ bool MapData::loadMap(const QString & mapFile)
 
 	mapName = mp2.name;
 	mapDescription = mp2.description;
+
+	switch(mp2.difficulty)
+	{
+	    case 0:	mapDifficulty = Difficulty::Easy; break;
+	    case 2:	mapDifficulty = Difficulty::Tough; break;
+	    case 3:	mapDifficulty = Difficulty::Expert; break;
+	    default:	mapDifficulty = Difficulty::Normal; break;
+	}
 
 	setSceneRect(QRect(QPoint(0, 0),
 		QSize(size().width() * tileSize.width(), size().height() * tileSize.height())));

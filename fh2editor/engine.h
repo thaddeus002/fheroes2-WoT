@@ -61,6 +61,11 @@ namespace SpriteLevel
     int fromString(const QString &);
 }
 
+namespace Difficulty
+{
+    enum { Easy, Normal, Tough, Expert };
+}
+
 struct mp2icn_t
 {
     mp2icn_t(const char*);
