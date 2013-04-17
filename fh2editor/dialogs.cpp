@@ -401,7 +401,7 @@ Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QStrin
 
         for(int pos2 = 0; pos2 < objectsList.size(); ++pos2)
         {
-            CompositeObject obj(icn, objectsList.item(pos2).toElement());
+            CompositeObject obj(icn, objectsList.item(pos2).toElement(), 0);
 
             if(obj.isValid())
 		listWidget->addItem(new SelectImageItem(obj, theme));
@@ -442,6 +442,11 @@ bool Form::SelectImageTab::isSelected(void) const
     return listWidget->selectedItems().size();
 }
 
+namespace Form
+{
+    int SelectImage::lastNumTab = 0;
+};
+
 Form::SelectImage::SelectImage(EditorTheme & theme)
 {
     setWindowTitle(QApplication::translate("SelectImage", "Dialog", 0, QApplication::UnicodeUTF8));
@@ -461,10 +466,10 @@ Form::SelectImage::SelectImage(EditorTheme & theme)
             QString name = groupElem.attribute("name");
 
             if(! name.isEmpty())
-	    {
 		tabWidget->addTab(new SelectImageTab(groupElem, dataFolder, theme), name);
-	    }
 	}
+
+	tabWidget->setCurrentIndex(lastNumTab);
     }
 
     verticalLayout = new QVBoxLayout(this);
@@ -487,7 +492,7 @@ Form::SelectImage::SelectImage(EditorTheme & theme)
     verticalLayout->addLayout(horizontalLayout);
 
     resize(540, 410);
-    tabSwitched(0);
+    tabSwitched(lastNumTab);
 
     QObject::connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabSwitched(int)));
     QObject::connect(pushButtonClose, SIGNAL(clicked()), this, SLOT(reject()));
@@ -507,6 +512,8 @@ void Form::SelectImage::tabSwitched(int num)
 
 	QObject::connect(tab->listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(accept(QListWidgetItem*)));
 	QObject::connect(tab->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
+
+	lastNumTab = num;
     }
 }
 

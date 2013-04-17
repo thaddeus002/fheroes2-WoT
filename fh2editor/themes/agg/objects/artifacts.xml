@@ -7,4 +7,9 @@
     <template section="resource" name="Arcane Necklace of Magic" index="16" />
     <template section="resource" name="Caster's Bracelet of Magic" index="18" />
     <template section="resource" name="Mage's Ring of Power" index="20" />
+    <template section="resource" name="Random Artifact" index="162" />
+    <template section="resource" name="Ultimate Artifact" index="164" />
+    <template section="resource" name="Random Artifact 1" index="166" />
+    <template section="resource" name="Random Artifact 2" index="168" />
+    <template section="resource" name="Random Artifact 3" index="170" />
 </objects>

@@ -41,6 +41,13 @@ MapTileExt::MapTileExt(int lvl, const mp2lev_t & ext)
 {
 }
 
+MapTileExt::MapTileExt(int icn, const CompositeSprite & cs, quint32 uid)
+    : spriteICN(icn), spriteExt(0), spriteIndex(cs.spriteIndex), spriteLevel(0), tmp(0), spriteUID(uid)
+{
+    if(cs.spriteAnimation)
+	spriteExt |= 0x01;
+}
+
 bool MapTileExt::sortLevel1(const MapTileExt* mte1, const MapTileExt* mte2)
 {
     return (mte1->spriteLevel % 4) > (mte2->spriteLevel % 4);
@@ -118,6 +125,8 @@ void MapTileLevels::paint(QPainter & painter, const QPoint & offset, EditorTheme
 		QPair<QPixmap, QPoint> p2 = theme.getImageICN((*it)->icn(), anim);
 		painter.drawPixmap(offset + p2.second, p2.first);
 	    }
+	    else
+		qDebug() << "H2::isAnimationICN:" << "incorrect animation" << "icn:" << (*it)->icn() << "index:" << (*it)->index();
 	}
     }
 }
@@ -154,12 +163,6 @@ MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos, EditorTheme & theme)
     setTileSprite(til.tileSprite, til.tileShape);
     loadSpriteLevel(spritesLevel1, 0, mp2.level1);
     loadSpriteLevel(spritesLevel2, 0, mp2.level2);
-
-//    int l1 = spritesLevel1.isExt();
-//    int l2 = spritesLevel2.isExt();
-//
-//    if(l1 || l2)
-//	qDebug() << mpos << l1 << l2;
 }
 
 MapTile::MapTile(const MapTile & other)
@@ -275,6 +278,14 @@ void MapTile::sortSpritesLevels(void)
     qStableSort(spritesLevel2.begin(), spritesLevel2.end(), MapTileExt::sortLevel2);
 }
 
+void MapTile::addSpriteSection(int icn, const CompositeSprite & cs, quint32 uid)
+{
+    if(cs.spriteLevel == SpriteLevel::Top)
+	spritesLevel2 << new MapTileExt(icn, cs, uid);
+    else
+	spritesLevel1 << new MapTileExt(icn, cs, uid);
+}
+
 MapTiles::MapTiles(const MapTiles & tiles, const QRect & area) : size(area.size())
 {
     for(int yy = area.y(); yy < area.y() + area.height(); ++yy)
@@ -327,6 +338,20 @@ bool MapTiles::importMap(const QSize & sz, const QVector<mp2til_t> & mp2Tiles, c
     }
 
     return true;
+}
+
+const MapTile* MapTiles::mapToTileConst(const QPoint & pos) const
+{
+    for(MapTiles::const_iterator
+	it = begin(); it != end(); ++it)
+	if((*it)->boundingRect().contains(pos)) return *it;
+
+    return NULL;
+}
+
+MapTile* MapTiles::mapToTile(const QPoint & pos)
+{
+    return const_cast<MapTile*>(mapToTileConst(pos));
 }
 
 const MapTile* MapTiles::tileConst(const QPoint & pos) const
@@ -447,6 +472,17 @@ void MapArea::importMP2SphinxRiddles(const QVector<H2::SphinxPos> & sphinxes)
     }
 }
 
+void MapArea::addObject(const QPoint & pos, const CompositeObject & obj, const QSize & tileSize, quint32 uid)
+{
+    for(CompositeObject::const_iterator
+	it = obj.begin(); it != obj.end(); ++it)
+    {
+	QPoint offset((*it).spritePos.x() * tileSize.width() + 1, (*it).spritePos.y() * tileSize.height() + 1);
+	MapTile* tile = tiles.mapToTile(pos + offset);
+	tile->addSpriteSection(obj.icn.second, *it, uid);
+    }
+}
+
 MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), themeContent(parent->mainWindow->aggContent),
     tileOverMouse(NULL), mapArea(), mapTiles(mapArea.tiles), mapObjects(mapArea.objects)
 {
@@ -491,11 +527,9 @@ void MapData::mousePressEvent(QGraphicsSceneMouseEvent* event)
     if(currentObject.isValid())
     {
 	if(event->buttons() & Qt::LeftButton)
-	{
-	    qDebug() << "place:" << currentObject.name;
-	}
-
-	currentObject.reset();
+	    mapArea.addObject(currentObject.scenePos, currentObject, themeContent.tileSize(), uniq());
+	else
+	    currentObject.reset();
 	update(currentObject.area());
     }
 

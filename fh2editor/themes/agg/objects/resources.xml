@@ -7,4 +7,7 @@
     <template section="resource" name="Crystal" index="8" />
     <template section="resource" name="Gems" index="10" />
     <template section="resource" name="Gold" index="12" />
+    <template section="resource" name="XYZ" index="14" />
+    <template section="resource" name="Random" index="16" />
+    <template section="resource" name="Treasure" index="18" />
 </objects>

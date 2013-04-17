@@ -161,6 +161,7 @@ namespace Form
         QPushButton*		pushButtonClose;
 
 	CompositeObject		result;
+	static int		lastNumTab;
 
     protected slots:
 	void			tabSwitched(int);

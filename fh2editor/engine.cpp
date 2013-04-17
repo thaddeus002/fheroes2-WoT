@@ -32,6 +32,11 @@
 #include "engine.h"
 #include "mapdata.h"
 
+inline bool IS_EQUAL_VALS(int A, int B)
+{
+    return (A & B) == A;
+}
+
 QString readStringFromStream(QDataStream & ds, int count = 0)
 {
     QString str;
@@ -653,7 +658,7 @@ QPair<QPixmap, QPoint> AGG::Spool::getImageICN(const QString & icn, int index)
 
 QPixmap AGG::Spool::getImage(const CompositeObject & obj, const QSize & tileSize)
 {
-    const QString key = obj.icn + obj.name;
+    const QString key = obj.icn.first + obj.name;
     QPixmap result = NULL;
 
     if(! QPixmapCache::find(key, & result))
@@ -668,13 +673,14 @@ QPixmap AGG::Spool::getImage(const CompositeObject & obj, const QSize & tileSize
 	for(QVector<CompositeSprite>::const_iterator
 	    it = obj.begin(); it != obj.end(); ++it)
 	{
-	    QPair<QPixmap, QPoint> sprite = getImageICN(obj.icn, (*it).spriteIndex);
-	    paint.drawPixmap((*it).spritePos.x() * tileSize.width() + sprite.second.x(), (*it).spritePos.y() * tileSize.height() + sprite.second.y(), sprite.first);
+	    QPoint offset((*it).spritePos.x() * tileSize.width(), (*it).spritePos.y() * tileSize.height());
+	    QPair<QPixmap, QPoint> sprite = getImageICN(obj.icn.first, (*it).spriteIndex);
+	    paint.drawPixmap(offset + sprite.second, sprite.first);
 
 	    if((*it).spriteAnimation)
 	    {
-		sprite = getImageICN(obj.icn, (*it).spriteIndex + 1);
-		paint.drawPixmap((*it).spritePos.x() * tileSize.width() + sprite.second.x(), (*it).spritePos.y() * tileSize.height() + sprite.second.y(), sprite.first);
+		sprite = getImageICN(obj.icn.first, (*it).spriteIndex + 1);
+		paint.drawPixmap(offset + sprite.second, sprite.first);
 	    }
 	}
 
@@ -695,7 +701,7 @@ quint32 Editor::Rand(quint32 max)
     return static_cast<quint32>((max + 1) * (qrand() / (RAND_MAX + 1.0)));
 }
 
-QPixmap Editor::pixmapBorder(const QSize & size, const QColor & color, int offset)
+QPixmap Editor::pixmapBorder(const QSize & size, const QColor & color)
 {
     QPixmap result(size);
     result.fill(Qt::transparent);
@@ -703,7 +709,82 @@ QPixmap Editor::pixmapBorder(const QSize & size, const QColor & color, int offse
     QPainter paint(& result);
     paint.setPen(QPen(color, 1));
     paint.setBrush(QBrush(QColor(0, 0, 0, 0)));
-    paint.drawRect(offset, offset, size.width() - 2 * offset - 1, size.height() - 2 * offset - 1);
+    paint.drawRect(0, 0, size.width() - 1, size.height() - 1);
+
+    return result;
+}
+
+QPixmap Editor::pixmapBorderPassable(const QSize & size, int passable)
+{
+    QColor redColor(255, 0, 0);
+    QColor greenColor(0, 255, 0);
+
+    if(Direction::Unknown == passable || Direction::Center == passable)
+	return pixmapBorder(size, redColor);
+    else
+    if(IS_EQUAL_VALS(Direction::All, passable))
+	return pixmapBorder(size, greenColor);
+
+    QPixmap result(size);
+    result.fill(Qt::transparent);
+
+    int cw = (size.width() - 3) / 3;
+    int ch = (size.height() - 3) / 3;
+
+    QPainter paint(& result);
+    paint.setBrush(QBrush(QColor(0, 0, 0, 0)));
+
+    for(int xx = 1; xx < size.width() - 2; ++xx)
+    {
+	if(xx < cw)
+	{
+	    paint.setPen(QPen((passable & Direction::TopLeft ? greenColor : redColor), 1));
+	    paint.drawPoint(xx, 1);
+	    paint.setPen(QPen((passable & Direction::BottomLeft ? greenColor : redColor), 1));
+	    paint.drawPoint(xx, size.height() - 2);
+	}
+	else
+	if(xx < 2 * cw)
+	{
+	    paint.setPen(QPen((passable & Direction::Top ? greenColor : redColor), 1));
+	    paint.drawPoint(xx, 1);
+	    paint.setPen(QPen((passable & Direction::Bottom ? greenColor : redColor), 1));
+	    paint.drawPoint(xx, size.height() - 2);
+	}
+	else
+	{
+	    paint.setPen(QPen((passable & Direction::TopRight ? greenColor : redColor), 1));
+	    paint.drawPoint(xx, 1);
+	    paint.setPen(QPen((passable & Direction::BottomRight ? greenColor : redColor), 1));
+	    paint.drawPoint(xx, size.height() - 2);
+	}
+    }
+
+    for(int yy = 1; yy < size.height() - 2; ++yy)
+    {
+	if(yy < ch)
+	{
+	    paint.setPen(QPen((passable & Direction::TopLeft ? greenColor : redColor), 1));
+	    paint.drawPoint(1, yy);
+	    paint.setPen(QPen((passable & Direction::TopRight ? greenColor : redColor), 1));
+	    paint.drawPoint(size.width() - 2, yy);
+	}
+	else
+	if(yy < 2 * ch)
+	{
+	    paint.setPen(QPen((passable & Direction::Left ? greenColor : redColor), 1));
+	    paint.drawPoint(1, yy);
+	    paint.setPen(QPen((passable & Direction::Right ? greenColor : redColor), 1));
+	    paint.drawPoint(size.width() - 2, yy);
+	}
+	else
+	{
+	    paint.setPen(QPen((passable & Direction::BottomLeft ? greenColor : redColor), 1));
+	    paint.drawPoint(1, yy);
+	    paint.setPen(QPen((passable & Direction::BottomRight ? greenColor : redColor), 1));
+	    paint.drawPoint(size.width() - 2, yy);
+	}
+    }
 
     return result;
 }
@@ -881,10 +962,21 @@ QString H2::icnString(int type)
 	case ICN::X_LOC2: return "X_LOC2.ICN";
 	case ICN::X_LOC3: return "X_LOC3.ICN";
 	// unknown
-	default: qWarning() << "H2::icnString: return NULL, object:" << type; break;
+	default: break;
     }
 
     return NULL;
+}
+
+int H2::mapICN(const QString & str)
+{
+    for(int ii = 0; ii < 0xFF; ++ii)
+    {
+	QString icn = H2::icnString(ii);
+	if(! icn.isNull() && str == icn) return ii;
+    }
+
+    return ICN::UNKNOWN;
 }
 
 int H2::isAnimationICN(int spriteClass, int spriteIndex, int ticket)
@@ -1386,11 +1478,6 @@ int AroundGrounds::directionsAroundGround(int ground) const
     return res;
 }
 
-inline bool IS_EQUAL_VALS(int A, int B)
-{
-    return (A & B) == A;
-}
-
 /* return pair, first: index tile, second: shape - 0: none, 1: vert, 2: horz, 3: both */
 QPair<int, int> EditorTheme::groundBoundariesFix(const MapTile & tile, const MapTiles & tiles) const
 {
@@ -1629,7 +1716,7 @@ int SpriteLevel::fromString(const QString & level)
 	return Action;
     else
     if(level == "shadow")
-	return Shadow;
+	return Top;
     else
     if(level == "top")
 	return Top;
@@ -1644,25 +1731,31 @@ CompositeSprite::CompositeSprite(const QDomElement & elem, int templateIndex)
     spritePos.setX(elem.attribute("px").toInt());
     spritePos.setY(elem.attribute("py").toInt());
 
-    if(0 <= templateIndex)
+    if(templateIndex)
 	spriteIndex += templateIndex;
 
     spriteLevel = SpriteLevel::fromString(elem.attribute("level").toLower());
 
     if(elem.hasAttribute("passable"))
-	spritePassable = elem.attribute("passable").toInt();
+    {
+	bool ok;
+	spritePassable = elem.attribute("passable").toInt(&ok, 16);
+	if(! ok)
+	spritePassable = elem.attribute("passable").toInt(&ok, 10);
+    }
 
     if(elem.hasAttribute("animation"))
 	spriteAnimation = elem.attribute("animation").toInt();
 }
 
 CompositeObject::CompositeObject(const QString & obj, const QDomElement & elem, int templateIndex)
-    : name(elem.attribute("name")), size(elem.attribute("width").toInt(), elem.attribute("height").toInt()), icn(obj.toUpper())
+    : name(elem.attribute("name")), size(elem.attribute("width").toInt(), elem.attribute("height").toInt())
 {
-    if(0 > icn.lastIndexOf(".ICN")) icn.append(".ICN");
+    QString icnStr = obj.toUpper();
+    if(0 > icnStr.lastIndexOf(".ICN")) icnStr.append(".ICN");
+    icn = qMakePair(icnStr, H2::mapICN(icnStr));
 
     QDomNodeList list = elem.elementsByTagName("sprite");
-
     for(int pos = 0; pos < list.size(); ++pos)
 	push_back(CompositeSprite(list.item(pos).toElement(), templateIndex));
 }
@@ -1677,8 +1770,8 @@ CompositeObjectCursor::CompositeObjectCursor(const CompositeObject & obj, Editor
     const QSize areaSize(theme.tileSize().width() * size.width(), theme.tileSize().height() * size.height());
 
     objectArea = theme.getImage(obj);
-    borderRed = Editor::pixmapBorder(areaSize, QColor(255, 0, 0), 0);
-    borderGreen = Editor::pixmapBorder(areaSize, QColor(0, 255, 0), 0);
+    //borderRed = Editor::pixmapBorder(areaSize, QColor(255, 0, 0));
+    //borderGreen = Editor::pixmapBorder(areaSize, QColor(0, 255, 0));
 
     centerOffset = QPoint(areaSize.width() - theme.tileSize().width(),
 				areaSize.height() - theme.tileSize().height());
@@ -1687,15 +1780,8 @@ CompositeObjectCursor::CompositeObjectCursor(const CompositeObject & obj, Editor
     passableMap = QPixmap(areaSize);
     passableMap.fill(Qt::transparent);
 
-    QPixmap tileR = Editor::pixmapBorder(theme.tileSize(), QColor(255, 0, 0), 1);
-    QPixmap tileG = Editor::pixmapBorder(theme.tileSize(), QColor(0, 255, 0), 1);
-    QPixmap tileY = Editor::pixmapBorder(theme.tileSize(), QColor(255, 255, 0), 1);
-
+    QPixmap yellowBound = Editor::pixmapBorder(theme.tileSize() - QSize(2, 2), QColor(255, 255, 0));
     QPainter paint(& passableMap);
-
-    for(int yy = 0; yy < size.height(); ++yy)
-	for(int xx = 0; xx < size.width(); ++xx)
-	    paint.drawPixmap(xx * theme.tileSize().width(), yy * theme.tileSize().height(), tileG);
 
     for(CompositeObject::const_iterator
 	it = begin(); it != end(); ++it)
@@ -1703,27 +1789,24 @@ CompositeObjectCursor::CompositeObjectCursor(const CompositeObject & obj, Editor
 	const QPoint offset((*it).spritePos.x() * theme.tileSize().width(),
 				(*it).spritePos.y() * theme.tileSize().height());
 
+	QPixmap tileP = Editor::pixmapBorderPassable(theme.tileSize() - QSize(2, 2), (*it).spritePassable);
+
 	switch((*it).spriteLevel)
 	{
 	    case SpriteLevel::Bottom:
-		paint.drawPixmap(offset, tileR);
+		paint.drawPixmap(offset + QPoint(1, 1), tileP);
 		break;
 
 	    case SpriteLevel::Action:
-		paint.drawPixmap(offset, tileR);
+		paint.drawPixmap(offset + QPoint(1, 1), tileP);
 		centerOffset = offset;
 		break;
 
-// int spritePassable
-
-	    case SpriteLevel::Shadow:
 	    case SpriteLevel::Top:
-		paint.drawPixmap(offset, tileY);
+		paint.drawPixmap(offset + QPoint(1, 1), yellowBound);
 		break;
 
-	    default:
-		paint.drawPixmap(offset, tileG);
-		break;
+	    default: break;
 	}
     }
 }
@@ -1734,7 +1817,7 @@ void CompositeObjectCursor::paint(QPainter & painter, const QPoint & pos, bool a
 
     painter.drawPixmap(pos, objectArea);
     painter.drawPixmap(pos, passableMap);
-    painter.drawPixmap(pos, (allow ? borderGreen : borderRed));
+    //painter.drawPixmap(pos, (allow ? borderGreen : borderRed));
 }
 
 QRect CompositeObjectCursor::area(void) const

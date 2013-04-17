@@ -56,7 +56,7 @@ namespace ICN
 
 namespace SpriteLevel
 {
-    enum { Uknown, Bottom, Action, Shadow, Top };
+    enum { Uknown, Bottom, Action, Top };
 
     int fromString(const QString &);
 }
@@ -230,10 +230,10 @@ struct CompositeObject : public QVector<CompositeSprite>
 {
     QString	name;
     QSize	size;
-    QString	icn;
+    QPair<QString, int> icn;
 
     CompositeObject(){}
-    CompositeObject(const QString &, const QDomElement &, int = -1);
+    CompositeObject(const QString &, const QDomElement &, int);
 
     bool	isValid(void) const;
 };
@@ -245,7 +245,8 @@ namespace Editor
 {
     quint32 Rand(quint32 max);
     quint32 Rand(quint32 min, quint32 max);
-    QPixmap pixmapBorder(const QSize &, const QColor &, int offset = 0);
+    QPixmap pixmapBorder(const QSize &, const QColor &);
+    QPixmap pixmapBorderPassable(const QSize &, int passable);
 
     class MyXML : public QDomElement
     {
@@ -281,7 +282,9 @@ namespace H2
 	void DrawVariant2(const quint8*, const quint8*, const QVector<QRgb> &);
     };
 
+    int          mapICN(const QString &);
     int          mapICN(int);
+
     QString      icnString(int);
     int          isAnimationICN(int, int, int);
 
@@ -503,8 +506,6 @@ struct CompositeObjectCursor : public CompositeObject
     QPoint		centerOffset;
     QPixmap		objectArea;
     QPixmap		passableMap;
-    QPixmap		borderRed;
-    QPixmap		borderGreen;
     bool		valid;
 
     CompositeObjectCursor() : valid(false) {}

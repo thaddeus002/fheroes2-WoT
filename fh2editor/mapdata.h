@@ -91,6 +91,7 @@ class MapTileExt
 
 public:
     MapTileExt(int lv, const mp2lev_t &);
+    MapTileExt(int, const CompositeSprite &, quint32);
 
     static bool		sortLevel1(const MapTileExt*, const MapTileExt*);
     static bool		sortLevel2(const MapTileExt*, const MapTileExt*);
@@ -140,6 +141,7 @@ public:
     void		loadSpriteLevels(const mp2ext_t &);
     void		sortSpritesLevels(void);
     void		setTileSprite(int, int);
+    void		addSpriteSection(int, const CompositeSprite &, quint32);
 
     const MapTileLevels & levels1(void) const { return spritesLevel1; }
     const MapTileLevels & levels2(void) const { return spritesLevel2; }
@@ -175,6 +177,8 @@ public:
 
     const MapTile*	tileConst(const QPoint &) const;
     MapTile*		tile(const QPoint &);
+    const MapTile*	mapToTileConst(const QPoint &) const;
+    MapTile*		mapToTile(const QPoint &);
 
     const MapTile*	tileFromDirectionConst(const MapTile*, int direct) const;
     MapTile*		tileFromDirection(const MapTile*, int direct);
@@ -198,6 +202,8 @@ public:
     void		importMP2Signs(const QVector<H2::SignPos> &);
     void		importMP2MapEvents(const QVector<H2::EventPos> &);
     void		importMP2SphinxRiddles(const QVector<H2::SphinxPos> &);
+
+    void		addObject(const QPoint &, const CompositeObject &, const QSize &, quint32);
 };
 
 class MapSelectedArea : public MapArea
