@@ -363,5 +363,5 @@ void MainWindow::setActiveSubWindow(QWidget* window)
 void MainWindow::mapOptions(void)
 {
     if(activeMapWindow())
-	Dialog::MapOptions(activeMapWindow()->mapData);
+	activeMapWindow()->mapData.showMapOptions();
 }

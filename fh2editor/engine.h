@@ -32,6 +32,7 @@
 #include <QVector>
 #include <QMap>
 #include <QDomElement>
+#include <QVariant>
 #include <QMenu>
 
 namespace Ground
@@ -64,13 +65,6 @@ namespace SpriteLevel
 namespace Difficulty
 {
     enum { Easy, Normal, Tough, Expert };
-}
-
-namespace Conditions
-{
-    enum { Default = 0,
-	    Wins = 0x100, CaptureTown = 0x101, DefeatHero = 0x102, FindArtifact = 0x103, SideWins = 0x104, AccumulateGold = 0x105,
-	    Loss = 0x200, LoseTown = 0x201, LoseHero = 0x202, OutTime = 0x203 };
 }
 
 struct mp2icn_t
@@ -528,6 +522,45 @@ struct CompositeObjectCursor : public CompositeObject
     void		paint(QPainter &, const QPoint &, bool allow);
     QRect		area(void) const;
     QPoint		center(void) const;
+};
+
+namespace Conditions
+{
+    enum { Wins = 0x1000, CaptureTown = 0x1001, DefeatHero = 0x1002, FindArtifact = 0x1003, SideWins = 0x1004, AccumulateGold = 0x1005,
+	    CompAlsoWins = 0x0100, AllowNormalVictory = 0x0200,
+	    Loss = 0x2000, LoseTown = 0x2001, LoseHero = 0x2002, OutTime = 0x2003 };
+}
+
+struct GameCondition : public QPair<int, QVariant>
+{
+    GameCondition(int cond, const QVariant & val = QVariant()) : QPair<int, QVariant>(cond, val) {}
+
+    void		set(int cond, const QVariant & val = QVariant()) { first = cond; second = val; }
+    int			index(void) const { return 0x000000FF & first; }
+    const QVariant &	variant(void) const { return second; }
+};
+
+struct CondWins : public GameCondition
+{
+    CondWins() : GameCondition(Conditions::Wins){}
+
+    bool		allowNormalVictory(void) const { return Conditions::AllowNormalVictory & first; }
+    bool		compAlsoWins(void) const { return Conditions::CompAlsoWins & first; }
+    int			condition(void) const { return Conditions::Wins | index(); }
+
+    void		setAllowNormalVictory(bool f) { if(f) first |= Conditions::AllowNormalVictory; else first &= ~Conditions::AllowNormalVictory; }
+    void		setCompAlsoWins(bool f) { if(f) first |= Conditions::CompAlsoWins; else first &= ~Conditions::CompAlsoWins; }
+};
+
+struct CondLoss : public GameCondition
+{
+    CondLoss() : GameCondition(Conditions::Loss){}
+
+    int			condition(void) const { return Conditions::Loss | index(); }
+};
+
+struct ListStringPos : public QList< QPair<QString, QPoint> >
+{
 };
 
 #endif

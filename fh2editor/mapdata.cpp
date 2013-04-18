@@ -485,13 +485,8 @@ void MapArea::addObject(const QPoint & pos, const CompositeObject & obj, const Q
 
 MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), themeContent(parent->mainWindow->aggContent),
     tileOverMouse(NULL), mapName("New Map"), mapAuthors("unknown"), mapLicense("unknown"), mapDifficulty(Difficulty::Normal),
-        mapUniq(1), mapStartWithHero(false), mapConditionWins(Conditions::Wins), mapConditionLoss(Conditions::Loss), mapCompAlsoWins(false),
-    mapAllowNormalVictory(false), mapArea(), mapTiles(mapArea.tiles), mapObjects(mapArea.objects)
+    mapUniq(1), mapStartWithHero(false), mapArea(), mapTiles(mapArea.tiles), mapObjects(mapArea.objects)
 {
-    mapConditionData[0] = 0;
-    mapConditionData[1] = 0;
-    mapConditionData[2] = 0;
-    mapConditionData[3] = 0;
 }
 
 EditorTheme & MapData::theme(void)
@@ -519,54 +514,54 @@ bool MapData::startWithHero(void) const
     return mapStartWithHero;
 }
 
-int MapData::conditionWins(void) const
+const CondWins & MapData::conditionWins(void) const
 {
     return mapConditionWins;
 }
 
-int MapData::conditionWinsSideWins(void) const
-{
-    return mapConditionData[0];
-}
-
-int MapData::conditionWinsFindArtifact(void) const
-{
-    return mapConditionData[0];
-}
-
-int MapData::conditionWinsAccumulateGolds(void) const
-{
-    return 1000 * mapConditionData[0];
-}
-
-QPoint MapData::conditionWinsObjectPos(void) const
-{
-    return QPoint(mapConditionData[0], mapConditionData[1]);
-}
-
-bool MapData::conditionWinsCompAlsoWins(void) const
-{
-    return mapCompAlsoWins;
-}
-
-bool MapData::conditionWinsAllowNormalVictory(void) const
-{
-    return mapAllowNormalVictory;
-}
-
-int MapData::conditionLoss(void) const
+const CondLoss & MapData::conditionLoss(void) const
 {
     return mapConditionLoss;
 }
 
-QPoint MapData::conditionLossObjectPos(void) const
+ListStringPos MapData::conditionHeroList(int cond) const
 {
-    return QPoint(mapConditionData[2], mapConditionData[3]);
+    ListStringPos res;
+
+    if(Conditions::Wins & cond)
+	res << QPair<QString, QPoint>("Test 1", QPoint(22,33)) << QPair<QString, QPoint>("Hero 2", QPoint(11,67));
+    else
+    if(Conditions::Loss & cond)
+	res << QPair<QString, QPoint>("Test 1", QPoint(22,33)) << QPair<QString, QPoint>("Hero 2", QPoint(11,67));
+
+    return res;
 }
 
-int MapData::conditionLossCountDays(void) const
+ListStringPos MapData::conditionTownList(int cond) const
 {
-    return mapConditionData[2];
+    ListStringPos res;
+
+    if(Conditions::Wins & cond)
+	res << QPair<QString, QPoint>("Test 1", QPoint(62,83)) << QPair<QString, QPoint>("Town 2", QPoint(81,27));
+    else
+    if(Conditions::Loss & cond)
+	res << QPair<QString, QPoint>("Test 1", QPoint(62,83)) << QPair<QString, QPoint>("Town 2", QPoint(81,27));
+
+    return res;
+}
+
+ListStringPos MapData::conditionArtifactList(void) const
+{
+    ListStringPos res;
+
+    res << QPair<QString, QPoint>("Test 1", QPoint(62,83)) << QPair<QString, QPoint>("Artifact 2", QPoint(81,27));
+
+    return res;
+}
+
+QList<QString> MapData::conditionSideList(void) const
+{
+    return QList<QString>() << "Left vs Right" << "Right vs Left";
 }
 
 const QSize & MapData::size(void) const
@@ -771,9 +766,10 @@ void MapData::fillGroundAction(QAction* act)
 	// fixed border
 	QSize tileSize = themeContent.tileSize();
         QRectF rectArea = selectionArea().boundingRect();
+	QPoint tile2(tileSize.width() / 2, tileSize.height() / 2);
 
-	rectArea.setTopLeft(rectArea.topLeft() - QPoint(tileSize.width() / 2, tileSize.height() / 2));
-	rectArea.setBottomRight(rectArea.bottomRight() + QPoint(tileSize.width() / 2, tileSize.height() / 2));
+	rectArea.setTopLeft(rectArea.topLeft() - tile2);
+	rectArea.setBottomRight(rectArea.bottomRight() + tile2);
 
 	QList<QGraphicsItem*> listItems = items(rectArea);
 
@@ -853,29 +849,27 @@ bool MapData::loadMap(const QString & mapFile)
 
 	switch(mp2.conditionWins)
 	{
-	    case 1:	mapConditionWins = Conditions::CaptureTown; break;
-	    case 2:	mapConditionWins = Conditions::DefeatHero; break;
-	    case 3:	mapConditionWins = Conditions::FindArtifact; break;
-	    case 4:	mapConditionWins = Conditions::SideWins; break;
-	    case 5:	mapConditionWins = Conditions::AccumulateGold; break;
-	    default:	mapConditionWins = Conditions::Wins; break;
+	    case 1:	mapConditionWins.set(Conditions::CaptureTown, QPoint(mp2.conditionWinsData3, mp2.conditionWinsData4)); break;
+	    case 2:	mapConditionWins.set(Conditions::DefeatHero, QPoint(mp2.conditionWinsData3, mp2.conditionWinsData4)); break;
+	    case 3:	mapConditionWins.set(Conditions::FindArtifact, static_cast<int>(mp2.conditionWinsData3)); break;
+	    case 4:	mapConditionWins.set(Conditions::SideWins, static_cast<int>(mp2.conditionWinsData3)); break;
+	    case 5:	mapConditionWins.set(Conditions::AccumulateGold, 1000 * static_cast<int>(mp2.conditionWinsData3)); break;
+	    default:	mapConditionWins.set(Conditions::Wins); break;
 	}
 
-	mapCompAlsoWins = mp2.conditionWinsData1;
-	mapAllowNormalVictory = mp2.conditionWinsData2;
+	if(mp2.conditionWinsData1)
+	    mapConditionWins.first |= Conditions::CompAlsoWins;
+
+	if(mp2.conditionWinsData2)
+	    mapConditionWins.first |= Conditions::AllowNormalVictory;
 
 	switch(mp2.conditionLoss)
 	{
-	    case 1:	mapConditionLoss = Conditions::LoseTown; break;
-	    case 2:	mapConditionLoss = Conditions::LoseHero; break;
-	    case 3:	mapConditionLoss = Conditions::OutTime; break;
-	    default:	mapConditionLoss = Conditions::Loss; break;
+	    case 1:	mapConditionLoss.set(Conditions::LoseTown, QPoint(mp2.conditionLossData1, mp2.conditionLossData2)); break;
+	    case 2:	mapConditionLoss.set(Conditions::LoseHero, QPoint(mp2.conditionLossData1, mp2.conditionLossData2)); break;
+	    case 3:	mapConditionLoss.set(Conditions::OutTime, static_cast<int>(mp2.conditionLossData1)); break;
+	    default:	mapConditionLoss.set(Conditions::Loss); break;
 	}
-
-	mapConditionData[0] = mp2.conditionWinsData3;
-	mapConditionData[1] = mp2.conditionWinsData4;
-	mapConditionData[2] = mp2.conditionLossData1;
-	mapConditionData[3] = mp2.conditionLossData2;
 
 	mapUniq = mp2.uniq + 1;
 
@@ -1223,5 +1217,24 @@ void MapData::selectObjectImage(void)
     {
         currentObject = CompositeObjectCursor(form.result, themeContent);
 	update();
+    }
+}
+void MapData::showMapOptions(void)
+{
+    Form::MapOptions form(*this);
+
+    if(QDialog::Accepted == form.exec())
+    {
+	// tab1
+	mapName = form.lineEditName->text();
+	mapDescription = form.plainTextEditDescription->toPlainText();
+	mapDifficulty = qvariant_cast<int>(comboBoxCurrentData(form.comboBoxDifficulty));
+
+	// tab2
+	mapConditionWins.set(qvariant_cast<int>(comboBoxCurrentData(form.comboBoxWinsCond)), comboBoxCurrentData(form.comboBoxWinsCondExt));
+	mapConditionWins.setAllowNormalVictory(form.checkBoxAllowNormalVictory->isChecked());
+	mapConditionWins.setCompAlsoWins(form.checkBoxCompAlsoWins->isChecked());
+	mapConditionLoss.set(qvariant_cast<int>(comboBoxCurrentData(form.comboBoxLossCond)), comboBoxCurrentData(form.comboBoxLossCondExt));
+	mapStartWithHero = form.checkBoxStartWithHero->isChecked();
     }
 }

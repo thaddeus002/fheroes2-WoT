@@ -26,6 +26,8 @@
 #include <QDialog>
 #include <QSize>
 #include <QPair>
+#include <QVariant>
+#include <QListWidget>
 #include "engine.h"
 
 QT_BEGIN_NAMESPACE
@@ -53,15 +55,7 @@ class MapData;
 class EditorTheme;
 class CompositeObject;
 
-namespace Dialog
-{
-    void	MapOptions(MapData &);
-}
-
-struct ListStringPos : public QList< QPair<QString, QPoint> >
-{
-    void fillComboBox(QComboBox &) const;
-};
+QVariant comboBoxCurrentData(const QComboBox*);
 
 namespace Form
 {
@@ -162,6 +156,49 @@ namespace Form
 	bool 			isSelected(void) const;
     };
 
+    class ItemsList : public QListWidget
+    {
+        Q_OBJECT
+
+    public:
+	QAction*		addItemAct;
+	QAction*		editItemAct;
+	QAction*		delItemAct;
+
+	ItemsList(QWidget*);
+
+    protected slots:
+	virtual void		addItem(void) = 0;
+	virtual void		editItem(QListWidgetItem*) = 0;
+	void			editCurrentItem(void);
+	void			deleteCurrentItem(void);
+
+    protected:
+	void			mousePressEvent(QMouseEvent*);
+    };
+
+    class RumorsList : public ItemsList
+    {
+	Q_OBJECT
+
+    public:
+	RumorsList(QWidget*);
+
+	void			addItem(void);
+	void			editItem(QListWidgetItem*);
+    };
+
+    class EventsList : public ItemsList
+    {
+	Q_OBJECT
+
+    public:
+	EventsList(QWidget*);
+
+	void			addItem(void);
+	void			editItem(QListWidgetItem*);
+    };
+
     class MapOptions : public QDialog
     {
 	Q_OBJECT
@@ -187,7 +224,7 @@ namespace Form
 	QComboBox*		comboBoxWinsCond;
 	QComboBox*		comboBoxWinsCondExt;
 	QHBoxLayout*		horizontalLayoutVictoryCheck;
-	QCheckBox*		checkBoxAllowNormalVicory;
+	QCheckBox*		checkBoxAllowNormalVictory;
 	QCheckBox*		checkBoxCompAlsoWins;
 	QGroupBox*		groupBoxLossCond;
 	QVBoxLayout*		verticalLayout4;
@@ -208,10 +245,10 @@ namespace Form
 	QHBoxLayout*		horizontalLayout6;
 	QGroupBox*		groupBoxRumors;
 	QVBoxLayout*		verticalLayout7;
-	QListWidget*		listWidgetRumors;
+	RumorsList*		listWidgetRumors;
 	QGroupBox*		groupBoxEvents;
         QVBoxLayout*		verticalLayout8;
-        QListWidget*		listWidgetEvents;
+        EventsList*		listWidgetEvents;
         QHBoxLayout*		horizontalLayoutButton;
 	QPushButton*		pushButtonSave;
         QSpacerItem*		horizontalSpacerButton;

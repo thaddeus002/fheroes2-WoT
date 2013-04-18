@@ -25,6 +25,7 @@
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QMenu>
 #include <QPushButton>
 #include <QSpacerItem>
 #include <QSpinBox>
@@ -42,10 +43,9 @@
 #include "mapdata.h"
 #include "dialogs.h"
 
-void Dialog::MapOptions(MapData & map)
+QVariant comboBoxCurrentData(const QComboBox* box)
 {
-    Form::MapOptions form(map);
-    form.exec();
+    return box->itemData(box->currentIndex());
 }
 
 Form::SelectMapSize::SelectMapSize()
@@ -58,10 +58,10 @@ Form::SelectMapSize::SelectMapSize()
 
     comboBoxSize = new QComboBox(this);
     comboBoxSize->clear();
-    comboBoxSize->addItem(QApplication::translate("SelectMapSize", "Small (36x36)", 0, QApplication::UnicodeUTF8));
-    comboBoxSize->addItem(QApplication::translate("SelectMapSize", "Medium (72x72)", 0, QApplication::UnicodeUTF8));
-    comboBoxSize->addItem(QApplication::translate("SelectMapSize", "Large (108x108)", 0, QApplication::UnicodeUTF8));
-    comboBoxSize->addItem(QApplication::translate("SelectMapSize", "Extra Large (144x144)", 0, QApplication::UnicodeUTF8));
+    comboBoxSize->addItem(QApplication::translate("SelectMapSize", "Small (36x36)", 0, QApplication::UnicodeUTF8), 36);
+    comboBoxSize->addItem(QApplication::translate("SelectMapSize", "Medium (72x72)", 0, QApplication::UnicodeUTF8), 72);
+    comboBoxSize->addItem(QApplication::translate("SelectMapSize", "Large (108x108)", 0, QApplication::UnicodeUTF8), 108);
+    comboBoxSize->addItem(QApplication::translate("SelectMapSize", "Extra Large (144x144)", 0, QApplication::UnicodeUTF8), 144);
     comboBoxSize->setCurrentIndex(1);
     vboxLayout->addWidget(comboBoxSize);
 
@@ -186,14 +186,8 @@ void Form::SelectMapSize::clickOk(void)
 {
     if(comboBoxSize->isVisible())
     {
-	switch(comboBoxSize->currentIndex())
-	{
-	    case 0:	result = QSize(36, 36); break;
-	    case 1:	result = QSize(72, 72); break;
-	    case 2:	result = QSize(108, 108); break;
-	    case 3:	result = QSize(144, 144); break;
-	    default: break;
-	}
+	int size = qvariant_cast<int>(comboBoxCurrentData(comboBoxSize));
+	result = QSize(size, size);
     }
     else
     {
@@ -442,10 +436,11 @@ void Form::SelectImage::accept(QListWidgetItem* item)
     }
 }
 
-void ListStringPos::fillComboBox(QComboBox & box) const
+void fillComboBox(QComboBox & box, const ListStringPos & list)
 {
     box.clear();
-    for(const_iterator it = begin(); it != end(); ++it)
+    for(ListStringPos::const_iterator
+	it = list.begin(); it != list.end(); ++it)
     {
 	QString str; QTextStream ts(&str);
 	ts << "(" << (*it).second.x() << ", " << (*it).second.x() << ")" << " - " << (*it).first;
@@ -473,12 +468,10 @@ Form::MapOptions::MapOptions(const MapData & map)
     labelDifficulty->setText(QApplication::translate("MapOptions", "Map Difficulty:", 0, QApplication::UnicodeUTF8));
 
     comboBoxDifficulty = new QComboBox(tabInfo);
-    comboBoxDifficulty->insertItems(0, QStringList()
-         << QApplication::translate("MapOptions", "Easy", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("MapOptions", "Normal", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("MapOptions", "Tough", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("MapOptions", "Expert", 0, QApplication::UnicodeUTF8)
-    );
+    comboBoxDifficulty->addItem(QApplication::translate("MapOptions", "Easy", 0, QApplication::UnicodeUTF8), Difficulty::Easy);
+    comboBoxDifficulty->addItem(QApplication::translate("MapOptions", "Normal", 0, QApplication::UnicodeUTF8), Difficulty::Normal);
+    comboBoxDifficulty->addItem(QApplication::translate("MapOptions", "Tough", 0, QApplication::UnicodeUTF8), Difficulty::Tough);
+    comboBoxDifficulty->addItem(QApplication::translate("MapOptions", "Expert", 0, QApplication::UnicodeUTF8), Difficulty::Expert);
     comboBoxDifficulty->setCurrentIndex(map.difficulty());
 
     labelDescription = new QLabel(tabInfo);
@@ -502,14 +495,12 @@ Form::MapOptions::MapOptions(const MapData & map)
     groupBoxWinsCond->setTitle(QApplication::translate("MapOptions", "Victory Condition", 0, QApplication::UnicodeUTF8));
 
     comboBoxWinsCond = new QComboBox(groupBoxWinsCond);
-    comboBoxWinsCond->insertItems(0, QStringList()
-         << QApplication::translate("MapOptions", "Default", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("MapOptions", "Capture a particular castle", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("MapOptions", "Defeat a particular hero", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("MapOptions", "Find a particular artifact", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("MapOptions", "One side defeats another", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("MapOptions", "Accumulate gold", 0, QApplication::UnicodeUTF8)
-    );
+    comboBoxWinsCond->addItem(QApplication::translate("MapOptions", "Default", 0, QApplication::UnicodeUTF8), Conditions::Wins);
+    comboBoxWinsCond->addItem(QApplication::translate("MapOptions", "Capture a particular castle", 0, QApplication::UnicodeUTF8), Conditions::CaptureTown);
+    comboBoxWinsCond->addItem(QApplication::translate("MapOptions", "Defeat a particular hero", 0, QApplication::UnicodeUTF8), Conditions::DefeatHero);
+    comboBoxWinsCond->addItem(QApplication::translate("MapOptions", "Find a particular artifact", 0, QApplication::UnicodeUTF8), Conditions::FindArtifact);
+    comboBoxWinsCond->addItem(QApplication::translate("MapOptions", "One side defeats another", 0, QApplication::UnicodeUTF8), Conditions::SideWins);
+    comboBoxWinsCond->addItem(QApplication::translate("MapOptions", "Accumulate gold", 0, QApplication::UnicodeUTF8), Conditions::AccumulateGold);
 
     comboBoxWinsCondExt = new QComboBox(groupBoxWinsCond);
     comboBoxWinsCondExt->setEnabled(false);
@@ -518,16 +509,16 @@ Form::MapOptions::MapOptions(const MapData & map)
     horizontalLayoutVictorySlct->addWidget(comboBoxWinsCond);
     horizontalLayoutVictorySlct->addWidget(comboBoxWinsCondExt);
 
-    checkBoxAllowNormalVicory = new QCheckBox(groupBoxWinsCond);
-    checkBoxAllowNormalVicory->setEnabled(false);
-    checkBoxAllowNormalVicory->setText(QApplication::translate("MapOptions", "Allow normal victory condition", 0, QApplication::UnicodeUTF8));
+    checkBoxAllowNormalVictory = new QCheckBox(groupBoxWinsCond);
+    checkBoxAllowNormalVictory->setEnabled(false);
+    checkBoxAllowNormalVictory->setText(QApplication::translate("MapOptions", "Allow normal victory condition", 0, QApplication::UnicodeUTF8));
 
     checkBoxCompAlsoWins = new QCheckBox(groupBoxWinsCond);
     checkBoxCompAlsoWins->setEnabled(false);
     checkBoxCompAlsoWins->setText(QApplication::translate("MapOptions", "Comp also wins via Special VC", 0, QApplication::UnicodeUTF8));
 
     horizontalLayoutVictoryCheck = new QHBoxLayout();
-    horizontalLayoutVictoryCheck->addWidget(checkBoxAllowNormalVicory);
+    horizontalLayoutVictoryCheck->addWidget(checkBoxAllowNormalVictory);
     horizontalLayoutVictoryCheck->addWidget(checkBoxCompAlsoWins);
 
     verticalLayout3 = new QVBoxLayout(groupBoxWinsCond);
@@ -538,12 +529,10 @@ Form::MapOptions::MapOptions(const MapData & map)
     groupBoxLossCond->setTitle(QApplication::translate("MapOptions", "Loss Condition", 0, QApplication::UnicodeUTF8));
 
     comboBoxLossCond = new QComboBox(groupBoxLossCond);
-    comboBoxLossCond->insertItems(0, QStringList()
-         << QApplication::translate("MapOptions", "Default", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("MapOptions", "Lose a particuclar castle", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("MapOptions", "Lose a particular hero", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("MapOptions", "Run out of time", 0, QApplication::UnicodeUTF8)
-    );
+    comboBoxLossCond->addItem(QApplication::translate("MapOptions", "Default", 0, QApplication::UnicodeUTF8), Conditions::Loss);
+    comboBoxLossCond->addItem(QApplication::translate("MapOptions", "Lose a particuclar castle", 0, QApplication::UnicodeUTF8), Conditions::LoseTown);
+    comboBoxLossCond->addItem(QApplication::translate("MapOptions", "Lose a particular hero", 0, QApplication::UnicodeUTF8), Conditions::LoseHero);
+    comboBoxLossCond->addItem(QApplication::translate("MapOptions", "Run out of time", 0, QApplication::UnicodeUTF8), Conditions::OutTime);
 
     horizontalLayoutLossCond = new QHBoxLayout();
     horizontalLayoutLossCond->addWidget(comboBoxLossCond);
@@ -580,7 +569,7 @@ Form::MapOptions::MapOptions(const MapData & map)
 
     checkBoxStartWithHero = new QCheckBox(groupBoxPlayers);
     checkBoxStartWithHero->setText(QApplication::translate("MapOptions", "Start with hero in each player's main castle", 0, QApplication::UnicodeUTF8));
-    checkBoxStartWithHero->setCheckState(map.startWithHero() ? Qt::Checked : Qt::Unchecked);
+    checkBoxStartWithHero->setChecked(map.startWithHero());
 
     verticalLayout5 = new QVBoxLayout(groupBoxPlayers);
     verticalLayout5->addLayout(horizontalLayoutPlayers);
@@ -601,8 +590,8 @@ Form::MapOptions::MapOptions(const MapData & map)
     groupBoxEvents = new QGroupBox(tabRumorsEvents);
     groupBoxEvents->setTitle(QApplication::translate("MapOptions", "Events", 0, QApplication::UnicodeUTF8));
 
-    listWidgetRumors = new QListWidget(groupBoxRumors);
-    listWidgetEvents = new QListWidget(groupBoxEvents);
+    listWidgetRumors = new RumorsList(groupBoxRumors);
+    listWidgetEvents = new EventsList(groupBoxEvents);
 
     verticalLayout7 = new QVBoxLayout(groupBoxRumors);
     verticalLayout7->addWidget(listWidgetRumors);
@@ -639,12 +628,12 @@ Form::MapOptions::MapOptions(const MapData & map)
     verticalLayout2->addLayout(horizontalLayoutButton);
 
     // contents test
-    winsCondHeroList << QPair<QString, QPoint>("Hero 1", QPoint(22,33)) << QPair<QString, QPoint>("Hero 2", QPoint(11,67));
-    winsCondTownList << QPair<QString, QPoint>("Town 1", QPoint(62,83)) << QPair<QString, QPoint>("Town 2", QPoint(81,27));
-    winsCondArtifactList << QPair<QString, QPoint>("Ultimate Artifact", QPoint(62,83)) << QPair<QString, QPoint>("Artifact 2", QPoint(81,27));
-    winsCondSideList << "Left vs Right" << "Right vs Left";
-    lossCondHeroList << QPair<QString, QPoint>("Hero 1", QPoint(22,33)) << QPair<QString, QPoint>("Hero 2", QPoint(11,67));
-    lossCondTownList << QPair<QString, QPoint>("Town 1", QPoint(62,83)) << QPair<QString, QPoint>("Town 2", QPoint(81,27));
+    winsCondHeroList << map.conditionHeroList(Conditions::Wins);
+    winsCondTownList << map.conditionTownList(Conditions::Wins);
+    winsCondArtifactList << map.conditionArtifactList();
+    winsCondSideList << map.conditionSideList();
+    lossCondHeroList << map.conditionHeroList(Conditions::Loss);
+    lossCondTownList << map.conditionTownList(Conditions::Loss);
 
     setConditionsBoxesMapValues(map);
 
@@ -664,7 +653,7 @@ Form::MapOptions::MapOptions(const MapData & map)
     QObject::connect(comboBoxWinsCondExt, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setEnableSaveButton(const QString &)));
     QObject::connect(comboBoxLossCondExt, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setEnableSaveButton(const QString &)));
 
-    QObject::connect(checkBoxAllowNormalVicory, SIGNAL(clicked()), this, SLOT(setEnableSaveButton()));
+    QObject::connect(checkBoxAllowNormalVictory, SIGNAL(clicked()), this, SLOT(setEnableSaveButton()));
     QObject::connect(checkBoxCompAlsoWins, SIGNAL(clicked()), this, SLOT(setEnableSaveButton()));
     QObject::connect(checkBoxStartWithHero, SIGNAL(clicked()), this, SLOT(setEnableSaveButton()));
 
@@ -674,37 +663,40 @@ Form::MapOptions::MapOptions(const MapData & map)
 
 void Form::MapOptions::setConditionsBoxesMapValues(const MapData & map)
 {
-    comboBoxWinsCond->setCurrentIndex(map.conditionWins() & (~Conditions::Wins));
-    comboBoxLossCond->setCurrentIndex(map.conditionLoss() & (~Conditions::Loss));
+    const CondWins & condWins = map.conditionWins();
+    const CondLoss & condLoss = map.conditionLoss();
+
+    comboBoxWinsCond->setCurrentIndex(condWins.index());
+    comboBoxLossCond->setCurrentIndex(condLoss.index());
 
     winsConditionsSelected(comboBoxWinsCond->currentIndex());
 
-    switch(map.conditionWins())
+    switch(condWins.condition())
     {
 	case Conditions::CaptureTown:
-	    qDebug() << map.conditionWinsObjectPos();
-	    checkBoxAllowNormalVicory->setCheckState(map.conditionWinsAllowNormalVictory() ? Qt::Checked : Qt::Unchecked);
-	    checkBoxCompAlsoWins->setCheckState(map.conditionWinsCompAlsoWins() ? Qt::Checked : Qt::Unchecked);
+	    qDebug() << qvariant_cast<QPoint>(condWins.variant());
+	    checkBoxAllowNormalVictory->setChecked(condWins.allowNormalVictory());
+	    checkBoxCompAlsoWins->setChecked(condWins.compAlsoWins());
 	    break;
 
 	case Conditions::DefeatHero:
-	    qDebug() << map.conditionWinsObjectPos();
+	    qDebug() << qvariant_cast<QPoint>(condWins.variant());
 	    break;
 
 	case Conditions::FindArtifact:
-	    checkBoxAllowNormalVicory->setCheckState(map.conditionWinsAllowNormalVictory() ? Qt::Checked : Qt::Unchecked);
-	    qDebug() << map.conditionWinsFindArtifact();
+	    checkBoxAllowNormalVictory->setChecked(condWins.allowNormalVictory());
+	    qDebug() << qvariant_cast<int>(condWins.variant());
 	    break;
 
 	case Conditions::SideWins:
-	    qDebug() << map.conditionWinsSideWins();
+	    qDebug() << qvariant_cast<int>(condWins.variant());
 	    break;
 
 	case Conditions::AccumulateGold:
 	{
-	    checkBoxAllowNormalVicory->setCheckState(map.conditionWinsAllowNormalVictory() ? Qt::Checked : Qt::Unchecked);
-	    checkBoxCompAlsoWins->setCheckState(map.conditionWinsCompAlsoWins() ? Qt::Checked : Qt::Unchecked);
-	    int find = comboBoxWinsCondExt->findData(map.conditionWinsAccumulateGolds());
+	    checkBoxAllowNormalVictory->setChecked(condWins.allowNormalVictory());
+	    checkBoxCompAlsoWins->setChecked(condWins.compAlsoWins());
+	    int find = comboBoxWinsCondExt->findData(condWins.variant());
 	    if(0 > find)
 		comboBoxWinsCondExt->clear();
 	    else
@@ -717,16 +709,16 @@ void Form::MapOptions::setConditionsBoxesMapValues(const MapData & map)
 
     lossConditionsSelected(comboBoxLossCond->currentIndex());
 
-    switch(map.conditionLoss())
+    switch(condLoss.condition())
     {
 	case Conditions::LoseTown:
 	case Conditions::LoseHero:
-	    qDebug() << map.conditionLossObjectPos();
+	    qDebug() << qvariant_cast<int>(condLoss.variant());
 	    break;
 
 	case Conditions::OutTime:
 	{
-	    int find = comboBoxLossCondExt->findData(map.conditionLossCountDays());
+	    int find = comboBoxLossCondExt->findData(condLoss.variant());
 	    if(0 > find)
 		comboBoxLossCondExt->clear();
 	    else
@@ -744,9 +736,9 @@ void Form::MapOptions::winsConditionsSelected(int index)
 {
     comboBoxWinsCondExt->clear();
     comboBoxWinsCondExt->setEnabled(false);
-    checkBoxAllowNormalVicory->setEnabled(false);
+    checkBoxAllowNormalVictory->setEnabled(false);
     checkBoxCompAlsoWins->setEnabled(false);
-    checkBoxAllowNormalVicory->setCheckState(Qt::Unchecked);
+    checkBoxAllowNormalVictory->setCheckState(Qt::Unchecked);
     checkBoxCompAlsoWins->setCheckState(Qt::Unchecked);
 
     switch(index)
@@ -754,22 +746,22 @@ void Form::MapOptions::winsConditionsSelected(int index)
 	// capture castle
 	case 1:
 	    comboBoxWinsCondExt->setEnabled(true);
-	    winsCondTownList.fillComboBox(*comboBoxWinsCondExt);
-	    checkBoxAllowNormalVicory->setEnabled(true);
+	    fillComboBox(*comboBoxWinsCondExt, winsCondTownList);
+	    checkBoxAllowNormalVictory->setEnabled(true);
 	    checkBoxCompAlsoWins->setEnabled(true);
 	    break;
 
 	// defeat hero
 	case 2:
 	    comboBoxWinsCondExt->setEnabled(true);
-	    winsCondHeroList.fillComboBox(*comboBoxWinsCondExt);
+	    fillComboBox(*comboBoxWinsCondExt, winsCondHeroList);
 	    break;
 
 	// find artifact
 	case 3:
 	    comboBoxWinsCondExt->setEnabled(true);
-	    winsCondArtifactList.fillComboBox(*comboBoxWinsCondExt);
-	    checkBoxAllowNormalVicory->setEnabled(true);
+	    fillComboBox(*comboBoxWinsCondExt, winsCondArtifactList);
+	    checkBoxAllowNormalVictory->setEnabled(true);
 	    break;
 
 	// defeat side
@@ -785,7 +777,7 @@ void Form::MapOptions::winsConditionsSelected(int index)
 	    comboBoxWinsCondExt->setEnabled(true);
 	    for(int ii = 50000; ii < 1005000; ii += 50000)
 		comboBoxWinsCondExt->addItem(QApplication::translate("MapOptions", "%n golds", 0, QApplication::UnicodeUTF8, ii), ii);
-	    checkBoxAllowNormalVicory->setEnabled(true);
+	    checkBoxAllowNormalVictory->setEnabled(true);
 	    checkBoxCompAlsoWins->setEnabled(true);
 	    break;
 
@@ -805,12 +797,12 @@ void Form::MapOptions::lossConditionsSelected(int index)
 	// lose castle
 	case 1:
 	    comboBoxLossCondExt->setEnabled(true);
-	    lossCondTownList.fillComboBox(*comboBoxLossCondExt);
+	    fillComboBox(*comboBoxLossCondExt, lossCondTownList);
 	    break;
 	// lose chero
 	case 2:
 	    comboBoxLossCondExt->setEnabled(true);
-	    lossCondHeroList.fillComboBox(*comboBoxLossCondExt);
+	    fillComboBox(*comboBoxLossCondExt, lossCondHeroList);
 	    break;
 	// out of time
 	case 3:
@@ -837,4 +829,86 @@ void Form::MapOptions::setEnableSaveButton(const QString & val)
 {
     Q_UNUSED(val);
     pushButtonSave->setEnabled(true);
+}
+
+Form::ItemsList::ItemsList(QWidget* parent) : QListWidget(parent)
+{
+    addItemAct = new QAction(tr("Add"), this);
+    addItemAct->setEnabled(true);
+
+    editItemAct = new QAction(tr("Edit"), this);
+    editItemAct->setEnabled(false);
+
+    delItemAct = new QAction(tr("Delete"), this);
+    delItemAct->setEnabled(false);
+
+    connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(editItem(QListWidgetItem*)));
+    connect(addItemAct, SIGNAL(triggered()), this, SLOT(addItem()));
+    connect(editItemAct, SIGNAL(triggered()), this, SLOT(editCurrentItem()));
+    connect(delItemAct, SIGNAL(triggered()), this, SLOT(deleteCurrentItem()));
+}
+
+void Form::ItemsList::editCurrentItem(void)
+{
+    editItem(currentItem());
+}
+
+void Form::ItemsList::deleteCurrentItem(void)
+{
+    removeItemWidget(currentItem());
+}
+
+void Form::ItemsList::mousePressEvent(QMouseEvent* event)
+{
+    if(event->buttons() & Qt::RightButton)
+    {
+	bool selected = NULL != currentItem();
+	editItemAct->setEnabled(selected);
+	delItemAct->setEnabled(selected);
+
+	QMenu menu(this);
+
+	menu.addAction(addItemAct);
+	menu.addAction(editItemAct);
+        menu.addSeparator();
+	menu.addAction(delItemAct);
+
+	menu.exec(event->globalPos());
+    }
+
+    event->accept();
+}
+
+Form::RumorsList::RumorsList(QWidget* parent) : ItemsList(parent)
+{
+    addItemAct->setStatusTip(tr("Add new rumor"));
+    editItemAct->setStatusTip(tr("Edit rumor"));
+    delItemAct->setStatusTip(tr("Delete rumor"));
+}
+
+void Form::RumorsList::addItem(void)
+{
+    QListWidget::addItem(QString("rumor rumor rumor"));
+}
+
+void Form::RumorsList::editItem(QListWidgetItem*)
+{
+    qDebug() << "edit rumor";
+}
+
+Form::EventsList::EventsList(QWidget* parent) : ItemsList(parent)
+{
+    addItemAct->setStatusTip(tr("Add new event"));
+    editItemAct->setStatusTip(tr("Edit event"));
+    delItemAct->setStatusTip(tr("Delete event"));
+}
+
+void Form::EventsList::addItem(void)
+{
+    QListWidget::addItem(QString("event event event"));
+}
+
+void Form::EventsList::editItem(QListWidgetItem*)
+{
+    qDebug() << "edit event";
 }
