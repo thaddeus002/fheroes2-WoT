@@ -223,6 +223,17 @@ public:
     const QString &	description(void) const;
     const QSize &	size(void) const;
     int			difficulty(void) const;
+    bool		startWithHero(void) const;
+    int			conditionWins(void) const;
+    QPoint		conditionWinsObjectPos(void) const;
+    int			conditionWinsFindArtifact(void) const;
+    int			conditionWinsSideWins(void) const;
+    int			conditionWinsAccumulateGolds(void) const;
+    bool		conditionWinsCompAlsoWins(void) const;
+    bool		conditionWinsAllowNormalVictory(void) const;
+    int			conditionLoss(void) const;
+    QPoint		conditionLossObjectPos(void) const;
+    int			conditionLossCountDays(void) const;
 
     quint32		uniq(void);
 
@@ -268,6 +279,12 @@ protected:
     QString		mapLicense;
     int			mapDifficulty;
     quint32		mapUniq;
+    bool		mapStartWithHero;
+    int			mapConditionWins;
+    int			mapConditionLoss;
+    int			mapConditionData[4];
+    bool		mapCompAlsoWins;
+    bool		mapAllowNormalVictory;
 
     MapArea		mapArea;
     MapTiles &		mapTiles;

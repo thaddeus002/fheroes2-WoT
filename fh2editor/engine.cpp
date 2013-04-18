@@ -75,9 +75,9 @@ H2::File::File(const QString & fn) : QFile(fn)
 {
 }
 
-qint16 H2::File::readLE16(void)
+quint32 H2::File::readLE16(void)
 {
-    qint16 res = 0;
+    quint16 res = 0;
 
     if(pos() + sizeof(res) <= size())
     {
@@ -90,9 +90,9 @@ qint16 H2::File::readLE16(void)
     return res;
 }
 
-qint32 H2::File::readLE32(void)
+quint32 H2::File::readLE32(void)
 {
-    qint32 res = 0;
+    quint32 res = 0;
 
     if(pos() + sizeof(res) <= size())
     {
@@ -105,9 +105,9 @@ qint32 H2::File::readLE32(void)
     return res;
 }
 
-qint8 H2::File::readByte(void)
+quint32 H2::File::readByte(void)
 {
-    qint8 res = 0;
+    quint8 res = 0;
 
     if(pos() + sizeof(res) <= size())
     {

@@ -442,6 +442,17 @@ void Form::SelectImage::accept(QListWidgetItem* item)
     }
 }
 
+void ListStringPos::fillComboBox(QComboBox & box) const
+{
+    box.clear();
+    for(const_iterator it = begin(); it != end(); ++it)
+    {
+	QString str; QTextStream ts(&str);
+	ts << "(" << (*it).second.x() << ", " << (*it).second.x() << ")" << " - " << (*it).first;
+	box.addItem(str, (*it).second);
+    }
+}
+
 Form::MapOptions::MapOptions(const MapData & map)
 {
     setWindowTitle(QApplication::translate("MapOptions", "Dialog", 0, QApplication::UnicodeUTF8));
@@ -492,7 +503,7 @@ Form::MapOptions::MapOptions(const MapData & map)
 
     comboBoxWinsCond = new QComboBox(groupBoxWinsCond);
     comboBoxWinsCond->insertItems(0, QStringList()
-         << QApplication::translate("MapOptions", "None", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MapOptions", "Default", 0, QApplication::UnicodeUTF8)
          << QApplication::translate("MapOptions", "Capture a particular castle", 0, QApplication::UnicodeUTF8)
          << QApplication::translate("MapOptions", "Defeat a particular hero", 0, QApplication::UnicodeUTF8)
          << QApplication::translate("MapOptions", "Find a particular artifact", 0, QApplication::UnicodeUTF8)
@@ -501,9 +512,6 @@ Form::MapOptions::MapOptions(const MapData & map)
     );
 
     comboBoxWinsCondExt = new QComboBox(groupBoxWinsCond);
-    comboBoxWinsCondExt->insertItems(0, QStringList()
-         << QApplication::translate("MapOptions", "None", 0, QApplication::UnicodeUTF8)
-    );
     comboBoxWinsCondExt->setEnabled(false);
 
     horizontalLayoutVictorySlct = new QHBoxLayout();
@@ -531,7 +539,7 @@ Form::MapOptions::MapOptions(const MapData & map)
 
     comboBoxLossCond = new QComboBox(groupBoxLossCond);
     comboBoxLossCond->insertItems(0, QStringList()
-         << QApplication::translate("MapOptions", "None", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("MapOptions", "Default", 0, QApplication::UnicodeUTF8)
          << QApplication::translate("MapOptions", "Lose a particuclar castle", 0, QApplication::UnicodeUTF8)
          << QApplication::translate("MapOptions", "Lose a particular hero", 0, QApplication::UnicodeUTF8)
          << QApplication::translate("MapOptions", "Run out of time", 0, QApplication::UnicodeUTF8)
@@ -541,9 +549,6 @@ Form::MapOptions::MapOptions(const MapData & map)
     horizontalLayoutLossCond->addWidget(comboBoxLossCond);
 
     comboBoxLossCondExt = new QComboBox(groupBoxLossCond);
-    comboBoxLossCondExt->insertItems(0, QStringList()
-         << QApplication::translate("MapOptions", "None", 0, QApplication::UnicodeUTF8)
-    );
     comboBoxLossCondExt->setEnabled(false);
 
     horizontalLayoutLossCond = new QHBoxLayout();
@@ -575,6 +580,7 @@ Form::MapOptions::MapOptions(const MapData & map)
 
     checkBoxStartWithHero = new QCheckBox(groupBoxPlayers);
     checkBoxStartWithHero->setText(QApplication::translate("MapOptions", "Start with hero in each player's main castle", 0, QApplication::UnicodeUTF8));
+    checkBoxStartWithHero->setCheckState(map.startWithHero() ? Qt::Checked : Qt::Unchecked);
 
     verticalLayout5 = new QVBoxLayout(groupBoxPlayers);
     verticalLayout5->addLayout(horizontalLayoutPlayers);
@@ -608,20 +614,22 @@ Form::MapOptions::MapOptions(const MapData & map)
     horizontalLayout6->addWidget(groupBoxRumors);
     horizontalLayout6->addWidget(groupBoxEvents);
 
+
     /* end */
     tabWidget = new QTabWidget(this);
     tabWidget->addTab(tabInfo, QApplication::translate("MapOptions", "General Info", 0, QApplication::UnicodeUTF8));
     tabWidget->addTab(tabConditions, QApplication::translate("MapOptions", "Wins/Loss Condition", 0, QApplication::UnicodeUTF8));
     tabWidget->addTab(tabRumorsEvents, QApplication::translate("MapOptions", "Rumors and Events", 0, QApplication::UnicodeUTF8));
 
-    pushButtonOk = new QPushButton(this);
-    pushButtonOk->setText(QApplication::translate("MapOptions", "Save", 0, QApplication::UnicodeUTF8));
+    pushButtonSave = new QPushButton(this);
+    pushButtonSave->setText(QApplication::translate("MapOptions", "Save", 0, QApplication::UnicodeUTF8));
 
     pushButtonCancel = new QPushButton(this);
     pushButtonCancel->setText(QApplication::translate("MapOptions", "Cancel", 0, QApplication::UnicodeUTF8));
+    pushButtonSave->setEnabled(false);
 
     horizontalLayoutButton = new QHBoxLayout();
-    horizontalLayoutButton->addWidget(pushButtonOk);
+    horizontalLayoutButton->addWidget(pushButtonSave);
     horizontalSpacerButton = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     horizontalLayoutButton->addItem(horizontalSpacerButton);
     horizontalLayoutButton->addWidget(pushButtonCancel);
@@ -630,16 +638,203 @@ Form::MapOptions::MapOptions(const MapData & map)
     verticalLayout2->addWidget(tabWidget);
     verticalLayout2->addLayout(horizontalLayoutButton);
 
+    // contents test
+    winsCondHeroList << QPair<QString, QPoint>("Hero 1", QPoint(22,33)) << QPair<QString, QPoint>("Hero 2", QPoint(11,67));
+    winsCondTownList << QPair<QString, QPoint>("Town 1", QPoint(62,83)) << QPair<QString, QPoint>("Town 2", QPoint(81,27));
+    winsCondArtifactList << QPair<QString, QPoint>("Ultimate Artifact", QPoint(62,83)) << QPair<QString, QPoint>("Artifact 2", QPoint(81,27));
+    winsCondSideList << "Left vs Right" << "Right vs Left";
+    lossCondHeroList << QPair<QString, QPoint>("Hero 1", QPoint(22,33)) << QPair<QString, QPoint>("Hero 2", QPoint(11,67));
+    lossCondTownList << QPair<QString, QPoint>("Town 1", QPoint(62,83)) << QPair<QString, QPoint>("Town 2", QPoint(81,27));
+
+    setConditionsBoxesMapValues(map);
+
+
     QSize minSize = minimumSizeHint();
 
     resize(minSize);
     setMinimumSize(minSize);
 
+    QObject::connect(lineEditName, SIGNAL(textChanged(const QString &)), this, SLOT(setEnableSaveButton(const QString &)));
+    QObject::connect(plainTextEditDescription, SIGNAL(textChanged()), this, SLOT(setEnableSaveButton()));
+    QObject::connect(comboBoxDifficulty, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setEnableSaveButton(const QString &)));
+
+    QObject::connect(comboBoxWinsCond, SIGNAL(currentIndexChanged(int)), this, SLOT(winsConditionsSelected(int)));
+    QObject::connect(comboBoxLossCond, SIGNAL(currentIndexChanged(int)), this, SLOT(lossConditionsSelected(int)));
+
+    QObject::connect(comboBoxWinsCondExt, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setEnableSaveButton(const QString &)));
+    QObject::connect(comboBoxLossCondExt, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setEnableSaveButton(const QString &)));
+
+    QObject::connect(checkBoxAllowNormalVicory, SIGNAL(clicked()), this, SLOT(setEnableSaveButton()));
+    QObject::connect(checkBoxCompAlsoWins, SIGNAL(clicked()), this, SLOT(setEnableSaveButton()));
+    QObject::connect(checkBoxStartWithHero, SIGNAL(clicked()), this, SLOT(setEnableSaveButton()));
+
     QObject::connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
-    QObject::connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(clickSave()));
+    QObject::connect(pushButtonSave, SIGNAL(clicked()), this, SLOT(accept()));
 }
 
-void Form::MapOptions::clickSave(void)
+void Form::MapOptions::setConditionsBoxesMapValues(const MapData & map)
 {
-    accept();
+    comboBoxWinsCond->setCurrentIndex(map.conditionWins() & (~Conditions::Wins));
+    comboBoxLossCond->setCurrentIndex(map.conditionLoss() & (~Conditions::Loss));
+
+    winsConditionsSelected(comboBoxWinsCond->currentIndex());
+
+    switch(map.conditionWins())
+    {
+	case Conditions::CaptureTown:
+	    qDebug() << map.conditionWinsObjectPos();
+	    checkBoxAllowNormalVicory->setCheckState(map.conditionWinsAllowNormalVictory() ? Qt::Checked : Qt::Unchecked);
+	    checkBoxCompAlsoWins->setCheckState(map.conditionWinsCompAlsoWins() ? Qt::Checked : Qt::Unchecked);
+	    break;
+
+	case Conditions::DefeatHero:
+	    qDebug() << map.conditionWinsObjectPos();
+	    break;
+
+	case Conditions::FindArtifact:
+	    checkBoxAllowNormalVicory->setCheckState(map.conditionWinsAllowNormalVictory() ? Qt::Checked : Qt::Unchecked);
+	    qDebug() << map.conditionWinsFindArtifact();
+	    break;
+
+	case Conditions::SideWins:
+	    qDebug() << map.conditionWinsSideWins();
+	    break;
+
+	case Conditions::AccumulateGold:
+	{
+	    checkBoxAllowNormalVicory->setCheckState(map.conditionWinsAllowNormalVictory() ? Qt::Checked : Qt::Unchecked);
+	    checkBoxCompAlsoWins->setCheckState(map.conditionWinsCompAlsoWins() ? Qt::Checked : Qt::Unchecked);
+	    int find = comboBoxWinsCondExt->findData(map.conditionWinsAccumulateGolds());
+	    if(0 > find)
+		comboBoxWinsCondExt->clear();
+	    else
+		comboBoxWinsCondExt->setCurrentIndex(find);
+	}
+	    break;
+
+	default: break;
+    }
+
+    lossConditionsSelected(comboBoxLossCond->currentIndex());
+
+    switch(map.conditionLoss())
+    {
+	case Conditions::LoseTown:
+	case Conditions::LoseHero:
+	    qDebug() << map.conditionLossObjectPos();
+	    break;
+
+	case Conditions::OutTime:
+	{
+	    int find = comboBoxLossCondExt->findData(map.conditionLossCountDays());
+	    if(0 > find)
+		comboBoxLossCondExt->clear();
+	    else
+		comboBoxLossCondExt->setCurrentIndex(find + 1);
+	}
+	break;
+
+	default: break;
+    }
+
+    pushButtonSave->setEnabled(false);
+}
+
+void Form::MapOptions::winsConditionsSelected(int index)
+{
+    comboBoxWinsCondExt->clear();
+    comboBoxWinsCondExt->setEnabled(false);
+    checkBoxAllowNormalVicory->setEnabled(false);
+    checkBoxCompAlsoWins->setEnabled(false);
+    checkBoxAllowNormalVicory->setCheckState(Qt::Unchecked);
+    checkBoxCompAlsoWins->setCheckState(Qt::Unchecked);
+
+    switch(index)
+    {
+	// capture castle
+	case 1:
+	    comboBoxWinsCondExt->setEnabled(true);
+	    winsCondTownList.fillComboBox(*comboBoxWinsCondExt);
+	    checkBoxAllowNormalVicory->setEnabled(true);
+	    checkBoxCompAlsoWins->setEnabled(true);
+	    break;
+
+	// defeat hero
+	case 2:
+	    comboBoxWinsCondExt->setEnabled(true);
+	    winsCondHeroList.fillComboBox(*comboBoxWinsCondExt);
+	    break;
+
+	// find artifact
+	case 3:
+	    comboBoxWinsCondExt->setEnabled(true);
+	    winsCondArtifactList.fillComboBox(*comboBoxWinsCondExt);
+	    checkBoxAllowNormalVicory->setEnabled(true);
+	    break;
+
+	// defeat side
+	case 4:
+	    comboBoxWinsCondExt->setEnabled(true);
+	    for(QList<QString>::const_iterator
+		it = winsCondSideList.begin(); it != winsCondSideList.end(); ++it)
+		comboBoxWinsCondExt->addItem(*it);
+	    break;
+
+	// accumulate gold
+	case 5:
+	    comboBoxWinsCondExt->setEnabled(true);
+	    for(int ii = 50000; ii < 1005000; ii += 50000)
+		comboBoxWinsCondExt->addItem(QApplication::translate("MapOptions", "%n golds", 0, QApplication::UnicodeUTF8, ii), ii);
+	    checkBoxAllowNormalVicory->setEnabled(true);
+	    checkBoxCompAlsoWins->setEnabled(true);
+	    break;
+
+	default: break;
+    }
+
+    setEnableSaveButton();
+}
+
+void Form::MapOptions::lossConditionsSelected(int index)
+{
+    comboBoxLossCondExt->clear();
+    comboBoxLossCondExt->setEnabled(false);
+
+    switch(index)
+    {
+	// lose castle
+	case 1:
+	    comboBoxLossCondExt->setEnabled(true);
+	    lossCondTownList.fillComboBox(*comboBoxLossCondExt);
+	    break;
+	// lose chero
+	case 2:
+	    comboBoxLossCondExt->setEnabled(true);
+	    lossCondHeroList.fillComboBox(*comboBoxLossCondExt);
+	    break;
+	// out of time
+	case 3:
+	    comboBoxLossCondExt->setEnabled(true);
+	    for(int ii = 2; ii < 8; ++ii) // 2-7 days
+		comboBoxLossCondExt->addItem(QApplication::translate("MapOptions", "%n days", 0, QApplication::UnicodeUTF8, ii), ii);
+	    for(int ii = 2; ii < 9; ++ii) // 2-8 weeks
+		comboBoxLossCondExt->addItem(QApplication::translate("MapOptions", "%n weeks", 0, QApplication::UnicodeUTF8, ii), ii * 7);
+	    for(int ii = 3; ii < 13; ++ii) // 3-12 months
+		comboBoxLossCondExt->addItem(QApplication::translate("MapOptions", "%n months", 0, QApplication::UnicodeUTF8, ii), ii * 7 * 4);
+	    break;
+	default: break;
+    }
+
+    setEnableSaveButton();
+}
+
+void Form::MapOptions::setEnableSaveButton(void)
+{
+    pushButtonSave->setEnabled(true);
+}
+
+void Form::MapOptions::setEnableSaveButton(const QString & val)
+{
+    Q_UNUSED(val);
+    pushButtonSave->setEnabled(true);
 }

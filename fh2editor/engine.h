@@ -66,6 +66,13 @@ namespace Difficulty
     enum { Easy, Normal, Tough, Expert };
 }
 
+namespace Conditions
+{
+    enum { Default = 0,
+	    Wins = 0x100, CaptureTown = 0x101, DefeatHero = 0x102, FindArtifact = 0x103, SideWins = 0x104, AccumulateGold = 0x105,
+	    Loss = 0x200, LoseTown = 0x201, LoseHero = 0x202, OutTime = 0x203 };
+}
+
 struct mp2icn_t
 {
     mp2icn_t(const char*);
@@ -268,13 +275,13 @@ namespace H2
 	File();
 	File(const QString &);
 
-	qint8	readByte(void);
+	quint32	readByte(void);
 	QString	readString(size_t);
 	QByteArray
 		readBlock(size_t, int = -1);
 
-	qint16	readLE16(void);
-	qint32	readLE32(void);
+	quint32	readLE16(void);
+	quint32	readLE32(void);
     };
 
     class ICNSprite : public QImage

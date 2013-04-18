@@ -484,8 +484,14 @@ void MapArea::addObject(const QPoint & pos, const CompositeObject & obj, const Q
 }
 
 MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), themeContent(parent->mainWindow->aggContent),
-    tileOverMouse(NULL), mapArea(), mapTiles(mapArea.tiles), mapObjects(mapArea.objects)
+    tileOverMouse(NULL), mapName("New Map"), mapAuthors("unknown"), mapLicense("unknown"), mapDifficulty(Difficulty::Normal),
+        mapUniq(1), mapStartWithHero(false), mapConditionWins(Conditions::Wins), mapConditionLoss(Conditions::Loss), mapCompAlsoWins(false),
+    mapAllowNormalVictory(false), mapArea(), mapTiles(mapArea.tiles), mapObjects(mapArea.objects)
 {
+    mapConditionData[0] = 0;
+    mapConditionData[1] = 0;
+    mapConditionData[2] = 0;
+    mapConditionData[3] = 0;
 }
 
 EditorTheme & MapData::theme(void)
@@ -506,6 +512,61 @@ const QString & MapData::description(void) const
 int MapData::difficulty(void) const
 {
     return mapDifficulty;
+}
+
+bool MapData::startWithHero(void) const
+{
+    return mapStartWithHero;
+}
+
+int MapData::conditionWins(void) const
+{
+    return mapConditionWins;
+}
+
+int MapData::conditionWinsSideWins(void) const
+{
+    return mapConditionData[0];
+}
+
+int MapData::conditionWinsFindArtifact(void) const
+{
+    return mapConditionData[0];
+}
+
+int MapData::conditionWinsAccumulateGolds(void) const
+{
+    return 1000 * mapConditionData[0];
+}
+
+QPoint MapData::conditionWinsObjectPos(void) const
+{
+    return QPoint(mapConditionData[0], mapConditionData[1]);
+}
+
+bool MapData::conditionWinsCompAlsoWins(void) const
+{
+    return mapCompAlsoWins;
+}
+
+bool MapData::conditionWinsAllowNormalVictory(void) const
+{
+    return mapAllowNormalVictory;
+}
+
+int MapData::conditionLoss(void) const
+{
+    return mapConditionLoss;
+}
+
+QPoint MapData::conditionLossObjectPos(void) const
+{
+    return QPoint(mapConditionData[2], mapConditionData[3]);
+}
+
+int MapData::conditionLossCountDays(void) const
+{
+    return mapConditionData[2];
 }
 
 const QSize & MapData::size(void) const
@@ -755,13 +816,6 @@ void MapData::removeObjectsAction(QAction* act)
 
 void MapData::newMap(const QSize & msz, const QString &)
 {
-    mapDifficulty = Difficulty::Normal;
-    mapUniq = 1;
-
-    mapName = "New Map";
-    mapAuthors = "unknown";
-    mapLicense = "unknown";
-
     const QSize & tileSize = themeContent.tileSize();
 
     mapTiles.newMap(msz, themeContent);
@@ -787,6 +841,7 @@ bool MapData::loadMap(const QString & mapFile)
 
 	mapName = mp2.name;
 	mapDescription = mp2.description;
+	mapStartWithHero = mp2.startWithHero;
 
 	switch(mp2.difficulty)
 	{
@@ -795,6 +850,34 @@ bool MapData::loadMap(const QString & mapFile)
 	    case 3:	mapDifficulty = Difficulty::Expert; break;
 	    default:	mapDifficulty = Difficulty::Normal; break;
 	}
+
+	switch(mp2.conditionWins)
+	{
+	    case 1:	mapConditionWins = Conditions::CaptureTown; break;
+	    case 2:	mapConditionWins = Conditions::DefeatHero; break;
+	    case 3:	mapConditionWins = Conditions::FindArtifact; break;
+	    case 4:	mapConditionWins = Conditions::SideWins; break;
+	    case 5:	mapConditionWins = Conditions::AccumulateGold; break;
+	    default:	mapConditionWins = Conditions::Wins; break;
+	}
+
+	mapCompAlsoWins = mp2.conditionWinsData1;
+	mapAllowNormalVictory = mp2.conditionWinsData2;
+
+	switch(mp2.conditionLoss)
+	{
+	    case 1:	mapConditionLoss = Conditions::LoseTown; break;
+	    case 2:	mapConditionLoss = Conditions::LoseHero; break;
+	    case 3:	mapConditionLoss = Conditions::OutTime; break;
+	    default:	mapConditionLoss = Conditions::Loss; break;
+	}
+
+	mapConditionData[0] = mp2.conditionWinsData3;
+	mapConditionData[1] = mp2.conditionWinsData4;
+	mapConditionData[2] = mp2.conditionLossData1;
+	mapConditionData[3] = mp2.conditionLossData2;
+
+	mapUniq = mp2.uniq + 1;
 
 	setSceneRect(QRect(QPoint(0, 0),
 		QSize(size().width() * tileSize.width(), size().height() * tileSize.height())));
@@ -911,11 +994,16 @@ bool MP2Format::loadMap(const QString & mapFile)
 
 	// data map: width, heigth
 	map.seek(0x01A4);
-	if(map.readLE32() != size.width())
+	if(static_cast<int>(map.readLE32()) != size.width())
+	{
 	    qDebug() << "MP2Format::loadMap:" << "incorrect size";
-	if(map.readLE32() != size.height())
+    	    return false;
+	}
+	if(static_cast<int>(map.readLE32()) != size.height())
+	{
 	    qDebug() << "MP2Format::loadMap:" << "incorrect size";
-
+    	    return false;
+	}
 
 	// data map: mp2tile, part1
 	// count blocks: width * heigth

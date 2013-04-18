@@ -25,6 +25,7 @@
 
 #include <QDialog>
 #include <QSize>
+#include <QPair>
 #include "engine.h"
 
 QT_BEGIN_NAMESPACE
@@ -56,6 +57,11 @@ namespace Dialog
 {
     void	MapOptions(MapData &);
 }
+
+struct ListStringPos : public QList< QPair<QString, QPoint> >
+{
+    void fillComboBox(QComboBox &) const;
+};
 
 namespace Form
 {
@@ -207,12 +213,23 @@ namespace Form
         QVBoxLayout*		verticalLayout8;
         QListWidget*		listWidgetEvents;
         QHBoxLayout*		horizontalLayoutButton;
-	QPushButton*		pushButtonOk;
+	QPushButton*		pushButtonSave;
         QSpacerItem*		horizontalSpacerButton;
 	QPushButton*		pushButtonCancel;
 
+	ListStringPos		winsCondHeroList;
+	ListStringPos		winsCondTownList;
+	QList<QString>		winsCondSideList;
+	ListStringPos		winsCondArtifactList;
+	ListStringPos		lossCondHeroList;
+	ListStringPos		lossCondTownList;
+
     protected slots:
-	void			clickSave(void);
+	void			winsConditionsSelected(int);
+	void			lossConditionsSelected(int);
+	void			setEnableSaveButton(void);
+	void			setEnableSaveButton(const QString &);
+	void			setConditionsBoxesMapValues(const MapData &);
     };
 }
 
