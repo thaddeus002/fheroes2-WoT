@@ -143,7 +143,7 @@ namespace Form
 	void			selectionChanged(void);
     };
 
-    class SelectImageTab : public QWidget
+    class SelectImageTab : public QDialog
     {
         Q_OBJECT
 
@@ -167,6 +167,9 @@ namespace Form
 
 	ItemsList(QWidget*);
 
+    signals:
+	void			mousePressed(void);
+
     protected slots:
 	virtual void		addItem(void) = 0;
 	virtual void		editItem(QListWidgetItem*) = 0;
@@ -184,6 +187,7 @@ namespace Form
     public:
 	RumorsList(QWidget*);
 
+    protected slots:
 	void			addItem(void);
 	void			editItem(QListWidgetItem*);
     };
@@ -195,6 +199,7 @@ namespace Form
     public:
 	EventsList(QWidget*);
 
+    protected slots:
 	void			addItem(void);
 	void			editItem(QListWidgetItem*);
     };
@@ -250,6 +255,12 @@ namespace Form
         QVBoxLayout*		verticalLayout8;
         EventsList*		listWidgetEvents;
         QHBoxLayout*		horizontalLayoutButton;
+	QWidget*		tabAuthorsLicense;
+	QVBoxLayout*		verticalLayout9;
+	QLabel*			labelAuthors;
+	QLabel*			labelLicense;
+	QPlainTextEdit*		plainTextEditAuthors;
+	QPlainTextEdit*		plainTextEditLicense;
 	QPushButton*		pushButtonSave;
         QSpacerItem*		horizontalSpacerButton;
 	QPushButton*		pushButtonCancel;
@@ -267,6 +278,24 @@ namespace Form
 	void			setEnableSaveButton(void);
 	void			setEnableSaveButton(const QString &);
 	void			setConditionsBoxesMapValues(const MapData &);
+    };
+
+    class RumorDialog : public QDialog
+    {
+        Q_OBJECT
+
+    public:
+        RumorDialog(const QString & = QString());
+
+        QVBoxLayout*		verticalLayout;
+        QHBoxLayout*		horizontalLayout;
+        QPushButton*		pushButtonOk;
+        QSpacerItem*		horizontalSpacer;
+        QPushButton*		pushButtonCancel;
+	QPlainTextEdit*		plainText;
+
+    protected slots:
+	void			enableButtonOk(void);
     };
 }
 

@@ -504,6 +504,16 @@ const QString & MapData::description(void) const
     return mapDescription;
 }
 
+const QString & MapData::authors(void) const
+{
+    return mapAuthors;
+}
+
+const QString & MapData::license(void) const
+{
+    return mapLicense;
+}
+
 int MapData::difficulty(void) const
 {
     return mapDifficulty;
@@ -572,6 +582,11 @@ const QSize & MapData::size(void) const
 quint32 MapData::uniq(void)
 {
     return mapUniq++;
+}
+
+const QStringList & MapData::tavernRumorsList(void) const
+{
+    return tavernRumors;
 }
 
 void MapData::mousePressEvent(QGraphicsSceneMouseEvent* event)
@@ -899,7 +914,7 @@ bool MapData::loadMap(const QString & mapFile)
 	// import rumors
 	for(QVector<mp2rumor_t>::const_iterator
 	    it = mp2.rumors.begin(); it != mp2.rumors.end(); ++it)
-	    tavernRumors.push_back(QSharedPointer<Rumor>(new Rumor(*it)));
+	    tavernRumors << Rumor(*it);
 
 	return true;
     }
@@ -1236,5 +1251,10 @@ void MapData::showMapOptions(void)
 	mapConditionWins.setCompAlsoWins(form.checkBoxCompAlsoWins->isChecked());
 	mapConditionLoss.set(qvariant_cast<int>(comboBoxCurrentData(form.comboBoxLossCond)), comboBoxCurrentData(form.comboBoxLossCondExt));
 	mapStartWithHero = form.checkBoxStartWithHero->isChecked();
+
+	// tab3
+	tavernRumors.clear();
+	for(int pos = 0; pos < form.listWidgetRumors->count(); ++pos)
+	    tavernRumors << form.listWidgetRumors->item(pos)->text();
     }
 }

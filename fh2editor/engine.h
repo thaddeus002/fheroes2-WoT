@@ -476,7 +476,7 @@ public:
 class Rumor : public QString
 {
 public:
-    Rumor(const mp2rumor_t &);
+    Rumor(const mp2rumor_t & mp2) : QString(mp2.text) {}
 };
 
 class MapKey : public QPoint
@@ -500,10 +500,10 @@ public:
     DayEvents();
 };
 
-class TavernRumors : public QVector<QSharedPointer<Rumor> >
+class TavernRumors : public QStringList
 {
 public:
-    TavernRumors();
+    TavernRumors(){}
 };
 
 struct CompositeObjectCursor : public CompositeObject
@@ -561,6 +561,7 @@ struct CondLoss : public GameCondition
 
 struct ListStringPos : public QList< QPair<QString, QPoint> >
 {
+    ListStringPos() {}
 };
 
 #endif

@@ -221,6 +221,8 @@ public:
 
     const QString &	name(void) const;
     const QString &	description(void) const;
+    const QString &	authors(void) const;
+    const QString &	license(void) const;
     const QSize &	size(void) const;
     int			difficulty(void) const;
     bool		startWithHero(void) const;
@@ -230,6 +232,7 @@ public:
     ListStringPos	conditionTownList(int) const;
     ListStringPos	conditionArtifactList(void) const;
     QList<QString>	conditionSideList(void) const;
+    const QStringList & tavernRumorsList(void) const;
 
     quint32		uniq(void);
 

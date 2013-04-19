@@ -59,8 +59,8 @@ QString readStringFromStream(QDataStream & ds, int count = 0)
 	while(! ds.atEnd())
 	{
 	    ds >> byte;
-	    str.push_back(byte);
 	    if(0 == byte) break;
+	    str.push_back(byte);
 	}
     }
 
@@ -1686,10 +1686,6 @@ DayEvent::DayEvent(const mp2dayevent_t &)
 {
 }
 
-Rumor::Rumor(const mp2rumor_t &)
-{
-}
-
 MapObjects::MapObjects()
 {
 }
@@ -1700,10 +1696,6 @@ MapObjects::MapObjects(const MapObjects & mo, const QRect & rt)
 }
 
 DayEvents::DayEvents()
-{
-}
-
-TavernRumors::TavernRumors()
 {
 }
 
