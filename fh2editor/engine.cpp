@@ -987,7 +987,7 @@ int H2::isAnimationICN(int spriteClass, int spriteIndex, int ticket)
 	    switch(spriteIndex)
 	    {
 		// shadow of lava
-		case 0x4F: case 0x58: case 0x62:
+		case 0x4E: case 0x58: case 0x62:
 		    return spriteIndex + (ticket % 9) + 1;
 		default: break;
 	    }
@@ -1194,7 +1194,7 @@ int H2::isAnimationICN(int spriteClass, int spriteIndex, int ticket)
 		case 0xE2: case 0xE9: case 0xF1: case 0xF8:
 		    return spriteIndex + (ticket % 6) + 1;
 		// seagull on stones
-		case 0x76: case 0x86: case 0x96:
+		case 0x76: case 0x86: case 0x96: case 0xA6:
 		    return spriteIndex + (ticket % 15) + 1;
 		// whirlpool
 		case 0xCA: case 0xCE: case 0xD2: case 0xD6: case 0xDA: case 0xDE:
@@ -1682,8 +1682,49 @@ MapSphinx::MapSphinx(const QPoint & pos, quint32 id, const mp2sphinx_t &)
 {
 }
 
-DayEvent::DayEvent(const mp2dayevent_t &)
+DayEvent::DayEvent(const mp2dayevent_t & mp2)
+    : allowComputer(mp2.allowComputer), dayFirstOccurent(mp2.dayFirstOccurent), subsequentOccurrences(mp2.subsequentOccurrences), colors(0), message(mp2.text)
 {
+    resources.wood = mp2.resources[0];
+    resources.mercury = mp2.resources[1];
+    resources.ore = mp2.resources[2];
+    resources.sulfur = mp2.resources[3];
+    resources.crystal = mp2.resources[4];
+    resources.gems = mp2.resources[5];
+    resources.gold = mp2.resources[6];
+
+    if(mp2.colors[0]) colors |= Color::Blue;
+    if(mp2.colors[1]) colors |= Color::Red;
+    if(mp2.colors[2]) colors |= Color::Green;
+    if(mp2.colors[3]) colors |= Color::Yellow;
+    if(mp2.colors[4]) colors |= Color::Orange;
+    if(mp2.colors[5]) colors |= Color::Purple;
+}
+
+void DayEvent::setResources(const Resources & res)
+{
+    resources = res;
+}
+
+void DayEvent::setAllowComputer(bool f)
+{
+    allowComputer = f;
+}
+
+void DayEvent::setDayOccurent(int first, int subseq)
+{
+    dayFirstOccurent = first;
+    subsequentOccurrences = subseq;
+}
+
+void DayEvent::setColors(int cols)
+{
+    colors = cols;
+}
+
+void DayEvent::setMessage(const QString & msg)
+{
+    message = msg;
 }
 
 MapObjects::MapObjects()

@@ -109,25 +109,23 @@ MapTileLevels::~MapTileLevels()
     qDeleteAll(begin(), end());
 }
 
-void MapTileLevels::paint(QPainter & painter, const QPoint & offset, EditorTheme & theme) const
+void MapTileLevels::paint(QPainter & painter, const QPoint & offset, const QPoint & mpos, EditorTheme & theme) const
 {
     for(const_iterator it = begin(); it != end(); ++it)
     {
 	QPair<QPixmap, QPoint> p1 = theme.getImageICN((*it)->icn(), (*it)->index());
 	painter.drawPixmap(offset + p1.second, p1.first);
 
-	if((*it)->ext() & 0x01)
-	{
-	    int anim = H2::isAnimationICN((*it)->icn(), (*it)->index(), 0);
+	int anim = H2::isAnimationICN((*it)->icn(), (*it)->index(), 0);
 
-	    if(0 < anim)
-	    {
-		QPair<QPixmap, QPoint> p2 = theme.getImageICN((*it)->icn(), anim);
-		painter.drawPixmap(offset + p2.second, p2.first);
-	    }
-	    else
-		qDebug() << "H2::isAnimationICN:" << "incorrect animation" << "icn:" << (*it)->icn() << "index:" << (*it)->index();
+	if(0 < anim)
+	{
+	    QPair<QPixmap, QPoint> p2 = theme.getImageICN((*it)->icn(), anim);
+	    painter.drawPixmap(offset + p2.second, p2.first);
 	}
+	else
+	if((*it)->ext() & 0x01)
+	    qDebug() << "H2::isAnimationICN:" << "incorrect animation" << mpos << "icn:" << (*it)->icn() << "index:" << (*it)->index();
     }
 }
 
@@ -222,10 +220,10 @@ void MapTile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, Q
     painter->drawPixmap(offset(), pixmap());
 
     // draw level1
-    spritesLevel1.paint(*painter, offset().toPoint(), themeContent);
+    spritesLevel1.paint(*painter, offset().toPoint(), mpos, themeContent);
 
     // draw level2
-    spritesLevel2.paint(*painter, offset().toPoint(), themeContent);
+    spritesLevel2.paint(*painter, offset().toPoint(), mpos, themeContent);
 }
 
 void MapTile::showInfo(void) const

@@ -119,7 +119,7 @@ public:
     ~MapTileLevels();
 
     const MapTileExt*	find(bool (*pf)(const MapTileExt*)) const;
-    void		paint(QPainter &, const QPoint &, EditorTheme &) const;
+    void		paint(QPainter &, const QPoint &, const QPoint &, EditorTheme &) const;
     QString		infoString(void) const;
 };
 

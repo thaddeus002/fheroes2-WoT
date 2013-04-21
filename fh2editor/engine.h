@@ -55,6 +55,12 @@ namespace ICN
 	    OBJNSWMP = 0xD4, OBJNLAVA = 0xD8, OBJNDSRT = 0xDC, OBJNDIRT = 0xE0, OBJNCRCK = 0xE4, OBJNLAV3 = 0xE8, OBJNMULT = 0xEC, OBJNLAV2 = 0xF0, X_LOC1 = 0xF4, X_LOC2 = 0xF8, X_LOC3 = 0xFC };
 }
 
+namespace Color
+{
+    enum { Unknown = 0, Blue = 0x01, Red = 0x02, Green = 0x04, Yellow = 0x08, Orange = 0x10, Purple = 0x20,
+	    All = Blue | Red | Green | Yellow | Orange | Purple };
+}
+
 namespace SpriteLevel
 {
     enum { Uknown, Bottom, Action, Top };
@@ -170,7 +176,7 @@ struct mp2sign_t
 struct mp2mapevent_t
 {
     quint8	id; /* 0x01 */
-    quint32	resources[7]; /* wood, mercury, ore, sulfur, crystal, gems, golds */
+    qint32	resources[7]; /* wood, mercury, ore, sulfur, crystal, gems, golds */
     quint16	artifact; /* 0xffff - none */
     quint8	allowComputer;
     quint8	cancelAfterFirstVisit;
@@ -182,7 +188,7 @@ struct mp2mapevent_t
 struct mp2sphinx_t
 {
     quint8	id; /* 0x00 */
-    quint32	resources[7]; /* wood, mercury, ore, sulfur, crystal, gems, golds */
+    qint32	resources[7]; /* wood, mercury, ore, sulfur, crystal, gems, golds */
     quint16	artifact; /* 0xffff - none */
     quint8	answersCount;
     QVector<QString> answers; /* 8 blocks, 13 byte string */
@@ -192,7 +198,7 @@ struct mp2sphinx_t
 struct mp2dayevent_t
 {
     quint8	id; /* 0 */
-    quint32	resources[7]; /* wood, mercury, ore, sulfur, crystal, gems, golds */
+    qint32	resources[7]; /* wood, mercury, ore, sulfur, crystal, gems, golds */
     quint16	artifact; /* always 0xffff - none */
     quint16	allowComputer;
     quint16	dayFirstOccurent;
@@ -426,6 +432,17 @@ public:
     QString			resourceFile(const QString & dir, const QString & file) const;
 };
 
+struct Resources
+{
+    int		wood;
+    int		mercury;
+    int		ore;
+    int		sulfur;
+    int		crystal;
+    int		gems;
+    int		gold;
+};
+
 class MapObject : public QPoint
 {
     int	uniq;
@@ -469,8 +486,22 @@ public:
 
 class DayEvent
 {
+    Resources	resources;
+    bool	allowComputer;
+    int		dayFirstOccurent;
+    int		subsequentOccurrences;
+    int		colors;
+    QString	message;
+
 public:
+    DayEvent() {}
     DayEvent(const mp2dayevent_t &);
+
+    void	setResources(const Resources &);
+    void	setAllowComputer(bool);
+    void	setDayOccurent(int, int);
+    void	setColors(int);
+    void	setMessage(const QString &);
 };
 
 class Rumor : public QString
