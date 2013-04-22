@@ -157,6 +157,8 @@ namespace Form
 	bool 			isSelected(void) const;
     };
 
+    class MapOptions;
+
     class ItemsList : public QListWidget
     {
         Q_OBJECT
@@ -165,8 +167,9 @@ namespace Form
 	QAction*		addItemAct;
 	QAction*		editItemAct;
 	QAction*		delItemAct;
+	MapOptions*		parentObj;
 
-	ItemsList(QWidget*);
+	ItemsList(MapOptions*);
 
     signals:
 	void			mousePressed(void);
@@ -186,7 +189,7 @@ namespace Form
 	Q_OBJECT
 
     public:
-	RumorsList(QWidget*);
+	RumorsList(MapOptions*);
 
     protected slots:
 	void			addItem(void);
@@ -198,7 +201,7 @@ namespace Form
 	Q_OBJECT
 
     public:
-	EventsList(QWidget*);
+	EventsList(MapOptions*);
 
     protected slots:
 	void			addItem(void);
@@ -214,7 +217,7 @@ namespace Form
 	EditorTheme &		theme;
 
     public:
-	PlayerStatus(int, int, EditorTheme &, QWidget* parent);
+	PlayerStatus(int, int, EditorTheme &, QWidget*);
 
 	int			color(void) const { return col; }
 	int			status(void) const { return stat % 4; }
@@ -293,6 +296,8 @@ namespace Form
 	ListStringPos		lossCondHeroList;
 	ListStringPos		lossCondTownList;
 
+	MapData &		data;
+
     protected slots:
 	void			winsConditionsSelected(int);
 	void			lossConditionsSelected(int);
@@ -317,6 +322,92 @@ namespace Form
 
     protected slots:
 	void			enableButtonOk(void);
+    };
+
+    class PlayerAllow : public QLabel
+    {
+	Q_OBJECT
+
+	int			col;
+	bool			stat;
+	EditorTheme &		theme;
+
+    public:
+	PlayerAllow(int, bool, EditorTheme &, QWidget*);
+
+	int			color(void) const { return col; }
+	bool			allow(void) const { return stat; }
+
+    signals:
+        void                    mousePressed(void);
+
+    protected:
+	void			updatePlayers(void);
+	void			mousePressEvent(QMouseEvent*);
+    };
+
+    class DayEventDialog : public QDialog
+    {
+	Q_OBJECT
+
+    public:
+	DayEventDialog(const DayEvent &, int, EditorTheme &);
+
+	QVBoxLayout*		verticalLayout2;
+	QTabWidget*		tabWidget;
+	QWidget*		tabDay;
+	QVBoxLayout*		verticalLayout;
+	QHBoxLayout*		horizontalLayout;
+	QLabel*			labelDayFirst;
+	QSpinBox*		spinBoxDayFirst;
+	QHBoxLayout*		horizontalLayout2;
+	QLabel*			labelSubsequent;
+	QComboBox*		comboBoxSubsequent;
+	QGroupBox*		groupBoxAllowedColors;
+	QVBoxLayout*		verticalLayout3;
+	QHBoxLayout*		horizontalLayout4;
+	QSpacerItem*		horizontalSpacerPlayersLeft;
+	QSpacerItem*		horizontalSpacerPlayersRight;
+	QVector<PlayerAllow*>	labelPlayers;
+	QCheckBox*		checkBoxAllowComp;
+	QWidget*		tabResource;
+	QVBoxLayout*		verticalLayout4;
+	QHBoxLayout*		horizontalLayout5;
+	QLabel*			labelResWood;
+	QSpinBox*		spinBoxResWood;
+	QSpacerItem*		horizontalSpacer2;
+	QLabel*			labelResSulfur;
+	QSpinBox*		spinBoxResSulfur;
+        QHBoxLayout*		horizontalLayout6;
+	QLabel*			labelResMercury;
+	QSpinBox*		spinBoxResMercury;
+	QSpacerItem*		horizontalSpacer3;
+	QLabel*			labelResCrystal;
+	QSpinBox*		spinBoxResCrystal;
+	QHBoxLayout*		horizontalLayout7;
+	QLabel*			labelResOre;
+	QSpinBox*		spinBoxResOre;
+	QSpacerItem*		horizontalSpacer4;
+	QLabel*			labelResGems;
+	QSpinBox*		spinBoxResGems;
+	QHBoxLayout*		horizontalLayout8;
+	QSpacerItem*		horizontalSpacer5;
+	QLabel*			labelResGold;
+	QSpinBox*		spinBoxResGold;
+	QSpacerItem*		horizontalSpacer6;
+	QWidget*		tabMessage;
+	QVBoxLayout*		verticalLayout5;
+	QPlainTextEdit*		plainTextMessage;
+	QHBoxLayout*		horizontalLayout3;
+	QPushButton*		pushButtonOk;
+	QSpacerItem*		horizontalSpacer;
+	QPushButton*		pushButtonCancel;
+
+	DayEvent		result(void) const;
+
+    protected slots:
+	void			setEnableOKButton(void);
+	void			setEnableOKButton(const QString &);
     };
 }
 

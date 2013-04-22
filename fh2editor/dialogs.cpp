@@ -466,17 +466,17 @@ void Form::PlayerStatus::updatePlayers(void)
 {
     switch(col)
     {
-        case Color::Blue:	setPixmap(theme.getImageICN("CELLWIN.ICN", 19 + status()).first); break;
-        case Color::Green:	setPixmap(theme.getImageICN("CELLWIN.ICN", 23 + status()).first); break;
-        case Color::Red:	setPixmap(theme.getImageICN("CELLWIN.ICN", 27 + status()).first); break;
-        case Color::Yellow:	setPixmap(theme.getImageICN("CELLWIN.ICN", 31 + status()).first); break;
-        case Color::Orange:	setPixmap(theme.getImageICN("CELLWIN.ICN", 35 + status()).first); break;
-        case Color::Purple:	setPixmap(theme.getImageICN("CELLWIN.ICN", 39 + status()).first); break;
-        default: break;
+	    case Color::Blue:	setPixmap(theme.getImageICN("CELLWIN.ICN", 19 + status()).first); break;
+    	    case Color::Green:	setPixmap(theme.getImageICN("CELLWIN.ICN", 23 + status()).first); break;
+    	    case Color::Red:	setPixmap(theme.getImageICN("CELLWIN.ICN", 27 + status()).first); break;
+    	    case Color::Yellow:	setPixmap(theme.getImageICN("CELLWIN.ICN", 31 + status()).first); break;
+    	    case Color::Orange:	setPixmap(theme.getImageICN("CELLWIN.ICN", 35 + status()).first); break;
+    	    case Color::Purple:	setPixmap(theme.getImageICN("CELLWIN.ICN", 39 + status()).first); break;
+    	    default: break;
     }
 }
 
-Form::MapOptions::MapOptions(MapData & map)
+Form::MapOptions::MapOptions(MapData & map) : data(map)
 {
     setWindowTitle(QApplication::translate("MapOptions", "Map Options", 0, QApplication::UnicodeUTF8));
 
@@ -706,7 +706,9 @@ Form::MapOptions::MapOptions(MapData & map)
     for(DayEvents::const_iterator
         it = map.dayEvents().begin(); it != map.dayEvents().end(); ++it)
     {
-	static_cast<QListWidget*>(listWidgetEvents)->addItem((*it).header());
+	QListWidgetItem* item = new QListWidgetItem((*it).header());
+	item->setData(Qt::UserRole, QVariant::fromValue(*it));
+	static_cast<QListWidget*>(listWidgetEvents)->addItem(item);
     }
     listWidgetEvents->sortItems();
 
@@ -916,7 +918,7 @@ void Form::MapOptions::setEnableSaveButton(const QString & val)
     pushButtonSave->setEnabled(true);
 }
 
-Form::ItemsList::ItemsList(QWidget* parent) : QListWidget(parent)
+Form::ItemsList::ItemsList(MapOptions* parent) : QListWidget(parent), parentObj(parent)
 {
     setViewMode(QListView::ListMode);
 
@@ -980,7 +982,7 @@ void Form::ItemsList::mousePressEvent(QMouseEvent* event)
     QListWidget::mousePressEvent(event);
 }
 
-Form::RumorsList::RumorsList(QWidget* parent) : ItemsList(parent)
+Form::RumorsList::RumorsList(MapOptions* parent) : ItemsList(parent)
 {
     addItemAct->setStatusTip(tr("Add new rumor"));
     editItemAct->setStatusTip(tr("Edit rumor"));
@@ -1006,7 +1008,7 @@ void Form::RumorsList::editItem(QListWidgetItem* item)
 	item->setText(dialog.plainText->toPlainText());
 }
 
-Form::EventsList::EventsList(QWidget* parent) : ItemsList(parent)
+Form::EventsList::EventsList(MapOptions* parent) : ItemsList(parent)
 {
     addItemAct->setStatusTip(tr("Add new event"));
     editItemAct->setStatusTip(tr("Edit event"));
@@ -1015,13 +1017,35 @@ Form::EventsList::EventsList(QWidget* parent) : ItemsList(parent)
 
 void Form::EventsList::addItem(void)
 {
-    QListWidget::addItem(QString("event event event"));
-    setCurrentRow(count() - 1);
+    if(parentObj)
+    {
+	DayEventDialog dialog(DayEvent(), parentObj->data.kingdomColors(), parentObj->data.theme());
+
+	if(QDialog::Accepted == dialog.exec())
+	{
+	    DayEvent event = dialog.result();
+	    QListWidgetItem* item = new QListWidgetItem(event.header());
+	    item->setData(Qt::UserRole, QVariant::fromValue(event));
+	    QListWidget::addItem(item);
+	    setCurrentRow(count() - 1);
+	}
+    }
 }
 
-void Form::EventsList::editItem(QListWidgetItem*)
+void Form::EventsList::editItem(QListWidgetItem* item)
 {
-    qDebug() << "edit event";
+    if(parentObj)
+    {
+	DayEvent event = qvariant_cast<DayEvent>(item->data(Qt::UserRole));
+	DayEventDialog dialog(event, parentObj->data.kingdomColors(), parentObj->data.theme());
+
+	if(QDialog::Accepted == dialog.exec())
+	{
+	    event = dialog.result();
+	    item->setText(event.header());
+	    item->setData(Qt::UserRole, QVariant::fromValue(event));
+	}
+    }
 }
 
 Form::RumorDialog::RumorDialog(const QString & msg)
@@ -1059,4 +1083,346 @@ Form::RumorDialog::RumorDialog(const QString & msg)
 void Form::RumorDialog::enableButtonOk(void)
 {
     pushButtonOk->setEnabled(! plainText->toPlainText().isEmpty());
+}
+
+Form::PlayerAllow::PlayerAllow(int c, bool v, EditorTheme & t, QWidget* parent) : QLabel(parent), col(c), stat(v), theme(t)
+{
+    updatePlayers();
+}
+
+void Form::PlayerAllow::mousePressEvent(QMouseEvent* event)
+{
+    Q_UNUSED(event);
+    stat = stat ? false : true;
+    updatePlayers();
+    emit mousePressed();
+}
+
+void Form::PlayerAllow::updatePlayers(void)
+{
+    QPixmap pix;
+
+    switch(col)
+    {
+	case Color::Blue:	pix = theme.getImageICN("CELLWIN.ICN", 43).first; break;
+    	case Color::Green:	pix = theme.getImageICN("CELLWIN.ICN", 44).first; break;
+    	case Color::Red:	pix = theme.getImageICN("CELLWIN.ICN", 45).first; break;
+    	case Color::Yellow:	pix = theme.getImageICN("CELLWIN.ICN", 46).first; break;
+    	case Color::Orange:	pix = theme.getImageICN("CELLWIN.ICN", 47).first; break;
+    	case Color::Purple:	pix = theme.getImageICN("CELLWIN.ICN", 48).first; break;
+	default: break;
+    }
+
+    if(stat)
+    {
+	QPainter paint(& pix);
+	paint.drawPixmap(QPoint(2, 2), theme.getImageICN("CELLWIN.ICN", 2).first);
+    }
+
+    setPixmap(pix);
+}
+
+Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors, EditorTheme & theme)
+{
+    setWindowTitle(QApplication::translate("DayEventDialog", "Event Detail", 0, QApplication::UnicodeUTF8));
+
+    // tab 1
+    tabDay = new QWidget();
+
+    const QPair<int,int> & dayPair = event.dayOccurent();
+
+    labelDayFirst = new QLabel(tabDay);
+    labelDayFirst->setText(QApplication::translate("DayEventDialog", "Day of first occurent", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayout = new QHBoxLayout();
+    horizontalLayout->addWidget(labelDayFirst);
+
+    spinBoxDayFirst = new QSpinBox(tabDay);
+    spinBoxDayFirst->setMinimum(1);
+    spinBoxDayFirst->setMaximum(65535);
+    spinBoxDayFirst->setValue(dayPair.first);
+    horizontalLayout->addWidget(spinBoxDayFirst);
+
+    labelSubsequent = new QLabel(tabDay);
+    labelSubsequent->setText(QApplication::translate("DayEventDialog", "Subsequent occurrences", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayout2 = new QHBoxLayout();
+    horizontalLayout2->addWidget(labelSubsequent);
+
+    comboBoxSubsequent = new QComboBox(tabDay);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Never", 0, QApplication::UnicodeUTF8), 0);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every Day", 0, QApplication::UnicodeUTF8), 1);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 2 Days", 0, QApplication::UnicodeUTF8), 2);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 3 Days", 0, QApplication::UnicodeUTF8), 3);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 4 Days", 0, QApplication::UnicodeUTF8), 4);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 5 Days", 0, QApplication::UnicodeUTF8), 5);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 6 Days", 0, QApplication::UnicodeUTF8), 6);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 7 Days", 0, QApplication::UnicodeUTF8), 7);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 14 Days", 0, QApplication::UnicodeUTF8), 14);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 21 Days", 0, QApplication::UnicodeUTF8), 21);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 28 Days", 0, QApplication::UnicodeUTF8), 28);
+    int find = comboBoxSubsequent->findData(dayPair.second);
+    if(0 <= find)
+	comboBoxSubsequent->setCurrentIndex(find);
+    horizontalLayout2->addWidget(comboBoxSubsequent);
+
+    groupBoxAllowedColors = new QGroupBox(tabDay);
+    groupBoxAllowedColors->setTitle(QApplication::translate("DayEventDialog", "Colors allowed to get event", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayout4 = new QHBoxLayout();
+    horizontalSpacerPlayersLeft = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    horizontalSpacerPlayersRight = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    horizontalLayout4->addItem(horizontalSpacerPlayersLeft);
+
+    // create allow players labels
+    QVector<int> colors = Color::colors(Color::All);
+
+    for(QVector<int>::const_iterator
+	it = colors.begin(); it != colors.end(); ++it)
+    if((*it) & kingdomColors)
+    {
+	labelPlayers.push_back(new PlayerAllow(*it, (*it) & event.colors(), theme, groupBoxAllowedColors));
+	horizontalLayout4->addWidget(labelPlayers.back());
+    }
+    horizontalLayout4->addItem(horizontalSpacerPlayersRight);
+
+    checkBoxAllowComp = new QCheckBox(groupBoxAllowedColors);
+    checkBoxAllowComp->setLayoutDirection(Qt::LeftToRight);
+    checkBoxAllowComp->setText(QApplication::translate("DayEventDialog", "Allow computer", 0, QApplication::UnicodeUTF8));
+    checkBoxAllowComp->setChecked(event.allowComputer());
+
+    verticalLayout3 = new QVBoxLayout(groupBoxAllowedColors);
+    verticalLayout3->addLayout(horizontalLayout4);
+    verticalLayout3->addWidget(checkBoxAllowComp);
+
+    verticalLayout = new QVBoxLayout(tabDay);
+    verticalLayout->addLayout(horizontalLayout);
+    verticalLayout->addLayout(horizontalLayout2);
+    verticalLayout->addWidget(groupBoxAllowedColors);
+
+    // tab 2
+    tabResource = new QWidget();
+
+    const Resources & resources = event.resources();
+    int resMin = -65535;
+    int resMax = 65535;
+
+    labelResWood = new QLabel(tabResource);
+    labelResWood->setPixmap(theme.getImageICN("RESOURCE.ICN", 0).first);
+
+    spinBoxResWood = new QSpinBox(tabResource);
+    spinBoxResWood->setMinimum(resMin);
+    spinBoxResWood->setMaximum(resMax);
+    spinBoxResWood->setValue(resources.wood);
+
+    horizontalSpacer2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    labelResSulfur = new QLabel(tabResource);
+    labelResSulfur->setPixmap(theme.getImageICN("RESOURCE.ICN", 3).first);
+
+    spinBoxResSulfur = new QSpinBox(tabResource);
+    spinBoxResSulfur->setMinimum(resMin);
+    spinBoxResSulfur->setMaximum(resMax);
+    spinBoxResSulfur->setValue(resources.sulfur);
+
+    horizontalLayout5 = new QHBoxLayout();
+    horizontalLayout5->addWidget(labelResWood);
+    horizontalLayout5->addWidget(spinBoxResWood);
+    horizontalLayout5->addItem(horizontalSpacer2);
+    horizontalLayout5->addWidget(labelResSulfur);
+    horizontalLayout5->addWidget(spinBoxResSulfur);
+
+    labelResMercury = new QLabel(tabResource);
+    labelResMercury->setPixmap(theme.getImageICN("RESOURCE.ICN", 1).first);
+
+    spinBoxResMercury = new QSpinBox(tabResource);
+    spinBoxResMercury->setMinimum(resMin);
+    spinBoxResMercury->setMaximum(resMax);
+    spinBoxResMercury->setValue(resources.mercury);
+
+    horizontalSpacer3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    labelResCrystal = new QLabel(tabResource);
+    labelResCrystal->setPixmap(theme.getImageICN("RESOURCE.ICN", 4).first);
+
+    spinBoxResCrystal = new QSpinBox(tabResource);
+    spinBoxResCrystal->setMinimum(resMin);
+    spinBoxResCrystal->setMaximum(resMax);
+    spinBoxResCrystal->setValue(resources.crystal);
+
+    horizontalLayout6 = new QHBoxLayout();
+    horizontalLayout6->addWidget(labelResMercury);
+    horizontalLayout6->addWidget(spinBoxResMercury);
+    horizontalLayout6->addItem(horizontalSpacer3);
+    horizontalLayout6->addWidget(labelResCrystal);
+    horizontalLayout6->addWidget(spinBoxResCrystal);
+
+    labelResOre = new QLabel(tabResource);
+    labelResOre->setPixmap(theme.getImageICN("RESOURCE.ICN", 2).first);
+
+    spinBoxResOre = new QSpinBox(tabResource);
+    spinBoxResOre->setMinimum(resMin);
+    spinBoxResOre->setMaximum(resMax);
+    spinBoxResOre->setValue(resources.ore);
+
+    horizontalSpacer4 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    labelResGems = new QLabel(tabResource);
+    labelResGems->setPixmap(theme.getImageICN("RESOURCE.ICN", 5).first);
+
+    spinBoxResGems = new QSpinBox(tabResource);
+    spinBoxResGems->setMinimum(resMin);
+    spinBoxResGems->setMaximum(resMax);
+    spinBoxResGems->setValue(resources.gems);
+
+    horizontalLayout7 = new QHBoxLayout();
+    horizontalLayout7->addWidget(labelResOre);
+    horizontalLayout7->addWidget(spinBoxResOre);
+    horizontalLayout7->addItem(horizontalSpacer4);
+    horizontalLayout7->addWidget(labelResGems);
+    horizontalLayout7->addWidget(spinBoxResGems);
+
+    horizontalSpacer5 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    horizontalSpacer6 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    labelResGold = new QLabel(tabResource);
+    labelResGold->setPixmap(theme.getImageICN("RESOURCE.ICN", 6).first);
+
+    spinBoxResGold = new QSpinBox(tabResource);
+    spinBoxResGold->setMinimum(resMin);
+    spinBoxResGold->setMaximum(resMax);
+    spinBoxResGold->setValue(resources.gold);
+
+    horizontalLayout8 = new QHBoxLayout();
+    horizontalLayout8->addItem(horizontalSpacer5);
+    horizontalLayout8->addWidget(labelResGold);
+    horizontalLayout8->addWidget(spinBoxResGold);
+    horizontalLayout8->addItem(horizontalSpacer6);
+
+    verticalLayout4 = new QVBoxLayout(tabResource);
+    verticalLayout4->addLayout(horizontalLayout5);
+    verticalLayout4->addLayout(horizontalLayout6);
+    verticalLayout4->addLayout(horizontalLayout7);
+    verticalLayout4->addLayout(horizontalLayout8);
+
+#ifndef QT_NO_TOOLTIP
+    labelResWood->setToolTip(QApplication::translate("DayEventDialog", "wood", 0, QApplication::UnicodeUTF8));
+    spinBoxResWood->setToolTip(QApplication::translate("DayEventDialog", "wood", 0, QApplication::UnicodeUTF8));
+    labelResSulfur->setToolTip(QApplication::translate("DayEventDialog", "sulfur", 0, QApplication::UnicodeUTF8));
+    spinBoxResSulfur->setToolTip(QApplication::translate("DayEventDialog", "sulfur", 0, QApplication::UnicodeUTF8));
+    labelResMercury->setToolTip(QApplication::translate("DayEventDialog", "mercury", 0, QApplication::UnicodeUTF8));
+    spinBoxResMercury->setToolTip(QApplication::translate("DayEventDialog", "mercury", 0, QApplication::UnicodeUTF8));
+    labelResCrystal->setToolTip(QApplication::translate("DayEventDialog", "crystal", 0, QApplication::UnicodeUTF8));
+    spinBoxResCrystal->setToolTip(QApplication::translate("DayEventDialog", "crystal", 0, QApplication::UnicodeUTF8));
+    labelResOre->setToolTip(QApplication::translate("DayEventDialog", "ore", 0, QApplication::UnicodeUTF8));
+    spinBoxResOre->setToolTip(QApplication::translate("DayEventDialog", "ore", 0, QApplication::UnicodeUTF8));
+    labelResGems->setToolTip(QApplication::translate("DayEventDialog", "gems", 0, QApplication::UnicodeUTF8));
+    spinBoxResGems->setToolTip(QApplication::translate("DayEventDialog", "gems", 0, QApplication::UnicodeUTF8));
+    labelResGold->setToolTip(QApplication::translate("DayEventDialog", "gold", 0, QApplication::UnicodeUTF8));
+    spinBoxResGold->setToolTip(QApplication::translate("DayEventDialog", "gold", 0, QApplication::UnicodeUTF8));
+#endif // QT_NO_TOOLTIP
+
+    // tab 3
+    tabMessage = new QWidget();
+
+    plainTextMessage = new QPlainTextEdit(tabMessage);
+    plainTextMessage->setPlainText(event.message());
+
+    verticalLayout5 = new QVBoxLayout(tabMessage);
+    verticalLayout5->addWidget(plainTextMessage);
+
+    // end
+    tabWidget = new QTabWidget(this);
+
+    tabWidget->addTab(tabDay, "Days");
+    tabWidget->addTab(tabResource, "Resources");
+    tabWidget->addTab(tabMessage, "Message");
+
+    pushButtonOk = new QPushButton(this);
+    pushButtonOk->setText(QApplication::translate("DayEventDialog", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setEnabled(false);
+
+    horizontalSpacer = new QSpacerItem(238, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    pushButtonCancel = new QPushButton(this);
+    pushButtonCancel->setText(QApplication::translate("DayEventDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayout3 = new QHBoxLayout();
+    horizontalLayout3->addWidget(pushButtonOk);
+    horizontalLayout3->addItem(horizontalSpacer);
+    horizontalLayout3->addWidget(pushButtonCancel);
+
+    verticalLayout2 = new QVBoxLayout(this);
+    verticalLayout2->addWidget(tabWidget);
+    verticalLayout2->addLayout(horizontalLayout3);
+
+    tabWidget->setCurrentIndex(0);
+
+    QSize minSize = minimumSizeHint();
+
+    resize(minSize);
+    setMinimumSize(minSize);
+
+    QObject::connect(spinBoxDayFirst, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    QObject::connect(comboBoxSubsequent , SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    QObject::connect(checkBoxAllowComp, SIGNAL(clicked()), this, SLOT(setEnableOKButton()));
+
+    QObject::connect(spinBoxResWood, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    QObject::connect(spinBoxResMercury, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    QObject::connect(spinBoxResOre, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    QObject::connect(spinBoxResSulfur, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    QObject::connect(spinBoxResCrystal, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    QObject::connect(spinBoxResGems, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    QObject::connect(spinBoxResGold, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+
+    QObject::connect(plainTextMessage, SIGNAL(textChanged()), this, SLOT(setEnableOKButton()));
+
+    for(QVector<PlayerAllow*>::const_iterator
+	it = labelPlayers.begin(); it != labelPlayers.end(); ++it)
+	QObject::connect(*it, SIGNAL(mousePressed()), this, SLOT(setEnableOKButton()));
+
+    QObject::connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
+    QObject::connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
+}
+
+void Form::DayEventDialog::setEnableOKButton(void)
+{
+    pushButtonOk->setEnabled(true);
+}
+
+void Form::DayEventDialog::setEnableOKButton(const QString & val)
+{
+    Q_UNUSED(val);
+    pushButtonOk->setEnabled(true);
+}
+
+DayEvent Form::DayEventDialog::result(void) const
+{
+    DayEvent res;
+    Resources rs;
+
+    rs.wood = spinBoxResWood->value();
+    rs.mercury = spinBoxResMercury->value();
+    rs.ore = spinBoxResOre->value();
+    rs.sulfur = spinBoxResSulfur->value();
+    rs.crystal = spinBoxResCrystal->value();
+    rs.gems = spinBoxResGems->value();
+    rs.gold = spinBoxResGold->value();
+
+    int colors = 0;
+
+    for(QVector<PlayerAllow*>::const_iterator
+	it = labelPlayers.begin(); it != labelPlayers.end(); ++it)
+    if((*it)->allow())
+    {
+	colors |= (*it)->color();
+    }
+
+    res.setResources(rs);
+    res.setAllowComputer(checkBoxAllowComp->isChecked());
+    res.setDayOccurent(spinBoxDayFirst->value(), qvariant_cast<int>(comboBoxCurrentData(comboBoxSubsequent)));
+    res.setColors(colors);
+    res.setMessage(plainTextMessage->toPlainText());
+
+    return res;
 }

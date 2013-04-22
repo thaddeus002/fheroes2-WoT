@@ -447,7 +447,11 @@ struct Resources
     int		crystal;
     int		gems;
     int		gold;
+
+    Resources() : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0) {}
 };
+
+Q_DECLARE_METATYPE(Resources);
 
 class MapObject : public QPoint
 {
@@ -519,6 +523,8 @@ public:
 
     QString	header(void) const;
 };
+
+Q_DECLARE_METATYPE(DayEvent);
 
 class Rumor : public QString
 {

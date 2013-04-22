@@ -1367,6 +1367,10 @@ void MapData::showMapOptions(void)
 	tavernRumors.clear();
 	for(int pos = 0; pos < form.listWidgetRumors->count(); ++pos)
 	    tavernRumors << form.listWidgetRumors->item(pos)->text();
+
+	mapDayEvents.clear();
+	for(int pos = 0; pos < form.listWidgetEvents->count(); ++pos)
+	    mapDayEvents.push_back(qvariant_cast<DayEvent>(form.listWidgetEvents->item(pos)->data(Qt::UserRole)));
     }
 }
 
