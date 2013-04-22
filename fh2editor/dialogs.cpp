@@ -584,6 +584,7 @@ Form::MapOptions::MapOptions(MapData & map)
     horizontalLayoutPlayers = new QHBoxLayout();
     horizontalLayoutPlayers->addItem(horizontalSpacerPlayersLeft);
 
+    // create players labels
     QVector<int> colors = Color::colors(Color::All);
 
     for(QVector<int>::const_iterator
@@ -701,6 +702,13 @@ Form::MapOptions::MapOptions(MapData & map)
     lossCondTownList << map.conditionTownList(Conditions::Loss);
 
     listWidgetRumors->addItems(map.tavernRumorsList());
+
+    for(DayEvents::const_iterator
+        it = map.dayEvents().begin(); it != map.dayEvents().end(); ++it)
+    {
+	static_cast<QListWidget*>(listWidgetEvents)->addItem((*it).header());
+    }
+    listWidgetEvents->sortItems();
 
     setConditionsBoxesMapValues(map);
 

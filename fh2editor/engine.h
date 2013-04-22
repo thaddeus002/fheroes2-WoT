@@ -492,12 +492,12 @@ public:
 
 class DayEvent
 {
-    Resources	resources;
-    bool	allowComputer;
+    Resources	res;
+    bool	allowComp;
     int		dayFirstOccurent;
     int		subsequentOccurrences;
-    int		colors;
-    QString	message;
+    int		cols;
+    QString	msg;
 
 public:
     DayEvent() {}
@@ -508,6 +508,16 @@ public:
     void	setDayOccurent(int, int);
     void	setColors(int);
     void	setMessage(const QString &);
+
+    const Resources &
+	    	resources(void) const { return res; }
+    QPair<int,int>
+		dayOccurent(void) const { return qMakePair(dayFirstOccurent, subsequentOccurrences); }
+    bool	allowComputer(void) const { return allowComp; }
+    int		colors(void) const { return cols; }
+    QString	message(void) const { return msg; }
+
+    QString	header(void) const;
 };
 
 class Rumor : public QString
@@ -531,7 +541,7 @@ public:
     MapObjects(const MapObjects &, const QRect &);
 };
 
-class DayEvents : public QVector<QSharedPointer<DayEvent> >
+class DayEvents : public QList<DayEvent>
 {
 public:
     DayEvents();

@@ -944,7 +944,7 @@ bool MapData::loadMap(const QString & mapFile)
 	// import day events
 	for(QVector<mp2dayevent_t>::const_iterator
 	    it = mp2.dayEvents.begin(); it != mp2.dayEvents.end(); ++it)
-	    dayEvents.push_back(QSharedPointer<DayEvent>(new DayEvent(*it)));
+	    mapDayEvents.push_back(DayEvent(*it));
 
 	// import rumors
 	for(QVector<mp2rumor_t>::const_iterator
@@ -1272,6 +1272,42 @@ void MapData::SaveTest(void) const
     quint32             mapUniq;
 */
 
+    QDomElement erumors = doc.createElement("rumors");
+    emap.appendChild(erumors);
+
+    for(TavernRumors::const_iterator
+	it = tavernRumors.begin(); it != tavernRumors.end(); ++it)
+	erumors.appendChild(doc.createElement("msg")).appendChild(doc.createTextNode(*it));
+
+    QDomElement events = doc.createElement("events");
+    emap.appendChild(events);
+
+    for(DayEvents::const_iterator
+	it = mapDayEvents.begin(); it != mapDayEvents.end(); ++it)
+    {
+	QDomElement event = doc.createElement("event");
+	events.appendChild(event);
+
+	event.setAttribute("colors", (*it).colors());
+	event.setAttribute("allowComputer", (*it).allowComputer());
+
+	QPair<int,int> day = (*it).dayOccurent();
+	event.setAttribute("dayFirst", day.first);
+	event.setAttribute("daySubsequent", day.second);
+
+	QDomElement resources = doc.createElement("resources");
+	event.appendChild(resources);
+	resources.setAttribute("wood", (*it).resources().wood);
+	resources.setAttribute("mercury", (*it).resources().mercury);
+	resources.setAttribute("ore", (*it).resources().ore);
+	resources.setAttribute("sulfur", (*it).resources().sulfur);
+	resources.setAttribute("crystal", (*it).resources().crystal);
+	resources.setAttribute("gems", (*it).resources().gems);
+	resources.setAttribute("gold", (*it).resources().gold);
+
+	event.appendChild(doc.createElement("msg")).appendChild(doc.createTextNode((*it).message()));
+    }
+
     doc.insertBefore(doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\""), doc.firstChild());
 
     QFile file("out.xml");
@@ -1332,4 +1368,9 @@ void MapData::showMapOptions(void)
 	for(int pos = 0; pos < form.listWidgetRumors->count(); ++pos)
 	    tavernRumors << form.listWidgetRumors->item(pos)->text();
     }
+}
+
+const DayEvents & MapData::dayEvents(void) const
+{
+    return mapDayEvents;
 }

@@ -236,6 +236,7 @@ public:
     ListStringPos	conditionArtifactList(void) const;
     QList<QString>	conditionSideList(void) const;
     const QStringList & tavernRumorsList(void) const;
+    const DayEvents &	dayEvents(void) const;
 
     quint32		uniq(void);
 
@@ -292,7 +293,7 @@ protected:
     MapTiles &		mapTiles;
     MapObjects &	mapObjects;
 
-    DayEvents		dayEvents;
+    DayEvents		mapDayEvents;
     TavernRumors	tavernRumors;
 
     CompositeObjectCursor
