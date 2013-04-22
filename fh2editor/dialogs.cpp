@@ -448,7 +448,35 @@ void fillComboBox(QComboBox & box, const ListStringPos & list)
     }
 }
 
-Form::MapOptions::MapOptions(const MapData & map)
+Form::PlayerStatus::PlayerStatus(int c, int v, EditorTheme & t, QWidget* parent) : QLabel(parent), col(c), stat(v), theme(t)
+{
+    updatePlayers();
+}
+
+void Form::PlayerStatus::mousePressEvent(QMouseEvent* event)
+{
+    Q_UNUSED(event);
+    stat += 1;
+    if(0 == (stat % 4)) stat += 1;
+    updatePlayers();
+    emit mousePressed();
+}
+
+void Form::PlayerStatus::updatePlayers(void)
+{
+    switch(col)
+    {
+        case Color::Blue:	setPixmap(theme.getImageICN("CELLWIN.ICN", 19 + status()).first); break;
+        case Color::Green:	setPixmap(theme.getImageICN("CELLWIN.ICN", 23 + status()).first); break;
+        case Color::Red:	setPixmap(theme.getImageICN("CELLWIN.ICN", 27 + status()).first); break;
+        case Color::Yellow:	setPixmap(theme.getImageICN("CELLWIN.ICN", 31 + status()).first); break;
+        case Color::Orange:	setPixmap(theme.getImageICN("CELLWIN.ICN", 35 + status()).first); break;
+        case Color::Purple:	setPixmap(theme.getImageICN("CELLWIN.ICN", 39 + status()).first); break;
+        default: break;
+    }
+}
+
+Form::MapOptions::MapOptions(MapData & map)
 {
     setWindowTitle(QApplication::translate("MapOptions", "Map Options", 0, QApplication::UnicodeUTF8));
 
@@ -553,18 +581,32 @@ Form::MapOptions::MapOptions(const MapData & map)
     horizontalSpacerPlayersRight = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     verticalSpacerPage2 = new QSpacerItem(20, 17, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-    labelPlayer1 = new QLabel(groupBoxPlayers);
-    labelPlayer2 = new QLabel(groupBoxPlayers);
-    labelPlayer3 = new QLabel(groupBoxPlayers);
-    labelPlayer1->setText(QApplication::translate("MapOptions", "player 1", 0, QApplication::UnicodeUTF8));
-    labelPlayer2->setText(QApplication::translate("MapOptions", "player 2", 0, QApplication::UnicodeUTF8));
-    labelPlayer3->setText(QApplication::translate("MapOptions", "player 3", 0, QApplication::UnicodeUTF8));
-
     horizontalLayoutPlayers = new QHBoxLayout();
     horizontalLayoutPlayers->addItem(horizontalSpacerPlayersLeft);
-    horizontalLayoutPlayers->addWidget(labelPlayer1);
-    horizontalLayoutPlayers->addWidget(labelPlayer2);
-    horizontalLayoutPlayers->addWidget(labelPlayer3);
+
+    QVector<int> colors = Color::colors(Color::All);
+
+    for(QVector<int>::const_iterator
+	it = colors.begin(); it != colors.end(); ++it)
+    {
+	int stat = 0; /* 0: n/a, 1: human only, 2: comp only, 3: comp or human */
+	if((*it) & map.kingdomColors())
+	{
+	    if(((*it) & map.computerColors()) &&
+		((*it) & map.humanColors()))
+		stat = 3;
+	    else
+	    if((*it) & map.humanColors())
+		stat = 1;
+	    else
+	    if((*it) & map.computerColors())
+		stat = 2;
+	}
+        labelPlayers.push_back(new PlayerStatus(*it, stat, map.theme(), groupBoxPlayers));
+	labelPlayers.back()->setEnabled((*it) & map.kingdomColors());
+        horizontalLayoutPlayers->addWidget(labelPlayers.back());
+    }
+
     horizontalLayoutPlayers->addItem(horizontalSpacerPlayersRight);
 
     checkBoxStartWithHero = new QCheckBox(groupBoxPlayers);
@@ -687,6 +729,10 @@ Form::MapOptions::MapOptions(const MapData & map)
 
     QObject::connect(plainTextEditAuthors, SIGNAL(textChanged()), this, SLOT(setEnableSaveButton()));
     QObject::connect(plainTextEditLicense, SIGNAL(textChanged()), this, SLOT(setEnableSaveButton()));
+
+    for(QVector<PlayerStatus*>::const_iterator
+	it = labelPlayers.begin(); it != labelPlayers.end(); ++it)
+	QObject::connect(*it, SIGNAL(mousePressed()), this, SLOT(setEnableSaveButton()));
 
     QObject::connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
     QObject::connect(pushButtonSave, SIGNAL(clicked()), this, SLOT(accept()));

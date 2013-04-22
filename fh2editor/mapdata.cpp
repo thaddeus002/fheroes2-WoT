@@ -483,7 +483,8 @@ void MapArea::addObject(const QPoint & pos, const CompositeObject & obj, const Q
 
 MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), themeContent(parent->mainWindow->aggContent),
     tileOverMouse(NULL), mapName("New Map"), mapAuthors("unknown"), mapLicense("unknown"), mapDifficulty(Difficulty::Normal),
-    mapUniq(1), mapStartWithHero(false), mapArea(), mapTiles(mapArea.tiles), mapObjects(mapArea.objects)
+    mapKingdomColors(0), mapCompColors(0), mapHumanColors(0), mapUniq(1), mapStartWithHero(false), mapArea(),
+    mapTiles(mapArea.tiles), mapObjects(mapArea.objects)
 {
 }
 
@@ -515,6 +516,21 @@ const QString & MapData::license(void) const
 int MapData::difficulty(void) const
 {
     return mapDifficulty;
+}
+
+int MapData::kingdomColors(void) const
+{
+    return mapKingdomColors;
+}
+
+int MapData::humanColors(void) const
+{
+    return mapHumanColors;
+}
+
+int MapData::computerColors(void) const
+{
+    return mapCompColors;
 }
 
 bool MapData::startWithHero(void) const
@@ -860,6 +876,27 @@ bool MapData::loadMap(const QString & mapFile)
 	    default:	mapDifficulty = Difficulty::Normal; break;
 	}
 
+	if(mp2.kingdomColor[0]) mapKingdomColors |= Color::Blue;
+	if(mp2.kingdomColor[1]) mapKingdomColors |= Color::Green;
+	if(mp2.kingdomColor[2]) mapKingdomColors |= Color::Red;
+	if(mp2.kingdomColor[3]) mapKingdomColors |= Color::Yellow;
+	if(mp2.kingdomColor[4]) mapKingdomColors |= Color::Orange;
+	if(mp2.kingdomColor[5]) mapKingdomColors |= Color::Purple;
+
+	if(mp2.humanAllow[0]) mapHumanColors |= Color::Blue;
+	if(mp2.humanAllow[1]) mapHumanColors |= Color::Green;
+	if(mp2.humanAllow[2]) mapHumanColors |= Color::Red;
+	if(mp2.humanAllow[3]) mapHumanColors |= Color::Yellow;
+	if(mp2.humanAllow[4]) mapHumanColors |= Color::Orange;
+	if(mp2.humanAllow[5]) mapHumanColors |= Color::Purple;
+
+	if(mp2.compAllow[0]) mapCompColors |= Color::Blue;
+	if(mp2.compAllow[1]) mapCompColors |= Color::Green;
+	if(mp2.compAllow[2]) mapCompColors |= Color::Red;
+	if(mp2.compAllow[3]) mapCompColors |= Color::Yellow;
+	if(mp2.compAllow[4]) mapCompColors |= Color::Orange;
+	if(mp2.compAllow[5]) mapCompColors |= Color::Purple;
+
 	switch(mp2.conditionWins)
 	{
 	    case 1:	mapConditionWins.set(Conditions::CaptureTown, QPoint(mp2.conditionWinsData3, mp2.conditionWinsData4)); break;
@@ -1203,13 +1240,37 @@ void MapData::SaveTest(void) const
     QDomElement eheader = doc.createElement("header");
     emap.appendChild(eheader);
 
-    eheader.setAttribute("version", 12345);
-    eheader.setAttribute("localtime", 123456789);
+    eheader.setAttribute("version", 3075);
+    eheader.setAttribute("localtime", QDateTime::currentDateTime().toTime_t());
 
-    eheader.appendChild(doc.createElement("name")).appendChild(doc.createTextNode("BeltWay"));
-    eheader.appendChild(doc.createElement("description")).appendChild(doc.createTextNode("BeltWay BeltWay BeltWay BeltWay BeltWay"));
-    eheader.appendChild(doc.createElement("authors")).appendChild(doc.createTextNode("I'm"));
-    eheader.appendChild(doc.createElement("license")).appendChild(doc.createTextNode("Creative"));
+    eheader.appendChild(doc.createElement("name")).appendChild(doc.createTextNode(mapName));
+    eheader.appendChild(doc.createElement("description")).appendChild(doc.createTextNode(mapDescription));
+    eheader.appendChild(doc.createElement("authors")).appendChild(doc.createTextNode(mapAuthors));
+    eheader.appendChild(doc.createElement("license")).appendChild(doc.createTextNode(mapLicense));
+    eheader.appendChild(doc.createElement("difficulty")).appendChild(doc.createTextNode(QString::number(mapDifficulty)));
+
+    QDomElement eplayers = doc.createElement("players");
+    eplayers.setAttribute("kingdoms", mapKingdomColors);
+    eplayers.setAttribute("humans", mapHumanColors);
+    eplayers.setAttribute("computers", mapCompColors);
+    eplayers.setAttribute("startWithHero", mapStartWithHero);
+    eheader.appendChild(eplayers);
+
+    QDomElement ewins = doc.createElement("conditionWins");
+    ewins.setAttribute("condition", mapConditionWins.condition());
+    ewins.setAttribute("allowNormalVictory", mapConditionWins.allowNormalVictory());
+    ewins.setAttribute("computerAlsoWins", mapConditionWins.compAlsoWins());
+    ewins.setAttribute("extValue", mapConditionWins.variantString());
+    eheader.appendChild(ewins);
+
+    QDomElement eloss = doc.createElement("conditionLoss");
+    eloss.setAttribute("condition", mapConditionLoss.condition());
+    eloss.setAttribute("extValue", mapConditionLoss.variantString());
+    eheader.appendChild(eloss);
+
+/*
+    quint32             mapUniq;
+*/
 
     doc.insertBefore(doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\""), doc.firstChild());
 
@@ -1249,6 +1310,22 @@ void MapData::showMapOptions(void)
 	mapConditionWins.setCompAlsoWins(form.checkBoxCompAlsoWins->isChecked());
 	mapConditionLoss.set(qvariant_cast<int>(comboBoxCurrentData(form.comboBoxLossCond)), comboBoxCurrentData(form.comboBoxLossCondExt));
 	mapStartWithHero = form.checkBoxStartWithHero->isChecked();
+
+	mapCompColors = 0;
+	mapHumanColors = 0;
+
+	for(QVector<Form::PlayerStatus*>::const_iterator
+    	    it = form.labelPlayers.begin(); it != form.labelPlayers.end(); ++it)
+	{
+	    if(mapKingdomColors & (*it)->color())
+	    {
+		/* 0: n/a, 1: human only, 2: comp only, 3: comp or human */
+		if(0x01 & (*it)->status())
+		    mapHumanColors |= (*it)->color();
+		if(0x02 & (*it)->status())
+		    mapCompColors |= (*it)->color();
+	    }
+	}
 
 	// tab3
 	tavernRumors.clear();

@@ -26,6 +26,7 @@
 #include <QDialog>
 #include <QSize>
 #include <QPair>
+#include <QLabel>
 #include <QVariant>
 #include <QListWidget>
 #include "engine.h"
@@ -204,12 +205,34 @@ namespace Form
 	void			editItem(QListWidgetItem*);
     };
 
+    class PlayerStatus : public QLabel
+    {
+	Q_OBJECT
+
+	int			col;
+	int			stat;
+	EditorTheme &		theme;
+
+    public:
+	PlayerStatus(int, int, EditorTheme &, QWidget* parent);
+
+	int			color(void) const { return col; }
+	int			status(void) const { return stat % 4; }
+
+    signals:
+        void                    mousePressed(void);
+
+    protected:
+	void			updatePlayers(void);
+	void			mousePressEvent(QMouseEvent*);
+    };
+
     class MapOptions : public QDialog
     {
 	Q_OBJECT
 
     public:
-	MapOptions(const MapData &);
+	MapOptions(MapData &);
 
 	QVBoxLayout*		verticalLayout2;
 	QTabWidget*		tabWidget;
@@ -240,9 +263,7 @@ namespace Form
 	QVBoxLayout*		verticalLayout5;
 	QHBoxLayout*		horizontalLayoutPlayers;
 	QSpacerItem*		horizontalSpacerPlayersLeft;
-	QLabel*			labelPlayer1;
-	QLabel*			labelPlayer2;
-	QLabel*			labelPlayer3;
+	QVector<PlayerStatus*>	labelPlayers;
 	QSpacerItem*		horizontalSpacerPlayersRight;
 	QCheckBox*		checkBoxStartWithHero;
 	QSpacerItem*		verticalSpacerPage2;

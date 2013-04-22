@@ -1277,6 +1277,11 @@ QPixmap EditorTheme::getImageTIL(const QString & til, int index)
     return aggSpool.getImageTIL(til, index);
 }
 
+QPair<QPixmap, QPoint> EditorTheme::getImageICN(const QString & icn, int index)
+{
+    return aggSpool.getImageICN(icn, index);
+}
+
 QPair<QPixmap, QPoint> EditorTheme::getImageICN(int icn, int index)
 {
     return aggSpool.getImageICN(H2::icnString(icn), index);
@@ -1803,9 +1808,6 @@ CompositeObjectCursor::CompositeObjectCursor(const CompositeObject & obj, Editor
     const QSize areaSize(theme.tileSize().width() * size.width(), theme.tileSize().height() * size.height());
 
     objectArea = theme.getImage(obj);
-    //borderRed = Editor::pixmapBorder(areaSize, QColor(255, 0, 0));
-    //borderGreen = Editor::pixmapBorder(areaSize, QColor(0, 255, 0));
-
     centerOffset = QPoint(areaSize.width() - theme.tileSize().width(),
 				areaSize.height() - theme.tileSize().height());
 
@@ -1871,4 +1873,67 @@ void CompositeObjectCursor::reset(void)
 bool CompositeObjectCursor::isValid(void) const
 {
     return valid;
+}
+
+QString GameCondition::variantString(void) const
+{
+    QString res;
+    if(QVariant::Point == variant().type())
+    {
+        QPoint pt = variant().toPoint();
+        QTextStream ts(& res);
+        ts << pt.x() << "," << pt.y();
+    }
+    else
+    if(QVariant::Int == variant().type())
+        res = QString::number(variant().toInt());
+    return res;
+}
+
+int Color::count(int v)
+{
+    int res = 0;
+    if(Blue & v) ++res;
+    if(Red & v) ++res;
+    if(Green & v) ++res;
+    if(Yellow & v) ++res;
+    if(Orange & v) ++res;
+    if(Purple & v) ++res;
+    return res;
+}
+
+QColor Color::convert(int v)
+{
+    switch(v)
+    {
+	case Blue:	return QColor(0, 0, 0xFF);
+	case Red:	return QColor(0xFF, 0, 0);
+	case Green:	return QColor(0, 0xFF, 0);
+	case Yellow:	return QColor(0xFF, 0xFF, 0);
+	case Orange:	return QColor(0xFF, 0x66, 0);
+	case Purple:	return QColor(0xFF, 0, 0xFF);
+	default: break;
+    }
+
+    return QColor(0, 0, 0);
+}
+
+QPixmap Color::pixmap(int v, const QSize & sz)
+{
+    QPixmap pixmap(sz);
+    pixmap.fill(convert(v));
+    return pixmap;
+}
+
+QVector<int> Color::colors(int v)
+{
+    QVector<int> res;
+    res.reserve(6);
+    if(Blue & v) res.push_back(Blue);
+    if(Green & v) res.push_back(Green);
+    if(Red & v) res.push_back(Red);
+    if(Yellow & v) res.push_back(Yellow);
+    if(Orange & v) res.push_back(Orange);
+    if(Purple & v) res.push_back(Purple);
+    return res;
 }

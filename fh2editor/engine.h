@@ -59,6 +59,11 @@ namespace Color
 {
     enum { Unknown = 0, Blue = 0x01, Red = 0x02, Green = 0x04, Yellow = 0x08, Orange = 0x10, Purple = 0x20,
 	    All = Blue | Red | Green | Yellow | Orange | Purple };
+
+    int		count(int);
+    QColor	convert(int);
+    QPixmap	pixmap(int, const QSize &);
+    QVector<int> colors(int);
 }
 
 namespace SpriteLevel
@@ -417,6 +422,7 @@ public:
 
     QPixmap			getImageTIL(const QString &, int);
     QPair<QPixmap, QPoint>	getImageICN(int, int);
+    QPair<QPixmap, QPoint>	getImageICN(const QString &, int);
     QPixmap			getImage(const CompositeObject &);
 
     const QSize &		tileSize(void) const;
@@ -569,6 +575,7 @@ struct GameCondition : public QPair<int, QVariant>
     void		set(int cond, const QVariant & val = QVariant()) { first = cond; second = val; }
     int			index(void) const { return 0x000000FF & first; }
     const QVariant &	variant(void) const { return second; }
+    QString		variantString(void) const;
 };
 
 struct CondWins : public GameCondition

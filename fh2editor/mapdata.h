@@ -225,6 +225,9 @@ public:
     const QString &	license(void) const;
     const QSize &	size(void) const;
     int			difficulty(void) const;
+    int			kingdomColors(void) const;
+    int			computerColors(void) const;
+    int			humanColors(void) const;
     bool		startWithHero(void) const;
     const CondWins &	conditionWins(void) const;
     const CondLoss &	conditionLoss(void) const;
@@ -277,6 +280,9 @@ protected:
     QString		mapAuthors;
     QString		mapLicense;
     int			mapDifficulty;
+    int			mapKingdomColors;
+    int			mapCompColors;
+    int			mapHumanColors;
     quint32		mapUniq;
     bool		mapStartWithHero;
     CondWins		mapConditionWins;
