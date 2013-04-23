@@ -60,10 +60,30 @@ namespace Color
     enum { Unknown = 0, Blue = 0x01, Red = 0x02, Green = 0x04, Yellow = 0x08, Orange = 0x10, Purple = 0x20,
 	    All = Blue | Red | Green | Yellow | Orange | Purple };
 
-    int		count(int);
-    QColor	convert(int);
-    QPixmap	pixmap(int, const QSize &);
-    QVector<int> colors(int);
+    int			count(int);
+    QColor		convert(int);
+    QPixmap		pixmap(int, const QSize &);
+    QVector<int>	colors(int);
+}
+
+namespace Race
+{
+    enum { Unknown = 0, Knight = 0x01, Barbarian = 0x02, Sorceress = 0x04, Warlock = 0x08, Wizard = 0x10, Necromancer = 0x20,
+	    Multi = 0x40, Random = 0x80, All = Knight | Barbarian | Sorceress | Warlock | Wizard | Necromancer };
+}
+
+namespace Building
+{
+    enum { Unknown = 0, ThievesGuild = 0x00000001, Tavern = 0x00000002, Shipyard = 0x00000004, Well = 0x00000008, Statue = 0x00000010, LeftTurret = 0x00000020,
+	    RightTurret = 0x00000040, Marketplace = 0x00000080, ExtraWel2 = 0x00000100 /* Farm, Garbage He, Crystal Gar, Waterfall, Orchard, Skull Pile */,
+	    Moat = 0x00000200, ExtraSpec = 0x00000400 /* Fortification, Coliseum, Rainbow, Dungeon, Library, Storm */,
+	    Castle = 0x00000800, Captain = 0x00001000, Shrine = 0x00002000,
+	    MageGuild1 = 0x00004000, MageGuild2 = 0x00008000, MageGuild3 = 0x00010000, MageGuild4 = 0x00020000, MageGuild5 = 0x00040000,
+	    Dwelling1 = 0x00100000, Dwelling2 = 0x00200000, Dwelling3 = 0x00400000, Dwelling4 = 0x00800000, Dwelling5 = 0x01000000, Dwelling6 = 0x02000000,
+	    Upgrade2 = 0x04000000, Upgrade3 = 0x08000000, Upgrade4 = 0x10000000, Upgrade5 = 0x20000000, Upgrade6 = 0x40000000, Upgrade7 = 0x80000000,
+	    MageGuild = MageGuild1 | MageGuild2 | MageGuild3 | MageGuild4 | MageGuild5,
+	    Dwellings = Dwelling1 | Dwelling2 | Dwelling3 | Dwelling4 | Dwelling5 | Dwelling6,
+	    Upgrades = Upgrade2 | Upgrade3 | Upgrade4 | Upgrade5 | Upgrade6 | Upgrade7 };
 }
 
 namespace SpriteLevel
@@ -455,19 +475,57 @@ Q_DECLARE_METATYPE(Resources);
 
 class MapObject : public QPoint
 {
-    int	uniq;
+    int		objUid;
+    int		objType;
 
 public:
-    MapObject(const QPoint & pos, int id) : QPoint(pos), uniq(id) {}
+    enum { Unknown = 0, Town, Hero, Sign, Event, Sphinx };
+
+    MapObject(const QPoint & pos, int uid, int type = Unknown) : QPoint(pos), objUid(uid), objType(type) {}
     virtual ~MapObject() {}
 
-    const int & uid(void) const { return uniq; }
+    int 		uid(void) const { return objUid; }
+    int 		type(void) const { return objType; }
+    const QPoint &	pos(void) const { return *this; }
+};
+
+class Troop : public QPair<int, int>
+{
+public:
+    Troop() : QPair<int, int>(0, 0) {}
+    Troop(int type, int count) : QPair<int, int>(type, count) {}
+
+    bool	isValid(void) const { return first && second; }
+    int &	type(void) { return first; }
+    int &	count(void) { return second; }
+};
+
+class Troops : public QVector<Troop>
+{
+public:
+    Troops() {  reserve(7); }
 };
 
 class MapTown : public MapObject
 {
+    int		townColor;
+    int		townRace;
+    int		townBuildings;
+    QString     townName;
+    Troops	townTroops;
+    bool	forceTown;
+
 public:
     MapTown(const QPoint & pos, quint32 id, const mp2town_t &);
+
+    int			color(void) const { return townColor; }
+    int			race(void) const { return townRace; }
+    int			buildings(void) const { return townBuildings; }
+    const QString & 	name(void) const { return townName; }
+    bool		disableCastle(void) const { return forceTown; }
+
+    const Troops &	troops(void) const { return townTroops; }
+    Troops &		troops(void) { return townTroops; }
 };
 
 class MapHero : public MapObject
@@ -532,15 +590,13 @@ public:
     Rumor(const mp2rumor_t & mp2) : QString(mp2.text) {}
 };
 
-class MapKey : public QPoint
+class SharedMapObject : public QSharedPointer<MapObject>
 {
 public:
-    MapKey(const QPoint & pos) : QPoint(pos) {}
-
-    bool operator< (const QPoint & pt) const { return x() + y() < pt.x() + pt.y(); }
+    SharedMapObject(MapObject* ptr) : QSharedPointer<MapObject>(ptr) {}
 };
 
-class MapObjects : public QMap<MapKey, QSharedPointer<MapObject> >
+class MapObjects : public QList<SharedMapObject>
 {
 public:
     MapObjects();

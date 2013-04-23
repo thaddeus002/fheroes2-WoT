@@ -422,7 +422,7 @@ void MapArea::importMP2Towns(const QVector<H2::TownPos> & towns)
     {
 	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1().find(MapTileExt::isTown);
 	int uid = ext ? ext->uid() : -1;
-	objects[(*it).pos()] = QSharedPointer<MapObject>(new MapTown((*it).pos(), uid, (*it).town()));
+	objects.push_back(new MapTown((*it).pos(), uid, (*it).town()));
     }
 }
 
@@ -433,7 +433,7 @@ void MapArea::importMP2Heroes(const QVector<H2::HeroPos> & heroes)
     {
 	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1().find(MapTileExt::isMiniHero);
 	int uid = ext ? ext->uid() : -1;
-	objects[(*it).pos()] = QSharedPointer<MapObject>(new MapHero((*it).pos(), uid, (*it).hero()));
+	objects.push_back(new MapHero((*it).pos(), uid, (*it).hero()));
     }
 }
 
@@ -444,7 +444,7 @@ void MapArea::importMP2Signs(const QVector<H2::SignPos> & signs)
     {
 	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1().find(MapTileExt::isSign);
 	int uid = ext ? ext->uid() : -1;
-	objects[(*it).pos()] = QSharedPointer<MapObject>(new MapSign((*it).pos(), uid, (*it).sign()));
+	objects.push_back(new MapSign((*it).pos(), uid, (*it).sign()));
     }
 }
 
@@ -455,7 +455,7 @@ void MapArea::importMP2MapEvents(const QVector<H2::EventPos> & events)
     {
 	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1().find(MapTileExt::isMapEvent);
 	int uid = ext ? ext->uid() : -1;
-	objects[(*it).pos()] = QSharedPointer<MapObject>(new MapEvent((*it).pos(), uid, (*it).event()));
+	objects.push_back(new MapEvent((*it).pos(), uid, (*it).event()));
     }
 }
 
@@ -466,7 +466,7 @@ void MapArea::importMP2SphinxRiddles(const QVector<H2::SphinxPos> & sphinxes)
     {
 	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1().find(MapTileExt::isSphinx);
 	int uid = ext ? ext->uid() : -1;
-	objects[(*it).pos()] = QSharedPointer<MapObject>(new MapSphinx((*it).pos(), uid, (*it).sphinx()));
+	objects.push_back(new MapSphinx((*it).pos(), uid, (*it).sphinx()));
     }
 }
 
@@ -565,11 +565,22 @@ ListStringPos MapData::conditionTownList(int cond) const
 {
     ListStringPos res;
 
-    if(Conditions::Wins & cond)
-	res << QPair<QString, QPoint>("Test 1", QPoint(62,83)) << QPair<QString, QPoint>("Town 2", QPoint(81,27));
-    else
-    if(Conditions::Loss & cond)
-	res << QPair<QString, QPoint>("Test 1", QPoint(62,83)) << QPair<QString, QPoint>("Town 2", QPoint(81,27));
+    for(MapObjects::const_iterator
+	it = mapObjects.begin(); it != mapObjects.end(); ++it)
+    if(MapObject::Town == (*it).data()->type())
+    {
+	//if(Conditions::Wins & cond)
+	//else
+	//if(Conditions::Loss & cond)
+	//
+	// mapCompColors;
+	// mapHumanColors;
+
+	const MapTown* town = dynamic_cast<const MapTown*>((*it).data());
+
+	if(town)
+	    res << QPair<QString, QPoint>(town->name(), town->pos());
+    }
 
     return res;
 }
@@ -855,6 +866,7 @@ bool MapData::loadMap(const QString & mapFile)
     const QSize & tileSize = themeContent.tileSize();
 
     MP2Format mp2;
+    qDebug() << "MapData::loadMap:" << mapFile;
 
     if(mp2.loadMap(mapFile))
     {
@@ -1133,49 +1145,42 @@ bool MP2Format::loadMap(const QString & mapFile)
 
 	    if(0 <= posBlock.x() && 0 <= posBlock.y())
 	    {
-		switch(block.size())
+		// sign block: 10 byte
+		if(10 <= block.size() && 0x01 == block.at(0))
 		{
-		    // castle block: 70 byte
-		    case 70:
-		    {
-			mp2town_t castle; data >> castle;
-			castles.push_back(H2::TownPos(castle, posBlock));
-		    }
-			break;
-
-		    // hero block: 76 byte
-		    case 76:
-		    {
-			mp2hero_t hero; data >> hero;
-			heroes.push_back(H2::HeroPos(hero, posBlock));
-		    }
-			break;
-
-		    default:
-			// sign block: 10 byte
-			if(10 <= block.size() && 0x01 == block.at(0))
-			{
-			    mp2sign_t sign; data >> sign;
-			    signs.push_back(H2::SignPos(sign, posBlock));
-			}
-			else
-			// map event block: 50 byte
-			if(50 <= block.size() && 0x01 == block.at(0))
-			{
-			    mp2mapevent_t event; data >> event;
-			    mapEvents.push_back(H2::EventPos(event, posBlock));
-			}
-			else
-			// sphinx block: 138 byte
-			if(138 <= block.size() && 0 == block.at(0))
-			{
-			    mp2sphinx_t sphinx; data >> sphinx;
-			    sphinxes.push_back(H2::SphinxPos(sphinx, posBlock));
-			}
-			else
-			    qCritical() << "unknown block: " << ii << ", size: " << block.size() << ", pos: " << posBlock;
-			break;
+		    mp2sign_t sign; data >> sign;
+		    signs.push_back(H2::SignPos(sign, posBlock));
 		}
+		else
+		// map event block: 50 byte
+		if(50 <= block.size() && 0x01 == block.at(0))
+		{
+		    mp2mapevent_t event; data >> event;
+		    mapEvents.push_back(H2::EventPos(event, posBlock));
+		}
+		else
+		// castle block: 70 byte
+		if(block.size() == 70)
+		{
+		    mp2town_t castle; data >> castle;
+		    castles.push_back(H2::TownPos(castle, posBlock));
+		}
+		else
+		// hero block: 76 byte
+		if(block.size() == 76)
+		{
+		    mp2hero_t hero; data >> hero;
+		    heroes.push_back(H2::HeroPos(hero, posBlock));
+		}
+		else
+		// sphinx block: 138 byte
+		if(138 <= block.size() && 0 == block.at(0))
+		{
+		    mp2sphinx_t sphinx; data >> sphinx;
+		    sphinxes.push_back(H2::SphinxPos(sphinx, posBlock));
+		}
+		else
+		    qCritical() << "unknown block: " << ii << ", size: " << block.size() << ", pos: " << posBlock;
 	    }
 	    else
 	    if(block.at(0) == 0)

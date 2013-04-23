@@ -443,7 +443,7 @@ void fillComboBox(QComboBox & box, const ListStringPos & list)
 	it = list.begin(); it != list.end(); ++it)
     {
 	QString str; QTextStream ts(&str);
-	ts << "(" << (*it).second.x() << ", " << (*it).second.x() << ")" << " - " << (*it).first;
+	ts << (*it).first << " - " << "(" << (*it).second.x() << ", " << (*it).second.y() << ")";
 	box.addItem(str, (*it).second);
     }
 }

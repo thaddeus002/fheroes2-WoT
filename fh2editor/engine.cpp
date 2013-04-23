@@ -49,6 +49,7 @@ QString readStringFromStream(QDataStream & ds, int count = 0)
 	for(int ii = 0; ii < count; ++ii)
 	{
 	    ds >> byte;
+	    if(0 == byte) break;
 	    str.push_back(byte);
 	}
     }
@@ -346,7 +347,6 @@ QDataStream & operator>> (QDataStream & ds, mp2town_t & cstl)
     ds >> cstl.captainPresent >> cstl.customName;
 
     cstl.name = readStringFromStream(ds, 13);
-
     ds >> cstl.race >> cstl.forceTown;
     return ds;
 }
@@ -1662,28 +1662,89 @@ QPair<int, int> EditorTheme::groundBoundariesFix(const MapTile & tile, const Map
     return res;
 }
 
-MapTown::MapTown(const QPoint & pos, quint32 id, const mp2town_t &)
-    : MapObject(pos, id)
+MapTown::MapTown(const QPoint & pos, quint32 id, const mp2town_t & mp2)
+    : MapObject(pos, id, MapObject::Town), townName(mp2.name), forceTown(mp2.forceTown)
 {
+    switch(mp2.color)
+    {
+        case 0:	townColor = Color::Blue; break;
+        case 1: townColor = Color::Green; break;
+        case 2: townColor = Color::Red; break;
+        case 3: townColor = Color::Yellow; break;
+        case 4: townColor = Color::Orange; break;
+        case 5: townColor = Color::Purple; break;
+        default: townColor = Color::Unknown; break;
+    }
+
+    switch(mp2.race)
+    {
+        case 0: townRace = Race::Knight; break;
+        case 1: townRace = Race::Barbarian; break;
+        case 2: townRace = Race::Sorceress; break;
+        case 3: townRace = Race::Warlock; break;
+        case 4: townRace = Race::Wizard; break;
+        case 5: townRace = Race::Necromancer; break;
+        default: townRace = Race::Random; break;
+    }
+
+    if(mp2.customBuilding)
+    {
+	if(0x00000002 & mp2.building) townBuildings |= Building::ThievesGuild;
+        if(0x00000004 & mp2.building) townBuildings |= Building::Tavern;
+	if(0x00000008 & mp2.building) townBuildings |= Building::Shipyard;
+        if(0x00000010 & mp2.building) townBuildings |= Building::Well;
+        if(0x00000080 & mp2.building) townBuildings |= Building::Statue;
+        if(0x00000100 & mp2.building) townBuildings |= Building::LeftTurret;
+        if(0x00000200 & mp2.building) townBuildings |= Building::RightTurret;
+        if(0x00000400 & mp2.building) townBuildings |= Building::Marketplace;
+        if(0x00001000 & mp2.building) townBuildings |= Building::Moat;
+        if(0x00000800 & mp2.building) townBuildings |= Building::ExtraWel2;
+        if(0x00002000 & mp2.building) townBuildings |= Building::ExtraSpec;
+        if(0x00080000 & mp2.building) townBuildings |= Building::Dwelling1;
+        if(0x00100000 & mp2.building) townBuildings |= Building::Dwelling2;
+        if(0x00200000 & mp2.building) townBuildings |= Building::Dwelling3;
+        if(0x00400000 & mp2.building) townBuildings |= Building::Dwelling4;
+        if(0x00800000 & mp2.building) townBuildings |= Building::Dwelling5;
+        if(0x01000000 & mp2.building) townBuildings |= Building::Dwelling6;
+        if(0x02000000 & mp2.building) townBuildings |= Building::Upgrade2 | Building::Dwelling2;
+        if(0x04000000 & mp2.building) townBuildings |= Building::Upgrade3 | Building::Dwelling3;
+        if(0x08000000 & mp2.building) townBuildings |= Building::Upgrade4 | Building::Dwelling4;
+        if(0x10000000 & mp2.building) townBuildings |= Building::Upgrade5 | Building::Dwelling5;
+        if(0x20000000 & mp2.building) townBuildings |= Building::Upgrade6 | Building::Dwelling6;
+    }
+
+    if(0 < mp2.magicTower) townBuildings |= Building::MageGuild1;
+    if(1 < mp2.magicTower) townBuildings |= Building::MageGuild2;
+    if(2 < mp2.magicTower) townBuildings |= Building::MageGuild3;
+    if(3 < mp2.magicTower) townBuildings |= Building::MageGuild4;
+    if(4 < mp2.magicTower) townBuildings |= Building::MageGuild5;
+
+    if(mp2.captainPresent) townBuildings |= Building::Captain;
+
+    if(mp2.customTroops)
+    {
+	for(int ii = 0; ii < 5; ++ii)
+	    townTroops.push_back(Troop(mp2.troopId[ii], mp2.troopCount[ii]));
+    }
 }
 
 MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t &)
-    : MapObject(pos, id)
+    : MapObject(pos, id, MapObject::Hero)
 {
 }
 
 MapSign::MapSign(const QPoint & pos, quint32 id, const mp2sign_t &)
-    : MapObject(pos, id)
+    : MapObject(pos, id, MapObject::Sign)
 {
 }
 
 MapEvent::MapEvent(const QPoint & pos, quint32 id, const mp2mapevent_t &)
-    : MapObject(pos, id)
+    : MapObject(pos, id, MapObject::Event)
 {
 }
 
 MapSphinx::MapSphinx(const QPoint & pos, quint32 id, const mp2sphinx_t &)
-    : MapObject(pos, id)
+    : MapObject(pos, id, MapObject::Sphinx)
 {
 }
 
