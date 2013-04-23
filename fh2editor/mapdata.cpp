@@ -579,7 +579,7 @@ ListStringPos MapData::conditionTownList(int cond) const
 	const MapTown* town = dynamic_cast<const MapTown*>((*it).data());
 
 	if(town)
-	    res << QPair<QString, QPoint>(town->name(), town->pos());
+	    res << QPair<QString, QPoint>(town->name, town->pos());
     }
 
     return res;
@@ -1293,24 +1293,23 @@ void MapData::SaveTest(void) const
 	QDomElement event = doc.createElement("event");
 	events.appendChild(event);
 
-	event.setAttribute("colors", (*it).colors());
-	event.setAttribute("allowComputer", (*it).allowComputer());
+	event.setAttribute("colors", (*it).colors);
+	event.setAttribute("allowComputer", (*it).allowComputer);
 
-	QPair<int,int> day = (*it).dayOccurent();
-	event.setAttribute("dayFirst", day.first);
-	event.setAttribute("daySubsequent", day.second);
+	event.setAttribute("dayFirst", (*it).dayFirstOccurent);
+	event.setAttribute("daySubsequent", (*it).daySubsequentOccurrences);
 
 	QDomElement resources = doc.createElement("resources");
 	event.appendChild(resources);
-	resources.setAttribute("wood", (*it).resources().wood);
-	resources.setAttribute("mercury", (*it).resources().mercury);
-	resources.setAttribute("ore", (*it).resources().ore);
-	resources.setAttribute("sulfur", (*it).resources().sulfur);
-	resources.setAttribute("crystal", (*it).resources().crystal);
-	resources.setAttribute("gems", (*it).resources().gems);
-	resources.setAttribute("gold", (*it).resources().gold);
+	resources.setAttribute("wood", (*it).resources.wood);
+	resources.setAttribute("mercury", (*it).resources.mercury);
+	resources.setAttribute("ore", (*it).resources.ore);
+	resources.setAttribute("sulfur", (*it).resources.sulfur);
+	resources.setAttribute("crystal", (*it).resources.crystal);
+	resources.setAttribute("gems", (*it).resources.gems);
+	resources.setAttribute("gold", (*it).resources.gold);
 
-	event.appendChild(doc.createElement("msg")).appendChild(doc.createTextNode((*it).message()));
+	event.appendChild(doc.createElement("msg")).appendChild(doc.createTextNode((*it).message));
     }
 
     doc.insertBefore(doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\""), doc.firstChild());
@@ -1376,6 +1375,10 @@ void MapData::showMapOptions(void)
 	mapDayEvents.clear();
 	for(int pos = 0; pos < form.listWidgetEvents->count(); ++pos)
 	    mapDayEvents.push_back(qvariant_cast<DayEvent>(form.listWidgetEvents->item(pos)->data(Qt::UserRole)));
+
+	// tab4
+	mapAuthors = form.plainTextEditAuthors->toPlainText();
+        mapLicense = form.plainTextEditLicense->toPlainText();
     }
 }
 

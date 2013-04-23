@@ -98,6 +98,16 @@ namespace Difficulty
     enum { Easy, Normal, Tough, Expert };
 }
 
+namespace Artifact
+{
+    enum { Unknown };
+}
+
+namespace SkillLevel
+{
+    enum { Unknown = 0, Basic = 1, Advanced = 2, Expert = 3 };
+}
+
 struct mp2icn_t
 {
     mp2icn_t(const char*);
@@ -489,9 +499,25 @@ public:
     const QPoint &	pos(void) const { return *this; }
 };
 
-class Troop : public QPair<int, int>
+struct Skill : public QPair<int, int>
 {
-public:
+    enum { Unknown = 0 };
+
+    Skill() : QPair<int, int>(Skill::Unknown, SkillLevel::Unknown) {}
+    Skill(int type, int level) : QPair<int, int>(type, level) {}
+
+    bool	isValid(void) const { return first && second; }
+    int &	skill(void) { return first; }
+    int &	level(void) { return second; }
+};
+
+struct Skills : public QVector<Skill>
+{
+    Skills() { reserve(10); }
+};
+
+struct Troop : public QPair<int, int>
+{
     Troop() : QPair<int, int>(0, 0) {}
     Troop(int type, int count) : QPair<int, int>(type, count) {}
 
@@ -500,93 +526,86 @@ public:
     int &	count(void) { return second; }
 };
 
-class Troops : public QVector<Troop>
+struct Troops : public QVector<Troop>
 {
-public:
-    Troops() {  reserve(7); }
+    Troops() { reserve(7); }
 };
 
-class MapTown : public MapObject
+struct MapTown : public MapObject
 {
-    int		townColor;
-    int		townRace;
-    int		townBuildings;
-    QString     townName;
-    Troops	townTroops;
+    int		color;
+    int		race;
+    int		buildings;
+    QString     name;
+    Troops	troops;
     bool	forceTown;
 
-public:
-    MapTown(const QPoint & pos, quint32 id, const mp2town_t &);
-
-    int			color(void) const { return townColor; }
-    int			race(void) const { return townRace; }
-    int			buildings(void) const { return townBuildings; }
-    const QString & 	name(void) const { return townName; }
-    bool		disableCastle(void) const { return forceTown; }
-
-    const Troops &	troops(void) const { return townTroops; }
-    Troops &		troops(void) { return townTroops; }
+    MapTown(const QPoint &, quint32, const mp2town_t &);
+    MapTown(const QPoint &, quint32);
 };
 
-class MapHero : public MapObject
+struct MapHero : public MapObject
 {
-public:
-    MapHero(const QPoint & pos, quint32 id, const mp2hero_t &);
+    int		color;
+    int		race;
+    Troops	troops;
+    int		portrait;
+    int		artifacts[3];
+    Skills	skills;
+    quint32	experience;
+    bool	patrolMode;
+    int		patrolSquare;
+    QString     name;
+
+    MapHero(const QPoint &, quint32, const mp2hero_t &);
+    MapHero(const QPoint &, quint32);
 };
 
-class MapSign : public MapObject
+struct MapSign : public MapObject
 {
-public:
-    MapSign(const QPoint & pos, quint32 id, const mp2sign_t &);
+    QString	message;
+
+    MapSign(const QPoint &, quint32, const mp2sign_t &);
+    MapSign(const QPoint &, quint32);
 };
 
-class MapEvent : public MapObject
+struct MapEvent : public MapObject
 {
-public:
-    MapEvent(const QPoint & pos, quint32 id, const mp2mapevent_t &);
+    Resources	resources;
+    int		artifact;
+    bool	allowComputer;
+    bool	cancelAfterFirstVisit;
+    int		colors;
+    QString	message;
+
+    MapEvent(const QPoint &, quint32, const mp2mapevent_t &);
+    MapEvent(const QPoint &, quint32);
 };
 
-class MapSphinx : public MapObject
+struct MapSphinx : public MapObject
 {
-public:
-    MapSphinx(const QPoint & pos, quint32 id, const mp2sphinx_t &);
+    MapSphinx(const QPoint &, quint32, const mp2sphinx_t &);
 };
 
-class DayEvent
+struct DayEvent
 {
-    Resources	res;
-    bool	allowComp;
+    Resources	resources;
+    bool	allowComputer;
     int		dayFirstOccurent;
-    int		subsequentOccurrences;
-    int		cols;
-    QString	msg;
+    int		daySubsequentOccurrences;
+    int		colors;
+    QString	message;
 
-public:
     DayEvent() {}
     DayEvent(const mp2dayevent_t &);
-
-    void	setResources(const Resources &);
-    void	setAllowComputer(bool);
-    void	setDayOccurent(int, int);
-    void	setColors(int);
-    void	setMessage(const QString &);
-
-    const Resources &
-	    	resources(void) const { return res; }
-    QPair<int,int>
-		dayOccurent(void) const { return qMakePair(dayFirstOccurent, subsequentOccurrences); }
-    bool	allowComputer(void) const { return allowComp; }
-    int		colors(void) const { return cols; }
-    QString	message(void) const { return msg; }
 
     QString	header(void) const;
 };
 
 Q_DECLARE_METATYPE(DayEvent);
 
-class Rumor : public QString
+struct Rumor : public QString
 {
-public:
     Rumor(const mp2rumor_t & mp2) : QString(mp2.text) {}
 };
 

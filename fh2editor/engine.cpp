@@ -1662,85 +1662,126 @@ QPair<int, int> EditorTheme::groundBoundariesFix(const MapTile & tile, const Map
     return res;
 }
 
+MapTown::MapTown(const QPoint & pos, quint32 id)
+    : MapObject(pos, id, MapObject::Town), color(Color::Unknown), race(Race::Unknown), buildings(0), forceTown(false)
+{
+}
+
 MapTown::MapTown(const QPoint & pos, quint32 id, const mp2town_t & mp2)
-    : MapObject(pos, id, MapObject::Town), townName(mp2.name), forceTown(mp2.forceTown)
+    : MapObject(pos, id, MapObject::Town), name(mp2.name), forceTown(mp2.forceTown)
 {
     switch(mp2.color)
     {
-        case 0:	townColor = Color::Blue; break;
-        case 1: townColor = Color::Green; break;
-        case 2: townColor = Color::Red; break;
-        case 3: townColor = Color::Yellow; break;
-        case 4: townColor = Color::Orange; break;
-        case 5: townColor = Color::Purple; break;
-        default: townColor = Color::Unknown; break;
+        case 0:	color = Color::Blue; break;
+        case 1: color = Color::Green; break;
+        case 2: color = Color::Red; break;
+        case 3: color = Color::Yellow; break;
+        case 4: color = Color::Orange; break;
+        case 5: color = Color::Purple; break;
+        default: color = Color::Unknown; break;
     }
 
     switch(mp2.race)
     {
-        case 0: townRace = Race::Knight; break;
-        case 1: townRace = Race::Barbarian; break;
-        case 2: townRace = Race::Sorceress; break;
-        case 3: townRace = Race::Warlock; break;
-        case 4: townRace = Race::Wizard; break;
-        case 5: townRace = Race::Necromancer; break;
-        default: townRace = Race::Random; break;
+        case 0: race = Race::Knight; break;
+        case 1: race = Race::Barbarian; break;
+        case 2: race = Race::Sorceress; break;
+        case 3: race = Race::Warlock; break;
+        case 4: race = Race::Wizard; break;
+        case 5: race = Race::Necromancer; break;
+        default: race = Race::Random; break;
     }
 
     if(mp2.customBuilding)
     {
-	if(0x00000002 & mp2.building) townBuildings |= Building::ThievesGuild;
-        if(0x00000004 & mp2.building) townBuildings |= Building::Tavern;
-	if(0x00000008 & mp2.building) townBuildings |= Building::Shipyard;
-        if(0x00000010 & mp2.building) townBuildings |= Building::Well;
-        if(0x00000080 & mp2.building) townBuildings |= Building::Statue;
-        if(0x00000100 & mp2.building) townBuildings |= Building::LeftTurret;
-        if(0x00000200 & mp2.building) townBuildings |= Building::RightTurret;
-        if(0x00000400 & mp2.building) townBuildings |= Building::Marketplace;
-        if(0x00001000 & mp2.building) townBuildings |= Building::Moat;
-        if(0x00000800 & mp2.building) townBuildings |= Building::ExtraWel2;
-        if(0x00002000 & mp2.building) townBuildings |= Building::ExtraSpec;
-        if(0x00080000 & mp2.building) townBuildings |= Building::Dwelling1;
-        if(0x00100000 & mp2.building) townBuildings |= Building::Dwelling2;
-        if(0x00200000 & mp2.building) townBuildings |= Building::Dwelling3;
-        if(0x00400000 & mp2.building) townBuildings |= Building::Dwelling4;
-        if(0x00800000 & mp2.building) townBuildings |= Building::Dwelling5;
-        if(0x01000000 & mp2.building) townBuildings |= Building::Dwelling6;
-        if(0x02000000 & mp2.building) townBuildings |= Building::Upgrade2 | Building::Dwelling2;
-        if(0x04000000 & mp2.building) townBuildings |= Building::Upgrade3 | Building::Dwelling3;
-        if(0x08000000 & mp2.building) townBuildings |= Building::Upgrade4 | Building::Dwelling4;
-        if(0x10000000 & mp2.building) townBuildings |= Building::Upgrade5 | Building::Dwelling5;
-        if(0x20000000 & mp2.building) townBuildings |= Building::Upgrade6 | Building::Dwelling6;
+	if(0x00000002 & mp2.building) buildings |= Building::ThievesGuild;
+        if(0x00000004 & mp2.building) buildings |= Building::Tavern;
+	if(0x00000008 & mp2.building) buildings |= Building::Shipyard;
+        if(0x00000010 & mp2.building) buildings |= Building::Well;
+        if(0x00000080 & mp2.building) buildings |= Building::Statue;
+        if(0x00000100 & mp2.building) buildings |= Building::LeftTurret;
+        if(0x00000200 & mp2.building) buildings |= Building::RightTurret;
+        if(0x00000400 & mp2.building) buildings |= Building::Marketplace;
+        if(0x00001000 & mp2.building) buildings |= Building::Moat;
+        if(0x00000800 & mp2.building) buildings |= Building::ExtraWel2;
+        if(0x00002000 & mp2.building) buildings |= Building::ExtraSpec;
+        if(0x00080000 & mp2.building) buildings |= Building::Dwelling1;
+        if(0x00100000 & mp2.building) buildings |= Building::Dwelling2;
+        if(0x00200000 & mp2.building) buildings |= Building::Dwelling3;
+        if(0x00400000 & mp2.building) buildings |= Building::Dwelling4;
+        if(0x00800000 & mp2.building) buildings |= Building::Dwelling5;
+        if(0x01000000 & mp2.building) buildings |= Building::Dwelling6;
+        if(0x02000000 & mp2.building) buildings |= Building::Upgrade2 | Building::Dwelling2;
+        if(0x04000000 & mp2.building) buildings |= Building::Upgrade3 | Building::Dwelling3;
+        if(0x08000000 & mp2.building) buildings |= Building::Upgrade4 | Building::Dwelling4;
+        if(0x10000000 & mp2.building) buildings |= Building::Upgrade5 | Building::Dwelling5;
+        if(0x20000000 & mp2.building) buildings |= Building::Upgrade6 | Building::Dwelling6;
     }
 
-    if(0 < mp2.magicTower) townBuildings |= Building::MageGuild1;
-    if(1 < mp2.magicTower) townBuildings |= Building::MageGuild2;
-    if(2 < mp2.magicTower) townBuildings |= Building::MageGuild3;
-    if(3 < mp2.magicTower) townBuildings |= Building::MageGuild4;
-    if(4 < mp2.magicTower) townBuildings |= Building::MageGuild5;
+    if(0 < mp2.magicTower) buildings |= Building::MageGuild1;
+    if(1 < mp2.magicTower) buildings |= Building::MageGuild2;
+    if(2 < mp2.magicTower) buildings |= Building::MageGuild3;
+    if(3 < mp2.magicTower) buildings |= Building::MageGuild4;
+    if(4 < mp2.magicTower) buildings |= Building::MageGuild5;
 
-    if(mp2.captainPresent) townBuildings |= Building::Captain;
+    if(mp2.captainPresent) buildings |= Building::Captain;
 
     if(mp2.customTroops)
     {
 	for(int ii = 0; ii < 5; ++ii)
-	    townTroops.push_back(Troop(mp2.troopId[ii], mp2.troopCount[ii]));
+	    troops.push_back(Troop(mp2.troopId[ii], mp2.troopCount[ii]));
     }
 }
 
-MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t &)
-    : MapObject(pos, id, MapObject::Hero)
+MapHero::MapHero(const QPoint & pos, quint32 id)
+    : MapObject(pos, id, MapObject::Hero), color(Color::Unknown), race(Race::Unknown),
+    portrait(0), experience(0), patrolMode(false), patrolSquare(0)
+{
+    artifacts[0] = Artifact::Unknown;
+    artifacts[1] = Artifact::Unknown;
+    artifacts[2] = Artifact::Unknown;
+}
+
+MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2)
+    : MapObject(pos, id, MapObject::Hero), color(Color::Unknown), race(Race::Unknown),
+    portrait(0), experience(0), patrolMode(false), patrolSquare(0), name(mp2.name)
 {
 }
 
-MapSign::MapSign(const QPoint & pos, quint32 id, const mp2sign_t &)
+MapSign::MapSign(const QPoint & pos, quint32 id)
     : MapObject(pos, id, MapObject::Sign)
 {
 }
 
-MapEvent::MapEvent(const QPoint & pos, quint32 id, const mp2mapevent_t &)
-    : MapObject(pos, id, MapObject::Event)
+MapSign::MapSign(const QPoint & pos, quint32 id, const mp2sign_t & mp2)
+    : MapObject(pos, id, MapObject::Sign), message(mp2.text)
 {
+}
+
+MapEvent::MapEvent(const QPoint & pos, quint32 id)
+    : MapObject(pos, id, MapObject::Event), artifact(Artifact::Unknown), allowComputer(false),
+	cancelAfterFirstVisit(true), colors(0)
+{
+}
+
+MapEvent::MapEvent(const QPoint & pos, quint32 id, const mp2mapevent_t & mp2)
+    : MapObject(pos, id, MapObject::Event), artifact(mp2.artifact), allowComputer(mp2.allowComputer),
+	cancelAfterFirstVisit(mp2.cancelAfterFirstVisit), colors(0), message(mp2.text)
+{
+    resources.wood = mp2.resources[0];
+    resources.mercury = mp2.resources[1];
+    resources.ore = mp2.resources[2];
+    resources.sulfur = mp2.resources[3];
+    resources.crystal = mp2.resources[4];
+    resources.gems = mp2.resources[5];
+    resources.gold = mp2.resources[6];
+
+    if(mp2.colors[0]) colors |= Color::Blue;
+    if(mp2.colors[1]) colors |= Color::Red;
+    if(mp2.colors[2]) colors |= Color::Green;
+    if(mp2.colors[3]) colors |= Color::Yellow;
+    if(mp2.colors[4]) colors |= Color::Orange;
+    if(mp2.colors[5]) colors |= Color::Purple;
 }
 
 MapSphinx::MapSphinx(const QPoint & pos, quint32 id, const mp2sphinx_t &)
@@ -1749,56 +1790,31 @@ MapSphinx::MapSphinx(const QPoint & pos, quint32 id, const mp2sphinx_t &)
 }
 
 DayEvent::DayEvent(const mp2dayevent_t & mp2)
-    : allowComp(mp2.allowComputer), dayFirstOccurent(mp2.dayFirstOccurent), subsequentOccurrences(mp2.subsequentOccurrences), cols(0), msg(mp2.text)
+    : allowComputer(mp2.allowComputer), dayFirstOccurent(mp2.dayFirstOccurent),
+	daySubsequentOccurrences(mp2.subsequentOccurrences), colors(0), message(mp2.text)
 {
-    res.wood = mp2.resources[0];
-    res.mercury = mp2.resources[1];
-    res.ore = mp2.resources[2];
-    res.sulfur = mp2.resources[3];
-    res.crystal = mp2.resources[4];
-    res.gems = mp2.resources[5];
-    res.gold = mp2.resources[6];
+    resources.wood = mp2.resources[0];
+    resources.mercury = mp2.resources[1];
+    resources.ore = mp2.resources[2];
+    resources.sulfur = mp2.resources[3];
+    resources.crystal = mp2.resources[4];
+    resources.gems = mp2.resources[5];
+    resources.gold = mp2.resources[6];
 
-    if(mp2.colors[0]) cols |= Color::Blue;
-    if(mp2.colors[1]) cols |= Color::Red;
-    if(mp2.colors[2]) cols |= Color::Green;
-    if(mp2.colors[3]) cols |= Color::Yellow;
-    if(mp2.colors[4]) cols |= Color::Orange;
-    if(mp2.colors[5]) cols |= Color::Purple;
+    if(mp2.colors[0]) colors |= Color::Blue;
+    if(mp2.colors[1]) colors |= Color::Red;
+    if(mp2.colors[2]) colors |= Color::Green;
+    if(mp2.colors[3]) colors |= Color::Yellow;
+    if(mp2.colors[4]) colors |= Color::Orange;
+    if(mp2.colors[5]) colors |= Color::Purple;
 }
 
 QString DayEvent::header(void) const
 {
     QString header;
     QTextStream ts(& header);
-    ts << "Day " << dayFirstOccurent << " - " << msg;
+    ts << "Day " << dayFirstOccurent << " - " << message;
     return header;
-}
-
-void DayEvent::setResources(const Resources & rs)
-{
-    res = rs;
-}
-
-void DayEvent::setAllowComputer(bool f)
-{
-    allowComp = f;
-}
-
-void DayEvent::setDayOccurent(int first, int subseq)
-{
-    dayFirstOccurent = first;
-    subsequentOccurrences = subseq;
-}
-
-void DayEvent::setColors(int colors)
-{
-    cols = colors;
-}
-
-void DayEvent::setMessage(const QString & message)
-{
-    msg = message;
 }
 
 MapObjects::MapObjects()

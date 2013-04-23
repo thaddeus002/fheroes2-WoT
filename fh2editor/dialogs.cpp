@@ -1129,8 +1129,6 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors, 
     // tab 1
     tabDay = new QWidget();
 
-    const QPair<int,int> & dayPair = event.dayOccurent();
-
     labelDayFirst = new QLabel(tabDay);
     labelDayFirst->setText(QApplication::translate("DayEventDialog", "Day of first occurent", 0, QApplication::UnicodeUTF8));
 
@@ -1140,7 +1138,7 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors, 
     spinBoxDayFirst = new QSpinBox(tabDay);
     spinBoxDayFirst->setMinimum(1);
     spinBoxDayFirst->setMaximum(65535);
-    spinBoxDayFirst->setValue(dayPair.first);
+    spinBoxDayFirst->setValue(event.dayFirstOccurent);
     horizontalLayout->addWidget(spinBoxDayFirst);
 
     labelSubsequent = new QLabel(tabDay);
@@ -1161,7 +1159,7 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors, 
     comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 14 Days", 0, QApplication::UnicodeUTF8), 14);
     comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 21 Days", 0, QApplication::UnicodeUTF8), 21);
     comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 28 Days", 0, QApplication::UnicodeUTF8), 28);
-    int find = comboBoxSubsequent->findData(dayPair.second);
+    int find = comboBoxSubsequent->findData(event.daySubsequentOccurrences);
     if(0 <= find)
 	comboBoxSubsequent->setCurrentIndex(find);
     horizontalLayout2->addWidget(comboBoxSubsequent);
@@ -1181,7 +1179,7 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors, 
 	it = colors.begin(); it != colors.end(); ++it)
     if((*it) & kingdomColors)
     {
-	labelPlayers.push_back(new PlayerAllow(*it, (*it) & event.colors(), theme, groupBoxAllowedColors));
+	labelPlayers.push_back(new PlayerAllow(*it, (*it) & event.colors, theme, groupBoxAllowedColors));
 	horizontalLayout4->addWidget(labelPlayers.back());
     }
     horizontalLayout4->addItem(horizontalSpacerPlayersRight);
@@ -1189,7 +1187,7 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors, 
     checkBoxAllowComp = new QCheckBox(groupBoxAllowedColors);
     checkBoxAllowComp->setLayoutDirection(Qt::LeftToRight);
     checkBoxAllowComp->setText(QApplication::translate("DayEventDialog", "Allow computer", 0, QApplication::UnicodeUTF8));
-    checkBoxAllowComp->setChecked(event.allowComputer());
+    checkBoxAllowComp->setChecked(event.allowComputer);
 
     verticalLayout3 = new QVBoxLayout(groupBoxAllowedColors);
     verticalLayout3->addLayout(horizontalLayout4);
@@ -1203,7 +1201,7 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors, 
     // tab 2
     tabResource = new QWidget();
 
-    const Resources & resources = event.resources();
+    const Resources & resources = event.resources;
     int resMin = -65535;
     int resMax = 65535;
 
@@ -1326,7 +1324,7 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors, 
     tabMessage = new QWidget();
 
     plainTextMessage = new QPlainTextEdit(tabMessage);
-    plainTextMessage->setPlainText(event.message());
+    plainTextMessage->setPlainText(event.message);
 
     verticalLayout5 = new QVBoxLayout(tabMessage);
     verticalLayout5->addWidget(plainTextMessage);
@@ -1399,30 +1397,28 @@ void Form::DayEventDialog::setEnableOKButton(const QString & val)
 DayEvent Form::DayEventDialog::result(void) const
 {
     DayEvent res;
-    Resources rs;
 
-    rs.wood = spinBoxResWood->value();
-    rs.mercury = spinBoxResMercury->value();
-    rs.ore = spinBoxResOre->value();
-    rs.sulfur = spinBoxResSulfur->value();
-    rs.crystal = spinBoxResCrystal->value();
-    rs.gems = spinBoxResGems->value();
-    rs.gold = spinBoxResGold->value();
+    res.resources.wood = spinBoxResWood->value();
+    res.resources.mercury = spinBoxResMercury->value();
+    res.resources.ore = spinBoxResOre->value();
+    res.resources.sulfur = spinBoxResSulfur->value();
+    res.resources.crystal = spinBoxResCrystal->value();
+    res.resources.gems = spinBoxResGems->value();
+    res.resources.gold = spinBoxResGold->value();
 
-    int colors = 0;
+    res.colors = 0;
 
     for(QVector<PlayerAllow*>::const_iterator
 	it = labelPlayers.begin(); it != labelPlayers.end(); ++it)
     if((*it)->allow())
     {
-	colors |= (*it)->color();
+	res.colors |= (*it)->color();
     }
 
-    res.setResources(rs);
-    res.setAllowComputer(checkBoxAllowComp->isChecked());
-    res.setDayOccurent(spinBoxDayFirst->value(), qvariant_cast<int>(comboBoxCurrentData(comboBoxSubsequent)));
-    res.setColors(colors);
-    res.setMessage(plainTextMessage->toPlainText());
+    res.allowComputer = checkBoxAllowComp->isChecked();
+    res.dayFirstOccurent = spinBoxDayFirst->value();
+    res.daySubsequentOccurrences = qvariant_cast<int>(comboBoxCurrentData(comboBoxSubsequent));
+    res.message = plainTextMessage->toPlainText();
 
     return res;
 }
