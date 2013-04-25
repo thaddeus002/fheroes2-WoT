@@ -53,7 +53,6 @@ class QDomElement;
 QT_END_NAMESPACE
 
 class MapData;
-class EditorTheme;
 class CompositeObject;
 
 QVariant comboBoxCurrentData(const QComboBox*);
@@ -125,7 +124,7 @@ namespace Form
         Q_OBJECT
 
     public:
-        SelectImage(EditorTheme &);
+        SelectImage();
 
         QVBoxLayout*		verticalLayout;
         QTabWidget*		tabWidget;
@@ -149,7 +148,7 @@ namespace Form
         Q_OBJECT
 
     public:
-	SelectImageTab(const QDomElement &, const QString &, EditorTheme &);
+	SelectImageTab(const QDomElement &, const QString &);
 
 	QVBoxLayout*        	verticalLayout;
 	QListWidget*        	listWidget;
@@ -168,8 +167,9 @@ namespace Form
 	QAction*		editItemAct;
 	QAction*		delItemAct;
 	MapOptions*		parentObj;
+	int			kingdomColors;
 
-	ItemsList(MapOptions*);
+	ItemsList(int, QWidget*);
 
     signals:
 	void			mousePressed(void);
@@ -189,7 +189,7 @@ namespace Form
 	Q_OBJECT
 
     public:
-	RumorsList(MapOptions*);
+	RumorsList(int, QWidget*);
 
     protected slots:
 	void			addItem(void);
@@ -201,7 +201,7 @@ namespace Form
 	Q_OBJECT
 
     public:
-	EventsList(MapOptions*);
+	EventsList(int, QWidget*);
 
     protected slots:
 	void			addItem(void);
@@ -214,10 +214,9 @@ namespace Form
 
 	int			col;
 	int			stat;
-	EditorTheme &		theme;
 
     public:
-	PlayerStatus(int, int, EditorTheme &, QWidget*);
+	PlayerStatus(int, int, QWidget*);
 
 	int			color(void) const { return col; }
 	int			status(void) const { return stat % 4; }
@@ -296,8 +295,6 @@ namespace Form
 	ListStringPos		lossCondHeroList;
 	ListStringPos		lossCondTownList;
 
-	MapData &		data;
-
     protected slots:
 	void			winsConditionsSelected(int);
 	void			lossConditionsSelected(int);
@@ -330,10 +327,9 @@ namespace Form
 
 	int			col;
 	bool			stat;
-	EditorTheme &		theme;
 
     public:
-	PlayerAllow(int, bool, EditorTheme &, QWidget*);
+	PlayerAllow(int, bool, QWidget*);
 
 	int			color(void) const { return col; }
 	bool			allow(void) const { return stat; }
@@ -351,7 +347,7 @@ namespace Form
 	Q_OBJECT
 
     public:
-	DayEventDialog(const DayEvent &, int, EditorTheme &);
+	DayEventDialog(const DayEvent &, int);
 
 	QVBoxLayout*		verticalLayout2;
 	QTabWidget*		tabWidget;

@@ -119,14 +119,14 @@ public:
     ~MapTileLevels();
 
     const MapTileExt*	find(bool (*pf)(const MapTileExt*)) const;
-    void		paint(QPainter &, const QPoint &, const QPoint &, EditorTheme &) const;
+    void		paint(QPainter &, const QPoint &, const QPoint &) const;
     QString		infoString(void) const;
 };
 
 class MapTile : public QGraphicsPixmapItem
 {
 public:
-    MapTile(const mp2til_t &, const QPoint &, EditorTheme &);
+    MapTile(const mp2til_t &, const QPoint &);
     MapTile(const MapTile &);
 
     QRectF		boundingRect(void) const;
@@ -149,7 +149,6 @@ public:
 protected:
     static void		loadSpriteLevel(MapTileLevels &, int, const mp2lev_t &);
 
-    EditorTheme &	themeContent;
     mp2til_t		til;
     QPoint		mpos;
 
@@ -168,8 +167,8 @@ public:
     MapTiles() {}
     MapTiles(const MapTiles &, const QRect &);
 
-    void		newMap(const QSize &, EditorTheme &);
-    bool		importMap(const QSize &, const QVector<mp2til_t> &, const QVector<mp2ext_t> &, EditorTheme &);
+    void		newMap(const QSize &);
+    bool		importMap(const QSize &, const QVector<mp2til_t> &, const QVector<mp2ext_t> &);
 
     const QSize &	mapSize(void) const { return size; }
     int			indexPoint(const QPoint &) const;
@@ -203,7 +202,7 @@ public:
     void		importMP2MapEvents(const QVector<H2::EventPos> &);
     void		importMP2SphinxRiddles(const QVector<H2::SphinxPos> &);
 
-    void		addObject(const QPoint &, const CompositeObject &, const QSize &, quint32);
+    void		addObject(const QPoint &, const CompositeObject &, quint32);
 };
 
 class MapSelectedArea : public MapArea
@@ -246,7 +245,6 @@ public:
     QPoint		mapToTile(const QPoint &) const;
     QRect		mapToTile(const QRect &) const;
 
-    EditorTheme &	theme(void);
     void		SaveTest(void) const;
     void		showMapOptions(void);
 
@@ -273,7 +271,6 @@ protected:
     friend class	MP2Format;
     friend class	MapTile;
 
-    EditorTheme		themeContent;
     MapTile*		tileOverMouse;
 
     QString		mapName;

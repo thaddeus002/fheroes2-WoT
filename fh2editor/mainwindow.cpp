@@ -26,7 +26,7 @@
 #include "mainwindow.h"
 #include "mapwindow.h"
 
-MainWindow::MainWindow(const QString & dataFile) : sequenceMapNumber(0), aggContent(dataFile)
+MainWindow::MainWindow() : sequenceMapNumber(0)
 {
     mdiArea = new QMdiArea;
     mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);

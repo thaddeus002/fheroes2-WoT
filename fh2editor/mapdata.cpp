@@ -109,18 +109,18 @@ MapTileLevels::~MapTileLevels()
     qDeleteAll(begin(), end());
 }
 
-void MapTileLevels::paint(QPainter & painter, const QPoint & offset, const QPoint & mpos, EditorTheme & theme) const
+void MapTileLevels::paint(QPainter & painter, const QPoint & offset, const QPoint & mpos) const
 {
     for(const_iterator it = begin(); it != end(); ++it)
     {
-	QPair<QPixmap, QPoint> p1 = theme.getImageICN((*it)->icn(), (*it)->index());
+	QPair<QPixmap, QPoint> p1 = EditorTheme::getImageICN((*it)->icn(), (*it)->index());
 	painter.drawPixmap(offset + p1.second, p1.first);
 
 	int anim = H2::isAnimationICN((*it)->icn(), (*it)->index(), 0);
 
 	if(0 < anim)
 	{
-	    QPair<QPixmap, QPoint> p2 = theme.getImageICN((*it)->icn(), anim);
+	    QPair<QPixmap, QPoint> p2 = EditorTheme::getImageICN((*it)->icn(), anim);
 	    painter.drawPixmap(offset + p2.second, p2.first);
 	}
 	else
@@ -152,10 +152,11 @@ const MapTileExt* MapTileLevels::find(bool (*pf)(const MapTileExt*)) const
     return it != end() ? *it : NULL;
 }
 
-MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos, EditorTheme & theme)
-    : themeContent(theme), til(mp2), mpos(pos), passableBase(0), passableLocal(0xFFFF)
+MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos)
+    : til(mp2), mpos(pos), passableBase(0), passableLocal(0xFFFF)
 {
-    QPoint offset(mpos.x() * theme.tileSize().width(), mpos.y() * theme.tileSize().height());
+    const QSize & tileSize = EditorTheme::tileSize();
+    QPoint offset(mpos.x() * tileSize.width(), mpos.y() * tileSize.height());
     setOffset(offset);
     setFlags(QGraphicsItem::ItemIsSelectable);
     setTileSprite(til.tileSprite, til.tileShape);
@@ -164,8 +165,7 @@ MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos, EditorTheme & theme)
 }
 
 MapTile::MapTile(const MapTile & other)
-    : QGraphicsPixmapItem(), themeContent(other.themeContent), til(other.til),
-	mpos(other.mpos), spritesLevel1(other.spritesLevel1), spritesLevel2(other.spritesLevel2),
+    : QGraphicsPixmapItem(), til(other.til), mpos(other.mpos), spritesLevel1(other.spritesLevel1), spritesLevel2(other.spritesLevel2),
 	passableBase(other.passableBase), passableLocal(other.passableLocal)
 {
     setFlags(QGraphicsItem::ItemIsSelectable);
@@ -177,7 +177,7 @@ void MapTile::setTileSprite(int index, int rotate)
     til.tileSprite = index;
     til.tileShape = rotate;
 
-    QPixmap sprite = themeContent.getImageTIL("GROUND32.TIL", til.tileSprite);
+    QPixmap sprite = EditorTheme::getImageTIL("GROUND32.TIL", til.tileSprite);
 
     switch(til.tileShape % 4)
     {
@@ -195,7 +195,7 @@ QRectF MapTile::boundingRect(void) const
 
 int MapTile::groundType(void) const
 {
-    return themeContent.ground(til.tileSprite);
+    return EditorTheme::ground(til.tileSprite);
 }
 
 QString MapTile::indexString(int index)
@@ -220,10 +220,10 @@ void MapTile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, Q
     painter->drawPixmap(offset(), pixmap());
 
     // draw level1
-    spritesLevel1.paint(*painter, offset().toPoint(), mpos, themeContent);
+    spritesLevel1.paint(*painter, offset().toPoint(), mpos);
 
     // draw level2
-    spritesLevel2.paint(*painter, offset().toPoint(), mpos, themeContent);
+    spritesLevel2.paint(*painter, offset().toPoint(), mpos);
 }
 
 void MapTile::showInfo(void) const
@@ -296,18 +296,18 @@ MapTiles::MapTiles(const MapTiles & tiles, const QRect & area) : size(area.size(
     }
 }
 
-void MapTiles::newMap(const QSize & sz, EditorTheme & theme)
+void MapTiles::newMap(const QSize & sz)
 {
     size = sz;
 
     for(int yy = 0; yy < size.height(); ++yy)
     {
 	for(int xx = 0; xx < size.width(); ++xx)
-    	    push_back(new MapTile(mp2til_t(), QPoint(xx, yy), theme));
+    	    push_back(new MapTile(mp2til_t(), QPoint(xx, yy)));
     }
 }
 
-bool MapTiles::importMap(const QSize & sz, const QVector<mp2til_t> & mp2Tiles, const QVector<mp2ext_t> & mp2Sprites, EditorTheme & theme)
+bool MapTiles::importMap(const QSize & sz, const QVector<mp2til_t> & mp2Tiles, const QVector<mp2ext_t> & mp2Sprites)
 {
     size = sz;
 
@@ -316,7 +316,7 @@ bool MapTiles::importMap(const QSize & sz, const QVector<mp2til_t> & mp2Tiles, c
 	for(int xx = 0; xx < size.width(); ++xx)
 	{
 	    const mp2til_t & mp2til = mp2Tiles[indexPoint(QPoint(xx, yy))];
-	    push_back(new MapTile(mp2til, QPoint(xx, yy), theme));
+	    push_back(new MapTile(mp2til, QPoint(xx, yy)));
 	    int ext = mp2til.indexExt;
 
 	    while(ext)
@@ -470,8 +470,10 @@ void MapArea::importMP2SphinxRiddles(const QVector<H2::SphinxPos> & sphinxes)
     }
 }
 
-void MapArea::addObject(const QPoint & pos, const CompositeObject & obj, const QSize & tileSize, quint32 uid)
+void MapArea::addObject(const QPoint & pos, const CompositeObject & obj, quint32 uid)
 {
+    const QSize & tileSize = EditorTheme::tileSize();
+
     for(CompositeObject::const_iterator
 	it = obj.begin(); it != obj.end(); ++it)
     {
@@ -481,16 +483,11 @@ void MapArea::addObject(const QPoint & pos, const CompositeObject & obj, const Q
     }
 }
 
-MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), themeContent(parent->mainWindow->aggContent),
-    tileOverMouse(NULL), mapName("New Map"), mapAuthors("unknown"), mapLicense("unknown"), mapDifficulty(Difficulty::Normal),
+MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), tileOverMouse(NULL),
+    mapName("New Map"), mapAuthors("unknown"), mapLicense("unknown"), mapDifficulty(Difficulty::Normal),
     mapKingdomColors(0), mapCompColors(0), mapHumanColors(0), mapUniq(1), mapStartWithHero(false), mapArea(),
     mapTiles(mapArea.tiles), mapObjects(mapArea.objects)
 {
-}
-
-EditorTheme & MapData::theme(void)
-{
-    return themeContent;
 }
 
 const QString & MapData::name(void) const
@@ -628,7 +625,7 @@ void MapData::mousePressEvent(QGraphicsSceneMouseEvent* event)
     if(currentObject.isValid())
     {
 	if(event->buttons() & Qt::LeftButton)
-	    mapArea.addObject(currentObject.scenePos, currentObject, themeContent.tileSize(), uniq());
+	    mapArea.addObject(currentObject.scenePos, currentObject, uniq());
 	else
 	    currentObject.reset();
 	update(currentObject.area());
@@ -695,7 +692,7 @@ void MapData::selectArea(QPointF ptdn, QPointF ptup)
 
 	QRect selRect = QRectF(ptdn, ptup).toRect();
 
-	const QSize & tileSize = themeContent.tileSize();
+	const QSize & tileSize = EditorTheme::tileSize();
 
 	int sl = selRect.left() / tileSize.width();
 	int st = selRect.top() / tileSize.height();
@@ -724,7 +721,7 @@ void MapData::selectArea(QPointF ptdn, QPointF ptup)
 void MapData::selectAllTiles(void)
 {
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    const QSize & sz = themeContent.tileSize();
+    const QSize & sz = EditorTheme::tileSize();
     selectArea(QPointF(0, 0), QPointF(sz.width() * size().width(), sz.height() * size().height()));
     QApplication::restoreOverrideCursor();
 }
@@ -800,11 +797,11 @@ void MapData::fillGroundAction(QAction* act)
 	    MapTile* tile = qgraphicsitem_cast<MapTile*>(*it);
 
     	    if(tile)
-		tile->setTileSprite(themeContent.startFilledTile(ground), 0);
+		tile->setTileSprite(EditorTheme::startFilledTile(ground), 0);
 	}
 
 	// fixed border
-	QSize tileSize = themeContent.tileSize();
+	const QSize & tileSize = EditorTheme::tileSize();
         QRectF rectArea = selectionArea().boundingRect();
 	QPoint tile2(tileSize.width() / 2, tileSize.height() / 2);
 
@@ -820,7 +817,7 @@ void MapData::fillGroundAction(QAction* act)
 
     	    if(tile)
 	    {
-		QPair<int, int> indexGroundRotate = themeContent.groundBoundariesFix(*tile, mapTiles);
+		QPair<int, int> indexGroundRotate = EditorTheme::groundBoundariesFix(*tile, mapTiles);
 
 		if(0 <= indexGroundRotate.first)
             	    tile->setTileSprite(indexGroundRotate.first, indexGroundRotate.second);
@@ -852,9 +849,9 @@ void MapData::removeObjectsAction(QAction* act)
 
 void MapData::newMap(const QSize & msz, const QString &)
 {
-    const QSize & tileSize = themeContent.tileSize();
+    const QSize & tileSize = EditorTheme::tileSize();
 
-    mapTiles.newMap(msz, themeContent);
+    mapTiles.newMap(msz);
     mapTiles.insertToScene(*this);
 
     setSceneRect(QRect(QPoint(0, 0),
@@ -863,7 +860,7 @@ void MapData::newMap(const QSize & msz, const QString &)
 
 bool MapData::loadMap(const QString & mapFile)
 {
-    const QSize & tileSize = themeContent.tileSize();
+    const QSize & tileSize = EditorTheme::tileSize();
 
     MP2Format mp2;
     qDebug() << "MapData::loadMap:" << mapFile;
@@ -871,7 +868,7 @@ bool MapData::loadMap(const QString & mapFile)
     if(mp2.loadMap(mapFile))
     {
 	// import tiles
-	if(! mapTiles.importMap(mp2.size, mp2.tiles, mp2.sprites, themeContent))
+	if(! mapTiles.importMap(mp2.size, mp2.tiles, mp2.sprites))
 	    return false;
 
 	mapTiles.insertToScene(*this);
@@ -1325,11 +1322,11 @@ void MapData::SaveTest(void) const
 
 void MapData::selectObjectImage(void)
 {
-    Form::SelectImage form(themeContent);
+    Form::SelectImage form;
 
     if(QDialog::Accepted == form.exec())
     {
-        currentObject = CompositeObjectCursor(form.result, themeContent);
+        currentObject = CompositeObjectCursor(form.result);
 	update();
     }
 }

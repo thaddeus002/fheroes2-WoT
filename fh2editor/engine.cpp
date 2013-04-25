@@ -581,8 +581,7 @@ QPair<QPixmap, QPoint> AGG::File::getImageICN(const QString & id, int index, QVe
     return result;
 }
 
-
-AGG::Spool::Spool(const QString & file)
+bool AGG::Spool::setData(const QString & file)
 {
     if(first.loadFile(file))
     {
@@ -610,10 +609,14 @@ AGG::Spool::Spool(const QString & file)
 	    }
 
 	    qDebug() << "AGG::Spool:" << "loaded palette: " << colors.size();
+
+	    return true;
 	}
 	else
 	    qCritical() << "AGG::Spool:" << "palette not found";
     }
+
+    return false;
 }
 
 bool AGG::Spool::isHeroes2XMode(void) const
@@ -1262,13 +1265,29 @@ int H2::isAnimationICN(int spriteClass, int spriteIndex, int ticket)
 
 
 /*Themes section */
-EditorTheme::EditorTheme(AGG::Spool & spool) : aggSpool(spool), name("agg"), tile(32, 32)
+namespace EditorTheme
 {
+    AGG::Spool	aggSpool;
+    QString	themeName("unknown");
+    QSize	themeTile(0, 0);
 }
 
-QString EditorTheme::resourceFile(const QString & dir, const QString & file) const
+bool EditorTheme::load(const QString & data)
 {
-    return Resource::FindFile(QDir::toNativeSeparators(QString("themes") + QDir::separator() + name),
+    if(aggSpool.setData(data))
+    {
+	themeName = "agg";
+	themeTile = QSize(32, 32);
+
+	return true;
+    }
+
+    return false;
+}
+
+QString EditorTheme::resourceFile(const QString & dir, const QString & file)
+{
+    return Resource::FindFile(QDir::toNativeSeparators(QString("themes") + QDir::separator() + themeName),
 	    QDir::toNativeSeparators(dir + QDir::separator() + file));
 }
 
@@ -1289,15 +1308,15 @@ QPair<QPixmap, QPoint> EditorTheme::getImageICN(int icn, int index)
 
 QPixmap EditorTheme::getImage(const CompositeObject & obj)
 {
-    return aggSpool.getImage(obj, tile);
+    return aggSpool.getImage(obj, themeTile);
 }
 
-const QSize & EditorTheme::tileSize(void) const
+const QSize & EditorTheme::tileSize(void)
 {
-    return tile;
+    return themeTile;
 }
 
-int EditorTheme::startFilledTile(int ground) const
+int EditorTheme::startFilledTile(int ground)
 {
     // 30%
     if(0 == Editor::Rand(6))
@@ -1322,7 +1341,7 @@ int EditorTheme::startFilledTile(int ground) const
     return res + Editor::Rand(7);
 }
 
-int EditorTheme::startFilledOriginalTile(int ground) const
+int EditorTheme::startFilledOriginalTile(int ground)
 {
     int res = 0;
     int count = 8;
@@ -1344,7 +1363,7 @@ int EditorTheme::startFilledOriginalTile(int ground) const
     return res + Editor::Rand(count - 1);
 }
 
-int EditorTheme::ground(int index) const
+int EditorTheme::ground(int index)
 {
     // list grounds from GROUND32.TIL
     if(30 > index)
@@ -1377,7 +1396,7 @@ int EditorTheme::ground(int index) const
     return Ground::Unknown;
 }
 
-int EditorTheme::startGroundTile(int ground) const
+int EditorTheme::startGroundTile(int ground)
 {
     int res = 0;
 
@@ -1399,7 +1418,7 @@ int EditorTheme::startGroundTile(int ground) const
     return res;
 }
 
-int EditorTheme::startGroundOriginalTile(int ground) const
+int EditorTheme::startGroundOriginalTile(int ground)
 {
     return startGroundTile(ground) + Editor::Rand(3);
 }
@@ -1484,7 +1503,7 @@ int AroundGrounds::directionsAroundGround(int ground) const
 }
 
 /* return pair, first: index tile, second: shape - 0: none, 1: vert, 2: horz, 3: both */
-QPair<int, int> EditorTheme::groundBoundariesFix(const MapTile & tile, const MapTiles & tiles) const
+QPair<int, int> EditorTheme::groundBoundariesFix(const MapTile & tile, const MapTiles & tiles)
 {
     QPair<int, int> res(-1, 0);
     const int & ground = tile.groundType();
@@ -1888,28 +1907,29 @@ bool CompositeObject::isValid(void) const
     return ! name.isEmpty();
 }
 
-CompositeObjectCursor::CompositeObjectCursor(const CompositeObject & obj, EditorTheme & theme) : CompositeObject(obj), valid(true)
+CompositeObjectCursor::CompositeObjectCursor(const CompositeObject & obj) : CompositeObject(obj), valid(true)
 {
-    const QSize areaSize(theme.tileSize().width() * size.width(), theme.tileSize().height() * size.height());
+    const QSize & tileSize = EditorTheme::tileSize();
+    const QSize areaSize(tileSize.width() * size.width(), tileSize.height() * size.height());
 
-    objectArea = theme.getImage(obj);
-    centerOffset = QPoint(areaSize.width() - theme.tileSize().width(),
-				areaSize.height() - theme.tileSize().height());
+    objectArea = EditorTheme::getImage(obj);
+    centerOffset = QPoint(areaSize.width() - tileSize.width(),
+				areaSize.height() - tileSize.height());
 
     // generate passable color map
     passableMap = QPixmap(areaSize);
     passableMap.fill(Qt::transparent);
 
-    QPixmap yellowBound = Editor::pixmapBorder(theme.tileSize() - QSize(2, 2), QColor(255, 255, 0));
+    QPixmap yellowBound = Editor::pixmapBorder(tileSize - QSize(2, 2), QColor(255, 255, 0));
     QPainter paint(& passableMap);
 
     for(CompositeObject::const_iterator
 	it = begin(); it != end(); ++it)
     {
-	const QPoint offset((*it).spritePos.x() * theme.tileSize().width(),
-				(*it).spritePos.y() * theme.tileSize().height());
+	const QPoint offset((*it).spritePos.x() * tileSize.width(),
+				(*it).spritePos.y() * tileSize.height());
 
-	QPixmap tileP = Editor::pixmapBorderPassable(theme.tileSize() - QSize(2, 2), (*it).spritePassable);
+	QPixmap tileP = Editor::pixmapBorderPassable(tileSize - QSize(2, 2), (*it).spritePassable);
 
 	switch((*it).spriteLevel)
 	{

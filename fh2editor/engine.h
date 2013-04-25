@@ -415,7 +415,9 @@ namespace AGG
 	QMap<QString, QPoint>	icnOffsetCache;
 
     public:
-	Spool(const QString &);
+	Spool(){}
+
+	bool			setData(const QString &);
 
 	QPixmap			getImageTIL(const QString &, int);
 	QPair<QPixmap, QPoint>	getImageICN(const QString &, int);
@@ -440,33 +442,27 @@ public:
     int directionsAroundGround(int) const;
 };
 
-class EditorTheme
+namespace EditorTheme
 {
-protected:
-    AGG::Spool &		aggSpool;
-    QString			name;
-    QSize			tile;
-
-public:
-    EditorTheme(AGG::Spool &);
+    bool			load(const QString &);
 
     QPixmap			getImageTIL(const QString &, int);
     QPair<QPixmap, QPoint>	getImageICN(int, int);
     QPair<QPixmap, QPoint>	getImageICN(const QString &, int);
     QPixmap			getImage(const CompositeObject &);
 
-    const QSize &		tileSize(void) const;
+    const QSize &		tileSize(void);
 
-    int				startFilledTile(int) const;
-    int				startGroundTile(int) const;
-    int				startFilledOriginalTile(int) const;
-    int				startGroundOriginalTile(int) const;
+    int				startFilledTile(int);
+    int				startGroundTile(int);
+    int				startFilledOriginalTile(int);
+    int				startGroundOriginalTile(int);
 
-    int				ground(int) const;
-    QPair<int, int>		groundBoundariesFix(const MapTile &, const MapTiles &) const;
+    int				ground(int);
+    QPair<int, int>		groundBoundariesFix(const MapTile &, const MapTiles &);
 
-    QString			resourceFile(const QString & dir, const QString & file) const;
-};
+    QString			resourceFile(const QString & dir, const QString & file);
+}
 
 struct Resources
 {
@@ -643,7 +639,7 @@ struct CompositeObjectCursor : public CompositeObject
     bool		valid;
 
     CompositeObjectCursor() : valid(false) {}
-    CompositeObjectCursor(const CompositeObject &, EditorTheme &);
+    CompositeObjectCursor(const CompositeObject &);
 
     void		reset(void);
     bool		isValid(void) const;

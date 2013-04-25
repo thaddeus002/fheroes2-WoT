@@ -263,17 +263,17 @@ void Form::SelectDataFile::clickSelect(void)
 class SelectImageItem : public QListWidgetItem
 {
 public:
-    SelectImageItem(const CompositeObject & obj, EditorTheme & theme)
+    SelectImageItem(const CompositeObject & obj)
     {
 	setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 	setData(Qt::UserRole, QVariant::fromValue(obj));
-	setIcon(theme.getImage(obj));
+	setIcon(EditorTheme::getImage(obj));
 	setText(obj.name);
 	setSizeHint(QSize(132, 80));
     }
 };
 
-Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QString & dataFolder, EditorTheme & theme)
+Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QString & dataFolder)
 {
     verticalLayout = new QVBoxLayout(this);
     listWidget = new QListWidget(this);
@@ -283,8 +283,8 @@ Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QStrin
     listWidget->setWrapping(true);
     listWidget->setResizeMode(QListView::Adjust);
 
-    Editor::MyXML templateObjects(theme.resourceFile(dataFolder, "template.xml"), "template");
-    Editor::MyXML objectsElem(theme.resourceFile(dataFolder, groupElem.attribute("file")), "objects");
+    Editor::MyXML templateObjects(EditorTheme::resourceFile(dataFolder, "template.xml"), "template");
+    Editor::MyXML objectsElem(EditorTheme::resourceFile(dataFolder, groupElem.attribute("file")), "objects");
     QString icn = objectsElem.attribute("icn");
 
     if(! objectsElem.isNull())
@@ -297,7 +297,7 @@ Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QStrin
             CompositeObject obj(icn, objectsList.item(pos2).toElement(), 0);
 
             if(obj.isValid())
-		listWidget->addItem(new SelectImageItem(obj, theme));
+		listWidget->addItem(new SelectImageItem(obj));
         }
 
         // parse element: template
@@ -324,7 +324,7 @@ Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QStrin
 
 
             	if(obj.isValid())
-		    listWidget->addItem(new SelectImageItem(obj, theme));
+		    listWidget->addItem(new SelectImageItem(obj));
             }
         }
     }
@@ -340,14 +340,14 @@ namespace Form
     int SelectImage::lastNumTab = 0;
 };
 
-Form::SelectImage::SelectImage(EditorTheme & theme)
+Form::SelectImage::SelectImage()
 {
     setWindowTitle(QApplication::translate("SelectImage", "Select Object", 0, QApplication::UnicodeUTF8));
 
     tabWidget = new QTabWidget(this);
 
     const QString dataFolder("objects");
-    Editor::MyXML groupsElem(theme.resourceFile(dataFolder, "groups.xml"), "groups");
+    Editor::MyXML groupsElem(EditorTheme::resourceFile(dataFolder, "groups.xml"), "groups");
 
     if(! groupsElem.isNull())
     {
@@ -359,7 +359,7 @@ Form::SelectImage::SelectImage(EditorTheme & theme)
             QString name = groupElem.attribute("name");
 
             if(! name.isEmpty())
-		tabWidget->addTab(new SelectImageTab(groupElem, dataFolder, theme), name);
+		tabWidget->addTab(new SelectImageTab(groupElem, dataFolder), name);
 	}
 
 	tabWidget->setCurrentIndex(lastNumTab);
@@ -448,7 +448,7 @@ void fillComboBox(QComboBox & box, const ListStringPos & list)
     }
 }
 
-Form::PlayerStatus::PlayerStatus(int c, int v, EditorTheme & t, QWidget* parent) : QLabel(parent), col(c), stat(v), theme(t)
+Form::PlayerStatus::PlayerStatus(int c, int v, QWidget* parent) : QLabel(parent), col(c), stat(v)
 {
     updatePlayers();
 }
@@ -466,17 +466,17 @@ void Form::PlayerStatus::updatePlayers(void)
 {
     switch(col)
     {
-	    case Color::Blue:	setPixmap(theme.getImageICN("CELLWIN.ICN", 19 + status()).first); break;
-    	    case Color::Green:	setPixmap(theme.getImageICN("CELLWIN.ICN", 23 + status()).first); break;
-    	    case Color::Red:	setPixmap(theme.getImageICN("CELLWIN.ICN", 27 + status()).first); break;
-    	    case Color::Yellow:	setPixmap(theme.getImageICN("CELLWIN.ICN", 31 + status()).first); break;
-    	    case Color::Orange:	setPixmap(theme.getImageICN("CELLWIN.ICN", 35 + status()).first); break;
-    	    case Color::Purple:	setPixmap(theme.getImageICN("CELLWIN.ICN", 39 + status()).first); break;
+	    case Color::Blue:	setPixmap(EditorTheme::getImageICN("CELLWIN.ICN", 19 + status()).first); break;
+    	    case Color::Green:	setPixmap(EditorTheme::getImageICN("CELLWIN.ICN", 23 + status()).first); break;
+    	    case Color::Red:	setPixmap(EditorTheme::getImageICN("CELLWIN.ICN", 27 + status()).first); break;
+    	    case Color::Yellow:	setPixmap(EditorTheme::getImageICN("CELLWIN.ICN", 31 + status()).first); break;
+    	    case Color::Orange:	setPixmap(EditorTheme::getImageICN("CELLWIN.ICN", 35 + status()).first); break;
+    	    case Color::Purple:	setPixmap(EditorTheme::getImageICN("CELLWIN.ICN", 39 + status()).first); break;
     	    default: break;
     }
 }
 
-Form::MapOptions::MapOptions(MapData & map) : data(map)
+Form::MapOptions::MapOptions(MapData & map)
 {
     setWindowTitle(QApplication::translate("MapOptions", "Map Options", 0, QApplication::UnicodeUTF8));
 
@@ -603,7 +603,7 @@ Form::MapOptions::MapOptions(MapData & map) : data(map)
 	    if((*it) & map.computerColors())
 		stat = 2;
 	}
-        labelPlayers.push_back(new PlayerStatus(*it, stat, map.theme(), groupBoxPlayers));
+        labelPlayers.push_back(new PlayerStatus(*it, stat, groupBoxPlayers));
 	labelPlayers.back()->setEnabled((*it) & map.kingdomColors());
         horizontalLayoutPlayers->addWidget(labelPlayers.back());
     }
@@ -633,8 +633,8 @@ Form::MapOptions::MapOptions(MapData & map) : data(map)
     groupBoxEvents = new QGroupBox(tabRumorsEvents);
     groupBoxEvents->setTitle(QApplication::translate("MapOptions", "Events", 0, QApplication::UnicodeUTF8));
 
-    listWidgetRumors = new RumorsList(this);
-    listWidgetEvents = new EventsList(this);
+    listWidgetRumors = new RumorsList(map.kingdomColors(), this);
+    listWidgetEvents = new EventsList(map.kingdomColors(), this);
 
     verticalLayout7 = new QVBoxLayout(groupBoxRumors);
     verticalLayout7->addWidget(listWidgetRumors);
@@ -918,7 +918,7 @@ void Form::MapOptions::setEnableSaveButton(const QString & val)
     pushButtonSave->setEnabled(true);
 }
 
-Form::ItemsList::ItemsList(MapOptions* parent) : QListWidget(parent), parentObj(parent)
+Form::ItemsList::ItemsList(int colors, QWidget* parent) : QListWidget(parent), kingdomColors(colors)
 {
     setViewMode(QListView::ListMode);
 
@@ -944,7 +944,6 @@ Form::ItemsList::ItemsList(MapOptions* parent) : QListWidget(parent), parentObj(
 	QObject::connect(editItemAct, SIGNAL(triggered()), ptr, SLOT(setEnableSaveButton()));
 	QObject::connect(delItemAct, SIGNAL(triggered()), ptr, SLOT(setEnableSaveButton()));
     }
-
 }
 
 void Form::ItemsList::editCurrentItem(void)
@@ -982,7 +981,7 @@ void Form::ItemsList::mousePressEvent(QMouseEvent* event)
     QListWidget::mousePressEvent(event);
 }
 
-Form::RumorsList::RumorsList(MapOptions* parent) : ItemsList(parent)
+Form::RumorsList::RumorsList(int colors, QWidget* parent) : ItemsList(colors, parent)
 {
     addItemAct->setStatusTip(tr("Add new rumor"));
     editItemAct->setStatusTip(tr("Edit rumor"));
@@ -1008,7 +1007,7 @@ void Form::RumorsList::editItem(QListWidgetItem* item)
 	item->setText(dialog.plainText->toPlainText());
 }
 
-Form::EventsList::EventsList(MapOptions* parent) : ItemsList(parent)
+Form::EventsList::EventsList(int colors, QWidget* parent) : ItemsList(colors, parent)
 {
     addItemAct->setStatusTip(tr("Add new event"));
     editItemAct->setStatusTip(tr("Edit event"));
@@ -1017,34 +1016,28 @@ Form::EventsList::EventsList(MapOptions* parent) : ItemsList(parent)
 
 void Form::EventsList::addItem(void)
 {
-    if(parentObj)
-    {
-	DayEventDialog dialog(DayEvent(), parentObj->data.kingdomColors(), parentObj->data.theme());
+    DayEventDialog dialog(DayEvent(), kingdomColors);
 
-	if(QDialog::Accepted == dialog.exec())
-	{
-	    DayEvent event = dialog.result();
-	    QListWidgetItem* item = new QListWidgetItem(event.header());
-	    item->setData(Qt::UserRole, QVariant::fromValue(event));
-	    QListWidget::addItem(item);
-	    setCurrentRow(count() - 1);
-	}
+    if(QDialog::Accepted == dialog.exec())
+    {
+	DayEvent event = dialog.result();
+	QListWidgetItem* item = new QListWidgetItem(event.header());
+	item->setData(Qt::UserRole, QVariant::fromValue(event));
+	QListWidget::addItem(item);
+	setCurrentRow(count() - 1);
     }
 }
 
 void Form::EventsList::editItem(QListWidgetItem* item)
 {
-    if(parentObj)
-    {
-	DayEvent event = qvariant_cast<DayEvent>(item->data(Qt::UserRole));
-	DayEventDialog dialog(event, parentObj->data.kingdomColors(), parentObj->data.theme());
+    DayEvent event = qvariant_cast<DayEvent>(item->data(Qt::UserRole));
+    DayEventDialog dialog(event, kingdomColors);
 
-	if(QDialog::Accepted == dialog.exec())
-	{
-	    event = dialog.result();
-	    item->setText(event.header());
-	    item->setData(Qt::UserRole, QVariant::fromValue(event));
-	}
+    if(QDialog::Accepted == dialog.exec())
+    {
+	event = dialog.result();
+	item->setText(event.header());
+	item->setData(Qt::UserRole, QVariant::fromValue(event));
     }
 }
 
@@ -1085,7 +1078,7 @@ void Form::RumorDialog::enableButtonOk(void)
     pushButtonOk->setEnabled(! plainText->toPlainText().isEmpty());
 }
 
-Form::PlayerAllow::PlayerAllow(int c, bool v, EditorTheme & t, QWidget* parent) : QLabel(parent), col(c), stat(v), theme(t)
+Form::PlayerAllow::PlayerAllow(int c, bool v, QWidget* parent) : QLabel(parent), col(c), stat(v)
 {
     updatePlayers();
 }
@@ -1104,25 +1097,25 @@ void Form::PlayerAllow::updatePlayers(void)
 
     switch(col)
     {
-	case Color::Blue:	pix = theme.getImageICN("CELLWIN.ICN", 43).first; break;
-    	case Color::Green:	pix = theme.getImageICN("CELLWIN.ICN", 44).first; break;
-    	case Color::Red:	pix = theme.getImageICN("CELLWIN.ICN", 45).first; break;
-    	case Color::Yellow:	pix = theme.getImageICN("CELLWIN.ICN", 46).first; break;
-    	case Color::Orange:	pix = theme.getImageICN("CELLWIN.ICN", 47).first; break;
-    	case Color::Purple:	pix = theme.getImageICN("CELLWIN.ICN", 48).first; break;
+	case Color::Blue:	pix = EditorTheme::getImageICN("CELLWIN.ICN", 43).first; break;
+    	case Color::Green:	pix = EditorTheme::getImageICN("CELLWIN.ICN", 44).first; break;
+    	case Color::Red:	pix = EditorTheme::getImageICN("CELLWIN.ICN", 45).first; break;
+    	case Color::Yellow:	pix = EditorTheme::getImageICN("CELLWIN.ICN", 46).first; break;
+    	case Color::Orange:	pix = EditorTheme::getImageICN("CELLWIN.ICN", 47).first; break;
+    	case Color::Purple:	pix = EditorTheme::getImageICN("CELLWIN.ICN", 48).first; break;
 	default: break;
     }
 
     if(stat)
     {
 	QPainter paint(& pix);
-	paint.drawPixmap(QPoint(2, 2), theme.getImageICN("CELLWIN.ICN", 2).first);
+	paint.drawPixmap(QPoint(2, 2), EditorTheme::getImageICN("CELLWIN.ICN", 2).first);
     }
 
     setPixmap(pix);
 }
 
-Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors, EditorTheme & theme)
+Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors)
 {
     setWindowTitle(QApplication::translate("DayEventDialog", "Event Detail", 0, QApplication::UnicodeUTF8));
 
@@ -1179,7 +1172,7 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors, 
 	it = colors.begin(); it != colors.end(); ++it)
     if((*it) & kingdomColors)
     {
-	labelPlayers.push_back(new PlayerAllow(*it, (*it) & event.colors, theme, groupBoxAllowedColors));
+	labelPlayers.push_back(new PlayerAllow(*it, (*it) & event.colors, groupBoxAllowedColors));
 	horizontalLayout4->addWidget(labelPlayers.back());
     }
     horizontalLayout4->addItem(horizontalSpacerPlayersRight);
@@ -1206,7 +1199,7 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors, 
     int resMax = 65535;
 
     labelResWood = new QLabel(tabResource);
-    labelResWood->setPixmap(theme.getImageICN("RESOURCE.ICN", 0).first);
+    labelResWood->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 0).first);
 
     spinBoxResWood = new QSpinBox(tabResource);
     spinBoxResWood->setMinimum(resMin);
@@ -1216,7 +1209,7 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors, 
     horizontalSpacer2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     labelResSulfur = new QLabel(tabResource);
-    labelResSulfur->setPixmap(theme.getImageICN("RESOURCE.ICN", 3).first);
+    labelResSulfur->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 3).first);
 
     spinBoxResSulfur = new QSpinBox(tabResource);
     spinBoxResSulfur->setMinimum(resMin);
@@ -1231,7 +1224,7 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors, 
     horizontalLayout5->addWidget(spinBoxResSulfur);
 
     labelResMercury = new QLabel(tabResource);
-    labelResMercury->setPixmap(theme.getImageICN("RESOURCE.ICN", 1).first);
+    labelResMercury->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 1).first);
 
     spinBoxResMercury = new QSpinBox(tabResource);
     spinBoxResMercury->setMinimum(resMin);
@@ -1241,7 +1234,7 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors, 
     horizontalSpacer3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     labelResCrystal = new QLabel(tabResource);
-    labelResCrystal->setPixmap(theme.getImageICN("RESOURCE.ICN", 4).first);
+    labelResCrystal->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 4).first);
 
     spinBoxResCrystal = new QSpinBox(tabResource);
     spinBoxResCrystal->setMinimum(resMin);
@@ -1256,7 +1249,7 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors, 
     horizontalLayout6->addWidget(spinBoxResCrystal);
 
     labelResOre = new QLabel(tabResource);
-    labelResOre->setPixmap(theme.getImageICN("RESOURCE.ICN", 2).first);
+    labelResOre->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 2).first);
 
     spinBoxResOre = new QSpinBox(tabResource);
     spinBoxResOre->setMinimum(resMin);
@@ -1266,7 +1259,7 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors, 
     horizontalSpacer4 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     labelResGems = new QLabel(tabResource);
-    labelResGems->setPixmap(theme.getImageICN("RESOURCE.ICN", 5).first);
+    labelResGems->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 5).first);
 
     spinBoxResGems = new QSpinBox(tabResource);
     spinBoxResGems->setMinimum(resMin);
@@ -1284,7 +1277,7 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors, 
     horizontalSpacer6 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     labelResGold = new QLabel(tabResource);
-    labelResGold->setPixmap(theme.getImageICN("RESOURCE.ICN", 6).first);
+    labelResGold->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 6).first);
 
     spinBoxResGold = new QSpinBox(tabResource);
     spinBoxResGold->setMinimum(resMin);

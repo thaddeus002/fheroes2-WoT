@@ -36,14 +36,12 @@ class QSignalMapper;
 class MapWindow;
 QT_END_NAMESPACE
 
-#include "engine.h"
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    MainWindow(const QString &);
+    MainWindow();
 
 protected:
     void		closeEvent(QCloseEvent*);
@@ -106,7 +104,6 @@ private:
     QLabel*		labelTileY;
 
     int			sequenceMapNumber;
-    AGG::Spool		aggContent;
 };
 
 #endif
