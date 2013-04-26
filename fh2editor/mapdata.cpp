@@ -37,7 +37,7 @@
 #include "mapdata.h"
 
 MapTileExt::MapTileExt(int lvl, const mp2lev_t & ext)
-    : spriteICN(H2::mapICN(ext.object)), spriteExt(0x03 & ext.object), spriteIndex(ext.index), spriteLevel(lvl), tmp(0), spriteUID(ext.uniq)
+    : spriteICN(H2::mapICN(ext.object)), spriteExt(ext.object), spriteIndex(ext.index), spriteLevel(lvl), tmp(0), spriteUID(ext.uniq)
 {
 }
 
@@ -46,6 +46,11 @@ MapTileExt::MapTileExt(int icn, const CompositeSprite & cs, quint32 uid)
 {
     if(cs.spriteAnimation)
 	spriteExt |= 0x01;
+}
+
+bool MapTileExt::isAnimation(const MapTileExt* mte)
+{
+    return mte->spriteExt & 0x01;
 }
 
 bool MapTileExt::sortLevel1(const MapTileExt* mte1, const MapTileExt* mte2)
@@ -116,16 +121,18 @@ void MapTileLevels::paint(QPainter & painter, const QPoint & offset, const QPoin
 	QPair<QPixmap, QPoint> p1 = EditorTheme::getImageICN((*it)->icn(), (*it)->index());
 	painter.drawPixmap(offset + p1.second, p1.first);
 
-	int anim = H2::isAnimationICN((*it)->icn(), (*it)->index(), 0);
-
-	if(0 < anim)
+	if(MapTileExt::isAnimation(*it))
 	{
-	    QPair<QPixmap, QPoint> p2 = EditorTheme::getImageICN((*it)->icn(), anim);
-	    painter.drawPixmap(offset + p2.second, p2.first);
+	    int anim = H2::isAnimationICN((*it)->icn(), (*it)->index(), 0);
+
+	    if(0 < anim)
+	    {
+		QPair<QPixmap, QPoint> p2 = EditorTheme::getImageICN((*it)->icn(), anim);
+		painter.drawPixmap(offset + p2.second, p2.first);
+	    }
+	    else
+		qDebug() << "H2::isAnimationICN:" << "incorrect animation" << mpos << "icn:" << (*it)->icn() << "index:" << (*it)->index();
 	}
-	else
-	if((*it)->ext() & 0x01)
-	    qDebug() << "H2::isAnimationICN:" << "incorrect animation" << mpos << "icn:" << (*it)->icn() << "index:" << (*it)->index();
     }
 }
 
@@ -138,8 +145,7 @@ QString MapTileLevels::infoString(void) const
     {
 	ss <<
 	    "uniq:   " << (*it)->uid() << endl <<
-	    "object: " << H2::icnString((*it)->icn()) << ", " << (*it)->ext() << endl <<
-	    "index:  " << (*it)->index() << endl <<
+	    "object: " << H2::icnString((*it)->icn()) << ", " <<  (*it)->index() << endl <<
 	    "level:  " << (*it)->level() << endl;
     }
 
@@ -259,6 +265,11 @@ void MapTile::loadSpriteLevel(MapTileLevels & list, int level, const mp2lev_t & 
 	if(! icn.isEmpty())
 	    list << new MapTileExt(level, ext);
     }
+}
+
+bool MapTile::isAction(void) const
+{
+    return til.objectID & 0x80;
 }
 
 void MapTile::loadSpriteLevels(const mp2ext_t & mp2)
@@ -547,19 +558,26 @@ const CondLoss & MapData::conditionLoss(void) const
 
 ListStringPos MapData::conditionHeroList(int cond) const
 {
+    Q_UNUSED(cond);
     ListStringPos res;
 
-    if(Conditions::Wins & cond)
-	res << QPair<QString, QPoint>("Test 1", QPoint(22,33)) << QPair<QString, QPoint>("Hero 2", QPoint(11,67));
-    else
-    if(Conditions::Loss & cond)
-	res << QPair<QString, QPoint>("Test 1", QPoint(22,33)) << QPair<QString, QPoint>("Hero 2", QPoint(11,67));
+
+    for(MapObjects::const_iterator
+	it = mapObjects.begin(); it != mapObjects.end(); ++it)
+    if(MapObject::Hero == (*it).data()->type())
+    {
+	const MapHero* hero = dynamic_cast<const MapHero*>((*it).data());
+
+	if(hero)
+	    res << QPair<QString, QPoint>(hero->name, hero->pos());
+    }
 
     return res;
 }
 
 ListStringPos MapData::conditionTownList(int cond) const
 {
+    Q_UNUSED(cond);
     ListStringPos res;
 
     for(MapObjects::const_iterator
@@ -748,7 +766,7 @@ void MapData::drawForeground(QPainter* painter, const QRectF & rect)
     // paint: selected item over mouse
     if(tileOverMouse)
     {
-	painter->setPen(QPen(QColor(255, 255, 0), 1));
+	painter->setPen(QPen(tileOverMouse->isAction() ? QColor(0, 255, 0) : QColor(255, 255, 0), 1));
 	painter->setBrush(QBrush(QColor(0, 0, 0, 0)));
 	const QRectF & rt = tileOverMouse->boundingRect();
 	painter->drawRect(QRectF(rt.x(), rt.y(), rt.width() - 1, rt.height() - 1));

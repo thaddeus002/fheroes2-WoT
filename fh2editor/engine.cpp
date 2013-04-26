@@ -32,6 +32,36 @@
 #include "engine.h"
 #include "mapdata.h"
 
+QString townName(int num)
+{
+    const char* towns[] = { "Blackridge", "Pinehurst", "Woodhaven", "Hillstone", "Whiteshield", "Bloodreign", "Dragontooth", "Greywind", "Blackwind", "Portsmith", "Middle Gate", "Tundara", 
+	"Vulcania", "Sansobar", "Atlantium", "Baywatch", "Wildabar", "Fountainhead", "Vertigo", "Winterkill", "Nightshadow", "Sandcaster", "Lakeside", "Olympus", 
+	"Brindamoor", "Burlock", "Xabran", "Dragadune", "Alamar", "Kalindra", "Blackfang", "Basenji", "Algary", "Sorpigal", "New Dawn", "Erliquin", 
+	"Avone", "Big Oak", "Hampshire", "Chandler", "South Mill", "Weed Patch", "Roc Haven", "Avalon", "Antioch", "Brownston", "Weddington", "Whittingham",
+	"Westfork", "Hilltop", "Yorksford", "Sherman", "Roscomon", "Elk's Head", "Cathcart", "Viper's Nest", "Pig's Eye", "Blacksford", "Burton", "Blackburn",
+	"Lankershire", "Lombard", "Timberhill", "Fenton", "Troy", "Forder Oaks", "Meramec", "Quick Silver", "Westmoor", "Willow", "Sheltemburg", "Corackston" };
+
+    return QString(towns[num % 72]);
+}
+
+QString Portrait::transcribe(int port)
+{
+    const char* ports[] = { "Unknown",
+	"Lord Kilburn", "Sir Gallanth", "Ector", "Gwenneth", "Tyro", "Ambrose", "Ruby", "Maximus", "Dimitry",
+	"Thundax", "Fineous", "Jojosh", "Crag Hack", "Jezebel", "Jaclyn", "Ergon", "Tsabu", "Atlas",
+	"Astra", "Natasha", "Troyan", "Vatawna", "Rebecca", "Gem", "Ariel", "Carlawn", "Luna",
+	"Arie", "Alamar", "Vesper", "Crodo", "Barok", "Kastore", "Agar", "Falagar", "Wrathmont",
+	"Myra", "Flint", "Dawn", "Halon", "Myrini", "Wilfrey", "Sarakin", "Kalindra", "Mandigal",
+	"Zom", "Darlana", "Zam", "Ranloo", "Charity", "Rialdo", "Roxana", "Sandro", "Celia",
+	"Roland", "Lord Corlagon", "Sister Eliza", "Archibald", "Lord Halton", "Brother Bax",
+	"Solmyr", "Dainwin", "Mog", "Uncle Ivan", "Joseph", "Gallavant", "Elderian", "Ceallach", "Drakonia", "Martine", "Jarkonas",
+	"Random Hero" };
+
+    const int count = sizeof(ports) / sizeof(ports[0]);
+
+    return count > port ? QString(ports[port]) : QString(ports[0]);
+}
+
 inline bool IS_EQUAL_VALS(int A, int B)
 {
     return (A & B) == A;
@@ -303,7 +333,7 @@ mp2til_t::mp2til_t()
     quantity1 = 0;
     quantity2 = 0;
     tileShape = 0;
-    tileObject = 0;
+    objectID = 0;
     indexExt = 0;
 }
 
@@ -320,7 +350,7 @@ QDataStream & operator>> (QDataStream & ds, mp2til_t & til)
 	til.level1.object >> til.level1.index >>
 	til.quantity1 >> til.quantity2 >>
 	til.level2.object >> til.level2.index >>
-	til.tileShape >> til.tileObject >>
+	til.tileShape >> til.objectID >>
 	til.indexExt >> til.level1.uniq >> til.level2.uniq;
 }
 
@@ -367,7 +397,7 @@ QDataStream & operator>> (QDataStream & ds, mp2hero_t & hero)
     for(int ii = 0; ii < 3; ++ii)
 	ds >> hero.artifacts[ii];
 
-    ds >> hero.unknown2 >> hero.exerience >> hero.customSkills;
+    ds >> hero.unknown2 >> hero.experience >> hero.customSkills;
 
     for(int ii = 0; ii < 8; ++ii)
 	ds >> hero.skillId[ii];
@@ -1754,7 +1784,7 @@ MapTown::MapTown(const QPoint & pos, quint32 id, const mp2town_t & mp2)
 
 MapHero::MapHero(const QPoint & pos, quint32 id)
     : MapObject(pos, id, MapObject::Hero), color(Color::Unknown), race(Race::Unknown),
-    portrait(0), experience(0), patrolMode(false), patrolSquare(0)
+    portrait(Portrait::Random), experience(0), patrolMode(false), patrolSquare(0)
 {
     artifacts[0] = Artifact::Unknown;
     artifacts[1] = Artifact::Unknown;
@@ -1762,9 +1792,33 @@ MapHero::MapHero(const QPoint & pos, quint32 id)
 }
 
 MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2)
-    : MapObject(pos, id, MapObject::Hero), color(Color::Unknown), race(Race::Unknown),
-    portrait(0), experience(0), patrolMode(false), patrolSquare(0), name(mp2.name)
+    : MapObject(pos, id, MapObject::Hero), color(Color::Unknown), race(Race::Unknown), portrait(Portrait::Random), name(mp2.name)
 {
+    if(mp2.customTroops)
+    {
+	for(int ii = 0; ii < 5; ++ii)
+	    troops.push_back(Troop(mp2.troopId[ii], mp2.troopCount[ii]));
+    }
+
+    artifacts[0] = mp2.artifacts[0];
+    artifacts[1] = mp2.artifacts[1];
+    artifacts[2] = mp2.artifacts[2];
+
+    experience = mp2.experience;
+    patrolMode = mp2.patrol;
+    patrolSquare = mp2.patrolSquare;
+
+    if(mp2.customPortrate)
+	portrait = mp2.portrateType + 1;
+
+    if(name.isEmpty())
+	name = Portrait::transcribe(portrait);
+
+    if(mp2.customSkills)
+    {
+	for(int ii = 0; ii < 8; ++ii)
+	    skills.push_back(Skill(mp2.skillId[ii], mp2.skillLevel[ii]));
+    }
 }
 
 MapSign::MapSign(const QPoint & pos, quint32 id)

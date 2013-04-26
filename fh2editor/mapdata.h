@@ -96,12 +96,14 @@ public:
     static bool		sortLevel1(const MapTileExt*, const MapTileExt*);
     static bool		sortLevel2(const MapTileExt*, const MapTileExt*);
 
+
     int			uid(void) const { return spriteUID; }
     int			icn(void) const { return spriteICN; }
     int			ext(void) const { return spriteExt; }
     int			index(void) const { return spriteIndex; }
     int			level(void) const { return spriteLevel; }
 
+    static bool		isAnimation(const MapTileExt*);
     static bool		isMapEvent(const MapTileExt*);
     static bool		isSphinx(const MapTileExt*);
     static bool		isSign(const MapTileExt*);
@@ -145,6 +147,8 @@ public:
 
     const MapTileLevels & levels1(void) const { return spritesLevel1; }
     const MapTileLevels & levels2(void) const { return spritesLevel2; }
+
+    bool		isAction(void) const;
 
 protected:
     static void		loadSpriteLevel(MapTileLevels &, int, const mp2lev_t &);

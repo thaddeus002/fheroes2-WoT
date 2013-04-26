@@ -103,6 +103,22 @@ namespace Artifact
     enum { Unknown };
 }
 
+namespace Portrait
+{
+    enum { Unknown,
+	    LordKilburn, SirGallanth, Ector, Gwenneth, Tyro, Ambrose, Ruby, Maximus, Dimitry,
+	    Thundax, Fineous, Jojosh, CragHack, Jezebel, Jaclyn, Ergon, Tsabu, Atlas,
+	    Astra, Natasha, Troyan, Vatawna, Rebecca, Gem, Ariel, Carlawn, Luna,
+	    Arie, Alamar, Vesper, Crodo, Barok, Kastore, Agar, Falagar, Wrathmont,
+	    Myra, Flint, Dawn, Halon, Myrini, Wilfrey, Sarakin, Kalindra, Mandigal,
+	    Zom, Darlana, Zam, Ranloo, Charity, Rialdo, Roxana, Sandro, Celia,
+	    Roland, LordCorlagon, SisterEliza, Archibald, LordHalton, BrotherBax,
+	    Solmyr, Dainwin, Mog, UncleIvan, Joseph, Gallavant, Elderian, Ceallach, Drakonia, Martine, Jarkonas,
+	    Random };
+
+    QString transcribe(int);
+}
+
 namespace SkillLevel
 {
     enum { Unknown = 0, Basic = 1, Advanced = 2, Expert = 3 };
@@ -139,7 +155,7 @@ struct mp2til_t
     quint8      quantity1;
     quint8      quantity2;
     quint8      tileShape;
-    quint8      tileObject;
+    quint8      objectID;
     quint16     indexExt;
     mp2lev_t	level1;
     mp2lev_t	level2;
@@ -189,7 +205,7 @@ struct mp2hero_t
     quint8	portrateType;
     quint8	artifacts[3];
     quint8	unknown2;
-    quint32	exerience;
+    quint32	experience;
     quint8	customSkills;
     quint8	skillId[8];
     quint8	skillLevel[8];
