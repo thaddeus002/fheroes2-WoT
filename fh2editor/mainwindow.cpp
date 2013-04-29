@@ -32,8 +32,7 @@ MainWindow::MainWindow() : sequenceMapNumber(0)
     mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     setCentralWidget(mdiArea);
-    connect(mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(updateMenus()));
-    connect(mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(updateStatusBar()));
+    connect(mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(subWindowActivated(QMdiSubWindow*)));
 
     windowMapper = new QSignalMapper(this);
     connect(windowMapper, SIGNAL(mapped(QWidget*)), this, SLOT(setActiveSubWindow(QWidget*)));
@@ -45,13 +44,13 @@ MainWindow::MainWindow() : sequenceMapNumber(0)
 
     updateMenus();
     updateStatusBar();
+    updateMiniMapDock();
 
     readSettings();
 
     setWindowTitle(tr("FHeroes2 Map Editor"));
     setUnifiedTitleAndToolBarOnMac(true);
 }
-
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
@@ -120,9 +119,34 @@ void MainWindow::about(void)
    QMessageBox::about(this, tr("Map Editor"), tr("<b>Demo version 0.1.</b>"));
 }
 
+void MainWindow::updateMiniMapDock(void)
+{
+    MapWindow* activeWindow = activeMapWindow();
+
+    if(activeWindow && activeWindow->miniMapWidget())
+	dockMiniMap->setWidget(activeWindow->miniMapWidget());
+    else
+    if(dockMiniMap->widget())
+	dockMiniMap->widget()->hide();
+}
+
+void MainWindow::updateStatusBar(void)
+{
+    MapWindow* mapWindow = activeMapWindow();
+
+    disconnect(labelTileX, SLOT(setNum(int)));
+    disconnect(labelTileY, SLOT(setNum(int)));
+
+    if(mapWindow)
+    {
+	connect(mapWindow, SIGNAL(cursorTileXPosChanged(int)), labelTileX, SLOT(setNum(int)));
+	connect(mapWindow, SIGNAL(cursorTileYPosChanged(int)), labelTileY, SLOT(setNum(int)));
+    }
+}
+
 void MainWindow::updateMenus(void)
 {
-    bool hasMapWindow = (activeMapWindow() != 0);
+    bool hasMapWindow = (activeMapWindow() != NULL);
 
     fileSaveAct->setEnabled(hasMapWindow);
     fileSaveAsAct->setEnabled(hasMapWindow);
@@ -134,7 +158,6 @@ void MainWindow::updateMenus(void)
     previousAct->setEnabled(hasMapWindow);
     separatorAct->setVisible(hasMapWindow);
     mapOptionsAct->setEnabled(hasMapWindow);
-    showRadarAct->setEnabled(hasMapWindow);
     showPassableAct->setEnabled(hasMapWindow);
 }
 
@@ -245,9 +268,6 @@ void MainWindow::createActions(void)
     menuAboutAct->setStatusTip(tr("Show the application's About box"));
     connect(menuAboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
-    showRadarAct = new QAction(tr("Radar"), this);
-    showRadarAct->setStatusTip(tr("Show the mini map"));
-
     showPassableAct = new QAction(tr("Passable Mode"), this);
     showPassableAct->setStatusTip(tr("Show the passable mode"));
 }
@@ -266,7 +286,6 @@ void MainWindow::createMenus(void)
     mapMenu = menuBar()->addMenu(tr("&Map"));
     mapMenu->addAction(mapOptionsAct);
     mapMenu->addSeparator()->setText(tr("View Mode"));
-    mapMenu->addAction(showRadarAct);
     mapMenu->addAction(showPassableAct);
 
     windowMenu = menuBar()->addMenu(tr("&Window"));
@@ -275,6 +294,11 @@ void MainWindow::createMenus(void)
 
     menuBar()->addSeparator();
     menuBar()->addAction(menuAboutAct);
+
+    dockMiniMap = new QDockWidget(tr("Mini Map"), this);
+    dockMiniMap->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    addDockWidget(Qt::RightDockWidgetArea, dockMiniMap);
+    mapMenu->addAction(dockMiniMap->toggleViewAction());
 }
 
 void MainWindow::createToolBars(void)
@@ -295,20 +319,6 @@ void MainWindow::createStatusBar(void)
     statusBar()->addPermanentWidget(new QLabel("tile y:", this));
     statusBar()->addPermanentWidget(labelTileY);
     statusBar()->showMessage(tr("Ready"));
-}
-
-void MainWindow::updateStatusBar(void)
-{
-    MapWindow* mapWindow = activeMapWindow();
-
-    disconnect(labelTileX, SLOT(setNum(int)));
-    disconnect(labelTileY, SLOT(setNum(int)));
-
-    if(mapWindow)
-    {
-	connect(mapWindow, SIGNAL(cursorTileXPosChanged(int)), labelTileX, SLOT(setNum(int)));
-	connect(mapWindow, SIGNAL(cursorTileYPosChanged(int)), labelTileY, SLOT(setNum(int)));
-    }
 }
 
 void MainWindow::readSettings(void)
@@ -335,7 +345,6 @@ void MainWindow::writeSettings(void)
 MapWindow* MainWindow::activeMapWindow(void)
 {
     QMdiSubWindow* activeSubWindow = mdiArea->activeSubWindow();
-
     return activeSubWindow ? qobject_cast<MapWindow*>(activeSubWindow->widget()) : 0;
 }
 
@@ -358,6 +367,15 @@ void MainWindow::setActiveSubWindow(QWidget* window)
 {
     if(window)
 	mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow*>(window));
+}
+
+void MainWindow::subWindowActivated(QMdiSubWindow* mapWindow)
+{
+    Q_UNUSED(mapWindow);
+
+    updateMenus();
+    updateStatusBar();
+    updateMiniMapDock();
 }
 
 void MainWindow::mapOptions(void)

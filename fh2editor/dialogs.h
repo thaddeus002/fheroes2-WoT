@@ -50,9 +50,11 @@ class QCheckBox;
 class QListWidget;
 class QListWidgetItem;
 class QDomElement;
+class QGraphicsScene;
 QT_END_NAMESPACE
 
 class MapData;
+class MapTiles;
 class CompositeObject;
 
 QVariant comboBoxCurrentData(const QComboBox*);
@@ -404,6 +406,20 @@ namespace Form
     protected slots:
 	void			setEnableOKButton(void);
 	void			setEnableOKButton(const QString &);
+    };
+
+    class MiniMap : public QFrame
+    {
+    Q_OBJECT
+
+    public:
+	MiniMap(QWidget*);
+
+	QVBoxLayout*		verticalLayout;
+	QLabel*			labelPixmap;
+
+	void			generateFromScene(const MapTiles &);
+	void			generateFromScene(QGraphicsScene*);
     };
 }
 

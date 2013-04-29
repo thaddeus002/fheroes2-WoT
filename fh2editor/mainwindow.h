@@ -34,6 +34,7 @@ class QMdiArea;
 class QMdiSubWindow;
 class QSignalMapper;
 class MapWindow;
+class QDockWidget;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -52,12 +53,11 @@ private slots:
     void		save(void);
     void		saveAs(void);
     void		about(void);
-    void		updateMenus(void);
-    void		updateStatusBar(void);
     void		updateWindowMenu(void);
     MapWindow*		createMapWindow(void);
     void		setActiveSubWindow(QWidget*);
     void		mapOptions(void);
+    void		subWindowActivated(QMdiSubWindow*);
 
 private:
     friend class	MapWindow;
@@ -69,6 +69,10 @@ private:
     void		createStatusBar(void);
     void		readSettings(void);
     void		writeSettings(void);
+
+    void		updateMenus(void);
+    void		updateStatusBar(void);
+    void		updateMiniMapDock(void);
 
     MapWindow*		activeMapWindow(void);
     QMdiSubWindow*	findMapWindow(const QString &);
@@ -97,8 +101,9 @@ private:
     QAction*		menuAboutAct;
 
     QAction*		mapOptionsAct;
-    QAction*		showRadarAct;
     QAction*		showPassableAct;
+
+    QDockWidget*	dockMiniMap;
 
     QLabel*		labelTileX;
     QLabel*		labelTileY;

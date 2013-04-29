@@ -24,15 +24,15 @@
 #define _EDITOR_MAPWINDOW_H_
 
 #include <QGraphicsView>
-
 #include "mapdata.h"
-
-class MainWindow;
 
 QT_BEGIN_NAMESPACE
 class QContextMenuEvent;
 class QActionGroup;
 QT_END_NAMESPACE
+
+class MainWindow;
+namespace Form { class MiniMap; }
 
 class MapWindow : public QGraphicsView
 {
@@ -48,6 +48,8 @@ public:
     bool	saveFile(const QString &);
     QString	userFriendlyCurrentFile(void);
     QString	currentFile(void);
+    Form::MiniMap*
+		miniMapWidget(void);
 
 signals:
     void	selectedItems(bool);
@@ -86,6 +88,8 @@ private:
 
     QActionGroup*	fillGroundAct;
     QActionGroup*	clearObjectsAct;
+
+    Form::MiniMap*	miniMap;
 };
 
 #endif

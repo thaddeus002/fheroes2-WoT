@@ -168,6 +168,8 @@ MapWindow::MapWindow(MainWindow* parent) : mainWindow(parent), mapData(this)
     selectAllAct = new QAction(QIcon(":/images/menu_fill.png"), tr("Select All"), this);
     selectAllAct->setStatusTip(tr("Select all tiles"));
     connect(selectAllAct, SIGNAL(triggered()), &mapData, SLOT(selectAllTiles()));
+
+    miniMap = new Form::MiniMap(this);
 }
 
 void MapWindow::newFile(const QSize & sz, int sequenceNumber)
@@ -195,6 +197,8 @@ void MapWindow::newFile(const QSize & sz, int sequenceNumber)
     connect(&mapData, SIGNAL(selectionChanged(void)), this, SLOT(mapWasSelectionChanged(void)));
     connect(&mapData, SIGNAL(dataModified(void)), this, SLOT(mapWasModified(void)));
 
+    miniMap->generateFromScene(&mapData);
+
     mapWasModified();
 }
 
@@ -217,6 +221,8 @@ bool MapWindow::loadFile(const QString & fileName)
     connect(&mapData, SIGNAL(selectionChanged(void)), this, SLOT(mapWasSelectionChanged(void)));
     connect(&mapData, SIGNAL(dataModified(void)), this, SLOT(mapWasModified(void)));
 
+    miniMap->generateFromScene(&mapData);
+
     return true;
 }
 
@@ -236,6 +242,16 @@ bool MapWindow::saveFile(const QString & fileName)
 {
     Q_UNUSED(fileName);
     mapData.SaveTest();
+
+//    QImage img(mapData.sceneRect().size().toSize(), QImage::Format_ARGB32_Premultiplied);
+
+// QRect viewport = view.viewport()->rect();
+// view.render(&painter,
+//             QRectF(0, printer.height() / 2,
+//                    printer.width(), printer.height() / 2),
+//             viewport.adjusted(0, 0, 0, -viewport.height() / 2));
+
+
 /*
     QFile file(fileName);
 
@@ -370,4 +386,9 @@ void MapWindow::contextMenuEvent(QContextMenuEvent* event)
 
     if(selectAllAct != menu.exec(event->globalPos()))
 	mapData.clearSelection();
+}
+
+Form::MiniMap* MapWindow::miniMapWidget(void)
+{
+    return miniMap;
 }

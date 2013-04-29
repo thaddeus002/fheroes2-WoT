@@ -1415,3 +1415,43 @@ DayEvent Form::DayEventDialog::result(void) const
 
     return res;
 }
+
+Form::MiniMap::MiniMap(QWidget* parent) : QFrame(parent)
+{
+    setFixedSize(144, 144);
+
+    labelPixmap = new QLabel(this);
+    verticalLayout = new QVBoxLayout(this);
+    verticalLayout->addWidget(labelPixmap);
+}
+
+void Form::MiniMap::generateFromScene(QGraphicsScene* scene)
+{
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+    QPixmap pixmap(maximumSize());
+    QPainter painter(& pixmap);
+    scene->render(& painter);
+    labelPixmap->setPixmap(pixmap);
+
+    QApplication::restoreOverrideCursor();
+}
+
+void Form::MiniMap::generateFromScene(const MapTiles & tiles)
+{
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+    QImage image(maximumSize(), QImage::Format_RGB32);
+    const QSize & mapSize = tiles.mapSize();
+
+    for(MapTiles::const_iterator
+	it = tiles.begin(); it != tiles.end(); ++it)
+    {
+	const QPoint & pos = (*it)->mapPos();
+	image.setPixel(QPoint(0, 0), qRgb(0, 0, 0));
+    }
+
+    labelPixmap->setPixmap(QPixmap::fromImage(image));
+
+    QApplication::restoreOverrideCursor();
+}

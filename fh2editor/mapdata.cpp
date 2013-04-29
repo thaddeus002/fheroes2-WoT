@@ -499,6 +499,7 @@ MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), tileOverMouse(NULL
     mapKingdomColors(0), mapCompColors(0), mapHumanColors(0), mapUniq(1), mapStartWithHero(false), mapArea(),
     mapTiles(mapArea.tiles), mapObjects(mapArea.objects)
 {
+    connect(this, SIGNAL(dataModified()), this, SLOT(generateMiniMap()));
 }
 
 const QString & MapData::name(void) const
@@ -643,7 +644,10 @@ void MapData::mousePressEvent(QGraphicsSceneMouseEvent* event)
     if(currentObject.isValid())
     {
 	if(event->buttons() & Qt::LeftButton)
+	{
 	    mapArea.addObject(currentObject.scenePos, currentObject, uniq());
+	    emit dataModified();
+	}
 	else
 	    currentObject.reset();
 	update(currentObject.area());
@@ -1195,18 +1199,11 @@ bool MP2Format::loadMap(const QString & mapFile)
 		    sphinxes.push_back(H2::SphinxPos(sphinx, posBlock));
 		}
 		else
-		    qCritical() << "unknown block: " << ii << ", size: " << block.size() << ", pos: " << posBlock;
+		    qCritical() << "MP2Format::loadMap:" <<"unknown block: " << ii << ", size: " << block.size() << ", pos: " << posBlock;
 	    }
 	    else
 	    if(block.at(0) == 0)
 	    {
-		// rumor block: 9 byte
-		if(9 <= block.size() && block.at(8))
-		{
-		    mp2rumor_t rumor; data >> rumor;
-		    rumors.push_back(rumor);
-		}
-		else
 		// day event block: 50 byte
 		if(50 <= block.size() && 0x01 == block.at(42))
 		{
@@ -1214,10 +1211,20 @@ bool MP2Format::loadMap(const QString & mapFile)
 		    dayEvents.push_back(event);
 		}
 		else
-    		    qCritical() << "unknown block: " << ii << ", size: " << block.size();
+		// rumor block: 9 byte
+		if(9 <= block.size())
+		{
+		    mp2rumor_t rumor; data >> rumor;
+		    if(rumor.text.isEmpty())
+    			qDebug() << "MP2Format::loadMap:" <<"skip empty rumor, block: " << ii;
+		    else
+			rumors.push_back(rumor);
+		}
+    		else
+		    qCritical() << "MP2Format::loadMap:" <<"unknown block: " << ii << ", size: " << block.size();
 	    }
 	    else
-	     qCritical() << "unknown block: " << ii << ", size: " << block.size() << ", byte: " << block[0];
+	     qCritical() << "MP2Format::loadMap:" <<"unknown block: " << ii << ", size: " << block.size() << ", byte: " << block[0];
 	}
 
 	uniq = map.readLE32();
@@ -1348,6 +1355,7 @@ void MapData::selectObjectImage(void)
 	update();
     }
 }
+
 void MapData::showMapOptions(void)
 {
     Form::MapOptions form(*this);
@@ -1400,4 +1408,12 @@ void MapData::showMapOptions(void)
 const DayEvents & MapData::dayEvents(void) const
 {
     return mapDayEvents;
+}
+
+void MapData::generateMiniMap(void)
+{
+    MapWindow* mapWindow = qobject_cast<MapWindow*>(parent());
+
+    if(mapWindow && mapWindow->miniMapWidget())
+	mapWindow->miniMapWidget()->generateFromScene(this);
 }

@@ -163,7 +163,7 @@ protected:
     quint16		passableLocal;
 };
 
-class MapTiles : protected QList<MapTile*>
+class MapTiles : public QList<MapTile*>
 {
     QSize		size;
 
@@ -265,6 +265,7 @@ protected slots:
     void		fillGroundAction(QAction*);
     void		removeObjectsAction(QAction*);
     void		selectObjectImage(void);
+    void		generateMiniMap(void);
 
 protected:
     void                mousePressEvent(QGraphicsSceneMouseEvent*);
