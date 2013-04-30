@@ -197,7 +197,7 @@ void MapWindow::newFile(const QSize & sz, int sequenceNumber)
     connect(&mapData, SIGNAL(selectionChanged(void)), this, SLOT(mapWasSelectionChanged(void)));
     connect(&mapData, SIGNAL(dataModified(void)), this, SLOT(mapWasModified(void)));
 
-    miniMap->generateFromScene(&mapData);
+    //mapData.generateMiniMap();
 
     mapWasModified();
 }
@@ -221,7 +221,7 @@ bool MapWindow::loadFile(const QString & fileName)
     connect(&mapData, SIGNAL(selectionChanged(void)), this, SLOT(mapWasSelectionChanged(void)));
     connect(&mapData, SIGNAL(dataModified(void)), this, SLOT(mapWasModified(void)));
 
-    miniMap->generateFromScene(&mapData);
+    //mapData.generateMiniMap();
 
     return true;
 }

@@ -418,8 +418,7 @@ namespace Form
 	QVBoxLayout*		verticalLayout;
 	QLabel*			labelPixmap;
 
-	void			generateFromScene(const MapTiles &);
-	void			generateFromScene(QGraphicsScene*);
+	void			generateFromTiles(const MapTiles &);
     };
 }
 

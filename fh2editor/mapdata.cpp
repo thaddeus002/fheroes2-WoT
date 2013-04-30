@@ -878,6 +878,8 @@ void MapData::newMap(const QSize & msz, const QString &)
 
     setSceneRect(QRect(QPoint(0, 0),
 	QSize(size().width() * tileSize.width(), size().height() * tileSize.height())));
+
+    generateMiniMap();
 }
 
 bool MapData::loadMap(const QString & mapFile)
@@ -887,105 +889,105 @@ bool MapData::loadMap(const QString & mapFile)
     MP2Format mp2;
     qDebug() << "MapData::loadMap:" << mapFile;
 
-    if(mp2.loadMap(mapFile))
+    if(! mp2.loadMap(mapFile))
+	return false;
+
+    // import tiles
+    if(! mapTiles.importMap(mp2.size, mp2.tiles, mp2.sprites))
+	return false;
+
+    mapTiles.insertToScene(*this);
+
+    mapName = mp2.name;
+    mapDescription = mp2.description;
+    mapStartWithHero = mp2.startWithHero;
+
+    switch(mp2.difficulty)
     {
-	// import tiles
-	if(! mapTiles.importMap(mp2.size, mp2.tiles, mp2.sprites))
-	    return false;
+	case 0:		mapDifficulty = Difficulty::Easy; break;
+	case 2:		mapDifficulty = Difficulty::Tough; break;
+	case 3:		mapDifficulty = Difficulty::Expert; break;
+	default:	mapDifficulty = Difficulty::Normal; break;
+    }
 
-	mapTiles.insertToScene(*this);
+    if(mp2.kingdomColor[0]) mapKingdomColors |= Color::Blue;
+    if(mp2.kingdomColor[1]) mapKingdomColors |= Color::Green;
+    if(mp2.kingdomColor[2]) mapKingdomColors |= Color::Red;
+    if(mp2.kingdomColor[3]) mapKingdomColors |= Color::Yellow;
+    if(mp2.kingdomColor[4]) mapKingdomColors |= Color::Orange;
+    if(mp2.kingdomColor[5]) mapKingdomColors |= Color::Purple;
 
-	mapName = mp2.name;
-	mapDescription = mp2.description;
-	mapStartWithHero = mp2.startWithHero;
+    if(mp2.humanAllow[0]) mapHumanColors |= Color::Blue;
+    if(mp2.humanAllow[1]) mapHumanColors |= Color::Green;
+    if(mp2.humanAllow[2]) mapHumanColors |= Color::Red;
+    if(mp2.humanAllow[3]) mapHumanColors |= Color::Yellow;
+    if(mp2.humanAllow[4]) mapHumanColors |= Color::Orange;
+    if(mp2.humanAllow[5]) mapHumanColors |= Color::Purple;
 
-	switch(mp2.difficulty)
-	{
-	    case 0:	mapDifficulty = Difficulty::Easy; break;
-	    case 2:	mapDifficulty = Difficulty::Tough; break;
-	    case 3:	mapDifficulty = Difficulty::Expert; break;
-	    default:	mapDifficulty = Difficulty::Normal; break;
-	}
+    if(mp2.compAllow[0]) mapCompColors |= Color::Blue;
+    if(mp2.compAllow[1]) mapCompColors |= Color::Green;
+    if(mp2.compAllow[2]) mapCompColors |= Color::Red;
+    if(mp2.compAllow[3]) mapCompColors |= Color::Yellow;
+    if(mp2.compAllow[4]) mapCompColors |= Color::Orange;
+    if(mp2.compAllow[5]) mapCompColors |= Color::Purple;
 
-	if(mp2.kingdomColor[0]) mapKingdomColors |= Color::Blue;
-	if(mp2.kingdomColor[1]) mapKingdomColors |= Color::Green;
-	if(mp2.kingdomColor[2]) mapKingdomColors |= Color::Red;
-	if(mp2.kingdomColor[3]) mapKingdomColors |= Color::Yellow;
-	if(mp2.kingdomColor[4]) mapKingdomColors |= Color::Orange;
-	if(mp2.kingdomColor[5]) mapKingdomColors |= Color::Purple;
+    switch(mp2.conditionWins)
+    {
+	case 1:		mapConditionWins.set(Conditions::CaptureTown, QPoint(mp2.conditionWinsData3, mp2.conditionWinsData4)); break;
+	case 2:		mapConditionWins.set(Conditions::DefeatHero, QPoint(mp2.conditionWinsData3, mp2.conditionWinsData4)); break;
+	case 3:		mapConditionWins.set(Conditions::FindArtifact, static_cast<int>(mp2.conditionWinsData3)); break;
+	case 4:		mapConditionWins.set(Conditions::SideWins, static_cast<int>(mp2.conditionWinsData3)); break;
+	case 5:		mapConditionWins.set(Conditions::AccumulateGold, 1000 * static_cast<int>(mp2.conditionWinsData3)); break;
+	default:	mapConditionWins.set(Conditions::Wins); break;
+    }
 
-	if(mp2.humanAllow[0]) mapHumanColors |= Color::Blue;
-	if(mp2.humanAllow[1]) mapHumanColors |= Color::Green;
-	if(mp2.humanAllow[2]) mapHumanColors |= Color::Red;
-	if(mp2.humanAllow[3]) mapHumanColors |= Color::Yellow;
-	if(mp2.humanAllow[4]) mapHumanColors |= Color::Orange;
-	if(mp2.humanAllow[5]) mapHumanColors |= Color::Purple;
+    if(mp2.conditionWinsData1)
+	mapConditionWins.first |= Conditions::CompAlsoWins;
 
-	if(mp2.compAllow[0]) mapCompColors |= Color::Blue;
-	if(mp2.compAllow[1]) mapCompColors |= Color::Green;
-	if(mp2.compAllow[2]) mapCompColors |= Color::Red;
-	if(mp2.compAllow[3]) mapCompColors |= Color::Yellow;
-	if(mp2.compAllow[4]) mapCompColors |= Color::Orange;
-	if(mp2.compAllow[5]) mapCompColors |= Color::Purple;
+    if(mp2.conditionWinsData2)
+	mapConditionWins.first |= Conditions::AllowNormalVictory;
 
-	switch(mp2.conditionWins)
-	{
-	    case 1:	mapConditionWins.set(Conditions::CaptureTown, QPoint(mp2.conditionWinsData3, mp2.conditionWinsData4)); break;
-	    case 2:	mapConditionWins.set(Conditions::DefeatHero, QPoint(mp2.conditionWinsData3, mp2.conditionWinsData4)); break;
-	    case 3:	mapConditionWins.set(Conditions::FindArtifact, static_cast<int>(mp2.conditionWinsData3)); break;
-	    case 4:	mapConditionWins.set(Conditions::SideWins, static_cast<int>(mp2.conditionWinsData3)); break;
-	    case 5:	mapConditionWins.set(Conditions::AccumulateGold, 1000 * static_cast<int>(mp2.conditionWinsData3)); break;
-	    default:	mapConditionWins.set(Conditions::Wins); break;
-	}
+    switch(mp2.conditionLoss)
+    {
+	case 1:		mapConditionLoss.set(Conditions::LoseTown, QPoint(mp2.conditionLossData1, mp2.conditionLossData2)); break;
+	case 2:		mapConditionLoss.set(Conditions::LoseHero, QPoint(mp2.conditionLossData1, mp2.conditionLossData2)); break;
+	case 3:		mapConditionLoss.set(Conditions::OutTime, static_cast<int>(mp2.conditionLossData1)); break;
+	default:	mapConditionLoss.set(Conditions::Loss); break;
+    }
 
-	if(mp2.conditionWinsData1)
-	    mapConditionWins.first |= Conditions::CompAlsoWins;
+    mapUniq = mp2.uniq + 1;
 
-	if(mp2.conditionWinsData2)
-	    mapConditionWins.first |= Conditions::AllowNormalVictory;
+    setSceneRect(QRect(QPoint(0, 0),
+	QSize(size().width() * tileSize.width(), size().height() * tileSize.height())));
 
-	switch(mp2.conditionLoss)
-	{
-	    case 1:	mapConditionLoss.set(Conditions::LoseTown, QPoint(mp2.conditionLossData1, mp2.conditionLossData2)); break;
-	    case 2:	mapConditionLoss.set(Conditions::LoseHero, QPoint(mp2.conditionLossData1, mp2.conditionLossData2)); break;
-	    case 3:	mapConditionLoss.set(Conditions::OutTime, static_cast<int>(mp2.conditionLossData1)); break;
-	    default:	mapConditionLoss.set(Conditions::Loss); break;
-	}
+    // import towns
+    mapArea.importMP2Towns(mp2.castles);
 
-	mapUniq = mp2.uniq + 1;
+    // import heroes
+    mapArea.importMP2Heroes(mp2.heroes);
 
-	setSceneRect(QRect(QPoint(0, 0),
-		QSize(size().width() * tileSize.width(), size().height() * tileSize.height())));
+    // import signs
+    mapArea.importMP2Signs(mp2.signs);
 
-	// import towns
-	mapArea.importMP2Towns(mp2.castles);
+    // import map events
+    mapArea.importMP2MapEvents(mp2.mapEvents);
 
-	// import heroes
-	mapArea.importMP2Heroes(mp2.heroes);
+    // import sphinx riddles
+    mapArea.importMP2SphinxRiddles(mp2.sphinxes);
 
-	// import signs
-	mapArea.importMP2Signs(mp2.signs);
-
-	// import map events
-	mapArea.importMP2MapEvents(mp2.mapEvents);
-
-	// import sphinx riddles
-	mapArea.importMP2SphinxRiddles(mp2.sphinxes);
-
-	// import day events
-	for(QVector<mp2dayevent_t>::const_iterator
+    // import day events
+    for(QVector<mp2dayevent_t>::const_iterator
 	    it = mp2.dayEvents.begin(); it != mp2.dayEvents.end(); ++it)
 	    mapDayEvents.push_back(DayEvent(*it));
 
-	// import rumors
-	for(QVector<mp2rumor_t>::const_iterator
+    // import rumors
+    for(QVector<mp2rumor_t>::const_iterator
 	    it = mp2.rumors.begin(); it != mp2.rumors.end(); ++it)
 	    tavernRumors << Rumor(*it);
 
-	return true;
-    }
+    generateMiniMap();
 
-    return false;
+    return true;
 }
 
 QPoint MapData::mapToTile(const QPoint & pt) const
@@ -1415,5 +1417,5 @@ void MapData::generateMiniMap(void)
     MapWindow* mapWindow = qobject_cast<MapWindow*>(parent());
 
     if(mapWindow && mapWindow->miniMapWidget())
-	mapWindow->miniMapWidget()->generateFromScene(this);
+	mapWindow->miniMapWidget()->generateFromTiles(mapTiles);
 }

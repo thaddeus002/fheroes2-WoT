@@ -146,8 +146,7 @@ Form::SelectMapSize::SelectMapSize()
     QSize minSize = minimumSizeHint();
 
     resize(minSize);
-    setMinimumSize(minSize);
-    setMaximumSize(minSize);
+    setFixedSize(minSize);
 
     QObject::connect(pushButtonExpert, SIGNAL(clicked()), this, SLOT(clickExpert()));
     QObject::connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(clickOk()));
@@ -246,8 +245,7 @@ Form::SelectDataFile::SelectDataFile(const QString & dataFile, const QStringList
     QSize minSize = minimumSizeHint();
 
     resize(minSize);
-    setMinimumSize(minSize);
-    setMaximumSize(minSize);
+    setFixedSize(minSize);
 
     QObject::connect(pushButtonExit, SIGNAL(clicked()), this, SLOT(reject()));
     QObject::connect(pushButtonSave, SIGNAL(clicked()), this, SLOT(accept()));
@@ -1418,40 +1416,57 @@ DayEvent Form::DayEventDialog::result(void) const
 
 Form::MiniMap::MiniMap(QWidget* parent) : QFrame(parent)
 {
-    setFixedSize(144, 144);
-
     labelPixmap = new QLabel(this);
     verticalLayout = new QVBoxLayout(this);
     verticalLayout->addWidget(labelPixmap);
 }
 
-void Form::MiniMap::generateFromScene(QGraphicsScene* scene)
+void Form::MiniMap::generateFromTiles(const MapTiles & tiles)
 {
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
-    QPixmap pixmap(maximumSize());
-    QPainter painter(& pixmap);
-    scene->render(& painter);
-    labelPixmap->setPixmap(pixmap);
-
-    QApplication::restoreOverrideCursor();
-}
-
-void Form::MiniMap::generateFromScene(const MapTiles & tiles)
-{
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-
-    QImage image(maximumSize(), QImage::Format_RGB32);
-    const QSize & mapSize = tiles.mapSize();
+    const QSize & ms = tiles.mapSize();
+    QImage image(ms, QImage::Format_RGB32);
 
     for(MapTiles::const_iterator
 	it = tiles.begin(); it != tiles.end(); ++it)
     {
 	const QPoint & pos = (*it)->mapPos();
-	image.setPixel(QPoint(0, 0), qRgb(0, 0, 0));
+
+	switch((*it)->groundType())
+	{
+	    case Ground::Desert:	image.setPixel(pos, qRgb(0xD0, 0xC0, 0x48)); break;
+	    case Ground::Snow:		image.setPixel(pos, qRgb(0xE0, 0xE0, 0xE0)); break;
+	    case Ground::Swamp:		image.setPixel(pos, qRgb(0x58, 0x94, 0xA0)); break;
+	    case Ground::Wasteland:	image.setPixel(pos, qRgb(0xE0, 0x48, 0)); break;
+	    case Ground::Beach:		image.setPixel(pos, qRgb(0xE0, 0xD0, 0x80)); break;
+	    case Ground::Lava:		image.setPixel(pos, qRgb(0x58, 0x58, 0x58)); break;
+	    case Ground::Dirt:		image.setPixel(pos, qRgb(0x80, 0x58, 0x28)); break;
+	    case Ground::Grass:		image.setPixel(pos, qRgb(0x18, 0x68, 0x18)); break;
+	    case Ground::Water:		image.setPixel(pos, qRgb(0, 0x48, 0xD0)); break;
+	    default: break;
+	}
     }
 
-    labelPixmap->setPixmap(QPixmap::fromImage(image));
+    const QSize sz(144, 144);
+    QImage scaled;
+
+    if(ms.width() > ms.height())
+	scaled = image.scaledToWidth(sz.width());
+    else
+    if(ms.width() < ms.height())
+        scaled = image.scaledToHeight(sz.height());
+    else
+        scaled = image.scaled(sz);
+
+    QPixmap border = Editor::pixmapBorder(scaled.size() + QSize(2, 2), QColor(0x10, 0x10, 0x10));
+    QPainter paint(& border);
+    paint.drawImage(1, 1, scaled);
+    labelPixmap->setPixmap(border);
+
+    QSize minSize = minimumSizeHint();
+    resize(minSize);
+    setFixedSize(minSize);
 
     QApplication::restoreOverrideCursor();
 }
