@@ -295,7 +295,7 @@ void MapTile::addSpriteSection(int icn, const CompositeSprite & cs, quint32 uid)
 	spritesLevel1 << new MapTileExt(icn, cs, uid);
 }
 
-MapTiles::MapTiles(const MapTiles & tiles, const QRect & area) : size(area.size())
+MapTiles::MapTiles(const MapTiles & tiles, const QRect & area) : msize(area.size())
 {
     for(int yy = area.y(); yy < area.y() + area.height(); ++yy)
     {
@@ -307,24 +307,41 @@ MapTiles::MapTiles(const MapTiles & tiles, const QRect & area) : size(area.size(
     }
 }
 
+QString MapTiles::sizeDescription(void) const
+{
+    if(msize.width() == msize.height())
+    {
+	switch(msize.width())
+	{
+	    case 36:	return "small";
+	    case 72:	return "medium";
+	    case 108:	return "large";
+	    case 144:	return "extra large";
+	    default: break;
+	}
+    }
+
+    return "custom";
+}
+
 void MapTiles::newMap(const QSize & sz)
 {
-    size = sz;
+    msize = sz;
 
-    for(int yy = 0; yy < size.height(); ++yy)
+    for(int yy = 0; yy < msize.height(); ++yy)
     {
-	for(int xx = 0; xx < size.width(); ++xx)
+	for(int xx = 0; xx < msize.width(); ++xx)
     	    push_back(new MapTile(mp2til_t(), QPoint(xx, yy)));
     }
 }
 
 bool MapTiles::importMap(const QSize & sz, const QVector<mp2til_t> & mp2Tiles, const QVector<mp2ext_t> & mp2Sprites)
 {
-    size = sz;
+    msize = sz;
 
-    for(int yy = 0; yy < size.height(); ++yy)
+    for(int yy = 0; yy < msize.height(); ++yy)
     {
-	for(int xx = 0; xx < size.width(); ++xx)
+	for(int xx = 0; xx < msize.width(); ++xx)
 	{
 	    const mp2til_t & mp2til = mp2Tiles[indexPoint(QPoint(xx, yy))];
 	    push_back(new MapTile(mp2til, QPoint(xx, yy)));
@@ -391,9 +408,9 @@ const MapTile* MapTiles::tileFromDirectionConst(const QPoint & center, int direc
     switch(direct)
     {
 	case Direction::Top:         if(center.y()) next.setY(center.y() - 1); break;
-    	case Direction::Bottom:      if(center.y() < size.height()) next.setY(center.y() + 1); break;
+    	case Direction::Bottom:      if(center.y() < msize.height()) next.setY(center.y() + 1); break;
     	case Direction::Left:        if(center.x()) next.setX(center.x() - 1); break;
-    	case Direction::Right:       if(center.x() < size.width()) next.setX(center.x() + 1); break;
+    	case Direction::Right:       if(center.x() < msize.width()) next.setX(center.x() + 1); break;
 
     	case Direction::TopRight:    return tileFromDirectionConst(tileFromDirectionConst(center, Direction::Top), Direction::Right);
     	case Direction::BottomRight: return tileFromDirectionConst(tileFromDirectionConst(center, Direction::Bottom), Direction::Right);
@@ -412,12 +429,12 @@ MapTile* MapTiles::tileFromDirection(const QPoint & center, int direct)
 
 int MapTiles::indexPoint(const QPoint & pos) const
 {
-    return pos.x() + pos.y() * size.width();
+    return pos.x() + pos.y() * msize.width();
 }
 
 bool MapTiles::isValidPoint(const QPoint & pos) const
 {
-    return QRect(QPoint(0, 0), size).contains(pos);
+    return QRect(QPoint(0, 0), msize).contains(pos);
 }
 
 void MapTiles::insertToScene(QGraphicsScene & scene) const
@@ -1272,6 +1289,7 @@ void MapData::SaveTest(void) const
     eheader.setAttribute("version", 3075);
     eheader.setAttribute("localtime", QDateTime::currentDateTime().toTime_t());
 
+    eheader.appendChild(doc.createElement("size")).appendChild(doc.createTextNode(mapTiles.sizeDescription()));
     eheader.appendChild(doc.createElement("name")).appendChild(doc.createTextNode(mapName));
     eheader.appendChild(doc.createElement("description")).appendChild(doc.createTextNode(mapDescription));
     eheader.appendChild(doc.createElement("authors")).appendChild(doc.createTextNode(mapAuthors));
@@ -1296,10 +1314,6 @@ void MapData::SaveTest(void) const
     eloss.setAttribute("condition", mapConditionLoss.condition());
     eloss.setAttribute("extValue", mapConditionLoss.variantString());
     eheader.appendChild(eloss);
-
-/*
-    quint32             mapUniq;
-*/
 
     QDomElement erumors = doc.createElement("rumors");
     emap.appendChild(erumors);
@@ -1334,6 +1348,28 @@ void MapData::SaveTest(void) const
 	resources.setAttribute("gold", (*it).resources.gold);
 
 	event.appendChild(doc.createElement("msg")).appendChild(doc.createTextNode((*it).message));
+    }
+
+    QDomElement eobjects = doc.createElement("objects");
+    eobjects.setAttribute("lastUID", mapUniq);
+    emap.appendChild(eobjects);
+
+
+
+    QDomElement etiles = doc.createElement("tiles");
+    etiles.setAttribute("width", mapTiles.mapSize().width());
+    etiles.setAttribute("height", mapTiles.mapSize().height());
+    emap.appendChild(etiles);
+
+    // map tiles
+    for(MapTiles::const_iterator
+	it = mapTiles.begin(); it != mapTiles.end(); ++it)
+    {
+	QDomElement etile = doc.createElement("tile");
+	etiles.appendChild(etile);
+
+	etile.setAttribute("posx", (*it)->mapPos().x());
+	etile.setAttribute("posy", (*it)->mapPos().y());
     }
 
     doc.insertBefore(doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\""), doc.firstChild());

@@ -165,7 +165,7 @@ protected:
 
 class MapTiles : public QList<MapTile*>
 {
-    QSize		size;
+    QSize		msize;
 
 public:
     MapTiles() {}
@@ -174,7 +174,7 @@ public:
     void		newMap(const QSize &);
     bool		importMap(const QSize &, const QVector<mp2til_t> &, const QVector<mp2ext_t> &);
 
-    const QSize &	mapSize(void) const { return size; }
+    const QSize &	mapSize(void) const { return msize; }
     int			indexPoint(const QPoint &) const;
     bool		isValidPoint(const QPoint &) const;
 
@@ -189,6 +189,7 @@ public:
     MapTile*		tileFromDirection(const QPoint &, int direct);
 
     void		insertToScene(QGraphicsScene &) const;
+    QString		sizeDescription(void) const;
 };
 
 class MapArea

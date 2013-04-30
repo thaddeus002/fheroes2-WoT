@@ -1459,7 +1459,8 @@ void Form::MiniMap::generateFromTiles(const MapTiles & tiles)
     else
         scaled = image.scaled(sz);
 
-    QPixmap border = Editor::pixmapBorder(scaled.size() + QSize(2, 2), QColor(0x10, 0x10, 0x10));
+    QPixmap border(scaled.size() + QSize(2, 2));
+    border.fill(QColor(0x10, 0x10, 0x10));
     QPainter paint(& border);
     paint.drawImage(1, 1, scaled);
     labelPixmap->setPixmap(border);

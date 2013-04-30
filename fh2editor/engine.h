@@ -414,6 +414,7 @@ namespace AGG
     public:
 	File(){}
 
+	int			seekToData(const QString &);
 	QByteArray		readRawData(const QString &);
 
 	bool			loadFile(const QString &);

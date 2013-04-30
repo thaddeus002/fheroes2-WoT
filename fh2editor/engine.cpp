@@ -505,16 +505,21 @@ bool AGG::File::exists(const QString & str) const
     return items.end() != items.find(str);
 }
 
-QByteArray AGG::File::readRawData(const QString & name)
+int AGG::File::seekToData(const QString & name)
 {
     QMap<QString, Item>::const_iterator it = items.find(name);
 
     if(items.end() != it)
-	return readBlock((*it).size, (*it).offset);
+	seek((*it).offset);
     else
-	qCritical() << "AGG::File::readRawData:" << "item" << qPrintable(name) << "not found";
+	qCritical() << "AGG::File::seekToData:" << "item" << qPrintable(name) << "not found";
 
-    return NULL;
+    return items.end() != it ? (*it).size : 0;
+}
+
+QByteArray AGG::File::readRawData(const QString & name)
+{
+    return readBlock(seekToData(name));
 }
 
 bool AGG::File::loadFile(const QString & fn)
@@ -554,18 +559,19 @@ bool AGG::File::loadFile(const QString & fn)
 
 QPixmap AGG::File::getImageTIL(const QString & id, int index, QVector<QRgb> & colors)
 {
-    QByteArray buf = readRawData(id);
+    int blockSize = seekToData(id);
 
-    if(buf.size())
+    if(blockSize)
     {
-	quint16 tileCount = qFromLittleEndian(*((quint16*) buf.data()));
+	quint16 tileCount = readLE16();
 
 	if(index < tileCount)
 	{
-	    quint16 tileWidth = qFromLittleEndian(*((quint16*) (buf.data() + 2)));
-	    quint16 tileHeight = qFromLittleEndian(*((quint16*) (buf.data() + 4)));
+	    quint16 tileWidth = readLE16();
+	    quint16 tileHeight = readLE16();
+	    QByteArray buf = readBlock(blockSize - 6);
 
-	    QImage image((uchar*) buf.data() + 6 + index * tileWidth * tileHeight, tileWidth, tileHeight, QImage::Format_Indexed8);
+	    QImage image((uchar*) buf.data() + index * tileWidth * tileHeight, tileWidth, tileHeight, QImage::Format_Indexed8);
 	    image.setColorTable(colors);
 
 	    return QPixmap::fromImage(image);
@@ -580,26 +586,27 @@ QPixmap AGG::File::getImageTIL(const QString & id, int index, QVector<QRgb> & co
 QPair<QPixmap, QPoint> AGG::File::getImageICN(const QString & id, int index, QVector<QRgb> & colors)
 {
     QPair<QPixmap, QPoint> result;
-    QByteArray buf = readRawData(id);
+    int blockSize = seekToData(id);
 
-    if(buf.size())
+    if(blockSize)
     {
-	quint16 icnCount = qFromLittleEndian(*((quint16*) buf.data()));
+	quint16 icnCount = readLE16();
 
 	if(index < icnCount)
 	{
-	    mp2icn_t header(buf.data() + 6 + index * mp2icn_t::sizeOf());
-	    quint32 sizeData = 0;
+	    quint32 sizeData = readLE32();
+	    QByteArray buf = readBlock(blockSize - 6);
+	    mp2icn_t header(buf.data() + index * mp2icn_t::sizeOf());
 
 	    if(index + 1 < icnCount)
 	    {
-		mp2icn_t headerNext(buf.data() + 6 + (index + 1) * mp2icn_t::sizeOf());
+		mp2icn_t headerNext(buf.data() + (index + 1) * mp2icn_t::sizeOf());
 		sizeData = headerNext.offsetData - header.offsetData;
 	    }
 	    else
-		sizeData = qFromLittleEndian(*((quint32*) (buf.data() + 2))) - header.offsetData;
+		sizeData = sizeData - header.offsetData;
 
-	    H2::ICNSprite image(header, buf.data() + 6 + header.offsetData, sizeData, colors);
+	    H2::ICNSprite image(header, buf.data() + header.offsetData, sizeData, colors);
 
 	    result.first = QPixmap::fromImage(image);
 	    result.second = QPoint(header.offsetX, header.offsetY);
