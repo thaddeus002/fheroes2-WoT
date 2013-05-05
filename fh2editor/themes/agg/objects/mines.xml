@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<objects>
+<objects cid="0x17" >
     <template section="mine" icn="mtncrck" name="Mine 1" index="104" />
     <template section="mine" icn="mtndirt" name="Mine 2" index="104" />
     <template section="mine" icn="mtndsrt" name="Mine 3" index="74" />
@@ -8,5 +8,5 @@
     <template section="mine" icn="mtnmult" name="Mine 6" index="74" />
     <template section="mine" icn="mtnsnow" name="Mine (snow)" index="74" />
     <template section="mine" icn="mtnswmp" name="Mine 8" index="74" />
-    <template section="mine" icn="objndirt" name="Mine Ghost" index="0" />
+    <template section="mine" icn="objndirt" name="Mine Ghost" index="0" cid="0x40" />
 </objects>

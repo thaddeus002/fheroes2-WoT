@@ -233,8 +233,7 @@ bool MapWindow::save(void)
 
 bool MapWindow::saveAs(void)
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"),
-                                                    curFile);
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), curFile);
     return fileName.isEmpty() ? false : saveFile(fileName);
 }
 
@@ -310,23 +309,21 @@ void MapWindow::mapWasModified(void)
 
 bool MapWindow::maybeSave(void)
 {
-/*
     if(isModified)
     {
-	QMessageBox::StandardButton ret;
+	QMessageBox::StandardButton ret = QMessageBox::warning(this, tr("Map Editor"),
+		tr("'%1' has been modified.\nDo you want to save your changes?") .arg(userFriendlyCurrentFile()),
+		QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 
-        ret = QMessageBox::warning(this, tr("Map Editor"),
-                     tr("'%1' has been modified.\n"
-		     "Do you want to save your changes?") .arg(userFriendlyCurrentFile()),
-                     QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-
-        if(ret == QMessageBox::Save)
-            return save();
-        else
-	if(ret == QMessageBox::Cancel)
-    	    return false;
+	switch(ret)
+	{
+	    case QMessageBox::Save:	return save();
+	    case QMessageBox::Cancel:	return false;
+	    case QMessageBox::Discard:	return true;
+	    default: break;
+	}
     }
-*/
+
     return true;
 }
 

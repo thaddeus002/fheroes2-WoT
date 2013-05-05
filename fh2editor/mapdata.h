@@ -256,6 +256,7 @@ public:
 signals:
     void		dataModified(void);
     void		validBuffer(bool);
+    void		clickActionObject(MapTile*);
 
 protected slots:
     void		selectAllTiles(void);

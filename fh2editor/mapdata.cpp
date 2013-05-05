@@ -657,6 +657,13 @@ void MapData::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	    clearSelection();
     }
     else
+    // click action object
+    if(tileOverMouse && tileOverMouse->isAction())
+    {
+	if(event->buttons() & Qt::LeftButton)
+	    emit clickActionObject(tileOverMouse);
+    }
+    else
     // place object
     if(currentObject.isValid())
     {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<objects icn="objnarti">
+<objects icn="objnarti" cid="0x29" >
     <template section="resource" name="Ultimate Shield" index="8" />
     <template section="resource" name="Ultimate Staff" index="10" />
     <template section="resource" name="Ultimate Crown" index="12" />
@@ -7,9 +7,9 @@
     <template section="resource" name="Arcane Necklace of Magic" index="16" />
     <template section="resource" name="Caster's Bracelet of Magic" index="18" />
     <template section="resource" name="Mage's Ring of Power" index="20" />
-    <template section="resource" name="Random Artifact" index="162" />
-    <template section="resource" name="Ultimate Artifact" index="164" />
-    <template section="resource" name="Random Artifact 1" index="166" />
-    <template section="resource" name="Random Artifact 2" index="168" />
-    <template section="resource" name="Random Artifact 3" index="170" />
+    <template section="resource" name="Random Artifact" index="162" cid="0x2D" />
+    <template section="resource" name="Ultimate Artifact" index="164" cid="0x2C" />
+    <template section="resource" name="Random Artifact 1" index="166" cid="0x74" />
+    <template section="resource" name="Random Artifact 2" index="168" cid="0x75" />
+    <template section="resource" name="Random Artifact 3" index="170" cid="0x76" />
 </objects>

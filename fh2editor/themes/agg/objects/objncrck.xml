@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects icn="objncrck">
-    <object name="Artesian Spring" width="3" height="2">
+    <object name="Artesian Spring" width="3" height="2" cid="0x52" >
 	<sprite px="1" py="0" index="0" level="top" />
 	<sprite px="2" py="0" index="1" level="top" />
 	<sprite px="0" py="1" index="2" level="shadow" />

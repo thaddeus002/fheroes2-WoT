@@ -1940,23 +1940,21 @@ CompositeSprite::CompositeSprite(const QDomElement & elem, int templateIndex)
     spriteLevel = SpriteLevel::fromString(elem.attribute("level").toLower());
 
     if(elem.hasAttribute("passable"))
-    {
-	bool ok;
-	spritePassable = elem.attribute("passable").toInt(&ok, 16);
-	if(! ok)
-	spritePassable = elem.attribute("passable").toInt(&ok, 10);
-    }
+	spritePassable = elem.attribute("passable").toInt(NULL, 0);
 
     if(elem.hasAttribute("animation"))
 	spriteAnimation = elem.attribute("animation").toInt();
 }
 
-CompositeObject::CompositeObject(const QString & obj, const QDomElement & elem, int templateIndex)
-    : name(elem.attribute("name")), size(elem.attribute("width").toInt(), elem.attribute("height").toInt())
+CompositeObject::CompositeObject(const QString & obj, const QDomElement & elem, int templateIndex, int cid)
+    : name(elem.attribute("name")), size(elem.attribute("width").toInt(), elem.attribute("height").toInt()), classId(cid)
 {
     QString icnStr = obj.toUpper();
     if(0 > icnStr.lastIndexOf(".ICN")) icnStr.append(".ICN");
     icn = qMakePair(icnStr, H2::mapICN(icnStr));
+
+    if(elem.hasAttribute("cid"))
+	classId = elem.attribute("cid").toInt(NULL, 0);
 
     QDomNodeList list = elem.elementsByTagName("sprite");
     for(int pos = 0; pos < list.size(); ++pos)

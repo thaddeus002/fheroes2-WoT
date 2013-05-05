@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<objects>
+<objects cid="0x64" >
     <template section="mount_6x4_1" icn="mtncrck" name="Mount 1" index="0" />
     <template section="mount_6x4_2" icn="mtncrck" name="Mount 2" index="21" />
     <template section="mount_6x3_1" icn="mtncrck" name="Mount 3" index="42" />

@@ -266,7 +266,10 @@ public:
 	setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 	setData(Qt::UserRole, QVariant::fromValue(obj));
 	setIcon(EditorTheme::getImage(obj));
-	setText(obj.name);
+	if(obj.classId != MapObj::Unknown)
+	    setText(obj.name);
+	else
+	    setText(obj.name + " (unk class id)");
 	setSizeHint(QSize(132, 80));
     }
 };
@@ -284,6 +287,10 @@ Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QStrin
     Editor::MyXML templateObjects(EditorTheme::resourceFile(dataFolder, "template.xml"), "template");
     Editor::MyXML objectsElem(EditorTheme::resourceFile(dataFolder, groupElem.attribute("file")), "objects");
     QString icn = objectsElem.attribute("icn");
+    int cid = MapObj::Unknown;
+
+    if(objectsElem.hasAttribute("cid"))
+        cid = objectsElem.attribute("cid").toInt(NULL, 0);
 
     if(! objectsElem.isNull())
     {
@@ -292,7 +299,7 @@ Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QStrin
 
         for(int pos2 = 0; pos2 < objectsList.size(); ++pos2)
         {
-            CompositeObject obj(icn, objectsList.item(pos2).toElement(), 0);
+            CompositeObject obj(icn, objectsList.item(pos2).toElement(), 0, cid);
 
             if(obj.isValid())
 		listWidget->addItem(new SelectImageItem(obj));
@@ -314,12 +321,15 @@ Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QStrin
                 if(tmplElem.hasAttribute("icn"))
                     icn = tmplElem.attribute("icn");
 
-                CompositeObject obj(icn, objElem, startIndex);
+                // override tags: cid
+                if(tmplElem.hasAttribute("cid"))
+		    cid = objectsElem.attribute("cid").toInt(NULL, 0);
+
+                CompositeObject obj(icn, objElem, startIndex, cid);
 
                 // override tags: name
                 if(tmplElem.hasAttribute("name"))
                     obj.name = tmplElem.attribute("name");
-
 
             	if(obj.isValid())
 		    listWidget->addItem(new SelectImageItem(obj));

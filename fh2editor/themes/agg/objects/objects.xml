@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects>
+    <class name="AlchemyLab" id="0x01" />
+    <class name="Sign" id="0x02" />
+    <class name="Buoy" id="0x03" />
+    <class name="Skeleton" id="0x04" />
+    <class name="DaemonCave" id="0x05" />
+    <class name="TreasureChest" id="0x06" />
+    <class name="RaerieRing" id="0x07" />
+    <class name="CampFire" id="0x08" />
+    <class name="Fountain" id="0x09" />
+    <class name="Gazebo" id="0x0A" />
+    <class name="AncientLamp" id="0x0B" />
+    <class name="Graveyard" id="0x0C" />
+    <class name="ArcherHouse" id="0x0D" />
+    <class name="GoblinHut" id="0x0E" />
+    <class name="DwarfCott" id="0x0F" />
+    <class name="PeasantHut" id="0x10" />
+    <class name="Event" id="0x13" />
+    <class name="DragonCity" id="0x14" />
+    <class name="LightHouse" id="0x15" />
+    <class name="WaterWheel" id="0x16" />
+    <class name="Mines" id="0x17" />
+    <class name="Monster" id="0x18" />
+    <class name="Obelisk" id="0x19" />
+    <class name="Oasis" id="0x1A" />
+    <class name="Resource" id="0x1B" />
+    <class name="Coast" id="0x1C" />
+    <class name="SawMill" id="0x1D" />
+    <class name="Oracle" id="0x1E" />
+    <class name="Shrine1" id="0x1F" />
+    <class name="ShipWreck" id="0x20" />
+    <class name="DesertTent" id="0x22" />
+    <class name="Castle" id="0x23" />
+    <class name="StoneLights" id="0x24" />
+    <class name="WagonCamp" id="0x25" />
+    <class name="WaterChest" id="0x26" />
+    <class name="WhirlPool" id="0x27" />
+    <class name="WindMill" id="0x28" />
+    <class name="Artifact" id="0x29" />
+    <class name="Reefs" id="0x2A" />
+    <class name="Boat" id="0x2B" />
+    <class name="RndUltimateArtifact" id="0x2C" />
+    <class name="RndArtifact" id="0x2D" />
+    <class name="RndResource" id="0x2E" />
+    <class name="RndMonster" id="0x2F" />
+    <class name="RndTown" id="0x30" />
+    <class name="RndCastle" id="0x31" />
+    <class name="Mermaid" id="0x32" />
+    <class name="RndMonster1" id="0x33" />
+    <class name="RndMonster2" id="0x34" />
+    <class name="RndMonster3" id="0x35" />
+    <class name="RndMonster4" id="0x36" />
+    <class name="Heroes" id="0x37" />
+    <class name="Sirens" id="0x38" />
+    <class name="HutMagi" id="0x39" />
+    <class name="WatchTower" id="0x3A" />
+    <class name="TreeHouse" id="0x3B" />
+    <class name="TreeCity" id="0x3C" />
+    <class name="Ruins" id="0x3D" />
+    <class name="Fort" id="0x3E" />
+    <class name="TradingPost" id="0x3F" />
+    <class name="AbandonedMine" id="0x40" />
+    <class name="ThatchedHut" id="0x41" />
+    <class name="StandingStones" id="0x42" />
+    <class name="Idol" id="0x43" />
+    <class name="TreeKnowledge" id="0x44" />
+    <class name="DoctorHut" id="0x45" />
+    <class name="Temple" id="0x46" />
+    <class name="HillFort" id="0x47" />
+    <class name="HalflingHole" id="0x48" />
+    <class name="MercenaryCamp" id="0x49" />
+    <class name="Shrine2" id="0x4A" />
+    <class name="Shrine3" id="0x4B" />
+    <class name="Pyramid" id="0x4C" />
+    <class name="CityDead" id="0x4D" />
+    <class name="Excavation" id="0x4E" />
+    <class name="Sphinx" id="0x4F" />
+    <class name="Wagon" id="0x50" />
+    <class name="Tarpit" id="0x51" />
+    <class name="ArtesianSpring" id="0x52" />
+    <class name="TrollBridge" id="0x53" />
+    <class name="WateringHole" id="0x54" />
+    <class name="WitchsHut" id="0x55" />
+    <class name="Xanadu" id="0x56" />
+    <class name="Cave" id="0x57" />
+    <class name="Leanto" id="0x58" />
+    <class name="MagellanMaps" id="0x59" />
+    <class name="FlotSam" id="0x5A" />
+    <class name="DerelictShip" id="0x5B" />
+    <class name="ShipwreckSurviror" id="0x5C" />
+    <class name="Bottle" id="0x5D" />
+    <class name="MagicWell" id="0x5E" />
+    <class name="MagicGarden" id="0x5F" />
+    <class name="ObservationTower" id="0x60" />
+    <class name="FreemanFoundry" id="0x61" />
+    <class name="EyeMagi" id="0x62" />
+    <class name="Trees" id="0x63" />
+    <class name="Mounts" id="0x64" />
+    <class name="Volcano" id="0x65" />
+    <class name="Flowers" id="0x66" />
+    <class name="Stones" id="0x67" />
+    <class name="WaterLake" id="0x68" />
+    <class name="Mandrake" id="0x69" />
+    <class name="DeadTree" id="0x6A" />
+    <class name="Stump" id="0x6B" />
+    <class name="Crater" id="0x6C" />
+    <class name="Cactus" id="0x6D" />
+    <class name="Mound" id="0x6E" />
+    <class name="Dune" id="0x6F" />
+    <class name="LavaPool" id="0x70" />
+    <class name="Shrub" id="0x71" />
+    <class name="Arena" id="0x72" />
+    <class name="BarrowMounds" id="0x73" />
+    <class name="RndArtifact1" id="0x74" />
+    <class name="RndArtifact2" id="0x75" />
+    <class name="RndArtifact3" id="0x76" />
+    <class name="Barrier" id="0x77" />
+    <class name="TravellerTent" id="0x78" />
+    <class name="AlchemyTower" id="0x79" />
+    <class name="Stables" id="0x7A" />
+    <class name="Jail" id="0x7B" />
+    <class name="FireAltar" id="0x7C" />
+    <class name="AirAltar" id="0x7D" />
+    <class name="EarthAltar" id="0x7E" />
+    <class name="WaterAltar" id="0x7F" />
+<!--
+    <class name="Unused" id="0x11" />
+    <class name="Unused" id="0x12" />
+    <class name="Unused" id="0x21" />
+
+    <class name="Unused" id="0x26" /> map to: waterchest
+    <class name="Unused" id="0x2A" /> map to: reefs
+    <class name="Unused" id="0x32" /> map to: mermaid
+    <class name="Unused" id="0x38" /> map to: sirens
+    <class name="Unused" id="0x39" /> map to: hutmagi
+    <class name="Unused" id="0x62" /> map to: eyemagi
+    <class name="Unused" id="0x79" /> map to: alchemytower
+    <class name="Unused" id="0x7A" /> map to: stables
+-->
+
+<!--
+    <class name="WaterChest" id="0x00" />
+    <class name="Reefs" id="0x169" />
+    <class name="Mermaid" id="0x16C" />
+    <class name="Sirens" id="0x16D" />
+    <class name="HutMagi" id="0x16E" />
+    <class name="EyeMagi" id="0x16F" />
+    <class name="AlchemyTower" id="0x170" />
+    <class name="Stables" id="0x171" />
+-->
+</objects>
