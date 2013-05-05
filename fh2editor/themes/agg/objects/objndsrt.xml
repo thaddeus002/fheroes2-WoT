@@ -26,7 +26,7 @@
     <template section="trees_2x1" name="Cactus 50" index="50" />
     <template section="trees_2x1" name="Cactus 52" index="52" />
     <template section="campfire" name="Camp Fire" index="54" />
-    <object name="Desert Tent" width="3" height="2">
+    <object name="Desert Tent" width="3" height="2" cid="0x22" >
         <sprite px="1" py="0" index="69" level="top" />
         <sprite px="2" py="0" index="70" level="top" />
         <sprite px="0" py="1" index="71" level="shadow" />
@@ -34,7 +34,7 @@
         <sprite px="2" py="1" index="73" level="action" passable="0x01F8" />
     </object>
     <template section="trees_2x2" name="Trees 74" index="74" />
-    <object name="Piramid" width="3" height="2">
+    <object name="Piramid" width="3" height="2" cid="0x4C" >
         <sprite px="0" py="0" index="77" level="shadow" />
         <sprite px="1" py="0" index="78" level="top" />
         <sprite px="2" py="0" index="79" level="top" />
@@ -42,17 +42,17 @@
         <sprite px="1" py="1" index="81" level="bottom" passable="0x01F8" />
         <sprite px="2" py="1" index="82" level="action" passable="0x01F8" />
     </object>
-    <object name="Skeleton" width="2" height="1">
+    <object name="Skeleton" width="2" height="1" cid="0x04" >
         <sprite px="0" py="0" index="83" level="bottom" passable="0x01F8" />
         <sprite px="1" py="0" index="84" level="action" passable="0x01F8" />
     </object>
-    <object name="Sphinx" width="3" height="2">
+    <object name="Sphinx" width="3" height="2" cid="0x4F" >
 	<sprite px="1" py="0" index="85" level="top" />
         <sprite px="0" py="1" index="86" level="shadow" />
         <sprite px="1" py="1" index="87" level="action" passable="0x01F8" />
         <sprite px="2" py="1" index="88" level="bottom" passable="0x01F8" />
     </object>
-    <object name="City of Dead" width="5" height="2">
+    <object name="City of Dead" width="5" height="2"  cid="0x4D" >
         <sprite px="0" py="0" index="89" level="bottom" passable="0" />
         <sprite px="1" py="0" index="90" level="bottom" passable="0" />
         <sprite px="2" py="0" index="91" level="bottom" passable="0" />
@@ -64,7 +64,7 @@
         <sprite px="3" py="1" index="97" level="bottom" passable="0x01F8" />
         <sprite px="4" py="1" index="98" level="bottom" passable="0x01F8" />
     </object>
-    <object name="Excavation" width="3" height="1">
+    <object name="Excavation" width="3" height="1" cid="0x4E" >
         <sprite px="0" py="0" index="99" level="bottom" passable="0x01F8" />
         <sprite px="1" py="0" index="100" level="bottom" passable="0x01F8" />
         <sprite px="2" py="0" index="101" level="action" passable="0x01F8" />

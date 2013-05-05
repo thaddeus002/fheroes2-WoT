@@ -261,18 +261,35 @@ void Form::SelectDataFile::clickSelect(void)
 class SelectImageItem : public QListWidgetItem
 {
 public:
-    SelectImageItem(const CompositeObject & obj)
+    SelectImageItem(const CompositeObject & obj, const QMap<int, QString> & ids)
     {
 	setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 	setData(Qt::UserRole, QVariant::fromValue(obj));
 	setIcon(EditorTheme::getImage(obj));
-	if(obj.classId != MapObj::Unknown)
-	    setText(obj.name);
-	else
-	    setText(obj.name + " (unk class id)");
+	setText(obj.name);
+#ifndef QT_NO_TOOLTIP
+	setToolTip(QString("class id: ") + (ids[obj.classId].isEmpty() ? QString("unknown") : ids[obj.classId]));
+#endif
 	setSizeHint(QSize(132, 80));
     }
 };
+
+QMap<int, QString> GetIDObjects(const QString & dataFolder)
+{
+    Editor::MyXML objectsElem(EditorTheme::resourceFile(dataFolder, "objects.xml"), "objects");
+    QDomNodeList objectsList = objectsElem.elementsByTagName("class");
+
+    QMap<int, QString> res;
+
+    for(int pos = 0; pos < objectsList.size(); ++pos)
+    {
+        QDomElement classElem = objectsList.item(pos).toElement();
+	int index = classElem.attribute("id").toInt(NULL, 0);
+	res[index] = classElem.attribute("name");
+    }
+
+    return res;
+}
 
 Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QString & dataFolder)
 {
@@ -283,6 +300,8 @@ Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QStrin
     listWidget->setViewMode(QListView::IconMode);
     listWidget->setWrapping(true);
     listWidget->setResizeMode(QListView::Adjust);
+
+    const QMap<int, QString> objectsID = GetIDObjects(dataFolder);
 
     Editor::MyXML templateObjects(EditorTheme::resourceFile(dataFolder, "template.xml"), "template");
     Editor::MyXML objectsElem(EditorTheme::resourceFile(dataFolder, groupElem.attribute("file")), "objects");
@@ -297,12 +316,12 @@ Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QStrin
         // parse element: object
         QDomNodeList objectsList = objectsElem.elementsByTagName("object");
 
-        for(int pos2 = 0; pos2 < objectsList.size(); ++pos2)
+        for(int pos1 = 0; pos1 < objectsList.size(); ++pos1)
         {
-            CompositeObject obj(icn, objectsList.item(pos2).toElement(), 0, cid);
+            CompositeObject obj(icn, objectsList.item(pos1).toElement(), 0, cid);
 
             if(obj.isValid())
-		listWidget->addItem(new SelectImageItem(obj));
+		listWidget->addItem(new SelectImageItem(obj, objectsID));
         }
 
         // parse element: template
@@ -332,7 +351,7 @@ Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QStrin
                     obj.name = tmplElem.attribute("name");
 
             	if(obj.isValid())
-		    listWidget->addItem(new SelectImageItem(obj));
+		    listWidget->addItem(new SelectImageItem(obj, objectsID));
             }
         }
     }

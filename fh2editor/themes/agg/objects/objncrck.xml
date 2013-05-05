@@ -33,7 +33,7 @@
     <template section="trees_1x1" name="Shrub 71" index="71" />
     <template section="trees_1x1" name="Shrub 72" index="72" />
     <template section="wagon" name="Wagon" index="73" />
-    <object name="Tar Pit" width="6" height="3">
+    <object name="Tar Pit" width="6" height="3" cid="0x51" >
         <sprite px="0" py="0" index="75" level="bottom" passable="0x01FF" />
         <sprite px="1" py="0" index="76" level="bottom" passable="0" />
         <sprite px="2" py="0" index="77" level="bottom" passable="0" />
@@ -52,7 +52,7 @@
         <sprite px="4" py="2" index="170" level="bottom" passable="0x01F8" animation="10" />
         <sprite px="5" py="2" index="181" level="bottom" passable="0x01F8" />
     </object>
-    <object name="Troll Bridge" width="4" height="2">
+    <object name="Troll Bridge" width="4" height="2" cid="0x53" >
 	<sprite px="0" py="0" index="182" level="bottom" passable="0" />
 	<sprite px="1" py="0" index="183" level="bottom" passable="0" />
         <sprite px="2" py="0" index="184" level="bottom" passable="0x0117" /> <!-- center, bottom right, top row -->
@@ -63,7 +63,7 @@
         <sprite px="3" py="1" index="189" level="action" passable="0x01F8" />
     </object>
     <template section="market" name="Market" index="190" />
-    <object name="Watering Hole" width="4" height="2">
+    <object name="Watering Hole" width="4" height="2" cid="0x54" >
 	<sprite px="0" py="0" index="214" level="top" />
 	<sprite px="1" py="0" index="215" level="top" />
 	<sprite px="2" py="0" index="216" level="top" />
