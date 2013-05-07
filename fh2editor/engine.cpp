@@ -62,6 +62,25 @@ QString Portrait::transcribe(int port)
     return count > port ? QString(ports[port]) : QString(ports[0]);
 }
 
+QString Resource::transcribe(int res)
+{
+    switch(res)
+    {
+	case Resource::Wood:	return "Wood";
+	case Resource::Mercury:	return "Mercury";
+	case Resource::Ore:	return "Ore";
+	case Resource::Sulfur:	return "Sulfur";
+	case Resource::Crystal:	return "Crystal";
+	case Resource::Gems:	return "Gems";
+	case Resource::Gold:	return "Gold";
+	case Resource::Random:	return "Random";
+
+	default: break;
+    }
+
+    return "Unknown";
+}
+
 inline bool IS_EQUAL_VALS(int A, int B)
 {
     return (A & B) == A;
@@ -2013,7 +2032,6 @@ void CompositeObjectCursor::paint(QPainter & painter, const QPoint & pos, bool a
 
     painter.drawPixmap(pos, objectArea);
     painter.drawPixmap(pos, passableMap);
-    //painter.drawPixmap(pos, (allow ? borderGreen : borderRed));
 }
 
 QRect CompositeObjectCursor::area(void) const

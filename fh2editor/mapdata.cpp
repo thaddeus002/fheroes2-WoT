@@ -87,6 +87,32 @@ bool MapTileExt::isSign(const MapTileExt* te)
 	    (ICN::OBJNSWMP == te->spriteICN && 140 == te->spriteIndex);
 }
 
+bool MapTileExt::isResource(const MapTileExt* te)
+{
+    return Resource::Unknown != resource(te);
+}
+
+int MapTileExt::resource(const MapTileExt* te)
+{
+    if(ICN::OBJNRSRC == te->spriteICN)
+    {
+	switch(te->spriteIndex)
+	{
+	    case 1:	return Resource::Wood;
+	    case 3:	return Resource::Mercury;
+	    case 5:	return Resource::Ore;
+	    case 7:	return Resource::Sulfur;
+	    case 9:	return Resource::Crystal;
+	    case 11:	return Resource::Gems;
+	    case 13:	return Resource::Gold;
+	    case 17:	return Resource::Random;
+	    default: break;
+	}
+    }
+
+    return Resource::Unknown;
+}
+
 bool MapTileExt::isButtle(const MapTileExt* te)
 {
     return ICN::OBJNWATR == te->spriteICN && 0 == te->spriteIndex;
@@ -269,7 +295,6 @@ MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos)
 	    for(MapTileLevels::const_iterator
 		it = spritesLevel2.begin(); it != spritesLevel2.end() && objectID == MapObj::None; ++it)
 		objectID = MapTileExt::loyaltyObject(*it);
-
 	}
     }
 }
@@ -410,6 +435,34 @@ void MapTile::addSpriteSection(int icn, const CompositeSprite & cs, quint32 uid)
 	spritesLevel2 << new MapTileExt(icn, cs, uid);
     else
 	spritesLevel1 << new MapTileExt(icn, cs, uid);
+}
+
+void MapTile::editObjectDialog(void)
+{
+    switch(object())
+    {
+	case MapObj::Resource:		editResourceDialog(); break;
+
+	default: qDebug() << "edit object"; break;
+    }
+}
+
+void MapTile::editResourceDialog(void)
+{
+    const MapTileExt* ext = spritesLevel1.find(MapTileExt::isResource);
+
+    if(ext)
+    {
+	int res = MapTileExt::resource(ext);
+	Form::EditResource form;
+
+	qDebug() << Resource::transcribe(res);
+
+	if(QDialog::Accepted == form.exec())
+	{
+	    // default: gold: 500-1000, wood, ore: 5-10, other: 3-6
+	}
+    }
 }
 
 QDomElement & operator<< (QDomElement & el, const MapTile & tile)
@@ -899,12 +952,10 @@ void MapData::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 	{
 	    MapWindow* mapWindow = qobject_cast<MapWindow*>(parent());
 
-	    if(mapWindow &&
-		(!tileOverMouse || tileOverMouse->mapPos().x() != newTileOverMouse->mapPos().x()))
+	    if(!tileOverMouse || tileOverMouse->mapPos().x() != newTileOverMouse->mapPos().x())
 		    emit mapWindow->cursorTileXPosChanged(newTileOverMouse->mapPos().x());
 
-	    if(mapWindow &&
-		(!tileOverMouse || tileOverMouse->mapPos().y() != newTileOverMouse->mapPos().y()))
+	    if(!tileOverMouse || tileOverMouse->mapPos().y() != newTileOverMouse->mapPos().y())
 		    emit mapWindow->cursorTileYPosChanged(newTileOverMouse->mapPos().y());
 
 	    tileOverMouse = newTileOverMouse;
@@ -912,6 +963,23 @@ void MapData::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 
 	if(tileOverMouse)
 	    update(tileOverMouse->boundingRect());
+    }
+
+    event->accept();
+}
+
+void MapData::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
+{
+    if(tileOverMouse)
+    {
+	if(tileOverMouse->isAction())
+	{
+	    editObjectAttributes();
+	}
+	else
+	{
+	    cellInfoDialog();
+	}
     }
 
     event->accept();
@@ -1641,4 +1709,11 @@ void MapData::generateMiniMap(void)
 
     if(mapWindow && mapWindow->miniMapWidget())
 	mapWindow->miniMapWidget()->generateFromTiles(mapTiles);
+}
+
+void MapData::editObjectAttributes(void)
+{
+    if(tileOverMouse)
+	tileOverMouse->editObjectDialog();
+    qDebug() << "edit object";
 }

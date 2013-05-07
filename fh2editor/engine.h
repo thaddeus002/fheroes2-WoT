@@ -104,6 +104,14 @@ namespace Artifact
     enum { Unknown };
 }
 
+namespace Resource
+{
+    enum { Unknown = 0, Wood = 0x01, Mercury = 0x02, Ore = 0x04, Sulfur = 0x08, Crystal = 0x10, Gems = 0x20, Gold = 0x40,
+	    Random = 0x80, All = Wood | Mercury | Ore | Sulfur | Crystal | Gems | Gold };
+
+    QString transcribe(int);
+}
+
 namespace Portrait
 {
     enum { Unknown,

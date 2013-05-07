@@ -55,6 +55,10 @@ MapWindow::MapWindow(MainWindow* parent) : mainWindow(parent), mapData(this)
     addObjectAct->setStatusTip(tr("Select map object"));
     connect(addObjectAct, SIGNAL(triggered()), &mapData, SLOT(selectObjectImage()));
 
+    editObjectAct = new QAction(QIcon(":/images/edit_objects.png"), tr("Edit object..."), this);
+    editObjectAct->setStatusTip(tr("Edit map object"));
+    connect(editObjectAct, SIGNAL(triggered()), &mapData, SLOT(editObjectAttributes()));
+
     QAction* curAct;
 
     // init: fill ground
@@ -375,7 +379,10 @@ void MapWindow::contextMenuEvent(QContextMenuEvent* event)
 
 	menu.addSeparator();
 	menu.addAction(editPassableAct);
+        menu.addAction(editObjectAct);
 	menu.addAction(cellInfoAct);
+
+	editObjectAct->setEnabled(mapData.currentTile() && mapData.currentTile()->isAction());
 
 	menu.addSeparator();
 	menu.addAction(selectAllAct);
@@ -383,6 +390,8 @@ void MapWindow::contextMenuEvent(QContextMenuEvent* event)
 
     if(selectAllAct != menu.exec(event->globalPos()))
 	mapData.clearSelection();
+
+    event->accept();
 }
 
 Form::MiniMap* MapWindow::miniMapWidget(void)

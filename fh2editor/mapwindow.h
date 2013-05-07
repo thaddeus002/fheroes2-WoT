@@ -85,6 +85,7 @@ private:
     QAction*            cellInfoAct;
     QAction*            selectAllAct;
     QAction*            addObjectAct;
+    QAction*            editObjectAct;
 
     QActionGroup*	fillGroundAct;
     QActionGroup*	clearObjectsAct;

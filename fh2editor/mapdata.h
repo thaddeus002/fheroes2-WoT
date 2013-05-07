@@ -29,10 +29,11 @@
 #include <QString>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
-#include <QAction>
 
 QT_BEGIN_NAMESPACE
 class QDomElement;
+class QAction;
+class QGraphicsSceneMouseEvent;
 QT_END_NAMESPACE
 
 #include "engine.h"
@@ -115,6 +116,8 @@ public:
     static bool		isTown(const MapTileExt*);
     static bool		isRandomTown(const MapTileExt*);
     static int		loyaltyObject(const MapTileExt*);
+    static bool		isResource(const MapTileExt*);
+    static int		resource(const MapTileExt*);
 };
 
 class MapTileLevels : public QList<MapTileExt*>
@@ -157,12 +160,16 @@ public:
 
     bool		isAction(void) const;
     int			object(void) const;
+    void		editObjectDialog(void);
 
 protected:
     static void		loadSpriteLevel(MapTileLevels &, int, const mp2lev_t &);
 
+    void		editResourceDialog(void);
+
     friend		QDomElement & operator<< (QDomElement &, const MapTile &);
     friend		QDomElement & operator>> (QDomElement &, MapTile &);
+
 
     QPoint		mpos;
 
@@ -277,6 +284,8 @@ public:
     void		SaveTest(void) const;
     void		showMapOptions(void);
 
+    MapTile*		currentTile(void) { return tileOverMouse; }
+
 signals:
     void		dataModified(void);
     void		validBuffer(bool);
@@ -291,11 +300,13 @@ protected slots:
     void		fillGroundAction(QAction*);
     void		removeObjectsAction(QAction*);
     void		selectObjectImage(void);
+    void		editObjectAttributes(void);
     void		generateMiniMap(void);
 
 protected:
     void                mousePressEvent(QGraphicsSceneMouseEvent*);
     void                mouseMoveEvent(QGraphicsSceneMouseEvent*);
+    void		mouseDoubleClickEvent(QGraphicsSceneMouseEvent*);
     void		drawForeground(QPainter*, const QRectF &);
     void		selectArea(QPointF, QPointF);
 

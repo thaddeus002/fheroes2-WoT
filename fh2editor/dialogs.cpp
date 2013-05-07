@@ -68,47 +68,49 @@ Form::SelectMapSize::SelectMapSize()
     spacerItem = new QSpacerItem(20, 16, QSizePolicy::Minimum, QSizePolicy::Expanding);
     vboxLayout->addItem(spacerItem);
 
-    hboxLayout = new QHBoxLayout();
-    hboxLayout->setSpacing(6);
-    hboxLayout->setMargin(0);
-
     spacerItem1 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-    hboxLayout->addItem(spacerItem1);
-
-    labelWidth = new QLabel(this);
-    labelWidth->setEnabled(true);
-    labelWidth->setVisible(false);
-    labelWidth->setText(QApplication::translate("SelectMapSize", "width", 0, QApplication::UnicodeUTF8));
-    hboxLayout->addWidget(labelWidth);
 
     spinBoxWidth = new QSpinBox(this);
     spinBoxWidth->setMaximum(1024);
     spinBoxWidth->setMinimum(36);
     spinBoxWidth->setSingleStep(2);
     spinBoxWidth->setVisible(false);
-    hboxLayout->addWidget(spinBoxWidth);
+
+    labelWidth = new QLabel(this);
+    labelWidth->setEnabled(true);
+    labelWidth->setVisible(false);
+    labelWidth->setText(QApplication::translate("SelectMapSize", "width", 0, QApplication::UnicodeUTF8));
+    labelWidth->setBuddy(spinBoxWidth);
 
     spacerItem2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    hboxLayout = new QHBoxLayout();
+    hboxLayout->setSpacing(6);
+    hboxLayout->setMargin(0);
+    hboxLayout->addItem(spacerItem1);
+    hboxLayout->addWidget(labelWidth);
+    hboxLayout->addWidget(spinBoxWidth);
     hboxLayout->addItem(spacerItem2);
     vboxLayout->addLayout(hboxLayout);
 
-    hboxLayout1 = new QHBoxLayout();
-    hboxLayout1->setSpacing(6);
-    hboxLayout1->setMargin(0);
-
     spacerItem3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-    hboxLayout1->addItem(spacerItem3);
-
-    labelHeight = new QLabel(this);
-    labelHeight->setText(QApplication::translate("SelectMapSize", "height", 0, QApplication::UnicodeUTF8));
-    labelHeight->setVisible(false);
-    hboxLayout1->addWidget(labelHeight);
 
     spinBoxHeight = new QSpinBox(this);
     spinBoxHeight->setMaximum(1024);
     spinBoxHeight->setMinimum(36);
     spinBoxHeight->setSingleStep(2);
     spinBoxHeight->setVisible(false);
+
+    labelHeight = new QLabel(this);
+    labelHeight->setText(QApplication::translate("SelectMapSize", "height", 0, QApplication::UnicodeUTF8));
+    labelHeight->setVisible(false);
+    labelHeight->setBuddy(spinBoxHeight);
+
+    hboxLayout1 = new QHBoxLayout();
+    hboxLayout1->setSpacing(6);
+    hboxLayout1->setMargin(0);
+    hboxLayout1->addItem(spacerItem3);
+    hboxLayout1->addWidget(labelHeight);
     hboxLayout1->addWidget(spinBoxHeight);
 
     spacerItem4 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -139,9 +141,6 @@ Form::SelectMapSize::SelectMapSize()
     spacerItem8 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     hboxLayout2->addItem(spacerItem8);
     vboxLayout->addLayout(hboxLayout2);
-
-    labelWidth->setBuddy(spinBoxWidth);
-    labelHeight->setBuddy(spinBoxHeight);
 
     QSize minSize = minimumSizeHint();
 
@@ -1155,6 +1154,7 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors)
     spinBoxDayFirst->setMinimum(1);
     spinBoxDayFirst->setMaximum(65535);
     spinBoxDayFirst->setValue(event.dayFirstOccurent);
+    labelDayFirst->setBuddy(spinBoxDayFirst);
     horizontalLayout->addWidget(spinBoxDayFirst);
 
     labelSubsequent = new QLabel(tabDay);
@@ -1221,23 +1221,25 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors)
     int resMin = -65535;
     int resMax = 65535;
 
-    labelResWood = new QLabel(tabResource);
-    labelResWood->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 0).first);
-
     spinBoxResWood = new QSpinBox(tabResource);
     spinBoxResWood->setMinimum(resMin);
     spinBoxResWood->setMaximum(resMax);
     spinBoxResWood->setValue(resources.wood);
 
-    horizontalSpacer2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    labelResWood = new QLabel(tabResource);
+    labelResWood->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 0).first);
+    labelResWood->setBuddy(spinBoxResWood);
 
-    labelResSulfur = new QLabel(tabResource);
-    labelResSulfur->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 3).first);
+    horizontalSpacer2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     spinBoxResSulfur = new QSpinBox(tabResource);
     spinBoxResSulfur->setMinimum(resMin);
     spinBoxResSulfur->setMaximum(resMax);
     spinBoxResSulfur->setValue(resources.sulfur);
+
+    labelResSulfur = new QLabel(tabResource);
+    labelResSulfur->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 3).first);
+    labelResSulfur->setBuddy(spinBoxResSulfur);
 
     horizontalLayout5 = new QHBoxLayout();
     horizontalLayout5->addWidget(labelResWood);
@@ -1246,23 +1248,24 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors)
     horizontalLayout5->addWidget(labelResSulfur);
     horizontalLayout5->addWidget(spinBoxResSulfur);
 
-    labelResMercury = new QLabel(tabResource);
-    labelResMercury->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 1).first);
-
     spinBoxResMercury = new QSpinBox(tabResource);
     spinBoxResMercury->setMinimum(resMin);
     spinBoxResMercury->setMaximum(resMax);
     spinBoxResMercury->setValue(resources.mercury);
 
+    labelResMercury = new QLabel(tabResource);
+    labelResMercury->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 1).first);
+    labelResMercury->setBuddy(spinBoxResMercury);
+
     horizontalSpacer3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-    labelResCrystal = new QLabel(tabResource);
-    labelResCrystal->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 4).first);
-
     spinBoxResCrystal = new QSpinBox(tabResource);
     spinBoxResCrystal->setMinimum(resMin);
     spinBoxResCrystal->setMaximum(resMax);
     spinBoxResCrystal->setValue(resources.crystal);
+
+    labelResCrystal = new QLabel(tabResource);
+    labelResCrystal->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 4).first);
+    labelResCrystal->setBuddy(spinBoxResCrystal);
 
     horizontalLayout6 = new QHBoxLayout();
     horizontalLayout6->addWidget(labelResMercury);
@@ -1271,23 +1274,25 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors)
     horizontalLayout6->addWidget(labelResCrystal);
     horizontalLayout6->addWidget(spinBoxResCrystal);
 
-    labelResOre = new QLabel(tabResource);
-    labelResOre->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 2).first);
-
     spinBoxResOre = new QSpinBox(tabResource);
     spinBoxResOre->setMinimum(resMin);
     spinBoxResOre->setMaximum(resMax);
     spinBoxResOre->setValue(resources.ore);
 
-    horizontalSpacer4 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    labelResOre = new QLabel(tabResource);
+    labelResOre->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 2).first);
+    labelResOre->setBuddy(spinBoxResOre);
 
-    labelResGems = new QLabel(tabResource);
-    labelResGems->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 5).first);
+    horizontalSpacer4 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     spinBoxResGems = new QSpinBox(tabResource);
     spinBoxResGems->setMinimum(resMin);
     spinBoxResGems->setMaximum(resMax);
     spinBoxResGems->setValue(resources.gems);
+
+    labelResGems = new QLabel(tabResource);
+    labelResGems->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 5).first);
+    labelResGems->setBuddy(spinBoxResGems);
 
     horizontalLayout7 = new QHBoxLayout();
     horizontalLayout7->addWidget(labelResOre);
@@ -1299,13 +1304,14 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors)
     horizontalSpacer5 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     horizontalSpacer6 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-    labelResGold = new QLabel(tabResource);
-    labelResGold->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 6).first);
-
     spinBoxResGold = new QSpinBox(tabResource);
     spinBoxResGold->setMinimum(resMin);
     spinBoxResGold->setMaximum(resMax);
     spinBoxResGold->setValue(resources.gold);
+
+    labelResGold = new QLabel(tabResource);
+    labelResGold->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 6).first);
+    labelResGold->setBuddy(spinBoxResGold);
 
     horizontalLayout8 = new QHBoxLayout();
     horizontalLayout8->addItem(horizontalSpacer5);
@@ -1495,4 +1501,63 @@ void Form::MiniMap::generateFromTiles(const MapTiles & tiles)
     setFixedSize(minSize);
 
     QApplication::restoreOverrideCursor();
+}
+
+Form::EditResource::EditResource()
+{
+    setWindowTitle(QApplication::translate("DialogEditResource", "Edit Resource", 0, QApplication::UnicodeUTF8));
+
+    checkBoxDefault = new QCheckBox(this);
+    checkBoxDefault->setChecked(true);
+    checkBoxDefault->setText(QApplication::translate("DialogEditResource", "default (random: min-max)", 0, QApplication::UnicodeUTF8));
+
+    spinBoxCount = new QSpinBox(this);
+    spinBoxCount->setEnabled(false);
+    spinBoxCount->setMinimum(1);
+    spinBoxCount->setMaximum(99);
+
+    labelCount = new QLabel(this);
+    labelCount->setEnabled(false);
+    labelCount->setText(QApplication::translate("DialogEditResource", "fixed value:", 0, QApplication::UnicodeUTF8));
+    labelCount->setBuddy(spinBoxCount);
+
+    horizontalLayout1 = new QHBoxLayout();
+    horizontalLayout1->addWidget(labelCount);
+    horizontalLayout1->addWidget(spinBoxCount);
+
+    verticalSpacer = new QSpacerItem(20, 1, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    pushButtonOk = new QPushButton(this);
+    pushButtonOk->setText(QApplication::translate("DialogEditResource", "Ok", 0, QApplication::UnicodeUTF8));
+
+    horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    pushButtonCancel = new QPushButton(this);
+    pushButtonCancel->setText(QApplication::translate("DialogEditResource", "Cancel", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayout2 = new QHBoxLayout();
+    horizontalLayout2->addWidget(pushButtonOk);
+    horizontalLayout2->addItem(horizontalSpacer);
+    horizontalLayout2->addWidget(pushButtonCancel);
+
+    verticalLayout = new QVBoxLayout(this);
+    verticalLayout->addWidget(checkBoxDefault);
+    verticalLayout->addLayout(horizontalLayout1);
+    verticalLayout->addItem(verticalSpacer);
+    verticalLayout->addLayout(horizontalLayout2);
+
+    QSize minSize = minimumSizeHint();
+
+    resize(minSize);
+    setFixedSize(minSize);
+
+    connect(checkBoxDefault, SIGNAL(toggled(bool)), this, SLOT(disableCustomCount(bool)));
+    QObject::connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(reject()));
+    QObject::connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(accept()));
+}
+
+void Form::EditResource::disableCustomCount(bool f)
+{
+    labelCount->setEnabled(! f);
+    spinBoxCount->setEnabled(! f);
 }

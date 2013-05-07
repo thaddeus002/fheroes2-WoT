@@ -18,8 +18,8 @@
         <sprite px="1" py="0" index="0" level="top" />
         <sprite px="2" py="0" index="1" level="top" />
         <sprite px="0" py="1" index="2" level="bottom" passable="0x01F8" />
-        <sprite px="1" py="1" index="3" level="action" passable="0x01F8" />
-        <sprite px="2" py="1" index="4" level="bottom" passable="0x01F8" />
+        <sprite px="1" py="1" index="3" level="bottom" passable="0x01F8" />
+        <sprite px="2" py="1" index="4" level="action" passable="0x01F8" />
     </hillfort>
     <halflinghole width="4" height="1" cid="0x48" >
         <sprite px="0" py="0" index="0" level="top" />
@@ -62,7 +62,7 @@
         <sprite px="1" py="0" index="1" level="top" />
         <sprite px="2" py="0" index="2" level="top" />
         <sprite px="0" py="1" index="3" level="top" />
-        <sprite px="1" py="1" index="4" level="bottom" />
+        <sprite px="1" py="1" index="4" level="action" />
         <sprite px="2" py="1" index="5" level="action" />
     </oracle>
     <market width="3" height="2" cid="0x3F" >

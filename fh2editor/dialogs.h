@@ -51,6 +51,7 @@ class QListWidget;
 class QListWidgetItem;
 class QDomElement;
 class QGraphicsScene;
+class QDialogButtonBox;
 QT_END_NAMESPACE
 
 class MapData;
@@ -410,7 +411,7 @@ namespace Form
 
     class MiniMap : public QFrame
     {
-    Q_OBJECT
+	Q_OBJECT
 
     public:
 	MiniMap(QWidget*);
@@ -419,6 +420,28 @@ namespace Form
 	QLabel*			labelPixmap;
 
 	void			generateFromTiles(const MapTiles &);
+    };
+
+    class EditResource : public QDialog
+    {
+	Q_OBJECT
+
+    public:
+	QVBoxLayout*		verticalLayout;
+	QCheckBox*		checkBoxDefault;
+	QHBoxLayout*		horizontalLayout1;
+	QLabel*			labelCount;
+	QSpinBox*		spinBoxCount;
+	QHBoxLayout*		horizontalLayout2;
+	QPushButton*		pushButtonOk;
+	QSpacerItem*		horizontalSpacer;
+	QPushButton*		pushButtonCancel;
+        QSpacerItem*		verticalSpacer;
+
+	EditResource();
+
+    protected slots:
+	void			 disableCustomCount(bool);
     };
 }
 
