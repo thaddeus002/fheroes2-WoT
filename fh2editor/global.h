@@ -20,18 +20,16 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _EDITOR_PROGRAM_H_
-#define _EDITOR_PROGRAM_H_
+#ifndef _EDITOR_GLOBAL_H_
+#define _EDITOR_GLOBAL_H_
 
-QT_BEGIN_NAMESPACE
-class QString;
-class QSettings;
-QT_END_NAMESPACE
+#define DEFAULT_RESOURCE_GOLD_MIN	500
+#define DEFAULT_RESOURCE_GOLD_MAX	1000
 
-namespace Resource
-{
-    QString FindFile(const QString & dir, const QString & file);
-    QSettings & localSettings(void);
-}
+#define DEFAULT_RESOURCE_WOOD_ORE_MIN	5
+#define DEFAULT_RESOURCE_WOOD_ORE_MAX	10
+
+#define DEFAULT_RESOURCE_OTHER_MIN	3
+#define DEFAULT_RESOURCE_OTHER_MAX	6
 
 #endif

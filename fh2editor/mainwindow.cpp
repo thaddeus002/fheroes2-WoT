@@ -24,6 +24,7 @@
 
 #include "dialogs.h"
 #include "mainwindow.h"
+#include "program.h"
 #include "mapwindow.h"
 
 MainWindow::MainWindow() : sequenceMapNumber(0)
@@ -323,11 +324,11 @@ void MainWindow::createStatusBar(void)
 
 void MainWindow::readSettings(void)
 {
-    QSettings settings("fheroes2", "editor");
+    QSettings & settings = Resource::localSettings();
 
-    QPoint pos = settings.value("pos", QPoint(200, 200)).toPoint();
-    QSize size = settings.value("size", QSize(400, 400)).toSize();
-    sequenceMapNumber = settings.value("sequenceMapNumber", 1).toInt();
+    QPoint pos = settings.value("MainWindow/pos", QPoint(200, 200)).toPoint();
+    QSize size = settings.value("MainWindow/size", QSize(400, 400)).toSize();
+    sequenceMapNumber = settings.value("MainWindow/sequenceMapNumber", 1).toInt();
 
     move(pos);
     resize(size);
@@ -335,11 +336,11 @@ void MainWindow::readSettings(void)
 
 void MainWindow::writeSettings(void)
 {
-    QSettings settings("fheroes2", "editor");
+    QSettings & settings = Resource::localSettings();
 
-    settings.setValue("pos", pos());
-    settings.setValue("size", size());
-    settings.setValue("sequenceMapNumber", sequenceMapNumber);
+    settings.setValue("MainWindow/pos", pos());
+    settings.setValue("MainWindow/size", size());
+    settings.setValue("MainWindow/sequenceMapNumber", sequenceMapNumber);
 }
 
 MapWindow* MainWindow::activeMapWindow(void)

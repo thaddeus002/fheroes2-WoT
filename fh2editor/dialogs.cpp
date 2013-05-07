@@ -38,6 +38,7 @@
 #include <QTreeWidget>
 #include <QListWidget>
 
+#include "global.h"
 #include "program.h"
 #include "engine.h"
 #include "mapdata.h"
@@ -384,7 +385,7 @@ Form::SelectImage::SelectImage()
 		tabWidget->addTab(new SelectImageTab(groupElem, dataFolder), name);
 	}
 
-	tabWidget->setCurrentIndex(lastNumTab);
+	tabWidget->setCurrentIndex(0);
     }
 
     verticalLayout = new QVBoxLayout(this);
@@ -406,12 +407,24 @@ Form::SelectImage::SelectImage()
     horizontalLayout->addWidget(pushButtonClose);
     verticalLayout->addLayout(horizontalLayout);
 
-    resize(540, 410);
-    tabSwitched(lastNumTab);
+    // set size
+    QSettings & settings = Resource::localSettings();
+    setMinimumSize(QSize(540, 410));
+    resize(settings.value("SelectImageDialog/size", minimumSize()).toSize());
+
+    tabSwitched(settings.value("SelectImageDialog/lastTab", 0).toInt());
 
     QObject::connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabSwitched(int)));
     QObject::connect(pushButtonClose, SIGNAL(clicked()), this, SLOT(reject()));
     QObject::connect(pushButtonSelect, SIGNAL(clicked()), this, SLOT(clickSelect()));
+
+    QObject::connect(this, SIGNAL(finished(int)), this, SLOT(saveSettings()));
+}
+
+void Form::SelectImage::saveSettings(void)
+{
+    QSettings & settings = Resource::localSettings();
+    settings.setValue("SelectImageDialog/size", size());
 }
 
 void Form::SelectImage::tabSwitched(int num)
@@ -428,7 +441,7 @@ void Form::SelectImage::tabSwitched(int num)
 	QObject::connect(tab->listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(accept(QListWidgetItem*)));
 	QObject::connect(tab->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
 
-	lastNumTab = num;
+	Resource::localSettings().setValue("SelectImageDialog/lastTab", num);
     }
 }
 
@@ -500,6 +513,7 @@ void Form::PlayerStatus::updatePlayers(void)
 
 Form::MapOptions::MapOptions(MapData & map)
 {
+    QSettings & settings = Resource::localSettings();
     setWindowTitle(QApplication::translate("MapOptions", "Map Options", 0, QApplication::UnicodeUTF8));
 
     /* tab info block */
@@ -668,6 +682,77 @@ Form::MapOptions::MapOptions(MapData & map)
     horizontalLayout6->addWidget(groupBoxRumors);
     horizontalLayout6->addWidget(groupBoxEvents);
 
+    /* tab: default values */
+    tabDefaults = new QWidget();
+    verticalLayoutDefaults = new QVBoxLayout(tabDefaults);
+
+    spinBoxResourceGoldMin = new QSpinBox(tabDefaults);
+    spinBoxResourceGoldMin->setMaximum(1000);
+    spinBoxResourceGoldMin->setMinimum(100);
+    spinBoxResourceGoldMin->setSingleStep(100);
+    spinBoxResourceGoldMin->setValue(settings.value("MapOptions/defaultGoldMin", DEFAULT_RESOURCE_GOLD_MIN).toInt());
+
+    spinBoxResourceGoldMax = new QSpinBox(tabDefaults);
+    spinBoxResourceGoldMax->setMaximum(5000);
+    spinBoxResourceGoldMax->setMinimum(300);
+    spinBoxResourceGoldMax->setSingleStep(100);
+    spinBoxResourceGoldMax->setValue(settings.value("MapOptions/defaultGoldMax", DEFAULT_RESOURCE_GOLD_MAX).toInt());
+
+    labelResourceGold = new QLabel(this);
+    labelResourceGold->setText(QApplication::translate("MapOptions", "Resource (gold)", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutResourceGold = new QHBoxLayout();
+    horizontalLayoutResourceGold->addWidget(labelResourceGold);
+    horizontalLayoutResourceGold->addWidget(spinBoxResourceGoldMin);
+    horizontalLayoutResourceGold->addWidget(spinBoxResourceGoldMax);
+
+    spinBoxResourceWoodOreMin = new QSpinBox(tabDefaults);
+    spinBoxResourceWoodOreMin->setMaximum(10);
+    spinBoxResourceWoodOreMin->setMinimum(1);
+    spinBoxResourceWoodOreMin->setSingleStep(1);
+    spinBoxResourceWoodOreMin->setValue(settings.value("MapOptions/defaultWoodOreMin", DEFAULT_RESOURCE_WOOD_ORE_MIN).toInt());
+
+    spinBoxResourceWoodOreMax = new QSpinBox(tabDefaults);
+    spinBoxResourceWoodOreMax->setMaximum(50);
+    spinBoxResourceWoodOreMax->setMinimum(3);
+    spinBoxResourceWoodOreMax->setSingleStep(1);
+    spinBoxResourceWoodOreMax->setValue(settings.value("MapOptions/defaultWoodOreMax", DEFAULT_RESOURCE_WOOD_ORE_MAX).toInt());
+
+    labelResourceWoodOre = new QLabel(this);
+    labelResourceWoodOre->setText(QApplication::translate("MapOptions", "Resource (wood, ore)", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutResourceWoodOre = new QHBoxLayout();
+    horizontalLayoutResourceWoodOre->addWidget(labelResourceWoodOre);
+    horizontalLayoutResourceWoodOre->addWidget(spinBoxResourceWoodOreMin);
+    horizontalLayoutResourceWoodOre->addWidget(spinBoxResourceWoodOreMax);
+
+    spinBoxResourceOtherMin = new QSpinBox(tabDefaults);
+    spinBoxResourceOtherMin->setMaximum(10);
+    spinBoxResourceOtherMin->setMinimum(1);
+    spinBoxResourceOtherMin->setSingleStep(1);
+    spinBoxResourceOtherMin->setValue(settings.value("MapOptions/defaultOtherMin", DEFAULT_RESOURCE_OTHER_MIN).toInt());
+
+    spinBoxResourceOtherMax = new QSpinBox(tabDefaults);
+    spinBoxResourceOtherMax->setMaximum(30);
+    spinBoxResourceOtherMax->setMinimum(3);
+    spinBoxResourceOtherMax->setSingleStep(1);
+    spinBoxResourceOtherMax->setValue(settings.value("MapOptions/defaultOtherMax", DEFAULT_RESOURCE_OTHER_MAX).toInt());
+
+    labelResourceOther = new QLabel(this);
+    labelResourceOther->setText(QApplication::translate("MapOptions", "Resource (other)", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutResourceOther = new QHBoxLayout();
+    horizontalLayoutResourceOther->addWidget(labelResourceOther);
+    horizontalLayoutResourceOther->addWidget(spinBoxResourceOtherMin);
+    horizontalLayoutResourceOther->addWidget(spinBoxResourceOtherMax);
+
+    verticalSpacerDefaults = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    verticalLayoutDefaults->addLayout(horizontalLayoutResourceGold);
+    verticalLayoutDefaults->addLayout(horizontalLayoutResourceWoodOre);
+    verticalLayoutDefaults->addLayout(horizontalLayoutResourceOther);
+    verticalLayoutDefaults->addItem(verticalSpacerDefaults);
+
     /* tab: authors/license */
     tabAuthorsLicense = new QWidget();
     verticalLayout9 = new QVBoxLayout(tabAuthorsLicense);
@@ -696,6 +781,7 @@ Form::MapOptions::MapOptions(MapData & map)
     tabWidget->addTab(tabInfo, QApplication::translate("MapOptions", "General Info", 0, QApplication::UnicodeUTF8));
     tabWidget->addTab(tabConditions, QApplication::translate("MapOptions", "Wins/Loss Condition", 0, QApplication::UnicodeUTF8));
     tabWidget->addTab(tabRumorsEvents, QApplication::translate("MapOptions", "Rumors and Events", 0, QApplication::UnicodeUTF8));
+    tabWidget->addTab(tabDefaults, QApplication::translate("MapOptions", "Default Values", 0, QApplication::UnicodeUTF8));
     tabWidget->addTab(tabAuthorsLicense, QApplication::translate("MapOptions", "Authors and License", 0, QApplication::UnicodeUTF8));
 
     pushButtonSave = new QPushButton(this);
@@ -736,11 +822,9 @@ Form::MapOptions::MapOptions(MapData & map)
 
     setConditionsBoxesMapValues(map);
 
-
-    QSize minSize = minimumSizeHint();
-
-    resize(minSize);
-    setMinimumSize(minSize);
+    // set size
+    setMinimumSize(minimumSizeHint());
+    resize(settings.value("MapOptions/size", minimumSize()).toSize());
 
     QObject::connect(lineEditName, SIGNAL(textChanged(const QString &)), this, SLOT(setEnableSaveButton(const QString &)));
     QObject::connect(plainTextEditDescription, SIGNAL(textChanged()), this, SLOT(setEnableSaveButton()));
@@ -759,6 +843,13 @@ Form::MapOptions::MapOptions(MapData & map)
     QObject::connect(listWidgetRumors, SIGNAL(mousePressed()), listWidgetEvents, SLOT(clearSelection()));
     QObject::connect(listWidgetEvents, SIGNAL(mousePressed()), listWidgetRumors, SLOT(clearSelection()));
 
+    QObject::connect(spinBoxResourceGoldMin, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
+    QObject::connect(spinBoxResourceGoldMax, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
+    QObject::connect(spinBoxResourceWoodOreMin, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
+    QObject::connect(spinBoxResourceWoodOreMax, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
+    QObject::connect(spinBoxResourceOtherMin, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
+    QObject::connect(spinBoxResourceOtherMax, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
+
     QObject::connect(plainTextEditAuthors, SIGNAL(textChanged()), this, SLOT(setEnableSaveButton()));
     QObject::connect(plainTextEditLicense, SIGNAL(textChanged()), this, SLOT(setEnableSaveButton()));
 
@@ -768,6 +859,20 @@ Form::MapOptions::MapOptions(MapData & map)
 
     QObject::connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
     QObject::connect(pushButtonSave, SIGNAL(clicked()), this, SLOT(accept()));
+
+    QObject::connect(this, SIGNAL(finished(int)), this, SLOT(saveSettings()));
+}
+
+void Form::MapOptions::saveSettings(void)
+{
+    QSettings & settings = Resource::localSettings();
+    settings.setValue("MapOptions/size", size());
+    settings.setValue("MapOptions/defaultGoldMin", spinBoxResourceGoldMin->value());
+    settings.setValue("MapOptions/defaultGoldMax", spinBoxResourceGoldMax->value());
+    settings.setValue("MapOptions/defaultWoodOreMin", spinBoxResourceWoodOreMin->value());
+    settings.setValue("MapOptions/defaultWoodOreMax", spinBoxResourceWoodOreMax->value());
+    settings.setValue("MapOptions/defaultOtherMin", spinBoxResourceOtherMin->value());
+    settings.setValue("MapOptions/defaultOtherMax", spinBoxResourceOtherMax->value());
 }
 
 void Form::MapOptions::setConditionsBoxesMapValues(const MapData & map)
@@ -1507,14 +1612,22 @@ Form::EditResource::EditResource()
 {
     setWindowTitle(QApplication::translate("DialogEditResource", "Edit Resource", 0, QApplication::UnicodeUTF8));
 
+    QSettings & settings = Resource::localSettings();
+    int min = 0;
+    int max = 0;
+
+    min = settings.value("MapOptions/defaultWoodOreMin", DEFAULT_RESOURCE_WOOD_ORE_MIN).toInt();
+    max = settings.value("MapOptions/defaultWoodOreMax", DEFAULT_RESOURCE_WOOD_ORE_MAX).toInt();
+
     checkBoxDefault = new QCheckBox(this);
     checkBoxDefault->setChecked(true);
-    checkBoxDefault->setText(QApplication::translate("DialogEditResource", "default (random: min-max)", 0, QApplication::UnicodeUTF8));
+    checkBoxDefault->setText(tr("default (random: %1-%2)").arg(min).arg(max));
 
     spinBoxCount = new QSpinBox(this);
     spinBoxCount->setEnabled(false);
-    spinBoxCount->setMinimum(1);
-    spinBoxCount->setMaximum(99);
+    spinBoxCount->setMinimum(min);
+    spinBoxCount->setMaximum(max);
+    spinBoxCount->setValue(min);
 
     labelCount = new QLabel(this);
     labelCount->setEnabled(false);

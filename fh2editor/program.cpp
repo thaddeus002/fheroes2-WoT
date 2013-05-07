@@ -20,7 +20,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <QCleanlooksStyle>
 #include <QCoreApplication>
 #include <QProcessEnvironment>
 #include <QRegExp>
@@ -35,11 +34,11 @@
 #include "dialogs.h"
 #include "program.h"
 
-#define PROGRAM_SHARE "fh2editor"
+#define PROGRAM_NAME "fh2editor"
 
 struct ProgramShareEnv : QRegExp
 {
-    ProgramShareEnv() : QRegExp(QString(PROGRAM_SHARE).toUpper() + "=(.+)"){}
+    ProgramShareEnv() : QRegExp(QString(PROGRAM_NAME).toUpper() + "=(.+)"){}
 
     bool operator() (const QString & str) const { return exactMatch(str); }
 };
@@ -47,6 +46,12 @@ struct ProgramShareEnv : QRegExp
 namespace Resource
 {
     QStringList shares;
+    QSettings   settings(QSettings::IniFormat, QSettings::UserScope, PROGRAM_NAME, "settings");
+
+    QSettings & localSettings(void)
+    {
+        return settings;
+    }
 
     const QStringList & ShareDirs(void)
     {
@@ -64,32 +69,13 @@ namespace Resource
 
 	return NULL;
     }
-/*
-    QString Path(const char* str, ...)
-    {
-	QStringList list;
 
-	for(const char** ptr = &str; *ptr != NULL; ++ptr)
-	    list.push_back(*ptr);
-
-	QString shortres = list.join(QDir::separator());
-
-	for(QStringList::const_iterator
-	    it = shares.begin(); it != shares.end(); ++it)
-	{
-	    QString fullres = QDir::toNativeSeparators(*it + QDir::separator() + shortres);
-	    if(QFile(fullres).exists()) return fullres;
-	}
-
-	return NULL;
-    }
-*/
     void InitShares(void)
     {
 	QStringList list;
 
-#ifdef BUILD_PROGRAM_SHARE
-	list.push_back(QDir::toNativeSeparators(QString(BUILD_PROGRAM_SHARE)));
+#ifdef BUILD_PROGRAM_NAME
+	list.push_back(QDir::toNativeSeparators(QString(BUILD_PROGRAM_NAME)));
 #endif
 
 	const QStringList & envs = QProcess::systemEnvironment();
@@ -100,15 +86,15 @@ namespace Resource
 	if(regExp.exactMatch(*it)){ list.push_back(QDir::toNativeSeparators(regExp.cap(1))); break; }
 
 	list.push_back(QDir::toNativeSeparators(QCoreApplication::applicationDirPath()));
-	list.push_back(QDir::toNativeSeparators(QDir::homePath() + QDir::separator() + "." + QString(PROGRAM_SHARE).toLower()));
+	list.push_back(QDir::toNativeSeparators(QDir::homePath() + QDir::separator() + "." + QString(PROGRAM_NAME).toLower()));
 
-	Resource::shares.clear();
+	shares.clear();
 
 	for(QStringList::const_iterator
 	    it = list.begin(); it != list.end(); ++it)
 	{
 	    qDebug() << "registry sharedir:" << *it;
-    	    Resource::shares.push_front(*it);
+    	    shares.push_front(*it);
 	}
     }
 }
@@ -120,8 +106,8 @@ int main(int argc, char *argv[])
     qsrand(std::time(0));
     QPixmapCache::setCacheLimit(40000);
 
-    QSettings settings("fheroes2", "editor");
-    QString dataFile = settings.value("dataFile", "").toString();
+    QSettings & settings = Resource::localSettings();
+    QString dataFile = settings.value("Main/dataFile", "").toString();
 
     if(! QFile(dataFile).exists())
     {
@@ -145,7 +131,7 @@ int main(int argc, char *argv[])
 	    dataFile = form.result;
 	}
 
-	settings.setValue("dataFile", dataFile);
+	settings.setValue("Main/dataFile", dataFile);
     }
 
     if(EditorTheme::load(dataFile))

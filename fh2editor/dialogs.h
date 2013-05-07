@@ -144,6 +144,7 @@ namespace Form
 	void			clickSelect(void);
 	void			accept(QListWidgetItem*);
 	void			selectionChanged(void);
+	void			saveSettings(void);
     };
 
     class SelectImageTab : public QDialog
@@ -281,6 +282,21 @@ namespace Form
         QVBoxLayout*		verticalLayout8;
         EventsList*		listWidgetEvents;
         QHBoxLayout*		horizontalLayoutButton;
+	QWidget*		tabDefaults;
+	QLabel*			labelResourceGold;
+	QLabel*			labelResourceWoodOre;
+	QLabel*			labelResourceOther;
+	QSpinBox*		spinBoxResourceGoldMin;
+	QSpinBox*		spinBoxResourceGoldMax;
+	QSpinBox*		spinBoxResourceWoodOreMin;
+	QSpinBox*		spinBoxResourceWoodOreMax;
+	QSpinBox*		spinBoxResourceOtherMin;
+	QSpinBox*		spinBoxResourceOtherMax;
+	QHBoxLayout*		horizontalLayoutResourceGold;
+	QHBoxLayout*		horizontalLayoutResourceWoodOre;
+	QHBoxLayout*		horizontalLayoutResourceOther;
+	QVBoxLayout*		verticalLayoutDefaults;
+	QSpacerItem*		verticalSpacerDefaults;
 	QWidget*		tabAuthorsLicense;
 	QVBoxLayout*		verticalLayout9;
 	QLabel*			labelAuthors;
@@ -304,6 +320,7 @@ namespace Form
 	void			setEnableSaveButton(void);
 	void			setEnableSaveButton(const QString &);
 	void			setConditionsBoxesMapValues(const MapData &);
+	void			saveSettings(void);
     };
 
     class RumorDialog : public QDialog

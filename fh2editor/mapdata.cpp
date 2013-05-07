@@ -1715,5 +1715,4 @@ void MapData::editObjectAttributes(void)
 {
     if(tileOverMouse)
 	tileOverMouse->editObjectDialog();
-    qDebug() << "edit object";
 }
