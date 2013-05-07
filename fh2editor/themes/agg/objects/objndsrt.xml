@@ -1,44 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects icn="objndsrt">
-    <template section="bottom_2x1" name="Ground Object 0" index="0" />
-    <template section="trees_2x1" name="Trees 2" index="2" />
-    <template section="trees_2x2" name="Trees 4" index="4" />
-    <template section="trees_2x2" name="Trees 7" index="7" />
-    <template section="trees_2x2" name="Trees 10" index="10" />
-    <template section="mound_3x1" name="Dune 13" index="13" />
-    <template section="mound_3x1" name="Dune 16" index="16" />
-    <template section="mound_3x1" name="Dune 19" index="19" />
-    <template section="mound_1x1" name="Dune 22" index="22" />
-    <template section="trees_2x1" name="Cactus 23" index="23" />
-    <template section="trees_2x1" name="Cactus 25" index="25" />
-    <template section="trees_2x1" name="Cactus 27" index="27" />
-    <template section="trees_2x1" name="Cactus 29" index="29" />
-    <template section="trees_1x1" name="Cactus 31" index="31" />
-    <template section="trees_1x1" name="Cactus 32" index="32" />
-    <template section="trees_2x1" name="Cactus 33" index="33" />
-    <template section="trees_2x1" name="Cactus 35" index="35" />
-    <template section="trees_2x2" name="Cactus 37" index="37" />
-    <template section="trees_1x1" name="Cactus 40" index="40" />
-    <template section="trees_2x1" name="Cactus 41" index="41" />
-    <template section="trees_2x2" name="Cactus 43" index="43" />
-    <template section="trees_2x2" name="Cactus 46" index="46" />
-    <template section="trees_1x1" name="Cactus 49" index="49" />
-    <template section="trees_2x1" name="Cactus 50" index="50" />
-    <template section="trees_2x1" name="Cactus 52" index="52" />
+    <template section="passable_2x1_2" name="Ground 0" index="0" />
+    <template section="bottom_2x1_1" name="Trees 2" index="2" cid="0x63" />
+    <template section="trees_2x2_1" name="Trees 4" index="4" />
+    <template section="trees_2x2_1" name="Trees 7" index="7" />
+    <template section="trees_2x2_1" name="Trees 10" index="10" />
+    <template section="bottom_3x1_2" name="Dune 13" index="13" cid="0x6E" />
+    <template section="bottom_3x1_2" name="Dune 16" index="16" cid="0x6E" />
+    <template section="bottom_3x1_2" name="Dune 19" index="19" cid="0x6E" />
+    <template section="bottom_1x1" name="Dune 22" index="22" cid="0x6E" />
+    <template section="bottom_2x1_1" name="Cactus 23" index="23" cid="0x6D" />
+    <template section="bottom_2x1_1" name="Cactus 25" index="25" cid="0x6D" />
+    <template section="bottom_2x1_1" name="Cactus 27" index="27" cid="0x6D" />
+    <template section="bottom_2x1_1" name="Cactus 29" index="29" cid="0x6D" />
+    <template section="bottom_1x1" name="Cactus 31" index="31" cid="0x6D" />
+    <template section="bottom_1x1" name="Cactus 32" index="32" cid="0x6D" />
+    <template section="bottom_2x1_1" name="Cactus 33" index="33" cid="0x6D" />
+    <template section="bottom_2x1_1" name="Cactus 35" index="35" cid="0x6D" />
+    <template section="trees_2x2_1" name="Cactus 37" index="37" cid="0x6D" />
+    <template section="bottom_1x1" name="Cactus 40" index="40" cid="0x6D" />
+    <template section="bottom_2x1_1" name="Cactus 41" index="41" cid="0x6D" />
+    <template section="trees_2x2_1" name="Cactus 43" index="43" cid="0x6D" />
+    <template section="trees_2x2_1" name="Cactus 46" index="46" cid="0x6D" />
+    <template section="bottom_1x1" name="Cactus 49" index="49" cid="0x6D" />
+    <template section="bottom_2x1_1" name="Cactus 50" index="50" cid="0x6D" />
+    <template section="bottom_2x1_1" name="Cactus 52" index="52" cid="0x6D" />
     <template section="campfire" name="Camp Fire" index="54" />
     <object name="Desert Tent" width="3" height="2" cid="0x22" >
         <sprite px="1" py="0" index="69" level="top" />
         <sprite px="2" py="0" index="70" level="top" />
-        <sprite px="0" py="1" index="71" level="shadow" />
+        <sprite px="0" py="1" index="71" level="top" />
         <sprite px="1" py="1" index="72" level="bottom" passable="0x01F8" />
         <sprite px="2" py="1" index="73" level="action" passable="0x01F8" />
     </object>
-    <template section="trees_2x2" name="Trees 74" index="74" />
+    <template section="trees_2x2_1" name="Trees 74" index="74" />
     <object name="Piramid" width="3" height="2" cid="0x4C" >
-        <sprite px="0" py="0" index="77" level="shadow" />
+        <sprite px="0" py="0" index="77" level="top" />
         <sprite px="1" py="0" index="78" level="top" />
         <sprite px="2" py="0" index="79" level="top" />
-        <sprite px="0" py="1" index="80" level="shadow" />
+        <sprite px="0" py="1" index="80" level="top" />
         <sprite px="1" py="1" index="81" level="bottom" passable="0x01F8" />
         <sprite px="2" py="1" index="82" level="action" passable="0x01F8" />
     </object>
@@ -48,7 +48,7 @@
     </object>
     <object name="Sphinx" width="3" height="2" cid="0x4F" >
 	<sprite px="1" py="0" index="85" level="top" />
-        <sprite px="0" py="1" index="86" level="shadow" />
+        <sprite px="0" py="1" index="86" level="top" />
         <sprite px="1" py="1" index="87" level="action" passable="0x01F8" />
         <sprite px="2" py="1" index="88" level="bottom" passable="0x01F8" />
     </object>

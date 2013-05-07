@@ -274,23 +274,6 @@ public:
     }
 };
 
-QMap<int, QString> GetIDObjects(const QString & dataFolder)
-{
-    Editor::MyXML objectsElem(EditorTheme::resourceFile(dataFolder, "objects.xml"), "objects");
-    QDomNodeList objectsList = objectsElem.elementsByTagName("class");
-
-    QMap<int, QString> res;
-
-    for(int pos = 0; pos < objectsList.size(); ++pos)
-    {
-        QDomElement classElem = objectsList.item(pos).toElement();
-	int index = classElem.attribute("id").toInt(NULL, 0);
-	res[index] = classElem.attribute("name");
-    }
-
-    return res;
-}
-
 Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QString & dataFolder)
 {
     verticalLayout = new QVBoxLayout(this);
@@ -301,15 +284,14 @@ Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QStrin
     listWidget->setWrapping(true);
     listWidget->setResizeMode(QListView::Adjust);
 
-    const QMap<int, QString> objectsID = GetIDObjects(dataFolder);
+    QMap<int, QString> objectsID;
+
+    for(int index = 0; index < 0x80; ++index)
+	objectsID[index] = MapObj::transcribe(index);
 
     Editor::MyXML templateObjects(EditorTheme::resourceFile(dataFolder, "template.xml"), "template");
     Editor::MyXML objectsElem(EditorTheme::resourceFile(dataFolder, groupElem.attribute("file")), "objects");
     QString icn = objectsElem.attribute("icn");
-    int cid = MapObj::Unknown;
-
-    if(objectsElem.hasAttribute("cid"))
-        cid = objectsElem.attribute("cid").toInt(NULL, 0);
 
     if(! objectsElem.isNull())
     {
@@ -318,7 +300,9 @@ Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QStrin
 
         for(int pos1 = 0; pos1 < objectsList.size(); ++pos1)
         {
-            CompositeObject obj(icn, objectsList.item(pos1).toElement(), 0, cid);
+            QDomElement objElem = objectsList.item(pos1).toElement();
+	    int cid = objElem.hasAttribute("cid") ? objElem.attribute("cid").toInt(NULL, 0) : MapObj::None;
+            CompositeObject obj(icn, objElem, 0, cid);
 
             if(obj.isValid())
 		listWidget->addItem(new SelectImageItem(obj, objectsID));
@@ -334,15 +318,27 @@ Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QStrin
             if(! templateObjects.isNull() && tmplElem.hasAttribute("section"))
             {
                 QDomElement objElem = templateObjects.firstChildElement(tmplElem.attribute("section"));
+
+		if(objElem.isNull())
+		{
+		    qDebug() << "unknown xml section:" << tmplElem.attribute("section") << "file:" << groupElem.attribute("file");
+		    continue;
+		}
+
                 int startIndex = tmplElem.attribute("index").toInt();
 
                 // override tags: icn
                 if(tmplElem.hasAttribute("icn"))
                     icn = tmplElem.attribute("icn");
 
+		int cid = MapObj::None;
+
                 // override tags: cid
+                if(objElem.hasAttribute("cid"))
+		    cid = objElem.attribute("cid").toInt(NULL, 0);
+
                 if(tmplElem.hasAttribute("cid"))
-		    cid = objectsElem.attribute("cid").toInt(NULL, 0);
+		    cid = tmplElem.attribute("cid").toInt(NULL, 0);
 
                 CompositeObject obj(icn, objElem, startIndex, cid);
 

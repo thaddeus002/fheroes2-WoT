@@ -31,6 +31,10 @@
 #include <QGraphicsScene>
 #include <QAction>
 
+QT_BEGIN_NAMESPACE
+class QDomElement;
+QT_END_NAMESPACE
+
 #include "engine.h"
 
 class MapTile;
@@ -86,7 +90,6 @@ class MapTileExt
     quint8		spriteExt;
     quint8		spriteIndex;
     quint8		spriteLevel;
-    quint8		tmp;
     quint32		spriteUID;
 
 public:
@@ -111,6 +114,7 @@ public:
     static bool		isMiniHero(const MapTileExt*);
     static bool		isTown(const MapTileExt*);
     static bool		isRandomTown(const MapTileExt*);
+    static int		loyaltyObject(const MapTileExt*);
 };
 
 class MapTileLevels : public QList<MapTileExt*>
@@ -128,6 +132,7 @@ public:
 class MapTile : public QGraphicsPixmapItem
 {
 public:
+    MapTile();
     MapTile(const mp2til_t &, const QPoint &);
     MapTile(const MapTile &);
 
@@ -139,6 +144,8 @@ public:
     static QString	indexString(int);
 
     const QPoint &	mapPos(void) const { return mpos; }
+    int			basePassable(void) const { return passableBase; }
+    int			localPassable(void) const { return passableLocal; }
     void		paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget* = 0);
     void		loadSpriteLevels(const mp2ext_t &);
     void		sortSpritesLevels(void);
@@ -149,12 +156,20 @@ public:
     const MapTileLevels & levels2(void) const { return spritesLevel2; }
 
     bool		isAction(void) const;
+    int			object(void) const;
 
 protected:
     static void		loadSpriteLevel(MapTileLevels &, int, const mp2lev_t &);
 
-    mp2til_t		til;
+    friend		QDomElement & operator<< (QDomElement &, const MapTile &);
+    friend		QDomElement & operator>> (QDomElement &, MapTile &);
+
     QPoint		mpos;
+
+    int			tileSprite;
+    int			tileShape;
+    int			objectID;
+    int			objectOld;
 
     MapTileLevels	spritesLevel1;
     MapTileLevels	spritesLevel2;
@@ -163,9 +178,15 @@ protected:
     quint16		passableLocal;
 };
 
+QDomElement & operator<< (QDomElement &, const MapTile &);
+QDomElement & operator>> (QDomElement &, MapTile &);
+
 class MapTiles : public QList<MapTile*>
 {
     QSize		msize;
+
+    friend		QDomElement & operator<< (QDomElement &, const MapTiles &);
+    friend		QDomElement & operator>> (QDomElement &, MapTiles &);
 
 public:
     MapTiles() {}
@@ -191,6 +212,9 @@ public:
     void		insertToScene(QGraphicsScene &) const;
     QString		sizeDescription(void) const;
 };
+
+QDomElement & operator<< (QDomElement &, const MapTiles &);
+QDomElement & operator>> (QDomElement &, MapTiles &);
 
 class MapArea
 {

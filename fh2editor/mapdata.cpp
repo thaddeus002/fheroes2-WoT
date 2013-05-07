@@ -37,12 +37,12 @@
 #include "mapdata.h"
 
 MapTileExt::MapTileExt(int lvl, const mp2lev_t & ext)
-    : spriteICN(H2::mapICN(ext.object)), spriteExt(ext.object), spriteIndex(ext.index), spriteLevel(lvl), tmp(0), spriteUID(ext.uniq)
+    : spriteICN(H2::mapICN(ext.object)), spriteExt(ext.object), spriteIndex(ext.index), spriteLevel(lvl), spriteUID(ext.uniq)
 {
 }
 
 MapTileExt::MapTileExt(int icn, const CompositeSprite & cs, quint32 uid)
-    : spriteICN(icn), spriteExt(0), spriteIndex(cs.spriteIndex), spriteLevel(0), tmp(0), spriteUID(uid)
+    : spriteICN(icn), spriteExt(0), spriteIndex(cs.spriteIndex), spriteLevel(0), spriteUID(uid)
 {
     if(cs.spriteAnimation)
 	spriteExt |= 0x01;
@@ -102,6 +102,76 @@ bool MapTileExt::isMapEvent(const MapTileExt* te)
     return ICN::OBJNMUL2 == te->spriteICN && 163 == te->spriteIndex;
 }
 
+int MapTileExt::loyaltyObject(const MapTileExt* te)
+{
+    switch(te->spriteICN)
+    {
+        case ICN::X_LOC1:
+            if(te->spriteIndex == 3) return MapObj::AlchemyTower | MapObj::IsAction;
+            else
+            if(te->spriteIndex < 3) return MapObj::AlchemyTower;
+            else
+            if(70 == te->spriteIndex) return MapObj::Arena | MapObj::IsAction;
+            else
+            if(3 < te->spriteIndex && te->spriteIndex < 72) return MapObj::Arena;
+            else
+            if(77 == te->spriteIndex) return MapObj::BarrowMounds | MapObj::IsAction;
+            else
+            if(71 < te->spriteIndex && te->spriteIndex < 78) return MapObj::BarrowMounds;
+            else
+            if(94 == te->spriteIndex) return MapObj::EarthAltar | MapObj::IsAction;
+            else
+            if(77 < te->spriteIndex && te->spriteIndex < 112) return MapObj::EarthAltar;
+            else
+            if(118 == te->spriteIndex) return MapObj::AirAltar | MapObj::IsAction;
+            else
+            if(111 < te->spriteIndex && te->spriteIndex < 120) return MapObj::AirAltar;
+            else
+            if(127 == te->spriteIndex) return MapObj::FireAltar | MapObj::IsAction;
+            else
+            if(119 < te->spriteIndex && te->spriteIndex < 129) return MapObj::FireAltar;
+            else
+            if(135 == te->spriteIndex) return MapObj::WaterAltar | MapObj::IsAction;
+            else
+            if(128 < te->spriteIndex && te->spriteIndex < 137) return MapObj::WaterAltar;
+            break;
+
+        case ICN::X_LOC2:
+            if(te->spriteIndex == 4) return MapObj::Stables | MapObj::IsAction;
+            else
+            if(te->spriteIndex < 4) return MapObj::Stables;
+            else
+            if(te->spriteIndex == 9) return MapObj::Jail | MapObj::IsAction;
+            else
+            if(4 < te->spriteIndex && te->spriteIndex < 10) return MapObj::Jail;
+            else
+            if(te->spriteIndex == 37) return MapObj::Mermaid | MapObj::IsAction;
+            else
+            if(9 < te->spriteIndex && te->spriteIndex < 47) return MapObj::Mermaid;
+            else
+            if(te->spriteIndex == 101) return MapObj::Sirens | MapObj::IsAction;
+            else
+            if(46 < te->spriteIndex && te->spriteIndex < 111) return MapObj::Sirens;
+            else
+            if(110 < te->spriteIndex && te->spriteIndex < 136) return MapObj::Reefs;
+            break;
+
+        case ICN::X_LOC3:
+            if(te->spriteIndex == 30) return MapObj::HutMagi | MapObj::IsAction;
+            else
+            if(te->spriteIndex < 32) return MapObj::HutMagi;
+            else
+            if(te->spriteIndex == 50) return MapObj::EyeMagi | MapObj::IsAction;
+            else
+            if(31 < te->spriteIndex && te->spriteIndex < 59) return MapObj::EyeMagi;
+            break;
+
+        default: break;
+    }
+
+    return MapObj::None;
+}
+
 MapTileLevels::MapTileLevels(const MapTileLevels & other)
     : QList<MapTileExt*>()
 {
@@ -145,7 +215,7 @@ QString MapTileLevels::infoString(void) const
     {
 	ss <<
 	    "uniq:   " << (*it)->uid() << endl <<
-	    "object: " << H2::icnString((*it)->icn()) << ", " <<  (*it)->index() << endl <<
+	    "sprite: " << H2::icnString((*it)->icn()) << ", " <<  (*it)->index() << endl <<
 	    "level:  " << (*it)->level() << endl;
     }
 
@@ -159,33 +229,74 @@ const MapTileExt* MapTileLevels::find(bool (*pf)(const MapTileExt*)) const
 }
 
 MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos)
-    : til(mp2), mpos(pos), passableBase(0), passableLocal(0xFFFF)
+    : mpos(pos), tileSprite(mp2.tileSprite), tileShape(mp2.tileShape % 4), objectID(mp2.objectID), objectOld(mp2.objectID),
+	passableBase(Direction::All), passableLocal(Direction::All)
 {
     const QSize & tileSize = EditorTheme::tileSize();
     QPoint offset(mpos.x() * tileSize.width(), mpos.y() * tileSize.height());
     setOffset(offset);
     setFlags(QGraphicsItem::ItemIsSelectable);
-    setTileSprite(til.tileSprite, til.tileShape);
-    loadSpriteLevel(spritesLevel1, 0, mp2.level1);
-    loadSpriteLevel(spritesLevel2, 0, mp2.level2);
+    setTileSprite(tileSprite, tileShape);
+    loadSpriteLevels(mp2.ext);
+
+    // fix MP2 objects
+    switch(mp2.objectID)
+    {
+	// Shrub2
+        case 0x38:      objectID = MapObj::Shrub; break;
+	// Nothing Special
+        case 0x39:      objectID = MapObj::None; break;
+        case 0xE9:      objectID = MapObj::Reefs; break;
+	// change treasurechest to waterchest
+        case 0x86:      objectID = EditorTheme::ground(tileSprite) != Ground::Water ? MapObj::TreasureChest : MapObj::WaterChest; break;
+	// fix loyalty obj
+        case 0x79:
+        case 0x7A:
+        case 0xF9:
+        case 0xFA:	objectID = MapObj::None; break;
+
+        default: break;
+    }
+
+    if(objectID == MapObj::None)
+    {
+	for(MapTileLevels::const_iterator
+	    it = spritesLevel1.begin(); it != spritesLevel1.end() && objectID == MapObj::None; ++it)
+	    objectID = MapTileExt::loyaltyObject(*it);
+
+	if(objectID == MapObj::None)
+	{
+	    for(MapTileLevels::const_iterator
+		it = spritesLevel2.begin(); it != spritesLevel2.end() && objectID == MapObj::None; ++it)
+		objectID = MapTileExt::loyaltyObject(*it);
+
+	}
+    }
 }
 
 MapTile::MapTile(const MapTile & other)
-    : QGraphicsPixmapItem(), til(other.til), mpos(other.mpos), spritesLevel1(other.spritesLevel1), spritesLevel2(other.spritesLevel2),
-	passableBase(other.passableBase), passableLocal(other.passableLocal)
+    : QGraphicsPixmapItem(), mpos(other.mpos), tileSprite(other.tileSprite), tileShape(other.tileShape), objectID(MapObj::None),
+	spritesLevel1(other.spritesLevel1), spritesLevel2(other.spritesLevel2), passableBase(other.passableBase), passableLocal(other.passableLocal)
 {
     setFlags(QGraphicsItem::ItemIsSelectable);
-    setTileSprite(til.tileSprite, til.tileShape);
+    setTileSprite(tileSprite, tileShape);
+}
+
+MapTile::MapTile()
+    : QGraphicsPixmapItem(), tileSprite(0), tileShape(0), objectID(MapObj::None), passableBase(Direction::All), passableLocal(Direction::All)
+{
+    setFlags(QGraphicsItem::ItemIsSelectable);
+    setTileSprite(tileSprite, tileShape);
 }
 
 void MapTile::setTileSprite(int index, int rotate)
 {
-    til.tileSprite = index;
-    til.tileShape = rotate;
+    tileSprite = index;
+    tileShape = rotate % 4;
 
-    QPixmap sprite = EditorTheme::getImageTIL("GROUND32.TIL", til.tileSprite);
+    QPixmap sprite = EditorTheme::getImageTIL("GROUND32.TIL", tileSprite);
 
-    switch(til.tileShape % 4)
+    switch(tileShape)
     {
 	case 1: setPixmap(sprite.transformed(QTransform().scale( 1, -1))); break;
 	case 2: setPixmap(sprite.transformed(QTransform().scale(-1,  1))); break;
@@ -201,7 +312,7 @@ QRectF MapTile::boundingRect(void) const
 
 int MapTile::groundType(void) const
 {
-    return EditorTheme::ground(til.tileSprite);
+    return EditorTheme::ground(tileSprite);
 }
 
 QString MapTile::indexString(int index)
@@ -234,12 +345,13 @@ void MapTile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, Q
 
 void MapTile::showInfo(void) const
 {
-    QString str, msg;
-    QTextStream ss1(& str), ss2(& msg);
+    QString msg;
+    QTextStream ss2(& msg);
 
-    ss1 << "Tile" << "(" << mpos.x() << "," << mpos.y() << ")";
-    ss2 << "tile sprite: " << til.tileSprite << endl \
-	<< "tile rotate:  " << til.tileShape << endl;
+    ss2 << "tile pos:    " << mpos.x() << ", " << mpos.y() << endl \
+	<< "tile sprite: " << tileSprite << endl \
+	<< "tile rotate: " << tileShape << endl \
+	<< "object:      " << MapObj::transcribe(objectID) << " (" << objectOld << "," << objectID << ")" << endl;
 
     ss2 << "----------------------" << endl;
 
@@ -253,7 +365,7 @@ void MapTile::showInfo(void) const
 	ss2 << spritesLevel2.infoString() <<
 	    "----------------------" << endl;
 
-    QMessageBox::information(NULL, str, msg);
+    QMessageBox::information(NULL, "Tile Info", msg);
 }
 
 void MapTile::loadSpriteLevel(MapTileLevels & list, int level, const mp2lev_t & ext)
@@ -269,7 +381,12 @@ void MapTile::loadSpriteLevel(MapTileLevels & list, int level, const mp2lev_t & 
 
 bool MapTile::isAction(void) const
 {
-    return til.objectID & 0x80;
+    return objectID & 0x80;
+}
+
+int MapTile::object(void) const
+{
+    return objectID & 0x7F;
 }
 
 void MapTile::loadSpriteLevels(const mp2ext_t & mp2)
@@ -293,6 +410,48 @@ void MapTile::addSpriteSection(int icn, const CompositeSprite & cs, quint32 uid)
 	spritesLevel2 << new MapTileExt(icn, cs, uid);
     else
 	spritesLevel1 << new MapTileExt(icn, cs, uid);
+}
+
+QDomElement & operator<< (QDomElement & el, const MapTile & tile)
+{
+    el << tile.mpos;
+
+    el.setAttribute("base", tile.passableBase);
+    el.setAttribute("local", tile.passableLocal);
+
+    el.setAttribute("tileSprite", tile.tileSprite);
+    el.setAttribute("tileShape", tile.tileShape);
+    el.setAttribute("objectID", tile.objectID);
+
+//    el.setAttribute("quantity1", tile.til.quantity1);
+//    el.setAttribute("quantity2", tile.til.quantity2);
+
+//    quint16     indexExt;
+//    mp2lev_t    level1;
+//    mp2lev_t    level2;
+
+/*
+    : til(mp2)
+    const QSize & tileSize = EditorTheme::tileSize();
+    QPoint offset(mpos.x() * tileSize.width(), mpos.y() * tileSize.height());
+    setOffset(offset);
+    setFlags(QGraphicsItem::ItemIsSelectable);
+    setTileSprite(tileSprite, tileShape);
+    loadSpriteLevel(spritesLevel1, 0, mp2.level1);
+    loadSpriteLevel(spritesLevel2, 0, mp2.level2);
+*/
+
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, MapTile & tile)
+{
+    el >> tile.mpos;
+
+    tile.passableBase = el.hasAttribute("base") ? el.attribute("base").toInt() : Direction::All;
+    tile.passableLocal = el.hasAttribute("local") ? el.attribute("local").toInt() : Direction::All;
+
+    return el;
 }
 
 MapTiles::MapTiles(const MapTiles & tiles, const QRect & area) : msize(area.size())
@@ -345,7 +504,7 @@ bool MapTiles::importMap(const QSize & sz, const QVector<mp2til_t> & mp2Tiles, c
 	{
 	    const mp2til_t & mp2til = mp2Tiles[indexPoint(QPoint(xx, yy))];
 	    push_back(new MapTile(mp2til, QPoint(xx, yy)));
-	    int ext = mp2til.indexExt;
+	    int ext = mp2til.ext.indexExt;
 
 	    while(ext)
 	    {
@@ -441,6 +600,38 @@ void MapTiles::insertToScene(QGraphicsScene & scene) const
 {
     for(const_iterator it = begin(); it != end(); ++it)
 	scene.addItem(*it);
+}
+
+QDomElement & operator<< (QDomElement & el, const MapTiles & tiles)
+{
+    el << tiles.msize;
+
+    for(MapTiles::const_iterator
+	it = tiles.begin(); it != tiles.end(); ++it)
+    {
+	QDomElement elem = el.ownerDocument().createElement("tile");
+	el.appendChild(elem);
+	elem << **it;
+    }
+
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, MapTiles & tiles)
+{
+    el >> tiles.msize;
+
+    tiles.clear();
+    QDomNodeList nodeList = el.elementsByTagName("tile");
+
+    for(int pos = 0; pos < nodeList.size(); ++pos)
+    {
+	QDomElement elem = nodeList.item(pos).toElement();
+	tiles << new MapTile();
+	elem >> *tiles.back();
+    }
+
+    return el;
 }
 
 void MapArea::importMP2Towns(const QVector<H2::TownPos> & towns)
@@ -1364,20 +1555,9 @@ void MapData::SaveTest(void) const
 
 
     QDomElement etiles = doc.createElement("tiles");
-    etiles.setAttribute("width", mapTiles.mapSize().width());
-    etiles.setAttribute("height", mapTiles.mapSize().height());
     emap.appendChild(etiles);
 
-    // map tiles
-    for(MapTiles::const_iterator
-	it = mapTiles.begin(); it != mapTiles.end(); ++it)
-    {
-	QDomElement etile = doc.createElement("tile");
-	etiles.appendChild(etile);
-
-	etile.setAttribute("posx", (*it)->mapPos().x());
-	etile.setAttribute("posy", (*it)->mapPos().y());
-    }
+    etiles << mapTiles;
 
     doc.insertBefore(doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\""), doc.firstChild());
 

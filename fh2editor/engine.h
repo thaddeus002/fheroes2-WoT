@@ -86,26 +86,6 @@ namespace Building
 	    Upgrades = Upgrade2 | Upgrade3 | Upgrade4 | Upgrade5 | Upgrade6 | Upgrade7 };
 }
 
-namespace MapObj
-{
-    enum { Unknown = 0, AlchemyLab = 0x01, Sign = 0x02, Buoy = 0x03, Skeleton = 0x04, DaemonCave = 0x05, TreasureChest = 0x06, FaerieRing = 0x07,
-	    CampFire = 0x08, Fountain = 0x09, Gazebo = 0x0A, AncientLamp = 0x0B, Graveyard = 0x0C, ArcherHouse = 0x0D, GoblinHut = 0x0E, DwarfCott = 0x0F,
-	    PeasantHut = 0x10, Unused17 = 0x11, Unused18 = 0x12, Event = 0x13, DragonCity = 0x14, LightHouse = 0x15, WaterWheel = 0x16, Mines = 0x17,
-	    Monster = 0x18, Obelisk = 0x19, Oasis = 0x1A, Resource = 0x1B, Coast = 0x1C, SawMill = 0x1D, Oracle = 0x1E, Shrine1 = 0x1F, ShipWreck = 0x20,
-	    Unused33 = 0x21, DesertTent = 0x22, Castle = 0x23, StoneLights = 0x24, WagonCamp = 0x25, WaterChest = 0x26, WhirlPool = 0x27, WindMill = 0x28,
-	    Artifact = 0x29, Reefs = 0x2A, Boat = 0x2B, RndUltimateArtifact = 0x2C, RndArtifact = 0x2D, RndResource = 0x2E, RndMonster = 0x2F, 
-	    RndTown = 0x30, RndCastle = 0x31, Mermaid = 0x32, RndMonster1 = 0x33, RndMonster2 = 0x34, RndMonster3 = 0x35, RndMonster4 = 0x36, Heroes = 0x37,
-	    Sirens = 0x38, HutMagi = 0x39, WatchTower = 0x3A, TreeHouse = 0x3B, TreeCity = 0x3C, Ruins = 0x3D, Fort = 0x3E, TradingPost = 0x3F,
-	    AbandonedMine = 0x40, ThatchedHut = 0x41, StandingStones = 0x42, Idol = 0x43, TreeKnowledge = 0x44, DoctorHut = 0x45, Temple = 0x46,
-	    HillFort = 0x47, HalflingHole = 0x48, MercenaryCamp = 0x49, Shrine2 = 0x4A, Shrine3 = 0x4B, Pyramid = 0x4C, CityDead = 0x4D, Excavation = 0x4E,
-	    Sphinx = 0x4F, Wagon = 0x50, Tarpit = 0x51, ArtesianSpring = 0x52, TrollBridge = 0x53, WateringHole = 0x54, WitchsHut = 0x55, Xanadu = 0x56,
-	    Cave = 0x57, Leanto = 0x58, MagellanMaps = 0x59, FlotSam = 0x5A, DerelictShip = 0x5B, ShipwreckSurviror = 0x5C, Bottle = 0x5D, MagicWell = 0x5E,
-	    MagicGarden = 0x5F, ObservationTower = 0x60, FreemanFoundry = 0x61, EyeMagi = 0x62, Trees = 0x63, Mounts = 0x64, Volcano = 0x65, Flowers = 0x66,
-	    Stones = 0x67, WaterLake = 0x68, Mandrake = 0x69, DeadTree = 0x6A, Stump = 0x6B, Crater = 0x6C, Cactus = 0x6D, Mound = 0x6E, Dune = 0x6F,
-	    LavaPool = 0x70, Shrub = 0x71, Arena = 0x72, BarrowMounds = 0x73, RndArtifact1 = 0x74, RndArtifact2 = 0x75, RndArtifact3 = 0x76, Barrier = 0x77,
-	    TravellerTent = 0x78, AlchemyTower = 0x79, Stables = 0x7A, Jail = 0x7B, FireAltar = 0x7C, AirAltar = 0x7D, EarthAltar = 0x7E, WaterAltar = 0x7F,
-	    IsAction = 0x80 };
-}
 
 namespace SpriteLevel
 {
@@ -168,20 +148,6 @@ struct mp2lev_t
     quint32	uniq;
 };
 
-struct mp2til_t
-{
-    mp2til_t();
-
-    quint16     tileSprite;
-    quint8      quantity1;
-    quint8      quantity2;
-    quint8      tileShape;
-    quint8      objectID;
-    quint16     indexExt;
-    mp2lev_t	level1;
-    mp2lev_t	level2;
-};
-
 struct mp2ext_t
 {
     mp2ext_t();
@@ -191,6 +157,19 @@ struct mp2ext_t
     mp2lev_t	level1;
     mp2lev_t	level2;
 };
+
+struct mp2til_t
+{
+    mp2til_t();
+
+    quint16     tileSprite;
+    quint8      quantity1;
+    quint8      quantity2;
+    quint8      tileShape;
+    quint8      objectID;
+    mp2ext_t	ext;
+};
+
 
 struct mp2pos_t
 {
@@ -298,6 +277,29 @@ QDataStream & operator>> (QDataStream &, mp2dayevent_t &);
 QDataStream & operator>> (QDataStream &, mp2rumor_t &);
 QDataStream & operator>> (QDataStream &, mp2sphinx_t &);
 
+namespace MapObj
+{
+    enum { None = 0, AlchemyLab = 0x01, Sign = 0x02, Buoy = 0x03, Skeleton = 0x04, DaemonCave = 0x05, TreasureChest = 0x06, FaerieRing = 0x07,
+	    CampFire = 0x08, Fountain = 0x09, Gazebo = 0x0A, AncientLamp = 0x0B, Graveyard = 0x0C, ArcherHouse = 0x0D, GoblinHut = 0x0E, DwarfCott = 0x0F,
+	    PeasantHut = 0x10, Unused17 = 0x11, Unused18 = 0x12, Event = 0x13, DragonCity = 0x14, LightHouse = 0x15, WaterWheel = 0x16, Mines = 0x17,
+	    Monster = 0x18, Obelisk = 0x19, Oasis = 0x1A, Resource = 0x1B, Coast = 0x1C, SawMill = 0x1D, Oracle = 0x1E, Shrine1 = 0x1F, ShipWreck = 0x20,
+	    Unused33 = 0x21, DesertTent = 0x22, Castle = 0x23, StoneLights = 0x24, WagonCamp = 0x25, WaterChest = 0x26, WhirlPool = 0x27, WindMill = 0x28,
+	    Artifact = 0x29, Reefs = 0x2A, Boat = 0x2B, RndUltimateArtifact = 0x2C, RndArtifact = 0x2D, RndResource = 0x2E, RndMonster = 0x2F, 
+	    RndTown = 0x30, RndCastle = 0x31, Mermaid = 0x32, RndMonster1 = 0x33, RndMonster2 = 0x34, RndMonster3 = 0x35, RndMonster4 = 0x36, Heroes = 0x37,
+	    Sirens = 0x38, HutMagi = 0x39, WatchTower = 0x3A, TreeHouse = 0x3B, TreeCity = 0x3C, Ruins = 0x3D, Fort = 0x3E, TradingPost = 0x3F,
+	    AbandonedMine = 0x40, ThatchedHut = 0x41, StandingStones = 0x42, Idol = 0x43, TreeKnowledge = 0x44, DoctorHut = 0x45, Temple = 0x46,
+	    HillFort = 0x47, HalflingHole = 0x48, MercenaryCamp = 0x49, Shrine2 = 0x4A, Shrine3 = 0x4B, Pyramid = 0x4C, CityDead = 0x4D, Excavation = 0x4E,
+	    Sphinx = 0x4F, Wagon = 0x50, Tarpit = 0x51, ArtesianSpring = 0x52, TrollBridge = 0x53, WateringHole = 0x54, WitchsHut = 0x55, Xanadu = 0x56,
+	    Cave = 0x57, Leanto = 0x58, MagellanMaps = 0x59, FlotSam = 0x5A, DerelictShip = 0x5B, ShipwreckSurviror = 0x5C, Bottle = 0x5D, MagicWell = 0x5E,
+	    MagicGarden = 0x5F, ObservationTower = 0x60, FreemanFoundry = 0x61, EyeMagi = 0x62, Trees = 0x63, Mounts = 0x64, Volcano = 0x65, Flowers = 0x66,
+	    Stones = 0x67, WaterLake = 0x68, Mandrake = 0x69, DeadTree = 0x6A, Stump = 0x6B, Crater = 0x6C, Cactus = 0x6D, Mound = 0x6E, Dune = 0x6F,
+	    LavaPool = 0x70, Shrub = 0x71, Arena = 0x72, BarrowMounds = 0x73, RndArtifact1 = 0x74, RndArtifact2 = 0x75, RndArtifact3 = 0x76, Barrier = 0x77,
+	    TravellerTent = 0x78, AlchemyTower = 0x79, Stables = 0x7A, Jail = 0x7B, FireAltar = 0x7C, AirAltar = 0x7D, EarthAltar = 0x7E, WaterAltar = 0x7F,
+	    IsAction = 0x80 };
+
+    QString transcribe(int);
+}
+
 struct CompositeSprite
 {
     int		spriteIndex;
@@ -317,7 +319,7 @@ struct CompositeObject : public QVector<CompositeSprite>
     QPair<QString, int> icn;
     int		classId;
 
-    CompositeObject() : classId(MapObj::Unknown) {}
+    CompositeObject() : classId(MapObj::None) {}
     CompositeObject(const QString &, const QDomElement &, int, int);
 
     bool	isValid(void) const;
@@ -727,5 +729,11 @@ struct ListStringPos : public QList< QPair<QString, QPoint> >
 {
     ListStringPos() {}
 };
+
+QDomElement & operator<< (QDomElement &, const QSize &);
+QDomElement & operator>> (QDomElement &, QSize &);
+
+QDomElement & operator<< (QDomElement &, const QPoint &);
+QDomElement & operator>> (QDomElement &, QPoint &);
 
 #endif

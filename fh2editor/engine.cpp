@@ -334,7 +334,6 @@ mp2til_t::mp2til_t()
     quantity2 = 0;
     tileShape = 0;
     objectID = 0;
-    indexExt = 0;
 }
 
 mp2ext_t::mp2ext_t()
@@ -346,12 +345,13 @@ mp2ext_t::mp2ext_t()
 QDataStream & operator>> (QDataStream & ds, mp2til_t & til)
 {
     ds.setByteOrder(QDataStream::LittleEndian);
+    til.ext.quantity = 0;
     return ds >> til.tileSprite >>
-	til.level1.object >> til.level1.index >>
+	til.ext.level1.object >> til.ext.level1.index >>
 	til.quantity1 >> til.quantity2 >>
-	til.level2.object >> til.level2.index >>
+	til.ext.level2.object >> til.ext.level2.index >>
 	til.tileShape >> til.objectID >>
-	til.indexExt >> til.level1.uniq >> til.level2.uniq;
+	til.ext.indexExt >> til.ext.level1.uniq >> til.ext.level2.uniq;
 }
 
 QDataStream & operator>> (QDataStream & ds, mp2ext_t & ext)
@@ -1953,9 +1953,6 @@ CompositeObject::CompositeObject(const QString & obj, const QDomElement & elem, 
     if(0 > icnStr.lastIndexOf(".ICN")) icnStr.append(".ICN");
     icn = qMakePair(icnStr, H2::mapICN(icnStr));
 
-    if(elem.hasAttribute("cid"))
-	classId = elem.attribute("cid").toInt(NULL, 0);
-
     QDomNodeList list = elem.elementsByTagName("sprite");
     for(int pos = 0; pos < list.size(); ++pos)
 	push_back(CompositeSprite(list.item(pos).toElement(), templateIndex));
@@ -2100,4 +2097,50 @@ QVector<int> Color::colors(int v)
     if(Orange & v) res.push_back(Orange);
     if(Purple & v) res.push_back(Purple);
     return res;
+}
+
+QDomElement & operator<< (QDomElement & el, const QSize & sz)
+{
+    el.setAttribute("width", sz.width());
+    el.setAttribute("height", sz.height());
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, QSize & sz)
+{
+    sz.setWidth(el.hasAttribute("width") ? el.attribute("width").toInt() : 0);
+    sz.setHeight(el.hasAttribute("height") ? el.attribute("height").toInt() : 0);
+    return el;
+}
+
+QDomElement & operator<< (QDomElement & el, const QPoint & pt)
+{
+    el.setAttribute("posx", pt.x());
+    el.setAttribute("posy", pt.y());
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, QPoint & pt)
+{
+    pt.setX(el.hasAttribute("posx") ? el.attribute("posx").toInt() : 0);
+    pt.setY(el.hasAttribute("posy") ? el.attribute("posy").toInt() : 0);
+    return el;
+}
+
+QString MapObj::transcribe(int index)
+{
+    const char* names[] = { "None", "AlchemyLab", "Sign", "Buoy", "Skeleton", "DaemonCave", "TreasureChest", "FaerieRing", "CampFire", "Fountain",
+	"Gazebo", "AncientLamp", "Graveyard", "ArcherHouse", "GoblinHut", "DwarfCott", "PeasantHut", "Unused17", "Unused18", "Event", "DragonCity",
+	"LightHouse", "WaterWheel", "Mines", "Monster", "Obelisk", "Oasis", "Resource", "Coast", "SawMill", "Oracle", "Shrine1", "ShipWreck",
+	"Unused33", "DesertTent", "Castle", "StoneLights", "WagonCamp", "WaterChest", "WhirlPool", "WindMill", "Artifact", "Reefs", "Boat",
+	"RndUltimateArtifact", "RndArtifact", "RndResource", "RndMonster", "RndTown", "RndCastle", "Mermaid", "RndMonster1", "RndMonster2",
+	"RndMonster3", "RndMonster4", "Heroes", "Sirens", "HutMagi", "WatchTower", "TreeHouse", "TreeCity", "Ruins", "Fort", "TradingPost",
+	"AbandonedMine", "ThatchedHut", "StandingStones", "Idol", "TreeKnowledge", "DoctorHut", "Temple", "HillFort", "HalflingHole", "MercenaryCamp",
+	"Shrine2", "Shrine3", "Pyramid", "CityDead", "Excavation", "Sphinx", "Wagon", "Tarpit", "ArtesianSpring", "TrollBridge", "WateringHole",
+	"WitchsHut", "Xanadu", "Cave", "Leanto", "MagellanMaps", "FlotSam", "DerelictShip", "ShipwreckSurviror", "Bottle", "MagicWell", "MagicGarden",
+	"ObservationTower", "FreemanFoundry", "EyeMagi", "Trees", "Mounts", "Volcano", "Flowers", "Stones", "WaterLake", "Mandrake", "DeadTree", "Stump",
+	"Crater", "Cactus", "Mound", "Dune", "LavaPool", "Shrub", "Arena", "BarrowMounds", "RndArtifact1", "RndArtifact2", "RndArtifact3", "Barrier",
+	"TravellerTent", "AlchemyTower", "Stables", "Jail", "FireAltar", "AirAltar", "EarthAltar", "WaterAltar" };
+
+    return QString(names[index & 0x7F]);
 }
