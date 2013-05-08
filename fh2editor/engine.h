@@ -101,7 +101,21 @@ namespace Difficulty
 
 namespace Artifact
 {
-    enum { Unknown };
+    enum { None, UltimateBook, UltimateSword, UltimateCloak, UltimateWand, UltimateShield, UltimateStaff, UltimateCrown, GoldenGoose,
+	    ArcaneNecklace, CasterBracelet, MageRing, WitchesBroach, MedalValor, MedalCourage, MedalHonor, MedalDistinction, FizbinMisfortune,
+	    ThunderMace, ArmoredGauntlets, DefenderHelm, GiantFlail, Ballista, StealthShield, DragonSword, PowerAxe, DivineBreastplate,
+	    MinorScroll, MajorScroll, SuperiorScroll, ForemostScroll, EndlessSackGold, EndlessBagGold, EndlessPurseGold, NomadBootsMobility,
+	    TravelerBootsMobility, RabbitFoot, GoldenHorseShoe, GamblerLuckyCoin, FourLeafClover, TrueCompassMobility, SailorsAstrolabeMobility,
+	    EvilEye, Wnchanted_Hourglass, GoldWatch, SkullCap, IceCloak, FireCloak, LightningHelm, EvercoldIcicle, EverhotLavaRock, LightningRod,
+	    SnakeRing, Ankh, BookElements, ElementalRing, HolyPendant, PendantFreeWill, PendantLife, SerenityPendant, SeeingEyePendant, KineticPendant,
+	    PendantDeath, WandNegation, GoldenBow, Telescope, StatesmanQuill, WizardHat, PowerRing, AmmoCart, TaxLien, HideousMask, EndlessPouchSulfur,
+	    EndlessVialMercury, EndlessPouchGems, EndlessCordWood, EndlessCartOre, EndlessPouchCrystal, SpikedHelm, SpikedShield, WhitePearl, BlackPearl,
+	    MagicBook, Dummy1, Dummy2, Dummy3, Dummy4, SpellScroll, ArmMartyr, BreastplateAnduran, BroachShielding, BattleGarb, CrystalBall, HeartFire,
+	    HeartIce, HelmetAnduran, HolyHammer, LegendaryScepter, Masthead, SphereNegation, StaffWizardry, SwordBreaker, SwordAnduran, SpadeNecromancy,
+	    Unknown };
+
+    bool	isValid(int);
+    QString	transcribe(int);
 }
 
 namespace Resource
@@ -534,14 +548,13 @@ class MapObject : public QPoint
     int		objType;
 
 public:
-    enum { Unknown = 0, Town, Hero, Sign, Event, Sphinx };
-
-    MapObject(const QPoint & pos, int uid, int type = Unknown) : QPoint(pos), objUid(uid), objType(type) {}
+    MapObject(const QPoint & pos, int uid, int type = MapObj::None) : QPoint(pos), objUid(uid), objType(type) {}
     virtual ~MapObject() {}
 
     int 		uid(void) const { return objUid; }
     int 		type(void) const { return objType; }
     const QPoint &	pos(void) const { return *this; }
+    virtual QString	name(void) const { return MapObj::transcribe(objType); }
 };
 
 struct Skill : public QPair<int, int>
@@ -581,12 +594,14 @@ struct MapTown : public MapObject
     int		color;
     int		race;
     int		buildings;
-    QString     name;
+    QString     nameTown;
     Troops	troops;
     bool	forceTown;
 
     MapTown(const QPoint &, quint32, const mp2town_t &);
     MapTown(const QPoint &, quint32);
+
+    QString	name(void) const { return nameTown; }
 };
 
 struct MapHero : public MapObject
@@ -600,10 +615,12 @@ struct MapHero : public MapObject
     quint32	experience;
     bool	patrolMode;
     int		patrolSquare;
-    QString     name;
+    QString     nameHero;
 
     MapHero(const QPoint &, quint32, const mp2hero_t &);
     MapHero(const QPoint &, quint32);
+
+    QString	name(void) const { return nameHero; }
 };
 
 struct MapSign : public MapObject
@@ -641,7 +658,7 @@ struct DayEvent
     int		colors;
     QString	message;
 
-    DayEvent() {}
+    DayEvent() : allowComputer(false), dayFirstOccurent(0), daySubsequentOccurrences(0), colors(0) {}
     DayEvent(const mp2dayevent_t &);
 
     QString	header(void) const;
@@ -658,6 +675,9 @@ class SharedMapObject : public QSharedPointer<MapObject>
 {
 public:
     SharedMapObject(MapObject* ptr) : QSharedPointer<MapObject>(ptr) {}
+
+    bool		operator== (const QPoint & pt) const { return data() && pt == data()->pos(); }
+    bool		operator== (int uid) const { return data() && uid == data()->uid(); }
 };
 
 class MapObjects : public QList<SharedMapObject>
@@ -665,6 +685,12 @@ class MapObjects : public QList<SharedMapObject>
 public:
     MapObjects();
     MapObjects(const MapObjects &, const QRect &);
+
+    SharedMapObject		find(const QPoint &) const;
+    QList<SharedMapObject>	list(int types) const;
+
+    void			remove(const QPoint &);
+    void			remove(int uid);
 };
 
 class DayEvents : public QList<DayEvent>
@@ -737,6 +763,16 @@ struct ListStringPos : public QList< QPair<QString, QPoint> >
 {
     ListStringPos() {}
 };
+
+/*
+struct MapResource : public MapObject
+{
+    int		min;
+    int 	max;
+
+    MapResource() : min(0), max(0) {}
+};
+*/
 
 QDomElement & operator<< (QDomElement &, const QSize &);
 QDomElement & operator>> (QDomElement &, QSize &);

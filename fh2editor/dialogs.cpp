@@ -148,8 +148,8 @@ Form::SelectMapSize::SelectMapSize()
     resize(minSize);
     setFixedSize(minSize);
 
-    QObject::connect(pushButtonExpert, SIGNAL(clicked()), this, SLOT(clickExpert()));
-    QObject::connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(clickOk()));
+    connect(pushButtonExpert, SIGNAL(clicked()), this, SLOT(clickExpert()));
+    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(clickOk()));
 }
 
 void Form::SelectMapSize::clickExpert(void)
@@ -247,9 +247,9 @@ Form::SelectDataFile::SelectDataFile(const QString & dataFile, const QStringList
     resize(minSize);
     setFixedSize(minSize);
 
-    QObject::connect(pushButtonExit, SIGNAL(clicked()), this, SLOT(reject()));
-    QObject::connect(pushButtonSave, SIGNAL(clicked()), this, SLOT(accept()));
-    QObject::connect(pushButtonSelect, SIGNAL(clicked()), this, SLOT(clickSelect()));
+    connect(pushButtonExit, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(pushButtonSave, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(pushButtonSelect, SIGNAL(clicked()), this, SLOT(clickSelect()));
 }
 
 void Form::SelectDataFile::clickSelect(void)
@@ -414,11 +414,11 @@ Form::SelectImage::SelectImage()
 
     tabSwitched(settings.value("SelectImageDialog/lastTab", 0).toInt());
 
-    QObject::connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabSwitched(int)));
-    QObject::connect(pushButtonClose, SIGNAL(clicked()), this, SLOT(reject()));
-    QObject::connect(pushButtonSelect, SIGNAL(clicked()), this, SLOT(clickSelect()));
+    connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabSwitched(int)));
+    connect(pushButtonClose, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(pushButtonSelect, SIGNAL(clicked()), this, SLOT(clickSelect()));
 
-    QObject::connect(this, SIGNAL(finished(int)), this, SLOT(saveSettings()));
+    connect(this, SIGNAL(finished(int)), this, SLOT(saveSettings()));
 }
 
 void Form::SelectImage::saveSettings(void)
@@ -438,8 +438,8 @@ void Form::SelectImage::tabSwitched(int num)
     {
 	pushButtonSelect->setEnabled(tab->isSelected());
 
-	QObject::connect(tab->listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(accept(QListWidgetItem*)));
-	QObject::connect(tab->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
+	connect(tab->listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(accept(QListWidgetItem*)));
+	connect(tab->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
 
 	Resource::localSettings().setValue("SelectImageDialog/lastTab", num);
     }
@@ -826,41 +826,41 @@ Form::MapOptions::MapOptions(MapData & map)
     setMinimumSize(minimumSizeHint());
     resize(settings.value("MapOptions/size", minimumSize()).toSize());
 
-    QObject::connect(lineEditName, SIGNAL(textChanged(const QString &)), this, SLOT(setEnableSaveButton(const QString &)));
-    QObject::connect(plainTextEditDescription, SIGNAL(textChanged()), this, SLOT(setEnableSaveButton()));
-    QObject::connect(comboBoxDifficulty, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setEnableSaveButton(const QString &)));
+    connect(lineEditName, SIGNAL(textChanged(const QString &)), this, SLOT(setEnableSaveButton(const QString &)));
+    connect(plainTextEditDescription, SIGNAL(textChanged()), this, SLOT(setEnableSaveButton()));
+    connect(comboBoxDifficulty, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setEnableSaveButton(const QString &)));
 
-    QObject::connect(comboBoxWinsCond, SIGNAL(currentIndexChanged(int)), this, SLOT(winsConditionsSelected(int)));
-    QObject::connect(comboBoxLossCond, SIGNAL(currentIndexChanged(int)), this, SLOT(lossConditionsSelected(int)));
+    connect(comboBoxWinsCond, SIGNAL(currentIndexChanged(int)), this, SLOT(winsConditionsSelected(int)));
+    connect(comboBoxLossCond, SIGNAL(currentIndexChanged(int)), this, SLOT(lossConditionsSelected(int)));
 
-    QObject::connect(comboBoxWinsCondExt, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setEnableSaveButton(const QString &)));
-    QObject::connect(comboBoxLossCondExt, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setEnableSaveButton(const QString &)));
+    connect(comboBoxWinsCondExt, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setEnableSaveButton(const QString &)));
+    connect(comboBoxLossCondExt, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setEnableSaveButton(const QString &)));
 
-    QObject::connect(checkBoxAllowNormalVictory, SIGNAL(clicked()), this, SLOT(setEnableSaveButton()));
-    QObject::connect(checkBoxCompAlsoWins, SIGNAL(clicked()), this, SLOT(setEnableSaveButton()));
-    QObject::connect(checkBoxStartWithHero, SIGNAL(clicked()), this, SLOT(setEnableSaveButton()));
+    connect(checkBoxAllowNormalVictory, SIGNAL(clicked()), this, SLOT(setEnableSaveButton()));
+    connect(checkBoxCompAlsoWins, SIGNAL(clicked()), this, SLOT(setEnableSaveButton()));
+    connect(checkBoxStartWithHero, SIGNAL(clicked()), this, SLOT(setEnableSaveButton()));
 
-    QObject::connect(listWidgetRumors, SIGNAL(mousePressed()), listWidgetEvents, SLOT(clearSelection()));
-    QObject::connect(listWidgetEvents, SIGNAL(mousePressed()), listWidgetRumors, SLOT(clearSelection()));
+    connect(listWidgetRumors, SIGNAL(mousePressed()), listWidgetEvents, SLOT(clearSelection()));
+    connect(listWidgetEvents, SIGNAL(mousePressed()), listWidgetRumors, SLOT(clearSelection()));
 
-    QObject::connect(spinBoxResourceGoldMin, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
-    QObject::connect(spinBoxResourceGoldMax, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
-    QObject::connect(spinBoxResourceWoodOreMin, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
-    QObject::connect(spinBoxResourceWoodOreMax, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
-    QObject::connect(spinBoxResourceOtherMin, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
-    QObject::connect(spinBoxResourceOtherMax, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
+    connect(spinBoxResourceGoldMin, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
+    connect(spinBoxResourceGoldMax, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
+    connect(spinBoxResourceWoodOreMin, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
+    connect(spinBoxResourceWoodOreMax, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
+    connect(spinBoxResourceOtherMin, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
+    connect(spinBoxResourceOtherMax, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
 
-    QObject::connect(plainTextEditAuthors, SIGNAL(textChanged()), this, SLOT(setEnableSaveButton()));
-    QObject::connect(plainTextEditLicense, SIGNAL(textChanged()), this, SLOT(setEnableSaveButton()));
+    connect(plainTextEditAuthors, SIGNAL(textChanged()), this, SLOT(setEnableSaveButton()));
+    connect(plainTextEditLicense, SIGNAL(textChanged()), this, SLOT(setEnableSaveButton()));
 
     for(QVector<PlayerStatus*>::const_iterator
 	it = labelPlayers.begin(); it != labelPlayers.end(); ++it)
-	QObject::connect(*it, SIGNAL(mousePressed()), this, SLOT(setEnableSaveButton()));
+	connect(*it, SIGNAL(mousePressed()), this, SLOT(setEnableSaveButton()));
 
-    QObject::connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
-    QObject::connect(pushButtonSave, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(pushButtonSave, SIGNAL(clicked()), this, SLOT(accept()));
 
-    QObject::connect(this, SIGNAL(finished(int)), this, SLOT(saveSettings()));
+    connect(this, SIGNAL(finished(int)), this, SLOT(saveSettings()));
 }
 
 void Form::MapOptions::saveSettings(void)
@@ -1058,18 +1058,18 @@ Form::ItemsList::ItemsList(int colors, QWidget* parent) : QListWidget(parent), k
     delItemAct = new QAction(tr("Delete"), this);
     delItemAct->setEnabled(false);
 
-    QObject::connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(editItem(QListWidgetItem*)));
-    QObject::connect(addItemAct, SIGNAL(triggered()), this, SLOT(addItem()));
-    QObject::connect(editItemAct, SIGNAL(triggered()), this, SLOT(editCurrentItem()));
-    QObject::connect(delItemAct, SIGNAL(triggered()), this, SLOT(deleteCurrentItem()));
+    connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(editItem(QListWidgetItem*)));
+    connect(addItemAct, SIGNAL(triggered()), this, SLOT(addItem()));
+    connect(editItemAct, SIGNAL(triggered()), this, SLOT(editCurrentItem()));
+    connect(delItemAct, SIGNAL(triggered()), this, SLOT(deleteCurrentItem()));
 
     MapOptions* ptr = qobject_cast<MapOptions*>(parent);
 
     if(ptr)
     {
-	QObject::connect(addItemAct, SIGNAL(triggered()), ptr, SLOT(setEnableSaveButton()));
-	QObject::connect(editItemAct, SIGNAL(triggered()), ptr, SLOT(setEnableSaveButton()));
-	QObject::connect(delItemAct, SIGNAL(triggered()), ptr, SLOT(setEnableSaveButton()));
+	connect(addItemAct, SIGNAL(triggered()), ptr, SLOT(setEnableSaveButton()));
+	connect(editItemAct, SIGNAL(triggered()), ptr, SLOT(setEnableSaveButton()));
+	connect(delItemAct, SIGNAL(triggered()), ptr, SLOT(setEnableSaveButton()));
     }
 }
 
@@ -1195,9 +1195,9 @@ Form::RumorDialog::RumorDialog(const QString & msg)
 
     resize(250, 160);
 
-    QObject::connect(plainText, SIGNAL(textChanged()), this, SLOT(enableButtonOk()));
-    QObject::connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
-    QObject::connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(plainText, SIGNAL(textChanged()), this, SLOT(enableButtonOk()));
+    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
 }
 
 void Form::RumorDialog::enableButtonOk(void)
@@ -1488,26 +1488,26 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors)
     resize(minSize);
     setMinimumSize(minSize);
 
-    QObject::connect(spinBoxDayFirst, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
-    QObject::connect(comboBoxSubsequent , SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
-    QObject::connect(checkBoxAllowComp, SIGNAL(clicked()), this, SLOT(setEnableOKButton()));
+    connect(spinBoxDayFirst, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(comboBoxSubsequent , SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(checkBoxAllowComp, SIGNAL(clicked()), this, SLOT(setEnableOKButton()));
 
-    QObject::connect(spinBoxResWood, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
-    QObject::connect(spinBoxResMercury, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
-    QObject::connect(spinBoxResOre, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
-    QObject::connect(spinBoxResSulfur, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
-    QObject::connect(spinBoxResCrystal, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
-    QObject::connect(spinBoxResGems, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
-    QObject::connect(spinBoxResGold, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(spinBoxResWood, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(spinBoxResMercury, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(spinBoxResOre, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(spinBoxResSulfur, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(spinBoxResCrystal, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(spinBoxResGems, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(spinBoxResGold, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
 
-    QObject::connect(plainTextMessage, SIGNAL(textChanged()), this, SLOT(setEnableOKButton()));
+    connect(plainTextMessage, SIGNAL(textChanged()), this, SLOT(setEnableOKButton()));
 
     for(QVector<PlayerAllow*>::const_iterator
 	it = labelPlayers.begin(); it != labelPlayers.end(); ++it)
-	QObject::connect(*it, SIGNAL(mousePressed()), this, SLOT(setEnableOKButton()));
+	connect(*it, SIGNAL(mousePressed()), this, SLOT(setEnableOKButton()));
 
-    QObject::connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
-    QObject::connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
 }
 
 void Form::DayEventDialog::setEnableOKButton(void)
@@ -1608,7 +1608,7 @@ void Form::MiniMap::generateFromTiles(const MapTiles & tiles)
     QApplication::restoreOverrideCursor();
 }
 
-Form::EditResource::EditResource()
+Form::EditResource::EditResource(int res)
 {
     setWindowTitle(QApplication::translate("DialogEditResource", "Edit Resource", 0, QApplication::UnicodeUTF8));
 
@@ -1616,8 +1616,29 @@ Form::EditResource::EditResource()
     int min = 0;
     int max = 0;
 
-    min = settings.value("MapOptions/defaultWoodOreMin", DEFAULT_RESOURCE_WOOD_ORE_MIN).toInt();
-    max = settings.value("MapOptions/defaultWoodOreMax", DEFAULT_RESOURCE_WOOD_ORE_MAX).toInt();
+    switch(res)
+    {
+        case Resource::Gold:
+	    min = settings.value("MapOptions/defaultGoldMin", DEFAULT_RESOURCE_GOLD_MIN).toInt();
+	    max = settings.value("MapOptions/defaultGoldMax", DEFAULT_RESOURCE_GOLD_MAX).toInt();
+	    break;
+
+        case Resource::Wood:
+        case Resource::Ore:
+	    min = settings.value("MapOptions/defaultWoodOreMin", DEFAULT_RESOURCE_WOOD_ORE_MIN).toInt();
+	    max = settings.value("MapOptions/defaultWoodOreMax", DEFAULT_RESOURCE_WOOD_ORE_MAX).toInt();
+	    break;
+
+        case Resource::Mercury:
+        case Resource::Sulfur:
+        case Resource::Crystal:
+        case Resource::Gems:
+	    min = settings.value("MapOptions/defaultOtherMin", DEFAULT_RESOURCE_OTHER_MIN).toInt();
+	    max = settings.value("MapOptions/defaultOtherMax", DEFAULT_RESOURCE_OTHER_MAX).toInt();
+	    break;
+
+	default: break;
+    }
 
     checkBoxDefault = new QCheckBox(this);
     checkBoxDefault->setChecked(true);
@@ -1665,12 +1686,322 @@ Form::EditResource::EditResource()
     setFixedSize(minSize);
 
     connect(checkBoxDefault, SIGNAL(toggled(bool)), this, SLOT(disableCustomCount(bool)));
-    QObject::connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(reject()));
-    QObject::connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(accept()));
 }
 
 void Form::EditResource::disableCustomCount(bool f)
 {
     labelCount->setEnabled(! f);
     spinBoxCount->setEnabled(! f);
+}
+
+Form::MapEventDialog::MapEventDialog(const MapEvent & event, int kingdomColors)
+{
+    setWindowTitle(QApplication::translate("MapEventDialog", "Event Detail", 0, QApplication::UnicodeUTF8));
+
+    // tab 1
+    tabAccess = new QWidget();
+
+    groupBoxAllowedColors = new QGroupBox(tabAccess);
+    groupBoxAllowedColors->setTitle(QApplication::translate("MapEventDialog", "Colors allowed to get event", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutPlayers = new QHBoxLayout();
+    horizontalSpacerPlayersLeft = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    horizontalSpacerPlayersRight = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    horizontalLayoutPlayers->addItem(horizontalSpacerPlayersLeft);
+
+    // create allow players labels
+    QVector<int> colors = Color::colors(Color::All);
+
+    for(QVector<int>::const_iterator
+	it = colors.begin(); it != colors.end(); ++it)
+    if((*it) & kingdomColors)
+    {
+	labelPlayers.push_back(new PlayerAllow(*it, (*it) & event.colors, groupBoxAllowedColors));
+	horizontalLayoutPlayers->addWidget(labelPlayers.back());
+    }
+    horizontalLayoutPlayers->addItem(horizontalSpacerPlayersRight);
+
+    checkBoxAllowComp = new QCheckBox(groupBoxAllowedColors);
+    checkBoxAllowComp->setLayoutDirection(Qt::LeftToRight);
+    checkBoxAllowComp->setText(QApplication::translate("MapEventDialog", "Allow computer", 0, QApplication::UnicodeUTF8));
+    checkBoxAllowComp->setChecked(event.allowComputer);
+
+    checkBoxCancelAfterFirstVisit = new QCheckBox(groupBoxAllowedColors);
+    checkBoxCancelAfterFirstVisit->setLayoutDirection(Qt::LeftToRight);
+    checkBoxCancelAfterFirstVisit->setText(QApplication::translate("MapEventDialog", "Cancel after first visit", 0, QApplication::UnicodeUTF8));
+    checkBoxCancelAfterFirstVisit->setChecked(event.cancelAfterFirstVisit);
+
+    verticalLayoutAllowCols = new QVBoxLayout(groupBoxAllowedColors);
+    verticalLayoutAllowCols->addLayout(horizontalLayoutPlayers);
+    verticalLayoutAllowCols->addWidget(checkBoxAllowComp);
+    verticalLayoutAllowCols->addWidget(checkBoxCancelAfterFirstVisit);
+
+    spacerItemAccess = new QSpacerItem(40, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    verticalLayoutTabAcs = new QVBoxLayout(tabAccess);
+    verticalLayoutTabAcs->addWidget(groupBoxAllowedColors);
+    verticalLayoutTabAcs->addItem(spacerItemAccess);
+
+    // tab 2
+    tabGift = new QWidget();
+
+    groupBoxResource = new QGroupBox(tabGift);
+    groupBoxResource->setTitle(QApplication::translate("MapEventDialog", "Resources", 0, QApplication::UnicodeUTF8));
+
+    const Resources & resources = event.resources;
+    int resMin = -65535;
+    int resMax = 65535;
+
+    spinBoxResWood = new QSpinBox(groupBoxResource);
+    spinBoxResWood->setMinimum(resMin);
+    spinBoxResWood->setMaximum(resMax);
+    spinBoxResWood->setValue(resources.wood);
+
+    labelResWood = new QLabel(groupBoxResource);
+    labelResWood->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 0).first);
+    labelResWood->setBuddy(spinBoxResWood);
+
+    horizontalSpacerWoodSulf = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    spinBoxResSulfur = new QSpinBox(groupBoxResource);
+    spinBoxResSulfur->setMinimum(resMin);
+    spinBoxResSulfur->setMaximum(resMax);
+    spinBoxResSulfur->setValue(resources.sulfur);
+
+    labelResSulfur = new QLabel(groupBoxResource);
+    labelResSulfur->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 3).first);
+    labelResSulfur->setBuddy(spinBoxResSulfur);
+
+    horizontalLayoutWoodSulf = new QHBoxLayout();
+    horizontalLayoutWoodSulf->addWidget(labelResWood);
+    horizontalLayoutWoodSulf->addWidget(spinBoxResWood);
+    horizontalLayoutWoodSulf->addItem(horizontalSpacerWoodSulf);
+    horizontalLayoutWoodSulf->addWidget(labelResSulfur);
+    horizontalLayoutWoodSulf->addWidget(spinBoxResSulfur);
+
+    spinBoxResMercury = new QSpinBox(groupBoxResource);
+    spinBoxResMercury->setMinimum(resMin);
+    spinBoxResMercury->setMaximum(resMax);
+    spinBoxResMercury->setValue(resources.mercury);
+
+    labelResMercury = new QLabel(groupBoxResource);
+    labelResMercury->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 1).first);
+    labelResMercury->setBuddy(spinBoxResMercury);
+
+    horizontalSpacerMercCryst = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    spinBoxResCrystal = new QSpinBox(tabGift);
+    spinBoxResCrystal->setMinimum(resMin);
+    spinBoxResCrystal->setMaximum(resMax);
+    spinBoxResCrystal->setValue(resources.crystal);
+
+    labelResCrystal = new QLabel(groupBoxResource);
+    labelResCrystal->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 4).first);
+    labelResCrystal->setBuddy(spinBoxResCrystal);
+
+    horizontalLayoutMercCryst = new QHBoxLayout();
+    horizontalLayoutMercCryst->addWidget(labelResMercury);
+    horizontalLayoutMercCryst->addWidget(spinBoxResMercury);
+    horizontalLayoutMercCryst->addItem(horizontalSpacerMercCryst);
+    horizontalLayoutMercCryst->addWidget(labelResCrystal);
+    horizontalLayoutMercCryst->addWidget(spinBoxResCrystal);
+
+    spinBoxResOre = new QSpinBox(groupBoxResource);
+    spinBoxResOre->setMinimum(resMin);
+    spinBoxResOre->setMaximum(resMax);
+    spinBoxResOre->setValue(resources.ore);
+
+    labelResOre = new QLabel(groupBoxResource);
+    labelResOre->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 2).first);
+    labelResOre->setBuddy(spinBoxResOre);
+
+    horizontalSpacerOreGems = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    spinBoxResGems = new QSpinBox(groupBoxResource);
+    spinBoxResGems->setMinimum(resMin);
+    spinBoxResGems->setMaximum(resMax);
+    spinBoxResGems->setValue(resources.gems);
+
+    labelResGems = new QLabel(groupBoxResource);
+    labelResGems->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 5).first);
+    labelResGems->setBuddy(spinBoxResGems);
+
+    horizontalLayoutOreGems = new QHBoxLayout();
+    horizontalLayoutOreGems->addWidget(labelResOre);
+    horizontalLayoutOreGems->addWidget(spinBoxResOre);
+    horizontalLayoutOreGems->addItem(horizontalSpacerOreGems);
+    horizontalLayoutOreGems->addWidget(labelResGems);
+    horizontalLayoutOreGems->addWidget(spinBoxResGems);
+
+    horizontalSpacerGoldLeft = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    horizontalSpacerGoldRight= new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    spinBoxResGold = new QSpinBox(groupBoxResource);
+    spinBoxResGold->setMinimum(resMin);
+    spinBoxResGold->setMaximum(resMax);
+    spinBoxResGold->setValue(resources.gold);
+
+    labelResGold = new QLabel(groupBoxResource);
+    labelResGold->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 6).first);
+    labelResGold->setBuddy(spinBoxResGold);
+
+    horizontalLayoutGold = new QHBoxLayout();
+    horizontalLayoutGold->addItem(horizontalSpacerGoldLeft);
+    horizontalLayoutGold->addWidget(labelResGold);
+    horizontalLayoutGold->addWidget(spinBoxResGold);
+    horizontalLayoutGold->addItem(horizontalSpacerGoldRight);
+
+    verticalLayoutResource = new QVBoxLayout(groupBoxResource);
+    verticalLayoutResource->addLayout(horizontalLayoutWoodSulf);
+    verticalLayoutResource->addLayout(horizontalLayoutMercCryst);
+    verticalLayoutResource->addLayout(horizontalLayoutOreGems);
+    verticalLayoutResource->addLayout(horizontalLayoutGold);
+
+    groupBoxArtifact = new QGroupBox(tabGift);
+    groupBoxArtifact->setTitle(QApplication::translate("MapEventDialog", "Artifact to give", 0, QApplication::UnicodeUTF8));
+
+    labelArtifact = new QLabel(groupBoxArtifact);
+    changeLabelArtifact(event.artifact);
+
+    comboBoxArtifact = new QComboBox(groupBoxArtifact);
+    for(int index = Artifact::None; index < Artifact::Unknown; ++index)
+	comboBoxArtifact->addItem(Artifact::transcribe(index), index);
+    comboBoxArtifact->setCurrentIndex(event.artifact);
+
+    horizontalLayoutArtifact = new QHBoxLayout(groupBoxArtifact);
+    horizontalLayoutArtifact->addWidget(labelArtifact);
+    horizontalLayoutArtifact->addWidget(comboBoxArtifact);
+
+    verticalLayoutGift = new QVBoxLayout(tabGift);
+    verticalLayoutGift->addWidget(groupBoxResource);
+    verticalLayoutGift->addWidget(groupBoxArtifact);
+
+#ifndef QT_NO_TOOLTIP
+    labelResWood->setToolTip(QApplication::translate("MapEventDialog", "wood", 0, QApplication::UnicodeUTF8));
+    spinBoxResWood->setToolTip(QApplication::translate("MapEventDialog", "wood", 0, QApplication::UnicodeUTF8));
+    labelResSulfur->setToolTip(QApplication::translate("MapEventDialog", "sulfur", 0, QApplication::UnicodeUTF8));
+    spinBoxResSulfur->setToolTip(QApplication::translate("MapEventDialog", "sulfur", 0, QApplication::UnicodeUTF8));
+    labelResMercury->setToolTip(QApplication::translate("MapEventDialog", "mercury", 0, QApplication::UnicodeUTF8));
+    spinBoxResMercury->setToolTip(QApplication::translate("MapEventDialog", "mercury", 0, QApplication::UnicodeUTF8));
+    labelResCrystal->setToolTip(QApplication::translate("MapEventDialog", "crystal", 0, QApplication::UnicodeUTF8));
+    spinBoxResCrystal->setToolTip(QApplication::translate("MapEventDialog", "crystal", 0, QApplication::UnicodeUTF8));
+    labelResOre->setToolTip(QApplication::translate("MapEventDialog", "ore", 0, QApplication::UnicodeUTF8));
+    spinBoxResOre->setToolTip(QApplication::translate("MapEventDialog", "ore", 0, QApplication::UnicodeUTF8));
+    labelResGems->setToolTip(QApplication::translate("MapEventDialog", "gems", 0, QApplication::UnicodeUTF8));
+    spinBoxResGems->setToolTip(QApplication::translate("MapEventDialog", "gems", 0, QApplication::UnicodeUTF8));
+    labelResGold->setToolTip(QApplication::translate("MapEventDialog", "gold", 0, QApplication::UnicodeUTF8));
+    spinBoxResGold->setToolTip(QApplication::translate("MapEventDialog", "gold", 0, QApplication::UnicodeUTF8));
+#endif // QT_NO_TOOLTIP
+
+    // tab 3
+    tabMessage = new QWidget();
+
+    plainTextMessage = new QPlainTextEdit(tabMessage);
+    plainTextMessage->setPlainText(event.message);
+
+    verticalLayoutTabMsg = new QVBoxLayout(tabMessage);
+    verticalLayoutTabMsg->addWidget(plainTextMessage);
+
+    // end
+    tabWidget = new QTabWidget(this);
+
+    tabWidget->addTab(tabAccess, "Access");
+    tabWidget->addTab(tabGift, "Gifts");
+    tabWidget->addTab(tabMessage, "Message");
+
+    pushButtonOk = new QPushButton(this);
+    pushButtonOk->setText(QApplication::translate("MapEventDialog", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setEnabled(false);
+
+    horizontalSpacerButtons = new QSpacerItem(238, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    pushButtonCancel = new QPushButton(this);
+    pushButtonCancel->setText(QApplication::translate("MapEventDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutButtons = new QHBoxLayout();
+    horizontalLayoutButtons->addWidget(pushButtonOk);
+    horizontalLayoutButtons->addItem(horizontalSpacerButtons);
+    horizontalLayoutButtons->addWidget(pushButtonCancel);
+
+    verticalLayoutForm = new QVBoxLayout(this);
+    verticalLayoutForm->addWidget(tabWidget);
+    verticalLayoutForm->addLayout(horizontalLayoutButtons);
+
+    tabWidget->setCurrentIndex(0);
+
+    QSize minSize = minimumSizeHint();
+
+    resize(minSize);
+    setMinimumSize(minSize);
+
+    connect(checkBoxAllowComp, SIGNAL(clicked()), this, SLOT(setEnableOKButton()));
+    connect(checkBoxCancelAfterFirstVisit, SIGNAL(clicked()), this, SLOT(setEnableOKButton()));
+
+    connect(spinBoxResWood, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(spinBoxResMercury, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(spinBoxResOre, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(spinBoxResSulfur, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(spinBoxResCrystal, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(spinBoxResGems, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(spinBoxResGold, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(comboBoxArtifact , SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(comboBoxArtifact , SIGNAL(currentIndexChanged(int)), this, SLOT(changeLabelArtifact(int)));
+
+    connect(plainTextMessage, SIGNAL(textChanged()), this, SLOT(setEnableOKButton()));
+
+    for(QVector<PlayerAllow*>::const_iterator
+	it = labelPlayers.begin(); it != labelPlayers.end(); ++it)
+	connect(*it, SIGNAL(mousePressed()), this, SLOT(setEnableOKButton()));
+
+    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
+}
+
+void Form::MapEventDialog::setEnableOKButton(void)
+{
+    pushButtonOk->setEnabled(true);
+}
+
+void Form::MapEventDialog::setEnableOKButton(const QString & val)
+{
+    Q_UNUSED(val);
+    pushButtonOk->setEnabled(true);
+}
+
+void Form::MapEventDialog::changeLabelArtifact(int index)
+{
+    labelArtifact->setPixmap(EditorTheme::getImageICN("ARTIFACT.ICN", index).first.scaled(48, 48));
+    labelArtifact->setToolTip(Artifact::transcribe(index));
+}
+
+MapEvent Form::MapEventDialog::result(const QPoint & pos, quint32 uid) const
+{
+    MapEvent res(pos, uid);
+
+    res.resources.wood = spinBoxResWood->value();
+    res.resources.mercury = spinBoxResMercury->value();
+    res.resources.ore = spinBoxResOre->value();
+    res.resources.sulfur = spinBoxResSulfur->value();
+    res.resources.crystal = spinBoxResCrystal->value();
+    res.resources.gems = spinBoxResGems->value();
+    res.resources.gold = spinBoxResGold->value();
+
+    res.colors = 0;
+
+    for(QVector<PlayerAllow*>::const_iterator
+	it = labelPlayers.begin(); it != labelPlayers.end(); ++it)
+    if((*it)->allow())
+    {
+	res.colors |= (*it)->color();
+    }
+
+    res.artifact = comboBoxArtifact->currentIndex();
+
+    res.allowComputer = checkBoxAllowComp->isChecked();
+    res.cancelAfterFirstVisit = checkBoxCancelAfterFirstVisit->isChecked();
+    res.message = plainTextMessage->toPlainText();
+
+    return res;
 }

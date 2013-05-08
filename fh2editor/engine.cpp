@@ -414,7 +414,12 @@ QDataStream & operator>> (QDataStream & ds, mp2hero_t & hero)
     ds >> hero.customPortrate >> hero.portrateType;
 
     for(int ii = 0; ii < 3; ++ii)
+    {
 	ds >> hero.artifacts[ii];
+    
+	if(! Artifact::isValid(hero.artifacts[ii]))
+	    hero.artifacts[ii] = Artifact::None;
+    }
 
     ds >> hero.unknown2 >> hero.experience >> hero.customSkills;
 
@@ -460,6 +465,9 @@ QDataStream & operator>> (QDataStream & ds, mp2mapevent_t & evnt)
     for(int ii = 0; ii < 6; ++ii)
 	ds >> evnt.colors[ii];
 
+    if(! Artifact::isValid(evnt.artifact))
+	evnt.artifact = Artifact::None;
+
     evnt.text = readStringFromStream(ds);
     return ds;
 }
@@ -479,6 +487,9 @@ QDataStream & operator>> (QDataStream & ds, mp2dayevent_t & evnt)
 
     for(int ii = 0; ii < 6; ++ii)
 	ds >> evnt.colors[ii];
+
+    if(! Artifact::isValid(evnt.artifact))
+	evnt.artifact = Artifact::None;
 
     evnt.text = readStringFromStream(ds);
     return ds;
@@ -513,6 +524,9 @@ QDataStream & operator>> (QDataStream & ds, mp2sphinx_t & sphinx)
 	if(! str.isEmpty())
 	    sphinx.answers.push_back(str);
     }
+
+    if(! Artifact::isValid(sphinx.artifact))
+	sphinx.artifact = Artifact::None;
 
     sphinx.text = readStringFromStream(ds);
     return ds;
@@ -700,16 +714,19 @@ QPair<QPixmap, QPoint> AGG::Spool::getImageICN(const QString & icn, int index)
     QString key = icn + QString::number(index);
     QPair<QPixmap, QPoint> result;
 
-    if(! QPixmapCache::find(key, & result.first))
+    if(0 <= index)
     {
-	result = second.isReadable() && second.exists(icn) ?
+	if(! QPixmapCache::find(key, & result.first))
+	{
+	    result = second.isReadable() && second.exists(icn) ?
 		second.getImageICN(icn, index, colors) : first.getImageICN(icn, index, colors);
-	QPixmapCache::insert(key, result.first);
-	icnOffsetCache[key] = result.second;
-    }
-    else
-    {
-	result.second = icnOffsetCache[key];
+	    QPixmapCache::insert(key, result.first);
+	    icnOffsetCache[key] = result.second;
+	}
+	else
+	{
+	    result.second = icnOffsetCache[key];
+	}
     }
 
     return result;
@@ -1738,12 +1755,12 @@ QPair<int, int> EditorTheme::groundBoundariesFix(const MapTile & tile, const Map
 }
 
 MapTown::MapTown(const QPoint & pos, quint32 id)
-    : MapObject(pos, id, MapObject::Town), color(Color::Unknown), race(Race::Unknown), buildings(0), forceTown(false)
+    : MapObject(pos, id, MapObj::Castle), color(Color::Unknown), race(Race::Unknown), buildings(0), forceTown(false)
 {
 }
 
 MapTown::MapTown(const QPoint & pos, quint32 id, const mp2town_t & mp2)
-    : MapObject(pos, id, MapObject::Town), name(mp2.name), forceTown(mp2.forceTown)
+    : MapObject(pos, id, MapObj::Castle), nameTown(mp2.name), forceTown(mp2.forceTown)
 {
     switch(mp2.color)
     {
@@ -1809,7 +1826,7 @@ MapTown::MapTown(const QPoint & pos, quint32 id, const mp2town_t & mp2)
 }
 
 MapHero::MapHero(const QPoint & pos, quint32 id)
-    : MapObject(pos, id, MapObject::Hero), color(Color::Unknown), race(Race::Unknown),
+    : MapObject(pos, id, MapObj::Heroes), color(Color::Unknown), race(Race::Unknown),
     portrait(Portrait::Random), experience(0), patrolMode(false), patrolSquare(0)
 {
     artifacts[0] = Artifact::Unknown;
@@ -1818,7 +1835,7 @@ MapHero::MapHero(const QPoint & pos, quint32 id)
 }
 
 MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2)
-    : MapObject(pos, id, MapObject::Hero), color(Color::Unknown), race(Race::Unknown), portrait(Portrait::Random), name(mp2.name)
+    : MapObject(pos, id, MapObj::Heroes), color(Color::Unknown), race(Race::Unknown), portrait(Portrait::Random), nameHero(mp2.name)
 {
     if(mp2.customTroops)
     {
@@ -1837,8 +1854,8 @@ MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2)
     if(mp2.customPortrate)
 	portrait = mp2.portrateType + 1;
 
-    if(name.isEmpty())
-	name = Portrait::transcribe(portrait);
+    if(nameHero.isEmpty())
+	nameHero = Portrait::transcribe(portrait);
 
     if(mp2.customSkills)
     {
@@ -1848,23 +1865,23 @@ MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2)
 }
 
 MapSign::MapSign(const QPoint & pos, quint32 id)
-    : MapObject(pos, id, MapObject::Sign)
+    : MapObject(pos, id, MapObj::Sign)
 {
 }
 
 MapSign::MapSign(const QPoint & pos, quint32 id, const mp2sign_t & mp2)
-    : MapObject(pos, id, MapObject::Sign), message(mp2.text)
+    : MapObject(pos, id, MapObj::Sign), message(mp2.text)
 {
 }
 
 MapEvent::MapEvent(const QPoint & pos, quint32 id)
-    : MapObject(pos, id, MapObject::Event), artifact(Artifact::Unknown), allowComputer(false),
+    : MapObject(pos, id, MapObj::Event), artifact(Artifact::Unknown), allowComputer(false),
 	cancelAfterFirstVisit(true), colors(0)
 {
 }
 
 MapEvent::MapEvent(const QPoint & pos, quint32 id, const mp2mapevent_t & mp2)
-    : MapObject(pos, id, MapObject::Event), artifact(mp2.artifact), allowComputer(mp2.allowComputer),
+    : MapObject(pos, id, MapObj::Event), artifact(mp2.artifact), allowComputer(mp2.allowComputer),
 	cancelAfterFirstVisit(mp2.cancelAfterFirstVisit), colors(0), message(mp2.text)
 {
     resources.wood = mp2.resources[0];
@@ -1884,7 +1901,7 @@ MapEvent::MapEvent(const QPoint & pos, quint32 id, const mp2mapevent_t & mp2)
 }
 
 MapSphinx::MapSphinx(const QPoint & pos, quint32 id, const mp2sphinx_t &)
-    : MapObject(pos, id, MapObject::Sphinx)
+    : MapObject(pos, id, MapObj::Sphinx)
 {
 }
 
@@ -1923,6 +1940,32 @@ MapObjects::MapObjects()
 MapObjects::MapObjects(const MapObjects & mo, const QRect & rt)
 {
     //QMap<MapKey, QSharedPointer<MapObject> >
+}
+
+void MapObjects::remove(const QPoint & pos)
+{
+    erase(std::remove(begin(), end(), pos), end());
+}
+
+void MapObjects::remove(int uid)
+{
+    erase(std::remove(begin(), end(), uid), end());
+}
+
+SharedMapObject MapObjects::find(const QPoint & pos) const
+{
+    const_iterator it = std::find(begin(), end(), pos);
+    return it != end() ? *it : NULL;
+}
+
+QList<SharedMapObject> MapObjects::list(int type) const
+{
+    QList<SharedMapObject> result;
+
+    for(const_iterator it = begin(); it != end(); ++it)
+	if(*it == type) result.push_back(*it);
+
+    return result;
 }
 
 DayEvents::DayEvents()
@@ -2161,4 +2204,30 @@ QString MapObj::transcribe(int index)
 	"TravellerTent", "AlchemyTower", "Stables", "Jail", "FireAltar", "AirAltar", "EarthAltar", "WaterAltar" };
 
     return QString(names[index & 0x7F]);
+}
+
+QString Artifact::transcribe(int index)
+{
+    const char* names[] = { "None", "Ultimate Book of Knowledge", "Ultimate Sword of Dominion", "Ultimate Cloak of Protection", "Ultimate Wand of Magic",
+	"Ultimate Shield", "Ultimate Staff", "Ultimate Crown", "Golden Goose", "Arcane Necklace of Magic", "Caster's Bracelet of Magic", "Mage's Ring of Power",
+	"Witch's Broach of Magic", "Medal of Valor", "Medal of Courage", "Medal of Honor", "Medal of Distinction", "Fizbin of Misfortune", "Thunder Mace of Dominion",
+	"Armored Gauntlets of Protection", "Defender Helm of Protection", "Giant Flail of Dominion", "Ballista of Quickness", "Stealth Shield of Protection",
+	"Dragon Sword of Dominion", "Power Axe of Dominion", "Divine Breastplate of Protection", "Minor Scroll of Knowledge", "Major Scroll of Knowledge",
+	"Superior Scroll of Knowledge", "Foremost Scroll of Knowledge", "Endless Sack of Gold", "Endless Bag of Gold", "Endless Purse of Gold", "Nomad Boots of Mobility",
+	"Traveler's Boots of Mobility", "Lucky Rabbit's Foot", "Golden Horseshoe", "Gambler's Lucky Coin", "Four-Leaf Clover", "True Compass of Mobility",
+	"Sailor's Astrolabe of Mobility", "Evil Eye", "Enchanted Hourglass", "Gold Watch", "Skullcap", "Ice Cloak", "Fire Cloak", "Lightning Helm", "Evercold Icicle",
+	"Everhot Lava Rock", "Lightning Rod", "Snake-Ring", "Ankh", "Book of Elements", "Elemental Ring", "Holy Pendant", "Pendant of Free Will", "Pendant of Life",
+	"Serenity Pendant", "Seeing-eye Pendant", "Kinetic Pendant", "Pendant of Death", "Wand of Negation", "Golden Bow", "Telescope", "Statesman's Quill",
+	"Wizard's Hat", "Power Ring", "Ammo Cart", "Tax Lien", "Hideous Mask", "Endless Pouch of Sulfur", "Endless Vial of Mercury", "Endless Pouch of Gems",
+	"Endless Cord of Wood", "Endless Cart of Ore", "Endless Pouch of Crystal", "Spiked Helm", "Spiked Shield", "White Pearl", "Black Pearl", "Magic Book",
+	"Dummy 1", "Dummy 2", "Dummy 3", "Dummy 4", "Spell Scroll", "Arm of the Martyr", "Breastplate of Anduran", "Broach of Shielding", "Battle Garb of Anduran",
+	"Crystal Ball", "Heart of Fire", "Heart of Ice", "Helmet of Anduran", "Holy Hammer", "Legendary Scepter", "Masthead", "Sphere of Negation", "Staff of Wizardry",
+	"Sword Breaker", "Sword of Anduran", "Spade of Necromancy", "Unknown" };
+
+    return isValid(index) ? QString(names[index]) : QString(names[Unknown]);
+}
+
+bool Artifact::isValid(int index)
+{
+    return 0 <= index && Unknown > index;
 }

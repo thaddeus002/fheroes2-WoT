@@ -455,10 +455,77 @@ namespace Form
 	QPushButton*		pushButtonCancel;
         QSpacerItem*		verticalSpacer;
 
-	EditResource();
+	EditResource(int res);
 
     protected slots:
 	void			 disableCustomCount(bool);
+    };
+
+    class MapEventDialog : public QDialog
+    {
+	Q_OBJECT
+
+    public:
+	MapEventDialog(const MapEvent &, int);
+
+	QVBoxLayout*		verticalLayoutForm;
+	QTabWidget*		tabWidget;
+	QWidget*		tabAccess;
+	QSpacerItem*		spacerItemAccess;
+	QVBoxLayout*		verticalLayoutTabAcs;
+	QGroupBox*		groupBoxAllowedColors;
+	QVBoxLayout*		verticalLayoutAllowCols;
+	QHBoxLayout*		horizontalLayoutPlayers;
+	QSpacerItem*		horizontalSpacerPlayersLeft;
+	QSpacerItem*		horizontalSpacerPlayersRight;
+	QVector<PlayerAllow*>	labelPlayers;
+	QCheckBox*		checkBoxAllowComp;
+	QCheckBox*		checkBoxCancelAfterFirstVisit;
+	QWidget*		tabGift;
+	QVBoxLayout*		verticalLayoutGift;
+	QVBoxLayout*		verticalLayoutResource;
+	QHBoxLayout*		horizontalLayoutWoodSulf;
+	QLabel*			labelResWood;
+	QSpinBox*		spinBoxResWood;
+	QSpacerItem*		horizontalSpacerWoodSulf;
+	QLabel*			labelResSulfur;
+	QSpinBox*		spinBoxResSulfur;
+        QHBoxLayout*		horizontalLayoutMercCryst;
+	QLabel*			labelResMercury;
+	QSpinBox*		spinBoxResMercury;
+	QSpacerItem*		horizontalSpacerMercCryst;
+	QLabel*			labelResCrystal;
+	QSpinBox*		spinBoxResCrystal;
+	QHBoxLayout*		horizontalLayoutOreGems;
+	QLabel*			labelResOre;
+	QSpinBox*		spinBoxResOre;
+	QSpacerItem*		horizontalSpacerOreGems;
+	QLabel*			labelResGems;
+	QSpinBox*		spinBoxResGems;
+	QHBoxLayout*		horizontalLayoutGold;
+	QSpacerItem*		horizontalSpacerGoldLeft;
+	QLabel*			labelResGold;
+	QSpinBox*		spinBoxResGold;
+	QSpacerItem*		horizontalSpacerGoldRight;
+	QHBoxLayout*		horizontalLayoutArtifact;
+	QLabel*			labelArtifact;
+	QComboBox*		comboBoxArtifact;
+	QGroupBox*              groupBoxResource;
+	QGroupBox*              groupBoxArtifact;
+	QWidget*		tabMessage;
+	QVBoxLayout*		verticalLayoutTabMsg;
+	QPlainTextEdit*		plainTextMessage;
+	QHBoxLayout*		horizontalLayoutButtons;
+	QPushButton*		pushButtonOk;
+	QSpacerItem*		horizontalSpacerButtons;
+	QPushButton*		pushButtonCancel;
+
+	MapEvent		result(const QPoint &, quint32 uid) const;
+
+    protected slots:
+	void			setEnableOKButton(void);
+	void			setEnableOKButton(const QString &);
+	void			changeLabelArtifact(int);
     };
 }
 

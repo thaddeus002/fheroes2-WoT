@@ -160,12 +160,9 @@ public:
 
     bool		isAction(void) const;
     int			object(void) const;
-    void		editObjectDialog(void);
 
 protected:
     static void		loadSpriteLevel(MapTileLevels &, int, const mp2lev_t &);
-
-    void		editResourceDialog(void);
 
     friend		QDomElement & operator<< (QDomElement &, const MapTile &);
     friend		QDomElement & operator>> (QDomElement &, MapTile &);
@@ -309,6 +306,9 @@ protected:
     void		mouseDoubleClickEvent(QGraphicsSceneMouseEvent*);
     void		drawForeground(QPainter*, const QRectF &);
     void		selectArea(QPointF, QPointF);
+
+    void		editMapEventDialog(const MapTile &);
+    void		editResourceDialog(const MapTile &);
 
     friend class	MP2Format;
     friend class	MapTile;

@@ -437,34 +437,6 @@ void MapTile::addSpriteSection(int icn, const CompositeSprite & cs, quint32 uid)
 	spritesLevel1 << new MapTileExt(icn, cs, uid);
 }
 
-void MapTile::editObjectDialog(void)
-{
-    switch(object())
-    {
-	case MapObj::Resource:		editResourceDialog(); break;
-
-	default: qDebug() << "edit object"; break;
-    }
-}
-
-void MapTile::editResourceDialog(void)
-{
-    const MapTileExt* ext = spritesLevel1.find(MapTileExt::isResource);
-
-    if(ext)
-    {
-	int res = MapTileExt::resource(ext);
-	Form::EditResource form;
-
-	qDebug() << Resource::transcribe(res);
-
-	if(QDialog::Accepted == form.exec())
-	{
-	    // default: gold: 500-1000, wood, ore: 5-10, other: 3-6
-	}
-    }
-}
-
 QDomElement & operator<< (QDomElement & el, const MapTile & tile)
 {
     el << tile.mpos;
@@ -821,18 +793,13 @@ const CondLoss & MapData::conditionLoss(void) const
 ListStringPos MapData::conditionHeroList(int cond) const
 {
     Q_UNUSED(cond);
+
     ListStringPos res;
+    QList<SharedMapObject> listHeroes = mapObjects.list(MapObj::Heroes);
 
-
-    for(MapObjects::const_iterator
-	it = mapObjects.begin(); it != mapObjects.end(); ++it)
-    if(MapObject::Hero == (*it).data()->type())
-    {
-	const MapHero* hero = dynamic_cast<const MapHero*>((*it).data());
-
-	if(hero)
-	    res << QPair<QString, QPoint>(hero->name, hero->pos());
-    }
+    for(QList<SharedMapObject>::const_iterator
+	it = listHeroes.begin(); it != listHeroes.end(); ++it)
+        res << QPair<QString, QPoint>((*it).data()->name(), (*it).data()->pos());
 
     return res;
 }
@@ -840,24 +807,13 @@ ListStringPos MapData::conditionHeroList(int cond) const
 ListStringPos MapData::conditionTownList(int cond) const
 {
     Q_UNUSED(cond);
+
     ListStringPos res;
+    QList<SharedMapObject> listCastles = mapObjects.list(MapObj::Castle);
 
-    for(MapObjects::const_iterator
-	it = mapObjects.begin(); it != mapObjects.end(); ++it)
-    if(MapObject::Town == (*it).data()->type())
-    {
-	//if(Conditions::Wins & cond)
-	//else
-	//if(Conditions::Loss & cond)
-	//
-	// mapCompColors;
-	// mapHumanColors;
-
-	const MapTown* town = dynamic_cast<const MapTown*>((*it).data());
-
-	if(town)
-	    res << QPair<QString, QPoint>(town->name, town->pos());
-    }
+    for(QList<SharedMapObject>::const_iterator
+	it = listCastles.begin(); it != listCastles.end(); ++it)
+        res << QPair<QString, QPoint>((*it).data()->name(), (*it).data()->pos());
 
     return res;
 }
@@ -1446,45 +1402,58 @@ bool MP2Format::loadMap(const QString & mapFile)
 	    QDataStream data(block);
 	    data.setByteOrder(QDataStream::LittleEndian);
 	    const QPoint posBlock = positionExtBlockFromNumber(ii + 1);
+	    const int posMapIndex = posBlock.x() < 0 ? -1 : size.width() * posBlock.y() + posBlock.x();
 
-	    if(0 <= posBlock.x() && 0 <= posBlock.y())
+	    if(0 <= posMapIndex && posMapIndex < tiles.size())
 	    {
-		// sign block: 10 byte
-		if(10 <= block.size() && 0x01 == block.at(0))
+		switch(tiles[posMapIndex].objectID)
 		{
-		    mp2sign_t sign; data >> sign;
-		    signs.push_back(H2::SignPos(sign, posBlock));
+		    case 0x82: // sign,bottle block: 10 byte
+		    case 0xDD:
+			if(10 <= block.size() && 0x01 == block.at(0))
+			{
+			    mp2sign_t sign; data >> sign;
+			    signs.push_back(H2::SignPos(sign, posBlock));
+			}
+			break;
+
+		    case 0x93: // map event block: 50 byte
+			if(50 <= block.size() && 0x01 == block.at(0))
+			{
+			    mp2mapevent_t event; data >> event;
+			    mapEvents.push_back(H2::EventPos(event, posBlock));
+			}
+			break;
+
+		    case 0xA3: // castle, rnd town, rnd castle block: 70 byte
+		    case 0xB0:
+		    case 0xB1:
+			if(block.size() == 70)
+			{
+			    mp2town_t castle; data >> castle;
+			    castles.push_back(H2::TownPos(castle, posBlock));
+			}
+			break;
+
+		    case 0xB7: // hero, jail block: 76 byte
+		    case 0xFB:
+			if(block.size() == 76)
+			{
+			    mp2hero_t hero; data >> hero;
+			    heroes.push_back(H2::HeroPos(hero, posBlock));
+			}
+			break;
+
+		    case 0xCF: // sphinx block: 138 byte
+			if(138 <= block.size() && 0 == block.at(0))
+			{
+			    mp2sphinx_t sphinx; data >> sphinx;
+			    sphinxes.push_back(H2::SphinxPos(sphinx, posBlock));
+			}
+			break;
+
+		    default: break;
 		}
-		else
-		// map event block: 50 byte
-		if(50 <= block.size() && 0x01 == block.at(0))
-		{
-		    mp2mapevent_t event; data >> event;
-		    mapEvents.push_back(H2::EventPos(event, posBlock));
-		}
-		else
-		// castle block: 70 byte
-		if(block.size() == 70)
-		{
-		    mp2town_t castle; data >> castle;
-		    castles.push_back(H2::TownPos(castle, posBlock));
-		}
-		else
-		// hero block: 76 byte
-		if(block.size() == 76)
-		{
-		    mp2hero_t hero; data >> hero;
-		    heroes.push_back(H2::HeroPos(hero, posBlock));
-		}
-		else
-		// sphinx block: 138 byte
-		if(138 <= block.size() && 0 == block.at(0))
-		{
-		    mp2sphinx_t sphinx; data >> sphinx;
-		    sphinxes.push_back(H2::SphinxPos(sphinx, posBlock));
-		}
-		else
-		    qCritical() << "MP2Format::loadMap:" <<"unknown block: " << ii << ", size: " << block.size() << ", pos: " << posBlock;
 	    }
 	    else
 	    if(block.at(0) == 0)
@@ -1714,5 +1683,42 @@ void MapData::generateMiniMap(void)
 void MapData::editObjectAttributes(void)
 {
     if(tileOverMouse)
-	tileOverMouse->editObjectDialog();
+    {
+	switch(tileOverMouse->object())
+	{
+    	    case MapObj::Resource:	editResourceDialog(*tileOverMouse); break;
+    	    case MapObj::Event:		editMapEventDialog(*tileOverMouse); break;
+
+    	    default: QMessageBox::information(qobject_cast<MapWindow*>(parent()), "Object Attributes",
+				    "Sorry!\nChange attributes of the object is not yet available."); break;
+	}
+    }
+}
+
+void MapData::editMapEventDialog(const MapTile & tile)
+{
+    MapEvent* event = dynamic_cast<MapEvent*>(mapObjects.find(tile.mapPos()).data());
+
+    if(event)
+    {
+	Form::MapEventDialog form(*event, mapKingdomColors);
+
+	if(QDialog::Accepted == form.exec())
+	    *event = form.result(event->pos(), event->uid());
+    }
+}
+
+void MapData::editResourceDialog(const MapTile & tile)
+{
+    const MapTileExt* ext = tile.levels1().find(MapTileExt::isResource);
+
+    if(ext)
+    {
+	Form::EditResource form(MapTileExt::resource(ext));
+
+	if(QDialog::Accepted == form.exec())
+	{
+	    //objects.push_back(new MapTown((*it).pos(), uid, (*it).town()));
+	}
+    }
 }
