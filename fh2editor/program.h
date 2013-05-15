@@ -25,12 +25,14 @@
 
 QT_BEGIN_NAMESPACE
 class QString;
+class QStringList;
 class QSettings;
 QT_END_NAMESPACE
 
 namespace Resource
 {
-    QString FindFile(const QString & dir, const QString & file);
+    QString 	FindFile(const QString & dir, const QString & file);
+    QStringList	FindFiles(const QString & dir, const QString & file);
     QSettings & localSettings(void);
 }
 

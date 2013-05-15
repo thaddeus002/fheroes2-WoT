@@ -64,10 +64,28 @@ namespace Resource
 	    it = shares.begin(); it != shares.end(); ++it)
 	{
 	    const QString path = QDir::toNativeSeparators(*it + QDir::separator() + dir + QDir::separator() + file);
-	    if(QFile(path).exists()) return path;
+	    if(QFileInfo(path).isReadable()) return path;
 	}
 
 	return NULL;
+    }
+
+    QStringList FindFiles(const QString & dir, const QString & file)
+    {
+	QStringList res;
+
+	for(QStringList::const_iterator
+	    it = shares.begin(); it != shares.end(); ++it)
+	{
+	    QDir fullDir(QDir::toNativeSeparators(*it + QDir::separator() + dir));
+	    QStringList files = fullDir.entryList(QStringList() << file, QDir::Files | QDir::Readable);
+
+	    for(QStringList::const_iterator
+		ft = files.begin(); ft != files.end(); ++ft)
+		res << QDir::toNativeSeparators(fullDir.path() + QDir::separator() + *ft);
+	}
+
+	return res;
     }
 
     void InitShares(void)

@@ -289,67 +289,15 @@ Form::SelectImageTab::SelectImageTab(const QDomElement & groupElem, const QStrin
     for(int index = 0; index < 0x80; ++index)
 	objectsID[index] = MapObj::transcribe(index);
 
-    Editor::MyXML templateObjects(EditorTheme::resourceFile(dataFolder, "template.xml"), "template");
-    Editor::MyXML objectsElem(EditorTheme::resourceFile(dataFolder, groupElem.attribute("file")), "objects");
-    QString icn = objectsElem.attribute("icn");
+    Editor::MyObjectsXML objectsElem(EditorTheme::resourceFile(dataFolder, groupElem.attribute("file")));
 
-    if(! objectsElem.isNull())
+    for(Editor::MyObjectsXML::const_iterator
+	it = objectsElem.begin(); it != objectsElem.end(); ++it)
     {
-        // parse element: object
-        QDomNodeList objectsList = objectsElem.elementsByTagName("object");
+        CompositeObject obj(*it);
 
-        for(int pos1 = 0; pos1 < objectsList.size(); ++pos1)
-        {
-            QDomElement objElem = objectsList.item(pos1).toElement();
-	    int cid = objElem.hasAttribute("cid") ? objElem.attribute("cid").toInt(NULL, 0) : MapObj::None;
-            CompositeObject obj(icn, objElem, 0, cid);
-
-            if(obj.isValid())
-		listWidget->addItem(new SelectImageItem(obj, objectsID));
-        }
-
-        // parse element: template
-        objectsList = objectsElem.elementsByTagName("template");
-
-        for(int pos2 = 0; pos2 < objectsList.size(); ++pos2)
-        {
-            QDomElement tmplElem = objectsList.item(pos2).toElement();
-
-            if(! templateObjects.isNull() && tmplElem.hasAttribute("section"))
-            {
-                QDomElement objElem = templateObjects.firstChildElement(tmplElem.attribute("section"));
-
-		if(objElem.isNull())
-		{
-		    qDebug() << "unknown xml section:" << tmplElem.attribute("section") << "file:" << groupElem.attribute("file");
-		    continue;
-		}
-
-                int startIndex = tmplElem.attribute("index").toInt();
-
-                // override tags: icn
-                if(tmplElem.hasAttribute("icn"))
-                    icn = tmplElem.attribute("icn");
-
-		int cid = MapObj::None;
-
-                // override tags: cid
-                if(objElem.hasAttribute("cid"))
-		    cid = objElem.attribute("cid").toInt(NULL, 0);
-
-                if(tmplElem.hasAttribute("cid"))
-		    cid = tmplElem.attribute("cid").toInt(NULL, 0);
-
-                CompositeObject obj(icn, objElem, startIndex, cid);
-
-                // override tags: name
-                if(tmplElem.hasAttribute("name"))
-                    obj.name = tmplElem.attribute("name");
-
-            	if(obj.isValid())
-		    listWidget->addItem(new SelectImageItem(obj, objectsID));
-            }
-        }
+        if(obj.isValid())
+	    listWidget->addItem(new SelectImageItem(obj, objectsID));
     }
 }
 
@@ -357,11 +305,6 @@ bool Form::SelectImageTab::isSelected(void) const
 {
     return listWidget->selectedItems().size();
 }
-
-namespace Form
-{
-    int SelectImage::lastNumTab = 0;
-};
 
 Form::SelectImage::SelectImage()
 {

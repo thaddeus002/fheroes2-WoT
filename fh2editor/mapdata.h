@@ -95,7 +95,7 @@ class MapTileExt
 
 public:
     MapTileExt(int lv, const mp2lev_t &);
-    MapTileExt(int, const CompositeSprite &, quint32);
+    MapTileExt(const CompositeObject &, const CompositeSprite &, quint32);
 
     static bool		sortLevel1(const MapTileExt*, const MapTileExt*);
     static bool		sortLevel2(const MapTileExt*, const MapTileExt*);
@@ -153,7 +153,7 @@ public:
     void		loadSpriteLevels(const mp2ext_t &);
     void		sortSpritesLevels(void);
     void		setTileSprite(int, int);
-    void		addSpriteSection(int, const CompositeSprite &, quint32);
+    void		addSpriteSection(const CompositeObject &, const CompositeSprite &, quint32);
 
     const MapTileLevels & levels1(void) const { return spritesLevel1; }
     const MapTileLevels & levels2(void) const { return spritesLevel2; }
@@ -173,7 +173,6 @@ protected:
     int			tileSprite;
     int			tileShape;
     int			objectID;
-    int			objectOld;
 
     MapTileLevels	spritesLevel1;
     MapTileLevels	spritesLevel2;

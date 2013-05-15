@@ -41,8 +41,8 @@ MapTileExt::MapTileExt(int lvl, const mp2lev_t & ext)
 {
 }
 
-MapTileExt::MapTileExt(int icn, const CompositeSprite & cs, quint32 uid)
-    : spriteICN(icn), spriteExt(0), spriteIndex(cs.spriteIndex), spriteLevel(0), spriteUID(uid)
+MapTileExt::MapTileExt(const CompositeObject & co, const CompositeSprite & cs, quint32 uid)
+    : spriteICN(co.icn.second), spriteExt(0), spriteIndex(cs.spriteIndex), spriteLevel(0), spriteUID(uid)
 {
     if(cs.spriteAnimation)
 	spriteExt |= 0x01;
@@ -255,7 +255,7 @@ const MapTileExt* MapTileLevels::find(bool (*pf)(const MapTileExt*)) const
 }
 
 MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos)
-    : mpos(pos), tileSprite(mp2.tileSprite), tileShape(mp2.tileShape % 4), objectID(mp2.objectID), objectOld(mp2.objectID),
+    : mpos(pos), tileSprite(mp2.tileSprite), tileShape(mp2.tileShape % 4), objectID(mp2.objectID),
 	passableBase(Direction::All), passableLocal(Direction::All)
 {
     const QSize & tileSize = EditorTheme::tileSize();
@@ -376,7 +376,7 @@ void MapTile::showInfo(void) const
     ss2 << "tile pos:    " << mpos.x() << ", " << mpos.y() << endl \
 	<< "tile sprite: " << tileSprite << endl \
 	<< "tile rotate: " << tileShape << endl \
-	<< "object:      " << MapObj::transcribe(objectID) << " (" << objectOld << "," << objectID << ")" << endl;
+	<< "object:      " << MapObj::transcribe(objectID) << endl;
 
     ss2 << "----------------------" << endl;
 
@@ -429,12 +429,12 @@ void MapTile::sortSpritesLevels(void)
     qStableSort(spritesLevel2.begin(), spritesLevel2.end(), MapTileExt::sortLevel2);
 }
 
-void MapTile::addSpriteSection(int icn, const CompositeSprite & cs, quint32 uid)
+void MapTile::addSpriteSection(const CompositeObject & co, const CompositeSprite & cs, quint32 uid)
 {
     if(cs.spriteLevel == SpriteLevel::Top)
-	spritesLevel2 << new MapTileExt(icn, cs, uid);
+	spritesLevel2 << new MapTileExt(co, cs, uid);
     else
-	spritesLevel1 << new MapTileExt(icn, cs, uid);
+	spritesLevel1 << new MapTileExt(co, cs, uid);
 }
 
 QDomElement & operator<< (QDomElement & el, const MapTile & tile)
@@ -718,12 +718,20 @@ void MapArea::addObject(const QPoint & pos, const CompositeObject & obj, quint32
 {
     const QSize & tileSize = EditorTheme::tileSize();
 
+/*
+    classId
+    spriteLevel
+*/
+
     for(CompositeObject::const_iterator
 	it = obj.begin(); it != obj.end(); ++it)
     {
 	QPoint offset((*it).spritePos.x() * tileSize.width() + 1, (*it).spritePos.y() * tileSize.height() + 1);
 	MapTile* tile = tiles.mapToTile(pos + offset);
-	tile->addSpriteSection(obj.icn.second, *it, uid);
+	tile->addSpriteSection(obj, *it, uid);
+
+	if((*it).spriteLevel == SpriteLevel::Action)
+	    qDebug() << "456456456456";
     }
 }
 

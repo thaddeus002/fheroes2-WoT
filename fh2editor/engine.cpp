@@ -651,14 +651,21 @@ QPair<QPixmap, QPoint> AGG::File::getImageICN(const QString & id, int index, QVe
     return result;
 }
 
+QString AGG::Spool::dirName(void) const
+{
+    return first.isReadable() ?
+	QDir::toNativeSeparators(QFileInfo(first.fileName()).absolutePath()) : NULL;
+}
+
 bool AGG::Spool::setData(const QString & file)
 {
     if(first.loadFile(file))
     {
-	QStringList list = QFileInfo(file).absoluteDir().entryList(QStringList() << "heroes2x.agg", QDir::Files | QDir::Readable);
+	QFileInfo fileInfo(file);
+	QStringList list = fileInfo.absoluteDir().entryList(QStringList() << "heroes2x.agg", QDir::Files | QDir::Readable);
 
 	if(list.size())
-	    second.loadFile(QDir::toNativeSeparators(QFileInfo(file).absolutePath() + QDir::separator() + list.front()));
+	    second.loadFile(QDir::toNativeSeparators(fileInfo.absolutePath() + QDir::separator() + list.front()));
 
 	// load palette
 	QByteArray array = first.readRawData("KB.PAL");
@@ -865,7 +872,7 @@ QPixmap Editor::pixmapBorderPassable(const QSize & size, int passable)
     return result;
 }
 
-Editor::MyXML::MyXML(const QString & xml, const QString & root)
+Editor::MyXML::MyXML(const QString & xml, const QString & root, bool debug)
 {
     QDomDocument dom;
     QFile file(xml);
@@ -888,8 +895,84 @@ Editor::MyXML::MyXML(const QString & xml, const QString & root)
 
     if(tagName() != root)
     {
-	qDebug() << "MyXML:" << xml << "unknown tag:" << tagName();
+	if(debug)
+	    qDebug() << "MyXML:" << xml << "unknown tag:" << tagName();
 	clear();
+    }
+}
+
+Editor::MyObjectsXML::MyObjectsXML(const QString & xml, bool debug)
+{
+    Editor::MyXML templateObjects(QDir::toNativeSeparators(QFileInfo(xml).absolutePath() + QDir::separator() + "template.xml"), "template");
+    Editor::MyXML objectsElem(xml, "objects", debug);
+
+    if(! objectsElem.isNull())
+    {
+	QString icn = objectsElem.hasAttribute("icn") ? objectsElem.attribute("icn") : NULL;
+	int cid = objectsElem.hasAttribute("cid") ? objectsElem.attribute("cid").toInt(NULL, 0) : MapObj::None;
+    
+	// parse element: object
+        QDomNodeList objectsList = objectsElem.elementsByTagName("object");
+
+        for(int pos = 0; pos < objectsList.size(); ++pos)
+        {
+            QDomElement objElem = objectsList.item(pos).toElement();
+
+            if(! objElem.hasAttribute("cid")) objElem.setAttribute("cid", cid);
+            if(! objElem.hasAttribute("icn")) objElem.setAttribute("icn", icn.isNull() ? "unknown" : icn);
+
+	    push_back(objElem);
+        }
+
+        if(! templateObjects.isNull())
+	{
+    	    // parse element: template
+    	    objectsList = objectsElem.elementsByTagName("template");
+
+    	    for(int pos = 0; pos < objectsList.size(); ++pos)
+    	    {
+        	QDomElement tmplElem(objectsList.item(pos).toElement());
+
+        	if(tmplElem.hasAttribute("section"))
+        	{
+            	    QDomElement objElem = templateObjects.firstChildElement(tmplElem.attribute("section")).cloneNode(true).toElement();
+
+            	    if(objElem.isNull())
+            	    {
+			if(debug)
+                	    qDebug() << "Editor::MyObjectsXML:" << "unknown xml section:" << tmplElem.attribute("section") << "file:" << xml;
+                	continue;
+            	    }
+
+		    if(tmplElem.hasAttribute("icn")) objElem.setAttribute("icn", tmplElem.attribute("icn"));
+        	    else
+		    if(!icn.isNull()) objElem.setAttribute("icn", icn);
+
+		    if(tmplElem.hasAttribute("cid")) objElem.setAttribute("cid", tmplElem.attribute("cid").toInt(NULL, 0));
+        	    else
+		    if(cid != MapObj::None) objElem.setAttribute("cid", cid);
+
+            	    objElem.setAttribute("name", tmplElem.hasAttribute("name") ? tmplElem.attribute("name") : objElem.tagName());
+            	    objElem.setTagName("object");
+		    
+		    // fix index offset
+		    if(tmplElem.hasAttribute("index"))
+		    {
+            		int startIndex = tmplElem.attribute("index").toInt();
+    			QDomNodeList spritesList = objElem.elementsByTagName("sprite");
+
+    			for(int pos2 = 0; pos2 < spritesList.size(); ++pos2)
+    			{
+        		    QDomElement spriteElem = spritesList.item(pos2).toElement();
+        		    int offsetIndex = spriteElem.hasAttribute("index") ? spriteElem.attribute("index").toInt(NULL, 0) : 0;
+			    spriteElem.setAttribute("index", startIndex + offsetIndex);
+			}
+		    }
+
+		    push_back(objElem);
+		}
+	    }
+	}
     }
 }
 
@@ -1336,13 +1419,23 @@ int H2::isAnimationICN(int spriteClass, int spriteIndex, int ticket)
     return 0;
 }
 
+struct SpriteInfo
+{
+    int		oid;
+    int		level;
+    int		passable;
+
+    SpriteInfo() : oid(MapObj::None), level(SpriteLevel::Unknown), passable(Direction::Unknown) {}
+    SpriteInfo(int id, int lv, int ps) : oid(id), level(lv), passable(ps) {}
+};
 
 /*Themes section */
 namespace EditorTheme
 {
-    AGG::Spool	aggSpool;
-    QString	themeName("unknown");
-    QSize	themeTile(0, 0);
+    AGG::Spool			aggSpool;
+    QString			themeName("unknown");
+    QSize			themeTile(0, 0);
+    QMap<int, SpriteInfo>	mapSpriteInfoCache;
 }
 
 bool EditorTheme::load(const QString & data)
@@ -1352,6 +1445,35 @@ bool EditorTheme::load(const QString & data)
 	themeName = "agg";
 	themeTile = QSize(32, 32);
 
+	mapSpriteInfoCache.clear();
+	QStringList files = resourceFiles("objects", "*.xml");
+	for(QStringList::const_iterator
+	    it = files.begin(); it != files.end(); ++it)
+	{
+	    Editor::MyObjectsXML objectsElem(*it, false);
+
+	    for(QList<QDomElement>::const_iterator
+		it = objectsElem.begin(); it != objectsElem.end(); ++it)
+	    {
+		QString icnStr = (*it).attribute("icn").toUpper();
+		if(0 > icnStr.lastIndexOf(".ICN")) icnStr.append(".ICN");
+		int icn = H2::mapICN(icnStr);
+		int cid = (*it).attribute("cid").toInt(NULL, 0);
+
+    		QDomNodeList spritesList = (*it).elementsByTagName("sprite");
+
+    		for(int pos = 0; pos < spritesList.size(); ++pos)
+    		{
+        	    QDomElement spriteElem = spritesList.item(pos).toElement();
+		    int index = spriteElem.attribute("index").toInt();
+		    QString level = spriteElem.attribute("level");
+		    int passable = spriteElem.attribute("passable").toInt(NULL, 0);
+		    int key = (icn << 16) | (0x0000FFFF & index);
+		    mapSpriteInfoCache[key] = SpriteInfo(cid, SpriteLevel::fromString(level), passable);
+		}
+	    }
+	}
+
 	return true;
     }
 
@@ -1360,8 +1482,24 @@ bool EditorTheme::load(const QString & data)
 
 QString EditorTheme::resourceFile(const QString & dir, const QString & file)
 {
-    return Resource::FindFile(QDir::toNativeSeparators(QString("themes") + QDir::separator() + themeName),
-	    QDir::toNativeSeparators(dir + QDir::separator() + file));
+    return Resource::FindFile(QDir::toNativeSeparators(QString("themes") + QDir::separator() + themeName + QDir::separator() + dir), file);
+}
+
+QStringList EditorTheme::resourceFiles(const QString & dir, const QString & file)
+{
+    return Resource::FindFiles(QDir::toNativeSeparators(QString("themes") + QDir::separator() + themeName+ QDir::separator() + dir), file);
+}
+
+int EditorTheme::getObjectID(const QString & icn, int index)
+{
+    return getObjectID(H2::mapICN(icn), index);
+}
+
+int EditorTheme::getObjectID(int icn, int index)
+{
+    int key = (icn << 16) | (0x0000FFFF & index);
+    QMap<int,SpriteInfo>::const_iterator it = mapSpriteInfoCache.find(key);
+    return it != mapSpriteInfoCache.end() ? (*it).oid : ICN::UNKNOWN;
 }
 
 QPixmap EditorTheme::getImageTIL(const QString & til, int index)
@@ -1987,17 +2125,14 @@ int SpriteLevel::fromString(const QString & level)
 	return Top;
 
     qDebug() << "SpriteLevel::fromString:" << "unknown sprite level";
-    return Uknown;
+    return Unknown;
 }
 
-CompositeSprite::CompositeSprite(const QDomElement & elem, int templateIndex)
+CompositeSprite::CompositeSprite(const QDomElement & elem)
     : spriteIndex(elem.attribute("index").toInt()), spriteLevel(0), spritePassable(Direction::All), spriteAnimation(0)
 {
     spritePos.setX(elem.attribute("px").toInt());
     spritePos.setY(elem.attribute("py").toInt());
-
-    if(templateIndex)
-	spriteIndex += templateIndex;
 
     spriteLevel = SpriteLevel::fromString(elem.attribute("level").toLower());
 
@@ -2008,16 +2143,16 @@ CompositeSprite::CompositeSprite(const QDomElement & elem, int templateIndex)
 	spriteAnimation = elem.attribute("animation").toInt();
 }
 
-CompositeObject::CompositeObject(const QString & obj, const QDomElement & elem, int templateIndex, int cid)
-    : name(elem.attribute("name")), size(elem.attribute("width").toInt(), elem.attribute("height").toInt()), classId(cid)
+CompositeObject::CompositeObject(const QDomElement & elem)
+    : name(elem.attribute("name")), size(elem.attribute("width").toInt(), elem.attribute("height").toInt()), classId(elem.attribute("cid").toInt(NULL, 0))
 {
-    QString icnStr = obj.toUpper();
+    QString icnStr = elem.attribute("icn").toUpper();
     if(0 > icnStr.lastIndexOf(".ICN")) icnStr.append(".ICN");
     icn = qMakePair(icnStr, H2::mapICN(icnStr));
 
     QDomNodeList list = elem.elementsByTagName("sprite");
     for(int pos = 0; pos < list.size(); ++pos)
-	push_back(CompositeSprite(list.item(pos).toElement(), templateIndex));
+	push_back(CompositeSprite(list.item(pos).toElement()));
 }
 
 bool CompositeObject::isValid(void) const

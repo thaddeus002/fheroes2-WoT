@@ -89,7 +89,7 @@ namespace Building
 
 namespace SpriteLevel
 {
-    enum { Uknown, Bottom, Action, Top };
+    enum { Unknown, Bottom, Action, Top };
 
     int fromString(const QString &);
 }
@@ -331,7 +331,7 @@ struct CompositeSprite
     int		spriteAnimation;
 
     CompositeSprite(){}
-    CompositeSprite(const QDomElement &, int = -1);
+    CompositeSprite(const QDomElement &);
 };
 
 struct CompositeObject : public QVector<CompositeSprite>
@@ -342,7 +342,7 @@ struct CompositeObject : public QVector<CompositeSprite>
     int		classId;
 
     CompositeObject() : classId(MapObj::None) {}
-    CompositeObject(const QString &, const QDomElement &, int, int);
+    CompositeObject(const QDomElement &);
 
     bool	isValid(void) const;
 };
@@ -360,7 +360,13 @@ namespace Editor
     class MyXML : public QDomElement
     {
     public:
-	MyXML(const QString &, const QString &);
+	MyXML(const QString &, const QString &, bool debug = true);
+    };
+
+    class MyObjectsXML : public QList<QDomElement>
+    {
+    public:
+	MyObjectsXML(const QString &, bool debug = true);
     };
 }
 
@@ -487,6 +493,7 @@ namespace AGG
 	QPixmap			getImage(const CompositeObject &, const QSize &);
 
 	bool			isHeroes2XMode(void) const;
+	QString			dirName(void) const;
     };
 }
 
@@ -513,6 +520,8 @@ namespace EditorTheme
     QPair<QPixmap, QPoint>	getImageICN(int, int);
     QPair<QPixmap, QPoint>	getImageICN(const QString &, int);
     QPixmap			getImage(const CompositeObject &);
+    int				getObjectID(int, int);
+    int				getObjectID(const QString &, int);
 
     const QSize &		tileSize(void);
 
@@ -525,6 +534,7 @@ namespace EditorTheme
     QPair<int, int>		groundBoundariesFix(const MapTile &, const MapTiles &);
 
     QString			resourceFile(const QString & dir, const QString & file);
+    QStringList			resourceFiles(const QString & dir, const QString & file);
 }
 
 struct Resources
