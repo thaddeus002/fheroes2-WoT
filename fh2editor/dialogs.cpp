@@ -1551,7 +1551,7 @@ void Form::MiniMap::generateFromTiles(const MapTiles & tiles)
     QApplication::restoreOverrideCursor();
 }
 
-Form::EditResource::EditResource(int res)
+Form::EditResource::EditResource(int res, int count)
 {
     setWindowTitle(QApplication::translate("DialogEditResource", "Edit Resource", 0, QApplication::UnicodeUTF8));
 
@@ -1584,17 +1584,17 @@ Form::EditResource::EditResource(int res)
     }
 
     checkBoxDefault = new QCheckBox(this);
-    checkBoxDefault->setChecked(true);
+    checkBoxDefault->setChecked(count ? false : true);
     checkBoxDefault->setText(tr("default (random: %1-%2)").arg(min).arg(max));
 
     spinBoxCount = new QSpinBox(this);
-    spinBoxCount->setEnabled(false);
+    spinBoxCount->setEnabled(count ? true : false);
     spinBoxCount->setMinimum(min);
     spinBoxCount->setMaximum(max);
-    spinBoxCount->setValue(min);
+    spinBoxCount->setValue(count ? count : min);
 
     labelCount = new QLabel(this);
-    labelCount->setEnabled(false);
+    labelCount->setEnabled(count ? true : false);
     labelCount->setText(QApplication::translate("DialogEditResource", "fixed value:", 0, QApplication::UnicodeUTF8));
     labelCount->setBuddy(spinBoxCount);
 
@@ -1605,6 +1605,7 @@ Form::EditResource::EditResource(int res)
     verticalSpacer = new QSpacerItem(20, 1, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
     pushButtonOk = new QPushButton(this);
+    pushButtonOk->setEnabled(false);
     pushButtonOk->setText(QApplication::translate("DialogEditResource", "Ok", 0, QApplication::UnicodeUTF8));
 
     horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -1629,12 +1630,19 @@ Form::EditResource::EditResource(int res)
     setFixedSize(minSize);
 
     connect(checkBoxDefault, SIGNAL(toggled(bool)), this, SLOT(disableCustomCount(bool)));
-    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(spinBoxCount, SIGNAL(valueChanged(const QString &)), this, SLOT(enableButtonOk()));
+    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
     connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(accept()));
+}
+
+void Form::EditResource::enableButtonOk(void)
+{
+    pushButtonOk->setEnabled(true);
 }
 
 void Form::EditResource::disableCustomCount(bool f)
 {
+    enableButtonOk();
     labelCount->setEnabled(! f);
     spinBoxCount->setEnabled(! f);
 }

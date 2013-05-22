@@ -201,8 +201,6 @@ void MapWindow::newFile(const QSize & sz, int sequenceNumber)
     connect(&mapData, SIGNAL(selectionChanged(void)), this, SLOT(mapWasSelectionChanged(void)));
     connect(&mapData, SIGNAL(dataModified(void)), this, SLOT(mapWasModified(void)));
 
-    //mapData.generateMiniMap();
-
     mapWasModified();
 }
 
@@ -225,8 +223,6 @@ bool MapWindow::loadFile(const QString & fileName)
     connect(&mapData, SIGNAL(selectionChanged(void)), this, SLOT(mapWasSelectionChanged(void)));
     connect(&mapData, SIGNAL(dataModified(void)), this, SLOT(mapWasModified(void)));
 
-    //mapData.generateMiniMap();
-
     return true;
 }
 
@@ -243,38 +239,14 @@ bool MapWindow::saveAs(void)
 
 bool MapWindow::saveFile(const QString & fileName)
 {
-    Q_UNUSED(fileName);
-    mapData.SaveTest();
-
-//    QImage img(mapData.sceneRect().size().toSize(), QImage::Format_ARGB32_Premultiplied);
-
-// QRect viewport = view.viewport()->rect();
-// view.render(&painter,
-//             QRectF(0, printer.height() / 2,
-//                    printer.width(), printer.height() / 2),
-//             viewport.adjusted(0, 0, 0, -viewport.height() / 2));
-
-
-/*
-    QFile file(fileName);
-
-    if(!file.open(QFile::WriteOnly | QFile::Text))
+    if(! mapData.saveXML(fileName))
     {
-        QMessageBox::warning(this, tr("Map Editor"),
-                             tr("Cannot write file %1:\n%2.")
-                             .arg(fileName)
-                             .arg(file.errorString()));
-        return false;
+        QMessageBox::warning(this, tr("Map Editor"), tr("Cannot write file %1.").arg(fileName));
+        return saveAs();
     }
 
-    QTextStream out(&file);
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    out << toPlainText();
-
-    QApplication::restoreOverrideCursor();
     setCurrentFile(fileName);
 
-*/
     return true;
 }
 
@@ -333,7 +305,9 @@ bool MapWindow::maybeSave(void)
 
 void MapWindow::setCurrentFile(const QString & fileName)
 {
-    curFile = QFileInfo(fileName).canonicalFilePath();
+    QFileInfo fileInfo(fileName);
+    curFile = QDir::toNativeSeparators(fileInfo.absolutePath() + QDir::separator() + fileInfo.baseName() + ".map");
+
     isUntitled = false;
     isModified = false;
     setWindowModified(false);

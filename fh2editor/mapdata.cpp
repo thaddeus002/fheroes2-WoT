@@ -1528,8 +1528,15 @@ QPoint MP2Format::positionExtBlockFromNumber(int num) const
     return QPoint(-1, -1);
 }
 
-void MapData::SaveTest(void) const
+bool MapData::saveXML(const QString & fn) const
 {
+    QFile file(fn);
+
+    if(! file.open(QIODevice::WriteOnly))
+	return false;
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
     QDomDocument doc;
 
     QDomElement emap = doc.createElement("map");
@@ -1538,7 +1545,7 @@ void MapData::SaveTest(void) const
     QDomElement eheader = doc.createElement("header");
     emap.appendChild(eheader);
 
-    eheader.setAttribute("version", 3075);
+    eheader.setAttribute("version", 3100);
     eheader.setAttribute("localtime", QDateTime::currentDateTime().toTime_t());
 
     eheader.appendChild(doc.createElement("size")).appendChild(doc.createTextNode(mapTiles.sizeDescription()));
@@ -1587,13 +1594,13 @@ void MapData::SaveTest(void) const
 
     doc.insertBefore(doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\""), doc.firstChild());
 
-    QFile file("out.xml");
-    file.open(QIODevice::WriteOnly);
-
     QTextStream out(&file);
     out.setCodec(QTextCodec::codecForName("UTF-8"));
-
     doc.save(out, 5, QDomNode::EncodingFromTextStream);
+
+    QApplication::restoreOverrideCursor();
+
+    return true;
 }
 
 void MapData::selectObjectImage(void)
@@ -1703,11 +1710,15 @@ void MapData::editResourceDialog(const MapTile & tile)
 
     if(ext)
     {
-	Form::EditResource form(MapTileExt::resource(ext));
+	MapResource* res = dynamic_cast<MapResource*>(mapObjects.find(tile.mapPos()).data());
+	Form::EditResource form(res ? res->type : MapTileExt::resource(ext), res ? res->count : 0);
 
 	if(QDialog::Accepted == form.exec())
 	{
-	    //objects.push_back(new MapTown((*it).pos(), uid, (*it).town()));
+	    if(form.checkBoxDefault->isChecked())
+		mapObjects.remove(tile.mapPos());
+	    else
+		mapObjects.push_back(new MapResource(tile.mapPos(), ext->uid(), MapTileExt::resource(ext), form.spinBoxCount->value()));
 	}
     }
 }

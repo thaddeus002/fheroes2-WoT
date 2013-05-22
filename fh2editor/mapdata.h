@@ -275,10 +275,11 @@ public:
     void		newMap(const QSize &, const QString &);
     bool		loadMap(const QString &);
 
+    bool		saveXML(const QString &) const;
+
     QPoint		mapToTile(const QPoint &) const;
     QRect		mapToTile(const QRect &) const;
 
-    void		SaveTest(void) const;
     void		showMapOptions(void);
 
     MapTile*		currentTile(void) { return tileOverMouse; }

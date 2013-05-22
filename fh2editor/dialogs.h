@@ -455,10 +455,11 @@ namespace Form
 	QPushButton*		pushButtonCancel;
         QSpacerItem*		verticalSpacer;
 
-	EditResource(int res);
+	EditResource(int res, int count);
 
     protected slots:
 	void			 disableCustomCount(bool);
+	void			 enableButtonOk(void);
     };
 
     class MapEventDialog : public QDialog

@@ -695,6 +695,17 @@ struct MapSphinx : public MapObject
     QString	object(void) const { return "sphinx"; }
 };
 
+struct MapResource : public MapObject
+{
+    int		type;
+    int 	count;
+
+    MapResource(const QPoint & pos, quint32 uid, int res, int val);
+    MapResource(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1);
+
+    QString	object(void) const { return "resource"; }
+};
+
 struct DayEvent
 {
     Resources	resources;
@@ -810,16 +821,6 @@ struct ListStringPos : public QList< QPair<QString, QPoint> >
     ListStringPos() {}
 };
 
-/*
-struct MapResource : public MapObject
-{
-    int		min;
-    int 	max;
-
-    MapResource() : min(0), max(0) {}
-};
-*/
-
 QDomElement & operator<< (QDomElement &, const QSize &);
 QDomElement & operator>> (QDomElement &, QSize &);
 
@@ -855,6 +856,9 @@ QDomElement & operator>> (QDomElement &, MapHero &);
 
 QDomElement & operator<< (QDomElement &, const MapTown &);
 QDomElement & operator>> (QDomElement &, MapTown &);
+
+QDomElement & operator<< (QDomElement &, const MapResource &);
+QDomElement & operator>> (QDomElement &, MapResource &);
 
 QDomElement & operator<< (QDomElement &, const Troops &);
 QDomElement & operator>> (QDomElement &, Troops &);
