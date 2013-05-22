@@ -254,6 +254,16 @@ const MapTileExt* MapTileLevels::find(bool (*pf)(const MapTileExt*)) const
     return it != end() ? *it : NULL;
 }
 
+int MapTileLevels::topObjectID(void) const
+{
+    int id = MapObj::None;
+
+    for(const_iterator it = begin(); it != end() && id != MapObj::None; ++it)
+	id = *it ? EditorTheme::getObjectID((*it)->icn(), (*it)->index()) : MapObj::None;
+
+    return id;
+}
+
 MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos)
     : mpos(pos), tileSprite(mp2.tileSprite), tileShape(mp2.tileShape % 4), objectID(mp2.objectID),
 	passableBase(Direction::All), passableLocal(Direction::All)
@@ -435,6 +445,12 @@ void MapTile::addSpriteSection(const CompositeObject & co, const CompositeSprite
 	spritesLevel2 << new MapTileExt(co, cs, uid);
     else
 	spritesLevel1 << new MapTileExt(co, cs, uid);
+
+    if(spritesLevel2.size())
+	objectID = spritesLevel2.topObjectID();
+    
+    if(objectID == MapObj::None && spritesLevel1.size())
+	objectID = spritesLevel1.topObjectID();
 }
 
 QDomElement & operator<< (QDomElement & el, const MapTile & tile)
@@ -687,6 +703,7 @@ void MapArea::importMP2Signs(const QVector<H2::SignPos> & signs)
 	it = signs.begin(); it != signs.end(); ++it) if(tiles.isValidPoint((*it).pos()))
     {
 	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1().find(MapTileExt::isSign);
+	if(!ext) ext = tiles.tileConst((*it).pos())->levels1().find(MapTileExt::isButtle);
 	int uid = ext ? ext->uid() : -1;
 	objects.push_back(new MapSign((*it).pos(), uid, (*it).sign()));
     }
@@ -718,20 +735,12 @@ void MapArea::addObject(const QPoint & pos, const CompositeObject & obj, quint32
 {
     const QSize & tileSize = EditorTheme::tileSize();
 
-/*
-    classId
-    spriteLevel
-*/
-
     for(CompositeObject::const_iterator
 	it = obj.begin(); it != obj.end(); ++it)
     {
 	QPoint offset((*it).spritePos.x() * tileSize.width() + 1, (*it).spritePos.y() * tileSize.height() + 1);
 	MapTile* tile = tiles.mapToTile(pos + offset);
 	tile->addSpriteSection(obj, *it, uid);
-
-	if((*it).spriteLevel == SpriteLevel::Action)
-	    qDebug() << "456456456456";
     }
 }
 
@@ -1560,48 +1569,20 @@ void MapData::SaveTest(void) const
 
     QDomElement erumors = doc.createElement("rumors");
     emap.appendChild(erumors);
-
-    for(TavernRumors::const_iterator
-	it = tavernRumors.begin(); it != tavernRumors.end(); ++it)
-	erumors.appendChild(doc.createElement("msg")).appendChild(doc.createTextNode(*it));
+    erumors << tavernRumors;
 
     QDomElement events = doc.createElement("events");
     emap.appendChild(events);
-
-    for(DayEvents::const_iterator
-	it = mapDayEvents.begin(); it != mapDayEvents.end(); ++it)
-    {
-	QDomElement event = doc.createElement("event");
-	events.appendChild(event);
-
-	event.setAttribute("colors", (*it).colors);
-	event.setAttribute("allowComputer", (*it).allowComputer);
-
-	event.setAttribute("dayFirst", (*it).dayFirstOccurent);
-	event.setAttribute("daySubsequent", (*it).daySubsequentOccurrences);
-
-	QDomElement resources = doc.createElement("resources");
-	event.appendChild(resources);
-	resources.setAttribute("wood", (*it).resources.wood);
-	resources.setAttribute("mercury", (*it).resources.mercury);
-	resources.setAttribute("ore", (*it).resources.ore);
-	resources.setAttribute("sulfur", (*it).resources.sulfur);
-	resources.setAttribute("crystal", (*it).resources.crystal);
-	resources.setAttribute("gems", (*it).resources.gems);
-	resources.setAttribute("gold", (*it).resources.gold);
-
-	event.appendChild(doc.createElement("msg")).appendChild(doc.createTextNode((*it).message));
-    }
+    events << mapDayEvents;
 
     QDomElement eobjects = doc.createElement("objects");
     eobjects.setAttribute("lastUID", mapUniq);
     emap.appendChild(eobjects);
-
+    eobjects << mapObjects;
 
 
     QDomElement etiles = doc.createElement("tiles");
     emap.appendChild(etiles);
-
     etiles << mapTiles;
 
     doc.insertBefore(doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\""), doc.firstChild());

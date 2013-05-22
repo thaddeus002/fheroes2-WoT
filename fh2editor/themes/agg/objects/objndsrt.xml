@@ -35,10 +35,10 @@
     </object>
     <template section="trees_2x2_1" name="Trees 74" index="74" />
     <object name="Piramid" width="3" height="2" cid="0x4C" >
-        <sprite px="0" py="0" index="77" level="top" />
+        <sprite px="0" py="0" index="77" level="top" cid="0" />
         <sprite px="1" py="0" index="78" level="top" />
         <sprite px="2" py="0" index="79" level="top" />
-        <sprite px="0" py="1" index="80" level="top" />
+        <sprite px="0" py="1" index="80" level="top" cid="0" />
         <sprite px="1" py="1" index="81" level="bottom" passable="0x01F8" />
         <sprite px="2" py="1" index="82" level="action" passable="0x01F8" />
     </object>

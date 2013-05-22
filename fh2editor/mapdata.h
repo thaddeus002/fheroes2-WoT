@@ -130,6 +130,7 @@ public:
     const MapTileExt*	find(bool (*pf)(const MapTileExt*)) const;
     void		paint(QPainter &, const QPoint &, const QPoint &) const;
     QString		infoString(void) const;
+    int			topObjectID(void) const;
 };
 
 class MapTile : public QGraphicsPixmapItem

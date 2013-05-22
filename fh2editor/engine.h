@@ -142,9 +142,28 @@ namespace Portrait
     QString transcribe(int);
 }
 
+namespace SkillType
+{
+    enum {Unknown,
+            PathFinding, Archery, Logistics, Scouting, Diplomacy, Navigation, LeaderShip, Wisdom, Mysticism, Luck, Ballistics, EagleEye, Necromancy, Estates };
+}
+
 namespace SkillLevel
 {
     enum { Unknown = 0, Basic = 1, Advanced = 2, Expert = 3 };
+}
+
+namespace Monster
+{
+    enum { Unknown,
+	Peasant, Archer, Ranger, Pikeman, VeteranPikeman, Swordsman, MasterSwordsman, Cavalry, Champion, Paladin, Crusader,
+	Goblin, Orc, OrcChief, Wolf, Ogre, OgreLord, Troll, WarTroll, Cyclops,
+	Sprite, Dwarf, BattleDwarf, Llf, GrandGlf, Druid, GreaterDruid, Unicorn, Phoenix,
+	Centaur, Gargoyle, Griffin, Minotaur, MinotaurKing, Hydra, GreenDragon, RedDragon, BlackDragon,
+	Halfling, Boar, IronGolem, SteelGolem, Roc, Mage, Archmage, Giant, Titan,
+	Skeleton, Zombie, MutantZombie, Mummy, RoyalMummy, Vampire, VampireLord, Lich, PowerLich, BoneDragon,
+	Rogue, Nomad, Ghost, Genie, Medusa, EarthElement, AirElement, FireElement, WaterElement,
+	Random1, Random2, Random3, Random4, Random };
 }
 
 struct mp2icn_t
@@ -263,8 +282,7 @@ struct mp2sphinx_t
     quint8	id; /* 0x00 */
     qint32	resources[7]; /* wood, mercury, ore, sulfur, crystal, gems, golds */
     quint16	artifact; /* 0xffff - none */
-    quint8	answersCount;
-    QVector<QString> answers; /* 8 blocks, 13 byte string */
+    QStringList answers; /* 8 blocks, 13 byte string */
     QString	text;
 };
 
@@ -557,6 +575,9 @@ class MapObject : public QPoint
     int		objUid;
     int		objType;
 
+    friend 	QDomElement & operator<< (QDomElement &, const MapObject &);
+    friend	QDomElement & operator>> (QDomElement &, MapObject &);
+
 public:
     MapObject(const QPoint & pos, int uid, int type = MapObj::None) : QPoint(pos), objUid(uid), objType(type) {}
     virtual ~MapObject() {}
@@ -565,6 +586,7 @@ public:
     int 		type(void) const { return objType; }
     const QPoint &	pos(void) const { return *this; }
     virtual QString	name(void) const { return MapObj::transcribe(objType); }
+    virtual QString	object(void) const { return "object"; }
 };
 
 struct Skill : public QPair<int, int>
@@ -575,8 +597,8 @@ struct Skill : public QPair<int, int>
     Skill(int type, int level) : QPair<int, int>(type, level) {}
 
     bool	isValid(void) const { return first && second; }
-    int &	skill(void) { return first; }
-    int &	level(void) { return second; }
+    const int &	skill(void) const { return first; }
+    const int &	level(void) const { return second; }
 };
 
 struct Skills : public QVector<Skill>
@@ -590,8 +612,8 @@ struct Troop : public QPair<int, int>
     Troop(int type, int count) : QPair<int, int>(type, count) {}
 
     bool	isValid(void) const { return first && second; }
-    int &	type(void) { return first; }
-    int &	count(void) { return second; }
+    const int &	type(void) const { return first; }
+    const int &	count(void) const { return second; }
 };
 
 struct Troops : public QVector<Troop>
@@ -609,9 +631,10 @@ struct MapTown : public MapObject
     bool	forceTown;
 
     MapTown(const QPoint &, quint32, const mp2town_t &);
-    MapTown(const QPoint &, quint32);
+    MapTown(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1);
 
     QString	name(void) const { return nameTown; }
+    QString	object(void) const { return "town"; }
 };
 
 struct MapHero : public MapObject
@@ -620,7 +643,7 @@ struct MapHero : public MapObject
     int		race;
     Troops	troops;
     int		portrait;
-    int		artifacts[3];
+    QVector<int> artifacts;
     Skills	skills;
     quint32	experience;
     bool	patrolMode;
@@ -628,9 +651,10 @@ struct MapHero : public MapObject
     QString     nameHero;
 
     MapHero(const QPoint &, quint32, const mp2hero_t &);
-    MapHero(const QPoint &, quint32);
+    MapHero(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1);
 
     QString	name(void) const { return nameHero; }
+    QString	object(void) const { return "hero"; }
 };
 
 struct MapSign : public MapObject
@@ -638,7 +662,9 @@ struct MapSign : public MapObject
     QString	message;
 
     MapSign(const QPoint &, quint32, const mp2sign_t &);
-    MapSign(const QPoint &, quint32);
+    MapSign(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1);
+
+    QString	object(void) const { return "sign"; }
 };
 
 struct MapEvent : public MapObject
@@ -651,12 +677,22 @@ struct MapEvent : public MapObject
     QString	message;
 
     MapEvent(const QPoint &, quint32, const mp2mapevent_t &);
-    MapEvent(const QPoint &, quint32);
+    MapEvent(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1);
+
+    QString	object(void) const { return "event"; }
 };
 
 struct MapSphinx : public MapObject
 {
+    Resources	resources;
+    int		artifact;
+    QStringList answers;
+    QString	message;
+
     MapSphinx(const QPoint &, quint32, const mp2sphinx_t &);
+    MapSphinx(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1);
+
+    QString	object(void) const { return "sphinx"; }
 };
 
 struct DayEvent
@@ -789,5 +825,41 @@ QDomElement & operator>> (QDomElement &, QSize &);
 
 QDomElement & operator<< (QDomElement &, const QPoint &);
 QDomElement & operator>> (QDomElement &, QPoint &);
+
+QDomElement & operator<< (QDomElement &, const Resources &);
+QDomElement & operator>> (QDomElement &, Resources &);
+
+QDomElement & operator<< (QDomElement &, const DayEvents &);
+QDomElement & operator>> (QDomElement &, DayEvents &);
+
+QDomElement & operator<< (QDomElement &, const DayEvent &);
+QDomElement & operator>> (QDomElement &, DayEvent &);
+
+QDomElement & operator<< (QDomElement &, const TavernRumors &);
+QDomElement & operator>> (QDomElement &, TavernRumors &);
+
+QDomElement & operator<< (QDomElement &, const MapObjects &);
+QDomElement & operator>> (QDomElement &, MapObjects &);
+
+QDomElement & operator<< (QDomElement &, const MapSign &);
+QDomElement & operator>> (QDomElement &, MapSign &);
+
+QDomElement & operator<< (QDomElement &, const MapEvent &);
+QDomElement & operator>> (QDomElement &, MapEvent &);
+
+QDomElement & operator<< (QDomElement &, const MapSphinx &);
+QDomElement & operator>> (QDomElement &, MapSphinx &);
+
+QDomElement & operator<< (QDomElement &, const MapHero &);
+QDomElement & operator>> (QDomElement &, MapHero &);
+
+QDomElement & operator<< (QDomElement &, const MapTown &);
+QDomElement & operator>> (QDomElement &, MapTown &);
+
+QDomElement & operator<< (QDomElement &, const Troops &);
+QDomElement & operator>> (QDomElement &, Troops &);
+
+QDomElement & operator<< (QDomElement &, const Skills &);
+QDomElement & operator>> (QDomElement &, Skills &);
 
 #endif

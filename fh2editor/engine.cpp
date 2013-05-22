@@ -388,7 +388,7 @@ QDataStream & operator>> (QDataStream & ds, mp2town_t & cstl)
     ds >> cstl.color >> cstl.customBuilding >> cstl.building >> cstl.magicTower >> cstl.customTroops;
 
     for(int ii = 0; ii < 5; ++ii)
-	ds >> cstl.troopId[ii];
+    { ds >> cstl.troopId[ii]; cstl.troopId[ii] += 1; }
 
     for(int ii = 0; ii < 5; ++ii)
 	ds >> cstl.troopCount[ii];
@@ -406,7 +406,7 @@ QDataStream & operator>> (QDataStream & ds, mp2hero_t & hero)
     ds >> hero.unknown1 >> hero.customTroops;
 
     for(int ii = 0; ii < 5; ++ii)
-	ds >> hero.troopId[ii];
+    { ds >> hero.troopId[ii]; hero.troopId[ii] += 1; }
 
     for(int ii = 0; ii < 5; ++ii)
 	ds >> hero.troopCount[ii];
@@ -416,15 +416,16 @@ QDataStream & operator>> (QDataStream & ds, mp2hero_t & hero)
     for(int ii = 0; ii < 3; ++ii)
     {
 	ds >> hero.artifacts[ii];
-    
-	if(! Artifact::isValid(hero.artifacts[ii]))
-	    hero.artifacts[ii] = Artifact::None;
+	hero.artifacts[ii] = 0xFF == hero.artifacts[ii] ? Artifact::None : hero.artifacts[ii] + 1;
     }
 
     ds >> hero.unknown2 >> hero.experience >> hero.customSkills;
 
     for(int ii = 0; ii < 8; ++ii)
+    {
 	ds >> hero.skillId[ii];
+	hero.skillId[ii] = 0xFF == hero.skillId[ii] ? SkillType::Unknown : hero.skillId[ii] + 1;
+    }
 
     for(int ii = 0; ii < 8; ++ii)
 	ds >> hero.skillLevel[ii];
@@ -458,15 +459,13 @@ QDataStream & operator>> (QDataStream & ds, mp2mapevent_t & evnt)
 	ds >> evnt.resources[ii];
 
     ds >> evnt.artifact >> evnt.allowComputer >> evnt.cancelAfterFirstVisit;
+    evnt.artifact = 0xFF == evnt.artifact ? Artifact::None : evnt.artifact + 1;
 
     for(int ii = 0; ii < 10; ++ii)
 	ds >> evnt.zero[ii];
 
     for(int ii = 0; ii < 6; ++ii)
 	ds >> evnt.colors[ii];
-
-    if(! Artifact::isValid(evnt.artifact))
-	evnt.artifact = Artifact::None;
 
     evnt.text = readStringFromStream(ds);
     return ds;
@@ -481,15 +480,13 @@ QDataStream & operator>> (QDataStream & ds, mp2dayevent_t & evnt)
 	ds >> evnt.resources[ii];
 
     ds >> evnt.artifact >> evnt.allowComputer >> evnt.dayFirstOccurent >> evnt.subsequentOccurrences;
+    evnt.artifact = 0xFF == evnt.artifact ? Artifact::None : evnt.artifact + 1;
 
     for(int ii = 0; ii < 6; ++ii)
 	ds >> evnt.zero[ii];
 
     for(int ii = 0; ii < 6; ++ii)
 	ds >> evnt.colors[ii];
-
-    if(! Artifact::isValid(evnt.artifact))
-	evnt.artifact = Artifact::None;
 
     evnt.text = readStringFromStream(ds);
     return ds;
@@ -515,23 +512,21 @@ QDataStream & operator>> (QDataStream & ds, mp2sphinx_t & sphinx)
     for(int ii = 0; ii < 7; ++ii)
 	ds >> sphinx.resources[ii];
 
-    ds >> sphinx.artifact >> sphinx.answersCount;
+    quint8 answersCount = 0;
+    ds >> sphinx.artifact >> answersCount;
+    sphinx.artifact = 0xFF == sphinx.artifact ? Artifact::None : sphinx.artifact + 1;
 
     for(int ii = 0; ii < 8; ++ii)
     {
 	QString str = readStringFromStream(ds, 13);
 
 	if(! str.isEmpty())
-	    sphinx.answers.push_back(str);
+	    sphinx.answers << str;
     }
-
-    if(! Artifact::isValid(sphinx.artifact))
-	sphinx.artifact = Artifact::None;
 
     sphinx.text = readStringFromStream(ds);
     return ds;
 }
-
 
 bool AGG::File::exists(const QString & str) const
 {
@@ -1458,7 +1453,7 @@ bool EditorTheme::load(const QString & data)
 		QString icnStr = (*it).attribute("icn").toUpper();
 		if(0 > icnStr.lastIndexOf(".ICN")) icnStr.append(".ICN");
 		int icn = H2::mapICN(icnStr);
-		int cid = (*it).attribute("cid").toInt(NULL, 0);
+		int gcid = (*it).attribute("cid").toInt(NULL, 0);
 
     		QDomNodeList spritesList = (*it).elementsByTagName("sprite");
 
@@ -1469,6 +1464,7 @@ bool EditorTheme::load(const QString & data)
 		    QString level = spriteElem.attribute("level");
 		    int passable = spriteElem.attribute("passable").toInt(NULL, 0);
 		    int key = (icn << 16) | (0x0000FFFF & index);
+		    int cid = spriteElem.hasAttribute("cid") ? spriteElem.attribute("cid").toInt(NULL, 0) : gcid;
 		    mapSpriteInfoCache[key] = SpriteInfo(cid, SpriteLevel::fromString(level), passable);
 		}
 	    }
@@ -1892,6 +1888,80 @@ QPair<int, int> EditorTheme::groundBoundariesFix(const MapTile & tile, const Map
     return res;
 }
 
+QDomElement & operator<< (QDomElement & el, const MapObject & obj)
+{
+    el.setAttribute("uid", obj.objUid);
+    el << static_cast<const QPoint &>(obj);
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, MapObject & obj)
+{
+    obj.objUid = el.hasAttribute("uid") ? el.attribute("uid").toInt() : 0;
+    el >> static_cast<QPoint &>(obj);
+    return el;
+}
+
+QDomElement & operator<< (QDomElement & el, const Troops & troops)
+{
+    for(Troops::const_iterator
+	it = troops.begin(); it != troops.end(); ++it)
+    {
+	QDomElement troopElem = el.ownerDocument().createElement("troop");
+	el.appendChild(troopElem);
+	troopElem.setAttribute("type", (*it).type());
+	troopElem.setAttribute("count", (*it).count());
+    }
+
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, Troops & troops)
+{
+    troops.clear();
+
+    QDomNodeList troopList = el.elementsByTagName("troop");
+    for(int pos = 0; pos < troopList.size(); ++pos)
+    {
+	QDomElement troopElem = troopList.item(pos).toElement();
+	int type = troopElem.hasAttribute("type") ? troopElem.attribute("type").toInt() : 0;
+	int count = troopElem.hasAttribute("count") ? troopElem.attribute("count").toInt() : 0;
+	if(type && count) troops.push_back(Troop(type, count));
+    }
+
+    return el;
+}
+
+QDomElement & operator<< (QDomElement & el, const Skills & skills)
+{
+    for(Skills::const_iterator
+	it = skills.begin(); it != skills.end(); ++it)
+    {
+	QDomElement skillElem = el.ownerDocument().createElement("skill");
+	el.appendChild(skillElem);
+	skillElem.setAttribute("id", (*it).skill());
+	skillElem.setAttribute("level", (*it).level());
+    }
+
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, Skills & skills)
+{
+    skills.clear();
+
+    QDomNodeList skillList = el.elementsByTagName("skill");
+    for(int pos = 0; pos < skillList.size(); ++pos)
+    {
+	QDomElement skillElem = skillList.item(pos).toElement();
+	int id = skillElem.hasAttribute("id") ? skillElem.attribute("id").toInt() : 0;
+	int level = skillElem.hasAttribute("level") ? skillElem.attribute("level").toInt() : 0;
+	if(id && level) skills.push_back(Skill(id, level));
+    }
+
+    return el;
+}
+
 MapTown::MapTown(const QPoint & pos, quint32 id)
     : MapObject(pos, id, MapObj::Castle), color(Color::Unknown), race(Race::Unknown), buildings(0), forceTown(false)
 {
@@ -1959,17 +2029,53 @@ MapTown::MapTown(const QPoint & pos, quint32 id, const mp2town_t & mp2)
     if(mp2.customTroops)
     {
 	for(int ii = 0; ii < 5; ++ii)
-	    troops.push_back(Troop(mp2.troopId[ii], mp2.troopCount[ii]));
+	    if(mp2.troopId[ii] && mp2.troopCount[ii])
+		troops.push_back(Troop(mp2.troopId[ii], mp2.troopCount[ii]));
     }
+}
+
+QDomElement & operator<< (QDomElement & el, const MapTown & town)
+{
+    el << static_cast<const MapObject &>(town);
+
+    el.setAttribute("name", town.nameTown);
+    el.setAttribute("color", town.color);
+    el.setAttribute("race", town.race);
+    el.setAttribute("buildings", town.buildings);
+    el.setAttribute("forceTown", town.forceTown);
+
+    QDomDocument doc = el.ownerDocument();
+
+    if(town.troops.size())
+    {
+	QDomElement troopsElem = doc.createElement("troops");
+	el.appendChild(troopsElem);
+	troopsElem << town.troops;
+    }
+
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, MapTown & town)
+{
+    el >> static_cast<MapObject &>(town);
+
+    town.nameTown = el.hasAttribute("name") ? el.attribute("name") : "Unknown";
+    town.color = el.hasAttribute("color") ? el.attribute("color").toInt() : Color::Unknown;
+    town.race =  el.hasAttribute("race") ? el.attribute("race").toInt() : Race::Unknown;
+    town.buildings = el.hasAttribute("buildings") ? el.attribute("buildings").toInt() : 0;
+    town.forceTown = el.hasAttribute("forceTown") ? el.attribute("forceTown").toInt() : false;
+
+    QDomElement troopsElem = el.firstChildElement("troops");
+    troopsElem >> town.troops;
+
+    return el;
 }
 
 MapHero::MapHero(const QPoint & pos, quint32 id)
     : MapObject(pos, id, MapObj::Heroes), color(Color::Unknown), race(Race::Unknown),
     portrait(Portrait::Random), experience(0), patrolMode(false), patrolSquare(0)
 {
-    artifacts[0] = Artifact::Unknown;
-    artifacts[1] = Artifact::Unknown;
-    artifacts[2] = Artifact::Unknown;
 }
 
 MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2)
@@ -1978,12 +2084,13 @@ MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2)
     if(mp2.customTroops)
     {
 	for(int ii = 0; ii < 5; ++ii)
-	    troops.push_back(Troop(mp2.troopId[ii], mp2.troopCount[ii]));
+	    if(mp2.troopId[ii] && mp2.troopCount[ii])
+		troops.push_back(Troop(mp2.troopId[ii], mp2.troopCount[ii]));
     }
 
-    artifacts[0] = mp2.artifacts[0];
-    artifacts[1] = mp2.artifacts[1];
-    artifacts[2] = mp2.artifacts[2];
+    for(int index = 0; index < 3; ++index)
+	if(Artifact::None != mp2.artifacts[index])
+	    artifacts.push_back(mp2.artifacts[index]);
 
     experience = mp2.experience;
     patrolMode = mp2.patrol;
@@ -1998,8 +2105,84 @@ MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2)
     if(mp2.customSkills)
     {
 	for(int ii = 0; ii < 8; ++ii)
-	    skills.push_back(Skill(mp2.skillId[ii], mp2.skillLevel[ii]));
+	    if(mp2.skillId[ii] && mp2.skillLevel[ii])
+		skills.push_back(Skill(mp2.skillId[ii], mp2.skillLevel[ii]));
     }
+}
+
+QDomElement & operator<< (QDomElement & el, const MapHero & hero)
+{
+    el << static_cast<const MapObject &>(hero);
+
+    el.setAttribute("name", hero.nameHero);
+    el.setAttribute("color", hero.color);
+    el.setAttribute("race", hero.race);
+    el.setAttribute("portrait", hero.portrait);
+    el.setAttribute("experience", hero.experience);
+    el.setAttribute("patrolMode", hero.patrolMode);
+    el.setAttribute("patrolSquare", hero.patrolSquare);
+
+    QDomDocument doc = el.ownerDocument();
+
+    if(hero.artifacts.size())
+    {
+	QDomElement artifactsElem = doc.createElement("artifacts");
+	el.appendChild(artifactsElem);
+
+	for(QVector<int>::const_iterator
+	    it = hero.artifacts.begin(); it != hero.artifacts.end(); ++it)
+	{
+	    QDomElement artElem = doc.createElement("artifact");
+	    artifactsElem.appendChild(artElem);
+	    artElem.setAttribute("id", *it);
+	}
+    }
+
+    if(hero.skills.size())
+    {
+	QDomElement skillsElem = doc.createElement("skills");
+	el.appendChild(skillsElem);
+	skillsElem << hero.skills;
+    }
+
+    if(hero.troops.size())
+    {
+	QDomElement troopsElem = doc.createElement("troops");
+	el.appendChild(troopsElem);
+	troopsElem << hero.troops;
+    }
+
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, MapHero & hero)
+{
+    el >> static_cast<MapObject &>(hero);
+
+    hero.nameHero = el.hasAttribute("name") ? el.attribute("name") : "Unknown";
+    hero.color = el.hasAttribute("color") ? el.attribute("color").toInt() : Color::Unknown;
+    hero.race =  el.hasAttribute("race") ? el.attribute("race").toInt() : Race::Unknown;
+    hero.portrait = el.hasAttribute("portrait") ? el.attribute("portrait").toInt() : Portrait::Random;
+    hero.experience = el.hasAttribute("experience") ? el.attribute("experience").toInt() : 0;
+    hero.patrolMode = el.hasAttribute("patrolMode") ? el.attribute("patrolMode").toInt() : false;
+    hero.patrolSquare = el.hasAttribute("patrolSquare") ? el.attribute("patrolSquare").toInt() : 0;
+
+    hero.artifacts.clear();
+    QDomNodeList artList = el.firstChildElement("artifacts").elementsByTagName("artifact");
+    for(int pos = 0; pos < artList.size(); ++pos)
+    {
+	QDomElement artElem = artList.item(pos).toElement();
+	if(artElem.hasAttribute("id"))
+	    hero.artifacts.push_back(artElem.attribute("id").toInt());
+    }
+
+    QDomElement skillsElem = el.firstChildElement("skills");
+    skillsElem >> hero.skills;
+
+    QDomElement troopsElem = el.firstChildElement("troops");
+    troopsElem >> hero.troops;
+
+    return el;
 }
 
 MapSign::MapSign(const QPoint & pos, quint32 id)
@@ -2010,6 +2193,20 @@ MapSign::MapSign(const QPoint & pos, quint32 id)
 MapSign::MapSign(const QPoint & pos, quint32 id, const mp2sign_t & mp2)
     : MapObject(pos, id, MapObj::Sign), message(mp2.text)
 {
+}
+
+QDomElement & operator<< (QDomElement & el, const MapSign & sign)
+{
+    el << static_cast<const MapObject &>(sign);
+    el.appendChild(el.ownerDocument().createTextNode(sign.message));
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, MapSign & sign)
+{
+    el >> static_cast<MapObject &>(sign);
+    sign.message = el.text();
+    return el;
 }
 
 MapEvent::MapEvent(const QPoint & pos, quint32 id)
@@ -2038,9 +2235,105 @@ MapEvent::MapEvent(const QPoint & pos, quint32 id, const mp2mapevent_t & mp2)
     if(mp2.colors[5]) colors |= Color::Purple;
 }
 
-MapSphinx::MapSphinx(const QPoint & pos, quint32 id, const mp2sphinx_t &)
-    : MapObject(pos, id, MapObj::Sphinx)
+QDomElement & operator<< (QDomElement & el, const MapEvent & event)
 {
+    el << static_cast<const MapObject &>(event);
+
+    QDomDocument doc = el.ownerDocument();
+
+    QDomElement resourcesElem = doc.createElement("resources");
+    el.appendChild(resourcesElem);
+    resourcesElem << event.resources;
+
+    el.setAttribute("artifact", event.artifact);
+    el.setAttribute("colors", event.colors);
+    el.setAttribute("allowComputer", event.allowComputer);
+    el.setAttribute("cancelAfterFirstVisit", event.cancelAfterFirstVisit);
+
+    el.appendChild(doc.createElement("msg")).appendChild(doc.createTextNode(event.message));
+
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, MapEvent & event)
+{
+    el >> static_cast<MapObject &>(event);
+
+    QDomElement resourcesElem = el.firstChildElement("resources");
+    resourcesElem >> event.resources;
+
+    event.artifact = el.hasAttribute("artifact") ? el.attribute("artifact").toInt() : 0;
+    event.colors = el.hasAttribute("colors") ? el.attribute("colors").toInt() : 0;
+    event.allowComputer = el.hasAttribute("allowComputer") ? el.attribute("allowComputer").toInt() : false;
+    event.cancelAfterFirstVisit = el.hasAttribute("cancelAfterFirstVisit") ? el.attribute("cancelAfterFirstVisit").toInt() : true;
+
+    QDomElement msgElem = el.firstChildElement("msg");
+    event.message = msgElem.text();
+
+    return el;
+}
+
+MapSphinx::MapSphinx(const QPoint & pos, quint32 id, const mp2sphinx_t & mp2)
+    : MapObject(pos, id, MapObj::Sphinx), artifact(mp2.artifact), answers(mp2.answers), message(mp2.text)
+{
+    resources.wood = mp2.resources[0];
+    resources.mercury = mp2.resources[1];
+    resources.ore = mp2.resources[2];
+    resources.sulfur = mp2.resources[3];
+    resources.crystal = mp2.resources[4];
+    resources.gems = mp2.resources[5];
+    resources.gold = mp2.resources[6];
+}
+
+MapSphinx::MapSphinx(const QPoint & pos, quint32 id)
+    : MapObject(pos, id, MapObj::Sphinx), artifact(Artifact::Unknown)
+{
+}
+
+QDomElement & operator<< (QDomElement & el, const MapSphinx & sphinx)
+{
+    el << static_cast<const MapObject &>(sphinx);
+
+    QDomDocument doc = el.ownerDocument();
+
+    QDomElement resourcesElem = doc.createElement("resources");
+    el.appendChild(resourcesElem);
+    resourcesElem << sphinx.resources;
+
+    el.setAttribute("artifact", sphinx.artifact);
+
+    QDomElement answersElem = doc.createElement("answers");
+    el.appendChild(answersElem);
+
+    for(QStringList::const_iterator
+	it = sphinx.answers.begin(); it != sphinx.answers.end(); ++it)
+	answersElem.appendChild(doc.createElement("answer")).appendChild(doc.createTextNode(*it));
+
+    el.appendChild(doc.createElement("msg")).appendChild(doc.createTextNode(sphinx.message));
+
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, MapSphinx & sphinx)
+{
+    el >> static_cast<MapObject &>(sphinx);
+
+    QDomElement resourcesElem = el.firstChildElement("resources");
+    resourcesElem >> sphinx.resources;
+
+    sphinx.artifact = el.hasAttribute("artifact") ? el.attribute("artifact").toInt() : 0;
+
+    sphinx.answers.clear();
+    QDomElement answersElem = el.firstChildElement("answers");
+    QDomNodeList list = answersElem.elementsByTagName("answer");
+
+    for(int pos = 0; pos < list.size(); ++pos)
+	sphinx.answers << list.item(pos).toElement().text();
+
+    QDomElement msgElem = el.firstChildElement("msg");
+    sphinx.message = msgElem.text();
+
+    return el;
 }
 
 DayEvent::DayEvent(const mp2dayevent_t & mp2)
@@ -2069,6 +2362,42 @@ QString DayEvent::header(void) const
     QTextStream ts(& header);
     ts << "Day " << dayFirstOccurent << " - " << message;
     return header;
+}
+
+QDomElement & operator<< (QDomElement & el, const DayEvent & event)
+{
+    el.setAttribute("colors", event.colors);
+    el.setAttribute("allowComputer", event.allowComputer);
+
+    el.setAttribute("dayFirst", event.dayFirstOccurent);
+    el.setAttribute("daySubsequent", event.daySubsequentOccurrences);
+
+    QDomDocument doc = el.ownerDocument();
+
+    QDomElement resourcesElem = doc.createElement("resources");
+    el.appendChild(resourcesElem);
+    resourcesElem << event.resources;
+
+    el.appendChild(doc.createElement("msg")).appendChild(doc.createTextNode(event.message));
+
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, DayEvent & event)
+{
+    event.colors = el.hasAttribute("colors") ? el.attribute("colors").toInt() : 0;
+    event.allowComputer = el.hasAttribute("allowComputer") ? el.attribute("allowComputer").toInt() : false;
+
+    event.dayFirstOccurent = el.hasAttribute("dayFirst") ? el.attribute("dayFirst").toInt() : 0;
+    event.daySubsequentOccurrences = el.hasAttribute("daySubsequent") ? el.attribute("daySubsequent").toInt() : 0;
+
+    QDomElement resourcesElem = el.firstChildElement("resources");
+    resourcesElem >> event.resources;
+
+    QDomElement msgElem = el.firstChildElement("msg");
+    event.message = msgElem.text();
+
+    return el;
 }
 
 MapObjects::MapObjects()
@@ -2106,8 +2435,136 @@ QList<SharedMapObject> MapObjects::list(int type) const
     return result;
 }
 
+QDomElement & operator<< (QDomElement & el, const MapObjects & objects)
+{
+    QDomDocument doc = el.ownerDocument();
+
+    for(QList<SharedMapObject>::const_iterator
+	it = objects.begin(); it != objects.end(); ++it)
+    {
+	QDomElement elem = doc.createElement((*it).data()->object());
+	el.appendChild(elem);
+
+	switch((*it).data()->type())
+	{
+	    case MapObj::Castle: { MapTown* obj = dynamic_cast<MapTown*>((*it).data()); if(obj) elem << *obj; } break;
+	    case MapObj::Heroes: { MapHero* obj = dynamic_cast<MapHero*>((*it).data());	if(obj) elem << *obj; } break;
+	    case MapObj::Sign:   { MapSign* obj = dynamic_cast<MapSign*>((*it).data());	if(obj) elem << *obj; } break;
+	    case MapObj::Event:  { MapEvent* obj = dynamic_cast<MapEvent*>((*it).data()); if(obj) elem << *obj; } break;
+	    case MapObj::Sphinx: { MapSphinx* obj = dynamic_cast<MapSphinx*>((*it).data()); if(obj) elem << *obj; } break;
+	    default: elem << *(*it).data(); break;
+	}
+    }
+
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, MapObjects & objects)
+{
+    QDomDocument doc = el.ownerDocument();
+    objects.clear();
+
+    for(QDomElement elem = el.firstChildElement(); ! elem.isNull(); elem = el.nextSiblingElement())
+    {
+	if(elem.tagName() == "town")
+	{ MapTown* obj = new MapTown(); elem >> *obj; objects.push_back(obj); }
+	else
+	if(elem.tagName() == "hero")
+	{ MapHero* obj = new MapHero(); elem >> *obj; objects.push_back(obj); }
+	else
+	if(elem.tagName() == "sign")
+	{ MapSign* obj = new MapSign(); elem >> *obj; objects.push_back(obj); }
+	else
+	if(elem.tagName() == "event")
+	{ MapEvent* obj = new MapEvent(); elem >> *obj; objects.push_back(obj); }
+	else
+	if(elem.tagName() == "sphinx")
+	{ MapSphinx* obj = new MapSphinx(); elem >> *obj; objects.push_back(obj); }
+    }
+
+    return el;
+}
+
 DayEvents::DayEvents()
 {
+}
+
+QDomElement & operator<< (QDomElement & el, const DayEvents & events)
+{
+    for(DayEvents::const_iterator
+        it = events.begin(); it != events.end(); ++it)
+    {
+	QDomElement elem = el.ownerDocument().createElement("event");
+        el.appendChild(elem);
+        elem << *it;
+    }
+
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, DayEvents & events)
+{
+    QDomDocument doc = el.ownerDocument();
+    events.clear();
+
+    QDomNodeList list = el.elementsByTagName("event");
+    for(int pos = 0; pos < list.size(); ++pos)
+    {
+	DayEvent event;
+	QDomElement elem = list.item(pos).toElement();
+	elem >> event;
+	events.push_back(event);
+    }
+
+    return el;
+}
+
+QDomElement & operator<< (QDomElement & el, const Resources & res)
+{
+    el.setAttribute("wood", res.wood);
+    el.setAttribute("mercury", res.mercury);
+    el.setAttribute("ore", res.ore);
+    el.setAttribute("sulfur", res.sulfur);
+    el.setAttribute("crystal", res.crystal);
+    el.setAttribute("gems", res.gems);
+    el.setAttribute("gold", res.gold);
+
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, Resources & res)
+{
+    res.wood = el.hasAttribute("wood") ? el.attribute("wood").toInt() : 0;
+    res.mercury = el.hasAttribute("mercury") ? el.attribute("mercury").toInt() : 0;
+    res.ore = el.hasAttribute("ore") ? el.attribute("ore").toInt() : 0;
+    res.sulfur = el.hasAttribute("sulfur") ? el.attribute("sulfur").toInt() : 0;
+    res.crystal = el.hasAttribute("crystal") ? el.attribute("crystal").toInt() : 0;
+    res.gems = el.hasAttribute("gems") ? el.attribute("gems").toInt() : 0;
+    res.gold = el.hasAttribute("gold") ? el.attribute("gold").toInt() : 0;
+
+    return el;
+}
+
+QDomElement & operator<< (QDomElement & el, const TavernRumors & rumors)
+{
+    QDomDocument doc = el.ownerDocument();
+
+    for(TavernRumors::const_iterator
+        it = rumors.begin(); it != rumors.end(); ++it)
+        el.appendChild(doc.createElement("msg")).appendChild(doc.createTextNode(*it));
+
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, TavernRumors & rumors)
+{
+    rumors.clear();
+    QDomNodeList list = el.elementsByTagName("msg");
+
+    for(int pos = 0; pos < list.size(); ++pos)
+	rumors << list.item(pos).toElement().text();
+
+    return el;
 }
 
 int SpriteLevel::fromString(const QString & level)
@@ -2206,6 +2663,7 @@ CompositeObjectCursor::CompositeObjectCursor(const CompositeObject & obj) : Comp
 
 void CompositeObjectCursor::paint(QPainter & painter, const QPoint & pos, bool allow)
 {
+    Q_UNUSED(allow);
     scenePos = pos;
 
     painter.drawPixmap(pos, objectArea);
