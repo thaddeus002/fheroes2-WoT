@@ -439,7 +439,7 @@ namespace Form
 	void			generateFromTiles(const MapTiles &);
     };
 
-    class EditResource : public QDialog
+    class EditResourceDialog : public QDialog
     {
 	Q_OBJECT
 
@@ -455,7 +455,7 @@ namespace Form
 	QPushButton*		pushButtonCancel;
         QSpacerItem*		verticalSpacer;
 
-	EditResource(int res, int count);
+	EditResourceDialog(int res, int count);
 
     protected slots:
 	void			 disableCustomCount(bool);
@@ -527,6 +527,107 @@ namespace Form
 	void			setEnableOKButton(void);
 	void			setEnableOKButton(const QString &);
 	void			changeLabelArtifact(int);
+    };
+
+
+    class TownDialog : public QDialog
+    {
+	Q_OBJECT
+
+    public:
+	TownDialog(const MapTown &);
+
+	QVBoxLayout*		verticalLayoutWidget;
+	QTabWidget*		tabWidget;
+	QWidget*		tabInfo;
+	QVBoxLayout*		verticalLayoutInfo;
+	QHBoxLayout*		horizontalLayoutName;
+	QLabel*			labelName;
+        QLineEdit*		lineEditName;
+	QCheckBox*		checkBoxCaptain;
+	QCheckBox*		checkBoxAllowCastle;
+	QSpacerItem*		verticalSpacerInfo;
+	QWidget*		tabTroops;
+	QVBoxLayout*		verticalLayoutTroops;
+	QCheckBox*		checkBoxTroopsDefault;
+	QHBoxLayout*		horizontalLayoutT1;
+	QLabel*			labelSlot1;
+	QComboBox*		comboBoxTroop1;
+	QSpinBox*		spinBoxCount1;
+	QHBoxLayout*		horizontalLayoutT2;
+	QLabel*			labelSlot2;
+	QComboBox*		comboBoxTroop2;
+	QSpinBox*		spinBoxCount2;
+	QHBoxLayout*		horizontalLayoutT3;
+	QLabel*			labelSlot3;
+	QComboBox*		comboBoxTroop3;
+	QSpinBox*		spinBoxCount3;
+	QHBoxLayout*		horizontalLayoutT4;
+	QLabel*			labelSlot4;
+	QComboBox*		comboBoxTroop4;
+	QSpinBox*		spinBoxCount4;
+	QHBoxLayout*		horizontalLayoutT5;
+	QLabel*			labelSlot5;
+	QComboBox*		comboBoxTroop5;
+	QSpinBox*		spinBoxCount5;
+	QSpacerItem*		verticalSpacerTroops;
+	QWidget*		tabBuildings;
+	QVBoxLayout*		verticalLayoutBuildings;
+	QCheckBox*		checkBoxBuildingsDefault;
+	QLabel*			labelMageGuild;
+	QComboBox*		comboBoxMageGuild;
+	QHBoxLayout*		horizontalLayoutMageGuild;
+	QHBoxLayout*		horizontalLayoutB1;
+	QCheckBox*		checkBoxMarket;
+	QCheckBox*		checkBoxLeftTurret;
+	QHBoxLayout*		horizontalLayoutB2;
+	QCheckBox*		checkBoxTavern;
+	QCheckBox*		checkBoxRightTurret;
+        QHBoxLayout*		horizontalLayoutB3;
+        QCheckBox*		checkBoxShipyard;
+        QCheckBox*		checkBoxMoat;
+	QHBoxLayout*		horizontalLayoutB4;
+	QCheckBox*		checkBoxWell;
+	QCheckBox*		checkBoxExt;
+	QHBoxLayout*		horizontalLayoutB5;
+	QCheckBox*		checkBoxStatue;
+	QCheckBox*		checkBoxSpec;
+	QCheckBox*		checkBoxThievesGuild;
+	QSpacerItem*		verticalSpacerBuildings;
+	QWidget*		tabDwellings;
+	QVBoxLayout*		verticalLayoutDwellings;
+	QCheckBox*		checkBoxDwellingsDefault;
+	QCheckBox*		checkBoxDwelling1;
+	QHBoxLayout*		horizontalLayoutD2;
+	QCheckBox*		checkBoxDwelling2;
+	QCheckBox*		checkBoxUpgrade2;
+	QHBoxLayout*		horizontalLayoutD3;
+	QCheckBox*		checkBoxDwelling3;
+	QCheckBox*		checkBoxUpgrade3;
+	QHBoxLayout*		horizontalLayoutD4;
+	QCheckBox*		checkBoxDwelling4;
+	QCheckBox*		checkBoxUpgrade4;
+	QHBoxLayout*		horizontalLayoutD5;
+	QCheckBox*		checkBoxDwelling5;
+	QCheckBox*		checkBoxUpgrade5;
+	QHBoxLayout*		horizontalLayoutD6;
+	QCheckBox*		checkBoxDwelling6;
+	QCheckBox*		checkBoxUpgrade6;
+	QSpacerItem*		verticalSpacerDwellings;
+	QHBoxLayout*		horizontalLayoutButtons;
+	QPushButton*		pushButtonOk;
+	QSpacerItem*		horizontalSpacerButton;
+	QPushButton*		pushButtonCancel;
+
+	int			buildings(void) const;
+	int			dwellings(void) const;
+	Troops			troops(void) const;
+
+    protected slots:
+	void			setEnableOKButton(void);
+	void			setDefaultTroops(bool);
+	void			setDefaultBuildings(bool);
+	void			setDefaultDwellings(bool);
     };
 }
 

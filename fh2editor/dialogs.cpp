@@ -1551,9 +1551,9 @@ void Form::MiniMap::generateFromTiles(const MapTiles & tiles)
     QApplication::restoreOverrideCursor();
 }
 
-Form::EditResource::EditResource(int res, int count)
+Form::EditResourceDialog::EditResourceDialog(int res, int count)
 {
-    setWindowTitle(QApplication::translate("DialogEditResource", "Edit Resource", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("EditResourceDialog", "Edit Resource", 0, QApplication::UnicodeUTF8));
 
     QSettings & settings = Resource::localSettings();
     int min = 0;
@@ -1595,7 +1595,7 @@ Form::EditResource::EditResource(int res, int count)
 
     labelCount = new QLabel(this);
     labelCount->setEnabled(count ? true : false);
-    labelCount->setText(QApplication::translate("DialogEditResource", "fixed value:", 0, QApplication::UnicodeUTF8));
+    labelCount->setText(QApplication::translate("EditResourceDialog", "fixed value:", 0, QApplication::UnicodeUTF8));
     labelCount->setBuddy(spinBoxCount);
 
     horizontalLayout1 = new QHBoxLayout();
@@ -1606,12 +1606,12 @@ Form::EditResource::EditResource(int res, int count)
 
     pushButtonOk = new QPushButton(this);
     pushButtonOk->setEnabled(false);
-    pushButtonOk->setText(QApplication::translate("DialogEditResource", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setText(QApplication::translate("EditResourceDialog", "Ok", 0, QApplication::UnicodeUTF8));
 
     horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("DialogEditResource", "Cancel", 0, QApplication::UnicodeUTF8));
+    pushButtonCancel->setText(QApplication::translate("EditResourceDialog", "Cancel", 0, QApplication::UnicodeUTF8));
 
     horizontalLayout2 = new QHBoxLayout();
     horizontalLayout2->addWidget(pushButtonOk);
@@ -1635,12 +1635,12 @@ Form::EditResource::EditResource(int res, int count)
     connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(accept()));
 }
 
-void Form::EditResource::enableButtonOk(void)
+void Form::EditResourceDialog::enableButtonOk(void)
 {
     pushButtonOk->setEnabled(true);
 }
 
-void Form::EditResource::disableCustomCount(bool f)
+void Form::EditResourceDialog::disableCustomCount(bool f)
 {
     enableButtonOk();
     labelCount->setEnabled(! f);
@@ -1955,4 +1955,668 @@ MapEvent Form::MapEventDialog::result(const QPoint & pos, quint32 uid) const
     res.message = plainTextMessage->toPlainText();
 
     return res;
+}
+
+Form::TownDialog::TownDialog(const MapTown & town)
+{
+    setWindowTitle(QApplication::translate("TownDialog", "Dialog", 0, QApplication::UnicodeUTF8));
+
+    // tab: info
+    tabInfo = new QWidget();
+
+    labelName = new QLabel(tabInfo);
+    labelName->setText(QApplication::translate("TownDialog", "Name", 0, QApplication::UnicodeUTF8));
+
+    lineEditName = new QLineEdit(tabInfo);
+    lineEditName->setText(town.nameTown);
+
+    horizontalLayoutName = new QHBoxLayout();
+    horizontalLayoutName->addWidget(labelName);
+    horizontalLayoutName->addWidget(lineEditName);
+
+    checkBoxCaptain = new QCheckBox(tabInfo);
+    checkBoxCaptain->setText(QApplication::translate("TownDialog", "Captain", 0, QApplication::UnicodeUTF8));
+    checkBoxCaptain->setChecked(town.buildings & Building::Captain);
+
+    checkBoxAllowCastle = new QCheckBox(tabInfo);
+    checkBoxAllowCastle->setVisible(! (town.buildings & Building::Castle));
+    checkBoxAllowCastle->setChecked(! town.forceTown);
+    checkBoxAllowCastle->setText(QApplication::translate("TownDialog", "Allow castle", 0, QApplication::UnicodeUTF8));
+
+    verticalSpacerInfo = new QSpacerItem(20, 142, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    verticalLayoutInfo = new QVBoxLayout(tabInfo);
+    verticalLayoutInfo->addLayout(horizontalLayoutName);
+    verticalLayoutInfo->addWidget(checkBoxCaptain);
+    verticalLayoutInfo->addWidget(checkBoxAllowCastle);
+    verticalLayoutInfo->addItem(verticalSpacerInfo);
+
+    // tab: troops
+    tabTroops = new QWidget();
+    bool defaultTroops = 0 == town.troops.validCount();
+
+    checkBoxTroopsDefault = new QCheckBox(tabTroops);
+    checkBoxTroopsDefault->setChecked(defaultTroops);
+    checkBoxTroopsDefault->setText(QApplication::translate("TownDialog", "Default", 0, QApplication::UnicodeUTF8));
+
+    // troop 1
+    labelSlot1 = new QLabel(tabTroops);
+    labelSlot1->setEnabled(! defaultTroops);
+    labelSlot1->setText(QApplication::translate("TownDialog", "Slot 1", 0, QApplication::UnicodeUTF8));
+
+    comboBoxTroop1 = new QComboBox(tabTroops);
+    comboBoxTroop1->setEnabled(! defaultTroops);
+
+    spinBoxCount1 = new QSpinBox(tabTroops);
+    spinBoxCount1->setEnabled(! defaultTroops);
+    spinBoxCount1->setMaximumWidth(61);
+    spinBoxCount1->setMaximum(65535);
+
+    horizontalLayoutT1 = new QHBoxLayout();
+    horizontalLayoutT1->addWidget(labelSlot1);
+    horizontalLayoutT1->addWidget(comboBoxTroop1);
+    horizontalLayoutT1->addWidget(spinBoxCount1);
+
+    // troop 2
+    labelSlot2 = new QLabel(tabTroops);
+    labelSlot2->setEnabled(! defaultTroops);
+    labelSlot2->setText(QApplication::translate("TownDialog", "Slot 2", 0, QApplication::UnicodeUTF8));
+
+    comboBoxTroop2 = new QComboBox(tabTroops);
+    comboBoxTroop2->setEnabled(! defaultTroops);
+
+    spinBoxCount2 = new QSpinBox(tabTroops);
+    spinBoxCount2->setEnabled(! defaultTroops);
+    spinBoxCount2->setMaximumWidth(61);
+    spinBoxCount2->setMaximum(65535);
+
+    horizontalLayoutT2 = new QHBoxLayout();
+    horizontalLayoutT2->addWidget(labelSlot2);
+    horizontalLayoutT2->addWidget(comboBoxTroop2);
+    horizontalLayoutT2->addWidget(spinBoxCount2);
+
+    // troop 3
+    labelSlot3 = new QLabel(tabTroops);
+    labelSlot3->setEnabled(! defaultTroops);
+    labelSlot3->setText(QApplication::translate("TownDialog", "Slot 3", 0, QApplication::UnicodeUTF8));
+
+    comboBoxTroop3 = new QComboBox(tabTroops);
+    comboBoxTroop3->setEnabled(! defaultTroops);
+
+    spinBoxCount3 = new QSpinBox(tabTroops);
+    spinBoxCount3->setEnabled(! defaultTroops);
+    spinBoxCount3->setMaximumWidth(61);
+    spinBoxCount3->setMaximum(65535);
+
+    horizontalLayoutT3 = new QHBoxLayout();
+    horizontalLayoutT3->addWidget(labelSlot3);
+    horizontalLayoutT3->addWidget(comboBoxTroop3);
+    horizontalLayoutT3->addWidget(spinBoxCount3);
+
+    // troop 4
+    labelSlot4 = new QLabel(tabTroops);
+    labelSlot4->setEnabled(! defaultTroops);
+    labelSlot4->setText(QApplication::translate("TownDialog", "Slot 4", 0, QApplication::UnicodeUTF8));
+
+    comboBoxTroop4 = new QComboBox(tabTroops);
+    comboBoxTroop4->setEnabled(! defaultTroops);
+
+    spinBoxCount4 = new QSpinBox(tabTroops);
+    spinBoxCount4->setEnabled(! defaultTroops);
+    spinBoxCount4->setMaximumWidth(61);
+    spinBoxCount4->setMaximum(65535);
+
+    horizontalLayoutT4 = new QHBoxLayout();
+    horizontalLayoutT4->addWidget(labelSlot4);
+    horizontalLayoutT4->addWidget(comboBoxTroop4);
+    horizontalLayoutT4->addWidget(spinBoxCount4);
+
+    // troop 5
+    labelSlot5 = new QLabel(tabTroops);
+    labelSlot5->setEnabled(! defaultTroops);
+    labelSlot5->setText(QApplication::translate("TownDialog", "Slot 5", 0, QApplication::UnicodeUTF8));
+
+    comboBoxTroop5 = new QComboBox(tabTroops);
+    comboBoxTroop5->setEnabled(! defaultTroops);
+
+    spinBoxCount5 = new QSpinBox(tabTroops);
+    spinBoxCount5->setEnabled(! defaultTroops);
+    spinBoxCount5->setMaximumWidth(61);
+    spinBoxCount5->setMaximum(65535);
+
+    for(int index = Monster::None; index < Monster::Unknown; ++index)
+    {
+	QPixmap mons32 = EditorTheme::getImageICN(ICN::MONS32, index - 1).first;
+	comboBoxTroop1->addItem(mons32, Monster::transcribe(index), index);
+	comboBoxTroop2->addItem(mons32, Monster::transcribe(index), index);
+	comboBoxTroop3->addItem(mons32, Monster::transcribe(index), index);
+	comboBoxTroop4->addItem(mons32, Monster::transcribe(index), index);
+	comboBoxTroop5->addItem(mons32, Monster::transcribe(index), index);
+    }
+
+    if(! defaultTroops)
+    {
+	comboBoxTroop1->setCurrentIndex(town.troops[0].type());
+	comboBoxTroop2->setCurrentIndex(town.troops[1].type());
+	comboBoxTroop3->setCurrentIndex(town.troops[2].type());
+	comboBoxTroop4->setCurrentIndex(town.troops[3].type());
+	comboBoxTroop5->setCurrentIndex(town.troops[4].type());
+
+	spinBoxCount1->setValue(town.troops[0].count());
+	spinBoxCount2->setValue(town.troops[1].count());
+	spinBoxCount3->setValue(town.troops[2].count());
+	spinBoxCount4->setValue(town.troops[3].count());
+	spinBoxCount5->setValue(town.troops[4].count());
+    }
+
+    horizontalLayoutT5 = new QHBoxLayout();
+    horizontalLayoutT5->addWidget(labelSlot5);
+    horizontalLayoutT5->addWidget(comboBoxTroop5);
+    horizontalLayoutT5->addWidget(spinBoxCount5);
+
+    verticalSpacerTroops = new QSpacerItem(20, 37, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    verticalLayoutTroops = new QVBoxLayout(tabTroops);
+    verticalLayoutTroops->addWidget(checkBoxTroopsDefault);
+    verticalLayoutTroops->addLayout(horizontalLayoutT1);
+    verticalLayoutTroops->addLayout(horizontalLayoutT2);
+    verticalLayoutTroops->addLayout(horizontalLayoutT3);
+    verticalLayoutTroops->addLayout(horizontalLayoutT4);
+    verticalLayoutTroops->addLayout(horizontalLayoutT5);
+    verticalLayoutTroops->addItem(verticalSpacerTroops);
+
+    // tab: buildings
+    tabBuildings = new QWidget();
+    bool defaultBuildings = ! town.customBuilding;
+
+    checkBoxBuildingsDefault = new QCheckBox(tabBuildings);
+    checkBoxBuildingsDefault->setChecked(defaultBuildings);
+    checkBoxBuildingsDefault->setText(QApplication::translate("TownDialog", "Default", 0, QApplication::UnicodeUTF8));
+
+    labelMageGuild = new QLabel(tabBuildings);
+    labelMageGuild->setText(QApplication::translate("TownDialog", "Mage Guild", 0, QApplication::UnicodeUTF8));
+    labelMageGuild->setEnabled(! defaultBuildings);
+
+    comboBoxMageGuild = new QComboBox(tabBuildings);
+    comboBoxMageGuild->setEnabled(! defaultBuildings);
+    comboBoxMageGuild->addItem(QApplication::translate("TownDialog", "None", 0, QApplication::UnicodeUTF8), 0);
+    comboBoxMageGuild->addItem(QApplication::translate("TownDialog", "Level 1", 0, QApplication::UnicodeUTF8), 1);
+    comboBoxMageGuild->addItem(QApplication::translate("TownDialog", "Level 2", 0, QApplication::UnicodeUTF8), 2);
+    comboBoxMageGuild->addItem(QApplication::translate("TownDialog", "Level 3", 0, QApplication::UnicodeUTF8), 3);
+    comboBoxMageGuild->addItem(QApplication::translate("TownDialog", "Level 4", 0, QApplication::UnicodeUTF8), 4);
+    comboBoxMageGuild->addItem(QApplication::translate("TownDialog", "Level 5", 0, QApplication::UnicodeUTF8), 5);
+    comboBoxMageGuild->setCurrentIndex(0);
+
+    horizontalLayoutMageGuild = new QHBoxLayout();
+    horizontalLayoutMageGuild->addWidget(labelMageGuild);
+    horizontalLayoutMageGuild->addWidget(comboBoxMageGuild);
+
+    checkBoxMarket = new QCheckBox(tabBuildings);
+    checkBoxMarket->setEnabled(! defaultBuildings);
+    checkBoxMarket->setText(QApplication::translate("TownDialog", "Marketplace", 0, QApplication::UnicodeUTF8));
+
+    checkBoxLeftTurret = new QCheckBox(tabBuildings);
+    checkBoxLeftTurret->setEnabled(! defaultBuildings);
+    checkBoxLeftTurret->setText(QApplication::translate("TownDialog", "Left Turret", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutB1 = new QHBoxLayout();
+    horizontalLayoutB1->addWidget(checkBoxMarket);
+    horizontalLayoutB1->addWidget(checkBoxLeftTurret);
+
+    checkBoxTavern = new QCheckBox(tabBuildings);
+    checkBoxTavern->setEnabled(! defaultBuildings);
+    checkBoxTavern->setText(QApplication::translate("TownDialog", "Tavern", 0, QApplication::UnicodeUTF8));
+
+    checkBoxRightTurret = new QCheckBox(tabBuildings);
+    checkBoxRightTurret->setEnabled(! defaultBuildings);
+    checkBoxRightTurret->setText(QApplication::translate("TownDialog", "Right Turret", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutB2 = new QHBoxLayout();
+    horizontalLayoutB2->addWidget(checkBoxTavern);
+    horizontalLayoutB2->addWidget(checkBoxRightTurret);
+
+    checkBoxShipyard = new QCheckBox(tabBuildings);
+    checkBoxShipyard->setEnabled(! defaultBuildings);
+    checkBoxShipyard->setText(QApplication::translate("TownDialog", "Shipyard", 0, QApplication::UnicodeUTF8));
+
+    checkBoxMoat = new QCheckBox(tabBuildings);
+    checkBoxMoat->setEnabled(! defaultBuildings);
+    checkBoxMoat->setText(QApplication::translate("TownDialog", "Moat", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutB3 = new QHBoxLayout();
+    horizontalLayoutB3->addWidget(checkBoxShipyard);
+    horizontalLayoutB3->addWidget(checkBoxMoat);
+
+    checkBoxWell = new QCheckBox(tabBuildings);
+    checkBoxWell->setEnabled(! defaultBuildings);
+    checkBoxWell->setText(QApplication::translate("TownDialog", "Well", 0, QApplication::UnicodeUTF8));
+
+    checkBoxExt = new QCheckBox(tabBuildings);
+    checkBoxExt->setEnabled(! defaultBuildings);
+    checkBoxExt->setText(Building::extraWel2(town.race));
+
+    horizontalLayoutB4 = new QHBoxLayout();
+    horizontalLayoutB4->addWidget(checkBoxWell);
+    horizontalLayoutB4->addWidget(checkBoxExt);
+
+    checkBoxStatue = new QCheckBox(tabBuildings);
+    checkBoxStatue->setEnabled(! defaultBuildings);
+    checkBoxStatue->setText(QApplication::translate("TownDialog", "Statue", 0, QApplication::UnicodeUTF8));
+
+    checkBoxSpec = new QCheckBox(tabBuildings);
+    checkBoxSpec->setEnabled(! defaultBuildings);
+    checkBoxSpec->setText(Building::extraSpec(town.race));
+
+    horizontalLayoutB5 = new QHBoxLayout();
+    horizontalLayoutB5->addWidget(checkBoxStatue);
+    horizontalLayoutB5->addWidget(checkBoxSpec);
+
+    checkBoxThievesGuild = new QCheckBox(tabBuildings);
+    checkBoxThievesGuild->setEnabled(! defaultBuildings);
+    checkBoxThievesGuild->setText(QApplication::translate("TownDialog", "Thieves Guild", 0, QApplication::UnicodeUTF8));
+
+    verticalSpacerBuildings = new QSpacerItem(20, 45, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    verticalLayoutBuildings = new QVBoxLayout(tabBuildings);
+    verticalLayoutBuildings->addWidget(checkBoxBuildingsDefault);
+    verticalLayoutBuildings->addLayout(horizontalLayoutMageGuild);
+    verticalLayoutBuildings->addLayout(horizontalLayoutB1);
+    verticalLayoutBuildings->addLayout(horizontalLayoutB2);
+    verticalLayoutBuildings->addLayout(horizontalLayoutB3);
+    verticalLayoutBuildings->addLayout(horizontalLayoutB4);
+    verticalLayoutBuildings->addLayout(horizontalLayoutB5);
+    verticalLayoutBuildings->addWidget(checkBoxThievesGuild);
+    verticalLayoutBuildings->addItem(verticalSpacerBuildings);
+
+    if(!defaultBuildings)
+    {
+	if(town.buildings & Building::MageGuild5)
+	    comboBoxMageGuild->setCurrentIndex(5);
+	else
+	if(town.buildings & Building::MageGuild4)
+	    comboBoxMageGuild->setCurrentIndex(4);
+	else
+	if(town.buildings & Building::MageGuild3)
+	    comboBoxMageGuild->setCurrentIndex(3);
+	else
+	if(town.buildings & Building::MageGuild2)
+	    comboBoxMageGuild->setCurrentIndex(2);
+	else
+	if(town.buildings & Building::MageGuild1)
+	    comboBoxMageGuild->setCurrentIndex(1);
+
+	checkBoxThievesGuild->setChecked(town.buildings & Building::ThievesGuild);
+	checkBoxTavern->setChecked(town.buildings & Building::Tavern);
+	checkBoxShipyard->setChecked(town.buildings & Building::Shipyard);
+	checkBoxWell->setChecked(town.buildings & Building::Well);
+	checkBoxStatue->setChecked(town.buildings & Building::Statue);
+	checkBoxLeftTurret->setChecked(town.buildings & Building::LeftTurret);
+	checkBoxRightTurret->setChecked(town.buildings & Building::RightTurret);
+	checkBoxMarket->setChecked(town.buildings & Building::Marketplace);
+	checkBoxMoat->setChecked(town.buildings & Building::Moat);
+	checkBoxExt->setChecked(town.buildings & Building::ExtraWel2);
+	checkBoxSpec->setChecked(town.buildings & Building::ExtraSpec);
+    }
+
+    // tab: dwellings
+    tabDwellings = new QWidget();
+    bool defaultDwellings = defaultBuildings;
+    int dwellingMap = Building::dwellingMap(town.race);
+
+    checkBoxDwellingsDefault = new QCheckBox(tabDwellings);
+    checkBoxDwellingsDefault->setChecked(defaultDwellings);
+    checkBoxDwellingsDefault->setText(QApplication::translate("TownDialog", "Default", 0, QApplication::UnicodeUTF8));
+
+    checkBoxDwelling1 = new QCheckBox(tabDwellings);
+    checkBoxDwelling1->setEnabled(! defaultDwellings);
+    checkBoxDwelling1->setText(QApplication::translate("TownDialog", "Dwelling 1", 0, QApplication::UnicodeUTF8));
+
+    checkBoxDwelling2 = new QCheckBox(tabDwellings);
+    checkBoxDwelling2->setEnabled(! defaultDwellings);
+    checkBoxDwelling2->setText(QApplication::translate("TownDialog", "Dwelling 2", 0, QApplication::UnicodeUTF8));
+
+    checkBoxUpgrade2 = new QCheckBox(tabDwellings);
+    checkBoxUpgrade2->setEnabled(! defaultDwellings);
+    checkBoxUpgrade2->setVisible(dwellingMap & Building::Upgrade2);
+    checkBoxUpgrade2->setText(QApplication::translate("TownDialog", "Upgrade 2", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutD2 = new QHBoxLayout();
+    horizontalLayoutD2->addWidget(checkBoxDwelling2);
+    horizontalLayoutD2->addWidget(checkBoxUpgrade2);
+
+    checkBoxDwelling3 = new QCheckBox(tabDwellings);
+    checkBoxDwelling3->setEnabled(! defaultDwellings);
+    checkBoxDwelling3->setText(QApplication::translate("TownDialog", "Dwelling 3", 0, QApplication::UnicodeUTF8));
+
+    checkBoxUpgrade3 = new QCheckBox(tabDwellings);
+    checkBoxUpgrade3->setEnabled(! defaultDwellings);
+    checkBoxUpgrade3->setVisible(dwellingMap & Building::Upgrade3);
+    checkBoxUpgrade3->setText(QApplication::translate("TownDialog", "Upgrade 3", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutD3 = new QHBoxLayout();
+    horizontalLayoutD3->addWidget(checkBoxDwelling3);
+    horizontalLayoutD3->addWidget(checkBoxUpgrade3);
+
+    checkBoxDwelling4 = new QCheckBox(tabDwellings);
+    checkBoxDwelling4->setEnabled(! defaultDwellings);
+    checkBoxDwelling4->setText(QApplication::translate("TownDialog", "Dwelling 4", 0, QApplication::UnicodeUTF8));
+
+    checkBoxUpgrade4 = new QCheckBox(tabDwellings);
+    checkBoxUpgrade4->setEnabled(! defaultDwellings);
+    checkBoxUpgrade4->setVisible(dwellingMap & Building::Upgrade4);
+    checkBoxUpgrade4->setText(QApplication::translate("TownDialog", "Upgrade 4", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutD4 = new QHBoxLayout();
+    horizontalLayoutD4->addWidget(checkBoxDwelling4);
+    horizontalLayoutD4->addWidget(checkBoxUpgrade4);
+
+    checkBoxDwelling5 = new QCheckBox(tabDwellings);
+    checkBoxDwelling5->setEnabled(! defaultDwellings);
+    checkBoxDwelling5->setText(QApplication::translate("TownDialog", "Dwelling 5", 0, QApplication::UnicodeUTF8));
+
+    checkBoxUpgrade5 = new QCheckBox(tabDwellings);
+    checkBoxUpgrade5->setEnabled(! defaultDwellings);
+    checkBoxUpgrade5->setVisible(dwellingMap & Building::Upgrade5);
+    checkBoxUpgrade5->setText(QApplication::translate("TownDialog", "Upgrade 5", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutD5 = new QHBoxLayout();
+    horizontalLayoutD5->addWidget(checkBoxDwelling5);
+    horizontalLayoutD5->addWidget(checkBoxUpgrade5);
+
+    checkBoxDwelling6 = new QCheckBox(tabDwellings);
+    checkBoxDwelling6->setEnabled(! defaultDwellings);
+    checkBoxDwelling6->setText(QApplication::translate("TownDialog", "Dwelling 6", 0, QApplication::UnicodeUTF8));
+
+    checkBoxUpgrade6 = new QCheckBox(tabDwellings);
+    checkBoxUpgrade6->setEnabled(! defaultDwellings);
+    checkBoxUpgrade6->setVisible(dwellingMap & Building::Upgrade6);
+    checkBoxUpgrade6->setText(QApplication::translate("TownDialog", "Upgrade 6", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutD6 = new QHBoxLayout();
+    horizontalLayoutD6->addWidget(checkBoxDwelling6);
+    horizontalLayoutD6->addWidget(checkBoxUpgrade6);
+
+    verticalSpacerDwellings = new QSpacerItem(20, 30, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    verticalLayoutDwellings = new QVBoxLayout(tabDwellings);
+    verticalLayoutDwellings->addWidget(checkBoxDwellingsDefault);
+    verticalLayoutDwellings->addWidget(checkBoxDwelling1);
+    verticalLayoutDwellings->addLayout(horizontalLayoutD2);
+    verticalLayoutDwellings->addLayout(horizontalLayoutD3);
+    verticalLayoutDwellings->addLayout(horizontalLayoutD4);
+    verticalLayoutDwellings->addLayout(horizontalLayoutD5);
+    verticalLayoutDwellings->addLayout(horizontalLayoutD6);
+    verticalLayoutDwellings->addItem(verticalSpacerDwellings);
+
+    if(!defaultBuildings)
+    {
+	checkBoxDwelling1->setChecked(town.buildings & Building::Dwelling1);
+	checkBoxDwelling2->setChecked(town.buildings & Building::Dwelling2);
+	checkBoxDwelling3->setChecked(town.buildings & Building::Dwelling3);
+	checkBoxDwelling4->setChecked(town.buildings & Building::Dwelling4);
+	checkBoxDwelling5->setChecked(town.buildings & Building::Dwelling5);
+	checkBoxDwelling6->setChecked(town.buildings & Building::Dwelling6);
+
+	checkBoxUpgrade2->setChecked(town.buildings & Building::Upgrade2);
+	checkBoxUpgrade3->setChecked(town.buildings & Building::Upgrade3);
+	checkBoxUpgrade4->setChecked(town.buildings & Building::Upgrade4);
+	checkBoxUpgrade5->setChecked(town.buildings & Building::Upgrade5);
+	checkBoxUpgrade6->setChecked(town.buildings & Building::Upgrade6);
+    }
+
+    // add tabs
+    tabWidget = new QTabWidget(this);
+    tabWidget->addTab(tabInfo, "Info");
+    tabWidget->addTab(tabTroops, "Troops");
+    tabWidget->addTab(tabBuildings, "Buildings");
+    tabWidget->addTab(tabDwellings, "Dwellings");
+    tabWidget->setCurrentIndex(0);
+
+    pushButtonOk = new QPushButton(this);
+    pushButtonOk->setEnabled(false);
+    pushButtonOk->setText(QApplication::translate("TownDialog", "Ok", 0, QApplication::UnicodeUTF8));
+
+    horizontalSpacerButton = new QSpacerItem(48, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    pushButtonCancel = new QPushButton(this);
+    pushButtonCancel->setText(QApplication::translate("TownDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutButtons = new QHBoxLayout();
+    horizontalLayoutButtons->addWidget(pushButtonOk);
+    horizontalLayoutButtons->addItem(horizontalSpacerButton);
+    horizontalLayoutButtons->addWidget(pushButtonCancel);
+
+    verticalLayoutWidget = new QVBoxLayout(this);
+    verticalLayoutWidget->addWidget(tabWidget);
+    verticalLayoutWidget->addLayout(horizontalLayoutButtons);
+
+    QSize minSize = minimumSizeHint();
+
+    resize(minSize);
+    setMinimumSize(minSize);
+
+    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
+
+    connect(checkBoxCaptain, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxAllowCastle, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(lineEditName, SIGNAL(textChanged(QString)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxCaptain, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+
+    connect(checkBoxTroopsDefault, SIGNAL(toggled(bool)), this, SLOT(setDefaultTroops(bool)));
+    connect(comboBoxTroop1, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(comboBoxTroop2, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(comboBoxTroop3, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(comboBoxTroop4, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(comboBoxTroop5, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(spinBoxCount1, SIGNAL(valueChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(spinBoxCount2, SIGNAL(valueChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(spinBoxCount3, SIGNAL(valueChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(spinBoxCount4, SIGNAL(valueChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(spinBoxCount5, SIGNAL(valueChanged(int)), this, SLOT(setEnableOKButton()));
+
+    connect(checkBoxBuildingsDefault, SIGNAL(toggled(bool)), this, SLOT(setDefaultBuildings(bool)));
+    connect(comboBoxMageGuild, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxMarket, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxLeftTurret, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxTavern, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxRightTurret, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxShipyard, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxMoat, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxWell, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxExt, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxStatue, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxSpec, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxThievesGuild, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+
+    connect(checkBoxDwellingsDefault, SIGNAL(toggled(bool)), this, SLOT(setDefaultDwellings(bool)));
+    connect(checkBoxDwelling1, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxDwelling2, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxDwelling3, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxDwelling4, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxDwelling5, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxDwelling6, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxUpgrade2, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxUpgrade3, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxUpgrade4, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxUpgrade5, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(checkBoxUpgrade6, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+}
+
+Troops Form::TownDialog::troops(void) const
+{
+    Troops res;
+
+    res[0] = Troop(comboBoxTroop1->currentIndex(), spinBoxCount1->value());
+    res[1] = Troop(comboBoxTroop2->currentIndex(), spinBoxCount2->value());
+    res[2] = Troop(comboBoxTroop3->currentIndex(), spinBoxCount3->value());
+    res[3] = Troop(comboBoxTroop4->currentIndex(), spinBoxCount4->value());
+    res[4] = Troop(comboBoxTroop5->currentIndex(), spinBoxCount5->value());
+
+    return res;
+}
+
+int Form::TownDialog::buildings(void) const
+{
+    int res = 0;
+
+    switch(comboBoxMageGuild->currentIndex())
+    {
+	case 1: res |= Building::MageGuild1; break;
+	case 2: res |= Building::MageGuild2; break;
+	case 3: res |= Building::MageGuild3; break;
+	case 4: res |= Building::MageGuild4; break;
+	case 5: res |= Building::MageGuild5; break;
+	default: break;
+    }
+
+    if(checkBoxMarket->isChecked()) res |= Building::Marketplace;
+    if(checkBoxLeftTurret->isChecked()) res |= Building::LeftTurret;
+    if(checkBoxTavern->isChecked()) res |= Building::Tavern;
+    if(checkBoxRightTurret->isChecked()) res |= Building::RightTurret;
+    if(checkBoxShipyard->isChecked()) res |= Building::Shipyard;
+    if(checkBoxMoat->isChecked()) res |= Building::Moat;
+    if(checkBoxWell->isChecked()) res |= Building::Well;
+    if(checkBoxExt->isChecked()) res |= Building::ExtraWel2;
+    if(checkBoxStatue->isChecked()) res |= Building::Statue;
+    if(checkBoxSpec->isChecked()) res |= Building::ExtraSpec;
+    if(checkBoxThievesGuild->isChecked()) res |= Building::ThievesGuild;
+
+    if(checkBoxCaptain->isChecked()) res |= Building::Captain;
+
+    return res;
+}
+
+int Form::TownDialog::dwellings(void) const
+{
+    int res = 0;
+
+    if(checkBoxDwelling1->isChecked()) res |= Building::Dwelling1;
+    if(checkBoxDwelling2->isChecked()) res |= Building::Dwelling2;
+    if(checkBoxDwelling3->isChecked()) res |= Building::Dwelling3;
+    if(checkBoxDwelling4->isChecked()) res |= Building::Dwelling4;
+    if(checkBoxDwelling5->isChecked()) res |= Building::Dwelling5;
+    if(checkBoxDwelling6->isChecked()) res |= Building::Dwelling6;
+
+    if(checkBoxUpgrade2->isChecked()) res |= Building::Upgrade2;
+    if(checkBoxUpgrade3->isChecked()) res |= Building::Upgrade3;
+    if(checkBoxUpgrade4->isChecked()) res |= Building::Upgrade4;
+    if(checkBoxUpgrade5->isChecked()) res |= Building::Upgrade5;
+    if(checkBoxUpgrade6->isChecked()) res |= Building::Upgrade6;
+
+    return res;
+}
+
+void Form::TownDialog::setDefaultBuildings(bool f)
+{
+    if(f)
+    {
+	comboBoxMageGuild->setCurrentIndex(0);
+
+	checkBoxMarket->setChecked(false);
+	checkBoxLeftTurret->setChecked(false);
+	checkBoxTavern->setChecked(false);
+	checkBoxRightTurret->setChecked(false);
+	checkBoxShipyard->setChecked(false);
+	checkBoxMoat->setChecked(false);
+	checkBoxWell->setChecked(false);
+	checkBoxExt->setChecked(false);
+	checkBoxStatue->setChecked(false);
+	checkBoxSpec->setChecked(false);
+	checkBoxThievesGuild->setChecked(false);
+    }
+
+    labelMageGuild->setDisabled(f);
+    comboBoxMageGuild->setDisabled(f);
+
+    checkBoxMarket->setDisabled(f);
+    checkBoxLeftTurret->setDisabled(f);
+    checkBoxTavern->setDisabled(f);
+    checkBoxRightTurret->setDisabled(f);
+    checkBoxShipyard->setDisabled(f);
+    checkBoxMoat->setDisabled(f);
+    checkBoxWell->setDisabled(f);
+    checkBoxExt->setDisabled(f);
+    checkBoxStatue->setDisabled(f);
+    checkBoxSpec->setDisabled(f);
+    checkBoxThievesGuild->setDisabled(f);
+
+    setEnableOKButton();
+}
+
+void Form::TownDialog::setDefaultDwellings(bool f)
+{
+    if(f)
+    {
+	checkBoxDwelling1->setChecked(false);
+	checkBoxDwelling2->setChecked(false);
+	checkBoxDwelling3->setChecked(false);
+        checkBoxDwelling4->setChecked(false);
+	checkBoxDwelling5->setChecked(false);
+	checkBoxDwelling6->setChecked(false);
+
+	checkBoxUpgrade2->setChecked(false);
+	checkBoxUpgrade3->setChecked(false);
+	checkBoxUpgrade4->setChecked(false);
+	checkBoxUpgrade5->setChecked(false);
+	checkBoxUpgrade6->setChecked(false);
+    }
+
+    checkBoxDwelling1->setDisabled(f);
+    checkBoxDwelling2->setDisabled(f);
+    checkBoxDwelling3->setDisabled(f);
+    checkBoxDwelling4->setDisabled(f);
+    checkBoxDwelling5->setDisabled(f);
+    checkBoxDwelling6->setDisabled(f);
+
+    checkBoxUpgrade2->setDisabled(f);
+    checkBoxUpgrade3->setDisabled(f);
+    checkBoxUpgrade4->setDisabled(f);
+    checkBoxUpgrade5->setDisabled(f);
+    checkBoxUpgrade6->setDisabled(f);
+
+    setEnableOKButton();
+}
+
+void Form::TownDialog::setDefaultTroops(bool f)
+{
+    if(f)
+    {
+	comboBoxTroop1->setCurrentIndex(0);
+	comboBoxTroop2->setCurrentIndex(0);
+	comboBoxTroop3->setCurrentIndex(0);
+	comboBoxTroop4->setCurrentIndex(0);
+	comboBoxTroop5->setCurrentIndex(0);
+
+	spinBoxCount1->setValue(0);
+	spinBoxCount2->setValue(0);
+	spinBoxCount3->setValue(0);
+	spinBoxCount4->setValue(0);
+	spinBoxCount5->setValue(0);
+    }
+
+    labelSlot1->setDisabled(f);
+    labelSlot2->setDisabled(f);
+    labelSlot3->setDisabled(f);
+    labelSlot4->setDisabled(f);
+    labelSlot5->setDisabled(f);
+
+    comboBoxTroop1->setDisabled(f);
+    comboBoxTroop2->setDisabled(f);
+    comboBoxTroop3->setDisabled(f);
+    comboBoxTroop4->setDisabled(f);
+    comboBoxTroop5->setDisabled(f);
+
+    spinBoxCount1->setDisabled(f);
+    spinBoxCount2->setDisabled(f);
+    spinBoxCount3->setDisabled(f);
+    spinBoxCount4->setDisabled(f);
+    spinBoxCount5->setDisabled(f);
+
+    setEnableOKButton();
+}
+
+void Form::TownDialog::setEnableOKButton(void)
+{
+    pushButtonOk->setEnabled(true);
 }

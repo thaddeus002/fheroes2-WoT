@@ -310,6 +310,7 @@ protected:
 
     void		editMapEventDialog(const MapTile &);
     void		editResourceDialog(const MapTile &);
+    void		editTownDialog(const MapTile &);
 
     friend class	MP2Format;
     friend class	MapTile;

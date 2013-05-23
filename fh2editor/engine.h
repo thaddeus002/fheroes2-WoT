@@ -70,6 +70,8 @@ namespace Race
 {
     enum { Unknown = 0, Knight = 0x01, Barbarian = 0x02, Sorceress = 0x04, Warlock = 0x08, Wizard = 0x10, Necromancer = 0x20,
 	    Multi = 0x40, Random = 0x80, All = Knight | Barbarian | Sorceress | Warlock | Wizard | Necromancer };
+
+    QString transcribe(int);
 }
 
 namespace Building
@@ -84,6 +86,10 @@ namespace Building
 	    MageGuild = MageGuild1 | MageGuild2 | MageGuild3 | MageGuild4 | MageGuild5,
 	    Dwellings = Dwelling1 | Dwelling2 | Dwelling3 | Dwelling4 | Dwelling5 | Dwelling6,
 	    Upgrades = Upgrade2 | Upgrade3 | Upgrade4 | Upgrade5 | Upgrade6 | Upgrade7 };
+
+    int		dwellingMap(int race);
+    QString	extraWel2(int race);
+    QString	extraSpec(int race);
 }
 
 
@@ -155,15 +161,18 @@ namespace SkillLevel
 
 namespace Monster
 {
-    enum { Unknown,
+    enum { None,
 	Peasant, Archer, Ranger, Pikeman, VeteranPikeman, Swordsman, MasterSwordsman, Cavalry, Champion, Paladin, Crusader,
 	Goblin, Orc, OrcChief, Wolf, Ogre, OgreLord, Troll, WarTroll, Cyclops,
-	Sprite, Dwarf, BattleDwarf, Llf, GrandGlf, Druid, GreaterDruid, Unicorn, Phoenix,
+	Sprite, Dwarf, BattleDwarf, Elf, GrandElf, Druid, GreaterDruid, Unicorn, Phoenix,
 	Centaur, Gargoyle, Griffin, Minotaur, MinotaurKing, Hydra, GreenDragon, RedDragon, BlackDragon,
 	Halfling, Boar, IronGolem, SteelGolem, Roc, Mage, Archmage, Giant, Titan,
 	Skeleton, Zombie, MutantZombie, Mummy, RoyalMummy, Vampire, VampireLord, Lich, PowerLich, BoneDragon,
 	Rogue, Nomad, Ghost, Genie, Medusa, EarthElement, AirElement, FireElement, WaterElement,
-	Random1, Random2, Random3, Random4, Random };
+	Random, Random1, Random2, Random3, Random4, Unknown };
+
+    bool	isValid(int);
+    QString	transcribe(int);
 }
 
 struct mp2icn_t
@@ -232,6 +241,7 @@ struct mp2town_t
     quint8	customName;
     QString	name; /* string: 13 byte */
     quint8	race;
+    quint8	isCastle;
     quint8	forceTown;
     quint8      unknown1[29];
 };
@@ -618,7 +628,9 @@ struct Troop : public QPair<int, int>
 
 struct Troops : public QVector<Troop>
 {
-    Troops() { reserve(7); }
+    Troops() { resize(5); /* five slots */ }
+
+    int validCount(void) const;
 };
 
 struct MapTown : public MapObject
@@ -629,6 +641,7 @@ struct MapTown : public MapObject
     QString     nameTown;
     Troops	troops;
     bool	forceTown;
+    bool	customBuilding;
 
     MapTown(const QPoint &, quint32, const mp2town_t &);
     MapTown(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1);

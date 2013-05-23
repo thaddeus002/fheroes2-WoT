@@ -1684,6 +1684,9 @@ void MapData::editObjectAttributes(void)
 	{
     	    case MapObj::Resource:	editResourceDialog(*tileOverMouse); break;
     	    case MapObj::Event:		editMapEventDialog(*tileOverMouse); break;
+    	    case MapObj::RndCastle:
+    	    case MapObj::RndTown:
+    	    case MapObj::Castle:	editTownDialog(*tileOverMouse); break;
 
     	    default: QMessageBox::information(qobject_cast<MapWindow*>(parent()), "Object Attributes",
 				    "Sorry!\nChange attributes of the object is not yet available."); break;
@@ -1700,7 +1703,10 @@ void MapData::editMapEventDialog(const MapTile & tile)
 	Form::MapEventDialog form(*event, mapKingdomColors);
 
 	if(QDialog::Accepted == form.exec())
+	{
 	    *event = form.result(event->pos(), event->uid());
+	    emit dataModified();
+	}
     }
 }
 
@@ -1711,7 +1717,7 @@ void MapData::editResourceDialog(const MapTile & tile)
     if(ext)
     {
 	MapResource* res = dynamic_cast<MapResource*>(mapObjects.find(tile.mapPos()).data());
-	Form::EditResource form(res ? res->type : MapTileExt::resource(ext), res ? res->count : 0);
+	Form::EditResourceDialog form(res ? res->type : MapTileExt::resource(ext), res ? res->count : 0);
 
 	if(QDialog::Accepted == form.exec())
 	{
@@ -1719,6 +1725,29 @@ void MapData::editResourceDialog(const MapTile & tile)
 		mapObjects.remove(tile.mapPos());
 	    else
 		mapObjects.push_back(new MapResource(tile.mapPos(), ext->uid(), MapTileExt::resource(ext), form.spinBoxCount->value()));
+
+	    emit dataModified();
+	}
+    }
+}
+
+void MapData::editTownDialog(const MapTile & tile)
+{
+    MapTown* town = dynamic_cast<MapTown*>(mapObjects.find(tile.mapPos()).data());
+
+    if(town)
+    {
+	Form::TownDialog form(*town);
+
+	if(QDialog::Accepted == form.exec())
+	{
+	    town->nameTown = form.labelName->text();
+	    town->buildings = form.buildings() | form.dwellings();
+	    town->troops = form.troops();
+	    town->forceTown = form.checkBoxAllowCastle->isChecked();
+	    town->customBuilding = ! form.checkBoxBuildingsDefault->isChecked();
+
+	    emit dataModified();
 	}
     }
 }

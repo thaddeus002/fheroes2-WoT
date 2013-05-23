@@ -94,12 +94,13 @@ QString readStringFromStream(QDataStream & ds, int count = 0)
     if(count)
     {
 	str.reserve(128);
+	bool endLine = false;
 
 	for(int ii = 0; ii < count; ++ii)
 	{
 	    ds >> byte;
-	    if(0 == byte) break;
-	    str.push_back(byte);
+	    if(0 == byte) endLine = true;
+	    if(! endLine) str.push_back(byte);
 	}
     }
     else
@@ -396,7 +397,8 @@ QDataStream & operator>> (QDataStream & ds, mp2town_t & cstl)
     ds >> cstl.captainPresent >> cstl.customName;
 
     cstl.name = readStringFromStream(ds, 13);
-    ds >> cstl.race >> cstl.forceTown;
+    ds >> cstl.race >> cstl.isCastle >> cstl.forceTown;
+
     return ds;
 }
 
@@ -1926,7 +1928,7 @@ QDomElement & operator>> (QDomElement & el, Troops & troops)
 	QDomElement troopElem = troopList.item(pos).toElement();
 	int type = troopElem.hasAttribute("type") ? troopElem.attribute("type").toInt() : 0;
 	int count = troopElem.hasAttribute("count") ? troopElem.attribute("count").toInt() : 0;
-	if(type && count) troops.push_back(Troop(type, count));
+	troops.push_back(Troop(type, count));
     }
 
     return el;
@@ -1962,13 +1964,18 @@ QDomElement & operator>> (QDomElement & el, Skills & skills)
     return el;
 }
 
+int Troops::validCount(void) const
+{
+    return std::count_if(begin(), end(), std::mem_fun_ref(&Troop::isValid));
+}
+
 MapTown::MapTown(const QPoint & pos, quint32 id)
-    : MapObject(pos, id, MapObj::Castle), color(Color::Unknown), race(Race::Unknown), buildings(0), forceTown(false)
+    : MapObject(pos, id, MapObj::Castle), color(Color::Unknown), race(Race::Unknown), buildings(0), forceTown(false), customBuilding(false)
 {
 }
 
 MapTown::MapTown(const QPoint & pos, quint32 id, const mp2town_t & mp2)
-    : MapObject(pos, id, MapObj::Castle), nameTown(mp2.name), forceTown(mp2.forceTown)
+    : MapObject(pos, id, MapObj::Castle), nameTown(mp2.name), forceTown(mp2.forceTown), customBuilding(mp2.customBuilding)
 {
     switch(mp2.color)
     {
@@ -2024,13 +2031,13 @@ MapTown::MapTown(const QPoint & pos, quint32 id, const mp2town_t & mp2)
     if(3 < mp2.magicTower) buildings |= Building::MageGuild4;
     if(4 < mp2.magicTower) buildings |= Building::MageGuild5;
 
+    if(mp2.isCastle) buildings |= Building::Castle;
     if(mp2.captainPresent) buildings |= Building::Captain;
 
     if(mp2.customTroops)
     {
 	for(int ii = 0; ii < 5; ++ii)
-	    if(mp2.troopId[ii] && mp2.troopCount[ii])
-		troops.push_back(Troop(mp2.troopId[ii], mp2.troopCount[ii]));
+	    troops[ii] = Troop(mp2.troopId[ii], mp2.troopCount[ii]);
     }
 }
 
@@ -2084,8 +2091,7 @@ MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2)
     if(mp2.customTroops)
     {
 	for(int ii = 0; ii < 5; ++ii)
-	    if(mp2.troopId[ii] && mp2.troopCount[ii])
-		troops.push_back(Troop(mp2.troopId[ii], mp2.troopCount[ii]));
+	    troops[ii] = Troop(mp2.troopId[ii], mp2.troopCount[ii]);
     }
 
     for(int index = 0; index < 3; ++index)
@@ -2855,6 +2861,107 @@ QString Artifact::transcribe(int index)
 }
 
 bool Artifact::isValid(int index)
+{
+    return 0 <= index && Unknown > index;
+}
+
+QString Building::extraSpec(int race)
+{
+    const char* names[] = { "Special", "Fortification", "Coliseum", "Rainbow", "Dungeon", "Library", "Storm" };
+
+    switch(race)
+    {
+	case Race::Knight:	return names[1];
+	case Race::Barbarian:	return names[2];
+	case Race::Sorceress:	return names[3];
+	case Race::Warlock:	return names[4];
+	case Race::Wizard:	return names[5];
+	case Race::Necromancer:	return names[6];
+	default: break;
+    }
+
+    return names[0];
+}
+
+QString Building::extraWel2(int race)
+{
+    const char* names[] = { "1st Level Grow", "Farm", "Garbage He", "Crystal Gar", "Waterfall", "Orchard", "Skull Pile" };
+
+    switch(race)
+    {
+	case Race::Knight:	return names[1];
+	case Race::Barbarian:	return names[2];
+	case Race::Sorceress:	return names[3];
+	case Race::Warlock:	return names[4];
+	case Race::Wizard:	return names[5];
+	case Race::Necromancer:	return names[6];
+	default: break;
+    }
+
+    return names[0];
+}
+
+int Building::dwellingMap(int race)
+{
+    switch(race)
+    {
+	case Race::Knight:	return Dwelling1 | Dwelling2 | Dwelling3 | Dwelling4 | Dwelling5 | Dwelling6 |
+					Upgrade2 | Upgrade3 | Upgrade4 | Upgrade5 | Upgrade6;
+	case Race::Barbarian:	return Dwelling1 | Dwelling2 | Dwelling3 | Dwelling4 | Dwelling5 | Dwelling6 |
+					Upgrade2 | Upgrade4 | Upgrade5;
+	case Race::Sorceress:	return Dwelling1 | Dwelling2 | Dwelling3 | Dwelling4 | Dwelling5 | Dwelling6 |
+					Upgrade2 | Upgrade3 | Upgrade4;
+	case Race::Warlock:	return Dwelling1 | Dwelling2 | Dwelling3 | Dwelling4 | Dwelling5 | Dwelling6 |
+					Upgrade4 | Upgrade6 | Upgrade7;
+	case Race::Wizard:	return Dwelling1 | Dwelling2 | Dwelling3 | Dwelling4 | Dwelling5 | Dwelling6 |
+					Upgrade3 | Upgrade5 | Upgrade6;
+	case Race::Necromancer:	return Dwelling1 | Dwelling2 | Dwelling3 | Dwelling4 | Dwelling5 | Dwelling6 |
+					Upgrade2 | Upgrade3 | Upgrade4 | Upgrade5;
+	case Race::Random:	return Dwelling1 | Dwelling2 | Dwelling3 | Dwelling4 | Dwelling5 | Dwelling6 |
+					Upgrade2 | Upgrade3 | Upgrade4 | Upgrade5 | Upgrade6;
+	default: break;
+    }
+
+    return Unknown;
+}
+
+QString Race::transcribe(int race)
+{
+    const char* names[] = { "Unknown", "Knight", "Barbarian", "Sorceress", "Warlock", "Wizard", "Necromancer",
+            "Multi", "Random" };
+
+    switch(race)
+    {
+	case Knight:		return names[1];
+	case Barbarian:		return names[2];
+	case Sorceress:		return names[3];
+	case Warlock:		return names[4];
+	case Wizard:		return names[5];
+	case Necromancer:	return names[6];
+	case Multi:		return names[7];
+	case Random:		return names[8];
+	default: break;
+    }
+
+    return names[0];
+}
+
+QString Monster::transcribe(int index)
+{
+    const char* names[] = { "None",
+        "Peasant", "Archer", "Ranger", "Pikeman", "Veteran Pikeman", "Swordsman", "Master Swordsman", "Cavalry", "Champion", "Paladin", "Crusader",
+        "Goblin", "Orc", "Orc Chief", "Wolf", "Ogre", "Ogre Lord", "Troll", "WarTroll", "Cyclops",
+        "Sprite", "Dwarf", "Battle Dwarf", "Elf", "Grand Elf", "Druid", "Greater Druid", "Unicorn", "Phoenix",
+        "Centaur", "Gargoyle", "Griffin", "Minotaur", "Minotaur King", "Hydra", "Green Dragon", "Red Dragon", "Black Dragon",
+        "Halfling", "Boar", "Iron Golem", "Steel Golem", "Roc", "Mage", "Archmage", "Giant", "Titan",
+        "Skeleton", "Zombie", "Mutant Zombie", "Mummy", "Royal Mummy", "Vampire", "Vampire Lord", "Lich", "Power Lich", "Bone Dragon",
+        "Rogue", "Nomad", "Ghost", "Genie", "Medusa", "Earth Element", "Air Element", "Fire Element", "Water Element",
+        "Random", "Random Level1", "Random Level2", "Random Level3", "Random Level4", "Unknown" };
+
+    return isValid(index) ? QString(names[index]) : QString(names[None]);
+}
+
+bool Monster::isValid(int index)
 {
     return 0 <= index && Unknown > index;
 }
