@@ -633,13 +633,13 @@ Form::MapOptions::MapOptions(MapData & map)
     spinBoxResourceGoldMin->setMaximum(1000);
     spinBoxResourceGoldMin->setMinimum(100);
     spinBoxResourceGoldMin->setSingleStep(100);
-    spinBoxResourceGoldMin->setValue(settings.value("MapOptions/defaultGoldMin", DEFAULT_RESOURCE_GOLD_MIN).toInt());
+    spinBoxResourceGoldMin->setValue(Default::resourceGoldMin());
 
     spinBoxResourceGoldMax = new QSpinBox(tabDefaults);
     spinBoxResourceGoldMax->setMaximum(5000);
     spinBoxResourceGoldMax->setMinimum(300);
     spinBoxResourceGoldMax->setSingleStep(100);
-    spinBoxResourceGoldMax->setValue(settings.value("MapOptions/defaultGoldMax", DEFAULT_RESOURCE_GOLD_MAX).toInt());
+    spinBoxResourceGoldMax->setValue(Default::resourceGoldMax());
 
     labelResourceGold = new QLabel(this);
     labelResourceGold->setText(QApplication::translate("MapOptions", "Resource (gold)", 0, QApplication::UnicodeUTF8));
@@ -653,13 +653,13 @@ Form::MapOptions::MapOptions(MapData & map)
     spinBoxResourceWoodOreMin->setMaximum(10);
     spinBoxResourceWoodOreMin->setMinimum(1);
     spinBoxResourceWoodOreMin->setSingleStep(1);
-    spinBoxResourceWoodOreMin->setValue(settings.value("MapOptions/defaultWoodOreMin", DEFAULT_RESOURCE_WOOD_ORE_MIN).toInt());
+    spinBoxResourceWoodOreMin->setValue(Default::resourceWoodOreMin());
 
     spinBoxResourceWoodOreMax = new QSpinBox(tabDefaults);
     spinBoxResourceWoodOreMax->setMaximum(50);
     spinBoxResourceWoodOreMax->setMinimum(3);
     spinBoxResourceWoodOreMax->setSingleStep(1);
-    spinBoxResourceWoodOreMax->setValue(settings.value("MapOptions/defaultWoodOreMax", DEFAULT_RESOURCE_WOOD_ORE_MAX).toInt());
+    spinBoxResourceWoodOreMax->setValue(Default::resourceWoodOreMax());
 
     labelResourceWoodOre = new QLabel(this);
     labelResourceWoodOre->setText(QApplication::translate("MapOptions", "Resource (wood, ore)", 0, QApplication::UnicodeUTF8));
@@ -673,13 +673,13 @@ Form::MapOptions::MapOptions(MapData & map)
     spinBoxResourceOtherMin->setMaximum(10);
     spinBoxResourceOtherMin->setMinimum(1);
     spinBoxResourceOtherMin->setSingleStep(1);
-    spinBoxResourceOtherMin->setValue(settings.value("MapOptions/defaultOtherMin", DEFAULT_RESOURCE_OTHER_MIN).toInt());
+    spinBoxResourceOtherMin->setValue(Default::resourceOtherMin());
 
     spinBoxResourceOtherMax = new QSpinBox(tabDefaults);
     spinBoxResourceOtherMax->setMaximum(30);
     spinBoxResourceOtherMax->setMinimum(3);
     spinBoxResourceOtherMax->setSingleStep(1);
-    spinBoxResourceOtherMax->setValue(settings.value("MapOptions/defaultOtherMax", DEFAULT_RESOURCE_OTHER_MAX).toInt());
+    spinBoxResourceOtherMax->setValue(Default::resourceOtherMax());
 
     labelResourceOther = new QLabel(this);
     labelResourceOther->setText(QApplication::translate("MapOptions", "Resource (other)", 0, QApplication::UnicodeUTF8));
@@ -810,12 +810,12 @@ void Form::MapOptions::saveSettings(void)
 {
     QSettings & settings = Resource::localSettings();
     settings.setValue("MapOptions/size", size());
-    settings.setValue("MapOptions/defaultGoldMin", spinBoxResourceGoldMin->value());
-    settings.setValue("MapOptions/defaultGoldMax", spinBoxResourceGoldMax->value());
-    settings.setValue("MapOptions/defaultWoodOreMin", spinBoxResourceWoodOreMin->value());
-    settings.setValue("MapOptions/defaultWoodOreMax", spinBoxResourceWoodOreMax->value());
-    settings.setValue("MapOptions/defaultOtherMin", spinBoxResourceOtherMin->value());
-    settings.setValue("MapOptions/defaultOtherMax", spinBoxResourceOtherMax->value());
+    Default::resourceGoldMin() = spinBoxResourceGoldMin->value();
+    Default::resourceGoldMax() = spinBoxResourceGoldMax->value();
+    Default::resourceWoodOreMin() = spinBoxResourceWoodOreMin->value();
+    Default::resourceWoodOreMax() = spinBoxResourceWoodOreMax->value();
+    Default::resourceOtherMin() = spinBoxResourceOtherMin->value();
+    Default::resourceOtherMin() = spinBoxResourceOtherMax->value();
 }
 
 void Form::MapOptions::setConditionsBoxesMapValues(const MapData & map)
@@ -1562,22 +1562,22 @@ Form::EditResourceDialog::EditResourceDialog(int res, int count)
     switch(res)
     {
         case Resource::Gold:
-	    min = settings.value("MapOptions/defaultGoldMin", DEFAULT_RESOURCE_GOLD_MIN).toInt();
-	    max = settings.value("MapOptions/defaultGoldMax", DEFAULT_RESOURCE_GOLD_MAX).toInt();
+	    min = settings.value("MapOptions/defaultGoldMin", Default::resourceGoldMin()).toInt();
+	    max = settings.value("MapOptions/defaultGoldMax", Default::resourceGoldMax()).toInt();
 	    break;
 
         case Resource::Wood:
         case Resource::Ore:
-	    min = settings.value("MapOptions/defaultWoodOreMin", DEFAULT_RESOURCE_WOOD_ORE_MIN).toInt();
-	    max = settings.value("MapOptions/defaultWoodOreMax", DEFAULT_RESOURCE_WOOD_ORE_MAX).toInt();
+	    min = settings.value("MapOptions/defaultWoodOreMin", Default::resourceWoodOreMin()).toInt();
+	    max = settings.value("MapOptions/defaultWoodOreMax", Default::resourceWoodOreMax()).toInt();
 	    break;
 
         case Resource::Mercury:
         case Resource::Sulfur:
         case Resource::Crystal:
         case Resource::Gems:
-	    min = settings.value("MapOptions/defaultOtherMin", DEFAULT_RESOURCE_OTHER_MIN).toInt();
-	    max = settings.value("MapOptions/defaultOtherMax", DEFAULT_RESOURCE_OTHER_MAX).toInt();
+	    min = settings.value("MapOptions/defaultOtherMin", Default::resourceOtherMin()).toInt();
+	    max = settings.value("MapOptions/defaultOtherMax", Default::resourceOtherMax()).toInt();
 	    break;
 
 	default: break;
@@ -1977,6 +1977,9 @@ Form::TownDialog::TownDialog(const MapTown & town)
     checkBoxCaptain = new QCheckBox(tabInfo);
     checkBoxCaptain->setText(QApplication::translate("TownDialog", "Captain", 0, QApplication::UnicodeUTF8));
     checkBoxCaptain->setChecked(town.buildings & Building::Captain);
+#ifndef QT_NO_TOOLTIP
+    checkBoxCaptain->setToolTip(Building::description(Building::Captain, town.race));
+#endif
 
     checkBoxAllowCastle = new QCheckBox(tabInfo);
     checkBoxAllowCastle->setVisible(! (town.buildings & Building::Castle));
@@ -2087,11 +2090,18 @@ Form::TownDialog::TownDialog(const MapTown & town)
     for(int index = Monster::None; index < Monster::Unknown; ++index)
     {
 	QPixmap mons32 = EditorTheme::getImageICN(ICN::MONS32, index - 1).first;
-	comboBoxTroop1->addItem(mons32, Monster::transcribe(index), index);
-	comboBoxTroop2->addItem(mons32, Monster::transcribe(index), index);
-	comboBoxTroop3->addItem(mons32, Monster::transcribe(index), index);
-	comboBoxTroop4->addItem(mons32, Monster::transcribe(index), index);
-	comboBoxTroop5->addItem(mons32, Monster::transcribe(index), index);
+	comboBoxTroop1->addItem(mons32, Monster::transcribe(index));
+	comboBoxTroop2->addItem(mons32, Monster::transcribe(index));
+	comboBoxTroop3->addItem(mons32, Monster::transcribe(index));
+	comboBoxTroop4->addItem(mons32, Monster::transcribe(index));
+	comboBoxTroop5->addItem(mons32, Monster::transcribe(index));
+#ifndef QT_NO_TOOLTIP
+	comboBoxTroop1->setItemData(index, Monster::tips(index), Qt::ToolTipRole);
+	comboBoxTroop2->setItemData(index, Monster::tips(index), Qt::ToolTipRole);
+	comboBoxTroop3->setItemData(index, Monster::tips(index), Qt::ToolTipRole);
+	comboBoxTroop4->setItemData(index, Monster::tips(index), Qt::ToolTipRole);
+	comboBoxTroop5->setItemData(index, Monster::tips(index), Qt::ToolTipRole);
+#endif
     }
 
     if(! defaultTroops)
@@ -2257,6 +2267,22 @@ Form::TownDialog::TownDialog(const MapTown & town)
 	checkBoxExt->setChecked(town.buildings & Building::ExtraWel2);
 	checkBoxSpec->setChecked(town.buildings & Building::ExtraSpec);
     }
+
+#ifndef QT_NO_TOOLTIP
+    labelMageGuild->setToolTip(Building::description(Building::MageGuild, town.race));
+    comboBoxMageGuild->setToolTip(Building::description(Building::MageGuild, town.race));
+    checkBoxMarket->setToolTip(Building::description(Building::Marketplace, town.race));
+    checkBoxLeftTurret->setToolTip(Building::description(Building::LeftTurret, town.race));
+    checkBoxTavern->setToolTip(Building::description(Building::Tavern, town.race));
+    checkBoxRightTurret->setToolTip(Building::description(Building::RightTurret, town.race));
+    checkBoxShipyard->setToolTip(Building::description(Building::Shipyard, town.race));
+    checkBoxMoat->setToolTip(Building::description(Building::Moat, town.race));
+    checkBoxWell->setToolTip(Building::description(Building::Well, town.race));
+    checkBoxExt->setToolTip(Building::description(Building::ExtraWel2, town.race));
+    checkBoxStatue->setToolTip(Building::description(Building::Statue, town.race));
+    checkBoxSpec->setToolTip(Building::description(Building::ExtraSpec, town.race));
+    checkBoxThievesGuild->setToolTip(Building::description(Building::ThievesGuild, town.race));
+#endif
 
     // tab: dwellings
     tabDwellings = new QWidget();

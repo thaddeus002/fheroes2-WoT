@@ -14,5 +14,5 @@ FORMS +=
 
 # Input
 HEADERS += mainwindow.h mapwindow.h mapdata.h dialogs.h
-SOURCES += program.cpp engine.cpp mainwindow.cpp mapwindow.cpp mapdata.cpp dialogs.cpp
+SOURCES += program.cpp engine.cpp mainwindow.cpp mapwindow.cpp mapdata.cpp dialogs.cpp global.cpp
 CONFIG += qt debug console

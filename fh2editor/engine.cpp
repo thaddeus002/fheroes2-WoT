@@ -29,8 +29,9 @@
 #include <QPainter>
 
 #include "program.h"
-#include "engine.h"
 #include "mapdata.h"
+#include "global.h"
+#include "engine.h"
 
 QString townName(int num)
 {
@@ -2925,6 +2926,107 @@ int Building::dwellingMap(int race)
     return Unknown;
 }
 
+QString Building::description(int type, int race)
+{
+    const char* names[] = { "Unknown",
+        "The Thieves' Guild provides information on enemy players.\nThieves' Guilds can also provide scouting information on enemy towns.",
+        "The Tavern increases morale for troops defending the castle.",
+        "The Shipyard allows ships to be built.",
+        "The Well increases the growth rate of all dwellings by 2 creatures per week.",
+        "The Statue increases your town's income by 250 per day.",
+        "The Left Turret provides extra firepower during castle combat.",
+        "The Right Turret provides extra firepower during castle combat.",
+        "The Marketplace can be used to convert one type of resource into another.\nThe more marketplaces you control, the better the exchange rate.",
+        "The Moat slows attacking units.\nAny unit entering the moat must end its turn there and becomes more vulnerable to attack.",
+        "The Castle improves town defense and increases income to 1000 gold per day.",
+        "The Captain's Quarters provides a captain to assist in the castle's defense when no hero is present.",
+        "The Mage Guild allows heroes to learn spells and replenish their spell points.",
+	"The Shrine increases the necromancy skill of all your necromancers by 10 percent.",
+
+        "The Farm increases production of Peasants by 8 per week.",
+        "The Garbage Heap increases production of Goblins by 8 per week.",
+        "The Crystal Garden increases production of Sprites by 8 per week.",
+        "The Waterfall increases production of Centaurs by 8 per week.",
+        "The Orchard increases production of Halflings by 8 per week.",
+        "The Skull Pile increases production of Skeletons by 8 per week.",
+        "The building increases production of 1st level monster by 8 per week.",
+
+        "The Fortifications increase the toughness of the walls,\nincreasing the number of turns it takes to knock them down.",
+        "The Coliseum provides inspiring spectacles to defending troops,\nraising their morale by two during combat.",
+        "The Rainbow increases the luck of the defending units by two.",
+        "The Dungeon increases the income of the town by 500 / day.",
+        "The Library increases the number of spells in the Guild by one for each level of the guild.",
+        "The Storm adds +2 to the power of spells of a defending spell caster.",
+        "The special building." };
+
+    switch(type)
+    {
+	case ThievesGuild:	return names[1];
+	case Tavern:		return names[2];
+	case Shipyard:		return names[3];
+	case Well:		return names[4];
+	case Statue:		return names[5];
+	case LeftTurret:	return names[6];
+	case RightTurret:	return names[7];
+	case Marketplace:	return names[8];
+	case Moat:		return names[9];
+	case Castle:		return names[10];
+	case Captain:		return names[11];
+	case MageGuild:		return names[12];
+	case Shrine:		return names[13];
+
+	case ExtraWel2:
+	    switch(race)
+	    {
+		case Race::Knight:	return names[14];
+		case Race::Barbarian:	return names[15];
+		case Race::Sorceress:	return names[16];
+		case Race::Warlock:	return names[17];
+		case Race::Wizard:	return names[18];
+		case Race::Necromancer: return names[19];
+		default:		return names[20];
+	    }
+	break;
+    
+	case ExtraSpec:
+	    switch(race)
+	    {
+		case Race::Knight:	return names[21];
+		case Race::Barbarian:	return names[22];
+		case Race::Sorceress:	return names[23];
+		case Race::Warlock:	return names[24];
+		case Race::Wizard:	return names[25];
+		case Race::Necromancer: return names[26];
+		default:		return names[27];
+	    }
+	break;
+
+	default: break;
+    }
+
+    return names[0];
+}
+
+QString Speed::transcribe(int speed)
+{
+    const char* _names[] = { "Standing", "Crawling", "Very Slow", "Slow", "Average", "Fast", "Very Fast", "Ultra Fast", "Blazing", "Instant" };
+
+    switch(speed)
+    {
+	case Crawling:	return _names[1];
+	case VerySlow:	return _names[2];
+	case Slow:	return _names[3];
+	case Average:	return _names[4];
+	case Fast:	return _names[5];
+	case VeryFast:	return _names[6];
+	case UltraFast:	return _names[7];
+	case Blazing:	return _names[8];
+	case Instant:	return _names[9];
+    }
+
+    return _names[0];
+}
+
 QString Race::transcribe(int race)
 {
     const char* names[] = { "Unknown", "Knight", "Barbarian", "Sorceress", "Warlock", "Wizard", "Necromancer",
@@ -2950,7 +3052,7 @@ QString Monster::transcribe(int index)
 {
     const char* names[] = { "None",
         "Peasant", "Archer", "Ranger", "Pikeman", "Veteran Pikeman", "Swordsman", "Master Swordsman", "Cavalry", "Champion", "Paladin", "Crusader",
-        "Goblin", "Orc", "Orc Chief", "Wolf", "Ogre", "Ogre Lord", "Troll", "WarTroll", "Cyclops",
+        "Goblin", "Orc", "Orc Chief", "Wolf", "Ogre", "Ogre Lord", "Troll", "War Troll", "Cyclops",
         "Sprite", "Dwarf", "Battle Dwarf", "Elf", "Grand Elf", "Druid", "Greater Druid", "Unicorn", "Phoenix",
         "Centaur", "Gargoyle", "Griffin", "Minotaur", "Minotaur King", "Hydra", "Green Dragon", "Red Dragon", "Black Dragon",
         "Halfling", "Boar", "Iron Golem", "Steel Golem", "Roc", "Mage", "Archmage", "Giant", "Titan",
@@ -2959,6 +3061,26 @@ QString Monster::transcribe(int index)
         "Random", "Random Level1", "Random Level2", "Random Level3", "Random Level4", "Unknown" };
 
     return isValid(index) ? QString(names[index]) : QString(names[None]);
+}
+
+QString Monster::tips(int type)
+{
+    const MonsterStat & stat = Default::monsterStat(type);
+    QString res;
+    QTextStream ts(& res);
+
+    ts << transcribe(type) << " stats: " << "\n" <<
+	"- " << "attack: " << stat.attack << "\n" <<
+	"- " << "defense: " << stat.defense << "\n" <<
+	"- " << "damage min: " << stat.damageMin << "\n" <<
+	"- " << "damage max: " << stat.damageMax << "\n" <<
+	"- " << "hp: " << stat.hp << "\n" <<
+	"- " << "speed: " << Speed::transcribe(stat.speed) << "\n";
+
+	if(stat.shots)
+	    ts << "shots: " << stat.grown << "\n";
+
+    return res;
 }
 
 bool Monster::isValid(int index)

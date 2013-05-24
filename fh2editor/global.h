@@ -23,13 +23,26 @@
 #ifndef _EDITOR_GLOBAL_H_
 #define _EDITOR_GLOBAL_H_
 
-#define DEFAULT_RESOURCE_GOLD_MIN	500
-#define DEFAULT_RESOURCE_GOLD_MAX	1000
+class QDomElement;
+struct MonsterStat;
 
-#define DEFAULT_RESOURCE_WOOD_ORE_MIN	5
-#define DEFAULT_RESOURCE_WOOD_ORE_MAX	10
+namespace Default
+{
+    int &		resourceGoldMin(void);
+    int &		resourceGoldMax(void);
+    int &		resourceWoodOreMin(void);
+    int &		resourceWoodOreMax(void);
+    int &		resourceOtherMin(void);
+    int &		resourceOtherMax(void);
 
-#define DEFAULT_RESOURCE_OTHER_MIN	3
-#define DEFAULT_RESOURCE_OTHER_MAX	6
+    MonsterStat &	monsterStat(int);
+}
+
+struct DefaultValues
+{
+};
+
+QDomElement & operator<< (QDomElement &, const DefaultValues &);
+QDomElement & operator>> (QDomElement &, DefaultValues &);
 
 #endif

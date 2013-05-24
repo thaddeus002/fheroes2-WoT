@@ -74,6 +74,13 @@ namespace Race
     QString transcribe(int);
 }
 
+namespace Speed
+{
+    enum { Standing = 0, Crawling, VerySlow, Slow, Average, Fast, VeryFast, UltraFast, Blazing, Instant };
+
+    QString transcribe(int);
+}
+
 namespace Building
 {
     enum { Unknown = 0, ThievesGuild = 0x00000001, Tavern = 0x00000002, Shipyard = 0x00000004, Well = 0x00000008, Statue = 0x00000010, LeftTurret = 0x00000020,
@@ -90,8 +97,8 @@ namespace Building
     int		dwellingMap(int race);
     QString	extraWel2(int race);
     QString	extraSpec(int race);
+    QString	description(int type, int race);
 }
-
 
 namespace SpriteLevel
 {
@@ -173,6 +180,7 @@ namespace Monster
 
     bool	isValid(int);
     QString	transcribe(int);
+    QString	tips(int);
 }
 
 struct mp2icn_t
@@ -565,7 +573,7 @@ namespace EditorTheme
     QStringList			resourceFiles(const QString & dir, const QString & file);
 }
 
-struct Resources
+struct resources_t
 {
     int		wood;
     int		mercury;
@@ -574,8 +582,24 @@ struct Resources
     int		crystal;
     int		gems;
     int		gold;
+};
 
-    Resources() : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0) {}
+struct Resources : public resources_t
+{
+    Resources(){ wood = 0; mercury = 0; ore = 0; sulfur = 0; crystal = 0; gems = 0; gold = 0; }
+};
+
+struct MonsterStat
+{
+    int		attack;
+    int		defense;
+    int		damageMin;
+    int		damageMax;
+    int		hp;
+    int		speed;
+    int		grown;
+    int		shots;
+    resources_t	cost;
 };
 
 Q_DECLARE_METATYPE(Resources);

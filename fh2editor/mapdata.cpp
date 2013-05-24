@@ -30,6 +30,7 @@
 #include <QStyleOptionGraphicsItem>
 
 #include "engine.h"
+#include "global.h"
 #include "program.h"
 #include "dialogs.h"
 #include "mainwindow.h"
@@ -1591,6 +1592,10 @@ bool MapData::saveXML(const QString & fn) const
     QDomElement etiles = doc.createElement("tiles");
     emap.appendChild(etiles);
     etiles << mapTiles;
+
+    QDomElement edefaults = doc.createElement("defaults");
+    emap.appendChild(edefaults);
+    edefaults << DefaultValues();
 
     doc.insertBefore(doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\""), doc.firstChild());
 
