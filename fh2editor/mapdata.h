@@ -93,7 +93,11 @@ class MapTileExt
     quint8		spriteLevel;
     quint32		spriteUID;
 
+    friend		QDomElement & operator<< (QDomElement &, const MapTileExt &);
+    friend		QDomElement & operator>> (QDomElement &, MapTileExt &);
+
 public:
+    MapTileExt() : spriteICN(0), spriteExt(0), spriteIndex(0), spriteLevel(0), spriteUID(0) {}
     MapTileExt(int lv, const mp2lev_t &);
     MapTileExt(const CompositeObject &, const CompositeSprite &, quint32);
 
@@ -120,6 +124,9 @@ public:
     static int		resource(const MapTileExt*);
 };
 
+QDomElement & operator<< (QDomElement &, const MapTileExt &);
+QDomElement & operator>> (QDomElement &, MapTileExt &);
+
 class MapTileLevels : public QList<MapTileExt*>
 {
 public:
@@ -132,6 +139,9 @@ public:
     QString		infoString(void) const;
     int			topObjectID(void) const;
 };
+
+QDomElement & operator<< (QDomElement &, const MapTileLevels &);
+QDomElement & operator>> (QDomElement &, MapTileLevels &);
 
 class MapTile : public QGraphicsPixmapItem
 {

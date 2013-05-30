@@ -199,6 +199,28 @@ int MapTileExt::loyaltyObject(const MapTileExt* te)
     return MapObj::None;
 }
 
+QDomElement & operator<< (QDomElement & el, const MapTileExt & ext)
+{
+    el.setAttribute("icn", ext.spriteICN);
+    el.setAttribute("ext", ext.spriteExt);
+    el.setAttribute("index", ext.spriteIndex);
+    el.setAttribute("level", ext.spriteLevel);
+    el.setAttribute("uid", ext.spriteUID);
+
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, MapTileExt & ext)
+{
+    ext.spriteICN = el.attribute("icn").toInt();
+    ext.spriteExt = el.attribute("ext").toInt();
+    ext.spriteIndex = el.attribute("index").toInt();
+    ext.spriteLevel = el.attribute("level").toInt();
+    ext.spriteUID = el.attribute("uid").toInt();
+
+    return el;
+}
+
 MapTileLevels::MapTileLevels(const MapTileLevels & other)
     : QList<MapTileExt*>()
 {
@@ -263,6 +285,34 @@ int MapTileLevels::topObjectID(void) const
 	id = *it ? EditorTheme::getObjectID((*it)->icn(), (*it)->index()) : MapObj::None;
 
     return id;
+}
+
+QDomElement & operator<< (QDomElement & el, const MapTileLevels & levels)
+{
+    for(MapTileLevels::const_iterator
+	it = levels.begin(); it != levels.end(); ++it)
+    {
+	QDomElement sprite = el.ownerDocument().createElement("sprite");
+	el.appendChild(sprite);
+	sprite << **it;
+    }
+
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, MapTileLevels & levels)
+{
+    levels.clear();
+    QDomNodeList list = el.elementsByTagName("sprite");
+
+    for(int pos = 0; pos < list.size(); ++pos)
+    {
+	levels << new MapTileExt();    
+	QDomElement sprite = list.item(pos).toElement();
+	sprite >> *levels.back();
+    }
+
+    return el;
 }
 
 MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos)
@@ -465,23 +515,13 @@ QDomElement & operator<< (QDomElement & el, const MapTile & tile)
     el.setAttribute("tileShape", tile.tileShape);
     el.setAttribute("objectID", tile.objectID);
 
-//    el.setAttribute("quantity1", tile.til.quantity1);
-//    el.setAttribute("quantity2", tile.til.quantity2);
+    QDomElement el1 = el.ownerDocument().createElement("levels1");
+    el.appendChild(el1);
+    el1 << tile.spritesLevel1;
 
-//    quint16     indexExt;
-//    mp2lev_t    level1;
-//    mp2lev_t    level2;
-
-/*
-    : til(mp2)
-    const QSize & tileSize = EditorTheme::tileSize();
-    QPoint offset(mpos.x() * tileSize.width(), mpos.y() * tileSize.height());
-    setOffset(offset);
-    setFlags(QGraphicsItem::ItemIsSelectable);
-    setTileSprite(tileSprite, tileShape);
-    loadSpriteLevel(spritesLevel1, 0, mp2.level1);
-    loadSpriteLevel(spritesLevel2, 0, mp2.level2);
-*/
+    QDomElement el2 = el.ownerDocument().createElement("levels2");
+    el.appendChild(el2);
+    el1 << tile.spritesLevel2;
 
     return el;
 }
@@ -492,6 +532,16 @@ QDomElement & operator>> (QDomElement & el, MapTile & tile)
 
     tile.passableBase = el.hasAttribute("base") ? el.attribute("base").toInt() : Direction::All;
     tile.passableLocal = el.hasAttribute("local") ? el.attribute("local").toInt() : Direction::All;
+
+    tile.tileSprite = el.attribute("tileSprite").toInt();
+    tile.tileShape = el.attribute("tileShape").toInt();
+    tile.objectID = el.attribute("objectID").toInt();
+
+    QDomElement el1 = el.firstChildElement("levels1");
+    el1 >> tile.spritesLevel1;
+
+    QDomElement el2 = el.firstChildElement("levels2");
+    el2 >> tile.spritesLevel2;
 
     return el;
 }
@@ -1517,7 +1567,23 @@ QPoint MP2Format::positionExtBlockFromNumber(int num) const
         {
             const mp2til_t & mp2 = tiles[xx + yy * size.width()];
 
-            quint16 orders = (mp2.quantity2 ? mp2.quantity2 : 0);
+	    switch(mp2.objectID)
+	    {
+		case 0x82: // sign, bottle block
+		case 0xDD:
+		case 0x93: // map event block
+		case 0xA3: // castle, rnd town, rnd castle block
+		case 0xB0:
+		case 0xB1:
+		case 0xB7: // hero, jail block
+		case 0xFB:
+		case 0xCF: // sphinx block
+		    break;
+
+		default: continue;
+	    }
+
+            quint16 orders = mp2.quantity2;
             orders <<= 8;
             orders |= mp2.quantity1;
 

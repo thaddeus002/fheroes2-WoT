@@ -2904,13 +2904,14 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
 
     // tab: skills
     tabSkills = new QWidget();
+    bool defaultSkills = 0 == hero.skills.size();
 
     checkBoxDefaultSkills = new QCheckBox(tabSkills);
-    checkBoxDefaultSkills->setChecked(true);
+    checkBoxDefaultSkills->setChecked(defaultSkills);
     checkBoxDefaultSkills->setText(QApplication::translate("HeroDialog", "Default", 0, QApplication::UnicodeUTF8));
 
     listWidgetSkills = new SkillsList(tabSkills);
-    listWidgetSkills->setVisible(false);
+    listWidgetSkills->setVisible(! defaultSkills);
 
     verticalSpacerSkills = new QSpacerItem(20, 6, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
