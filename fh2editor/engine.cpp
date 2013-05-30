@@ -2082,12 +2082,12 @@ QDomElement & operator>> (QDomElement & el, MapTown & town)
 
 MapHero::MapHero(const QPoint & pos, quint32 id)
     : MapObject(pos, id, MapObj::Heroes), color(Color::Unknown), race(Race::Unknown),
-    portrait(Portrait::Random), experience(0), patrolMode(false), patrolSquare(0)
+    portrait(Portrait::Unknown), experience(0), patrolMode(false), patrolSquare(0)
 {
 }
 
 MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2)
-    : MapObject(pos, id, MapObj::Heroes), color(Color::Unknown), race(Race::Unknown), portrait(Portrait::Random), nameHero(mp2.name)
+    : MapObject(pos, id, MapObj::Heroes), color(Color::Unknown), race(Race::Unknown), portrait(Portrait::Unknown), nameHero(mp2.name)
 {
     if(mp2.customTroops)
     {
@@ -2104,7 +2104,10 @@ MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2)
     patrolSquare = mp2.patrolSquare;
 
     if(mp2.customPortrate)
+    {
 	portrait = mp2.portrateType + 1;
+	if(Portrait::Random <= portrait) portrait = Portrait::Unknown;
+    }
 
     if(nameHero.isEmpty())
 	nameHero = Portrait::transcribe(portrait);
@@ -2861,6 +2864,11 @@ QString Artifact::transcribe(int index)
     return isValid(index) ? QString(names[index]) : QString(names[Unknown]);
 }
 
+QString Artifact::description(int index)
+{
+    return transcribe(index);
+}
+
 bool Artifact::isValid(int index)
 {
     return 0 <= index && Unknown > index;
@@ -3060,7 +3068,7 @@ QString Monster::transcribe(int index)
         "Rogue", "Nomad", "Ghost", "Genie", "Medusa", "Earth Element", "Air Element", "Fire Element", "Water Element",
         "Random", "Random Level1", "Random Level2", "Random Level3", "Random Level4", "Unknown" };
 
-    return isValid(index) ? QString(names[index]) : QString(names[None]);
+    return isValid(index) ? names[index] : names[None];
 }
 
 QString Monster::tips(int type)
@@ -3086,4 +3094,32 @@ QString Monster::tips(int type)
 bool Monster::isValid(int index)
 {
     return 0 <= index && Unknown > index;
+}
+
+QString SkillType::transcribe(int index)
+{
+    const char* names[] = { "None", "Pathfinding", "Archery", "Logistics", "Scouting", "Diplomacy", "Navigation", "Leadership",
+	"Wisdom", "Mysticism", "Luck", "Ballistics", "Eagleeye", "Necromancy", "Estates", "Unknown" };
+    return index < Unknown ? names[index] : names[Unknown];
+}
+
+QString SkillLevel::transcribe(int index)
+{
+    const char* names[] = { "Unknown", "Basic", "Advanced", "Expert" };
+    return index <= Expert ? names[index] : names[0];
+}
+
+QString Skill::name(void) const
+{
+    return SkillLevel::transcribe(level()) + " " + SkillType::transcribe(skill());
+}
+
+QString Skill::description(void) const
+{
+    return name();
+}
+
+QPixmap Skill::pixmap(void) const
+{
+    return isValid() ? EditorTheme::getImageICN("MINISS.ICN", skill() - 1).first : NULL;
 }

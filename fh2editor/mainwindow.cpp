@@ -98,7 +98,10 @@ void MainWindow::open(void)
         	child->show();
     	    }
 	    else
+	    {
         	child->close();
+		mdiArea->removeSubWindow(child);
+	    }
 	}
     }
 }
@@ -182,18 +185,21 @@ void MainWindow::updateWindowMenu(void)
     {
         MapWindow* child = qobject_cast<MapWindow*>(windows.at(i)->widget());
 
-        QString text;
+        if(child)
+	{
+	    QString text;
 
-        if(i < 9)
-            text = tr("&%1 %2").arg(i + 1).arg(child->userFriendlyCurrentFile());
-	else
-            text = tr("%1 %2").arg(i + 1).arg(child->userFriendlyCurrentFile());
+    	    if(i < 9)
+        	text = tr("&%1 %2").arg(i + 1).arg(child->userFriendlyCurrentFile());
+	    else
+        	text = tr("%1 %2").arg(i + 1).arg(child->userFriendlyCurrentFile());
 
-        QAction* action  = windowMenu->addAction(text);
-        action->setCheckable(true);
-        action ->setChecked(child == activeMapWindow());
-        connect(action, SIGNAL(triggered()), windowMapper, SLOT(map()));
-        windowMapper->setMapping(action, windows.at(i));
+    	    QAction* action  = windowMenu->addAction(text);
+    	    action->setCheckable(true);
+    	    action ->setChecked(child == activeMapWindow());
+    	    connect(action, SIGNAL(triggered()), windowMapper, SLOT(map()));
+    	    windowMapper->setMapping(action, windows.at(i));
+	}
     }
 }
 

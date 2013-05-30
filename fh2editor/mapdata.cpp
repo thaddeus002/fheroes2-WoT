@@ -1692,6 +1692,8 @@ void MapData::editObjectAttributes(void)
     	    case MapObj::RndCastle:
     	    case MapObj::RndTown:
     	    case MapObj::Castle:	editTownDialog(*tileOverMouse); break;
+    	    case MapObj::Sign:		editSignDialog(*tileOverMouse); break;
+    	    case MapObj::Heroes:	editHeroDialog(*tileOverMouse); break;
 
     	    default: QMessageBox::information(qobject_cast<MapWindow*>(parent()), "Object Attributes",
 				    "Sorry!\nChange attributes of the object is not yet available."); break;
@@ -1746,11 +1748,56 @@ void MapData::editTownDialog(const MapTile & tile)
 
 	if(QDialog::Accepted == form.exec())
 	{
-	    town->nameTown = form.labelName->text();
+	    town->nameTown = form.lineEditName->text();
 	    town->buildings = form.buildings() | form.dwellings();
 	    town->troops = form.troops();
 	    town->forceTown = form.checkBoxAllowCastle->isChecked();
 	    town->customBuilding = ! form.checkBoxBuildingsDefault->isChecked();
+	    //town->color = ;
+	    //town->race = ;
+
+	    emit dataModified();
+	}
+    }
+}
+
+void MapData::editHeroDialog(const MapTile & tile)
+{
+    MapHero* hero = dynamic_cast<MapHero*>(mapObjects.find(tile.mapPos()).data());
+
+    if(hero)
+    {
+	Form::HeroDialog form(*hero);
+
+	if(QDialog::Accepted == form.exec())
+	{
+	    hero->nameHero = form.lineEditName->text();
+	    hero->troops = form.troops();
+	    hero->portrait = form.verticalScrollBarPort->value();
+	    hero->artifacts = form.artifacts();
+	    hero->experience = form.lineEditExperience->text().toInt();
+	    hero->patrolMode = form.checkBoxEnablePatrol->isChecked();
+	    hero->patrolSquare = form.comboBoxPatrol->itemData(form.comboBoxPatrol->currentIndex()).toInt();
+	    hero->skills = form.skills();
+	    //hero->color = ;
+	    //hero->race = ;
+
+	    emit dataModified();
+	}
+    }
+}
+
+void MapData::editSignDialog(const MapTile & tile)
+{
+    MapSign* sign = dynamic_cast<MapSign*>(mapObjects.find(tile.mapPos()).data());
+
+    if(sign)
+    {
+	Form::SignDialog form(sign->message);
+
+	if(QDialog::Accepted == form.exec())
+	{
+	    sign->message = form.plainTextEdit->toPlainText();
 
 	    emit dataModified();
 	}

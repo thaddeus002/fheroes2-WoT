@@ -311,6 +311,8 @@ protected:
     void		editMapEventDialog(const MapTile &);
     void		editResourceDialog(const MapTile &);
     void		editTownDialog(const MapTile &);
+    void		editSignDialog(const MapTile &);
+    void		editHeroDialog(const MapTile &);
 
     friend class	MP2Format;
     friend class	MapTile;

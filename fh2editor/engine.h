@@ -49,7 +49,8 @@ namespace Direction
 
 namespace ICN
 {
-    enum { UNKNOWN = 0, OBJNARTI = 0x2C, MONS32 = 0x30, FLAG32 = 0x38, MINIHERO = 0x54, MTNSNOW = 0x58, MTNSWMP = 0x5C, MTNLAVA = 0x60, MTNDSRT = 0x64, MTNDIRT = 0x68, MTNMULT = 0x6C,
+    enum { UNKNOWN = 0,
+	    OBJNARTI = 0x2C, MONS32 = 0x30, FLAG32 = 0x38, MINIHERO = 0x54, MTNSNOW = 0x58, MTNSWMP = 0x5C, MTNLAVA = 0x60, MTNDSRT = 0x64, MTNDIRT = 0x68, MTNMULT = 0x6C,
 	    EXTRAOVR = 0x74, ROAD = 0x78, MTNCRCK = 0x7C, MTNGRAS = 0x80, TREJNGL = 0x84, TREEVIL = 0x88, OBJNTOWN = 0x8C, OBJNTWBA = 0x90, OBJNTWSH = 0x94, OBJNTWRD = 0x98, OBJNWAT2 = 0xA0,
 	    OBJNMUL2 = 0xA4, TRESNOW = 0xA8, TREFIR = 0xAC, TREFALL = 0xB0, STREAM = 0xB4, OBJNRSRC = 0xB8, OBJNGRA2 = 0xC0, TREDECI = 0xC4, OBJNWATR = 0xC8, OBJNGRAS = 0xCC, OBJNSNOW = 0xD0,
 	    OBJNSWMP = 0xD4, OBJNLAVA = 0xD8, OBJNDSRT = 0xDC, OBJNDIRT = 0xE0, OBJNCRCK = 0xE4, OBJNLAV3 = 0xE8, OBJNMULT = 0xEC, OBJNLAV2 = 0xF0, X_LOC1 = 0xF4, X_LOC2 = 0xF8, X_LOC3 = 0xFC };
@@ -129,6 +130,7 @@ namespace Artifact
 
     bool	isValid(int);
     QString	transcribe(int);
+    QString	description(int);
 }
 
 namespace Resource
@@ -157,13 +159,16 @@ namespace Portrait
 
 namespace SkillType
 {
-    enum {Unknown,
-            PathFinding, Archery, Logistics, Scouting, Diplomacy, Navigation, LeaderShip, Wisdom, Mysticism, Luck, Ballistics, EagleEye, Necromancy, Estates };
+    enum { None, PathFinding, Archery, Logistics, Scouting, Diplomacy, Navigation, LeaderShip, Wisdom, Mysticism, Luck, Ballistics, EagleEye, Necromancy, Estates, Unknown };
+
+    QString transcribe(int);
 }
 
 namespace SkillLevel
 {
     enum { Unknown = 0, Basic = 1, Advanced = 2, Expert = 3 };
+
+    QString transcribe(int);
 }
 
 namespace Monster
@@ -625,15 +630,19 @@ public:
 
 struct Skill : public QPair<int, int>
 {
-    enum { Unknown = 0 };
-
-    Skill() : QPair<int, int>(Skill::Unknown, SkillLevel::Unknown) {}
+    Skill() : QPair<int, int>(SkillType::None, SkillLevel::Unknown) {}
     Skill(int type, int level) : QPair<int, int>(type, level) {}
 
     bool	isValid(void) const { return first && second; }
     const int &	skill(void) const { return first; }
     const int &	level(void) const { return second; }
+
+    QString	name(void) const;
+    QString	description(void) const;
+    QPixmap	pixmap(void) const;
 };
+
+Q_DECLARE_METATYPE(Skill);
 
 struct Skills : public QVector<Skill>
 {

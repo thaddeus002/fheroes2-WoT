@@ -170,13 +170,12 @@ namespace Form
 	QAction*		addItemAct;
 	QAction*		editItemAct;
 	QAction*		delItemAct;
-	MapOptions*		parentObj;
-	int			kingdomColors;
 
-	ItemsList(int, QWidget*);
+	ItemsList(QWidget*);
 
     signals:
 	void			mousePressed(void);
+	void			listChanged(void);
 
     protected slots:
 	virtual void		addItem(void) = 0;
@@ -193,7 +192,7 @@ namespace Form
 	Q_OBJECT
 
     public:
-	RumorsList(int, QWidget*);
+	RumorsList(QWidget*);
 
     protected slots:
 	void			addItem(void);
@@ -203,6 +202,8 @@ namespace Form
     class EventsList : public ItemsList
     {
 	Q_OBJECT
+
+	int			kingdomColors;
 
     public:
 	EventsList(int, QWidget*);
@@ -628,6 +629,167 @@ namespace Form
 	void			setDefaultTroops(bool);
 	void			setDefaultBuildings(bool);
 	void			setDefaultDwellings(bool);
+    };
+
+    class SignDialog : public QDialog
+    {
+	Q_OBJECT
+
+    public:
+	SignDialog(const QString &);
+
+	QVBoxLayout*		verticalLayout;
+	QPlainTextEdit*		plainTextEdit;
+	QHBoxLayout*		horizontalLayout;
+	QPushButton*		pushButtonOk;
+	QSpacerItem*		horizontalSpacerButtons;
+	QPushButton*		pushButtonCancel;
+
+    protected slots:
+	void			setEnableOKButton(void);
+    };
+
+    class ArtifactsList : public ItemsList
+    {
+	Q_OBJECT
+
+    public:
+	ArtifactsList(QWidget*);
+
+	bool			limit(void) const;
+
+    protected slots:
+	void			addItem(void);
+	void			editItem(QListWidgetItem*);
+	void			checkLimit(void);
+    };
+
+    class SkillsList : public ItemsList
+    {
+	Q_OBJECT
+
+    public:
+	SkillsList(QWidget*);
+
+	bool			limit(void) const;
+
+    protected slots:
+	void			addItem(void);
+	void			editItem(QListWidgetItem*);
+	void			checkLimit(void);
+    };
+
+    class HeroDialog : public QDialog
+    {
+	Q_OBJECT
+
+    public:
+	HeroDialog(const MapHero &);
+
+	QVBoxLayout* 		verticalLayoutWidget;
+	QTabWidget* 		tabWidget;
+	QWidget* 		tabInfo;
+	QVBoxLayout* 		verticalLayoutInfo;
+	QHBoxLayout* 		horizontalLayout;
+	QVBoxLayout* 		verticalLayoutNameExp;
+	QHBoxLayout* 		horizontalLayoutName;
+	QLabel* 		labelName;
+	QLineEdit* 		lineEditName;
+	QHBoxLayout* 		horizontalLayoutExp;
+	QLabel* 		labelExperience;
+	QLineEdit* 		lineEditExperience;
+	QSpacerItem* 		horizontalSpacerCenter;
+	QLabel* 		labelPortrait;
+	QScrollBar* 		verticalScrollBarPort;
+	QSpacerItem* 		verticalSpacerInfo;
+	QWidget* 		tabTroops;
+	QVBoxLayout* 		verticalLayoutTroops;
+	QCheckBox* 		checkBoxTroopsDefault;
+	QHBoxLayout* 		horizontalLayoutT1;
+	QLabel* 		labelSlot1;
+	QComboBox* 		comboBoxTroop1;
+	QSpinBox* 		spinBoxCount1;
+	QHBoxLayout* 		horizontalLayoutT2;
+	QLabel* 		labelSlot2;
+	QComboBox* 		comboBoxTroop2;
+	QSpinBox* 		spinBoxCount2;
+	QHBoxLayout* 		horizontalLayoutT3;
+	QLabel* 		labelSlot3;
+	QComboBox* 		comboBoxTroop3;
+	QSpinBox* 		spinBoxCount3;
+	QHBoxLayout* 		horizontalLayoutT4;
+	QLabel* 		labelSlot4;
+	QComboBox* 		comboBoxTroop4;
+        QSpinBox* 		spinBoxCount4;
+	QHBoxLayout* 		horizontalLayoutT5;
+        QLabel* 		labelSlot5;
+        QComboBox* 		comboBoxTroop5;
+        QSpinBox* 		spinBoxCount5;
+        QSpacerItem* 		verticalSpacerTroops;
+        QWidget* 		tabArtifacts;
+	QVBoxLayout* 		verticalLayoutArtifacts;
+        ArtifactsList* 		listWidgetArtifacts;
+	QSpacerItem* 		verticalSpacerArtifacts;
+        QWidget* 		tabSkills;
+	QVBoxLayout* 		verticalLayoutSkills;
+	QCheckBox* 		checkBoxDefaultSkills;
+	SkillsList* 		listWidgetSkills;
+	QSpacerItem* 		verticalSpacerSkills;
+        QWidget* 		tabOther;
+	QVBoxLayout* 		verticalLayoutOther;
+	QGroupBox* 		groupBoxPatrol;
+	QVBoxLayout* 		verticalLayoutPatrol;
+	QCheckBox* 		checkBoxEnablePatrol;
+	QComboBox* 		comboBoxPatrol;
+	QSpacerItem* 		verticalSpacerOther;
+	QHBoxLayout* 		horizontalLayoutButtons;
+	QPushButton* 		pushButtonOk;
+	QSpacerItem* 		horizontalSpacerButtons;
+	QPushButton* 		pushButtonCancel;
+
+	Troops			troops(void) const;
+	QVector<int>		artifacts(void) const;
+	Skills			skills(void) const;
+
+    protected slots:
+	void			setEnableOKButton(void);
+	void			setPortrait(int);
+	void			setDefaultTroops(bool);
+	void			widgetSkillsVisible(bool);
+    };
+
+    class ListDialog : public QDialog
+    {
+	Q_OBJECT
+
+    public:
+	ListDialog();
+
+	QVBoxLayout*		verticalLayout;
+	QListWidget*		listWidget;
+	QHBoxLayout*		horizontalLayout;
+	QPushButton*		pushButtonOk;
+	QSpacerItem*		horizontalSpacer;
+	QPushButton*		pushButtonCancel;
+
+    protected slots:
+	void			setEnableOKButton(void);
+    };
+
+    class SelectArtifactDialog : public ListDialog
+    {
+	Q_OBJECT
+
+    public:
+	SelectArtifactDialog(int = 0);
+    };
+
+    class SelectSkillDialog : public ListDialog
+    {
+	Q_OBJECT
+
+    public:
+	SelectSkillDialog(const Skill & = Skill());
     };
 }
 

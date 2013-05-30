@@ -612,8 +612,8 @@ Form::MapOptions::MapOptions(MapData & map)
     groupBoxEvents = new QGroupBox(tabRumorsEvents);
     groupBoxEvents->setTitle(QApplication::translate("MapOptions", "Events", 0, QApplication::UnicodeUTF8));
 
-    listWidgetRumors = new RumorsList(map.kingdomColors(), this);
-    listWidgetEvents = new EventsList(map.kingdomColors(), this);
+    listWidgetRumors = new RumorsList(groupBoxRumors);
+    listWidgetEvents = new EventsList(map.kingdomColors(), groupBoxEvents);
 
     verticalLayout7 = new QVBoxLayout(groupBoxRumors);
     verticalLayout7->addWidget(listWidgetRumors);
@@ -785,6 +785,14 @@ Form::MapOptions::MapOptions(MapData & map)
 
     connect(listWidgetRumors, SIGNAL(mousePressed()), listWidgetEvents, SLOT(clearSelection()));
     connect(listWidgetEvents, SIGNAL(mousePressed()), listWidgetRumors, SLOT(clearSelection()));
+
+    connect(listWidgetRumors->addItemAct, SIGNAL(triggered()), this, SLOT(setEnableSaveButton()));
+    connect(listWidgetRumors->editItemAct, SIGNAL(triggered()), this, SLOT(setEnableSaveButton()));
+    connect(listWidgetRumors->delItemAct, SIGNAL(triggered()), this, SLOT(setEnableSaveButton()));
+
+    connect(listWidgetEvents->addItemAct, SIGNAL(triggered()), this, SLOT(setEnableSaveButton()));
+    connect(listWidgetEvents->editItemAct, SIGNAL(triggered()), this, SLOT(setEnableSaveButton()));
+    connect(listWidgetEvents->delItemAct, SIGNAL(triggered()), this, SLOT(setEnableSaveButton()));
 
     connect(spinBoxResourceGoldMin, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
     connect(spinBoxResourceGoldMax, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
@@ -988,7 +996,7 @@ void Form::MapOptions::setEnableSaveButton(const QString & val)
     pushButtonSave->setEnabled(true);
 }
 
-Form::ItemsList::ItemsList(int colors, QWidget* parent) : QListWidget(parent), kingdomColors(colors)
+Form::ItemsList::ItemsList(QWidget* parent) : QListWidget(parent)
 {
     setViewMode(QListView::ListMode);
 
@@ -1005,15 +1013,6 @@ Form::ItemsList::ItemsList(int colors, QWidget* parent) : QListWidget(parent), k
     connect(addItemAct, SIGNAL(triggered()), this, SLOT(addItem()));
     connect(editItemAct, SIGNAL(triggered()), this, SLOT(editCurrentItem()));
     connect(delItemAct, SIGNAL(triggered()), this, SLOT(deleteCurrentItem()));
-
-    MapOptions* ptr = qobject_cast<MapOptions*>(parent);
-
-    if(ptr)
-    {
-	connect(addItemAct, SIGNAL(triggered()), ptr, SLOT(setEnableSaveButton()));
-	connect(editItemAct, SIGNAL(triggered()), ptr, SLOT(setEnableSaveButton()));
-	connect(delItemAct, SIGNAL(triggered()), ptr, SLOT(setEnableSaveButton()));
-    }
 }
 
 void Form::ItemsList::editCurrentItem(void)
@@ -1024,6 +1023,7 @@ void Form::ItemsList::editCurrentItem(void)
 void Form::ItemsList::deleteCurrentItem(void)
 {
     takeItem(currentRow());
+    emit listChanged();
 }
 
 void Form::ItemsList::mousePressEvent(QMouseEvent* event)
@@ -1051,7 +1051,7 @@ void Form::ItemsList::mousePressEvent(QMouseEvent* event)
     QListWidget::mousePressEvent(event);
 }
 
-Form::RumorsList::RumorsList(int colors, QWidget* parent) : ItemsList(colors, parent)
+Form::RumorsList::RumorsList(QWidget* parent) : ItemsList(parent)
 {
     addItemAct->setStatusTip(tr("Add new rumor"));
     editItemAct->setStatusTip(tr("Edit rumor"));
@@ -1077,7 +1077,7 @@ void Form::RumorsList::editItem(QListWidgetItem* item)
 	item->setText(dialog.plainText->toPlainText());
 }
 
-Form::EventsList::EventsList(int colors, QWidget* parent) : ItemsList(colors, parent)
+Form::EventsList::EventsList(int colors, QWidget* parent) : ItemsList(parent), kingdomColors(colors)
 {
     addItemAct->setStatusTip(tr("Add new event"));
     editItemAct->setStatusTip(tr("Edit event"));
@@ -1959,7 +1959,7 @@ MapEvent Form::MapEventDialog::result(const QPoint & pos, quint32 uid) const
 
 Form::TownDialog::TownDialog(const MapTown & town)
 {
-    setWindowTitle(QApplication::translate("TownDialog", "Dialog", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("TownDialog", "Town Detail", 0, QApplication::UnicodeUTF8));
 
     // tab: info
     tabInfo = new QWidget();
@@ -2087,6 +2087,11 @@ Form::TownDialog::TownDialog(const MapTown & town)
     spinBoxCount5->setMaximumWidth(61);
     spinBoxCount5->setMaximum(65535);
 
+    horizontalLayoutT5 = new QHBoxLayout();
+    horizontalLayoutT5->addWidget(labelSlot5);
+    horizontalLayoutT5->addWidget(comboBoxTroop5);
+    horizontalLayoutT5->addWidget(spinBoxCount5);
+
     for(int index = Monster::None; index < Monster::Unknown; ++index)
     {
 	QPixmap mons32 = EditorTheme::getImageICN(ICN::MONS32, index - 1).first;
@@ -2118,11 +2123,6 @@ Form::TownDialog::TownDialog(const MapTown & town)
 	spinBoxCount4->setValue(town.troops[3].count());
 	spinBoxCount5->setValue(town.troops[4].count());
     }
-
-    horizontalLayoutT5 = new QHBoxLayout();
-    horizontalLayoutT5->addWidget(labelSlot5);
-    horizontalLayoutT5->addWidget(comboBoxTroop5);
-    horizontalLayoutT5->addWidget(spinBoxCount5);
 
     verticalSpacerTroops = new QSpacerItem(20, 37, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
@@ -2645,4 +2645,627 @@ void Form::TownDialog::setDefaultTroops(bool f)
 void Form::TownDialog::setEnableOKButton(void)
 {
     pushButtonOk->setEnabled(true);
+}
+
+Form::SignDialog::SignDialog(const QString & msg)
+{
+    setWindowTitle(QApplication::translate("SignDialog", "Sign Detail", 0, QApplication::UnicodeUTF8));
+
+    plainTextEdit = new QPlainTextEdit(this);
+    plainTextEdit->setPlainText(msg);
+
+    pushButtonOk = new QPushButton(this);
+    pushButtonOk->setEnabled(false);
+    pushButtonOk->setText(QApplication::translate("SignDialog", "Ok", 0, QApplication::UnicodeUTF8));
+
+    horizontalSpacerButtons = new QSpacerItem(88, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    pushButtonCancel = new QPushButton(this);
+    pushButtonCancel->setText(QApplication::translate("SignDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayout = new QHBoxLayout();
+    horizontalLayout->addWidget(pushButtonOk);
+    horizontalLayout->addItem(horizontalSpacerButtons);
+    horizontalLayout->addWidget(pushButtonCancel);
+
+    verticalLayout = new QVBoxLayout(this);
+    verticalLayout->addWidget(plainTextEdit);
+    verticalLayout->addLayout(horizontalLayout);
+
+    QSize minSize(240, 170);
+
+    resize(minSize);
+    setMinimumSize(minSize);
+
+    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(plainTextEdit, SIGNAL(modificationChanged(bool)), this, SLOT(setEnableOKButton()));
+}
+
+void Form::SignDialog::setEnableOKButton(void)
+{
+    pushButtonOk->setEnabled(true);
+}
+
+Form::HeroDialog::HeroDialog(const MapHero & hero)
+{
+    setWindowTitle(QApplication::translate("HeroDialog", "Hero Detail", 0, QApplication::UnicodeUTF8));
+
+    // tab: info
+    tabInfo = new QWidget();
+
+    labelName = new QLabel(tabInfo);
+    labelName->setText(QApplication::translate("HeroDialog", "Name", 0, QApplication::UnicodeUTF8));
+
+    lineEditName = new QLineEdit(tabInfo);
+    lineEditName->setText(hero.nameHero);
+
+    horizontalLayoutName = new QHBoxLayout();
+    horizontalLayoutName->addWidget(labelName);
+    horizontalLayoutName->addWidget(lineEditName);
+
+    labelExperience = new QLabel(tabInfo);
+    labelExperience->setText(QApplication::translate("HeroDialog", "Experience", 0, QApplication::UnicodeUTF8));
+
+    lineEditExperience = new QLineEdit(tabInfo);
+    lineEditExperience->setInputMethodHints(Qt::ImhDigitsOnly);
+    lineEditExperience->setText(QString::number(hero.experience));
+
+    horizontalLayoutExp = new QHBoxLayout();
+    horizontalLayoutExp->addWidget(labelExperience);
+    horizontalLayoutExp->addWidget(lineEditExperience);
+
+    verticalLayoutNameExp = new QVBoxLayout();
+    verticalLayoutNameExp->addLayout(horizontalLayoutName);
+    verticalLayoutNameExp->addLayout(horizontalLayoutExp);
+
+    horizontalSpacerCenter = new QSpacerItem(18, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    labelPortrait = new QLabel(tabInfo);
+    labelPortrait->setPixmap(EditorTheme::getImageICN("PORTMEDI.ICN", hero.portrait).first);
+
+    verticalScrollBarPort = new QScrollBar(tabInfo);
+    verticalScrollBarPort->setPageStep(1);
+    verticalScrollBarPort->setTracking(false);
+    verticalScrollBarPort->setMinimum(Portrait::Unknown);
+    verticalScrollBarPort->setMaximum(Portrait::Random - 1);
+    verticalScrollBarPort->setValue(hero.portrait);
+    verticalScrollBarPort->setOrientation(Qt::Vertical);
+    verticalScrollBarPort->setInvertedAppearance(false);
+
+    horizontalLayout = new QHBoxLayout();
+    horizontalLayout->addLayout(verticalLayoutNameExp);
+    horizontalLayout->addItem(horizontalSpacerCenter);
+    horizontalLayout->addWidget(labelPortrait);
+    horizontalLayout->addWidget(verticalScrollBarPort);
+
+    verticalSpacerInfo = new QSpacerItem(20, 121, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    verticalLayoutInfo = new QVBoxLayout(tabInfo);
+    verticalLayoutInfo->addLayout(horizontalLayout);
+    verticalLayoutInfo->addItem(verticalSpacerInfo);
+
+    // tab: troops
+    tabTroops = new QWidget();
+    bool defaultTroops = 0 == hero.troops.validCount();
+
+    checkBoxTroopsDefault = new QCheckBox(tabTroops);
+    checkBoxTroopsDefault->setChecked(defaultTroops);
+    checkBoxTroopsDefault->setText(QApplication::translate("HeroDialog", "Default", 0, QApplication::UnicodeUTF8));
+
+    labelSlot1 = new QLabel(tabTroops);
+    labelSlot1->setEnabled(! defaultTroops);
+    labelSlot1->setText(QApplication::translate("HeroDialog", "Slot 1", 0, QApplication::UnicodeUTF8));
+
+    comboBoxTroop1 = new QComboBox(tabTroops);
+    comboBoxTroop1->setEnabled(! defaultTroops);
+
+    spinBoxCount1 = new QSpinBox(tabTroops);
+    spinBoxCount1->setEnabled(! defaultTroops);
+    spinBoxCount1->setMaximumWidth(61);
+    spinBoxCount1->setMaximum(65535);
+
+    horizontalLayoutT1 = new QHBoxLayout();
+    horizontalLayoutT1->addWidget(labelSlot1);
+    horizontalLayoutT1->addWidget(comboBoxTroop1);
+    horizontalLayoutT1->addWidget(spinBoxCount1);
+
+    labelSlot2 = new QLabel(tabTroops);
+    labelSlot2->setEnabled(! defaultTroops);
+    labelSlot2->setText(QApplication::translate("HeroDialog", "Slot 2", 0, QApplication::UnicodeUTF8));
+
+    comboBoxTroop2 = new QComboBox(tabTroops);
+    comboBoxTroop2->setEnabled(! defaultTroops);
+
+    spinBoxCount2 = new QSpinBox(tabTroops);
+    spinBoxCount2->setEnabled(! defaultTroops);
+    spinBoxCount2->setMaximumWidth(61);
+    spinBoxCount2->setMaximum(65535);
+
+    horizontalLayoutT2 = new QHBoxLayout();
+    horizontalLayoutT2->addWidget(labelSlot2);
+    horizontalLayoutT2->addWidget(comboBoxTroop2);
+    horizontalLayoutT2->addWidget(spinBoxCount2);
+
+    labelSlot3 = new QLabel(tabTroops);
+    labelSlot3->setEnabled(! defaultTroops);
+    labelSlot3->setText(QApplication::translate("HeroDialog", "Slot 3", 0, QApplication::UnicodeUTF8));
+
+    comboBoxTroop3 = new QComboBox(tabTroops);
+    comboBoxTroop3->setEnabled(! defaultTroops);
+
+    spinBoxCount3 = new QSpinBox(tabTroops);
+    spinBoxCount3->setEnabled(! defaultTroops);
+    spinBoxCount3->setMaximumWidth(61);
+    spinBoxCount3->setMaximum(65535);
+
+    horizontalLayoutT3 = new QHBoxLayout();
+    horizontalLayoutT3->addWidget(labelSlot3);
+    horizontalLayoutT3->addWidget(comboBoxTroop3);
+    horizontalLayoutT3->addWidget(spinBoxCount3);
+
+    labelSlot4 = new QLabel(tabTroops);
+    labelSlot4->setEnabled(! defaultTroops);
+    labelSlot4->setText(QApplication::translate("HeroDialog", "Slot 4", 0, QApplication::UnicodeUTF8));
+
+    comboBoxTroop4 = new QComboBox(tabTroops);
+    comboBoxTroop4->setEnabled(! defaultTroops);
+
+    spinBoxCount4 = new QSpinBox(tabTroops);
+    spinBoxCount4->setEnabled(! defaultTroops);
+    spinBoxCount4->setMaximumWidth(61);
+    spinBoxCount4->setMaximum(65535);
+
+    horizontalLayoutT4 = new QHBoxLayout();
+    horizontalLayoutT4->addWidget(labelSlot4);
+    horizontalLayoutT4->addWidget(comboBoxTroop4);
+    horizontalLayoutT4->addWidget(spinBoxCount4);
+
+    labelSlot5 = new QLabel(tabTroops);
+    labelSlot5->setEnabled(! defaultTroops);
+    labelSlot5->setText(QApplication::translate("HeroDialog", "Slot 5", 0, QApplication::UnicodeUTF8));
+
+    comboBoxTroop5 = new QComboBox(tabTroops);
+    comboBoxTroop5->setEnabled(! defaultTroops);
+
+    spinBoxCount5 = new QSpinBox(tabTroops);
+    spinBoxCount5->setEnabled(! defaultTroops);
+    spinBoxCount5->setMaximumWidth(61);
+    spinBoxCount5->setMaximum(65535);
+
+    horizontalLayoutT5 = new QHBoxLayout();
+    horizontalLayoutT5->addWidget(labelSlot5);
+    horizontalLayoutT5->addWidget(comboBoxTroop5);
+    horizontalLayoutT5->addWidget(spinBoxCount5);
+
+    for(int index = Monster::None; index < Monster::Unknown; ++index)
+    {
+	QPixmap mons32 = EditorTheme::getImageICN(ICN::MONS32, index - 1).first;
+	comboBoxTroop1->addItem(mons32, Monster::transcribe(index));
+	comboBoxTroop2->addItem(mons32, Monster::transcribe(index));
+	comboBoxTroop3->addItem(mons32, Monster::transcribe(index));
+	comboBoxTroop4->addItem(mons32, Monster::transcribe(index));
+	comboBoxTroop5->addItem(mons32, Monster::transcribe(index));
+#ifndef QT_NO_TOOLTIP
+	comboBoxTroop1->setItemData(index, Monster::tips(index), Qt::ToolTipRole);
+	comboBoxTroop2->setItemData(index, Monster::tips(index), Qt::ToolTipRole);
+	comboBoxTroop3->setItemData(index, Monster::tips(index), Qt::ToolTipRole);
+	comboBoxTroop4->setItemData(index, Monster::tips(index), Qt::ToolTipRole);
+	comboBoxTroop5->setItemData(index, Monster::tips(index), Qt::ToolTipRole);
+#endif
+    }
+
+    if(! defaultTroops)
+    {
+	comboBoxTroop1->setCurrentIndex(hero.troops[0].type());
+	comboBoxTroop2->setCurrentIndex(hero.troops[1].type());
+	comboBoxTroop3->setCurrentIndex(hero.troops[2].type());
+	comboBoxTroop4->setCurrentIndex(hero.troops[3].type());
+	comboBoxTroop5->setCurrentIndex(hero.troops[4].type());
+
+	spinBoxCount1->setValue(hero.troops[0].count());
+	spinBoxCount2->setValue(hero.troops[1].count());
+	spinBoxCount3->setValue(hero.troops[2].count());
+	spinBoxCount4->setValue(hero.troops[3].count());
+	spinBoxCount5->setValue(hero.troops[4].count());
+    }
+
+    verticalSpacerTroops = new QSpacerItem(20, 19, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    verticalLayoutTroops = new QVBoxLayout(tabTroops);
+    verticalLayoutTroops->addWidget(checkBoxTroopsDefault);
+    verticalLayoutTroops->addLayout(horizontalLayoutT1);
+    verticalLayoutTroops->addLayout(horizontalLayoutT2);
+    verticalLayoutTroops->addLayout(horizontalLayoutT3);
+    verticalLayoutTroops->addLayout(horizontalLayoutT4);
+    verticalLayoutTroops->addLayout(horizontalLayoutT5);
+    verticalLayoutTroops->addItem(verticalSpacerTroops);
+
+    // tab: artifacts
+    tabArtifacts = new QWidget();
+
+    listWidgetArtifacts = new ArtifactsList(tabArtifacts);
+    verticalSpacerArtifacts = new QSpacerItem(20, 36, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    verticalLayoutArtifacts = new QVBoxLayout(tabArtifacts);
+    verticalLayoutArtifacts->addWidget(listWidgetArtifacts);
+    verticalLayoutArtifacts->addItem(verticalSpacerArtifacts);
+
+    for(QVector<int>::const_iterator
+	it = hero.artifacts.begin(); it != hero.artifacts.end(); ++it)
+    {
+	QListWidgetItem* item = new QListWidgetItem(EditorTheme::getImageICN("ARTFX.ICN", *it - 1).first, Artifact::transcribe(*it));
+	item->setData(Qt::UserRole, *it);
+#ifndef QT_NO_TOOLTIP
+	item->setToolTip(Artifact::description(*it));
+#endif
+	static_cast<QListWidget*>(listWidgetArtifacts)->addItem(item);
+    }
+
+    // tab: skills
+    tabSkills = new QWidget();
+
+    checkBoxDefaultSkills = new QCheckBox(tabSkills);
+    checkBoxDefaultSkills->setChecked(true);
+    checkBoxDefaultSkills->setText(QApplication::translate("HeroDialog", "Default", 0, QApplication::UnicodeUTF8));
+
+    listWidgetSkills = new SkillsList(tabSkills);
+    listWidgetSkills->setVisible(false);
+
+    verticalSpacerSkills = new QSpacerItem(20, 6, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    verticalLayoutSkills = new QVBoxLayout(tabSkills);
+    verticalLayoutSkills->addWidget(checkBoxDefaultSkills);
+    verticalLayoutSkills->addWidget(listWidgetSkills);
+    verticalLayoutSkills->addItem(verticalSpacerSkills);
+
+    for(Skills::const_iterator
+	it = hero.skills.begin(); it != hero.skills.end(); ++it)
+    {
+	QListWidgetItem* item = new QListWidgetItem((*it).pixmap(), (*it).name());
+	item->setData(Qt::UserRole, QVariant::fromValue(*it));
+#ifndef QT_NO_TOOLTIP
+	item->setToolTip((*it).description());
+#endif
+	static_cast<QListWidget*>(listWidgetSkills)->addItem(item);
+    }
+
+    // tab: other
+    tabOther = new QWidget();
+
+    groupBoxPatrol = new QGroupBox(tabOther);
+    groupBoxPatrol->setTitle(QApplication::translate("HeroDialog", "Patrol", 0, QApplication::UnicodeUTF8));
+
+    checkBoxEnablePatrol = new QCheckBox(groupBoxPatrol);
+    checkBoxEnablePatrol->setChecked(hero.patrolMode);
+
+    checkBoxEnablePatrol->setText(QApplication::translate("HeroDialog", "Enable", 0, QApplication::UnicodeUTF8));
+
+    comboBoxPatrol = new QComboBox(groupBoxPatrol);
+    comboBoxPatrol->setEnabled(hero.patrolMode);
+    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Stand still", 0, QApplication::UnicodeUTF8), 0);
+    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Radius 1 square", 0, QApplication::UnicodeUTF8), 1);
+    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Radius 2 squares", 0, QApplication::UnicodeUTF8), 2);
+    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Radius 3 squares", 0, QApplication::UnicodeUTF8), 3);
+    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Radius 4 squares", 0, QApplication::UnicodeUTF8), 4);
+    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Radius 5 squares", 0, QApplication::UnicodeUTF8), 5);
+    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Radius 6 squares", 0, QApplication::UnicodeUTF8), 6);
+    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Radius 7 squares", 0, QApplication::UnicodeUTF8), 7);
+    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Radius 8 squares", 0, QApplication::UnicodeUTF8), 8);
+    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Radius 9 squares", 0, QApplication::UnicodeUTF8), 9);
+    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Radius 10 squares", 0, QApplication::UnicodeUTF8), 10);
+    comboBoxPatrol->setCurrentIndex(hero.patrolSquare < comboBoxPatrol->count() ? hero.patrolSquare : 0);
+
+    verticalLayoutPatrol = new QVBoxLayout(groupBoxPatrol);
+    verticalLayoutPatrol->addWidget(checkBoxEnablePatrol);
+    verticalLayoutPatrol->addWidget(comboBoxPatrol);
+
+    verticalSpacerOther = new QSpacerItem(20, 96, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    verticalLayoutOther = new QVBoxLayout(tabOther);
+    verticalLayoutOther->addWidget(groupBoxPatrol);
+    verticalLayoutOther->addItem(verticalSpacerOther);
+
+    // buttons
+    pushButtonOk = new QPushButton(this);
+    pushButtonOk->setEnabled(false);
+    pushButtonOk->setText(QApplication::translate("HeroDialog", "Ok", 0, QApplication::UnicodeUTF8));
+
+    horizontalSpacerButtons = new QSpacerItem(68, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    pushButtonCancel = new QPushButton(this);
+    pushButtonCancel->setText(QApplication::translate("HeroDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutButtons = new QHBoxLayout();
+    horizontalLayoutButtons->addWidget(pushButtonOk);
+    horizontalLayoutButtons->addItem(horizontalSpacerButtons);
+    horizontalLayoutButtons->addWidget(pushButtonCancel);
+
+    tabWidget = new QTabWidget(this);
+    tabWidget->addTab(tabInfo, "Info");
+    tabWidget->addTab(tabTroops, "Troops");
+    tabWidget->addTab(tabArtifacts, "Artifacts");
+    tabWidget->addTab(tabSkills, "Skills");
+    tabWidget->addTab(tabOther, "Other");
+    tabWidget->setCurrentIndex(0);
+
+    verticalLayoutWidget = new QVBoxLayout(this);
+    verticalLayoutWidget->addWidget(tabWidget);
+    verticalLayoutWidget->addLayout(horizontalLayoutButtons);
+
+    QSize minSize = minimumSizeHint();
+
+    resize(minSize);
+    setMinimumSize(minSize);
+
+    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
+
+    connect(lineEditName, SIGNAL(textChanged(QString)), this, SLOT(setEnableOKButton()));
+    connect(lineEditExperience, SIGNAL(textChanged(QString)), this, SLOT(setEnableOKButton()));
+    connect(verticalScrollBarPort, SIGNAL(valueChanged(int)), this, SLOT(setPortrait(int)));
+
+    connect(checkBoxTroopsDefault, SIGNAL(toggled(bool)), this, SLOT(setDefaultTroops(bool)));
+    connect(comboBoxTroop1, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(comboBoxTroop2, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(comboBoxTroop3, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(comboBoxTroop4, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(comboBoxTroop5, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(spinBoxCount1, SIGNAL(valueChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(spinBoxCount2, SIGNAL(valueChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(spinBoxCount3, SIGNAL(valueChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(spinBoxCount4, SIGNAL(valueChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(spinBoxCount5, SIGNAL(valueChanged(int)), this, SLOT(setEnableOKButton()));
+
+    connect(checkBoxDefaultSkills, SIGNAL(toggled(bool)), this, SLOT(widgetSkillsVisible(bool)));
+    connect(listWidgetArtifacts, SIGNAL(currentTextChanged(const QString &)), this, SLOT(setEnableOKButton()));
+
+    connect(checkBoxEnablePatrol, SIGNAL(toggled(bool)), comboBoxPatrol, SLOT(setEnabled(bool)));
+    connect(checkBoxEnablePatrol, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    connect(comboBoxPatrol, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
+}
+
+void Form::HeroDialog::widgetSkillsVisible(bool f)
+{
+    if(f) listWidgetSkills->clear();
+    listWidgetSkills->setVisible(! f);
+    setEnableOKButton();
+}
+
+void Form::HeroDialog::setPortrait(int val)
+{
+    labelPortrait->setPixmap(EditorTheme::getImageICN("PORTMEDI.ICN", val).first);
+    setEnableOKButton();
+}
+
+void Form::HeroDialog::setEnableOKButton(void)
+{
+    pushButtonOk->setEnabled(true);
+}
+
+void Form::HeroDialog::setDefaultTroops(bool f)
+{
+    if(f)
+    {
+	comboBoxTroop1->setCurrentIndex(0);
+	comboBoxTroop2->setCurrentIndex(0);
+	comboBoxTroop3->setCurrentIndex(0);
+	comboBoxTroop4->setCurrentIndex(0);
+	comboBoxTroop5->setCurrentIndex(0);
+
+	spinBoxCount1->setValue(0);
+	spinBoxCount2->setValue(0);
+	spinBoxCount3->setValue(0);
+	spinBoxCount4->setValue(0);
+	spinBoxCount5->setValue(0);
+    }
+
+    labelSlot1->setDisabled(f);
+    labelSlot2->setDisabled(f);
+    labelSlot3->setDisabled(f);
+    labelSlot4->setDisabled(f);
+    labelSlot5->setDisabled(f);
+
+    comboBoxTroop1->setDisabled(f);
+    comboBoxTroop2->setDisabled(f);
+    comboBoxTroop3->setDisabled(f);
+    comboBoxTroop4->setDisabled(f);
+    comboBoxTroop5->setDisabled(f);
+
+    spinBoxCount1->setDisabled(f);
+    spinBoxCount2->setDisabled(f);
+    spinBoxCount3->setDisabled(f);
+    spinBoxCount4->setDisabled(f);
+    spinBoxCount5->setDisabled(f);
+
+    setEnableOKButton();
+}
+
+Troops Form::HeroDialog::troops(void) const
+{
+    Troops res;
+
+    res[0] = Troop(comboBoxTroop1->currentIndex(), spinBoxCount1->value());
+    res[1] = Troop(comboBoxTroop2->currentIndex(), spinBoxCount2->value());
+    res[2] = Troop(comboBoxTroop3->currentIndex(), spinBoxCount3->value());
+    res[3] = Troop(comboBoxTroop4->currentIndex(), spinBoxCount4->value());
+    res[4] = Troop(comboBoxTroop5->currentIndex(), spinBoxCount5->value());
+
+    return res;
+}
+
+QVector<int> Form::HeroDialog::artifacts(void) const
+{
+    QVector<int> res;
+
+    for(int index = 0; index < listWidgetArtifacts->count(); ++index)
+	res.push_back(listWidgetArtifacts->item(index)->data(Qt::UserRole).toInt());
+
+    return res;
+}
+
+Skills Form::HeroDialog::skills(void) const
+{
+    Skills res;
+
+    for(int index = 0; index < listWidgetSkills->count(); ++index)
+	res.push_back(qvariant_cast<Skill>(listWidgetSkills->item(index)->data(Qt::UserRole)));
+
+    return res;
+}
+
+Form::ArtifactsList::ArtifactsList(QWidget* parent) : ItemsList(parent)
+{
+    addItemAct->setStatusTip(tr("Add artifact"));
+    editItemAct->setStatusTip(tr("Edit artifact"));
+    delItemAct->setStatusTip(tr("Delete artifact"));
+
+    connect(this, SIGNAL(listChanged()), this, SLOT(checkLimit()));
+}
+
+void Form::ArtifactsList::addItem(void)
+{
+    SelectArtifactDialog dialog;
+
+    if(QDialog::Accepted == dialog.exec())
+    {
+	QListWidget::addItem(new QListWidgetItem(*dialog.listWidget->currentItem()));
+	setCurrentRow(count() - 1);
+    }
+
+    emit listChanged();
+}
+
+bool Form::ArtifactsList::limit(void) const
+{
+    return count() >= 3;
+}
+
+void Form::ArtifactsList::editItem(QListWidgetItem* item)
+{
+    SelectArtifactDialog dialog(item->data(Qt::UserRole).toInt());
+
+    if(QDialog::Accepted == dialog.exec())
+	*item = *dialog.listWidget->currentItem();
+}
+
+void Form::ArtifactsList::checkLimit(void)
+{
+    addItemAct->setDisabled(limit());
+}
+
+Form::SkillsList::SkillsList(QWidget* parent) : ItemsList(parent)
+{
+    addItemAct->setStatusTip(tr("Add skill"));
+    editItemAct->setStatusTip(tr("Edit skill"));
+    delItemAct->setStatusTip(tr("Delete skill"));
+
+    connect(this, SIGNAL(listChanged()), this, SLOT(checkLimit()));
+}
+
+void Form::SkillsList::addItem(void)
+{
+    SelectSkillDialog dialog;
+
+    if(QDialog::Accepted == dialog.exec())
+    {
+	QListWidget::addItem(new QListWidgetItem(*dialog.listWidget->currentItem()));
+	setCurrentRow(count() - 1);
+    }
+
+    emit listChanged();
+}
+
+bool Form::SkillsList::limit(void) const
+{
+    return count() >= 8;
+}
+
+void Form::SkillsList::editItem(QListWidgetItem* item)
+{
+    SelectSkillDialog dialog(qvariant_cast<Skill>(item->data(Qt::UserRole)));
+
+    if(QDialog::Accepted == dialog.exec())
+	*item = *dialog.listWidget->currentItem();
+}
+
+void Form::SkillsList::checkLimit(void)
+{
+    addItemAct->setDisabled(limit());
+}
+
+Form::ListDialog::ListDialog()
+{
+    listWidget = new QListWidget(this);
+
+    pushButtonOk = new QPushButton(this);
+    pushButtonOk->setEnabled(false);
+    pushButtonOk->setText(QApplication::translate("ListDialog", "Ok", 0, QApplication::UnicodeUTF8));
+
+    horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    pushButtonCancel = new QPushButton(this);
+    pushButtonCancel->setText(QApplication::translate("ListDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayout = new QHBoxLayout();
+    horizontalLayout->addWidget(pushButtonOk);
+    horizontalLayout->addItem(horizontalSpacer);
+    horizontalLayout->addWidget(pushButtonCancel);
+
+    verticalLayout = new QVBoxLayout(this);
+    verticalLayout->addWidget(listWidget);
+    verticalLayout->addLayout(horizontalLayout);
+
+    QSize minSize(270, 240);
+
+    resize(minSize);
+    setMinimumSize(minSize);
+
+    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(setEnableOKButton()));
+    connect(listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(accept()));
+}
+
+void Form::ListDialog::setEnableOKButton(void)
+{
+    pushButtonOk->setEnabled(true);
+}
+
+Form::SelectArtifactDialog::SelectArtifactDialog(int current)
+{
+    setWindowTitle(QApplication::translate("SelectArtifactDialog", "Select artifact", 0, QApplication::UnicodeUTF8));
+
+    for(int index = Artifact::None + 1; index < Artifact::Unknown; ++index)
+    {
+	QListWidgetItem* item = new QListWidgetItem(EditorTheme::getImageICN("ARTIFACT.ICN", index).first, Artifact::transcribe(index));
+	item->setData(Qt::UserRole, index);
+#ifndef QT_NO_TOOLTIP
+	item->setToolTip(Artifact::description(index));
+#endif
+	listWidget->addItem(item);
+    }
+
+    if(current && current < listWidget->count()) listWidget->setCurrentRow(current);
+}
+
+Form::SelectSkillDialog::SelectSkillDialog(const Skill & current)
+{
+    setWindowTitle(QApplication::translate("SelectSkillDialog", "Select skill", 0, QApplication::UnicodeUTF8));
+
+    for(int skill = SkillType::None + 1; skill < SkillType::Unknown; ++skill)
+    {
+	for(int level = SkillLevel::Basic; level <= SkillLevel::Expert; ++level)
+	{
+	    Skill obj(skill, level);
+	    QListWidgetItem* item = new QListWidgetItem(obj.pixmap(), obj.name());
+	    item->setData(Qt::UserRole, QVariant::fromValue(obj));
+#ifndef QT_NO_TOOLTIP
+	    item->setToolTip(obj.description());
+#endif
+	    listWidget->addItem(item);
+	}
+    }
+
+    if(current.isValid()) listWidget->setCurrentRow(3 * (current.skill() - 1) + (current.level() - 1));
 }
