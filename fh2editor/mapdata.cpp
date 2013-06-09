@@ -795,6 +795,32 @@ void MapArea::addObject(const QPoint & pos, const CompositeObject & obj, quint32
     }
 }
 
+QDomElement & operator<< (QDomElement & el, const MapArea & area)
+{
+    QDomElement eobjects = el.ownerDocument().createElement("objects");
+    eobjects.setAttribute("lastUID", area.uniq);
+    el.appendChild(eobjects);
+    eobjects << area.objects;
+
+    QDomElement etiles = el.ownerDocument().createElement("tiles");
+    el.appendChild(etiles);
+    etiles << area.tiles;
+
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, MapArea & area)
+{
+    QDomElement eobjects = el.firstChildElement("objects");
+    eobjects >> area.objects;
+    area.uniq = eobjects.hasAttribute("lastUID") ? eobjects.attribute("lastUID").toInt() : 0;
+
+    QDomElement etiles = el.firstChildElement("tiles");
+    etiles >> area.tiles;
+
+    return el;
+}
+
 MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), tileOverMouse(NULL),
     mapName("New Map"), mapAuthors("unknown"), mapLicense("unknown"), mapDifficulty(Difficulty::Normal),
     mapKingdomColors(0), mapCompColors(0), mapHumanColors(0), mapUniq(1), mapStartWithHero(false), mapArea(),
@@ -1595,6 +1621,55 @@ QPoint MP2Format::positionExtBlockFromNumber(int num) const
     return QPoint(-1, -1);
 }
 
+QDomElement & operator<< (QDomElement & emap, const MapData & data)
+{
+    QDomDocument doc = emap.ownerDocument();
+    QDomElement eheader = doc.createElement("header");
+    emap.appendChild(eheader);
+
+    eheader.setAttribute("version", 3100);
+    eheader.setAttribute("localtime", QDateTime::currentDateTime().toTime_t());
+
+    eheader.appendChild(doc.createElement("size")).appendChild(doc.createTextNode(data.mapTiles.sizeDescription()));
+    eheader.appendChild(doc.createElement("name")).appendChild(doc.createTextNode(data.mapName));
+    eheader.appendChild(doc.createElement("description")).appendChild(doc.createTextNode(data.mapDescription));
+    eheader.appendChild(doc.createElement("authors")).appendChild(doc.createTextNode(data.mapAuthors));
+    eheader.appendChild(doc.createElement("license")).appendChild(doc.createTextNode(data.mapLicense));
+    eheader.appendChild(doc.createElement("difficulty")).appendChild(doc.createTextNode(QString::number(data.mapDifficulty)));
+
+    QDomElement eplayers = doc.createElement("players");
+    eplayers.setAttribute("kingdoms", data.mapKingdomColors);
+    eplayers.setAttribute("humans", data.mapHumanColors);
+    eplayers.setAttribute("computers", data.mapCompColors);
+    eplayers.setAttribute("startWithHero", data.mapStartWithHero);
+    eheader.appendChild(eplayers);
+
+    QDomElement ewins = doc.createElement("conditionWins");
+    eheader.appendChild(ewins);
+    ewins << data.mapConditionWins;
+
+    QDomElement eloss = doc.createElement("conditionLoss");
+    eheader.appendChild(eloss);
+    eloss << data.mapConditionLoss;
+
+    QDomElement erumors = doc.createElement("rumors");
+    emap.appendChild(erumors);
+    erumors << data.tavernRumors;
+
+    QDomElement events = doc.createElement("events");
+    emap.appendChild(events);
+    events << data.mapDayEvents;
+
+    emap << data.mapArea;
+
+    return emap;
+}
+
+QDomElement & operator>> (QDomElement & emap, MapData & data)
+{
+    return emap;
+}
+
 bool MapData::saveXML(const QString & fn) const
 {
     QFile file(fn);
@@ -1609,55 +1684,7 @@ bool MapData::saveXML(const QString & fn) const
     QDomElement emap = doc.createElement("map");
     doc.appendChild(emap);
 
-    QDomElement eheader = doc.createElement("header");
-    emap.appendChild(eheader);
-
-    eheader.setAttribute("version", 3100);
-    eheader.setAttribute("localtime", QDateTime::currentDateTime().toTime_t());
-
-    eheader.appendChild(doc.createElement("size")).appendChild(doc.createTextNode(mapTiles.sizeDescription()));
-    eheader.appendChild(doc.createElement("name")).appendChild(doc.createTextNode(mapName));
-    eheader.appendChild(doc.createElement("description")).appendChild(doc.createTextNode(mapDescription));
-    eheader.appendChild(doc.createElement("authors")).appendChild(doc.createTextNode(mapAuthors));
-    eheader.appendChild(doc.createElement("license")).appendChild(doc.createTextNode(mapLicense));
-    eheader.appendChild(doc.createElement("difficulty")).appendChild(doc.createTextNode(QString::number(mapDifficulty)));
-
-    QDomElement eplayers = doc.createElement("players");
-    eplayers.setAttribute("kingdoms", mapKingdomColors);
-    eplayers.setAttribute("humans", mapHumanColors);
-    eplayers.setAttribute("computers", mapCompColors);
-    eplayers.setAttribute("startWithHero", mapStartWithHero);
-    eheader.appendChild(eplayers);
-
-    QDomElement ewins = doc.createElement("conditionWins");
-    ewins.setAttribute("condition", mapConditionWins.condition());
-    ewins.setAttribute("allowNormalVictory", mapConditionWins.allowNormalVictory());
-    ewins.setAttribute("computerAlsoWins", mapConditionWins.compAlsoWins());
-    ewins.setAttribute("extValue", mapConditionWins.variantString());
-    eheader.appendChild(ewins);
-
-    QDomElement eloss = doc.createElement("conditionLoss");
-    eloss.setAttribute("condition", mapConditionLoss.condition());
-    eloss.setAttribute("extValue", mapConditionLoss.variantString());
-    eheader.appendChild(eloss);
-
-    QDomElement erumors = doc.createElement("rumors");
-    emap.appendChild(erumors);
-    erumors << tavernRumors;
-
-    QDomElement events = doc.createElement("events");
-    emap.appendChild(events);
-    events << mapDayEvents;
-
-    QDomElement eobjects = doc.createElement("objects");
-    eobjects.setAttribute("lastUID", mapUniq);
-    emap.appendChild(eobjects);
-    eobjects << mapObjects;
-
-
-    QDomElement etiles = doc.createElement("tiles");
-    emap.appendChild(etiles);
-    etiles << mapTiles;
+    emap << *this;
 
     QDomElement edefaults = doc.createElement("defaults");
     emap.appendChild(edefaults);

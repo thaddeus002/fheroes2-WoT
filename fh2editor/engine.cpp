@@ -3124,3 +3124,31 @@ QPixmap Skill::pixmap(void) const
 {
     return isValid() ? EditorTheme::getImageICN("MINISS.ICN", skill() - 1).first : NULL;
 }
+
+QDomElement & operator<< (QDomElement & ewins, const CondWins & cond)
+{
+    ewins.setAttribute("condition", cond.condition());
+    ewins.setAttribute("allowNormalVictory", cond.allowNormalVictory());
+    ewins.setAttribute("computerAlsoWins", cond.compAlsoWins());
+    ewins.setAttribute("extValue", cond.variantString());
+
+    return ewins;
+}
+
+QDomElement & operator>> (QDomElement & ewins, CondWins & cond)
+{
+    return ewins;
+}
+
+QDomElement & operator<< (QDomElement & eloss, const CondLoss & cond)
+{
+    eloss.setAttribute("condition", cond.condition());
+    eloss.setAttribute("extValue", cond.variantString());
+
+    return eloss;
+}
+
+QDomElement & operator>> (QDomElement & eloss, CondLoss & cond)
+{
+    return eloss;
+}

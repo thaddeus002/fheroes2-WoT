@@ -912,4 +912,10 @@ QDomElement & operator>> (QDomElement &, Troops &);
 QDomElement & operator<< (QDomElement &, const Skills &);
 QDomElement & operator>> (QDomElement &, Skills &);
 
+QDomElement & operator<< (QDomElement &, const CondWins &);
+QDomElement & operator>> (QDomElement &, CondWins &);
+
+QDomElement & operator<< (QDomElement &, const CondLoss &);
+QDomElement & operator>> (QDomElement &, CondLoss &);
+
 #endif

@@ -235,9 +235,10 @@ class MapArea
 public:
     MapTiles		tiles;
     MapObjects		objects;
+    quint32		uniq;
 
-    MapArea(){}
-    MapArea(const MapArea & ma, const QRect & rt) : tiles(ma.tiles, rt), objects(ma.objects, rt) {}
+    MapArea() : uniq(0) {}
+    MapArea(const MapArea & ma, const QRect & rt) : tiles(ma.tiles, rt), objects(ma.objects, rt), uniq(ma.uniq) {}
 
     void		importMP2Towns(const QVector<H2::TownPos> &);
     void		importMP2Heroes(const QVector<H2::HeroPos> &);
@@ -247,6 +248,9 @@ public:
 
     void		addObject(const QPoint &, const CompositeObject &, quint32);
 };
+
+QDomElement & operator<< (QDomElement &, const MapArea &);
+QDomElement & operator>> (QDomElement &, MapArea &);
 
 class MapSelectedArea : public MapArea
 {
@@ -326,6 +330,8 @@ protected:
 
     friend class	MP2Format;
     friend class	MapTile;
+    friend		QDomElement & operator<< (QDomElement &, const MapData &);
+    friend		QDomElement & operator>> (QDomElement &, MapData &);
 
     MapTile*		tileOverMouse;
 
@@ -352,5 +358,11 @@ protected:
     CompositeObjectCursor
                         currentObject;
 };
+
+QDomElement & operator<< (QDomElement &, const MapData &);
+QDomElement & operator>> (QDomElement &, MapData &);
+
+QDomElement & operator<< (QDomElement &, const MapData &);
+QDomElement & operator>> (QDomElement &, MapData &);
 
 #endif
