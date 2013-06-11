@@ -237,7 +237,7 @@ public:
     MapObjects		objects;
     quint32		uniq;
 
-    MapArea() : uniq(0) {}
+    MapArea() : uniq(1) {}
     MapArea(const MapArea & ma, const QRect & rt) : tiles(ma.tiles, rt), objects(ma.objects, rt), uniq(ma.uniq) {}
 
     void		importMP2Towns(const QVector<H2::TownPos> &);
@@ -289,7 +289,7 @@ public:
     void		newMap(const QSize &, const QString &);
     bool		loadMap(const QString &);
 
-    bool		saveXML(const QString &) const;
+    bool		saveMapXML(const QString &) const;
 
     QPoint		mapToTile(const QPoint &) const;
     QRect		mapToTile(const QRect &) const;
@@ -328,6 +328,9 @@ protected:
     void		editSignDialog(const MapTile &);
     void		editHeroDialog(const MapTile &);
 
+    bool		loadMapMP2(const QString &);
+    bool		loadMapXML(const QString &);
+
     friend class	MP2Format;
     friend class	MapTile;
     friend		QDomElement & operator<< (QDomElement &, const MapData &);
@@ -343,7 +346,6 @@ protected:
     int			mapKingdomColors;
     int			mapCompColors;
     int			mapHumanColors;
-    quint32		mapUniq;
     bool		mapStartWithHero;
     CondWins		mapConditionWins;
     CondLoss		mapConditionLoss;
@@ -357,6 +359,9 @@ protected:
 
     CompositeObjectCursor
                         currentObject;
+
+    int			engineVersion;
+    int			mapVersion;
 };
 
 QDomElement & operator<< (QDomElement &, const MapData &);

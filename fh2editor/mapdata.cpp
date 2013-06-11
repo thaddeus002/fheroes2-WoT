@@ -320,8 +320,7 @@ MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos)
 	passableBase(Direction::All), passableLocal(Direction::All)
 {
     const QSize & tileSize = EditorTheme::tileSize();
-    QPoint offset(mpos.x() * tileSize.width(), mpos.y() * tileSize.height());
-    setOffset(offset);
+    setOffset(mpos.x() * tileSize.width(), mpos.y() * tileSize.height());
     setFlags(QGraphicsItem::ItemIsSelectable);
     setTileSprite(tileSprite, tileShape);
     loadSpriteLevels(mp2.ext);
@@ -372,7 +371,6 @@ MapTile::MapTile()
     : QGraphicsPixmapItem(), tileSprite(0), tileShape(0), objectID(MapObj::None), passableBase(Direction::All), passableLocal(Direction::All)
 {
     setFlags(QGraphicsItem::ItemIsSelectable);
-    setTileSprite(tileSprite, tileShape);
 }
 
 void MapTile::setTileSprite(int index, int rotate)
@@ -536,6 +534,10 @@ QDomElement & operator>> (QDomElement & el, MapTile & tile)
     tile.tileSprite = el.attribute("tileSprite").toInt();
     tile.tileShape = el.attribute("tileShape").toInt();
     tile.objectID = el.attribute("objectID").toInt();
+
+    const QSize & tileSize = EditorTheme::tileSize();
+    tile.setOffset(tile.mpos.x() * tileSize.width(), tile.mpos.y() * tileSize.height());
+    tile.setTileSprite(tile.tileSprite, tile.tileShape);
 
     QDomElement el1 = el.firstChildElement("levels1");
     el1 >> tile.spritesLevel1;
@@ -716,6 +718,9 @@ QDomElement & operator>> (QDomElement & el, MapTiles & tiles)
     tiles.clear();
     QDomNodeList nodeList = el.elementsByTagName("tile");
 
+    if(tiles.msize.width() * tiles.msize.height() != nodeList.size())
+	qCritical() << "read tiles: " << "incorrect array";
+
     for(int pos = 0; pos < nodeList.size(); ++pos)
     {
 	QDomElement elem = nodeList.item(pos).toElement();
@@ -823,8 +828,8 @@ QDomElement & operator>> (QDomElement & el, MapArea & area)
 
 MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), tileOverMouse(NULL),
     mapName("New Map"), mapAuthors("unknown"), mapLicense("unknown"), mapDifficulty(Difficulty::Normal),
-    mapKingdomColors(0), mapCompColors(0), mapHumanColors(0), mapUniq(1), mapStartWithHero(false), mapArea(),
-    mapTiles(mapArea.tiles), mapObjects(mapArea.objects)
+    mapKingdomColors(0), mapCompColors(0), mapHumanColors(0), mapStartWithHero(false), mapArea(),
+    mapTiles(mapArea.tiles), mapObjects(mapArea.objects), engineVersion(FH2ENGINE_CURRENT_VERSION), mapVersion(engineVersion)
 {
     connect(this, SIGNAL(dataModified()), this, SLOT(generateMiniMap()));
 }
@@ -933,7 +938,7 @@ const QSize & MapData::size(void) const
 
 quint32 MapData::uniq(void)
 {
-    return mapUniq++;
+    return mapArea.uniq++;
 }
 
 const QStringList & MapData::tavernRumorsList(void) const
@@ -1217,10 +1222,25 @@ void MapData::newMap(const QSize & msz, const QString &)
 
 bool MapData::loadMap(const QString & mapFile)
 {
-    const QSize & tileSize = EditorTheme::tileSize();
-
-    MP2Format mp2;
     qDebug() << "MapData::loadMap:" << mapFile;
+
+    if(! loadMapMP2(mapFile) && ! loadMapXML(mapFile))
+	return false;
+
+    mapTiles.insertToScene(*this);
+
+    const QSize & tileSize = EditorTheme::tileSize();
+    setSceneRect(QRect(QPoint(0, 0),
+	QSize(size().width() * tileSize.width(), size().height() * tileSize.height())));
+
+    generateMiniMap();
+
+    return true;
+}
+
+bool MapData::loadMapMP2(const QString & mapFile)
+{
+    MP2Format mp2;
 
     if(! mp2.loadMap(mapFile))
 	return false;
@@ -1228,8 +1248,6 @@ bool MapData::loadMap(const QString & mapFile)
     // import tiles
     if(! mapTiles.importMap(mp2.size, mp2.tiles, mp2.sprites))
 	return false;
-
-    mapTiles.insertToScene(*this);
 
     mapName = mp2.name;
     mapDescription = mp2.description;
@@ -1288,10 +1306,7 @@ bool MapData::loadMap(const QString & mapFile)
 	default:	mapConditionLoss.set(Conditions::Loss); break;
     }
 
-    mapUniq = mp2.uniq + 1;
-
-    setSceneRect(QRect(QPoint(0, 0),
-	QSize(size().width() * tileSize.width(), size().height() * tileSize.height())));
+    mapArea.uniq = mp2.uniq + 1;
 
     // import towns
     mapArea.importMP2Towns(mp2.castles);
@@ -1318,7 +1333,74 @@ bool MapData::loadMap(const QString & mapFile)
 	    it = mp2.rumors.begin(); it != mp2.rumors.end(); ++it)
 	    tavernRumors << Rumor(*it);
 
-    generateMiniMap();
+    return true;
+}
+
+bool MapData::loadMapXML(const QString & mapFile)
+{
+    QFile file(mapFile);
+    QDomDocument dom;
+
+    if(file.open(QIODevice::ReadOnly))
+    {
+	QString errorStr;
+        int errorLine;
+        int errorColumn;
+
+        if(! dom.setContent(&file, false, &errorStr, &errorLine, &errorColumn))
+        {
+    	    qDebug() << errorStr << errorLine << errorColumn;
+            file.close();
+            return false;
+        }
+    }
+    else
+    { qDebug() << "error open " << mapFile;  return false; }
+    file.close();
+
+    QDomElement emap = dom.firstChildElement("map");
+
+    if(emap.isNull())
+    { qDebug() << "unknown format map";  return false; }
+
+    int version = emap.hasAttribute("version") ? emap.attribute("version").toInt() : 0;
+    if(version < FH2ENGINE_LAST_VERSION)
+    {
+	QApplication::restoreOverrideCursor();
+	QMessageBox::warning(NULL, "Map Editor", "Unsupported map format.");
+	return false;
+    }
+    mapVersion = version;
+
+    emap >> *this;
+
+    return true;
+}
+
+bool MapData::saveMapXML(const QString & mapFile) const
+{
+    QFile file(mapFile);
+
+    if(! file.open(QIODevice::WriteOnly))
+	return false;
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+    QDomDocument doc;
+
+    QDomElement emap = doc.createElement("map");
+    emap.setAttribute("version", engineVersion);
+    doc.appendChild(emap);
+
+    emap << *this;
+
+    doc.insertBefore(doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\""), doc.firstChild());
+
+    QTextStream out(&file);
+    out.setCodec(QTextCodec::codecForName("UTF-8"));
+    doc.save(out, 5, QDomNode::EncodingFromTextStream);
+
+    QApplication::restoreOverrideCursor();
 
     return true;
 }
@@ -1623,11 +1705,11 @@ QPoint MP2Format::positionExtBlockFromNumber(int num) const
 
 QDomElement & operator<< (QDomElement & emap, const MapData & data)
 {
+    DefaultValues defs;
     QDomDocument doc = emap.ownerDocument();
     QDomElement eheader = doc.createElement("header");
     emap.appendChild(eheader);
 
-    eheader.setAttribute("version", 3100);
     eheader.setAttribute("localtime", QDateTime::currentDateTime().toTime_t());
 
     eheader.appendChild(doc.createElement("size")).appendChild(doc.createTextNode(data.mapTiles.sizeDescription()));
@@ -1662,44 +1744,53 @@ QDomElement & operator<< (QDomElement & emap, const MapData & data)
 
     emap << data.mapArea;
 
+    QDomElement edefaults = doc.createElement("defaults");
+    emap.appendChild(edefaults);
+    edefaults << defs;
+
     return emap;
 }
 
 QDomElement & operator>> (QDomElement & emap, MapData & data)
 {
+    DefaultValues defs;
+    QDomElement eheader = emap.firstChildElement("header");
+
+    //int loctime = eheader.hasAttribute("localtime") ? eheader.attribute("localtime").toInt() : 0;
+
+    data.mapName = eheader.firstChildElement("name").text();
+    data.mapDescription = eheader.firstChildElement("description").text();
+    data.mapAuthors = eheader.firstChildElement("authors").text();
+    data.mapLicense = eheader.firstChildElement("license").text();
+    data.mapDifficulty = eheader.firstChildElement("difficulty").text().toInt();
+
+    QDomElement eplayers = eheader.firstChildElement("players");
+
+    data.mapKingdomColors = eplayers.attribute("kingdoms").toInt();
+    data.mapHumanColors = eplayers.attribute("humans").toInt();
+    data.mapCompColors = eplayers.attribute("computers").toInt();
+    data.mapStartWithHero = eplayers.attribute("startWithHero").toInt();
+
+    QDomElement ewins = eheader.firstChildElement("conditionWins");
+    ewins >> data.mapConditionWins;
+
+    QDomElement eloss = eheader.firstChildElement("conditionLoss");
+    eloss >> data.mapConditionLoss;
+
+    QDomElement erumors = emap.firstChildElement("rumors");
+    erumors >> data.tavernRumors;
+
+    QDomElement events = emap.firstChildElement("events");
+    events >> data.mapDayEvents;
+
+    emap >> data.mapArea;
+
+    QDomElement edefaults = emap.firstChildElement("defaults");
+    edefaults >> defs;
+
     return emap;
 }
 
-bool MapData::saveXML(const QString & fn) const
-{
-    QFile file(fn);
-
-    if(! file.open(QIODevice::WriteOnly))
-	return false;
-
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-
-    QDomDocument doc;
-
-    QDomElement emap = doc.createElement("map");
-    doc.appendChild(emap);
-
-    emap << *this;
-
-    QDomElement edefaults = doc.createElement("defaults");
-    emap.appendChild(edefaults);
-    edefaults << DefaultValues();
-
-    doc.insertBefore(doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\""), doc.firstChild());
-
-    QTextStream out(&file);
-    out.setCodec(QTextCodec::codecForName("UTF-8"));
-    doc.save(out, 5, QDomNode::EncodingFromTextStream);
-
-    QApplication::restoreOverrideCursor();
-
-    return true;
-}
 
 void MapData::selectObjectImage(void)
 {

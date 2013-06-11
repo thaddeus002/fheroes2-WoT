@@ -2505,9 +2505,12 @@ QDomElement & operator>> (QDomElement & el, MapObjects & objects)
 {
     QDomDocument doc = el.ownerDocument();
     objects.clear();
+    QDomNodeList list = el.childNodes();
 
-    for(QDomElement elem = el.firstChildElement(); ! elem.isNull(); elem = el.nextSiblingElement())
+    for(int pos = 0; pos < list.size(); ++pos)
     {
+	QDomElement elem = list.item(pos).toElement();
+
 	if(elem.tagName() == "town")
 	{ MapTown* obj = new MapTown(); elem >> *obj; objects.push_back(obj); }
 	else
@@ -3125,30 +3128,34 @@ QPixmap Skill::pixmap(void) const
     return isValid() ? EditorTheme::getImageICN("MINISS.ICN", skill() - 1).first : NULL;
 }
 
-QDomElement & operator<< (QDomElement & ewins, const CondWins & cond)
+QDomElement & operator<< (QDomElement & el, const GameCondition & cond)
 {
-    ewins.setAttribute("condition", cond.condition());
-    ewins.setAttribute("allowNormalVictory", cond.allowNormalVictory());
-    ewins.setAttribute("computerAlsoWins", cond.compAlsoWins());
-    ewins.setAttribute("extValue", cond.variantString());
+    el.setAttribute("cond", cond.first);
 
-    return ewins;
+    if(QVariant::Point == cond.second.type())
+    {
+        QPoint pt = cond.second.toPoint();
+	el.setAttribute("pointX", pt.x());
+	el.setAttribute("pointY", pt.y());
+    }
+    else
+    if(QVariant::Int == cond.second.type())
+	el.setAttribute("valueInt", cond.second.toInt());
+
+    return el;
 }
 
-QDomElement & operator>> (QDomElement & ewins, CondWins & cond)
+QDomElement & operator>> (QDomElement & el, GameCondition & cond)
 {
-    return ewins;
-}
+    cond.first = el.hasAttribute("cond") ? el.attribute("cond").toInt() : 0;
 
-QDomElement & operator<< (QDomElement & eloss, const CondLoss & cond)
-{
-    eloss.setAttribute("condition", cond.condition());
-    eloss.setAttribute("extValue", cond.variantString());
+    if(el.hasAttribute("pointX") || el.hasAttribute("pointY"))
+	cond.second = QPoint(el.attribute("pointX").toInt(), el.attribute("pointY").toInt());
+    else
+    if(el.hasAttribute("valueInt"))
+	cond.second = el.attribute("valueInt").toInt();
+    else
+	cond.second = QVariant();
 
-    return eloss;
-}
-
-QDomElement & operator>> (QDomElement & eloss, CondLoss & cond)
-{
-    return eloss;
+    return el;
 }
