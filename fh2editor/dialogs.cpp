@@ -306,7 +306,7 @@ bool Form::SelectImageTab::isSelected(void) const
     return listWidget->selectedItems().size();
 }
 
-Form::SelectImage::SelectImage()
+Form::SelectImageObject::SelectImageObject()
 {
     setWindowTitle(QApplication::translate("SelectImage", "Select Object", 0, QApplication::UnicodeUTF8));
 
@@ -364,13 +364,13 @@ Form::SelectImage::SelectImage()
     connect(this, SIGNAL(finished(int)), this, SLOT(saveSettings()));
 }
 
-void Form::SelectImage::saveSettings(void)
+void Form::SelectImageObject::saveSettings(void)
 {
     QSettings & settings = Resource::localSettings();
     settings.setValue("SelectImageDialog/size", size());
 }
 
-void Form::SelectImage::tabSwitched(int num)
+void Form::SelectImageObject::tabSwitched(int num)
 {
     SelectImageTab* tab = qobject_cast<SelectImageTab*>(tabWidget->widget(num));
 
@@ -388,7 +388,7 @@ void Form::SelectImage::tabSwitched(int num)
     }
 }
 
-void Form::SelectImage::selectionChanged(void)
+void Form::SelectImageObject::selectionChanged(void)
 {
     SelectImageTab* tab = qobject_cast<SelectImageTab*>(tabWidget->currentWidget());
 
@@ -397,7 +397,7 @@ void Form::SelectImage::selectionChanged(void)
 }
 
 
-void Form::SelectImage::clickSelect(void)
+void Form::SelectImageObject::clickSelect(void)
 {
     SelectImageTab* tab = qobject_cast<SelectImageTab*>(tabWidget->currentWidget());
 
@@ -405,7 +405,7 @@ void Form::SelectImage::clickSelect(void)
 	accept(tab->listWidget->currentItem());
 }
 
-void Form::SelectImage::accept(QListWidgetItem* item)
+void Form::SelectImageObject::accept(QListWidgetItem* item)
 {
     if(item)
     {
@@ -613,7 +613,7 @@ Form::MapOptions::MapOptions(MapData & map)
     groupBoxEvents->setTitle(QApplication::translate("MapOptions", "Events", 0, QApplication::UnicodeUTF8));
 
     listWidgetRumors = new RumorsList(groupBoxRumors);
-    listWidgetEvents = new EventsList(map.kingdomColors(), groupBoxEvents);
+    listWidgetEvents = new DayEventsList(map.kingdomColors(), groupBoxEvents);
 
     verticalLayout7 = new QVBoxLayout(groupBoxRumors);
     verticalLayout7->addWidget(listWidgetRumors);
@@ -1077,14 +1077,14 @@ void Form::RumorsList::editItem(QListWidgetItem* item)
 	item->setText(dialog.plainText->toPlainText());
 }
 
-Form::EventsList::EventsList(int colors, QWidget* parent) : ItemsList(parent), kingdomColors(colors)
+Form::DayEventsList::DayEventsList(int colors, QWidget* parent) : ItemsList(parent), kingdomColors(colors)
 {
     addItemAct->setStatusTip(tr("Add new event"));
     editItemAct->setStatusTip(tr("Edit event"));
     delItemAct->setStatusTip(tr("Delete event"));
 }
 
-void Form::EventsList::addItem(void)
+void Form::DayEventsList::addItem(void)
 {
     DayEventDialog dialog(DayEvent(), kingdomColors);
 
@@ -1098,7 +1098,7 @@ void Form::EventsList::addItem(void)
     }
 }
 
-void Form::EventsList::editItem(QListWidgetItem* item)
+void Form::DayEventsList::editItem(QListWidgetItem* item)
 {
     DayEvent event = qvariant_cast<DayEvent>(item->data(Qt::UserRole));
     DayEventDialog dialog(event, kingdomColors);
@@ -3269,4 +3269,103 @@ Form::SelectSkillDialog::SelectSkillDialog(const Skill & current)
     }
 
     if(current.isValid()) listWidget->setCurrentRow(3 * (current.skill() - 1) + (current.level() - 1));
+}
+
+Form::ObjectEventsDialog::ObjectEventsDialog()
+{
+    setWindowTitle(QApplication::translate("ObjectEventsDialog", "Object Events", 0, QApplication::UnicodeUTF8));
+
+    pushButtonUp = new QPushButton(this);
+    pushButtonUp->setIcon(QIcon(":/images/uparrow.png"));
+    pushButtonUp->setEnabled(false);
+
+    pushButtonDown = new QPushButton(this);
+    pushButtonDown->setIcon(QIcon(":/images/downarrow.png"));
+    pushButtonDown->setEnabled(false);
+
+    verticalSpacerButtons = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    verticalLayoutButtons = new QVBoxLayout();
+    verticalLayoutButtons->addWidget(pushButtonUp);
+    verticalLayoutButtons->addWidget(pushButtonDown);
+    verticalLayoutButtons->addItem(verticalSpacerButtons);
+
+    listWidgetEvents = new ObjectEventsList(this);
+
+    horizontalLayoutList = new QHBoxLayout();
+    horizontalLayoutList->addWidget(listWidgetEvents);
+    horizontalLayoutList->addLayout(verticalLayoutButtons);
+
+    verticalSpacerForm = new QSpacerItem(20, 21, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    pushButtonOk = new QPushButton(this);
+    pushButtonOk->setEnabled(false);
+    pushButtonOk->setText(QApplication::translate("ObjectEventsDialog", "Ok", 0, QApplication::UnicodeUTF8));
+
+    horizontalSpacerButtons = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    pushButtonCancel = new QPushButton(this);
+    pushButtonCancel->setText(QApplication::translate("ObjectEventsDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutButtons = new QHBoxLayout();
+    horizontalLayoutButtons->addWidget(pushButtonOk);
+    horizontalLayoutButtons->addItem(horizontalSpacerButtons);
+    horizontalLayoutButtons->addWidget(pushButtonCancel);
+
+    verticalLayoutForm = new QVBoxLayout(this);
+    verticalLayoutForm->addLayout(horizontalLayoutList);
+    verticalLayoutForm->addItem(verticalSpacerForm);
+    verticalLayoutForm->addLayout(horizontalLayoutButtons);
+
+    QSize minSize = minimumSizeHint();
+
+    resize(minSize);
+    setMinimumSize(minSize);
+
+    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
+}
+
+Form::ObjectEventsList::ObjectEventsList(QWidget* parent) : ItemsList(parent)
+{
+    addItemAct->setStatusTip(tr("Add"));
+    editItemAct->setStatusTip(tr("Edit"));
+    delItemAct->setStatusTip(tr("Delete"));
+
+    connect(this, SIGNAL(listChanged()), this, SLOT(checkLimit()));
+}
+
+void Form::ObjectEventsList::addItem(void)
+{
+/*
+    SelectSkillDialog dialog;
+
+    if(QDialog::Accepted == dialog.exec())
+    {
+	QListWidget::addItem(new QListWidgetItem(*dialog.listWidget->currentItem()));
+	setCurrentRow(count() - 1);
+    }
+
+    emit listChanged();
+*/
+}
+
+bool Form::ObjectEventsList::limit(void) const
+{
+    return count() >= 8;
+}
+
+void Form::ObjectEventsList::editItem(QListWidgetItem* item)
+{
+/*
+    SelectSkillDialog dialog(qvariant_cast<Skill>(item->data(Qt::UserRole)));
+
+    if(QDialog::Accepted == dialog.exec())
+	*item = *dialog.listWidget->currentItem();
+*/
+}
+
+void Form::ObjectEventsList::checkLimit(void)
+{
+    addItemAct->setDisabled(limit());
 }

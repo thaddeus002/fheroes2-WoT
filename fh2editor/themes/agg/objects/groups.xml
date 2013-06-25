@@ -3,8 +3,11 @@
     <group name="Desert" file="objndsrt.xml" />
     <group name="Waste Land" file="objncrck.xml" />
     <group name="Dirt" file="objndirt.xml" />
+    <group name="Grass" file="objngras.xml" />
+    <group name="Grass Object" file="objngra2.xml" />
     <group name="Mounts" file="mounts.xml" />
     <group name="Mines" file="mines.xml" />
+    <group name="Lava 2" file="objnlav2.xml" />
     <group name="Pickup Resources" file="resources.xml" />
     <group name="Pickup Artifacts" file="artifacts.xml" />
 </groups>

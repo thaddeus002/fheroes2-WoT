@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects icn="objnlav2">
+    <template section="volcano_5x3_1" name="Volcano 1" index="0" />
+    <template section="volcano_5x3_2" name="Volcano 2" index="33" />
+    <template section="volcano_8x5" icn="objnlav3" name="Volcano 3" index="0" />
+</objects>

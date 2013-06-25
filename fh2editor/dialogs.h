@@ -122,12 +122,12 @@ namespace Form
 	QString			result;
     };
 
-    class SelectImage : public QDialog
+    class SelectImageObject : public QDialog
     {
         Q_OBJECT
 
     public:
-        SelectImage();
+        SelectImageObject();
 
         QVBoxLayout*		verticalLayout;
         QTabWidget*		tabWidget;
@@ -199,14 +199,14 @@ namespace Form
 	void			editItem(QListWidgetItem*);
     };
 
-    class EventsList : public ItemsList
+    class DayEventsList : public ItemsList
     {
 	Q_OBJECT
 
-	int			kingdomColors;
+	int                     kingdomColors;
 
-    public:
-	EventsList(int, QWidget*);
+     public:
+	DayEventsList(int, QWidget*);
 
     protected slots:
 	void			addItem(void);
@@ -281,7 +281,7 @@ namespace Form
 	RumorsList*		listWidgetRumors;
 	QGroupBox*		groupBoxEvents;
         QVBoxLayout*		verticalLayout8;
-        EventsList*		listWidgetEvents;
+        DayEventsList*		listWidgetEvents;
         QHBoxLayout*		horizontalLayoutButton;
 	QWidget*		tabDefaults;
 	QLabel*			labelResourceGold;
@@ -790,6 +790,42 @@ namespace Form
 
     public:
 	SelectSkillDialog(const Skill & = Skill());
+    };
+
+    class ObjectEventsList : public ItemsList
+    {
+	Q_OBJECT
+
+    public:
+	ObjectEventsList(QWidget*);
+
+	bool			limit(void) const;
+
+    protected slots:
+	void			addItem(void);
+	void			editItem(QListWidgetItem*);
+	void			checkLimit(void);
+    };
+
+    class ObjectEventsDialog : public QDialog
+    {
+	Q_OBJECT
+
+    public:
+	ObjectEventsDialog();
+
+	QVBoxLayout*		verticalLayoutForm;
+	QHBoxLayout*		horizontalLayoutList;
+	ObjectEventsList*	listWidgetEvents;
+        QVBoxLayout*		verticalLayoutButtons;
+	QPushButton*		pushButtonUp;
+	QPushButton*		pushButtonDown;
+	QSpacerItem*		verticalSpacerButtons;
+	QSpacerItem*		verticalSpacerForm;
+	QHBoxLayout*		horizontalLayoutButtons;
+	QPushButton*		pushButtonOk;
+	QSpacerItem*		horizontalSpacerButtons;
+	QPushButton*		pushButtonCancel;
     };
 }
 

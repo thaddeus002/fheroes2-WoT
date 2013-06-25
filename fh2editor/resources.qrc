@@ -24,5 +24,7 @@
      <file>images/edit_objects.png</file>
      <file>images/edit_cell.png</file>
      <file>images/cell_info.png</file>
+     <file>images/downarrow.png</file>
+     <file>images/uparrow.png</file>
 </qresource>
 </RCC>

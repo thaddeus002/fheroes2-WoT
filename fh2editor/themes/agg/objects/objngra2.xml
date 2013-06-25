@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects icn="objngra2">
+    <template section="hillfort" name="Hill Fort" index="0" />
+    <template section="windmill" name="Wind Mill" index="23" />
+    <template section="archerhouse" name="Archer House" index="63" />
+    <template section="goblinhut" name="Goblin Hut" index="91" />
+    <template section="dwarfcott" name="Dwarf Cott" index="93" />
+    <template section="oasis" name="Oasis" index="121" />
+    <template section="obelisk" name="Obelisk" index="127" />
+</objects>

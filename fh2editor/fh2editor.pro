@@ -10,7 +10,7 @@ QMAKE_LIBDIR += $(QTLIB)
 QT+= xml
 
 RESOURCES = resources.qrc
-FORMS +=
+FORMS += 
 
 # Input
 HEADERS += mainwindow.h mapwindow.h mapdata.h dialogs.h

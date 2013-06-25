@@ -183,12 +183,12 @@ void MapWindow::newFile(const QSize & sz, int sequenceNumber)
     QString fileName;
     QTextStream ss(& fileName);
 
-    ss << "map_";
+    ss << "fh2map_";
     ss.setFieldWidth(4);
     ss.setPadChar('0');
     ss << sequenceNumber;
     ss.setFieldWidth(0);
-    ss << ".xml";
+    ss << ".map";
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
 

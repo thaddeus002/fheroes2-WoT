@@ -233,6 +233,16 @@ MapTileLevels::~MapTileLevels()
     qDeleteAll(begin(), end());
 }
 
+MapTileLevels & MapTileLevels::operator=(const MapTileLevels & other)
+{
+    clear();
+
+    for(const_iterator it = other.begin(); it != other.end(); ++it)
+	*this << new MapTileExt(**it);
+
+    return *this;
+}
+
 void MapTileLevels::paint(QPainter & painter, const QPoint & offset, const QPoint & mpos) const
 {
     for(const_iterator it = begin(); it != end(); ++it)
@@ -281,7 +291,7 @@ int MapTileLevels::topObjectID(void) const
 {
     int id = MapObj::None;
 
-    for(const_iterator it = begin(); it != end() && id != MapObj::None; ++it)
+    for(const_iterator it = begin(); it != end() && id == MapObj::None; ++it)
 	id = *it ? EditorTheme::getObjectID((*it)->icn(), (*it)->index()) : MapObj::None;
 
     return id;
@@ -360,7 +370,7 @@ MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos)
 }
 
 MapTile::MapTile(const MapTile & other)
-    : QGraphicsPixmapItem(), mpos(other.mpos), tileSprite(other.tileSprite), tileShape(other.tileShape), objectID(MapObj::None),
+    : QGraphicsPixmapItem(), mpos(other.mpos), tileSprite(other.tileSprite), tileShape(other.tileShape), objectID(other.objectID /* MapObj::None */),
 	spritesLevel1(other.spritesLevel1), spritesLevel2(other.spritesLevel2), passableBase(other.passableBase), passableLocal(other.passableLocal)
 {
     setFlags(QGraphicsItem::ItemIsSelectable);
@@ -371,6 +381,25 @@ MapTile::MapTile()
     : QGraphicsPixmapItem(), tileSprite(0), tileShape(0), objectID(MapObj::None), passableBase(Direction::All), passableLocal(Direction::All)
 {
     setFlags(QGraphicsItem::ItemIsSelectable);
+}
+
+MapTile & MapTile::operator=(const MapTile & other)
+{
+    mpos = other.mpos;
+    tileSprite = other.tileSprite;
+    tileShape = other.tileShape;
+    objectID = other.objectID;
+
+    spritesLevel1 = other.spritesLevel1;
+    spritesLevel2 = other.spritesLevel2;
+
+    passableBase = other.passableBase;
+    passableLocal = other.passableLocal;
+
+    setFlags(QGraphicsItem::ItemIsSelectable);
+    setTileSprite(tileSprite, tileShape);
+
+    return *this;
 }
 
 void MapTile::setTileSprite(int index, int rotate)
@@ -497,7 +526,7 @@ void MapTile::addSpriteSection(const CompositeObject & co, const CompositeSprite
 
     if(spritesLevel2.size())
 	objectID = spritesLevel2.topObjectID();
-    
+
     if(objectID == MapObj::None && spritesLevel1.size())
 	objectID = spritesLevel1.topObjectID();
 }
@@ -696,6 +725,18 @@ void MapTiles::insertToScene(QGraphicsScene & scene) const
 	scene.addItem(*it);
 }
 
+void MapTiles::fixedOffset(void)
+{
+    if(size())
+    {
+	QPoint offset = front()->mapPos();
+
+	if(offset != QPoint(0, 0))
+	    for(iterator it = begin(); it != end(); ++it)
+		(*it)->setMapPos((*it)->mapPos() - offset);
+    }
+}
+
 QDomElement & operator<< (QDomElement & el, const MapTiles & tiles)
 {
     el << tiles.msize;
@@ -729,6 +770,11 @@ QDomElement & operator>> (QDomElement & el, MapTiles & tiles)
     }
 
     return el;
+}
+
+MapArea::MapArea(const MapArea & ma, const QRect & rt) : tiles(ma.tiles, rt), objects(ma.objects, rt), uniq(ma.uniq)
+{
+    tiles.fixedOffset();
 }
 
 void MapArea::importMP2Towns(const QVector<H2::TownPos> & towns)
@@ -800,6 +846,33 @@ void MapArea::addObject(const QPoint & pos, const CompositeObject & obj, quint32
     }
 }
 
+void MapArea::importArea(const MapArea & area, const QPoint & dst)
+{
+    QSize mapSize = area.tiles.mapSize();
+
+    if(dst.x() + area.tiles.mapSize().width() > tiles.mapSize().width())
+	mapSize.setWidth(tiles.mapSize().width() - dst.x() + area.tiles.mapSize().width());
+
+    if(dst.y() + area.tiles.mapSize().height() > tiles.mapSize().height())
+	mapSize.setHeight(tiles.mapSize().height() - dst.y() + area.tiles.mapSize().height());
+
+    for(int yy = 0; yy < mapSize.height(); ++yy)
+    {
+	for(int xx = 0; xx < mapSize.width(); ++xx)
+	{
+	    const MapTile* srcTile = area.tiles.tileConst(QPoint(xx, yy));
+	    MapTile* dstTile = tiles.tile(QPoint(dst.x() + xx, dst.y() + yy));
+
+	    if(srcTile && dstTile)
+	    {
+		QPoint tmp = dstTile->mapPos();
+		*dstTile = *srcTile;
+		dstTile->setMapPos(tmp);
+	    }
+	}
+    }
+}
+
 QDomElement & operator<< (QDomElement & el, const MapArea & area)
 {
     QDomElement eobjects = el.ownerDocument().createElement("objects");
@@ -825,6 +898,8 @@ QDomElement & operator>> (QDomElement & el, MapArea & area)
 
     return el;
 }
+
+QSharedPointer<MapArea> MapData::selectedArea = QSharedPointer<MapArea>();
 
 MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), tileOverMouse(NULL),
     mapName("New Map"), mapAuthors("unknown"), mapLicense("unknown"), mapDifficulty(Difficulty::Normal),
@@ -953,7 +1028,10 @@ void MapData::mousePressEvent(QGraphicsSceneMouseEvent* event)
     {
 	if((event->buttons() & Qt::LeftButton) ||
 	    ((event->buttons() & Qt::RightButton) && ! selectionArea().contains(event->scenePos())))
+	{
 	    clearSelection();
+	    selectedArea.clear();
+	}
     }
     else
     // click action object
@@ -1132,15 +1210,18 @@ void MapData::copyToBuffer(void)
 
     if(selected.size())
     {
-	MapSelectedArea(mapArea, mapToTile(selectionArea().boundingRect().toRect()));
+	selectedArea = QSharedPointer<MapArea>(new MapArea(mapArea, mapToTile(selectionArea().boundingRect().toRect())));
         emit validBuffer(true);
     }
 }
 
 void MapData::pasteFromBuffer(void)
 {
-    emit dataModified();
-    qDebug() << "paste action";
+    if(tileOverMouse && !selectedArea.isNull())
+    {
+	mapArea.importArea(*selectedArea.data(), tileOverMouse->mapPos());
+	emit dataModified();
+    }
 }
 
 void MapData::fillGroundAction(QAction* act)
@@ -1794,7 +1875,7 @@ QDomElement & operator>> (QDomElement & emap, MapData & data)
 
 void MapData::selectObjectImage(void)
 {
-    Form::SelectImage form;
+    Form::SelectImageObject form;
 
     if(QDialog::Accepted == form.exec())
     {
@@ -1879,8 +1960,17 @@ void MapData::editObjectAttributes(void)
     	    case MapObj::Sign:		editSignDialog(*tileOverMouse); break;
     	    case MapObj::Heroes:	editHeroDialog(*tileOverMouse); break;
 
-    	    default: QMessageBox::information(qobject_cast<MapWindow*>(parent()), "Object Attributes",
-				    "Sorry!\nChange attributes of the object is not yet available."); break;
+    	    default:
+	    {
+		Form::ObjectEventsDialog form;
+
+		if(QDialog::Accepted == form.exec())
+		{
+		}
+	
+			//QMessageBox::information(qobject_cast<MapWindow*>(parent()), "Object Attributes",
+			//	    "Sorry!\nChange attributes of the object is not yet available."); break;
+	    }
 	}
     }
 }

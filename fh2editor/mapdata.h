@@ -133,6 +133,7 @@ public:
     MapTileLevels() {}
     MapTileLevels(const MapTileLevels &);
     ~MapTileLevels();
+    MapTileLevels & operator=(const MapTileLevels &);
 
     const MapTileExt*	find(bool (*pf)(const MapTileExt*)) const;
     void		paint(QPainter &, const QPoint &, const QPoint &) const;
@@ -150,6 +151,8 @@ public:
     MapTile(const mp2til_t &, const QPoint &);
     MapTile(const MapTile &);
 
+    MapTile &		operator=(const MapTile &);
+
     QRectF		boundingRect(void) const;
 
     void		showInfo(void) const;
@@ -158,6 +161,8 @@ public:
     static QString	indexString(int);
 
     const QPoint &	mapPos(void) const { return mpos; }
+    void		setMapPos(const QPoint & pos) { mpos = pos; }
+
     int			basePassable(void) const { return passableBase; }
     int			localPassable(void) const { return passableLocal; }
     void		paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget* = 0);
@@ -225,6 +230,8 @@ public:
 
     void		insertToScene(QGraphicsScene &) const;
     QString		sizeDescription(void) const;
+
+    void		fixedOffset(void);
 };
 
 QDomElement & operator<< (QDomElement &, const MapTiles &);
@@ -238,8 +245,9 @@ public:
     quint32		uniq;
 
     MapArea() : uniq(1) {}
-    MapArea(const MapArea & ma, const QRect & rt) : tiles(ma.tiles, rt), objects(ma.objects, rt), uniq(ma.uniq) {}
+    MapArea(const MapArea &, const QRect &);
 
+    void		importArea(const MapArea &, const QPoint &);
     void		importMP2Towns(const QVector<H2::TownPos> &);
     void		importMP2Heroes(const QVector<H2::HeroPos> &);
     void		importMP2Signs(const QVector<H2::SignPos> &);
@@ -251,12 +259,6 @@ public:
 
 QDomElement & operator<< (QDomElement &, const MapArea &);
 QDomElement & operator>> (QDomElement &, MapArea &);
-
-class MapSelectedArea : public MapArea
-{
-public:
-    MapSelectedArea(const MapArea & ma, const QRect & rt) : MapArea(ma, rt) {}
-};
 
 class MapData : public QGraphicsScene
 {
@@ -362,6 +364,9 @@ protected:
 
     int			engineVersion;
     int			mapVersion;
+
+    static QSharedPointer<MapArea>
+    			selectedArea;
 };
 
 QDomElement & operator<< (QDomElement &, const MapData &);

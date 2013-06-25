@@ -1487,7 +1487,7 @@ QString EditorTheme::resourceFile(const QString & dir, const QString & file)
 
 QStringList EditorTheme::resourceFiles(const QString & dir, const QString & file)
 {
-    return Resource::FindFiles(QDir::toNativeSeparators(QString("themes") + QDir::separator() + themeName+ QDir::separator() + dir), file);
+    return Resource::FindFiles(QDir::toNativeSeparators(QString("themes") + QDir::separator() + themeName + QDir::separator() + dir), file);
 }
 
 int EditorTheme::getObjectID(const QString & icn, int index)
@@ -1499,7 +1499,14 @@ int EditorTheme::getObjectID(int icn, int index)
 {
     int key = (icn << 16) | (0x0000FFFF & index);
     QMap<int,SpriteInfo>::const_iterator it = mapSpriteInfoCache.find(key);
-    return it != mapSpriteInfoCache.end() ? (*it).oid : ICN::UNKNOWN;
+    int res = MapObj::None;
+    if(it != mapSpriteInfoCache.end())
+    {
+	res = (*it).oid;
+	if((*it).level == SpriteLevel::Action)
+	    res |= MapObj::IsAction;
+    }
+    return res;
 }
 
 QPixmap EditorTheme::getImageTIL(const QString & til, int index)
