@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <template>
+    <sign width="1" height="1" cid="0x02" >
+	<sprite px="0" py="0" index="0" level="action" passable="0x01F8" />
+    </sign>
     <obelisk width="2" height="2" cid="0x19" >
 	<sprite px="1" py="0" index="0" level="top" />
 	<sprite px="0" py="1" index="1" level="top" />
@@ -224,6 +227,11 @@
         <sprite px="5" py="4" index="245" level="bottom" passable="0x018F" />
         <sprite px="6" py="4" index="246" level="bottom" passable="0x018F" />
     </volcano_8x5>
+    <volcano_2x1 width="2" height="2" cid="0x65" >
+        <sprite px="1" py="0" index="0" level="top" animation="9" />
+        <sprite px="0" py="1" index="10" level="bottom" passable="0x018F" animation="9" />
+        <sprite px="1" py="1" index="20" level="bottom" passable="0x018F" animation="9" />
+    </volcano_2x1>
 
     <crater_4x3 width="4" height="3" cid="0x6C" >
         <sprite px="0" py="0" index="0" level="bottom" passable="0" />
@@ -247,6 +255,20 @@
         <sprite px="1" py="1" index="4" level="bottom" passable="0x01F8" />
         <sprite px="2" py="1" index="5" level="bottom" passable="0x01F8" />
     </crater_3x2>
+    <crater_3x2_1 width="3" height="2" cid="0x6C" >
+        <sprite px="1" py="0" index="0" level="bottom" passable="0" />
+        <sprite px="2" py="0" index="1" level="bottom" passable="0" />
+        <sprite px="0" py="1" index="2" level="bottom" passable="0x01F8" />
+        <sprite px="1" py="1" index="3" level="bottom" passable="0x01F8" />
+        <sprite px="2" py="1" index="4" level="bottom" passable="0x01F8" />
+    </crater_3x2_1>
+    <crater_3x2_2 width="3" height="2" cid="0x6C" >
+        <sprite px="0" py="0" index="0" level="bottom" passable="0" />
+        <sprite px="1" py="0" index="1" level="bottom" passable="0" />
+        <sprite px="0" py="1" index="2" level="bottom" passable="0x01F8" />
+        <sprite px="1" py="1" index="3" level="bottom" passable="0x01F8" />
+        <sprite px="2" py="1" index="4" level="bottom" passable="0x01F8" />
+    </crater_3x2_2>
     <crater_2x3 width="2" height="3" cid="0x6C" >
         <sprite px="0" py="0" index="0" level="bottom" passable="0" />
         <sprite px="1" py="0" index="1" level="bottom" passable="0x018F" />
@@ -255,6 +277,17 @@
         <sprite px="0" py="2" index="4" level="bottom" passable="0x01F8" />
         <sprite px="1" py="2" index="5" level="bottom" passable="0x01F8" />
     </crater_2x3>
+    <crater_2x2_1 width="2" height="2" cid="0x6C" >
+        <sprite px="1" py="0" index="0" level="bottom" passable="0" />
+        <sprite px="0" py="1" index="1" level="bottom" passable="0x01F8" />
+        <sprite px="1" py="1" index="2" level="bottom" passable="0x01F8" />
+    </crater_2x2_1>
+    <crater_2x2_2 width="2" height="2" cid="0x6C" >
+        <sprite px="0" py="0" index="0" level="bottom" passable="0" />
+        <sprite px="1" py="0" index="1" level="bottom" passable="0" />
+        <sprite px="0" py="1" index="2" level="bottom" passable="0x01F8" />
+        <sprite px="1" py="1" index="3" level="bottom" passable="0x01F8" />
+    </crater_2x2_2>
 
     <lake_8x3 width="8" height="3" cid="0x68" >
         <sprite px="0" py="0" index="0" level="bottom" passable="0" />
@@ -320,6 +353,39 @@
         <sprite px="2" py="1" index="6" level="bottom" passable="0x01F8" />
         <sprite px="3" py="1" index="7" level="bottom" passable="0x01F8" />
     </lake_4x2>
+
+    <lavapool_6x2 width="6" height="2" cid="0x70" >
+        <sprite px="0" py="0" index="0" level="bottom" passable="0" />
+        <sprite px="1" py="0" index="1" level="bottom" passable="0" />
+        <sprite px="2" py="0" index="2" level="bottom" passable="0" />
+        <sprite px="3" py="0" index="3" level="bottom" passable="0" />
+        <sprite px="4" py="0" index="4" level="bottom" passable="0" />
+        <sprite px="5" py="0" index="5" level="bottom" passable="0" />
+        <sprite px="0" py="1" index="6" level="bottom" passable="0x01F8" />
+        <sprite px="1" py="1" index="7" level="bottom" passable="0x01F8" />
+        <sprite px="2" py="1" index="8" level="bottom" passable="0x01F8" />
+        <sprite px="3" py="1" index="9" level="bottom" passable="0x01F8" />
+        <sprite px="4" py="1" index="10" level="bottom" passable="0x01F8" />
+        <sprite px="5" py="1" index="11" level="bottom" passable="0x01F8" />
+    </lavapool_6x2>
+    <lavapool_4x2 width="4" height="2" cid="0x70" >
+        <sprite px="0" py="0" index="0" level="top" />
+        <sprite px="1" py="0" index="1" level="bottom" passable="0" />
+        <sprite px="2" py="0" index="2" level="bottom" passable="0" />
+        <sprite px="3" py="0" index="3" level="bottom" passable="0" />
+        <sprite px="0" py="1" index="4" level="top" />
+        <sprite px="1" py="1" index="5" level="bottom" passable="0x01F8" />
+        <sprite px="2" py="1" index="6" level="bottom" passable="0x01F8" />
+        <sprite px="3" py="1" index="7" level="bottom" passable="0x01F8" />
+    </lavapool_4x2>
+    <lavapool_3x2 width="3" height="2" cid="0x70" >
+        <sprite px="0" py="0" index="0" level="bottom" passable="0" />
+        <sprite px="1" py="0" index="1" level="bottom" passable="0" />
+        <sprite px="2" py="0" index="2" level="bottom" passable="0" />
+        <sprite px="0" py="1" index="3" level="bottom" passable="0x01F8" />
+        <sprite px="1" py="1" index="4" level="bottom" passable="0x01F8" />
+        <sprite px="2" py="1" index="5" level="bottom" passable="0x01F8" />
+    </lavapool_3x2>
 
     <rock_2x1 width="2" height="1" cid="0x67" >
         <sprite px="0" py="0" index="0" level="top" />
@@ -493,6 +559,12 @@
         <sprite px="0" py="1" index="1" level="top" />
         <sprite px="1" py="1" index="2" level="bottom" passable="0x01F8" />
     </bottom_2x2_1>
+    <bottom_2x2_2 width="2" height="2">
+        <sprite px="0" py="0" index="0" level="top" />
+        <sprite px="1" py="0" index="1" level="top" />
+        <sprite px="0" py="1" index="2" level="bottom" passable="0x01F8" />
+        <sprite px="1" py="1" index="3" level="bottom" passable="0x01F8" />
+    </bottom_2x2_2>
     <bottom_3x1_2 width="3" height="1">
         <sprite px="0" py="0" index="0" level="top" />
         <sprite px="1" py="0" index="1" level="bottom" passable="0x01F8" />
@@ -509,6 +581,16 @@
         <sprite px="2" py="0" index="2" level="bottom" passable="0x01F8" />
         <sprite px="3" py="0" index="3" level="bottom" passable="0x01F8" />
     </bottom_4x1_1>
+    <bottom_4x2_1 width="4" height="2">
+        <sprite px="0" py="0" index="0" level="bottom" passable="0" />
+        <sprite px="1" py="0" index="1" level="bottom" passable="0" />
+        <sprite px="2" py="0" index="2" level="bottom" passable="0" />
+        <sprite px="3" py="0" index="3" level="bottom" passable="0" />
+        <sprite px="0" py="1" index="4" level="bottom" passable="0x01F8" />
+        <sprite px="1" py="1" index="5" level="bottom" passable="0x01F8" />
+        <sprite px="2" py="1" index="6" level="bottom" passable="0x01F8" />
+        <sprite px="3" py="1" index="7" level="bottom" passable="0x01F8" />
+    </bottom_4x2_1>
 
     <passable_1x1 width="2" height="1">
         <sprite px="0" py="0" index="0" level="bottom" passable="0x01FF" />
