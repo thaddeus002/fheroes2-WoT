@@ -297,6 +297,20 @@ int MapTileLevels::topObjectID(void) const
     return id;
 }
 
+bool MapTileLevels::removeSprite(quint32 uid)
+{
+    iterator pend = std::remove_if(begin(), end(), std::bind2nd(std::mem_fun(&MapTileExt::isUID), uid));
+
+    if(pend != end())
+    {
+	qDeleteAll(pend, end());
+	erase(pend, end());
+	return true;
+    }
+
+    return false;
+}
+
 QDomElement & operator<< (QDomElement & el, const MapTileLevels & levels)
 {
     for(MapTileLevels::const_iterator
@@ -344,7 +358,7 @@ MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos)
         case 0x39:      objectID = MapObj::None; break;
         case 0xE9:      objectID = MapObj::Reefs; break;
 	// change treasurechest to waterchest
-        case 0x86:      objectID = EditorTheme::ground(tileSprite) != Ground::Water ? MapObj::TreasureChest : MapObj::WaterChest; break;
+        case 0x86:      objectID = (EditorTheme::ground(tileSprite) != Ground::Water ? MapObj::TreasureChest : MapObj::WaterChest) | MapObj::IsAction; break;
 	// fix loyalty obj
         case 0x79:
         case 0x7A:
@@ -494,12 +508,12 @@ void MapTile::loadSpriteLevel(MapTileLevels & list, int level, const mp2lev_t & 
 
 bool MapTile::isAction(void) const
 {
-    return objectID & 0x80;
+    return objectID & MapObj::IsAction;
 }
 
 int MapTile::object(void) const
 {
-    return objectID & 0x7F;
+    return objectID & ~MapObj::IsAction;
 }
 
 void MapTile::loadSpriteLevels(const mp2ext_t & mp2)
@@ -529,6 +543,12 @@ void MapTile::addSpriteSection(const CompositeObject & co, const CompositeSprite
 
     if(objectID == MapObj::None && spritesLevel1.size())
 	objectID = spritesLevel1.topObjectID();
+}
+
+void MapTile::removeSpriteSection(quint32 uid)
+{
+    spritesLevel1.removeSprite(uid);
+    spritesLevel2.removeSprite(uid);
 }
 
 QDomElement & operator<< (QDomElement & el, const MapTile & tile)
@@ -707,6 +727,12 @@ const MapTile* MapTiles::tileFromDirectionConst(const QPoint & center, int direc
 MapTile* MapTiles::tileFromDirection(const QPoint & center, int direct)
 {
     return const_cast<MapTile*>(tileFromDirectionConst(center, direct));
+}
+
+void MapTiles::removeSprites(quint32 uid)
+{
+    for(iterator it = begin(); it != end(); ++it)
+	(*it)->removeSpriteSection(uid);
 }
 
 int MapTiles::indexPoint(const QPoint & pos) const
@@ -1930,31 +1956,49 @@ void MapData::generateMiniMap(void)
 void MapData::editObjectAttributes(void)
 {
     if(tileOverMouse)
-    {
 	switch(tileOverMouse->object())
+    {
+    	case MapObj::Resource:	editResourceDialog(*tileOverMouse); break;
+    	case MapObj::Event:	editMapEventDialog(*tileOverMouse); break;
+    	case MapObj::RndCastle:
+    	case MapObj::RndTown:
+    	case MapObj::Castle:	editTownDialog(*tileOverMouse); break;
+    	case MapObj::Bottle:
+    	case MapObj::Sign:	editSignDialog(*tileOverMouse); break;
+    	case MapObj::Heroes:	editHeroDialog(*tileOverMouse); break;
+	case MapObj::Sphinx:	editSphinxDialog(*tileOverMouse); break;
+
+    	default:
 	{
-    	    case MapObj::Resource:	editResourceDialog(*tileOverMouse); break;
-    	    case MapObj::Event:		editMapEventDialog(*tileOverMouse); break;
-    	    case MapObj::RndCastle:
-    	    case MapObj::RndTown:
-    	    case MapObj::Castle:	editTownDialog(*tileOverMouse); break;
-    	    case MapObj::Bottle:
-    	    case MapObj::Sign:		editSignDialog(*tileOverMouse); break;
-    	    case MapObj::Heroes:	editHeroDialog(*tileOverMouse); break;
-	    case MapObj::Sphinx:	editSphinxDialog(*tileOverMouse); break;
+	    Form::ObjectEventsDialog form;
 
-    	    default:
+	    if(QDialog::Accepted == form.exec())
 	    {
-		Form::ObjectEventsDialog form;
-
-		if(QDialog::Accepted == form.exec())
-		{
-		}
-	
-			//QMessageBox::information(qobject_cast<MapWindow*>(parent()), "Object Attributes",
-			//	    "Sorry!\nChange attributes of the object is not yet available."); break;
 	    }
+	
+	    //QMessageBox::information(qobject_cast<MapWindow*>(parent()), "Object Attributes",
+	    //	    "Sorry!\nChange attributes of the object is not yet available."); break;
 	}
+    }
+}
+
+void MapData::removeCurrentObject(void)
+{
+    if(tileOverMouse)
+    {
+	// remove object info
+	MapObject* obj = mapObjects.find(tileOverMouse->mapPos()).data();
+	if(obj) mapObjects.remove(obj->uid());
+
+	// remove sprites
+	if(! tileOverMouse->levels1().empty())
+	{
+    	    // get uid from level 1 (last sprite)
+	    mapTiles.removeSprites(tileOverMouse->levels1().back()->uid());
+	    update();
+	}
+
+	emit dataModified();
     }
 }
 
@@ -1969,6 +2013,7 @@ void MapData::editMapEventDialog(const MapTile & tile)
 	if(QDialog::Accepted == form.exec())
 	{
 	    *event = form.result(event->pos(), event->uid());
+
 	    emit dataModified();
 	}
     }

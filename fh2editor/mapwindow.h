@@ -86,6 +86,7 @@ private:
     QAction*            selectAllAct;
     QAction*            addObjectAct;
     QAction*            editObjectAct;
+    QAction*            removeObjectAct;
 
     QActionGroup*	fillGroundAct;
     QActionGroup*	clearObjectsAct;

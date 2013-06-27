@@ -59,6 +59,10 @@ MapWindow::MapWindow(MainWindow* parent) : mainWindow(parent), mapData(this)
     editObjectAct->setStatusTip(tr("Edit map object"));
     connect(editObjectAct, SIGNAL(triggered()), &mapData, SLOT(editObjectAttributes()));
 
+    removeObjectAct = new QAction(QIcon(":/images/clear_objects.png"), tr("Remove object..."), this);
+    removeObjectAct->setStatusTip(tr("Remove map object"));
+    connect(removeObjectAct, SIGNAL(triggered()), &mapData, SLOT(removeCurrentObject()));
+
     QAction* curAct;
 
     // init: fill ground
@@ -354,9 +358,11 @@ void MapWindow::contextMenuEvent(QContextMenuEvent* event)
 	menu.addSeparator();
 	menu.addAction(editPassableAct);
         menu.addAction(editObjectAct);
+        menu.addAction(removeObjectAct);
 	menu.addAction(cellInfoAct);
 
 	editObjectAct->setEnabled(mapData.currentTile() && mapData.currentTile()->isAction());
+	removeObjectAct->setEnabled(mapData.currentTile() && mapData.currentTile()->isAction());
 
 	menu.addSeparator();
 	menu.addAction(selectAllAct);

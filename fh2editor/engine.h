@@ -360,7 +360,8 @@ namespace MapObj
 	    TravellerTent = 0x78, AlchemyTower = 0x79, Stables = 0x7A, Jail = 0x7B, FireAltar = 0x7C, AirAltar = 0x7D, EarthAltar = 0x7E, WaterAltar = 0x7F,
 	    IsAction = 0x80 };
 
-    QString transcribe(int);
+    bool	IsPickup(int);
+    QString	transcribe(int);
 }
 
 struct CompositeSprite

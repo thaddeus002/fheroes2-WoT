@@ -104,12 +104,13 @@ public:
     static bool		sortLevel1(const MapTileExt*, const MapTileExt*);
     static bool		sortLevel2(const MapTileExt*, const MapTileExt*);
 
-
     int			uid(void) const { return spriteUID; }
     int			icn(void) const { return spriteICN; }
     int			ext(void) const { return spriteExt; }
     int			index(void) const { return spriteIndex; }
     int			level(void) const { return spriteLevel; }
+
+    bool		isUID(quint32 uid) const { return uid == spriteUID; }
 
     static bool		isAnimation(const MapTileExt*);
     static bool		isMapEvent(const MapTileExt*);
@@ -139,6 +140,7 @@ public:
     void		paint(QPainter &, const QPoint &, const QPoint &) const;
     QString		infoString(void) const;
     int			topObjectID(void) const;
+    bool		removeSprite(quint32);
 };
 
 QDomElement & operator<< (QDomElement &, const MapTileLevels &);
@@ -170,6 +172,7 @@ public:
     void		sortSpritesLevels(void);
     void		setTileSprite(int, int);
     void		addSpriteSection(const CompositeObject &, const CompositeSprite &, quint32);
+    void		removeSpriteSection(quint32);
 
     const MapTileLevels & levels1(void) const { return spritesLevel1; }
     const MapTileLevels & levels2(void) const { return spritesLevel2; }
@@ -222,6 +225,8 @@ public:
     MapTile*		tile(const QPoint &);
     const MapTile*	mapToTileConst(const QPoint &) const;
     MapTile*		mapToTile(const QPoint &);
+
+    void		removeSprites(quint32);
 
     const MapTile*	tileFromDirectionConst(const MapTile*, int direct) const;
     MapTile*		tileFromDirection(const MapTile*, int direct);
@@ -313,6 +318,7 @@ protected slots:
     void		removeObjectsAction(QAction*);
     void		selectObjectImage(void);
     void		editObjectAttributes(void);
+    void		removeCurrentObject(void);
     void		generateMiniMap(void);
 
 protected:

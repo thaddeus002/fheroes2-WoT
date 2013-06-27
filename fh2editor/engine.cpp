@@ -2836,6 +2836,27 @@ QDomElement & operator>> (QDomElement & el, QPoint & pt)
     return el;
 }
 
+bool MapObj::IsPickup(int obj)
+{
+    switch(obj)
+    {
+        case WaterChest:
+        case ShipwreckSurviror:
+        case FlotSam:
+        case Bottle:
+        case TreasureChest:
+        case AncientLamp:
+        case CampFire:
+        case Resource:
+        case Artifact:
+            return true;
+
+        default: break;
+    }
+
+    return false;
+}
+
 QString MapObj::transcribe(int index)
 {
     const char* names[] = { "None", "AlchemyLab", "Sign", "Buoy", "Skeleton", "DaemonCave", "TreasureChest", "FaerieRing", "CampFire", "Fountain",
