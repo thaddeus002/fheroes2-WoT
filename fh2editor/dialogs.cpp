@@ -1540,9 +1540,9 @@ void Form::MiniMap::generateFromTiles(const MapTiles & tiles)
     for(MapTiles::const_iterator
 	it = tiles.begin(); it != tiles.end(); ++it)
     {
-	const QPoint & pos = (*it)->mapPos();
+	const QPoint & pos = (*it).mapPos();
 
-	switch((*it)->groundType())
+	switch((*it).groundType())
 	{
 	    case Ground::Desert:	image.setPixel(pos, qRgb(0xD0, 0xC0, 0x48)); break;
 	    case Ground::Snow:		image.setPixel(pos, qRgb(0xE0, 0xE0, 0xE0)); break;

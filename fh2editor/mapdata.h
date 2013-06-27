@@ -97,46 +97,44 @@ class MapTileExt
     friend		QDomElement & operator>> (QDomElement &, MapTileExt &);
 
 public:
-    MapTileExt() : spriteICN(0), spriteExt(0), spriteIndex(0), spriteLevel(0), spriteUID(0) {}
+    MapTileExt(int uid = 0) : spriteICN(0), spriteExt(0), spriteIndex(0), spriteLevel(0), spriteUID(uid) {}
     MapTileExt(int lv, const mp2lev_t &);
     MapTileExt(const CompositeObject &, const CompositeSprite &, quint32);
 
-    static bool		sortLevel1(const MapTileExt*, const MapTileExt*);
-    static bool		sortLevel2(const MapTileExt*, const MapTileExt*);
+    bool		operator==(const MapTileExt & ext) const { return spriteUID == ext.spriteUID; }
+    bool		operator==(quint32 uid) const { return uid == spriteUID; }
 
-    int			uid(void) const { return spriteUID; }
+    static bool		sortLevel1(const MapTileExt &, const MapTileExt &);
+    static bool		sortLevel2(const MapTileExt &, const MapTileExt &);
+
+    quint32		uid(void) const { return spriteUID; }
     int			icn(void) const { return spriteICN; }
     int			ext(void) const { return spriteExt; }
     int			index(void) const { return spriteIndex; }
     int			level(void) const { return spriteLevel; }
 
-    bool		isUID(quint32 uid) const { return uid == spriteUID; }
-
-    static bool		isAnimation(const MapTileExt*);
-    static bool		isMapEvent(const MapTileExt*);
-    static bool		isSphinx(const MapTileExt*);
-    static bool		isSign(const MapTileExt*);
-    static bool		isButtle(const MapTileExt*);
-    static bool		isMiniHero(const MapTileExt*);
-    static bool		isTown(const MapTileExt*);
-    static bool		isRandomTown(const MapTileExt*);
-    static int		loyaltyObject(const MapTileExt*);
-    static bool		isResource(const MapTileExt*);
-    static int		resource(const MapTileExt*);
+    static bool		isAnimation(const MapTileExt &);
+    static bool		isMapEvent(const MapTileExt &);
+    static bool		isSphinx(const MapTileExt &);
+    static bool		isSign(const MapTileExt &);
+    static bool		isButtle(const MapTileExt &);
+    static bool		isMiniHero(const MapTileExt &);
+    static bool		isTown(const MapTileExt &);
+    static bool		isRandomTown(const MapTileExt &);
+    static int		loyaltyObject(const MapTileExt &);
+    static bool		isResource(const MapTileExt &);
+    static int		resource(const MapTileExt &);
 };
 
 QDomElement & operator<< (QDomElement &, const MapTileExt &);
 QDomElement & operator>> (QDomElement &, MapTileExt &);
 
-class MapTileLevels : public QList<MapTileExt*>
+class MapTileLevels : public QList<MapTileExt>
 {
 public:
     MapTileLevels() {}
-    MapTileLevels(const MapTileLevels &);
-    ~MapTileLevels();
-    MapTileLevels & operator=(const MapTileLevels &);
 
-    const MapTileExt*	find(bool (*pf)(const MapTileExt*)) const;
+    const MapTileExt*	find(bool (*pf)(const MapTileExt &)) const;
     void		paint(QPainter &, const QPoint &, const QPoint &) const;
     QString		infoString(void) const;
     int			topObjectID(void) const;
@@ -153,6 +151,7 @@ public:
     MapTile(const mp2til_t &, const QPoint &);
     MapTile(const MapTile &);
 
+    void		setGraphicsPixmapItemValues(void);
     MapTile &		operator=(const MapTile &);
 
     QRectF		boundingRect(void) const;
@@ -203,7 +202,7 @@ protected:
 QDomElement & operator<< (QDomElement &, const MapTile &);
 QDomElement & operator>> (QDomElement &, MapTile &);
 
-class MapTiles : public QList<MapTile*>
+class MapTiles : public QVector<MapTile>
 {
     QSize		msize;
 
@@ -233,7 +232,7 @@ public:
     const MapTile*	tileFromDirectionConst(const QPoint &, int direct) const;
     MapTile*		tileFromDirection(const QPoint &, int direct);
 
-    void		insertToScene(QGraphicsScene &) const;
+    void		insertToScene(QGraphicsScene &);
     QString		sizeDescription(void) const;
 
     void		fixedOffset(void);

@@ -49,55 +49,55 @@ MapTileExt::MapTileExt(const CompositeObject & co, const CompositeSprite & cs, q
 	spriteExt |= 0x01;
 }
 
-bool MapTileExt::isAnimation(const MapTileExt* mte)
+bool MapTileExt::isAnimation(const MapTileExt & mte)
 {
-    return mte->spriteExt & 0x01;
+    return mte.spriteExt & 0x01;
 }
 
-bool MapTileExt::sortLevel1(const MapTileExt* mte1, const MapTileExt* mte2)
+bool MapTileExt::sortLevel1(const MapTileExt & mte1, const MapTileExt & mte2)
 {
-    return (mte1->spriteLevel % 4) > (mte2->spriteLevel % 4);
+    return (mte1.spriteLevel % 4) > (mte2.spriteLevel % 4);
 }
 
-bool MapTileExt::sortLevel2(const MapTileExt* mte1, const MapTileExt* mte2)
+bool MapTileExt::sortLevel2(const MapTileExt & mte1, const MapTileExt & mte2)
 {
-    return (mte1->spriteLevel % 4) < (mte2->spriteLevel % 4);
+    return (mte1.spriteLevel % 4) < (mte2.spriteLevel % 4);
 }
 
-bool MapTileExt::isTown(const MapTileExt* te)
+bool MapTileExt::isTown(const MapTileExt & te)
 {
-    return ICN::OBJNTOWN == te->spriteICN ? true : isRandomTown(te);
+    return ICN::OBJNTOWN == te.spriteICN ? true : isRandomTown(te);
 }
 
-bool MapTileExt::isRandomTown(const MapTileExt* te)
+bool MapTileExt::isRandomTown(const MapTileExt & te)
 {
-    return ICN::OBJNTWRD == te->spriteICN && 32 > te->spriteIndex;
+    return ICN::OBJNTWRD == te.spriteICN && 32 > te.spriteIndex;
 }
 
-bool MapTileExt::isMiniHero(const MapTileExt* te)
+bool MapTileExt::isMiniHero(const MapTileExt & te)
 {
-    return ICN::MINIHERO == te->spriteICN;
+    return ICN::MINIHERO == te.spriteICN;
 }
 
-bool MapTileExt::isSign(const MapTileExt* te)
+bool MapTileExt::isSign(const MapTileExt & te)
 {
-    return (ICN::OBJNMUL2 == te->spriteICN && 114 == te->spriteIndex) ||
-	    (ICN::OBJNDSRT == te->spriteICN && 119 == te->spriteIndex) ||
-	    (ICN::OBJNLAVA == te->spriteICN && 117 == te->spriteIndex) ||
-	    (ICN::OBJNSNOW == te->spriteICN && 143 == te->spriteIndex) ||
-	    (ICN::OBJNSWMP == te->spriteICN && 140 == te->spriteIndex);
+    return (ICN::OBJNMUL2 == te.spriteICN && 114 == te.spriteIndex) ||
+	    (ICN::OBJNDSRT == te.spriteICN && 119 == te.spriteIndex) ||
+	    (ICN::OBJNLAVA == te.spriteICN && 117 == te.spriteIndex) ||
+	    (ICN::OBJNSNOW == te.spriteICN && 143 == te.spriteIndex) ||
+	    (ICN::OBJNSWMP == te.spriteICN && 140 == te.spriteIndex);
 }
 
-bool MapTileExt::isResource(const MapTileExt* te)
+bool MapTileExt::isResource(const MapTileExt & te)
 {
     return Resource::Unknown != resource(te);
 }
 
-int MapTileExt::resource(const MapTileExt* te)
+int MapTileExt::resource(const MapTileExt & te)
 {
-    if(ICN::OBJNRSRC == te->spriteICN)
+    if(ICN::OBJNRSRC == te.spriteICN)
     {
-	switch(te->spriteIndex)
+	switch(te.spriteIndex)
 	{
 	    case 1:	return Resource::Wood;
 	    case 3:	return Resource::Mercury;
@@ -114,83 +114,83 @@ int MapTileExt::resource(const MapTileExt* te)
     return Resource::Unknown;
 }
 
-bool MapTileExt::isButtle(const MapTileExt* te)
+bool MapTileExt::isButtle(const MapTileExt & te)
 {
-    return ICN::OBJNWATR == te->spriteICN && 0 == te->spriteIndex;
+    return ICN::OBJNWATR == te.spriteICN && 0 == te.spriteIndex;
 }
 
-bool MapTileExt::isSphinx(const MapTileExt* te)
+bool MapTileExt::isSphinx(const MapTileExt & te)
 {
-    return ICN::OBJNDSRT == te->spriteICN && (85 <= te->spriteIndex || 88 <= te->spriteIndex);
+    return ICN::OBJNDSRT == te.spriteICN && (85 <= te.spriteIndex || 88 <= te.spriteIndex);
 }
 
-bool MapTileExt::isMapEvent(const MapTileExt* te)
+bool MapTileExt::isMapEvent(const MapTileExt & te)
 {
-    return ICN::OBJNMUL2 == te->spriteICN && 163 == te->spriteIndex;
+    return ICN::OBJNMUL2 == te.spriteICN && 163 == te.spriteIndex;
 }
 
-int MapTileExt::loyaltyObject(const MapTileExt* te)
+int MapTileExt::loyaltyObject(const MapTileExt & te)
 {
-    switch(te->spriteICN)
+    switch(te.spriteICN)
     {
         case ICN::X_LOC1:
-            if(te->spriteIndex == 3) return MapObj::AlchemyTower | MapObj::IsAction;
+            if(te.spriteIndex == 3) return MapObj::AlchemyTower | MapObj::IsAction;
             else
-            if(te->spriteIndex < 3) return MapObj::AlchemyTower;
+            if(te.spriteIndex < 3) return MapObj::AlchemyTower;
             else
-            if(70 == te->spriteIndex) return MapObj::Arena | MapObj::IsAction;
+            if(70 == te.spriteIndex) return MapObj::Arena | MapObj::IsAction;
             else
-            if(3 < te->spriteIndex && te->spriteIndex < 72) return MapObj::Arena;
+            if(3 < te.spriteIndex && te.spriteIndex < 72) return MapObj::Arena;
             else
-            if(77 == te->spriteIndex) return MapObj::BarrowMounds | MapObj::IsAction;
+            if(77 == te.spriteIndex) return MapObj::BarrowMounds | MapObj::IsAction;
             else
-            if(71 < te->spriteIndex && te->spriteIndex < 78) return MapObj::BarrowMounds;
+            if(71 < te.spriteIndex && te.spriteIndex < 78) return MapObj::BarrowMounds;
             else
-            if(94 == te->spriteIndex) return MapObj::EarthAltar | MapObj::IsAction;
+            if(94 == te.spriteIndex) return MapObj::EarthAltar | MapObj::IsAction;
             else
-            if(77 < te->spriteIndex && te->spriteIndex < 112) return MapObj::EarthAltar;
+            if(77 < te.spriteIndex && te.spriteIndex < 112) return MapObj::EarthAltar;
             else
-            if(118 == te->spriteIndex) return MapObj::AirAltar | MapObj::IsAction;
+            if(118 == te.spriteIndex) return MapObj::AirAltar | MapObj::IsAction;
             else
-            if(111 < te->spriteIndex && te->spriteIndex < 120) return MapObj::AirAltar;
+            if(111 < te.spriteIndex && te.spriteIndex < 120) return MapObj::AirAltar;
             else
-            if(127 == te->spriteIndex) return MapObj::FireAltar | MapObj::IsAction;
+            if(127 == te.spriteIndex) return MapObj::FireAltar | MapObj::IsAction;
             else
-            if(119 < te->spriteIndex && te->spriteIndex < 129) return MapObj::FireAltar;
+            if(119 < te.spriteIndex && te.spriteIndex < 129) return MapObj::FireAltar;
             else
-            if(135 == te->spriteIndex) return MapObj::WaterAltar | MapObj::IsAction;
+            if(135 == te.spriteIndex) return MapObj::WaterAltar | MapObj::IsAction;
             else
-            if(128 < te->spriteIndex && te->spriteIndex < 137) return MapObj::WaterAltar;
+            if(128 < te.spriteIndex && te.spriteIndex < 137) return MapObj::WaterAltar;
             break;
 
         case ICN::X_LOC2:
-            if(te->spriteIndex == 4) return MapObj::Stables | MapObj::IsAction;
+            if(te.spriteIndex == 4) return MapObj::Stables | MapObj::IsAction;
             else
-            if(te->spriteIndex < 4) return MapObj::Stables;
+            if(te.spriteIndex < 4) return MapObj::Stables;
             else
-            if(te->spriteIndex == 9) return MapObj::Jail | MapObj::IsAction;
+            if(te.spriteIndex == 9) return MapObj::Jail | MapObj::IsAction;
             else
-            if(4 < te->spriteIndex && te->spriteIndex < 10) return MapObj::Jail;
+            if(4 < te.spriteIndex && te.spriteIndex < 10) return MapObj::Jail;
             else
-            if(te->spriteIndex == 37) return MapObj::Mermaid | MapObj::IsAction;
+            if(te.spriteIndex == 37) return MapObj::Mermaid | MapObj::IsAction;
             else
-            if(9 < te->spriteIndex && te->spriteIndex < 47) return MapObj::Mermaid;
+            if(9 < te.spriteIndex && te.spriteIndex < 47) return MapObj::Mermaid;
             else
-            if(te->spriteIndex == 101) return MapObj::Sirens | MapObj::IsAction;
+            if(te.spriteIndex == 101) return MapObj::Sirens | MapObj::IsAction;
             else
-            if(46 < te->spriteIndex && te->spriteIndex < 111) return MapObj::Sirens;
+            if(46 < te.spriteIndex && te.spriteIndex < 111) return MapObj::Sirens;
             else
-            if(110 < te->spriteIndex && te->spriteIndex < 136) return MapObj::Reefs;
+            if(110 < te.spriteIndex && te.spriteIndex < 136) return MapObj::Reefs;
             break;
 
         case ICN::X_LOC3:
-            if(te->spriteIndex == 30) return MapObj::HutMagi | MapObj::IsAction;
+            if(te.spriteIndex == 30) return MapObj::HutMagi | MapObj::IsAction;
             else
-            if(te->spriteIndex < 32) return MapObj::HutMagi;
+            if(te.spriteIndex < 32) return MapObj::HutMagi;
             else
-            if(te->spriteIndex == 50) return MapObj::EyeMagi | MapObj::IsAction;
+            if(te.spriteIndex == 50) return MapObj::EyeMagi | MapObj::IsAction;
             else
-            if(31 < te->spriteIndex && te->spriteIndex < 59) return MapObj::EyeMagi;
+            if(31 < te.spriteIndex && te.spriteIndex < 59) return MapObj::EyeMagi;
             break;
 
         default: break;
@@ -221,46 +221,24 @@ QDomElement & operator>> (QDomElement & el, MapTileExt & ext)
     return el;
 }
 
-MapTileLevels::MapTileLevels(const MapTileLevels & other)
-    : QList<MapTileExt*>()
-{
-    for(const_iterator it = other.begin(); it != other.end(); ++it)
-	*this << new MapTileExt(**it);
-}
-
-MapTileLevels::~MapTileLevels()
-{
-    qDeleteAll(begin(), end());
-}
-
-MapTileLevels & MapTileLevels::operator=(const MapTileLevels & other)
-{
-    clear();
-
-    for(const_iterator it = other.begin(); it != other.end(); ++it)
-	*this << new MapTileExt(**it);
-
-    return *this;
-}
-
 void MapTileLevels::paint(QPainter & painter, const QPoint & offset, const QPoint & mpos) const
 {
     for(const_iterator it = begin(); it != end(); ++it)
     {
-	QPair<QPixmap, QPoint> p1 = EditorTheme::getImageICN((*it)->icn(), (*it)->index());
+	QPair<QPixmap, QPoint> p1 = EditorTheme::getImageICN((*it).icn(), (*it).index());
 	painter.drawPixmap(offset + p1.second, p1.first);
 
 	if(MapTileExt::isAnimation(*it))
 	{
-	    int anim = H2::isAnimationICN((*it)->icn(), (*it)->index(), 0);
+	    int anim = H2::isAnimationICN((*it).icn(), (*it).index(), 0);
 
 	    if(0 < anim)
 	    {
-		QPair<QPixmap, QPoint> p2 = EditorTheme::getImageICN((*it)->icn(), anim);
+		QPair<QPixmap, QPoint> p2 = EditorTheme::getImageICN((*it).icn(), anim);
 		painter.drawPixmap(offset + p2.second, p2.first);
 	    }
 	    else
-		qDebug() << "H2::isAnimationICN:" << "incorrect animation" << mpos << "icn:" << (*it)->icn() << "index:" << (*it)->index();
+		qDebug() << "H2::isAnimationICN:" << "incorrect animation" << mpos << "icn:" << (*it).icn() << "index:" << (*it).index();
 	}
     }
 }
@@ -273,18 +251,19 @@ QString MapTileLevels::infoString(void) const
     for(const_iterator it = begin(); it != end(); ++it)
     {
 	ss <<
-	    "uniq:   " << (*it)->uid() << endl <<
-	    "sprite: " << H2::icnString((*it)->icn()) << ", " <<  (*it)->index() << endl <<
-	    "level:  " << (*it)->level() << endl;
+	    "uniq:   " << (*it).uid() << endl <<
+	    "sprite: " << H2::icnString((*it).icn()) << ", " <<  (*it).index() << endl <<
+	    "level:  " << (*it).level() << endl;
     }
 
     return str;
 }
 
-const MapTileExt* MapTileLevels::find(bool (*pf)(const MapTileExt*)) const
+const MapTileExt* MapTileLevels::find(bool (*pf)(const MapTileExt &)) const
 {
-    const_iterator it = std::find_if(begin(), end(), pf);
-    return it != end() ? *it : NULL;
+    const_iterator it = begin();
+    for(; it != end(); ++it) if(pf(*it)) break;
+    return it != end() ? &(*it) : NULL;
 }
 
 int MapTileLevels::topObjectID(void) const
@@ -292,23 +271,14 @@ int MapTileLevels::topObjectID(void) const
     int id = MapObj::None;
 
     for(const_iterator it = begin(); it != end() && id == MapObj::None; ++it)
-	id = *it ? EditorTheme::getObjectID((*it)->icn(), (*it)->index()) : MapObj::None;
+	id = EditorTheme::getObjectID((*it).icn(), (*it).index());
 
     return id;
 }
 
 bool MapTileLevels::removeSprite(quint32 uid)
 {
-    iterator pend = std::remove_if(begin(), end(), std::bind2nd(std::mem_fun(&MapTileExt::isUID), uid));
-
-    if(pend != end())
-    {
-	qDeleteAll(pend, end());
-	erase(pend, end());
-	return true;
-    }
-
-    return false;
+    return removeAll(MapTileExt(uid));
 }
 
 QDomElement & operator<< (QDomElement & el, const MapTileLevels & levels)
@@ -318,7 +288,7 @@ QDomElement & operator<< (QDomElement & el, const MapTileLevels & levels)
     {
 	QDomElement sprite = el.ownerDocument().createElement("sprite");
 	el.appendChild(sprite);
-	sprite << **it;
+	sprite << *it;
     }
 
     return el;
@@ -331,9 +301,9 @@ QDomElement & operator>> (QDomElement & el, MapTileLevels & levels)
 
     for(int pos = 0; pos < list.size(); ++pos)
     {
-	levels << new MapTileExt();    
+	levels << MapTileExt();    
 	QDomElement sprite = list.item(pos).toElement();
-	sprite >> *levels.back();
+	sprite >> levels.back();
     }
 
     return el;
@@ -343,10 +313,7 @@ MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos)
     : mpos(pos), tileSprite(mp2.tileSprite), tileShape(mp2.tileShape % 4), objectID(mp2.objectID),
 	passableBase(Direction::All), passableLocal(Direction::All)
 {
-    const QSize & tileSize = EditorTheme::tileSize();
-    setOffset(mpos.x() * tileSize.width(), mpos.y() * tileSize.height());
-    setFlags(QGraphicsItem::ItemIsSelectable);
-    setTileSprite(tileSprite, tileShape);
+    setGraphicsPixmapItemValues();
     loadSpriteLevels(mp2.ext);
 
     // fix MP2 objects
@@ -384,11 +351,10 @@ MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos)
 }
 
 MapTile::MapTile(const MapTile & other)
-    : QGraphicsPixmapItem(), mpos(other.mpos), tileSprite(other.tileSprite), tileShape(other.tileShape), objectID(other.objectID /* MapObj::None */),
+    : QGraphicsPixmapItem(), mpos(other.mpos), tileSprite(other.tileSprite), tileShape(other.tileShape), objectID(other.objectID),
 	spritesLevel1(other.spritesLevel1), spritesLevel2(other.spritesLevel2), passableBase(other.passableBase), passableLocal(other.passableLocal)
 {
-    setFlags(QGraphicsItem::ItemIsSelectable);
-    setTileSprite(tileSprite, tileShape);
+    setGraphicsPixmapItemValues();
 }
 
 MapTile::MapTile()
@@ -410,10 +376,17 @@ MapTile & MapTile::operator=(const MapTile & other)
     passableBase = other.passableBase;
     passableLocal = other.passableLocal;
 
-    setFlags(QGraphicsItem::ItemIsSelectable);
-    setTileSprite(tileSprite, tileShape);
+    setGraphicsPixmapItemValues();
 
     return *this;
+}
+
+void MapTile::setGraphicsPixmapItemValues(void)
+{
+    const QSize & tileSize = EditorTheme::tileSize();
+    setOffset(mpos.x() * tileSize.width(), mpos.y() * tileSize.height());
+    setFlags(QGraphicsItem::ItemIsSelectable);
+    setTileSprite(tileSprite, tileShape);
 }
 
 void MapTile::setTileSprite(int index, int rotate)
@@ -502,7 +475,7 @@ void MapTile::loadSpriteLevel(MapTileLevels & list, int level, const mp2lev_t & 
 	const QString & icn = H2::icnString(H2::mapICN(ext.object));
 
 	if(! icn.isEmpty())
-	    list << new MapTileExt(level, ext);
+	    list << MapTileExt(level, ext);
     }
 }
 
@@ -534,9 +507,9 @@ void MapTile::sortSpritesLevels(void)
 void MapTile::addSpriteSection(const CompositeObject & co, const CompositeSprite & cs, quint32 uid)
 {
     if(cs.spriteLevel == SpriteLevel::Top)
-	spritesLevel2 << new MapTileExt(co, cs, uid);
+	spritesLevel2 << MapTileExt(co, cs, uid);
     else
-	spritesLevel1 << new MapTileExt(co, cs, uid);
+	spritesLevel1 << MapTileExt(co, cs, uid);
 
     if(spritesLevel2.size())
 	objectID = spritesLevel2.topObjectID();
@@ -584,27 +557,27 @@ QDomElement & operator>> (QDomElement & el, MapTile & tile)
     tile.tileShape = el.attribute("tileShape").toInt();
     tile.objectID = el.attribute("objectID").toInt();
 
-    const QSize & tileSize = EditorTheme::tileSize();
-    tile.setOffset(tile.mpos.x() * tileSize.width(), tile.mpos.y() * tileSize.height());
-    tile.setTileSprite(tile.tileSprite, tile.tileShape);
-
     QDomElement el1 = el.firstChildElement("levels1");
     el1 >> tile.spritesLevel1;
 
     QDomElement el2 = el.firstChildElement("levels2");
     el2 >> tile.spritesLevel2;
 
+    tile.setGraphicsPixmapItemValues();
+
     return el;
 }
 
 MapTiles::MapTiles(const MapTiles & tiles, const QRect & area) : msize(area.size())
 {
+    reserve(msize.width() * msize.height());
+
     for(int yy = area.y(); yy < area.y() + area.height(); ++yy)
     {
 	for(int xx = area.x(); xx < area.x() + area.width(); ++xx)
         {
 	    const MapTile* tile = tiles.tileConst(QPoint(xx, yy));
-	    if(tile) *this << new MapTile(*tile);
+	    if(tile) *this << MapTile(*tile);
         }
     }
 }
@@ -629,24 +602,26 @@ QString MapTiles::sizeDescription(void) const
 void MapTiles::newMap(const QSize & sz)
 {
     msize = sz;
+    reserve(msize.width() * msize.height());
 
     for(int yy = 0; yy < msize.height(); ++yy)
     {
 	for(int xx = 0; xx < msize.width(); ++xx)
-    	    push_back(new MapTile(mp2til_t(), QPoint(xx, yy)));
+    	    *this << MapTile(mp2til_t(), QPoint(xx, yy));
     }
 }
 
 bool MapTiles::importMap(const QSize & sz, const QVector<mp2til_t> & mp2Tiles, const QVector<mp2ext_t> & mp2Sprites)
 {
     msize = sz;
+    reserve(msize.width() * msize.height());
 
     for(int yy = 0; yy < msize.height(); ++yy)
     {
 	for(int xx = 0; xx < msize.width(); ++xx)
 	{
 	    const mp2til_t & mp2til = mp2Tiles[indexPoint(QPoint(xx, yy))];
-	    push_back(new MapTile(mp2til, QPoint(xx, yy)));
+	    *this << MapTile(mp2til, QPoint(xx, yy));
 	    int ext = mp2til.ext.indexExt;
 
 	    while(ext)
@@ -657,11 +632,11 @@ bool MapTiles::importMap(const QSize & sz, const QVector<mp2til_t> & mp2Tiles, c
     		    return false;
 		}
 
-		back()->loadSpriteLevels(mp2Sprites[ext]);
+		back().loadSpriteLevels(mp2Sprites[ext]);
 		ext = mp2Sprites[ext].indexExt;
 	    }
 
-	    back()->sortSpritesLevels();
+	    back().sortSpritesLevels();
 	}
     }
 
@@ -672,7 +647,7 @@ const MapTile* MapTiles::mapToTileConst(const QPoint & pos) const
 {
     for(MapTiles::const_iterator
 	it = begin(); it != end(); ++it)
-	if((*it)->boundingRect().contains(pos)) return *it;
+	if((*it).boundingRect().contains(pos)) return &(*it);
 
     return NULL;
 }
@@ -684,8 +659,8 @@ MapTile* MapTiles::mapToTile(const QPoint & pos)
 
 const MapTile* MapTiles::tileConst(const QPoint & pos) const
 {
-    const QList<MapTile*> & mapTiles = *this;
-    return isValidPoint(pos) ? mapTiles[indexPoint(pos)] : NULL;
+    const QVector<MapTile> & mapTiles = *this;
+    return isValidPoint(pos) ? & mapTiles[indexPoint(pos)] : NULL;
 }
 
 MapTile* MapTiles::tile(const QPoint & pos)
@@ -732,7 +707,7 @@ MapTile* MapTiles::tileFromDirection(const QPoint & center, int direct)
 void MapTiles::removeSprites(quint32 uid)
 {
     for(iterator it = begin(); it != end(); ++it)
-	(*it)->removeSpriteSection(uid);
+	(*it).removeSpriteSection(uid);
 }
 
 int MapTiles::indexPoint(const QPoint & pos) const
@@ -745,21 +720,21 @@ bool MapTiles::isValidPoint(const QPoint & pos) const
     return QRect(QPoint(0, 0), msize).contains(pos);
 }
 
-void MapTiles::insertToScene(QGraphicsScene & scene) const
+void MapTiles::insertToScene(QGraphicsScene & scene)
 {
-    for(const_iterator it = begin(); it != end(); ++it)
-	scene.addItem(*it);
+    for(iterator it = begin(); it != end(); ++it)
+	scene.addItem(& (*it));
 }
 
 void MapTiles::fixedOffset(void)
 {
     if(size())
     {
-	QPoint offset = front()->mapPos();
+	QPoint offset = front().mapPos();
 
 	if(offset != QPoint(0, 0))
 	    for(iterator it = begin(); it != end(); ++it)
-		(*it)->setMapPos((*it)->mapPos() - offset);
+		(*it).setMapPos((*it).mapPos() - offset);
     }
 }
 
@@ -772,7 +747,7 @@ QDomElement & operator<< (QDomElement & el, const MapTiles & tiles)
     {
 	QDomElement elem = el.ownerDocument().createElement("tile");
 	el.appendChild(elem);
-	elem << **it;
+	elem << *it;
     }
 
     return el;
@@ -791,8 +766,8 @@ QDomElement & operator>> (QDomElement & el, MapTiles & tiles)
     for(int pos = 0; pos < nodeList.size(); ++pos)
     {
 	QDomElement elem = nodeList.item(pos).toElement();
-	tiles << new MapTile();
-	elem >> *tiles.back();
+	tiles << MapTile();
+	elem >> tiles.back();
     }
 
     return el;
@@ -1186,20 +1161,22 @@ void MapData::drawForeground(QPainter* painter, const QRectF & rect)
 	painter->drawRoundedRect(selectionArea().boundingRect(), 6.0, 6.0);
     }
     else
-    // paint: selected new object place
-    if(currentObject.isValid())
-    {
-	QPoint pos = tileOverMouse->boundingRect().topLeft().toPoint() - currentObject.center();
-	currentObject.paint(*painter, pos, true);
-    }
-    else
-    // paint: selected item over mouse
     if(tileOverMouse)
     {
-	painter->setPen(QPen(tileOverMouse->isAction() ? QColor(0, 255, 0) : QColor(255, 255, 0), 1));
-	painter->setBrush(QBrush(QColor(0, 0, 0, 0)));
-	const QRectF & rt = tileOverMouse->boundingRect();
-	painter->drawRect(QRectF(rt.x(), rt.y(), rt.width() - 1, rt.height() - 1));
+	// paint: selected new object place
+	if(currentObject.isValid())
+	{
+	    QPoint pos = tileOverMouse->boundingRect().topLeft().toPoint() - currentObject.center();
+	    currentObject.paint(*painter, pos, true);
+	}
+	else
+	// paint: selected item over mouse
+	{
+	    painter->setPen(QPen(tileOverMouse->isAction() ? QColor(0, 255, 0) : QColor(255, 255, 0), 1));
+	    painter->setBrush(QBrush(QColor(0, 0, 0, 0)));
+	    const QRectF & rt = tileOverMouse->boundingRect();
+	    painter->drawRect(QRectF(rt.x(), rt.y(), rt.width() - 1, rt.height() - 1));
+	}
     }
 }
 
@@ -1994,7 +1971,7 @@ void MapData::removeCurrentObject(void)
 	if(! tileOverMouse->levels1().empty())
 	{
     	    // get uid from level 1 (last sprite)
-	    mapTiles.removeSprites(tileOverMouse->levels1().back()->uid());
+	    mapTiles.removeSprites(tileOverMouse->levels1().back().uid());
 	    update();
 	}
 
@@ -2026,14 +2003,14 @@ void MapData::editResourceDialog(const MapTile & tile)
     if(ext)
     {
 	MapResource* res = dynamic_cast<MapResource*>(mapObjects.find(tile.mapPos()).data());
-	Form::EditResourceDialog form(res ? res->type : MapTileExt::resource(ext), res ? res->count : 0);
+	Form::EditResourceDialog form(res ? res->type : MapTileExt::resource(*ext), res ? res->count : 0);
 
 	if(QDialog::Accepted == form.exec())
 	{
 	    if(form.checkBoxDefault->isChecked())
 		mapObjects.remove(tile.mapPos());
 	    else
-		mapObjects.push_back(new MapResource(tile.mapPos(), ext->uid(), MapTileExt::resource(ext), form.spinBoxCount->value()));
+		mapObjects.push_back(new MapResource(tile.mapPos(), ext->uid(), MapTileExt::resource(*ext), form.spinBoxCount->value()));
 
 	    emit dataModified();
 	}
