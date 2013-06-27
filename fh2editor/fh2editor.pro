@@ -3,16 +3,23 @@
 ######################################################################
 
 TEMPLATE = app
-TARGET = 
+TARGET =
 DEPENDPATH += .
 INCLUDEPATH += .
 QMAKE_LIBDIR += $(QTLIB)
 QT+= xml
+CONFIG += qt
 
 RESOURCES = resources.qrc
-FORMS += 
+FORMS +=
+
+win32-g++-cross {
+    CONFIG += console
+}
+
+linux-g++ {
+}
 
 # Input
 HEADERS += mainwindow.h mapwindow.h mapdata.h dialogs.h
 SOURCES += program.cpp engine.cpp mainwindow.cpp mapwindow.cpp mapdata.cpp dialogs.cpp global.cpp
-CONFIG += qt debug console

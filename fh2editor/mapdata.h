@@ -253,8 +253,6 @@ public:
     void		importMP2Signs(const QVector<H2::SignPos> &);
     void		importMP2MapEvents(const QVector<H2::EventPos> &);
     void		importMP2SphinxRiddles(const QVector<H2::SphinxPos> &);
-
-    void		addObject(const QPoint &, const CompositeObject &, quint32);
 };
 
 QDomElement & operator<< (QDomElement &, const MapArea &);
@@ -324,10 +322,13 @@ protected:
     void		drawForeground(QPainter*, const QRectF &);
     void		selectArea(QPointF, QPointF);
 
+    void               addMapObject(const QPoint &, const CompositeObject &, quint32);
+
     void		editMapEventDialog(const MapTile &);
     void		editResourceDialog(const MapTile &);
     void		editTownDialog(const MapTile &);
     void		editSignDialog(const MapTile &);
+    void		editSphinxDialog(const MapTile &);
     void		editHeroDialog(const MapTile &);
 
     bool		loadMapMP2(const QString &);

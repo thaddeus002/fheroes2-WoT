@@ -172,6 +172,7 @@ namespace Form
 	QAction*		delItemAct;
 
 	ItemsList(QWidget*);
+	QStringList		results(void) const;
 
     signals:
 	void			mousePressed(void);
@@ -194,6 +195,8 @@ namespace Form
     public:
 	RumorsList(QWidget*);
 
+	TavernRumors		results(void) const;
+
     protected slots:
 	void			addItem(void);
 	void			editItem(QListWidgetItem*);
@@ -207,6 +210,8 @@ namespace Form
 
      public:
 	DayEventsList(int, QWidget*);
+
+	DayEvents		results(void) const;
 
     protected slots:
 	void			addItem(void);
@@ -324,12 +329,12 @@ namespace Form
 	void			saveSettings(void);
     };
 
-    class RumorDialog : public QDialog
+    class MessageDialog : public QDialog
     {
         Q_OBJECT
 
     public:
-        RumorDialog(const QString & = QString());
+        MessageDialog(const QString & = QString());
 
         QVBoxLayout*		verticalLayout;
         QHBoxLayout*		horizontalLayout;
@@ -790,6 +795,77 @@ namespace Form
 
     public:
 	SelectSkillDialog(const Skill & = Skill());
+    };
+
+    class RiddlesList : public ItemsList
+    {
+	Q_OBJECT
+
+    public:
+	RiddlesList(QWidget*);
+
+    protected slots:
+	void			addItem(void);
+	void			editItem(QListWidgetItem*);
+    };
+
+    class MapSphinxDialog : public QDialog
+    {
+	Q_OBJECT
+
+    public:
+	MapSphinxDialog(const MapSphinx &);
+
+	QVBoxLayout*		verticalLayoutForm;
+	QTabWidget*		tabWidget;
+	QWidget*		tabGift;
+	QVBoxLayout*		verticalLayoutGift;
+	QVBoxLayout*		verticalLayoutResource;
+	QHBoxLayout*		horizontalLayoutWoodSulf;
+	QLabel*			labelResWood;
+	QSpinBox*		spinBoxResWood;
+	QSpacerItem*		horizontalSpacerWoodSulf;
+	QLabel*			labelResSulfur;
+	QSpinBox*		spinBoxResSulfur;
+        QHBoxLayout*		horizontalLayoutMercCryst;
+	QLabel*			labelResMercury;
+	QSpinBox*		spinBoxResMercury;
+	QSpacerItem*		horizontalSpacerMercCryst;
+	QLabel*			labelResCrystal;
+	QSpinBox*		spinBoxResCrystal;
+	QHBoxLayout*		horizontalLayoutOreGems;
+	QLabel*			labelResOre;
+	QSpinBox*		spinBoxResOre;
+	QSpacerItem*		horizontalSpacerOreGems;
+	QLabel*			labelResGems;
+	QSpinBox*		spinBoxResGems;
+	QHBoxLayout*		horizontalLayoutGold;
+	QSpacerItem*		horizontalSpacerGoldLeft;
+	QLabel*			labelResGold;
+	QSpinBox*		spinBoxResGold;
+	QSpacerItem*		horizontalSpacerGoldRight;
+	QHBoxLayout*		horizontalLayoutArtifact;
+	QLabel*			labelArtifact;
+	QComboBox*		comboBoxArtifact;
+	QGroupBox*              groupBoxResource;
+	QGroupBox*              groupBoxArtifact;
+	QWidget*		tabMessage;
+	QVBoxLayout*		verticalLayoutTabMsg;
+	QPlainTextEdit*		plainTextMessage;
+	QWidget*		tabAnswers;
+	RiddlesList*		listWidgetAnswers;
+	QVBoxLayout*		verticalLayoutAnswers;
+	QHBoxLayout*		horizontalLayoutButtons;
+	QPushButton*		pushButtonOk;
+	QSpacerItem*		horizontalSpacerButtons;
+	QPushButton*		pushButtonCancel;
+
+	MapSphinx		result(const QPoint &, quint32 uid) const;
+
+    protected slots:
+	void			setEnableOKButton(void);
+	void			setEnableOKButton(const QString &);
+	void			changeLabelArtifact(int);
     };
 
     class ObjectEventsList : public ItemsList

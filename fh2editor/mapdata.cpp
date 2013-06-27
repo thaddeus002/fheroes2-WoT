@@ -833,19 +833,6 @@ void MapArea::importMP2SphinxRiddles(const QVector<H2::SphinxPos> & sphinxes)
     }
 }
 
-void MapArea::addObject(const QPoint & pos, const CompositeObject & obj, quint32 uid)
-{
-    const QSize & tileSize = EditorTheme::tileSize();
-
-    for(CompositeObject::const_iterator
-	it = obj.begin(); it != obj.end(); ++it)
-    {
-	QPoint offset((*it).spritePos.x() * tileSize.width() + 1, (*it).spritePos.y() * tileSize.height() + 1);
-	MapTile* tile = tiles.mapToTile(pos + offset);
-	tile->addSpriteSection(obj, *it, uid);
-    }
-}
-
 void MapArea::importArea(const MapArea & area, const QPoint & dst)
 {
     QSize mapSize = area.tiles.mapSize();
@@ -1045,10 +1032,7 @@ void MapData::mousePressEvent(QGraphicsSceneMouseEvent* event)
     if(currentObject.isValid())
     {
 	if(event->buttons() & Qt::LeftButton)
-	{
-	    mapArea.addObject(currentObject.scenePos, currentObject, uniq());
-	    emit dataModified();
-	}
+	    addMapObject(currentObject.scenePos, currentObject, uniq());
 	else
 	    currentObject.reset();
 	update(currentObject.area());
@@ -1919,17 +1903,14 @@ void MapData::showMapOptions(void)
 	}
 
 	// tab3
-	tavernRumors.clear();
-	for(int pos = 0; pos < form.listWidgetRumors->count(); ++pos)
-	    tavernRumors << form.listWidgetRumors->item(pos)->text();
-
-	mapDayEvents.clear();
-	for(int pos = 0; pos < form.listWidgetEvents->count(); ++pos)
-	    mapDayEvents.push_back(qvariant_cast<DayEvent>(form.listWidgetEvents->item(pos)->data(Qt::UserRole)));
+	tavernRumors = form.listWidgetRumors->results();
+        mapDayEvents = form.listWidgetEvents->results();
 
 	// tab4
 	mapAuthors = form.plainTextEditAuthors->toPlainText();
         mapLicense = form.plainTextEditLicense->toPlainText();
+
+        emit dataModified();
     }
 }
 
@@ -1957,8 +1938,10 @@ void MapData::editObjectAttributes(void)
     	    case MapObj::RndCastle:
     	    case MapObj::RndTown:
     	    case MapObj::Castle:	editTownDialog(*tileOverMouse); break;
+    	    case MapObj::Bottle:
     	    case MapObj::Sign:		editSignDialog(*tileOverMouse); break;
     	    case MapObj::Heroes:	editHeroDialog(*tileOverMouse); break;
+	    case MapObj::Sphinx:	editSphinxDialog(*tileOverMouse); break;
 
     	    default:
 	    {
@@ -2061,6 +2044,23 @@ void MapData::editHeroDialog(const MapTile & tile)
     }
 }
 
+void MapData::editSphinxDialog(const MapTile & tile)
+{
+    MapSphinx* sphinx = dynamic_cast<MapSphinx*>(mapObjects.find(tile.mapPos()).data());
+
+    if(sphinx)
+    {
+	Form::MapSphinxDialog form(*sphinx);
+
+	if(QDialog::Accepted == form.exec())
+	{
+	    *sphinx = form.result(sphinx->pos(), sphinx->uid());
+
+	    emit dataModified();
+	}
+    }
+}
+
 void MapData::editSignDialog(const MapTile & tile)
 {
     MapSign* sign = dynamic_cast<MapSign*>(mapObjects.find(tile.mapPos()).data());
@@ -2076,4 +2076,44 @@ void MapData::editSignDialog(const MapTile & tile)
 	    emit dataModified();
 	}
     }
+}
+
+
+void MapData::addMapObject(const QPoint & pos, const CompositeObject & obj, quint32 uid)
+{
+    const QSize & tileSize = EditorTheme::tileSize();
+
+    // add sprites section
+    for(CompositeObject::const_iterator
+	it = obj.begin(); it != obj.end(); ++it)
+    {
+	QPoint offset((*it).spritePos.x() * tileSize.width() + 1, (*it).spritePos.y() * tileSize.height() + 1);
+	MapTile* tile = mapTiles.mapToTile(pos + offset);
+	tile->addSpriteSection(obj, *it, uid);
+
+	// add object info
+	if((*it).spriteLevel == SpriteLevel::Action)
+	{
+	    MapObject* objPtr = NULL;
+
+	    switch(obj.classId)
+	    {
+		case MapObj::Bottle:
+		case MapObj::Sign:	objPtr = new MapSign(tile->mapPos(), uid); break;
+    		case MapObj::Resource:	objPtr = new MapResource(tile->mapPos(), uid); break;
+		case MapObj::Event:	objPtr = new MapEvent(tile->mapPos(), uid); break;
+    		case MapObj::RndCastle:
+    		case MapObj::RndTown:
+    		case MapObj::Castle:	objPtr = new MapTown(tile->mapPos(), uid); break;
+    		case MapObj::Heroes:	objPtr = new MapHero(tile->mapPos(), uid); break;
+    		case MapObj::Sphinx:	objPtr = new MapSphinx(tile->mapPos(), uid); break;
+		default: break;
+	    }
+
+	    if(objPtr)
+		mapObjects.push_back(objPtr);
+	}
+    }
+
+    emit dataModified();
 }

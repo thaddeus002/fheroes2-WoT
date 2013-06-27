@@ -1051,6 +1051,16 @@ void Form::ItemsList::mousePressEvent(QMouseEvent* event)
     QListWidget::mousePressEvent(event);
 }
 
+QStringList Form::ItemsList::results(void) const
+{
+    QStringList res;
+
+    for(int pos = 0; pos < count(); ++pos)
+        res << item(pos)->text();
+
+    return res;
+}
+
 Form::RumorsList::RumorsList(QWidget* parent) : ItemsList(parent)
 {
     addItemAct->setStatusTip(tr("Add new rumor"));
@@ -1060,7 +1070,7 @@ Form::RumorsList::RumorsList(QWidget* parent) : ItemsList(parent)
 
 void Form::RumorsList::addItem(void)
 {
-    RumorDialog dialog;
+    MessageDialog dialog;
 
     if(QDialog::Accepted == dialog.exec())
     {
@@ -1071,10 +1081,20 @@ void Form::RumorsList::addItem(void)
 
 void Form::RumorsList::editItem(QListWidgetItem* item)
 {
-    RumorDialog dialog(item->text());
+    MessageDialog dialog(item->text());
 
     if(QDialog::Accepted == dialog.exec())
 	item->setText(dialog.plainText->toPlainText());
+}
+
+TavernRumors Form::RumorsList::results(void) const
+{
+    TavernRumors res;
+
+    for(int pos = 0; pos < count(); ++pos)
+	res.push_back(item(pos)->text());
+
+    return res;
 }
 
 Form::DayEventsList::DayEventsList(int colors, QWidget* parent) : ItemsList(parent), kingdomColors(colors)
@@ -1111,9 +1131,19 @@ void Form::DayEventsList::editItem(QListWidgetItem* item)
     }
 }
 
-Form::RumorDialog::RumorDialog(const QString & msg)
+DayEvents Form::DayEventsList::results(void) const
 {
-    setWindowTitle(QApplication::translate("RumorDialog", "Rumor Detail", 0, QApplication::UnicodeUTF8));
+    DayEvents res;
+
+    for(int pos = 0; pos < count(); ++pos)
+	res.push_back(qvariant_cast<DayEvent>(item(pos)->data(Qt::UserRole)));
+
+    return res;
+}
+
+Form::MessageDialog::MessageDialog(const QString & msg)
+{
+    setWindowTitle(QApplication::translate("MessageDialog", "Message Detail", 0, QApplication::UnicodeUTF8));
 
     plainText = new QPlainTextEdit(this);
     plainText->setPlainText(msg);
@@ -1122,13 +1152,13 @@ Form::RumorDialog::RumorDialog(const QString & msg)
     verticalLayout->addWidget(plainText);
 
     pushButtonOk = new QPushButton(this);
-    pushButtonOk->setText(QApplication::translate("RumorDialog", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setText(QApplication::translate("MessageDialog", "Ok", 0, QApplication::UnicodeUTF8));
     pushButtonOk->setEnabled(false);
 
     horizontalSpacer = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("RumorDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+    pushButtonCancel->setText(QApplication::translate("MessageDialog", "Cancel", 0, QApplication::UnicodeUTF8));
 
     horizontalLayout = new QHBoxLayout();
     horizontalLayout->addWidget(pushButtonOk);
@@ -1143,7 +1173,7 @@ Form::RumorDialog::RumorDialog(const QString & msg)
     connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
 }
 
-void Form::RumorDialog::enableButtonOk(void)
+void Form::MessageDialog::enableButtonOk(void)
 {
     pushButtonOk->setEnabled(! plainText->toPlainText().isEmpty());
 }
@@ -3269,6 +3299,291 @@ Form::SelectSkillDialog::SelectSkillDialog(const Skill & current)
     }
 
     if(current.isValid()) listWidget->setCurrentRow(3 * (current.skill() - 1) + (current.level() - 1));
+}
+
+Form::RiddlesList::RiddlesList(QWidget* parent) : ItemsList(parent)
+{
+    addItemAct->setStatusTip(tr("Add new riddle"));
+    editItemAct->setStatusTip(tr("Edit riddle"));
+    delItemAct->setStatusTip(tr("Delete riddle"));
+}
+
+void Form::RiddlesList::addItem(void)
+{
+    MessageDialog dialog;
+
+    if(QDialog::Accepted == dialog.exec())
+    {
+	QListWidget::addItem(dialog.plainText->toPlainText());
+	setCurrentRow(count() - 1);
+    }
+}
+
+void Form::RiddlesList::editItem(QListWidgetItem* item)
+{
+    MessageDialog dialog(item->text());
+
+    if(QDialog::Accepted == dialog.exec())
+	item->setText(dialog.plainText->toPlainText());
+}
+
+Form::MapSphinxDialog::MapSphinxDialog(const MapSphinx & sphinx)
+{
+    setWindowTitle(QApplication::translate("MapSphinxDialog", "Sphinx Detail", 0, QApplication::UnicodeUTF8));
+
+    // tab message
+    tabMessage = new QWidget();
+
+    plainTextMessage = new QPlainTextEdit(tabMessage);
+    plainTextMessage->setPlainText(sphinx.message);
+
+    verticalLayoutTabMsg = new QVBoxLayout(tabMessage);
+    verticalLayoutTabMsg->addWidget(plainTextMessage);
+
+    // tab resources
+    tabGift = new QWidget();
+
+    groupBoxResource = new QGroupBox(tabGift);
+    groupBoxResource->setTitle(QApplication::translate("MapSphinxDialog", "Resources", 0, QApplication::UnicodeUTF8));
+
+    const Resources & resources = sphinx.resources;
+    int resMin = -65535;
+    int resMax = 65535;
+
+    spinBoxResWood = new QSpinBox(groupBoxResource);
+    spinBoxResWood->setMinimum(resMin);
+    spinBoxResWood->setMaximum(resMax);
+    spinBoxResWood->setValue(resources.wood);
+
+    labelResWood = new QLabel(groupBoxResource);
+    labelResWood->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 0).first);
+    labelResWood->setBuddy(spinBoxResWood);
+
+    horizontalSpacerWoodSulf = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    spinBoxResSulfur = new QSpinBox(groupBoxResource);
+    spinBoxResSulfur->setMinimum(resMin);
+    spinBoxResSulfur->setMaximum(resMax);
+    spinBoxResSulfur->setValue(resources.sulfur);
+
+    labelResSulfur = new QLabel(groupBoxResource);
+    labelResSulfur->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 3).first);
+    labelResSulfur->setBuddy(spinBoxResSulfur);
+
+    horizontalLayoutWoodSulf = new QHBoxLayout();
+    horizontalLayoutWoodSulf->addWidget(labelResWood);
+    horizontalLayoutWoodSulf->addWidget(spinBoxResWood);
+    horizontalLayoutWoodSulf->addItem(horizontalSpacerWoodSulf);
+    horizontalLayoutWoodSulf->addWidget(labelResSulfur);
+    horizontalLayoutWoodSulf->addWidget(spinBoxResSulfur);
+
+    spinBoxResMercury = new QSpinBox(groupBoxResource);
+    spinBoxResMercury->setMinimum(resMin);
+    spinBoxResMercury->setMaximum(resMax);
+    spinBoxResMercury->setValue(resources.mercury);
+
+    labelResMercury = new QLabel(groupBoxResource);
+    labelResMercury->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 1).first);
+    labelResMercury->setBuddy(spinBoxResMercury);
+
+    horizontalSpacerMercCryst = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    spinBoxResCrystal = new QSpinBox(tabGift);
+    spinBoxResCrystal->setMinimum(resMin);
+    spinBoxResCrystal->setMaximum(resMax);
+    spinBoxResCrystal->setValue(resources.crystal);
+
+    labelResCrystal = new QLabel(groupBoxResource);
+    labelResCrystal->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 4).first);
+    labelResCrystal->setBuddy(spinBoxResCrystal);
+
+    horizontalLayoutMercCryst = new QHBoxLayout();
+    horizontalLayoutMercCryst->addWidget(labelResMercury);
+    horizontalLayoutMercCryst->addWidget(spinBoxResMercury);
+    horizontalLayoutMercCryst->addItem(horizontalSpacerMercCryst);
+    horizontalLayoutMercCryst->addWidget(labelResCrystal);
+    horizontalLayoutMercCryst->addWidget(spinBoxResCrystal);
+
+    spinBoxResOre = new QSpinBox(groupBoxResource);
+    spinBoxResOre->setMinimum(resMin);
+    spinBoxResOre->setMaximum(resMax);
+    spinBoxResOre->setValue(resources.ore);
+
+    labelResOre = new QLabel(groupBoxResource);
+    labelResOre->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 2).first);
+    labelResOre->setBuddy(spinBoxResOre);
+
+    horizontalSpacerOreGems = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    spinBoxResGems = new QSpinBox(groupBoxResource);
+    spinBoxResGems->setMinimum(resMin);
+    spinBoxResGems->setMaximum(resMax);
+    spinBoxResGems->setValue(resources.gems);
+
+    labelResGems = new QLabel(groupBoxResource);
+    labelResGems->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 5).first);
+    labelResGems->setBuddy(spinBoxResGems);
+
+    horizontalLayoutOreGems = new QHBoxLayout();
+    horizontalLayoutOreGems->addWidget(labelResOre);
+    horizontalLayoutOreGems->addWidget(spinBoxResOre);
+    horizontalLayoutOreGems->addItem(horizontalSpacerOreGems);
+    horizontalLayoutOreGems->addWidget(labelResGems);
+    horizontalLayoutOreGems->addWidget(spinBoxResGems);
+
+    horizontalSpacerGoldLeft = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    horizontalSpacerGoldRight= new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    spinBoxResGold = new QSpinBox(groupBoxResource);
+    spinBoxResGold->setMinimum(resMin);
+    spinBoxResGold->setMaximum(resMax);
+    spinBoxResGold->setValue(resources.gold);
+
+    labelResGold = new QLabel(groupBoxResource);
+    labelResGold->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 6).first);
+    labelResGold->setBuddy(spinBoxResGold);
+
+    horizontalLayoutGold = new QHBoxLayout();
+    horizontalLayoutGold->addItem(horizontalSpacerGoldLeft);
+    horizontalLayoutGold->addWidget(labelResGold);
+    horizontalLayoutGold->addWidget(spinBoxResGold);
+    horizontalLayoutGold->addItem(horizontalSpacerGoldRight);
+
+    verticalLayoutResource = new QVBoxLayout(groupBoxResource);
+    verticalLayoutResource->addLayout(horizontalLayoutWoodSulf);
+    verticalLayoutResource->addLayout(horizontalLayoutMercCryst);
+    verticalLayoutResource->addLayout(horizontalLayoutOreGems);
+    verticalLayoutResource->addLayout(horizontalLayoutGold);
+
+    groupBoxArtifact = new QGroupBox(tabGift);
+    groupBoxArtifact->setTitle(QApplication::translate("MapSphinxDialog", "Artifact to give", 0, QApplication::UnicodeUTF8));
+
+    labelArtifact = new QLabel(groupBoxArtifact);
+    changeLabelArtifact(sphinx.artifact);
+
+    comboBoxArtifact = new QComboBox(groupBoxArtifact);
+    for(int index = Artifact::None; index < Artifact::Unknown; ++index)
+	comboBoxArtifact->addItem(Artifact::transcribe(index), index);
+    comboBoxArtifact->setCurrentIndex(sphinx.artifact);
+
+    horizontalLayoutArtifact = new QHBoxLayout(groupBoxArtifact);
+    horizontalLayoutArtifact->addWidget(labelArtifact);
+    horizontalLayoutArtifact->addWidget(comboBoxArtifact);
+
+    verticalLayoutGift = new QVBoxLayout(tabGift);
+    verticalLayoutGift->addWidget(groupBoxResource);
+    verticalLayoutGift->addWidget(groupBoxArtifact);
+
+#ifndef QT_NO_TOOLTIP
+    labelResWood->setToolTip(QApplication::translate("MapSphinxDialog", "wood", 0, QApplication::UnicodeUTF8));
+    spinBoxResWood->setToolTip(QApplication::translate("MapSphinxDialog", "wood", 0, QApplication::UnicodeUTF8));
+    labelResSulfur->setToolTip(QApplication::translate("MapSphinxDialog", "sulfur", 0, QApplication::UnicodeUTF8));
+    spinBoxResSulfur->setToolTip(QApplication::translate("MapSphinxDialog", "sulfur", 0, QApplication::UnicodeUTF8));
+    labelResMercury->setToolTip(QApplication::translate("MapSphinxDialog", "mercury", 0, QApplication::UnicodeUTF8));
+    spinBoxResMercury->setToolTip(QApplication::translate("MapSphinxDialog", "mercury", 0, QApplication::UnicodeUTF8));
+    labelResCrystal->setToolTip(QApplication::translate("MapSphinxDialog", "crystal", 0, QApplication::UnicodeUTF8));
+    spinBoxResCrystal->setToolTip(QApplication::translate("MapSphinxDialog", "crystal", 0, QApplication::UnicodeUTF8));
+    labelResOre->setToolTip(QApplication::translate("MapSphinxDialog", "ore", 0, QApplication::UnicodeUTF8));
+    spinBoxResOre->setToolTip(QApplication::translate("MapSphinxDialog", "ore", 0, QApplication::UnicodeUTF8));
+    labelResGems->setToolTip(QApplication::translate("MapSphinxDialog", "gems", 0, QApplication::UnicodeUTF8));
+    spinBoxResGems->setToolTip(QApplication::translate("MapSphinxDialog", "gems", 0, QApplication::UnicodeUTF8));
+    labelResGold->setToolTip(QApplication::translate("MapSphinxDialog", "gold", 0, QApplication::UnicodeUTF8));
+    spinBoxResGold->setToolTip(QApplication::translate("MapSphinxDialog", "gold", 0, QApplication::UnicodeUTF8));
+#endif // QT_NO_TOOLTIP
+
+    // tab riddles
+    tabAnswers = new QWidget();
+    listWidgetAnswers = new RiddlesList(tabAnswers);
+    listWidgetAnswers->addItems(sphinx.answers);
+    verticalLayoutAnswers = new QVBoxLayout(tabAnswers);
+    verticalLayoutAnswers->addWidget(listWidgetAnswers);
+
+    // end
+    tabWidget = new QTabWidget(this);
+
+    tabWidget->addTab(tabMessage, "Message");
+    tabWidget->addTab(tabGift, "Gifts");
+    tabWidget->addTab(tabAnswers, "Answers");
+
+    pushButtonOk = new QPushButton(this);
+    pushButtonOk->setText(QApplication::translate("MapSphinxDialog", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setEnabled(false);
+
+    horizontalSpacerButtons = new QSpacerItem(238, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    pushButtonCancel = new QPushButton(this);
+    pushButtonCancel->setText(QApplication::translate("MapSphinxDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutButtons = new QHBoxLayout();
+    horizontalLayoutButtons->addWidget(pushButtonOk);
+    horizontalLayoutButtons->addItem(horizontalSpacerButtons);
+    horizontalLayoutButtons->addWidget(pushButtonCancel);
+
+    verticalLayoutForm = new QVBoxLayout(this);
+    verticalLayoutForm->addWidget(tabWidget);
+    verticalLayoutForm->addLayout(horizontalLayoutButtons);
+
+    tabWidget->setCurrentIndex(0);
+
+    QSize minSize = minimumSizeHint();
+
+    resize(minSize);
+    setMinimumSize(minSize);
+
+    connect(spinBoxResWood, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(spinBoxResMercury, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(spinBoxResOre, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(spinBoxResSulfur, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(spinBoxResCrystal, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(spinBoxResGems, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(spinBoxResGold, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(comboBoxArtifact , SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
+    connect(comboBoxArtifact , SIGNAL(currentIndexChanged(int)), this, SLOT(changeLabelArtifact(int)));
+
+    connect(plainTextMessage, SIGNAL(textChanged()), this, SLOT(setEnableOKButton()));
+
+    connect(listWidgetAnswers->addItemAct, SIGNAL(triggered()), this, SLOT(setEnableOKButton()));
+    connect(listWidgetAnswers->editItemAct, SIGNAL(triggered()), this, SLOT(setEnableOKButton()));
+    connect(listWidgetAnswers->delItemAct, SIGNAL(triggered()), this, SLOT(setEnableOKButton()));
+
+    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
+}
+
+void Form::MapSphinxDialog::setEnableOKButton(void)
+{
+    pushButtonOk->setEnabled(true);
+}
+
+void Form::MapSphinxDialog::setEnableOKButton(const QString & val)
+{
+    Q_UNUSED(val);
+    pushButtonOk->setEnabled(true);
+}
+
+void Form::MapSphinxDialog::changeLabelArtifact(int index)
+{
+    labelArtifact->setPixmap(EditorTheme::getImageICN("ARTIFACT.ICN", index).first.scaled(48, 48));
+    labelArtifact->setToolTip(Artifact::transcribe(index));
+}
+
+MapSphinx Form::MapSphinxDialog::result(const QPoint & pos, quint32 uid) const
+{
+    MapSphinx res(pos, uid);
+
+    res.resources.wood = spinBoxResWood->value();
+    res.resources.mercury = spinBoxResMercury->value();
+    res.resources.ore = spinBoxResOre->value();
+    res.resources.sulfur = spinBoxResSulfur->value();
+    res.resources.crystal = spinBoxResCrystal->value();
+    res.resources.gems = spinBoxResGems->value();
+    res.resources.gold = spinBoxResGold->value();
+
+    res.artifact = comboBoxArtifact->currentIndex();
+    res.message = plainTextMessage->toPlainText();
+    res.answers = listWidgetAnswers->results();
+
+    return res;
 }
 
 Form::ObjectEventsDialog::ObjectEventsDialog()
