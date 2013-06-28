@@ -3187,3 +3187,18 @@ QDomElement & operator>> (QDomElement & el, GameCondition & cond)
 
     return el;
 }
+
+QString Resources::describe(void) const
+{
+    QStringList list;
+
+    if(wood)	list << QString("wood(").append(QString::number(wood)).append(")");
+    if(mercury)	list << QString("mercury(").append(QString::number(mercury)).append(")");
+    if(ore)	list << QString("ore(").append(QString::number(ore)).append(")");
+    if(sulfur)	list << QString("sulfur(").append(QString::number(sulfur)).append(")");
+    if(crystal)	list << QString("crystal(").append(QString::number(crystal)).append(")");
+    if(gems)	list << QString("gems(").append(QString::number(gems)).append(")");
+    if(gold)	list << QString("gold(").append(QString::number(gold)).append(")");
+
+    return list.join(",");
+}

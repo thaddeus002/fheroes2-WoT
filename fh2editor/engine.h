@@ -593,6 +593,8 @@ struct resources_t
 struct Resources : public resources_t
 {
     Resources(){ wood = 0; mercury = 0; ore = 0; sulfur = 0; crystal = 0; gems = 0; gold = 0; }
+
+    QString	describe(void) const;
 };
 
 struct MonsterStat
@@ -609,6 +611,17 @@ struct MonsterStat
 };
 
 Q_DECLARE_METATYPE(Resources);
+
+struct TypeVariant
+{
+    int		type;
+    QVariant	variant;
+
+    TypeVariant() : type(-1), variant() {}
+    TypeVariant(const int & t, const QVariant & v) : type(t), variant(v) {}
+};
+
+Q_DECLARE_METATYPE(TypeVariant);
 
 class MapObject : public QPoint
 {

@@ -1034,10 +1034,14 @@ void Form::ItemsList::deleteCurrentItem(void)
     emit listChanged();
 }
 
+void Form::ItemsList::setCurrentItem(int row)
+{
+    setCurrentRow(row);
+    emit listChanged();
+}
+
 void Form::ItemsList::mousePressEvent(QMouseEvent* event)
 {
-    emit mousePressed();
-
     if(event->buttons() & Qt::RightButton)
     {
 	QMenu menu(this);
@@ -1048,6 +1052,8 @@ void Form::ItemsList::mousePressEvent(QMouseEvent* event)
     event->accept();
 
     QListWidget::mousePressEvent(event);
+
+    emit mousePressed();
 }
 
 void Form::ItemsList::createMenuItems(QMenu* menu)
@@ -1086,7 +1092,7 @@ void Form::RumorsList::addItem(void)
 
     if(QDialog::Accepted == dialog.exec())
     {
-	QListWidget::addItem(dialog.result());
+	QListWidget::addItem(dialog.message());
 	setCurrentRow(count() - 1);
     }
 }
@@ -1096,7 +1102,7 @@ void Form::RumorsList::editItem(QListWidgetItem* item)
     MessageDialog dialog(item->text());
 
     if(QDialog::Accepted == dialog.exec())
-	item->setText(dialog.result());
+	item->setText(dialog.message());
 }
 
 TavernRumors Form::RumorsList::results(void) const
@@ -1190,7 +1196,7 @@ void Form::MessageDialog::enableButtonOk(void)
     pushButtonOk->setEnabled(! plainText->toPlainText().isEmpty());
 }
 
-QString Form::MessageDialog::result(void) const
+QString Form::MessageDialog::message(void) const
 {
     return plainText->toPlainText();
 }
@@ -3300,7 +3306,7 @@ void Form::RiddlesList::addItem(void)
 
     if(QDialog::Accepted == dialog.exec())
     {
-	QListWidget::addItem(dialog.plainText->toPlainText());
+	QListWidget::addItem(dialog.message());
 	setCurrentRow(count() - 1);
     }
 }
@@ -3310,7 +3316,7 @@ void Form::RiddlesList::editItem(QListWidgetItem* item)
     MessageDialog dialog(item->text());
 
     if(QDialog::Accepted == dialog.exec())
-	item->setText(dialog.plainText->toPlainText());
+	item->setText(dialog.message());
 }
 
 Form::MapSphinxDialog::MapSphinxDialog(const MapSphinx & sphinx)
@@ -3461,6 +3467,61 @@ Form::ObjectEventsDialog::ObjectEventsDialog()
 
     connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
     connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(pushButtonUp, SIGNAL(clicked()), this, SLOT(moveCurrentItemUp()));
+    connect(pushButtonDown, SIGNAL(clicked()), this, SLOT(moveCurrentItemDown()));
+    connect(listWidgetEvents, SIGNAL(mousePressed()), this, SLOT(checkUpDownButtons()));
+    connect(listWidgetEvents, SIGNAL(listChanged()), this, SLOT(setEnableOKButton()));
+}
+
+void Form::ObjectEventsDialog::checkUpDownButtons(void)
+{
+    int row = listWidgetEvents->currentRow();
+
+    if(0 <=row)
+    {
+	pushButtonUp->setEnabled(0 != row);
+	pushButtonDown->setEnabled(listWidgetEvents->count() - 1 != row);
+    }
+}
+
+void Form::ObjectEventsDialog::moveCurrentItemUp(void)
+{
+    int row = listWidgetEvents->currentRow();
+
+    if(0 <=row)
+    {
+	QListWidgetItem* crnt = listWidgetEvents->item(row);
+	QListWidgetItem* next = listWidgetEvents->item(row - 1);
+
+	if(next)
+	{
+	    qSwap(*crnt, *next);
+	    listWidgetEvents->setCurrentItem(row - 1);
+	}
+    }
+}
+
+void Form::ObjectEventsDialog::moveCurrentItemDown(void)
+{
+    int row = listWidgetEvents->currentRow();
+
+    if(0 <=row)
+    {
+	QListWidgetItem* crnt = listWidgetEvents->item(row);
+	QListWidgetItem* next = listWidgetEvents->item(row + 1);
+
+	if(next)
+	{
+	    qSwap(*crnt, *next);
+	    listWidgetEvents->setCurrentItem(row + 1);
+	}
+    }
+}
+
+void Form::ObjectEventsDialog::setEnableOKButton(void)
+{
+    checkUpDownButtons();
+    pushButtonOk->setEnabled(true);
 }
 
 Form::ObjectEventsList::ObjectEventsList(QWidget* parent) : ItemsList(parent)
@@ -3507,6 +3568,7 @@ void Form::ObjectEventsList::addEventsAction(QAction* act)
     if(act)
     {
         int type = act->data().toInt();
+	QListWidgetItem* item = NULL;
 
 	switch(type)
 	{
@@ -3519,7 +3581,9 @@ void Form::ObjectEventsList::addEventsAction(QAction* act)
 	        MessageDialog dialog;
 		if(QDialog::Accepted == dialog.exec())
 		{
-		    // dialog.result();
+		    item = new QListWidgetItem();
+		    item->setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(dialog.message()))));
+		    item->setText(QString("message - ").append(dialog.message()));
 		}
 	    }
 	    break;
@@ -3529,7 +3593,9 @@ void Form::ObjectEventsList::addEventsAction(QAction* act)
 	        ResourcesDialog dialog;
 		if(QDialog::Accepted == dialog.exec())
 		{
-		    // dialog.result();
+		    item = new QListWidgetItem();
+		    item->setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(dialog.resources()))));
+		    item->setText(QString("resources - ").append(dialog.resources().describe()));
 		}
 	    }
 	    break;
@@ -3539,12 +3605,26 @@ void Form::ObjectEventsList::addEventsAction(QAction* act)
 	        ArtifactDialog dialog;
 		if(QDialog::Accepted == dialog.exec())
 		{
-		    // dialog.result();
+		    item = new QListWidgetItem();
+		    item->setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(dialog.artifact()))));
+		    item->setText(QString("artifact - ").append(Artifact::transcribe(dialog.artifact())));
 		}
 	    }
 	    break;
+	    // troops
+	    case 5:
+	    break;
+	    // action
+	    case 6:
+	    break;
 	    // unknown
 	    default: break;
+	}
+
+	if(item)
+	{
+    	    QListWidget::addItem(item);
+    	    setCurrentItem(count() - 1);
 	}
     }
 }
@@ -3556,12 +3636,55 @@ bool Form::ObjectEventsList::limit(void) const
 
 void Form::ObjectEventsList::editItem(QListWidgetItem* item)
 {
-/*
-    SelectSkillDialog dialog(qvariant_cast<Skill>(item->data(Qt::UserRole)));
+    TypeVariant data = qvariant_cast<TypeVariant>(item->data(Qt::UserRole));
 
-    if(QDialog::Accepted == dialog.exec())
-	*item = *dialog.listWidget->currentItem();
-*/
+    switch(data.type)
+    {
+	// access
+	case 1:
+	break;
+	// message
+	case 2:
+	{
+	    MessageDialog dialog(qvariant_cast<QString>(data.variant));
+	    if(QDialog::Accepted == dialog.exec())
+	    {
+		item->setData(Qt::UserRole, QVariant::fromValue(TypeVariant(data.type, QVariant::fromValue(dialog.message()))));
+		item->setText(QString("message - ").append(dialog.message()));
+	    }
+	}
+	break;
+	// resources
+	case 3:
+	{
+	    ResourcesDialog dialog(qvariant_cast<Resources>(data.variant));
+	    if(QDialog::Accepted == dialog.exec())
+	    {
+		item->setData(Qt::UserRole, QVariant::fromValue(TypeVariant(data.type, QVariant::fromValue(dialog.resources()))));
+		item->setText(QString("resources - ").append(dialog.resources().describe()));
+	    }
+	}
+	break;
+	// artifact
+	case 4:
+	{
+	    ArtifactDialog dialog(qvariant_cast<int>(data.variant));
+	    if(QDialog::Accepted == dialog.exec())
+	    {
+		item->setData(Qt::UserRole, QVariant::fromValue(TypeVariant(data.type, QVariant::fromValue(dialog.artifact()))));
+		item->setText(QString("artifact - ").append(Artifact::transcribe(dialog.artifact())));
+	    }
+	}
+	break;
+	// troops
+	case 5:
+	break;
+	// action
+	case 6:
+	break;
+	// unknown
+	default: break;
+    }
 }
 
 void Form::ObjectEventsList::checkLimit(void)

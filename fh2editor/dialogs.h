@@ -178,6 +178,7 @@ namespace Form
 	virtual void		addItem(void) = 0;
 	virtual void		editItem(QListWidgetItem*) = 0;
 	virtual void		checkLimit(void) {}
+	void			setCurrentItem(int);
 
     signals:
 	void			mousePressed(void);
@@ -446,7 +447,7 @@ namespace Form
         QPushButton*		pushButtonCancel;
 	QPlainTextEdit*		plainText;
 
-	QString			result(void) const;
+	QString			message(void) const;
 
     protected slots:
 	void			enableButtonOk(void);
@@ -934,6 +935,12 @@ namespace Form
 	QPushButton*		pushButtonOk;
 	QSpacerItem*		horizontalSpacerButtons;
 	QPushButton*		pushButtonCancel;
+
+    protected slots:
+	void			checkUpDownButtons(void);
+	void			setEnableOKButton(void);
+	void			moveCurrentItemUp(void);
+	void			moveCurrentItemDown(void);
     };
 }
 
