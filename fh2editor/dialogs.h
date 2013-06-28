@@ -29,6 +29,7 @@
 #include <QLabel>
 #include <QVariant>
 #include <QListWidget>
+#include <QVBoxLayout>
 #include "engine.h"
 
 QT_BEGIN_NAMESPACE
@@ -174,18 +175,23 @@ namespace Form
 	ItemsList(QWidget*);
 	QStringList		results(void) const;
 
+	virtual void		addItem(void) = 0;
+	virtual void		editItem(QListWidgetItem*) = 0;
+	virtual void		checkLimit(void) {}
+
     signals:
 	void			mousePressed(void);
 	void			listChanged(void);
 
     protected slots:
-	virtual void		addItem(void) = 0;
-	virtual void		editItem(QListWidgetItem*) = 0;
+	void			addNewItem(void);
 	void			editCurrentItem(void);
 	void			deleteCurrentItem(void);
+	void			slotCheckLimit(void);
 
     protected:
 	void			mousePressEvent(QMouseEvent*);
+	virtual void		createMenuItems(QMenu*);
     };
 
     class RumorsList : public ItemsList
@@ -197,7 +203,6 @@ namespace Form
 
 	TavernRumors		results(void) const;
 
-    protected slots:
 	void			addItem(void);
 	void			editItem(QListWidgetItem*);
     };
@@ -213,7 +218,6 @@ namespace Form
 
 	DayEvents		results(void) const;
 
-    protected slots:
 	void			addItem(void);
 	void			editItem(QListWidgetItem*);
     };
@@ -237,6 +241,105 @@ namespace Form
     protected:
 	void			updatePlayers(void);
 	void			mousePressEvent(QMouseEvent*);
+    };
+
+    class ArtifactLayout : public QVBoxLayout
+    {
+        Q_OBJECT
+
+    public:
+	ArtifactLayout(QWidget*, int = Artifact::None);
+
+        QLabel*                 labelArtifact;
+        QComboBox*              comboBoxArtifact;
+        QHBoxLayout*		horizontalLayout;
+
+        int                     result(void) const;
+
+    signals:
+        void                    formChanged(void);
+
+    protected slots:
+        void                    changeLabelArtifact(int);
+        void                    setFormChanged(void);
+    };
+
+    class ArtifactDialog : public QDialog
+    {
+        Q_OBJECT
+
+    public:
+        ArtifactDialog(int = Artifact::None);
+
+        ArtifactLayout*		artifactLayout;
+        QHBoxLayout*		horizontalLayout;
+        QPushButton*		pushButtonOk;
+        QSpacerItem*		horizontalSpacer;
+        QPushButton*		pushButtonCancel;
+
+        int               	artifact(void) const;
+
+    protected slots:
+	void			enableButtonOk(void);
+    };
+
+    class ResourcesLayout : public QVBoxLayout
+    {
+        Q_OBJECT
+
+    public:
+	ResourcesLayout(QWidget*, const Resources &);
+
+        QHBoxLayout*            horizontalLayoutWoodSulfur;
+        QLabel*                 labelResWood;
+        QSpinBox*               spinBoxResWood;
+        QSpacerItem*            horizontalSpacerWoodSulfur;
+        QLabel*                 labelResSulfur;
+        QSpinBox*               spinBoxResSulfur;
+        QHBoxLayout*            horizontalLayoutMercuryCristal;
+        QLabel*                 labelResMercury;
+        QSpinBox*               spinBoxResMercury;
+        QSpacerItem*            horizontalSpacerMercuryCristal;
+        QLabel*                 labelResCrystal;
+        QSpinBox*               spinBoxResCrystal;
+        QHBoxLayout*            horizontalLayoutOreGems;
+        QLabel*                 labelResOre;
+        QSpinBox*               spinBoxResOre;
+        QSpacerItem*            horizontalSpacerOreGems;
+        QLabel*                 labelResGems;
+        QSpinBox*               spinBoxResGems;
+        QHBoxLayout*            horizontalLayoutGold;
+        QSpacerItem*            horizontalSpacerGoldLeft;
+        QLabel*                 labelResGold;
+        QSpinBox*               spinBoxResGold;
+        QSpacerItem*            horizontalSpacerGoldRight;
+
+        Resources               result(void) const;
+
+    signals:
+        void                    formChanged(void);
+
+    protected slots:
+        void                    setFormChanged(void);
+    };
+
+    class ResourcesDialog : public QDialog
+    {
+        Q_OBJECT
+
+    public:
+        ResourcesDialog(const Resources & = Resources());
+
+        ResourcesLayout*	resourcesLayout;
+        QHBoxLayout*		horizontalLayout;
+        QPushButton*		pushButtonOk;
+        QSpacerItem*		horizontalSpacer;
+        QPushButton*		pushButtonCancel;
+
+        Resources               resources(void) const;
+
+    protected slots:
+	void			enableButtonOk(void);
     };
 
     class MapOptions : public QDialog
@@ -343,6 +446,8 @@ namespace Form
         QPushButton*		pushButtonCancel;
 	QPlainTextEdit*		plainText;
 
+	QString			result(void) const;
+
     protected slots:
 	void			enableButtonOk(void);
     };
@@ -393,30 +498,7 @@ namespace Form
 	QVector<PlayerAllow*>	labelPlayers;
 	QCheckBox*		checkBoxAllowComp;
 	QWidget*		tabResource;
-	QVBoxLayout*		verticalLayout4;
-	QHBoxLayout*		horizontalLayout5;
-	QLabel*			labelResWood;
-	QSpinBox*		spinBoxResWood;
-	QSpacerItem*		horizontalSpacer2;
-	QLabel*			labelResSulfur;
-	QSpinBox*		spinBoxResSulfur;
-        QHBoxLayout*		horizontalLayout6;
-	QLabel*			labelResMercury;
-	QSpinBox*		spinBoxResMercury;
-	QSpacerItem*		horizontalSpacer3;
-	QLabel*			labelResCrystal;
-	QSpinBox*		spinBoxResCrystal;
-	QHBoxLayout*		horizontalLayout7;
-	QLabel*			labelResOre;
-	QSpinBox*		spinBoxResOre;
-	QSpacerItem*		horizontalSpacer4;
-	QLabel*			labelResGems;
-	QSpinBox*		spinBoxResGems;
-	QHBoxLayout*		horizontalLayout8;
-	QSpacerItem*		horizontalSpacer5;
-	QLabel*			labelResGold;
-	QSpinBox*		spinBoxResGold;
-	QSpacerItem*		horizontalSpacer6;
+	ResourcesLayout*	resourcesLayout;
 	QWidget*		tabMessage;
 	QVBoxLayout*		verticalLayout5;
 	QPlainTextEdit*		plainTextMessage;
@@ -489,34 +571,9 @@ namespace Form
 	QCheckBox*		checkBoxAllowComp;
 	QCheckBox*		checkBoxCancelAfterFirstVisit;
 	QWidget*		tabGift;
+	ResourcesLayout*	resourcesLayout;
 	QVBoxLayout*		verticalLayoutGift;
-	QVBoxLayout*		verticalLayoutResource;
-	QHBoxLayout*		horizontalLayoutWoodSulf;
-	QLabel*			labelResWood;
-	QSpinBox*		spinBoxResWood;
-	QSpacerItem*		horizontalSpacerWoodSulf;
-	QLabel*			labelResSulfur;
-	QSpinBox*		spinBoxResSulfur;
-        QHBoxLayout*		horizontalLayoutMercCryst;
-	QLabel*			labelResMercury;
-	QSpinBox*		spinBoxResMercury;
-	QSpacerItem*		horizontalSpacerMercCryst;
-	QLabel*			labelResCrystal;
-	QSpinBox*		spinBoxResCrystal;
-	QHBoxLayout*		horizontalLayoutOreGems;
-	QLabel*			labelResOre;
-	QSpinBox*		spinBoxResOre;
-	QSpacerItem*		horizontalSpacerOreGems;
-	QLabel*			labelResGems;
-	QSpinBox*		spinBoxResGems;
-	QHBoxLayout*		horizontalLayoutGold;
-	QSpacerItem*		horizontalSpacerGoldLeft;
-	QLabel*			labelResGold;
-	QSpinBox*		spinBoxResGold;
-	QSpacerItem*		horizontalSpacerGoldRight;
-	QHBoxLayout*		horizontalLayoutArtifact;
-	QLabel*			labelArtifact;
-	QComboBox*		comboBoxArtifact;
+	ArtifactLayout*		artifactLayout;
 	QGroupBox*              groupBoxResource;
 	QGroupBox*              groupBoxArtifact;
 	QWidget*		tabMessage;
@@ -531,8 +588,6 @@ namespace Form
 
     protected slots:
 	void			setEnableOKButton(void);
-	void			setEnableOKButton(const QString &);
-	void			changeLabelArtifact(int);
     };
 
 
@@ -663,7 +718,6 @@ namespace Form
 
 	bool			limit(void) const;
 
-    protected slots:
 	void			addItem(void);
 	void			editItem(QListWidgetItem*);
 	void			checkLimit(void);
@@ -678,7 +732,6 @@ namespace Form
 
 	bool			limit(void) const;
 
-    protected slots:
 	void			addItem(void);
 	void			editItem(QListWidgetItem*);
 	void			checkLimit(void);
@@ -804,7 +857,6 @@ namespace Form
     public:
 	RiddlesList(QWidget*);
 
-    protected slots:
 	void			addItem(void);
 	void			editItem(QListWidgetItem*);
     };
@@ -819,34 +871,9 @@ namespace Form
 	QVBoxLayout*		verticalLayoutForm;
 	QTabWidget*		tabWidget;
 	QWidget*		tabGift;
+	ResourcesLayout*	resourcesLayout;
 	QVBoxLayout*		verticalLayoutGift;
-	QVBoxLayout*		verticalLayoutResource;
-	QHBoxLayout*		horizontalLayoutWoodSulf;
-	QLabel*			labelResWood;
-	QSpinBox*		spinBoxResWood;
-	QSpacerItem*		horizontalSpacerWoodSulf;
-	QLabel*			labelResSulfur;
-	QSpinBox*		spinBoxResSulfur;
-        QHBoxLayout*		horizontalLayoutMercCryst;
-	QLabel*			labelResMercury;
-	QSpinBox*		spinBoxResMercury;
-	QSpacerItem*		horizontalSpacerMercCryst;
-	QLabel*			labelResCrystal;
-	QSpinBox*		spinBoxResCrystal;
-	QHBoxLayout*		horizontalLayoutOreGems;
-	QLabel*			labelResOre;
-	QSpinBox*		spinBoxResOre;
-	QSpacerItem*		horizontalSpacerOreGems;
-	QLabel*			labelResGems;
-	QSpinBox*		spinBoxResGems;
-	QHBoxLayout*		horizontalLayoutGold;
-	QSpacerItem*		horizontalSpacerGoldLeft;
-	QLabel*			labelResGold;
-	QSpinBox*		spinBoxResGold;
-	QSpacerItem*		horizontalSpacerGoldRight;
-	QHBoxLayout*		horizontalLayoutArtifact;
-	QLabel*			labelArtifact;
-	QComboBox*		comboBoxArtifact;
+	ArtifactLayout*		artifactLayout;
 	QGroupBox*              groupBoxResource;
 	QGroupBox*              groupBoxArtifact;
 	QWidget*		tabMessage;
@@ -864,8 +891,6 @@ namespace Form
 
     protected slots:
 	void			setEnableOKButton(void);
-	void			setEnableOKButton(const QString &);
-	void			changeLabelArtifact(int);
     };
 
     class ObjectEventsList : public ItemsList
@@ -877,10 +902,17 @@ namespace Form
 
 	bool			limit(void) const;
 
-    protected slots:
-	void			addItem(void);
+	void			addItem(void){}
 	void			editItem(QListWidgetItem*);
 	void			checkLimit(void);
+
+    protected slots:
+	void			addEventsAction(QAction*);
+
+    protected:
+	void			createMenuItems(QMenu*);
+
+	QActionGroup*		eventsGroupAct;
     };
 
     class ObjectEventsDialog : public QDialog
