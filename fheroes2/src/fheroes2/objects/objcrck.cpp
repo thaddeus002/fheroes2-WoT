@@ -28,7 +28,6 @@
 
 u16 ObjCrck::GetPassable(const u8 & index)
 {
-
     const u8 disabled[] = { 58, 59, 63, 64, 65, 76, 77, 78, 80, 91, 102, 113, 124,
 	    135, 182, 183, 185, 221, 222, 223, 227, 228, 229, 230, 238, 241, 242, 245 };
     const u8 restricted[] = { 5, 6, 10, 11, 14, 16, 17, 18, 21, 22, 24, 25, 29, 30, 31, 32, 34,
@@ -80,6 +79,8 @@ u8 ObjCrck::GetActionObject(const u8 & index)
 	case 74:	return MP2::OBJ_WAGON;
 	case 189:	return MP2::OBJ_TROLLBRIDGE;
 	case 213:	return MP2::OBJ_TRADINGPOST;
+	case 217: case 218: case 219:
+	case 220:	return MP2::OBJ_WATERINGHOLE;
 	case 238:	return MP2::OBJ_OBELISK;
 	case 245:	return MP2::OBJ_SAWMILL;
     }

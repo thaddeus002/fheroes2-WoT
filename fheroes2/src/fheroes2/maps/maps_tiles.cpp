@@ -127,10 +127,10 @@ Maps::TilesAddon::TilesAddon(u8 lv, u32 gid, u8 obj, u8 ii) : uniq(gid), level(l
 {
 }
 
-std::string Maps::TilesAddon::String(int level) const
+std::string Maps::TilesAddon::String(int lvl) const
 {
     std::ostringstream os;
-    os << "----------------" << level << "--------" << std::endl <<
+    os << "----------------" << lvl << "--------" << std::endl <<
 	  "object          : " << "0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(object) <<
 				", (" << ICN::GetString(MP2::GetICNObject(object)) << ")" << std::endl <<
 	  "index           : " << std::dec << static_cast<int>(index) << std::endl <<
