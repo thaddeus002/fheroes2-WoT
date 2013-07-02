@@ -1238,38 +1238,162 @@ void Form::PlayerAllow::updatePlayers(void)
     setPixmap(pix);
 }
 
-Form::ArtifactLayout::ArtifactLayout(QWidget* parent, int artifact) : QVBoxLayout(parent)
+Form::AccessGroup::AccessGroup(QWidget* parent, int kingdomColors, int checkedColors) : QGroupBox(parent)
 {
-    labelArtifact = new QLabel(parent);
+    setFlat(true);
+
+    horizontalLayoutPlayers = new QHBoxLayout();
+    horizontalSpacerPlayersLeft = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    horizontalSpacerPlayersRight = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    horizontalLayoutPlayers->addItem(horizontalSpacerPlayersLeft);
+
+    // create allow players labels
+    QVector<int> colors = Color::colors(Color::All);
+
+    for(QVector<int>::const_iterator
+	it = colors.begin(); it != colors.end(); ++it)
+    if((*it) & kingdomColors)
+    {
+	labelPlayers.push_back(new PlayerAllow(*it, (*it) & checkedColors, this));
+	horizontalLayoutPlayers->addWidget(labelPlayers.back());
+    }
+    horizontalLayoutPlayers->addItem(horizontalSpacerPlayersRight);
+
+    checkBoxAllowComp = new QCheckBox(this);
+    checkBoxAllowComp->setLayoutDirection(Qt::LeftToRight);
+    checkBoxAllowComp->setText(QApplication::translate("AccessGroup", "Allow computer", 0, QApplication::UnicodeUTF8));
+
+    checkBoxCancelAfterFirstVisit = new QCheckBox(this);
+    checkBoxCancelAfterFirstVisit->setLayoutDirection(Qt::LeftToRight);
+    checkBoxCancelAfterFirstVisit->setText(QApplication::translate("AccessGroup", "Cancel after first visit", 0, QApplication::UnicodeUTF8));
+
+    verticalLayoutAllowCols = new QVBoxLayout(this);
+    verticalLayoutAllowCols->addLayout(horizontalLayoutPlayers);
+    verticalLayoutAllowCols->addWidget(checkBoxAllowComp);
+    verticalLayoutAllowCols->addWidget(checkBoxCancelAfterFirstVisit);
+
+   for(QVector<PlayerAllow*>::const_iterator
+        it = labelPlayers.begin(); it != labelPlayers.end(); ++it)
+        connect(*it, SIGNAL(mousePressed()), this, SLOT(setFormChanged()));
+}
+
+void Form::AccessGroup::setFormChanged(void)
+{
+    emit formChanged();
+}
+
+void Form::AccessGroup::setAllowComputer(bool f)
+{
+    checkBoxAllowComp->setChecked(f);
+}
+
+void Form::AccessGroup::setCancelAfterFirstVisit(bool f)
+{
+    checkBoxCancelAfterFirstVisit->setChecked(f);
+}
+
+int Form::AccessGroup::colors(void) const
+{
+    int res = 0;
+
+    for(QVector<PlayerAllow*>::const_iterator
+        it = labelPlayers.begin(); it != labelPlayers.end(); ++it)
+    if((*it)->allow())
+    {
+        res |= (*it)->color();
+    }
+
+    return res;
+}
+
+bool Form::AccessGroup::allowComputer(void) const
+{
+    return checkBoxAllowComp->isChecked();
+}
+
+bool Form::AccessGroup::cancelAfterFirstVisit(void) const
+{
+    return checkBoxCancelAfterFirstVisit->isChecked();
+}
+
+Form::AccessDialog::AccessDialog(int kingdomColors, int checkedColors, bool allowComp, bool cancelAfterVisit)
+{
+    setWindowTitle(QApplication::translate("AccessDialog", "Access", 0, QApplication::UnicodeUTF8));
+
+    accessGroup = new AccessGroup(this, kingdomColors, checkedColors);
+    accessGroup->setAllowComputer(allowComp);
+    accessGroup->setCancelAfterFirstVisit(cancelAfterVisit);
+
+    pushButtonOk = new QPushButton(this);
+    pushButtonOk->setText(QApplication::translate("AccessDialog", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setEnabled(false);
+
+    horizontalSpacer = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    pushButtonCancel = new QPushButton(this);
+    pushButtonCancel->setText(QApplication::translate("AccessDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+
+    buttonsLayout = new QHBoxLayout();
+    buttonsLayout->addWidget(pushButtonOk);
+    buttonsLayout->addItem(horizontalSpacer);
+    buttonsLayout->addWidget(pushButtonCancel);
+
+    formLayout = new QVBoxLayout(this);
+    formLayout->addWidget(accessGroup);
+    formLayout->addLayout(buttonsLayout);
+
+    QSize minSize = minimumSizeHint();
+
+    resize(minSize);
+    setMinimumSize(minSize);
+
+    connect(accessGroup, SIGNAL(formChanged()), this, SLOT(enableButtonOk()));
+    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
+}
+
+void Form::AccessDialog::enableButtonOk(void)
+{
+    pushButtonOk->setEnabled(true);
+}
+
+AccessResult Form::AccessDialog::result(void) const
+{
+    return AccessResult(accessGroup->colors(), accessGroup->allowComputer(), accessGroup->cancelAfterFirstVisit());
+}
+
+Form::ArtifactGroup::ArtifactGroup(QWidget* parent, int artifact) : QGroupBox(parent)
+{
+    setFlat(true);
+
+    labelArtifact = new QLabel(this);
     changeLabelArtifact(artifact);
 
-    comboBoxArtifact = new QComboBox(parent);
+    comboBoxArtifact = new QComboBox(this);
     for(int index = Artifact::None; index < Artifact::Unknown; ++index)
 	comboBoxArtifact->addItem(Artifact::transcribe(index), index);
     comboBoxArtifact->setCurrentIndex(artifact);
 
-    horizontalLayout = new QHBoxLayout();
+    horizontalLayout = new QHBoxLayout(this);
     horizontalLayout->addWidget(labelArtifact);
     horizontalLayout->addWidget(comboBoxArtifact);
-
-    addLayout(horizontalLayout);
 
     connect(comboBoxArtifact , SIGNAL(currentIndexChanged(int)), this, SLOT(setFormChanged()));
     connect(comboBoxArtifact , SIGNAL(currentIndexChanged(int)), this, SLOT(changeLabelArtifact(int)));
 }
 
-void Form::ArtifactLayout::setFormChanged(void)
+void Form::ArtifactGroup::setFormChanged(void)
 {
     emit formChanged();
 }
 
-void Form::ArtifactLayout::changeLabelArtifact(int index)
+void Form::ArtifactGroup::changeLabelArtifact(int index)
 {
     labelArtifact->setPixmap(EditorTheme::getImageICN("ARTIFACT.ICN", index).first.scaled(48, 48));
     labelArtifact->setToolTip(Artifact::transcribe(index));
 }
 
-int Form::ArtifactLayout::result(void) const
+int Form::ArtifactGroup::result(void) const
 {
     return comboBoxArtifact->currentIndex();
 }
@@ -1278,7 +1402,7 @@ Form::ArtifactDialog::ArtifactDialog(int artifact)
 {
     setWindowTitle(QApplication::translate("ArtifactDialog", "Artifact", 0, QApplication::UnicodeUTF8));
 
-    artifactLayout = new ArtifactLayout(this, artifact);
+    artifactGroup = new ArtifactGroup(this, artifact);
 
     pushButtonOk = new QPushButton(this);
     pushButtonOk->setText(QApplication::translate("ArtifactDialog", "Ok", 0, QApplication::UnicodeUTF8));
@@ -1289,19 +1413,21 @@ Form::ArtifactDialog::ArtifactDialog(int artifact)
     pushButtonCancel = new QPushButton(this);
     pushButtonCancel->setText(QApplication::translate("ArtifactDialog", "Cancel", 0, QApplication::UnicodeUTF8));
 
-    horizontalLayout = new QHBoxLayout();
-    horizontalLayout->addWidget(pushButtonOk);
-    horizontalLayout->addItem(horizontalSpacer);
-    horizontalLayout->addWidget(pushButtonCancel);
+    buttonsLayout = new QHBoxLayout();
+    buttonsLayout->addWidget(pushButtonOk);
+    buttonsLayout->addItem(horizontalSpacer);
+    buttonsLayout->addWidget(pushButtonCancel);
 
-    artifactLayout->addLayout(horizontalLayout);
+    formLayout = new QVBoxLayout(this);
+    formLayout->addWidget(artifactGroup);
+    formLayout->addLayout(buttonsLayout);
 
     QSize minSize = minimumSizeHint();
 
     resize(minSize);
     setMinimumSize(minSize);
 
-    connect(artifactLayout, SIGNAL(formChanged()), this, SLOT(enableButtonOk()));
+    connect(artifactGroup, SIGNAL(formChanged()), this, SLOT(enableButtonOk()));
     connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
     connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
 }
@@ -1313,31 +1439,33 @@ void Form::ArtifactDialog::enableButtonOk(void)
 
 int Form::ArtifactDialog::artifact(void) const
 {
-    return artifactLayout->result();
+    return artifactGroup->result();
 }
 
-Form::ResourcesLayout::ResourcesLayout(QWidget* parent, const Resources & resources) : QVBoxLayout(parent)
+Form::ResourcesGroup::ResourcesGroup(QWidget* parent, const Resources & resources) : QGroupBox(parent)
 {
+    setFlat(true);
+
     int resMin = -65535;
     int resMax = 65535;
 
-    spinBoxResWood = new QSpinBox(parent);
+    spinBoxResWood = new QSpinBox(this);
     spinBoxResWood->setMinimum(resMin);
     spinBoxResWood->setMaximum(resMax);
     spinBoxResWood->setValue(resources.wood);
 
-    labelResWood = new QLabel(parent);
+    labelResWood = new QLabel(this);
     labelResWood->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 0).first);
     labelResWood->setBuddy(spinBoxResWood);
 
     horizontalSpacerWoodSulfur = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-    spinBoxResSulfur = new QSpinBox(parent);
+    spinBoxResSulfur = new QSpinBox(this);
     spinBoxResSulfur->setMinimum(resMin);
     spinBoxResSulfur->setMaximum(resMax);
     spinBoxResSulfur->setValue(resources.sulfur);
 
-    labelResSulfur = new QLabel(parent);
+    labelResSulfur = new QLabel(this);
     labelResSulfur->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 3).first);
     labelResSulfur->setBuddy(spinBoxResSulfur);
 
@@ -1348,22 +1476,22 @@ Form::ResourcesLayout::ResourcesLayout(QWidget* parent, const Resources & resour
     horizontalLayoutWoodSulfur->addWidget(labelResSulfur);
     horizontalLayoutWoodSulfur->addWidget(spinBoxResSulfur);
 
-    spinBoxResMercury = new QSpinBox(parent);
+    spinBoxResMercury = new QSpinBox(this);
     spinBoxResMercury->setMinimum(resMin);
     spinBoxResMercury->setMaximum(resMax);
     spinBoxResMercury->setValue(resources.mercury);
 
-    labelResMercury = new QLabel(parent);
+    labelResMercury = new QLabel(this);
     labelResMercury->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 1).first);
     labelResMercury->setBuddy(spinBoxResMercury);
 
     horizontalSpacerMercuryCristal = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-    spinBoxResCrystal = new QSpinBox(parent);
+    spinBoxResCrystal = new QSpinBox(this);
     spinBoxResCrystal->setMinimum(resMin);
     spinBoxResCrystal->setMaximum(resMax);
     spinBoxResCrystal->setValue(resources.crystal);
 
-    labelResCrystal = new QLabel(parent);
+    labelResCrystal = new QLabel(this);
     labelResCrystal->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 4).first);
     labelResCrystal->setBuddy(spinBoxResCrystal);
 
@@ -1374,23 +1502,23 @@ Form::ResourcesLayout::ResourcesLayout(QWidget* parent, const Resources & resour
     horizontalLayoutMercuryCristal->addWidget(labelResCrystal);
     horizontalLayoutMercuryCristal->addWidget(spinBoxResCrystal);
 
-    spinBoxResOre = new QSpinBox(parent);
+    spinBoxResOre = new QSpinBox(this);
     spinBoxResOre->setMinimum(resMin);
     spinBoxResOre->setMaximum(resMax);
     spinBoxResOre->setValue(resources.ore);
 
-    labelResOre = new QLabel(parent);
+    labelResOre = new QLabel(this);
     labelResOre->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 2).first);
     labelResOre->setBuddy(spinBoxResOre);
 
     horizontalSpacerOreGems = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-    spinBoxResGems = new QSpinBox(parent);
+    spinBoxResGems = new QSpinBox(this);
     spinBoxResGems->setMinimum(resMin);
     spinBoxResGems->setMaximum(resMax);
     spinBoxResGems->setValue(resources.gems);
 
-    labelResGems = new QLabel(parent);
+    labelResGems = new QLabel(this);
     labelResGems->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 5).first);
     labelResGems->setBuddy(spinBoxResGems);
 
@@ -1404,12 +1532,12 @@ Form::ResourcesLayout::ResourcesLayout(QWidget* parent, const Resources & resour
     horizontalSpacerGoldLeft = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     horizontalSpacerGoldRight = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-    spinBoxResGold = new QSpinBox(parent);
+    spinBoxResGold = new QSpinBox(this);
     spinBoxResGold->setMinimum(resMin);
     spinBoxResGold->setMaximum(resMax);
     spinBoxResGold->setValue(resources.gold);
 
-    labelResGold = new QLabel(parent);
+    labelResGold = new QLabel(this);
     labelResGold->setPixmap(EditorTheme::getImageICN("RESOURCE.ICN", 6).first);
     labelResGold->setBuddy(spinBoxResGold);
 
@@ -1419,10 +1547,11 @@ Form::ResourcesLayout::ResourcesLayout(QWidget* parent, const Resources & resour
     horizontalLayoutGold->addWidget(spinBoxResGold);
     horizontalLayoutGold->addItem(horizontalSpacerGoldRight);
 
-    addLayout(horizontalLayoutWoodSulfur);
-    addLayout(horizontalLayoutMercuryCristal);
-    addLayout(horizontalLayoutOreGems);
-    addLayout(horizontalLayoutGold);
+    verticalLayoutBox = new QVBoxLayout(this);
+    verticalLayoutBox->addLayout(horizontalLayoutWoodSulfur);
+    verticalLayoutBox->addLayout(horizontalLayoutMercuryCristal);
+    verticalLayoutBox->addLayout(horizontalLayoutOreGems);
+    verticalLayoutBox->addLayout(horizontalLayoutGold);
 
 #ifndef QT_NO_TOOLTIP
     labelResWood->setToolTip(QApplication::translate("DayEventDialog", "wood", 0, QApplication::UnicodeUTF8));
@@ -1450,12 +1579,12 @@ Form::ResourcesLayout::ResourcesLayout(QWidget* parent, const Resources & resour
     connect(spinBoxResGold, SIGNAL(valueChanged(int)), this, SLOT(setFormChanged()));
 }
 
-void Form::ResourcesLayout::setFormChanged(void)
+void Form::ResourcesGroup::setFormChanged(void)
 {
     emit formChanged();
 }
 
-Resources Form::ResourcesLayout::result(void) const
+Resources Form::ResourcesGroup::result(void) const
 {
     Resources res;
 
@@ -1474,7 +1603,7 @@ Form::ResourcesDialog::ResourcesDialog(const Resources & resources)
 {
     setWindowTitle(QApplication::translate("ResourcesDialog", "Resources", 0, QApplication::UnicodeUTF8));
 
-    resourcesLayout = new ResourcesLayout(this, resources);
+    resourcesGroup = new ResourcesGroup(this, resources);
 
     pushButtonOk = new QPushButton(this);
     pushButtonOk->setText(QApplication::translate("ResourcesDialog", "Ok", 0, QApplication::UnicodeUTF8));
@@ -1485,19 +1614,21 @@ Form::ResourcesDialog::ResourcesDialog(const Resources & resources)
     pushButtonCancel = new QPushButton(this);
     pushButtonCancel->setText(QApplication::translate("ResourcesDialog", "Cancel", 0, QApplication::UnicodeUTF8));
 
-    horizontalLayout = new QHBoxLayout();
-    horizontalLayout->addWidget(pushButtonOk);
-    horizontalLayout->addItem(horizontalSpacer);
-    horizontalLayout->addWidget(pushButtonCancel);
+    buttonsLayout = new QHBoxLayout();
+    buttonsLayout->addWidget(pushButtonOk);
+    buttonsLayout->addItem(horizontalSpacer);
+    buttonsLayout->addWidget(pushButtonCancel);
 
-    resourcesLayout->addLayout(horizontalLayout);
+    formLayout = new QVBoxLayout(this);
+    formLayout->addWidget(resourcesGroup);
+    formLayout->addLayout(buttonsLayout);
 
     QSize minSize = minimumSizeHint();
 
     resize(minSize);
     setMinimumSize(minSize);
 
-    connect(resourcesLayout, SIGNAL(formChanged()), this, SLOT(enableButtonOk()));
+    connect(resourcesGroup, SIGNAL(formChanged()), this, SLOT(enableButtonOk()));
     connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
     connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
 }
@@ -1509,7 +1640,7 @@ void Form::ResourcesDialog::enableButtonOk(void)
 
 Resources Form::ResourcesDialog::resources(void) const
 {
-    return resourcesLayout->result();
+    return resourcesGroup->result();
 }
 
 Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors)
@@ -1592,7 +1723,7 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors)
     // tab 2
     tabResource = new QWidget();
 
-    resourcesLayout = new ResourcesLayout(tabResource, event.resources);
+    resourcesGroup = new ResourcesGroup(tabResource, event.resources);
 
     // tab 3
     tabMessage = new QWidget();
@@ -1638,7 +1769,7 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors)
     connect(spinBoxDayFirst, SIGNAL(valueChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
     connect(comboBoxSubsequent , SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setEnableOKButton(const QString &)));
     connect(checkBoxAllowComp, SIGNAL(clicked()), this, SLOT(setEnableOKButton()));
-    connect(resourcesLayout, SIGNAL(formChanged()), this, SLOT(setEnableOKButton()));
+    connect(resourcesGroup, SIGNAL(formChanged()), this, SLOT(setEnableOKButton()));
 
     connect(plainTextMessage, SIGNAL(textChanged()), this, SLOT(setEnableOKButton()));
 
@@ -1665,7 +1796,7 @@ DayEvent Form::DayEventDialog::result(void) const
 {
     DayEvent res;
 
-    res.resources = resourcesLayout->result();
+    res.resources = resourcesGroup->result();
     res.colors = 0;
 
     for(QVector<PlayerAllow*>::const_iterator
@@ -1844,63 +1975,32 @@ Form::MapEventDialog::MapEventDialog(const MapEvent & event, int kingdomColors)
     // tab 1
     tabAccess = new QWidget();
 
-    groupBoxAllowedColors = new QGroupBox(tabAccess);
-    groupBoxAllowedColors->setTitle(QApplication::translate("MapEventDialog", "Colors allowed to get event", 0, QApplication::UnicodeUTF8));
-
-    horizontalLayoutPlayers = new QHBoxLayout();
-    horizontalSpacerPlayersLeft = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-    horizontalSpacerPlayersRight = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-    horizontalLayoutPlayers->addItem(horizontalSpacerPlayersLeft);
-
-    // create allow players labels
-    QVector<int> colors = Color::colors(Color::All);
-
-    for(QVector<int>::const_iterator
-	it = colors.begin(); it != colors.end(); ++it)
-    if((*it) & kingdomColors)
-    {
-	labelPlayers.push_back(new PlayerAllow(*it, (*it) & event.colors, groupBoxAllowedColors));
-	horizontalLayoutPlayers->addWidget(labelPlayers.back());
-    }
-    horizontalLayoutPlayers->addItem(horizontalSpacerPlayersRight);
-
-    checkBoxAllowComp = new QCheckBox(groupBoxAllowedColors);
-    checkBoxAllowComp->setLayoutDirection(Qt::LeftToRight);
-    checkBoxAllowComp->setText(QApplication::translate("MapEventDialog", "Allow computer", 0, QApplication::UnicodeUTF8));
-    checkBoxAllowComp->setChecked(event.allowComputer);
-
-    checkBoxCancelAfterFirstVisit = new QCheckBox(groupBoxAllowedColors);
-    checkBoxCancelAfterFirstVisit->setLayoutDirection(Qt::LeftToRight);
-    checkBoxCancelAfterFirstVisit->setText(QApplication::translate("MapEventDialog", "Cancel after first visit", 0, QApplication::UnicodeUTF8));
-    checkBoxCancelAfterFirstVisit->setChecked(event.cancelAfterFirstVisit);
-
-    verticalLayoutAllowCols = new QVBoxLayout(groupBoxAllowedColors);
-    verticalLayoutAllowCols->addLayout(horizontalLayoutPlayers);
-    verticalLayoutAllowCols->addWidget(checkBoxAllowComp);
-    verticalLayoutAllowCols->addWidget(checkBoxCancelAfterFirstVisit);
+    accessGroup = new AccessGroup(tabAccess, kingdomColors, event.colors);
+    accessGroup->setTitle(QApplication::translate("MapEventDialog", "Colors allowed to get event", 0, QApplication::UnicodeUTF8));
+    accessGroup->setFlat(false);
+    accessGroup->setAllowComputer(event.allowComputer);
+    accessGroup->setCancelAfterFirstVisit(event.cancelAfterFirstVisit);
 
     spacerItemAccess = new QSpacerItem(40, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
     verticalLayoutTabAcs = new QVBoxLayout(tabAccess);
-    verticalLayoutTabAcs->addWidget(groupBoxAllowedColors);
+    verticalLayoutTabAcs->addWidget(accessGroup);
     verticalLayoutTabAcs->addItem(spacerItemAccess);
 
     // tab 2
     tabGift = new QWidget();
 
-    groupBoxResource = new QGroupBox(tabGift);
-    groupBoxResource->setTitle(QApplication::translate("MapEventDialog", "Resources", 0, QApplication::UnicodeUTF8));
+    resourcesGroup = new ResourcesGroup(tabGift, event.resources);
+    resourcesGroup->setFlat(false);
+    resourcesGroup->setTitle(QApplication::translate("MapEventDialog", "Resources", 0, QApplication::UnicodeUTF8));
 
-    resourcesLayout = new ResourcesLayout(groupBoxResource, event.resources);
-
-    groupBoxArtifact = new QGroupBox(tabGift);
-    groupBoxArtifact->setTitle(QApplication::translate("MapEventDialog", "Artifact to give", 0, QApplication::UnicodeUTF8));
-
-    artifactLayout = new ArtifactLayout(groupBoxArtifact, event.artifact);
+    artifactGroup = new ArtifactGroup(tabGift, event.artifact);
+    artifactGroup->setTitle(QApplication::translate("MapEventDialog", "Artifact to give", 0, QApplication::UnicodeUTF8));
+    artifactGroup->setFlat(false);
 
     verticalLayoutGift = new QVBoxLayout(tabGift);
-    verticalLayoutGift->addWidget(groupBoxResource);
-    verticalLayoutGift->addWidget(groupBoxArtifact);
+    verticalLayoutGift->addWidget(resourcesGroup);
+    verticalLayoutGift->addWidget(artifactGroup);
 
     // tab 3
     tabMessage = new QWidget();
@@ -1943,17 +2043,10 @@ Form::MapEventDialog::MapEventDialog(const MapEvent & event, int kingdomColors)
     resize(minSize);
     setMinimumSize(minSize);
 
-    connect(checkBoxAllowComp, SIGNAL(clicked()), this, SLOT(setEnableOKButton()));
-    connect(checkBoxCancelAfterFirstVisit, SIGNAL(clicked()), this, SLOT(setEnableOKButton()));
-
-    connect(resourcesLayout, SIGNAL(formChanged()), this, SLOT(setEnableOKButton()));
-    connect(artifactLayout, SIGNAL(formChanged()), this, SLOT(setEnableOKButton()));
-
+    connect(accessGroup, SIGNAL(formChanged()), this, SLOT(setEnableOKButton()));
+    connect(resourcesGroup, SIGNAL(formChanged()), this, SLOT(setEnableOKButton()));
+    connect(artifactGroup, SIGNAL(formChanged()), this, SLOT(setEnableOKButton()));
     connect(plainTextMessage, SIGNAL(textChanged()), this, SLOT(setEnableOKButton()));
-
-    for(QVector<PlayerAllow*>::const_iterator
-	it = labelPlayers.begin(); it != labelPlayers.end(); ++it)
-	connect(*it, SIGNAL(mousePressed()), this, SLOT(setEnableOKButton()));
 
     connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
     connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
@@ -1968,20 +2061,12 @@ MapEvent Form::MapEventDialog::result(const QPoint & pos, quint32 uid) const
 {
     MapEvent res(pos, uid);
 
-    res.resources = resourcesLayout->result();
-    res.colors = 0;
+    res.resources = resourcesGroup->result();
+    res.colors = accessGroup->colors();
+    res.artifact = artifactGroup->result();
 
-    for(QVector<PlayerAllow*>::const_iterator
-	it = labelPlayers.begin(); it != labelPlayers.end(); ++it)
-    if((*it)->allow())
-    {
-	res.colors |= (*it)->color();
-    }
-
-    res.artifact = artifactLayout->result();
-
-    res.allowComputer = checkBoxAllowComp->isChecked();
-    res.cancelAfterFirstVisit = checkBoxCancelAfterFirstVisit->isChecked();
+    res.allowComputer = accessGroup->allowComputer();
+    res.cancelAfterFirstVisit = accessGroup->cancelAfterFirstVisit();
     res.message = plainTextMessage->toPlainText();
 
     return res;
@@ -3335,18 +3420,17 @@ Form::MapSphinxDialog::MapSphinxDialog(const MapSphinx & sphinx)
     // tab resources
     tabGift = new QWidget();
 
-    groupBoxResource = new QGroupBox(tabGift);
-    groupBoxResource->setTitle(QApplication::translate("MapSphinxDialog", "Resources", 0, QApplication::UnicodeUTF8));
+    resourcesGroup = new ResourcesGroup(tabGift, sphinx.resources);
+    resourcesGroup->setFlat(false);
+    resourcesGroup->setTitle(QApplication::translate("MapSphinxDialog", "Resources", 0, QApplication::UnicodeUTF8));
 
-    resourcesLayout = new ResourcesLayout(groupBoxResource, sphinx.resources);
-    groupBoxArtifact = new QGroupBox(tabGift);
-    groupBoxArtifact->setTitle(QApplication::translate("MapSphinxDialog", "Artifact to give", 0, QApplication::UnicodeUTF8));
-
-    artifactLayout = new ArtifactLayout(groupBoxArtifact, sphinx.artifact);
+    artifactGroup = new ArtifactGroup(tabGift, sphinx.artifact);
+    artifactGroup->setTitle(QApplication::translate("MapSphinxDialog", "Artifact to give", 0, QApplication::UnicodeUTF8));
+    artifactGroup->setFlat(false);
 
     verticalLayoutGift = new QVBoxLayout(tabGift);
-    verticalLayoutGift->addWidget(groupBoxResource);
-    verticalLayoutGift->addWidget(groupBoxArtifact);
+    verticalLayoutGift->addWidget(resourcesGroup);
+    verticalLayoutGift->addWidget(artifactGroup);
 
     // tab riddles
     tabAnswers = new QWidget();
@@ -3387,8 +3471,8 @@ Form::MapSphinxDialog::MapSphinxDialog(const MapSphinx & sphinx)
     resize(minSize);
     setMinimumSize(minSize);
 
-    connect(resourcesLayout, SIGNAL(formChanged()), this, SLOT(setEnableOKButton()));
-    connect(artifactLayout, SIGNAL(formChanged()), this, SLOT(setEnableOKButton()));
+    connect(resourcesGroup, SIGNAL(formChanged()), this, SLOT(setEnableOKButton()));
+    connect(artifactGroup, SIGNAL(formChanged()), this, SLOT(setEnableOKButton()));
 
     connect(plainTextMessage, SIGNAL(textChanged()), this, SLOT(setEnableOKButton()));
     connect(listWidgetAnswers, SIGNAL(listChanged()), this, SLOT(setEnableOKButton()));
@@ -3406,8 +3490,8 @@ MapSphinx Form::MapSphinxDialog::result(const QPoint & pos, quint32 uid) const
 {
     MapSphinx res(pos, uid);
 
-    res.resources = resourcesLayout->result();
-    res.artifact = artifactLayout->result();
+    res.resources = resourcesGroup->result();
+    res.artifact = artifactGroup->result();
     res.message = plainTextMessage->toPlainText();
     res.answers = listWidgetAnswers->results();
 
@@ -3530,7 +3614,7 @@ Form::ObjectEventsList::ObjectEventsList(QWidget* parent) : ItemsList(parent)
     delItemAct->setStatusTip(tr("Delete event"));
 
     eventsGroupAct = new QActionGroup(this);
-    QString eventsName[] = { tr("Access"), tr("Message"), tr("Resources"), tr("Artifact"), tr("Troops"), tr("Action") };
+    QString eventsName[] = { tr("Access"), tr("Message"), tr("Resources"), tr("Artifact"), tr("Troops"), tr("Morale"), tr("Luck"), tr("Experience"), tr("Skill"), tr("Action") };
     const int eventsCount = sizeof(eventsName) / sizeof(eventsName[0]);
 
     for(int ii = 0; ii < eventsCount; ++ii)
@@ -3574,6 +3658,15 @@ void Form::ObjectEventsList::addEventsAction(QAction* act)
 	{
 	    // access
 	    case 1:
+	    {
+	        AccessDialog dialog(Color::All, Color::All, true, false);
+		if(QDialog::Accepted == dialog.exec())
+		{
+		    item = new QListWidgetItem();
+		    item->setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(dialog.result()))));
+		    item->setText(QString("access - ").append(dialog.result().transcribe()));
+		}
+	    }
 	    break;
 	    // message
 	    case 2:
@@ -3613,9 +3706,20 @@ void Form::ObjectEventsList::addEventsAction(QAction* act)
 	    break;
 	    // troops
 	    case 5:
+	    // morale
+	    case 6:
+	    break;
+	    // luck
+	    case 7:
+	    break;
+	    // experience
+	    case 8:
+	    break;
+	    // skill
+	    case 9:
 	    break;
 	    // action
-	    case 6:
+	    case 10:
 	    break;
 	    // unknown
 	    default: break;
@@ -3631,7 +3735,7 @@ void Form::ObjectEventsList::addEventsAction(QAction* act)
 
 bool Form::ObjectEventsList::limit(void) const
 {
-    return count() >= 8;
+    return count() >= 15;
 }
 
 void Form::ObjectEventsList::editItem(QListWidgetItem* item)
@@ -3679,8 +3783,20 @@ void Form::ObjectEventsList::editItem(QListWidgetItem* item)
 	// troops
 	case 5:
 	break;
-	// action
+	// morale
 	case 6:
+	break;
+	// luck
+	case 7:
+	break;
+	// experience
+	case 8:
+	break;
+	// skill
+	case 9:
+	break;
+	// action
+	case 10:
 	break;
 	// unknown
 	default: break;

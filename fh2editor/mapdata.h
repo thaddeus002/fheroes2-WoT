@@ -114,6 +114,7 @@ public:
     int			level(void) const { return spriteLevel; }
 
     static bool		isAnimation(const MapTileExt &);
+    static bool		isAction(const MapTileExt &);
     static bool		isMapEvent(const MapTileExt &);
     static bool		isSphinx(const MapTileExt &);
     static bool		isSign(const MapTileExt &);
@@ -178,6 +179,7 @@ public:
 
     bool		isAction(void) const;
     int			object(void) const;
+    void		updateObjectID(void);
 
 protected:
     static void		loadSpriteLevel(MapTileLevels &, int, const mp2lev_t &);

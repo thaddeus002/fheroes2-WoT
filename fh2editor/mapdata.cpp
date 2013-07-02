@@ -64,6 +64,11 @@ bool MapTileExt::sortLevel2(const MapTileExt & mte1, const MapTileExt & mte2)
     return (mte1.spriteLevel % 4) < (mte2.spriteLevel % 4);
 }
 
+bool MapTileExt::isAction(const MapTileExt & mte)
+{
+    return mte.spriteLevel == SpriteLevel::Action;
+}
+
 bool MapTileExt::isTown(const MapTileExt & te)
 {
     return ICN::OBJNTOWN == te.spriteICN ? true : isRandomTown(te);
@@ -270,8 +275,12 @@ int MapTileLevels::topObjectID(void) const
 {
     int id = MapObj::None;
 
-    for(const_iterator it = begin(); it != end() && id == MapObj::None; ++it)
-	id = EditorTheme::getObjectID((*it).icn(), (*it).index());
+    for(const_iterator it = end(); it != begin(); --it)
+    {
+	const MapTileExt & ext = *(it - 1);
+	id = EditorTheme::getObjectID(ext.icn(), ext.index());
+	if(MapObj::None != id) break;
+    }
 
     return id;
 }
@@ -504,6 +513,23 @@ void MapTile::sortSpritesLevels(void)
     qStableSort(spritesLevel2.begin(), spritesLevel2.end(), MapTileExt::sortLevel2);
 }
 
+void MapTile::updateObjectID(void)
+{
+    // is action
+    if(spritesLevel1.empty())
+    {
+	objectID = MapObj::None;
+
+	if(spritesLevel2.size())
+	    objectID = spritesLevel2.topObjectID();
+    }
+    else
+    {
+	const MapTileExt* ext = spritesLevel1.find(MapTileExt::isAction);
+	objectID = ext ? EditorTheme::getObjectID(ext->icn(), ext->index()) : spritesLevel1.topObjectID();
+    }
+}
+
 void MapTile::addSpriteSection(const CompositeObject & co, const CompositeSprite & cs, quint32 uid)
 {
     if(cs.spriteLevel == SpriteLevel::Top)
@@ -511,17 +537,14 @@ void MapTile::addSpriteSection(const CompositeObject & co, const CompositeSprite
     else
 	spritesLevel1 << MapTileExt(co, cs, uid);
 
-    if(spritesLevel2.size())
-	objectID = spritesLevel2.topObjectID();
-
-    if(objectID == MapObj::None && spritesLevel1.size())
-	objectID = spritesLevel1.topObjectID();
+    updateObjectID();
 }
 
 void MapTile::removeSpriteSection(quint32 uid)
 {
-    spritesLevel1.removeSprite(uid);
-    spritesLevel2.removeSprite(uid);
+    bool res1 = spritesLevel1.removeSprite(uid);
+    bool res2 = spritesLevel2.removeSprite(uid);
+    if(res1 || res2) updateObjectID();
 }
 
 QDomElement & operator<< (QDomElement & el, const MapTile & tile)
@@ -1951,10 +1974,8 @@ void MapData::editObjectAttributes(void)
 
 	    if(QDialog::Accepted == form.exec())
 	    {
+		// store map object
 	    }
-	
-	    //QMessageBox::information(qobject_cast<MapWindow*>(parent()), "Object Attributes",
-	    //	    "Sorry!\nChange attributes of the object is not yet available."); break;
 	}
     }
 }
@@ -2129,6 +2150,7 @@ void MapData::addMapObject(const QPoint & pos, const CompositeObject & obj, quin
     		case MapObj::Castle:	objPtr = new MapTown(tile->mapPos(), uid); break;
     		case MapObj::Heroes:	objPtr = new MapHero(tile->mapPos(), uid); break;
     		case MapObj::Sphinx:	objPtr = new MapSphinx(tile->mapPos(), uid); break;
+
 		default: break;
 	    }
 

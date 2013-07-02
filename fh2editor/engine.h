@@ -58,7 +58,7 @@ namespace ICN
 
 namespace Color
 {
-    enum { Unknown = 0, Blue = 0x01, Red = 0x02, Green = 0x04, Yellow = 0x08, Orange = 0x10, Purple = 0x20,
+    enum { None = 0, Blue = 0x01, Red = 0x02, Green = 0x04, Yellow = 0x08, Orange = 0x10, Purple = 0x20,
 	    All = Blue | Red | Green | Yellow | Orange | Purple };
 
     int			count(int);
@@ -391,6 +391,19 @@ struct CompositeObject : public QVector<CompositeSprite>
 
 Q_DECLARE_METATYPE(CompositeObject);
 
+struct AccessResult
+{
+    int		allowPlayers;
+    bool	allowComputer;
+    bool	cancelAfterFirstVisit;
+
+    AccessResult() : allowPlayers(0), allowComputer(false), cancelAfterFirstVisit(false) {}
+    AccessResult(int c, bool a, bool f) : allowPlayers(c), allowComputer(a), cancelAfterFirstVisit(f) {}
+
+    QString	transcribe(void) const;
+};
+
+Q_DECLARE_METATYPE(AccessResult);
 
 namespace Editor
 {

@@ -29,7 +29,7 @@
 #include <QLabel>
 #include <QVariant>
 #include <QListWidget>
-#include <QVBoxLayout>
+#include <QGroupBox>
 #include "engine.h"
 
 QT_BEGIN_NAMESPACE
@@ -244,12 +244,82 @@ namespace Form
 	void			mousePressEvent(QMouseEvent*);
     };
 
-    class ArtifactLayout : public QVBoxLayout
+    class PlayerAllow : public QLabel
+    {
+	Q_OBJECT
+
+	int			col;
+	bool			stat;
+
+    public:
+	PlayerAllow(int, bool, QWidget*);
+
+	int			color(void) const { return col; }
+	bool			allow(void) const { return stat; }
+
+    signals:
+        void                    mousePressed(void);
+
+    protected:
+	void			updatePlayers(void);
+	void			mousePressEvent(QMouseEvent*);
+    };
+
+    class AccessGroup : public QGroupBox
     {
         Q_OBJECT
 
     public:
-	ArtifactLayout(QWidget*, int = Artifact::None);
+	AccessGroup(QWidget*, int, int);
+
+	QVBoxLayout*		verticalLayoutAllowCols;
+	QHBoxLayout*		horizontalLayoutPlayers;
+	QSpacerItem*		horizontalSpacerPlayersLeft;
+	QSpacerItem*		horizontalSpacerPlayersRight;
+	QVector<PlayerAllow*>	labelPlayers;
+	QCheckBox*		checkBoxAllowComp;
+	QCheckBox*		checkBoxCancelAfterFirstVisit;
+
+	void			setCancelAfterFirstVisit(bool);
+	void			setAllowComputer(bool);
+
+	int			colors(void) const;
+	bool			allowComputer(void) const;
+	bool			cancelAfterFirstVisit(void) const;
+
+    signals:
+        void                    formChanged(void);
+
+    protected slots:
+        void                    setFormChanged(void);
+    };
+
+    class AccessDialog : public QDialog
+    {
+        Q_OBJECT
+
+    public:
+        AccessDialog(int, int, bool, bool);
+
+        AccessGroup*		accessGroup;
+        QVBoxLayout*		formLayout;
+        QHBoxLayout*		buttonsLayout;
+        QPushButton*		pushButtonOk;
+        QSpacerItem*		horizontalSpacer;
+        QPushButton*		pushButtonCancel;
+
+        AccessResult           	result(void) const;
+
+    protected slots:
+	void			enableButtonOk(void);
+    };
+
+    class ArtifactGroup : public QGroupBox
+    {
+        Q_OBJECT
+
+    public:
+	ArtifactGroup(QWidget*, int = Artifact::None);
 
         QLabel*                 labelArtifact;
         QComboBox*              comboBoxArtifact;
@@ -272,8 +342,9 @@ namespace Form
     public:
         ArtifactDialog(int = Artifact::None);
 
-        ArtifactLayout*		artifactLayout;
-        QHBoxLayout*		horizontalLayout;
+        ArtifactGroup*		artifactGroup;
+        QVBoxLayout*		formLayout;
+        QHBoxLayout*		buttonsLayout;
         QPushButton*		pushButtonOk;
         QSpacerItem*		horizontalSpacer;
         QPushButton*		pushButtonCancel;
@@ -284,12 +355,12 @@ namespace Form
 	void			enableButtonOk(void);
     };
 
-    class ResourcesLayout : public QVBoxLayout
+    class ResourcesGroup : public QGroupBox
     {
         Q_OBJECT
 
     public:
-	ResourcesLayout(QWidget*, const Resources &);
+	ResourcesGroup(QWidget*, const Resources &);
 
         QHBoxLayout*            horizontalLayoutWoodSulfur;
         QLabel*                 labelResWood;
@@ -314,6 +385,7 @@ namespace Form
         QLabel*                 labelResGold;
         QSpinBox*               spinBoxResGold;
         QSpacerItem*            horizontalSpacerGoldRight;
+	QVBoxLayout*		verticalLayoutBox;
 
         Resources               result(void) const;
 
@@ -331,8 +403,9 @@ namespace Form
     public:
         ResourcesDialog(const Resources & = Resources());
 
-        ResourcesLayout*	resourcesLayout;
-        QHBoxLayout*		horizontalLayout;
+        ResourcesGroup*	resourcesGroup;
+        QVBoxLayout*		formLayout;
+        QHBoxLayout*		buttonsLayout;
         QPushButton*		pushButtonOk;
         QSpacerItem*		horizontalSpacer;
         QPushButton*		pushButtonCancel;
@@ -453,26 +526,6 @@ namespace Form
 	void			enableButtonOk(void);
     };
 
-    class PlayerAllow : public QLabel
-    {
-	Q_OBJECT
-
-	int			col;
-	bool			stat;
-
-    public:
-	PlayerAllow(int, bool, QWidget*);
-
-	int			color(void) const { return col; }
-	bool			allow(void) const { return stat; }
-
-    signals:
-        void                    mousePressed(void);
-
-    protected:
-	void			updatePlayers(void);
-	void			mousePressEvent(QMouseEvent*);
-    };
 
     class DayEventDialog : public QDialog
     {
@@ -499,7 +552,7 @@ namespace Form
 	QVector<PlayerAllow*>	labelPlayers;
 	QCheckBox*		checkBoxAllowComp;
 	QWidget*		tabResource;
-	ResourcesLayout*	resourcesLayout;
+	ResourcesGroup*		resourcesGroup;
 	QWidget*		tabMessage;
 	QVBoxLayout*		verticalLayout5;
 	QPlainTextEdit*		plainTextMessage;
@@ -563,20 +616,11 @@ namespace Form
 	QWidget*		tabAccess;
 	QSpacerItem*		spacerItemAccess;
 	QVBoxLayout*		verticalLayoutTabAcs;
-	QGroupBox*		groupBoxAllowedColors;
-	QVBoxLayout*		verticalLayoutAllowCols;
-	QHBoxLayout*		horizontalLayoutPlayers;
-	QSpacerItem*		horizontalSpacerPlayersLeft;
-	QSpacerItem*		horizontalSpacerPlayersRight;
-	QVector<PlayerAllow*>	labelPlayers;
-	QCheckBox*		checkBoxAllowComp;
-	QCheckBox*		checkBoxCancelAfterFirstVisit;
+	AccessGroup*		accessGroup;
 	QWidget*		tabGift;
-	ResourcesLayout*	resourcesLayout;
+	ResourcesGroup*		resourcesGroup;
 	QVBoxLayout*		verticalLayoutGift;
-	ArtifactLayout*		artifactLayout;
-	QGroupBox*              groupBoxResource;
-	QGroupBox*              groupBoxArtifact;
+	ArtifactGroup*		artifactGroup;
 	QWidget*		tabMessage;
 	QVBoxLayout*		verticalLayoutTabMsg;
 	QPlainTextEdit*		plainTextMessage;
@@ -872,11 +916,9 @@ namespace Form
 	QVBoxLayout*		verticalLayoutForm;
 	QTabWidget*		tabWidget;
 	QWidget*		tabGift;
-	ResourcesLayout*	resourcesLayout;
+	ResourcesGroup*		resourcesGroup;
 	QVBoxLayout*		verticalLayoutGift;
-	ArtifactLayout*		artifactLayout;
-	QGroupBox*              groupBoxResource;
-	QGroupBox*              groupBoxArtifact;
+	ArtifactGroup*		artifactGroup;
 	QWidget*		tabMessage;
 	QVBoxLayout*		verticalLayoutTabMsg;
 	QPlainTextEdit*		plainTextMessage;

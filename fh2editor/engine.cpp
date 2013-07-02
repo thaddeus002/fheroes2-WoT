@@ -1979,7 +1979,7 @@ int Troops::validCount(void) const
 }
 
 MapTown::MapTown(const QPoint & pos, quint32 id)
-    : MapObject(pos, id, MapObj::Castle), color(Color::Unknown), race(Race::Unknown), buildings(0), forceTown(false), customBuilding(false)
+    : MapObject(pos, id, MapObj::Castle), color(Color::None), race(Race::Unknown), buildings(0), forceTown(false), customBuilding(false)
 {
 }
 
@@ -1994,7 +1994,7 @@ MapTown::MapTown(const QPoint & pos, quint32 id, const mp2town_t & mp2)
         case 3: color = Color::Yellow; break;
         case 4: color = Color::Orange; break;
         case 5: color = Color::Purple; break;
-        default: color = Color::Unknown; break;
+        default: color = Color::None; break;
     }
 
     switch(mp2.race)
@@ -2077,7 +2077,7 @@ QDomElement & operator>> (QDomElement & el, MapTown & town)
     el >> static_cast<MapObject &>(town);
 
     town.nameTown = el.hasAttribute("name") ? el.attribute("name") : "Unknown";
-    town.color = el.hasAttribute("color") ? el.attribute("color").toInt() : Color::Unknown;
+    town.color = el.hasAttribute("color") ? el.attribute("color").toInt() : Color::None;
     town.race =  el.hasAttribute("race") ? el.attribute("race").toInt() : Race::Unknown;
     town.buildings = el.hasAttribute("buildings") ? el.attribute("buildings").toInt() : 0;
     town.forceTown = el.hasAttribute("forceTown") ? el.attribute("forceTown").toInt() : false;
@@ -2089,13 +2089,13 @@ QDomElement & operator>> (QDomElement & el, MapTown & town)
 }
 
 MapHero::MapHero(const QPoint & pos, quint32 id)
-    : MapObject(pos, id, MapObj::Heroes), color(Color::Unknown), race(Race::Unknown),
+    : MapObject(pos, id, MapObj::Heroes), color(Color::None), race(Race::Unknown),
     portrait(Portrait::Unknown), experience(0), patrolMode(false), patrolSquare(0)
 {
 }
 
 MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2)
-    : MapObject(pos, id, MapObj::Heroes), color(Color::Unknown), race(Race::Unknown), portrait(Portrait::Unknown), nameHero(mp2.name)
+    : MapObject(pos, id, MapObj::Heroes), color(Color::None), race(Race::Unknown), portrait(Portrait::Unknown), nameHero(mp2.name)
 {
     if(mp2.customTroops)
     {
@@ -2178,7 +2178,7 @@ QDomElement & operator>> (QDomElement & el, MapHero & hero)
     el >> static_cast<MapObject &>(hero);
 
     hero.nameHero = el.hasAttribute("name") ? el.attribute("name") : "Unknown";
-    hero.color = el.hasAttribute("color") ? el.attribute("color").toInt() : Color::Unknown;
+    hero.color = el.hasAttribute("color") ? el.attribute("color").toInt() : Color::None;
     hero.race =  el.hasAttribute("race") ? el.attribute("race").toInt() : Race::Unknown;
     hero.portrait = el.hasAttribute("portrait") ? el.attribute("portrait").toInt() : Portrait::Random;
     hero.experience = el.hasAttribute("experience") ? el.attribute("experience").toInt() : 0;
@@ -2304,7 +2304,7 @@ MapSphinx::MapSphinx(const QPoint & pos, quint32 id, const mp2sphinx_t & mp2)
 }
 
 MapSphinx::MapSphinx(const QPoint & pos, quint32 id)
-    : MapObject(pos, id, MapObj::Sphinx), artifact(Artifact::Unknown)
+    : MapObject(pos, id, MapObj::Sphinx), artifact(Artifact::None)
 {
 }
 
@@ -3201,4 +3201,9 @@ QString Resources::describe(void) const
     if(gold)	list << QString("gold(").append(QString::number(gold)).append(")");
 
     return list.join(",");
+}
+
+QString AccessResult::transcribe(void) const
+{
+    return NULL;
 }
