@@ -29,8 +29,6 @@
     <template section="bottom_2x2_2" name="Volcano 74" index="74" cid="0x65" />
     <template section="volcano_2x1" name="Volcano 78" index="78" />
     <template section="obelisk" name="Yellow Obelisk" index="108" />
-    <template section="sign" name="Sign" index="117" />
-    <template section="sawmill" name="SawMill" index="118" />
 
     <object name="Daemon Cave" width="3" height="2" cid="0x05" >
         <sprite px="1" py="0" index="111" level="top" />
@@ -39,4 +37,7 @@
         <sprite px="1" py="1" index="114" level="bottom" passable="0x01F8" />
         <sprite px="2" py="1" index="115" level="action" passable="0x01F8" />
     </object>
+
+    <template section="sign" name="Sign" index="117" />
+    <template section="sawmill" name="SawMill" index="118" />
 </objects>

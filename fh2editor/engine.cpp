@@ -2228,7 +2228,7 @@ QDomElement & operator>> (QDomElement & el, MapSign & sign)
 }
 
 MapEvent::MapEvent(const QPoint & pos, quint32 id)
-    : MapObject(pos, id, MapObj::Event), artifact(Artifact::Unknown), allowComputer(false),
+    : MapObject(pos, id, MapObj::Event), artifact(Artifact::None), allowComputer(false),
 	cancelAfterFirstVisit(true), colors(0)
 {
 }

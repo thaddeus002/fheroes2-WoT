@@ -3,6 +3,10 @@
     <sign width="1" height="1" cid="0x02" >
 	<sprite px="0" py="0" index="0" level="action" passable="0x01F8" />
     </sign>
+    <fountain width="2" height="1" cid="0x09" >
+	<sprite px="0" py="0" index="0" level="top" />
+	<sprite px="1" py="0" index="1" level="action" passable="0x01F8" />
+    </fountain>
     <obelisk width="2" height="2" cid="0x19" >
 	<sprite px="1" py="0" index="0" level="top" />
 	<sprite px="0" py="1" index="1" level="top" />
@@ -72,6 +76,16 @@
         <sprite px="2" py="1" index="6" level="action" passable="0x01F8" />
         <sprite px="3" py="1" index="7" level="bottom" passable="0x01F8" />
     </sawmill>
+    <alchemylab width="4" height="2" cid="0x01" >
+        <sprite px="0" py="0" index="0" level="top" />
+        <sprite px="1" py="0" index="1" level="top" />
+        <sprite px="2" py="0" index="2" level="top" />
+        <sprite px="3" py="0" index="3" level="top" />
+        <sprite px="0" py="1" index="4" level="top" />
+        <sprite px="1" py="1" index="5" level="bottom" passable="0x01F8" />
+        <sprite px="2" py="1" index="6" level="action" passable="0x01F8" />
+        <sprite px="3" py="1" index="7" level="bottom" passable="0x01F8" animation="6" />
+    </alchemylab>
     <windmill width="4" height="3" cid="0x28" >
         <sprite px="2" py="0" index="0" level="top" animation="3" />
         <sprite px="3" py="0" index="4" level="top" animation="3" />
@@ -84,6 +98,15 @@
         <sprite px="2" py="2" index="32" level="action" passable="0x01F8" animation="3" />
         <sprite px="3" py="2" index="36" level="bottom" passable="0x01F8" animation="3" />
     </windmill>
+    <waterwheel width="3" height="3" cid="0x16" >
+        <sprite px="1" py="0" index="0" level="top" />
+        <sprite px="0" py="1" index="1" level="top" animation="6" />
+        <sprite px="1" py="1" index="8" level="bottom" passable="0" animation="6" />
+        <sprite px="2" py="1" index="15" level="top" />
+        <sprite px="0" py="2" index="16" level="bottom" passable="0x01F8" animation="6" />
+        <sprite px="1" py="2" index="23" level="bottom" passable="0x01F8" animation="6" />
+        <sprite px="2" py="2" index="30" level="action" passable="0x01F8" />
+    </waterwheel>
     <oracle width="3" height="2" cid="0x1E" >
         <sprite px="0" py="0" index="0" level="top" />
         <sprite px="1" py="0" index="1" level="top" />
@@ -92,12 +115,6 @@
         <sprite px="1" py="1" index="4" level="action" passable="0x01F8" />
         <sprite px="2" py="1" index="5" level="action" passable="0x01F8" />
     </oracle>
-    <market width="3" height="2" cid="0x3F" >
-        <sprite px="2" py="0" index="0" level="top" animation="10" />
-        <sprite px="0" py="1" index="11" level="top" />
-        <sprite px="1" py="1" index="12" level="bottom" passable="0x01F8" animation="10" />
-        <sprite px="2" py="1" index="23" level="action" passable="0x01F8" />
-    </market>
     <wagon width="2" height="1" cid="0x50" >
         <sprite px="0" py="0" index="0" level="top" />
         <sprite px="1" py="0" index="1" level="action" passable="0x01F8" />

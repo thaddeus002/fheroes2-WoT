@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects icn="objnswmp">
+    <object name="Witchs Hut" width="3" height="3" cid="0x55" >
+        <sprite px="2" py="0" index="0" level="top" animation="6" />
+        <sprite px="2" py="1" index="7" level="top" animation="6" />
+        <sprite px="0" py="2" index="14" level="top" animation="6" />
+        <sprite px="1" py="2" index="21" level="top" />
+        <sprite px="2" py="2" index="22" level="action" passable="0x01F8" animation="6" />
+    </object>
+    <template section="passable_2x1_2" name="Ground 29" index="29" />
+</objects>

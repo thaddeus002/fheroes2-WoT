@@ -60,7 +60,12 @@
         <sprite px="2" py="1" index="188" level="bottom" passable="0x01F8" />
         <sprite px="3" py="1" index="189" level="action" passable="0x01F8" />
     </object>
-    <template section="market" name="Market" index="190" />
+    <object name="Market" width="3" height="2" cid="0x3f" >
+        <sprite px="2" py="0" index="190" level="top" animation="10" />
+        <sprite px="0" py="1" index="201" level="top" />
+        <sprite px="1" py="1" index="202" level="bottom" passable="0x01F8" animation="10" />
+        <sprite px="2" py="1" index="213" level="action" passable="0x01F8" />
+    </object>
     <object name="Watering Hole" width="4" height="2" cid="0x54" >
 	<sprite px="0" py="0" index="214" level="top" />
 	<sprite px="1" py="0" index="215" level="top" />

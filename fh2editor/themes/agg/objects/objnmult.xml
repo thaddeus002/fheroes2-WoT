@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects icn="objnmult">
+
+    <template section="bottom_2x2_1" name="Dead Tree 1" index="0" cid="0x6a" />
+    <template section="bottom_2x1_1" name="Dead Tree 2" index="3" cid="0x6a" />
+
+    <object name="Peasant Hut" width="3" height="2" cid="0x10" >
+        <sprite px="2" py="0" index="5" level="top" animation="9" />
+        <sprite px="0" py="1" index="15" level="top" animation="9" />
+        <sprite px="1" py="1" index="25" level="top" animation="9" />
+        <sprite px="2" py="1" index="35" level="action" passable="0x01F8" />
+    </object>
+    <object name="Fort" width="4" height="3" cid="0x3e" >
+        <sprite px="2" py="0" index="36" level="top" animation="8" />
+        <sprite px="0" py="1" index="45" level="top" animation="8" />
+        <sprite px="1" py="1" index="54" level="top" />
+        <sprite px="2" py="1" index="55" level="bottom" passable="0" />
+        <sprite px="3" py="1" index="56" level="bottom" passable="0" />
+        <sprite px="1" py="2" index="57" level="top" />
+        <sprite px="2" py="2" index="58" level="bottom" passable="0x01F8" />
+        <sprite px="3" py="2" index="59" level="action" passable="0x01F8" />
+    </object>
+    <object name="Gazebo" width="2" height="2" cid="0x0a" >
+        <sprite px="1" py="0" index="60" level="top" />
+        <sprite px="0" py="1" index="61" level="top" />
+        <sprite px="1" py="1" index="62" level="action" passable="0x01F8" />
+    </object>
+
+    <template section="bottom_3x1_3" name="Shrub 63" index="63" cid="0x71" />
+
+    <object name="Hut Magi" width="3" height="2" cid="0x39" >
+        <sprite px="2" py="0" index="66" level="top" />
+        <sprite px="0" py="1" index="67" level="top" />
+        <sprite px="1" py="1" index="68" level="top" />
+        <sprite px="2" py="1" index="69" level="action" passable="0x01F8" />
+    </object>
+    <object name="Mercenary Camp" width="3" height="1" cid="0x49" >
+        <sprite px="0" py="0" index="70" level="bottom" passable="0x01F8" />
+        <sprite px="1" py="0" index="71" level="action" passable="0x01F8" />
+        <sprite px="2" py="0" index="72" level="bottom" passable="0x01F8" />
+    </object>
+    <object name="Ruins" width="2" height="1" cid="0x3d" >
+        <sprite px="0" py="0" index="73" level="bottom" passable="0x01F8" />
+        <sprite px="1" py="0" index="74" level="action" passable="0x01F8" />
+    </object>
+    <object name="Shrine 2" width="2" height="1" cid="0x1f" >
+        <sprite px="0" py="0" index="75" level="top" />
+        <sprite px="1" py="0" index="76" level="action" passable="0x01F8" />
+    </object>
+    <object name="Shrine 3" width="2" height="1" cid="0x4a" >
+        <sprite px="0" py="0" index="77" level="top" />
+        <sprite px="1" py="0" index="78" level="action" passable="0x01F8" />
+    </object>
+    <object name="Shrine 1" width="2" height="1" cid="0x4b" >
+        <sprite px="0" py="0" index="79" level="top" />
+        <sprite px="1" py="0" index="80" level="action" passable="0x01F8" />
+    </object>
+    <object name="Idol" width="2" height="1" cid="0x43" >
+        <sprite px="0" py="0" index="81" level="top" />
+        <sprite px="1" py="0" index="82" level="action" passable="0x01F8" />
+    </object>
+    <object name="Standing Stones" width="3" height="1" cid="0x42" >
+        <sprite px="0" py="0" index="83" level="top" />
+        <sprite px="1" py="0" index="84" level="action" passable="0x01F8" />
+        <sprite px="2" py="0" index="85" level="action" passable="0x01F8" />
+    </object>
+    <object name="Temple" width="2" height="2" cid="0x46" >
+        <sprite px="0" py="0" index="86" level="bottom" passable="0" />
+        <sprite px="1" py="0" index="87" level="bottom" passable="0" />
+        <sprite px="0" py="1" index="88" level="action" passable="0x01F8" />
+        <sprite px="1" py="1" index="89" level="bottom" passable="0x01F8" />
+    </object>
+    <object name="Market" width="3" height="2" cid="0x3f" >
+        <sprite px="2" py="0" index="90" level="top" animation="6" />
+        <sprite px="0" py="1" index="97" level="top" animation="6" />
+        <sprite px="1" py="1" index="104" level="bottom" passable="0x01F8" animation="6" />
+        <sprite px="2" py="1" index="111" level="action" passable="0x01F8" />
+    </object>
+    <object name="Tree House" width="2" height="2" cid="0x3b" >
+        <sprite px="1" py="0" index="112" level="top" />
+        <sprite px="0" py="1" index="113" level="top" />
+        <sprite px="1" py="1" index="114" level="action" passable="0x01F8" />
+    </object>
+    <object name="Watch Tower" width="2" height="1" cid="0x3a" >
+        <sprite px="0" py="0" index="115" level="top" />
+        <sprite px="1" py="0" index="116" level="action" passable="0x01F8" />
+    </object>
+    <object name="Tree Knowledge" width="3" height="3" cid="0x44" >
+        <sprite px="1" py="0" index="117" level="top" />
+        <sprite px="2" py="0" index="118" level="top" />
+        <sprite px="1" py="1" index="119" level="top" />
+        <sprite px="2" py="1" index="120" level="top" />
+        <sprite px="0" py="2" index="121" level="top" />
+        <sprite px="1" py="2" index="122" level="top" />
+        <sprite px="2" py="2" index="123" level="action" passable="0x01F8" />
+    </object>
+
+    <template section="campfire" name="Camp Fire" index="124" />
+</objects>
