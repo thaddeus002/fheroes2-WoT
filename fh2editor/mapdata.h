@@ -26,6 +26,7 @@
 #include <QVector>
 #include <QList>
 #include <QMap>
+#include <QSet>
 #include <QString>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
@@ -113,6 +114,8 @@ public:
     int			index(void) const { return spriteIndex; }
     int			level(void) const { return spriteLevel; }
 
+    void		setUID(quint32 uid) { spriteUID = uid; }
+
     static bool		isAnimation(const MapTileExt &);
     static bool		isAction(const MapTileExt &);
     static bool		isMapEvent(const MapTileExt &);
@@ -140,6 +143,8 @@ public:
     QString		infoString(void) const;
     int			topObjectID(void) const;
     bool		removeSprite(quint32);
+    void		changeUIDs(QMap<quint32, quint32> &);
+    QSet<quint32>	uids(void) const;
 };
 
 QDomElement & operator<< (QDomElement &, const MapTileLevels &);
@@ -148,7 +153,7 @@ QDomElement & operator>> (QDomElement &, MapTileLevels &);
 class MapTile : public QGraphicsPixmapItem
 {
 public:
-    MapTile();
+    MapTile(const QPoint & = QPoint(0, 0));
     MapTile(const mp2til_t &, const QPoint &);
     MapTile(const MapTile &);
 
@@ -157,11 +162,13 @@ public:
 
     QRectF		boundingRect(void) const;
 
+    void		importTile(const MapTile &, QMap<quint32, quint32> &);
     void		showInfo(void) const;
     int			groundType(void) const;
 
     static QString	indexString(int);
 
+    QSet<quint32>	uids(void) const;
     const QPoint &	mapPos(void) const { return mpos; }
     void		setMapPos(const QPoint & pos) { mpos = pos; }
 
@@ -213,11 +220,12 @@ class MapTiles : public QVector<MapTile>
 
 public:
     MapTiles() {}
-    MapTiles(const MapTiles &, const QRect &);
+    MapTiles(const QSize &);
 
-    void		newMap(const QSize &);
-    bool		importMap(const QSize &, const QVector<mp2til_t> &, const QVector<mp2ext_t> &);
+    bool		importTiles(const QSize &, const QVector<mp2til_t> &, const QVector<mp2ext_t> &);
+    void		importTiles(const MapTiles &, const QRect &, const QPoint &, QMap<quint32, quint32> &);
 
+    QRect		fixedRect(const QRect &, const QPoint &) const;
     const QSize &	mapSize(void) const { return msize; }
     int			indexPoint(const QPoint &) const;
     bool		isValidPoint(const QPoint &) const;
@@ -236,8 +244,6 @@ public:
 
     void		insertToScene(QGraphicsScene &);
     QString		sizeDescription(void) const;
-
-    void		fixedOffset(void);
 };
 
 QDomElement & operator<< (QDomElement &, const MapTiles &);
@@ -251,9 +257,12 @@ public:
     quint32		uniq;
 
     MapArea() : uniq(1) {}
-    MapArea(const MapArea &, const QRect &);
+    MapArea(const QSize & sz) : tiles(sz), uniq(1) {}
 
-    void		importArea(const MapArea &, const QPoint &);
+    quint32		uid(void) { return uniq++; }
+    const QSize &	size(void) const { return tiles.mapSize(); }
+
+    void		importArea(const MapArea &, const QRect &, const QPoint &);
     void		importMP2Towns(const QVector<H2::TownPos> &);
     void		importMP2Heroes(const QVector<H2::HeroPos> &);
     void		importMP2Signs(const QVector<H2::SignPos> &);
@@ -290,15 +299,14 @@ public:
     const QStringList & tavernRumorsList(void) const;
     const DayEvents &	dayEvents(void) const;
 
-    quint32		uniq(void);
-
     void		newMap(const QSize &, const QString &);
     bool		loadMap(const QString &);
 
     bool		saveMapXML(const QString &) const;
+    bool		isValidBuffer(void) const;
 
-    QPoint		mapToTile(const QPoint &) const;
-    QRect		mapToTile(const QRect &) const;
+    QPoint		mapToPoint(const QPoint &) const;
+    QRect		mapToRect(const QRect &) const;
 
     void		showMapOptions(void);
 
@@ -332,7 +340,6 @@ protected:
     void               addMapObject(const QPoint &, const CompositeObject &, quint32);
 
     void		editMapEventDialog(const MapTile &);
-    void		editResourceDialog(const MapTile &);
     void		editTownDialog(const MapTile &);
     void		editSignDialog(const MapTile &);
     void		editSphinxDialog(const MapTile &);

@@ -27,7 +27,7 @@
 #include "mainwindow.h"
 #include "mapwindow.h"
 
-MapWindow::MapWindow(MainWindow* parent) : mainWindow(parent), mapData(this)
+MapWindow::MapWindow(MainWindow* parent) : QGraphicsView(parent), mapData(this)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setMouseTracking(true);
@@ -43,11 +43,11 @@ MapWindow::MapWindow(MainWindow* parent) : mainWindow(parent), mapData(this)
 
     editPasteAct = new QAction(QIcon(":/images/menu_paste.png"), tr("Paste"), this);
     editPasteAct->setStatusTip(tr("Paste the clipboard's contents into the current selection"));
-    editPasteAct->setEnabled(false);
+    editPasteAct->setEnabled(mapData.isValidBuffer());
     connect(editPasteAct, SIGNAL(triggered()), this, SLOT(mapWasModified()));
     connect(editPasteAct, SIGNAL(triggered()), &mapData, SLOT(pasteFromBuffer()));
 
-    connect(&mapData, SIGNAL(validBuffer(bool)), editPasteAct, SLOT(setEnabled(bool)));
+    connect(&mapData, SIGNAL(validBuffer(bool)), parent, SLOT(setActivePasteAction(bool)));
     connect(this, SIGNAL(selectedItems(bool)), editCopyAct, SLOT(setEnabled(bool)));
 
     //
@@ -118,45 +118,53 @@ MapWindow::MapWindow(MainWindow* parent) : mainWindow(parent), mapData(this)
     // init: clear objects
     clearObjectsAct = new QActionGroup(this);
 
+/*
     curAct = new QAction(tr("Buildings"), this);
     curAct->setStatusTip(tr("Remove buildings"));
+    curAct->setEnabled(false);
     curAct->setData(1);
     clearObjectsAct->addAction(curAct);
 
     curAct = new QAction(tr("Mounts/Rocs"), this);
     curAct->setStatusTip(tr("Remove mounts/rocs"));
+    curAct->setEnabled(false);
     curAct->setData(2);
     clearObjectsAct->addAction(curAct);
 
     curAct = new QAction(tr("Trees/Shrubs"), this);
     curAct->setStatusTip(tr("Remove trees/shrubs"));
+    curAct->setEnabled(false);
     curAct->setData(3);
     clearObjectsAct->addAction(curAct);
 
     curAct = new QAction(tr("Pickup resources"), this);
     curAct->setStatusTip(tr("Remove resources"));
+    curAct->setEnabled(false);
     curAct->setData(4);
     clearObjectsAct->addAction(curAct);
 
     curAct = new QAction(tr("Artifacts"), this);
     curAct->setStatusTip(tr("Remove artifacts"));
+    curAct->setEnabled(false);
     curAct->setData(5);
     clearObjectsAct->addAction(curAct);
 
     curAct = new QAction(tr("Monsters"), this);
     curAct->setStatusTip(tr("Remove monsters"));
+    curAct->setEnabled(false);
     curAct->setData(6);
     clearObjectsAct->addAction(curAct);
 
     curAct = new QAction(tr("Heroes"), this);
     curAct->setStatusTip(tr("Remove heroes"));
+    curAct->setEnabled(false);
     curAct->setData(7);
     clearObjectsAct->addAction(curAct);
 
     curAct = new QAction(this);
     curAct->setSeparator(true);
     clearObjectsAct->addAction(curAct);
-
+*/
     curAct = new QAction(tr("All"), this);
     curAct->setStatusTip(tr("Remove all objects"));
     curAct->setData(10);

@@ -638,7 +638,7 @@ Q_DECLARE_METATYPE(TypeVariant);
 
 class MapObject : public QPoint
 {
-    int		objUid;
+    quint32	objUid;
     int		objType;
 
     friend 	QDomElement & operator<< (QDomElement &, const MapObject &);
@@ -648,11 +648,15 @@ public:
     MapObject(const QPoint & pos, int uid, int type = MapObj::None) : QPoint(pos), objUid(uid), objType(type) {}
     virtual ~MapObject() {}
 
-    int 		uid(void) const { return objUid; }
+    quint32 		uid(void) const { return objUid; }
     int 		type(void) const { return objType; }
     const QPoint &	pos(void) const { return *this; }
     virtual QString	name(void) const { return MapObj::transcribe(objType); }
     virtual QString	object(void) const { return "object"; }
+    virtual MapObject*	copy(void) const = 0;
+
+    void 		setUID(quint32 uid) { objUid = uid; }
+    void 		setPos(const QPoint & pos) { setX(pos.x()); setY(pos.y()); }
 };
 
 struct Skill : public QPair<int, int>
@@ -708,6 +712,8 @@ struct MapTown : public MapObject
 
     QString	name(void) const { return nameTown; }
     QString	object(void) const { return "town"; }
+
+    MapObject*	copy(void) const { return new MapTown(*this); }
 };
 
 struct MapHero : public MapObject
@@ -728,6 +734,8 @@ struct MapHero : public MapObject
 
     QString	name(void) const { return nameHero; }
     QString	object(void) const { return "hero"; }
+
+    MapObject*	copy(void) const { return new MapHero(*this); }
 };
 
 struct MapSign : public MapObject
@@ -738,6 +746,8 @@ struct MapSign : public MapObject
     MapSign(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1);
 
     QString	object(void) const { return "sign"; }
+
+    MapObject*	copy(void) const { return new MapSign(*this); }
 };
 
 struct MapEvent : public MapObject
@@ -753,6 +763,8 @@ struct MapEvent : public MapObject
     MapEvent(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1);
 
     QString	object(void) const { return "event"; }
+
+    MapObject*	copy(void) const { return new MapEvent(*this); }
 };
 
 struct MapSphinx : public MapObject
@@ -766,17 +778,8 @@ struct MapSphinx : public MapObject
     MapSphinx(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1);
 
     QString	object(void) const { return "sphinx"; }
-};
 
-struct MapResource : public MapObject
-{
-    int		type;
-    int 	count;
-
-    MapResource(const QPoint & pos, quint32 uid, int res, int val);
-    MapResource(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1);
-
-    QString	object(void) const { return "resource"; }
+    MapObject*	copy(void) const { return new MapSphinx(*this); }
 };
 
 struct DayEvent
@@ -807,17 +810,17 @@ public:
     SharedMapObject(MapObject* ptr) : QSharedPointer<MapObject>(ptr) {}
 
     bool		operator== (const QPoint & pt) const { return data() && pt == data()->pos(); }
-    bool		operator== (int uid) const { return data() && uid == data()->uid(); }
+    bool		operator== (quint32 uid) const { return data() && uid == data()->uid(); }
 };
 
 class MapObjects : public QList<SharedMapObject>
 {
 public:
     MapObjects();
-    MapObjects(const MapObjects &, const QRect &);
 
     SharedMapObject		find(const QPoint &) const;
     QList<SharedMapObject>	list(int types) const;
+    QMap<quint32, quint32>	importObjects(const MapObjects &, const QRect &, const QPoint &, quint32);
 
     void			remove(const QPoint &);
     void			remove(int uid);
@@ -929,9 +932,6 @@ QDomElement & operator>> (QDomElement &, MapHero &);
 
 QDomElement & operator<< (QDomElement &, const MapTown &);
 QDomElement & operator>> (QDomElement &, MapTown &);
-
-QDomElement & operator<< (QDomElement &, const MapResource &);
-QDomElement & operator>> (QDomElement &, MapResource &);
 
 QDomElement & operator<< (QDomElement &, const Troops &);
 QDomElement & operator>> (QDomElement &, Troops &);

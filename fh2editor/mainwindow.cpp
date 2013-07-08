@@ -390,3 +390,12 @@ void MainWindow::mapOptions(void)
     if(activeMapWindow())
 	activeMapWindow()->mapData.showMapOptions();
 }
+
+void MainWindow::setActivePasteAction(bool f)
+{
+    foreach(QMdiSubWindow* window, mdiArea->subWindowList())
+    {
+        MapWindow* child = qobject_cast<MapWindow*>(window->widget());
+        if(child) child->editPasteAct->setEnabled(f);
+    }
+}

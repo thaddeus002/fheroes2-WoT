@@ -2354,36 +2354,6 @@ QDomElement & operator>> (QDomElement & el, MapSphinx & sphinx)
     return el;
 }
 
-MapResource::MapResource(const QPoint & pos, quint32 id, int res ,int val)
-    : MapObject(pos, id, MapObj::Resource), type(res), count(val)
-{
-}
-
-MapResource::MapResource(const QPoint & pos, quint32 id)
-    : MapObject(pos, id, MapObj::Resource), type(Resource::Unknown), count(0)
-{
-}
-
-QDomElement & operator<< (QDomElement & el, const MapResource & res)
-{
-    el << static_cast<const MapObject &>(res);
-
-    el.setAttribute("type", res.type);
-    el.setAttribute("count", res.count);
-
-    return el;
-}
-
-QDomElement & operator>> (QDomElement & el, MapResource & res)
-{
-    el >> static_cast<MapObject &>(res);
-
-    res.type = el.hasAttribute("type") ? el.attribute("type").toInt() : 0;
-    res.count = el.hasAttribute("count") ? el.attribute("count").toInt() : 0;
-
-    return el;
-}
-
 DayEvent::DayEvent(const mp2dayevent_t & mp2)
     : allowComputer(mp2.allowComputer), dayFirstOccurent(mp2.dayFirstOccurent),
 	daySubsequentOccurrences(mp2.subsequentOccurrences), colors(0), message(mp2.text)
@@ -2452,9 +2422,29 @@ MapObjects::MapObjects()
 {
 }
 
-MapObjects::MapObjects(const MapObjects & mo, const QRect & rt)
+QMap<quint32, quint32>
+    MapObjects::importObjects(const MapObjects & mo, const QRect & srcrt, const QPoint & dstpt, quint32 curUID)
 {
-    //QMap<MapKey, QSharedPointer<MapObject> >
+    QMap<quint32, quint32> result;
+
+    for(int yy = 0; yy < srcrt.height(); ++yy)
+    {
+	for(int xx = 0; xx < srcrt.width(); ++xx)
+	{
+	    SharedMapObject sharedObj = mo.find(QPoint(xx + srcrt.x(), yy + srcrt.y()));
+	    if(sharedObj.data())
+	    {
+		MapObject* ptr = sharedObj.data()->copy();
+		result.insert(ptr->uid(), curUID);
+		ptr->setPos(QPoint(xx + dstpt.x(), yy + dstpt.y()));
+		ptr->setUID(curUID);
+		push_back(SharedMapObject(ptr));
+		curUID += 1;
+	    }
+	}
+    }
+
+    return result;
 }
 
 void MapObjects::remove(const QPoint & pos)
@@ -2500,7 +2490,6 @@ QDomElement & operator<< (QDomElement & el, const MapObjects & objects)
 	    case MapObj::Sign:   { MapSign* obj = dynamic_cast<MapSign*>((*it).data());	if(obj) elem << *obj; } break;
 	    case MapObj::Event:  { MapEvent* obj = dynamic_cast<MapEvent*>((*it).data()); if(obj) elem << *obj; } break;
 	    case MapObj::Sphinx: { MapSphinx* obj = dynamic_cast<MapSphinx*>((*it).data()); if(obj) elem << *obj; } break;
-	    case MapObj::Resource: { MapResource* obj = dynamic_cast<MapResource*>((*it).data()); if(obj) elem << *obj; } break;
 	    default: elem << *(*it).data(); break;
 	}
     }
@@ -2532,9 +2521,6 @@ QDomElement & operator>> (QDomElement & el, MapObjects & objects)
 	else
 	if(elem.tagName() == "sphinx")
 	{ MapSphinx* obj = new MapSphinx(); elem >> *obj; objects.push_back(obj); }
-	else
-	if(elem.tagName() == "resource")
-	{ MapResource* obj = new MapResource(); elem >> *obj; objects.push_back(obj); }
     }
 
     return el;

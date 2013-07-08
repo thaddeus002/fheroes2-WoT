@@ -581,29 +581,6 @@ namespace Form
 	void			generateFromTiles(const MapTiles &);
     };
 
-    class EditResourceDialog : public QDialog
-    {
-	Q_OBJECT
-
-    public:
-	QVBoxLayout*		verticalLayout;
-	QCheckBox*		checkBoxDefault;
-	QHBoxLayout*		horizontalLayout1;
-	QLabel*			labelCount;
-	QSpinBox*		spinBoxCount;
-	QHBoxLayout*		horizontalLayout2;
-	QPushButton*		pushButtonOk;
-	QSpacerItem*		horizontalSpacer;
-	QPushButton*		pushButtonCancel;
-        QSpacerItem*		verticalSpacer;
-
-	EditResourceDialog(int res, int count);
-
-    protected slots:
-	void			 disableCustomCount(bool);
-	void			 enableButtonOk(void);
-    };
-
     class MapEventDialog : public QDialog
     {
 	Q_OBJECT

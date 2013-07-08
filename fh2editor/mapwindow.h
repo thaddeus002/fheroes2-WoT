@@ -76,7 +76,6 @@ private:
     bool	isUntitled;
     bool	isModified;
 
-    MainWindow*		mainWindow;
     MapData		mapData;
 
     QAction*            editCopyAct;

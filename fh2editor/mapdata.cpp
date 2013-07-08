@@ -271,6 +271,14 @@ const MapTileExt* MapTileLevels::find(bool (*pf)(const MapTileExt &)) const
     return it != end() ? &(*it) : NULL;
 }
 
+QSet<quint32> MapTileLevels::uids(void) const
+{
+    QSet<quint32> res;
+    for(const_iterator it = begin(); it != end(); ++it)
+	res.insert((*it).uid());    
+    return res;
+}
+
 int MapTileLevels::topObjectID(void) const
 {
     int id = MapObj::None;
@@ -288,6 +296,21 @@ int MapTileLevels::topObjectID(void) const
 bool MapTileLevels::removeSprite(quint32 uid)
 {
     return removeAll(MapTileExt(uid));
+}
+
+void MapTileLevels::changeUIDs(QMap<quint32, quint32> & mapUIDs)
+{
+    for(iterator itl = begin(); itl != end(); ++itl)
+    {
+	const QMap<quint32, quint32>::const_iterator itf = mapUIDs.find((*itl).uid());
+	if(itf != mapUIDs.end())
+	    (*itl).setUID(*itf);
+	else
+	{
+	    (*itl).setUID(mapUIDs[0xFFFFFFFF]);
+	    mapUIDs[0xFFFFFFFF] += 1;
+	}
+    }
 }
 
 QDomElement & operator<< (QDomElement & el, const MapTileLevels & levels)
@@ -366,10 +389,10 @@ MapTile::MapTile(const MapTile & other)
     setGraphicsPixmapItemValues();
 }
 
-MapTile::MapTile()
-    : QGraphicsPixmapItem(), tileSprite(0), tileShape(0), objectID(MapObj::None), passableBase(Direction::All), passableLocal(Direction::All)
+MapTile::MapTile(const QPoint & pos)
+    : QGraphicsPixmapItem(), mpos(pos), tileSprite(0), tileShape(0), objectID(MapObj::None), passableBase(Direction::All), passableLocal(Direction::All)
 {
-    setFlags(QGraphicsItem::ItemIsSelectable);
+    setGraphicsPixmapItemValues();
 }
 
 MapTile & MapTile::operator=(const MapTile & other)
@@ -388,6 +411,27 @@ MapTile & MapTile::operator=(const MapTile & other)
     setGraphicsPixmapItemValues();
 
     return *this;
+}
+
+void MapTile::importTile(const MapTile & other, QMap<quint32, quint32> & mapUIDs)
+{
+    tileSprite = other.tileSprite;
+    tileShape = other.tileShape;
+    objectID = other.objectID;
+
+    spritesLevel1 = other.spritesLevel1;
+    spritesLevel2 = other.spritesLevel2;
+
+    spritesLevel1.changeUIDs(mapUIDs);
+    spritesLevel2.changeUIDs(mapUIDs);
+
+    passableBase = other.passableBase;
+    passableLocal = other.passableLocal;
+
+    setGraphicsPixmapItemValues();
+
+    if(objectID == MapObj::None)
+	updateObjectID();
 }
 
 void MapTile::setGraphicsPixmapItemValues(void)
@@ -547,6 +591,14 @@ void MapTile::removeSpriteSection(quint32 uid)
     if(res1 || res2) updateObjectID();
 }
 
+QSet<quint32> MapTile::uids(void) const
+{
+    QSet<quint32> res;
+    res += spritesLevel1.uids();
+    res += spritesLevel2.uids();
+    return res;
+}
+
 QDomElement & operator<< (QDomElement & el, const MapTile & tile)
 {
     el << tile.mpos;
@@ -591,17 +643,14 @@ QDomElement & operator>> (QDomElement & el, MapTile & tile)
     return el;
 }
 
-MapTiles::MapTiles(const MapTiles & tiles, const QRect & area) : msize(area.size())
+MapTiles::MapTiles(const QSize & sz) : msize(sz)
 {
     reserve(msize.width() * msize.height());
 
-    for(int yy = area.y(); yy < area.y() + area.height(); ++yy)
+    for(int yy = 0; yy < msize.height(); ++yy)
     {
-	for(int xx = area.x(); xx < area.x() + area.width(); ++xx)
-        {
-	    const MapTile* tile = tiles.tileConst(QPoint(xx, yy));
-	    if(tile) *this << MapTile(*tile);
-        }
+	for(int xx = 0; xx < msize.width(); ++xx)
+    	    *this << MapTile(mp2til_t(), QPoint(xx, yy));
     }
 }
 
@@ -622,19 +671,35 @@ QString MapTiles::sizeDescription(void) const
     return "custom";
 }
 
-void MapTiles::newMap(const QSize & sz)
+QRect MapTiles::fixedRect(const QRect & srcrt, const QPoint & dstpt) const
 {
-    msize = sz;
-    reserve(msize.width() * msize.height());
+    QRect res = srcrt;
 
-    for(int yy = 0; yy < msize.height(); ++yy)
+    if(dstpt.x() + srcrt.width() > msize.width())
+	res.setWidth(msize.width() - dstpt.x() + srcrt.width());
+
+    if(dstpt.y() + srcrt.height() > msize.height())
+	res.setHeight(msize.height() - dstpt.y() + srcrt.height());
+
+    return res;
+}
+
+void MapTiles::importTiles(const MapTiles & tiles, const QRect & srcrt, const QPoint & dstpt, QMap<quint32, quint32> & mapUIDs)
+{
+    for(int yy = 0; yy < srcrt.height(); ++yy)
     {
-	for(int xx = 0; xx < msize.width(); ++xx)
-    	    *this << MapTile(mp2til_t(), QPoint(xx, yy));
+	for(int xx = 0; xx < srcrt.width(); ++xx)
+	{
+	    const MapTile* srcTile = tiles.tileConst(QPoint(srcrt.x() + xx, srcrt.y() + yy));
+	    MapTile* dstTile = tile(QPoint(dstpt.x() + xx, dstpt.y() + yy));
+
+	    if(srcTile && dstTile)
+		dstTile->importTile(*srcTile, mapUIDs);
+	}
     }
 }
 
-bool MapTiles::importMap(const QSize & sz, const QVector<mp2til_t> & mp2Tiles, const QVector<mp2ext_t> & mp2Sprites)
+bool MapTiles::importTiles(const QSize & sz, const QVector<mp2til_t> & mp2Tiles, const QVector<mp2ext_t> & mp2Sprites)
 {
     msize = sz;
     reserve(msize.width() * msize.height());
@@ -749,18 +814,6 @@ void MapTiles::insertToScene(QGraphicsScene & scene)
 	scene.addItem(& (*it));
 }
 
-void MapTiles::fixedOffset(void)
-{
-    if(size())
-    {
-	QPoint offset = front().mapPos();
-
-	if(offset != QPoint(0, 0))
-	    for(iterator it = begin(); it != end(); ++it)
-		(*it).setMapPos((*it).mapPos() - offset);
-    }
-}
-
 QDomElement & operator<< (QDomElement & el, const MapTiles & tiles)
 {
     el << tiles.msize;
@@ -794,11 +847,6 @@ QDomElement & operator>> (QDomElement & el, MapTiles & tiles)
     }
 
     return el;
-}
-
-MapArea::MapArea(const MapArea & ma, const QRect & rt) : tiles(ma.tiles, rt), objects(ma.objects, rt), uniq(ma.uniq)
-{
-    tiles.fixedOffset();
 }
 
 void MapArea::importMP2Towns(const QVector<H2::TownPos> & towns)
@@ -857,31 +905,17 @@ void MapArea::importMP2SphinxRiddles(const QVector<H2::SphinxPos> & sphinxes)
     }
 }
 
-void MapArea::importArea(const MapArea & area, const QPoint & dst)
+void MapArea::importArea(const MapArea & area, const QRect & srcrt, const QPoint & dstpt)
 {
     QSize mapSize = area.tiles.mapSize();
+    QRect srcrt2 = tiles.fixedRect(srcrt, dstpt);
 
-    if(dst.x() + area.tiles.mapSize().width() > tiles.mapSize().width())
-	mapSize.setWidth(tiles.mapSize().width() - dst.x() + area.tiles.mapSize().width());
+    QMap<quint32, quint32> mapUIDs = objects.importObjects(area.objects, srcrt2, dstpt, uniq);
+    uniq += mapUIDs.size();
+    mapUIDs[0xFFFFFFFF] = uniq;
 
-    if(dst.y() + area.tiles.mapSize().height() > tiles.mapSize().height())
-	mapSize.setHeight(tiles.mapSize().height() - dst.y() + area.tiles.mapSize().height());
-
-    for(int yy = 0; yy < mapSize.height(); ++yy)
-    {
-	for(int xx = 0; xx < mapSize.width(); ++xx)
-	{
-	    const MapTile* srcTile = area.tiles.tileConst(QPoint(xx, yy));
-	    MapTile* dstTile = tiles.tile(QPoint(dst.x() + xx, dst.y() + yy));
-
-	    if(srcTile && dstTile)
-	    {
-		QPoint tmp = dstTile->mapPos();
-		*dstTile = *srcTile;
-		dstTile->setMapPos(tmp);
-	    }
-	}
-    }
+    tiles.importTiles(area.tiles, srcrt2, dstpt, mapUIDs);
+    uniq = mapUIDs[0xFFFFFFFF];
 }
 
 QDomElement & operator<< (QDomElement & el, const MapArea & area)
@@ -1022,11 +1056,6 @@ const QSize & MapData::size(void) const
     return mapTiles.mapSize();
 }
 
-quint32 MapData::uniq(void)
-{
-    return mapArea.uniq++;
-}
-
 const QStringList & MapData::tavernRumorsList(void) const
 {
     return tavernRumors;
@@ -1056,7 +1085,7 @@ void MapData::mousePressEvent(QGraphicsSceneMouseEvent* event)
     if(currentObject.isValid())
     {
 	if(event->buttons() & Qt::LeftButton)
-	    addMapObject(currentObject.scenePos, currentObject, uniq());
+	    addMapObject(currentObject.scenePos, currentObject, mapArea.uid());
 	else
 	    currentObject.reset();
 	update(currentObject.area());
@@ -1220,16 +1249,25 @@ void MapData::copyToBuffer(void)
 
     if(selected.size())
     {
-	selectedArea = QSharedPointer<MapArea>(new MapArea(mapArea, mapToTile(selectionArea().boundingRect().toRect())));
+	const QRect srcrt = mapToRect(selectionArea().boundingRect().toRect());
+	MapArea* ptr = new MapArea(srcrt.size());
+	ptr->importArea(mapArea, srcrt, QPoint(0, 0));
+	selectedArea = QSharedPointer<MapArea>(ptr);
         emit validBuffer(true);
     }
 }
 
+bool MapData::isValidBuffer(void) const
+{
+    return ! selectedArea.isNull();
+}
+
 void MapData::pasteFromBuffer(void)
 {
-    if(tileOverMouse && !selectedArea.isNull())
+    if(tileOverMouse && isValidBuffer())
     {
-	mapArea.importArea(*selectedArea.data(), tileOverMouse->mapPos());
+	const MapArea & selMapArea = *selectedArea.data();
+	mapArea.importArea(selMapArea, QRect(QPoint(0, 0), selMapArea.size()), tileOverMouse->mapPos());
 	emit dataModified();
     }
 }
@@ -1285,15 +1323,51 @@ void MapData::removeObjectsAction(QAction* act)
 
     if(act)
     {
-        //int type = act->data().toInt();
+        int type = act->data().toInt();
 	QList<QGraphicsItem*> selected = selectedItems();
+	QSet<quint32> uids;
 
 	for(QList<QGraphicsItem*>::iterator
 	    it = selected.begin(); it != selected.end(); ++it)
 	{
-	    // code: remove objects
+	    MapTile* tile = qgraphicsitem_cast<MapTile*>(*it);
+	    if(tile) uids += tile->uids();
 	}
 
+	switch(type)
+	{
+	    // remove buildings
+	    case 1:
+	    // remove mounts/rocs
+	    case 2:
+	    // remove trees/shrubs
+	    case 3:
+	    // remove resources
+	    case 4:
+	    // remove artifacts
+	    case 5:
+	    // remove monsters
+	    case 6:
+	    // remove heroes
+	    case 7:
+		uids.clear();
+		break;
+
+	    // Remove all objects
+	    case 10:
+		break;
+
+	    default: uids.clear(); break;
+	}
+
+	for(QSet<quint32>::const_iterator
+	    it = uids.begin(); it != uids.end(); ++it)
+	{
+	    mapTiles.removeSprites(*it);
+	    mapObjects.remove(*it);
+	}
+
+	update();
 	emit dataModified();
     }
 }
@@ -1302,7 +1376,8 @@ void MapData::newMap(const QSize & msz, const QString &)
 {
     const QSize & tileSize = EditorTheme::tileSize();
 
-    mapTiles.newMap(msz);
+    mapArea = MapArea(msz);
+
     mapTiles.insertToScene(*this);
 
     setSceneRect(QRect(QPoint(0, 0),
@@ -1337,7 +1412,7 @@ bool MapData::loadMapMP2(const QString & mapFile)
 	return false;
 
     // import tiles
-    if(! mapTiles.importMap(mp2.size, mp2.tiles, mp2.sprites))
+    if(! mapTiles.importTiles(mp2.size, mp2.tiles, mp2.sprites))
 	return false;
 
     mapName = mp2.name;
@@ -1496,15 +1571,15 @@ bool MapData::saveMapXML(const QString & mapFile) const
     return true;
 }
 
-QPoint MapData::mapToTile(const QPoint & pt) const
+QPoint MapData::mapToPoint(const QPoint & pt) const
 {
     const MapTile* tile = qgraphicsitem_cast<const MapTile*>(itemAt(pt));
     return tile ? tile->mapPos() : QPoint(-1, -1);
 }
 
-QRect MapData::mapToTile(const QRect & rt) const
+QRect MapData::mapToRect(const QRect & rt) const
 {
-    return QRect(mapToTile(rt.topLeft()), mapToTile(rt.bottomRight()));
+    return QRect(mapToPoint(rt.topLeft()), mapToPoint(rt.bottomRight()));
 }
 
 bool MP2Format::loadMap(const QString & mapFile)
@@ -1958,7 +2033,6 @@ void MapData::editObjectAttributes(void)
     if(tileOverMouse)
 	switch(tileOverMouse->object())
     {
-    	case MapObj::Resource:	editResourceDialog(*tileOverMouse); break;
     	case MapObj::Event:	editMapEventDialog(*tileOverMouse); break;
     	case MapObj::RndCastle:
     	case MapObj::RndTown:
@@ -1970,12 +2044,16 @@ void MapData::editObjectAttributes(void)
 
     	default:
 	{
+	    QMessageBox::information(qobject_cast<MapWindow*>(parent()), "Object Attributes",
+		    "Sorry!\nChange attributes of the object is not yet available."); break;
+/*
 	    Form::ObjectEventsDialog form;
 
 	    if(QDialog::Accepted == form.exec())
 	    {
 		// store map object
 	    }
+*/
 	}
     }
 }
@@ -2011,27 +2089,6 @@ void MapData::editMapEventDialog(const MapTile & tile)
 	if(QDialog::Accepted == form.exec())
 	{
 	    *event = form.result(event->pos(), event->uid());
-
-	    emit dataModified();
-	}
-    }
-}
-
-void MapData::editResourceDialog(const MapTile & tile)
-{
-    const MapTileExt* ext = tile.levels1().find(MapTileExt::isResource);
-
-    if(ext)
-    {
-	MapResource* res = dynamic_cast<MapResource*>(mapObjects.find(tile.mapPos()).data());
-	Form::EditResourceDialog form(res ? res->type : MapTileExt::resource(*ext), res ? res->count : 0);
-
-	if(QDialog::Accepted == form.exec())
-	{
-	    if(form.checkBoxDefault->isChecked())
-		mapObjects.remove(tile.mapPos());
-	    else
-		mapObjects.push_back(new MapResource(tile.mapPos(), ext->uid(), MapTileExt::resource(*ext), form.spinBoxCount->value()));
 
 	    emit dataModified();
 	}
@@ -2143,7 +2200,6 @@ void MapData::addMapObject(const QPoint & pos, const CompositeObject & obj, quin
 	    {
 		case MapObj::Bottle:
 		case MapObj::Sign:	objPtr = new MapSign(tile->mapPos(), uid); break;
-    		case MapObj::Resource:	objPtr = new MapResource(tile->mapPos(), uid); break;
 		case MapObj::Event:	objPtr = new MapEvent(tile->mapPos(), uid); break;
     		case MapObj::RndCastle:
     		case MapObj::RndTown:
