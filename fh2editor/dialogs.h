@@ -577,8 +577,17 @@ namespace Form
 
 	QVBoxLayout*		verticalLayout;
 	QLabel*			labelPixmap;
+	QSize			sizeMap;
 
 	void			generateFromTiles(const MapTiles &);
+
+    signals:
+	void			windowPositionChanged(const QPoint &);
+
+    protected:
+	QPoint			fixOffset(void) const;
+	void			mouseMoveEvent(QMouseEvent*);
+	void			mousePressEvent(QMouseEvent*);
     };
 
     class MapEventDialog : public QDialog

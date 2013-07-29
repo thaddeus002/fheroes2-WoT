@@ -186,6 +186,7 @@ MapWindow::MapWindow(MainWindow* parent) : QGraphicsView(parent), mapData(this)
     connect(selectAllAct, SIGNAL(triggered()), &mapData, SLOT(selectAllTiles()));
 
     miniMap = new Form::MiniMap(this);
+    connect(miniMap, SIGNAL(windowPositionChanged(const QPoint &)), this, SLOT(viewportSetPosition(const QPoint &)));
 }
 
 void MapWindow::newFile(const QSize & sz, int sequenceNumber)
@@ -385,4 +386,19 @@ void MapWindow::contextMenuEvent(QContextMenuEvent* event)
 Form::MiniMap* MapWindow::miniMapWidget(void)
 {
     return miniMap;
+}
+
+void MapWindow::viewportSetPosition(const QPoint & miniPos)
+{
+    QPointF pos(mapData.size().width() * miniPos.x(), mapData.size().height() * miniPos.y());
+
+    pos.rx() /= miniMap->sizeMap.width();
+    pos.ry() /= miniMap->sizeMap.height();
+
+    if(0 <= pos.x() && 0 <= pos.y() &&
+	pos.x() < mapData.size().width() && pos.y() < mapData.size().height())
+    {
+	const QSize & ts = EditorTheme::tileSize();
+	centerOn(pos.x() * ts.width(), pos.y() * ts.height());
+    }
 }

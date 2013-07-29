@@ -1814,11 +1814,17 @@ DayEvent Form::DayEventDialog::result(void) const
     return res;
 }
 
-Form::MiniMap::MiniMap(QWidget* parent) : QFrame(parent)
+Form::MiniMap::MiniMap(QWidget* parent) : QFrame(parent), sizeMap(144, 144)
 {
     labelPixmap = new QLabel(this);
     verticalLayout = new QVBoxLayout(this);
     verticalLayout->addWidget(labelPixmap);
+}
+
+QPoint Form::MiniMap::fixOffset(void) const
+{
+    const QRect & brect = visibleRegion().boundingRect();
+    return QPoint((brect.width() - sizeMap.width()) / 2, (brect.height() - sizeMap.height()) / 2);
 }
 
 void Form::MiniMap::generateFromTiles(const MapTiles & tiles)
@@ -1848,16 +1854,15 @@ void Form::MiniMap::generateFromTiles(const MapTiles & tiles)
 	}
     }
 
-    const QSize sz(144, 144);
     QImage scaled;
 
     if(ms.width() > ms.height())
-	scaled = image.scaledToWidth(sz.width());
+	scaled = image.scaledToWidth(sizeMap.width());
     else
     if(ms.width() < ms.height())
-        scaled = image.scaledToHeight(sz.height());
+        scaled = image.scaledToHeight(sizeMap.height());
     else
-        scaled = image.scaled(sz);
+        scaled = image.scaled(sizeMap);
 
     QPixmap border(scaled.size() + QSize(2, 2));
     border.fill(QColor(0x10, 0x10, 0x10));
@@ -1870,6 +1875,23 @@ void Form::MiniMap::generateFromTiles(const MapTiles & tiles)
     setFixedSize(minSize);
 
     QApplication::restoreOverrideCursor();
+}
+
+void Form::MiniMap::mouseMoveEvent(QMouseEvent* event)
+{
+    if(event->buttons() & Qt::LeftButton)
+    {
+	emit windowPositionChanged(event->pos() - fixOffset());
+    }
+}
+
+
+void Form::MiniMap::mousePressEvent(QMouseEvent* event)
+{
+    if(event->buttons() & Qt::LeftButton)
+    {
+	emit windowPositionChanged(event->pos() - fixOffset());
+    }
 }
 
 Form::MapEventDialog::MapEventDialog(const MapEvent & event, int kingdomColors)

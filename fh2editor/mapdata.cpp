@@ -907,7 +907,6 @@ void MapArea::importMP2SphinxRiddles(const QVector<H2::SphinxPos> & sphinxes)
 
 void MapArea::importArea(const MapArea & area, const QRect & srcrt, const QPoint & dstpt)
 {
-    QSize mapSize = area.tiles.mapSize();
     QRect srcrt2 = tiles.fixedRect(srcrt, dstpt);
 
     QMap<quint32, quint32> mapUIDs = objects.importObjects(area.objects, srcrt2, dstpt, uniq);

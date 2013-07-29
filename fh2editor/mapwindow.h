@@ -63,6 +63,7 @@ protected:
 private slots:
     void	mapWasSelectionChanged(void);
     void	mapWasModified(void);
+    void	viewportSetPosition(const QPoint &);
 
 private:
     friend class MainWindow;
