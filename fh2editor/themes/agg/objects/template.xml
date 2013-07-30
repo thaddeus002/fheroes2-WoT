@@ -41,10 +41,13 @@
         <sprite px="1" py="0" index="1" level="action" passable="0x01F8" />
         <sprite px="2" py="0" index="2" level="bottom" passable="0x01F8" />
     </faeriering>
-    <campfire width="2" height="1" cid="0x08" >
+    <campfire1 width="1" height="1" cid="0x08" >
+        <sprite px="0" py="0" index="0" level="action" passable="0x01F8" animation="6" />
+    </campfire1>
+    <campfire2 width="2" height="1" cid="0x08" >
         <sprite px="0" py="0" index="0" level="top" animation="6" />
         <sprite px="1" py="0" index="7" level="action" passable="0x01F8" animation="6" />
-    </campfire>
+    </campfire2>
     <hillfort width="3" height="2" cid="0x47" >
         <sprite px="1" py="0" index="0" level="top" />
         <sprite px="2" py="0" index="1" level="top" />

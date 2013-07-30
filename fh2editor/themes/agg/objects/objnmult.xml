@@ -95,5 +95,5 @@
         <sprite px="2" py="2" index="123" level="action" passable="0x01F8" />
     </object>
 
-    <template section="campfire" name="Camp Fire" index="124" />
+    <template section="campfire2" name="Camp Fire" index="124" />
 </objects>

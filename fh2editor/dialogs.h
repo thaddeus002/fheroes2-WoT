@@ -123,6 +123,14 @@ namespace Form
 	QString			result;
     };
 
+    class TabWidgetWest : public QTabWidget
+    {
+        Q_OBJECT
+
+    public:
+	TabWidgetWest(QWidget*);
+    };
+
     class SelectImageObject : public QDialog
     {
         Q_OBJECT
@@ -131,7 +139,7 @@ namespace Form
         SelectImageObject();
 
         QVBoxLayout*		verticalLayout;
-        QTabWidget*		tabWidget;
+        TabWidgetWest*		tabWidget;
         QHBoxLayout*		horizontalLayout;
         QPushButton*		pushButtonSelect;
         QSpacerItem*		horizontalSpacer;
@@ -568,26 +576,29 @@ namespace Form
 	void			setEnableOKButton(const QString &);
     };
 
-    class MiniMap : public QFrame
+    class MiniMap : public QLabel
     {
 	Q_OBJECT
 
     public:
 	MiniMap(QWidget*);
 
-	QVBoxLayout*		verticalLayout;
-	QLabel*			labelPixmap;
-	QSize			sizeMap;
-
 	void			generateFromTiles(const MapTiles &);
+	void			setWindowPos(int, int, int, int);
+
+	const QSize & 		mapSize(void) const { return miniMapSize; }
 
     signals:
-	void			windowPositionChanged(const QPoint &);
+	void			windowPositionNeedChange(const QPoint &);
 
     protected:
-	QPoint			fixOffset(void) const;
 	void			mouseMoveEvent(QMouseEvent*);
 	void			mousePressEvent(QMouseEvent*);
+	void			paintEvent(QPaintEvent*);
+
+	QSize			miniMapSize;
+	QRect			windowPos;
+	QPixmap			windowPixmap;
     };
 
     class MapEventDialog : public QDialog

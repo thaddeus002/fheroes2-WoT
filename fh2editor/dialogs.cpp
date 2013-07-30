@@ -306,11 +306,46 @@ bool Form::SelectImageTab::isSelected(void) const
     return listWidget->selectedItems().size();
 }
 
+class TabWidgetWestStyle : public QProxyStyle
+{
+public:
+    QSize sizeFromContents(ContentsType type, const QStyleOption* option, const QSize & size, const QWidget* widget) const
+    {
+	QSize res = QProxyStyle::sizeFromContents(type, option, size, widget);
+
+	if(type == QStyle::CT_TabBarTab)
+	    res.transpose();
+
+	return res;
+    }
+ 
+    void drawControl(ControlElement element, const QStyleOption* option, QPainter* painter, const QWidget* widget) const
+    {
+	const QStyleOptionTab* tab = qstyleoption_cast<const QStyleOptionTab*>(option);
+
+	if(element == CE_TabBarTabLabel && tab)
+	{
+	    QStyleOptionTab opt(*tab);
+	    opt.shape = QTabBar::RoundedNorth;
+	    QProxyStyle::drawControl(element, &opt, painter, widget);
+	}
+	else
+	    QProxyStyle::drawControl(element, option, painter, widget);
+    }
+};
+
+Form::TabWidgetWest::TabWidgetWest(QWidget* parent) : QTabWidget(parent)
+{
+    setTabPosition(QTabWidget::West);
+    tabBar()->setStyle(new TabWidgetWestStyle);
+    tabBar()->setShape(QTabBar::RoundedWest);
+}
+
 Form::SelectImageObject::SelectImageObject()
 {
     setWindowTitle(QApplication::translate("SelectImage", "Select Object", 0, QApplication::UnicodeUTF8));
 
-    tabWidget = new QTabWidget(this);
+    tabWidget = new TabWidgetWest(this);
 
     const QString dataFolder("objects");
     Editor::MyXML groupsElem(EditorTheme::resourceFile(dataFolder, "groups.xml"), "groups");
@@ -352,7 +387,7 @@ Form::SelectImageObject::SelectImageObject()
 
     // set size
     QSettings & settings = Resource::localSettings();
-    setMinimumSize(QSize(540, 410));
+    setMinimumSize(QSize(550, 410));
     resize(settings.value("SelectImageDialog/size", minimumSize()).toSize());
 
     tabSwitched(settings.value("SelectImageDialog/lastTab", 0).toInt());
@@ -1814,17 +1849,12 @@ DayEvent Form::DayEventDialog::result(void) const
     return res;
 }
 
-Form::MiniMap::MiniMap(QWidget* parent) : QFrame(parent), sizeMap(144, 144)
+Form::MiniMap::MiniMap(QWidget* parent) : QLabel(parent), miniMapSize(144, 144)
 {
-    labelPixmap = new QLabel(this);
-    verticalLayout = new QVBoxLayout(this);
-    verticalLayout->addWidget(labelPixmap);
-}
-
-QPoint Form::MiniMap::fixOffset(void) const
-{
-    const QRect & brect = visibleRegion().boundingRect();
-    return QPoint((brect.width() - sizeMap.width()) / 2, (brect.height() - sizeMap.height()) / 2);
+    //labelPixmap = new QLabel(this);
+    setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    //verticalLayout = new QVBoxLayout(this);
+    //verticalLayout->addWidget(labelPixmap);
 }
 
 void Form::MiniMap::generateFromTiles(const MapTiles & tiles)
@@ -1857,18 +1887,18 @@ void Form::MiniMap::generateFromTiles(const MapTiles & tiles)
     QImage scaled;
 
     if(ms.width() > ms.height())
-	scaled = image.scaledToWidth(sizeMap.width());
+	scaled = image.scaledToWidth(miniMapSize.width());
     else
     if(ms.width() < ms.height())
-        scaled = image.scaledToHeight(sizeMap.height());
+        scaled = image.scaledToHeight(miniMapSize.height());
     else
-        scaled = image.scaled(sizeMap);
+        scaled = image.scaled(miniMapSize);
 
     QPixmap border(scaled.size() + QSize(2, 2));
     border.fill(QColor(0x10, 0x10, 0x10));
     QPainter paint(& border);
     paint.drawImage(1, 1, scaled);
-    labelPixmap->setPixmap(border);
+    setPixmap(border);
 
     QSize minSize = minimumSizeHint();
     resize(minSize);
@@ -1877,20 +1907,41 @@ void Form::MiniMap::generateFromTiles(const MapTiles & tiles)
     QApplication::restoreOverrideCursor();
 }
 
+void Form::MiniMap::setWindowPos(int px, int py, int pw, int ph)
+{
+    if(windowPos != QRect(px, py, pw, ph))
+    {
+	windowPos.setRect(px, py, pw, ph);
+
+	if(windowPixmap.isNull() || windowPixmap.size() != windowPos.size())
+	{
+	    windowPixmap = Editor::pixmapBorder(windowPos.size(), QColor(220, 0, 220));
+	}
+
+	update();
+    }
+}
+
+void Form::MiniMap::paintEvent(QPaintEvent* event)
+{
+    QLabel::paintEvent(event);
+    QPainter painter(this);
+    painter.drawPixmap(windowPos.topLeft() + QPoint(1, 1), windowPixmap);
+}
+
 void Form::MiniMap::mouseMoveEvent(QMouseEvent* event)
 {
     if(event->buttons() & Qt::LeftButton)
     {
-	emit windowPositionChanged(event->pos() - fixOffset());
+	emit windowPositionNeedChange(event->pos() - QPoint(1, 1));
     }
 }
-
 
 void Form::MiniMap::mousePressEvent(QMouseEvent* event)
 {
     if(event->buttons() & Qt::LeftButton)
     {
-	emit windowPositionChanged(event->pos() - fixOffset());
+	emit windowPositionNeedChange(event->pos() - QPoint(1, 1));
     }
 }
 

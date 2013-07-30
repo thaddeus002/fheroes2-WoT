@@ -186,7 +186,13 @@ MapWindow::MapWindow(MainWindow* parent) : QGraphicsView(parent), mapData(this)
     connect(selectAllAct, SIGNAL(triggered()), &mapData, SLOT(selectAllTiles()));
 
     miniMap = new Form::MiniMap(this);
-    connect(miniMap, SIGNAL(windowPositionChanged(const QPoint &)), this, SLOT(viewportSetPosition(const QPoint &)));
+    connect(miniMap, SIGNAL(windowPositionNeedChange(const QPoint &)), this, SLOT(viewportSetPositionFromMiniMap(const QPoint &)));
+
+    // change size
+    connect(horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(changeViewedRect()));
+    connect(verticalScrollBar() , SIGNAL(valueChanged(int)), this, SLOT(changeViewedRect()));
+    connect(horizontalScrollBar(), SIGNAL(rangeChanged(int, int)), this, SLOT(changeViewedRect()));
+    connect(verticalScrollBar() , SIGNAL(rangeChanged(int, int)), this, SLOT(changeViewedRect()));
 }
 
 void MapWindow::newFile(const QSize & sz, int sequenceNumber)
@@ -388,17 +394,34 @@ Form::MiniMap* MapWindow::miniMapWidget(void)
     return miniMap;
 }
 
-void MapWindow::viewportSetPosition(const QPoint & miniPos)
+void MapWindow::viewportSetPositionFromMiniMap(const QPoint & miniPos)
 {
-    QPointF pos(mapData.size().width() * miniPos.x(), mapData.size().height() * miniPos.y());
+    if(miniMap)
+    {
+	QPointF pos(mapData.size().width() * miniPos.x(), mapData.size().height() * miniPos.y());
 
-    pos.rx() /= miniMap->sizeMap.width();
-    pos.ry() /= miniMap->sizeMap.height();
+	pos.rx() /= miniMap->mapSize().width();
+	pos.ry() /= miniMap->mapSize().height();
 
-    if(0 <= pos.x() && 0 <= pos.y() &&
-	pos.x() < mapData.size().width() && pos.y() < mapData.size().height())
+	if(0 <= pos.x() && 0 <= pos.y() &&
+	    pos.x() < mapData.size().width() && pos.y() < mapData.size().height())
+	{
+	    const QSize & ts = EditorTheme::tileSize();
+	    centerOn(pos.x() * ts.width(), pos.y() * ts.height());
+	}
+    }
+}
+
+void MapWindow::changeViewedRect(void)
+{
+    if(miniMap)
     {
 	const QSize & ts = EditorTheme::tileSize();
-	centerOn(pos.x() * ts.width(), pos.y() * ts.height());
+	const QSize absSize = QSize(mapData.size().width() * ts.width(), mapData.size().height() * ts.height());
+	const QSize tmpSize = QSize(size().width() * miniMap->mapSize().width(), size().height() * miniMap->mapSize().height());
+
+	miniMap->setWindowPos(horizontalScrollBar()->value() * miniMap->mapSize().width() / absSize.width(),
+				verticalScrollBar()->value() * miniMap->mapSize().height() / absSize.height(),
+				tmpSize.width() / absSize.width(), tmpSize.height() / absSize.height());
     }
 }

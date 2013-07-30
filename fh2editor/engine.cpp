@@ -3193,3 +3193,4 @@ QString AccessResult::transcribe(void) const
 {
     return NULL;
 }
+

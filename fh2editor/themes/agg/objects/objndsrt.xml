@@ -25,7 +25,7 @@
     <template section="bottom_1x1" name="Cactus 49" index="49" cid="0x6D" />
     <template section="bottom_2x1_1" name="Cactus 50" index="50" cid="0x6D" />
     <template section="bottom_2x1_1" name="Cactus 52" index="52" cid="0x6D" />
-    <template section="campfire" name="Camp Fire" index="54" />
+    <template section="campfire2" name="Camp Fire" index="54" />
     <object name="Desert Tent" width="3" height="2" cid="0x22" >
         <sprite px="1" py="0" index="69" level="top" />
         <sprite px="2" py="0" index="70" level="top" />
