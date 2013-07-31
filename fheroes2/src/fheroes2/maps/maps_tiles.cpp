@@ -131,11 +131,11 @@ std::string Maps::TilesAddon::String(int lvl) const
 {
     std::ostringstream os;
     os << "----------------" << lvl << "--------" << std::endl <<
+	  "uniq            : " << uniq << std::endl <<
 	  "object          : " << "0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(object) <<
 				", (" << ICN::GetString(MP2::GetICNObject(object)) << ")" << std::endl <<
 	  "index           : " << std::dec << static_cast<int>(index) << std::endl <<
-	  "uniq            : " << uniq << std::endl <<
-	  "level           : " << static_cast<int>(level) << std::endl <<
+	  "level           : " << static_cast<int>(level) << ", (" << static_cast<int>(level % 4) << ")" << std::endl <<
 	  "tmp             : " << static_cast<int>(tmp) << std::endl;
     return os.str();
 }
@@ -146,7 +146,7 @@ Maps::TilesAddon & Maps::TilesAddon::operator= (const Maps::TilesAddon & ta)
     object = ta.object;
     index = ta.index;
     uniq = ta.uniq;
-    
+
     return *this;
 }
 

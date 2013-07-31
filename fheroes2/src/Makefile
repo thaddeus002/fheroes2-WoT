@@ -13,7 +13,7 @@ LIBS :=
 ifdef DEBUG
 CFLAGS := $(CFLAGS) -O0 -g -pedantic -DWITH_DEBUG
 else
-CFLAGS := $(CFLAGS) -O2
+CFLAGS := -O2 $(CFLAGS)
 endif
 
 ifndef WITHOUT_MIXER

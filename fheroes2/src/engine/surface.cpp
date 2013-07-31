@@ -1249,35 +1249,34 @@ Surface Surface::ScaleMinifyByTwo(const Surface & sf_src, bool event)
     Surface sf_dst;
     const u8 mul = 2;
 
-    if(sf_src.isValid() && 4 < sf_src.w() && 4 < sf_src.h())
+    u16 w = sf_src.w() / mul;
+    u16 h = sf_src.h() / mul;
+
+    if(w == 0) w = 1;
+    if(h == 0) h = 1;
+
+    sf_dst.Set(w, h, sf_src.depth(), sf_src.amask());
+
+    u16 x, y, x2, y2;
+
+    sf_dst.Lock();
+    sf_src.Lock();
+
+    for(y = 0; y < h; y++)
     {
-	u16 x, y, x2, y2;
-
-	u16 w = sf_src.w() / mul;
-	u16 h = sf_src.h() / mul;
-
-	sf_dst.Set(w, h, sf_src.depth(), sf_src.amask());
-
-	sf_dst.Lock();
-	sf_src.Lock();
-
-	for(y = 0; y < h; y++)
-	{
-    	    y2 = mul * y;
-	    for(x = 0; x < w; x++)
-    	    {
-		x2 = mul * x;
-		const u32 & p = AVERAGE(sf_src.surface->format, sf_src.GetPixel(x2, y2), sf_src.GetPixel(x2 + 1, y2));
-		const u32 & q = AVERAGE(sf_src.surface->format, sf_src.GetPixel(x2, y2 + 1), sf_src.GetPixel(x2 + 1, y2 + 1));
-		sf_dst.SetPixel(x, y, AVERAGE(sf_src.surface->format, p, q));
-		if(event) LocalEvent::Get().HandleEvents(false);
-    	    }
-	}
-	sf_src.Unlock();
-	sf_dst.Unlock();
+    	y2 = mul * y;
+	for(x = 0; x < w; x++)
+    	{
+	    x2 = mul * x;
+	    const u32 & p = AVERAGE(sf_src.surface->format, sf_src.GetPixel(x2, y2), sf_src.GetPixel(x2 + 1, y2));
+	    const u32 & q = AVERAGE(sf_src.surface->format, sf_src.GetPixel(x2, y2 + 1), sf_src.GetPixel(x2 + 1, y2 + 1));
+	    sf_dst.SetPixel(x, y, AVERAGE(sf_src.surface->format, p, q));
+	    if(event) LocalEvent::Get().HandleEvents(false);
+    	}
     }
-    else
-	std::cerr << __FUNCTION__ << "invalid surface" << std::endl;
+
+    sf_src.Unlock();
+    sf_dst.Unlock();
 
     return sf_dst;
 }

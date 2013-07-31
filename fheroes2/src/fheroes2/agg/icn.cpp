@@ -1123,6 +1123,7 @@ u16 ICN::AnimationFrame(const icn_t & icn, const u8 & start, const u32 & ticket,
 		case 0x76:
 		case 0x86:
 		case 0x96:
+		case 0xA6:
 		    return start + (ticket % 15) + 1;
 
 		// whirlpool
@@ -1313,7 +1314,7 @@ u16 ICN::AnimationFrame(const icn_t & icn, const u8 & start, const u32 & ticket,
 	    switch(start)
 	    {
 		// shadow of lava
-		case 0x4F:
+		case 0x4E:
 		case 0x58:
 		case 0x62:
 		    return start + (ticket % 9) + 1;
