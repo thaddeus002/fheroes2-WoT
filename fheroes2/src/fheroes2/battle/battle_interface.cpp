@@ -2040,12 +2040,12 @@ void Battle::Interface::MousePressRightBoardAction(u16 themes, const Cell & cell
 	else
 	switch(PocketPC::GetCursorAttackDialog(cell.GetPos(), allow))
 	{
-	    case Cursor::SWORD_TOPLEFT:     MouseLeftClickBoardAction(Cursor::SWORD_TOPLEFT, index, a); break;
-	    case Cursor::SWORD_TOPRIGHT:    MouseLeftClickBoardAction(Cursor::SWORD_TOPRIGHT, index, a); break;
-	    case Cursor::SWORD_RIGHT:       MouseLeftClickBoardAction(Cursor::SWORD_RIGHT, index, a); break;
-	    case Cursor::SWORD_BOTTOMRIGHT: MouseLeftClickBoardAction(Cursor::SWORD_BOTTOMRIGHT, index, a); break;
-	    case Cursor::SWORD_BOTTOMLEFT:  MouseLeftClickBoardAction(Cursor::SWORD_BOTTOMLEFT, index, a); break;
-	    case Cursor::SWORD_LEFT:        MouseLeftClickBoardAction(Cursor::SWORD_LEFT, index, a); break;
+	    case Cursor::SWORD_TOPLEFT:     MouseLeftClickBoardAction(Cursor::SWORD_TOPLEFT, cell, a); break;
+	    case Cursor::SWORD_TOPRIGHT:    MouseLeftClickBoardAction(Cursor::SWORD_TOPRIGHT, cell, a); break;
+	    case Cursor::SWORD_RIGHT:       MouseLeftClickBoardAction(Cursor::SWORD_RIGHT, cell, a); break;
+	    case Cursor::SWORD_BOTTOMRIGHT: MouseLeftClickBoardAction(Cursor::SWORD_BOTTOMRIGHT, cell, a); break;
+	    case Cursor::SWORD_BOTTOMLEFT:  MouseLeftClickBoardAction(Cursor::SWORD_BOTTOMLEFT, cell, a); break;
+	    case Cursor::SWORD_LEFT:        MouseLeftClickBoardAction(Cursor::SWORD_LEFT, cell, a); break;
 
 	    default: Dialog::ArmyInfo(*b, Dialog::READONLY|Dialog::BUTTONS); break;
 	}
