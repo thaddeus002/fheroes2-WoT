@@ -292,28 +292,29 @@ void DrawMonsterStats(const Point & dst, const Troop & troop)
     text.Blit(dst_pt);
 }
 
-const Sprite* GetModesSprite(u32 mod)
+Sprite GetModesSprite(u32 mod)
 {
     switch(mod)
     {
-	case Battle::SP_BLOODLUST:	return &AGG::GetICN(ICN::SPELLINF, 9);
-	case Battle::SP_BLESS:		return &AGG::GetICN(ICN::SPELLINF, 3);
-	case Battle::SP_HASTE:		return &AGG::GetICN(ICN::SPELLINF, 0);
-	case Battle::SP_SHIELD:	return &AGG::GetICN(ICN::SPELLINF, 10);
-	case Battle::SP_STONESKIN:	return &AGG::GetICN(ICN::SPELLINF, 13);
-	case Battle::SP_DRAGONSLAYER:	return &AGG::GetICN(ICN::SPELLINF, 8);
-	case Battle::SP_STEELSKIN:	return &AGG::GetICN(ICN::SPELLINF, 14);
-	case Battle::SP_ANTIMAGIC:	return &AGG::GetICN(ICN::SPELLINF, 12);
-	case Battle::SP_CURSE:		return &AGG::GetICN(ICN::SPELLINF, 4);
-	case Battle::SP_SLOW:		return &AGG::GetICN(ICN::SPELLINF, 1);
-	case Battle::SP_BERSERKER:	return &AGG::GetICN(ICN::SPELLINF, 5);
-	case Battle::SP_HYPNOTIZE:	return &AGG::GetICN(ICN::SPELLINF, 7);
-	case Battle::SP_BLIND:		return &AGG::GetICN(ICN::SPELLINF, 2);
-	case Battle::SP_PARALYZE:	return &AGG::GetICN(ICN::SPELLINF, 6);
-	case Battle::SP_STONE:		return &AGG::GetICN(ICN::SPELLINF, 11);
+	case Battle::SP_BLOODLUST:	return AGG::GetICN(ICN::SPELLINF, 9);
+	case Battle::SP_BLESS:		return AGG::GetICN(ICN::SPELLINF, 3);
+	case Battle::SP_HASTE:		return AGG::GetICN(ICN::SPELLINF, 0);
+	case Battle::SP_SHIELD:		return AGG::GetICN(ICN::SPELLINF, 10);
+	case Battle::SP_STONESKIN:	return AGG::GetICN(ICN::SPELLINF, 13);
+	case Battle::SP_DRAGONSLAYER:	return AGG::GetICN(ICN::SPELLINF, 8);
+	case Battle::SP_STEELSKIN:	return AGG::GetICN(ICN::SPELLINF, 14);
+	case Battle::SP_ANTIMAGIC:	return AGG::GetICN(ICN::SPELLINF, 12);
+	case Battle::SP_CURSE:		return AGG::GetICN(ICN::SPELLINF, 4);
+	case Battle::SP_SLOW:		return AGG::GetICN(ICN::SPELLINF, 1);
+	case Battle::SP_BERSERKER:	return AGG::GetICN(ICN::SPELLINF, 5);
+	case Battle::SP_HYPNOTIZE:	return AGG::GetICN(ICN::SPELLINF, 7);
+	case Battle::SP_BLIND:		return AGG::GetICN(ICN::SPELLINF, 2);
+	case Battle::SP_PARALYZE:	return AGG::GetICN(ICN::SPELLINF, 6);
+	case Battle::SP_STONE:		return AGG::GetICN(ICN::SPELLINF, 11);
 	default: break;
     }
-    return NULL;
+
+    return Sprite();
 }
 
 void DrawBattleStats(const Point & dst, const Troop & b)
@@ -330,9 +331,8 @@ void DrawBattleStats(const Point & dst, const Troop & b)
     for(u8 ii = 0; ii < ARRAY_COUNT(modes); ++ii)
 	if(b.isModes(modes[ii]))
 	{
-	    const Sprite* sprite = GetModesSprite(modes[ii]);
-	    if(sprite)
-		ow += sprite->w() + 4;
+	    const Sprite & sprite = GetModesSprite(modes[ii]);
+	    if(sprite.isValid()) ow += sprite.w() + 4;
 	}
 
     ow -= 4;
@@ -344,19 +344,19 @@ void DrawBattleStats(const Point & dst, const Troop & b)
     for(u8 ii = 0; ii < ARRAY_COUNT(modes); ++ii)
 	if(b.isModes(modes[ii]))
 	{
-	    const Sprite* sprite = GetModesSprite(modes[ii]);
-	    if(sprite)
+	    const Sprite & sprite = GetModesSprite(modes[ii]);
+	    if(sprite.isValid())
 	    {
-		sprite->Blit(ow, dst.y);
+		sprite.Blit(ow, dst.y);
 
 		const u16 duration = b.GetAffectedDuration(modes[ii]);
 		if(duration)
 		{
 		    text.Set(GetString(duration), Font::SMALL);
-		    text.Blit(ow + (sprite->w() - text.w()) / 2, dst.y + sprite->h() + 1);
+		    text.Blit(ow + (sprite.w() - text.w()) / 2, dst.y + sprite.h() + 1);
 		}
 
-		ow += sprite->w() + 4;
+		ow += sprite.w() + 4;
 	    }
 	}
 }

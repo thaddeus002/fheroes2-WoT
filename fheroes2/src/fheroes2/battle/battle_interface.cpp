@@ -943,19 +943,18 @@ Point GetTroopPosition(const Battle::Unit & b, const Sprite & sprite)
 void Battle::Interface::RedrawTroopSprite(const Unit & b) const
 {
     const  monstersprite_t & msi = b.GetMonsterSprite();
-    const Sprite* spmon1 = NULL;
-    const Sprite* spmon2 = NULL;
+    Sprite spmon1, spmon2;
 
     // redraw current
     if(b_current == &b)
     {
-	spmon1 = &AGG::GetICN(msi.icn_file, msi.frm_idle.start, b.isReflect());
+	spmon1 = AGG::GetICN(msi.icn_file, msi.frm_idle.start, b.isReflect());
 	spmon2 = (b.isReflect() ? b.GetContour(CONTOUR_REFLECT) : b.GetContour(CONTOUR_MAIN));
 
 	if(b_current_sprite)
 	{
-	    spmon1 = b_current_sprite;
-	    spmon2 = NULL;
+	    spmon1 = *b_current_sprite;
+	    spmon2.Reset();
 	}
     }
     else
@@ -966,20 +965,20 @@ void Battle::Interface::RedrawTroopSprite(const Unit & b) const
     }
     else
     {
-	spmon1 = &AGG::GetICN(msi.icn_file, b.GetFrame(), b.isReflect());
+	spmon1 = AGG::GetICN(msi.icn_file, b.GetFrame(), b.isReflect());
     }
 
-    if(spmon1)
+    if(spmon1.isValid())
     {
 	const Rect & rt = b.GetRectPosition();
-	Point sp = GetTroopPosition(b, *spmon1);
+	Point sp = GetTroopPosition(b, spmon1);
 
 	// move offset
 	if(b_move == &b)
 	{
 	    const animframe_t & frm = b_move->GetFrameState();
-	    const Sprite* spmon0 = &AGG::GetICN(msi.icn_file, frm.start, b.isReflect());
-	    const s16 ox = spmon0 ? spmon1->x() - spmon0->x() : 0;
+	    Sprite spmon0 = AGG::GetICN(msi.icn_file, frm.start, b.isReflect());
+	    const s16 ox = spmon1.x() - spmon0.x();
 
 	    if(frm.count)
 	    {
@@ -1005,12 +1004,12 @@ void Battle::Interface::RedrawTroopSprite(const Unit & b) const
 	}
 
 	// sprite monster
-	if(255 > b_current_alpha && b_current_sprite == spmon1)
-	    spmon1->Blit(b_current_alpha, sp.x, sp.y);
+	if(255 > b_current_alpha && spmon1 == *b_current_sprite)
+	    spmon1.Blit(b_current_alpha, sp.x, sp.y);
 	else
-	    spmon1->Blit(sp);
+	    spmon1.Blit(sp);
 	// contour
-	if(spmon2) spmon2->Blit(sp.x - 1, sp.y - 1);
+	if(spmon2.isValid()) spmon2.Blit(sp.x - 1, sp.y - 1);
     }
 }
 
@@ -1254,70 +1253,70 @@ void Battle::Interface::RedrawCastle3(const Castle & castle) const
 void Battle::Interface::RedrawLowObjects(s16 cell_index) const
 {
     const Cell* cell = Board::GetCell(cell_index);
-    const Sprite* sprite = NULL;
+    Sprite sprite;
 
     if(cell)
     switch(cell->GetObject())
     {
-	case 0x84:	sprite = &AGG::GetICN(ICN::COBJ0004, 0); break;
-	case 0x87:	sprite = &AGG::GetICN(ICN::COBJ0007, 0); break;
-	case 0x90:	sprite = &AGG::GetICN(ICN::COBJ0016, 0); break;
-	case 0x9E:	sprite = &AGG::GetICN(ICN::COBJ0030, 0); break;
-	case 0x9F:	sprite = &AGG::GetICN(ICN::COBJ0031, 0); break;
+	case 0x84:	sprite = AGG::GetICN(ICN::COBJ0004, 0); break;
+	case 0x87:	sprite = AGG::GetICN(ICN::COBJ0007, 0); break;
+	case 0x90:	sprite = AGG::GetICN(ICN::COBJ0016, 0); break;
+	case 0x9E:	sprite = AGG::GetICN(ICN::COBJ0030, 0); break;
+	case 0x9F:	sprite = AGG::GetICN(ICN::COBJ0031, 0); break;
 	default: break;
     }
 
-    if(sprite)
+    if(sprite.isValid())
     {
 	//const Point & topleft = border.GetArea();
 	const Rect & pt = cell->GetPos();
-	sprite->Blit(pt.x + pt.w / 2 + sprite->x(), pt.y + pt.h + sprite->y() - (Settings::Get().QVGA() ? 5 : 10));
+	sprite.Blit(pt.x + pt.w / 2 + sprite.x(), pt.y + pt.h + sprite.y() - (Settings::Get().QVGA() ? 5 : 10));
     }
 }
 
 void Battle::Interface::RedrawHighObjects(s16 cell_index) const
 {
     const Cell* cell = Board::GetCell(cell_index);
-    const Sprite* sprite = NULL;
+    Sprite sprite;
 
     if(cell)
     switch(cell->GetObject())
     {
-	case 0x80:	sprite = &AGG::GetICN(ICN::COBJ0000, 0); break;
-	case 0x81:	sprite = &AGG::GetICN(ICN::COBJ0001, 0); break;
-	case 0x82:	sprite = &AGG::GetICN(ICN::COBJ0002, 0); break;
-	case 0x83:	sprite = &AGG::GetICN(ICN::COBJ0003, 0); break;
-	case 0x85:	sprite = &AGG::GetICN(ICN::COBJ0005, 0); break;
-	case 0x86:	sprite = &AGG::GetICN(ICN::COBJ0006, 0); break;
-	case 0x88:	sprite = &AGG::GetICN(ICN::COBJ0008, 0); break;
-	case 0x89:	sprite = &AGG::GetICN(ICN::COBJ0009, 0); break;
-	case 0x8A:	sprite = &AGG::GetICN(ICN::COBJ0010, 0); break;
-	case 0x8B:	sprite = &AGG::GetICN(ICN::COBJ0011, 0); break;
-	case 0x8C:	sprite = &AGG::GetICN(ICN::COBJ0012, 0); break;
-	case 0x8D:	sprite = &AGG::GetICN(ICN::COBJ0013, 0); break;
-	case 0x8E:	sprite = &AGG::GetICN(ICN::COBJ0014, 0); break;
-	case 0x8F:	sprite = &AGG::GetICN(ICN::COBJ0015, 0); break;
-	case 0x91:	sprite = &AGG::GetICN(ICN::COBJ0017, 0); break;
-	case 0x92:	sprite = &AGG::GetICN(ICN::COBJ0018, 0); break;
-	case 0x93:	sprite = &AGG::GetICN(ICN::COBJ0019, 0); break;
-	case 0x94:	sprite = &AGG::GetICN(ICN::COBJ0020, 0); break;
-	case 0x95:	sprite = &AGG::GetICN(ICN::COBJ0021, 0); break;
-	case 0x96:	sprite = &AGG::GetICN(ICN::COBJ0022, 0); break;
-	case 0x97:	sprite = &AGG::GetICN(ICN::COBJ0023, 0); break;
-	case 0x98:	sprite = &AGG::GetICN(ICN::COBJ0024, 0); break;
-	case 0x99:	sprite = &AGG::GetICN(ICN::COBJ0025, 0); break;
-	case 0x9A:	sprite = &AGG::GetICN(ICN::COBJ0026, 0); break;
-	case 0x9B:	sprite = &AGG::GetICN(ICN::COBJ0027, 0); break;
-	case 0x9C:	sprite = &AGG::GetICN(ICN::COBJ0028, 0); break;
-	case 0x9D:	sprite = &AGG::GetICN(ICN::COBJ0029, 0); break;
+	case 0x80:	sprite = AGG::GetICN(ICN::COBJ0000, 0); break;
+	case 0x81:	sprite = AGG::GetICN(ICN::COBJ0001, 0); break;
+	case 0x82:	sprite = AGG::GetICN(ICN::COBJ0002, 0); break;
+	case 0x83:	sprite = AGG::GetICN(ICN::COBJ0003, 0); break;
+	case 0x85:	sprite = AGG::GetICN(ICN::COBJ0005, 0); break;
+	case 0x86:	sprite = AGG::GetICN(ICN::COBJ0006, 0); break;
+	case 0x88:	sprite = AGG::GetICN(ICN::COBJ0008, 0); break;
+	case 0x89:	sprite = AGG::GetICN(ICN::COBJ0009, 0); break;
+	case 0x8A:	sprite = AGG::GetICN(ICN::COBJ0010, 0); break;
+	case 0x8B:	sprite = AGG::GetICN(ICN::COBJ0011, 0); break;
+	case 0x8C:	sprite = AGG::GetICN(ICN::COBJ0012, 0); break;
+	case 0x8D:	sprite = AGG::GetICN(ICN::COBJ0013, 0); break;
+	case 0x8E:	sprite = AGG::GetICN(ICN::COBJ0014, 0); break;
+	case 0x8F:	sprite = AGG::GetICN(ICN::COBJ0015, 0); break;
+	case 0x91:	sprite = AGG::GetICN(ICN::COBJ0017, 0); break;
+	case 0x92:	sprite = AGG::GetICN(ICN::COBJ0018, 0); break;
+	case 0x93:	sprite = AGG::GetICN(ICN::COBJ0019, 0); break;
+	case 0x94:	sprite = AGG::GetICN(ICN::COBJ0020, 0); break;
+	case 0x95:	sprite = AGG::GetICN(ICN::COBJ0021, 0); break;
+	case 0x96:	sprite = AGG::GetICN(ICN::COBJ0022, 0); break;
+	case 0x97:	sprite = AGG::GetICN(ICN::COBJ0023, 0); break;
+	case 0x98:	sprite = AGG::GetICN(ICN::COBJ0024, 0); break;
+	case 0x99:	sprite = AGG::GetICN(ICN::COBJ0025, 0); break;
+	case 0x9A:	sprite = AGG::GetICN(ICN::COBJ0026, 0); break;
+	case 0x9B:	sprite = AGG::GetICN(ICN::COBJ0027, 0); break;
+	case 0x9C:	sprite = AGG::GetICN(ICN::COBJ0028, 0); break;
+	case 0x9D:	sprite = AGG::GetICN(ICN::COBJ0029, 0); break;
 	default: break;
     }
 
-    if(sprite)
+    if(sprite.isValid())
     {
 	//const Point & topleft = border.GetArea();
 	const Rect & pt = cell->GetPos();
-	sprite->Blit(pt.x + pt.w / 2 + sprite->x(), pt.y + pt.h + sprite->y() - (Settings::Get().QVGA() ? 5 : 10));
+	sprite.Blit(pt.x + pt.w / 2 + sprite.x(), pt.y + pt.h + sprite.y() - (Settings::Get().QVGA() ? 5 : 10));
     }
 }
 
@@ -3373,8 +3372,7 @@ void Battle::Interface::RedrawActionDisruptingRaySpell(Unit & target)
 
     const monstersprite_t & msi = target.GetMonsterSprite();
     const Sprite & sprite1 = AGG::GetICN(msi.icn_file, msi.frm_idle.start, target.isReflect());
-    Sprite sprite2(*target.GetContour(target.isReflect() ? CONTOUR_REFLECT|CONTOUR_BLACK : CONTOUR_BLACK));
-    sprite2.SetOffset(sprite1.x(), sprite1.y());
+    Sprite sprite2(target.GetContour(target.isReflect() ? CONTOUR_REFLECT|CONTOUR_BLACK : CONTOUR_BLACK), sprite1.x(), sprite1.y());
 
     const ICN::icn_t icn = ICN::DISRRAY;
     u8 frame = 0;

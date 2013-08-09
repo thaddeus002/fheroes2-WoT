@@ -89,8 +89,8 @@ namespace Battle
     private:
 	Text		bar1;
         Text		bar2;
-        const Sprite &	back1;
-        const Sprite &	back2;
+        Sprite 		back1;
+        Sprite 		back2;
         std::string	message;
 	StatusListBox*	listlog;
     };

@@ -87,7 +87,7 @@ bool AllowFlashBuilding(u32 build)
     return false;
 }
 
-const Sprite & GetActualSpriteBuilding(const Castle & castle, u32 build)
+Sprite GetActualSpriteBuilding(const Castle & castle, u32 build)
 {
     u8 index = 0;
     // correct index (mage guild)
@@ -137,8 +137,7 @@ building_t GetCurrentFlash(const Castle & castle, CastleDialog::CacheBuildings &
 	if(! (*it).contour.isValid())
         {
             const Sprite & sprite = GetActualSpriteBuilding(castle, flash);
-    	    (*it).contour.Set(Surface::Contour(sprite, sprite.GetColorIndex(0xDA)));
-	    (*it).contour.SetOffset(sprite.x() - 1, sprite.y() - 1);
+    	    (*it).contour = Sprite(Surface::Contour(sprite, sprite.GetColorIndex(0xDA)), sprite.x() - 1, sprite.y() - 1);
 	}
     }
 
@@ -160,17 +159,17 @@ void RedrawIcons(const Castle & castle, const CastleHeroes & heroes, const Point
 	Surface icon1, icon2;
 
 	if(hero1)
-    	    icon1.Set(Heroes::GetPortrait(hero1->GetID(), PORT_MEDIUM), true);
+    	    icon1 = Heroes::GetPortrait(hero1->GetID(), PORT_MEDIUM);
 	else
 	if(castle.isBuild(BUILD_CAPTAIN))
-    	    icon1.Set(castle.GetCaptain().GetPortrait(PORT_MEDIUM), true);
+    	    icon1 = castle.GetCaptain().GetPortrait(PORT_MEDIUM);
 	else
-    	    icon1.Set(AGG::GetICN(ICN::BRCREST, Color::GetIndex(castle.GetColor())), true);
+    	    icon1 = AGG::GetICN(ICN::BRCREST, Color::GetIndex(castle.GetColor()));
 
         if(hero2)
-    	    icon2.Set(Heroes::GetPortrait(hero2->GetID(), PORT_MEDIUM), true);
+    	    icon2 = Heroes::GetPortrait(hero2->GetID(), PORT_MEDIUM);
 	else
-	    icon2.Set(AGG::GetICN(ICN::BRCREST, Color::GetIndex(castle.GetColor())), true);
+	    icon2 = AGG::GetICN(ICN::BRCREST, Color::GetIndex(castle.GetColor()));
 
 	icon1.Blit(Rect((icon1.w() - 41) / 2, (icon1.h() - 41) / 2, 41, 41), pt.x + 3, pt.y + 80, display);
     	icon2.Blit(Rect((icon2.w() - 41) / 2, (icon2.h() - 41) / 2, 41, 41), pt.x + 3, pt.y + 125, display);
@@ -185,17 +184,17 @@ void RedrawIcons(const Castle & castle, const CastleHeroes & heroes, const Point
 	Surface icon1, icon2;
 
 	if(hero1)
-	    icon1.Set(Heroes::GetPortrait(hero1->GetID(), PORT_BIG), true);
+	    icon1 = Heroes::GetPortrait(hero1->GetID(), PORT_BIG);
 	else
 	if(castle.isBuild(BUILD_CAPTAIN))
-	    icon1.Set(castle.GetCaptain().GetPortrait(PORT_BIG), true);
+	    icon1 = castle.GetCaptain().GetPortrait(PORT_BIG);
 	else
-	    icon1.Set(AGG::GetICN(ICN::CREST, Color::GetIndex(castle.GetColor())), true);
+	    icon1 = AGG::GetICN(ICN::CREST, Color::GetIndex(castle.GetColor()));
 
 	if(hero2)
-	    icon2.Set(Heroes::GetPortrait(hero2->GetID(), PORT_BIG), true);
+	    icon2 = Heroes::GetPortrait(hero2->GetID(), PORT_BIG);
 	else
-	    icon2.Set(AGG::GetICN(ICN::STRIP, 3), true);
+	    icon2 = AGG::GetICN(ICN::STRIP, 3);
 
 	icon1.Blit(pt.x + 5, pt.y + 262, display);
 	icon2.Blit(pt.x + 5, pt.y + 361, display);

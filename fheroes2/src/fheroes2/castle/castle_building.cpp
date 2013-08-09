@@ -94,24 +94,24 @@ void CastleRedrawCurrentBuilding(const Castle & castle, const Point & dst_pt,
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
 
-    const Sprite* townbkg = NULL;
+    Sprite townbkg;
 
     // before redraw
     switch(castle.GetRace())
     {
-	case Race::KNGT: townbkg = &AGG::GetICN(ICN::TOWNBKG0, 0); break;
-	case Race::BARB: townbkg = &AGG::GetICN(ICN::TOWNBKG1, 0); break;
-	case Race::SORC: townbkg = &AGG::GetICN(ICN::TOWNBKG2, 0); break;
-	case Race::WRLK: townbkg = &AGG::GetICN(ICN::TOWNBKG3, 0); break;
-	case Race::WZRD: townbkg = &AGG::GetICN(ICN::TOWNBKG4, 0); break;
-	case Race::NECR: townbkg = &AGG::GetICN(ICN::TOWNBKG5, 0); break;
+	case Race::KNGT: townbkg = AGG::GetICN(ICN::TOWNBKG0, 0); break;
+	case Race::BARB: townbkg = AGG::GetICN(ICN::TOWNBKG1, 0); break;
+	case Race::SORC: townbkg = AGG::GetICN(ICN::TOWNBKG2, 0); break;
+	case Race::WRLK: townbkg = AGG::GetICN(ICN::TOWNBKG3, 0); break;
+	case Race::WZRD: townbkg = AGG::GetICN(ICN::TOWNBKG4, 0); break;
+	case Race::NECR: townbkg = AGG::GetICN(ICN::TOWNBKG5, 0); break;
 	default: break;
     }
 
     const Rect max = CastleGetMaxArea(castle, dst_pt);
 
-    if(townbkg)
-	townbkg->Blit(dst_pt.x, dst_pt.y);
+    if(townbkg.isValid())
+	townbkg.Blit(dst_pt.x, dst_pt.y);
 
     if(Race::BARB == castle.GetRace())
     {
@@ -122,44 +122,43 @@ void CastleRedrawCurrentBuilding(const Castle & castle, const Point & dst_pt,
     // sea anime
     if(Race::WZRD == castle.GetRace() || (!castle.isBuild(BUILD_SHIPYARD) && castle.HaveNearlySea()))
     {
-    	const Sprite* sprite50 = NULL;
-    	const Sprite* sprite51 = NULL;
+    	Sprite sprite50, sprite51;
 
     	switch(castle.GetRace())
     	{
     	    case Race::KNGT:
-    		sprite50 = &AGG::GetICN(ICN::TWNKEXT0, 0);
-    		sprite51 = &AGG::GetICN(ICN::TWNKEXT0, 1 + frame % 5);
+    		sprite50 = AGG::GetICN(ICN::TWNKEXT0, 0);
+    		sprite51 = AGG::GetICN(ICN::TWNKEXT0, 1 + frame % 5);
     		break;
     	    case Race::BARB:
-    		sprite50 = &AGG::GetICN(ICN::TWNBEXT0, 0);
-    		sprite51 = &AGG::GetICN(ICN::TWNBEXT0, 1 + frame % 5);
+    		sprite50 = AGG::GetICN(ICN::TWNBEXT0, 0);
+    		sprite51 = AGG::GetICN(ICN::TWNBEXT0, 1 + frame % 5);
     		break;
     	    case Race::SORC:
-    		sprite50 = &AGG::GetICN(ICN::TWNSEXT0, 0);
-    		sprite51 = &AGG::GetICN(ICN::TWNSEXT0, 1 + frame % 5);
+    		sprite50 = AGG::GetICN(ICN::TWNSEXT0, 0);
+    		sprite51 = AGG::GetICN(ICN::TWNSEXT0, 1 + frame % 5);
     		break;
     	    case Race::NECR:
-    		sprite50 = &AGG::GetICN(ICN::TWNNEXT0, 0);
-    		sprite51 = &AGG::GetICN(ICN::TWNNEXT0, 1 + frame % 5);
+    		sprite50 = AGG::GetICN(ICN::TWNNEXT0, 0);
+    		sprite51 = AGG::GetICN(ICN::TWNNEXT0, 1 + frame % 5);
     		break;
     	    case Race::WRLK:
-    		sprite50 = &AGG::GetICN(ICN::TWNWEXT0, 0);
-    		sprite51 = &AGG::GetICN(ICN::TWNWEXT0, 1 + frame % 5);
+    		sprite50 = AGG::GetICN(ICN::TWNWEXT0, 0);
+    		sprite51 = AGG::GetICN(ICN::TWNWEXT0, 1 + frame % 5);
     		break;
     	    case Race::WZRD:
-    		sprite50 = &AGG::GetICN(ICN::TWNZEXT0, 0);
-    		sprite51 = &AGG::GetICN(ICN::TWNZEXT0, 1 + frame % 5);
+    		sprite50 = AGG::GetICN(ICN::TWNZEXT0, 0);
+    		sprite51 = AGG::GetICN(ICN::TWNZEXT0, 1 + frame % 5);
     		break;
     	    default:
     		break;
     	}
 
-	if(sprite50)
-	    CastleDialog::RedrawBuildingSpriteToArea(*sprite50, dst_pt.x + sprite50->x(), dst_pt.y + sprite50->y(), max);
+	if(sprite50.isValid())
+	    CastleDialog::RedrawBuildingSpriteToArea(sprite50, dst_pt.x + sprite50.x(), dst_pt.y + sprite50.y(), max);
 
-	if(sprite51)
-	    CastleDialog::RedrawBuildingSpriteToArea(*sprite51, dst_pt.x + sprite51->x(), dst_pt.y + sprite51->y(), max);
+	if(sprite51.isValid())
+	    CastleDialog::RedrawBuildingSpriteToArea(sprite51, dst_pt.x + sprite51.x(), dst_pt.y + sprite51.y(), max);
     }
 
     // redraw all builds
@@ -846,23 +845,23 @@ void CastlePackOrdersBuildings(const Castle & castle, std::vector<building_t> & 
 Rect CastleGetMaxArea(const Castle & castle, const Point & top)
 {
     Rect res(top, 0, 0);
-    const Sprite* townbkg = NULL;
+    Sprite townbkg;
 
     switch(castle.GetRace())
     {
-	case Race::KNGT: townbkg = &AGG::GetICN(ICN::TOWNBKG0, 0); break;
-	case Race::BARB: townbkg = &AGG::GetICN(ICN::TOWNBKG1, 0); break;
-	case Race::SORC: townbkg = &AGG::GetICN(ICN::TOWNBKG2, 0); break;
-	case Race::WRLK: townbkg = &AGG::GetICN(ICN::TOWNBKG3, 0); break;
-	case Race::WZRD: townbkg = &AGG::GetICN(ICN::TOWNBKG4, 0); break;
-	case Race::NECR: townbkg = &AGG::GetICN(ICN::TOWNBKG5, 0); break;
+	case Race::KNGT: townbkg = AGG::GetICN(ICN::TOWNBKG0, 0); break;
+	case Race::BARB: townbkg = AGG::GetICN(ICN::TOWNBKG1, 0); break;
+	case Race::SORC: townbkg = AGG::GetICN(ICN::TOWNBKG2, 0); break;
+	case Race::WRLK: townbkg = AGG::GetICN(ICN::TOWNBKG3, 0); break;
+	case Race::WZRD: townbkg = AGG::GetICN(ICN::TOWNBKG4, 0); break;
+	case Race::NECR: townbkg = AGG::GetICN(ICN::TOWNBKG5, 0); break;
 	default: break;
     }
 
-    if(townbkg)
+    if(townbkg.isValid())
     {
-	res.w = townbkg->w();
-	res.h = townbkg->h();
+	res.w = townbkg.w();
+	res.h = townbkg.h();
     }
 
     return res;

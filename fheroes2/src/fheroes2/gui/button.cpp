@@ -36,8 +36,8 @@ Button::Button(s16 ox, s16 oy, ICN::icn_t icn, u16 index1, u16 index2) : flags(0
 {
     SetPos(ox, oy);
 
-    sf1.Set(AGG::GetICN(icn, index1), true);
-    sf2.Set(AGG::GetICN(icn, index2), true);
+    sf1 = AGG::GetICN(icn, index1);
+    sf2 = AGG::GetICN(icn, index2);
 
     SetSize(sf1.w(), sf1.h());
 }
@@ -81,16 +81,16 @@ void Button::SetPos(const Point & pos)
 
 void Button::SetSprite(ICN::icn_t icn, u16 index1, u16 index2)
 {
-    sf1.Set(AGG::GetICN(icn, index1), true);
-    sf2.Set(AGG::GetICN(icn, index2), true);
+    sf1 = AGG::GetICN(icn, index1);
+    sf2 = AGG::GetICN(icn, index2);
 
     SetSize(sf1.w(), sf1.h());
 }
 
 void Button::SetSprite(const Surface & s1, const Surface & s2)
 {
-    sf1.Set(s1, true);
-    sf2.Set(s2, true);
+    sf1 = s1;
+    sf2 = s2;
 
     SetSize(sf1.w(), sf1.h());
 }

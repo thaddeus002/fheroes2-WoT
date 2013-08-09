@@ -29,8 +29,14 @@ class Sprite : public Surface
 {
 public:
     Sprite();
+    Sprite(const Sprite &);
+    Sprite(const Surface &, s16, s16);
+
+    Sprite & operator= (const Surface &);
+    Sprite & operator= (const Sprite &);
 
     void SetOffset(s16, s16);
+    void Reset(void);
 
     s16 x(void) const{ return offsetX; }
     s16 y(void) const{ return offsetY; }

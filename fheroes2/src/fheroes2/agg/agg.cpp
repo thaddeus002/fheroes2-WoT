@@ -295,7 +295,7 @@ u32 AGG::Cache::ClearFreeObjects(void)
 		{
 		    Sprite & sprite1 = icns.sprites[jj];
 
-		    if(1 == sprite1.RefCount())
+		    if(! sprite1.isRefCopy())
 		    {
 			total += sprite1.GetMemoryUsage();
 			Surface::FreeSurface(sprite1);
@@ -308,7 +308,7 @@ u32 AGG::Cache::ClearFreeObjects(void)
 		{
 		    Sprite & sprite2 = icns.reflect[jj];
 
-		    if(1 == sprite2.RefCount())
+		    if(! sprite2.isRefCopy())
 		    {
 			total += sprite2.GetMemoryUsage();
 			Surface::FreeSurface(sprite2);
@@ -764,7 +764,7 @@ bool AGG::Cache::LoadAltICN(const ICN::icn_t icn, const u32 index, bool reflect)
 
 	    if(reflect && sp1.isValid() && ! sp2.isValid())
 	    {
-		sp2.Set(Surface::Reflect(sp1, 2));
+		sp2 = Surface::Reflect(sp1, 2);
 		sp2.SetOffset(ox, oy);
 		return sp2.isValid();
 	    }
@@ -954,6 +954,8 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u32 index, bool reflect)
 	    Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
 	    sp.ScaleMinifyByTwo();
 	}
+
+        Sprite back = reflect ? v.reflect[index] : v.sprites[index]; /* create ref copy, for CheckMemoryLimit skipping this sprite */
 
 	CheckMemoryLimit();
     }
@@ -1261,7 +1263,7 @@ void AGG::Cache::LoadFNT(u16 ch)
 #endif
 
 /* return ICN sprite from AGG::Cache */
-const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u32 index, bool reflect)
+Sprite AGG::Cache::GetICN(const ICN::icn_t icn, u32 index, bool reflect)
 {
     icn_cache_t & v = icn_cache[icn];
 
@@ -1293,7 +1295,7 @@ int AGG::Cache::GetICNCount(const ICN::icn_t icn)
 }
 
 /* return TIL surface from AGG::Cache */
-const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u32 index, u8 shape)
+Surface AGG::Cache::GetTIL(const TIL::til_t til, u32 index, u8 shape)
 {
     til_cache_t & v = til_cache[til];
 
@@ -1325,9 +1327,7 @@ const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u32 index, u8 shape)
 	const Surface & src = v.sprites[index];
 
 	if(src.isValid())
-	{
-	    surface.Set(Surface::Reflect(src, shape));
-	}
+	    surface = Surface::Reflect(src, shape);
 	else
 	DEBUG(DBG_ENGINE, DBG_WARN, "is NULL");
     }
@@ -1362,7 +1362,7 @@ const std::vector<u8> & AGG::Cache::GetMID(const XMI::xmi_t xmi)
 
 #ifdef WITH_TTF
 /* return FNT cache */
-const Surface & AGG::Cache::GetFNT(u16 c, u8 f)
+Surface AGG::Cache::GetFNT(u16 c, u8 f)
 {
     bool ttf_valid = font_small.isValid() && font_medium.isValid();
 
@@ -1409,12 +1409,12 @@ int AGG::GetICNCount(const ICN::icn_t icn)
     return AGG::Cache::Get().GetICNCount(icn);
 }
 
-const Sprite & AGG::GetICN(const ICN::icn_t icn, const u32 index, bool reflect)
+Sprite AGG::GetICN(const ICN::icn_t icn, const u32 index, bool reflect)
 {
     return AGG::Cache::Get().GetICN(icn, index, reflect);
 }
 
-const Surface & AGG::GetTIL(const TIL::til_t til, const u32 index, const u8 shape)
+Surface AGG::GetTIL(const TIL::til_t til, const u32 index, const u8 shape)
 {
     return AGG::Cache::Get().GetTIL(til, index, shape);
 }
@@ -1590,13 +1590,13 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 
 #ifdef WITH_TTF
 /* return letter sprite */
-const Surface & AGG::GetUnicodeLetter(u16 ch, u8 ft)
+Surface AGG::GetUnicodeLetter(u16 ch, u8 ft)
 {
     return AGG::Cache::Get().GetFNT(ch, ft);
 }
 #endif
 
-const Surface & AGG::GetLetter(char ch, u8 ft)
+Surface AGG::GetLetter(char ch, u8 ft)
 {
     if(ch < 0x21) DEBUG(DBG_ENGINE, DBG_WARN, "unknown letter");
 

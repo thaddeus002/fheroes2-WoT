@@ -51,6 +51,37 @@ Sprite::Sprite() : offsetX(0), offsetY(0)
 {
 }
 
+Sprite::Sprite(const Sprite & sp) : offsetX(sp.x()), offsetY(sp.y())
+{
+    Set(sp, true);
+}
+
+Sprite::Sprite(const Surface & sf, s16 ox, s16 oy) : offsetX(ox), offsetY(oy)
+{
+    Set(sf, true);
+}
+
+Sprite & Sprite::operator= (const Surface & sf)
+{
+    Set(sf, true);
+    return *this;
+}
+
+Sprite & Sprite::operator= (const Sprite & sp)
+{
+    Set(sp, true);
+    offsetX = sp.x();
+    offsetY = sp.y();
+    return *this;
+}
+
+void Sprite::Reset(void)
+{
+    offsetX = 0;
+    offsetY = 0;
+    Surface::Reset();
+}
+
 void Sprite::SetOffset(s16 ox, s16 oy)
 {
     offsetX = ox;

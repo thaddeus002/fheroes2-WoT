@@ -143,7 +143,7 @@ namespace Maps
 	u16 TileSpriteIndex(void) const;
 	u8  TileSpriteShape(void) const;
 
-	const Surface & GetTileSurface(void) const;
+	Surface GetTileSurface(void) const;
 
 	bool isPassable(const Heroes &) const;
 	bool isPassable(const Heroes*, u16 direct, bool skipfog) const;

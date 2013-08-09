@@ -38,20 +38,21 @@ public:
     Surface();
     Surface(const void* pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool amask);
     Surface(u16 sw, u16 sh, bool amask = false);
-    Surface(SDL_Surface* sf);
     Surface(const std::string &);
 
     Surface(const Surface &);
+
     Surface & operator= (const Surface &);
+    bool operator== (const Surface &);
 
     virtual ~Surface();
     virtual bool isDisplay(void) const;
 
-    void Set(const Surface &, bool refcopy = false);
-    void Set(SDL_Surface* sf);
     void Set(u16 sw, u16 sh, bool amask = false);
+    void Set(SDL_Surface*);
     void Set(u16 sw, u16 sh, u8 bpp, bool amask); /* bpp: 8, 16, 24, 32 */
     void Set(const void* pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool amask); /* bytes_per_pixel: 1, 2, 3, 4 */
+    void Reset(void);
 
     bool Load(const char*);
     bool Load(const std::string &);
@@ -65,7 +66,7 @@ public:
     u32 amask(void) const;
     u8  alpha(void) const;
     Size GetSize(void) const;
-    u32	RefCount(void) const;
+    bool isRefCopy(void) const;
 
     bool isValid(void) const;
     u32 MapRGB(u8 r, u8 g, u8 b, u8 a = 0) const;
@@ -79,7 +80,7 @@ public:
     void Blit(u8 alpha, s16, s16, Surface &) const;
     void Blit(u8 alpha, const Rect & srt, const Point &, Surface &) const;
 
-    //const SDL_Surface* GetSurface(void) const{ return surface; };
+    const SDL_Surface* SDLSurface(void) const{ return surface; };
 
     void Fill(u32 color);
     void Fill(u8 r, u8 g, u8 b);
@@ -88,7 +89,6 @@ public:
     void FillRect(u8 r, u8 g, u8 b, const Rect & src);
 
     void SetDisplayFormat(void);
-    void SetDefaultColorKey(void);
     void SetColorKey(u32 color);
     void SetAlpha(u8 level);
     void ResetAlpha(void);
@@ -102,11 +102,8 @@ public:
     void DrawLine(const Point &, const Point &, u32);
     void DrawLine(u16, u16, u16, u16, u32);
 
-
     void ChangeColor(u32, u32);
     void ChangeColorIndex(u32, u32);
-    void GrayScale(void);
-    void Sepia(void);
     
     void Lock(void) const;
     void Unlock(void) const;
@@ -119,6 +116,8 @@ public:
     static Surface Stencil(const Surface &, u32);
     static Surface Contour(const Surface &, u32);
     static Surface ScaleMinifyByTwo(const Surface & sf_src, bool event = false);
+    static Surface GrayScale(const Surface &);
+    static Surface Sepia(const Surface &);
 
     static void SetDefaultDepth(u8);
     static u8   GetDefaultDepth(void);
@@ -126,6 +125,7 @@ public:
     static void Swap(Surface &, Surface &);
     
 protected:
+    void Set(const Surface &, bool refcopy);
     void SetPixel4(u16 x, u16 y, u32 color);
     void SetPixel3(u16 x, u16 y, u32 color);
     void SetPixel2(u16 x, u16 y, u32 color);
@@ -141,12 +141,6 @@ protected:
     friend class Display;
 
     SDL_Surface* surface;
-};
-
-class SurfaceRef : public Surface
-{
-public:
-    SurfaceRef(const Surface &);
 };
 
 #endif

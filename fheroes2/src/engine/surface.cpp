@@ -196,11 +196,6 @@ void SDLFreeSurface(SDL_Surface *sf)
     }
 }
 
-SurfaceRef::SurfaceRef(const Surface & sf)
-{
-    Set(sf, true);
-}
-
 Surface::Surface() : surface(NULL)
 {
 }
@@ -217,12 +212,7 @@ Surface::Surface(u16 sw, u16 sh, bool amask) : surface(NULL)
 
 Surface::Surface(const Surface & bs) : surface(NULL)
 {
-    Set(bs, false);
-}
-
-Surface::Surface(SDL_Surface* sf) : surface(NULL)
-{
-    Set(sf);
+    Set(bs, true);
 }
 
 Surface::Surface(const std::string & file) : surface(NULL)
@@ -243,8 +233,13 @@ bool Surface::isDisplay(void) const
 /* operator = */
 Surface & Surface::operator= (const Surface & bs)
 {
-    Set(bs, false);
+    Set(bs, true);
     return *this;
+}
+
+bool Surface::operator== (const Surface & bs)
+{
+    return surface && bs.surface ? surface == bs.surface : false;
 }
 
 void Surface::SetDefaultDepth(u8 depth)
@@ -273,19 +268,24 @@ u8 Surface::GetDefaultDepth(void)
     return default_depth;
 }
 
+void Surface::Reset(void)
+{
+    FreeSurface(*this);
+}
+
 void Surface::Set(SDL_Surface* sf)
 {
     FreeSurface(*this);
-    surface = sf ? sf : NULL;
+    surface = sf;
 }
 
-void Surface::Set(const Surface & bs, bool refcopy) /* copy surface */
+void Surface::Set(const Surface & bs, bool refcopy)
 {
     FreeSurface(*this);
 
     if(bs.isValid())
     {
-	if(refcopy || 1 < bs.RefCount())
+	if(refcopy)
 	{
 	    surface = bs.surface;
 	    if(surface) surface->refcount += 1;
@@ -315,7 +315,10 @@ void Surface::Set(u16 sw, u16 sh, u8 bpp, bool amask0)
     CreateSurface(sw, sh, bpp, amask0);
 
     if(8 == bpp) LoadPalette();
-    SetDefaultColorKey();
+
+    u32 clkey = MapRGB(0xFF, 0, 0xFF);
+    Fill(clkey);
+    SetColorKey(clkey);
 }
 
 void Surface::Set(const void* pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool amask0)
@@ -393,9 +396,9 @@ bool Surface::Save(const std::string & str) const
     return Save(str.c_str());
 }
 
-u32 Surface::RefCount(void) const
+bool Surface::isRefCopy(void) const
 {
-    return surface ? surface->refcount : 0;
+    return surface ? 1 < surface->refcount : false;
 }
 
 u16 Surface::w(void) const
@@ -447,21 +450,24 @@ void Surface::GetRGB(u32 pixel, u8 *r, u8 *g, u8 *b, u8 *a) const
 /* load static palette (economize 1kb for each surface) only 8bit color! */
 void Surface::LoadPalette(void)
 {
-    if(pal_colors.empty())
-	LoadPalColors();
-
-    if(surface->format->palette)
+    if(isValid())
     {
-    	if(surface->format->palette->colors && &pal_colors[0] != surface->format->palette->colors) SDL_free(surface->format->palette->colors);
-    	surface->format->palette->colors = &pal_colors[0];
-	surface->format->palette->ncolors = pal_colors.size();
+	if(pal_colors.empty())
+	    LoadPalColors();
+
+	if(surface->format->palette)
+	{
+    	    if(surface->format->palette->colors && &pal_colors[0] != surface->format->palette->colors) SDL_free(surface->format->palette->colors);
+    	    surface->format->palette->colors = &pal_colors[0];
+	    surface->format->palette->ncolors = pal_colors.size();
+	}
     }
 }
 
 /* format surface */
 void Surface::SetDisplayFormat(void)
 {
-    if(surface)
+    if(isValid())
     {
 	SDL_Surface *osurface = surface;
 	surface = amask() ? SDL_DisplayFormatAlpha(osurface) : SDL_DisplayFormat(osurface);
@@ -501,18 +507,6 @@ u32 Surface::GetColorKey(void) const
     return 0;
 }
 
-/* set color key */
-void Surface::SetDefaultColorKey(void)
-{
-    if(isValid())
-    {
-	const u32 clkey = amask() ? SDL_MapRGBA(surface->format, 0xFF, 0, 0xFF, 0) : 
-				    SDL_MapRGB(surface->format, 0xFF, 0, 0xFF);
-	Fill(clkey);
-	SetColorKey(clkey);
-    }
-}
-
 void Surface::SetColorKey(u32 color)
 {
     SDL_SetColorKey(surface, SDL_SRCCOLORKEY, color);
@@ -549,14 +543,16 @@ void Surface::SetPixel1(u16 x, u16 y, u32 color)
 /* draw pixel */
 void Surface::SetPixel(u16 x, u16 y, u32 color)
 {
-    if(x < surface->w && y < surface->h)
+    if(x < w() && y < h())
     {
-	switch(surface->format->BytesPerPixel)
+	if(isRefCopy()) Set(*this, false);
+
+	switch(depth())
 	{
-	    case 1:	SetPixel1(x, y, color);	break;
-	    case 2:	SetPixel2(x, y, color);	break;
-	    case 3:	SetPixel3(x, y, color);	break;
-	    case 4:	SetPixel4(x, y, color);	break;
+	    case 8:	SetPixel1(x, y, color);	break;
+	    case 16:	SetPixel2(x, y, color);	break;
+	    case 24:	SetPixel3(x, y, color);	break;
+	    case 32:	SetPixel4(x, y, color);	break;
 	    default: break;
 	}
 	if(isDisplay()) Display::Get().AddUpdateRect(x, y, 1, 1);
@@ -591,14 +587,14 @@ u32 Surface::GetPixel1(u16 x, u16 y) const
 
 u32 Surface::GetPixel(u16 x, u16 y) const
 {
-    if(x < surface->w && y < surface->h)
+    if(x < w() && y < h())
     {
-	switch(surface->format->BytesPerPixel)
+	switch(depth())
 	{
-	    case 1:	return GetPixel1(x, y);
-	    case 2:	return GetPixel2(x, y);
-	    case 3:	return GetPixel3(x, y);
-	    case 4:	return GetPixel4(x, y);
+	    case 8:	return GetPixel1(x, y);
+	    case 16:	return GetPixel2(x, y);
+	    case 24:	return GetPixel3(x, y);
+	    case 32:	return GetPixel4(x, y);
 	    default: break;
 	}
     }
@@ -611,10 +607,7 @@ u32 Surface::GetPixel(u16 x, u16 y) const
 /* fill colors surface */
 void Surface::Fill(u32 color)
 {
-    SDL_Rect dstrect = {0, 0, surface->w, surface->h};
-
-    SDL_FillRect(surface, &dstrect, color);
-    if(isDisplay()) Display::Get().AddUpdateRect(0, 0, surface->w, surface->h);
+    FillRect(color, Rect(0, 0, w(), h()));
 }
 
 void Surface::Fill(u8 r, u8 g, u8 b)
@@ -625,6 +618,7 @@ void Surface::Fill(u8 r, u8 g, u8 b)
 /* rect fill colors surface */
 void Surface::FillRect(u32 color, const Rect & rect)
 {
+    if(isRefCopy()) Set(*this, false);
     SDL_Rect dstrect = {rect.x, rect.y, rect.w, rect.h};
     SDL_FillRect(surface, &dstrect, color);
     if(isDisplay()) Display::Get().AddUpdateRect(rect.x, rect.y, rect.w, rect.h);
@@ -683,6 +677,8 @@ void SetAmask(u8* ptr, u16 w, const SDL_PixelFormat* format, u8 alpha)
 /* my alt. variant: for RGBA <-> RGB */
 void Surface::BlitSurface(const Surface & sf1, SDL_Rect* srt, Surface & sf2, SDL_Rect* drt)
 {
+    if(sf2.isRefCopy()) sf2.Set(sf2, false);
+
     if(sf1.depth() == sf2.depth() &&
 	// RGBA <-> RGB
 	(((0 != sf1.amask() && 0 == sf2.amask()) ||
@@ -860,6 +856,7 @@ void Surface::SetAlpha(u8 level)
 {
     if(isValid())
     {
+        if(isRefCopy()) Set(*this, false);
 #if SDL_VERSION_ATLEAST(1, 3, 0)
 	SDL_SetSurfaceAlphaMod(surface, level);
 #else
@@ -872,6 +869,7 @@ void Surface::ResetAlpha(void)
 {
     if(isValid())
     {
+        if(isRefCopy()) Set(*this, false);
 #if SDL_VERSION_ATLEAST(1, 3, 0)
 	SDL_SetSurfaceAlphaMod(surface, 255);
 #else
@@ -894,7 +892,7 @@ void Surface::FreeSurface(Surface & sf)
 {
     if(sf.surface)
     {
-	if(1 < sf.surface->refcount)
+	if(sf.isRefCopy())
 	    --sf.surface->refcount;
 	else
 	{
@@ -920,6 +918,8 @@ void Surface::ChangeColorIndex(u32 fc, u32 tc)
 
 void Surface::ChangeColor(u32 fc, u32 tc)
 {
+    if(isRefCopy()) Set(*this, false);
+
     if(amask())
     {
 	fc |= amask();
@@ -928,62 +928,68 @@ void Surface::ChangeColor(u32 fc, u32 tc)
 
     Lock();
     if(fc != tc)
-    for(u16 y = 0; y < surface->h; ++y)
-	for(u16 x = 0; x < surface->w; ++x)
+    for(u16 y = 0; y < h(); ++y)
+	for(u16 x = 0; x < w(); ++x)
 	    if(fc == GetPixel(x, y)) SetPixel(x, y, tc);
     Unlock();
 }
 
-void Surface::GrayScale(void)
+Surface Surface::GrayScale(const Surface & sf)
 {
-    if(!surface) return;
+    Surface dst;
+    dst.Set(sf, false);
 
     u8 a, r, g, b, z;
     a = r = g = b = z = 0;
 
-    const u32 colkey = GetColorKey();
-    u32 color = 0;
+    const u32 colkey = sf.GetColorKey();
+    u32 pixel = 0;
 
-    Lock();
-    for(u16 y = 0; y < surface->h; ++y)
-	for(u16 x = 0; x < surface->w; ++x)
+    dst.Lock();
+    for(u16 y = 0; y < sf.h(); ++y)
+	for(u16 x = 0; x < sf.w(); ++x)
     {
-	color = GetPixel(x, y);
-	if(color == colkey) continue;
-	GetRGB(color, &r, &g, &b, &a);
+	pixel = sf.GetPixel(x, y);
+	if(pixel == colkey) continue;
+	sf.GetRGB(pixel, &r, &g, &b, &a);
 	z = static_cast<u8>(0.299 * r + 0.587 * g + 0.114 * b);
 	r = z;
 	g = z;
 	b = z;
-	SetPixel(x, y, MapRGB(r, g, b, a));
+	pixel = sf.MapRGB(r, g, b, a);
+	dst.SetPixel(x, y, pixel);
     }
-    Unlock();
+    dst.Unlock();
+    return dst;
 }
 
-void Surface::Sepia(void)
+Surface Surface::Sepia(const Surface & sf)
 {
-    if(!surface) return;
+    Surface dst;
+    dst.Set(sf, false);
 
     u8 r, g, b;
     r = g = b = 0;
+    u32 pixel = 0;
 
-    Lock();
-    for(u16 x = 0; x < surface->w; x++)
-        for(u16 y = 0; y < surface->h; y++)
+    dst.Lock();
+    for(u16 x = 0; x < sf.w(); x++)
+        for(u16 y = 0; y < sf.h(); y++)
         {
-            u32 pixel = GetPixel(x, y);
-            GetRGB(pixel, &r, &g, &b);
+            pixel = sf.GetPixel(x, y);
+            sf.GetRGB(pixel, &r, &g, &b);
     
             //Numbers derived from http://blogs.techrepublic.com.com/howdoi/?p=120
             #define CLAMP255(val) static_cast<u8>(std::min<u16>((val), 255))
             u8 outR = CLAMP255(static_cast<u16>(r * 0.693f + g * 0.769f + b * 0.189f));
             u8 outG = CLAMP255(static_cast<u16>(r * 0.449f + g * 0.686f + b * 0.168f));
             u8 outB = CLAMP255(static_cast<u16>(r * 0.272f + g * 0.534f + b * 0.131f));
-            pixel = MapRGB(outR, outG, outB);
-            SetPixel(x, y, pixel);
+            pixel = sf.MapRGB(outR, outG, outB);
+            dst.SetPixel(x, y, pixel);
             #undef CLAMP255
         }
-    Unlock();
+    dst.Unlock();
+    return dst;
 }
 
 void Surface::DrawLine(const Point & p1, const Point & p2, u32 c)
@@ -993,6 +999,8 @@ void Surface::DrawLine(const Point & p1, const Point & p2, u32 c)
 
 void Surface::DrawLine(u16 x1, u16 y1, u16 x2, u16 y2, u32 c)
 {
+    if(isRefCopy()) Set(*this, false);
+
     const u16 dx = std::abs(x2 - x1);
     const u16 dy = std::abs(y2 - y1);
 
@@ -1035,16 +1043,16 @@ void Surface::DrawLine(u16 x1, u16 y1, u16 x2, u16 y2, u32 c)
 Surface Surface::Stencil(const Surface & src, u32 col)
 {
     Surface dst;
-    dst.Set(src.surface->w,src.surface->h,src.depth(), false); // same depth for src and dst
+    dst.Set(src.w(), src.h(), src.depth(), false); // same depth for src and dst
     const u32 clkey = src.GetColorKey();
     u8 r, g, b, a;
 
     src.Lock();
     dst.Lock();
 
-    for(u16 y = 0; y < src.surface->h; ++y)
+    for(u16 y = 0; y < src.h(); ++y)
     {
-        for(u16 x = 0; x < src.surface->w; ++x)
+        for(u16 x = 0; x < src.w(); ++x)
         {
             u32 pixel = src.GetPixel(x, y);
             if(clkey != pixel)
@@ -1071,7 +1079,7 @@ Surface Surface::Contour(const Surface & src, u32 col)
 {
     const u32 fake = src.MapRGB(0x00, 0xFF, 0xFF);
     Surface dst;
-    dst.Set(src.surface->w + 2,src.surface->h + 2,src.depth(), false); // same depth for src and dst
+    dst.Set(src.w() + 2, src.h() + 2, src.depth(), false); // same depth for src and dst
     Surface trf = Stencil(src, fake);
     const u32 clkey = trf.GetColorKey();
 
@@ -1111,7 +1119,8 @@ Surface Surface::Reflect(const Surface & sf_src, const u8 shape)
 
     if(sf_src.isValid())
     {
-	sf_dst.Set(sf_src);
+	sf_dst.Set(sf_src, false);
+
 	sf_src.Lock();
 	sf_dst.Lock();
 

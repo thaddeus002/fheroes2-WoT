@@ -174,7 +174,7 @@ const Castle* Captain::inCastle(void) const
     return &home;
 }
 
-const Surface & Captain::GetPortrait(u8 type) const
+Surface Captain::GetPortrait(u8 type) const
 {
     switch(type)
     {

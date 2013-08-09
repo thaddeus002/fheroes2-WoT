@@ -160,7 +160,11 @@ int main(int argc, char **argv)
         fd_data.read(buf, data_size);
 
 	Surface sf(head.width, head.height, /*false*/true); // accepting transparency
-	sf.SetDefaultColorKey();
+
+        const u32 clkey = sf.MapRGB(0xFF, 0, 0xFF);
+        sf.Fill(clkey);
+	sf.SetColorKey(clkey);
+
 	//sf.Fill(0xff, 0xff, 0xff);
 	sf.Fill(0); // filling with transparent color
 

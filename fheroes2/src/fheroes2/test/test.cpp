@@ -75,7 +75,7 @@ void RunTest2(void)
     pt.x += sprite1.w() + 20;
 
     Surface sf1;
-    sf1.Set(sprite1);
+    sf1 = sprite1;
     sf1.SetAlpha(50);
 
     sf1.Blit(pt, display);

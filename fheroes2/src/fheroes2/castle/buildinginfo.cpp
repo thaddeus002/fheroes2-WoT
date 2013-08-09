@@ -370,9 +370,7 @@ void BuildingInfo::Redraw(void)
 
 	if(BUILD_DISABLE == bcond)
 	{
-	    Sprite gray1 = AGG::GetICN(ICN::BLDGXTRA, 0);
-	    gray1.GrayScale();
-	    gray1.Blit(area.x, area.y);
+	    Surface::GrayScale(AGG::GetICN(ICN::BLDGXTRA, 0)).Blit(area.x, area.y, Display::Get());
 	}
 	else
 	{
@@ -398,9 +396,7 @@ void BuildingInfo::Redraw(void)
 	else
 	if(bcond == BUILD_DISABLE)
 	{
-	    Sprite gray_deny = sprite_deny;
-	    gray_deny.GrayScale();
-	    gray_deny.Blit(dst_pt);
+	    Surface::GrayScale(sprite_deny).Blit(dst_pt, Display::Get());
 	}
 	else
 	if(bcond != ALLOW_BUILD)

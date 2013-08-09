@@ -34,9 +34,9 @@
 
 bool ReflectSprite(const u16 from);
 void PlayWalkSound(Maps::Ground::ground_t ground);
-const Sprite & SpriteHero(const Heroes & hero, const u8 index, const bool reflect, const bool rotate = false);
-const Sprite & SpriteFlag(const Heroes & hero, const u8 index, const bool reflect, const bool rotate = false);
-const Sprite & SpriteShad(const Heroes & hero, const u8 index);
+//const Sprite & SpriteHero(const Heroes & hero, const u8 index, const bool reflect, const bool rotate = false);
+//const Sprite & SpriteFlag(const Heroes & hero, const u8 index, const bool reflect, const bool rotate = false);
+//const Sprite & SpriteShad(const Heroes & hero, const u8 index);
 bool isNeedStayFrontObject(const Heroes & hero, const Maps::Tiles & next);
 
 void PlayWalkSound(Maps::Ground::ground_t ground)
@@ -78,7 +78,7 @@ bool ReflectSprite(const u16 from)
     return false;
 }
 
-const Sprite & SpriteHero(const Heroes & hero, const u8 index, const bool reflect, const bool rotate)
+Sprite SpriteHero(const Heroes & hero, const u8 index, const bool reflect, const bool rotate)
 {
     ICN::icn_t icn_hero = ICN::UNKNOWN;
     u16 index_sprite = 0;
@@ -116,7 +116,7 @@ const Sprite & SpriteHero(const Heroes & hero, const u8 index, const bool reflec
     return AGG::GetICN(icn_hero, index_sprite + (index % 9), reflect);
 }
 
-const Sprite & SpriteFlag(const Heroes & hero, const u8 index, const bool reflect, const bool rotate)
+Sprite SpriteFlag(const Heroes & hero, const u8 index, const bool reflect, const bool rotate)
 {
     ICN::icn_t icn_flag = ICN::UNKNOWN;
     u16 index_sprite = 0;
@@ -152,7 +152,7 @@ const Sprite & SpriteFlag(const Heroes & hero, const u8 index, const bool reflec
     return AGG::GetICN(icn_flag, index_sprite + (index % 9), reflect);
 }
 
-const Sprite & SpriteShad(const Heroes & hero, const u8 index)
+Sprite SpriteShad(const Heroes & hero, const u8 index)
 {
     const ICN::icn_t icn_shad = hero.isShipMaster() ? ICN::BOATSHAD : ICN::SHADOW32;
     u16 index_sprite = 0;
@@ -174,7 +174,7 @@ const Sprite & SpriteShad(const Heroes & hero, const u8 index)
     return AGG::GetICN(icn_shad, index_sprite + (index % 9));
 }
 
-const Sprite & SpriteFroth(const Heroes & hero, const u8 index, const bool reflect)
+Sprite SpriteFroth(const Heroes & hero, const u8 index, const bool reflect)
 {
     u16 index_sprite = 0;
 
@@ -231,8 +231,8 @@ void Heroes::Redraw(Surface & dst, const s16 dx, const s16 dy, bool with_shadow)
 
     bool reflect = ReflectSprite(direction);
 
-    const Sprite & sprite1 = SpriteHero(*this, sprite_index, reflect);
-    const Sprite & sprite2 = SpriteFlag(*this, sprite_index, reflect);
+    const Sprite & sprite1 = SpriteHero(*this, sprite_index, reflect, false);
+    const Sprite & sprite2 = SpriteFlag(*this, sprite_index, reflect, false);
     const Sprite & sprite3 = SpriteShad(*this, sprite_index);
     const Sprite & sprite4 = SpriteFroth(*this, sprite_index, reflect);
 
@@ -531,7 +531,7 @@ void Heroes::FadeOut(void) const
     s16 dx = gamearea.GetMapsPos().x + TILEWIDTH * (mp.x - gamearea.GetRectMaps().x);
     s16 dy = gamearea.GetMapsPos().y + TILEWIDTH * (mp.y - gamearea.GetRectMaps().y);
 
-    const Sprite & sprite1 = SpriteHero(*this, sprite_index, reflect);
+    const Sprite & sprite1 = SpriteHero(*this, sprite_index, reflect, false);
 
     Point dst_pt1(dx + (reflect ? TILEWIDTH - sprite1.x() - sprite1.w() : sprite1.x()), dy + sprite1.y() + TILEWIDTH);
     const Rect src_rt = gamearea.RectFixed(dst_pt1, sprite1.w(), sprite1.h());
@@ -588,7 +588,7 @@ void Heroes::FadeIn(void) const
     s16 dx = gamearea.GetMapsPos().x + TILEWIDTH * (mp.x - gamearea.GetRectMaps().x);
     s16 dy = gamearea.GetMapsPos().y + TILEWIDTH * (mp.y - gamearea.GetRectMaps().y);
 
-    const Sprite & sprite1 = SpriteHero(*this, sprite_index, reflect);
+    const Sprite & sprite1 = SpriteHero(*this, sprite_index, reflect, false);
 
     Point dst_pt1(dx + (reflect ? TILEWIDTH - sprite1.x() - sprite1.w() : sprite1.x()), dy + sprite1.y() + TILEWIDTH);
     const Rect src_rt = gamearea.RectFixed(dst_pt1, sprite1.w(), sprite1.h());

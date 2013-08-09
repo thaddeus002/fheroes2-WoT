@@ -39,7 +39,7 @@ Splitter::Splitter(const Surface & sf, const Rect & rt)
 
 void Splitter::SetSprite(const Surface & sf)
 {
-    cursor.Set(sf, true);
+    cursor = sf;
 }
 
 void Splitter::SetArea(const Rect & rt)

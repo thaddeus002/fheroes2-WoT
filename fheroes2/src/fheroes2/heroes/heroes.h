@@ -67,7 +67,7 @@ public:
     };
 
     static heroes_t ConvertID(u8);
-    static const Surface & GetPortrait(heroes_t, u8);
+    static Surface GetPortrait(heroes_t, u8);
 
     enum flags_t
     {

@@ -78,7 +78,7 @@ namespace Battle
 	u32		GetHitPointsLeft(void) const;
 	u16		GetAffectedDuration(u32) const;
 	u8		GetSpeed(void) const;
-	const Sprite*	GetContour(u8) const;
+	Surface		GetContour(u8) const;
 
 	void	InitContours(void);
 	void	SetMirror(Unit*);
@@ -201,7 +201,7 @@ namespace Battle
 	Position	position;
 	ModesAffected	affected;
 	Unit*		mirror;
-	Sprite		contours[4];
+	Surface		contours[4];
 
 	bool		blindanswer;
     };

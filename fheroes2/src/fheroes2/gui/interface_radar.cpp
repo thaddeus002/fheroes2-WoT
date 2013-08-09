@@ -175,7 +175,7 @@ void Interface::Radar::RedrawArea(const u8 color)
 
 	const u16 world_w = world.w();
 	const u16 world_h = world.h();
-	const Surface* tile_surface = NULL;
+	Surface tile_surface;
 
 	cursorArea.Hide();
 	spriteArea.Blit(area.x, area.y, display);
@@ -189,7 +189,7 @@ void Interface::Radar::RedrawArea(const u8 color)
 #endif
 
 	    if(! show_tile)
-		tile_surface = & sf_black;
+		tile_surface = sf_black;
 	    else
 	    switch(tile.GetObject())
 	    {
@@ -223,12 +223,12 @@ void Interface::Radar::RedrawArea(const u8 color)
 		default: continue;
 	    }
 
-	    if(tile_surface)
+	    if(tile_surface.isValid())
 	    {
 		float dstx = (index % world_w) * area.w / world_w;
 		float dsty = (index / world_h) * area.h / world_w;
 
-		tile_surface->Blit(area.x + static_cast<u16>(dstx), area.y + static_cast<u16>(dsty), display);
+		tile_surface.Blit(area.x + static_cast<u16>(dstx), area.y + static_cast<u16>(dsty), display);
 	    }
 	}
     }
@@ -259,21 +259,21 @@ void Interface::Radar::RedrawCursor(void)
     }
 }
 
-Surface* Interface::Radar::GetSurfaceFromColor(u8 color)
+Surface Interface::Radar::GetSurfaceFromColor(u8 color)
 {
     switch(color)
     {
-	case Color::BLUE:	return & sf_blue;
-	case Color::GREEN:	return & sf_green;
-	case Color::RED:	return & sf_red;
-	case Color::YELLOW:	return & sf_yellow;
-	case Color::ORANGE:	return & sf_orange;
-	case Color::PURPLE:	return & sf_purple;
-	case Color::NONE:	return & sf_gray;
+	case Color::BLUE:	return sf_blue;
+	case Color::GREEN:	return sf_green;
+	case Color::RED:	return sf_red;
+	case Color::YELLOW:	return sf_yellow;
+	case Color::ORANGE:	return sf_orange;
+	case Color::PURPLE:	return sf_purple;
+	case Color::NONE:	return sf_gray;
 	default:		break;
     }
 
-    return NULL;
+    return Surface();
 }
 
 u32 GetPaletteIndexFromGround(const u16 ground)

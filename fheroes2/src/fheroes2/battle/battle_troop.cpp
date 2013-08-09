@@ -406,18 +406,18 @@ std::string Battle::Unit::GetSpeedString(void) const
     return os.str();
 }
 
-const Sprite* Battle::Unit::GetContour(u8 val) const
+Surface Battle::Unit::GetContour(u8 val) const
 {
     switch(val)
     {
-	case CONTOUR_MAIN:			return &contours[0];
-	case CONTOUR_REFLECT:			return &contours[1];
-	case CONTOUR_BLACK:			return &contours[2];
-	case CONTOUR_BLACK|CONTOUR_REFLECT:	return &contours[3];
+	case CONTOUR_MAIN:			return contours[0];
+	case CONTOUR_REFLECT:			return contours[1];
+	case CONTOUR_BLACK:			return contours[2];
+	case CONTOUR_BLACK|CONTOUR_REFLECT:	return contours[3];
 	default: break;
     }
 
-    return NULL;
+    return Surface();
 }
 
 u32 Battle::Unit::GetDead(void) const
@@ -462,16 +462,14 @@ void Battle::Unit::InitContours(void)
     const Sprite & sprite2 = AGG::GetICN(msi.icn_file, msi.frm_idle.start, true);
 
     // main sprite
-    contours[0].Set(Surface::Contour(sprite1, sprite1.GetColorIndex(0xDA)));
+    contours[0] = Surface::Contour(sprite1, sprite1.GetColorIndex(0xDA));
 
     // revert sprite
-    contours[1].Set(Surface::Contour(sprite2, sprite2.GetColorIndex(0xDA)));
+    contours[1] = Surface::Contour(sprite2, sprite2.GetColorIndex(0xDA));
 
     // create white black sprite
-    contours[2].Set(sprite1);
-    contours[2].GrayScale();
-    contours[3].Set(sprite2);
-    contours[3].GrayScale();
+    contours[2] = Surface::GrayScale(sprite1);
+    contours[3] = Surface::GrayScale(sprite2);
 }
 
 void Battle::Unit::SetMirror(Unit* ptr)

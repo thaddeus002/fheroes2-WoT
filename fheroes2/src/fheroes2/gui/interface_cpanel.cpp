@@ -48,11 +48,11 @@ void Interface::ControlPanel::ResetTheme(void)
 {
     ICN::icn_t icn = Settings::Get().ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
 
-    btn_radr.Set(AGG::GetICN(icn, 4));
-    btn_icon.Set(AGG::GetICN(icn, 0));
-    btn_bttn.Set(AGG::GetICN(icn, 12));
-    btn_stat.Set(AGG::GetICN(icn, 10));
-    btn_quit.Set(AGG::GetICN(icn, 8));
+    btn_radr = AGG::GetICN(icn, 4);
+    btn_icon = AGG::GetICN(icn, 0);
+    btn_bttn = AGG::GetICN(icn, 12);
+    btn_stat = AGG::GetICN(icn, 10);
+    btn_quit = AGG::GetICN(icn, 8);
 
     btn_radr.SetAlpha(alpha);
     btn_icon.SetAlpha(alpha);

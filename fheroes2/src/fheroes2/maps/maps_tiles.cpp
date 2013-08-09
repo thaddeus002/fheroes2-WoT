@@ -1093,7 +1093,7 @@ u8  Maps::Tiles::TileSpriteShape(void) const
     return pack_sprite_index >> 14;
 }
 
-const Surface & Maps::Tiles::GetTileSurface(void) const
+Surface Maps::Tiles::GetTileSurface(void) const
 {
     return AGG::GetTIL(TIL::GROUND32, TileSpriteIndex(), TileSpriteShape());
 }

@@ -437,7 +437,7 @@ void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const s32 index, S
 			    areaPosition.y + pt.y * TILEWIDTH - gamearea.scrollOffset.y);
 	marker.Blit(dst.x, dst.y + 8, sf);
 
-	Settings::Get().ExtGameEvilInterface() ? sf.GrayScale() : sf.Sepia();
+	sf = (Settings::Get().ExtGameEvilInterface() ? Surface::GrayScale(sf) : Surface::Sepia(sf));
 
 	if(Settings::Get().QVGA())
 	{

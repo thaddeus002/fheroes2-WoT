@@ -1519,7 +1519,7 @@ void Heroes::Move2Dest(const s32 & dst_index, bool skip_action /* false */)
     }
 }
 
-const Surface & Heroes::GetPortrait(heroes_t id, u8 type)
+Surface Heroes::GetPortrait(heroes_t id, u8 type)
 {
     if(Heroes::UNKNOWN != id)
     switch(type)

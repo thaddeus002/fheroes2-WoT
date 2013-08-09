@@ -118,12 +118,12 @@ namespace AGG
 	bool ReadDataDir(void);
 
 	int GetICNCount(const ICN::icn_t icn);
-	const Sprite & GetICN(const ICN::icn_t icn, u32, bool reflect = false);
-	const Surface & GetTIL(const TIL::til_t til, u32, u8 shape);
+	Sprite GetICN(const ICN::icn_t icn, u32, bool reflect = false);
+	Surface GetTIL(const TIL::til_t til, u32, u8 shape);
 	const std::vector<u8> & GetWAV(const M82::m82_t m82);
 	const std::vector<u8> & GetMID(const XMI::xmi_t xmi);
 #ifdef WITH_TTF
-	const Surface & GetFNT(u16, u8);
+	Surface GetFNT(u16, u8);
 	const SDL::Font & GetMediumFont(void) const;
 	const SDL::Font & GetSmallFont(void) const;
 #endif
@@ -178,11 +178,11 @@ namespace AGG
 
     int GetICNCount(const ICN::icn_t icn);
 
-    const Sprite & GetICN(const ICN::icn_t icn, const u32 index, bool reflect = false);
-    const Surface & GetTIL(const TIL::til_t til, const u32 index, const u8 shape);
-    const Surface & GetLetter(char ch, u8 ft);
+    Sprite	GetICN(const ICN::icn_t icn, const u32 index, bool reflect = false);
+    Surface	GetTIL(const TIL::til_t til, const u32 index, const u8 shape);
+    Surface	GetLetter(char ch, u8 ft);
 #ifdef WITH_TTF
-    const Surface & GetUnicodeLetter(u16 ch, u8 ft);
+    Surface	GetUnicodeLetter(u16 ch, u8 ft);
 #endif
 
     // wrapper Audio

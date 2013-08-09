@@ -48,7 +48,7 @@ namespace Interface
 	void QueueEventProcessing(void);
 
     private:
-	Surface* GetSurfaceFromColor(u8);
+	Surface GetSurfaceFromColor(u8);
 
 	Basic & interface;
 

@@ -779,7 +779,7 @@ ArtifactsBar::ArtifactsBar(const Heroes* ptr, bool mini, bool ro, bool change /*
     {
         const Sprite & sprite = AGG::GetICN(ICN::ARTIFACT, 0);
         SetItemSize(sprite.w(), sprite.h());
-        spcursor.Set(AGG::GetICN(ICN::NGEXTRA, 62), true);
+        spcursor = AGG::GetICN(ICN::NGEXTRA, 62);
     }
 }
 

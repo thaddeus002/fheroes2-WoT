@@ -331,21 +331,21 @@ u8 Dialog::ArmySplitTroop(u8 free_slots, u32 max, u32 & cur, bool savelast)
 	    break;
 
 	case 3:	
-	    sp3.Set(AGG::GetICN(ICN::REQUESTS, 22), true);
+	    sp3 = AGG::GetICN(ICN::REQUESTS, 22);
 	    rt3 = Rect(center - sp3.w() / 2, pos.y + 95, sp3.w(), sp3.h());
 	    break;
 
 	case 4:
-	    sp3.Set(AGG::GetICN(ICN::REQUESTS, 22), true);
-	    sp4.Set(AGG::GetICN(ICN::REQUESTS, 23), true);
+	    sp3 = AGG::GetICN(ICN::REQUESTS, 22);
+	    sp4 = AGG::GetICN(ICN::REQUESTS, 23);
 	    rt3 = Rect(center - 5 - sp3.w(), pos.y + 95, sp3.w(), sp3.h());
 	    rt4 = Rect(center + 5, pos.y + 95, sp4.w(), sp4.h());
 	    break;
 
 	case 5:
-	    sp3.Set(AGG::GetICN(ICN::REQUESTS, 22), true);
-	    sp4.Set(AGG::GetICN(ICN::REQUESTS, 23), true);
-	    sp5.Set(AGG::GetICN(ICN::REQUESTS, 24), true);
+	    sp3 = AGG::GetICN(ICN::REQUESTS, 22);
+	    sp4 = AGG::GetICN(ICN::REQUESTS, 23);
+	    sp5 = AGG::GetICN(ICN::REQUESTS, 24);
 	    rt3 = Rect(center - sp3.w() / 2 - 10 - sp3.w(), pos.y + 95, sp3.w(), sp3.h());
 	    rt4 = Rect(center - sp4.w() / 2, pos.y + 95, sp4.w(), sp4.h());
 	    rt5 = Rect(center + sp5.w() / 2 + 10, pos.y + 95, sp5.w(), sp5.h());
