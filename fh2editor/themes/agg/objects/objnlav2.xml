@@ -38,6 +38,6 @@
         <sprite px="2" py="1" index="115" level="action" passable="0x01F8" />
     </object>
 
-    <template section="sign" name="Sign" index="117" />
+    <template section="sign" name="Sign" index="116" />
     <template section="sawmill" name="SawMill" index="118" />
 </objects>

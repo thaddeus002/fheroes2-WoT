@@ -1,8 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <template>
-    <sign width="1" height="1" cid="0x02" >
-	<sprite px="0" py="0" index="0" level="action" passable="0x01F8" />
+    <graveyard width="4" height="2" cid="0x0c" >
+	<sprite px="0" py="0" index="0" level="top" passable="0" />
+	<sprite px="1" py="0" index="1" level="top" passable="0" />
+	<sprite px="2" py="0" index="2" level="top" passable="0" />
+	<sprite px="3" py="0" index="3" level="top" passable="0" />
+	<sprite px="0" py="1" index="4" level="top" passable="0" />
+	<sprite px="1" py="1" index="5" level="bottom" passable="0x01F8" />
+	<sprite px="2" py="1" index="6" level="action" passable="0x01F8" />
+	<sprite px="3" py="1" index="7" level="bottom" passable="0x01F8" />
+    </graveyard>
+    <graveyard_2 width="3" height="1" cid="0x0c" >
+	<sprite px="0" py="0" index="0" level="top" passable="0" />
+	<sprite px="1" py="0" index="1" level="bottom" passable="0x01F8" />
+	<sprite px="2" py="0" index="2" level="action" passable="0x01F8" />
+    </graveyard_2>
+    <sign width="2" height="1" cid="0x02" >
+	<sprite px="0" py="0" index="0" level="top" passable="0" />
+	<sprite px="1" py="0" index="1" level="action" passable="0x01F8" />
     </sign>
+    <sign1 width="1" height="1" cid="0x02" >
+	<sprite px="0" py="0" index="0" level="action" passable="0x01F8" />
+    </sign1>
+    <watchtower width="2" height="1" cid="0x3a" >
+	<sprite px="0" py="0" index="0" level="top" />
+	<sprite px="1" py="0" index="1" level="action" passable="0x01F8" />
+    </watchtower>
     <fountain width="2" height="1" cid="0x09" >
 	<sprite px="0" py="0" index="0" level="top" />
 	<sprite px="1" py="0" index="1" level="action" passable="0x01F8" />
@@ -141,6 +164,11 @@
         <sprite px="0" py="0" index="0" level="top" />
         <sprite px="1" py="0" index="1" level="action" />
     </resource>
+    <magicwell width="2" height="2" cid="0x5E" >
+        <sprite px="1" py="0" index="0" level="top" />
+        <sprite px="0" py="1" index="1" level="top" />
+        <sprite px="1" py="1" index="2" level="action" />
+    </magicwell>
 
     <trees_2x2_1 width="2" height="2" cid="0x63" >
         <sprite px="1" py="0" index="0" level="top" />
@@ -335,6 +363,28 @@
         <sprite px="6" py="2" index="22" level="bottom" passable="0x01F8" />
         <sprite px="7" py="2" index="23" level="bottom" passable="0x01F8" />
     </lake_8x3>
+    <lake_7x3 width="8" height="3" cid="0x68" >
+        <sprite px="0" py="0" index="0" level="bottom" passable="0" />
+        <sprite px="1" py="0" index="1" level="bottom" passable="0" />
+        <sprite px="2" py="0" index="2" level="bottom" passable="0" />
+        <sprite px="3" py="0" index="3" level="bottom" passable="0" />
+        <sprite px="4" py="0" index="4" level="bottom" passable="0" />
+        <sprite px="5" py="0" index="5" level="bottom" passable="0" />
+        <sprite px="0" py="1" index="6" level="bottom" passable="0" />
+        <sprite px="1" py="1" index="7" level="bottom" passable="0" />
+        <sprite px="2" py="1" index="8" level="bottom" passable="0" />
+        <sprite px="3" py="1" index="9" level="bottom" passable="0" />
+        <sprite px="4" py="1" index="10" level="bottom" passable="0" />
+        <sprite px="5" py="1" index="11" level="bottom" passable="0" />
+        <sprite px="6" py="1" index="12" level="bottom" passable="0" />
+        <sprite px="0" py="2" index="13" level="bottom" passable="0x01F8" />
+        <sprite px="1" py="2" index="14" level="bottom" passable="0x01F8" />
+        <sprite px="2" py="2" index="15" level="bottom" passable="0x01F8" />
+        <sprite px="3" py="2" index="16" level="bottom" passable="0x01F8" />
+        <sprite px="4" py="2" index="17" level="bottom" passable="0x01F8" />
+        <sprite px="5" py="2" index="18" level="bottom" passable="0x01F8" />
+        <sprite px="6" py="2" index="19" level="bottom" passable="0x01F8" />
+    </lake_7x3>
     <lake_5x3 width="5" height="3" cid="0x68" >
         <sprite px="1" py="0" index="0" level="top" />
         <sprite px="2" py="0" index="1" level="top" />
@@ -351,7 +401,18 @@
         <sprite px="3" py="2" index="12" level="bottom" passable="0x01F8" />
         <sprite px="4" py="2" index="13" level="bottom" passable="0x01F8" />
     </lake_5x3>
-    <lake_5x2 width="5" height="2" cid="0x68" >
+    <lake_5x2_1 width="5" height="2" cid="0x68" >
+        <sprite px="1" py="0" index="0" level="bottom" passable="0" />
+        <sprite px="2" py="0" index="1" level="bottom" passable="0" />
+        <sprite px="3" py="0" index="2" level="bottom" passable="0" />
+        <sprite px="4" py="0" index="3" level="bottom" passable="0" />
+        <sprite px="0" py="1" index="4" level="bottom" passable="0x01F8" />
+        <sprite px="1" py="1" index="5" level="bottom" passable="0x01F8" />
+        <sprite px="2" py="1" index="6" level="bottom" passable="0x01F8" />
+        <sprite px="3" py="1" index="7" level="bottom" passable="0x01F8" />
+        <sprite px="4" py="1" index="8" level="bottom" passable="0x01F8" />
+    </lake_5x2_1>
+    <lake_5x2_2 width="5" height="2" cid="0x68" >
         <!-- empty <sprite px="0" py="0" index="0" level="bottom" passable="0x01F8" />  -->
         <sprite px="1" py="0" index="1" level="bottom" passable="0" />
         <sprite px="2" py="0" index="2" level="bottom" passable="0" />
@@ -362,8 +423,14 @@
         <sprite px="2" py="1" index="7" level="bottom" passable="0x01F8" />
         <sprite px="3" py="1" index="8" level="bottom" passable="0x01F8" />
         <sprite px="4" py="1" index="9" level="bottom" passable="0x01F8" />
-    </lake_5x2>
-    <lake_4x2 width="5" height="2" cid="0x68" >
+    </lake_5x2_2>
+    <lake_3x1 width="3" height="1" cid="0x68" >
+        <sprite px="0" py="0" index="0" level="bottom" passable="0x01F8" />
+        <sprite px="1" py="0" index="1" level="bottom" passable="0x01F8" />
+        <sprite px="2" py="0" index="2" level="bottom" passable="0x01F8" />
+        <sprite px="3" py="0" index="3" level="bottom" passable="0x01F8" />
+    </lake_3x1>
+    <lake_4x2 width="4" height="2" cid="0x68" >
         <sprite px="0" py="0" index="0" level="bottom" passable="0" />
         <sprite px="1" py="0" index="1" level="bottom" passable="0" />
         <sprite px="2" py="0" index="2" level="bottom" passable="0" />
@@ -373,6 +440,18 @@
         <sprite px="2" py="1" index="6" level="bottom" passable="0x01F8" />
         <sprite px="3" py="1" index="7" level="bottom" passable="0x01F8" />
     </lake_4x2>
+    <lake_4x3 width="4" height="3" cid="0x68" >
+        <sprite px="1" py="0" index="0" level="top" />
+        <sprite px="2" py="0" index="1" level="top" />
+        <sprite px="0" py="1" index="2" level="bottom" passable="0" />
+        <sprite px="1" py="1" index="3" level="bottom" passable="0" />
+        <sprite px="2" py="1" index="4" level="bottom" passable="0" />
+        <sprite px="3" py="1" index="5" level="bottom" passable="0" />
+        <sprite px="0" py="2" index="6" level="bottom" passable="0x01F8" />
+        <sprite px="1" py="2" index="7" level="bottom" passable="0x01F8" />
+        <sprite px="2" py="2" index="8" level="bottom" passable="0x01F8" />
+        <sprite px="3" py="2" index="9" level="bottom" passable="0x01F8" />
+    </lake_4x3>
 
     <lavapool_6x2 width="6" height="2" cid="0x70" >
         <sprite px="0" py="0" index="0" level="bottom" passable="0" />
@@ -422,6 +501,12 @@
         <sprite px="1" py="1" index="2" level="bottom" passable="0x01F8" />
         <sprite px="2" py="1" index="3" level="bottom" passable="0x01F8" />
     </rock_3x2>
+    <rock_3x2_2 width="3" height="2" cid="0x67" >
+        <sprite px="2" py="0" index="0" level="top" />
+        <sprite px="0" py="1" index="1" level="top" />
+        <sprite px="1" py="1" index="2" level="bottom" passable="0x01F8" />
+        <sprite px="2" py="1" index="3" level="bottom" passable="0x01F8" />
+    </rock_3x2_2>
     <rock_3x2_5 width="3" height="2" cid="0x67" >
         <sprite px="1" py="0" index="0" level="top" />
         <sprite px="2" py="0" index="1" level="top" />
@@ -595,6 +680,13 @@
         <sprite px="1" py="0" index="1" level="bottom" passable="0x01F8" />
         <sprite px="2" py="0" index="2" level="bottom" passable="0x01F8" />
     </bottom_3x1_3>
+    <bottom_3x2_1 width="3" height="2">
+        <sprite px="1" py="0" index="0" level="bottom" passable="0" />
+        <sprite px="2" py="0" index="1" level="bottom" passable="0" />
+        <sprite px="0" py="1" index="2" level="bottom" passable="0" />
+        <sprite px="1" py="1" index="3" level="bottom" passable="0x01F8" />
+        <sprite px="2" py="1" index="4" level="bottom" passable="0x01F8" />
+    </bottom_3x2_1>
     <bottom_4x1_1 width="4" height="1">
         <sprite px="0" py="0" index="0" level="top" />
         <sprite px="1" py="0" index="1" level="bottom" passable="0x01F8" />
@@ -611,6 +703,13 @@
         <sprite px="2" py="1" index="6" level="bottom" passable="0x01F8" />
         <sprite px="3" py="1" index="7" level="bottom" passable="0x01F8" />
     </bottom_4x2_1>
+    <bottom_5x1 width="5" height="1">
+        <sprite px="0" py="0" index="0" level="bottom" passable="0x01F8" />
+        <sprite px="1" py="0" index="1" level="bottom" passable="0x01F8" />
+        <sprite px="2" py="0" index="2" level="bottom" passable="0x01F8" />
+        <sprite px="3" py="0" index="3" level="bottom" passable="0x01F8" />
+        <sprite px="4" py="0" index="4" level="bottom" passable="0x01F8" />
+    </bottom_5x1>
 
     <passable_1x1 width="2" height="1">
         <sprite px="0" py="0" index="0" level="bottom" passable="0x01FF" />
@@ -628,6 +727,11 @@
         <sprite px="0" py="1" index="1" level="bottom" passable="0x01FF" />
         <sprite px="1" py="1" index="2" level="bottom" passable="0x01FF" />
     </passable_2x2_1>
+    <passable_3x1_3 width="3" height="3">
+        <sprite px="0" py="0" index="0" level="bottom" passable="0x01FF" />
+        <sprite px="1" py="0" index="1" level="bottom" passable="0x01FF" />
+        <sprite px="2" py="0" index="2" level="bottom" passable="0x01FF" />
+    </passable_3x1_3>
     <passable_3x3_1 width="3" height="3">
         <sprite px="0" py="0" index="0" level="bottom" passable="0x01FF" />
         <sprite px="1" py="0" index="1" level="bottom" passable="0x01FF" />

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects icn="objnwat2">
+
+    <template section="rock_2x2" name="Rock 0" index="0" />
+
+    <object name="DerelictShip" width="3" height="3" cid="0x5b" >
+	<sprite px="1" py="0" index="3" level="top" animation="6" />
+	<sprite px="2" py="0" index="10" level="bottom" passable="0x0183" /> <!-- center, left, top, top left -->
+	<sprite px="0" py="1" index="11" level="bottom" passable="0" />
+	<sprite px="1" py="1" index="12" level="bottom" passable="0" animation="6" />
+	<sprite px="2" py="1" index="19" level="bottom" passable="0" />
+	<sprite px="0" py="2" index="20" level="bottom" passable="0x01F8" />
+	<sprite px="1" py="2" index="21" level="bottom" passable="0x01F8" />
+	<sprite px="2" py="2" index="22" level="bottom" passable="0x01E8" /> <!-- center row, bottom. bottom left -->
+    </object>
+    <object name="Boat" width="1" height="1" cid="0x2b" >
+	<sprite px="0" py="0" index="23" level="action" passable="0x01F8" />
+    </object>
+
+</objects>

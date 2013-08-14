@@ -14,4 +14,6 @@
     <group name="Objects 2" file="objnmult.xml" />
     <group name="Pickup Resources" file="resources.xml" />
     <group name="Pickup Artifacts" file="artifacts.xml" />
+    <group name="Water 1" file="objnwat2.xml" />
+    <group name="Water 2" file="objnwatr.xml" />
 </groups>

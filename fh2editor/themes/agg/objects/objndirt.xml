@@ -7,7 +7,7 @@
     <template section="bottom_2x1_2" name="Crater 19" index="19" cid="0x6C" />
     <template section="bottom_2x1_2" name="Crater 21" index="21" cid="0x6C" />
     <template section="lake_8x3" name="Lake 23" index="23" />
-    <template section="lake_5x2" name="Lake 47" index="47" />
+    <template section="lake_5x2_2" name="Lake 47" index="47" />
     <template section="bottom_2x1_2" name="Lake 57" index="57" cid="0x68" />
     <template section="bottom_3x1_2" name="Shrub 59" index="59" cid="0x71" />
     <template section="bottom_3x1_2" name="Shrub 62" index="62" cid="0x71" />

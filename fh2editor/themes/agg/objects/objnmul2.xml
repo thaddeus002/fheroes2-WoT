@@ -43,7 +43,7 @@
 
     <template section="sawmill" name="SawMill" index="74" />
     <template section="waterwheel" name="Water Wheel" index="82" />
-    <template section="sign" name="Sign" index="114" />
+    <template section="sign" name="Sign" index="113" />
 
     <object name="Teleport 1" width="2" height="1" cid="0x24" >
 	<sprite px="0" py="0" index="115" level="top" />
