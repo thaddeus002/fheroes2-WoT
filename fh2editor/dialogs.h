@@ -786,6 +786,8 @@ namespace Form
     {
 	Q_OBJECT
 
+	int			oldport;
+
     public:
 	HeroDialog(const MapHero &);
 
@@ -801,6 +803,9 @@ namespace Form
 	QHBoxLayout*		horizontalLayoutColor;
 	QLabel*			labelColor;
 	QComboBox*		comboBoxColor;
+	QHBoxLayout*		horizontalLayoutRace;
+	QLabel*			labelRace;
+	QComboBox*		comboBoxRace;
 	QHBoxLayout* 		horizontalLayoutExp;
 	QLabel* 		labelExperience;
 	QLineEdit* 		lineEditExperience;

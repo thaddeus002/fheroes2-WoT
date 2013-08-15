@@ -353,6 +353,7 @@ protected:
     void		editSignDialog(const MapTile &);
     void		editSphinxDialog(const MapTile &);
     void		editHeroDialog(const MapTile &);
+    void		editOtherMapEventsDialog(const MapTile &);
 
     bool		loadMapMP2(const QString &);
     bool		loadMapXML(const QString &);

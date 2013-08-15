@@ -2106,14 +2106,7 @@ void MapData::editObjectAttributes(void)
 	{
 	    QMessageBox::information(qobject_cast<MapWindow*>(parent()), "Object Attributes",
 		    "Sorry!\nChange attributes of the object is not yet available."); break;
-/*
-	    Form::ObjectEventsDialog form;
-
-	    if(QDialog::Accepted == form.exec())
-	    {
-		// store map object
-	    }
-*/
+	    // editOtherMapEventsDialog(*tileOverMouse); break;
 	}
     }
 }
@@ -2135,6 +2128,16 @@ void MapData::removeCurrentObject(void)
 	}
 
 	emit dataModified();
+    }
+}
+
+void MapData::editOtherMapEventsDialog(const MapTile & tile)
+{
+    Form::ObjectEventsDialog form;
+
+    if(QDialog::Accepted == form.exec())
+    {
+	// store map object
     }
 }
 
@@ -2211,7 +2214,7 @@ void MapData::editHeroDialog(const MapTile & tile)
 	    hero->patrolSquare = form.comboBoxPatrol->itemData(form.comboBoxPatrol->currentIndex()).toInt();
 	    hero->skills = form.skills();
 	    hero->color = form.comboBoxColor->itemData(form.comboBoxColor->currentIndex()).toInt();
-	    //hero->race = ;
+	    hero->race = form.comboBoxColor->itemData(form.comboBoxRace->currentIndex()).toInt();
 
 	    updateHeroRaceColor(tile, hero->race, hero->color);
 	    updateKingdomColors(hero->color);

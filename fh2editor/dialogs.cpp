@@ -662,6 +662,7 @@ Form::MapOptions::MapOptions(MapData & map)
     horizontalLayout6->addWidget(groupBoxEvents);
 
     /* tab: default values */
+/*
     tabDefaults = new QWidget();
     verticalLayoutDefaults = new QVBoxLayout(tabDefaults);
 
@@ -731,7 +732,7 @@ Form::MapOptions::MapOptions(MapData & map)
     verticalLayoutDefaults->addLayout(horizontalLayoutResourceWoodOre);
     verticalLayoutDefaults->addLayout(horizontalLayoutResourceOther);
     verticalLayoutDefaults->addItem(verticalSpacerDefaults);
-
+*/
     /* tab: authors/license */
     tabAuthorsLicense = new QWidget();
     verticalLayout9 = new QVBoxLayout(tabAuthorsLicense);
@@ -760,7 +761,7 @@ Form::MapOptions::MapOptions(MapData & map)
     tabWidget->addTab(tabInfo, QApplication::translate("MapOptions", "General Info", 0, QApplication::UnicodeUTF8));
     tabWidget->addTab(tabConditions, QApplication::translate("MapOptions", "Wins/Loss Condition", 0, QApplication::UnicodeUTF8));
     tabWidget->addTab(tabRumorsEvents, QApplication::translate("MapOptions", "Rumors and Events", 0, QApplication::UnicodeUTF8));
-    tabWidget->addTab(tabDefaults, QApplication::translate("MapOptions", "Default Values", 0, QApplication::UnicodeUTF8));
+    //tabWidget->addTab(tabDefaults, QApplication::translate("MapOptions", "Default Values", 0, QApplication::UnicodeUTF8));
     tabWidget->addTab(tabAuthorsLicense, QApplication::translate("MapOptions", "Authors and License", 0, QApplication::UnicodeUTF8));
 
     pushButtonSave = new QPushButton(this);
@@ -825,12 +826,14 @@ Form::MapOptions::MapOptions(MapData & map)
     connect(listWidgetEvents, SIGNAL(mousePressed()), listWidgetRumors, SLOT(clearSelection()));
     connect(listWidgetEvents, SIGNAL(listChanged()), this, SLOT(setEnableSaveButton()));
 
+/*
     connect(spinBoxResourceGoldMin, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
     connect(spinBoxResourceGoldMax, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
     connect(spinBoxResourceWoodOreMin, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
     connect(spinBoxResourceWoodOreMax, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
     connect(spinBoxResourceOtherMin, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
     connect(spinBoxResourceOtherMax, SIGNAL(valueChanged(int)), this, SLOT(setEnableSaveButton()));
+*/
 
     connect(plainTextEditAuthors, SIGNAL(textChanged()), this, SLOT(setEnableSaveButton()));
     connect(plainTextEditLicense, SIGNAL(textChanged()), this, SLOT(setEnableSaveButton()));
@@ -849,12 +852,14 @@ void Form::MapOptions::saveSettings(void)
 {
     QSettings & settings = Resource::localSettings();
     settings.setValue("MapOptions/size", size());
+/*
     Default::resourceGoldMin() = spinBoxResourceGoldMin->value();
     Default::resourceGoldMax() = spinBoxResourceGoldMax->value();
     Default::resourceWoodOreMin() = spinBoxResourceWoodOreMin->value();
     Default::resourceWoodOreMax() = spinBoxResourceWoodOreMax->value();
     Default::resourceOtherMin() = spinBoxResourceOtherMin->value();
     Default::resourceOtherMin() = spinBoxResourceOtherMax->value();
+*/
 }
 
 void Form::MapOptions::setConditionsBoxesMapValues(const MapData & map)
@@ -1252,23 +1257,12 @@ void Form::PlayerAllow::mousePressEvent(QMouseEvent* event)
 
 void Form::PlayerAllow::updatePlayers(void)
 {
-    QPixmap pix;
-
-    switch(col)
-    {
-	case Color::Blue:	pix = EditorTheme::getImageICN("CELLWIN.ICN", 43).first; break;
-    	case Color::Green:	pix = EditorTheme::getImageICN("CELLWIN.ICN", 44).first; break;
-    	case Color::Red:	pix = EditorTheme::getImageICN("CELLWIN.ICN", 45).first; break;
-    	case Color::Yellow:	pix = EditorTheme::getImageICN("CELLWIN.ICN", 46).first; break;
-    	case Color::Orange:	pix = EditorTheme::getImageICN("CELLWIN.ICN", 47).first; break;
-    	case Color::Purple:	pix = EditorTheme::getImageICN("CELLWIN.ICN", 48).first; break;
-	default: break;
-    }
+    QPixmap pix = Editor::pixmapBorder(QSize(26, 26), Color::convert(col), QColor(0, 0, 0));
 
     if(stat)
     {
 	QPainter paint(& pix);
-	paint.drawPixmap(QPoint(2, 2), EditorTheme::getImageICN("CELLWIN.ICN", 2).first);
+	paint.drawPixmap(QPoint(6, 6), EditorTheme::getImageICN("CELLWIN.ICN", 2).first);
     }
 
     setPixmap(pix);
@@ -1916,7 +1910,7 @@ void Form::MiniMap::setWindowPos(int px, int py, int pw, int ph)
 
 	if(windowPixmap.isNull() || windowPixmap.size() != windowPos.size())
 	{
-	    windowPixmap = Editor::pixmapBorder(windowPos.size(), QColor(220, 0, 220));
+	    windowPixmap = Editor::pixmapBorder(windowPos.size(), Qt::transparent, QColor(220, 0, 220));
 	}
 
 	update();
@@ -2071,12 +2065,12 @@ Form::TownDialog::TownDialog(const MapTown & town)
     labelColor->setText(QApplication::translate("TownDialog", "Color", 0, QApplication::UnicodeUTF8));
 
     comboBoxColor = new QComboBox(tabInfo);
-    comboBoxColor->addItem(Color::pixmap(Color::None, QSize(24, 24)), "Gray", Color::None);
+    comboBoxColor->addItem(Editor::pixmapBorder(QSize(24, 24), QColor(130, 130, 130), QColor(0, 0, 0)), "Gray", Color::None);
 
     QVector<int> colors = Color::colors(Color::All);
     for(QVector<int>::const_iterator
 	it = colors.begin(); it != colors.end(); ++it)
-	comboBoxColor->addItem(Color::pixmap(*it, QSize(24, 24)), Color::transcribe(*it), *it);
+	comboBoxColor->addItem(Editor::pixmapBorder(QSize(24, 24), Color::convert(*it), QColor(0, 0, 0)), Color::transcribe(*it), *it);
 
     comboBoxColor->setCurrentIndex(Color::index(town.color));
 
@@ -2824,13 +2818,30 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
     QVector<int> colors = Color::colors(Color::All);
     for(QVector<int>::const_iterator
         it = colors.begin(); it != colors.end(); ++it)
-        comboBoxColor->addItem(Color::pixmap(*it, QSize(24, 24)), Color::transcribe(*it), *it);
+        comboBoxColor->addItem(Editor::pixmapBorder(QSize(24, 24), Color::convert(*it), QColor(0, 0, 0)), Color::transcribe(*it), *it);
 
-    comboBoxColor->setCurrentIndex(Color::index(hero.color));
+    comboBoxColor->setCurrentIndex(Color::index(hero.color) - 1);
 
     horizontalLayoutColor = new QHBoxLayout();
     horizontalLayoutColor->addWidget(labelColor);
     horizontalLayoutColor->addWidget(comboBoxColor);
+
+    labelRace = new QLabel(tabInfo);
+    labelRace->setText(QApplication::translate("TownDialog", "Race", 0, QApplication::UnicodeUTF8));
+
+    comboBoxRace = new QComboBox(tabInfo);
+    comboBoxRace->addItem(Race::transcribe(Race::Knight), Race::Knight);
+    comboBoxRace->addItem(Race::transcribe(Race::Barbarian), Race::Barbarian);
+    comboBoxRace->addItem(Race::transcribe(Race::Sorceress), Race::Sorceress);
+    comboBoxRace->addItem(Race::transcribe(Race::Warlock), Race::Warlock);
+    comboBoxRace->addItem(Race::transcribe(Race::Wizard), Race::Wizard);
+    comboBoxRace->addItem(Race::transcribe(Race::Necromancer), Race::Necromancer);
+    comboBoxRace->addItem(Race::transcribe(Race::Random), Race::Random);
+    comboBoxRace->setCurrentIndex(Race::index(hero.race) - 1);
+
+    horizontalLayoutRace = new QHBoxLayout();
+    horizontalLayoutRace->addWidget(labelRace);
+    horizontalLayoutRace->addWidget(comboBoxRace);
 
     labelExperience = new QLabel(tabInfo);
     labelExperience->setText(QApplication::translate("HeroDialog", "Experience", 0, QApplication::UnicodeUTF8));
@@ -2846,12 +2857,15 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
     verticalLayoutNameExp = new QVBoxLayout();
     verticalLayoutNameExp->addLayout(horizontalLayoutName);
     verticalLayoutNameExp->addLayout(horizontalLayoutColor);
+    verticalLayoutNameExp->addLayout(horizontalLayoutRace);
     verticalLayoutNameExp->addLayout(horizontalLayoutExp);
 
     horizontalSpacerCenter = new QSpacerItem(18, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     labelPortrait = new QLabel(tabInfo);
     labelPortrait->setPixmap(EditorTheme::getImageICN("PORTMEDI.ICN", hero.portrait).first);
+
+    oldport = hero.portrait;
 
     verticalScrollBarPort = new QScrollBar(tabInfo);
     verticalScrollBarPort->setPageStep(1);
@@ -3134,6 +3148,7 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
     connect(lineEditName, SIGNAL(textChanged(QString)), this, SLOT(setEnableOKButton()));
     connect(lineEditExperience, SIGNAL(textChanged(QString)), this, SLOT(setEnableOKButton()));
     connect(comboBoxColor, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(comboBoxRace, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
     connect(verticalScrollBarPort, SIGNAL(valueChanged(int)), this, SLOT(setPortrait(int)));
 
     connect(checkBoxTroopsDefault, SIGNAL(toggled(bool)), this, SLOT(setDefaultTroops(bool)));
@@ -3166,6 +3181,16 @@ void Form::HeroDialog::widgetSkillsVisible(bool f)
 void Form::HeroDialog::setPortrait(int val)
 {
     labelPortrait->setPixmap(EditorTheme::getImageICN("PORTMEDI.ICN", val).first);
+    if(lineEditName->text() == Portrait::transcribe(oldport))
+	lineEditName->setText(Portrait::transcribe(val));
+    if(val)
+    {
+	int curRace = (val - 1) / 9;
+	comboBoxRace->setCurrentIndex(curRace > 5 ? 6 : curRace);
+    }
+    else
+	comboBoxRace->setCurrentIndex(6);
+    oldport = val;
     setEnableOKButton();
 }
 

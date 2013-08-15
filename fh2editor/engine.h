@@ -64,7 +64,6 @@ namespace Color
 
     int			count(int);
     QColor		convert(int);
-    QPixmap		pixmap(int, const QSize &);
     QVector<int>	colors(int);
     QString		transcribe(int);
     int			index(int);
@@ -73,16 +72,17 @@ namespace Color
 namespace Race
 {
     enum { Unknown = 0, Knight = 0x01, Barbarian = 0x02, Sorceress = 0x04, Warlock = 0x08, Wizard = 0x10, Necromancer = 0x20,
-	    Multi = 0x40, Random = 0x80, All = Knight | Barbarian | Sorceress | Warlock | Wizard | Necromancer };
+	    Random = 0x40, Multi = 0x80, All = Knight | Barbarian | Sorceress | Warlock | Wizard | Necromancer };
 
-    QString transcribe(int);
+    QString		transcribe(int);
+    int			index(int);
 }
 
 namespace Speed
 {
     enum { Standing = 0, Crawling, VerySlow, Slow, Average, Fast, VeryFast, UltraFast, Blazing, Instant };
 
-    QString transcribe(int);
+    QString		transcribe(int);
 }
 
 namespace Building
@@ -413,7 +413,7 @@ namespace Editor
 {
     quint32 Rand(quint32 max);
     quint32 Rand(quint32 min, quint32 max);
-    QPixmap pixmapBorder(const QSize &, const QColor &);
+    QPixmap pixmapBorder(const QSize &, const QColor &, const QColor &);
     QPixmap pixmapBorderPassable(const QSize &, int passable);
 
     class MyXML : public QDomElement

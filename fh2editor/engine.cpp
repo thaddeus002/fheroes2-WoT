@@ -806,13 +806,13 @@ quint32 Editor::Rand(quint32 max)
     return static_cast<quint32>((max + 1) * (qrand() / (RAND_MAX + 1.0)));
 }
 
-QPixmap Editor::pixmapBorder(const QSize & size, const QColor & color)
+QPixmap Editor::pixmapBorder(const QSize & size, const QColor & fillCol, const QColor & bordCol)
 {
     QPixmap result(size);
-    result.fill(Qt::transparent);
+    result.fill(fillCol);
 
     QPainter paint(& result);
-    paint.setPen(QPen(color, 1));
+    paint.setPen(QPen(bordCol, 1));
     paint.setBrush(QBrush(QColor(0, 0, 0, 0)));
     paint.drawRect(0, 0, size.width() - 1, size.height() - 1);
 
@@ -825,10 +825,10 @@ QPixmap Editor::pixmapBorderPassable(const QSize & size, int passable)
     QColor greenColor(0, 255, 0);
 
     if(Direction::Unknown == passable || Direction::Center == passable)
-	return pixmapBorder(size, redColor);
+	return pixmapBorder(size, Qt::transparent, redColor);
     else
     if(IS_EQUAL_VALS(Direction::All, passable))
-	return pixmapBorder(size, greenColor);
+	return pixmapBorder(size, Qt::transparent, greenColor);
 
     QPixmap result(size);
     result.fill(Qt::transparent);
@@ -2722,7 +2722,7 @@ CompositeObjectCursor::CompositeObjectCursor(const CompositeObject & obj) : Comp
     passableMap = QPixmap(areaSize);
     passableMap.fill(Qt::transparent);
 
-    QPixmap yellowBound = Editor::pixmapBorder(tileSize - QSize(2, 2), QColor(255, 255, 0));
+    QPixmap yellowBound = Editor::pixmapBorder(tileSize - QSize(2, 2), Qt::transparent, QColor(255, 255, 0));
     QPainter paint(& passableMap);
 
     for(CompositeObject::const_iterator
@@ -2839,7 +2839,7 @@ QColor Color::convert(int v)
 	default: break;
     }
 
-    return QColor(100, 100, 100);
+    return QColor(0, 0, 0);
 }
 
 int Color::index(int v)
@@ -2856,13 +2856,6 @@ int Color::index(int v)
     }
 
     return 0;
-}
-
-QPixmap Color::pixmap(int v, const QSize & sz)
-{
-    QPixmap pixmap(sz);
-    pixmap.fill(convert(v));
-    return pixmap;
 }
 
 QVector<int> Color::colors(int v)
@@ -3137,25 +3130,29 @@ QString Speed::transcribe(int speed)
     return _names[0];
 }
 
-QString Race::transcribe(int race)
+int Race::index(int race)
 {
-    const char* names[] = { "Unknown", "Knight", "Barbarian", "Sorceress", "Warlock", "Wizard", "Necromancer",
-            "Multi", "Random" };
-
     switch(race)
     {
-	case Knight:		return names[1];
-	case Barbarian:		return names[2];
-	case Sorceress:		return names[3];
-	case Warlock:		return names[4];
-	case Wizard:		return names[5];
-	case Necromancer:	return names[6];
-	case Multi:		return names[7];
-	case Random:		return names[8];
+	case Knight:		return 1;
+	case Barbarian:		return 2;
+	case Sorceress:		return 3;
+	case Warlock:		return 4;
+	case Wizard:		return 5;
+	case Necromancer:	return 6;
+	case Random:		return 7;
+	case Multi:		return 8;
 	default: break;
     }
 
-    return names[0];
+    return 0;
+}
+
+QString Race::transcribe(int race)
+{
+    const char* names[] = { "Unknown", "Knight", "Barbarian", "Sorceress", "Warlock", "Wizard", "Necromancer",
+            "Random", "Multi" };
+    return names[index(race)];
 }
 
 QString Monster::transcribe(int index)
