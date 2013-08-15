@@ -715,6 +715,25 @@ QPixmap AGG::Spool::getImageTIL(const QString & til, int index)
     return result;
 }
 
+void AGG::Spool::fixAGGImagesBugs(const QString & icn, int index, QPair<QPixmap, QPoint> & result)
+{
+    // fix images
+    switch(EditorTheme::mapICN(icn))
+    {
+	case ICN::MINIHERO:
+	    // fix orange color
+	    if(index == 34)
+	    {
+		QPair<QPixmap, QPoint> goodImage = getImageICN(icn, 33);
+    		QPainter paint(& result.first);
+        	paint.drawPixmap(QRect(0,0,23,13), goodImage.first, QRect(0,0,23,13));
+	    }
+	    break;
+
+	default: break;		
+    }
+}
+
 QPair<QPixmap, QPoint> AGG::Spool::getImageICN(const QString & icn, int index)
 {
     QString key = icn + QString::number(index);
@@ -726,6 +745,9 @@ QPair<QPixmap, QPoint> AGG::Spool::getImageICN(const QString & icn, int index)
 	{
 	    result = second.isReadable() && second.exists(icn) ?
 		second.getImageICN(icn, index, colors) : first.getImageICN(icn, index, colors);
+
+	    fixAGGImagesBugs(icn, index, result);
+
 	    QPixmapCache::insert(key, result.first);
 	    icnOffsetCache[key] = result.second;
 	}
@@ -2100,9 +2122,32 @@ MapHero::MapHero(const QPoint & pos, quint32 id)
 {
 }
 
-MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2)
+MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2, int spriteIndex)
     : MapObject(pos, id, MapObj::Heroes), color(Color::None), race(Race::Unknown), portrait(Portrait::Unknown), nameHero(mp2.name)
 {
+    switch(spriteIndex / 7)
+    {
+	case 0:	color = Color::Blue; break;
+	case 1:	color = Color::Green; break;
+	case 2:	color = Color::Red; break;
+	case 3:	color = Color::Yellow; break;
+	case 4:	color = Color::Orange; break;
+	case 5:	color = Color::Purple; break;
+	default: break;
+    }
+
+    switch(spriteIndex % 7)
+    {
+	case 0:	race = Race::Knight; break;
+	case 1:	race = Race::Barbarian; break;
+	case 2:	race = Race::Sorceress; break;
+	case 3:	race = Race::Warlock; break;
+	case 4:	race = Race::Wizard; break;
+	case 5:	race = Race::Necromancer; break;
+	case 6:	race = Race::Random; break;
+	default: break;
+    }
+
     if(mp2.customTroops)
     {
 	for(int ii = 0; ii < 5; ++ii)

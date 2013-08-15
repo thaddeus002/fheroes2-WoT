@@ -540,6 +540,8 @@ namespace AGG
 	QVector<QRgb>           colors;
 	QMap<QString, QPoint>	icnOffsetCache;
 
+	void			fixAGGImagesBugs(const QString &, int index, QPair<QPixmap, QPoint> &);
+
     public:
 	Spool(){}
 
@@ -732,7 +734,7 @@ struct MapHero : public MapObject
     int		patrolSquare;
     QString     nameHero;
 
-    MapHero(const QPoint &, quint32, const mp2hero_t &);
+    MapHero(const QPoint &, quint32, const mp2hero_t &, int);
     MapHero(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1);
 
     QString	name(void) const { return nameHero; }

@@ -209,6 +209,33 @@ int MapTileExt::loyaltyObject(const MapTileExt & te)
     return MapObj::None;
 }
 
+void MapTileExt::updateMiniHero(MapTileExt & te, int race, int color)
+{
+    te.spriteIndex = 0;
+
+    switch(color)
+    {
+        case Color::Blue:          te.spriteIndex = 0; break;
+        case Color::Green:         te.spriteIndex = 7; break;
+        case Color::Red:           te.spriteIndex = 14; break;
+        case Color::Yellow:        te.spriteIndex = 21; break;
+        case Color::Orange:        te.spriteIndex = 28; break;
+        case Color::Purple:        te.spriteIndex = 35; break;
+        default: break;
+    }
+
+    switch(race)
+    {
+        case Race::Knight:          te.spriteIndex += 0; break;
+        case Race::Barbarian:       te.spriteIndex += 1; break;
+        case Race::Sorceress:       te.spriteIndex += 2; break;
+        case Race::Warlock:         te.spriteIndex += 3; break;
+        case Race::Wizard:          te.spriteIndex += 4; break;
+        case Race::Necromancer:     te.spriteIndex += 5; break;
+        default:                    te.spriteIndex += 6; break;
+    }
+}
+
 void MapTileExt::updateFlagColor(MapTileExt & te, int color)
 {
     switch(color)
@@ -248,9 +275,10 @@ QDomElement & operator>> (QDomElement & el, MapTileExt & ext)
 void MapTileLevels::paint(QPainter & painter, const QPoint & offset, const QPoint & mpos) const
 {
     for(const_iterator it = begin(); it != end(); ++it)
+	if((*it).icn() != ICN::MINIHERO)
     {
 	QPair<QPixmap, QPoint> p1 = EditorTheme::getImageICN((*it).icn(), (*it).index());
-	painter.drawPixmap(offset + p1.second, p1.first);
+        painter.drawPixmap(offset + p1.second, p1.first);
 
 	if(MapTileExt::isAnimation(*it))
 	{
@@ -259,7 +287,7 @@ void MapTileLevels::paint(QPainter & painter, const QPoint & offset, const QPoin
 	    if(0 < anim)
 	    {
 		QPair<QPixmap, QPoint> p2 = EditorTheme::getImageICN((*it).icn(), anim);
-		painter.drawPixmap(offset + p2.second, p2.first);
+		    painter.drawPixmap(offset + p2.second, p2.first);
 	    }
 	    else
 		qDebug() << "H2::isAnimationICN:" << "incorrect animation" << mpos << "icn:" << (*it).icn() << "index:" << (*it).index();
@@ -830,12 +858,6 @@ bool MapTiles::isValidPoint(const QPoint & pos) const
     return QRect(QPoint(0, 0), msize).contains(pos);
 }
 
-void MapTiles::insertToScene(QGraphicsScene & scene)
-{
-    for(iterator it = begin(); it != end(); ++it)
-	scene.addItem(& (*it));
-}
-
 QDomElement & operator<< (QDomElement & el, const MapTiles & tiles)
 {
     el << tiles.msize;
@@ -877,8 +899,7 @@ void MapArea::importMP2Towns(const QVector<H2::TownPos> & towns)
 	it = towns.begin(); it != towns.end(); ++it) if(tiles.isValidPoint((*it).pos()))
     {
 	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1Const().findConst(MapTileExt::isTown);
-	int uid = ext ? ext->uid() : -1;
-	objects.push_back(new MapTown((*it).pos(), uid, (*it).town()));
+	if(ext) objects.push_back(new MapTown((*it).pos(), ext->uid(), (*it).town()));
     }
 }
 
@@ -888,8 +909,7 @@ void MapArea::importMP2Heroes(const QVector<H2::HeroPos> & heroes)
 	it = heroes.begin(); it != heroes.end(); ++it) if(tiles.isValidPoint((*it).pos()))
     {
 	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1Const().findConst(MapTileExt::isMiniHero);
-	int uid = ext ? ext->uid() : -1;
-	objects.push_back(new MapHero((*it).pos(), uid, (*it).hero()));
+	if(ext) objects.push_back(new MapHero((*it).pos(), ext->uid(), (*it).hero(), ext->index()));
     }
 }
 
@@ -900,8 +920,7 @@ void MapArea::importMP2Signs(const QVector<H2::SignPos> & signs)
     {
 	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1Const().findConst(MapTileExt::isSign);
 	if(!ext) ext = tiles.tileConst((*it).pos())->levels1Const().findConst(MapTileExt::isButtle);
-	int uid = ext ? ext->uid() : -1;
-	objects.push_back(new MapSign((*it).pos(), uid, (*it).sign()));
+	if(ext) objects.push_back(new MapSign((*it).pos(), ext->uid(), (*it).sign()));
     }
 }
 
@@ -911,8 +930,7 @@ void MapArea::importMP2MapEvents(const QVector<H2::EventPos> & events)
 	it = events.begin(); it != events.end(); ++it) if(tiles.isValidPoint((*it).pos()))
     {
 	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1Const().findConst(MapTileExt::isMapEvent);
-	int uid = ext ? ext->uid() : -1;
-	objects.push_back(new MapEvent((*it).pos(), uid, (*it).event()));
+	if(ext) objects.push_back(new MapEvent((*it).pos(), ext->uid(), (*it).event()));
     }
 }
 
@@ -922,8 +940,7 @@ void MapArea::importMP2SphinxRiddles(const QVector<H2::SphinxPos> & sphinxes)
 	it = sphinxes.begin(); it != sphinxes.end(); ++it) if(tiles.isValidPoint((*it).pos()))
     {
 	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1Const().findConst(MapTileExt::isSphinx);
-	int uid = ext ? ext->uid() : -1;
-	objects.push_back(new MapSphinx((*it).pos(), uid, (*it).sphinx()));
+	if(ext) objects.push_back(new MapSphinx((*it).pos(), ext->uid(), (*it).sphinx()));
     }
 }
 
@@ -1135,7 +1152,7 @@ void MapData::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
     if(tileOverMouse)
 	update(tileOverMouse->boundingRect());
 
-    MapTile* newTileOverMouse = qgraphicsitem_cast<MapTile*>(itemAt(event->scenePos()));
+    MapTile* newTileOverMouse = itemAtAsTile(event->scenePos());
 
     if(newTileOverMouse)
     {
@@ -1318,7 +1335,7 @@ void MapData::fillGroundAction(QAction* act)
 	rectArea.setTopLeft(rectArea.topLeft() - tile2);
 	rectArea.setBottomRight(rectArea.bottomRight() + tile2);
 
-	QList<QGraphicsItem*> listItems = items(rectArea);
+	QList<QGraphicsItem*> listItems = items(rectArea, Qt::ContainsItemShape, Qt::AscendingOrder);
 
 	for(QList<QGraphicsItem*>::iterator
 	    it = listItems.begin(); it != listItems.end(); ++it)
@@ -1399,7 +1416,10 @@ void MapData::newMap(const QSize & msz, const QString &)
 
     mapArea = MapArea(msz);
 
-    mapTiles.insertToScene(*this);
+    // insert tiles
+    for(MapTiles::iterator
+	it = mapTiles.begin(); it != mapTiles.end(); ++it)
+	addItem(& (*it));
 
     setSceneRect(QRect(QPoint(0, 0),
 	QSize(size().width() * tileSize.width(), size().height() * tileSize.height())));
@@ -1414,7 +1434,26 @@ bool MapData::loadMap(const QString & mapFile)
     if(! loadMapMP2(mapFile) && ! loadMapXML(mapFile))
 	return false;
 
-    mapTiles.insertToScene(*this);
+    // insert tiles
+    for(MapTiles::iterator
+	it = mapTiles.begin(); it != mapTiles.end(); ++it)
+	addItem(& (*it));
+
+    // create heroes group
+    for(MapTiles::iterator
+	it = mapTiles.begin(); it != mapTiles.end(); ++it)
+    {
+	const MapTileExt* ext = (*it).levels1Const().findConst(MapTileExt::isMiniHero);
+
+	if(ext)
+	{
+	    const QSize & tileSize = EditorTheme::tileSize();
+	    QGraphicsPixmapItem* item = new QGraphicsPixmapItem();
+	    item->setOffset((*it).mapPos().x() * tileSize.width(), (*it).mapPos().y() * tileSize.height() - 15);
+	    item->setPixmap(EditorTheme::getImageICN(ext->icn(), ext->index()).first);
+	    addItem(item);
+	}
+    }
 
     const QSize & tileSize = EditorTheme::tileSize();
     setSceneRect(QRect(QPoint(0, 0),
@@ -2134,11 +2173,23 @@ void MapData::editTownDialog(const MapTile & tile)
 	    town->color = form.comboBoxColor->itemData(form.comboBoxColor->currentIndex()).toInt();
 	    //town->race = ;
 
-	    updateCastleFlags(tile, town->color);
+	    updateTownRaceColor(tile, town->race, town->color);
 	    updateKingdomColors(town->color);
 	    emit dataModified();
 	}
     }
+}
+
+MapTile* MapData::itemAtAsTile(const QPointF & pos)
+{
+    QList<QGraphicsItem*> tileItems = items(pos, Qt::ContainsItemShape, Qt::AscendingOrder);
+    return tileItems.size() ? qgraphicsitem_cast<MapTile*>(tileItems.front()) : NULL;
+}
+
+QGraphicsPixmapItem* MapData::itemAtAsHero(const QPointF & pos)
+{
+    QList<QGraphicsItem*> tileItems = items(pos, Qt::IntersectsItemShape, Qt::DescendingOrder);
+    return 2 > tileItems.size() ? NULL : qgraphicsitem_cast<QGraphicsPixmapItem*>(tileItems.front());
 }
 
 void MapData::editHeroDialog(const MapTile & tile)
@@ -2159,10 +2210,16 @@ void MapData::editHeroDialog(const MapTile & tile)
 	    hero->patrolMode = form.checkBoxEnablePatrol->isChecked();
 	    hero->patrolSquare = form.comboBoxPatrol->itemData(form.comboBoxPatrol->currentIndex()).toInt();
 	    hero->skills = form.skills();
-	    //hero->color = ;
+	    hero->color = form.comboBoxColor->itemData(form.comboBoxColor->currentIndex()).toInt();
 	    //hero->race = ;
 
+	    updateHeroRaceColor(tile, hero->race, hero->color);
 	    updateKingdomColors(hero->color);
+
+	    QGraphicsPixmapItem* item = itemAtAsHero(tile.boundingRect().center());
+	    const MapTileExt* ext = tile.levels1Const().findConst(MapTileExt::isMiniHero);
+	    if(ext) item->setPixmap(EditorTheme::getImageICN(ext->icn(), ext->index()).first);
+
 	    emit dataModified();
 	}
     }
@@ -2242,7 +2299,18 @@ void MapData::addMapObject(const QPoint & pos, const CompositeObject & obj, quin
     emit dataModified();
 }
 
-void MapData::updateCastleFlags(const MapTile & tile, int color)
+void MapData::updateHeroRaceColor(const MapTile & tile, int race, int color)
+{
+    const MapTileExt* ext = tile.levels1Const().findConst(MapTileExt::isMiniHero);
+
+    if(ext)
+    {
+	MapTileExt::updateMiniHero(*const_cast<MapTileExt*>(ext), race, color);
+	update(tile.boundingRect());
+    }
+}
+
+void MapData::updateTownRaceColor(const MapTile & tile, int race, int color)
 {
     const QPoint & mp = tile.mapPos();
     MapTile* ltile = mapTiles.tile(QPoint(mp.x() - 1, mp.y()));

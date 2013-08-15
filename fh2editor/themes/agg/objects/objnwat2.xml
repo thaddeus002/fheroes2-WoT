@@ -11,7 +11,7 @@
 	<sprite px="2" py="1" index="19" level="bottom" passable="0" />
 	<sprite px="0" py="2" index="20" level="bottom" passable="0x01F8" />
 	<sprite px="1" py="2" index="21" level="bottom" passable="0x01F8" />
-	<sprite px="2" py="2" index="22" level="bottom" passable="0x01E8" /> <!-- center row, bottom. bottom left -->
+	<sprite px="2" py="2" index="22" level="bottom" passable="0x01E0" /> <!-- center row, bottom, bottom left -->
     </object>
     <object name="Boat" width="1" height="1" cid="0x2b" >
 	<sprite px="0" py="0" index="23" level="action" passable="0x01F8" />

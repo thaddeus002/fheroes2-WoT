@@ -2063,6 +2063,10 @@ Form::TownDialog::TownDialog(const MapTown & town)
     lineEditName = new QLineEdit(tabInfo);
     lineEditName->setText(town.nameTown);
 
+    horizontalLayoutName = new QHBoxLayout();
+    horizontalLayoutName->addWidget(labelName);
+    horizontalLayoutName->addWidget(lineEditName);
+
     labelColor = new QLabel(tabInfo);
     labelColor->setText(QApplication::translate("TownDialog", "Color", 0, QApplication::UnicodeUTF8));
 
@@ -2075,10 +2079,6 @@ Form::TownDialog::TownDialog(const MapTown & town)
 	comboBoxColor->addItem(Color::pixmap(*it, QSize(24, 24)), Color::transcribe(*it), *it);
 
     comboBoxColor->setCurrentIndex(Color::index(town.color));
-
-    horizontalLayoutName = new QHBoxLayout();
-    horizontalLayoutName->addWidget(labelName);
-    horizontalLayoutName->addWidget(lineEditName);
 
     horizontalLayoutColor = new QHBoxLayout();
     horizontalLayoutColor->addWidget(labelColor);
@@ -2816,6 +2816,22 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
     horizontalLayoutName->addWidget(labelName);
     horizontalLayoutName->addWidget(lineEditName);
 
+    labelColor = new QLabel(tabInfo);
+    labelColor->setText(QApplication::translate("TownDialog", "Color", 0, QApplication::UnicodeUTF8));
+
+    comboBoxColor = new QComboBox(tabInfo);
+
+    QVector<int> colors = Color::colors(Color::All);
+    for(QVector<int>::const_iterator
+        it = colors.begin(); it != colors.end(); ++it)
+        comboBoxColor->addItem(Color::pixmap(*it, QSize(24, 24)), Color::transcribe(*it), *it);
+
+    comboBoxColor->setCurrentIndex(Color::index(hero.color));
+
+    horizontalLayoutColor = new QHBoxLayout();
+    horizontalLayoutColor->addWidget(labelColor);
+    horizontalLayoutColor->addWidget(comboBoxColor);
+
     labelExperience = new QLabel(tabInfo);
     labelExperience->setText(QApplication::translate("HeroDialog", "Experience", 0, QApplication::UnicodeUTF8));
 
@@ -2829,6 +2845,7 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
 
     verticalLayoutNameExp = new QVBoxLayout();
     verticalLayoutNameExp->addLayout(horizontalLayoutName);
+    verticalLayoutNameExp->addLayout(horizontalLayoutColor);
     verticalLayoutNameExp->addLayout(horizontalLayoutExp);
 
     horizontalSpacerCenter = new QSpacerItem(18, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -3116,6 +3133,7 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
 
     connect(lineEditName, SIGNAL(textChanged(QString)), this, SLOT(setEnableOKButton()));
     connect(lineEditExperience, SIGNAL(textChanged(QString)), this, SLOT(setEnableOKButton()));
+    connect(comboBoxColor, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
     connect(verticalScrollBarPort, SIGNAL(valueChanged(int)), this, SLOT(setPortrait(int)));
 
     connect(checkBoxTroopsDefault, SIGNAL(toggled(bool)), this, SLOT(setDefaultTroops(bool)));

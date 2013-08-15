@@ -129,7 +129,9 @@ public:
     static int		loyaltyObject(const MapTileExt &);
     static bool		isResource(const MapTileExt &);
     static int		resource(const MapTileExt &);
+
     static void		updateFlagColor(MapTileExt &, int);
+    static void		updateMiniHero(MapTileExt &, int, int);
 };
 
 QDomElement & operator<< (QDomElement &, const MapTileExt &);
@@ -247,7 +249,6 @@ public:
     const MapTile*	tileFromDirectionConst(const QPoint &, int direct) const;
     MapTile*		tileFromDirection(const QPoint &, int direct);
 
-    void		insertToScene(QGraphicsScene &);
     QString		sizeDescription(void) const;
 };
 
@@ -342,7 +343,8 @@ protected:
     void		drawForeground(QPainter*, const QRectF &);
     void		selectArea(QPointF, QPointF);
     void		updateKingdomColors(int);
-    void		updateCastleFlags(const MapTile &, int);
+    void		updateTownRaceColor(const MapTile &, int, int);
+    void		updateHeroRaceColor(const MapTile &, int, int);
 
     void               addMapObject(const QPoint &, const CompositeObject &, quint32);
 
@@ -354,6 +356,10 @@ protected:
 
     bool		loadMapMP2(const QString &);
     bool		loadMapXML(const QString &);
+
+    MapTile*		itemAtAsTile(const QPointF &);
+    QGraphicsPixmapItem*
+			itemAtAsHero(const QPointF &);
 
     friend class	MP2Format;
     friend class	MapTile;
