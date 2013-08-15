@@ -18,4 +18,5 @@
     <group name="Water 2" file="objnwatr.xml" />
     <group name="Trees" file="trees.xml" />
     <group name="Towns" file="objntown.xml" />
+    <group name="Heroes" file="heroes.xml" />
 </groups>

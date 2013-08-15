@@ -346,7 +346,8 @@ protected:
     void		updateTownRaceColor(const MapTile &, int, int);
     void		updateHeroRaceColor(const MapTile &, int, int);
 
-    void               addMapObject(const QPoint &, const CompositeObject &, quint32);
+    void		addMapObject(const QPoint &, const CompositeObject &, quint32);
+    void		addHeroItem(const QPoint &, const MapTileExt &);
 
     void		editMapEventDialog(const MapTile &);
     void		editTownDialog(const MapTile &);

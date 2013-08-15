@@ -741,6 +741,7 @@ struct MapHero : public MapObject
     QString	object(void) const { return "hero"; }
 
     MapObject*	copy(void) const { return new MapHero(*this); }
+    void	updateInfo(int);
 };
 
 struct MapSign : public MapObject

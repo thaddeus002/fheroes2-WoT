@@ -568,6 +568,10 @@
         <sprite px="1" py="1" index="2" level="bottom" passable="0x01F8" />
     </rock_2x2>
 
+    <heroes width="1" height="1" cid="0x37" icn="minihero" >
+        <sprite px="0" py="0" index="0" level="action" />
+    </heroes>
+
     <castle width="8" height="5" cid="0x23" icn="objntown" >
 	<!-- bottom -->
         <sprite px="3" py="3" index="0" skipoffset="1" level="bottom" passable="0" icn="objntwba" />

@@ -2120,33 +2120,13 @@ MapHero::MapHero(const QPoint & pos, quint32 id)
     : MapObject(pos, id, MapObj::Heroes), color(Color::None), race(Race::Unknown),
     portrait(Portrait::Unknown), experience(0), patrolMode(false), patrolSquare(0)
 {
+    nameHero = Portrait::transcribe(portrait);
 }
 
 MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2, int spriteIndex)
     : MapObject(pos, id, MapObj::Heroes), color(Color::None), race(Race::Unknown), portrait(Portrait::Unknown), nameHero(mp2.name)
 {
-    switch(spriteIndex / 7)
-    {
-	case 0:	color = Color::Blue; break;
-	case 1:	color = Color::Green; break;
-	case 2:	color = Color::Red; break;
-	case 3:	color = Color::Yellow; break;
-	case 4:	color = Color::Orange; break;
-	case 5:	color = Color::Purple; break;
-	default: break;
-    }
-
-    switch(spriteIndex % 7)
-    {
-	case 0:	race = Race::Knight; break;
-	case 1:	race = Race::Barbarian; break;
-	case 2:	race = Race::Sorceress; break;
-	case 3:	race = Race::Warlock; break;
-	case 4:	race = Race::Wizard; break;
-	case 5:	race = Race::Necromancer; break;
-	case 6:	race = Race::Random; break;
-	default: break;
-    }
+    updateInfo(spriteIndex);
 
     if(mp2.customTroops)
     {
@@ -2176,6 +2156,32 @@ MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2, int spri
 	for(int ii = 0; ii < 8; ++ii)
 	    if(mp2.skillId[ii] && mp2.skillLevel[ii])
 		skills.push_back(Skill(mp2.skillId[ii], mp2.skillLevel[ii]));
+    }
+}
+
+void MapHero::updateInfo(int spriteIndex)
+{
+    switch(spriteIndex / 7)
+    {
+	case 0:	color = Color::Blue; break;
+	case 1:	color = Color::Green; break;
+	case 2:	color = Color::Red; break;
+	case 3:	color = Color::Yellow; break;
+	case 4:	color = Color::Orange; break;
+	case 5:	color = Color::Purple; break;
+	default: break;
+    }
+
+    switch(spriteIndex % 7)
+    {
+	case 0:	race = Race::Knight; break;
+	case 1:	race = Race::Barbarian; break;
+	case 2:	race = Race::Sorceress; break;
+	case 3:	race = Race::Warlock; break;
+	case 4:	race = Race::Wizard; break;
+	case 5:	race = Race::Necromancer; break;
+	case 6:	race = Race::Random; break;
+	default: break;
     }
 }
 

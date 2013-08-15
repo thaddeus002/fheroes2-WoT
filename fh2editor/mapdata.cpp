@@ -1444,15 +1444,7 @@ bool MapData::loadMap(const QString & mapFile)
 	it = mapTiles.begin(); it != mapTiles.end(); ++it)
     {
 	const MapTileExt* ext = (*it).levels1Const().findConst(MapTileExt::isMiniHero);
-
-	if(ext)
-	{
-	    const QSize & tileSize = EditorTheme::tileSize();
-	    QGraphicsPixmapItem* item = new QGraphicsPixmapItem();
-	    item->setOffset((*it).mapPos().x() * tileSize.width(), (*it).mapPos().y() * tileSize.height() - 15);
-	    item->setPixmap(EditorTheme::getImageICN(ext->icn(), ext->index()).first);
-	    addItem(item);
-	}
+	if(ext) addHeroItem((*it).mapPos(), *ext);
     }
 
     const QSize & tileSize = EditorTheme::tileSize();
@@ -2195,6 +2187,15 @@ QGraphicsPixmapItem* MapData::itemAtAsHero(const QPointF & pos)
     return 2 > tileItems.size() ? NULL : qgraphicsitem_cast<QGraphicsPixmapItem*>(tileItems.front());
 }
 
+void MapData::addHeroItem(const QPoint & mpos, const MapTileExt & ext)
+{
+    const QSize & tileSize = EditorTheme::tileSize();
+    QGraphicsPixmapItem* item = new QGraphicsPixmapItem();
+    item->setOffset(mpos.x() * tileSize.width(), mpos.y() * tileSize.height() - 15);
+    item->setPixmap(EditorTheme::getImageICN(ext.icn(), ext.index()).first);
+    addItem(item);
+}
+
 void MapData::editHeroDialog(const MapTile & tile)
 {
     MapHero* hero = dynamic_cast<MapHero*>(mapObjects.find(tile.mapPos()).data());
@@ -2220,9 +2221,11 @@ void MapData::editHeroDialog(const MapTile & tile)
 	    updateKingdomColors(hero->color);
 
 	    QGraphicsPixmapItem* item = itemAtAsHero(tile.boundingRect().center());
-	    const MapTileExt* ext = tile.levels1Const().findConst(MapTileExt::isMiniHero);
-	    if(ext) item->setPixmap(EditorTheme::getImageICN(ext->icn(), ext->index()).first);
-
+	    if(item)
+	    {
+		const MapTileExt* ext = tile.levels1Const().findConst(MapTileExt::isMiniHero);
+		if(ext) item->setPixmap(EditorTheme::getImageICN(ext->icn(), ext->index()).first);
+	    }
 	    emit dataModified();
 	}
     }
@@ -2296,6 +2299,17 @@ void MapData::addMapObject(const QPoint & pos, const CompositeObject & obj, quin
 
 	    if(objPtr)
 		mapObjects.push_back(objPtr);
+
+	    if(obj.classId == MapObj::Heroes)
+	    {
+		const MapTileExt* ext = tile->levels1Const().findConst(MapTileExt::isMiniHero);
+		if(ext)
+		{
+		    addHeroItem(tile->mapPos(), *ext);
+		    MapHero* hero = dynamic_cast<MapHero*>(objPtr);
+		    if(hero) hero->updateInfo(ext->index());
+		}
+	    }
 	}
     }
 
