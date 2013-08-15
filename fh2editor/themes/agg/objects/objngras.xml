@@ -18,8 +18,8 @@
     <template section="lake_4x2" name="Lake 65" index="65" />
     <template section="bottom_3x1_3" name="Lake 73" index="73" cid="0x68" />
     <template section="bottom_3x1_2" name="Mound 76" index="76" cid="0x6e" />
-    <template section="trees_4x2_1" name="Trees 79" index="79" />
-    <template section="trees_3x2_1" name="Trees 86" index="86" />
+    <template section="trees_4x2" name="Trees 79" index="79" />
+    <template section="trees_3x2_7" name="Trees 86" index="86" />
     <template section="bottom_2x2_1" name="Trees 91" index="91" cid="0x63" />
     <template section="bottom_4x1_1" name="Shrub 94" index="94" cid="0x71" />
     <template section="bottom_4x1_1" name="Shrub 98" index="98" cid="0x71" />

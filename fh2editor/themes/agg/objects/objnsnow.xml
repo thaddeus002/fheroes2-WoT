@@ -28,10 +28,10 @@
     <template section="bottom_1x1" name="Shrub 43" index="43" cid="0x71" />
     <template section="bottom_1x1" name="Shrub 44" index="44" cid="0x71" />
     <template section="bottom_1x1" name="Shrub 45" index="45" cid="0x71" />
-    <template section="trees_3x2_1" name="Trees 46" index="46" />
-    <template section="trees_4x2_1" name="Trees 51" index="51" />
+    <template section="trees_3x2_7" name="Trees 46" index="46" />
+    <template section="trees_4x2" name="Trees 51" index="51" />
     <template section="trees_2x2_1" name="Trees 58" index="58" />
-    <template section="trees_3x2_1" name="Trees 61" index="61" />
+    <template section="trees_3x2_7" name="Trees 61" index="61" />
     <template section="trees_2x2_1" name="Trees 66" index="66" />
     <template section="trees_2x2_1" name="Trees 69" index="69" />
     <template section="trees_2x2_1" name="Trees 72" index="72" />

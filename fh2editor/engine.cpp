@@ -740,7 +740,7 @@ QPair<QPixmap, QPoint> AGG::Spool::getImageICN(const QString & icn, int index)
 
 QPixmap AGG::Spool::getImage(const CompositeObject & obj, const QSize & tileSize)
 {
-    const QString key = obj.icn.first + obj.name;
+    const QString key = obj.icn + obj.name;
     QPixmap result = NULL;
 
     if(! QPixmapCache::find(key, & result))
@@ -755,13 +755,14 @@ QPixmap AGG::Spool::getImage(const CompositeObject & obj, const QSize & tileSize
 	for(QVector<CompositeSprite>::const_iterator
 	    it = obj.begin(); it != obj.end(); ++it)
 	{
+	    const QString & icnStr = ICN::transcribe((*it).spriteICN);
 	    QPoint offset((*it).spritePos.x() * tileSize.width(), (*it).spritePos.y() * tileSize.height());
-	    QPair<QPixmap, QPoint> sprite = getImageICN(obj.icn.first, (*it).spriteIndex);
+	    QPair<QPixmap, QPoint> sprite = getImageICN(icnStr, (*it).spriteIndex);
 	    paint.drawPixmap(offset + sprite.second, sprite.first);
 
 	    if((*it).spriteAnimation)
 	    {
-		sprite = getImageICN(obj.icn.first, (*it).spriteIndex + 1);
+		sprite = getImageICN(icnStr, (*it).spriteIndex + 1);
 		paint.drawPixmap(offset + sprite.second, sprite.first);
 	    }
 	}
@@ -955,17 +956,15 @@ Editor::MyObjectsXML::MyObjectsXML(const QString & xml, bool debug)
             	    objElem.setTagName("object");
 		    
 		    // fix index offset
-		    if(tmplElem.hasAttribute("index"))
-		    {
-            		int startIndex = tmplElem.attribute("index").toInt();
-    			QDomNodeList spritesList = objElem.elementsByTagName("sprite");
+        	    int offsetIndex = tmplElem.attribute("index").toInt();
+    		    QDomNodeList spritesList = objElem.elementsByTagName("sprite");
 
-    			for(int pos2 = 0; pos2 < spritesList.size(); ++pos2)
-    			{
-        		    QDomElement spriteElem = spritesList.item(pos2).toElement();
-        		    int offsetIndex = spriteElem.hasAttribute("index") ? spriteElem.attribute("index").toInt(NULL, 0) : 0;
-			    spriteElem.setAttribute("index", startIndex + offsetIndex);
-			}
+    		    for(int pos2 = 0; pos2 < spritesList.size(); ++pos2)
+    		    {
+        		QDomElement spriteElem = spritesList.item(pos2).toElement();
+        		int startIndex = spriteElem.hasAttribute("index") ? spriteElem.attribute("index").toInt(NULL, 0) : 0;
+			bool skipoff = spriteElem.hasAttribute("skipoffset") && 0 != spriteElem.attribute("skipoffset").toInt(NULL, 0);
+			spriteElem.setAttribute("index", startIndex + (skipoff ? 0 : offsetIndex));
 		    }
 
 		    push_back(objElem);
@@ -975,7 +974,7 @@ Editor::MyObjectsXML::MyObjectsXML(const QString & xml, bool debug)
     }
 }
 
-int H2::mapICN(int type)
+int H2::MP2ICN(int type, bool warn)
 {
     switch(type & 0xFC)
     {
@@ -1066,13 +1065,13 @@ int H2::mapICN(int type)
 	// extra objects for loyalty version
 	case 0xFC: return ICN::X_LOC3;
 	// unknown
-	default: qWarning() << "H2::mapICN:unknown object:" << type; break;
+	default: if(warn) qWarning() << "H2::MP2ICN: unknown object:" << type; break;
     }
 
     return ICN::UNKNOWN;
 }
 
-QString H2::icnString(int type)
+QString ICN::transcribe(int type)
 {
     switch(type)
     {
@@ -1124,17 +1123,6 @@ QString H2::icnString(int type)
     }
 
     return NULL;
-}
-
-int H2::mapICN(const QString & str)
-{
-    for(int ii = 0; ii < 0xFF; ++ii)
-    {
-	QString icn = H2::icnString(ii);
-	if(! icn.isNull() && str == icn) return ii;
-    }
-
-    return ICN::UNKNOWN;
 }
 
 int H2::isAnimationICN(int spriteClass, int spriteIndex, int ticket)
@@ -1435,10 +1423,29 @@ namespace EditorTheme
     QString			themeName("unknown");
     QSize			themeTile(0, 0);
     QMap<int, SpriteInfo>	mapSpriteInfoCache;
+    QMap<QString, int>		mapICNs;
+}
+
+QString checkICN(const QString & str)
+{
+    QString res = str.toUpper();
+    if(0 > res.lastIndexOf(".ICN")) res.append(".ICN");
+    return res;
+}
+
+int EditorTheme::mapICN(const QString & str)
+{
+    return mapICNs[str];
 }
 
 bool EditorTheme::load(const QString & data)
 {
+    for(int ii = 0; ii < 0xFF; ++ii)
+    {
+	if(ICN::UNKNOWN != H2::MP2ICN(ii, false))
+	    mapICNs[ICN::transcribe(ii)] = ii;
+    }
+
     if(aggSpool.setData(data))
     {
 	themeName = "agg";
@@ -1454,9 +1461,7 @@ bool EditorTheme::load(const QString & data)
 	    for(QList<QDomElement>::const_iterator
 		it = objectsElem.begin(); it != objectsElem.end(); ++it)
 	    {
-		QString icnStr = (*it).attribute("icn").toUpper();
-		if(0 > icnStr.lastIndexOf(".ICN")) icnStr.append(".ICN");
-		int icn = H2::mapICN(icnStr);
+		int icn0 = mapICNs[checkICN((*it).attribute("icn"))];
 		int gcid = (*it).attribute("cid").toInt(NULL, 0);
 
     		QDomNodeList spritesList = (*it).elementsByTagName("sprite");
@@ -1467,6 +1472,7 @@ bool EditorTheme::load(const QString & data)
 		    int index = spriteElem.attribute("index").toInt();
 		    QString level = spriteElem.attribute("level");
 		    int passable = spriteElem.attribute("passable").toInt(NULL, 0);
+		    int icn = spriteElem.hasAttribute("icn") ? mapICNs[checkICN(spriteElem.attribute("icn"))] : icn0;
 		    int key = (icn << 16) | (0x0000FFFF & index);
 		    int cid = spriteElem.hasAttribute("cid") ? spriteElem.attribute("cid").toInt(NULL, 0) : gcid;
 		    mapSpriteInfoCache[key] = SpriteInfo(cid, SpriteLevel::fromString(level), passable);
@@ -1492,7 +1498,7 @@ QStringList EditorTheme::resourceFiles(const QString & dir, const QString & file
 
 int EditorTheme::getObjectID(const QString & icn, int index)
 {
-    return getObjectID(H2::mapICN(icn), index);
+    return getObjectID(mapICNs[icn], index);
 }
 
 int EditorTheme::getObjectID(int icn, int index)
@@ -1521,7 +1527,7 @@ QPair<QPixmap, QPoint> EditorTheme::getImageICN(const QString & icn, int index)
 
 QPair<QPixmap, QPoint> EditorTheme::getImageICN(int icn, int index)
 {
-    return aggSpool.getImageICN(H2::icnString(icn), index);
+    return aggSpool.getImageICN(ICN::transcribe(icn), index);
 }
 
 QPixmap EditorTheme::getImage(const CompositeObject & obj)
@@ -2468,7 +2474,7 @@ QList<SharedMapObject> MapObjects::list(int type) const
     QList<SharedMapObject> result;
 
     for(const_iterator it = begin(); it != end(); ++it)
-	if(*it == type) result.push_back(*it);
+	if((*it).data()->type() == type) result.push_back(*it);
 
     return result;
 }
@@ -2626,9 +2632,11 @@ int SpriteLevel::fromString(const QString & level)
     return Unknown;
 }
 
-CompositeSprite::CompositeSprite(const QDomElement & elem)
-    : spriteIndex(elem.attribute("index").toInt()), spriteLevel(0), spritePassable(Direction::All), spriteAnimation(0)
+CompositeSprite::CompositeSprite(const QString & icn, const QDomElement & elem)
+    : spriteICN(EditorTheme::mapICN(icn)), spriteIndex(elem.attribute("index").toInt()), spriteLevel(0), spritePassable(Direction::All), spriteAnimation(0)
 {
+    if(elem.hasAttribute("icn"))
+	spriteICN = EditorTheme::mapICN(checkICN(elem.attribute("icn")));
     spritePos.setX(elem.attribute("px").toInt());
     spritePos.setY(elem.attribute("py").toInt());
 
@@ -2644,13 +2652,11 @@ CompositeSprite::CompositeSprite(const QDomElement & elem)
 CompositeObject::CompositeObject(const QDomElement & elem)
     : name(elem.attribute("name")), size(elem.attribute("width").toInt(), elem.attribute("height").toInt()), classId(elem.attribute("cid").toInt(NULL, 0))
 {
-    QString icnStr = elem.attribute("icn").toUpper();
-    if(0 > icnStr.lastIndexOf(".ICN")) icnStr.append(".ICN");
-    icn = qMakePair(icnStr, H2::mapICN(icnStr));
+    icn = checkICN(elem.attribute("icn"));
 
     QDomNodeList list = elem.elementsByTagName("sprite");
     for(int pos = 0; pos < list.size(); ++pos)
-	push_back(CompositeSprite(list.item(pos).toElement()));
+	push_back(CompositeSprite(icn, list.item(pos).toElement()));
 }
 
 bool CompositeObject::isValid(void) const
@@ -2758,6 +2764,23 @@ int Color::count(int v)
     return res;
 }
 
+QString Color::transcribe(int v)
+{
+    switch(v)
+    {
+	case Blue:	return "Blue";
+	case Red:	return "Red";
+	case Green:	return "Green";
+	case Yellow:	return "Yellow";
+	case Orange:	return "Orange";
+	case Purple:	return "Purple";
+
+	default: break;
+    }
+
+    return "Gray";
+}
+
 QColor Color::convert(int v)
 {
     switch(v)
@@ -2771,7 +2794,23 @@ QColor Color::convert(int v)
 	default: break;
     }
 
-    return QColor(0, 0, 0);
+    return QColor(100, 100, 100);
+}
+
+int Color::index(int v)
+{
+    switch(v)
+    {
+	case Blue:	return 1;
+	case Green:	return 2;
+	case Red:	return 3;
+	case Yellow:	return 4;
+	case Orange:	return 5;
+	case Purple:	return 6;
+	default: break;
+    }
+
+    return 0;
 }
 
 QPixmap Color::pixmap(int v, const QSize & sz)

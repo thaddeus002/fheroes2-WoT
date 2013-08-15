@@ -403,10 +403,13 @@ void Form::SelectImageObject::saveSettings(void)
 {
     QSettings & settings = Resource::localSettings();
     settings.setValue("SelectImageDialog/size", size());
+    settings.setValue("SelectImageDialog/lastTab", tabWidget->currentIndex());
 }
 
 void Form::SelectImageObject::tabSwitched(int num)
 {
+    tabWidget->setCurrentIndex(num);
+
     SelectImageTab* tab = qobject_cast<SelectImageTab*>(tabWidget->widget(num));
 
     disconnect(this, SLOT(accept(QListWidgetItem*)));
@@ -418,8 +421,6 @@ void Form::SelectImageObject::tabSwitched(int num)
 
 	connect(tab->listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(accept(QListWidgetItem*)));
 	connect(tab->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
-
-	Resource::localSettings().setValue("SelectImageDialog/lastTab", num);
     }
 }
 
@@ -2062,9 +2063,26 @@ Form::TownDialog::TownDialog(const MapTown & town)
     lineEditName = new QLineEdit(tabInfo);
     lineEditName->setText(town.nameTown);
 
+    labelColor = new QLabel(tabInfo);
+    labelColor->setText(QApplication::translate("TownDialog", "Color", 0, QApplication::UnicodeUTF8));
+
+    comboBoxColor = new QComboBox(tabInfo);
+    comboBoxColor->addItem(Color::pixmap(Color::None, QSize(24, 24)), "Gray", Color::None);
+
+    QVector<int> colors = Color::colors(Color::All);
+    for(QVector<int>::const_iterator
+	it = colors.begin(); it != colors.end(); ++it)
+	comboBoxColor->addItem(Color::pixmap(*it, QSize(24, 24)), Color::transcribe(*it), *it);
+
+    comboBoxColor->setCurrentIndex(Color::index(town.color));
+
     horizontalLayoutName = new QHBoxLayout();
     horizontalLayoutName->addWidget(labelName);
     horizontalLayoutName->addWidget(lineEditName);
+
+    horizontalLayoutColor = new QHBoxLayout();
+    horizontalLayoutColor->addWidget(labelColor);
+    horizontalLayoutColor->addWidget(comboBoxColor);
 
     checkBoxCaptain = new QCheckBox(tabInfo);
     checkBoxCaptain->setText(QApplication::translate("TownDialog", "Captain", 0, QApplication::UnicodeUTF8));
@@ -2082,6 +2100,7 @@ Form::TownDialog::TownDialog(const MapTown & town)
 
     verticalLayoutInfo = new QVBoxLayout(tabInfo);
     verticalLayoutInfo->addLayout(horizontalLayoutName);
+    verticalLayoutInfo->addLayout(horizontalLayoutColor);
     verticalLayoutInfo->addWidget(checkBoxCaptain);
     verticalLayoutInfo->addWidget(checkBoxAllowCastle);
     verticalLayoutInfo->addItem(verticalSpacerInfo);
@@ -2519,6 +2538,7 @@ Form::TownDialog::TownDialog(const MapTown & town)
     connect(checkBoxCaptain, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
     connect(checkBoxAllowCastle, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
     connect(lineEditName, SIGNAL(textChanged(QString)), this, SLOT(setEnableOKButton()));
+    connect(comboBoxColor, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
     connect(checkBoxCaptain, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
 
     connect(checkBoxTroopsDefault, SIGNAL(toggled(bool)), this, SLOT(setDefaultTroops(bool)));

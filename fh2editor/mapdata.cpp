@@ -38,12 +38,12 @@
 #include "mapdata.h"
 
 MapTileExt::MapTileExt(int lvl, const mp2lev_t & ext)
-    : spriteICN(H2::mapICN(ext.object)), spriteExt(ext.object), spriteIndex(ext.index), spriteLevel(lvl), spriteUID(ext.uniq)
+    : spriteICN(H2::MP2ICN(ext.object, false)), spriteExt(ext.object), spriteIndex(ext.index), spriteLevel(lvl), spriteUID(ext.uniq)
 {
 }
 
-MapTileExt::MapTileExt(const CompositeObject & co, const CompositeSprite & cs, quint32 uid)
-    : spriteICN(co.icn.second), spriteExt(0), spriteIndex(cs.spriteIndex), spriteLevel(0), spriteUID(uid)
+MapTileExt::MapTileExt(const CompositeSprite & cs, quint32 uid)
+    : spriteICN(cs.spriteICN), spriteExt(0), spriteIndex(cs.spriteIndex), spriteLevel(0), spriteUID(uid)
 {
     if(cs.spriteAnimation)
 	spriteExt |= 0x01;
@@ -72,6 +72,11 @@ bool MapTileExt::isAction(const MapTileExt & mte)
 bool MapTileExt::isTown(const MapTileExt & te)
 {
     return ICN::OBJNTOWN == te.spriteICN ? true : isRandomTown(te);
+}
+
+bool MapTileExt::isFlag32(const MapTileExt & te)
+{
+    return ICN::FLAG32 == te.spriteICN;
 }
 
 bool MapTileExt::isRandomTown(const MapTileExt & te)
@@ -204,6 +209,20 @@ int MapTileExt::loyaltyObject(const MapTileExt & te)
     return MapObj::None;
 }
 
+void MapTileExt::updateFlagColor(MapTileExt & te, int color)
+{
+    switch(color)
+    {
+	case Color::Blue:	te.spriteIndex = te.spriteIndex % 2 ? 1 : 0; break;
+	case Color::Green:	te.spriteIndex = te.spriteIndex % 2 ? 3 : 2; break;
+	case Color::Red:	te.spriteIndex = te.spriteIndex % 2 ? 5 : 4; break;
+	case Color::Yellow:	te.spriteIndex = te.spriteIndex % 2 ? 7 : 6; break;
+	case Color::Orange:	te.spriteIndex = te.spriteIndex % 2 ? 9 : 8; break;
+	case Color::Purple:	te.spriteIndex = te.spriteIndex % 2 ? 11 : 10; break;
+	default:		te.spriteIndex = te.spriteIndex % 2 ? 13 : 12; break;
+    }
+}
+
 QDomElement & operator<< (QDomElement & el, const MapTileExt & ext)
 {
     el.setAttribute("icn", ext.spriteICN);
@@ -257,18 +276,23 @@ QString MapTileLevels::infoString(void) const
     {
 	ss <<
 	    "uniq:   " << (*it).uid() << endl <<
-	    "sprite: " << H2::icnString((*it).icn()) << ", " <<  (*it).index() << endl <<
+	    "sprite: " << ICN::transcribe((*it).icn()) << ", " <<  (*it).index() << endl <<
 	    "level:  " << (*it).level() << endl;
     }
 
     return str;
 }
 
-const MapTileExt* MapTileLevels::find(bool (*pf)(const MapTileExt &)) const
+const MapTileExt* MapTileLevels::findConst(bool (*pf)(const MapTileExt &)) const
 {
     const_iterator it = begin();
     for(; it != end(); ++it) if(pf(*it)) break;
     return it != end() ? &(*it) : NULL;
+}
+
+MapTileExt* MapTileLevels::find(bool (*pf)(const MapTileExt &))
+{
+    return const_cast<MapTileExt*>(findConst(pf));
 }
 
 QSet<quint32> MapTileLevels::uids(void) const
@@ -525,9 +549,7 @@ void MapTile::loadSpriteLevel(MapTileLevels & list, int level, const mp2lev_t & 
 {
     if(ext.object && ext.index < 0xFF)
     {
-	const QString & icn = H2::icnString(H2::mapICN(ext.object));
-
-	if(! icn.isEmpty())
+	if(ICN::UNKNOWN != H2::MP2ICN(ext.object, true))
 	    list << MapTileExt(level, ext);
     }
 }
@@ -574,12 +596,12 @@ void MapTile::updateObjectID(void)
     }
 }
 
-void MapTile::addSpriteSection(const CompositeObject & co, const CompositeSprite & cs, quint32 uid)
+void MapTile::addSpriteSection(const CompositeSprite & cs, quint32 uid)
 {
     if(cs.spriteLevel == SpriteLevel::Top)
-	spritesLevel2 << MapTileExt(co, cs, uid);
+	spritesLevel2 << MapTileExt(cs, uid);
     else
-	spritesLevel1 << MapTileExt(co, cs, uid);
+	spritesLevel1 << MapTileExt(cs, uid);
 
     updateObjectID();
 }
@@ -854,7 +876,7 @@ void MapArea::importMP2Towns(const QVector<H2::TownPos> & towns)
     for(QVector<H2::TownPos>::const_iterator
 	it = towns.begin(); it != towns.end(); ++it) if(tiles.isValidPoint((*it).pos()))
     {
-	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1().find(MapTileExt::isTown);
+	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1Const().findConst(MapTileExt::isTown);
 	int uid = ext ? ext->uid() : -1;
 	objects.push_back(new MapTown((*it).pos(), uid, (*it).town()));
     }
@@ -865,7 +887,7 @@ void MapArea::importMP2Heroes(const QVector<H2::HeroPos> & heroes)
     for(QVector<H2::HeroPos>::const_iterator
 	it = heroes.begin(); it != heroes.end(); ++it) if(tiles.isValidPoint((*it).pos()))
     {
-	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1().find(MapTileExt::isMiniHero);
+	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1Const().findConst(MapTileExt::isMiniHero);
 	int uid = ext ? ext->uid() : -1;
 	objects.push_back(new MapHero((*it).pos(), uid, (*it).hero()));
     }
@@ -876,8 +898,8 @@ void MapArea::importMP2Signs(const QVector<H2::SignPos> & signs)
     for(QVector<H2::SignPos>::const_iterator
 	it = signs.begin(); it != signs.end(); ++it) if(tiles.isValidPoint((*it).pos()))
     {
-	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1().find(MapTileExt::isSign);
-	if(!ext) ext = tiles.tileConst((*it).pos())->levels1().find(MapTileExt::isButtle);
+	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1Const().findConst(MapTileExt::isSign);
+	if(!ext) ext = tiles.tileConst((*it).pos())->levels1Const().findConst(MapTileExt::isButtle);
 	int uid = ext ? ext->uid() : -1;
 	objects.push_back(new MapSign((*it).pos(), uid, (*it).sign()));
     }
@@ -888,7 +910,7 @@ void MapArea::importMP2MapEvents(const QVector<H2::EventPos> & events)
     for(QVector<H2::EventPos>::const_iterator
 	it = events.begin(); it != events.end(); ++it) if(tiles.isValidPoint((*it).pos()))
     {
-	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1().find(MapTileExt::isMapEvent);
+	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1Const().findConst(MapTileExt::isMapEvent);
 	int uid = ext ? ext->uid() : -1;
 	objects.push_back(new MapEvent((*it).pos(), uid, (*it).event()));
     }
@@ -899,7 +921,7 @@ void MapArea::importMP2SphinxRiddles(const QVector<H2::SphinxPos> & sphinxes)
     for(QVector<H2::SphinxPos>::const_iterator
 	it = sphinxes.begin(); it != sphinxes.end(); ++it) if(tiles.isValidPoint((*it).pos()))
     {
-	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1().find(MapTileExt::isSphinx);
+	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1Const().findConst(MapTileExt::isSphinx);
 	int uid = ext ? ext->uid() : -1;
 	objects.push_back(new MapSphinx((*it).pos(), uid, (*it).sphinx()));
     }
@@ -2066,10 +2088,10 @@ void MapData::removeCurrentObject(void)
 	if(obj) mapObjects.remove(obj->uid());
 
 	// remove sprites
-	if(! tileOverMouse->levels1().empty())
+	if(! tileOverMouse->levels1Const().empty())
 	{
     	    // get uid from level 1 (last sprite)
-	    mapTiles.removeSprites(tileOverMouse->levels1().back().uid());
+	    mapTiles.removeSprites(tileOverMouse->levels1Const().back().uid());
 	    update();
 	}
 
@@ -2109,9 +2131,11 @@ void MapData::editTownDialog(const MapTile & tile)
 	    town->troops = form.troops();
 	    town->forceTown = form.checkBoxAllowCastle->isChecked();
 	    town->customBuilding = ! form.checkBoxBuildingsDefault->isChecked();
-	    //town->color = ;
+	    town->color = form.comboBoxColor->itemData(form.comboBoxColor->currentIndex()).toInt();
 	    //town->race = ;
 
+	    updateCastleFlags(tile, town->color);
+	    updateKingdomColors(town->color);
 	    emit dataModified();
 	}
     }
@@ -2138,6 +2162,7 @@ void MapData::editHeroDialog(const MapTile & tile)
 	    //hero->color = ;
 	    //hero->race = ;
 
+	    updateKingdomColors(hero->color);
 	    emit dataModified();
 	}
     }
@@ -2188,7 +2213,7 @@ void MapData::addMapObject(const QPoint & pos, const CompositeObject & obj, quin
     {
 	QPoint offset((*it).spritePos.x() * tileSize.width() + 1, (*it).spritePos.y() * tileSize.height() + 1);
 	MapTile* tile = mapTiles.mapToTile(pos + offset);
-	tile->addSpriteSection(obj, *it, uid);
+	tile->addSpriteSection(*it, uid);
 
 	// add object info
 	if((*it).spriteLevel == SpriteLevel::Action)
@@ -2215,4 +2240,48 @@ void MapData::addMapObject(const QPoint & pos, const CompositeObject & obj, quin
     }
 
     emit dataModified();
+}
+
+void MapData::updateCastleFlags(const MapTile & tile, int color)
+{
+    const QPoint & mp = tile.mapPos();
+    MapTile* ltile = mapTiles.tile(QPoint(mp.x() - 1, mp.y()));
+    MapTile* rtile = mapTiles.tile(QPoint(mp.x() + 1, mp.y()));
+
+    if(ltile && rtile)
+    {
+	MapTileExt* lext = ltile->levels1().find(MapTileExt::isFlag32);
+	if(! lext) lext = ltile->levels2().find(MapTileExt::isFlag32);
+	if(lext) MapTileExt::updateFlagColor(*lext, color);
+	update(ltile->boundingRect());
+
+	MapTileExt* rext = rtile->levels1().find(MapTileExt::isFlag32);
+	if(! rext) rext = rtile->levels2().find(MapTileExt::isFlag32);
+	if(rext) MapTileExt::updateFlagColor(*rext, color);
+	update(rtile->boundingRect());
+    }
+}
+
+void MapData::updateKingdomColors(int color)
+{
+    mapKingdomColors = 0;
+
+    QList<SharedMapObject> listCastles = mapObjects.list(MapObj::Castle);
+    for(QList<SharedMapObject>::const_iterator
+        it = listCastles.begin(); it != listCastles.end(); ++it)
+    {
+	MapTown* town = dynamic_cast<MapTown*>((*it).data());
+	if(town) mapKingdomColors |= town->color;
+    }
+
+    QList<SharedMapObject> listHeroes = mapObjects.list(MapObj::Heroes);
+    for(QList<SharedMapObject>::const_iterator
+        it = listHeroes.begin(); it != listHeroes.end(); ++it)
+    {
+	MapHero* hero = dynamic_cast<MapHero*>((*it).data());
+	if(hero) mapKingdomColors |= hero->color;
+    }
+
+    mapCompColors |= color;
+    mapHumanColors |= color;
 }

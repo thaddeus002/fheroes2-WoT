@@ -100,7 +100,7 @@ class MapTileExt
 public:
     MapTileExt(int uid = 0) : spriteICN(0), spriteExt(0), spriteIndex(0), spriteLevel(0), spriteUID(uid) {}
     MapTileExt(int lv, const mp2lev_t &);
-    MapTileExt(const CompositeObject &, const CompositeSprite &, quint32);
+    MapTileExt(const CompositeSprite &, quint32);
 
     bool		operator==(const MapTileExt & ext) const { return spriteUID == ext.spriteUID; }
     bool		operator==(quint32 uid) const { return uid == spriteUID; }
@@ -123,11 +123,13 @@ public:
     static bool		isSign(const MapTileExt &);
     static bool		isButtle(const MapTileExt &);
     static bool		isMiniHero(const MapTileExt &);
+    static bool		isFlag32(const MapTileExt &);
     static bool		isTown(const MapTileExt &);
     static bool		isRandomTown(const MapTileExt &);
     static int		loyaltyObject(const MapTileExt &);
     static bool		isResource(const MapTileExt &);
     static int		resource(const MapTileExt &);
+    static void		updateFlagColor(MapTileExt &, int);
 };
 
 QDomElement & operator<< (QDomElement &, const MapTileExt &);
@@ -138,7 +140,8 @@ class MapTileLevels : public QList<MapTileExt>
 public:
     MapTileLevels() {}
 
-    const MapTileExt*	find(bool (*pf)(const MapTileExt &)) const;
+    MapTileExt*		find(bool (*pf)(const MapTileExt &));
+    const MapTileExt*	findConst(bool (*pf)(const MapTileExt &)) const;
     void		paint(QPainter &, const QPoint &, const QPoint &) const;
     QString		infoString(void) const;
     int			topObjectID(void) const;
@@ -178,11 +181,13 @@ public:
     void		loadSpriteLevels(const mp2ext_t &);
     void		sortSpritesLevels(void);
     void		setTileSprite(int, int);
-    void		addSpriteSection(const CompositeObject &, const CompositeSprite &, quint32);
+    void		addSpriteSection(const CompositeSprite &, quint32);
     void		removeSpriteSection(quint32);
 
-    const MapTileLevels & levels1(void) const { return spritesLevel1; }
-    const MapTileLevels & levels2(void) const { return spritesLevel2; }
+    MapTileLevels &	levels1(void) { return spritesLevel1; }
+    MapTileLevels &	levels2(void) { return spritesLevel2; }
+    const MapTileLevels & levels1Const(void) const { return spritesLevel1; }
+    const MapTileLevels & levels2Const(void) const { return spritesLevel2; }
 
     bool		isAction(void) const;
     int			object(void) const;
@@ -336,6 +341,8 @@ protected:
     void		mouseDoubleClickEvent(QGraphicsSceneMouseEvent*);
     void		drawForeground(QPainter*, const QRectF &);
     void		selectArea(QPointF, QPointF);
+    void		updateKingdomColors(int);
+    void		updateCastleFlags(const MapTile &, int);
 
     void               addMapObject(const QPoint &, const CompositeObject &, quint32);
 

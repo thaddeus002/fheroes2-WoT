@@ -54,17 +54,20 @@ namespace ICN
 	    EXTRAOVR = 0x74, ROAD = 0x78, MTNCRCK = 0x7C, MTNGRAS = 0x80, TREJNGL = 0x84, TREEVIL = 0x88, OBJNTOWN = 0x8C, OBJNTWBA = 0x90, OBJNTWSH = 0x94, OBJNTWRD = 0x98, OBJNWAT2 = 0xA0,
 	    OBJNMUL2 = 0xA4, TRESNOW = 0xA8, TREFIR = 0xAC, TREFALL = 0xB0, STREAM = 0xB4, OBJNRSRC = 0xB8, OBJNGRA2 = 0xC0, TREDECI = 0xC4, OBJNWATR = 0xC8, OBJNGRAS = 0xCC, OBJNSNOW = 0xD0,
 	    OBJNSWMP = 0xD4, OBJNLAVA = 0xD8, OBJNDSRT = 0xDC, OBJNDIRT = 0xE0, OBJNCRCK = 0xE4, OBJNLAV3 = 0xE8, OBJNMULT = 0xEC, OBJNLAV2 = 0xF0, X_LOC1 = 0xF4, X_LOC2 = 0xF8, X_LOC3 = 0xFC };
+    QString	transcribe(int);
 }
 
 namespace Color
 {
-    enum { None = 0, Blue = 0x01, Red = 0x02, Green = 0x04, Yellow = 0x08, Orange = 0x10, Purple = 0x20,
+    enum { None = 0, Blue = 0x01, Green = 0x02, Red = 0x04, Yellow = 0x08, Orange = 0x10, Purple = 0x20,
 	    All = Blue | Red | Green | Yellow | Orange | Purple };
 
     int			count(int);
     QColor		convert(int);
     QPixmap		pixmap(int, const QSize &);
     QVector<int>	colors(int);
+    QString		transcribe(int);
+    int			index(int);
 }
 
 namespace Race
@@ -366,6 +369,7 @@ namespace MapObj
 
 struct CompositeSprite
 {
+    int		spriteICN;
     int		spriteIndex;
     QPoint	spritePos;
     int		spriteLevel;
@@ -373,15 +377,15 @@ struct CompositeSprite
     int		spriteAnimation;
 
     CompositeSprite(){}
-    CompositeSprite(const QDomElement &);
+    CompositeSprite(const QString &, const QDomElement &);
 };
 
 struct CompositeObject : public QVector<CompositeSprite>
 {
     QString	name;
     QSize	size;
-    QPair<QString, int> icn;
     int		classId;
+    QString	icn;
 
     CompositeObject() : classId(MapObj::None) {}
     CompositeObject(const QDomElement &);
@@ -452,9 +456,7 @@ namespace H2
 	void DrawVariant2(const quint8*, const quint8*, const QVector<QRgb> &);
     };
 
-    int          mapICN(const QString &);
-    int          mapICN(int);
-
+    int          MP2ICN(int, bool);
     QString      icnString(int);
     int          isAnimationICN(int, int, int);
 
@@ -570,6 +572,7 @@ public:
 namespace EditorTheme
 {
     bool			load(const QString &);
+    int          		mapICN(const QString &);
 
     QPixmap			getImageTIL(const QString &, int);
     QPair<QPixmap, QPoint>	getImageICN(int, int);

@@ -16,4 +16,6 @@
     <group name="Pickup Artifacts" file="artifacts.xml" />
     <group name="Water 1" file="objnwat2.xml" />
     <group name="Water 2" file="objnwatr.xml" />
+    <group name="Trees" file="trees.xml" />
+    <group name="Towns" file="objntown.xml" />
 </groups>
