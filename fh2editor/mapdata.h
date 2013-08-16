@@ -315,13 +315,12 @@ public:
     QRect		mapToRect(const QRect &) const;
 
     void		showMapOptions(void);
-
-    MapTile*		currentTile(void) { return tileOverMouse; }
+    const MapTiles &	tiles(void) const { return mapTiles; }
 
 signals:
     void		dataModified(void);
-    void		validBuffer(bool);
-    void		clickActionObject(MapTile*);
+    void		currentTilePosXChanged(int);
+    void		currentTilePosYChanged(int);
 
 protected slots:
     void		selectAllTiles(void);
@@ -334,9 +333,9 @@ protected slots:
     void		selectObjectImage(void);
     void		editObjectAttributes(void);
     void		removeCurrentObject(void);
-    void		generateMiniMap(void);
 
 protected:
+    void        	contextMenuEvent(QGraphicsSceneContextMenuEvent*);
     void                mousePressEvent(QGraphicsSceneMouseEvent*);
     void                mouseMoveEvent(QGraphicsSceneMouseEvent*);
     void		mouseDoubleClickEvent(QGraphicsSceneMouseEvent*);
@@ -394,6 +393,18 @@ protected:
 
     int			engineVersion;
     int			mapVersion;
+
+    QAction*            editCopyAct;
+    QAction*            editPasteAct;
+    QAction*            editPassableAct;
+    QAction*            cellInfoAct;
+    QAction*            selectAllAct;
+    QAction*            addObjectAct;
+    QAction*            editObjectAct;
+    QAction*            removeObjectAct;
+
+    QActionGroup*       fillGroundAct;
+    QActionGroup*       clearObjectsAct;
 
     static QSharedPointer<MapArea>
     			selectedArea;

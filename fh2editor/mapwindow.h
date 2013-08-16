@@ -26,11 +26,6 @@
 #include <QGraphicsView>
 #include "mapdata.h"
 
-QT_BEGIN_NAMESPACE
-class QContextMenuEvent;
-class QActionGroup;
-QT_END_NAMESPACE
-
 class MainWindow;
 namespace Form { class MiniMap; }
 
@@ -50,26 +45,21 @@ public:
     QString	currentFile(void);
     Form::MiniMap*
 		miniMapWidget(void);
-
-signals:
-    void	selectedItems(bool);
-    void	cursorTileXPosChanged(int);
-    void	cursorTileYPosChanged(int);
+    void	showMapOptions(void);
+    const MapData &
+		sceneMapData(void) const { return mapData; }
 
 protected:
     void	closeEvent(QCloseEvent*);
-    void	contextMenuEvent(QContextMenuEvent*);
+
+public slots:
+    void	mapWasModified(void);
 
 private slots:
-    void	mapWasSelectionChanged(void);
-    void	mapWasModified(void);
     void	viewportSetPositionFromMiniMap(const QPoint &);
     void	changeViewedRect(void);
 
 private:
-    friend class MainWindow;
-    friend class MapData;
-
     bool	maybeSave(void);
     void	setCurrentFile(const QString &);
     QString	strippedName(const QString &);
@@ -79,19 +69,6 @@ private:
     bool	isModified;
 
     MapData		mapData;
-
-    QAction*            editCopyAct;
-    QAction*            editPasteAct;
-    QAction*            editPassableAct;
-    QAction*            cellInfoAct;
-    QAction*            selectAllAct;
-    QAction*            addObjectAct;
-    QAction*            editObjectAct;
-    QAction*            removeObjectAct;
-
-    QActionGroup*	fillGroundAct;
-    QActionGroup*	clearObjectsAct;
-
     Form::MiniMap*	miniMap;
 };
 

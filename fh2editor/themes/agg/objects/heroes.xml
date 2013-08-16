@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<objects icn="minihero" cid="0x37" >
+<objects>
     <template section="heroes" name="Knight (blue)" index="0" />
     <template section="heroes" name="Barbarian (blue)" index="1" />
     <template section="heroes" name="Sorceress (blue)" index="2" />

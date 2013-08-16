@@ -58,12 +58,8 @@ private slots:
     void		setActiveSubWindow(QWidget*);
     void		mapOptions(void);
     void		subWindowActivated(QMdiSubWindow*);
-    void		setActivePasteAction(bool);
 
 private:
-    friend class	MapWindow;
-    friend class	MapData;
-
     void		createActions(void);
     void		createMenus(void);
     void		createToolBars(void);

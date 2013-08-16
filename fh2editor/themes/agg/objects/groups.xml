@@ -4,19 +4,16 @@
     <group name="Waste Land" file="objncrck.xml" />
     <group name="Dirt" file="objndirt.xml" />
     <group name="Grass" file="objngras.xml" />
-    <group name="Grass Object" file="objngra2.xml" />
     <group name="Snow" file="objnsnow.xml" />
     <group name="Swamp" file="objnswmp.xml" />
-    <group name="Mounts" file="mounts.xml" />
-    <group name="Mines" file="mines.xml" />
-    <group name="Lava" file="objnlav2.xml" />
-    <group name="Objects 1" file="objnmul2.xml" />
-    <group name="Objects 2" file="objnmult.xml" />
+    <group name="Lava" file="objnlava.xml" />
+    <group name="Multi Objects" file="objnmult.xml" />
     <group name="Pickup Resources" file="resources.xml" />
     <group name="Pickup Artifacts" file="artifacts.xml" />
-    <group name="Water 1" file="objnwat2.xml" />
-    <group name="Water 2" file="objnwatr.xml" />
-    <group name="Trees" file="trees.xml" />
+    <group name="Water Objects" file="objnwatr.xml" />
     <group name="Towns" file="objntown.xml" />
     <group name="Heroes" file="heroes.xml" />
+    <group name="Monsters" file="monsters.xml" />
+    <group name="Mounts" file="mounts.xml" />
+    <group name="Trees" file="trees.xml" />
 </groups>

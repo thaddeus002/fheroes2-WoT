@@ -572,6 +572,10 @@
         <sprite px="0" py="0" index="0" level="action" />
     </heroes>
 
+    <monster width="1" height="1" cid="0x18" icn="mons32" >
+        <sprite px="0" py="0" index="0" level="action" />
+    </monster>
+
     <castle width="8" height="5" cid="0x23" icn="objntown" >
 	<!-- bottom -->
         <sprite px="3" py="3" index="0" skipoffset="1" level="bottom" passable="0" icn="objntwba" />

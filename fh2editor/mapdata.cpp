@@ -989,7 +989,154 @@ MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), tileOverMouse(NULL
     mapKingdomColors(0), mapCompColors(0), mapHumanColors(0), mapStartWithHero(false), mapArea(),
     mapTiles(mapArea.tiles), mapObjects(mapArea.objects), engineVersion(FH2ENGINE_CURRENT_VERSION), mapVersion(engineVersion)
 {
-    connect(this, SIGNAL(dataModified()), this, SLOT(generateMiniMap()));
+    connect(this, SIGNAL(dataModified()), parent, SLOT(mapWasModified()));
+
+   // init: copy, paste
+    editCopyAct = new QAction(QIcon(":/images/menu_copy.png"), tr("Copy"), this);
+    editCopyAct->setStatusTip(tr("Copy the current selection's contents to the clipboard"));
+    editCopyAct->setEnabled(false);
+    connect(editCopyAct, SIGNAL(triggered()), this, SLOT(copyToBuffer()));
+
+    editPasteAct = new QAction(QIcon(":/images/menu_paste.png"), tr("Paste"), this);
+    editPasteAct->setStatusTip(tr("Paste the clipboard's contents into the current selection"));
+    editPasteAct->setEnabled(isValidBuffer());
+    connect(editPasteAct, SIGNAL(triggered()), this, SLOT(pasteFromBuffer()));
+
+    //
+    addObjectAct = new QAction(QIcon(":/images/add_objects.png"), tr("Add object..."), this);
+    addObjectAct->setStatusTip(tr("Select map object"));
+    connect(addObjectAct, SIGNAL(triggered()), this, SLOT(selectObjectImage()));
+
+    editObjectAct = new QAction(QIcon(":/images/edit_objects.png"), tr("Edit object..."), this);
+    editObjectAct->setStatusTip(tr("Edit map object"));
+    connect(editObjectAct, SIGNAL(triggered()), this, SLOT(editObjectAttributes()));
+
+    removeObjectAct = new QAction(QIcon(":/images/clear_objects.png"), tr("Remove object..."), this);
+    removeObjectAct->setStatusTip(tr("Remove map object"));
+    connect(removeObjectAct, SIGNAL(triggered()), this, SLOT(removeCurrentObject()));
+
+    QAction* curAct;
+
+    // init: fill ground
+    fillGroundAct = new QActionGroup(this);
+
+    curAct = new QAction(QIcon(":/images/ground_desert.png"), tr("Desert"), this);
+    curAct->setStatusTip(tr("Fill desert ground"));
+    curAct->setData(Ground::Desert);
+    fillGroundAct->addAction(curAct);
+
+    curAct = new QAction(QIcon(":/images/ground_snow.png"), tr("Snow"), this);
+    curAct->setStatusTip(tr("Fill snow ground"));
+    curAct->setData(Ground::Snow);
+    fillGroundAct->addAction(curAct);
+
+    curAct = new QAction(QIcon(":/images/ground_swamp.png"), tr("Swamp"), this);
+    curAct->setStatusTip(tr("Fill swamp ground"));
+    curAct->setData(Ground::Swamp);
+    fillGroundAct->addAction(curAct);
+
+    curAct = new QAction(QIcon(":/images/ground_wasteland.png"), tr("Wasteland"), this);
+    curAct->setStatusTip(tr("Fill wasteland ground"));
+    curAct->setData(Ground::Wasteland);
+    fillGroundAct->addAction(curAct);
+
+    curAct = new QAction(QIcon(":/images/ground_beach.png"), tr("Beach"), this);
+    curAct->setStatusTip(tr("Fill beach ground"));
+    curAct->setData(Ground::Beach);
+    fillGroundAct->addAction(curAct);
+
+    curAct = new QAction(QIcon(":/images/ground_lava.png"), tr("Lava"), this);
+    curAct->setStatusTip(tr("Fill lava ground"));
+    curAct->setData(Ground::Lava);
+    fillGroundAct->addAction(curAct);
+
+    curAct = new QAction(QIcon(":/images/ground_dirt.png"), tr("Dirt"), this);
+    curAct->setStatusTip(tr("Fill dirt ground"));
+    curAct->setData(Ground::Dirt);
+    fillGroundAct->addAction(curAct);
+
+    curAct = new QAction(QIcon(":/images/ground_grass.png"), tr("Grass"), this);
+    curAct->setStatusTip(tr("Fill grass ground"));
+    curAct->setData(Ground::Grass);
+    fillGroundAct->addAction(curAct);
+
+    curAct = new QAction(QIcon(":/images/ground_water.png"), tr("Water"), this);
+    curAct->setStatusTip(tr("Fill water"));
+    curAct->setData(Ground::Water);
+    fillGroundAct->addAction(curAct);
+
+    connect(fillGroundAct, SIGNAL(triggered(QAction*)), this, SLOT(fillGroundAction(QAction*)));
+
+    // init: clear objects
+    clearObjectsAct = new QActionGroup(this);
+
+/*
+    curAct = new QAction(tr("Buildings"), this);
+    curAct->setStatusTip(tr("Remove buildings"));
+    curAct->setEnabled(false);
+    curAct->setData(1);
+    clearObjectsAct->addAction(curAct);
+
+    curAct = new QAction(tr("Mounts/Rocs"), this);
+    curAct->setStatusTip(tr("Remove mounts/rocs"));
+    curAct->setEnabled(false);
+    curAct->setData(2);
+    clearObjectsAct->addAction(curAct);
+
+    curAct = new QAction(tr("Trees/Shrubs"), this);
+    curAct->setStatusTip(tr("Remove trees/shrubs"));
+    curAct->setEnabled(false);
+    curAct->setData(3);
+    clearObjectsAct->addAction(curAct);
+
+    curAct = new QAction(tr("Pickup resources"), this);
+    curAct->setStatusTip(tr("Remove resources"));
+    curAct->setEnabled(false);
+    curAct->setData(4);
+    clearObjectsAct->addAction(curAct);
+
+    curAct = new QAction(tr("Artifacts"), this);
+    curAct->setStatusTip(tr("Remove artifacts"));
+    curAct->setEnabled(false);
+    curAct->setData(5);
+    clearObjectsAct->addAction(curAct);
+
+    curAct = new QAction(tr("Monsters"), this);
+    curAct->setStatusTip(tr("Remove monsters"));
+    curAct->setEnabled(false);
+    curAct->setData(6);
+    clearObjectsAct->addAction(curAct);
+
+    curAct = new QAction(tr("Heroes"), this);
+    curAct->setStatusTip(tr("Remove heroes"));
+    curAct->setEnabled(false);
+    curAct->setData(7);
+    clearObjectsAct->addAction(curAct);
+
+    curAct = new QAction(this);
+    curAct->setSeparator(true);
+    clearObjectsAct->addAction(curAct);
+*/
+
+    curAct = new QAction(tr("All"), this);
+    curAct->setStatusTip(tr("Remove all objects"));
+    curAct->setData(10);
+    clearObjectsAct->addAction(curAct);
+
+    connect(clearObjectsAct, SIGNAL(triggered(QAction*)), this, SLOT(removeObjectsAction(QAction*)));
+
+    // init other
+    editPassableAct = new QAction(QIcon(":/images/edit_cell.png"), tr("Edit passable"), this);
+    editPassableAct->setStatusTip(tr("Edit cell passable"));
+    connect(editPassableAct, SIGNAL(triggered()), this, SLOT(editPassableDialog()));
+
+    cellInfoAct = new QAction(QIcon(":/images/cell_info.png"), tr("Cell info"), this);
+    cellInfoAct->setStatusTip(tr("Show cell info"));
+    connect(cellInfoAct, SIGNAL(triggered()), this, SLOT(cellInfoDialog()));
+
+    selectAllAct = new QAction(QIcon(":/images/menu_fill.png"), tr("Select All"), this);
+    selectAllAct->setStatusTip(tr("Select all tiles"));
+    connect(selectAllAct, SIGNAL(triggered()), this, SLOT(selectAllTiles()));
 }
 
 const QString & MapData::name(void) const
@@ -1112,21 +1259,77 @@ void MapData::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	}
     }
     else
-    // click action object
-    if(tileOverMouse && tileOverMouse->isAction())
+    // place current object
+    if(currentObject.isValid() &&
+	(event->buttons() & Qt::LeftButton))
     {
-	if(event->buttons() & Qt::LeftButton)
-	    emit clickActionObject(tileOverMouse);
+        addMapObject(currentObject.scenePos, currentObject, mapArea.uid());
+	update(currentObject.area());
     }
-    else
-    // place object
+
+    event->accept();
+}
+
+void MapData::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
+{
+    // reset current object
     if(currentObject.isValid())
     {
-	if(event->buttons() & Qt::LeftButton)
-	    addMapObject(currentObject.scenePos, currentObject, mapArea.uid());
-	else
-	    currentObject.reset();
+	currentObject.reset();
 	update(currentObject.area());
+    }
+    else
+    // context menu
+    {
+	QMenu menu;
+
+	if(selectedItems().size())
+	{
+	    editCopyAct->setEnabled(selectedItems().size());
+
+    	    menu.addAction(editCopyAct);
+    	    menu.addSeparator();
+
+    	    QMenu* groundSubMenu = menu.addMenu(QIcon(":/images/menu_fill.png"), tr("Fill Ground"));
+    	    QList<QAction*> actions = fillGroundAct->actions();
+
+    	    for(QList<QAction*>::const_iterator
+        	it = actions.begin(); it != actions.end(); ++it)
+        	groundSubMenu->addAction(*it);
+
+    	    menu.addSeparator();
+
+    	    QMenu* clearSubMenu = menu.addMenu(QIcon(":/images/clear_objects.png"), tr("Remove Objects"));
+    	    actions = clearObjectsAct->actions();
+
+    	    for(QList<QAction*>::const_iterator
+        	it = actions.begin(); it != actions.end(); ++it)
+        	clearSubMenu->addAction(*it);
+	}
+	else
+	{
+	    editPasteAct->setEnabled(isValidBuffer());
+
+	    menu.addAction(editPasteAct);
+    	    menu.addSeparator();
+
+    	    menu.addAction(addObjectAct);
+
+    	    menu.addSeparator();
+    	    menu.addAction(editPassableAct);
+    	    menu.addAction(editObjectAct);
+    	    menu.addAction(removeObjectAct);
+    	    menu.addAction(cellInfoAct);
+
+    	    editObjectAct->setEnabled(tileOverMouse && tileOverMouse->isAction());
+    	    removeObjectAct->setEnabled(tileOverMouse && tileOverMouse->isAction());
+
+    	    menu.addSeparator();
+    	    menu.addAction(selectAllAct);
+	}
+
+	if(selectAllAct != menu.exec(event->screenPos()))
+    	    clearSelection();
     }
 
     event->accept();
@@ -1158,13 +1361,11 @@ void MapData::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
     {
 	if(tileOverMouse != newTileOverMouse)
 	{
-	    MapWindow* mapWindow = qobject_cast<MapWindow*>(parent());
-
 	    if(!tileOverMouse || tileOverMouse->mapPos().x() != newTileOverMouse->mapPos().x())
-		    emit mapWindow->cursorTileXPosChanged(newTileOverMouse->mapPos().x());
+		    emit currentTilePosXChanged(newTileOverMouse->mapPos().x());
 
 	    if(!tileOverMouse || tileOverMouse->mapPos().y() != newTileOverMouse->mapPos().y())
-		    emit mapWindow->cursorTileYPosChanged(newTileOverMouse->mapPos().y());
+		    emit currentTilePosYChanged(newTileOverMouse->mapPos().y());
 
 	    tileOverMouse = newTileOverMouse;
 	}
@@ -1291,7 +1492,6 @@ void MapData::copyToBuffer(void)
 	MapArea* ptr = new MapArea(srcrt.size());
 	ptr->importArea(mapArea, srcrt, QPoint(0, 0));
 	selectedArea = QSharedPointer<MapArea>(ptr);
-        emit validBuffer(true);
     }
 }
 
@@ -1306,6 +1506,7 @@ void MapData::pasteFromBuffer(void)
     {
 	const MapArea & selMapArea = *selectedArea.data();
 	mapArea.importArea(selMapArea, QRect(QPoint(0, 0), selMapArea.size()), tileOverMouse->mapPos());
+
 	emit dataModified();
     }
 }
@@ -1424,7 +1625,7 @@ void MapData::newMap(const QSize & msz, const QString &)
     setSceneRect(QRect(QPoint(0, 0),
 	QSize(size().width() * tileSize.width(), size().height() * tileSize.height())));
 
-    generateMiniMap();
+    emit dataModified();
 }
 
 bool MapData::loadMap(const QString & mapFile)
@@ -1450,8 +1651,6 @@ bool MapData::loadMap(const QString & mapFile)
     const QSize & tileSize = EditorTheme::tileSize();
     setSceneRect(QRect(QPoint(0, 0),
 	QSize(size().width() * tileSize.width(), size().height() * tileSize.height())));
-
-    generateMiniMap();
 
     return true;
 }
@@ -2070,14 +2269,6 @@ void MapData::showMapOptions(void)
 const DayEvents & MapData::dayEvents(void) const
 {
     return mapDayEvents;
-}
-
-void MapData::generateMiniMap(void)
-{
-    MapWindow* mapWindow = qobject_cast<MapWindow*>(parent());
-
-    if(mapWindow && mapWindow->miniMapWidget())
-	mapWindow->miniMapWidget()->generateFromTiles(mapTiles);
 }
 
 void MapData::editObjectAttributes(void)

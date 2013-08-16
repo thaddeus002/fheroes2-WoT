@@ -143,8 +143,8 @@ void MainWindow::updateStatusBar(void)
 
     if(mapWindow)
     {
-	connect(mapWindow, SIGNAL(cursorTileXPosChanged(int)), labelTileX, SLOT(setNum(int)));
-	connect(mapWindow, SIGNAL(cursorTileYPosChanged(int)), labelTileY, SLOT(setNum(int)));
+	connect(& mapWindow->sceneMapData(), SIGNAL(currentTilePosXChanged(int)), labelTileX, SLOT(setNum(int)));
+	connect(& mapWindow->sceneMapData(), SIGNAL(currentTilePosYChanged(int)), labelTileY, SLOT(setNum(int)));
     }
 }
 
@@ -388,14 +388,5 @@ void MainWindow::subWindowActivated(QMdiSubWindow* mapWindow)
 void MainWindow::mapOptions(void)
 {
     if(activeMapWindow())
-	activeMapWindow()->mapData.showMapOptions();
-}
-
-void MainWindow::setActivePasteAction(bool f)
-{
-    foreach(QMdiSubWindow* window, mdiArea->subWindowList())
-    {
-        MapWindow* child = qobject_cast<MapWindow*>(window->widget());
-        if(child) child->editPasteAct->setEnabled(f);
-    }
+	activeMapWindow()->showMapOptions();
 }

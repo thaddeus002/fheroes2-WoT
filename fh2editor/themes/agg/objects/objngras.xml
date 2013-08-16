@@ -39,4 +39,13 @@
     <template section="bottom_2x1_1" name="Shrub 145" index="145" cid="0x71" />
     <template section="bottom_2x1_1" name="Shrub 147" index="147" cid="0x71" />
     <template section="bottom_2x1_2" name="Mound 149" index="149" cid="0x6e" />
+
+    <template section="hillfort" name="Hill Fort" index="0" icn="objngra2" />
+    <template section="windmill" name="Wind Mill" index="23" icn="objngra2" />
+    <template section="archerhouse" name="Archer House" index="63" icn="objngra2" />
+    <template section="goblinhut" name="Goblin Hut" index="91" icn="objngra2" />
+    <template section="dwarfcott" name="Dwarf Cott" index="93" icn="objngra2" />
+    <template section="oasis" name="Oasis" index="121" icn="objngra2" />
+    <template section="obelisk" name="Obelisk" index="127" icn="objngra2" />
+
 </objects>
