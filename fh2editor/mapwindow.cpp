@@ -213,8 +213,3 @@ void MapWindow::changeViewedRect(void)
 				tmpSize.width() / absSize.width(), tmpSize.height() / absSize.height());
     }
 }
-
-void MapWindow::showMapOptions(void)
-{
-    mapData.showMapOptions();
-}

@@ -819,76 +819,87 @@ QPixmap Editor::pixmapBorder(const QSize & size, const QColor & fillCol, const Q
     return result;
 }
 
-QPixmap Editor::pixmapBorderPassable(const QSize & size, int passable)
+QPixmap Editor::pixmapBorderPassable(int passable)
 {
-    QColor redColor(255, 0, 0);
-    QColor greenColor(0, 255, 0);
+    QPixmap result = NULL;
+    QString key = "passable_" + QString::number(passable);
 
-    if(Direction::Unknown == passable || Direction::Center == passable)
-	return pixmapBorder(size, Qt::transparent, redColor);
-    else
-    if(IS_EQUAL_VALS(Direction::All, passable))
-	return pixmapBorder(size, Qt::transparent, greenColor);
-
-    QPixmap result(size);
-    result.fill(Qt::transparent);
-
-    int cw = (size.width() - 3) / 3;
-    int ch = (size.height() - 3) / 3;
-
-    QPainter paint(& result);
-    paint.setBrush(QBrush(QColor(0, 0, 0, 0)));
-
-    for(int xx = 1; xx < size.width() - 2; ++xx)
+    if(! QPixmapCache::find(key, & result))
     {
-	if(xx < cw)
-	{
-	    paint.setPen(QPen((passable & Direction::TopLeft ? greenColor : redColor), 1));
-	    paint.drawPoint(xx, 1);
-	    paint.setPen(QPen((passable & Direction::BottomLeft ? greenColor : redColor), 1));
-	    paint.drawPoint(xx, size.height() - 2);
-	}
-	else
-	if(xx < 2 * cw)
-	{
-	    paint.setPen(QPen((passable & Direction::Top ? greenColor : redColor), 1));
-	    paint.drawPoint(xx, 1);
-	    paint.setPen(QPen((passable & Direction::Bottom ? greenColor : redColor), 1));
-	    paint.drawPoint(xx, size.height() - 2);
-	}
-	else
-	{
-	    paint.setPen(QPen((passable & Direction::TopRight ? greenColor : redColor), 1));
-	    paint.drawPoint(xx, 1);
-	    paint.setPen(QPen((passable & Direction::BottomRight ? greenColor : redColor), 1));
-	    paint.drawPoint(xx, size.height() - 2);
-	}
-    }
+	QColor redColor(255, 0, 0);
+	QColor greenColor(0, 255, 0);
+	QSize size = EditorTheme::tileSize() - QSize(2, 2);
 
-    for(int yy = 1; yy < size.height() - 2; ++yy)
-    {
-	if(yy < ch)
-	{
-	    paint.setPen(QPen((passable & Direction::TopLeft ? greenColor : redColor), 1));
-	    paint.drawPoint(1, yy);
-	    paint.setPen(QPen((passable & Direction::TopRight ? greenColor : redColor), 1));
-	    paint.drawPoint(size.width() - 2, yy);
-	}
+	if(Direction::Unknown == passable || Direction::Center == passable)
+	    result = pixmapBorder(size, Qt::transparent, redColor);
 	else
-	if(yy < 2 * ch)
-	{
-	    paint.setPen(QPen((passable & Direction::Left ? greenColor : redColor), 1));
-	    paint.drawPoint(1, yy);
-	    paint.setPen(QPen((passable & Direction::Right ? greenColor : redColor), 1));
-	    paint.drawPoint(size.width() - 2, yy);
-	}
+	if(IS_EQUAL_VALS(Direction::All, passable))
+	    result = pixmapBorder(size, Qt::transparent, greenColor);
 	else
 	{
-	    paint.setPen(QPen((passable & Direction::BottomLeft ? greenColor : redColor), 1));
-	    paint.drawPoint(1, yy);
-	    paint.setPen(QPen((passable & Direction::BottomRight ? greenColor : redColor), 1));
-	    paint.drawPoint(size.width() - 2, yy);
+	    result = QPixmap(size);
+	    result.fill(Qt::transparent);
+
+	    int cw = (size.width() - 3) / 3;
+	    int ch = (size.height() - 3) / 3;
+
+	    QPainter paint(& result);
+	    paint.setBrush(QBrush(QColor(0, 0, 0, 0)));
+
+	    for(int xx = 1; xx < size.width() - 2; ++xx)
+	    {
+		if(xx < cw)
+		{
+		    paint.setPen(QPen((passable & Direction::TopLeft ? greenColor : redColor), 1));
+		    paint.drawPoint(xx, 1);
+		    paint.setPen(QPen((passable & Direction::BottomLeft ? greenColor : redColor), 1));
+		    paint.drawPoint(xx, size.height() - 2);
+		}
+		else
+		if(xx < 2 * cw)
+		{
+		    paint.setPen(QPen((passable & Direction::Top ? greenColor : redColor), 1));
+		    paint.drawPoint(xx, 1);
+		    paint.setPen(QPen((passable & Direction::Bottom ? greenColor : redColor), 1));
+		    paint.drawPoint(xx, size.height() - 2);
+		}
+		else
+		{
+		    paint.setPen(QPen((passable & Direction::TopRight ? greenColor : redColor), 1));
+		    paint.drawPoint(xx, 1);
+		    paint.setPen(QPen((passable & Direction::BottomRight ? greenColor : redColor), 1));
+		    paint.drawPoint(xx, size.height() - 2);
+		}
+	    }
+
+	    for(int yy = 1; yy < size.height() - 2; ++yy)
+	    {
+		if(yy < ch)
+		{
+		    paint.setPen(QPen((passable & Direction::TopLeft ? greenColor : redColor), 1));
+		    paint.drawPoint(1, yy);
+		    paint.setPen(QPen((passable & Direction::TopRight ? greenColor : redColor), 1));
+		    paint.drawPoint(size.width() - 2, yy);
+		}
+		else
+		if(yy < 2 * ch)
+		{
+		    paint.setPen(QPen((passable & Direction::Left ? greenColor : redColor), 1));
+		    paint.drawPoint(1, yy);
+		    paint.setPen(QPen((passable & Direction::Right ? greenColor : redColor), 1));
+		    paint.drawPoint(size.width() - 2, yy);
+		}
+		else
+		{
+	    	    paint.setPen(QPen((passable & Direction::BottomLeft ? greenColor : redColor), 1));
+		    paint.drawPoint(1, yy);
+	    	    paint.setPen(QPen((passable & Direction::BottomRight ? greenColor : redColor), 1));
+		    paint.drawPoint(size.width() - 2, yy);
+		}
+	    }
 	}
+
+	QPixmapCache::insert(key, result);
     }
 
     return result;
@@ -1435,7 +1446,13 @@ struct SpriteInfo
     int		passable;
 
     SpriteInfo() : oid(MapObj::None), level(SpriteLevel::Unknown), passable(Direction::Unknown) {}
-    SpriteInfo(int id, int lv, int ps) : oid(id), level(lv), passable(ps) {}
+
+    SpriteInfo(int id, int lv, int ps) : oid(id), level(lv), passable(ps)
+    {
+	if(level == SpriteLevel::Top) passable = Direction::All;
+	else
+	if(level == SpriteLevel::Action) oid |= MapObj::IsAction;
+    }
 };
 
 /*Themes section */
@@ -1446,33 +1463,23 @@ namespace EditorTheme
     QSize			themeTile(0, 0);
     QMap<int, SpriteInfo>	mapSpriteInfoCache;
     QMap<QString, int>		mapICNs;
-}
 
-QString checkICN(const QString & str)
-{
-    QString res = str.toUpper();
-    if(0 > res.lastIndexOf(".ICN")) res.append(".ICN");
-    return res;
-}
-
-int EditorTheme::mapICN(const QString & str)
-{
-    return mapICNs[str];
-}
-
-bool EditorTheme::load(const QString & data)
-{
-    for(int ii = 0; ii < 0xFF; ++ii)
+    const SpriteInfo*		findCacheSprite(int icn, int index)
     {
-	if(ICN::UNKNOWN != H2::MP2ICN(ii, false))
-	    mapICNs[ICN::transcribe(ii)] = ii;
+	int key = (icn << 16) | (0x0000FFFF & index);
+	QMap<int,SpriteInfo>::const_iterator it = mapSpriteInfoCache.find(key);
+	return it != mapSpriteInfoCache.end() ? & (*it) : NULL;
     }
 
-    if(aggSpool.setData(data))
+    QString			checkICN(const QString & str)
     {
-	themeName = "agg";
-	themeTile = QSize(32, 32);
+	QString res = str.toUpper();
+	if(0 > res.lastIndexOf(".ICN")) res.append(".ICN");
+	return res;
+    }
 
+    void			loadCacheSprites(void)
+    {
 	mapSpriteInfoCache.clear();
 	QStringList files = resourceFiles("objects", "*.xml");
 	for(QStringList::const_iterator
@@ -1501,6 +1508,28 @@ bool EditorTheme::load(const QString & data)
 		}
 	    }
 	}
+    }
+}
+
+int EditorTheme::mapICN(const QString & str)
+{
+    return mapICNs[str];
+}
+
+bool EditorTheme::load(const QString & data)
+{
+    for(int ii = 0; ii < 0xFF; ++ii)
+    {
+	if(ICN::UNKNOWN != H2::MP2ICN(ii, false))
+	    mapICNs[ICN::transcribe(ii)] = ii;
+    }
+
+    if(aggSpool.setData(data))
+    {
+	themeName = "agg";
+	themeTile = QSize(32, 32);
+
+	loadCacheSprites();
 
 	return true;
     }
@@ -1518,23 +1547,16 @@ QStringList EditorTheme::resourceFiles(const QString & dir, const QString & file
     return Resource::FindFiles(QDir::toNativeSeparators(QString("themes") + QDir::separator() + themeName + QDir::separator() + dir), file);
 }
 
-int EditorTheme::getObjectID(const QString & icn, int index)
-{
-    return getObjectID(mapICNs[icn], index);
-}
-
 int EditorTheme::getObjectID(int icn, int index)
 {
-    int key = (icn << 16) | (0x0000FFFF & index);
-    QMap<int,SpriteInfo>::const_iterator it = mapSpriteInfoCache.find(key);
-    int res = MapObj::None;
-    if(it != mapSpriteInfoCache.end())
-    {
-	res = (*it).oid;
-	if((*it).level == SpriteLevel::Action)
-	    res |= MapObj::IsAction;
-    }
-    return res;
+    const SpriteInfo* spriteInfo = findCacheSprite(icn, index);
+    return spriteInfo ? spriteInfo->oid : MapObj::None;
+}
+
+int EditorTheme::getSpritePassable(int icn, int index)
+{
+    const SpriteInfo* spriteInfo = findCacheSprite(icn, index);
+    return spriteInfo ? spriteInfo->passable : Direction::Unknown;
 }
 
 QPixmap EditorTheme::getImageTIL(const QString & til, int index)
@@ -2687,7 +2709,7 @@ CompositeSprite::CompositeSprite(const QString & icn, const QDomElement & elem)
     : spriteICN(EditorTheme::mapICN(icn)), spriteIndex(elem.attribute("index").toInt()), spriteLevel(0), spritePassable(Direction::All), spriteAnimation(0)
 {
     if(elem.hasAttribute("icn"))
-	spriteICN = EditorTheme::mapICN(checkICN(elem.attribute("icn")));
+	spriteICN = EditorTheme::mapICN(EditorTheme::checkICN(elem.attribute("icn")));
     spritePos.setX(elem.attribute("px").toInt());
     spritePos.setY(elem.attribute("py").toInt());
 
@@ -2703,7 +2725,7 @@ CompositeSprite::CompositeSprite(const QString & icn, const QDomElement & elem)
 CompositeObject::CompositeObject(const QDomElement & elem)
     : name(elem.attribute("name")), size(elem.attribute("width").toInt(), elem.attribute("height").toInt()), classId(elem.attribute("cid").toInt(NULL, 0))
 {
-    icn = checkICN(elem.attribute("icn"));
+    icn = EditorTheme::checkICN(elem.attribute("icn"));
 
     QDomNodeList list = elem.elementsByTagName("sprite");
     for(int pos = 0; pos < list.size(); ++pos)
@@ -2737,7 +2759,7 @@ CompositeObjectCursor::CompositeObjectCursor(const CompositeObject & obj) : Comp
 	const QPoint offset((*it).spritePos.x() * tileSize.width(),
 				(*it).spritePos.y() * tileSize.height());
 
-	QPixmap tileP = Editor::pixmapBorderPassable(tileSize - QSize(2, 2), (*it).spritePassable);
+	QPixmap tileP = Editor::pixmapBorderPassable((*it).spritePassable);
 
 	switch((*it).spriteLevel)
 	{

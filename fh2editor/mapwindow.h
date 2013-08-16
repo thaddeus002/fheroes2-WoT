@@ -45,9 +45,6 @@ public:
     QString	currentFile(void);
     Form::MiniMap*
 		miniMapWidget(void);
-    void	showMapOptions(void);
-    const MapData &
-		sceneMapData(void) const { return mapData; }
 
 protected:
     void	closeEvent(QCloseEvent*);

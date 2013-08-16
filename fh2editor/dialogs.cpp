@@ -3847,3 +3847,93 @@ void Form::ObjectEventsList::checkLimit(void)
 {
     addItemAct->setDisabled(limit());
 }
+
+Form::EditPassableDialog::EditPassableDialog(const MapTile & tile)
+{
+    setWindowTitle(QApplication::translate("EditPassableDialog", "Edit Passable", 0, QApplication::UnicodeUTF8));
+
+    horizontalSpacer2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    labelText = new QLabel(this);
+    labelText->setText("TEST");
+
+    horizontalSpacer3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout5 = new QHBoxLayout();
+    horizontalLayout5->addItem(horizontalSpacer2);
+    horizontalLayout5->addWidget(labelText);
+    horizontalLayout5->addItem(horizontalSpacer3);
+
+    verticalSpacer2 = new QSpacerItem(20, 10, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    labelTopLeft = new QLabel(this);
+    labelTop = new QLabel(this);
+    labelTopRight = new QLabel(this);
+    horizontalSpacer4 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout2 = new QHBoxLayout();
+    horizontalLayout2->addItem(horizontalSpacer);
+    horizontalLayout2->addWidget(labelTopLeft);
+    horizontalLayout2->addWidget(labelTop);
+    horizontalLayout2->addWidget(labelTopRight);
+    horizontalLayout2->addItem(horizontalSpacer4);
+
+    horizontalSpacer5 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    labelLeft = new QLabel(this);
+    labelCenter = new QLabel(this);
+    labelRight = new QLabel(this);
+    horizontalSpacer7 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout3 = new QHBoxLayout();
+    horizontalLayout3->addItem(horizontalSpacer5);
+    horizontalLayout3->addWidget(labelLeft);
+    horizontalLayout3->addWidget(labelCenter);
+    horizontalLayout3->addWidget(labelRight);
+    horizontalLayout3->addItem(horizontalSpacer7);
+
+    horizontalSpacer8 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    labelBottomLeft = new QLabel(this);
+    labelBottom = new QLabel(this);
+    labelBottomRight = new QLabel(this);
+    horizontalSpacer11 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout4 = new QHBoxLayout();
+    horizontalLayout4->addItem(horizontalSpacer8);
+    horizontalLayout4->addWidget(labelBottomLeft);
+    horizontalLayout4->addWidget(labelBottom);
+    horizontalLayout4->addWidget(labelBottomRight);
+    horizontalLayout4->addItem(horizontalSpacer11);
+
+    verticalSpacer = new QSpacerItem(20, 10, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    pushButtonOk = new QPushButton(this);
+    pushButtonOk->setText(QApplication::translate("EditPassableDialog", "Ok", 0, QApplication::UnicodeUTF8));
+
+    horizontalSpacerButtons = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    pushButtonCancel = new QPushButton(this);
+    pushButtonCancel->setText(QApplication::translate("EditPassableDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayout = new QHBoxLayout();
+    horizontalLayout->addWidget(pushButtonOk);
+    horizontalLayout->addItem(horizontalSpacerButtons);
+    horizontalLayout->addWidget(pushButtonCancel);
+
+    verticalLayout = new QVBoxLayout(this);
+    verticalLayout->addLayout(horizontalLayout5);
+    verticalLayout->addItem(verticalSpacer2);
+    verticalLayout->addLayout(horizontalLayout2);
+    verticalLayout->addLayout(horizontalLayout3);
+    verticalLayout->addLayout(horizontalLayout4);
+    verticalLayout->addItem(verticalSpacer);
+    verticalLayout->addLayout(horizontalLayout);
+
+    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
+}
+
+int Form::EditPassableDialog::result(void) const
+{
+    return Direction::All;
+}

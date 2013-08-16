@@ -176,6 +176,7 @@ public:
     QSet<quint32>	uids(void) const;
     const QPoint &	mapPos(void) const { return mpos; }
     void		setMapPos(const QPoint & pos) { mpos = pos; }
+    void		setLocalPassable(int pass) { passableLocal = pass; }
 
     int			basePassable(void) const { return passableBase; }
     int			localPassable(void) const { return passableLocal; }
@@ -193,14 +194,15 @@ public:
 
     bool		isAction(void) const;
     int			object(void) const;
-    void		updateObjectID(void);
 
 protected:
+    void		updateObjectID(void);
+    void		updatePassable(void);
+
     static void		loadSpriteLevel(MapTileLevels &, int, const mp2lev_t &);
 
     friend		QDomElement & operator<< (QDomElement &, const MapTile &);
     friend		QDomElement & operator>> (QDomElement &, MapTile &);
-
 
     QPoint		mpos;
 
@@ -310,17 +312,21 @@ public:
 
     bool		saveMapXML(const QString &) const;
     bool		isValidBuffer(void) const;
+    bool		showPassableMode(void) const { return showPassable; }
 
     QPoint		mapToPoint(const QPoint &) const;
     QRect		mapToRect(const QRect &) const;
 
-    void		showMapOptions(void);
     const MapTiles &	tiles(void) const { return mapTiles; }
 
 signals:
     void		dataModified(void);
     void		currentTilePosXChanged(int);
     void		currentTilePosYChanged(int);
+
+public slots:
+    void		showPassableTriggered(void);
+    void		showMapOptions(void);
 
 protected slots:
     void		selectAllTiles(void);
@@ -405,6 +411,8 @@ protected:
 
     QActionGroup*       fillGroundAct;
     QActionGroup*       clearObjectsAct;
+
+    bool		showPassable;
 
     static QSharedPointer<MapArea>
     			selectedArea;

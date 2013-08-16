@@ -414,7 +414,7 @@ namespace Editor
     quint32 Rand(quint32 max);
     quint32 Rand(quint32 min, quint32 max);
     QPixmap pixmapBorder(const QSize &, const QColor &, const QColor &);
-    QPixmap pixmapBorderPassable(const QSize &, int passable);
+    QPixmap pixmapBorderPassable(int passable);
 
     class MyXML : public QDomElement
     {
@@ -581,7 +581,7 @@ namespace EditorTheme
     QPair<QPixmap, QPoint>	getImageICN(const QString &, int);
     QPixmap			getImage(const CompositeObject &);
     int				getObjectID(int, int);
-    int				getObjectID(const QString &, int);
+    int				getSpritePassable(int, int);
 
     const QSize &		tileSize(void);
 

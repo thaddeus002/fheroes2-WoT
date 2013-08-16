@@ -992,6 +992,46 @@ namespace Form
 	void			moveCurrentItemUp(void);
 	void			moveCurrentItemDown(void);
     };
+
+    class EditPassableDialog : public QDialog
+    {
+	Q_OBJECT
+
+    public:
+	EditPassableDialog(const MapTile &);
+
+	int			result(void) const;
+
+	QVBoxLayout*		verticalLayout;
+        QHBoxLayout*		horizontalLayout5;
+	QSpacerItem*		horizontalSpacer2;
+        QLabel*			labelText;
+        QSpacerItem*		horizontalSpacer3;
+        QSpacerItem*		verticalSpacer2;
+        QHBoxLayout*		horizontalLayout2;
+        QSpacerItem*		horizontalSpacer;
+        QLabel*			labelTopLeft;
+        QLabel*			labelTop;
+        QLabel*			labelTopRight;
+        QSpacerItem*		horizontalSpacer4;
+        QHBoxLayout*		horizontalLayout3;
+        QSpacerItem*		horizontalSpacer5;
+        QLabel*			labelLeft;
+        QLabel*			labelCenter;
+        QLabel*			labelRight;
+        QSpacerItem*		horizontalSpacer7;
+        QHBoxLayout*		horizontalLayout4;
+        QSpacerItem*		horizontalSpacer8;
+        QLabel*			labelBottomLeft;
+        QLabel*			labelBottom;
+        QLabel*			labelBottomRight;
+        QSpacerItem*		horizontalSpacer11;
+        QSpacerItem*		verticalSpacer;
+        QHBoxLayout*		horizontalLayout;
+        QPushButton*		pushButtonOk;
+        QSpacerItem*		horizontalSpacerButtons;
+        QPushButton*		pushButtonCancel;
+    };
 }
 
 #endif

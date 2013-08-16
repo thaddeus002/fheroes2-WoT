@@ -395,7 +395,7 @@ QDomElement & operator>> (QDomElement & el, MapTileLevels & levels)
 
 MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos)
     : mpos(pos), tileSprite(mp2.tileSprite), tileShape(mp2.tileShape % 4), objectID(mp2.objectID),
-	passableBase(Direction::All), passableLocal(Direction::All)
+	passableBase(Direction::All), passableLocal(Direction::Unknown)
 {
     setGraphicsPixmapItemValues();
     loadSpriteLevels(mp2.ext);
@@ -432,6 +432,8 @@ MapTile::MapTile(const mp2til_t & mp2, const QPoint & pos)
 		objectID = MapTileExt::loyaltyObject(*it);
 	}
     }
+
+    updatePassable();
 }
 
 MapTile::MapTile(const MapTile & other)
@@ -442,7 +444,7 @@ MapTile::MapTile(const MapTile & other)
 }
 
 MapTile::MapTile(const QPoint & pos)
-    : QGraphicsPixmapItem(), mpos(pos), tileSprite(0), tileShape(0), objectID(MapObj::None), passableBase(Direction::All), passableLocal(Direction::All)
+    : QGraphicsPixmapItem(), mpos(pos), tileSprite(0), tileShape(0), objectID(MapObj::None), passableBase(Direction::All), passableLocal(Direction::Unknown)
 {
     setGraphicsPixmapItemValues();
 }
@@ -461,6 +463,9 @@ MapTile & MapTile::operator=(const MapTile & other)
     passableLocal = other.passableLocal;
 
     setGraphicsPixmapItemValues();
+
+    if(objectID == MapObj::None)
+	updateObjectID();
 
     return *this;
 }
@@ -546,6 +551,17 @@ void MapTile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, Q
 
     // draw level2
     spritesLevel2.paint(*painter, offset().toPoint(), mpos);
+
+    MapData* mapData = qobject_cast<MapData*>(scene());
+
+    if(mapData && mapData->showPassableMode())
+    {
+	int passableCurrent = passableLocal != Direction::Unknown ? passableLocal : passableBase;
+
+	if(Direction::All != passableCurrent &&
+	    (!mapData->tileOverMouse || mapData->tileOverMouse != this))
+	    painter->drawPixmap(offset() + QPoint(1, 1), Editor::pixmapBorderPassable(passableCurrent));
+    }
 }
 
 void MapTile::showInfo(void) const
@@ -624,6 +640,15 @@ void MapTile::updateObjectID(void)
     }
 }
 
+void MapTile::updatePassable(void)
+{
+    passableBase = Direction::All;
+
+    for(MapTileLevels::const_iterator
+	it = spritesLevel1.begin(); it != spritesLevel1.end(); ++it)
+	passableBase &= EditorTheme::getSpritePassable((*it).icn(), (*it).index());
+}
+
 void MapTile::addSpriteSection(const CompositeSprite & cs, quint32 uid)
 {
     if(cs.spriteLevel == SpriteLevel::Top)
@@ -632,6 +657,7 @@ void MapTile::addSpriteSection(const CompositeSprite & cs, quint32 uid)
 	spritesLevel1 << MapTileExt(cs, uid);
 
     updateObjectID();
+    updatePassable();
 }
 
 void MapTile::removeSpriteSection(quint32 uid)
@@ -639,6 +665,7 @@ void MapTile::removeSpriteSection(quint32 uid)
     bool res1 = spritesLevel1.removeSprite(uid);
     bool res2 = spritesLevel2.removeSprite(uid);
     if(res1 || res2) updateObjectID();
+    updatePassable();
 }
 
 QSet<quint32> MapTile::uids(void) const
@@ -987,7 +1014,7 @@ QSharedPointer<MapArea> MapData::selectedArea = QSharedPointer<MapArea>();
 MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), tileOverMouse(NULL),
     mapName("New Map"), mapAuthors("unknown"), mapLicense("unknown"), mapDifficulty(Difficulty::Normal),
     mapKingdomColors(0), mapCompColors(0), mapHumanColors(0), mapStartWithHero(false), mapArea(),
-    mapTiles(mapArea.tiles), mapObjects(mapArea.objects), engineVersion(FH2ENGINE_CURRENT_VERSION), mapVersion(engineVersion)
+    mapTiles(mapArea.tiles), mapObjects(mapArea.objects), engineVersion(FH2ENGINE_CURRENT_VERSION), mapVersion(engineVersion), showPassable(false)
 {
     connect(this, SIGNAL(dataModified()), parent, SLOT(mapWasModified()));
 
@@ -1473,7 +1500,13 @@ void MapData::drawForeground(QPainter* painter, const QRectF & rect)
 
 void MapData::editPassableDialog(void)
 {
-    qDebug() << "edit passable dialog";
+    if(tileOverMouse)
+    {
+	Form::EditPassableDialog form(*tileOverMouse);
+
+        if(QDialog::Accepted == form.exec())
+	    tileOverMouse->setLocalPassable(form.result());
+    }
 }
 
 void MapData::cellInfoDialog(void)
@@ -2560,4 +2593,10 @@ void MapData::updateKingdomColors(int color)
 
     mapCompColors |= color;
     mapHumanColors |= color;
+}
+
+void MapData::showPassableTriggered(void)
+{
+    showPassable = showPassable ? false : true;
+    update();
 }

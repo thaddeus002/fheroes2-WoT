@@ -143,8 +143,8 @@ void MainWindow::updateStatusBar(void)
 
     if(mapWindow)
     {
-	connect(& mapWindow->sceneMapData(), SIGNAL(currentTilePosXChanged(int)), labelTileX, SLOT(setNum(int)));
-	connect(& mapWindow->sceneMapData(), SIGNAL(currentTilePosYChanged(int)), labelTileY, SLOT(setNum(int)));
+	connect(mapWindow->scene(), SIGNAL(currentTilePosXChanged(int)), labelTileX, SLOT(setNum(int)));
+	connect(mapWindow->scene(), SIGNAL(currentTilePosYChanged(int)), labelTileY, SLOT(setNum(int)));
     }
 }
 
@@ -196,7 +196,7 @@ void MainWindow::updateWindowMenu(void)
 
     	    QAction* action  = windowMenu->addAction(text);
     	    action->setCheckable(true);
-    	    action ->setChecked(child == activeMapWindow());
+    	    action->setChecked(child == activeMapWindow());
     	    connect(action, SIGNAL(triggered()), windowMapper, SLOT(map()));
     	    windowMapper->setMapping(action, windows.at(i));
 	}
@@ -235,7 +235,6 @@ void MainWindow::createActions(void)
 
     mapOptionsAct = new QAction(QIcon(":/images/map_options.png"), tr("&Options"), this);
     mapOptionsAct->setStatusTip(tr("Show map options"));
-    connect(mapOptionsAct, SIGNAL(triggered()), this, SLOT(mapOptions()));
 
     fileExitAct = new QAction(tr("E&xit"), this);
     fileExitAct->setShortcuts(QKeySequence::Quit);
@@ -277,6 +276,8 @@ void MainWindow::createActions(void)
 
     showPassableAct = new QAction(tr("Passable Mode"), this);
     showPassableAct->setStatusTip(tr("Show the passable mode"));
+    showPassableAct->setCheckable(true);
+    showPassableAct->setChecked(false);
 }
 
 void MainWindow::createMenus(void)
@@ -376,17 +377,22 @@ void MainWindow::setActiveSubWindow(QWidget* window)
 	mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow*>(window));
 }
 
-void MainWindow::subWindowActivated(QMdiSubWindow* mapWindow)
+void MainWindow::subWindowActivated(QMdiSubWindow* subWindow)
 {
-    Q_UNUSED(mapWindow);
+    Q_UNUSED(subWindow);
 
     updateMenus();
     updateStatusBar();
     updateMiniMapDock();
-}
 
-void MainWindow::mapOptions(void)
-{
-    if(activeMapWindow())
-	activeMapWindow()->showMapOptions();
+    MapWindow* mapWindow = activeMapWindow();
+
+    disconnect(mapOptionsAct, SIGNAL(triggered()), 0, 0);
+    disconnect(showPassableAct, SIGNAL(triggered()), 0, 0);
+
+    if(mapWindow)
+    {
+	connect(mapOptionsAct, SIGNAL(triggered()), mapWindow->scene(), SLOT(showMapOptions()));
+	connect(showPassableAct, SIGNAL(triggered()), mapWindow->scene(), SLOT(showPassableTriggered()));
+    }
 }

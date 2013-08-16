@@ -56,7 +56,6 @@ private slots:
     void		updateWindowMenu(void);
     MapWindow*		createMapWindow(void);
     void		setActiveSubWindow(QWidget*);
-    void		mapOptions(void);
     void		subWindowActivated(QMdiSubWindow*);
 
 private:
