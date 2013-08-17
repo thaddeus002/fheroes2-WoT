@@ -325,12 +325,22 @@ u32 AGG::Cache::ClearFreeObjects(void)
     return total;
 }
 
+namespace
+{
+    bool memory_limit_usage = true;
+
+    void SetMemoryLimit(bool usage)
+    {
+	memory_limit_usage = usage;
+    }
+}
+
 bool AGG::Cache::CheckMemoryLimit(void)
 {
     Settings & conf = Settings::Get();
 
     // memory limit trigger
-    if(conf.ExtPocketLowMemory() && 0 < conf.MemoryLimit())
+    if(conf.ExtPocketLowMemory() && 0 < conf.MemoryLimit() && memory_limit_usage)
     {
 	u32 usage = System::GetMemoryUsage();
 
@@ -449,184 +459,145 @@ bool AGG::Cache::LoadExtICN(const ICN::icn_t icn, const u32 index, bool reflect)
     }
 
     // simple modify
-    switch(icn)
+    if(index < count)
     {
-	case ICN::BTNBATTLEONLY:
-	if(index < count)
-	{
-	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
-	    LoadOrgICN(sprite, ICN::BTNNEWGM, 2 + index, false);
-	    // clean
-	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(10, 6, 55, 14), 15, 13, sprite);
-	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(10, 6, 55, 14), 70, 13, sprite);
-	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(10, 6, 55, 14), 42, 28, sprite);
-	    // ba
-	    GetICN(ICN::BTNCMPGN, index).Blit(Rect(41, 28, 28, 14), 30, 13, sprite);
-	    // tt
-	    GetICN(ICN::BTNNEWGM, index).Blit(Rect(25, 13, 13, 14), 57, 13, sprite);
-	    GetICN(ICN::BTNNEWGM, index).Blit(Rect(25, 13, 13, 14), 70, 13, sprite);
-	    // le
-	    GetICN(ICN::BTNNEWGM, 6 + index).Blit(Rect(97, 21, 13, 14), 83, 13, sprite);
-	    GetICN(ICN::BTNNEWGM, 6 + index).Blit(Rect(86, 21, 13, 14), 96, 13, sprite);
-	    // on
-	    GetICN(ICN::BTNDCCFG, 4 + index).Blit(Rect(44, 21, 31, 14), 40, 28, sprite);
-	    // ly
-	    GetICN(ICN::BTNHOTST, index).Blit(Rect(47, 21, 13, 13), 71, 28, sprite);
-	    GetICN(ICN::BTNHOTST, index).Blit(Rect(72, 21, 13, 13), 84, 28, sprite);
-	}
-	break;
+	Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
 
-	case ICN::BTNCONFIG:
-	if(index < count)
-	{
-	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
-	    LoadOrgICN(sprite, ICN::SYSTEM, 11 + index, false);
-	    // config
-	    GetICN(ICN::BTNDCCFG, 4 + index).Blit(Rect(30, 20, 80, 16), 8, 5, sprite);
-	}
-	break;
+	SetMemoryLimit(false);
 
-	case ICN::BTNGIFT:
-	if(index < count)
+	switch(icn)
 	{
-	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
-	    LoadOrgICN(sprite,
+	    case ICN::BTNBATTLEONLY:
+		LoadOrgICN(sprite, ICN::BTNNEWGM, 2 + index, false);
+		// clean
+		GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(10, 6, 55, 14), 15, 13, sprite);
+		GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(10, 6, 55, 14), 70, 13, sprite);
+		GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(10, 6, 55, 14), 42, 28, sprite);
+		// ba
+		GetICN(ICN::BTNCMPGN, index).Blit(Rect(41, 28, 28, 14), 30, 13, sprite);
+		// tt
+		GetICN(ICN::BTNNEWGM, index).Blit(Rect(25, 13, 13, 14), 57, 13, sprite);
+		GetICN(ICN::BTNNEWGM, index).Blit(Rect(25, 13, 13, 14), 70, 13, sprite);
+		// le
+		GetICN(ICN::BTNNEWGM, 6 + index).Blit(Rect(97, 21, 13, 14), 83, 13, sprite);
+		GetICN(ICN::BTNNEWGM, 6 + index).Blit(Rect(86, 21, 13, 14), 96, 13, sprite);
+		// on
+		GetICN(ICN::BTNDCCFG, 4 + index).Blit(Rect(44, 21, 31, 14), 40, 28, sprite);
+		// ly
+		GetICN(ICN::BTNHOTST, index).Blit(Rect(47, 21, 13, 13), 71, 28, sprite);
+		GetICN(ICN::BTNHOTST, index).Blit(Rect(72, 21, 13, 13), 84, 28, sprite);
+		break;
+
+	    case ICN::BTNCONFIG:
+		LoadOrgICN(sprite, ICN::SYSTEM, 11 + index, false);
+		// config
+		GetICN(ICN::BTNDCCFG, 4 + index).Blit(Rect(30, 20, 80, 16), 8, 5, sprite);
+		break;
+
+	    case ICN::BTNGIFT:
+		LoadOrgICN(sprite,
 			(Settings::Get().ExtGameEvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST),
 			17 + index, false);
-	    // clean
-	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(10, 6, 72, 15), 6, 4, sprite);
-	    // G
-	    GetICN(ICN::BTNDCCFG, 4 + index).Blit(Rect(94, 20, 15, 15), 20, 4, sprite);
-	    // I
-	    GetICN(ICN::BTNDCCFG, 4 + index).Blit(Rect(86, 20, 9, 15), 36, 4, sprite);
-	    // F
-	    GetICN(ICN::BTNDCCFG, 4 + index).Blit(Rect(74, 20, 13, 15), 46, 4, sprite);
-	    // T
-	    GetICN(ICN::BTNNEWGM, index).Blit(Rect(25, 13, 13, 14), 60, 5, sprite);
-	}
-	break;
-
-	case ICN::BTNMIN:
-	{
-	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
-	    // max
-	    LoadOrgICN(sprite, ICN::RECRUIT, index + 4, false);
-	    // clean
-	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(10, 6, 33, 15), 30, 4, sprite);
-	    // add: IN
-	    GetICN(ICN::APANEL, 4 + index).Blit(Rect(23, 20, 25, 15), 30, 4, sprite);
-	}
-	break;
-
-	case ICN::BUYMAX:
-	if(index < count)
-	{
-	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
-	    LoadOrgICN(sprite, ICN::WELLXTRA, index, false);
-	    // clean
-	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(10, 6, 52, 14), 6, 2, sprite);
-	    // max
-	    GetICN(ICN::RECRUIT, 4 + index).Blit(Rect(12, 6, 50, 12), 7, 3, sprite);
-	}
-	break;
-
-	case ICN::BATTLESKIP:
-	if(index < count)
-	{
-	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
-	    if(conf.PocketPC())
-		LoadOrgICN(sprite, ICN::TEXTBAR, index, false);
-	    else
-	    {
-		LoadOrgICN(sprite, ICN::TEXTBAR, 4 + index, false);
 		// clean
-		GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(3, 8, 43, 14), 3, 1, sprite);
-		// skip
-		GetICN(ICN::TEXTBAR, index).Blit(Rect(3, 8, 43, 14), 3, 0, sprite);
-	    }
-	}
-	break;
+		GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(10, 6, 72, 15), 6, 4, sprite);
+		// G
+		GetICN(ICN::BTNDCCFG, 4 + index).Blit(Rect(94, 20, 15, 15), 20, 4, sprite);
+		// I
+		GetICN(ICN::BTNDCCFG, 4 + index).Blit(Rect(86, 20, 9, 15), 36, 4, sprite);
+		// F
+		GetICN(ICN::BTNDCCFG, 4 + index).Blit(Rect(74, 20, 13, 15), 46, 4, sprite);
+		// T
+		GetICN(ICN::BTNNEWGM, index).Blit(Rect(25, 13, 13, 14), 60, 5, sprite);
+		break;
 
-	case ICN::BATTLEAUTO:
-	if(index < count)
-	{
-	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
-	    LoadOrgICN(sprite, ICN::TEXTBAR, 0 + index, false);
-	    // clean
-	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(4, 8, 43, 13), 3, 10, sprite);
-	    //
-	    GetICN(ICN::TEXTBAR, 4 + index).Blit(Rect(5, 2, 40, 12), 4, 11, sprite);
-	}
-	break;
-
-	case ICN::BATTLESETS:
-	if(index < count)
-	{
-	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
-	    LoadOrgICN(sprite, ICN::TEXTBAR, 0 + index, false);
-	    // clean
-	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(4, 8, 43, 13), 3, 10, sprite);
-	    //
-	    GetICN(ICN::ADVBTNS, 14 + index).Blit(Rect(5, 5, 26, 26), 10, 6, sprite);
-	}
-	break;
-
-	case ICN::BATTLEWAIT:
-	if(index < count)
-	{
-	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
-	    if(conf.PocketPC())
-		LoadOrgICN(sprite, ICN::ADVBTNS, 8 + index, false);
-	    else
-	    {
-		LoadOrgICN(sprite, ICN::TEXTBAR, 4 + index, false);
+	    case ICN::BTNMIN:
+		// max
+		LoadOrgICN(sprite, ICN::RECRUIT, index + 4, false);
 		// clean
-		GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(3, 8, 43, 14), 3, 1, sprite);
-		// wait
-		Surface src(28, 28);
-		GetICN(ICN::ADVBTNS, 8 + index).Blit(Rect(5, 4, 28, 28), 0, 0, src);
-		Surface dst = Surface::ScaleMinifyByTwo(src);
-		dst.Blit((sprite.w() - dst.w()) / 2, 2, sprite);
-	    }
-	}
-	break;
+		GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(10, 6, 33, 15), 30, 4, sprite);
+		// add: IN
+		GetICN(ICN::APANEL, 4 + index).Blit(Rect(23, 20, 25, 15), 30, 4, sprite);
+		break;
 
-	case ICN::BOAT12:
-	if(index < count)
-	{
-	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
-	    LoadOrgICN(sprite, ICN::ADVMCO, 28 + index, false);
-	    Surface dst = Surface::ScaleMinifyByTwo(sprite);
-	    Surface::Swap(sprite, dst);
-	}
-	break;
+	    case ICN::BUYMAX:
+		LoadOrgICN(sprite, ICN::WELLXTRA, index, false);
+		// clean
+		GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(10, 6, 52, 14), 6, 2, sprite);
+		// max
+		GetICN(ICN::RECRUIT, 4 + index).Blit(Rect(12, 6, 50, 12), 7, 3, sprite);
+		break;
 
+	    case ICN::BATTLESKIP:
+		if(conf.PocketPC())
+		    LoadOrgICN(sprite, ICN::TEXTBAR, index, false);
+		else
+		{
+		    LoadOrgICN(sprite, ICN::TEXTBAR, 4 + index, false);
+		    // clean
+		    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(3, 8, 43, 14), 3, 1, sprite);
+		    // skip
+		    GetICN(ICN::TEXTBAR, index).Blit(Rect(3, 8, 43, 14), 3, 0, sprite);
+		}
+		break;
 
-	case ICN::CSLMARKER:
-	if(index < count)
-	{
-	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
+	    case ICN::BATTLEAUTO:
+		LoadOrgICN(sprite, ICN::TEXTBAR, 0 + index, false);
+		// clean
+		GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(4, 8, 43, 13), 3, 10, sprite);
+		//
+		GetICN(ICN::TEXTBAR, 4 + index).Blit(Rect(5, 2, 40, 12), 4, 11, sprite);
+		break;
 
-	    // sprite: not allow build: complete, not today, all builds (white)
-	    LoadOrgICN(sprite, ICN::LOCATORS, 24, false);
+	    case ICN::BATTLESETS:
+		LoadOrgICN(sprite, ICN::TEXTBAR, 0 + index, false);
+		// clean
+		GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(4, 8, 43, 13), 3, 10, sprite);
+		//
+		GetICN(ICN::ADVBTNS, 14 + index).Blit(Rect(5, 5, 26, 26), 10, 6, sprite);
+		break;
 
-	    // sprite: not allow build: builds requires
-	    if(1 == index)
+	    case ICN::BATTLEWAIT:
+		if(conf.PocketPC())
+		    LoadOrgICN(sprite, ICN::ADVBTNS, 8 + index, false);
+		else
+		{
+		    LoadOrgICN(sprite, ICN::TEXTBAR, 4 + index, false);
+		    // clean
+		    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(3, 8, 43, 14), 3, 1, sprite);
+		    // wait
+		    Surface src(28, 28);
+		    GetICN(ICN::ADVBTNS, 8 + index).Blit(Rect(5, 4, 28, 28), 0, 0, src);
+		    Surface dst = Surface::ScaleMinifyByTwo(src);
+		    dst.Blit((sprite.w() - dst.w()) / 2, 2, sprite);
+		}
+		break;
+
+	    case ICN::BOAT12:
 	    {
-		sprite.ChangeColorIndex(0x0A, 0xD6);
+		LoadOrgICN(sprite, ICN::ADVMCO, 28 + index, false);
+		Surface dst = Surface::ScaleMinifyByTwo(sprite);
+		Surface::Swap(sprite, dst);
 	    }
-	    else
-	    // sprite: not allow build: lack resources (green)
-	    if(2 == index)
-	    {
-		sprite.ChangeColorIndex(0x0A, 0xDE);
-	    }
-	}
-	break;
+		break;
 
-	default: break;
+	    case ICN::CSLMARKER:
+		// sprite: not allow build: complete, not today, all builds (white)
+		LoadOrgICN(sprite, ICN::LOCATORS, 24, false);
+
+		// sprite: not allow build: builds requires
+		if(1 == index)
+		    sprite.ChangeColorIndex(0x0A, 0xD6);
+		else
+		// sprite: not allow build: lack resources (green)
+		if(2 == index)
+		    sprite.ChangeColorIndex(0x0A, 0xDE);
+		break;
+
+	    default: break;
+	}
+
+	SetMemoryLimit(true);
     }
-
 
     // change color
     for(u8 ii = 0; ii < count; ++ii)
@@ -954,10 +925,6 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u32 index, bool reflect)
 	    Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
 	    sp.ScaleMinifyByTwo();
 	}
-
-        Sprite back = reflect ? v.reflect[index] : v.sprites[index]; /* create ref copy, for CheckMemoryLimit skipping this sprite */
-
-	CheckMemoryLimit();
     }
 }
 
@@ -1278,13 +1245,16 @@ Sprite AGG::Cache::GetICN(const ICN::icn_t icn, u32 index, bool reflect)
     if(0 == v.count || ((reflect && (!v.reflect || !v.reflect[index].isValid())) || (!v.sprites || !v.sprites[index].isValid())))
 	LoadICN(icn, index, reflect);
 
+    Sprite result = reflect ? v.reflect[index] : v.sprites[index];
+    CheckMemoryLimit();
+
     // invalid sprite?
-    if((reflect && !v.reflect[index].isValid()) || (!reflect && !v.sprites[index].isValid()))
+    if(! result.isValid())
     {
 	DEBUG(DBG_ENGINE, DBG_INFO, "invalid sprite: " << ICN::GetString(icn) << ", index: " << index << ", reflect: " << (reflect ? "true" : "false"));
     }
 
-    return reflect ? v.reflect[index] : v.sprites[index];
+    return result;
 }
 
 /* return count of sprites from specific ICN */
