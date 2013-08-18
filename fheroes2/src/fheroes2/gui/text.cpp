@@ -253,8 +253,7 @@ u8 TextUnicode::CharWidth(u16 c, Font::type_t f)
 u8 TextUnicode::CharHeight(Font::type_t f)
 {
     return Font::SMALL == f || Font::YELLOW_SMALL ?
-        (AGG::Cache::Get().GetSmallFont().Height() + 2) :
-        (AGG::Cache::Get().GetMediumFont().Height() + 8);
+        (AGG::GetFontHeight(true) + 2) : (AGG::GetFontHeight(false) + 8);
 }
 
 u8 TextUnicode::CharAscent(Font::type_t f)

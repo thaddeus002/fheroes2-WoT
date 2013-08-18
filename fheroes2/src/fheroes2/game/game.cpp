@@ -238,7 +238,7 @@ void Game::EnvironmentSoundMixer(void)
 	    }
 	}
 
-	AGG::Cache::Get().LoadLOOPXXSounds(reserved_vols);
+	AGG::LoadLOOPXXSounds(reserved_vols);
     }
 }
 

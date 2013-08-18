@@ -42,7 +42,6 @@ void SetTimidityEnvPath(const Settings &);
 void SetLangEnvPath(const Settings &);
 void InitHomeDir(void);
 void ReadConfigs(void);
-void ShowAGGError(void);
 
 int PrintHelp(const char *basename)
 {
@@ -151,24 +150,13 @@ int main(int argc, char **argv)
     		_ptr_08067830.rmask, _ptr_08067830.gmask, _ptr_08067830.bmask, _ptr_08067830.amask, _ptr_08067830.zdata, sizeof(_ptr_08067830.zdata)))
 	    Display::SetIcons(zicons);
 #endif
-	    AGG::Cache & cache = AGG::Cache::Get();
 
             DEBUG(DBG_GAME, DBG_INFO, conf.String());
             DEBUG(DBG_GAME|DBG_ENGINE, DBG_INFO, Display::GetInfo());
 
 	    // read data dir
-	    if(! cache.ReadDataDir())
-	    {
-		DEBUG(DBG_GAME, DBG_WARN, "data files not found");
-		ShowAGGError();
+	    if(! AGG::Init())
 		return EXIT_FAILURE;
-	    }
-
-            // load palette
-	    cache.PreloadPalette();
-
-	    // load font
-	    cache.PreloadFonts();
 
 #ifdef WITH_ZLIB
 	    LoadZLogo();
@@ -211,6 +199,8 @@ int main(int argc, char **argv)
 	    		default: break;
 		}
 	    }
+
+	    AGG::Quit();
 	}
 #ifndef ANDROID
 	catch(Error::Exception)
@@ -332,24 +322,5 @@ void SetLangEnvPath(const Settings & conf)
     bindtextdomain(GETTEXT_PACKAGE, strtmp.c_str());
     bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
     textdomain(GETTEXT_PACKAGE);
-#endif
-}
-
-void ShowAGGError(void)
-{
-#ifdef WITH_ZLIB
-    ZSurface zerr;
-    if(zerr.Load(_ptr_080721d0.width, _ptr_080721d0.height, _ptr_080721d0.bpp, _ptr_080721d0.pitch,
-    	    _ptr_080721d0.rmask, _ptr_080721d0.gmask, _ptr_080721d0.bmask, _ptr_080721d0.amask, _ptr_080721d0.zdata, sizeof(_ptr_080721d0.zdata)))
-    {
-	Display & display = Display::Get();
-	LocalEvent & le = LocalEvent::Get();
-
-	display.Fill(zerr.MapRGB(0, 0, 0));
-	zerr.Blit((display.w() - zerr.w()) / 2, (display.h() - zerr.h()) / 2, display);
-	display.Flip();
-
-	while(le.HandleEvents() && !le.KeyPress() && !le.MouseClickLeft());
-    }
 #endif
 }
