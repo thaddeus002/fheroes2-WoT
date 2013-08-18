@@ -122,9 +122,8 @@ Rect::Rect(const Point & pt, const Size & sz) : Point(pt), Size(sz)
 {
 }
 
-Rect Rect::Get(const SDL_Rect & rt)
+Rect::Rect(const SDL_Rect & rt) : Point(rt.x, rt.y), Size(rt.w, rt.h)
 {
-    return Rect(rt.x, rt.y, rt.w, rt.h);
 }
 
 Rect Rect::Get(const Point & pt1, const Point & pt2)
@@ -243,34 +242,38 @@ s32 Rects::GetIndex(const Point & pt) const
     return -1;
 }
 
-Rect Rect::Fixed(s16 & rx, s16 & ry, u16 rw, u16 rh, const Rect & max)
+std::pair<Rect, Point> Rect::Fixed4Blit(const Rect & srcrt, const Rect & dstrt)
 {
-    Rect res;
+    std::pair<Rect, Point> res = std::make_pair(Rect(), Point());
+    Rect & srcrtfix = res.first;
+    Point & dstptfix = res.second;
 
-    if(rw && rh &&
-        rx + rw > max.x && ry + rh > max.y &&
-        rx < max.x + max.w && ry < max.y + max.h)
+    if(srcrt.w && srcrt.h &&
+        srcrt.x + srcrt.w > dstrt.x && srcrt.y + srcrt.h > dstrt.y &&
+        srcrt.x < dstrt.x + dstrt.w && srcrt.y < dstrt.y + dstrt.h)
     {
-        res.w = rw;
-        res.h = rh;
+        srcrtfix.w = srcrt.w;
+        srcrtfix.h = srcrt.h;
+	dstptfix.x = srcrt.x;
+	dstptfix.y = srcrt.y;
 
-        if(rx < max.x)
+        if(srcrt.x < dstrt.x)
         {
-            res.x = max.x - rx;
-            rx = max.x;
+            srcrtfix.x = dstrt.x - srcrt.x;
+            dstptfix.x = dstrt.x;
         }
 
-        if(ry < max.y)
+        if(srcrt.y < dstrt.y)
         {
-            res.y = max.y - ry;
-            ry = max.y;
+            srcrtfix.y = dstrt.y - srcrt.y;
+            dstptfix.y = dstrt.y;
         }
 
-        if(rx + rw > max.x + max.w)
-            res.w = max.x + max.w - rx;
+        if(dstptfix.x + srcrtfix.w > dstrt.x + dstrt.w)
+            srcrtfix.w = dstrt.x + dstrt.w - dstptfix.x;
 
-        if(ry + rh > max.y + max.h)
-            res.h = max.y + max.h - ry;
+        if(dstptfix.y + srcrtfix.h > dstrt.y + dstrt.h)
+            srcrtfix.h = dstrt.y + dstrt.h - dstptfix.y;
     }
 
     return res;

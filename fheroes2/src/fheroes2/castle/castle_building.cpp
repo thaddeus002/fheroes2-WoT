@@ -38,7 +38,8 @@ Rect CastleGetMaxArea(const Castle &, const Point &);
 
 void CastleDialog::RedrawBuildingSpriteToArea(const Sprite & sprite, s16 dst_x, s16 dst_y, const Rect & max)
 {
-    sprite.Blit(Rect::Fixed(dst_x, dst_y, sprite.w(), sprite.h(), max), dst_x, dst_y);
+    std::pair<Rect, Point> res = Rect::Fixed4Blit(Rect(dst_x, dst_y, sprite.w(), sprite.h()), max);
+    sprite.Blit(res.first, res.second);
 }
 
 CastleDialog::CacheBuildings::CacheBuildings(const Castle & castle, const Point & top)

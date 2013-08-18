@@ -24,6 +24,7 @@
 
 #include <vector>
 #include <string>
+#include <utility>
 #include <functional>
 #include "types.h"
 
@@ -67,20 +68,20 @@ struct Rect : Point, Size
     Rect(s16, s16, u16, u16);
     Rect(const Point &, u16, u16);
     Rect(const Point &, const Size &);
+    Rect(const SDL_Rect &);
 
-    Rect & operator= (const Point & pt);
-    bool operator== (const Rect & rt) const;
-    bool operator!= (const Rect & rt) const;
+    Rect & operator= (const Point &);
+    bool operator== (const Rect &) const;
+    bool operator!= (const Rect &) const;
 
     // rect include point
-    bool operator& (const Point & pt) const;
+    bool operator& (const Point &) const;
     // rect intersects rect
-    bool operator& (const Rect & rt) const;
+    bool operator& (const Rect &) const;
     //
-    static Rect Get(const SDL_Rect &);
     static Rect Get(const Point &, const Point &);
     static Rect Get(const Rect &, const Rect &, bool intersect);
-    static Rect Fixed(s16 &, s16 &, u16, u16, const Rect &);
+    static std::pair<Rect, Point> Fixed4Blit(const Rect &, const Rect &);
 };
 
 struct Points : std::vector<Point>

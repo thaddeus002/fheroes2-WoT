@@ -63,14 +63,16 @@ bool SDL::Init(const u32 system)
 
     SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
-    System::CreateTrayIcon();
+    System::CreateTrayIcon(true);
+    System::PowerManagerOff(true);
 
     return true;
 }
 
 void SDL::Quit(void)
 {
-    System::DeleteTrayIcon();
+    System::CreateTrayIcon(false);
+    System::PowerManagerOff(false);
 
 #ifdef WITH_NET
     Network::Quit();

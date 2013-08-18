@@ -54,9 +54,11 @@ const Rect & Interface::GameArea::GetRectMaps(void) const
 { return rectMaps; }
 
 /* fixed src rect image */
-Rect Interface::GameArea::RectFixed(Point & dst, const u16 rw, const u16 rh) const
+Rect Interface::GameArea::RectFixed(Point & dst, int rw, int rh) const
 {
-    return Rect::Fixed(dst.x, dst.y, rw, rh, interface.GetGameArea().GetArea());
+    std::pair<Rect, Point> res = Rect::Fixed4Blit(Rect(dst.x, dst.y, rw, rh), interface.GetGameArea().GetArea());
+    dst = res.second;
+    return res.first;
 }
 
 void Interface::GameArea::Build(void)
@@ -115,14 +117,12 @@ void Interface::GameArea::BlitOnTile(Surface & dst, const Sprite & src, const Po
 
 void Interface::GameArea::BlitOnTile(Surface & dst, const Surface & src, const s16 ox, const s16 oy, const Point & mp) const
 {
-    const s16 & dstx = rectMapsPosition.x + TILEWIDTH * (mp.x - rectMaps.x);
-    const s16 & dsty = rectMapsPosition.y + TILEWIDTH * (mp.y - rectMaps.y);
-
-    Point dstpt(dstx + ox, dsty + oy);
+    Point dstpt(rectMapsPosition.x + TILEWIDTH * (mp.x - rectMaps.x) + ox,
+		rectMapsPosition.y + TILEWIDTH * (mp.y - rectMaps.y) + oy);
 
     if(areaPosition & Rect(dstpt, src.w(), src.h()))
     {
-	src.Blit(Rect::Fixed(dstpt.x, dstpt.y, src.w(), src.h(), areaPosition), dstpt, dst);
+	src.Blit(RectFixed(dstpt, src.w(), src.h()), dstpt, dst);
     }
 }
 

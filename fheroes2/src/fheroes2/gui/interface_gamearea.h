@@ -83,7 +83,7 @@ namespace Interface
         void QueueEventProcessing(void);
         
 	s32 GetIndexFromMousePoint(const Point & pt) const;
-	Rect RectFixed(Point & dst, const u16 rw, const u16 rh) const;
+	Rect RectFixed(Point & dst, int rw, int rh) const;
 
 	static void GenerateUltimateArtifactAreaSurface(const s32, Surface &);
 

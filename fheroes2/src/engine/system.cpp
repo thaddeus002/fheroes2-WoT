@@ -240,32 +240,99 @@ int System::Unlink(const std::string & file)
     return unlink(file.c_str());
 }
 
-int System::CreateTrayIcon(void)
+int System::CreateTrayIcon(bool fl)
 {
 #if defined(__MINGW32CE__) && defined(ID_ICON)
     NOTIFYICONDATA nid = {0};
     nid.cbSize =  sizeof(nid);
     nid.uID = ID_ICON;
-    nid.uFlags = NIF_ICON | NIF_MESSAGE;
     nid.hWnd = SDL_Window;
-    nid.uCallbackMessage = WM_USER;
-    nid.hIcon = ::LoadIcon(SDL_Instance, MAKEINTRESOURCE(ID_ICON));
-    return Shell_NotifyIcon(NIM_ADD, &nid);
+
+    if(fl)
+    {
+	nid.uFlags = NIF_ICON | NIF_MESSAGE;
+	nid.uCallbackMessage = WM_USER;
+	nid.hIcon = ::LoadIcon(SDL_Instance, MAKEINTRESOURCE(ID_ICON));
+	return Shell_NotifyIcon(NIM_ADD, &nid);
+    }
+
+    return Shell_NotifyIcon(NIM_DELETE, &nid);
 #endif
     return 0;
 }
 
-void System::DeleteTrayIcon(void)
+void System::PowerManagerOff(bool fl)
 {
-#if defined(__MINGW32CE__) && defined(ID_ICON)
-    NOTIFYICONDATA nid = {0};
-    nid.cbSize =  sizeof(nid);
-    nid.uID = ID_ICON;
-    nid.hWnd = SDL_Window;
-    Shell_NotifyIcon(NIM_DELETE, &nid);
+#if defined(__MINGW32CE__)
+    // power manager control
+    const wchar_t lpGlobalSubKeyPM[] = TEXT("System\\CurrentControlSet\\Control\\Power\\Timeouts");
+    const wchar_t lpNamePM[] = TEXT("BattSuspendTimeout");
+    static DWORD origValuePM = 0;
+
+    HKEY   hKey;
+
+    if(ERROR_SUCCESS == RegOpenKeyEx(HKEY_LOCAL_MACHINE, lpGlobalSubKeyPM, 0, KEY_ALL_ACCESS, &hKey))
+    {
+        DWORD dwType = REG_DWORD;
+	DWORD value = 0;
+
+	// save orig value
+	if(fl)
+	{
+    	    DWORD valueLen = sizeof(origValuePM);
+
+    	    if(ERROR_SUCCESS == RegQueryValueEx(hKey, lpNamePM, 0, &dwType, (LPBYTE) &origValuePM, &valueLen))
+		RegSetValueEx(hKey, lpNamePM, 0, dwType, (const BYTE*) &value, sizeof(value));
+	}
+	else
+	if(origValuePM)
+	    RegSetValueEx(hKey, lpNamePM, 0, dwType, (const BYTE*) &origValuePM, sizeof(origValuePM));
+
+        RegCloseKey(hKey);
+    }
+
+    HANDLE hEvent = CreateEvent(NULL, FALSE, FALSE, TEXT("PowerManager/ReloadActivityTimeouts"));
+
+    if(hEvent != NULL)
+    {
+        SetEvent(hEvent);
+        CloseHandle(hEvent);
+    }
+
+    // backlight control
+    const wchar_t lpGlobalSubKeyBL[] = TEXT("\\ControlPanel\\Backlight");
+    const wchar_t lpNameBL[] = TEXT("BatteryTimeout");
+    static DWORD origValueBL = 0;
+
+    if(ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpGlobalSubKeyBL, 0, KEY_ALL_ACCESS, &hKey))
+    {
+        DWORD dwType = REG_DWORD;
+	DWORD value = 0;
+
+	// save orig value
+	if(fl)
+	{
+    	    DWORD valueLen = sizeof(origValueBL);
+
+    	    if(ERROR_SUCCESS == RegQueryValueEx(hKey, lpNameBL, 0, &dwType, (LPBYTE) &origValueBL, &valueLen))
+		RegSetValueEx(hKey, lpNameBL, 0, dwType, (const BYTE*) &value, sizeof(value));
+	}
+	else
+	if(origValueBL)
+	    RegSetValueEx(hKey, lpNameBL, 0, dwType, (const BYTE*) &origValueBL, sizeof(origValueBL));
+
+        RegCloseKey(hKey);
+    }
+
+    hEvent = CreateEvent(NULL, FALSE, FALSE, TEXT("BackLightChangeEvent"));
+
+    if(hEvent != NULL)
+    {
+        SetEvent(hEvent);
+        CloseHandle(hEvent);
+    }
 #endif
 }
-
 
 bool System::isRunning(void)
 {

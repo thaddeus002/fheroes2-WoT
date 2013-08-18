@@ -49,8 +49,8 @@ namespace System
     int		Unlink(const std::string &);
 
     bool	isRunning(void);
-    int		CreateTrayIcon(void);
-    void	DeleteTrayIcon(void);
+    int		CreateTrayIcon(bool);
+    void	PowerManagerOff(bool);
 
     int		ShellCommand(const char*);
 }

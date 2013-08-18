@@ -707,7 +707,7 @@ void Surface::BlitSurface(const Surface & sf1, SDL_Rect* srt, Surface & sf2, SDL
 
         if(srt != &rt1)
 	{
-            Rect tmp = Rect::Get(Rect::Get(*srt), Rect::Get(rt1), true);
+            Rect tmp = Rect::Get(Rect(*srt), Rect(rt1), true);
 
 	    srt->x = tmp.x;
 	    srt->y = tmp.y;
@@ -717,7 +717,7 @@ void Surface::BlitSurface(const Surface & sf1, SDL_Rect* srt, Surface & sf2, SDL
 
         if(drt != &rt2)
 	{
-            Rect tmp = Rect::Get(Rect::Get(*drt), Rect::Get(rt2), true);
+            Rect tmp = Rect::Get(Rect(*drt), Rect(rt2), true);
 
 	    drt->x = tmp.x;
 	    drt->y = tmp.y;
