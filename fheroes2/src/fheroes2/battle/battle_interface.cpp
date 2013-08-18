@@ -173,14 +173,14 @@ void DrawHexagon(Surface & sf, u8 index_color)
 	sf.Set(w, h);
 	u32 color = sf.GetColorIndex(index_color);
 
-	sf.DrawLine(r, 0, 0, l, color);
-	sf.DrawLine(r, 0, w - 1, l, color);
+	Surface::DrawLine(r, 0, 0, l, color, sf);
+	Surface::DrawLine(r, 0, w - 1, l, color, sf);
 
-	sf.DrawLine(0, l + 1, 0, h - l - 1, color);
-	sf.DrawLine(w - 1, l + 1, w - 1, h - l - 1, color);
+	Surface::DrawLine(0, l + 1, 0, h - l - 1, color, sf);
+	Surface::DrawLine(w - 1, l + 1, w - 1, h - l - 1, color, sf);
 
-	sf.DrawLine(r, h - 1, 0, h - l - 1, color);
-	sf.DrawLine(r, h - 1, w - 1, h - l - 1, color);
+	Surface::DrawLine(r, h - 1, 0, h - l - 1, color, sf);
+	Surface::DrawLine(r, h - 1, w - 1, h - l - 1, color, sf);
     }
     else
     {
@@ -192,14 +192,14 @@ void DrawHexagon(Surface & sf, u8 index_color)
 	sf.Set(w, h);
 	u32 color = sf.GetColorIndex(index_color);
 
-	sf.DrawLine(r, 0, 0, l, color);
-	sf.DrawLine(r, 0, w - 1, l, color);
+	Surface::DrawLine(r, 0, 0, l, color, sf);
+	Surface::DrawLine(r, 0, w - 1, l, color, sf);
 
-	sf.DrawLine(0, l + 1, 0, h - l - 1, color);
-	sf.DrawLine(w - 1, l + 1, w - 1, h - l - 1, color);
+	Surface::DrawLine(0, l + 1, 0, h - l - 1, color, sf);
+	Surface::DrawLine(w - 1, l + 1, w - 1, h - l - 1, color, sf);
 
-	sf.DrawLine(r, h - 1, 0, h - l - 1, color);
-	sf.DrawLine(r, h - 1, w - 1, h - l - 1, color);
+	Surface::DrawLine(r, h - 1, 0, h - l - 1, color, sf);
+	Surface::DrawLine(r, h - 1, w - 1, h - l - 1, color, sf);
     }
 
 }
@@ -3885,7 +3885,7 @@ void RedrawSparksEffects(const Point & src, const Point & dst)
 {
     Display & display = Display::Get();
     u32 yellow = display.MapRGB(0xFF, 0xFF, 0);
-    display.DrawLine(src.x, src.y, dst.x, dst.y, yellow);
+    Surface::DrawLine(src.x, src.y, dst.x, dst.y, yellow, display);
 }
 
 void Battle::Interface::RedrawTroopWithFrameAnimation(Unit & b, ICN::icn_t icn, M82::m82_t m82, bool pain)

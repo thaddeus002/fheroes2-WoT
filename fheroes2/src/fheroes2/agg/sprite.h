@@ -22,7 +22,6 @@
 #ifndef H2SPRITE_H
 #define H2SPRITE_H
 
-#include "display.h"
 #include "gamedefs.h"
 
 class Sprite : public Surface
@@ -38,22 +37,22 @@ public:
     void SetOffset(s16, s16);
     void Reset(void);
 
-    s16 x(void) const{ return offsetX; }
-    s16 y(void) const{ return offsetY; }
+    int x(void) const{ return offsetX; }
+    int y(void) const{ return offsetY; }
 
     void Blit(Surface & = Display::Get()) const;
-    void Blit(s16, s16, Surface & = Display::Get()) const;
+    void Blit(int, int, Surface & = Display::Get()) const;
     void Blit(const Point &, Surface & = Display::Get()) const;
-    void Blit(const Rect & srt, s16, s16, Surface & = Display::Get()) const;
+    void Blit(const Rect & srt, int dstx, int dsty, Surface & = Display::Get()) const;
     void Blit(const Rect & srt, const Point &, Surface & = Display::Get()) const;
-    void Blit(u8 alpha, s16, s16, Surface & = Display::Get()) const;
-    void Blit(u8 alpha, const Rect & srt, const Point &, Surface & = Display::Get()) const;
+    void Blit(int alpha, int dstx, int dsty, Surface & = Display::Get()) const;
+    void Blit(int alpha, const Rect & srt, const Point &, Surface & = Display::Get()) const;
 
     u32 GetMemoryUsage(void) const;
     void ScaleMinifyByTwo(void);
 
-    static void DrawICN(u16 icn, Surface & sf, const u8* buf, const u32 size, bool reflect);
-    static void AddonExtensionModify(Sprite & sp, u16 icn, u16 index);
+    static void DrawICN(int icn, const u8* buf, int size, bool reflect, Surface & sf);
+    static void AddonExtensionModify(Sprite & sp, int icn, int index);
 
 private:
     s16		offsetX;

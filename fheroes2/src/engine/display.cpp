@@ -39,7 +39,7 @@ UpdateRects::~UpdateRects()
     delete [] bits;
 }
 
-void UpdateRects::SetVideoMode(u16 dw, u16 dh)
+void UpdateRects::SetVideoMode(int dw, int dh)
 {
     if(dw < 640)
     {
@@ -91,7 +91,7 @@ SDL_Rect* UpdateRects::Data(void)
     return rects.size() ? &rects[0] : NULL;
 }
 
-void UpdateRects::PushRect(s16 px, s16 py, u16 pw, u16 ph)
+void UpdateRects::PushRect(int px, int py, int pw, int ph)
 {
     Display & display = Display::Get();
 
@@ -215,7 +215,7 @@ bool Display::isDisplay(void) const
     return true;
 }
 
-void Display::SetVideoMode(const u16 w, const u16 h, u32 flags)
+void Display::SetVideoMode(int w, int h, u32 flags)
 {
     Display & display = Display::Get();
 
@@ -282,7 +282,7 @@ void Display::Fade(void)
 {
     Surface temp(w(), h(), false);
     temp.Fill(0, 0, 0);
-    u8 alpha = 0;
+    int alpha = 0;
 
     while(alpha < 70)
     {
@@ -297,7 +297,7 @@ void Display::Rise(void)
 {
     Surface temp(w(), h(), false);
     temp.Fill(0, 0, 0);
-    u8 alpha = 71;
+    int alpha = 71;
 
     while(alpha > 5)
     {
@@ -357,7 +357,7 @@ int Display::GetMaxMode(Size & result, bool rotate)
     return 1;
 }
 
-void Display::AddUpdateRect(s16 px, s16 py, u16 pw, u16 ph)
+void Display::AddUpdateRect(int px, int py, int pw, int ph)
 {
     if(0 == (surface->flags & SDL_HWSURFACE))
 	update_rects.PushRect(px, py, pw, ph);

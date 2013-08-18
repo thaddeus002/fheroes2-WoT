@@ -128,6 +128,8 @@ namespace AGG
     std::vector<loop_sound_t>			loop_sounds;
     std::map<u16, fnt_cache_t>			fnt_cache;
 
+    bool					memlimit_usage = true;
+
 #ifdef WITH_TTF
     SDL::Font*			fonts; /* small, medium */
 
@@ -381,7 +383,7 @@ bool AGG::CheckMemoryLimit(void)
     Settings & conf = Settings::Get();
 
     // memory limit trigger
-    if(conf.ExtPocketLowMemory() && 0 < conf.MemoryLimit())
+    if(conf.ExtPocketLowMemory() && 0 < conf.MemoryLimit() && memlimit_usage)
     {
 	u32 usage = System::GetMemoryUsage();
 
@@ -496,6 +498,8 @@ bool AGG::LoadExtICN(const ICN::icn_t icn, const u32 index, bool reflect)
     if(index < count)
     {
 	Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
+
+	memlimit_usage = false;
 
 	switch(icn)
 	{
@@ -627,6 +631,8 @@ bool AGG::LoadExtICN(const ICN::icn_t icn, const u32 index, bool reflect)
 
 	    default: break;
 	}
+
+	memlimit_usage = true;
     }
 
     // change color
@@ -891,7 +897,7 @@ bool AGG::LoadOrgICN(Sprite & sp, ICN::icn_t icn, u32 index, bool reflect)
 
 	sp.Set(header1.Width(), header1.Height(), false);
 	sp.SetOffset(header1.OffsetX(), header1.OffsetY());
-	Sprite::DrawICN(icn, sp, &body[6 + header1.OffsetData()], size_data, reflect);
+	Sprite::DrawICN(icn, &body[6 + header1.OffsetData()], size_data, reflect, sp);
 	Sprite::AddonExtensionModify(sp, icn, index);
 
 	return true;
@@ -970,11 +976,12 @@ Sprite AGG::GetICN(ICN::icn_t icn, u32 index, bool reflect)
 	index = 0;
     }
 
-    CheckMemoryLimit();
-
     // need load?
     if(0 == v.count || ((reflect && (!v.reflect || !v.reflect[index].isValid())) || (!v.sprites || !v.sprites[index].isValid())))
+    {
+	CheckMemoryLimit();
 	LoadICN(icn, index, reflect);
+    }
 
     Sprite result = reflect ? v.reflect[index] : v.sprites[index];
 

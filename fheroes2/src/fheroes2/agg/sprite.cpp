@@ -88,7 +88,7 @@ void Sprite::SetOffset(s16 ox, s16 oy)
     offsetY = oy;
 }
 
-void Sprite::DrawICN(u16 icn, Surface & sf, const u8* cur, const u32 size, bool reflect)
+void Sprite::DrawICN(int icn, const u8* cur, int size, bool reflect, Surface & sf)
 {
     if(NULL == cur || 0 == size) return;
 
@@ -235,7 +235,7 @@ void Sprite::ScaleMinifyByTwo(void)
     offsetY /= 2;
 }
 
-void Sprite::AddonExtensionModify(Sprite & sp, u16 icn, u16 index)
+void Sprite::AddonExtensionModify(Sprite & sp, int icn, int index)
 {
     switch(icn)
     {
@@ -251,12 +251,13 @@ void Sprite::AddonExtensionModify(Sprite & sp, u16 icn, u16 index)
     }
 }
 
+
 void Sprite::Blit(Surface & dst) const
 {
     Surface::Blit(dst);
 }
 
-void Sprite::Blit(s16 dstx, s16 dsty, Surface & dst) const
+void Sprite::Blit(int dstx, int dsty, Surface & dst) const
 {
     Surface::Blit(dstx, dsty, dst);
 }
@@ -266,7 +267,7 @@ void Sprite::Blit(const Point & dpt, Surface & dst) const
     Surface::Blit(dpt, dst);
 }
 
-void Sprite::Blit(const Rect & srt, s16 dstx, s16 dsty, Surface & dst) const
+void Sprite::Blit(const Rect & srt, int dstx, int dsty, Surface & dst) const
 {
     Surface::Blit(srt, dstx, dsty, dst);
 }
@@ -276,12 +277,12 @@ void Sprite::Blit(const Rect & srt, const Point & dpt, Surface & dst) const
     Surface::Blit(srt, dpt, dst);
 }
 
-void Sprite::Blit(u8 alpha, s16 dstx, s16 dsty, Surface & dst) const
+void Sprite::Blit(int alpha, int dstx, int dsty, Surface & dst) const
 {
     Surface::Blit(alpha, dstx, dsty, dst);
 }
 
-void Sprite::Blit(u8 alpha, const Rect & srt, const Point & dpt, Surface & dst) const
+void Sprite::Blit(int alpha, const Rect & srt, const Point & dpt, Surface & dst) const
 {
     Surface::Blit(alpha, srt, dpt, dst);
 }

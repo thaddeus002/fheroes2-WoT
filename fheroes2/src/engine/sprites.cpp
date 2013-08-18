@@ -164,7 +164,7 @@ void SpriteMove::Move(const Point & pt)
     	background.SetPos(pt);
 }
 
-void SpriteMove::Move(s16 ax, s16 ay)
+void SpriteMove::Move(int ax, int ay)
 {
     Move(Point(ax, ay));
 }

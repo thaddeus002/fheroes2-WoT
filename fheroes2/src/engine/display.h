@@ -32,8 +32,8 @@ public:
     UpdateRects();
     ~UpdateRects();
 
-    void 	SetVideoMode(u16, u16);
-    void	PushRect(s16, s16, u16, u16);
+    void 	SetVideoMode(int, int);
+    void	PushRect(int, int, int, int);
     void	Clear(void);
     size_t	Size(void) const;
     SDL_Rect*	Data(void);
@@ -45,9 +45,9 @@ protected:
 
     std::vector<SDL_Rect>	rects;
     u8*				bits;
-    u32				len;
-    u8				bf;
-    u8				bw;
+    int				len;
+    int				bf;
+    int				bw;
 };
 
 class Display : public Surface
@@ -55,30 +55,30 @@ class Display : public Surface
 public:
     ~Display();
 
-    bool		isDisplay(void) const;
-    static Display &	Get(void);
+    bool                isDisplay(void) const;
+    static Display &    Get(void);
 
-    static void		SetVideoMode(const u16 w, const u16 h, u32 flags);
-    static int 		GetMaxMode(Size &, bool enable_rotate);
-    static std::string	GetInfo(void);
+    static void         SetVideoMode(int w, int h, u32 flags);
+    static int          GetMaxMode(Size &, bool enable_rotate);
+    static std::string  GetInfo(void);
 
-    static void		HideCursor(void);
-    static void		ShowCursor(void);
+    static void         HideCursor(void);
+    static void         ShowCursor(void);
 
-    static void		SetCaption(const char*);
-    static void		SetIcons(Surface &);
+    static void         SetCaption(const char*);
+    static void         SetIcons(Surface &);
 
-    void		AddUpdateRect(s16, s16, u16, u16);
-    void		Flip();
-    void		Fade(void);
-    void		Rise(void);
-    void		FullScreen(void);
+    void                AddUpdateRect(int, int, int, int);
+    void                Flip();
+    void                Fade(void);
+    void                Rise(void);
+    void                FullScreen(void);
 
 private:
     Display();
 
     UpdateRects update_rects;
-    bool	dirty;
+    bool        dirty;
 };
 
 #endif

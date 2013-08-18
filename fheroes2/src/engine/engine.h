@@ -29,7 +29,6 @@
 #include "error.h"
 #include "rect.h"
 #include "surface.h"
-#include "palette.h"
 #include "rand.h"
 #include "tools.h"
 #include "audio.h"

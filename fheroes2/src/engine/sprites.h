@@ -68,7 +68,7 @@ public:
     SpriteMove(const Surface &);
 
     void Move(const Point &);
-    void Move(s16, s16);
+    void Move(int, int);
 
     void Hide(void);
     void Show(void);

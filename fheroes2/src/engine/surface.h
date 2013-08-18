@@ -37,7 +37,7 @@ class Surface
 public:
     Surface();
     Surface(const void* pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool amask);
-    Surface(u16 sw, u16 sh, bool amask = false);
+    Surface(int sw, int sh, bool amask = false);
     Surface(const std::string &);
 
     Surface(const Surface &);
@@ -48,10 +48,10 @@ public:
     virtual ~Surface();
     virtual bool isDisplay(void) const;
 
-    void Set(u16 sw, u16 sh, bool amask = false);
+    void Set(int sw, int sh, bool amask = false);
     void Set(SDL_Surface*);
-    void Set(u16 sw, u16 sh, u8 bpp, bool amask); /* bpp: 8, 16, 24, 32 */
-    void Set(const void* pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool amask); /* bytes_per_pixel: 1, 2, 3, 4 */
+    void Set(int sw, int sh, int bpp /* 8, 16, 24, 32 */, bool amask); 
+    void Set(const void* pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel /* 1, 2, 3, 4 */, bool amask); 
     void Reset(void);
 
     bool Load(const char*);
@@ -60,11 +60,11 @@ public:
     bool Save(const char*) const;
     bool Save(const std::string &) const;
 
-    u16 w(void) const;
-    u16 h(void) const;
-    u8  depth(void) const;
+    int w(void) const;
+    int h(void) const;
+    int depth(void) const;
     u32 amask(void) const;
-    u8  alpha(void) const;
+    int alpha(void) const;
     Size GetSize(void) const;
     bool isRefCopy(void) const;
 
@@ -73,12 +73,12 @@ public:
     void GetRGB(u32 pixel, u8 *r, u8 *g, u8 *b, u8 *a = NULL) const;
 
     void Blit(Surface &) const;
-    void Blit(s16, s16, Surface &) const;
+    void Blit(int, int, Surface &) const;
     void Blit(const Point &, Surface &) const;
-    void Blit(const Rect & srt, s16, s16, Surface &) const;
+    void Blit(const Rect & srt, int, int, Surface &) const;
     void Blit(const Rect & srt, const Point &, Surface &) const;
-    void Blit(u8 alpha, s16, s16, Surface &) const;
-    void Blit(u8 alpha, const Rect & srt, const Point &, Surface &) const;
+    void Blit(int alpha, int, int, Surface &) const;
+    void Blit(int alpha, const Rect & srt, const Point &, Surface &) const;
 
     const SDL_Surface* SDLSurface(void) const{ return surface; };
 
@@ -90,17 +90,14 @@ public:
 
     void SetDisplayFormat(void);
     void SetColorKey(u32 color);
-    void SetAlpha(u8 level);
+    void SetAlpha(int level);
     void ResetAlpha(void);
-    void SetPixel(u16 x, u16 y, u32 color);
+    void SetPixel(int x, int y, u32 color);
     
     u32 GetColorKey(void) const;
-    u32 GetColorIndex(u16) const;
-    s32 GetIndexColor(u32) const;
-    u32 GetPixel(u16 x, u16 y) const;
-
-    void DrawLine(const Point &, const Point &, u32);
-    void DrawLine(u16, u16, u16, u16, u32);
+    u32 GetColorIndex(unsigned int) const;
+    int GetIndexColor(u32) const;
+    u32 GetPixel(int x, int y) const;
 
     void ChangeColor(u32, u32);
     void ChangeColorIndex(u32, u32);
@@ -111,31 +108,34 @@ public:
     virtual u32  GetMemoryUsage(void) const;
     std::string Info(void) const;
 
-    static Surface Reflect(const Surface &, u8 shape /* 0: none, 1 : vert, 2: horz, 3: both */);
-    static Surface Rotate(const Surface &, u8 parm /* 0: none, 1 : 90 CW, 2: 90 CCW, 3: 180 */);
+    static Surface Reflect(const Surface &, int shape /* 0: none, 1 : vert, 2: horz, 3: both */);
+    static Surface Rotate(const Surface &, int parm /* 0: none, 1 : 90 CW, 2: 90 CCW, 3: 180 */);
     static Surface Stencil(const Surface &, u32);
     static Surface Contour(const Surface &, u32);
     static Surface ScaleMinifyByTwo(const Surface & sf_src, bool event = false);
     static Surface GrayScale(const Surface &);
     static Surface Sepia(const Surface &);
 
-    static void SetDefaultDepth(u8);
-    static u8   GetDefaultDepth(void);
+    static void DrawLine(const Point &, const Point &, u32, Surface &);
+    static void DrawLine(int, int, int, int, u32, Surface &);
+
+    static void SetDefaultDepth(int);
+    static int  GetDefaultDepth(void);
     static void FreeSurface(Surface &);
     static void Swap(Surface &, Surface &);
     
 protected:
     void Set(const Surface &, bool refcopy);
-    void SetPixel4(u16 x, u16 y, u32 color);
-    void SetPixel3(u16 x, u16 y, u32 color);
-    void SetPixel2(u16 x, u16 y, u32 color);
-    void SetPixel1(u16 x, u16 y, u32 color);
-    u32 GetPixel4(u16 x, u16 y) const;
-    u32 GetPixel3(u16 x, u16 y) const;
-    u32 GetPixel2(u16 x, u16 y) const;
-    u32 GetPixel1(u16 x, u16 y) const;
+    void SetPixel4(int x, int y, u32 color);
+    void SetPixel3(int x, int y, u32 color);
+    void SetPixel2(int x, int y, u32 color);
+    void SetPixel1(int x, int y, u32 color);
+    u32 GetPixel4(int x, int y) const;
+    u32 GetPixel3(int x, int y) const;
+    u32 GetPixel2(int x, int y) const;
+    u32 GetPixel1(int x, int y) const;
     void LoadPalette(void);
-    void CreateSurface(u16 sw, u16 sh, u8 bpp, bool amask);
+    void CreateSurface(int sw, int sh, int bpp, bool amask);
     static void BlitSurface(const Surface &, SDL_Rect*, Surface &, SDL_Rect*);
 
     friend class Display;

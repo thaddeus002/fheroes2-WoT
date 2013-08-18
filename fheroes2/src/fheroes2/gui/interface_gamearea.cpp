@@ -601,8 +601,6 @@ void Interface::GameArea::QueueEventProcessing(void)
 			else break;
 		    }
 		}
-
-		DELAY(10);
 	    }
 	}
 

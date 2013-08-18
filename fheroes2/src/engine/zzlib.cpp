@@ -74,7 +74,7 @@ bool ZLibCompress(const char* src, size_t srcsz, std::vector<char> & dst)
     return Z_OK == res;
 }
 
-bool ZSurface::Load(u16 w, u16 h, u8 bpp, u16 pitch, u32 rmask, u32 gmask, u32 bmask, u32 amask, const u8* p, size_t s)
+bool ZSurface::Load(int w, int h, int bpp, int pitch, u32 rmask, u32 gmask, u32 bmask, u32 amask, const u8* p, size_t s)
 {
     if(ZLibUnCompress(reinterpret_cast<const char*>(p), s, buf))
     {
