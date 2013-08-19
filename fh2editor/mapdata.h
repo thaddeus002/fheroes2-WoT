@@ -281,6 +281,27 @@ public:
 QDomElement & operator<< (QDomElement &, const MapArea &);
 QDomElement & operator>> (QDomElement &, MapArea &);
 
+class MapHeader
+{
+public:
+    QString		mapName;
+    QString		mapDescription;
+    QString		mapAuthors;
+    QString		mapLicense;
+    int			mapDifficulty;
+    int			mapKingdomColors;
+    int			mapCompColors;
+    int			mapHumanColors;
+    bool		mapStartWithHero;
+    CondWins		mapConditionWins;
+    CondLoss		mapConditionLoss;
+
+    MapHeader();
+};
+
+QDomElement & operator<< (QDomElement &, const MapHeader &);
+QDomElement & operator>> (QDomElement &, MapHeader &);
+
 class MapData : public QGraphicsScene
 {
     Q_OBJECT
@@ -375,18 +396,8 @@ protected:
 
     MapTile*		tileOverMouse;
 
-    QString		mapName;
-    QString		mapDescription;
-    QString		mapAuthors;
-    QString		mapLicense;
-    int			mapDifficulty;
-    int			mapKingdomColors;
-    int			mapCompColors;
-    int			mapHumanColors;
-    bool		mapStartWithHero;
-    CondWins		mapConditionWins;
-    CondLoss		mapConditionLoss;
 
+    MapHeader		mapHeader;
     MapArea		mapArea;
     MapTiles &		mapTiles;
     MapObjects &	mapObjects;

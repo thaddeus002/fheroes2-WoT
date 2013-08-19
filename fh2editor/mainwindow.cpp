@@ -141,7 +141,7 @@ void MainWindow::updateStatusBar(void)
     disconnect(labelTileX, SLOT(setNum(int)));
     disconnect(labelTileY, SLOT(setNum(int)));
 
-    if(mapWindow)
+    if(mapWindow && mapWindow->scene())
     {
 	connect(mapWindow->scene(), SIGNAL(currentTilePosXChanged(int)), labelTileX, SLOT(setNum(int)));
 	connect(mapWindow->scene(), SIGNAL(currentTilePosYChanged(int)), labelTileY, SLOT(setNum(int)));
@@ -390,7 +390,7 @@ void MainWindow::subWindowActivated(QMdiSubWindow* subWindow)
     disconnect(mapOptionsAct, SIGNAL(triggered()), 0, 0);
     disconnect(showPassableAct, SIGNAL(triggered()), 0, 0);
 
-    if(mapWindow)
+    if(mapWindow && mapWindow->scene())
     {
 	connect(mapOptionsAct, SIGNAL(triggered()), mapWindow->scene(), SLOT(showMapOptions()));
 	connect(showPassableAct, SIGNAL(triggered()), mapWindow->scene(), SLOT(showPassableTriggered()));

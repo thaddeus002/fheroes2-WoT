@@ -1009,12 +1009,68 @@ QDomElement & operator>> (QDomElement & el, MapArea & area)
     return el;
 }
 
+MapHeader::MapHeader() : mapName("New Map"), mapAuthors("unknown"), mapLicense("unknown"), mapDifficulty(Difficulty::Normal),
+    mapKingdomColors(0), mapCompColors(0), mapHumanColors(0), mapStartWithHero(false)
+{
+}
+
+QDomElement & operator<< (QDomElement & eheader, const MapHeader & data)
+{
+    QDomDocument doc = eheader.ownerDocument();
+
+    eheader.appendChild(doc.createElement("name")).appendChild(doc.createTextNode(data.mapName));
+    eheader.appendChild(doc.createElement("description")).appendChild(doc.createTextNode(data.mapDescription));
+    eheader.appendChild(doc.createElement("authors")).appendChild(doc.createTextNode(data.mapAuthors));
+    eheader.appendChild(doc.createElement("license")).appendChild(doc.createTextNode(data.mapLicense));
+    eheader.appendChild(doc.createElement("difficulty")).appendChild(doc.createTextNode(QString::number(data.mapDifficulty)));
+
+    QDomElement eplayers = doc.createElement("players");
+    eplayers.setAttribute("kingdoms", data.mapKingdomColors);
+    eplayers.setAttribute("humans", data.mapHumanColors);
+    eplayers.setAttribute("computers", data.mapCompColors);
+    eplayers.setAttribute("startWithHero", data.mapStartWithHero);
+    eheader.appendChild(eplayers);
+
+    QDomElement ewins = doc.createElement("conditionWins");
+    eheader.appendChild(ewins);
+    ewins << data.mapConditionWins;
+
+    QDomElement eloss = doc.createElement("conditionLoss");
+    eheader.appendChild(eloss);
+    eloss << data.mapConditionLoss;
+
+    return eheader;
+}
+
+QDomElement & operator>> (QDomElement & eheader, MapHeader & data)
+{
+    data.mapName = eheader.firstChildElement("name").text();
+    data.mapDescription = eheader.firstChildElement("description").text();
+    data.mapAuthors = eheader.firstChildElement("authors").text();
+    data.mapLicense = eheader.firstChildElement("license").text();
+    data.mapDifficulty = eheader.firstChildElement("difficulty").text().toInt();
+
+    QDomElement eplayers = eheader.firstChildElement("players");
+
+    data.mapKingdomColors = eplayers.attribute("kingdoms").toInt();
+    data.mapHumanColors = eplayers.attribute("humans").toInt();
+    data.mapCompColors = eplayers.attribute("computers").toInt();
+    data.mapStartWithHero = eplayers.attribute("startWithHero").toInt();
+
+    QDomElement ewins = eheader.firstChildElement("conditionWins");
+    ewins >> data.mapConditionWins;
+
+    QDomElement eloss = eheader.firstChildElement("conditionLoss");
+    eloss >> data.mapConditionLoss;
+
+    return eheader;
+}
+
 QSharedPointer<MapArea> MapData::selectedArea = QSharedPointer<MapArea>();
 
 MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), tileOverMouse(NULL),
-    mapName("New Map"), mapAuthors("unknown"), mapLicense("unknown"), mapDifficulty(Difficulty::Normal),
-    mapKingdomColors(0), mapCompColors(0), mapHumanColors(0), mapStartWithHero(false), mapArea(),
-    mapTiles(mapArea.tiles), mapObjects(mapArea.objects), engineVersion(FH2ENGINE_CURRENT_VERSION), mapVersion(engineVersion), showPassable(false)
+    mapHeader(), mapArea(), mapTiles(mapArea.tiles), mapObjects(mapArea.objects),
+    engineVersion(FH2ENGINE_CURRENT_VERSION), mapVersion(engineVersion), showPassable(false)
 {
     connect(this, SIGNAL(dataModified()), parent, SLOT(mapWasModified()));
 
@@ -1168,57 +1224,57 @@ MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), tileOverMouse(NULL
 
 const QString & MapData::name(void) const
 {
-    return mapName;
+    return mapHeader.mapName;
 }
 
 const QString & MapData::description(void) const
 {
-    return mapDescription;
+    return mapHeader.mapDescription;
 }
 
 const QString & MapData::authors(void) const
 {
-    return mapAuthors;
+    return mapHeader.mapAuthors;
 }
 
 const QString & MapData::license(void) const
 {
-    return mapLicense;
+    return mapHeader.mapLicense;
 }
 
 int MapData::difficulty(void) const
 {
-    return mapDifficulty;
+    return mapHeader.mapDifficulty;
 }
 
 int MapData::kingdomColors(void) const
 {
-    return mapKingdomColors;
+    return mapHeader.mapKingdomColors;
 }
 
 int MapData::humanColors(void) const
 {
-    return mapHumanColors;
+    return mapHeader.mapHumanColors;
 }
 
 int MapData::computerColors(void) const
 {
-    return mapCompColors;
+    return mapHeader.mapCompColors;
 }
 
 bool MapData::startWithHero(void) const
 {
-    return mapStartWithHero;
+    return mapHeader.mapStartWithHero;
 }
 
 const CondWins & MapData::conditionWins(void) const
 {
-    return mapConditionWins;
+    return mapHeader.mapConditionWins;
 }
 
 const CondLoss & MapData::conditionLoss(void) const
 {
-    return mapConditionLoss;
+    return mapHeader.mapConditionLoss;
 }
 
 ListStringPos MapData::conditionHeroList(int cond) const
@@ -1699,61 +1755,61 @@ bool MapData::loadMapMP2(const QString & mapFile)
     if(! mapTiles.importTiles(mp2.size, mp2.tiles, mp2.sprites))
 	return false;
 
-    mapName = mp2.name;
-    mapDescription = mp2.description;
-    mapStartWithHero = mp2.startWithHero;
+    mapHeader.mapName = mp2.name;
+    mapHeader.mapDescription = mp2.description;
+    mapHeader.mapStartWithHero = mp2.startWithHero;
 
     switch(mp2.difficulty)
     {
-	case 0:		mapDifficulty = Difficulty::Easy; break;
-	case 2:		mapDifficulty = Difficulty::Tough; break;
-	case 3:		mapDifficulty = Difficulty::Expert; break;
-	default:	mapDifficulty = Difficulty::Normal; break;
+	case 0:		mapHeader.mapDifficulty = Difficulty::Easy; break;
+	case 2:		mapHeader.mapDifficulty = Difficulty::Tough; break;
+	case 3:		mapHeader.mapDifficulty = Difficulty::Expert; break;
+	default:	mapHeader.mapDifficulty = Difficulty::Normal; break;
     }
 
-    if(mp2.kingdomColor[0]) mapKingdomColors |= Color::Blue;
-    if(mp2.kingdomColor[1]) mapKingdomColors |= Color::Green;
-    if(mp2.kingdomColor[2]) mapKingdomColors |= Color::Red;
-    if(mp2.kingdomColor[3]) mapKingdomColors |= Color::Yellow;
-    if(mp2.kingdomColor[4]) mapKingdomColors |= Color::Orange;
-    if(mp2.kingdomColor[5]) mapKingdomColors |= Color::Purple;
+    if(mp2.kingdomColor[0]) mapHeader.mapKingdomColors |= Color::Blue;
+    if(mp2.kingdomColor[1]) mapHeader.mapKingdomColors |= Color::Green;
+    if(mp2.kingdomColor[2]) mapHeader.mapKingdomColors |= Color::Red;
+    if(mp2.kingdomColor[3]) mapHeader.mapKingdomColors |= Color::Yellow;
+    if(mp2.kingdomColor[4]) mapHeader.mapKingdomColors |= Color::Orange;
+    if(mp2.kingdomColor[5]) mapHeader.mapKingdomColors |= Color::Purple;
 
-    if(mp2.humanAllow[0]) mapHumanColors |= Color::Blue;
-    if(mp2.humanAllow[1]) mapHumanColors |= Color::Green;
-    if(mp2.humanAllow[2]) mapHumanColors |= Color::Red;
-    if(mp2.humanAllow[3]) mapHumanColors |= Color::Yellow;
-    if(mp2.humanAllow[4]) mapHumanColors |= Color::Orange;
-    if(mp2.humanAllow[5]) mapHumanColors |= Color::Purple;
+    if(mp2.humanAllow[0]) mapHeader.mapHumanColors |= Color::Blue;
+    if(mp2.humanAllow[1]) mapHeader.mapHumanColors |= Color::Green;
+    if(mp2.humanAllow[2]) mapHeader.mapHumanColors |= Color::Red;
+    if(mp2.humanAllow[3]) mapHeader.mapHumanColors |= Color::Yellow;
+    if(mp2.humanAllow[4]) mapHeader.mapHumanColors |= Color::Orange;
+    if(mp2.humanAllow[5]) mapHeader.mapHumanColors |= Color::Purple;
 
-    if(mp2.compAllow[0]) mapCompColors |= Color::Blue;
-    if(mp2.compAllow[1]) mapCompColors |= Color::Green;
-    if(mp2.compAllow[2]) mapCompColors |= Color::Red;
-    if(mp2.compAllow[3]) mapCompColors |= Color::Yellow;
-    if(mp2.compAllow[4]) mapCompColors |= Color::Orange;
-    if(mp2.compAllow[5]) mapCompColors |= Color::Purple;
+    if(mp2.compAllow[0]) mapHeader.mapCompColors |= Color::Blue;
+    if(mp2.compAllow[1]) mapHeader.mapCompColors |= Color::Green;
+    if(mp2.compAllow[2]) mapHeader.mapCompColors |= Color::Red;
+    if(mp2.compAllow[3]) mapHeader.mapCompColors |= Color::Yellow;
+    if(mp2.compAllow[4]) mapHeader.mapCompColors |= Color::Orange;
+    if(mp2.compAllow[5]) mapHeader.mapCompColors |= Color::Purple;
 
     switch(mp2.conditionWins)
     {
-	case 1:		mapConditionWins.set(Conditions::CaptureTown, QPoint(mp2.conditionWinsData3, mp2.conditionWinsData4)); break;
-	case 2:		mapConditionWins.set(Conditions::DefeatHero, QPoint(mp2.conditionWinsData3, mp2.conditionWinsData4)); break;
-	case 3:		mapConditionWins.set(Conditions::FindArtifact, static_cast<int>(mp2.conditionWinsData3)); break;
-	case 4:		mapConditionWins.set(Conditions::SideWins, static_cast<int>(mp2.conditionWinsData3)); break;
-	case 5:		mapConditionWins.set(Conditions::AccumulateGold, 1000 * static_cast<int>(mp2.conditionWinsData3)); break;
-	default:	mapConditionWins.set(Conditions::Wins); break;
+	case 1:		mapHeader.mapConditionWins.set(Conditions::CaptureTown, QPoint(mp2.conditionWinsData3, mp2.conditionWinsData4)); break;
+	case 2:		mapHeader.mapConditionWins.set(Conditions::DefeatHero, QPoint(mp2.conditionWinsData3, mp2.conditionWinsData4)); break;
+	case 3:		mapHeader.mapConditionWins.set(Conditions::FindArtifact, static_cast<int>(mp2.conditionWinsData3)); break;
+	case 4:		mapHeader.mapConditionWins.set(Conditions::SideWins, static_cast<int>(mp2.conditionWinsData3)); break;
+	case 5:		mapHeader.mapConditionWins.set(Conditions::AccumulateGold, 1000 * static_cast<int>(mp2.conditionWinsData3)); break;
+	default:	mapHeader.mapConditionWins.set(Conditions::Wins); break;
     }
 
     if(mp2.conditionWinsData1)
-	mapConditionWins.first |= Conditions::CompAlsoWins;
+	mapHeader.mapConditionWins.first |= Conditions::CompAlsoWins;
 
     if(mp2.conditionWinsData2)
-	mapConditionWins.first |= Conditions::AllowNormalVictory;
+	mapHeader.mapConditionWins.first |= Conditions::AllowNormalVictory;
 
     switch(mp2.conditionLoss)
     {
-	case 1:		mapConditionLoss.set(Conditions::LoseTown, QPoint(mp2.conditionLossData1, mp2.conditionLossData2)); break;
-	case 2:		mapConditionLoss.set(Conditions::LoseHero, QPoint(mp2.conditionLossData1, mp2.conditionLossData2)); break;
-	case 3:		mapConditionLoss.set(Conditions::OutTime, static_cast<int>(mp2.conditionLossData1)); break;
-	default:	mapConditionLoss.set(Conditions::Loss); break;
+	case 1:		mapHeader.mapConditionLoss.set(Conditions::LoseTown, QPoint(mp2.conditionLossData1, mp2.conditionLossData2)); break;
+	case 2:		mapHeader.mapConditionLoss.set(Conditions::LoseHero, QPoint(mp2.conditionLossData1, mp2.conditionLossData2)); break;
+	case 3:		mapHeader.mapConditionLoss.set(Conditions::OutTime, static_cast<int>(mp2.conditionLossData1)); break;
+	default:	mapHeader.mapConditionLoss.set(Conditions::Loss); break;
     }
 
     mapArea.uniq = mp2.uniq + 1;
@@ -1822,7 +1878,41 @@ bool MapData::loadMapXML(const QString & mapFile)
     }
     mapVersion = version;
 
-    emap >> *this;
+    QDomElement edata = emap.firstChildElement("data");
+    quint16 compress = edata.attribute("compress").toInt();
+    QByteArray bdata;
+
+    {
+	QByteArray cdata = QByteArray::fromBase64(edata.text().toLatin1());
+
+	if(compress != qChecksum(cdata.data(), cdata.size()))
+	{
+	    QApplication::restoreOverrideCursor();
+	    QMessageBox::warning(NULL, "Map Editor", "Checksum error.");
+	    return false;
+	}
+
+	bdata = qUncompress(cdata);
+    }
+
+    if(0 == bdata.size())
+    {
+	QApplication::restoreOverrideCursor();
+	QMessageBox::warning(NULL, "Map Editor", "Incorrect data.");
+	return false;
+    }
+
+    if(dom.setContent(bdata))
+    {
+	edata = dom.firstChildElement("data");
+	edata >> *this;
+    }
+    else
+    {
+	QApplication::restoreOverrideCursor();
+	QMessageBox::warning(NULL, "Map Editor", "Unknown error.");
+	return false;
+    }
 
     return true;
 }
@@ -1842,7 +1932,29 @@ bool MapData::saveMapXML(const QString & mapFile) const
     emap.setAttribute("version", engineVersion);
     doc.appendChild(emap);
 
-    emap << *this;
+    QDomElement eheader = doc.createElement("header");
+    emap.appendChild(eheader);
+    eheader.setAttribute("localtime", QDateTime::currentDateTime().toTime_t());
+    eheader.appendChild(doc.createElement("size")).appendChild(doc.createTextNode(mapTiles.sizeDescription()));
+    eheader << mapHeader;
+
+    QByteArray cdata;
+    quint16 checksum = 0;
+
+    {
+	QByteArray bdata;
+	QDomElement edata0 = doc.createElement("data");
+        edata0 << *this;
+	QTextStream ts(&bdata);
+        edata0.save(ts, 5);
+	cdata = qCompress(bdata, 7);
+	checksum = qChecksum(cdata.data(), cdata.size());
+    }
+
+    QDomElement edata = doc.createElement("data");
+    edata.setAttribute("compress", checksum);
+    emap.appendChild(edata);
+    edata.appendChild(doc.createTextNode(cdata.toBase64()));
 
     doc.insertBefore(doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\""), doc.firstChild());
 
@@ -2157,32 +2269,10 @@ QDomElement & operator<< (QDomElement & emap, const MapData & data)
 {
     DefaultValues defs;
     QDomDocument doc = emap.ownerDocument();
+
     QDomElement eheader = doc.createElement("header");
     emap.appendChild(eheader);
-
-    eheader.setAttribute("localtime", QDateTime::currentDateTime().toTime_t());
-
-    eheader.appendChild(doc.createElement("size")).appendChild(doc.createTextNode(data.mapTiles.sizeDescription()));
-    eheader.appendChild(doc.createElement("name")).appendChild(doc.createTextNode(data.mapName));
-    eheader.appendChild(doc.createElement("description")).appendChild(doc.createTextNode(data.mapDescription));
-    eheader.appendChild(doc.createElement("authors")).appendChild(doc.createTextNode(data.mapAuthors));
-    eheader.appendChild(doc.createElement("license")).appendChild(doc.createTextNode(data.mapLicense));
-    eheader.appendChild(doc.createElement("difficulty")).appendChild(doc.createTextNode(QString::number(data.mapDifficulty)));
-
-    QDomElement eplayers = doc.createElement("players");
-    eplayers.setAttribute("kingdoms", data.mapKingdomColors);
-    eplayers.setAttribute("humans", data.mapHumanColors);
-    eplayers.setAttribute("computers", data.mapCompColors);
-    eplayers.setAttribute("startWithHero", data.mapStartWithHero);
-    eheader.appendChild(eplayers);
-
-    QDomElement ewins = doc.createElement("conditionWins");
-    eheader.appendChild(ewins);
-    ewins << data.mapConditionWins;
-
-    QDomElement eloss = doc.createElement("conditionLoss");
-    eheader.appendChild(eloss);
-    eloss << data.mapConditionLoss;
+    eheader << data.mapHeader;
 
     QDomElement erumors = doc.createElement("rumors");
     emap.appendChild(erumors);
@@ -2204,28 +2294,9 @@ QDomElement & operator<< (QDomElement & emap, const MapData & data)
 QDomElement & operator>> (QDomElement & emap, MapData & data)
 {
     DefaultValues defs;
+
     QDomElement eheader = emap.firstChildElement("header");
-
-    //int loctime = eheader.hasAttribute("localtime") ? eheader.attribute("localtime").toInt() : 0;
-
-    data.mapName = eheader.firstChildElement("name").text();
-    data.mapDescription = eheader.firstChildElement("description").text();
-    data.mapAuthors = eheader.firstChildElement("authors").text();
-    data.mapLicense = eheader.firstChildElement("license").text();
-    data.mapDifficulty = eheader.firstChildElement("difficulty").text().toInt();
-
-    QDomElement eplayers = eheader.firstChildElement("players");
-
-    data.mapKingdomColors = eplayers.attribute("kingdoms").toInt();
-    data.mapHumanColors = eplayers.attribute("humans").toInt();
-    data.mapCompColors = eplayers.attribute("computers").toInt();
-    data.mapStartWithHero = eplayers.attribute("startWithHero").toInt();
-
-    QDomElement ewins = eheader.firstChildElement("conditionWins");
-    ewins >> data.mapConditionWins;
-
-    QDomElement eloss = eheader.firstChildElement("conditionLoss");
-    eloss >> data.mapConditionLoss;
+    eheader >> data.mapHeader;
 
     QDomElement erumors = emap.firstChildElement("rumors");
     erumors >> data.tavernRumors;
@@ -2260,30 +2331,30 @@ void MapData::showMapOptions(void)
     if(QDialog::Accepted == form.exec())
     {
 	// tab1
-	mapName = form.lineEditName->text();
-	mapDescription = form.plainTextEditDescription->toPlainText();
-	mapDifficulty = qvariant_cast<int>(comboBoxCurrentData(form.comboBoxDifficulty));
+	mapHeader.mapName = form.lineEditName->text();
+	mapHeader.mapDescription = form.plainTextEditDescription->toPlainText();
+	mapHeader.mapDifficulty = qvariant_cast<int>(comboBoxCurrentData(form.comboBoxDifficulty));
 
 	// tab2
-	mapConditionWins.set(qvariant_cast<int>(comboBoxCurrentData(form.comboBoxWinsCond)), comboBoxCurrentData(form.comboBoxWinsCondExt));
-	mapConditionWins.setAllowNormalVictory(form.checkBoxAllowNormalVictory->isChecked());
-	mapConditionWins.setCompAlsoWins(form.checkBoxCompAlsoWins->isChecked());
-	mapConditionLoss.set(qvariant_cast<int>(comboBoxCurrentData(form.comboBoxLossCond)), comboBoxCurrentData(form.comboBoxLossCondExt));
-	mapStartWithHero = form.checkBoxStartWithHero->isChecked();
+	mapHeader.mapConditionWins.set(qvariant_cast<int>(comboBoxCurrentData(form.comboBoxWinsCond)), comboBoxCurrentData(form.comboBoxWinsCondExt));
+	mapHeader.mapConditionWins.setAllowNormalVictory(form.checkBoxAllowNormalVictory->isChecked());
+	mapHeader.mapConditionWins.setCompAlsoWins(form.checkBoxCompAlsoWins->isChecked());
+	mapHeader.mapConditionLoss.set(qvariant_cast<int>(comboBoxCurrentData(form.comboBoxLossCond)), comboBoxCurrentData(form.comboBoxLossCondExt));
+	mapHeader.mapStartWithHero = form.checkBoxStartWithHero->isChecked();
 
-	mapCompColors = 0;
-	mapHumanColors = 0;
+	mapHeader.mapCompColors = 0;
+	mapHeader.mapHumanColors = 0;
 
 	for(QVector<Form::PlayerStatus*>::const_iterator
     	    it = form.labelPlayers.begin(); it != form.labelPlayers.end(); ++it)
 	{
-	    if(mapKingdomColors & (*it)->color())
+	    if(mapHeader.mapKingdomColors & (*it)->color())
 	    {
 		/* 0: n/a, 1: human only, 2: comp only, 3: comp or human */
 		if(0x01 & (*it)->status())
-		    mapHumanColors |= (*it)->color();
+		    mapHeader.mapHumanColors |= (*it)->color();
 		if(0x02 & (*it)->status())
-		    mapCompColors |= (*it)->color();
+		    mapHeader.mapCompColors |= (*it)->color();
 	    }
 	}
 
@@ -2292,8 +2363,8 @@ void MapData::showMapOptions(void)
         mapDayEvents = form.listWidgetEvents->results();
 
 	// tab4
-	mapAuthors = form.plainTextEditAuthors->toPlainText();
-        mapLicense = form.plainTextEditLicense->toPlainText();
+	mapHeader.mapAuthors = form.plainTextEditAuthors->toPlainText();
+        mapHeader.mapLicense = form.plainTextEditLicense->toPlainText();
 
         emit dataModified();
     }
@@ -2363,7 +2434,7 @@ void MapData::editMapEventDialog(const MapTile & tile)
 
     if(event)
     {
-	Form::MapEventDialog form(*event, mapKingdomColors);
+	Form::MapEventDialog form(*event, mapHeader.mapKingdomColors);
 
 	if(QDialog::Accepted == form.exec())
 	{
@@ -2573,14 +2644,14 @@ void MapData::updateTownRaceColor(const MapTile & tile, int race, int color)
 
 void MapData::updateKingdomColors(int color)
 {
-    mapKingdomColors = 0;
+    mapHeader.mapKingdomColors = 0;
 
     QList<SharedMapObject> listCastles = mapObjects.list(MapObj::Castle);
     for(QList<SharedMapObject>::const_iterator
         it = listCastles.begin(); it != listCastles.end(); ++it)
     {
 	MapTown* town = dynamic_cast<MapTown*>((*it).data());
-	if(town) mapKingdomColors |= town->color;
+	if(town) mapHeader.mapKingdomColors |= town->color;
     }
 
     QList<SharedMapObject> listHeroes = mapObjects.list(MapObj::Heroes);
@@ -2588,11 +2659,11 @@ void MapData::updateKingdomColors(int color)
         it = listHeroes.begin(); it != listHeroes.end(); ++it)
     {
 	MapHero* hero = dynamic_cast<MapHero*>((*it).data());
-	if(hero) mapKingdomColors |= hero->color;
+	if(hero) mapHeader.mapKingdomColors |= hero->color;
     }
 
-    mapCompColors |= color;
-    mapHumanColors |= color;
+    mapHeader.mapCompColors |= color;
+    mapHeader.mapHumanColors |= color;
 }
 
 void MapData::showPassableTriggered(void)

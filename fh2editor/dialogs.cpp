@@ -1891,6 +1891,7 @@ void Form::MiniMap::generateFromTiles(const MapTiles & tiles)
 
     QPixmap border(scaled.size() + QSize(2, 2));
     border.fill(QColor(0x10, 0x10, 0x10));
+
     QPainter paint(& border);
     paint.drawImage(1, 1, scaled);
     setPixmap(border);

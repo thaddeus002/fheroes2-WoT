@@ -207,9 +207,10 @@ void MapWindow::changeViewedRect(void)
 	const QSize & ts = EditorTheme::tileSize();
 	const QSize absSize = QSize(mapData.size().width() * ts.width(), mapData.size().height() * ts.height());
 	const QSize tmpSize = QSize(size().width() * miniMap->mapSize().width(), size().height() * miniMap->mapSize().height());
-
+	int mw = tmpSize.width() / absSize.width();
+	int mh = tmpSize.height() / absSize.height();
 	miniMap->setWindowPos(horizontalScrollBar()->value() * miniMap->mapSize().width() / absSize.width(),
 				verticalScrollBar()->value() * miniMap->mapSize().height() / absSize.height(),
-				tmpSize.width() / absSize.width(), tmpSize.height() / absSize.height());
+				mw ? mw : 1, mh ? mh : 1);
     }
 }
