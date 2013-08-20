@@ -859,6 +859,7 @@ struct CompositeObjectCursor : public CompositeObject
     CompositeObjectCursor() : valid(false) {}
     CompositeObjectCursor(const CompositeObject &);
 
+    void		move(const MapTile &);
     void		reset(void);
     bool		isValid(void) const;
     void		paint(QPainter &, const QPoint &, bool allow);

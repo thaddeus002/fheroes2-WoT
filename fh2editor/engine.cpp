@@ -2859,6 +2859,49 @@ bool CompositeObjectCursor::isValid(void) const
     return valid;
 }
 
+void CompositeObjectCursor::move(const MapTile & tile)
+{
+    if(classId == MapObj::Castle)
+    {
+	int ground = tile.groundType();
+
+	// find race
+        QVector<CompositeSprite>::iterator it;
+	for(it = begin(); it != end(); ++it)
+	    if((*it).spriteICN == ICN::OBJNTOWN) break;
+	int race = (*it).spriteIndex / 32;
+
+	QString newName = "castle" + QString::number(race) + QString("_") + QString::number(ground);
+
+	// change ground position
+	if(name != newName)
+	{
+	    for(it = begin(); it != end(); ++it)
+	    {
+		if((*it).spriteICN == ICN::OBJNTWBA)
+		{
+		    switch(ground)
+		    {
+			case Ground::Grass:		(*it).spriteIndex = (*it).spriteIndex % 10;break;
+			case Ground::Snow:		(*it).spriteIndex = 10 + (*it).spriteIndex % 10; break;
+			case Ground::Swamp:		(*it).spriteIndex = 20 + (*it).spriteIndex % 10; break;
+			case Ground::Lava:		(*it).spriteIndex = 30 + (*it).spriteIndex % 10; break;
+			case Ground::Desert:		(*it).spriteIndex = 40 + (*it).spriteIndex % 10; break;
+			case Ground::Dirt:		(*it).spriteIndex = 50 + (*it).spriteIndex % 10; break;
+			case Ground::Wasteland:		(*it).spriteIndex = 60 + (*it).spriteIndex % 10; break;
+			case Ground::Water:
+			case Ground::Beach:		(*it).spriteIndex = 70 + (*it).spriteIndex % 10; break;
+			default: break;
+		    }
+		}
+	    }
+
+	    name = newName;
+	    objectArea = EditorTheme::getImage(*this);
+	}
+    }
+}
+
 QString GameCondition::variantString(void) const
 {
     QString res;

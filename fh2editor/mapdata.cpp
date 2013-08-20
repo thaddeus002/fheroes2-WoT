@@ -1435,8 +1435,11 @@ void MapData::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 
 void MapData::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
+    MapTile* newTileOverMouse = itemAtAsTile(event->scenePos());
+
     if(currentObject.isValid())
     {
+	if(newTileOverMouse) currentObject.move(*newTileOverMouse);
 	update(currentObject.area());
     }
     else
@@ -1453,7 +1456,6 @@ void MapData::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
     if(tileOverMouse)
 	update(tileOverMouse->boundingRect());
 
-    MapTile* newTileOverMouse = itemAtAsTile(event->scenePos());
 
     if(newTileOverMouse)
     {
@@ -2622,7 +2624,7 @@ void MapData::addMapObject(const QPoint & pos, const CompositeObject & obj, quin
 
 		    if(ext)
 		    {
-			MapTown* town =new MapTown(tile->mapPos(), uid);
+			MapTown* town = new MapTown(tile->mapPos(), uid);
 			town->updateInfo(ext->index(), obj.classId != MapObj::Castle);
 			objPtr = town;
 		    }
