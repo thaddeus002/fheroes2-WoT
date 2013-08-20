@@ -103,7 +103,7 @@
     <template section="fountain" name="Fountain" index="14" icn="objnmul2" />
 
     <template section="bottom_1x1" name="Stump 16" index="16" cid="0x6b" icn="objnmul2" />
-    <template section="bottom_1x1" name="Stump 18" index="18" cid="0x6b" icn="objnmul2" />
+    <template section="bottom_2x1_1" name="Stump 17" index="17" cid="0x6b" icn="objnmul2" />
     <template section="bottom_1x1" name="Stump 19" index="19" cid="0x6b" icn="objnmul2" />
 
     <template section="alchemylab" name="Alchemy Lab" index="20" icn="objnmul2" />

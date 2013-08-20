@@ -786,8 +786,6 @@ namespace Form
     {
 	Q_OBJECT
 
-	int			oldport;
-
     public:
 	HeroDialog(const MapHero &);
 

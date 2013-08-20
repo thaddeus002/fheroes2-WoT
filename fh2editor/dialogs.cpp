@@ -2815,7 +2815,7 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
     horizontalLayoutName->addWidget(lineEditName);
 
     labelColor = new QLabel(tabInfo);
-    labelColor->setText(QApplication::translate("TownDialog", "Color", 0, QApplication::UnicodeUTF8));
+    labelColor->setText(QApplication::translate("HeroDialog", "Color", 0, QApplication::UnicodeUTF8));
 
     comboBoxColor = new QComboBox(tabInfo);
 
@@ -2831,7 +2831,7 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
     horizontalLayoutColor->addWidget(comboBoxColor);
 
     labelRace = new QLabel(tabInfo);
-    labelRace->setText(QApplication::translate("TownDialog", "Race", 0, QApplication::UnicodeUTF8));
+    labelRace->setText(QApplication::translate("HeroDialog", "Race", 0, QApplication::UnicodeUTF8));
 
     comboBoxRace = new QComboBox(tabInfo);
     comboBoxRace->addItem(Race::transcribe(Race::Knight), Race::Knight);
@@ -2868,8 +2868,6 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
 
     labelPortrait = new QLabel(tabInfo);
     labelPortrait->setPixmap(EditorTheme::getImageICN("PORTMEDI.ICN", hero.portrait).first);
-
-    oldport = hero.portrait;
 
     verticalScrollBarPort = new QScrollBar(tabInfo);
     verticalScrollBarPort->setPageStep(1);
@@ -3185,8 +3183,7 @@ void Form::HeroDialog::widgetSkillsVisible(bool f)
 void Form::HeroDialog::setPortrait(int val)
 {
     labelPortrait->setPixmap(EditorTheme::getImageICN("PORTMEDI.ICN", val).first);
-    if(lineEditName->text() == Portrait::transcribe(oldport))
-	lineEditName->setText(Portrait::transcribe(val));
+    lineEditName->setText(Portrait::transcribe(val));
     if(val)
     {
 	int curRace = (val - 1) / 9;
@@ -3194,7 +3191,6 @@ void Form::HeroDialog::setPortrait(int val)
     }
     else
 	comboBoxRace->setCurrentIndex(6);
-    oldport = val;
     setEnableOKButton();
 }
 
@@ -3967,6 +3963,8 @@ Form::HeroList::HeroList(QWidget* parent) : QListWidget(parent)
 
 void Form::HeroList::load(const MapObjects & objects)
 {
+    clear();
+
     QList<SharedMapObject> listHeroes = objects.list(MapObj::Heroes);
 
     for(QList<SharedMapObject>::const_iterator

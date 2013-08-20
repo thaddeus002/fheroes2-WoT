@@ -1902,11 +1902,19 @@ bool MapData::loadMapXML(const QString & mapFile)
     {
 	QByteArray cdata = QByteArray::fromBase64(edata.text().toLatin1());
 
-	if(compress != qChecksum(cdata.data(), cdata.size()))
+        if(compress != qChecksum(cdata.data(), cdata.size()))
 	{
 	    QApplication::restoreOverrideCursor();
 	    QMessageBox::warning(NULL, "Map Editor", "Checksum error.");
 	    return false;
+	}
+
+	if(version > FH2ENGINE_VERSION_3130)
+	{
+	    quint32 dataSize;
+	    QDataStream ds(cdata);
+	    ds.setByteOrder(QDataStream::LittleEndian);
+	    ds >> dataSize;
 	}
 
 	bdata = qUncompress(cdata);
@@ -1964,7 +1972,10 @@ bool MapData::saveMapXML(const QString & mapFile) const
         edata0 << *this;
 	QTextStream ts(&bdata);
         edata0.save(ts, 5);
-	cdata = qCompress(bdata, 7);
+	QDataStream ds(cdata);
+	ds.setByteOrder(QDataStream::LittleEndian);
+	ds << static_cast<quint32>(bdata.size());
+	cdata.append(qCompress(bdata, 7));
 	checksum = qChecksum(cdata.data(), cdata.size());
     }
 
