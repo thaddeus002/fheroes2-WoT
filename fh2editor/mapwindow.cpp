@@ -38,6 +38,14 @@ MapWindow::MapWindow(MainWindow* parent) : QGraphicsView(parent), mapData(this)
     miniMap = new Form::MiniMap(this);
     connect(miniMap, SIGNAL(windowPositionNeedChange(const QPoint &)), this, SLOT(viewportSetPositionFromMiniMap(const QPoint &)));
 
+    townList = new Form::TownList(this);
+    connect(townList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(viewportSetPositionFromListWidget(QListWidgetItem*)));
+
+    heroList = new Form::HeroList(this);
+    connect(heroList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(viewportSetPositionFromListWidget(QListWidgetItem*)));
+
+    infoForm = new Form::InfoForm(this);
+
     // change size
     connect(horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(changeViewedRect()));
     connect(verticalScrollBar() , SIGNAL(valueChanged(int)), this, SLOT(changeViewedRect()));
@@ -83,7 +91,10 @@ bool MapWindow::loadFile(const QString & fileName)
 
     QApplication::restoreOverrideCursor();
     setCurrentFile(fileName);
+
     miniMap->generateFromTiles(mapData.tiles());
+    townList->load(mapData.objects());
+    heroList->load(mapData.objects());
 
     return true;
 }
@@ -139,6 +150,8 @@ void MapWindow::mapWasModified(void)
     setWindowTitle(userFriendlyCurrentFile() + "[*]");
     setWindowModified(true);
     if(miniMap) miniMap->generateFromTiles(mapData.tiles());
+    if(townList) townList->load(mapData.objects());
+    if(heroList) heroList->load(mapData.objects());
 }
 
 bool MapWindow::maybeSave(void)
@@ -182,6 +195,21 @@ Form::MiniMap* MapWindow::miniMapWidget(void)
     return miniMap;
 }
 
+Form::TownList* MapWindow::townListWidget(void)
+{
+    return townList;
+}
+
+Form::HeroList* MapWindow::heroListWidget(void)
+{
+    return heroList;
+}
+
+Form::InfoForm* MapWindow::infoWidget(void)
+{
+    return infoForm;
+}
+
 void MapWindow::viewportSetPositionFromMiniMap(const QPoint & miniPos)
 {
     if(miniMap)
@@ -197,6 +225,16 @@ void MapWindow::viewportSetPositionFromMiniMap(const QPoint & miniPos)
 	    const QSize & ts = EditorTheme::tileSize();
 	    centerOn(pos.x() * ts.width(), pos.y() * ts.height());
 	}
+    }
+}
+
+void MapWindow::viewportSetPositionFromListWidget(QListWidgetItem* item)
+{
+    if(item)
+    {
+	QPoint pos = qvariant_cast<QPoint>(item->data(Qt::UserRole));
+        const QSize & ts = EditorTheme::tileSize();
+	centerOn(pos.x() * ts.width(), pos.y() * ts.height());
     }
 }
 

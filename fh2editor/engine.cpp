@@ -2039,7 +2039,7 @@ int Troops::validCount(void) const
 }
 
 MapTown::MapTown(const QPoint & pos, quint32 id)
-    : MapObject(pos, id, MapObj::Castle), color(Color::None), race(Race::Unknown), buildings(0), forceTown(false), customBuilding(false)
+    : MapObject(pos, id, MapObj::Castle), col(Color::None), race(Race::Unknown), buildings(0), forceTown(false), customBuilding(false)
 {
 }
 
@@ -2048,13 +2048,13 @@ MapTown::MapTown(const QPoint & pos, quint32 id, const mp2town_t & mp2)
 {
     switch(mp2.color)
     {
-        case 0:	color = Color::Blue; break;
-        case 1: color = Color::Green; break;
-        case 2: color = Color::Red; break;
-        case 3: color = Color::Yellow; break;
-        case 4: color = Color::Orange; break;
-        case 5: color = Color::Purple; break;
-        default: color = Color::None; break;
+        case 0:	col = Color::Blue; break;
+        case 1: col = Color::Green; break;
+        case 2: col = Color::Red; break;
+        case 3: col = Color::Yellow; break;
+        case 4: col = Color::Orange; break;
+        case 5: col = Color::Purple; break;
+        default: col = Color::None; break;
     }
 
     switch(mp2.race)
@@ -2130,7 +2130,7 @@ void MapTown::updateInfo(int spriteIndex, bool random)
 	default: break;
     }
 
-    color = Color::None;
+    col = Color::None;
 
     if(nameTown.isEmpty())
     {
@@ -2144,7 +2144,7 @@ QDomElement & operator<< (QDomElement & el, const MapTown & town)
     el << static_cast<const MapObject &>(town);
 
     el.setAttribute("name", town.nameTown);
-    el.setAttribute("color", town.color);
+    el.setAttribute("color", town.col);
     el.setAttribute("race", town.race);
     el.setAttribute("buildings", town.buildings);
     el.setAttribute("forceTown", town.forceTown);
@@ -2166,7 +2166,7 @@ QDomElement & operator>> (QDomElement & el, MapTown & town)
     el >> static_cast<MapObject &>(town);
 
     town.nameTown = el.hasAttribute("name") ? el.attribute("name") : "Unknown";
-    town.color = el.hasAttribute("color") ? el.attribute("color").toInt() : Color::None;
+    town.col = el.hasAttribute("color") ? el.attribute("color").toInt() : Color::None;
     town.race =  el.hasAttribute("race") ? el.attribute("race").toInt() : Race::Unknown;
     town.buildings = el.hasAttribute("buildings") ? el.attribute("buildings").toInt() : 0;
     town.forceTown = el.hasAttribute("forceTown") ? el.attribute("forceTown").toInt() : false;
@@ -2178,14 +2178,14 @@ QDomElement & operator>> (QDomElement & el, MapTown & town)
 }
 
 MapHero::MapHero(const QPoint & pos, quint32 id)
-    : MapObject(pos, id, MapObj::Heroes), color(Color::None), race(Race::Unknown),
+    : MapObject(pos, id, MapObj::Heroes), col(Color::None), race(Race::Unknown),
     portrait(Portrait::Unknown), experience(0), patrolMode(false), patrolSquare(0)
 {
     nameHero = Portrait::transcribe(portrait);
 }
 
 MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2, int spriteIndex)
-    : MapObject(pos, id, MapObj::Heroes), color(Color::None), race(Race::Unknown), portrait(Portrait::Unknown), nameHero(mp2.name)
+    : MapObject(pos, id, MapObj::Heroes), col(Color::None), race(Race::Unknown), portrait(Portrait::Unknown), nameHero(mp2.name)
 {
     updateInfo(spriteIndex);
 
@@ -2210,7 +2210,7 @@ MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2, int spri
     }
 
     if(nameHero.isEmpty())
-	nameHero = Portrait::transcribe(portrait);
+	nameHero = race == Race::Random ? "Random" : Portrait::transcribe(portrait);
 
     if(mp2.customSkills)
     {
@@ -2224,12 +2224,12 @@ void MapHero::updateInfo(int spriteIndex)
 {
     switch(spriteIndex / 7)
     {
-	case 0:	color = Color::Blue; break;
-	case 1:	color = Color::Green; break;
-	case 2:	color = Color::Red; break;
-	case 3:	color = Color::Yellow; break;
-	case 4:	color = Color::Orange; break;
-	case 5:	color = Color::Purple; break;
+	case 0:	col = Color::Blue; break;
+	case 1:	col = Color::Green; break;
+	case 2:	col = Color::Red; break;
+	case 3:	col = Color::Yellow; break;
+	case 4:	col = Color::Orange; break;
+	case 5:	col = Color::Purple; break;
 	default: break;
     }
 
@@ -2258,7 +2258,7 @@ QDomElement & operator<< (QDomElement & el, const MapHero & hero)
     el << static_cast<const MapObject &>(hero);
 
     el.setAttribute("name", hero.nameHero);
-    el.setAttribute("color", hero.color);
+    el.setAttribute("color", hero.col);
     el.setAttribute("race", hero.race);
     el.setAttribute("portrait", hero.portrait);
     el.setAttribute("experience", hero.experience);
@@ -2303,7 +2303,7 @@ QDomElement & operator>> (QDomElement & el, MapHero & hero)
     el >> static_cast<MapObject &>(hero);
 
     hero.nameHero = el.hasAttribute("name") ? el.attribute("name") : "Unknown";
-    hero.color = el.hasAttribute("color") ? el.attribute("color").toInt() : Color::None;
+    hero.col = el.hasAttribute("color") ? el.attribute("color").toInt() : Color::None;
     hero.race =  el.hasAttribute("race") ? el.attribute("race").toInt() : Race::Unknown;
     hero.portrait = el.hasAttribute("portrait") ? el.attribute("portrait").toInt() : Portrait::Random;
     hero.experience = el.hasAttribute("experience") ? el.attribute("experience").toInt() : 0;
@@ -2959,7 +2959,7 @@ QColor Color::convert(int v)
 	default: break;
     }
 
-    return QColor(0, 0, 0);
+    return QColor(100, 100, 100);
 }
 
 int Color::index(int v)

@@ -1032,6 +1032,39 @@ namespace Form
         QSpacerItem*		horizontalSpacerButtons;
         QPushButton*		pushButtonCancel;
     };
+
+    class TownList : public QListWidget
+    {
+	Q_OBJECT
+
+    public:
+	TownList(QWidget*);
+
+	void			load(const MapObjects &);
+    };
+
+    class HeroList : public QListWidget
+    {
+	Q_OBJECT
+
+    public:
+	HeroList(QWidget*);
+
+	void			load(const MapObjects &);
+    };
+
+    class InfoForm : public QFrame
+    {
+	Q_OBJECT
+
+    public:
+	InfoForm(QWidget*);
+
+    signals:
+
+    protected:
+	//void			mousePressEvent(QMouseEvent*);
+    };
 }
 
 #endif

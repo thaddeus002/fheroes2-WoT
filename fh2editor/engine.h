@@ -661,6 +661,7 @@ public:
     const QPoint &	pos(void) const { return *this; }
     virtual QString	name(void) const { return MapObj::transcribe(objType); }
     virtual QString	object(void) const { return "object"; }
+    virtual int		color(void) const { return Color::None; }
     virtual MapObject*	copy(void) const = 0;
 
     void 		setUID(quint32 uid) { objUid = uid; }
@@ -707,7 +708,7 @@ struct Troops : public QVector<Troop>
 
 struct MapTown : public MapObject
 {
-    int		color;
+    int		col;
     int		race;
     int		buildings;
     QString     nameTown;
@@ -721,13 +722,14 @@ struct MapTown : public MapObject
     QString	name(void) const { return nameTown; }
     QString	object(void) const { return "town"; }
 
+    int		color(void) const { return col; }
     MapObject*	copy(void) const { return new MapTown(*this); }
     void	updateInfo(int, bool);
 };
 
 struct MapHero : public MapObject
 {
-    int		color;
+    int		col;
     int		race;
     Troops	troops;
     int		portrait;
@@ -744,6 +746,7 @@ struct MapHero : public MapObject
     QString	name(void) const { return nameHero; }
     QString	object(void) const { return "hero"; }
 
+    int		color(void) const { return col; }
     MapObject*	copy(void) const { return new MapHero(*this); }
     void	updateInfo(int);
 };

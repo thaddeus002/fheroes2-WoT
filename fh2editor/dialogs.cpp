@@ -2075,7 +2075,7 @@ Form::TownDialog::TownDialog(const MapTown & town)
 	it = colors.begin(); it != colors.end(); ++it)
 	comboBoxColor->addItem(Editor::pixmapBorder(QSize(24, 24), Color::convert(*it), QColor(0, 0, 0)), Color::transcribe(*it), *it);
 
-    comboBoxColor->setCurrentIndex(Color::index(town.color));
+    comboBoxColor->setCurrentIndex(Color::index(town.color()));
 
     horizontalLayoutColor = new QHBoxLayout();
     horizontalLayoutColor->addWidget(labelColor);
@@ -2824,7 +2824,7 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
         it = colors.begin(); it != colors.end(); ++it)
         comboBoxColor->addItem(Editor::pixmapBorder(QSize(24, 24), Color::convert(*it), QColor(0, 0, 0)), Color::transcribe(*it), *it);
 
-    comboBoxColor->setCurrentIndex(Color::index(hero.color) - 1);
+    comboBoxColor->setCurrentIndex(Color::index(hero.color()) - 1);
 
     horizontalLayoutColor = new QHBoxLayout();
     horizontalLayoutColor->addWidget(labelColor);
@@ -3940,4 +3940,44 @@ Form::EditPassableDialog::EditPassableDialog(const MapTile & tile)
 int Form::EditPassableDialog::result(void) const
 {
     return Direction::All;
+}
+
+Form::TownList::TownList(QWidget* parent) : QListWidget(parent)
+{
+}
+
+void Form::TownList::load(const MapObjects & objects)
+{
+    clear();
+
+    QList<SharedMapObject> listCastles = objects.list(MapObj::Castle);
+
+    for(QList<SharedMapObject>::const_iterator
+        it = listCastles.begin(); it != listCastles.end(); ++it)
+    {
+	QListWidgetItem* item = new QListWidgetItem(Editor::pixmapBorder(QSize(10, 10), Color::convert((*it).data()->color()), QColor(0, 0, 0)), (*it).data()->name());
+	item->setData(Qt::UserRole, (*it).data()->pos());
+	addItem(item);
+    }
+}
+
+Form::HeroList::HeroList(QWidget* parent) : QListWidget(parent)
+{
+}
+
+void Form::HeroList::load(const MapObjects & objects)
+{
+    QList<SharedMapObject> listHeroes = objects.list(MapObj::Heroes);
+
+    for(QList<SharedMapObject>::const_iterator
+        it = listHeroes.begin(); it != listHeroes.end(); ++it)
+    {
+	QListWidgetItem* item = new QListWidgetItem(Editor::pixmapBorder(QSize(10, 10), Color::convert((*it).data()->color()), QColor(0, 0, 0)), (*it).data()->name());
+	item->setData(Qt::UserRole, (*it).data()->pos());
+	addItem(item);
+    }
+}
+
+Form::InfoForm::InfoForm(QWidget* parent) : QFrame(parent)
+{
 }

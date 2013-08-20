@@ -339,6 +339,7 @@ public:
     QRect		mapToRect(const QRect &) const;
 
     const MapTiles &	tiles(void) const { return mapTiles; }
+    const MapObjects	objects(void) const { return mapObjects; }
 
 signals:
     void		dataModified(void);

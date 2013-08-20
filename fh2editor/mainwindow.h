@@ -68,7 +68,7 @@ private:
 
     void		updateMenus(void);
     void		updateStatusBar(void);
-    void		updateMiniMapDock(void);
+    void		updateDockWidgets(void);
 
     MapWindow*		activeMapWindow(void);
     QMdiSubWindow*	findMapWindow(const QString &);
@@ -100,6 +100,9 @@ private:
     QAction*		showPassableAct;
 
     QDockWidget*	dockMiniMap;
+    QDockWidget*	dockTownList;
+    QDockWidget*	dockHeroList;
+    QDockWidget*	dockInfoWidget;
 
     QLabel*		labelTileX;
     QLabel*		labelTileY;

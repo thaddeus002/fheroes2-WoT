@@ -2477,11 +2477,11 @@ void MapData::editTownDialog(const MapTile & tile)
 	    town->troops = form.troops();
 	    town->forceTown = form.checkBoxAllowCastle->isChecked();
 	    town->customBuilding = ! form.checkBoxBuildingsDefault->isChecked();
-	    town->color = form.comboBoxColor->itemData(form.comboBoxColor->currentIndex()).toInt();
+	    town->col = form.comboBoxColor->itemData(form.comboBoxColor->currentIndex()).toInt();
 	    //town->race = ;
 
-	    updateTownRaceColor(tile, town->race, town->color);
-	    updateKingdomColors(town->color);
+	    updateTownRaceColor(tile, town->race, town->col);
+	    updateKingdomColors(town->col);
 	    emit dataModified();
 	}
     }
@@ -2526,11 +2526,11 @@ void MapData::editHeroDialog(const MapTile & tile)
 	    hero->patrolMode = form.checkBoxEnablePatrol->isChecked();
 	    hero->patrolSquare = form.comboBoxPatrol->itemData(form.comboBoxPatrol->currentIndex()).toInt();
 	    hero->skills = form.skills();
-	    hero->color = form.comboBoxColor->itemData(form.comboBoxColor->currentIndex()).toInt();
+	    hero->col = form.comboBoxColor->itemData(form.comboBoxColor->currentIndex()).toInt();
 	    hero->race = form.comboBoxColor->itemData(form.comboBoxRace->currentIndex()).toInt();
 
-	    updateHeroRaceColor(tile, hero->race, hero->color);
-	    updateKingdomColors(hero->color);
+	    updateHeroRaceColor(tile, hero->race, hero->col);
+	    updateKingdomColors(hero->col);
 
 	    QGraphicsPixmapItem* item = itemAtAsHero(tile.boundingRect().center());
 	    if(item)
@@ -2682,7 +2682,7 @@ void MapData::updateKingdomColors(int color)
         it = listCastles.begin(); it != listCastles.end(); ++it)
     {
 	MapTown* town = dynamic_cast<MapTown*>((*it).data());
-	if(town) mapHeader.mapKingdomColors |= town->color;
+	if(town) mapHeader.mapKingdomColors |= town->color();
     }
 
     QList<SharedMapObject> listHeroes = mapObjects.list(MapObj::Heroes);
@@ -2690,7 +2690,7 @@ void MapData::updateKingdomColors(int color)
         it = listHeroes.begin(); it != listHeroes.end(); ++it)
     {
 	MapHero* hero = dynamic_cast<MapHero*>((*it).data());
-	if(hero) mapHeader.mapKingdomColors |= hero->color;
+	if(hero) mapHeader.mapKingdomColors |= hero->color();
     }
 
     mapHeader.mapCompColors |= color;

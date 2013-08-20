@@ -26,8 +26,12 @@
 #include <QGraphicsView>
 #include "mapdata.h"
 
+QT_BEGIN_NAMESPACE
+class QListWidgetItem;
+QT_END_NAMESPACE
+
 class MainWindow;
-namespace Form { class MiniMap; }
+namespace Form { class MiniMap; class TownList; class HeroList; class InfoForm; }
 
 class MapWindow : public QGraphicsView
 {
@@ -43,8 +47,15 @@ public:
     bool	saveFile(const QString &);
     QString	userFriendlyCurrentFile(void);
     QString	currentFile(void);
+
     Form::MiniMap*
 		miniMapWidget(void);
+    Form::TownList*
+		townListWidget(void);
+    Form::HeroList*
+		heroListWidget(void);
+    Form::InfoForm*
+		infoWidget(void);
 
 protected:
     void	closeEvent(QCloseEvent*);
@@ -54,6 +65,7 @@ public slots:
 
 private slots:
     void	viewportSetPositionFromMiniMap(const QPoint &);
+    void	viewportSetPositionFromListWidget(QListWidgetItem*);
     void	changeViewedRect(void);
 
 private:
@@ -67,6 +79,9 @@ private:
 
     MapData		mapData;
     Form::MiniMap*	miniMap;
+    Form::TownList*	townList;
+    Form::HeroList*	heroList;
+    Form::InfoForm*	infoForm;
 };
 
 #endif

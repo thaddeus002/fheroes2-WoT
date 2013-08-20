@@ -45,7 +45,7 @@ MainWindow::MainWindow() : sequenceMapNumber(0)
 
     updateMenus();
     updateStatusBar();
-    updateMiniMapDock();
+    updateDockWidgets();
 
     readSettings();
 
@@ -123,7 +123,7 @@ void MainWindow::about(void)
    QMessageBox::about(this, tr("Map Editor"), tr("<b>Demo version 0.1.</b>"));
 }
 
-void MainWindow::updateMiniMapDock(void)
+void MainWindow::updateDockWidgets(void)
 {
     MapWindow* activeWindow = activeMapWindow();
 
@@ -132,6 +132,24 @@ void MainWindow::updateMiniMapDock(void)
     else
     if(dockMiniMap->widget())
 	dockMiniMap->widget()->hide();
+
+    if(activeWindow && activeWindow->townListWidget())
+	dockTownList->setWidget(activeWindow->townListWidget());
+    else
+    if(dockTownList->widget())
+	dockTownList->widget()->hide();
+
+    if(activeWindow && activeWindow->heroListWidget())
+	dockHeroList->setWidget(activeWindow->heroListWidget());
+    else
+    if(dockHeroList->widget())
+	dockHeroList->widget()->hide();
+
+    if(activeWindow && activeWindow->infoWidget())
+	dockInfoWidget->setWidget(activeWindow->infoWidget());
+    else
+    if(dockInfoWidget->widget())
+	dockInfoWidget->widget()->hide();
 }
 
 void MainWindow::updateStatusBar(void)
@@ -307,6 +325,21 @@ void MainWindow::createMenus(void)
     dockMiniMap->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     addDockWidget(Qt::RightDockWidgetArea, dockMiniMap);
     mapMenu->addAction(dockMiniMap->toggleViewAction());
+
+    dockTownList = new QDockWidget(tr("Town List"), this);
+    dockTownList->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    addDockWidget(Qt::RightDockWidgetArea, dockTownList);
+    mapMenu->addAction(dockTownList->toggleViewAction());
+
+    dockHeroList = new QDockWidget(tr("Hero List"), this);
+    dockHeroList->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    addDockWidget(Qt::RightDockWidgetArea, dockHeroList);
+    mapMenu->addAction(dockHeroList->toggleViewAction());
+
+    dockInfoWidget = new QDockWidget(tr("Info Window"), this);
+    dockInfoWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    addDockWidget(Qt::RightDockWidgetArea, dockInfoWidget);
+    mapMenu->addAction(dockInfoWidget->toggleViewAction());
 }
 
 void MainWindow::createToolBars(void)
@@ -383,7 +416,7 @@ void MainWindow::subWindowActivated(QMdiSubWindow* subWindow)
 
     updateMenus();
     updateStatusBar();
-    updateMiniMapDock();
+    updateDockWidgets();
 
     disconnect(mapOptionsAct, SIGNAL(triggered()), 0, 0);
     disconnect(showPassableAct, SIGNAL(triggered()), 0, 0);
