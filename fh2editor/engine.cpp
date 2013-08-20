@@ -34,7 +34,7 @@
 #include "global.h"
 #include "engine.h"
 
-QString townName(int num)
+QStringList Editor::townNames(void)
 {
     const char* towns[] = { "Blackridge", "Pinehurst", "Woodhaven", "Hillstone", "Whiteshield", "Bloodreign", "Dragontooth", "Greywind", "Blackwind", "Portsmith", "Middle Gate", "Tundara", 
 	"Vulcania", "Sansobar", "Atlantium", "Baywatch", "Wildabar", "Fountainhead", "Vertigo", "Winterkill", "Nightshadow", "Sandcaster", "Lakeside", "Olympus", 
@@ -43,7 +43,9 @@ QString townName(int num)
 	"Westfork", "Hilltop", "Yorksford", "Sherman", "Roscomon", "Elk's Head", "Cathcart", "Viper's Nest", "Pig's Eye", "Blacksford", "Burton", "Blackburn",
 	"Lankershire", "Lombard", "Timberhill", "Fenton", "Troy", "Forder Oaks", "Meramec", "Quick Silver", "Westmoor", "Willow", "Sheltemburg", "Corackston" };
 
-    return QString(towns[num % 72]);
+    QStringList res;
+    for(int it = 0; it < 72; ++it) res << towns[it];
+    return res;
 }
 
 QString Portrait::transcribe(int port)
@@ -977,6 +979,8 @@ Editor::MyObjectsXML::MyObjectsXML(const QString & xml, bool debug)
                 	continue;
             	    }
 
+		    if(tmplElem.hasAttribute("hide")) objElem.setAttribute("hide", tmplElem.attribute("hide"));
+
 		    if(tmplElem.hasAttribute("icn")) objElem.setAttribute("icn", tmplElem.attribute("icn"));
         	    else
 		    if(!icn.isNull()) objElem.setAttribute("icn", icn);
@@ -1547,10 +1551,16 @@ QStringList EditorTheme::resourceFiles(const QString & dir, const QString & file
     return Resource::FindFiles(QDir::toNativeSeparators(QString("themes") + QDir::separator() + themeName + QDir::separator() + dir), file);
 }
 
-int EditorTheme::getObjectID(int icn, int index)
+int EditorTheme::getSpriteID(int icn, int index)
 {
     const SpriteInfo* spriteInfo = findCacheSprite(icn, index);
     return spriteInfo ? spriteInfo->oid : MapObj::None;
+}
+
+int EditorTheme::getSpriteLevel(int icn, int index)
+{
+    const SpriteInfo* spriteInfo = findCacheSprite(icn, index);
+    return spriteInfo ? spriteInfo->level : SpriteLevel::Unknown;
 }
 
 int EditorTheme::getSpritePassable(int icn, int index)
@@ -2100,6 +2110,35 @@ MapTown::MapTown(const QPoint & pos, quint32 id, const mp2town_t & mp2)
     }
 }
 
+void MapTown::updateInfo(int spriteIndex, bool random)
+{
+    if((spriteIndex % 32) < 16)
+	buildings |= Building::Castle;
+
+    if(random)
+	race = Race::Random;
+    else
+    switch(spriteIndex / 32)
+    {
+	case 0:	race = Race::Knight; break;
+	case 1:	race = Race::Barbarian; break;
+	case 2:	race = Race::Sorceress; break;
+	case 3:	race = Race::Warlock; break;
+	case 4:	race = Race::Wizard; break;
+	case 5:	race = Race::Necromancer; break;
+	case 6:	race = Race::Random; break;
+	default: break;
+    }
+
+    color = Color::None;
+
+    if(nameTown.isEmpty())
+    {
+	QStringList names = Editor::townNames();
+	nameTown = names[Editor::Rand(names.size())];
+    }
+}
+
 QDomElement & operator<< (QDomElement & el, const MapTown & town)
 {
     el << static_cast<const MapObject &>(town);
@@ -2202,8 +2241,15 @@ void MapHero::updateInfo(int spriteIndex)
 	case 3:	race = Race::Warlock; break;
 	case 4:	race = Race::Wizard; break;
 	case 5:	race = Race::Necromancer; break;
-	case 6:	race = Race::Random; break;
-	default: break;
+	default:race = Race::Random; break;
+    }
+
+    // generate portrait, name
+    if(race != Race::Random &&
+	portrait == Portrait::Unknown)
+    {
+	portrait = 1 + (Race::index(race) - 1) * 9 + Editor::Rand(9);
+	nameHero = Portrait::transcribe(portrait);
     }
 }
 
@@ -2730,6 +2776,9 @@ CompositeObject::CompositeObject(const QDomElement & elem)
     QDomNodeList list = elem.elementsByTagName("sprite");
     for(int pos = 0; pos < list.size(); ++pos)
 	push_back(CompositeSprite(icn, list.item(pos).toElement()));
+
+    if(elem.hasAttribute("hide"))
+	name.clear();
 }
 
 bool CompositeObject::isValid(void) const

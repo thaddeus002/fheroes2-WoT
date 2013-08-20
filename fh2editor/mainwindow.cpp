@@ -385,14 +385,15 @@ void MainWindow::subWindowActivated(QMdiSubWindow* subWindow)
     updateStatusBar();
     updateMiniMapDock();
 
-    MapWindow* mapWindow = activeMapWindow();
-
     disconnect(mapOptionsAct, SIGNAL(triggered()), 0, 0);
     disconnect(showPassableAct, SIGNAL(triggered()), 0, 0);
 
-    if(mapWindow && mapWindow->scene())
+    MapData* mapData = activeMapWindow() ? qobject_cast<MapData*>(activeMapWindow()->scene()) : NULL;
+
+    if(mapData)
     {
-	connect(mapOptionsAct, SIGNAL(triggered()), mapWindow->scene(), SLOT(showMapOptions()));
-	connect(showPassableAct, SIGNAL(triggered()), mapWindow->scene(), SLOT(showPassableTriggered()));
+	connect(mapOptionsAct, SIGNAL(triggered()), mapData, SLOT(showMapOptions()));
+	connect(showPassableAct, SIGNAL(triggered()), mapData, SLOT(showPassableTriggered()));
+	showPassableAct->setChecked(mapData->showPassableMode());
     }
 }

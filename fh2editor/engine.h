@@ -416,6 +416,8 @@ namespace Editor
     QPixmap pixmapBorder(const QSize &, const QColor &, const QColor &);
     QPixmap pixmapBorderPassable(int passable);
 
+    QStringList townNames(void);
+
     class MyXML : public QDomElement
     {
     public:
@@ -580,7 +582,8 @@ namespace EditorTheme
     QPair<QPixmap, QPoint>	getImageICN(int, int);
     QPair<QPixmap, QPoint>	getImageICN(const QString &, int);
     QPixmap			getImage(const CompositeObject &);
-    int				getObjectID(int, int);
+    int				getSpriteID(int, int);
+    int				getSpriteLevel(int, int);
     int				getSpritePassable(int, int);
 
     const QSize &		tileSize(void);
@@ -719,6 +722,7 @@ struct MapTown : public MapObject
     QString	object(void) const { return "town"; }
 
     MapObject*	copy(void) const { return new MapTown(*this); }
+    void	updateInfo(int, bool);
 };
 
 struct MapHero : public MapObject

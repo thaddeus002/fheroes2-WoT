@@ -646,7 +646,7 @@ namespace Form
 	QVBoxLayout*		verticalLayoutInfo;
 	QHBoxLayout*		horizontalLayoutName;
 	QLabel*			labelName;
-        QLineEdit*		lineEditName;
+	QComboBox*		comboBoxName;
 	QHBoxLayout*		horizontalLayoutColor;
 	QLabel*			labelColor;
 	QComboBox*		comboBoxColor;

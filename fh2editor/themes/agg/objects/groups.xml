@@ -16,4 +16,6 @@
     <group name="Monsters" file="monsters.xml" />
     <group name="Mounts" file="mounts.xml" />
     <group name="Trees" file="trees.xml" />
+    <group name="Stream" file="stream.xml" />
+    <group name="Road" file="road.xml" />
 </groups>

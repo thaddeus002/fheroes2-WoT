@@ -91,14 +91,14 @@ class MapTileExt
     quint8		spriteICN;
     quint8		spriteExt;
     quint8		spriteIndex;
-    quint8		spriteLevel;
+    quint8		spriteLevelInt;
     quint32		spriteUID;
 
     friend		QDomElement & operator<< (QDomElement &, const MapTileExt &);
     friend		QDomElement & operator>> (QDomElement &, MapTileExt &);
 
 public:
-    MapTileExt(int uid = 0) : spriteICN(0), spriteExt(0), spriteIndex(0), spriteLevel(0), spriteUID(uid) {}
+    MapTileExt(int uid = 0) : spriteICN(0), spriteExt(0), spriteIndex(0), spriteLevelInt(0), spriteUID(uid) {}
     MapTileExt(int lv, const mp2lev_t &);
     MapTileExt(const CompositeSprite &, quint32);
 
@@ -108,16 +108,16 @@ public:
     static bool		sortLevel1(const MapTileExt &, const MapTileExt &);
     static bool		sortLevel2(const MapTileExt &, const MapTileExt &);
 
+    int			level(void) const { return spriteLevelInt; }
     quint32		uid(void) const { return spriteUID; }
     int			icn(void) const { return spriteICN; }
     int			ext(void) const { return spriteExt; }
     int			index(void) const { return spriteIndex; }
-    int			level(void) const { return spriteLevel; }
 
     void		setUID(quint32 uid) { spriteUID = uid; }
 
+    static bool		isActionSprite(const MapTileExt &);
     static bool		isAnimation(const MapTileExt &);
-    static bool		isAction(const MapTileExt &);
     static bool		isMapEvent(const MapTileExt &);
     static bool		isSphinx(const MapTileExt &);
     static bool		isSign(const MapTileExt &);

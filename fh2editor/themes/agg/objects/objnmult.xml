@@ -140,6 +140,7 @@
         <sprite px="2" py="2" index="73" level="action" passable="0x01F8" />
     </object>
     <template section="sawmill" name="SawMill" index="74" icn="objnmul2" />
+    <template section="sawmill" name="SawMill" index="210" icn="objnmul2" />
     <template section="waterwheel" name="Water Wheel" index="82" icn="objnmul2" />
     <template section="sign" name="Sign" index="113" icn="objnmul2" />
 

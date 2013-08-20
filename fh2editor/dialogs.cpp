@@ -2055,12 +2055,14 @@ Form::TownDialog::TownDialog(const MapTown & town)
     labelName = new QLabel(tabInfo);
     labelName->setText(QApplication::translate("TownDialog", "Name", 0, QApplication::UnicodeUTF8));
 
-    lineEditName = new QLineEdit(tabInfo);
-    lineEditName->setText(town.nameTown);
+    comboBoxName = new QComboBox(tabInfo);
+    comboBoxName->setEditable(true);
+    comboBoxName->addItems(Editor::townNames());
+    comboBoxName->lineEdit()->setText(town.nameTown);
 
     horizontalLayoutName = new QHBoxLayout();
     horizontalLayoutName->addWidget(labelName);
-    horizontalLayoutName->addWidget(lineEditName);
+    horizontalLayoutName->addWidget(comboBoxName);
 
     labelColor = new QLabel(tabInfo);
     labelColor->setText(QApplication::translate("TownDialog", "Color", 0, QApplication::UnicodeUTF8));
@@ -2532,7 +2534,8 @@ Form::TownDialog::TownDialog(const MapTown & town)
 
     connect(checkBoxCaptain, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
     connect(checkBoxAllowCastle, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
-    connect(lineEditName, SIGNAL(textChanged(QString)), this, SLOT(setEnableOKButton()));
+    connect(comboBoxName, SIGNAL(editTextChanged(QString)), this, SLOT(setEnableOKButton()));
+    connect(comboBoxName, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
     connect(comboBoxColor, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
     connect(checkBoxCaptain, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
 

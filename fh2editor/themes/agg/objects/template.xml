@@ -39,7 +39,7 @@
         <sprite px="2" py="0" index="0" level="top" animation="6" />
         <sprite px="0" py="1" index="7" level="top" animation="6" />
         <sprite px="1" py="1" index="14" level="top" animation="6" />
-        <sprite px="2" py="1" index="21" level="action" animation="6" />
+        <sprite px="2" py="1" index="21" level="action" passable="0x01F8" animation="6" />
     </archerhouse>
     <dwarfcott width="3" height="2" cid="0x0f">
         <sprite px="2" py="0" index="0" level="top" animation="6" />
@@ -160,6 +160,71 @@
         <sprite px="3" py="1" index="8" level="action" passable="0x01F8" />
         <sprite px="4" py="1" index="9" level="bottom" passable="0x01F8" />
     </mine>
+    <mine_ore width="5" height="2" cid="0x17" >
+        <sprite px="0" py="0" index="0" level="top" />
+        <sprite px="1" py="0" index="1" level="top" />
+        <sprite px="2" py="0" index="2" level="top" />
+        <sprite px="3" py="0" index="3" level="top" />
+        <sprite px="4" py="0" index="4" level="top" />
+        <sprite px="0" py="1" index="5" level="top" />
+        <sprite px="1" py="1" index="6" level="top" />
+        <sprite px="2" py="1" index="7" level="bottom" passable="0x01F8" />
+        <sprite px="3" py="1" index="8" level="action" passable="0x01F8" />
+        <sprite px="4" py="1" index="9" level="bottom" passable="0x01F8" />
+        <sprite px="3" py="1" index="0" skipoffset="1" level="action" passable="0x01F8" icn="extraovr" />
+    </mine_ore>
+    <mine_sulfur width="5" height="2" cid="0x17" >
+        <sprite px="0" py="0" index="0" level="top" />
+        <sprite px="1" py="0" index="1" level="top" />
+        <sprite px="2" py="0" index="2" level="top" />
+        <sprite px="3" py="0" index="3" level="top" />
+        <sprite px="4" py="0" index="4" level="top" />
+        <sprite px="0" py="1" index="5" level="top" />
+        <sprite px="1" py="1" index="6" level="top" />
+        <sprite px="2" py="1" index="7" level="bottom" passable="0x01F8" />
+        <sprite px="3" py="1" index="8" level="action" passable="0x01F8" />
+        <sprite px="4" py="1" index="9" level="bottom" passable="0x01F8" />
+        <sprite px="3" py="1" index="1" skipoffset="1" level="action" passable="0x01F8" icn="extraovr" />
+    </mine_sulfur>
+    <mine_crystal width="5" height="2" cid="0x17" >
+        <sprite px="0" py="0" index="0" level="top" />
+        <sprite px="1" py="0" index="1" level="top" />
+        <sprite px="2" py="0" index="2" level="top" />
+        <sprite px="3" py="0" index="3" level="top" />
+        <sprite px="4" py="0" index="4" level="top" />
+        <sprite px="0" py="1" index="5" level="top" />
+        <sprite px="1" py="1" index="6" level="top" />
+        <sprite px="2" py="1" index="7" level="bottom" passable="0x01F8" />
+        <sprite px="3" py="1" index="8" level="action" passable="0x01F8" />
+        <sprite px="4" py="1" index="9" level="bottom" passable="0x01F8" />
+        <sprite px="3" py="1" index="2" skipoffset="1" level="action" passable="0x01F8" icn="extraovr" />
+    </mine_crystal>
+    <mine_gems width="5" height="2" cid="0x17" >
+        <sprite px="0" py="0" index="0" level="top" />
+        <sprite px="1" py="0" index="1" level="top" />
+        <sprite px="2" py="0" index="2" level="top" />
+        <sprite px="3" py="0" index="3" level="top" />
+        <sprite px="4" py="0" index="4" level="top" />
+        <sprite px="0" py="1" index="5" level="top" />
+        <sprite px="1" py="1" index="6" level="top" />
+        <sprite px="2" py="1" index="7" level="bottom" passable="0x01F8" />
+        <sprite px="3" py="1" index="8" level="action" passable="0x01F8" />
+        <sprite px="4" py="1" index="9" level="bottom" passable="0x01F8" />
+        <sprite px="3" py="1" index="3" skipoffset="1" level="action" passable="0x01F8" icn="extraovr" />
+    </mine_gems>
+    <mine_gold width="5" height="2" cid="0x17" >
+        <sprite px="0" py="0" index="0" level="top" />
+        <sprite px="1" py="0" index="1" level="top" />
+        <sprite px="2" py="0" index="2" level="top" />
+        <sprite px="3" py="0" index="3" level="top" />
+        <sprite px="4" py="0" index="4" level="top" />
+        <sprite px="0" py="1" index="5" level="top" />
+        <sprite px="1" py="1" index="6" level="top" />
+        <sprite px="2" py="1" index="7" level="bottom" passable="0x01F8" />
+        <sprite px="3" py="1" index="8" level="action" passable="0x01F8" />
+        <sprite px="4" py="1" index="9" level="bottom" passable="0x01F8" />
+        <sprite px="3" py="1" index="4" skipoffset="1" level="action" passable="0x01F8" icn="extraovr" />
+    </mine_gold>
     <resource width="2" height="1" cid="0x1B" >
         <sprite px="0" py="0" index="0" level="top" />
         <sprite px="1" py="0" index="1" level="action" />
@@ -167,7 +232,7 @@
     <magicwell width="2" height="2" cid="0x5E" >
         <sprite px="1" py="0" index="0" level="top" />
         <sprite px="0" py="1" index="1" level="top" />
-        <sprite px="1" py="1" index="2" level="action" />
+        <sprite px="1" py="1" index="2" level="action" passable="0x01F8" />
     </magicwell>
 
     <trees_2x2_1 width="2" height="2" cid="0x63" >
@@ -576,6 +641,19 @@
         <sprite px="0" py="0" index="0" level="action" />
     </monster>
 
+    <twba width="5" height="2" icn="objntwba" >
+        <sprite px="0" py="0" index="0" level="bottom" passable="0" icn="objntwba" />
+        <sprite px="1" py="0" index="1" level="bottom" passable="0" icn="objntwba" />
+        <sprite px="2" py="0" index="2" level="bottom" passable="0" icn="objntwba" />
+        <sprite px="3" py="0" index="3" level="bottom" passable="0" icn="objntwba" />
+        <sprite px="4" py="0" index="4" level="bottom" passable="0" icn="objntwba" />
+        <sprite px="0" py="1" index="5" level="bottom" passable="0x01F8" icn="objntwba" />
+        <sprite px="1" py="1" index="6" level="bottom" passable="0x01F8" icn="objntwba" />
+        <sprite px="2" py="1" index="7" level="bottom" passable="0x01FA" icn="objntwba" /> <!-- center row, bottom row, top -->
+        <sprite px="3" py="1" index="8" level="bottom" passable="0x01F8" icn="objntwba" />
+        <sprite px="4" py="1" index="9" level="bottom" passable="0x01F8" icn="objntwba" />
+    </twba>
+
     <castle width="8" height="5" cid="0x23" icn="objntown" >
 	<!-- bottom -->
         <sprite px="3" py="3" index="0" skipoffset="1" level="bottom" passable="0" icn="objntwba" />
@@ -626,6 +704,56 @@
         <sprite px="4" py="3" index="12" skipoffset="1" level="bottom" passable="0" icn="flag32" />
         <sprite px="6" py="3" index="13" skipoffset="1" level="bottom" passable="0" icn="flag32" />
     </castle>
+    <rndtown width="8" height="5" cid="0x23" icn="objntwrd" >
+	<!-- bottom -->
+        <sprite px="3" py="3" index="0" skipoffset="1" level="bottom" passable="0" icn="objntwba" />
+        <sprite px="4" py="3" index="1" skipoffset="1" level="bottom" passable="0" icn="objntwba" />
+        <sprite px="5" py="3" index="2" skipoffset="1" level="bottom" passable="0" icn="objntwba" />
+        <sprite px="6" py="3" index="3" skipoffset="1" level="bottom" passable="0" icn="objntwba" />
+        <sprite px="7" py="3" index="4" skipoffset="1" level="bottom" passable="0" icn="objntwba" />
+        <sprite px="3" py="4" index="5" skipoffset="1" level="bottom" passable="0x01F8" icn="objntwba" />
+        <sprite px="4" py="4" index="6" skipoffset="1" level="bottom" passable="0x01F8" icn="objntwba" />
+        <sprite px="5" py="4" index="7" skipoffset="1" level="bottom" passable="0x01FA" icn="objntwba" /> <!-- center row, bottom row, top -->
+        <sprite px="6" py="4" index="8" skipoffset="1" level="bottom" passable="0x01F8" icn="objntwba" />
+        <sprite px="7" py="4" index="9" skipoffset="1" level="bottom" passable="0x01F8" icn="objntwba" />
+	<!-- castle -->
+        <sprite px="5" py="0" index="0" level="top" />
+        <sprite px="3" py="1" index="1" level="top" />
+        <sprite px="4" py="1" index="2" level="top" />
+        <sprite px="5" py="1" index="3" level="top" />
+        <sprite px="6" py="1" index="4" level="top" />
+        <sprite px="7" py="1" index="5" level="top" />
+        <sprite px="3" py="2" index="6" level="bottom" passable="0" />
+        <sprite px="4" py="2" index="7" level="bottom" passable="0" />
+        <sprite px="5" py="2" index="8" level="bottom" passable="0" />
+        <sprite px="6" py="2" index="9" level="bottom" passable="0" />
+        <sprite px="7" py="2" index="10" level="bottom" passable="0" />
+        <sprite px="3" py="3" index="11" level="bottom" passable="0" />
+        <sprite px="4" py="3" index="12" level="bottom" passable="0" />
+        <sprite px="5" py="3" index="13" level="action" passable="0x0120" /> <!-- center, bottom -->
+        <sprite px="6" py="3" index="14" level="bottom" passable="0" />
+        <sprite px="7" py="3" index="15" level="bottom" passable="0" />
+	<!-- shadow -->
+        <sprite px="1" py="1" index="32" level="top" />
+        <sprite px="2" py="1" index="33" level="top" />
+        <sprite px="3" py="1" index="34" level="top" />
+        <sprite px="4" py="1" index="35" level="top" />
+        <sprite px="0" py="2" index="36" level="top" />
+        <sprite px="1" py="2" index="37" level="top" />
+        <sprite px="2" py="2" index="38" level="top" />
+        <sprite px="3" py="2" index="39" level="top" />
+        <sprite px="4" py="3" index="40" level="top" />
+        <sprite px="1" py="3" index="41" level="top" />
+        <sprite px="2" py="3" index="42" level="top" />
+        <sprite px="3" py="3" index="43" level="top" />
+        <sprite px="4" py="3" index="44" level="top" />
+        <sprite px="2" py="4" index="45" level="top" />
+        <sprite px="3" py="4" index="46" level="top" />
+        <sprite px="4" py="4" index="47" level="top" />
+	<!-- flags -->
+        <sprite px="4" py="3" index="12" skipoffset="1" level="bottom" passable="0" icn="flag32" />
+        <sprite px="6" py="3" index="13" skipoffset="1" level="bottom" passable="0" icn="flag32" />
+    </rndtown>
 
     <mount_6x4_1 width="6" height="4" cid="0x64" >
         <sprite px="0" py="0" index="0" level="top" />
@@ -651,6 +779,7 @@
         <sprite px="5" py="3" index="20" level="bottom" passable="0x01F8" />
     </mount_6x4_1>
     <mount_6x4_2 width="6" height="4" cid="0x64" >
+        <sprite px="1" py="0" index="0" level="top" />
         <sprite px="2" py="0" index="1" level="top" />
         <sprite px="3" py="0" index="2" level="top" />
         <sprite px="4" py="0" index="3" level="top" />

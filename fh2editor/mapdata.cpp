@@ -38,12 +38,12 @@
 #include "mapdata.h"
 
 MapTileExt::MapTileExt(int lvl, const mp2lev_t & ext)
-    : spriteICN(H2::MP2ICN(ext.object, false)), spriteExt(ext.object), spriteIndex(ext.index), spriteLevel(lvl), spriteUID(ext.uniq)
+    : spriteICN(H2::MP2ICN(ext.object, false)), spriteExt(ext.object), spriteIndex(ext.index), spriteLevelInt(lvl), spriteUID(ext.uniq)
 {
 }
 
 MapTileExt::MapTileExt(const CompositeSprite & cs, quint32 uid)
-    : spriteICN(cs.spriteICN), spriteExt(0), spriteIndex(cs.spriteIndex), spriteLevel(0), spriteUID(uid)
+    : spriteICN(cs.spriteICN), spriteExt(0), spriteIndex(cs.spriteIndex), spriteLevelInt(0), spriteUID(uid)
 {
     if(cs.spriteAnimation)
 	spriteExt |= 0x01;
@@ -56,17 +56,17 @@ bool MapTileExt::isAnimation(const MapTileExt & mte)
 
 bool MapTileExt::sortLevel1(const MapTileExt & mte1, const MapTileExt & mte2)
 {
-    return (mte1.spriteLevel % 4) > (mte2.spriteLevel % 4);
+    return (mte1.spriteLevelInt % 4) > (mte2.spriteLevelInt % 4);
 }
 
 bool MapTileExt::sortLevel2(const MapTileExt & mte1, const MapTileExt & mte2)
 {
-    return (mte1.spriteLevel % 4) < (mte2.spriteLevel % 4);
+    return (mte1.spriteLevelInt % 4) < (mte2.spriteLevelInt % 4);
 }
 
-bool MapTileExt::isAction(const MapTileExt & mte)
+bool MapTileExt::isActionSprite(const MapTileExt & te)
 {
-    return mte.spriteLevel == SpriteLevel::Action;
+    return SpriteLevel::Action == EditorTheme::getSpriteLevel(te.spriteICN, te.spriteIndex);
 }
 
 bool MapTileExt::isTown(const MapTileExt & te)
@@ -255,7 +255,7 @@ QDomElement & operator<< (QDomElement & el, const MapTileExt & ext)
     el.setAttribute("icn", ext.spriteICN);
     el.setAttribute("ext", ext.spriteExt);
     el.setAttribute("index", ext.spriteIndex);
-    el.setAttribute("level", ext.spriteLevel);
+    el.setAttribute("level", ext.spriteLevelInt);
     el.setAttribute("uid", ext.spriteUID);
 
     return el;
@@ -266,7 +266,7 @@ QDomElement & operator>> (QDomElement & el, MapTileExt & ext)
     ext.spriteICN = el.attribute("icn").toInt();
     ext.spriteExt = el.attribute("ext").toInt();
     ext.spriteIndex = el.attribute("index").toInt();
-    ext.spriteLevel = el.attribute("level").toInt();
+    ext.spriteLevelInt = el.attribute("level").toInt();
     ext.spriteUID = el.attribute("uid").toInt();
 
     return el;
@@ -303,9 +303,11 @@ QString MapTileLevels::infoString(void) const
     for(const_iterator it = begin(); it != end(); ++it)
     {
 	ss <<
-	    "uniq:   " << (*it).uid() << endl <<
-	    "sprite: " << ICN::transcribe((*it).icn()) << ", " <<  (*it).index() << endl <<
-	    "level:  " << (*it).level() << endl;
+	    "uniq:     " << (*it).uid() << endl <<
+	    "sprite:   " << ICN::transcribe((*it).icn()) << ", " <<  (*it).index() << endl <<
+	    "level:    " << (*it).level() << (MapTileExt::isActionSprite(*it) ? ", (action)" : "") << endl <<
+	    "passable: " << EditorTheme::getSpritePassable((*it).icn(), (*it).index()) << endl;
+	    if(it + 1 != end()) ss << "----------"  << endl;
     }
 
     return str;
@@ -338,7 +340,7 @@ int MapTileLevels::topObjectID(void) const
     for(const_iterator it = end(); it != begin(); --it)
     {
 	const MapTileExt & ext = *(it - 1);
-	id = EditorTheme::getObjectID(ext.icn(), ext.index());
+	id = EditorTheme::getSpriteID(ext.icn(), ext.index());
 	if(MapObj::None != id) break;
     }
 
@@ -569,22 +571,25 @@ void MapTile::showInfo(void) const
     QString msg;
     QTextStream ss2(& msg);
 
-    ss2 << "tile pos:    " << mpos.x() << ", " << mpos.y() << endl \
-	<< "tile sprite: " << tileSprite << endl \
-	<< "tile rotate: " << tileShape << endl \
-	<< "object:      " << MapObj::transcribe(objectID) << endl;
+    ss2 << "tile pos:       " << mpos.x() << ", " << mpos.y() << endl \
+	<< "tile sprite:    " << tileSprite << endl \
+	<< "tile rotate:    " << tileShape << endl \
+	<< "base passable:  " << passableBase << endl \
+	<< "local passable: " << passableLocal << endl \
+	<< "object:         " << MapObj::transcribe(objectID) << endl;
 
-    ss2 << "----------------------" << endl;
 
     // draw level2
     if(spritesLevel1.size())
-	ss2 << spritesLevel1.infoString() <<
-	    "----------------------" << endl;
+	ss2 << "-------------1--------------" << endl <<
+	spritesLevel1.infoString();
 
     // draw level2
     if(spritesLevel2.size())
-	ss2 << spritesLevel2.infoString() <<
-	    "----------------------" << endl;
+	ss2 << "-------------2--------------" << endl <<
+	spritesLevel2.infoString();
+
+    ss2 << "----------------------------" << endl;
 
     QMessageBox::information(NULL, "Tile Info", msg);
 }
@@ -615,6 +620,8 @@ void MapTile::loadSpriteLevels(const mp2ext_t & mp2)
 
     // level2
     loadSpriteLevel(spritesLevel2, mp2.quantity, mp2.level2);
+
+    updatePassable();
 }
 
 void MapTile::sortSpritesLevels(void)
@@ -635,8 +642,8 @@ void MapTile::updateObjectID(void)
     }
     else
     {
-	const MapTileExt* ext = spritesLevel1.find(MapTileExt::isAction);
-	objectID = ext ? EditorTheme::getObjectID(ext->icn(), ext->index()) : spritesLevel1.topObjectID();
+	const MapTileExt* ext = spritesLevel1.find(MapTileExt::isActionSprite);
+	objectID = ext ? EditorTheme::getSpriteID(ext->icn(), ext->index()) : spritesLevel1.topObjectID();
     }
 }
 
@@ -646,7 +653,15 @@ void MapTile::updatePassable(void)
 
     for(MapTileLevels::const_iterator
 	it = spritesLevel1.begin(); it != spritesLevel1.end(); ++it)
-	passableBase &= EditorTheme::getSpritePassable((*it).icn(), (*it).index());
+    {
+	if(MapTileExt::isActionSprite(*it))
+	{
+	    passableBase = EditorTheme::getSpritePassable((*it).icn(), (*it).index());
+	    break;
+	}
+	else
+	    passableBase &= EditorTheme::getSpritePassable((*it).icn(), (*it).index());
+    }
 }
 
 void MapTile::addSpriteSection(const CompositeSprite & cs, quint32 uid)
@@ -2455,7 +2470,7 @@ void MapData::editTownDialog(const MapTile & tile)
 
 	if(QDialog::Accepted == form.exec())
 	{
-	    town->nameTown = form.lineEditName->text();
+	    town->nameTown = form.comboBoxName->lineEdit()->text();
 	    town->buildings = form.buildings() | form.dwellings();
 	    town->troops = form.troops();
 	    town->forceTown = form.checkBoxAllowCastle->isChecked();
@@ -2583,28 +2598,42 @@ void MapData::addMapObject(const QPoint & pos, const CompositeObject & obj, quin
 		case MapObj::Bottle:
 		case MapObj::Sign:	objPtr = new MapSign(tile->mapPos(), uid); break;
 		case MapObj::Event:	objPtr = new MapEvent(tile->mapPos(), uid); break;
+    		case MapObj::Sphinx:	objPtr = new MapSphinx(tile->mapPos(), uid); break;
+
+    		case MapObj::Heroes:
+		{
+		    const MapTileExt* ext = tile->levels1Const().findConst(MapTileExt::isMiniHero);
+
+		    if(ext)
+		    {
+			MapHero* hero = new MapHero(tile->mapPos(), uid);
+			addHeroItem(tile->mapPos(), *ext);
+			hero->updateInfo(ext->index());
+			objPtr = hero;
+		    }
+		}
+		break;
+
     		case MapObj::RndCastle:
     		case MapObj::RndTown:
-    		case MapObj::Castle:	objPtr = new MapTown(tile->mapPos(), uid); break;
-    		case MapObj::Heroes:	objPtr = new MapHero(tile->mapPos(), uid); break;
-    		case MapObj::Sphinx:	objPtr = new MapSphinx(tile->mapPos(), uid); break;
+    		case MapObj::Castle:
+		{	
+		    const MapTileExt* ext = tile->levels1Const().findConst(MapTileExt::isTown);
+
+		    if(ext)
+		    {
+			MapTown* town =new MapTown(tile->mapPos(), uid);
+			town->updateInfo(ext->index(), obj.classId != MapObj::Castle);
+			objPtr = town;
+		    }
+		}
+		break;
 
 		default: break;
 	    }
 
 	    if(objPtr)
 		mapObjects.push_back(objPtr);
-
-	    if(obj.classId == MapObj::Heroes)
-	    {
-		const MapTileExt* ext = tile->levels1Const().findConst(MapTileExt::isMiniHero);
-		if(ext)
-		{
-		    addHeroItem(tile->mapPos(), *ext);
-		    MapHero* hero = dynamic_cast<MapHero*>(objPtr);
-		    if(hero) hero->updateInfo(ext->index());
-		}
-	    }
 	}
     }
 
