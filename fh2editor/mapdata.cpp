@@ -1972,7 +1972,7 @@ bool MapData::saveMapXML(const QString & mapFile) const
         edata0 << *this;
 	QTextStream ts(&bdata);
         edata0.save(ts, 5);
-	QDataStream ds(cdata);
+	QDataStream ds(&cdata, QIODevice::WriteOnly);
 	ds.setByteOrder(QDataStream::LittleEndian);
 	ds << static_cast<quint32>(bdata.size());
 	cdata.append(qCompress(bdata, 7));
@@ -2712,4 +2712,9 @@ void MapData::showPassableTriggered(void)
 {
     showPassable = showPassable ? false : true;
     update();
+}
+
+QPair<int, int> MapData::versions(void) const
+{
+    return qMakePair(mapVersion, engineVersion);
 }

@@ -96,6 +96,11 @@ bool MapWindow::loadFile(const QString & fileName)
     townList->load(mapData.objects());
     heroList->load(mapData.objects());
 
+    QPair<int, int> vers = mapData.versions();
+
+    if(vers.first != vers.second)
+	mapWasModified();
+
     return true;
 }
 

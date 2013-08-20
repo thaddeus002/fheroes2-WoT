@@ -328,6 +328,8 @@ public:
     const QStringList & tavernRumorsList(void) const;
     const DayEvents &	dayEvents(void) const;
 
+    QPair<int, int>	versions(void) const;
+
     void		newMap(const QSize &, const QString &);
     bool		loadMap(const QString &);
 
