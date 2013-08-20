@@ -47,6 +47,14 @@ namespace
     std::vector<SDL_Color> pal_colors;
 }
 
+void FillSDLRect(SDL_Rect* rt, int x, int y, int w, int h)
+{
+    rt->x = x;
+    rt->y = y;
+    rt->w = w;
+    rt->h = h;
+}
+
 void LoadPalColors(void)
 {
     u32 ncolors = ARRAY_COUNT(kb_pal) / 3;
@@ -628,7 +636,8 @@ void Surface::Fill(u8 r, u8 g, u8 b)
 void Surface::FillRect(u32 color, const Rect & rect)
 {
     if(isRefCopy()) Set(*this, false);
-    SDL_Rect dstrect = {rect.x, rect.y, rect.w, rect.h};
+    SDL_Rect dstrect;
+    FillSDLRect(&dstrect, rect.x, rect.y, rect.w, rect.h);
     SDL_FillRect(surface, &dstrect, color);
     if(isDisplay()) Display::Get().AddUpdateRect(rect.x, rect.y, rect.w, rect.h);
 }
@@ -695,8 +704,8 @@ void Surface::BlitSurface(const Surface & sf1, SDL_Rect* srt, Surface & sf2, SDL
 	// depth 24, RGB <-> RGB
 	 (sf1.depth() == 24 && 0 == sf1.amask() && 0 == sf2.amask())))
     {
-        SDL_Rect rt1 = {0, 0, sf1.w(), sf1.h()};
-        SDL_Rect rt2 = {0, 0, sf2.w(), sf2.h()};
+        SDL_Rect rt1; FillSDLRect(&rt1, 0, 0, sf1.w(), sf1.h());
+        SDL_Rect rt2; FillSDLRect(&rt2, 0, 0, sf2.w(), sf2.h());
         if(!srt) srt = &rt1;
         if(!drt) drt = &rt2;
 
@@ -799,7 +808,8 @@ void Surface::Blit(Surface & dst) const
 /* blit */
 void Surface::Blit(int dst_ox, int dst_oy, Surface & dst) const
 {
-    SDL_Rect dstrect = {dst_ox, dst_oy, surface->w, surface->h};
+    SDL_Rect dstrect;
+    FillSDLRect(&dstrect, dst_ox, dst_oy, surface->w, surface->h);
 
     if(dst.isDisplay())
     {
@@ -813,8 +823,8 @@ void Surface::Blit(int dst_ox, int dst_oy, Surface & dst) const
 /* blit */
 void Surface::Blit(const Rect &src_rt, int dst_ox, int dst_oy, Surface & dst) const
 {
-    SDL_Rect dstrect = {dst_ox, dst_oy, src_rt.w, src_rt.h};
-    SDL_Rect srcrect = {src_rt.x, src_rt.y, src_rt.w, src_rt.h};
+    SDL_Rect dstrect; FillSDLRect(&dstrect, dst_ox, dst_oy, src_rt.w, src_rt.h);
+    SDL_Rect srcrect; FillSDLRect(&srcrect, src_rt.x, src_rt.y, src_rt.w, src_rt.h);
 
     if(dst.isDisplay())
     {
