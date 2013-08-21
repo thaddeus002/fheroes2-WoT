@@ -19,8 +19,8 @@
 	<sprite px="1" py="1" index="62" level="action" passable="0x01F8" animation="6" />
 	<sprite px="2" py="1" index="69" level="bottom" passable="0x01F8" animation="6" />
     </object>
-    <object name="Water 77" width="3" height="1" >
-	<sprite px="0" py="0" index="77" level="bottom" passable="0x01F8" animation="6" />
+    <object name="Water 76" width="3" height="1" >
+	<sprite px="0" py="0" index="76" level="bottom" passable="0x01F8" animation="6" />
 	<sprite px="1" py="0" index="83" level="bottom" passable="0x01F8" animation="6" />
 	<sprite px="2" py="0" index="90" level="bottom" passable="0x01F8" animation="6" />
     </object>

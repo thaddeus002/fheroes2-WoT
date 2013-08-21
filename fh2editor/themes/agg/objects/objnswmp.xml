@@ -26,7 +26,7 @@
         <sprite px="4" py="2" index="82" level="bottom" passable="0x01F8" />
     </object>
     <template section="faeriering" name="Faeriering" index="83" />
-    <template section="passable_1x1" name="Hole" index="86" />
+    <template section="bottom_1x1" name="Hole 86" index="86" />
     <template section="lake_7x3" name="Lake 87" index="87" />
     <template section="lake_4x2" name="Lake 107" index="107" />
     <template section="lake_4x3" name="Lake 115" index="115" />

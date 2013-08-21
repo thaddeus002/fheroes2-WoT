@@ -41,6 +41,12 @@
     <template section="bottom_2x1_2" name="Mound 149" index="149" cid="0x6e" />
 
     <template section="hillfort" name="Hill Fort" index="0" icn="objngra2" />
+    <template section="halflinghole" name="Halfling Hole" index="5"  icn="objngra2" />
+    <template section="bottom_1x1" name="Hole 9" index="9" icn="objngra2" />
+    <template section="bottom_2x1_2" name="Ground 10" index="10" icn="objngra2" />
+    <template section="bottom_2x1_2" name="Ground 12" index="12" icn="objngra2" />
+    <template section="bottom_3x1_2" name="Ground 14" index="14" icn="objngra2" />
+    <template section="treecity" name="Tree Sity" index="17" icn="objngra2" />
     <template section="windmill" name="Wind Mill" index="23" icn="objngra2" />
     <template section="archerhouse" name="Archer House" index="63" icn="objngra2" />
     <template section="goblinhut" name="Goblin Hut" index="91" icn="objngra2" />
