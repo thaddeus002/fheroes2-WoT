@@ -284,6 +284,9 @@ QDomElement & operator>> (QDomElement &, MapArea &);
 class MapHeader
 {
 public:
+    int			engineVersion;
+    int			mapVersion;
+
     QString		mapName;
     QString		mapDescription;
     QString		mapAuthors;
@@ -295,8 +298,9 @@ public:
     bool		mapStartWithHero;
     CondWins		mapConditionWins;
     CondLoss		mapConditionLoss;
+    const MapArea &	mapArea;
 
-    MapHeader();
+    MapHeader(const MapArea &);
 };
 
 QDomElement & operator<< (QDomElement &, const MapHeader &);
@@ -400,19 +404,16 @@ protected:
     MapTile*		tileOverMouse;
 
 
-    MapHeader		mapHeader;
     MapArea		mapArea;
     MapTiles &		mapTiles;
     MapObjects &	mapObjects;
+    MapHeader		mapHeader;
 
     DayEvents		mapDayEvents;
     TavernRumors	tavernRumors;
 
     CompositeObjectCursor
                         currentObject;
-
-    int			engineVersion;
-    int			mapVersion;
 
     QAction*            editCopyAct;
     QAction*            editPasteAct;

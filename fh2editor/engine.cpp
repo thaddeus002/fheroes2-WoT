@@ -3343,36 +3343,48 @@ QPixmap Skill::pixmap(void) const
     return isValid() ? EditorTheme::getImageICN("MINISS.ICN", skill() - 1).first : NULL;
 }
 
-QDomElement & operator<< (QDomElement & el, const GameCondition & cond)
+QDataStream & operator<< (QDataStream & ds, const GameCondition & cond)
 {
-    el.setAttribute("cond", cond.first);
+    ds << cond.first;
 
     if(QVariant::Point == cond.second.type())
     {
+	ds << static_cast<int>(1);
         QPoint pt = cond.second.toPoint();
-	el.setAttribute("pointX", pt.x());
-	el.setAttribute("pointY", pt.y());
+	ds << pt.x() << pt.y();
     }
     else
     if(QVariant::Int == cond.second.type())
-	el.setAttribute("valueInt", cond.second.toInt());
+    {
+	ds << static_cast<int>(2);
+	ds << cond.second.toInt();
+    }
 
-    return el;
+    return ds;
 }
 
-QDomElement & operator>> (QDomElement & el, GameCondition & cond)
+QDataStream & operator>> (QDataStream & ds, GameCondition & cond)
 {
-    cond.first = el.hasAttribute("cond") ? el.attribute("cond").toInt() : 0;
+    int variant;
+    ds >> cond.first >> variant;
 
-    if(el.hasAttribute("pointX") || el.hasAttribute("pointY"))
-	cond.second = QPoint(el.attribute("pointX").toInt(), el.attribute("pointY").toInt());
+    if(variant == 1)
+    {
+	int tempx, tempy;
+	ds >> tempx >>tempy;
+	cond.second = QPoint(tempx, tempy);
+    }
     else
-    if(el.hasAttribute("valueInt"))
-	cond.second = el.attribute("valueInt").toInt();
+    if(variant == 2)
+    {
+	int temp;
+	ds >> temp;
+	cond.second = temp;
+    }
     else
 	cond.second = QVariant();
 
-    return el;
+    return ds;
 }
 
 QString Resources::describe(void) const

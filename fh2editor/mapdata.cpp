@@ -1024,8 +1024,9 @@ QDomElement & operator>> (QDomElement & el, MapArea & area)
     return el;
 }
 
-MapHeader::MapHeader() : mapName("New Map"), mapAuthors("unknown"), mapLicense("unknown"), mapDifficulty(Difficulty::Normal),
-    mapKingdomColors(0), mapCompColors(0), mapHumanColors(0), mapStartWithHero(false)
+MapHeader::MapHeader(const MapArea & ma) : engineVersion(FH2ENGINE_CURRENT_VERSION), mapVersion(engineVersion),
+    mapName("New Map"), mapAuthors("unknown"), mapLicense("unknown"), mapDifficulty(Difficulty::Normal),
+    mapKingdomColors(0), mapCompColors(0), mapHumanColors(0), mapStartWithHero(false), mapArea(ma)
 {
 }
 
@@ -1037,22 +1038,26 @@ QDomElement & operator<< (QDomElement & eheader, const MapHeader & data)
     eheader.appendChild(doc.createElement("description")).appendChild(doc.createTextNode(data.mapDescription));
     eheader.appendChild(doc.createElement("authors")).appendChild(doc.createTextNode(data.mapAuthors));
     eheader.appendChild(doc.createElement("license")).appendChild(doc.createTextNode(data.mapLicense));
-    eheader.appendChild(doc.createElement("difficulty")).appendChild(doc.createTextNode(QString::number(data.mapDifficulty)));
 
-    QDomElement eplayers = doc.createElement("players");
-    eplayers.setAttribute("kingdoms", data.mapKingdomColors);
-    eplayers.setAttribute("humans", data.mapHumanColors);
-    eplayers.setAttribute("computers", data.mapCompColors);
-    eplayers.setAttribute("startWithHero", data.mapStartWithHero);
-    eheader.appendChild(eplayers);
+    QByteArray bdata;
+    QDataStream ds(&bdata, QIODevice::WriteOnly);
+    ds.setByteOrder(QDataStream::LittleEndian);
 
-    QDomElement ewins = doc.createElement("conditionWins");
-    eheader.appendChild(ewins);
-    ewins << data.mapConditionWins;
+    ds << data.engineVersion <<
+	// uint: localtime
+	QDateTime::currentDateTime().toTime_t() <<
+	// map size
+	data.mapArea.size().width() << data.mapArea.size().height() <<
+	// difficulty
+	data.mapDifficulty <<
+	// colors
+	data.mapKingdomColors << data.mapHumanColors << data.mapCompColors <<
+	// start with hero
+	data.mapStartWithHero <<
+	// conditions
+	data.mapConditionWins << data.mapConditionLoss;
 
-    QDomElement eloss = doc.createElement("conditionLoss");
-    eheader.appendChild(eloss);
-    eloss << data.mapConditionLoss;
+    eheader.appendChild(doc.createElement("info")).appendChild(doc.createTextNode(bdata.toBase64()));
 
     return eheader;
 }
@@ -1063,20 +1068,31 @@ QDomElement & operator>> (QDomElement & eheader, MapHeader & data)
     data.mapDescription = eheader.firstChildElement("description").text();
     data.mapAuthors = eheader.firstChildElement("authors").text();
     data.mapLicense = eheader.firstChildElement("license").text();
-    data.mapDifficulty = eheader.firstChildElement("difficulty").text().toInt();
 
-    QDomElement eplayers = eheader.firstChildElement("players");
+    QByteArray bdata = QByteArray::fromBase64(eheader.firstChildElement("info").text().toLatin1());
 
-    data.mapKingdomColors = eplayers.attribute("kingdoms").toInt();
-    data.mapHumanColors = eplayers.attribute("humans").toInt();
-    data.mapCompColors = eplayers.attribute("computers").toInt();
-    data.mapStartWithHero = eplayers.attribute("startWithHero").toInt();
+    if(bdata.isEmpty())
+	return eheader;
 
-    QDomElement ewins = eheader.firstChildElement("conditionWins");
-    ewins >> data.mapConditionWins;
+    QDataStream ds(bdata);
+    ds.setByteOrder(QDataStream::LittleEndian);
 
-    QDomElement eloss = eheader.firstChildElement("conditionLoss");
-    eloss >> data.mapConditionLoss;
+    uint localtime;
+    int mapw, maph;
+
+    ds >> data.mapVersion >>
+	// uint: localtime
+	localtime >>
+	// map size
+	mapw >> maph >>
+	// difficulty
+	data.mapDifficulty >>
+	// colors
+	data.mapKingdomColors >> data.mapHumanColors >> data.mapCompColors >>
+	// start with hero
+	data.mapStartWithHero >>
+	// conditions
+	data.mapConditionWins >> data.mapConditionLoss;
 
     return eheader;
 }
@@ -1084,8 +1100,7 @@ QDomElement & operator>> (QDomElement & eheader, MapHeader & data)
 QSharedPointer<MapArea> MapData::selectedArea = QSharedPointer<MapArea>();
 
 MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), tileOverMouse(NULL),
-    mapHeader(), mapArea(), mapTiles(mapArea.tiles), mapObjects(mapArea.objects),
-    engineVersion(FH2ENGINE_CURRENT_VERSION), mapVersion(engineVersion), showPassable(false)
+    mapArea(), mapTiles(mapArea.tiles), mapObjects(mapArea.objects), mapHeader(mapArea), showPassable(false)
 {
     connect(this, SIGNAL(dataModified()), parent, SLOT(mapWasModified()));
 
@@ -1886,15 +1901,6 @@ bool MapData::loadMapXML(const QString & mapFile)
     if(emap.isNull())
     { qDebug() << "unknown format map";  return false; }
 
-    int version = emap.hasAttribute("version") ? emap.attribute("version").toInt() : 0;
-    if(version < FH2ENGINE_LAST_VERSION)
-    {
-	QApplication::restoreOverrideCursor();
-	QMessageBox::warning(NULL, "Map Editor", "Unsupported map format.");
-	return false;
-    }
-    mapVersion = version;
-
     QDomElement edata = emap.firstChildElement("data");
     quint16 compress = edata.attribute("compress").toInt();
     QByteArray bdata;
@@ -1909,15 +1915,23 @@ bool MapData::loadMapXML(const QString & mapFile)
 	    return false;
 	}
 
-	if(version > FH2ENGINE_VERSION_3130)
-	{
-	    quint32 dataSize;
-	    QDataStream ds(cdata);
-	    ds.setByteOrder(QDataStream::LittleEndian);
-	    ds >> dataSize;
-	}
+	int version, dataSize;
 
-	bdata = qUncompress(cdata);
+        QDataStream ds(cdata);
+        ds.setByteOrder(QDataStream::LittleEndian);
+
+        ds >> version >> dataSize;
+	int offset = sizeof(version) + sizeof(dataSize);
+
+        if(version < FH2ENGINE_LAST_VERSION)
+        {
+	    QApplication::restoreOverrideCursor();
+	    QMessageBox::warning(NULL, "Map Editor", "Unsupported map format.");
+	    return false;
+        }
+
+	mapHeader.mapVersion = version;
+	bdata = qUncompress(reinterpret_cast<const uchar*>(cdata.data()) + offset, cdata.size() - offset);
     }
 
     if(0 == bdata.size())
@@ -1952,15 +1966,11 @@ bool MapData::saveMapXML(const QString & mapFile) const
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
     QDomDocument doc;
-
     QDomElement emap = doc.createElement("map");
-    emap.setAttribute("version", engineVersion);
     doc.appendChild(emap);
 
     QDomElement eheader = doc.createElement("header");
     emap.appendChild(eheader);
-    eheader.setAttribute("localtime", QDateTime::currentDateTime().toTime_t());
-    eheader.appendChild(doc.createElement("size")).appendChild(doc.createTextNode(mapTiles.sizeDescription()));
     eheader << mapHeader;
 
     QByteArray cdata;
@@ -1968,13 +1978,15 @@ bool MapData::saveMapXML(const QString & mapFile) const
 
     {
 	QByteArray bdata;
+	QTextStream ts(&bdata);
 	QDomElement edata0 = doc.createElement("data");
         edata0 << *this;
-	QTextStream ts(&bdata);
         edata0.save(ts, 5);
+
 	QDataStream ds(&cdata, QIODevice::WriteOnly);
 	ds.setByteOrder(QDataStream::LittleEndian);
-	ds << static_cast<quint32>(bdata.size());
+	ds << mapHeader.engineVersion << bdata.size();
+
 	cdata.append(qCompress(bdata, 7));
 	checksum = qChecksum(cdata.data(), cdata.size());
     }
@@ -2716,5 +2728,5 @@ void MapData::showPassableTriggered(void)
 
 QPair<int, int> MapData::versions(void) const
 {
-    return qMakePair(mapVersion, engineVersion);
+    return qMakePair(mapHeader.mapVersion, mapHeader.engineVersion);
 }

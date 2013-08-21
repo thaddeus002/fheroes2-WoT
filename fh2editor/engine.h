@@ -953,7 +953,7 @@ QDomElement & operator>> (QDomElement &, Troops &);
 QDomElement & operator<< (QDomElement &, const Skills &);
 QDomElement & operator>> (QDomElement &, Skills &);
 
-QDomElement & operator<< (QDomElement &, const GameCondition &);
-QDomElement & operator>> (QDomElement &, GameCondition &);
+QDataStream & operator<< (QDataStream &, const GameCondition &);
+QDataStream & operator>> (QDataStream &, GameCondition &);
 
 #endif
