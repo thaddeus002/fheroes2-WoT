@@ -18,4 +18,5 @@
     <group name="Trees" file="trees.xml" />
     <group name="Stream" file="stream.xml" />
     <group name="Road" file="road.xml" />
+    <group name="Loyalty Version" file="loyalty.xml" />
 </groups>
