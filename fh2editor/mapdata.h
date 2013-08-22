@@ -295,12 +295,16 @@ public:
     int			mapKingdomColors;
     int			mapCompColors;
     int			mapHumanColors;
+    int			playersRace[6];
     bool		mapStartWithHero;
     CondWins		mapConditionWins;
     CondLoss		mapConditionLoss;
     const MapArea &	mapArea;
 
     MapHeader(const MapArea &);
+
+    void		resetPlayerRace(void);
+    void		updatePlayerRace(int color, int race);
 };
 
 QDomElement & operator<< (QDomElement &, const MapHeader &);
@@ -378,6 +382,7 @@ protected:
     void		updateKingdomColors(int);
     void		updateTownRaceColor(const MapTile &, int, int);
     void		updateHeroRaceColor(const MapTile &, int, int);
+    void		updatePlayersRaces(void);
 
     void		addMapObject(const QPoint &, const CompositeObject &, quint32);
     void		addHeroItem(const QPoint &, const MapTileExt &);

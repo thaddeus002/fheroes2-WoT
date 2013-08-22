@@ -1028,6 +1028,19 @@ MapHeader::MapHeader(const MapArea & ma) : engineVersion(FH2ENGINE_CURRENT_VERSI
     mapName("New Map"), mapAuthors("unknown"), mapLicense("unknown"), mapDifficulty(Difficulty::Normal),
     mapKingdomColors(0), mapCompColors(0), mapHumanColors(0), mapStartWithHero(false), mapArea(ma)
 {
+    resetPlayerRace();
+}
+
+void MapHeader::resetPlayerRace(void)
+{
+    for(int it = 0; it < 6; ++it)
+	playersRace[it] = Race::Unknown;
+}
+
+void MapHeader::updatePlayerRace(int color, int race)
+{
+    int index = Color::index(color);
+    if(index) playersRace[index - 1] |= race;
 }
 
 QDomElement & operator<< (QDomElement & eheader, const MapHeader & data)
@@ -1051,9 +1064,14 @@ QDomElement & operator<< (QDomElement & eheader, const MapHeader & data)
 	// difficulty
 	data.mapDifficulty <<
 	// colors
-	data.mapKingdomColors << data.mapHumanColors << data.mapCompColors <<
-	// start with hero
-	data.mapStartWithHero <<
+	data.mapKingdomColors << data.mapHumanColors << data.mapCompColors;
+
+    // race players
+    for (int it = 0; it < 6; ++it)
+	ds << data.playersRace[it];
+
+    // start with hero
+    ds << data.mapStartWithHero <<
 	// conditions
 	data.mapConditionWins << data.mapConditionLoss;
 
@@ -1088,9 +1106,14 @@ QDomElement & operator>> (QDomElement & eheader, MapHeader & data)
 	// difficulty
 	data.mapDifficulty >>
 	// colors
-	data.mapKingdomColors >> data.mapHumanColors >> data.mapCompColors >>
-	// start with hero
-	data.mapStartWithHero >>
+	data.mapKingdomColors >> data.mapHumanColors >> data.mapCompColors;
+
+    // race players
+    for (int it = 0; it < 6; ++it)
+	ds >> data.playersRace[it];
+
+    // start with hero
+    ds >> data.mapStartWithHero >>
 	// conditions
 	data.mapConditionWins >> data.mapConditionLoss;
 
@@ -2505,6 +2528,7 @@ void MapData::editTownDialog(const MapTile & tile)
 
 	    updateTownRaceColor(tile, town->race, town->col);
 	    updateKingdomColors(town->col);
+	    updatePlayersRaces();
 	    emit dataModified();
 	}
     }
@@ -2554,6 +2578,7 @@ void MapData::editHeroDialog(const MapTile & tile)
 
 	    updateHeroRaceColor(tile, hero->race, hero->col);
 	    updateKingdomColors(hero->col);
+	    updatePlayersRaces();
 
 	    QGraphicsPixmapItem* item = itemAtAsHero(tile.boundingRect().center());
 	    if(item)
@@ -2635,6 +2660,12 @@ void MapData::addMapObject(const QPoint & pos, const CompositeObject & obj, quin
 			addHeroItem(tile->mapPos(), *ext);
 			hero->updateInfo(ext->index());
 			objPtr = hero;
+
+			mapObjects.push_back(objPtr);
+			//updateHeroRaceColor(*tile, hero->race, hero->col);
+			updateKingdomColors(hero->col);
+			updatePlayersRaces();
+			objPtr = NULL;
 		    }
 		}
 		break;
@@ -2650,6 +2681,10 @@ void MapData::addMapObject(const QPoint & pos, const CompositeObject & obj, quin
 			MapTown* town = new MapTown(tile->mapPos(), uid);
 			town->updateInfo(ext->index(), obj.classId != MapObj::Castle);
 			objPtr = town;
+
+			mapObjects.push_back(objPtr);
+			updatePlayersRaces();
+			objPtr = NULL;
 		    }
 		}
 		break;
@@ -2663,6 +2698,28 @@ void MapData::addMapObject(const QPoint & pos, const CompositeObject & obj, quin
     }
 
     emit dataModified();
+}
+
+void MapData::updatePlayersRaces(void)
+{
+    // update player race
+    mapHeader.resetPlayerRace();
+
+    QList<SharedMapObject> listCastles = mapObjects.list(MapObj::Castle);
+    for(QList<SharedMapObject>::const_iterator
+        it = listCastles.begin(); it != listCastles.end(); ++it)
+    {
+	MapTown* town = dynamic_cast<MapTown*>((*it).data());
+	if(town) mapHeader.updatePlayerRace(town->color(), town->race);
+    }
+
+    QList<SharedMapObject> listHeroes = mapObjects.list(MapObj::Heroes);
+    for(QList<SharedMapObject>::const_iterator
+        it = listHeroes.begin(); it != listHeroes.end(); ++it)
+    {
+	MapHero* hero = dynamic_cast<MapHero*>((*it).data());
+	if(hero)  mapHeader.updatePlayerRace(hero->color(), hero->race);
+    }
 }
 
 void MapData::updateHeroRaceColor(const MapTile & tile, int race, int color)
