@@ -1024,9 +1024,14 @@ QDomElement & operator>> (QDomElement & el, MapArea & area)
     return el;
 }
 
-MapHeader::MapHeader(const MapArea & ma) : engineVersion(FH2ENGINE_CURRENT_VERSION), mapVersion(engineVersion),
-    mapName("New Map"), mapAuthors("unknown"), mapLicense("unknown"), mapDifficulty(Difficulty::Normal),
-    mapKingdomColors(0), mapCompColors(0), mapHumanColors(0), mapStartWithHero(false), mapArea(ma)
+namespace
+{
+    QSharedPointer<MapArea>	_selectedArea	= QSharedPointer<MapArea>();
+    int				_mapVersion	= FH2ENGINE_CURRENT_VERSION;
+}
+
+MapHeader::MapHeader(const MapArea & ma) : mapName("New Map"), mapAuthors("unknown"), mapLicense("unknown"),
+    mapDifficulty(Difficulty::Normal), mapKingdomColors(0), mapCompColors(0), mapHumanColors(0), mapStartWithHero(false), mapArea(ma)
 {
     resetPlayerRace();
 }
@@ -1056,7 +1061,7 @@ QDomElement & operator<< (QDomElement & eheader, const MapHeader & data)
     QDataStream ds(&bdata, QIODevice::WriteOnly);
     ds.setByteOrder(QDataStream::LittleEndian);
 
-    ds << data.engineVersion <<
+    ds << static_cast<int>(FH2ENGINE_CURRENT_VERSION) <<
 	// uint: localtime
 	QDateTime::currentDateTime().toTime_t() <<
 	// map size
@@ -1067,7 +1072,7 @@ QDomElement & operator<< (QDomElement & eheader, const MapHeader & data)
 	data.mapKingdomColors << data.mapHumanColors << data.mapCompColors;
 
     // race players
-    for (int it = 0; it < 6; ++it)
+    for(int it = 0; it < 6; ++it)
 	ds << data.playersRace[it];
 
     // start with hero
@@ -1098,7 +1103,7 @@ QDomElement & operator>> (QDomElement & eheader, MapHeader & data)
     uint localtime;
     int mapw, maph;
 
-    ds >> data.mapVersion >>
+    ds >> _mapVersion >>
 	// uint: localtime
 	localtime >>
 	// map size
@@ -1119,8 +1124,6 @@ QDomElement & operator>> (QDomElement & eheader, MapHeader & data)
 
     return eheader;
 }
-
-QSharedPointer<MapArea> MapData::selectedArea = QSharedPointer<MapArea>();
 
 MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), tileOverMouse(NULL),
     mapArea(), mapTiles(mapArea.tiles), mapObjects(mapArea.objects), mapHeader(mapArea), showPassable(false)
@@ -1391,7 +1394,7 @@ void MapData::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	    ((event->buttons() & Qt::RightButton) && ! selectionArea().contains(event->scenePos())))
 	{
 	    clearSelection();
-	    selectedArea.clear();
+	    _selectedArea.clear();
 	}
     }
     else
@@ -1635,20 +1638,20 @@ void MapData::copyToBuffer(void)
 	const QRect srcrt = mapToRect(selectionArea().boundingRect().toRect());
 	MapArea* ptr = new MapArea(srcrt.size());
 	ptr->importArea(mapArea, srcrt, QPoint(0, 0));
-	selectedArea = QSharedPointer<MapArea>(ptr);
+	_selectedArea = QSharedPointer<MapArea>(ptr);
     }
 }
 
 bool MapData::isValidBuffer(void) const
 {
-    return ! selectedArea.isNull();
+    return ! _selectedArea.isNull();
 }
 
 void MapData::pasteFromBuffer(void)
 {
     if(tileOverMouse && isValidBuffer())
     {
-	const MapArea & selMapArea = *selectedArea.data();
+	const MapArea & selMapArea = *_selectedArea.data();
 	mapArea.importArea(selMapArea, QRect(QPoint(0, 0), selMapArea.size()), tileOverMouse->mapPos());
 
 	emit dataModified();
@@ -1775,8 +1778,16 @@ void MapData::newMap(const QSize & msz, const QString &)
 bool MapData::loadMap(const QString & mapFile)
 {
     qDebug() << "MapData::loadMap:" << mapFile;
+    bool load = false;
 
-    if(! loadMapMP2(mapFile) && ! loadMapXML(mapFile))
+    if(mapFile.right(4) == ".map")
+	load = loadMapXML(mapFile);
+    else
+    if(mapFile.right(4) == ".mp2" || mapFile.right(4) == ".mx2" ||
+	mapFile.right(4) == ".MP2" || mapFile.right(4) == ".MX2")
+	load = loadMapMP2(mapFile);
+
+    if(! load && ! loadMapMP2(mapFile) && ! loadMapXML(mapFile))
 	return false;
 
     // insert tiles
@@ -1795,6 +1806,8 @@ bool MapData::loadMap(const QString & mapFile)
     const QSize & tileSize = EditorTheme::tileSize();
     setSceneRect(QRect(QPoint(0, 0),
 	QSize(size().width() * tileSize.width(), size().height() * tileSize.height())));
+
+    updatePlayersRaces();
 
     return true;
 }
@@ -1938,22 +1951,19 @@ bool MapData::loadMapXML(const QString & mapFile)
 	    return false;
 	}
 
-	int version, dataSize;
-
         QDataStream ds(cdata);
         ds.setByteOrder(QDataStream::LittleEndian);
 
-        ds >> version >> dataSize;
-	int offset = sizeof(version) + sizeof(dataSize);
-
-        if(version < FH2ENGINE_LAST_VERSION)
+        ds >> _mapVersion;
+        if(_mapVersion < FH2ENGINE_LAST_VERSION)
         {
 	    QApplication::restoreOverrideCursor();
 	    QMessageBox::warning(NULL, "Map Editor", "Unsupported map format.");
 	    return false;
         }
 
-	mapHeader.mapVersion = version;
+	int dataSize; ds >> dataSize;
+	int offset = sizeof(_mapVersion) + sizeof(dataSize);
 	bdata = qUncompress(reinterpret_cast<const uchar*>(cdata.data()) + offset, cdata.size() - offset);
     }
 
@@ -2008,7 +2018,7 @@ bool MapData::saveMapXML(const QString & mapFile) const
 
 	QDataStream ds(&cdata, QIODevice::WriteOnly);
 	ds.setByteOrder(QDataStream::LittleEndian);
-	ds << mapHeader.engineVersion << bdata.size();
+	ds << static_cast<int>(FH2ENGINE_CURRENT_VERSION) << bdata.size();
 
 	cdata.append(qCompress(bdata, 7));
 	checksum = qChecksum(cdata.data(), cdata.size());
@@ -2507,6 +2517,11 @@ void MapData::editMapEventDialog(const MapTile & tile)
 	}
     }
 }
+void MapData::editTownDialog(const QPoint & pt)
+{
+    const MapTile* tile = mapTiles.tile(pt);
+    if(tile) editTownDialog(*tile);
+}
 
 void MapData::editTownDialog(const MapTile & tile)
 {
@@ -2553,6 +2568,12 @@ void MapData::addHeroItem(const QPoint & mpos, const MapTileExt & ext)
     item->setOffset(mpos.x() * tileSize.width(), mpos.y() * tileSize.height() - 15);
     item->setPixmap(EditorTheme::getImageICN(ext.icn(), ext.index()).first);
     addItem(item);
+}
+
+void MapData::editHeroDialog(const QPoint & pt)
+{
+    const MapTile* tile = mapTiles.tile(pt);
+    if(tile) editHeroDialog(*tile);
 }
 
 void MapData::editHeroDialog(const MapTile & tile)
@@ -2783,7 +2804,7 @@ void MapData::showPassableTriggered(void)
     update();
 }
 
-QPair<int, int> MapData::versions(void) const
+QPair<int, int> MapData::versions(void)
 {
-    return qMakePair(mapHeader.mapVersion, mapHeader.engineVersion);
+    return qMakePair(_mapVersion, FH2ENGINE_CURRENT_VERSION);
 }

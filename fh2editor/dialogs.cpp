@@ -3938,15 +3938,16 @@ int Form::EditPassableDialog::result(void) const
     return Direction::All;
 }
 
-Form::TownList::TownList(QWidget* parent) : QListWidget(parent)
+Form::TownList::TownList(QWidget* parent) : QListWidget(parent), mapData(NULL)
 {
+    connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(open(QListWidgetItem*)));
 }
 
-void Form::TownList::load(const MapObjects & objects)
+void Form::TownList::load(MapData & data)
 {
     clear();
 
-    QList<SharedMapObject> listCastles = objects.list(MapObj::Castle);
+    QList<SharedMapObject> listCastles = data.objects().list(MapObj::Castle);
 
     for(QList<SharedMapObject>::const_iterator
         it = listCastles.begin(); it != listCastles.end(); ++it)
@@ -3955,17 +3956,26 @@ void Form::TownList::load(const MapObjects & objects)
 	item->setData(Qt::UserRole, (*it).data()->pos());
 	addItem(item);
     }
+
+    mapData = & data;
 }
 
-Form::HeroList::HeroList(QWidget* parent) : QListWidget(parent)
+void Form::TownList::openTown(QListWidgetItem* item)
 {
+    if(item && mapData)
+	mapData->editTownDialog(item->data(Qt::UserRole).toPoint());
 }
 
-void Form::HeroList::load(const MapObjects & objects)
+Form::HeroList::HeroList(QWidget* parent) : QListWidget(parent), mapData(NULL)
+{
+    connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(openHero(QListWidgetItem*)));
+}
+
+void Form::HeroList::load(MapData & data)
 {
     clear();
 
-    QList<SharedMapObject> listHeroes = objects.list(MapObj::Heroes);
+    QList<SharedMapObject> listHeroes = data.objects().list(MapObj::Heroes);
 
     for(QList<SharedMapObject>::const_iterator
         it = listHeroes.begin(); it != listHeroes.end(); ++it)
@@ -3974,8 +3984,21 @@ void Form::HeroList::load(const MapObjects & objects)
 	item->setData(Qt::UserRole, (*it).data()->pos());
 	addItem(item);
     }
+
+    mapData = & data;
 }
 
-Form::InfoForm::InfoForm(QWidget* parent) : QFrame(parent)
+void Form::HeroList::openHero(QListWidgetItem* item)
 {
+    if(item && mapData)
+	mapData->editHeroDialog(item->data(Qt::UserRole).toPoint());
+}
+
+Form::InfoForm::InfoForm(QWidget* parent) : QFrame(parent), mapData(NULL)
+{
+}
+
+void Form::InfoForm::load(const MapData & data)
+{
+    mapData = & data;
 }

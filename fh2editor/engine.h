@@ -72,7 +72,7 @@ namespace Color
 namespace Race
 {
     enum { Unknown = 0, Knight = 0x01, Barbarian = 0x02, Sorceress = 0x04, Warlock = 0x08, Wizard = 0x10, Necromancer = 0x20,
-	    Random = 0x40, Multi = 0x80, All = Knight | Barbarian | Sorceress | Warlock | Wizard | Necromancer };
+	    Random = 0x80, Multi = 0x40, All = Knight | Barbarian | Sorceress | Warlock | Wizard | Necromancer };
 
     QString		transcribe(int);
     int			index(int);

@@ -93,8 +93,9 @@ bool MapWindow::loadFile(const QString & fileName)
     setCurrentFile(fileName);
 
     miniMap->generateFromTiles(mapData.tiles());
-    townList->load(mapData.objects());
-    heroList->load(mapData.objects());
+    townList->load(mapData);
+    heroList->load(mapData);
+    infoForm->load(mapData);
 
     QPair<int, int> vers = mapData.versions();
 
@@ -154,9 +155,11 @@ void MapWindow::mapWasModified(void)
     isModified = true;
     setWindowTitle(userFriendlyCurrentFile() + "[*]");
     setWindowModified(true);
+
     if(miniMap) miniMap->generateFromTiles(mapData.tiles());
-    if(townList) townList->load(mapData.objects());
-    if(heroList) heroList->load(mapData.objects());
+    if(townList) townList->load(mapData);
+    if(heroList) heroList->load(mapData);
+    if(infoForm) infoForm->load(mapData);
 }
 
 bool MapWindow::maybeSave(void)

@@ -284,9 +284,6 @@ QDomElement & operator>> (QDomElement &, MapArea &);
 class MapHeader
 {
 public:
-    int			engineVersion;
-    int			mapVersion;
-
     QString		mapName;
     QString		mapDescription;
     QString		mapAuthors;
@@ -336,7 +333,8 @@ public:
     const QStringList & tavernRumorsList(void) const;
     const DayEvents &	dayEvents(void) const;
 
-    QPair<int, int>	versions(void) const;
+    static QPair<int, int>
+			versions(void);
 
     void		newMap(const QSize &, const QString &);
     bool		loadMap(const QString &);
@@ -349,7 +347,10 @@ public:
     QRect		mapToRect(const QRect &) const;
 
     const MapTiles &	tiles(void) const { return mapTiles; }
-    const MapObjects	objects(void) const { return mapObjects; }
+    const MapObjects &	objects(void) const { return mapObjects; }
+
+    void		editTownDialog(const QPoint &);
+    void		editHeroDialog(const QPoint &);
 
 signals:
     void		dataModified(void);
@@ -433,9 +434,6 @@ protected:
     QActionGroup*       clearObjectsAct;
 
     bool		showPassable;
-
-    static QSharedPointer<MapArea>
-    			selectedArea;
 };
 
 QDomElement & operator<< (QDomElement &, const MapData &);

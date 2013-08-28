@@ -3345,44 +3345,76 @@ QPixmap Skill::pixmap(void) const
 
 QDataStream & operator<< (QDataStream & ds, const GameCondition & cond)
 {
-    ds << cond.first;
+    int buf[4];
+
+    buf[0] = cond.first;
+    buf[1] = 0;
+    buf[2] = 0;
+    buf[3] = 0;
 
     if(QVariant::Point == cond.second.type())
     {
-	ds << static_cast<int>(1);
         QPoint pt = cond.second.toPoint();
-	ds << pt.x() << pt.y();
+	buf[1] = 1;
+	buf[2] = pt.x();
+	buf[3] = pt.y();
     }
     else
     if(QVariant::Int == cond.second.type())
     {
-	ds << static_cast<int>(2);
-	ds << cond.second.toInt();
+	buf[1] = 1;
+	buf[2] = cond.second.toInt();
     }
+
+    for(int it = 0; it < 4; ++it)
+	ds << buf[it];
 
     return ds;
 }
 
 QDataStream & operator>> (QDataStream & ds, GameCondition & cond)
 {
-    int variant;
-    ds >> cond.first >> variant;
+    int vers = MapData::versions().first;
 
-    if(variant == 1)
+    if(vers > FH2ENGINE_VERSION_3140)
     {
-	int tempx, tempy;
-	ds >> tempx >>tempy;
-	cond.second = QPoint(tempx, tempy);
+	int buf[4];
+
+	for(int it = 0; it < 4; ++it)
+	    ds >> buf[it];
+
+	cond.first = buf[0];
+
+	if(buf[1] == 1)
+	    cond.second = QPoint(buf[2], buf[3]);
+	else
+	if(buf[1] == 2)
+	    cond.second = buf[2];
+	else
+	    cond.second = QVariant();
+
     }
     else
-    if(variant == 2)
     {
-	int temp;
-	ds >> temp;
-	cond.second = temp;
+	int variant;
+	ds >> cond.first >> variant;
+
+	if(variant == 1)
+	{
+	    int tempx, tempy;
+	    ds >> tempx >>tempy;
+	    cond.second = QPoint(tempx, tempy);
+	}
+	else
+	if(variant == 2)
+	{
+	    int temp;
+	    ds >> temp;
+	    cond.second = temp;
+	}
+	else
+	    cond.second = QVariant();
     }
-    else
-	cond.second = QVariant();
 
     return ds;
 }

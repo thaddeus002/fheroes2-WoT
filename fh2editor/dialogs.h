@@ -1035,33 +1035,42 @@ namespace Form
     {
 	Q_OBJECT
 
+	MapData*		mapData;
+
     public:
 	TownList(QWidget*);
 
-	void			load(const MapObjects &);
+	void			load(MapData &);
+
+    protected slots:
+	void			openTown(QListWidgetItem*);
     };
 
     class HeroList : public QListWidget
     {
 	Q_OBJECT
 
+	MapData*		mapData;
+
     public:
 	HeroList(QWidget*);
 
-	void			load(const MapObjects &);
+	void			load(MapData &);
+
+    protected slots:
+	void			openHero(QListWidgetItem*);
     };
 
     class InfoForm : public QFrame
     {
 	Q_OBJECT
 
+	const MapData*		mapData;
+
     public:
 	InfoForm(QWidget*);
 
-    signals:
-
-    protected:
-	//void			mousePressEvent(QMouseEvent*);
+	void			load(const MapData &);
     };
 }
 
