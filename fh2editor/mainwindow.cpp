@@ -39,6 +39,7 @@ MainWindow::MainWindow() : sequenceMapNumber(0)
     connect(windowMapper, SIGNAL(mapped(QWidget*)), this, SLOT(setActiveSubWindow(QWidget*)));
 
     createActions();
+
     createMenus();
     createToolBars();
     createStatusBar();
@@ -127,42 +128,67 @@ void MainWindow::updateDockWidgets(void)
 {
     MapWindow* activeWindow = activeMapWindow();
 
-    if(activeWindow && activeWindow->miniMapWidget())
-	dockMiniMap->setWidget(activeWindow->miniMapWidget());
+    disconnect(miniMap, SIGNAL(windowPositionNeedChange(const QPoint &)));
+    disconnect(miniMap, SLOT(changeWindowPos(const QRect &)));
+
+    disconnect(townList, SIGNAL(itemClicked(QListWidgetItem*)));
+    disconnect(townList, SLOT(update(MapData*)));
+
+    disconnect(heroList, SIGNAL(itemClicked(QListWidgetItem*)));
+    disconnect(heroList, SLOT(update(MapData*)));
+
+    disconnect(infoForm, SLOT(update(const MapTile*)));
+
+    if(activeWindow)
+    {
+	miniMap->generate(qobject_cast<MapData*>(activeWindow->scene()));
+	connect(miniMap, SIGNAL(windowPositionNeedChange(const QPoint &)), activeWindow, SLOT(viewportSetPositionFromMiniMap(const QPoint &)));
+	connect(activeWindow, SIGNAL(windowPosChanged(const QRect &)), miniMap, SLOT(changeWindowPos(const QRect &)));
+	connect(activeWindow, SIGNAL(windowPosChanged(const QRect &)), miniMap, SLOT(changeWindowPos(const QRect &)));
+	connect(activeWindow, SIGNAL(windowPosChanged(const QRect &)), miniMap, SLOT(changeWindowPos(const QRect &)));
+	connect(activeWindow, SIGNAL(windowPosChanged(const QRect &)), miniMap, SLOT(changeWindowPos(const QRect &)));
+
+	townList->update(qobject_cast<MapData*>(activeWindow->scene()));
+	heroList->update(qobject_cast<MapData*>(activeWindow->scene()));
+
+	connect(townList, SIGNAL(itemClicked(QListWidgetItem*)), activeWindow, SLOT(viewportSetPositionFromListWidget(QListWidgetItem*)));
+	connect(activeWindow, SIGNAL(windowModified(MapData*)), townList, SLOT(update(MapData*)));
+
+	connect(heroList, SIGNAL(itemClicked(QListWidgetItem*)), activeWindow, SLOT(viewportSetPositionFromListWidget(QListWidgetItem*)));
+	connect(activeWindow, SIGNAL(windowModified(MapData*)), heroList, SLOT(update(MapData*)));
+
+	connect(activeWindow->scene(), SIGNAL(currentTilePosChanged(const MapTile*)), infoForm, SLOT(update(const MapTile*)));
+
+	dockMiniMap->widget()->show();
+	dockTownList->widget()->show();
+	dockInfoWidget->widget()->show();
+	dockHeroList->widget()->show();
+    }
     else
-    if(dockMiniMap->widget())
+    {
 	dockMiniMap->widget()->hide();
-
-    if(activeWindow && activeWindow->townListWidget())
-	dockTownList->setWidget(activeWindow->townListWidget());
-    else
-    if(dockTownList->widget())
 	dockTownList->widget()->hide();
-
-    if(activeWindow && activeWindow->heroListWidget())
-	dockHeroList->setWidget(activeWindow->heroListWidget());
-    else
-    if(dockHeroList->widget())
-	dockHeroList->widget()->hide();
-
-    if(activeWindow && activeWindow->infoWidget())
-	dockInfoWidget->setWidget(activeWindow->infoWidget());
-    else
-    if(dockInfoWidget->widget())
 	dockInfoWidget->widget()->hide();
+	dockHeroList->widget()->hide();
+    }
 }
 
 void MainWindow::updateStatusBar(void)
 {
     MapWindow* mapWindow = activeMapWindow();
 
-    disconnect(labelTileX, SLOT(setNum(int)));
-    disconnect(labelTileY, SLOT(setNum(int)));
+    disconnect(this, SLOT(setCoordInfo(const MapTile*)));
 
     if(mapWindow && mapWindow->scene())
+	connect(mapWindow->scene(), SIGNAL(currentTilePosChanged(const MapTile*)), this, SLOT(setCoordInfo(const MapTile*)));
+}
+
+void MainWindow::setCoordInfo(const MapTile* tile)
+{
+    if(tile)
     {
-	connect(mapWindow->scene(), SIGNAL(currentTilePosXChanged(int)), labelTileX, SLOT(setNum(int)));
-	connect(mapWindow->scene(), SIGNAL(currentTilePosYChanged(int)), labelTileY, SLOT(setNum(int)));
+	labelTileX->setNum(tile->mapPos().x());
+	labelTileY->setNum(tile->mapPos().y());
     }
 }
 
@@ -326,20 +352,46 @@ void MainWindow::createMenus(void)
     addDockWidget(Qt::RightDockWidgetArea, dockMiniMap);
     mapMenu->addAction(dockMiniMap->toggleViewAction());
 
+    miniMap = new Form::MiniMap(dockMiniMap);
+    dockMiniMap->setWidget(miniMap);
+
     dockTownList = new QDockWidget(tr("Town List"), this);
     dockTownList->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     addDockWidget(Qt::RightDockWidgetArea, dockTownList);
     mapMenu->addAction(dockTownList->toggleViewAction());
+
+    townList = new Form::TownList(dockTownList);
+    dockTownList->setWidget(townList);
 
     dockHeroList = new QDockWidget(tr("Hero List"), this);
     dockHeroList->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     addDockWidget(Qt::RightDockWidgetArea, dockHeroList);
     mapMenu->addAction(dockHeroList->toggleViewAction());
 
+    heroList = new Form::HeroList(dockHeroList);
+    dockHeroList->setWidget(heroList);
+
     dockInfoWidget = new QDockWidget(tr("Info Window"), this);
     dockInfoWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     addDockWidget(Qt::RightDockWidgetArea, dockInfoWidget);
     mapMenu->addAction(dockInfoWidget->toggleViewAction());
+
+    infoForm = new Form::InfoForm(dockInfoWidget);
+    dockInfoWidget->setWidget(infoForm);
+
+    connect(townList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(updateInfoForm(QListWidgetItem*)));
+    connect(townList, SIGNAL(itemClicked(QListWidgetItem*)), heroList, SLOT(clearSelection()));
+
+    connect(heroList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(updateInfoForm(QListWidgetItem*)));
+    connect(heroList, SIGNAL(itemClicked(QListWidgetItem*)), townList, SLOT(clearSelection()));
+}
+
+void MainWindow::updateInfoForm(QListWidgetItem* item)
+{
+    const MapData* mapData = activeMapWindow() ? qobject_cast<const MapData*>(activeMapWindow()->scene()) : NULL;
+
+    if(item && mapData)
+        infoForm->update(mapData->tiles().tileConst(item->data(Qt::UserRole).toPoint()));
 }
 
 void MainWindow::createToolBars(void)

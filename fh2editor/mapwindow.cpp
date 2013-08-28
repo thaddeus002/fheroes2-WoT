@@ -35,22 +35,10 @@ MapWindow::MapWindow(MainWindow* parent) : QGraphicsView(parent), mapData(this)
     isUntitled = true;
     isModified = false;
 
-    miniMap = new Form::MiniMap(this);
-    connect(miniMap, SIGNAL(windowPositionNeedChange(const QPoint &)), this, SLOT(viewportSetPositionFromMiniMap(const QPoint &)));
-
-    townList = new Form::TownList(this);
-    connect(townList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(viewportSetPositionFromListWidget(QListWidgetItem*)));
-
-    heroList = new Form::HeroList(this);
-    connect(heroList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(viewportSetPositionFromListWidget(QListWidgetItem*)));
-
-    infoForm = new Form::InfoForm(this);
-
-    // change size
-    connect(horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(changeViewedRect()));
-    connect(verticalScrollBar() , SIGNAL(valueChanged(int)), this, SLOT(changeViewedRect()));
-    connect(horizontalScrollBar(), SIGNAL(rangeChanged(int, int)), this, SLOT(changeViewedRect()));
-    connect(verticalScrollBar() , SIGNAL(rangeChanged(int, int)), this, SLOT(changeViewedRect()));
+    connect(horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(updateWindowPos(void)));
+    connect(verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(updateWindowPos(void)));
+    connect(horizontalScrollBar(), SIGNAL(rangeChanged(int, int)), this, SLOT(updateWindowPos(void)));
+    connect(verticalScrollBar(), SIGNAL(rangeChanged(int, int)), this, SLOT(updateWindowPos(void)));
 }
 
 void MapWindow::newFile(const QSize & sz, int sequenceNumber)
@@ -92,15 +80,12 @@ bool MapWindow::loadFile(const QString & fileName)
     QApplication::restoreOverrideCursor();
     setCurrentFile(fileName);
 
-    miniMap->generateFromTiles(mapData.tiles());
-    townList->load(mapData);
-    heroList->load(mapData);
-    infoForm->load(mapData);
-
     QPair<int, int> vers = mapData.versions();
 
     if(vers.first != vers.second)
 	mapWasModified();
+    else
+	emit windowModified(& mapData);
 
     return true;
 }
@@ -156,10 +141,7 @@ void MapWindow::mapWasModified(void)
     setWindowTitle(userFriendlyCurrentFile() + "[*]");
     setWindowModified(true);
 
-    if(miniMap) miniMap->generateFromTiles(mapData.tiles());
-    if(townList) townList->load(mapData);
-    if(heroList) heroList->load(mapData);
-    if(infoForm) infoForm->load(mapData);
+    emit windowModified(& mapData);
 }
 
 bool MapWindow::maybeSave(void)
@@ -198,41 +180,13 @@ QString MapWindow::strippedName(const QString & fullFileName)
     return QFileInfo(fullFileName).fileName();
 }
 
-Form::MiniMap* MapWindow::miniMapWidget(void)
+void MapWindow::viewportSetPositionFromMiniMap(const QPoint & pos)
 {
-    return miniMap;
-}
-
-Form::TownList* MapWindow::townListWidget(void)
-{
-    return townList;
-}
-
-Form::HeroList* MapWindow::heroListWidget(void)
-{
-    return heroList;
-}
-
-Form::InfoForm* MapWindow::infoWidget(void)
-{
-    return infoForm;
-}
-
-void MapWindow::viewportSetPositionFromMiniMap(const QPoint & miniPos)
-{
-    if(miniMap)
+    if(0 <= pos.x() && 0 <= pos.y() &&
+	pos.x() < mapData.size().width() && pos.y() < mapData.size().height())
     {
-	QPointF pos(mapData.size().width() * miniPos.x(), mapData.size().height() * miniPos.y());
-
-	pos.rx() /= miniMap->mapSize().width();
-	pos.ry() /= miniMap->mapSize().height();
-
-	if(0 <= pos.x() && 0 <= pos.y() &&
-	    pos.x() < mapData.size().width() && pos.y() < mapData.size().height())
-	{
 	    const QSize & ts = EditorTheme::tileSize();
 	    centerOn(pos.x() * ts.width(), pos.y() * ts.height());
-	}
     }
 }
 
@@ -246,17 +200,7 @@ void MapWindow::viewportSetPositionFromListWidget(QListWidgetItem* item)
     }
 }
 
-void MapWindow::changeViewedRect(void)
+void MapWindow::updateWindowPos(void)
 {
-    if(miniMap)
-    {
-	const QSize & ts = EditorTheme::tileSize();
-	const QSize absSize = QSize(mapData.size().width() * ts.width(), mapData.size().height() * ts.height());
-	const QSize tmpSize = QSize(size().width() * miniMap->mapSize().width(), size().height() * miniMap->mapSize().height());
-	int mw = tmpSize.width() / absSize.width();
-	int mh = tmpSize.height() / absSize.height();
-	miniMap->setWindowPos(horizontalScrollBar()->value() * miniMap->mapSize().width() / absSize.width(),
-				verticalScrollBar()->value() * miniMap->mapSize().height() / absSize.height(),
-				mw ? mw : 1, mh ? mh : 1);
-    }
+    emit windowPosChanged(QRect(QPoint(horizontalScrollBar()->value(), verticalScrollBar()->value()), size()));
 }

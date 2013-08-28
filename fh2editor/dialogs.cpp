@@ -1846,18 +1846,18 @@ DayEvent Form::DayEventDialog::result(void) const
 
 Form::MiniMap::MiniMap(QWidget* parent) : QLabel(parent), miniMapSize(144, 144)
 {
-    //labelPixmap = new QLabel(this);
     setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-    //verticalLayout = new QVBoxLayout(this);
-    //verticalLayout->addWidget(labelPixmap);
 }
 
-void Form::MiniMap::generateFromTiles(const MapTiles & tiles)
+void Form::MiniMap::generate(const MapData* data)
 {
+    if(!data) return;
+
+    const MapTiles & tiles = data->tiles();
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
-    const QSize & ms = tiles.mapSize();
-    QImage image(ms, QImage::Format_RGB32);
+    mapSize = tiles.mapSize();
+    QImage image(mapSize, QImage::Format_RGB32);
 
     for(MapTiles::const_iterator
 	it = tiles.begin(); it != tiles.end(); ++it)
@@ -1881,10 +1881,10 @@ void Form::MiniMap::generateFromTiles(const MapTiles & tiles)
 
     QImage scaled;
 
-    if(ms.width() > ms.height())
+    if(mapSize.width() > mapSize.height())
 	scaled = image.scaledToWidth(miniMapSize.width());
     else
-    if(ms.width() < ms.height())
+    if(mapSize.width() < mapSize.height())
         scaled = image.scaledToHeight(miniMapSize.height());
     else
         scaled = image.scaled(miniMapSize);
@@ -1903,16 +1903,25 @@ void Form::MiniMap::generateFromTiles(const MapTiles & tiles)
     QApplication::restoreOverrideCursor();
 }
 
-void Form::MiniMap::setWindowPos(int px, int py, int pw, int ph)
+void Form::MiniMap::changeWindowPos(const QRect & windowRect)
 {
-    if(windowPos != QRect(px, py, pw, ph))
+    const QSize & ts = EditorTheme::tileSize();
+    const QSize absSize = QSize(mapSize.width() * ts.width(), mapSize.height() * ts.height());
+    const QSize tmpSize = QSize(windowRect.width() * miniMapSize.width(), windowRect.height() * miniMapSize.height());
+
+    int mw = tmpSize.width() / absSize.width();
+    int mh = tmpSize.height() / absSize.height();
+    
+    QRect newPos = QRect(windowRect.x() * miniMapSize.width() / absSize.width(),
+                                windowRect.y() * miniMapSize.height() / absSize.height(),
+                                mw ? mw : 1, mh ? mh : 1);
+
+    if(windowPos != newPos)
     {
-	windowPos.setRect(px, py, pw, ph);
+	windowPos = newPos;
 
 	if(windowPixmap.isNull() || windowPixmap.size() != windowPos.size())
-	{
 	    windowPixmap = Editor::pixmapBorder(windowPos.size(), Qt::transparent, QColor(220, 0, 220));
-	}
 
 	update();
     }
@@ -1929,7 +1938,13 @@ void Form::MiniMap::mouseMoveEvent(QMouseEvent* event)
 {
     if(event->buttons() & Qt::LeftButton)
     {
-	emit windowPositionNeedChange(event->pos() - QPoint(1, 1));
+	QPoint miniPos = event->pos() - QPoint(1, 1);
+	QPointF pos(mapSize.width() * miniPos.x(), mapSize.height() * miniPos.y());
+
+	pos.rx() /= miniMapSize.width();
+	pos.ry() /= miniMapSize.height();
+
+	emit windowPositionNeedChange(pos.toPoint());
     }
 }
 
@@ -1937,7 +1952,13 @@ void Form::MiniMap::mousePressEvent(QMouseEvent* event)
 {
     if(event->buttons() & Qt::LeftButton)
     {
-	emit windowPositionNeedChange(event->pos() - QPoint(1, 1));
+	QPoint miniPos = event->pos() - QPoint(1, 1);
+	QPointF pos(mapSize.width() * miniPos.x(), mapSize.height() * miniPos.y());
+
+	pos.rx() /= miniMapSize.width();
+	pos.ry() /= miniMapSize.height();
+
+	emit windowPositionNeedChange(pos.toPoint());
     }
 }
 
@@ -3943,24 +3964,27 @@ Form::TownList::TownList(QWidget* parent) : QListWidget(parent), mapData(NULL)
     connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(open(QListWidgetItem*)));
 }
 
-void Form::TownList::load(MapData & data)
+void Form::TownList::update(MapData* data)
 {
     clear();
 
-    QList<SharedMapObject> listCastles = data.objects().list(MapObj::Castle);
-
-    for(QList<SharedMapObject>::const_iterator
-        it = listCastles.begin(); it != listCastles.end(); ++it)
+    if(data)
     {
-	QListWidgetItem* item = new QListWidgetItem(Editor::pixmapBorder(QSize(10, 10), Color::convert((*it).data()->color()), QColor(0, 0, 0)), (*it).data()->name());
-	item->setData(Qt::UserRole, (*it).data()->pos());
-	addItem(item);
+	QList<SharedMapObject> listCastles = data->objects().list(MapObj::Castle);
+
+	for(QList<SharedMapObject>::const_iterator
+    	    it = listCastles.begin(); it != listCastles.end(); ++it)
+	{
+	    QListWidgetItem* item = new QListWidgetItem(Editor::pixmapBorder(QSize(10, 10), Color::convert((*it).data()->color()), QColor(0, 0, 0)), (*it).data()->name());
+	    item->setData(Qt::UserRole, (*it).data()->pos());
+	    addItem(item);
+	}
     }
 
-    mapData = & data;
+    mapData = data;
 }
 
-void Form::TownList::openTown(QListWidgetItem* item)
+void Form::TownList::open(QListWidgetItem* item)
 {
     if(item && mapData)
 	mapData->editTownDialog(item->data(Qt::UserRole).toPoint());
@@ -3968,37 +3992,47 @@ void Form::TownList::openTown(QListWidgetItem* item)
 
 Form::HeroList::HeroList(QWidget* parent) : QListWidget(parent), mapData(NULL)
 {
-    connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(openHero(QListWidgetItem*)));
+    connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(open(QListWidgetItem*)));
 }
 
-void Form::HeroList::load(MapData & data)
+void Form::HeroList::update(MapData* data)
 {
     clear();
 
-    QList<SharedMapObject> listHeroes = data.objects().list(MapObj::Heroes);
-
-    for(QList<SharedMapObject>::const_iterator
-        it = listHeroes.begin(); it != listHeroes.end(); ++it)
+    if(data)
     {
-	QListWidgetItem* item = new QListWidgetItem(Editor::pixmapBorder(QSize(10, 10), Color::convert((*it).data()->color()), QColor(0, 0, 0)), (*it).data()->name());
-	item->setData(Qt::UserRole, (*it).data()->pos());
-	addItem(item);
+	QList<SharedMapObject> listHeroes = data->objects().list(MapObj::Heroes);
+
+	for(QList<SharedMapObject>::const_iterator
+    	    it = listHeroes.begin(); it != listHeroes.end(); ++it)
+	{
+	    QListWidgetItem* item = new QListWidgetItem(Editor::pixmapBorder(QSize(10, 10), Color::convert((*it).data()->color()), QColor(0, 0, 0)), (*it).data()->name());
+	    item->setData(Qt::UserRole, (*it).data()->pos());
+	    addItem(item);
+	}
     }
 
-    mapData = & data;
+    mapData = data;
 }
 
-void Form::HeroList::openHero(QListWidgetItem* item)
+void Form::HeroList::open(QListWidgetItem* item)
 {
     if(item && mapData)
 	mapData->editHeroDialog(item->data(Qt::UserRole).toPoint());
 }
 
-Form::InfoForm::InfoForm(QWidget* parent) : QFrame(parent), mapData(NULL)
+Form::InfoForm::InfoForm(QWidget* parent) : QFrame(parent)
 {
+        verticalLayoutForm = new QVBoxLayout(this);
+        labelInfo = new QLabel(this);
+
+        verticalLayoutForm->addWidget(labelInfo);
 }
 
-void Form::InfoForm::load(const MapData & data)
+void Form::InfoForm::update(const MapTile* tile)
 {
-    mapData = & data;
+    if(tile)
+    {
+	labelInfo->setText(MapObj::transcribe(tile->object()));
+    }
 }

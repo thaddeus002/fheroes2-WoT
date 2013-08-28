@@ -583,10 +583,10 @@ namespace Form
     public:
 	MiniMap(QWidget*);
 
-	void			generateFromTiles(const MapTiles &);
-	void			setWindowPos(int, int, int, int);
+	void			generate(const MapData*);
 
-	const QSize & 		mapSize(void) const { return miniMapSize; }
+    public slots:
+	void			changeWindowPos(const QRect &);
 
     signals:
 	void			windowPositionNeedChange(const QPoint &);
@@ -596,6 +596,7 @@ namespace Form
 	void			mousePressEvent(QMouseEvent*);
 	void			paintEvent(QPaintEvent*);
 
+	QSize			mapSize;
 	QSize			miniMapSize;
 	QRect			windowPos;
 	QPixmap			windowPixmap;
@@ -1040,10 +1041,11 @@ namespace Form
     public:
 	TownList(QWidget*);
 
-	void			load(MapData &);
+    public slots:
+	void			update(MapData*);
 
     protected slots:
-	void			openTown(QListWidgetItem*);
+	void			open(QListWidgetItem*);
     };
 
     class HeroList : public QListWidget
@@ -1055,22 +1057,25 @@ namespace Form
     public:
 	HeroList(QWidget*);
 
-	void			load(MapData &);
+    public slots:
+	void			update(MapData*);
 
     protected slots:
-	void			openHero(QListWidgetItem*);
+	void			open(QListWidgetItem*);
     };
 
     class InfoForm : public QFrame
     {
 	Q_OBJECT
 
-	const MapData*		mapData;
+	QVBoxLayout*		verticalLayoutForm;
+        QLabel*			labelInfo;
 
     public:
 	InfoForm(QWidget*);
 
-	void			load(const MapData &);
+    public slots:
+	void			update(const MapTile*);
     };
 }
 

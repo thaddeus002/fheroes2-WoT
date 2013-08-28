@@ -352,10 +352,11 @@ public:
     void		editTownDialog(const QPoint &);
     void		editHeroDialog(const QPoint &);
 
+    const MapTile*	currentTile(void) const;
+
 signals:
     void		dataModified(void);
-    void		currentTilePosXChanged(int);
-    void		currentTilePosYChanged(int);
+    void		currentTilePosChanged(const MapTile*);
 
 public slots:
     void		showPassableTriggered(void);

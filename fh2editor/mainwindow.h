@@ -33,9 +33,13 @@ class QMenu;
 class QMdiArea;
 class QMdiSubWindow;
 class QSignalMapper;
-class MapWindow;
 class QDockWidget;
+class QListWidgetItem;
 QT_END_NAMESPACE
+
+namespace Form { class MiniMap; class TownList; class HeroList; class InfoForm; }
+class MapWindow;
+class MapTile;
 
 class MainWindow : public QMainWindow
 {
@@ -57,6 +61,8 @@ private slots:
     MapWindow*		createMapWindow(void);
     void		setActiveSubWindow(QWidget*);
     void		subWindowActivated(QMdiSubWindow*);
+    void		setCoordInfo(const MapTile*);
+    void		updateInfoForm(QListWidgetItem*);
 
 private:
     void		createActions(void);
@@ -106,6 +112,11 @@ private:
 
     QLabel*		labelTileX;
     QLabel*		labelTileY;
+
+    Form::MiniMap*      miniMap;
+    Form::TownList*     townList;
+    Form::HeroList*     heroList;
+    Form::InfoForm*     infoForm;
 
     int			sequenceMapNumber;
 };

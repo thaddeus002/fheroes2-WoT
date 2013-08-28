@@ -1502,11 +1502,10 @@ void MapData::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
     {
 	if(tileOverMouse != newTileOverMouse)
 	{
-	    if(!tileOverMouse || tileOverMouse->mapPos().x() != newTileOverMouse->mapPos().x())
-		    emit currentTilePosXChanged(newTileOverMouse->mapPos().x());
-
-	    if(!tileOverMouse || tileOverMouse->mapPos().y() != newTileOverMouse->mapPos().y())
-		    emit currentTilePosYChanged(newTileOverMouse->mapPos().y());
+	    if(!tileOverMouse ||
+		tileOverMouse->mapPos().x() != newTileOverMouse->mapPos().x() ||
+		tileOverMouse->mapPos().y() != newTileOverMouse->mapPos().y())
+		    emit currentTilePosChanged(newTileOverMouse);
 
 	    tileOverMouse = newTileOverMouse;
 	}
@@ -2807,4 +2806,9 @@ void MapData::showPassableTriggered(void)
 QPair<int, int> MapData::versions(void)
 {
     return qMakePair(_mapVersion, FH2ENGINE_CURRENT_VERSION);
+}
+
+const MapTile* MapData::currentTile(void) const
+{
+    return tileOverMouse;
 }
