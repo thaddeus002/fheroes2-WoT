@@ -1677,7 +1677,7 @@ void MapData::fillGroundAction(QAction* act)
 	// fixed border
 	const QSize & tileSize = EditorTheme::tileSize();
         QRectF rectArea = selectionArea().boundingRect();
-	QPoint tile2(tileSize.width() / 2, tileSize.height() / 2);
+	QPoint tile2(tileSize.width() * 2, tileSize.height() * 2);
 
 	rectArea.setTopLeft(rectArea.topLeft() - tile2);
 	rectArea.setBottomRight(rectArea.bottomRight() + tile2);

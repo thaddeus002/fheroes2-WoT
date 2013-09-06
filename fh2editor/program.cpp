@@ -152,13 +152,11 @@ int main(int argc, char *argv[])
 	settings.setValue("Main/dataFile", dataFile);
     }
 
-    if(EditorTheme::load(dataFile))
-    {
-	MainWindow main;
-	main.show();
+    if(! EditorTheme::load(dataFile))
+	return -1;
 
-	return app.exec();
-    }
+    MainWindow main;
+    main.show();
 
-    return -1;
+    return app.exec();
 }

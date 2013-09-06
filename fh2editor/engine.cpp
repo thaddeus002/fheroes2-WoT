@@ -1468,6 +1468,8 @@ namespace EditorTheme
     QMap<int, SpriteInfo>	mapSpriteInfoCache;
     QMap<QString, int>		mapICNs;
 
+    QPair<int, int>		groundBoundariesFixBase(const AroundGrounds & around, int ground, int groundMarker, int groundAND, int groundNOT);
+
     const SpriteInfo*		findCacheSprite(int icn, int index)
     {
 	int key = (icn << 16) | (0x0000FFFF & index);
@@ -1783,10 +1785,8 @@ int AroundGrounds::directionsAroundGround(int ground) const
 /* return pair, first: index tile, second: shape - 0: none, 1: vert, 2: horz, 3: both */
 QPair<int, int> EditorTheme::groundBoundariesFix(const MapTile & tile, const MapTiles & tiles)
 {
-    QPair<int, int> res(-1, 0);
-    const int & ground = tile.groundType();
+    const int ground = tile.groundType();
 
-    if(ground == Ground::Beach) return res;
     AroundGrounds around(tiles, tile.mapPos());
 
     /*
@@ -1795,168 +1795,167 @@ QPair<int, int> EditorTheme::groundBoundariesFix(const MapTile & tile, const Map
 	3. ground - water (+16)
     */
 
-    const int ground_and = around.directionsAroundGround(ground);
-    const int ground_not = ground == Ground::Water ? around.directionsAroundGround(Ground::All) :
-				around.directionsAroundGround(Ground::Water | (Ground::All & ~ground));
-    int marker_id = 0;
+    const int groundAND = around.directionsAroundGround(ground);
+    const int groundNOT = around.directionsAroundGround(Ground::All & ~ground);
 
-    // corner: top right
-    if(IS_EQUAL_VALS(Direction::All & ~(Direction::TopRight | Direction::Center), ground_and) &&
-	IS_EQUAL_VALS(Direction::TopRight, ground_not))
+    switch(ground)
     {
-	marker_id = around.groundsDirects(Direction::TopRight);
-	res = qMakePair(startGroundOriginalTile(ground) + 12, 0);
+	case Ground::Dirt:
+	    if(around.directionsAroundGround(Ground::All & ~(ground | Ground::Water | Ground::Beach)))
+		return QPair<int, int>(startFilledTile(ground), 0);
+	    else
+		return groundBoundariesFixBase(around, ground, 0, groundAND, groundNOT);
+	    break;
+
+	case Ground::Beach:
+	    return QPair<int, int>(-1, 0);
+
+	case Ground::Water:
+	    return groundBoundariesFixBase(around, ground, Ground::Water, groundAND, groundNOT);
+
+	default: break;
+    }
+
+    return groundBoundariesFixBase(around, ground, Ground::Water | Ground::Beach, groundAND, groundNOT);
+}
+
+QPair<int, int> EditorTheme::groundBoundariesFixBase(const AroundGrounds & around, int ground, int groundMarker, int groundAND, int groundNOT)
+{
+    // corner: top right
+    if(IS_EQUAL_VALS(Direction::All & ~(Direction::TopRight | Direction::Center), groundAND) &&
+	IS_EQUAL_VALS(Direction::TopRight, groundNOT))
+    {
+	return groundMarker & around.groundsDirects(Direction::TopRight) ?
+	    qMakePair(startGroundOriginalTile(ground) + 28, 0) : qMakePair(startGroundOriginalTile(ground) + 12, 0);
     }
     else
     // corner: top left
-    if(IS_EQUAL_VALS(Direction::All & ~(Direction::TopLeft | Direction::Center), ground_and) &&
-	IS_EQUAL_VALS(Direction::TopLeft, ground_not))
+    if(IS_EQUAL_VALS(Direction::All & ~(Direction::TopLeft | Direction::Center), groundAND) &&
+	IS_EQUAL_VALS(Direction::TopLeft, groundNOT))
     {
-	marker_id = around.groundsDirects(Direction::TopLeft);
-	res = qMakePair(startGroundOriginalTile(ground) + 12, 2);
+	return groundMarker & around.groundsDirects(Direction::TopLeft) ?
+	    qMakePair(startGroundOriginalTile(ground) + 28, 2) : qMakePair(startGroundOriginalTile(ground) + 12, 2);
     }
     else
     // corner: bottom right
-    if(IS_EQUAL_VALS(Direction::All & ~(Direction::BottomRight | Direction::Center), ground_and) &&
-	IS_EQUAL_VALS(Direction::BottomRight, ground_not))
+    if(IS_EQUAL_VALS(Direction::All & ~(Direction::BottomRight | Direction::Center), groundAND) &&
+	IS_EQUAL_VALS(Direction::BottomRight, groundNOT))
     {
-	marker_id = around.groundsDirects(Direction::BottomRight);
-	res = qMakePair(startGroundOriginalTile(ground) + 12, 1);
+	return groundMarker & around.groundsDirects(Direction::BottomRight) ?
+	    qMakePair(startGroundOriginalTile(ground) + 28, 1) : qMakePair(startGroundOriginalTile(ground) + 12, 1);
     }
     else
     // corner: bottom left
-    if(IS_EQUAL_VALS(Direction::All & ~(Direction::BottomLeft | Direction::Center), ground_and) &&
-	IS_EQUAL_VALS(Direction::BottomLeft, ground_not))
+    if(IS_EQUAL_VALS(Direction::All & ~(Direction::BottomLeft | Direction::Center), groundAND) &&
+	IS_EQUAL_VALS(Direction::BottomLeft, groundNOT))
     {
-	marker_id = around.groundsDirects(Direction::BottomLeft);
-	res = qMakePair(startGroundOriginalTile(ground) + 12, 3);
+	return groundMarker & around.groundsDirects(Direction::BottomLeft) ?
+	    qMakePair(startGroundOriginalTile(ground) + 28, 3) : qMakePair(startGroundOriginalTile(ground) + 12, 3);
     }
     else
     // top
-    if(IS_EQUAL_VALS(Direction::Left | Direction::Right | Direction::Bottom, ground_and) &&
-	IS_EQUAL_VALS(Direction::Top, ground_not))
+    if(IS_EQUAL_VALS(Direction::Left | Direction::Right | Direction::Bottom, groundAND) &&
+	IS_EQUAL_VALS(Direction::Top, groundNOT))
     {
-	marker_id = around.groundsDirects(Direction::Top);
-	res = qMakePair(startGroundOriginalTile(ground), 0);
+	return groundMarker & around.groundsDirects(Direction::Top) ? 
+	    qMakePair(startGroundOriginalTile(ground) + 16, 0) : qMakePair(startGroundOriginalTile(ground), 0);
     }
     else
     // bottom
-    if(IS_EQUAL_VALS(Direction::Left | Direction::Right | Direction::Top, ground_and) &&
-	IS_EQUAL_VALS(Direction::Bottom, ground_not))
+    if(IS_EQUAL_VALS(Direction::Left | Direction::Right | Direction::Top, groundAND) &&
+	IS_EQUAL_VALS(Direction::Bottom, groundNOT))
     {
-	marker_id = around.groundsDirects(Direction::Bottom);
-	res = qMakePair(startGroundOriginalTile(ground), 1);
+	return groundMarker & around.groundsDirects(Direction::Bottom) ? 
+	    qMakePair(startGroundOriginalTile(ground) + 16, 1) : qMakePair(startGroundOriginalTile(ground), 1);
     }
     else
     // right
-    if(IS_EQUAL_VALS(Direction::Left | Direction::Top | Direction::Bottom, ground_and) &&
-	IS_EQUAL_VALS(Direction::Right, ground_not))
+    if(IS_EQUAL_VALS(Direction::Left | Direction::Top | Direction::Bottom, groundAND) &&
+	IS_EQUAL_VALS(Direction::Right, groundNOT))
     {
-	marker_id = around.groundsDirects(Direction::Right);
-	res = qMakePair(startGroundOriginalTile(ground) + 8, 0);
+	return groundMarker & around.groundsDirects(Direction::Right) ? 
+	    qMakePair(startGroundOriginalTile(ground) + 24, 0) : qMakePair(startGroundOriginalTile(ground) + 8, 0);
     }
     else
     // left
-    if(IS_EQUAL_VALS(Direction::Right | Direction::Top | Direction::Bottom, ground_and) &&
-	IS_EQUAL_VALS(Direction::Left, ground_not))
+    if(IS_EQUAL_VALS(Direction::Right | Direction::Top | Direction::Bottom, groundAND) &&
+	IS_EQUAL_VALS(Direction::Left, groundNOT))
     {
-	marker_id = around.groundsDirects(Direction::Left);
-	res = qMakePair(startGroundOriginalTile(ground) + 8, 2);
+	return groundMarker & around.groundsDirects(Direction::Left) ? 
+	    qMakePair(startGroundOriginalTile(ground) + 24, 2) : qMakePair(startGroundOriginalTile(ground) + 8, 2);
     }
     else
     // corner: top + top right + right
-    if(IS_EQUAL_VALS(Direction::Left | Direction::Bottom | Direction::BottomLeft, ground_and) &&
-	IS_EQUAL_VALS(Direction::Top | Direction::Right, ground_not))
+    if(IS_EQUAL_VALS(Direction::Left | Direction::Bottom | Direction::BottomLeft, groundAND) &&
+	IS_EQUAL_VALS(Direction::Top | Direction::Right, groundNOT))
     {
-	if(Ground::Water != ground &&
-	    around.groundsDirects(Direction::Top) != around.groundsDirects(Direction::Right))
-	{
-	    res = Ground::Water == around.groundsDirects(Direction::Top) ?
-		    qMakePair(startGroundTile(ground) + 36, 0) :
-		    qMakePair(startGroundTile(ground) + 37, 0);
-	}
+	if((groundMarker & around.groundsDirects(Direction::Top)) && (groundMarker & around.groundsDirects(Direction::Right)))
+	    return qMakePair(startGroundOriginalTile(ground) + 20, 0);
 	else
-	{
-	    marker_id = around.groundsDirects(Direction::Top | Direction::Right);
-	    res = qMakePair(startGroundOriginalTile(ground) + 4, 0);
-	}
+	if(groundMarker & around.groundsDirects(Direction::Top))
+	    return qMakePair(startGroundTile(ground) + 36, 0);
+	else
+	if(groundMarker & around.groundsDirects(Direction::Right))
+	    return qMakePair(startGroundTile(ground) + 37, 0);
+	else
+	    return qMakePair(startGroundOriginalTile(ground) + 4, 0);
     }
     else
     // corner: top + top left + left
-    if(IS_EQUAL_VALS(Direction::Right | Direction::Bottom | Direction::BottomRight, ground_and) &&
-	IS_EQUAL_VALS(Direction::Top | Direction::Left, ground_not))
+    if(IS_EQUAL_VALS(Direction::Right | Direction::Bottom | Direction::BottomRight, groundAND) &&
+	IS_EQUAL_VALS(Direction::Top | Direction::Left, groundNOT))
     {
-	if(Ground::Water != ground &&
-	    around.groundsDirects(Direction::Top) != around.groundsDirects(Direction::Left))
-	{
-	    res = Ground::Water == around.groundsDirects(Direction::Top) ?
-		    qMakePair(startGroundTile(ground) + 36, 2) :
-		    qMakePair(startGroundTile(ground) + 37, 2);
-	}
+	if((groundMarker & around.groundsDirects(Direction::Top)) && (groundMarker & around.groundsDirects(Direction::Left)))
+	    return qMakePair(startGroundOriginalTile(ground) + 20, 2);
 	else
-	{
-	    marker_id = around.groundsDirects(Direction::Top | Direction::Left);
-	    res = qMakePair(startGroundOriginalTile(ground) + 4, 2);
-	}
+	if(groundMarker & around.groundsDirects(Direction::Top))
+	    return qMakePair(startGroundTile(ground) + 36, 2);
+	else
+	if(groundMarker & around.groundsDirects(Direction::Left))
+	    return qMakePair(startGroundTile(ground) + 37, 2);
+	else
+	    return qMakePair(startGroundOriginalTile(ground) + 4, 2);
     }
     else
     // corner: bottom + bottom right + right
-    if(IS_EQUAL_VALS(Direction::Left | Direction::Top | Direction::TopLeft, ground_and) &&
-	IS_EQUAL_VALS(Direction::Bottom | Direction::Right, ground_not))
+    if(IS_EQUAL_VALS(Direction::Left | Direction::Top | Direction::TopLeft, groundAND) &&
+	IS_EQUAL_VALS(Direction::Bottom | Direction::Right, groundNOT))
     {
-	if(Ground::Water != ground &&
-	    around.groundsDirects(Direction::Bottom) != around.groundsDirects(Direction::Right))
-	{
-	    res = Ground::Water == around.groundsDirects(Direction::Bottom) ?
-		    qMakePair(startGroundTile(ground) + 36, 1) :
-		    qMakePair(startGroundTile(ground) + 37, 1);
-	}
+	if((groundMarker & around.groundsDirects(Direction::Bottom)) && (groundMarker & around.groundsDirects(Direction::Right)))
+	    return qMakePair(startGroundOriginalTile(ground) + 20, 1);
 	else
-	{
-	    marker_id = around.groundsDirects(Direction::Bottom | Direction::Right);
-	    res = qMakePair(startGroundOriginalTile(ground) + 4, 1);
-	}
+	if(groundMarker & around.groundsDirects(Direction::Bottom))
+	    return qMakePair(startGroundTile(ground) + 36, 1);
+	else
+	if(groundMarker & around.groundsDirects(Direction::Right))
+	    return qMakePair(startGroundTile(ground) + 37, 1);
+	else
+	    return qMakePair(startGroundOriginalTile(ground) + 4, 1);
     }
     else
     // corner: bottom + bottom left + left
-    if(IS_EQUAL_VALS(Direction::Right | Direction::Top | Direction::TopRight, ground_and) &&
-	IS_EQUAL_VALS(Direction::Bottom | Direction::Left, ground_not))
+    if(IS_EQUAL_VALS(Direction::Right | Direction::Top | Direction::TopRight, groundAND) &&
+	IS_EQUAL_VALS(Direction::Bottom | Direction::Left, groundNOT))
     {
-	if(Ground::Water != ground &&
-	    around.groundsDirects(Direction::Bottom) != around.groundsDirects(Direction::Left))
-	{
-	    res = Ground::Water == around.groundsDirects(Direction::Bottom) ?
-		    qMakePair(startGroundTile(ground) + 36, 3) :
-		    qMakePair(startGroundTile(ground) + 37, 3);
-	}
+	if((groundMarker & around.groundsDirects(Direction::Bottom)) && (groundMarker & around.groundsDirects(Direction::Left)))
+	    return qMakePair(startGroundOriginalTile(ground) + 20, 3);
 	else
-	{
-	    marker_id = around.groundsDirects(Direction::Bottom | Direction::Left);
-	    res = qMakePair(startGroundOriginalTile(ground) + 4, 3);
-	}
+	if(groundMarker & around.groundsDirects(Direction::Bottom))
+	    return qMakePair(startGroundTile(ground) + 36, 3);
+	else
+	if(groundMarker & around.groundsDirects(Direction::Left))
+	    return qMakePair(startGroundTile(ground) + 37, 3);
+	else
+	    return qMakePair(startGroundOriginalTile(ground) + 4, 3);
     }
     else
     // filled
-    if(IS_EQUAL_VALS(Direction::All & ~Direction::Center, ground_and))
+    if(IS_EQUAL_VALS(Direction::All & ~Direction::Center, groundAND))
     {
-	res = qMakePair(startFilledTile(ground), 0);
+	return qMakePair(startFilledTile(ground), 0);
     }
-    else
-    // false
-	return qMakePair(-1, 0);
 
-    // dirt fixed
-    if(Ground::Dirt == ground)
-    {
-	if(Ground::Water != marker_id)
-	    res.first = startFilledTile(ground);
-    }
-    else
-    // coast fixed
-    if(Ground::Water != ground && Ground::Water == marker_id)
-	res.first += 16;
-
-    return res;
+    return qMakePair(-1, 0);
 }
 
 QDomElement & operator<< (QDomElement & el, const MapObject & obj)

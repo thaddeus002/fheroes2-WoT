@@ -4023,10 +4023,10 @@ void Form::HeroList::open(QListWidgetItem* item)
 
 Form::InfoForm::InfoForm(QWidget* parent) : QFrame(parent)
 {
-        verticalLayoutForm = new QVBoxLayout(this);
-        labelInfo = new QLabel(this);
+    verticalLayoutForm = new QVBoxLayout(this);
+    labelInfo = new QLabel(this);
 
-        verticalLayoutForm->addWidget(labelInfo);
+    verticalLayoutForm->addWidget(labelInfo);
 }
 
 void Form::InfoForm::update(const MapTile* tile)
