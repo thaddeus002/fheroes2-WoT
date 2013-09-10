@@ -143,7 +143,6 @@ void Castle::OpenMageGuild(void)
     Dialog::FrameBorder frameborder(Size(640, 480));
 
     const Point & cur_pt = frameborder.GetArea();
-    std::string message;
     Text text;
 
     // bar

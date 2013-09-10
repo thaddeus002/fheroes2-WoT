@@ -1479,7 +1479,7 @@ void AGG::LoadFNT(void)
 	DEBUG(DBG_ENGINE, DBG_INFO, "use bitmap fonts");
     }
     else
-    if(0 == fnt_cache.size())
+    if(fnt_cache.empty())
     {
 	const std::string letters = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 	std::vector<u16> unicode = StringUTF8_to_UNICODE(letters);
@@ -1488,14 +1488,16 @@ void AGG::LoadFNT(void)
 	    it = unicode.begin(); it != unicode.end(); ++it)
 	    LoadTTFChar(*it);
 
-	if(fnt_cache.size())
+	if(fnt_cache.empty())
+	{
+	    DEBUG(DBG_ENGINE, DBG_INFO, "use bitmap fonts");
+	}
+	else
 	{
     	    DEBUG(DBG_ENGINE, DBG_INFO, "normal fonts " << conf.FontsNormal());
     	    DEBUG(DBG_ENGINE, DBG_INFO, "small fonts " << conf.FontsSmall());	
 	    DEBUG(DBG_ENGINE, DBG_INFO, "preload english charsets");
 	}
-	else
-	    DEBUG(DBG_ENGINE, DBG_INFO, "use bitmap fonts");
     }
 }
 

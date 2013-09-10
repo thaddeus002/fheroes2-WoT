@@ -1414,7 +1414,6 @@ void ActionToPoorMoraleObject(Heroes & hero, const u8 & obj, const s32 & dst_ind
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     u16  gold = tile.QuantityGold();
-    bool complete = false;
     std::string ask, msg, win;
 
     switch(obj)
@@ -1439,6 +1438,8 @@ void ActionToPoorMoraleObject(Heroes & hero, const u8 & obj, const s32 & dst_ind
 
     if(Dialog::YES == Dialog::Message("", ask, Font::BIG, Dialog::YES | Dialog::NO))
     {
+	bool complete = false;
+
 	if(gold)
 	{
 	    PlaySoundWarning;

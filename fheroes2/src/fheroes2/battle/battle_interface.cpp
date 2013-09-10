@@ -1190,7 +1190,7 @@ void Battle::Interface::RedrawCastle2(const Castle & castle, s16 cell_index) con
 		case 1:	index += 35; break;
 		case 2:	index += 27; break;
 		case 3:	index += 23; break;
-		break;
+		default: break;
 	    }
 	}
 	else
@@ -1200,7 +1200,7 @@ void Battle::Interface::RedrawCastle2(const Castle & castle, s16 cell_index) con
 		case 0:	index += 8; break;
 		case 1:	index += 4; break;
 		case 2:	index += 0; break;
-		break;
+		default: break;
 	    }
 	}
 
@@ -2761,8 +2761,6 @@ void Battle::Interface::RedrawActionMonsterSpellCastStatus(const Unit & attacker
 
 void Battle::Interface::RedrawActionLuck(Unit & b)
 {
-    std::string msg;
-
     if(b.Modes(LUCK_GOOD))
     {
 	std::string msg = _("Good luck shines on the  %{attacker}");

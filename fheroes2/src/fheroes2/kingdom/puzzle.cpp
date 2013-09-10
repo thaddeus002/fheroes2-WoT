@@ -39,7 +39,6 @@ const u8 zone4_index[] = { 20, 21, 26, 27 };
 
 bool ClosedTilesExists(const Puzzle &, const u8*, const u8*);
 void ZoneOpenFirstTiles(Puzzle &, u8 &, const u8*, const u8*);
-void ZoneOpenRandomTiles(Puzzle &, u8 &, const u8*, const u8*);
 void ShowStandardDialog(const Puzzle &, const Surface &);
 void ShowExtendedDialog(const Puzzle &, const Surface &);
 void PuzzlesDraw(const Puzzle &, const Surface &, s16, s16);
@@ -134,23 +133,6 @@ void ZoneOpenFirstTiles(Puzzle & pzl, u8 & opens, const u8* it1, const u8* it2)
 	}
 	else
 	    break;
-    }
-}
-
-void ZoneOpenRandomTiles(Puzzle & pzl, u8 & opens, const u8* it1, const u8* it2)
-{
-    std::vector<u8> values;
-    values.reserve(25);
-    const u8* it = NULL;
-
-    while(opens)
-    {
-	values.clear();
-	it = it1;
-	while(it < it2){ if(! pzl.test(*it)) values.push_back(*it); ++it; }
-	if(values.empty()) break;
-	pzl.set(*Rand::Get(values));
-	--opens;
     }
 }
 

@@ -515,8 +515,6 @@ bool AI::HeroesGetTask(Heroes & hero)
     // primary target
     if(Maps::isValidAbsIndex(ai_hero.primary_target))
     {
-	const Castle* castle = NULL;
-
 	if(hero.GetIndex() == ai_hero.primary_target)
 	{
 	    ai_hero.primary_target = -1;
@@ -527,6 +525,8 @@ bool AI::HeroesGetTask(Heroes & hero)
 	{
 	    DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", primary target: " <<
 		    ai_hero.primary_target << ", " << MP2::StringObject(world.GetTiles(ai_hero.primary_target).GetObject()));
+
+	    const Castle* castle = NULL;
 
 	    if(NULL != (castle = world.GetCastle(ai_hero.primary_target)) &&
 		NULL != castle->GetHeroes().Guest() && castle->isFriends(hero.GetColor()))

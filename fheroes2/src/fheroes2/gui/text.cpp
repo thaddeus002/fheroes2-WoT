@@ -531,7 +531,7 @@ TextBox::TextBox(const std::string & msg, Font::type_t ft, const Rect & rt) : al
 
 void TextBox::Set(const std::string & msg, Font::type_t ft, u16 width)
 {
-    if(messages.size()) messages.clear();
+    messages.clear();
     if(msg.empty()) return;
 
 #ifdef WITH_TTF
@@ -585,7 +585,6 @@ void TextBox::SetAlign(u8 f)
 
 void TextBox::Append(const std::string & msg, Font::type_t ft, u16 width)
 {
-    if(msg.empty()) return;
     const Settings & conf = Settings::Get();
     if(conf.QVGA() && !conf.Unicode()) ft == Font::YELLOW_BIG || ft == Font::YELLOW_SMALL ? ft = Font::YELLOW_SMALL : ft = Font::SMALL;
 
@@ -632,7 +631,6 @@ void TextBox::Append(const std::string & msg, Font::type_t ft, u16 width)
 #ifdef WITH_TTF
 void TextBox::Append(const std::vector<u16> & msg, Font::type_t ft, u16 width)
 {
-    if(msg.empty()) return;
     const Settings & conf = Settings::Get();
     if(conf.QVGA() && !conf.Unicode()) ft == Font::YELLOW_BIG || ft == Font::YELLOW_SMALL ? ft = Font::YELLOW_SMALL : ft = Font::SMALL;
 

@@ -96,7 +96,7 @@ Heroes::heroes_t Heroes::ConvertID(u8 index)
     return index > UNKNOWN ? UNKNOWN : static_cast<heroes_t>(index);
 }
 
-Heroes::Heroes() : move_point_scale(-1), army(this), portrait(UNKNOWN), race(UNKNOWN), path(*this),
+Heroes::Heroes() : move_point_scale(-1), army(this), hid(UNKNOWN), portrait(UNKNOWN), race(UNKNOWN), path(*this),
     direction(Direction::RIGHT), sprite_index(18), patrol_square(0)
 {
 }

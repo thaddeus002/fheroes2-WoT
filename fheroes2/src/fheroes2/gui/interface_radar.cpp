@@ -183,9 +183,10 @@ void Interface::Radar::RedrawArea(const u8 color)
 	for(s32 index = 0; index < world_w * world_h; ++index)
 	{
 	    const Maps::Tiles & tile = world.GetTiles(index);
-	    bool show_tile = ! tile.isFog(color);
 #ifdef WITH_DEBUG
-	     show_tile = IS_DEVEL() || ! tile.isFog(color);
+	    bool show_tile = IS_DEVEL() || ! tile.isFog(color);
+#else
+	    const bool & show_tile = ! tile.isFog(color);
 #endif
 
 	    if(! show_tile)
