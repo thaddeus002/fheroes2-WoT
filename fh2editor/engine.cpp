@@ -3361,7 +3361,7 @@ QDataStream & operator<< (QDataStream & ds, const GameCondition & cond)
     else
     if(QVariant::Int == cond.second.type())
     {
-	buf[1] = 1;
+	buf[1] = 2;
 	buf[2] = cond.second.toInt();
     }
 

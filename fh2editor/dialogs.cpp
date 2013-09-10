@@ -480,13 +480,13 @@ void Form::PlayerStatus::updatePlayers(void)
 {
     switch(col)
     {
-	    case Color::Blue:	setPixmap(EditorTheme::getImageICN("CELLWIN.ICN", 19 + status()).first); break;
-    	    case Color::Green:	setPixmap(EditorTheme::getImageICN("CELLWIN.ICN", 23 + status()).first); break;
-    	    case Color::Red:	setPixmap(EditorTheme::getImageICN("CELLWIN.ICN", 27 + status()).first); break;
-    	    case Color::Yellow:	setPixmap(EditorTheme::getImageICN("CELLWIN.ICN", 31 + status()).first); break;
-    	    case Color::Orange:	setPixmap(EditorTheme::getImageICN("CELLWIN.ICN", 35 + status()).first); break;
-    	    case Color::Purple:	setPixmap(EditorTheme::getImageICN("CELLWIN.ICN", 39 + status()).first); break;
-    	    default: break;
+	case Color::Blue:	setPixmap(EditorTheme::getImageICN("CELLWIN.ICN", 19 + status()).first); break;
+    	case Color::Green:	setPixmap(EditorTheme::getImageICN("CELLWIN.ICN", 23 + status()).first); break;
+    	case Color::Red:	setPixmap(EditorTheme::getImageICN("CELLWIN.ICN", 27 + status()).first); break;
+    	case Color::Yellow:	setPixmap(EditorTheme::getImageICN("CELLWIN.ICN", 31 + status()).first); break;
+    	case Color::Orange:	setPixmap(EditorTheme::getImageICN("CELLWIN.ICN", 35 + status()).first); break;
+    	case Color::Purple:	setPixmap(EditorTheme::getImageICN("CELLWIN.ICN", 39 + status()).first); break;
+    	default: break;
     }
 }
 
@@ -961,7 +961,9 @@ void Form::MapOptions::winsConditionsSelected(int index)
 	// find artifact
 	case 3:
 	    comboBoxWinsCondExt->setEnabled(true);
-	    fillComboBox(*comboBoxWinsCondExt, winsCondArtifactList);
+	    for(ListStringPos::const_iterator
+		it = winsCondArtifactList.begin(); it != winsCondArtifactList.end(); ++it)
+		comboBoxWinsCondExt->addItem((*it).first, (*it).second.x());
 	    checkBoxAllowNormalVictory->setEnabled(true);
 	    break;
 

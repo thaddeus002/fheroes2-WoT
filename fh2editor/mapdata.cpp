@@ -1365,7 +1365,13 @@ ListStringPos MapData::conditionArtifactList(void) const
 {
     ListStringPos res;
 
-    res << QPair<QString, QPoint>("Test 1", QPoint(62,83)) << QPair<QString, QPoint>("Artifact 2", QPoint(81,27));
+    res << QPair<QString, QPoint>("Ultimate Artifact", QPoint(-1, -1));
+
+    for(int art = Artifact::UltimateBook; art < Artifact::MagicBook; ++art)
+	res << QPair<QString, QPoint>(Artifact::transcribe(art), QPoint(art, -1));
+
+    for(int art = Artifact::SpellScroll; art < Artifact::Unknown; ++art)
+	res << QPair<QString, QPoint>(Artifact::transcribe(art), QPoint(art, -1));
 
     return res;
 }
@@ -2537,7 +2543,7 @@ void MapData::editTownDialog(const MapTile & tile)
 	    town->troops = form.troops();
 	    town->forceTown = form.checkBoxAllowCastle->isChecked();
 	    town->customBuilding = ! form.checkBoxBuildingsDefault->isChecked();
-	    town->col = form.comboBoxColor->itemData(form.comboBoxColor->currentIndex()).toInt();
+	    town->col = qvariant_cast<int>(comboBoxCurrentData(form.comboBoxColor));
 	    //town->race = ;
 
 	    updateTownRaceColor(tile, town->race, town->col);
@@ -2591,10 +2597,10 @@ void MapData::editHeroDialog(const MapTile & tile)
 	    hero->artifacts = form.artifacts();
 	    hero->experience = form.lineEditExperience->text().toInt();
 	    hero->patrolMode = form.checkBoxEnablePatrol->isChecked();
-	    hero->patrolSquare = form.comboBoxPatrol->itemData(form.comboBoxPatrol->currentIndex()).toInt();
+	    hero->patrolSquare = qvariant_cast<int>(comboBoxCurrentData(form.comboBoxPatrol));
 	    hero->skills = form.skills();
-	    hero->col = form.comboBoxColor->itemData(form.comboBoxColor->currentIndex()).toInt();
-	    hero->race = form.comboBoxColor->itemData(form.comboBoxRace->currentIndex()).toInt();
+	    hero->col = qvariant_cast<int>(comboBoxCurrentData(form.comboBoxColor));
+	    hero->race = qvariant_cast<int>(comboBoxCurrentData(form.comboBoxRace));
 
 	    updateHeroRaceColor(tile, hero->race, hero->col);
 	    updateKingdomColors(hero->col);
