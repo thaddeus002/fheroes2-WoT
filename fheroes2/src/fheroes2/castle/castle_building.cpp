@@ -604,7 +604,7 @@ Rect CastleGetCoordBuilding(u8 race, building_t building, const Point & pt)
 		case Race::KNGT:	return Rect(pt.x + 328, pt.y + 195, 100, 50);
 		case Race::BARB:	return Rect(pt.x + 509, pt.y + 148, 123, 57);
 		case Race::SORC:	return Rect(pt.x + 208, pt.y + 182, 127, 55);
-		case Race::WRLK:	return Rect(pt.x + 154, pt.y + 168, 171, 36);
+		case Race::WRLK:	return Rect(pt.x + 154, pt.y + 168, 171, 76);
 		case Race::WZRD:	return Rect(pt.x + 593, pt.y + 187, 47, 28);
 		case Race::NECR:	return Rect(pt.x, pt.y + 154, 140, 74);
 		default: break;
