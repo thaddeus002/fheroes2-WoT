@@ -119,11 +119,9 @@ bool ClosedTilesExists(const Puzzle & pzl, const u8* it1, const u8* it2)
 
 void ZoneOpenFirstTiles(Puzzle & pzl, u8 & opens, const u8* it1, const u8* it2)
 {
-    const u8* it = NULL;
-
     while(opens)
     {
-	it = it1;
+	const u8* it = it1;
 	while(it < it2 && pzl.test(*it)) ++it;
 
 	if(it != it2)

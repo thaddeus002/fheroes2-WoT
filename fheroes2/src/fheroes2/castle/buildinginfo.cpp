@@ -152,11 +152,12 @@ void BuildingInfo::UpdateCosts(const std::string & spec)
     // parse buildings.xml
     TiXmlDocument doc;
     const TiXmlElement* xml_buildings = NULL;
-    size_t index = 0;
 
     if(doc.LoadFile(spec.c_str()) &&
         NULL != (xml_buildings = doc.FirstChildElement("buildings")))
     {
+	size_t index = 0;
+
         for(const TiXmlElement* xml_building = xml_buildings->FirstChildElement("building");
     		xml_building && BUILD_NOTHING != _builds[index].id2; xml_building = xml_building->NextSiblingElement("building"), ++index)
         {

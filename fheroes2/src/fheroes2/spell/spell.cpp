@@ -132,11 +132,11 @@ void Spell::UpdateStats(const std::string & spec)
     // parse spells.xml
     TiXmlDocument doc;
     const TiXmlElement* xml_spells = NULL;
-    size_t index = 0;
 
     if(doc.LoadFile(spec.c_str()) &&
         NULL != (xml_spells = doc.FirstChildElement("spells")))
     {
+	size_t index = 0;
         const TiXmlElement* xml_spell = xml_spells->FirstChildElement("spell");
         for(; xml_spell && index < STONE; xml_spell = xml_spell->NextSiblingElement("spell"), ++index)
         {

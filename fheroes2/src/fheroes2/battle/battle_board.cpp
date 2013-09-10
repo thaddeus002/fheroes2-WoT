@@ -476,12 +476,12 @@ s16 Battle::Board::GetIndexDirection(s16 index, u8 dir)
         switch(dir)
         {
             case CENTER:           return index;
-            case TOP_LEFT:         return index - (y % 2 ? ARENAW + 1: ARENAW);
-            case TOP_RIGHT:        return index - (y % 2 ? ARENAW : ARENAW - 1);
+            case TOP_LEFT:         return index - ((y % 2) ? ARENAW + 1: ARENAW);
+            case TOP_RIGHT:        return index - ((y % 2) ? ARENAW : ARENAW - 1);
             case LEFT:             return index - 1;
             case RIGHT:            return index + 1;
-            case BOTTOM_LEFT:      return index + (y % 2 ? ARENAW - 1: ARENAW);
-            case BOTTOM_RIGHT:     return index + (y % 2 ? ARENAW : ARENAW + 1);
+            case BOTTOM_LEFT:      return index + ((y % 2) ? ARENAW - 1: ARENAW);
+            case BOTTOM_RIGHT:     return index + ((y % 2) ? ARENAW : ARENAW + 1);
             default: break;
         }
     }

@@ -232,11 +232,11 @@ void Artifact::UpdateStats(const std::string & spec)
     // parse artifacts.xml
     TiXmlDocument doc;
     const TiXmlElement* xml_artifacts = NULL;
-    size_t index = 0;
 
     if(doc.LoadFile(spec.c_str()) &&
         NULL != (xml_artifacts = doc.FirstChildElement("artifacts")))
     {
+	size_t index = 0;
         const TiXmlElement* xml_artifact = xml_artifacts->FirstChildElement("artifact");
         for(; xml_artifact && index < UNKNOWN; xml_artifact = xml_artifact->NextSiblingElement("artifact"), ++index)
         {

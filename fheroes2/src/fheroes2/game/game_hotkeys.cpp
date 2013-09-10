@@ -231,11 +231,12 @@ bool Game::HotKeyPress(events_t evnt)
 void Game::HotKeysLoad(const std::string & hotkeys)
 {
     TinyConfig config('=', '#');
-    int ival;
     //const Tiny::Entry* entry = NULL;
 
     if(config.Load(hotkeys.c_str()))
     {
+	int ival = 0;
+
 	for(events_t evnt = EVENT_NONE; evnt < EVENT_LAST; ++evnt)
 	{
 	    const char* name = EventsName(evnt);

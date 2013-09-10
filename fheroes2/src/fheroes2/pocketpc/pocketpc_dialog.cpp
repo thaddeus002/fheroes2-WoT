@@ -331,7 +331,6 @@ void PocketPC::KeyboardDialog(std::string & str)
     cursor.Show();
     display.Flip();
 
-    char ch = 0;
     bool redraw = true;
 
     // mainmenu loop
@@ -343,7 +342,7 @@ void PocketPC::KeyboardDialog(std::string & str)
 	    break;
 	}
 
-	ch = 0;
+	char ch = 0;
 
         if(le.MouseClickLeft(rt_0))	ch = '0';
 	else

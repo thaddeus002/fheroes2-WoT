@@ -190,11 +190,11 @@ void Monster::UpdateStats(const std::string & spec)
     // parse monsters.xml
     TiXmlDocument doc;
     const TiXmlElement* xml_monsters = NULL;
-    size_t index = 0;
 
     if(doc.LoadFile(spec.c_str()) &&
         NULL != (xml_monsters = doc.FirstChildElement("monsters")))
     {
+	size_t index = 0;
         const TiXmlElement* xml_monster = xml_monsters->FirstChildElement("monster");
         for(; xml_monster && index < MONSTER_RND1; xml_monster = xml_monster->NextSiblingElement("monster"), ++index)
         {

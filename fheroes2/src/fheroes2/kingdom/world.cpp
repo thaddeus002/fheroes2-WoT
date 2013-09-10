@@ -1466,12 +1466,9 @@ EventsDate World::GetEventsDate(u8 color) const
 
 EventMaps* World::GetEventMaps(u8 color, s32 index)
 {
-    if(vec_eventsmap.size())
-    {
-	for(EventsMaps::iterator
-	    it = vec_eventsmap.begin(); it != vec_eventsmap.end(); ++it)
-	    if((*it).isAllow(color, index)) return &(*it);
-    }
+    for(EventsMaps::iterator
+	it = vec_eventsmap.begin(); it != vec_eventsmap.end(); ++it)
+	if((*it).isAllow(color, index)) return &(*it);
 
     return NULL;
 }

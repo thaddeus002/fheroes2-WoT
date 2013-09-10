@@ -189,11 +189,10 @@ void Battle::UpdateMonsterSpriteAnimation(const std::string & spec)
 
     	    const TiXmlElement *xml_anim = xml_icn->FirstChildElement("animation");
 	    int start, count;
-	    const char* state;
 
 	    for(; xml_anim; xml_anim = xml_anim->NextSiblingElement("animation"))
 	    {
-		state = xml_anim->Attribute("state");
+		const char* state = xml_anim->Attribute("state");
 		xml_anim->Attribute("start", &start);
 		xml_anim->Attribute("count", &count);
 		animframe_t frm;

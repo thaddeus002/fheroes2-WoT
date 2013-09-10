@@ -2725,19 +2725,19 @@ void Maps::Tiles::RedrawFogs(Surface & dst, u8 color) const
 	// see ICN::CLOP32: sprite 0, 1, 2, 3, 4, 5
 	if(around & (DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW) &&
 	 !(around & (Direction::TOP)))
-	{ index = GetIndex() % 2 ? 0 : 1; revert = false; }
+	{ index = (GetIndex() % 2) ? 0 : 1; revert = false; }
 	else
 	if(around & (DIRECTION_CENTER_ROW | DIRECTION_TOP_ROW) &&
 	 !(around & (Direction::BOTTOM)))
-	{ index = GetIndex() % 2 ? 4 : 5; revert = false; }
+	{ index = (GetIndex() % 2) ? 4 : 5; revert = false; }
 	else
 	if(around & (DIRECTION_CENTER_COL | DIRECTION_LEFT_COL) &&
 	 !(around & (Direction::RIGHT)))
-	{ index = GetIndex() % 2 ? 2 : 3; revert = false; }
+	{ index = (GetIndex() % 2) ? 2 : 3; revert = false; }
 	else
 	if(around & (DIRECTION_CENTER_COL | DIRECTION_RIGHT_COL) &&
 	 !(around & (Direction::LEFT)))
-	{ index = GetIndex() % 2 ? 2 : 3; revert = true; }
+	{ index = (GetIndex() % 2) ? 2 : 3; revert = true; }
 	// unknown
 	else
 	{

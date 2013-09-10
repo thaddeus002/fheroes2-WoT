@@ -717,7 +717,7 @@ bool AIHeroesScheduledVisit(const Kingdom & kingdom, s32 index)
     return false;
 }
 
-bool IsPriorityAndNotVisitAndNotPresent(const std::pair<s32, MP2::object_t> indexObj, const Heroes* hero)
+bool IsPriorityAndNotVisitAndNotPresent(const std::pair<s32, MP2::object_t> indexObj, const Heroes* hero) /* GCC_REFERENCE_FAIL: GCC_VERSION < 40300 */
 {
     AIHero & ai_hero = AIHeroes::Get(*hero);
     Queue & task = ai_hero.sheduled_visit;

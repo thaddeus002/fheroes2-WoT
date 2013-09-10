@@ -36,15 +36,12 @@ void ListFiles::Append(const ListFiles & list)
 void ListFiles::ReadDir(const std::string &path, const std::string &filter, bool sensitive)
 {
     // read directory
-    DIR *dp;
-    struct dirent *ep;
-
-    dp = opendir(path.c_str());
-
+    DIR *dp = opendir(path.c_str());
     DEBUG(DBG_ENGINE, DBG_INFO, (filter.size() ? path + " (" + filter + ")" : path));
 
     if(dp)
     {
+	struct dirent *ep;
 	while(NULL != (ep = readdir(dp)))
 	{
 	    const std::string fullname = System::ConcatePath(path, ep->d_name);
