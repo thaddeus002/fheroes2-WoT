@@ -354,7 +354,7 @@ bool GameOver::Result::LocalCheckGameOver(Game::menu_t & res)
 	{
 	    continue_game = true;
 
-    	    if(res == Game::HIGHSCORES) Game::HighScores();
+    	    if(res == Game::HIGHSCORES) Game::HighScores(false);
 
 	    res = old;
 	    game_over = false;

@@ -219,14 +219,14 @@ void HGSData::RedrawList(s16 ox, s16 oy)
     }
 }
 
-Game::menu_t Game::HighScores(void)
+Game::menu_t Game::HighScores(bool fill)
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
     const Settings & conf = Settings::Get();
 
     cursor.Hide();
-    display.Fill(0, 0, 0);
+    if(fill) display.Fill(0, 0, 0);
 
 #ifdef WITH_DEBUG
     if(IS_DEVEL() && world.CountDay())

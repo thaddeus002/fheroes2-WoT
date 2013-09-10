@@ -196,7 +196,7 @@ namespace Game
     menu_t MainMenu(void);
     menu_t NewGame(void);
     menu_t LoadGame(void);
-    menu_t HighScores(void);
+    menu_t HighScores(bool);
     menu_t Credits(void);
     menu_t NewStandard(void);
     menu_t NewCampain(void);

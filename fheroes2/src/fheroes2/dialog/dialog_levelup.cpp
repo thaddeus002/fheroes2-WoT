@@ -173,7 +173,7 @@ u8 DialogSelectSecondary(const std::string & name, const std::string & primary, 
 	if(le.MouseClickLeft(button_learn2) || Game::HotKeyPress(Game::EVENT_DEFAULT_RIGHT)) return sec2.Skill();
 	else
 	if(le.MouseClickLeft(button_hero) || Game::HotKeyPress(Game::EVENT_DEFAULT_READY))
-	    { hero.OpenDialog(false, false); cursor.Show(); display.Flip(); }
+	    { hero.OpenDialog(true /* read only */, false); cursor.Show(); display.Flip(); }
 
 	if(le.MouseClickLeft(rect_image1))
 	    { cursor.Hide(); Dialog::SecondarySkillInfo(sec1); cursor.Show(); display.Flip(); }

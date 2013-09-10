@@ -158,6 +158,8 @@ int main(int argc, char **argv)
 	    if(! AGG::Init())
 		return EXIT_FAILURE;
 
+	    atexit(&AGG::Quit);
+
 #ifdef WITH_ZLIB
 	    LoadZLogo();
 #endif
@@ -178,7 +180,7 @@ int main(int argc, char **argv)
 	    		case Game::MAINMENU:       rs = Game::MainMenu();		break;
 	    		case Game::NEWGAME:        rs = Game::NewGame();		break;
 	    		case Game::LOADGAME:       rs = Game::LoadGame();		break;
-	    		case Game::HIGHSCORES:     rs = Game::HighScores();		break;
+	    		case Game::HIGHSCORES:     rs = Game::HighScores(true);		break;
 	    		case Game::CREDITS:        rs = Game::Credits();		break;
 	    		case Game::NEWSTANDARD:    rs = Game::NewStandard();		break;
 	    		case Game::NEWCAMPAIN:     rs = Game::NewCampain();		break;
@@ -199,8 +201,6 @@ int main(int argc, char **argv)
 	    		default: break;
 		}
 	    }
-
-	    AGG::Quit();
 	}
 #ifndef ANDROID
 	catch(Error::Exception)
