@@ -61,5 +61,8 @@ protected:
 std::ostream & operator<< (std::ostream &, ZStreamBuf &);
 std::istream & operator>> (std::istream &, ZStreamBuf &);
 
+std::vector<char> zlibCompress(const char* src, size_t srcsz);
+std::vector<char> zlibDecompress(const char* src, size_t srcsz, size_t realsz = 0);
+
 #endif
 #endif

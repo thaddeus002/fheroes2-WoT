@@ -183,7 +183,7 @@ public:
 
     static void SetStateDefaults(void);
     static void SetState(u32 type, bool enable);
-    static u8   GetState(u32 type);
+    static int  GetState(u32 type);
 
     bool HandleEvents(bool delay = true);
 
@@ -240,7 +240,7 @@ public:
     bool KeyPress(void) const;
     bool KeyPress(KeySym key) const;
     KeySym KeyValue(void) const;
-    u16	   KeyMod(void) const;
+    int	   KeyMod(void) const;
 
 #ifdef WITHOUT_MOUSE
     void ToggleEmulateMouse(void);
@@ -258,14 +258,14 @@ public:
 private:
     LocalEvent();
 
-    void HandleMouseMotionEvent(const SDL_MouseMotionEvent & motion);
-    void HandleMouseButtonEvent(const SDL_MouseButtonEvent & button);
+    void HandleMouseMotionEvent(const SDL_MouseMotionEvent &);
+    void HandleMouseButtonEvent(const SDL_MouseButtonEvent &);
     void HandleKeyboardEvent(SDL_KeyboardEvent &);
 
 #if SDL_VERSION_ATLEAST(1, 3, 0)
-    static int GlobalFilterEvents(void *userdata, SDL_Event *event);
+    static int GlobalFilterEvents(void*, SDL_Event*);
 #else
-    static int GlobalFilterEvents(const SDL_Event *event);
+    static int GlobalFilterEvents(const SDL_Event*);
 #endif
 
     enum flag_t
@@ -285,10 +285,10 @@ private:
     void SetModes(flag_t);
     void ResetModes(flag_t);
 
-    u16    modes;
+    int    modes;
     KeySym key_value;
-    u8     mouse_state;
-    u8     mouse_button;
+    int    mouse_state;
+    int    mouse_button;
 
     Point mouse_st;	// mouse offset for pocketpc
 
@@ -306,16 +306,16 @@ private:
     void (*keyboard_filter_func)(int, u16);
 
     SDL::Time clock;
-    u32 clock_delay;
-    u8  loop_delay;
+    u32  clock_delay;
+    int  loop_delay;
 
 #ifdef WITHOUT_MOUSE
-    bool emulate_mouse;
+    bool   emulate_mouse;
     KeySym emulate_mouse_up;
     KeySym emulate_mouse_down;
     KeySym emulate_mouse_left;
     KeySym emulate_mouse_right;
-    u8 emulate_mouse_step;
+    int    emulate_mouse_step;
     KeySym emulate_press_left;
     KeySym emulate_press_right;
 #endif

@@ -47,6 +47,8 @@ std::string		EncodeString(const std::string &, const char* charset);
 std::vector<u16>	StringUTF8_to_UNICODE(const std::string &);
 std::string		StringUNICODE_to_UTF8(const std::vector<u16> &);
 
+std::vector<u8>		decodeBase64(const std::string &);
+
 std::string	InsertString(const std::string &, size_t, const char*);
 size_t		InsertKeySym(std::string &, size_t, KeySym, u16 mod = 0);
 KeySym		KeySymFromChar(char);

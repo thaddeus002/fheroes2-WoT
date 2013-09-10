@@ -665,7 +665,7 @@ const Point & LocalEvent::GetMouseCursor(void)
     return mouse_cu;
 }
 
-u16 LocalEvent::KeyMod(void) const
+int LocalEvent::KeyMod(void) const
 {
     return SDL_GetModState();
 }
@@ -733,7 +733,7 @@ void LocalEvent::SetState(u32 type, bool enable)
     SDL_EventState(type, enable ? SDL_ENABLE : SDL_IGNORE);
 }
 
-u8 LocalEvent::GetState(u32 type)
+int LocalEvent::GetState(u32 type)
 {
     return SDL_EventState(type, SDL_QUERY);
 }

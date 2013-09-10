@@ -44,9 +44,7 @@ namespace Maps
         SMALL	= 36,
         MEDIUM	= 72,
         LARGE	= 108,
-        XLARGE	= 144,
-	XLARGE2 = 252,
-	XLARGE3	= 324
+        XLARGE	= 144
     };
 
     typedef MapsIndexes Indexes;

@@ -36,11 +36,22 @@
 #define LENGTHNAME		16
 #define LENGTHDESCRIPTION	143
 
+#ifdef WITH_XML
+#include "xmlccwrap.h"
+#endif
+
 template <typename CharType>
 bool AlphabeticalCompare(const std::basic_string<CharType> & lhs, const std::basic_string<CharType> & rhs)
 {
     return std::use_facet< std::collate< CharType > >( std::locale() ).compare( lhs.data(), lhs.data() + lhs.size(),
 		    rhs.data(), rhs.data() + rhs.size() ) == -1;
+}
+
+namespace Editor
+{
+    enum { Wins = 0x1000, CaptureTown = 0x1001, DefeatHero = 0x1002, FindArtifact = 0x1003, SideWins = 0x1004, AccumulateGold = 0x1005,
+    	CompAlsoWins = 0x0100, AllowNormalVictory = 0x0200,
+    	Loss = 0x2000, LoseTown = 0x2001, LoseHero = 0x2002, OutTime = 0x2003 };
 }
 
 u8 ByteToColor(u8 byte)
@@ -79,14 +90,34 @@ u8 ByteToRace(u8 byte)
     return Race::NONE;
 }
 
-Maps::FileInfo::FileInfo() : difficulty(Difficulty::EASY),
-    kingdom_colors(0), allow_human_colors(0), allow_comp_colors(0), rnd_races(0), localtime(0), with_heroes(false)
+Maps::FileInfo::FileInfo()
 {
     Reset();
 }
 
 void Maps::FileInfo::Reset(void)
 {
+    file.clear();
+    name.clear();
+    description.clear();
+    size_w = 0;
+    size_h = 0;
+    difficulty = 0;
+    kingdom_colors = 0;
+    allow_human_colors = 0;
+    allow_comp_colors = 0;
+    rnd_races = 0;
+    conditions_wins = 0;
+    comp_also_wins = false;
+    allow_normal_victory = false;
+    wins1 = 0;
+    wins2 = 0;
+    conditions_loss = 0;
+    loss1 = 0;
+    loss2 = 0;
+    localtime = 0;
+    with_heroes = false;
+
     for(u8 ii = 0; ii < KINGDOMMAX; ++ii)
     {
 	races[ii] = Race::NONE;
@@ -100,12 +131,175 @@ bool Maps::FileInfo::ReadSAV(const std::string & filename)
     return Game::LoadSAV2FileInfo(filename,  *this);
 }
 
-bool Maps::FileInfo::ReadMP2(const std::string & filename)
+bool Maps::FileInfo::ReadMAP(const std::string & filename)
 {
-    if(filename.empty()) return false;
-
+#ifdef WITH_XML
     Reset();
 
+    TiXmlDocument doc;
+    const TiXmlElement* xml_map = NULL;
+
+    if(doc.LoadFile(filename.c_str()) &&
+        NULL != (xml_map = doc.FirstChildElement("map")))
+    {
+	const TiXmlElement* xml_header = xml_map->FirstChildElement("header");
+	if(! xml_header)
+	{
+	    DEBUG(DBG_GAME, DBG_WARN, filename << ", " << "header not found");
+	    return false;
+	}
+
+	const TiXmlElement* xml;
+
+	xml = xml_header->FirstChildElement("name");
+	if(xml) name = xml->GetText();
+
+	xml = xml_header->FirstChildElement("description");
+	if(xml) description = xml->GetText();
+
+	xml = xml_header->FirstChildElement("info");
+
+	if(xml)
+	{
+	    std::string info = xml->GetText();
+	    std::vector<u8> bytes = decodeBase64(info);
+	
+	    if(bytes.size() >= 89)
+	    {
+		ReadLE32(& bytes[0]); // version
+		localtime = ReadLE32(& bytes[4]);
+		size_w = ReadLE32(& bytes[8]);
+		size_h = ReadLE32(& bytes[12]);
+
+		switch(ReadLE32(& bytes[16]))
+		{
+		    case 0x00:	difficulty = Difficulty::EASY; break;
+		    case 0x01:  difficulty = Difficulty::NORMAL; break;
+		    case 0x02:	difficulty = Difficulty::HARD; break;
+		    case 0x03:	difficulty = Difficulty::EXPERT; break;
+		    default:	difficulty = Difficulty::NORMAL; break;
+		}
+
+		kingdom_colors = ReadLE32(& bytes[20]);
+		allow_human_colors = ReadLE32(& bytes[24]);
+		allow_comp_colors = ReadLE32(& bytes[28]);
+
+		for(int col = 0; col < 6; ++col)
+		{
+		    int v = ReadLE32(& bytes[32] + col * 4);
+		    races[col] = 1 < CountBits(v) ? Race::MULT : v;
+
+		    if(v & Race::RAND)
+		    switch(col)
+		    {
+			case 0: rnd_races |= Color::BLUE; break;
+			case 1: rnd_races |= Color::GREEN; break;
+			case 2: rnd_races |= Color::RED; break;
+			case 3: rnd_races |= Color::YELLOW; break;
+			case 4: rnd_races |= Color::ORANGE; break;
+			case 5: rnd_races |= Color::PURPLE; break;
+		        default: break;
+		    }
+		}
+
+		with_heroes = 0 != bytes[56];
+
+		int cond1[4], cond2[4];
+
+		for(int it = 0; it < 4; ++it)
+		    cond1[it] = ReadLE32(& bytes[57 + it * 4]);
+
+		for(int it = 0; it < 4; ++it)
+		    cond2[it] = ReadLE32(& bytes[73 + it * 4]);
+
+		comp_also_wins = cond1[0] & Editor::CompAlsoWins;
+		allow_normal_victory = cond1[0] & Editor::AllowNormalVictory;
+
+		switch(cond1[0] & 0x10FF)
+		{
+		    case Editor::Wins:
+			conditions_wins = 0;
+			break;
+
+		    case Editor::CaptureTown:
+	    		conditions_wins = 1;
+			wins1 = cond1[2];
+			wins2 = cond1[3];
+			break;
+
+		    case Editor::DefeatHero:
+			conditions_wins = 2;
+			wins1 = cond1[2];
+			wins2 = cond1[3];
+			break;
+
+		    case Editor::FindArtifact:
+			conditions_wins = 3;
+			wins1 = cond1[2];
+			break;
+
+		    case Editor::SideWins:
+			conditions_wins = 4;
+			//wins1 =; FIX:: Editor::ConditionSidePart
+			break;
+
+		    case Editor::AccumulateGold:
+			conditions_wins = 5;
+			wins1 = cond1[2] / 1000;
+			break;
+
+		    default: break;
+		}
+
+		switch(cond2[0] & 0x20FF)
+		{
+		    case Editor::Loss:
+			conditions_loss = 0;
+			break;
+
+		    case Editor::LoseTown:
+			conditions_loss = 1;
+			loss1 = cond2[2];
+			loss2 = cond2[3];
+			break;
+
+		    case Editor::LoseHero:
+			conditions_loss = 2;
+			loss1 = cond2[2];
+			loss2 = cond2[3];
+			break;
+
+		    case Editor::OutTime:
+			conditions_loss = 3;
+			loss1 = cond2[2];
+			break;
+
+		    default: break;
+		}
+
+		file = filename;
+
+		return true;
+	    }
+	    else
+	    {
+		DEBUG(DBG_GAME, DBG_WARN, filename << ", " << "incorrect header decode" << ", " << "size: " << bytes.size());
+	    }
+	}
+
+	return false;
+    }
+    else
+    VERBOSE(filename << ": " << doc.ErrorDesc());
+#else
+    DEBUG(DBG_GAME, DBG_WARN, filename << ", " << "unsupported map format");
+#endif
+    return false;
+}
+
+bool Maps::FileInfo::ReadMP2(const std::string & filename)
+{
+    Reset();
     std::ifstream fd(filename.c_str(), std::ios::binary);
 
     if(!fd.is_open())
@@ -142,25 +336,11 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
 
     switch(byte16)
     {
-	case 0x00:
-	    difficulty = Difficulty::EASY;
-	    break;
-
-	case 0x01:
-	    difficulty = Difficulty::NORMAL;
-	    break;
-
-	case 0x02:
-	    difficulty = Difficulty::HARD;
-	    break;
-
-	case 0x03:
-	    difficulty = Difficulty::EXPERT;
-	    break;
-
-	default:
-	    DEBUG(DBG_GAME, DBG_WARN, "incorrect difficulty" << ", maps: " << filename << ", load easy default");
-	    break;
+	case 0x00:	difficulty = Difficulty::EASY; break;
+	case 0x01:  	difficulty = Difficulty::NORMAL; break;
+	case 0x02:	difficulty = Difficulty::HARD; break;
+	case 0x03:	difficulty = Difficulty::EXPERT; break;
+	default:	difficulty = Difficulty::NORMAL; break;
     }
 
     // width
@@ -171,77 +351,31 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
     fd.read(reinterpret_cast<char *>(&byte8), 1);
     size_h = byte8;
 
-    // kingdom color blue
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) kingdom_colors |= Color::BLUE;
+    Colors colors(Color::ALL);
 
-    // kingdom color green
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) kingdom_colors |= Color::GREEN;
+    // kingdom color - blue, green, red, yellow, orange, purple
+    for(Colors::const_iterator
+	it = colors.begin(); it != colors.end(); ++it)
+    {
+	fd.read(reinterpret_cast<char *>(&byte8), 1);
+	if(byte8) kingdom_colors |= *it;
+    }
 
-    // kingdom color red
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) kingdom_colors |= Color::RED;
+    // allow human color - blue, green, red, yellow, orange, purple
+    for(Colors::const_iterator
+	it = colors.begin(); it != colors.end(); ++it)
+    {
+	fd.read(reinterpret_cast<char *>(&byte8), 1);
+	if(byte8) allow_human_colors |= *it;
+    }
 
-    // kingdom color yellow
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) kingdom_colors |= Color::YELLOW;
-
-    // kingdom color orange
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) kingdom_colors |= Color::ORANGE;
-
-    // kingdom color purple
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) kingdom_colors |= Color::PURPLE;
-
-    // allow human blue
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) allow_human_colors |= Color::BLUE;
-
-    // allow human green
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) allow_human_colors |= Color::GREEN;
-
-    // allow human red
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) allow_human_colors |= Color::RED;
-
-    // allow human yellow
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) allow_human_colors |= Color::YELLOW;
-
-    // allow human orange
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) allow_human_colors |= Color::ORANGE;
-
-    // allow human purple
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) allow_human_colors |= Color::PURPLE;
-
-    // allow comp blue
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) allow_comp_colors |= Color::BLUE;
-
-    // allow comp green
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) allow_comp_colors |= Color::GREEN;
-
-    // allow comp red
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) allow_comp_colors |= Color::RED;
-
-    // allow comp yellow
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) allow_comp_colors |= Color::YELLOW;
-
-    // allow comp orange
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) allow_comp_colors |= Color::ORANGE;
-
-    // allow comp purple
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) allow_comp_colors |= Color::PURPLE;
+    // allow comp color - blue, green, red, yellow, orange, purple
+    for(Colors::const_iterator
+	it = colors.begin(); it != colors.end(); ++it)
+    {
+	fd.read(reinterpret_cast<char *>(&byte8), 1);
+	if(byte8) allow_comp_colors |= *it;
+    }
 
     // kingdom count
     // fd.seekg(0x1A, std::ios_base::beg);
@@ -254,19 +388,19 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
 
     // data wins
     fd.read(reinterpret_cast<char *>(&byte8), 1);
-    wins1 = byte8;
+    comp_also_wins = byte8;
     // data wins
     fd.read(reinterpret_cast<char *>(&byte8), 1);
-    wins2 = byte8;
+    allow_normal_victory = byte8;
     // data wins
     fd.read(reinterpret_cast<char *>(&byte16), 2);
     SwapLE16(byte16);
-    wins3 = byte16;
+    wins1 = byte16;
     // data wins
     fd.seekg(0x2c, std::ios_base::beg);
     fd.read(reinterpret_cast<char *>(&byte16), 2);
     SwapLE16(byte16);
-    wins4 = byte16;
+    wins2 = byte16;
 
     // loss
     fd.seekg(0x22, std::ios_base::beg);
@@ -288,24 +422,14 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
     with_heroes = 0 == byte8;
 
     // race color
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    races[0] = ByteToRace(byte8);
-    if(Race::RAND == races[0]) rnd_races |= Color::BLUE;
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    races[1] = ByteToRace(byte8);
-    if(Race::RAND == races[1]) rnd_races |= Color::GREEN;
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    races[2] = ByteToRace(byte8);
-    if(Race::RAND == races[2]) rnd_races |= Color::RED;
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    races[3] = ByteToRace(byte8);
-    if(Race::RAND == races[3]) rnd_races |= Color::YELLOW;
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    races[4] = ByteToRace(byte8);
-    if(Race::RAND == races[4]) rnd_races |= Color::ORANGE;
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    races[5] = ByteToRace(byte8);
-    if(Race::RAND == races[5]) rnd_races |= Color::PURPLE;
+    for(Colors::const_iterator
+	it = colors.begin(); it != colors.end(); ++it)
+    {
+	fd.read(reinterpret_cast<char *>(&byte8), 1);
+	u8 race = ByteToRace(byte8);
+	races[Color::GetIndex(*it)] = race;
+	if(Race::RAND == race) rnd_races |= *it;
+    }
 
     // name
     char bufname[LENGTHNAME];
@@ -325,36 +449,39 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
     
     //fill unions
     if(4 == conditions_wins)
-    {
-	u8 side1 = 0;
-	u8 side2 = 0;
-
-	const Colors colors(kingdom_colors);
-
-	for(Colors::const_iterator
-	    it = colors.begin(); it != colors.end(); ++it)
-	{
-	    if(Color::GetIndex(*it) < wins3)
-		side1 |= *it;
-	    else
-		side2 |= *it;
-	}
-
-	for(u8 ii = 0; ii < KINGDOMMAX; ++ii)
-	{
-	    u8 cl = ByteToColor(ii);
-	
-	    if(side1 & cl)
-		unions[ii] = side1;
-	    else
-	    if(side2 & cl)
-		unions[ii] = side2;
-	    else
-		unions[ii] = cl;
-	}
-    }
+	FillUnions();
 
     return true;
+}
+
+void Maps::FileInfo::FillUnions(void)
+{
+    u8 side1 = 0;
+    u8 side2 = 0;
+
+    const Colors colors(kingdom_colors);
+
+    for(Colors::const_iterator
+	it = colors.begin(); it != colors.end(); ++it)
+    {
+	if(Color::GetIndex(*it) < wins1)
+	    side1 |= *it;
+	else
+	    side2 |= *it;
+    }
+
+    for(u8 ii = 0; ii < KINGDOMMAX; ++ii)
+    {
+	u8 cl = ByteToColor(ii);
+	
+	if(side1 & cl)
+	    unions[ii] = side1;
+	else
+	if(side2 & cl)
+	    unions[ii] = side2;
+	else
+	    unions[ii] = cl;
+    }
 }
 
 bool Maps::FileInfo::FileSorting(const FileInfo & fi1, const FileInfo & fi2)
@@ -392,11 +519,11 @@ u16 Maps::FileInfo::ConditionWins(void) const
     switch(conditions_wins)
     {
 	case 0: return GameOver::WINS_ALL;
-	case 1:	return wins2 ? GameOver::WINS_TOWN | GameOver::WINS_ALL : GameOver::WINS_TOWN;
-	case 2:	return wins2 ? GameOver::WINS_HERO | GameOver::WINS_ALL : GameOver::WINS_HERO;
-	case 3:	return wins2 ? GameOver::WINS_ARTIFACT | GameOver::WINS_ALL : GameOver::WINS_ARTIFACT;
+	case 1:	return allow_normal_victory ? GameOver::WINS_TOWN | GameOver::WINS_ALL : GameOver::WINS_TOWN;
+	case 2:	return allow_normal_victory ? GameOver::WINS_HERO | GameOver::WINS_ALL : GameOver::WINS_HERO;
+	case 3:	return allow_normal_victory ? GameOver::WINS_ARTIFACT | GameOver::WINS_ALL : GameOver::WINS_ARTIFACT;
 	case 4:	return GameOver::WINS_SIDE;
-	case 5:	return wins2 ? GameOver::WINS_GOLD | GameOver::WINS_ALL : GameOver::WINS_GOLD;
+	case 5:	return allow_normal_victory ? GameOver::WINS_GOLD | GameOver::WINS_ALL : GameOver::WINS_GOLD;
 	default: break;
     }
 
@@ -419,38 +546,32 @@ u16 Maps::FileInfo::ConditionLoss(void) const
 
 bool Maps::FileInfo::WinsCompAlsoWins(void) const
 {
-    return ((GameOver::WINS_TOWN | GameOver::WINS_GOLD) & ConditionWins()) && wins1;
+    return comp_also_wins && ((GameOver::WINS_TOWN | GameOver::WINS_GOLD) & ConditionWins());
 }
 
 bool Maps::FileInfo::WinsAllowNormalVictory(void) const
 {
-    return ((GameOver::WINS_TOWN | GameOver::WINS_ARTIFACT | GameOver::WINS_GOLD) & ConditionWins()) && wins2;
+    return allow_normal_victory && ((GameOver::WINS_TOWN | GameOver::WINS_ARTIFACT | GameOver::WINS_GOLD) & ConditionWins());
 }
 
 u8 Maps::FileInfo::WinsFindArtifactID(void) const
 {
-    return wins3 ? wins3 - 1 : Artifact::UNKNOWN;
+    return wins1 ? wins1 - 1 : Artifact::UNKNOWN;
 }
 
 bool Maps::FileInfo::WinsFindUltimateArtifact(void) const
 {
-    return 0 == wins3;
+    return 0 == wins1;
 }
 
 u32 Maps::FileInfo::WinsAccumulateGold(void) const
 {
-    return wins3 * 1000;
-}
-
-u16 Maps::FileInfo::WinsSidePart(void) const
-{
-    // FIX:: Maps::FileInfo::ConditionSidePart
-    return wins3;
+    return wins1 * 1000;
 }
 
 u32 Maps::FileInfo::WinsMapsIndexObject(void) const
 {
-    return wins4 * world.w() + wins3;
+    return wins2 * world.w() + wins1;
 }
 
 u32 Maps::FileInfo::LossMapsIndexObject(void) const
@@ -505,46 +626,59 @@ std::string Maps::FileInfo::String(void) const
 {
     std::ostringstream os;
 
-    os << "file: " << file << ", name: " << name << ", kingdom colors: " << static_cast<int>(kingdom_colors) << \
-	", allow human colors: " << static_cast<int>(allow_human_colors) << ", allow comp colors: " << static_cast<int>(allow_comp_colors) << ", rnd races: " << \
-	static_cast<int>(rnd_races) << ", conditions wins: " << static_cast<int>(conditions_wins) << ", wins1: " << static_cast<int>(wins1) << \
-	", wins2: " << static_cast<int>(wins2) << ", wins3: " << wins3 << ", wins4: " << wins4 << ", conditions loss: " << static_cast<int>(conditions_loss) << \
-        ", loss1: " << loss1 << ", loss2: " << loss2;
+    os << "file: " << file << ", " << "name: " << name << ", " << "kingdom colors: " << static_cast<int>(kingdom_colors) << \
+	", " << "allow human colors: " << static_cast<int>(allow_human_colors) << ", " << "allow comp colors: " << static_cast<int>(allow_comp_colors) << ", " << "rnd races: " << \
+	static_cast<int>(rnd_races) << ", " << "conditions wins: " << static_cast<int>(conditions_wins) << ", " << "comp also wins: " << (comp_also_wins ? "true" : "false") << \
+	", " << "allow normal victory: " << (allow_normal_victory ? "true" : "false") << ", " << "wins1: " << wins1 << ", " << "wins2: " << wins2 << ", " << "conditions loss: " << static_cast<int>(conditions_loss) << \
+        ", " << "loss1: " << loss1 << ", " << "loss2: " << loss2;
 
     return os.str();
+}
+
+ListFiles GetMapsFiles(const char* suffix)
+{
+    const Settings & conf = Settings::Get();
+    ListFiles maps = conf.GetListFiles("maps", suffix);
+    const ListDirs & list = conf.GetMapsParams();
+
+    if(! list.empty())
+    {
+	for(ListDirs::const_iterator
+	    it = list.begin(); it != list.end(); ++it)
+	    if(*it != "maps")
+    		maps.Append(conf.GetListFiles(*it, suffix));
+    }
+
+    return maps;
 }
 
 bool PrepareMapsFileInfoList(MapsFileInfoList & lists, bool multi)
 {
     const Settings & conf = Settings::Get();
-    ListFiles maps = conf.GetListFiles("maps", ".mp2");
 
-    // check loyality version
+    ListFiles maps_old = GetMapsFiles(".mp2");
     if(conf.PriceLoyaltyVersion())
-        maps.Append(conf.GetListFiles("maps", ".mx2"));
-
-    const ListDirs & list = conf.GetMapsParams();
-    if(! list.empty())
-    {
-	for(ListDirs::const_iterator
-	    it = list.begin(); it != list.end(); ++it)
-	if(*it != "maps")
-	{
-    	    maps.Append(conf.GetListFiles(*it, ".mp2"));
-	    if(conf.PriceLoyaltyVersion())
-    		maps.Append(conf.GetListFiles(*it, ".mx2"));
-	}
-    }
-
-    if(maps.empty()) return false;
-    lists.reserve(maps.size());
+        maps_old.Append(GetMapsFiles(".mx2"));
 
     for(ListFiles::const_iterator
-	it = maps.begin(); it != maps.end(); ++it)
+	it = maps_old.begin(); it != maps_old.end(); ++it)
     {
 	Maps::FileInfo fi;
 	if(fi.ReadMP2(*it)) lists.push_back(fi);
     }
+
+#ifdef WITH_XML
+    ListFiles maps_new = GetMapsFiles(".map");
+
+    for(ListFiles::const_iterator
+	it = maps_new.begin(); it != maps_new.end(); ++it)
+    {
+	Maps::FileInfo fi;
+	if(fi.ReadMAP(*it)) lists.push_back(fi);
+    }
+#endif
+
+    if(lists.empty()) return false;
 
     std::sort(lists.begin(), lists.end(), Maps::FileInfo::NameSorting);
     lists.resize(std::unique(lists.begin(), lists.end(), Maps::FileInfo::NameCompare) - lists.begin());
@@ -577,7 +711,7 @@ StreamBase & Maps::operator<< (StreamBase & msg, const FileInfo & fi)
 	msg << fi.races[ii] << fi.unions[ii];
 
     msg << fi.kingdom_colors << fi.allow_human_colors << fi.allow_comp_colors <<
-	fi.rnd_races << fi.conditions_wins << fi.wins1 << fi.wins2 << fi.wins3 << fi.wins4 <<
+	fi.rnd_races << fi.conditions_wins << fi.comp_also_wins << fi.allow_normal_victory << fi.wins1 << fi.wins2 <<
 	fi.conditions_loss << fi.loss1 << fi.loss2 << fi.localtime << fi.with_heroes;
 
     return msg;
@@ -594,7 +728,7 @@ StreamBase & Maps::operator>> (StreamBase & msg, FileInfo & fi)
 	msg >> fi.races[ii] >> fi.unions[ii];
 
     msg >> fi.kingdom_colors >> fi.allow_human_colors >> fi.allow_comp_colors >>
-	fi.rnd_races >> fi.conditions_wins >> fi.wins1 >> fi.wins2 >> fi.wins3 >> fi.wins4 >>
+	fi.rnd_races >> fi.conditions_wins >> fi.comp_also_wins >> fi.allow_normal_victory >> fi.wins1 >> fi.wins2 >>
 	fi.conditions_loss >> fi.loss1 >> fi.loss2 >> fi.localtime >> fi.with_heroes;
 
     return msg;

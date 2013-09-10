@@ -715,3 +715,55 @@ Points GetArcPoints(const Point & from, const Point & to, const Point & max, u16
 
     return res;
 }
+
+u32 decodeChar(int v)
+{
+    if('A' <= v && v <= 'Z')
+	return v - 'A';
+
+    if('a' <= v && v <= 'z')
+	return v - 'a' + 26;
+
+    if('0' <= v && v <= '9')
+	return v - '0' + 52;
+
+    if(v == '+')
+	return 62;
+
+    if(v == '/')
+	return 63;
+
+    return 0;
+}
+
+std::vector<u8> decodeBase64(const std::string & src)
+{
+    std::vector<u8> res;
+
+    if(src.size() % 4 == 0)
+    {
+	u32 size = 3 * src.size() / 4;
+
+	if(src[src.size() - 1] == '=') size--;
+	if(src[src.size() - 2] == '=') size--;
+
+	res.reserve(size);
+
+	for(u32 ii = 0; ii < src.size(); ii += 4)
+	{
+    	    u32 sextet_a = decodeChar(src[ii]);
+    	    u32 sextet_b = decodeChar(src[ii + 1]);
+    	    u32 sextet_c = decodeChar(src[ii + 2]);
+    	    u32 sextet_d = decodeChar(src[ii + 3]);
+
+    	    u32 triple = (sextet_a << 18) + (sextet_b << 12) +
+				(sextet_c << 6) + sextet_d;
+
+    	    if(res.size() < size) res.push_back((triple >> 16) & 0xFF);
+	    if(res.size() < size) res.push_back((triple >> 8) & 0xFF);
+    	    if(res.size() < size) res.push_back(triple & 0xFF);
+	}
+    }
+
+    return res;
+}

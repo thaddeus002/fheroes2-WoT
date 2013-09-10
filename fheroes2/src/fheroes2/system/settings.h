@@ -411,7 +411,6 @@ public:
     bool WinsAllowNormalVictory(void) const;
     u8 WinsFindArtifactID(void) const;
     bool WinsFindUltimateArtifact(void) const;
-    u16 WinsSidePart(void) const;
     u32 WinsAccumulateGold(void) const;
     u32 WinsMapsIndexObject(void) const;
     u32 LossMapsIndexObject(void) const;

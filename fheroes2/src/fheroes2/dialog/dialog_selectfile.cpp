@@ -37,13 +37,13 @@
 #include "world.h"
 #include "dialog.h"
 
-bool SelectFileListSimple(const std::string &, std::string &, bool);
+std::string SelectFileListSimple(const std::string &, const std::string &, bool);
 bool RedrawExtraInfo(const Point &, const std::string &, const std::string &, const Rect &);
 
 class FileInfoListBox : public Interface::ListBox<Maps::FileInfo>
 {
 public:
-    FileInfoListBox(const Point & pt, std::string & res, bool & edit) : Interface::ListBox<Maps::FileInfo>(pt), result(res), edit_mode(edit) {};
+    FileInfoListBox(const Point & pt, bool & edit) : Interface::ListBox<Maps::FileInfo>(pt), edit_mode(edit) {};
 
     void RedrawItem(const Maps::FileInfo &, s16, s16, bool);
     void RedrawBackground(const Point &);
@@ -54,7 +54,6 @@ public:
     void ActionListSingleClick(Maps::FileInfo &);
     void ActionListPressRight(Maps::FileInfo &){};
 
-    std::string & result;
     bool & edit_mode;
 };
 
@@ -106,7 +105,6 @@ void FileInfoListBox::ActionCurrentDn(void)
 
 void FileInfoListBox::ActionListDoubleClick(Maps::FileInfo &)
 {
-    result = (*cur).file;
     edit_mode = false;
 }
 
@@ -156,42 +154,29 @@ MapsFileInfoList GetSortedMapsFileInfoList(void)
     return list2;
 }
 
-bool Dialog::SelectFileSave(std::string & file)
+std::string Dialog::SelectFileSave(void)
 {
-    // set default
-    if(file.empty())
-    {
-	const Settings & conf = Settings::Get();
-//	const std::string & last = Game::GetLastSavename();
+    const Settings & conf = Settings::Get();
+    const std::string & name = conf.CurrentFileInfo().name;
 
-//	if(last.size())
-//	    os << last;
-//	else
+    std::string base = name.size() ? name : "newgame";
+    std::replace_if(base.begin(), base.end(), ::isspace, '_');
+    std::ostringstream os;
 
-	const std::string & name = conf.CurrentFileInfo().name;
-	std::string base = name.size() ? name : "newgame";
-	std::replace_if(base.begin(), base.end(), ::isspace, '_');
-	std::ostringstream os;
-
-	os << System::ConcatePath(Settings::GetSaveDir(), base) <<
+    os << System::ConcatePath(Settings::GetSaveDir(), base) <<
 	    // add postfix:
 	    '_' << std::setw(4) << std::setfill('0') << world.CountDay() << ".sav";
-
-	file = os.str();
-    }
-
-    return SelectFileListSimple(_("File to Save:"), file, true);
+    std::string lastfile = os.str();
+    return SelectFileListSimple(_("File to Save:"), lastfile, true);
 }
 
-bool Dialog::SelectFileLoad(std::string & file)
+std::string Dialog::SelectFileLoad(void)
 {
-    // set default
-    if(file.empty() && Game::GetLastSavename().size())
-	file = Game::GetLastSavename();
-    return SelectFileListSimple(_("File to Load:"), file, false);
+    const std::string & lastfile = Game::GetLastSavename();
+    return SelectFileListSimple(_("File to Load:"), (lastfile.size() ? lastfile : ""), false);
 }
 
-bool SelectFileListSimple(const std::string & header, std::string & result, bool editor)
+std::string SelectFileListSimple(const std::string & header, const std::string & lastfile, bool editor)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
@@ -216,7 +201,7 @@ bool SelectFileListSimple(const std::string & header, std::string & result, bool
     bool edit_mode = false;
 
     MapsFileInfoList lists = GetSortedMapsFileInfoList();
-    FileInfoListBox listbox(rt, result, edit_mode);
+    FileInfoListBox listbox(rt, edit_mode);
 
     listbox.RedrawBackground(rt);
     listbox.SetScrollButtonUp(ICN::REQUESTS, 5, 6, Point(rt.x + 327, rt.y + 55));
@@ -229,20 +214,18 @@ bool SelectFileListSimple(const std::string & header, std::string & result, bool
     std::string filename;
     size_t charInsertPos = 0;
 
-    if(result.size())
+    if(lastfile.size())
     {
-	filename = ResizeToShortName(result);
+	filename = ResizeToShortName(lastfile);
 	charInsertPos = filename.size();
 
 	MapsFileInfoList::iterator it = lists.begin();
-	for(; it != lists.end(); ++it) if((*it).file == result) break;
+	for(; it != lists.end(); ++it) if((*it).file == lastfile) break;
 
 	if(it != lists.end())
 	    listbox.SetCurrent(std::distance(lists.begin(), it));
 	else
     	    listbox.Unselect();
-
-	result.clear();
     }
 
     if(!editor && lists.empty())
@@ -263,6 +246,7 @@ bool SelectFileListSimple(const std::string & header, std::string & result, bool
     cursor.Show();
     display.Flip();
 
+    std::string result;
     bool is_limit = false;
 
     while(le.HandleEvents() && result.empty())
@@ -344,7 +328,7 @@ bool SelectFileListSimple(const std::string & header, std::string & result, bool
     cursor.Hide();
     back.Restore();
 
-    return result.size();
+    return result;
 }
 
 bool RedrawExtraInfo(const Point & dst, const std::string & header, const std::string & filename, const Rect & field)

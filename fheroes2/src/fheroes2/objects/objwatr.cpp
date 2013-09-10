@@ -39,6 +39,12 @@ u16 ObjWat2::GetPassable(const u8 & index)
     if(isShadow(index))
         return DIRECTION_ALL;
     else
+    if(10 == index)
+        return Direction::CENTER | Direction::TOP | Direction::LEFT | Direction::TOP_LEFT;
+    else
+    if(22 == index)
+        return DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::BOTTOM_LEFT;
+    else
     if(isAction(index) ||
         ARRAY_COUNT_END(disabled) != std::find(disabled, ARRAY_COUNT_END(disabled), index))
         return 0;

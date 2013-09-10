@@ -79,8 +79,8 @@ namespace Dialog
     Game::menu_t FileOptions(void);
     u8    SystemOptions(void);
 
-    bool SelectFileLoad(std::string &);
-    bool SelectFileSave(std::string &);
+    std::string SelectFileLoad(void);
+    std::string SelectFileSave(void);
 
     // show info cell maps
     void QuickInfo(const Maps::Tiles & tile);

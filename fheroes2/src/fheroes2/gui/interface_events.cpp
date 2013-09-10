@@ -297,8 +297,8 @@ void Interface::Basic::EventNextTown(void)
 
 void Interface::Basic::EventSaveGame(void)
 {
-    std::string filename;
-    if(Dialog::SelectFileSave(filename) && filename.size() && Game::Save(filename))
+    std::string filename = Dialog::SelectFileSave();
+    if(filename.size() && Game::Save(filename))
 	Dialog::Message("", _("Game saved successfully."), Font::BIG, Dialog::OK);
 }
 

@@ -117,8 +117,8 @@ void UpdateRects::PushRect(int px, int py, int pw, int ph)
 	if(py + ph > display.h())
 	    ph = display.h() - py;
 
-	const u16 dw = display.w() >> bf;
-	s16 xx, yy;
+	const int dw = display.w() >> bf;
+	int xx, yy;
 
 	for(yy = py; yy < py + ph; yy += bw)
 	    for(xx = px; xx < px + pw; xx += bw)
@@ -142,7 +142,7 @@ bool UpdateRects::BitsToRects(void)
 {
     Display & display = Display::Get();
 
-    const u16 dbf = display.w() >> bf;
+    const int dbf = display.w() >> bf;
     const size_t len2 = len << 3;
     size_t index;
     SDL_Rect rect;

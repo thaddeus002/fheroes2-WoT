@@ -974,11 +974,6 @@ bool Settings::WinsFindUltimateArtifact(void) const
     return current_maps_file.WinsFindUltimateArtifact();
 }
 
-u16 Settings::WinsSidePart(void) const
-{
-    return current_maps_file.WinsSidePart();
-}
-
 u32 Settings::WinsAccumulateGold(void) const
 {
     return current_maps_file.WinsAccumulateGold();

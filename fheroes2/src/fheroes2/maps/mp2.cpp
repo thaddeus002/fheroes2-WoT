@@ -1027,8 +1027,6 @@ u16 MP2::GetObjectDirect(const u8 obj)
             return Direction::CENTER | Direction::LEFT | DIRECTION_BOTTOM_ROW;
 
         case OBJ_DERELICTSHIP:
-            return Direction::CENTER | Direction::LEFT | Direction::BOTTOM_LEFT | Direction::BOTTOM;
-
         case OBJ_TROLLBRIDGE:
         case OBJ_ARCHERHOUSE:
         case OBJ_DOCTORHUT:

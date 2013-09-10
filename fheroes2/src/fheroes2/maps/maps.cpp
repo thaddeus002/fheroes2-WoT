@@ -102,7 +102,7 @@ Maps::Indexes & MapsIndexesFilteredObject(Maps::Indexes & indexes, u8 obj)
 
 const char* Maps::SizeString(u16 s)
 {
-    const char* mapsize[] = { "Unknown", _("maps|Small"), _("maps|Medium"), _("maps|Large"), _("maps|Extra Large"), "size256", "size320" };
+    const char* mapsize[] = { "Unknown", _("maps|Small"), _("maps|Medium"), _("maps|Large"), _("maps|Extra Large"), _("maps|Custom Size") };
 
     switch(s)
     {
@@ -110,12 +110,10 @@ const char* Maps::SizeString(u16 s)
 	case MEDIUM:	return mapsize[2];
 	case LARGE:	return mapsize[3];
 	case XLARGE:	return mapsize[4];
-	case XLARGE2:	return mapsize[5];
-	case XLARGE3:	return mapsize[6];
         default: break;
     }
 
-    return mapsize[0];
+    return mapsize[5];
 }
 
 const char* Maps::GetMinesName(u8 type)

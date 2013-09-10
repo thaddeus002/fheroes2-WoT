@@ -41,8 +41,8 @@ Game::menu_t PocketPC::LoadGame(void)
     cursor.Show();
     display.Flip();
 
-    std::string file;
-    if(!Dialog::SelectFileLoad(file) || file.empty() || !Game::Load(file)) return Game::MAINMENU;
+    std::string file = Dialog::SelectFileLoad();
+    if(file.empty() || !Game::Load(file)) return Game::MAINMENU;
 
     return Game::STARTGAME;
 }

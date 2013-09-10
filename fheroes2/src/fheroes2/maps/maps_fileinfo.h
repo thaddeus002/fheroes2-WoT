@@ -33,6 +33,7 @@ namespace Maps
   public:
     FileInfo();
 
+    bool ReadMAP(const std::string &);
     bool ReadMP2(const std::string &);
     bool ReadSAV(const std::string &);
 
@@ -57,7 +58,6 @@ namespace Maps
     bool WinsAllowNormalVictory(void) const;
     u8   WinsFindArtifactID(void) const;
     bool WinsFindUltimateArtifact(void) const;
-    u16 WinsSidePart(void) const;
     u32 WinsAccumulateGold(void) const;
     u32 WinsMapsIndexObject(void) const;
     u32 LossMapsIndexObject(void) const;
@@ -65,6 +65,7 @@ namespace Maps
 
     std::string String(void) const;
     void Reset(void);
+    void FillUnions(void);
 
     std::string file;
     std::string name;
@@ -80,12 +81,13 @@ namespace Maps
     u8 allow_human_colors;
     u8 allow_comp_colors;
     u8 rnd_races;
-    u8 conditions_wins;
-    u8 wins1;
-    u8 wins2;
-    u16 wins3;
-    u16 wins4;
-    u8 conditions_loss;
+
+    u8 conditions_wins; // 0: wins def, 1: town, 2: hero, 3: artifact, 4: side, 5: gold
+    bool comp_also_wins;
+    bool allow_normal_victory;
+    u16 wins1;
+    u16 wins2;
+    u8 conditions_loss; // 0: loss def, 1: town, 2: hero, 3: out time
     u16 loss1;
     u16 loss2;
 
