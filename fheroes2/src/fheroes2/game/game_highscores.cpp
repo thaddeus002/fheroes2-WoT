@@ -95,6 +95,7 @@ bool HGSData::Load(const char* fn)
     if(!fs.is_open()) return false;
 
     StreamBuf hdata(512);
+    hdata.setbigendian(true);
 
 #ifdef WITH_ZLIB
     ZStreamBuf zdata;
@@ -142,6 +143,7 @@ bool HGSData::Save(const char* fn)
     if(!fs.is_open()) return false;
 
     StreamBuf hdata(512);
+    hdata.setbigendian(true);
     hdata << static_cast<u16>(HGS_ID) << list;
 
 #ifdef WITH_ZLIB

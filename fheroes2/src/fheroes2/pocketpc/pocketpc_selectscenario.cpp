@@ -97,7 +97,7 @@ Game::menu_t PocketPC::SelectScenario(void)
     listbox.RedrawBackground(rt);
     listbox.SetScrollButtonUp(ICN::REQUESTS, 5, 6, Point(rt.x + 285, rt.y + 40));
     listbox.SetScrollButtonDn(ICN::REQUESTS, 7, 8, Point(rt.x + 285, rt.y + 175));
-    listbox.SetScrollSplitter(AGG::GetICN(ICN::ESCROLL, 3), Rect(rt.x + 288, rt.y + 58, 12, 114));
+    listbox.SetScrollSplitter(AGG::GetICN(ICN::ESCROLL, 3), Rect(rt.x + 286, rt.y + 58, 12, 114));
     listbox.SetAreaMaxItems(8);
     listbox.SetAreaItems(Rect(rt.x + 17, rt.y + 37, 266, 156));
     listbox.SetListContent(all);

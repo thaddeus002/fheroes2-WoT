@@ -1495,6 +1495,7 @@ void Settings::BinarySave(void) const
     if(fs.is_open())
     {
 	StreamBuf msg(64);
+	msg.setbigendian(true);
 
 	msg << static_cast<u16>(CURRENT_FORMAT_VERSION) <<
 	    opt_game << opt_world << opt_battle << opt_addons <<
@@ -1518,6 +1519,8 @@ void Settings::BinaryLoad(void)
     if(fs.is_open())
     {
 	StreamBuf msg(64);
+	msg.setbigendian(true);
+
 	fs >> msg;
 
 	if(! msg.fail())

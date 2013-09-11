@@ -33,6 +33,7 @@ bool Battle::Actions::HaveCommand(u16 cmd) const
 
 Battle::Command::Command(u16 msg) : StreamBuf(16), type(msg)
 {
+    setbigendian(true);
     *this << type;
 }
 
@@ -47,15 +48,18 @@ Battle::Command & Battle::Command::operator= (const Command & cmd)
 
 Battle::Command::Command(const Command & cmd) : StreamBuf(cmd), type(cmd.type)
 {
+    setbigendian(true);
 }
 
 Battle::Command::Command(const StreamBuf & sb) : StreamBuf(sb), type(0)
 {
+    setbigendian(true);
     *this >> type;
 }
 
 Battle::Command::Command(u16 cmd, s32 param1, s32 param2, const Indexes & param3) : StreamBuf(16), type(cmd)
 {
+    setbigendian(true);
     StreamBase & base = *this;
     *this << type;
 
@@ -71,6 +75,7 @@ Battle::Command::Command(u16 cmd, s32 param1, s32 param2, const Indexes & param3
 
 Battle::Command::Command(u16 cmd, s32 param1, s32 param2, s32 param3, s32 param4) : StreamBuf(16), type(cmd)
 {
+    setbigendian(true);
     StreamBase & base = *this;
     *this << type;
 
