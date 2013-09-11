@@ -31,8 +31,6 @@
 #include "settings.h"
 #include "text.h"
 #include "engine.h"
-#include "midi_xmi.h"
-#include "midi_mid.h"
 #include "artifact.h"
 #include "dir.h"
 #include "xmi.h"
@@ -1259,19 +1257,7 @@ void AGG::LoadMID(XMI::xmi_t xmi, std::vector<u8> & v)
     const std::vector<u8> & body = ReadChunk(XMI::GetString(xmi));
 
     if(body.size())
-    {
-	MIDI::Xmi x;
-	MIDI::Mid m;
-	MIDI::MTrk track;
-
-	x.Read(body);
-	track.ImportXmiEVNT(x.EVNT());
-
-	m.AddTrack(track);
-	m.SetPPQN(64);
-
-	m.Write(v);
-    }
+        v = Music::Xmi2Mid(body);
 }
 
 /* return CVT */

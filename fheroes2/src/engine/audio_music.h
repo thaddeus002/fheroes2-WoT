@@ -37,6 +37,8 @@ namespace Music
     void	Reset(void);
     bool	isPlaying(void);
     bool	isPaused(void);
+
+    std::vector<u8> Xmi2Mid(const std::vector<u8> &);
 }
 
 #endif

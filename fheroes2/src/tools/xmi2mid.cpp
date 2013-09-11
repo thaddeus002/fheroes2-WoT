@@ -21,36 +21,27 @@
  ***************************************************************************/
 
 #include <iostream>
-#include <fstream>
-
-#include "SDL.h"
 #include "engine.h"
-#include "midi_xmi.h"
-#include "midi_mid.h"
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     if(argc != 3)
     {
 	std::cout << argv[0] << " infile.xmi outfile.mid" << std::endl;
-
 	return EXIT_SUCCESS;
     }
 
-    MIDI::Xmi x;
-    MIDI::Mid m;
-    MIDI::MTrk track;
+    std::vector<u8> buf = LoadFileToMem(argv[1]);
 
-    x.Read(argv[1]);
+    if(buf.size())
+    {
+	buf = Music::Xmi2Mid(buf);
 
-    track.ImportXmiEVNT(x.EVNT());
+	if(buf.empty())
+    	    std::cerr << ", file: " << argv[1] << std::endl;
+	else
+    	    SaveMemToFile(buf, std::string(argv[2]));
+    }
 
-    m.AddTrack(track);
-    m.SetPPQN(64);
-
-    // m.Dump();
-
-    m.Write(argv[2]);
-
-    return EXIT_SUCCESS;
+    return 0;
 }
