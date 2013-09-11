@@ -478,8 +478,8 @@ KeySym KeySymFromChar(char c)
 
 bool SaveMemToFile(const std::vector<u8> & data, const std::string & file)
 {
-    std::ofstream fs;
-    fs.open(file.c_str(), std::ios::binary);
+    std::ofstream fs(file.c_str(), std::ios::binary);
+
     if(fs.is_open() && data.size())
     {
         fs.write(reinterpret_cast<const char*>(&data[0]), data.size());
@@ -489,10 +489,11 @@ bool SaveMemToFile(const std::vector<u8> & data, const std::string & file)
     return false;
 }
 
-bool LoadFileToMem(std::vector<u8> & data, const std::string & file)
+std::vector<u8> LoadFileToMem(const std::string & file)
 {
-    std::ifstream fs;
-    fs.open(file.c_str(), std::ios::binary);
+    std::ifstream fs(file.c_str(), std::ios::binary);
+    std::vector<u8> data;
+
     if(fs.is_open())
     {
         fs.seekg(0, std::ios_base::end);
@@ -500,9 +501,8 @@ bool LoadFileToMem(std::vector<u8> & data, const std::string & file)
         fs.seekg(0, std::ios_base::beg);
         fs.read(reinterpret_cast<char*>(&data[0]), data.size());
         fs.close();
-        return true;
     }
-    return false;
+    return data;
 }
 
 bool PressIntKey(u32 min, u32 max, u32 & result)

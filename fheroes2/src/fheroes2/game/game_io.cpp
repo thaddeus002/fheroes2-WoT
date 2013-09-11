@@ -153,6 +153,9 @@ bool Game::Load(const std::string & fn)
 	    StreamBuf gdata((Maps::MEDIUM < conf.MapsWidth() ? 1024 :512) * 1024);
 	    HeaderSAV header;
 
+	    hinfo.setbigendian(true);
+	    gdata.setbigendian(true);
+
 	    fs >> hinfo;
 
 	    if(hinfo.fail())
@@ -224,16 +227,8 @@ bool Game::Load(const std::string & fn)
 	    SetLoadVersion(binver);
 	    u16 end_check = 0;
 
-	    if(GetLoadVersion() < FORMAT_VERSION_2830)
-	    {
-		gdata >> Settings::Get() >> World::Get() >> GameOver::Result::Get() >>
-		    GameStatic::Data::Get() >> MonsterStaticData::Get() >> end_check;
-	    }
-	    else
-	    {
-		gdata >> World::Get() >> Settings::Get() >> GameOver::Result::Get() >>
-		    GameStatic::Data::Get() >> MonsterStaticData::Get() >> end_check;
-	    }
+	    gdata >> World::Get() >> Settings::Get() >> GameOver::Result::Get() >>
+		GameStatic::Data::Get() >> MonsterStaticData::Get() >> end_check;
 
 	    if(end_check == SAV2ID)
 	    {
@@ -274,6 +269,7 @@ bool Game::LoadSAV2FileInfo(const std::string & fn,  Maps::FileInfo & finfo)
 	{
 	    HeaderSAV header;
 	    StreamBuf hinfo(1024);
+	    hinfo.setbigendian(true);
 	    std::string strver;
 	    u16 binver;
 

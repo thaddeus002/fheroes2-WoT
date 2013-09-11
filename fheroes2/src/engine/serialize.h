@@ -41,6 +41,8 @@ struct Size;
 class StreamBase
 {
 public:
+    enum { EndianBig = 0x80000000 };
+
     StreamBase() {}
     virtual ~StreamBase() {}
 
@@ -50,14 +52,31 @@ public:
     virtual bool	put(const char &) = 0;
     virtual size_t	sizep(void) const = 0;
 
-    char		get(void);
+    int			get(void);
+    virtual bool	bigendian(void) const;
+
+    int			getBE16(void);
+    int			getLE16(void);
+    int			getBE32(void);
+    int			getLE32(void);
+
     void		get16(u16 &);
-    u16			get16(void);
+    int			get16(void);
     void		get32(u32 &);
-    u32			get32(void);
+    int			get32(void);
+
+    std::vector<u8>	getRaw(size_t);
+    void		putRaw(const char*, size_t);
 
     void		put16(const u16 &);
     void		put32(const u32 &);
+
+    void		putBE32(const u32 &);
+    void		putLE32(const u32 &);
+    void		putBE16(const u16 &);
+    void		putLE16(const u16 &);
+
+    void		skip(size_t);
 
     StreamBase &	operator>> (bool &);
     StreamBase &	operator>> (u8 &);
@@ -161,11 +180,17 @@ public:
 	return *this;
     }
 
-    static void		put32(std::ostream &, const u32 &);
-    static void		put16(std::ostream &, const u16 &);
+    static void		putBE32(std::ostream &, const u32 &);
+    static void		putLE32(std::ostream &, const u32 &);
 
-    static u32		get32(std::istream &);
-    static u16		get16(std::istream &);
+    static void		putBE16(std::ostream &, const u16 &);
+    static void		putLE16(std::ostream &, const u16 &);
+
+    static int		getBE32(std::istream &);
+    static int		getLE32(std::istream &);
+
+    static int		getBE16(std::istream &);
+    static int		getLE16(std::istream &);
 };
 
 #ifdef WITH_ZLIB
@@ -177,6 +202,7 @@ class StreamBuf : public StreamBase
 public:
     StreamBuf(size_t);
     StreamBuf(const StreamBuf &);
+    StreamBuf(const std::vector<u8> &);
 
     ~StreamBuf();
 
@@ -191,6 +217,12 @@ public:
     void	setlimit(size_t);
 
     bool	fail(void) const;
+
+    void	setconstbuf(bool);
+    bool	isconstbuf(void) const;
+
+    void	setbigendian(bool);
+    bool	bigendian(void) const;
 
 protected:
     size_t	tellg(void) const;

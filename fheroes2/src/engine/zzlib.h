@@ -45,7 +45,7 @@ private:
 class ZStreamBuf : protected StreamBuf
 {
 public:
-    ZStreamBuf() : StreamBuf(0) {}
+    ZStreamBuf();
 
     ZStreamBuf & operator<< (StreamBuf &);
     ZStreamBuf & operator>> (StreamBuf &);

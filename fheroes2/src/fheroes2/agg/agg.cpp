@@ -1179,14 +1179,15 @@ void AGG::LoadWAV(M82::m82_t m82, std::vector<u8> & v)
 	// ogg
 	StringReplace(name, ".82m", ".ogg");
 	std::string sound = Settings::GetLastFile(prefix_sounds, name);
+	v = LoadFileToMem(sound);
 
-	if(! LoadFileToMem(v, sound))
+	if(v.empty())
 	{
 	    // find mp3
 	    StringReplace(name, ".82m", ".mp3");
 	    sound = Settings::GetLastFile(prefix_sounds, name);
 
-	    LoadFileToMem(v, sound);
+	    v = LoadFileToMem(sound);
 	}
 
 	if(v.size())

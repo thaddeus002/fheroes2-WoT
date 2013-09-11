@@ -83,6 +83,11 @@ bool ZSurface::Load(int w, int h, int bpp, int pitch, u32 rmask, u32 gmask, u32 
     return false;
 }
 
+ZStreamBuf::ZStreamBuf() : StreamBuf(0)
+{
+    setbigendian(true);
+}
+
 std::ostream & operator<< (std::ostream & os, ZStreamBuf & zb)
 {
     return os << static_cast<StreamBuf &>(zb);
