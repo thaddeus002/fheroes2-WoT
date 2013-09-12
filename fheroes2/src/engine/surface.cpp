@@ -279,6 +279,7 @@ int Surface::GetDefaultDepth(void)
 void Surface::Reset(void)
 {
     FreeSurface(*this);
+    surface = NULL; /* hard set: for ref copy */
 }
 
 void Surface::Set(SDL_Surface* sf)
