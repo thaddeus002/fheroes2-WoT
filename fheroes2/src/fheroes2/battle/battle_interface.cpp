@@ -2850,7 +2850,7 @@ void Battle::Interface::RedrawActionTowerPart1(Tower & tower, Unit & defender)
     cursor.SetThemes(Cursor::WAR_NONE);
     b_current = NULL;
 
-    const Point pos1 = tower.GetPortPosition();
+    const Point pos1 = tower.GetPortPosition() + border.GetArea();
     const Rect & pos2 = defender.GetRectPosition();
 
     AGG::PlaySound(M82::KEEPSHOT);

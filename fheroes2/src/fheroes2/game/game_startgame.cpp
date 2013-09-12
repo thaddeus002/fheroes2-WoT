@@ -539,6 +539,9 @@ Game::menu_t Interface::Basic::StartGame(void)
     iconsPanel.ResetIcons();
     radar.Build();
 
+    if(conf.ExtGameHideInterface())
+	SetHideInterface(true);
+
     Redraw(REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_BORDER);
     iconsPanel.HideIcons();
 
