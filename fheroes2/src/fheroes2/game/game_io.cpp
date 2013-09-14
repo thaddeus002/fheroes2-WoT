@@ -99,16 +99,19 @@ bool Game::Save(const std::string &fn)
 
     if(fs.is_open())
     {
-	StreamBuf info(1024);
+	StreamBuf hinfo(1024);
 	StreamBuf gdata((Maps::MEDIUM < conf.MapsWidth() ? 1024 :512) * 1024);
 	if(! autosave) Game::SetLastSavename(fn);
 
-	info << GetString(GetLoadVersion()) << GetLoadVersion() <<
+	hinfo.setbigendian(true);
+	gdata.setbigendian(true);
+
+	hinfo << GetString(GetLoadVersion()) << GetLoadVersion() <<
 		HeaderSAV(conf.CurrentFileInfo(), conf.PriceLoyaltyVersion());
 	gdata << GetLoadVersion() << World::Get() << Settings::Get() <<
 	    GameOver::Result::Get() << GameStatic::Data::Get() << MonsterStaticData::Get() << SAV2ID; // eof marker
 
-	fs << static_cast<char>(SAV2ID >> 8) << static_cast<char>(SAV2ID) << info;
+	fs << static_cast<char>(SAV2ID >> 8) << static_cast<char>(SAV2ID) << hinfo;
 
 #ifdef WITH_ZLIB
 	ZStreamBuf zdata;
