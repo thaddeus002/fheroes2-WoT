@@ -2038,12 +2038,14 @@ int Troops::validCount(void) const
 }
 
 MapTown::MapTown(const QPoint & pos, quint32 id)
-    : MapObject(pos, id, MapObj::Castle), col(Color::None), race(Race::Unknown), buildings(0), forceTown(false), customBuilding(false)
+    : MapObject(pos, id, MapObj::Castle), col(Color::None), race(Race::Unknown),
+	buildings(0), dwellings(0), isCastle(false), forceTown(false), captainPresent(false), customTroops(false), customBuildings(false), customDwellings(false)
 {
 }
 
 MapTown::MapTown(const QPoint & pos, quint32 id, const mp2town_t & mp2)
-    : MapObject(pos, id, MapObj::Castle), nameTown(mp2.name), forceTown(mp2.forceTown), customBuilding(mp2.customBuilding)
+    : MapObject(pos, id, MapObj::Castle), buildings(0), dwellings(0), nameTown(mp2.name), isCastle(false), forceTown(mp2.forceTown), captainPresent(false),
+	customTroops(mp2.customTroops), customBuildings(mp2.customBuilding), customDwellings(false)
 {
     switch(mp2.color)
     {
@@ -2080,17 +2082,18 @@ MapTown::MapTown(const QPoint & pos, quint32 id, const mp2town_t & mp2)
         if(0x00001000 & mp2.building) buildings |= Building::Moat;
         if(0x00000800 & mp2.building) buildings |= Building::ExtraWel2;
         if(0x00002000 & mp2.building) buildings |= Building::ExtraSpec;
-        if(0x00080000 & mp2.building) buildings |= Building::Dwelling1;
-        if(0x00100000 & mp2.building) buildings |= Building::Dwelling2;
-        if(0x00200000 & mp2.building) buildings |= Building::Dwelling3;
-        if(0x00400000 & mp2.building) buildings |= Building::Dwelling4;
-        if(0x00800000 & mp2.building) buildings |= Building::Dwelling5;
-        if(0x01000000 & mp2.building) buildings |= Building::Dwelling6;
-        if(0x02000000 & mp2.building) buildings |= Building::Upgrade2 | Building::Dwelling2;
-        if(0x04000000 & mp2.building) buildings |= Building::Upgrade3 | Building::Dwelling3;
-        if(0x08000000 & mp2.building) buildings |= Building::Upgrade4 | Building::Dwelling4;
-        if(0x10000000 & mp2.building) buildings |= Building::Upgrade5 | Building::Dwelling5;
-        if(0x20000000 & mp2.building) buildings |= Building::Upgrade6 | Building::Dwelling6;
+        if(0x00080000 & mp2.building) dwellings |= Building::Dwelling1;
+        if(0x00100000 & mp2.building) dwellings |= Building::Dwelling2;
+        if(0x00200000 & mp2.building) dwellings |= Building::Dwelling3;
+        if(0x00400000 & mp2.building) dwellings |= Building::Dwelling4;
+        if(0x00800000 & mp2.building) dwellings |= Building::Dwelling5;
+        if(0x01000000 & mp2.building) dwellings |= Building::Dwelling6;
+        if(0x02000000 & mp2.building) dwellings |= Building::Upgrade2 | Building::Dwelling2;
+        if(0x04000000 & mp2.building) dwellings |= Building::Upgrade3 | Building::Dwelling3;
+        if(0x08000000 & mp2.building) dwellings |= Building::Upgrade4 | Building::Dwelling4;
+        if(0x10000000 & mp2.building) dwellings |= Building::Upgrade5 | Building::Dwelling5;
+        if(0x20000000 & mp2.building) dwellings |= Building::Upgrade6 | Building::Dwelling6;
+	customDwellings = 0x3FF8000 & mp2.building;
     }
 
     if(0 < mp2.magicTower) buildings |= Building::MageGuild1;
@@ -2099,8 +2102,17 @@ MapTown::MapTown(const QPoint & pos, quint32 id, const mp2town_t & mp2)
     if(3 < mp2.magicTower) buildings |= Building::MageGuild4;
     if(4 < mp2.magicTower) buildings |= Building::MageGuild5;
 
-    if(mp2.isCastle) buildings |= Building::Castle;
-    if(mp2.captainPresent) buildings |= Building::Captain;
+    if(mp2.isCastle)
+    {
+	buildings |= Building::Castle;
+	isCastle = true;
+    }
+
+    if(mp2.captainPresent)
+    {
+	buildings |= Building::Captain;
+	captainPresent = true;
+    }
 
     if(mp2.customTroops)
     {
@@ -2112,7 +2124,12 @@ MapTown::MapTown(const QPoint & pos, quint32 id, const mp2town_t & mp2)
 void MapTown::updateInfo(int spriteIndex, bool random)
 {
     if((spriteIndex % 32) < 16)
+    {
 	buildings |= Building::Castle;
+	isCastle = true;
+    }
+    else
+	isCastle = false;
 
     if(random)
 	race = Race::Random;
@@ -2146,7 +2163,13 @@ QDomElement & operator<< (QDomElement & el, const MapTown & town)
     el.setAttribute("color", town.col);
     el.setAttribute("race", town.race);
     el.setAttribute("buildings", town.buildings);
+    el.setAttribute("dwellings", town.dwellings);
+    el.setAttribute("customTroops", town.customTroops);
+    el.setAttribute("customDwellings", town.customDwellings);
+    el.setAttribute("customBuildings", town.customBuildings);
     el.setAttribute("forceTown", town.forceTown);
+    el.setAttribute("isCastle", town.isCastle);
+    el.setAttribute("captainPresent", town.captainPresent);
 
     QDomDocument doc = el.ownerDocument();
 
@@ -2168,7 +2191,13 @@ QDomElement & operator>> (QDomElement & el, MapTown & town)
     town.col = el.hasAttribute("color") ? el.attribute("color").toInt() : Color::None;
     town.race =  el.hasAttribute("race") ? el.attribute("race").toInt() : Race::Unknown;
     town.buildings = el.hasAttribute("buildings") ? el.attribute("buildings").toInt() : 0;
+    town.dwellings = el.hasAttribute("dwellings") ? el.attribute("dwellings").toInt() : 0;
+    town.customTroops = el.hasAttribute("customTroops") ? el.attribute("customTroops").toInt() : false;
+    town.customDwellings = el.hasAttribute("customDwellings") ? el.attribute("customDwellings").toInt() : false;
+    town.customBuildings = el.hasAttribute("customBuildings") ? el.attribute("customBuildings").toInt() : false;
     town.forceTown = el.hasAttribute("forceTown") ? el.attribute("forceTown").toInt() : false;
+    town.isCastle = el.hasAttribute("isCastle") ? el.attribute("isCastle").toInt() : false;
+    town.captainPresent = el.hasAttribute("captainPresent") ? el.attribute("captainPresent").toInt() : false;
 
     QDomElement troopsElem = el.firstChildElement("troops");
     troopsElem >> town.troops;

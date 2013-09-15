@@ -2106,13 +2106,13 @@ Form::TownDialog::TownDialog(const MapTown & town)
 
     checkBoxCaptain = new QCheckBox(tabInfo);
     checkBoxCaptain->setText(QApplication::translate("TownDialog", "Captain", 0, QApplication::UnicodeUTF8));
-    checkBoxCaptain->setChecked(town.buildings & Building::Captain);
+    checkBoxCaptain->setChecked(town.captainPresent);
 #ifndef QT_NO_TOOLTIP
     checkBoxCaptain->setToolTip(Building::description(Building::Captain, town.race));
 #endif
 
     checkBoxAllowCastle = new QCheckBox(tabInfo);
-    checkBoxAllowCastle->setVisible(! (town.buildings & Building::Castle));
+    checkBoxAllowCastle->setVisible(! town.isCastle);
     checkBoxAllowCastle->setChecked(! town.forceTown);
     checkBoxAllowCastle->setText(QApplication::translate("TownDialog", "Allow castle", 0, QApplication::UnicodeUTF8));
 
@@ -2127,7 +2127,7 @@ Form::TownDialog::TownDialog(const MapTown & town)
 
     // tab: troops
     tabTroops = new QWidget();
-    bool defaultTroops = 0 == town.troops.validCount();
+    bool defaultTroops = ! town.customTroops;
 
     checkBoxTroopsDefault = new QCheckBox(tabTroops);
     checkBoxTroopsDefault->setChecked(defaultTroops);
@@ -2268,7 +2268,7 @@ Form::TownDialog::TownDialog(const MapTown & town)
 
     // tab: buildings
     tabBuildings = new QWidget();
-    bool defaultBuildings = ! town.customBuilding;
+    bool defaultBuildings = ! town.customBuildings;
 
     checkBoxBuildingsDefault = new QCheckBox(tabBuildings);
     checkBoxBuildingsDefault->setChecked(defaultBuildings);
@@ -2417,7 +2417,7 @@ Form::TownDialog::TownDialog(const MapTown & town)
 
     // tab: dwellings
     tabDwellings = new QWidget();
-    bool defaultDwellings = defaultBuildings;
+    bool defaultDwellings = ! town.customDwellings;
     int dwellingMap = Building::dwellingMap(town.race);
 
     checkBoxDwellingsDefault = new QCheckBox(tabDwellings);
@@ -2507,18 +2507,18 @@ Form::TownDialog::TownDialog(const MapTown & town)
 
     if(!defaultBuildings)
     {
-	checkBoxDwelling1->setChecked(town.buildings & Building::Dwelling1);
-	checkBoxDwelling2->setChecked(town.buildings & Building::Dwelling2);
-	checkBoxDwelling3->setChecked(town.buildings & Building::Dwelling3);
-	checkBoxDwelling4->setChecked(town.buildings & Building::Dwelling4);
-	checkBoxDwelling5->setChecked(town.buildings & Building::Dwelling5);
-	checkBoxDwelling6->setChecked(town.buildings & Building::Dwelling6);
+	checkBoxDwelling1->setChecked(town.dwellings & Building::Dwelling1);
+	checkBoxDwelling2->setChecked(town.dwellings & Building::Dwelling2);
+	checkBoxDwelling3->setChecked(town.dwellings & Building::Dwelling3);
+	checkBoxDwelling4->setChecked(town.dwellings & Building::Dwelling4);
+	checkBoxDwelling5->setChecked(town.dwellings & Building::Dwelling5);
+	checkBoxDwelling6->setChecked(town.dwellings & Building::Dwelling6);
 
-	checkBoxUpgrade2->setChecked(town.buildings & Building::Upgrade2);
-	checkBoxUpgrade3->setChecked(town.buildings & Building::Upgrade3);
-	checkBoxUpgrade4->setChecked(town.buildings & Building::Upgrade4);
-	checkBoxUpgrade5->setChecked(town.buildings & Building::Upgrade5);
-	checkBoxUpgrade6->setChecked(town.buildings & Building::Upgrade6);
+	checkBoxUpgrade2->setChecked(town.dwellings & Building::Upgrade2);
+	checkBoxUpgrade3->setChecked(town.dwellings & Building::Upgrade3);
+	checkBoxUpgrade4->setChecked(town.dwellings & Building::Upgrade4);
+	checkBoxUpgrade5->setChecked(town.dwellings & Building::Upgrade5);
+	checkBoxUpgrade6->setChecked(town.dwellings & Building::Upgrade6);
     }
 
     // add tabs
@@ -2615,9 +2615,9 @@ Troops Form::TownDialog::troops(void) const
     return res;
 }
 
-int Form::TownDialog::buildings(void) const
+uint Form::TownDialog::buildings(void) const
 {
-    int res = 0;
+    uint res = 0;
 
     switch(comboBoxMageGuild->currentIndex())
     {
@@ -2646,9 +2646,9 @@ int Form::TownDialog::buildings(void) const
     return res;
 }
 
-int Form::TownDialog::dwellings(void) const
+uint Form::TownDialog::dwellings(void) const
 {
-    int res = 0;
+    uint res = 0;
 
     if(checkBoxDwelling1->isChecked()) res |= Building::Dwelling1;
     if(checkBoxDwelling2->isChecked()) res |= Building::Dwelling2;

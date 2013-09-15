@@ -726,8 +726,8 @@ namespace Form
 	QSpacerItem*		horizontalSpacerButton;
 	QPushButton*		pushButtonCancel;
 
-	int			buildings(void) const;
-	int			dwellings(void) const;
+	uint			buildings(void) const;
+	uint			dwellings(void) const;
 	Troops			troops(void) const;
 
     protected slots:

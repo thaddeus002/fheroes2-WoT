@@ -708,7 +708,7 @@ QDomElement & operator<< (QDomElement & el, const MapTile & tile)
 
     QDomElement el2 = el.ownerDocument().createElement("levels2");
     el.appendChild(el2);
-    el1 << tile.spritesLevel2;
+    el2 << tile.spritesLevel2;
 
     return el;
 }
@@ -2539,10 +2539,14 @@ void MapData::editTownDialog(const MapTile & tile)
 	if(QDialog::Accepted == form.exec())
 	{
 	    town->nameTown = form.comboBoxName->lineEdit()->text();
-	    town->buildings = form.buildings() | form.dwellings();
+	    town->buildings = form.checkBoxBuildingsDefault->isChecked() ? 0 : form.buildings();
+	    town->dwellings = form.checkBoxDwellingsDefault->isChecked() ? 0 : form.dwellings();
 	    town->troops = form.troops();
-	    town->forceTown = form.checkBoxAllowCastle->isChecked();
-	    town->customBuilding = ! form.checkBoxBuildingsDefault->isChecked();
+	    town->forceTown = ! form.checkBoxAllowCastle->isChecked();
+	    town->captainPresent = form.checkBoxCaptain->isChecked();
+	    town->customTroops = ! form.checkBoxTroopsDefault->isChecked();
+	    town->customBuildings = ! form.checkBoxBuildingsDefault->isChecked();
+	    town->customDwellings = ! form.checkBoxDwellingsDefault->isChecked();
 	    town->col = qvariant_cast<int>(comboBoxCurrentData(form.comboBoxColor));
 	    //town->race = ;
 

@@ -710,11 +710,16 @@ struct MapTown : public MapObject
 {
     int		col;
     int		race;
-    int		buildings;
+    uint	buildings;
+    uint	dwellings;
     QString     nameTown;
     Troops	troops;
+    bool	isCastle;
     bool	forceTown;
-    bool	customBuilding;
+    bool	captainPresent;
+    bool	customTroops;
+    bool	customBuildings;
+    bool	customDwellings;
 
     MapTown(const QPoint &, quint32, const mp2town_t &);
     MapTown(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1);
