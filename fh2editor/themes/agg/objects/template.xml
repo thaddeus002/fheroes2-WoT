@@ -142,7 +142,7 @@
         <sprite px="2" py="1" index="5" level="action" passable="0x01F8" />
     </oracle>
     <wagon width="2" height="1" cid="0x50" >
-        <sprite px="0" py="0" index="0" level="top" />
+        <sprite px="0" py="0" index="0" level="top" cid="0" />
         <sprite px="1" py="0" index="1" level="action" passable="0x01F8" />
     </wagon>
     <hole width="1" height="1">
@@ -656,16 +656,16 @@
 
     <castle width="8" height="5" cid="0x23" icn="objntown" >
 	<!-- bottom -->
-        <sprite px="3" py="3" index="0" skipoffset="1" level="bottom" passable="0" icn="objntwba" />
-        <sprite px="4" py="3" index="1" skipoffset="1" level="bottom" passable="0" icn="objntwba" />
-        <sprite px="5" py="3" index="2" skipoffset="1" level="bottom" passable="0" icn="objntwba" />
-        <sprite px="6" py="3" index="3" skipoffset="1" level="bottom" passable="0" icn="objntwba" />
-        <sprite px="7" py="3" index="4" skipoffset="1" level="bottom" passable="0" icn="objntwba" />
-        <sprite px="3" py="4" index="5" skipoffset="1" level="bottom" passable="0x01F8" icn="objntwba" />
-        <sprite px="4" py="4" index="6" skipoffset="1" level="bottom" passable="0x01F8" icn="objntwba" />
-        <sprite px="5" py="4" index="7" skipoffset="1" level="bottom" passable="0x01FA" icn="objntwba" /> <!-- center row, bottom row, top -->
-        <sprite px="6" py="4" index="8" skipoffset="1" level="bottom" passable="0x01F8" icn="objntwba" />
-        <sprite px="7" py="4" index="9" skipoffset="1" level="bottom" passable="0x01F8" icn="objntwba" />
+        <sprite px="3" py="3" index="0" skipoffset="1" level="bottom" passable="0" icn="objntwba" cid="0" />
+        <sprite px="4" py="3" index="1" skipoffset="1" level="bottom" passable="0" icn="objntwba" cid="0" />
+        <sprite px="5" py="3" index="2" skipoffset="1" level="bottom" passable="0" icn="objntwba" cid="0" />
+        <sprite px="6" py="3" index="3" skipoffset="1" level="bottom" passable="0" icn="objntwba" cid="0" />
+        <sprite px="7" py="3" index="4" skipoffset="1" level="bottom" passable="0" icn="objntwba" cid="0" />
+        <sprite px="3" py="4" index="5" skipoffset="1" level="bottom" passable="0x01F8" icn="objntwba" cid="0" />
+        <sprite px="4" py="4" index="6" skipoffset="1" level="bottom" passable="0x01F8" icn="objntwba" cid="0" />
+        <sprite px="5" py="4" index="7" skipoffset="1" level="bottom" passable="0x01FA" icn="objntwba" cid="0" /> <!-- center row, bottom row, top -->
+        <sprite px="6" py="4" index="8" skipoffset="1" level="bottom" passable="0x01F8" icn="objntwba" cid="0" />
+        <sprite px="7" py="4" index="9" skipoffset="1" level="bottom" passable="0x01F8" icn="objntwba" cid="0" />
 	<!-- castle -->
         <sprite px="5" py="0" index="0" level="top" />
         <sprite px="3" py="1" index="1" level="top" />
@@ -684,38 +684,38 @@
         <sprite px="6" py="3" index="14" level="bottom" passable="0" />
         <sprite px="7" py="3" index="15" level="bottom" passable="0" />
 	<!-- shadow -->
-        <sprite px="1" py="1" index="0" level="top" icn="objntwsh" />
-        <sprite px="2" py="1" index="1" level="top" icn="objntwsh" />
-        <sprite px="3" py="1" index="2" level="top" icn="objntwsh" />
-        <sprite px="4" py="1" index="3" level="top" icn="objntwsh" />
-        <sprite px="0" py="2" index="4" level="top" icn="objntwsh" />
-        <sprite px="1" py="2" index="5" level="top" icn="objntwsh" />
-        <sprite px="2" py="2" index="6" level="top" icn="objntwsh" />
-        <sprite px="3" py="2" index="7" level="top" icn="objntwsh" />
-        <sprite px="4" py="3" index="8" level="top" icn="objntwsh" />
-        <sprite px="1" py="3" index="9" level="top" icn="objntwsh" />
-        <sprite px="2" py="3" index="10" level="top" icn="objntwsh" />
-        <sprite px="3" py="3" index="11" level="top" icn="objntwsh" />
-        <sprite px="4" py="3" index="12" level="top" icn="objntwsh" />
-        <sprite px="2" py="4" index="13" level="top" icn="objntwsh" />
-        <sprite px="3" py="4" index="14" level="top" icn="objntwsh" />
-        <sprite px="4" py="4" index="15" level="top" icn="objntwsh" />
+        <sprite px="1" py="1" index="0" level="top" icn="objntwsh" cid="0" />
+        <sprite px="2" py="1" index="1" level="top" icn="objntwsh" cid="0" />
+        <sprite px="3" py="1" index="2" level="top" icn="objntwsh" cid="0" />
+        <sprite px="4" py="1" index="3" level="top" icn="objntwsh" cid="0" />
+        <sprite px="0" py="2" index="4" level="top" icn="objntwsh" cid="0" />
+        <sprite px="1" py="2" index="5" level="top" icn="objntwsh" cid="0" />
+        <sprite px="2" py="2" index="6" level="top" icn="objntwsh" cid="0" />
+        <sprite px="3" py="2" index="7" level="top" icn="objntwsh" cid="0" />
+        <sprite px="4" py="3" index="8" level="top" icn="objntwsh" cid="0" />
+        <sprite px="1" py="3" index="9" level="top" icn="objntwsh" cid="0" />
+        <sprite px="2" py="3" index="10" level="top" icn="objntwsh" cid="0" />
+        <sprite px="3" py="3" index="11" level="top" icn="objntwsh" cid="0" />
+        <sprite px="4" py="3" index="12" level="top" icn="objntwsh" cid="0" />
+        <sprite px="2" py="4" index="13" level="top" icn="objntwsh" cid="0" />
+        <sprite px="3" py="4" index="14" level="top" icn="objntwsh" cid="0" />
+        <sprite px="4" py="4" index="15" level="top" icn="objntwsh" cid="0" />
 	<!-- flags -->
-        <sprite px="4" py="3" index="12" skipoffset="1" level="bottom" passable="0" icn="flag32" />
-        <sprite px="6" py="3" index="13" skipoffset="1" level="bottom" passable="0" icn="flag32" />
+        <sprite px="4" py="3" index="12" skipoffset="1" level="bottom" passable="0" icn="flag32" cid="0" />
+        <sprite px="6" py="3" index="13" skipoffset="1" level="bottom" passable="0" icn="flag32" cid="0" />
     </castle>
     <rndtown width="8" height="5" cid="0x23" icn="objntwrd" >
 	<!-- bottom -->
-        <sprite px="3" py="3" index="0" skipoffset="1" level="bottom" passable="0" icn="objntwba" />
-        <sprite px="4" py="3" index="1" skipoffset="1" level="bottom" passable="0" icn="objntwba" />
-        <sprite px="5" py="3" index="2" skipoffset="1" level="bottom" passable="0" icn="objntwba" />
-        <sprite px="6" py="3" index="3" skipoffset="1" level="bottom" passable="0" icn="objntwba" />
-        <sprite px="7" py="3" index="4" skipoffset="1" level="bottom" passable="0" icn="objntwba" />
-        <sprite px="3" py="4" index="5" skipoffset="1" level="bottom" passable="0x01F8" icn="objntwba" />
-        <sprite px="4" py="4" index="6" skipoffset="1" level="bottom" passable="0x01F8" icn="objntwba" />
-        <sprite px="5" py="4" index="7" skipoffset="1" level="bottom" passable="0x01FA" icn="objntwba" /> <!-- center row, bottom row, top -->
-        <sprite px="6" py="4" index="8" skipoffset="1" level="bottom" passable="0x01F8" icn="objntwba" />
-        <sprite px="7" py="4" index="9" skipoffset="1" level="bottom" passable="0x01F8" icn="objntwba" />
+        <sprite px="3" py="3" index="0" skipoffset="1" level="bottom" passable="0" icn="objntwba" cid="0" />
+        <sprite px="4" py="3" index="1" skipoffset="1" level="bottom" passable="0" icn="objntwba" cid="0" />
+        <sprite px="5" py="3" index="2" skipoffset="1" level="bottom" passable="0" icn="objntwba" cid="0" />
+        <sprite px="6" py="3" index="3" skipoffset="1" level="bottom" passable="0" icn="objntwba" cid="0" />
+        <sprite px="7" py="3" index="4" skipoffset="1" level="bottom" passable="0" icn="objntwba" cid="0" />
+        <sprite px="3" py="4" index="5" skipoffset="1" level="bottom" passable="0x01F8" icn="objntwba" cid="0" />
+        <sprite px="4" py="4" index="6" skipoffset="1" level="bottom" passable="0x01F8" icn="objntwba" cid="0" />
+        <sprite px="5" py="4" index="7" skipoffset="1" level="bottom" passable="0x01FA" icn="objntwba" cid="0" /> <!-- center row, bottom row, top -->
+        <sprite px="6" py="4" index="8" skipoffset="1" level="bottom" passable="0x01F8" icn="objntwba" cid="0" />
+        <sprite px="7" py="4" index="9" skipoffset="1" level="bottom" passable="0x01F8" icn="objntwba" cid="0" />
 	<!-- castle -->
         <sprite px="5" py="0" index="0" level="top" />
         <sprite px="3" py="1" index="1" level="top" />
@@ -734,25 +734,25 @@
         <sprite px="6" py="3" index="14" level="bottom" passable="0" />
         <sprite px="7" py="3" index="15" level="bottom" passable="0" />
 	<!-- shadow -->
-        <sprite px="1" py="1" index="32" level="top" />
-        <sprite px="2" py="1" index="33" level="top" />
-        <sprite px="3" py="1" index="34" level="top" />
-        <sprite px="4" py="1" index="35" level="top" />
-        <sprite px="0" py="2" index="36" level="top" />
-        <sprite px="1" py="2" index="37" level="top" />
-        <sprite px="2" py="2" index="38" level="top" />
-        <sprite px="3" py="2" index="39" level="top" />
-        <sprite px="4" py="3" index="40" level="top" />
-        <sprite px="1" py="3" index="41" level="top" />
-        <sprite px="2" py="3" index="42" level="top" />
-        <sprite px="3" py="3" index="43" level="top" />
-        <sprite px="4" py="3" index="44" level="top" />
-        <sprite px="2" py="4" index="45" level="top" />
-        <sprite px="3" py="4" index="46" level="top" />
-        <sprite px="4" py="4" index="47" level="top" />
+        <sprite px="1" py="1" index="32" level="top" cid="0" />
+        <sprite px="2" py="1" index="33" level="top" cid="0" />
+        <sprite px="3" py="1" index="34" level="top" cid="0" />
+        <sprite px="4" py="1" index="35" level="top" cid="0" />
+        <sprite px="0" py="2" index="36" level="top" cid="0" />
+        <sprite px="1" py="2" index="37" level="top" cid="0" />
+        <sprite px="2" py="2" index="38" level="top" cid="0" />
+        <sprite px="3" py="2" index="39" level="top" cid="0" />
+        <sprite px="4" py="3" index="40" level="top" cid="0" />
+        <sprite px="1" py="3" index="41" level="top" cid="0" />
+        <sprite px="2" py="3" index="42" level="top" cid="0" />
+        <sprite px="3" py="3" index="43" level="top" cid="0" />
+        <sprite px="4" py="3" index="44" level="top" cid="0" />
+        <sprite px="2" py="4" index="45" level="top" cid="0" />
+        <sprite px="3" py="4" index="46" level="top" cid="0" />
+        <sprite px="4" py="4" index="47" level="top" cid="0" />
 	<!-- flags -->
-        <sprite px="4" py="3" index="12" skipoffset="1" level="bottom" passable="0" icn="flag32" />
-        <sprite px="6" py="3" index="13" skipoffset="1" level="bottom" passable="0" icn="flag32" />
+        <sprite px="4" py="3" index="12" skipoffset="1" level="bottom" passable="0" icn="flag32" cid="0" />
+        <sprite px="6" py="3" index="13" skipoffset="1" level="bottom" passable="0" icn="flag32" cid="0" />
     </rndtown>
 
     <barrier icn="x_loc3" width="2" height="1" cid="0x77" >

@@ -1556,7 +1556,7 @@ QStringList EditorTheme::resourceFiles(const QString & dir, const QString & file
 int EditorTheme::getSpriteID(int icn, int index)
 {
     const SpriteInfo* spriteInfo = findCacheSprite(icn, index);
-    return spriteInfo ? spriteInfo->oid : MapObj::None;
+    return spriteInfo && spriteInfo->level != SpriteLevel::Top ? spriteInfo->oid : MapObj::None; /* skip top level, shadow and other */
 }
 
 int EditorTheme::getSpriteLevel(int icn, int index)
