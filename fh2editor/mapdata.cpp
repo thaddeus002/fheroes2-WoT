@@ -84,6 +84,11 @@ bool MapTileExt::isRandomTown(const MapTileExt & te)
     return ICN::OBJNTWRD == te.spriteICN && 32 > te.spriteIndex;
 }
 
+bool MapTileExt::isJail(const MapTileExt & te)
+{
+    return ICN::X_LOC2 == te.spriteICN && 0x09 == te.spriteIndex;
+}
+
 bool MapTileExt::isMiniHero(const MapTileExt & te)
 {
     return ICN::MINIHERO == te.spriteICN;
@@ -951,6 +956,10 @@ void MapArea::importMP2Heroes(const QVector<H2::HeroPos> & heroes)
 	it = heroes.begin(); it != heroes.end(); ++it) if(tiles.isValidPoint((*it).pos()))
     {
 	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1Const().findConst(MapTileExt::isMiniHero);
+
+	if(!ext)
+	    ext = tiles.tileConst((*it).pos())->levels1Const().findConst(MapTileExt::isJail);
+
 	if(ext) objects.push_back(new MapHero((*it).pos(), ext->uid(), (*it).hero(), ext->index()));
     }
 }
@@ -2464,6 +2473,7 @@ void MapData::editObjectAttributes(void)
     	case MapObj::Castle:	editTownDialog(*tileOverMouse); break;
     	case MapObj::Bottle:
     	case MapObj::Sign:	editSignDialog(*tileOverMouse); break;
+    	case MapObj::Jail:
     	case MapObj::Heroes:	editHeroDialog(*tileOverMouse); break;
 	case MapObj::Sphinx:	editSphinxDialog(*tileOverMouse); break;
 

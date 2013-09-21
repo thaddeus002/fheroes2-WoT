@@ -122,6 +122,7 @@ public:
     static bool		isSphinx(const MapTileExt &);
     static bool		isSign(const MapTileExt &);
     static bool		isButtle(const MapTileExt &);
+    static bool		isJail(const MapTileExt &);
     static bool		isMiniHero(const MapTileExt &);
     static bool		isFlag32(const MapTileExt &);
     static bool		isTown(const MapTileExt &);
