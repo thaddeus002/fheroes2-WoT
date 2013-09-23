@@ -40,13 +40,13 @@ namespace BarrierColor
         RED	= 0x80
     };
 
-    const char* String(u8);
-    u8 FromMP2(u8);
+    const char* String(int);
+    int		FromMP2(int);
 }
 
 namespace Color
 {
-    enum color_t
+    enum
     {
 	NONE	= 0x00,
         BLUE    = 0x01,
@@ -59,19 +59,17 @@ namespace Color
 	ALL	= BLUE | GREEN | RED | YELLOW | ORANGE | PURPLE
     };
 
-    const char* String(u8);
-
-    u8 Count(u8);
-    u8 GetIndex(u8);
-    color_t GetFirst(u8);
-    color_t Get(u8);
-
+    const char* String(int);
+    int		Count(int);
+    int		GetIndex(int);
+    int		GetFirst(int);
+    int		FromInt(int);
 }
 
-class Colors : public std::vector<Color::color_t>
+class Colors : public std::vector<int>
 {
 public:
-    Colors(u8 = Color::ALL);
+    Colors(int = Color::ALL);
 
     std::string String(void) const;
 };
@@ -80,21 +78,21 @@ class Kingdom;
 
 class ColorBase
 {
-    Color::color_t color;
+    int color;
 
     friend StreamBase & operator<< (StreamBase &, const ColorBase &);
     friend StreamBase & operator>> (StreamBase &, ColorBase &);
 
 public:
-    ColorBase(Color::color_t col = Color::NONE): color(col){}
+    ColorBase(int col = Color::NONE): color(col){}
 
-    bool	operator== (u8) const;
-    bool	isFriends(u8) const;
-    void	SetColor(u8);
+    bool	operator== (int) const;
+    bool	isFriends(int) const;
+    void	SetColor(int);
 
-    Kingdom &		GetKingdom(void) const;
+    Kingdom &	GetKingdom(void) const;
 
-    const Color::color_t & GetColor(void) const { return color; }
+    int GetColor(void) const { return color; }
 };
 
 StreamBase & operator<< (StreamBase &, const ColorBase &);

@@ -40,19 +40,20 @@ struct Size;
 
 class StreamBase
 {
+protected:
+    virtual int		get8(void) = 0;
+    virtual void	put8(int) = 0;
+
+    virtual size_t	sizeg(void) const = 0;
+    virtual size_t	sizep(void) const = 0;
+
 public:
     enum { EndianBig = 0x80000000 };
 
     StreamBase() {}
     virtual ~StreamBase() {}
 
-    virtual bool	get(char &) = 0;
-    virtual size_t	sizeg(void) const = 0;
 
-    virtual bool	put(const char &) = 0;
-    virtual size_t	sizep(void) const = 0;
-
-    int			get(void);
     virtual bool	bigendian(void) const;
 
     int			getBE16(void);
@@ -60,25 +61,24 @@ public:
     int			getBE32(void);
     int			getLE32(void);
 
-    void		get16(u16 &);
     int			get16(void);
-    void		get32(u32 &);
     int			get32(void);
 
-    std::vector<u8>	getRaw(size_t);
+    std::vector<u8>	getRaw(size_t = 0 /* all data */);
     void		putRaw(const char*, size_t);
 
-    void		put16(const u16 &);
-    void		put32(const u32 &);
+    void		put16(u16);
+    void		put32(u32);
 
-    void		putBE32(const u32 &);
-    void		putLE32(const u32 &);
-    void		putBE16(const u16 &);
-    void		putLE16(const u16 &);
+    void		putBE32(u32);
+    void		putLE32(u32);
+    void		putBE16(u16);
+    void		putLE16(u16);
 
-    void		skip(size_t);
+    virtual void	skip(size_t);
 
     StreamBase &	operator>> (bool &);
+    StreamBase &	operator>> (char &);
     StreamBase &	operator>> (u8 &);
     StreamBase &	operator>> (s8 &);
     StreamBase &	operator>> (u16 &);
@@ -180,17 +180,23 @@ public:
 	return *this;
     }
 
-    static void		putBE32(std::ostream &, const u32 &);
-    static void		putLE32(std::ostream &, const u32 &);
+    static void		putBE32(std::ostream &, u32);
+    static void		putLE32(std::ostream &, u32);
 
-    static void		putBE16(std::ostream &, const u16 &);
-    static void		putLE16(std::ostream &, const u16 &);
+    static void		putBE16(std::ostream &, u16);
+    static void		putLE16(std::ostream &, u16);
 
     static int		getBE32(std::istream &);
     static int		getLE32(std::istream &);
 
     static int		getBE16(std::istream &);
     static int		getLE16(std::istream &);
+
+    static int		getBE32(const u8*);
+    static int		getLE32(const u8*);
+
+    static int		getBE16(const u8*);
+    static int		getLE16(const u8*);
 };
 
 #ifdef WITH_ZLIB
@@ -203,6 +209,7 @@ public:
     StreamBuf(size_t);
     StreamBuf(const StreamBuf &);
     StreamBuf(const std::vector<u8> &);
+    StreamBuf(const u8*, size_t);
 
     ~StreamBuf();
 
@@ -212,7 +219,7 @@ public:
     void	reset(void);
     std::string	dump(void) const;
 
-    char*	data(void);
+    u8*		data(void);
     size_t	size(void) const;
     void	setlimit(size_t);
 
@@ -224,6 +231,11 @@ public:
     void	setbigendian(bool);
     bool	bigendian(void) const;
 
+    int		get(void); /* get char */
+    void	put(int);
+
+    void	skip(size_t);
+
 protected:
     size_t	tellg(void) const;
     size_t	tellp(void) const;
@@ -232,8 +244,8 @@ protected:
     void	realloc(size_t);
     void	setfail(void);
 
-    bool	get(char &);
-    bool	put(const char &);
+    int		get8(void);
+    void	put8(int);
 
     size_t	sizeg(void) const;
     size_t	sizep(void) const;
@@ -250,10 +262,10 @@ protected:
     friend class ZStreamBuf;
 #endif
 
-    char*	itbeg;
-    char*	itget;
-    char*	itput;
-    char*	itend;
+    u8*		itbeg;
+    u8*		itget;
+    u8*		itput;
+    u8*		itend;
     size_t	flags;
 };
 

@@ -25,7 +25,6 @@
 
 #include <vector>
 #include "spell.h"
-#include "game_io.h"
 #include "gamedefs.h"
 
 class Artifact;
@@ -36,9 +35,9 @@ class SpellStorage : public std::vector<Spell>
 public:
 	SpellStorage();
 
-	u8 Size(u8 lvl = 0) const;
+	u32 Size(int lvl = 0) const;
 
-	SpellStorage GetSpells(u8) const;
+	SpellStorage GetSpells(int) const;
 	void Append(const SpellStorage &);
 	void Append(const Spell &);
 	void Append(const BagArtifacts &);

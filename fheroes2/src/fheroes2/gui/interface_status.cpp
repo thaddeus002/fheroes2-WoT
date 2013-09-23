@@ -51,7 +51,7 @@ void Interface::StatusWindow::Reset(void)
     ResetTimer();
 }
 
-info_t Interface::StatusWindow::GetState(void) const
+int Interface::StatusWindow::GetState(void) const
 {
     return state;
 }
@@ -84,10 +84,10 @@ void Interface::StatusWindow::SetRedraw(void) const
      interface.SetRedraw(REDRAW_STATUS);
 }
 
-void Interface::StatusWindow::SetPos(s16 ox, s16 oy)
+void Interface::StatusWindow::SetPos(s32 ox, s32 oy)
 {
-    u16 ow = 144;
-    u16 oh = 72;
+    u32 ow = 144;
+    u32 oh = 72;
 
     if(! Settings::Get().ExtGameHideInterface())
     {
@@ -97,7 +97,7 @@ void Interface::StatusWindow::SetPos(s16 ox, s16 oy)
     BorderWindow::SetPosition(ox, oy, ow, oh);
 }
 
-void Interface::StatusWindow::SetState(info_t info)
+void Interface::StatusWindow::SetState(int info)
 {
     if(STATUS_RESOURCE != state) state = info;
 }
@@ -166,7 +166,7 @@ void Interface::StatusWindow::NextState(void)
 }
 
 
-void Interface::StatusWindow::DrawKingdomInfo(const u8 oh) const
+void Interface::StatusWindow::DrawKingdomInfo(int oh) const
 {
     const Rect & pos = GetArea();
     Kingdom & myKingdom = world.GetKingdom(Settings::Get().CurrentColor());
@@ -203,7 +203,7 @@ void Interface::StatusWindow::DrawKingdomInfo(const u8 oh) const
     text.Blit(pos.x + 130 - text.w() / 2, pos.y + 58 + oh);
 }
 
-void Interface::StatusWindow::DrawDayInfo(const u8 oh) const
+void Interface::StatusWindow::DrawDayInfo(int oh) const
 {
     const Rect & pos = GetArea();
 
@@ -222,7 +222,7 @@ void Interface::StatusWindow::DrawDayInfo(const u8 oh) const
     text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + 46 + oh);
 }
 
-void Interface::StatusWindow::SetResource(u8 res, u16 count)
+void Interface::StatusWindow::SetResource(int res, u32 count)
 {
     lastResource = res;
     countLastResource = count;
@@ -247,7 +247,7 @@ void Interface::StatusWindow::ResetTimer(void)
     }
 }
 
-void Interface::StatusWindow::DrawResourceInfo(const u8 oh) const
+void Interface::StatusWindow::DrawResourceInfo(int oh) const
 {
     const Rect & pos = GetArea();
 
@@ -263,7 +263,7 @@ void Interface::StatusWindow::DrawResourceInfo(const u8 oh) const
     text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + oh + text.h() + spr.h() - 8);
 }
 
-void Interface::StatusWindow::DrawArmyInfo(const u8 oh) const
+void Interface::StatusWindow::DrawArmyInfo(int oh) const
 {
     const Army* armies = NULL;
 
@@ -276,7 +276,7 @@ void Interface::StatusWindow::DrawArmyInfo(const u8 oh) const
     if(armies)
     {
 	const Rect & pos = GetArea();
-	u8 count = armies->GetCount();
+	u32 count = armies->GetCount();
 
 	if(4 > count)
 	{
@@ -308,12 +308,12 @@ void Interface::StatusWindow::DrawAITurns(void) const
 	const Sprite & glass = AGG::GetICN(ICN::HOURGLAS, 0);
 	const Rect & pos = GetArea();
 
-	u16 dst_x = pos.x + (pos.w - glass.w()) / 2;
-	u16 dst_y = pos.y + (pos.h - glass.h()) / 2;
+	s32 dst_x = pos.x + (pos.w - glass.w()) / 2;
+	s32 dst_y = pos.y + (pos.h - glass.h()) / 2;
 
 	glass.Blit(dst_x, dst_y);
 
-	u8 color_index = 0;
+	int color_index = 0;
 
 	switch(conf.CurrentColor())
 	{
@@ -363,8 +363,8 @@ void Interface::StatusWindow::DrawBackground(void) const
 
 	//
 	srcrt = Rect(0, 16, icnston.w(), 16);
-	const u16 hh = 1 + (pos.h - 32) / 16;
-	for(u16 yy = 1; yy <= hh; ++yy)
+	const u32 hh = 1 + (pos.h - 32) / 16;
+	for(u32 yy = 1; yy <= hh; ++yy)
 	{
 	    dstpt = Point(pos.x, pos.y + 16 * yy);
 	    icnston.Blit(srcrt, dstpt);
@@ -404,7 +404,7 @@ void Interface::StatusWindow::QueueEventProcessing(void)
 	Dialog::Message(_("Status Window"), _("This window provides information on the status of your hero or kingdom, and shows the date. Left click here to cycle throungh these windows."), Font::BIG);
 }
 
-void Interface::StatusWindow::RedrawTurnProgress(u8 v)
+void Interface::StatusWindow::RedrawTurnProgress(u32 v)
 {
     turn_progress = v;
     SetRedraw();

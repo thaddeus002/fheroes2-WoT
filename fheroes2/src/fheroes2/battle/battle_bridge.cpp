@@ -55,9 +55,9 @@ bool Battle::Bridge::AllowUp(void) const
     return NULL == Board::GetCell(49)->GetUnit() && NULL == Board::GetCell(50)->GetUnit();
 }
 
-bool Battle::Bridge::NeedDown(const Unit & b, s16 pos2) const
+bool Battle::Bridge::NeedDown(const Unit & b, s32 pos2) const
 {
-    const s16 pos1 = b.GetHeadIndex();
+    const s32 pos1 = b.GetHeadIndex();
 
     if(pos2 == 50)
     {
@@ -73,7 +73,7 @@ bool Battle::Bridge::NeedDown(const Unit & b, s16 pos2) const
     return false;
 }
 
-bool Battle::Bridge::isPassable(u8 color) const
+bool Battle::Bridge::isPassable(int color) const
 {
     return color == Arena::GetCastle()->GetColor() || isDown();
 }
@@ -100,13 +100,13 @@ void Battle::Bridge::SetPassable(const Unit & b)
 }
 
 
-bool Battle::Bridge::NeedAction(const Unit & b, s16 dst) const
+bool Battle::Bridge::NeedAction(const Unit & b, s32 dst) const
 {
     return (!isDown() && NeedDown(b, dst)) ||
 	    (isValid() && isDown() && AllowUp());
 }
 
-void Battle::Bridge::Action(const Unit & b, s16 dst)
+void Battle::Bridge::Action(const Unit & b, s32 dst)
 {
     bool action_down = false;
 

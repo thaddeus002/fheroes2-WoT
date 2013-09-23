@@ -22,12 +22,9 @@
 #ifndef H2MORALE_H
 #define H2MORALE_H
 
-#include "gamedefs.h"
-#include <string>
-
 namespace Morale
 {
-    enum morale_t
+    enum
     {
 	UNKNOWN  = -4,
 	TREASON  = -3,
@@ -39,11 +36,8 @@ namespace Morale
         BLOOD    = 3
     };
 
-    const char* String(s8);
-    const char* Description(s8);
-
-    inline morale_t & operator++ (morale_t & morale){ return morale = BLOOD == morale ? BLOOD : morale_t(morale + 1); }
-    inline morale_t & operator-- (morale_t & morale){ return morale = TREASON == morale ? TREASON : morale_t(morale - 1); }
+    const char* String(int);
+    const char* Description(int);
 }
 
 #endif

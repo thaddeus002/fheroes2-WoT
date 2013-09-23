@@ -26,11 +26,8 @@
 #include "race.h"
 #include "army.h"
 #include "resource.h"
+#include "game.h"
 #include "spell.h"
-
-#ifdef WITH_XML
-#include "xmlccwrap.h"
-#endif
 
 enum { SP_DISABLE = 0x01 };
 
@@ -175,7 +172,7 @@ void Spell::UpdateStats(const std::string & spec)
 #endif
 }
 
-Spell::Spell(u8 s) : id(s > STONE ? NONE : s)
+Spell::Spell(int s) : id(s > STONE ? NONE : s)
 {
 }
 
@@ -199,12 +196,12 @@ bool Spell::isValid(void) const
     return id != Spell::NONE;
 }
 
-u8 Spell::operator() (void) const
+int Spell::operator() (void) const
 {
     return id;
 }
 
-u8 Spell::GetID(void) const
+int Spell::GetID(void) const
 {
     return id;
 }
@@ -219,15 +216,15 @@ const char* Spell::GetDescription(void) const
     return _(spells[id].description);
 }
 
-u16 Spell::MovePoint(void) const
+u32 Spell::MovePoint(void) const
 {
     return spells[id].mp;
 }
 
-u8 Spell::SpellPoint(const HeroBase* hero) const
+u32 Spell::SpellPoint(const HeroBase* hero) const
 {
-    u8 res = spells[id].sp;
-    u8 acount = 0;
+    u32 res = spells[id].sp;
+    u32 acount = 0;
 
     if(hero)
     {
@@ -275,12 +272,12 @@ payment_t Spell::GetCost(void) const
     return payment_t(spells[id].cost);
 }
 
-bool Spell::isLevel(u8 lvl) const
+bool Spell::isLevel(int lvl) const
 {
     return Level() == lvl;
 }
 
-u8 Spell::Level(void) const
+int Spell::Level(void) const
 {
     switch(id)
     {
@@ -407,7 +404,7 @@ bool Spell::isDamage(void) const
     return Damage();
 }
 
-u8 Spell::Damage(void) const
+u32 Spell::Damage(void) const
 {
     switch(id)
     {
@@ -448,12 +445,12 @@ bool Spell::isMindInfluence(void) const
     return false;
 }
 
-u8 Spell::IndexSprite(void) const
+u32 Spell::IndexSprite(void) const
 {
     return spells[id].sprite;
 }
 
-u8 Spell::InlIndexSprite(void) const
+u32 Spell::InlIndexSprite(void) const
 {
     switch(id)
     {
@@ -483,7 +480,7 @@ u8 Spell::InlIndexSprite(void) const
     return 0;
 }
 
-u8 Spell::Restore(void) const
+u32 Spell::Restore(void) const
 {
     switch(id)
     {
@@ -497,7 +494,7 @@ u8 Spell::Restore(void) const
     return Resurrect();
 }
 
-u8 Spell::Resurrect(void) const
+u32 Spell::Resurrect(void) const
 {
     switch(id)
     {
@@ -523,17 +520,17 @@ bool Spell::isResurrect(void) const
 }
 
 
-u8 Spell::ExtraValue(void) const
+u32 Spell::ExtraValue(void) const
 {
     return spells[id].extra;
 }
 
-Spell Spell::Rand(u8 lvl, bool adv)
+Spell Spell::Rand(int lvl, bool adv)
 {
     std::vector<Spell> v;
     v.reserve(15);
 
-    for(u8 sp = NONE; sp < STONE; ++sp)
+    for(u32 sp = NONE; sp < STONE; ++sp)
     {
 	const Spell spell(sp);
 	if(((adv && !spell.isCombat()) || (!adv && spell.isCombat())) &&
@@ -543,12 +540,12 @@ Spell Spell::Rand(u8 lvl, bool adv)
     return v.size() ? *Rand::Get(v) : Spell(Spell::NONE);
 }
 
-Spell Spell::RandCombat(u8 lvl)
+Spell Spell::RandCombat(int lvl)
 {
     return Rand(lvl, false);
 }
 
-Spell Spell::RandAdventure(u8 lvl)
+Spell Spell::RandAdventure(int lvl)
 {
     Spell res = Rand(lvl, true);
     return res.isValid() ? res : RandCombat(lvl);
@@ -717,7 +714,7 @@ bool Spell::isApplyToEnemies(void) const
     return false;
 }
 
-bool Spell::isRaceCompatible(u8 race) const
+bool Spell::isRaceCompatible(int race) const
 {
     switch(id)
     {
@@ -743,11 +740,11 @@ bool Spell::isRaceCompatible(u8 race) const
     return true;
 }
 
-u8 Spell::CalculateDimensionDoorDistance(u8 current_sp, u32 total_hp)
+u32 Spell::CalculateDimensionDoorDistance(u32 current_sp, u32 total_hp)
 {
     if(GameStatic::spell_dd_distance && GameStatic::spell_dd_hp && GameStatic::spell_dd_sp && total_hp)
     {
-	const u16 res = (GameStatic::spell_dd_distance * current_sp * GameStatic::spell_dd_hp) / (GameStatic::spell_dd_sp * total_hp);
+	const u32 res = (GameStatic::spell_dd_distance * current_sp * GameStatic::spell_dd_hp) / (GameStatic::spell_dd_sp * total_hp);
 	return res ? (res < 255 ? res : 255) : 1;
     }
     // original h2 variant
@@ -761,5 +758,13 @@ StreamBase & operator<< (StreamBase & msg, const Spell & spell)
 
 StreamBase & operator>> (StreamBase & msg, Spell & spell)
 {
-    return msg >> spell.id;
+    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
+    {
+	u8 id;
+	return msg >> id;
+	spell.id = id;
+    }
+    else
+	msg >> spell.id;
+    return msg;
 }

@@ -21,22 +21,24 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "text.h"
 #include "button.h"
 #include "cursor.h"
 #include "settings.h"
+#include "game.h"
 #include "dialog.h"
 
-Dialog::answer_t Dialog::AdventureOptions(const bool enabledig)
+int Dialog::AdventureOptions(bool enabledig)
 {
     Display & display = Display::Get();
 
     // preload
-    const ICN::icn_t apanbkg = Settings::Get().ExtGameEvilInterface() ? ICN::APANBKGE : ICN::APANBKG;
-    const ICN::icn_t apanel  = Settings::Get().ExtGameEvilInterface() ? ICN::APANELE : ICN::APANEL;
+    const int apanbkg = Settings::Get().ExtGameEvilInterface() ? ICN::APANBKGE : ICN::APANBKG;
+    const int apanel  = Settings::Get().ExtGameEvilInterface() ? ICN::APANELE : ICN::APANEL;
 
     // cursor
     Cursor & cursor = Cursor::Get();
-    const Cursor::themes_t oldcursor = cursor.Themes();
+    const int oldcursor = cursor.Themes();
 
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
@@ -66,7 +68,7 @@ Dialog::answer_t Dialog::AdventureOptions(const bool enabledig)
     cursor.Show();
     display.Flip();
 
-    Dialog::answer_t result = Dialog::ZERO;
+    int result = Dialog::ZERO;
 
     // dialog menu loop
     while(le.HandleEvents())
@@ -81,7 +83,7 @@ Dialog::answer_t Dialog::AdventureOptions(const bool enabledig)
         if(le.MouseClickLeft(buttonPuzzle)){ result = Dialog::PUZZLE; break; }
         if(le.MouseClickLeft(buttonInfo)){ result = Dialog::INFO; break; }
         if(le.MouseClickLeft(buttonDig) && buttonDig.isEnable()){ result = Dialog::DIG; break; }
-        if(le.MouseClickLeft(buttonCancel) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)){ result = Dialog::CANCEL; break; }
+        if(le.MouseClickLeft(buttonCancel) || Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)){ result = Dialog::CANCEL; break; }
 
 	// right info
         if(le.MousePressRight(buttonWorld)) Dialog::Message("", _("View the entire world."), Font::BIG);

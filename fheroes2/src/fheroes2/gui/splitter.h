@@ -24,42 +24,41 @@
 
 #include "gamedefs.h"
 
-class Splitter
+class Splitter : protected SpriteMove
 {
 public:
     Splitter();
     Splitter(const Surface &, const Rect &);
 
-    void Forward(void);
-    void Backward(void);
-    void MoveIndex(u16 pos);
-    void MoveCenter(void);
+    void	Forward(void);
+    void	Backward(void);
+    void	MoveIndex(int);
+    void	MoveCenter(void);
 
-    void RedrawCursor(void);
-    void HideCursor(void);
-    void ShowCursor(void);
+    void	RedrawCursor(void);
+    void	HideCursor(void);
+    void	ShowCursor(void);
 
-    void SetSprite(const Surface &);
-    void SetArea(const Rect &);
-    void SetRange(u16 smin, u16 smax);
+    void	SetSprite(const Surface &);
+    void	SetArea(const Rect &);
+    void	SetRange(int smin, int smax);
 
-    bool isVertical(void) const;
-    u16 GetCurrent(void) const{ return cur; };
-    u16 GetStep(void) const{ return step; };
-    u16 Max(void) const{ return max; };
-    u16 Min(void) const{ return min; };
+    bool	isVertical(void) const;
+    int		GetCurrent(void) const{ return cur; };
+    int		GetStep(void) const{ return step; };
+    int		Max(void) const{ return max; };
+    int		Min(void) const{ return min; };
 
     const Rect & GetRect(void) const{ return area; };
 
 private:
     Point	GetPositionCursor(void);
 
-    SpriteMove	cursor;
     Rect	area;
-    u16		step;
-    u16		min;
-    u16		max;
-    u16		cur;
+    int		step;
+    int		min;
+    int		max;
+    int		cur;
 };
 
 #endif

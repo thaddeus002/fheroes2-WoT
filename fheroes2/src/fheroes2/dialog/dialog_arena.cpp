@@ -21,30 +21,33 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "text.h"
 #include "settings.h"
 #include "cursor.h"
 #include "button.h"
+#include "skill.h"
+#include "game.h"
 #include "dialog.h"
 
-void InfoSkillClear(const Rect &, const Rect &, const Rect &, const Rect &);
-void InfoSkillSelect(Skill::Primary::skill_t, const Rect &, const Rect &, const Rect &, const Rect &);
-Skill::Primary::skill_t InfoSkillNext(Skill::Primary::skill_t);
-Skill::Primary::skill_t InfoSkillPrev(Skill::Primary::skill_t);
+void	InfoSkillClear(const Rect &, const Rect &, const Rect &, const Rect &);
+void	InfoSkillSelect(int, const Rect &, const Rect &, const Rect &, const Rect &);
+int	InfoSkillNext(int);
+int	InfoSkillPrev(int);
 
-Skill::Primary::skill_t Dialog::SelectSkillFromArena(void)
+int Dialog::SelectSkillFromArena(void)
 {
     Display & display = Display::Get();
-    const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+    const int system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     // cursor
     Cursor & cursor = Cursor::Get();
-    Cursor::themes_t oldthemes = cursor.Themes();
+    int oldthemes = cursor.Themes();
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
     TextBox textbox(_("You enter the arena and face a pack of vicious lions. You handily defeat them, to the wild cheers of the crowd.  Impressed by your skill, the aged trainer of gladiators agrees to train you in a skill of your choice."), Font::BIG, BOXAREA_WIDTH);
     const Sprite & sprite = AGG::GetICN(ICN::XPRIMARY, 0);
-    const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
+    const int spacer = Settings::Get().QVGA() ? 5 : 10;
 
     Dialog::FrameBox box(textbox.h() + spacer + sprite.h() + 15, true);
 
@@ -54,7 +57,7 @@ Skill::Primary::skill_t Dialog::SelectSkillFromArena(void)
     textbox.Blit(dst_pt);
     dst_pt.y += textbox.h() + spacer;
 
-    Skill::Primary::skill_t  res = Skill::Primary::ATTACK;
+    int res = Skill::Primary::ATTACK;
     Rect rect1, rect2, rect3, rect4;
 
     if(Settings::Get().ExtHeroArenaCanChoiseAnySkills())
@@ -115,13 +118,13 @@ Skill::Primary::skill_t Dialog::SelectSkillFromArena(void)
     {
 	le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
 
-	if(Game::HotKeyPress(Game::EVENT_DEFAULT_LEFT) && Skill::Primary::UNKNOWN != InfoSkillPrev(res))
+	if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_LEFT) && Skill::Primary::UNKNOWN != InfoSkillPrev(res))
 	{
 	    res = InfoSkillPrev(res);
 	    redraw = true;
 	}
 	else
-	if(Game::HotKeyPress(Game::EVENT_DEFAULT_RIGHT) && Skill::Primary::UNKNOWN != InfoSkillNext(res))
+	if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_RIGHT) && Skill::Primary::UNKNOWN != InfoSkillNext(res))
 	{
 	    res = InfoSkillNext(res);
 	    redraw = true;
@@ -161,7 +164,7 @@ Skill::Primary::skill_t Dialog::SelectSkillFromArena(void)
 	    redraw = false;
 	}
 
-        if(Game::HotKeyPress(Game::EVENT_DEFAULT_READY) || le.MouseClickLeft(buttonOk)) break;
+        if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_READY) || le.MouseClickLeft(buttonOk)) break;
     }
 
     cursor.Hide();
@@ -180,7 +183,7 @@ void InfoSkillClear(const Rect & rect1, const Rect & rect2, const Rect & rect3, 
 	AGG::GetICN(ICN::XPRIMARY, 3).Blit(rect4);
 }
 
-void InfoSkillSelect(Skill::Primary::skill_t skill, const Rect & rect1, const Rect & rect2, const Rect & rect3, const Rect & rect4)
+void InfoSkillSelect(int skill, const Rect & rect1, const Rect & rect2, const Rect & rect3, const Rect & rect4)
 {
     switch(skill)
     {
@@ -192,7 +195,7 @@ void InfoSkillSelect(Skill::Primary::skill_t skill, const Rect & rect1, const Re
     }
 }
 
-Skill::Primary::skill_t InfoSkillNext(Skill::Primary::skill_t skill)
+int InfoSkillNext(int skill)
 {
     switch(skill)
     {
@@ -205,7 +208,7 @@ Skill::Primary::skill_t InfoSkillNext(Skill::Primary::skill_t skill)
     return Skill::Primary::UNKNOWN;
 }
 
-Skill::Primary::skill_t InfoSkillPrev(Skill::Primary::skill_t skill)
+int InfoSkillPrev(int skill)
 {
     switch(skill)
     {

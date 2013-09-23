@@ -31,7 +31,7 @@ public:
     StatusBar();
 
     void SetCenter(const Point & pt);
-    void SetCenter(s16 cx, s16 cy);
+    void SetCenter(s32 cx, s32 cy);
 
     void ShowMessage(const std::string & msg);
     void Redraw(void);

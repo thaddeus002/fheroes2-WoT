@@ -22,12 +22,9 @@
 #ifndef H2SPEED_H
 #define H2SPEED_H
 
-#include <string>
-#include "gamedefs.h"
-
 namespace Speed
 {
-    enum speed_t
+    enum
     {
 	STANDING	= 0,
 	CRAWLING	= 1,
@@ -41,17 +38,10 @@ namespace Speed
         INSTANT		= 9
     };
 
-    const char* String(u8 speed);
-    
-    speed_t GetOriginalSlow(u8);
-    speed_t GetOriginalFast(u8);
-
-    inline speed_t& operator++ (speed_t& speed){ return speed = ( INSTANT == speed ? INSTANT : speed_t(speed + 1)); }
-    inline speed_t& operator-- (speed_t& speed){ return speed = ( CRAWLING == speed ? CRAWLING : speed_t(speed - 1)); }
-
+    const char*	String(int);
+    int		GetOriginalSlow(int);
+    int		GetOriginalFast(int);
+    int		FromInt(int);
 }
-
-StreamBase & operator<< (StreamBase &, const Speed::speed_t &);
-StreamBase & operator>> (StreamBase &, Speed::speed_t &);
 
 #endif

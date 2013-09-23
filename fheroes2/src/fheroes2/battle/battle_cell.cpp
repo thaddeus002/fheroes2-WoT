@@ -28,7 +28,7 @@
 
 #define INFL 12
 
-void Battle::Position::Set(s16 head, bool wide, bool reflect)
+void Battle::Position::Set(s32 head, bool wide, bool reflect)
 {
     first = Board::GetCell(head);
 
@@ -70,7 +70,7 @@ Rect Battle::Position::GetRect(void) const
     return Rect();
 }
 
-Battle::Position Battle::Position::GetCorrect(const Unit & b, s16 head)
+Battle::Position Battle::Position::GetCorrect(const Unit & b, s32 head)
 {
     Position result;
 
@@ -114,7 +114,7 @@ Battle::Cell::Cell() : index(0), object(0), direction(UNKNOWN), quality(0), troo
 {
 }
 
-Battle::Cell::Cell(const s16 & ii) : index(ii), object(0), direction(UNKNOWN), quality(0), troop(NULL)
+Battle::Cell::Cell(s32 ii) : index(ii), object(0), direction(UNKNOWN), quality(0), troop(NULL)
 {
     SetArea(Rect());
 }
@@ -180,22 +180,22 @@ bool Battle::Cell::isPositionIncludePoint(const Point & pt) const
     return UNKNOWN != GetTriangleDirection(pt);
 }
 
-const s16 & Battle::Cell::GetIndex(void) const
+s32 Battle::Cell::GetIndex(void) const
 {
     return index;
 }
 
-const s32 & Battle::Cell::GetQuality(void) const
+s32 Battle::Cell::GetQuality(void) const
 {
     return quality;
 }
 
-void Battle::Cell::SetObject(u8 val)
+void Battle::Cell::SetObject(int val)
 {
     object = val;
 }
 
-void Battle::Cell::SetDirection(u8 val)
+void Battle::Cell::SetDirection(int val)
 {
     direction = val;
 }
@@ -205,12 +205,12 @@ void Battle::Cell::SetQuality(u32 val)
     quality = val;
 }
 
-const u8 & Battle::Cell::GetObject(void) const
+int Battle::Cell::GetObject(void) const
 {
     return object;
 }
 
-const u8 & Battle::Cell::GetDirection(void) const
+int Battle::Cell::GetDirection(void) const
 {
     return direction;
 }
@@ -239,7 +239,7 @@ bool Battle::Cell::isPassable4(const Unit & b, const Cell & from) const
 {
     if(b.isWide())
     {
-	const u8 dir = Board::GetDirection(from.index, index);
+	const int dir = Board::GetDirection(from.index, index);
 
 	switch(dir)
 	{

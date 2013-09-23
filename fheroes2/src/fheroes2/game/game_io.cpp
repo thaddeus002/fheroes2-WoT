@@ -25,20 +25,23 @@
 #include <cstring>
 #include <ctime>
 #include "zzlib.h"
+#include "text.h"
 #include "settings.h"
 #include "kingdom.h"
 #include "heroes.h"
 #include "castle.h"
+#include "dialog.h"
 #include "army.h"
 #include "world.h"
 #include "gameevent.h"
 #include "interface_gamearea.h"
 #include "settings.h"
 #include "tools.h"
+#include "game.h"
 #include "game_over.h"
-#include "game_io.h"
 #include "game_static.h"
 #include "monster.h"
+#include "game_io.h"
 
 static u16 SAV2ID = 0xFF02;
 
@@ -105,10 +108,11 @@ bool Game::Save(const std::string &fn)
 
 	hinfo.setbigendian(true);
 	gdata.setbigendian(true);
+	u16 loadver = GetLoadVersion();
 
-	hinfo << GetString(GetLoadVersion()) << GetLoadVersion() <<
+	hinfo << GetString(loadver) << loadver <<
 		HeaderSAV(conf.CurrentFileInfo(), conf.PriceLoyaltyVersion());
-	gdata << GetLoadVersion() << World::Get() << Settings::Get() <<
+	gdata << loadver << World::Get() << Settings::Get() <<
 	    GameOver::Result::Get() << GameStatic::Data::Get() << MonsterStaticData::Get() << SAV2ID; // eof marker
 
 	fs << static_cast<char>(SAV2ID >> 8) << static_cast<char>(SAV2ID) << hinfo;
@@ -227,14 +231,16 @@ bool Game::Load(const std::string & fn)
  		return false;
 	    }
 
+    	    DEBUG(DBG_GAME, DBG_TRACE, "load version: " << binver);
 	    SetLoadVersion(binver);
 	    u16 end_check = 0;
 
-	    gdata >> World::Get() >> Settings::Get() >> GameOver::Result::Get() >>
-		GameStatic::Data::Get() >> MonsterStaticData::Get() >> end_check;
+	    gdata >> World::Get() >> Settings::Get() >>
+		GameOver::Result::Get() >> GameStatic::Data::Get() >> MonsterStaticData::Get() >> end_check;
 
 	    if(end_check == SAV2ID)
 	    {
+        	DEBUG(DBG_GAME, DBG_TRACE, "correct block, " << "monsters data");
 		SetLoadVersion(CURRENT_FORMAT_VERSION);
 		result = true;
 	    }

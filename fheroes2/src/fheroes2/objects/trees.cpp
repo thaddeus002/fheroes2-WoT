@@ -26,7 +26,7 @@
 #include "direction.h"
 #include "trees.h"
 
-u16 ObjTree::GetPassable(const u8 & index)
+int ObjTree::GetPassable(u32 index)
 {
     if(isShadow(index)) return DIRECTION_ALL;
 
@@ -34,18 +34,18 @@ u16 ObjTree::GetPassable(const u8 & index)
         0 : DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW);
 }
 
-bool ObjTree::isAction(const u8 & index)
+bool ObjTree::isAction(u32 index)
 {
     return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
-bool ObjTree::isShadow(const u8 & index)
+bool ObjTree::isShadow(u32 index)
 {
     const u8 shadows[] = { 0, 3, 7, 10, 13, 17, 20, 23, 26, 29, 32, 34 };
     return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
 }
 
-u8 ObjTree::GetActionObject(const u8 & index)
+int ObjTree::GetActionObject(u32 index)
 {
     return MP2::OBJ_ZERO;
 }

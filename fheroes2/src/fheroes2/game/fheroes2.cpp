@@ -171,7 +171,7 @@ int main(int argc, char **argv)
 	    Game::Init();
 
 	    // goto main menu
-	    Game::menu_t rs = (test ? Game::TESTING : Game::MAINMENU);
+	    int rs = (test ? Game::TESTING : Game::MAINMENU);
 
 	    while(rs != Game::QUITGAME)
 	    {
@@ -227,14 +227,14 @@ void LoadZLogo(void)
 	    // scale logo
 	    if(Settings::Get().QVGA())
 	    {
-		Surface small = Surface::ScaleMinifyByTwo(zlogo);
+		Surface small = Sprite::ScaleQVGA(zlogo);
 		Surface::Swap(zlogo, small);
 	    }
 
 	    const u32 black = zlogo.MapRGB(0, 0, 0);
 	    const Point offset((display.w() - zlogo.w()) / 2, (display.h() - zlogo.h()) / 2);
 
-	    u8 ii = 0;
+	    int ii = 0;
 
 	    while(ii < 250)
 	    {

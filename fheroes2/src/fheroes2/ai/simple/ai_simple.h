@@ -37,7 +37,7 @@
 #include "pairs.h"
 #include "ai.h"
 
-struct IndexObjectMap : public std::map<s32, MP2::object_t>
+struct IndexObjectMap : public std::map<s32, int>
 {
     void DumpObjects(const IndexDistance & id);
 };
@@ -54,7 +54,7 @@ struct AIKingdom
 class AIKingdoms : public std::vector<AIKingdom>
 {
 public:
-    static AIKingdom & Get(Color::color_t);
+    static AIKingdom & Get(int color);
     static void Reset(void);
 
 private:
@@ -76,7 +76,7 @@ struct AIHero
 
     Queue           sheduled_visit;
     s32             primary_target;
-    u8              fix_loop;
+    u32             fix_loop;
 };
 
 struct AIHeroes : public std::vector<AIHero>

@@ -116,6 +116,21 @@ std::string GetString(const Rect & rt)
     return os.str();
 }
 
+std::string GetString(const std::vector<u8> & v)
+{
+    return std::string(v.begin(), v.end());
+}
+
+int CountBits(u32 val)
+{
+    int res = 0;
+
+    for(u32 itr = 0x00000001; itr; itr <<= 1)
+        if(val & itr) ++res;
+
+    return res;
+}
+
 int GetInt(const std::string & str)
 {
     int res = 0;

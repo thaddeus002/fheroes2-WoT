@@ -33,7 +33,7 @@ namespace MUS
 {
     const struct
     {
-	mus_t type;
+	int type;
 	const char* string;
     } musmap[] = {
         { UNUSED,       ""                    },
@@ -83,19 +83,20 @@ namespace MUS
         { UNKNOWN,      "UNKNOWN"             }
     };
     
-    const std::string GetString(const mus_t mus, bool shortname)
+    const std::string GetString(int mus, bool shortname)
     {
       std::stringstream sstream;
       sstream << std::setw(2) << std::setfill('0') << (int)mus;
       if(shortname)
       sstream << ".ogg";
       else
-      sstream << " " << musmap[mus].string << ".ogg";
+      sstream << " " <<
+	(UNUSED <= mus && UNKNOWN > mus ? musmap[mus].string : musmap[UNKNOWN].string) << ".ogg";
       return sstream.str();
     }
 }
 
-MUS::mus_t MUS::FromGround(const u16 ground)
+int MUS::FromGround(int ground)
 {
     switch(ground)
     {
@@ -114,7 +115,7 @@ MUS::mus_t MUS::FromGround(const u16 ground)
     return UNKNOWN;
 }
 
-MUS::mus_t MUS::FromRace(const u8 race)
+int MUS::FromRace(int race)
 {
     switch(race)
     {
@@ -130,7 +131,7 @@ MUS::mus_t MUS::FromRace(const u8 race)
     return UNKNOWN;
 }
 
-MUS::mus_t MUS::FromMapObject(u8 object)
+int MUS::FromMapObject(int object)
 {
     if(Settings::Get().MusicMIDI())
         return MUS::UNKNOWN;
@@ -175,7 +176,7 @@ MUS::mus_t MUS::FromMapObject(u8 object)
     }
 }
 
-MUS::mus_t MUS::GetBattleRandom(void)
+int MUS::GetBattleRandom(void)
 {
     switch(Rand::Get(1, 3))
     {

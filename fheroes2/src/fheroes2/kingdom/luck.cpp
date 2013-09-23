@@ -20,9 +20,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "gamedefs.h"
 #include "luck.h"
 
-const char* Luck::String(s8 luck)
+const char* Luck::String(int luck)
 {
     const char* str_luck[] = { "Unknown", _("luck|Cursed"), _("luck|Awful"), _("luck|Bad"), _("luck|Normal"), _("luck|Good"), _("luck|Great"), _("luck|Irish") };
 
@@ -41,7 +42,7 @@ const char* Luck::String(s8 luck)
     return str_luck[0];
 }
 
-const char* Luck::Description(s8 luck)
+const char* Luck::Description(int luck)
 {
     const char* str_desc_luck[] = { "Unknown",
 	_("Bad luck sometimes falls on your armies in combat, causing their attacks to only do half damage."),

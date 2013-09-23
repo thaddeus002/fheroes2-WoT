@@ -24,8 +24,10 @@
 #include <fstream>
 
 #include "system.h"
+#include "text.h"
 #include "maps.h"
 #include "race.h"
+#include "game.h"
 #include "tinyconfig.h"
 #include "difficulty.h"
 #include "dialog.h"
@@ -36,7 +38,7 @@
 
 bool IS_DEBUG(int name, int level)
 {
-    const u16 debug = Settings::Get().Debug();
+    const int debug = Settings::Get().Debug();
     return
         ((DBG_ENGINE & name) && ((DBG_ENGINE & debug) >> 2) >= level) ||
         ((DBG_GAME & name) && ((DBG_GAME & debug) >> 4) >= level) ||
@@ -600,17 +602,6 @@ std::string Settings::String(void) const
 }
 
 /* read maps info */
-bool Settings::SetCurrentFileInfo(const std::string & fn)
-{
-    Maps::FileInfo fi;
-    if(fi.ReadMP2(fn))
-    {
-	SetCurrentFileInfo(fi);
-	return true;
-    }
-    return false;
-}
-
 void Settings::SetCurrentFileInfo(const Maps::FileInfo & fi)
 {
     current_maps_file = fi;
@@ -627,18 +618,13 @@ const Maps::FileInfo & Settings::CurrentFileInfo(void) const
     return current_maps_file;
 }
 
-Maps::FileInfo & Settings::CurrentFileInfo(void)
-{
-    return current_maps_file;
-}
-
 /* return debug */
-u16 Settings::Debug(void) const { return debug; }
+int Settings::Debug(void) const { return debug; }
 
 /* return game difficulty */
-u8 Settings::GameDifficulty(void) const { return game_difficulty; }
+int Settings::GameDifficulty(void) const { return game_difficulty; }
 
-const u8 & Settings::CurrentColor(void) const { return players.current_color; }
+int Settings::CurrentColor(void) const { return players.current_color; }
 
 const std::string & Settings::SelectVideoDriver(void) const { return video_driver; }
 
@@ -647,8 +633,8 @@ const std::string & Settings::FontsNormal(void) const { return font_normal; }
 const std::string & Settings::FontsSmall(void) const { return font_small; }
 const std::string & Settings::ForceLang(void) const { return force_lang; }
 const std::string & Settings::MapsCharset(void) const { return maps_charset; }
-u8 Settings::FontsNormalSize(void) const { return size_normal; }
-u8 Settings::FontsSmallSize(void) const { return size_small; }
+int Settings::FontsNormalSize(void) const { return size_normal; }
+int Settings::FontsSmallSize(void) const { return size_small; }
 bool Settings::FontSmallRenderBlended(void) const { return opt_global.Modes(GLOBAL_FONTRENDERBLENDED1); }
 bool Settings::FontNormalRenderBlended(void) const { return opt_global.Modes(GLOBAL_FONTRENDERBLENDED2); }
 
@@ -775,33 +761,24 @@ bool Settings::Sound(void) const { return opt_global.Modes(GLOBAL_SOUND); }
 bool Settings::Music(void) const { return opt_global.Modes(GLOBAL_MUSIC); }
 
 /* return move speed */
-u8   Settings::HeroesMoveSpeed(void) const { return heroes_speed; }
-u8   Settings::AIMoveSpeed(void) const { return ai_speed; }
-u8   Settings::BattleSpeed(void) const { return battle_speed; }
+int Settings::HeroesMoveSpeed(void) const { return heroes_speed; }
+int Settings::AIMoveSpeed(void) const { return ai_speed; }
+int Settings::BattleSpeed(void) const { return battle_speed; }
 
 /* return scroll speed */
-u8   Settings::ScrollSpeed(void) const { return scroll_speed; }
+int Settings::ScrollSpeed(void) const { return scroll_speed; }
 
 /* set ai speed: 0 - 10 */
-void Settings::SetAIMoveSpeed(u8 speed)
-{
-    ai_speed = (10 <= speed ? 10 : speed);
-}
+void Settings::SetAIMoveSpeed(int speed) { ai_speed = (10 <= speed ? 10 : speed); }
 
 /* set hero speed: 0 - 10 */
-void Settings::SetHeroesMoveSpeed(u8 speed)
-{
-    heroes_speed = (10 <= speed ? 10 : speed);
-}
+void Settings::SetHeroesMoveSpeed(int speed){ heroes_speed = (10 <= speed ? 10 : speed); }
 
 /* set battle speed: 0 - 10 */
-void Settings::SetBattleSpeed(u8 speed)
-{
-    battle_speed = (10 <= speed ? 10 : speed);
-}
+void Settings::SetBattleSpeed(int speed) { battle_speed = (10 <= speed ? 10 : speed); }
 
 /* set scroll speed: 1 - 4 */
-void Settings::SetScrollSpeed(u8 speed)
+void Settings::SetScrollSpeed(int speed)
 {
     switch(speed)
     {
@@ -835,54 +812,27 @@ bool Settings::PocketPC(void) const { return opt_global.Modes(GLOBAL_POCKETPC); 
 const Size & Settings::VideoMode(void) const { return video_mode; }
 
 /* set level debug */
-void Settings::SetDebug(const u16 d)
-{
-    debug = d;
-}
+void Settings::SetDebug(int d) { debug = d; }
 
 /**/
-void Settings::SetGameDifficulty(u8 d) { game_difficulty = d; }
+void Settings::SetGameDifficulty(int d) { game_difficulty = d; }
+void Settings::SetCurrentColor(int color) { players.current_color = color; }
 
-void Settings::SetCurrentColor(u8 color) { players.current_color = color; }
-
-u8   Settings::SoundVolume(void) const
-{
-    return sound_volume;
-}
-
-u8   Settings::MusicVolume(void) const
-{
-    return music_volume;
-}
+int Settings::SoundVolume(void) const { return sound_volume; }
+int  Settings::MusicVolume(void) const { return music_volume; }
 
 /* sound volume: 0 - 10 */
-void Settings::SetSoundVolume(const u8 v)
-{
-    sound_volume = 10 <= v ? 10 : v;
-}
+void Settings::SetSoundVolume(int v) { sound_volume = 10 <= v ? 10 : v; }
 
 /* music volume: 0 - 10 */
-void Settings::SetMusicVolume(const u8 v)
-{
-    music_volume = 10 <= v ? 10 : v;
-}
+void Settings::SetMusicVolume(int v) { music_volume = 10 <= v ? 10 : v; }
 
 /* check game type */
-bool Settings::GameType(u8 f) const
-{
-    return game_type & f;
-}
-
-u8 Settings::GameType(void) const
-{
-    return game_type;
-}
+bool Settings::GameType(int f) const { return game_type & f; }
+int Settings::GameType(void) const { return game_type; }
 
 /* set game type */
-void Settings::SetGameType(u8 type)
-{
-    game_type = type;
-}
+void Settings::SetGameType(int type) { game_type = type; }
 
 const Players & Settings::GetPlayers(void) const
 {
@@ -894,17 +844,17 @@ Players & Settings::GetPlayers(void)
     return players;
 }
 
-void Settings::SetPreferablyCountPlayers(u8 c)
+void Settings::SetPreferablyCountPlayers(int c)
 {
     preferably_count_players = 6 < c ? 6 : c;
 }
 
-u8 Settings::PreferablyCountPlayers(void) const
+int Settings::PreferablyCountPlayers(void) const
 {
     return preferably_count_players;
 }
 
-u16 Settings::GetPort(void) const
+int Settings::GetPort(void) const
 {
     return port;
 }
@@ -924,17 +874,22 @@ const std::string & Settings::MapsDescription(void) const
     return current_maps_file.description;
 }
 
-u8 Settings::MapsDifficulty(void) const
+int Settings::MapsDifficulty(void) const
 {
     return current_maps_file.difficulty;
 }
 
-u16 Settings::MapsWidth(void) const
+int Settings::MapsWidth(void) const
 {
     return current_maps_file.size_w;
 }
 
-bool Settings::AllowChangeRace(u8 f) const
+int Settings::MapsHeight(void) const
+{
+    return current_maps_file.size_h;
+}
+
+bool Settings::AllowChangeRace(int f) const
 {
     return current_maps_file.rnd_races & f;
 }
@@ -944,12 +899,12 @@ bool Settings::GameStartWithHeroes(void) const
     return current_maps_file.with_heroes;
 }
 
-u16 Settings::ConditionWins(void) const
+int Settings::ConditionWins(void) const
 {
     return current_maps_file.ConditionWins();
 }
 
-u16 Settings::ConditionLoss(void) const
+int Settings::ConditionLoss(void) const
 {
     return current_maps_file.ConditionLoss();
 }
@@ -964,7 +919,7 @@ bool Settings::WinsAllowNormalVictory(void) const
     return current_maps_file.WinsAllowNormalVictory();
 }
 
-u8 Settings::WinsFindArtifactID(void) const
+int Settings::WinsFindArtifactID(void) const
 {
     return current_maps_file.WinsFindArtifactID();
 }
@@ -979,17 +934,17 @@ u32 Settings::WinsAccumulateGold(void) const
     return current_maps_file.WinsAccumulateGold();
 }
 
-u32 Settings::WinsMapsIndexObject(void) const
+Point Settings::WinsMapsPositionObject(void) const
 {
-    return current_maps_file.WinsMapsIndexObject();
+    return current_maps_file.WinsMapsPositionObject();
 }
 
-u32 Settings::LossMapsIndexObject(void) const
+Point Settings::LossMapsPositionObject(void) const
 {
-    return current_maps_file.LossMapsIndexObject();
+    return current_maps_file.LossMapsPositionObject();
 }
 
-u16 Settings::LossCountDays(void) const
+u32 Settings::LossCountDays(void) const
 {
     return current_maps_file.LossCountDays();
 }
@@ -1066,7 +1021,7 @@ void Settings::SetShowStatus(bool f)
 
 bool Settings::CanChangeInGame(u32 f) const
 {
-    return static_cast<u8>(f >> 28) == 0x01; // GAME_ and POCKETPC_
+    return (f >> 28) == 0x01; // GAME_ and POCKETPC_
 }
 
 bool Settings::ExtModes(u32 f) const
@@ -1587,16 +1542,28 @@ StreamBase & operator>> (StreamBase & msg, Settings & conf)
         Dialog::Message("Warning!", msg, Font::BIG, Dialog::OK);
     }
 
-    u16 debug;
+    int debug;
     u32 opt_game = 0; // skip: settings
 
     // map file
-    msg >> conf.current_maps_file >>
-       // game config
-       conf.game_difficulty >>
-       conf.game_type >>
-       conf.preferably_count_players >>
-       debug >>
+    msg >> conf.current_maps_file;
+
+    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
+    {
+	u8 difficulty, game_type, count_players;
+	u16 debug2;
+	msg >>
+	    difficulty >> game_type >> count_players >> debug2;
+	conf.game_difficulty = difficulty;
+	conf.game_type = game_type;
+	conf.preferably_count_players = count_players;
+	debug = debug2;
+    }
+    else
+	msg >>
+	    conf.game_difficulty >> conf.game_type >> conf.preferably_count_players >> debug;
+
+    msg >>
        opt_game >> conf.opt_world >> conf.opt_battle >> conf.opt_addons >>
        conf.players;
 

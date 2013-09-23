@@ -22,7 +22,6 @@
 #ifndef H2BUTTON_H
 #define H2BUTTON_H
 
-#include "icn.h"
 #include "gamedefs.h"
 
 class Surface;
@@ -31,26 +30,26 @@ class Button : public Rect
 {
 public:
     Button();
-    Button(s16, s16, ICN::icn_t, u16 index1, u16 index2);
+    Button(s32, s32, int, u32 index1, u32 index2);
 
-    bool isEnable(void) const;
-    bool isDisable(void) const;
-    bool isPressed(void) const;
-    bool isReleased(void) const;
+    bool	isEnable(void) const;
+    bool	isDisable(void) const;
+    bool	isPressed(void) const;
+    bool	isReleased(void) const;
 
-    void Press(void);
-    void Release(void);
+    void	Press(void);
+    void	Release(void);
 
-    void SetPos(s16, s16);
-    void SetPos(const Point &);
-    void SetSize(u16, u16);
-    void SetSprite(ICN::icn_t, u16 index1, u16);
-    void SetSprite(const Surface &, const Surface &);
-    void SetDisable(bool);
+    void	SetPos(s32, s32);
+    void	SetPos(const Point &);
+    void	SetSize(u32, u32);
+    void	SetSprite(int icn, u32, u32);
+    void	SetSprite(const Surface &, const Surface &);
+    void	SetDisable(bool);
 
-    void Draw(void);
-    void PressDraw(void);
-    void ReleaseDraw(void);
+    void	Draw(void);
+    void	PressDraw(void);
+    void	ReleaseDraw(void);
 
 protected:
     Surface	sf1;
@@ -71,21 +70,21 @@ protected:
 class ButtonGroups
 {
 public:
-    ButtonGroups(const Rect &, u16);
+    ButtonGroups(const Rect &, u32);
     ~ButtonGroups();
     
-    void Draw(void);
-    u16 QueueEventProcessing(void);
+    void	Draw(void);
+    int		QueueEventProcessing(void);
 
-    void DisableButton1(bool);
-    void DisableButton2(bool);
+    void	DisableButton1(bool);
+    void	DisableButton2(bool);
 
 protected:
-    Button* button1;
-    Button* button2;
-    u16 result1;
-    u16 result2;
-    u16 buttons;
+    Button*	button1;
+    Button*	button2;
+    int		result1;
+    int		result2;
+    int		buttons;
 };
 
 #endif

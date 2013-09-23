@@ -26,12 +26,12 @@
 #include "battle_arena.h"
 #include "battle_command.h"
 
-bool Battle::Actions::HaveCommand(u16 cmd) const
+bool Battle::Actions::HaveCommand(u32 cmd) const
 {
     return end() != std::find_if(begin(), end(), std::bind2nd(std::mem_fun_ref(&Command::isType), cmd));
 }
 
-Battle::Command::Command(u16 msg) : StreamBuf(16), type(msg)
+Battle::Command::Command(u32 msg) : StreamBuf(16), type(msg)
 {
     setbigendian(true);
     *this << type;
@@ -57,7 +57,7 @@ Battle::Command::Command(const StreamBuf & sb) : StreamBuf(sb), type(0)
     *this >> type;
 }
 
-Battle::Command::Command(u16 cmd, s32 param1, s32 param2, const Indexes & param3) : StreamBuf(16), type(cmd)
+Battle::Command::Command(u32 cmd, u32 param1, s32 param2, const Indexes & param3) : StreamBuf(16), type(cmd)
 {
     setbigendian(true);
     StreamBase & base = *this;
@@ -66,14 +66,14 @@ Battle::Command::Command(u16 cmd, s32 param1, s32 param2, const Indexes & param3
     switch(type)
     {
         case MSG_BATTLE_MOVE:
-            base << static_cast<u32>(param1) << static_cast<s16>(param2) << static_cast<u8>(1) << param3; // uid, dst, path
+            base << param1 << param2 << static_cast<u8>(1) << param3; // uid, dst, path
             break;
 
         default: break;
     }
 }
 
-Battle::Command::Command(u16 cmd, s32 param1, s32 param2, s32 param3, s32 param4) : StreamBuf(16), type(cmd)
+Battle::Command::Command(u32 cmd, u32 param1, s32 param2, s32 param3, s32 param4) : StreamBuf(16), type(cmd)
 {
     setbigendian(true);
     StreamBase & base = *this;
@@ -82,7 +82,7 @@ Battle::Command::Command(u16 cmd, s32 param1, s32 param2, s32 param3, s32 param4
     switch(type)
     {
         case MSG_BATTLE_AUTO:
-            base << static_cast<u8>(param1); // color
+            base << param1; // color
             break;
 
         case MSG_BATTLE_SURRENDER:
@@ -94,40 +94,40 @@ Battle::Command::Command(u16 cmd, s32 param1, s32 param2, s32 param3, s32 param4
             break;
 
         case MSG_BATTLE_CAST:
-            switch(static_cast<u8>(param1))
+            switch(param1)
             {
                 case Spell::MIRRORIMAGE:
-                    base << static_cast<u8>(param1) << static_cast<s16>(param2); // spell, who
+                    base << param1 << param2; // spell, who
                     break;
 
                 case Spell::TELEPORT:
-                    base << static_cast<u8>(param1) << static_cast<s16>(param2) << static_cast<s16>(param3); // spell, src, dst
+                    base << param1 << param2 << param3; // spell, src, dst
                     break;
 
                 default:
-                    base << static_cast<u8>(param1) << static_cast<s16>(param2); // spell, dst
+                    base << param1 << param2; // spell, dst
                     break;
             }
             break;
 
         case MSG_BATTLE_END_TURN:
-            base << static_cast<u32>(param1); // uid
+            base << param1; // uid
             break;
 
         case MSG_BATTLE_SKIP:
-            base << static_cast<u32>(param1) << static_cast<u8>(param2); // uid, hard_skip
+            base << param1 << param2; // uid, hard_skip
             break;
 
         case MSG_BATTLE_MOVE:
-            base << static_cast<u32>(param1) << static_cast<s16>(param2) << static_cast<u8>(0); // uid, dst, path
+            base << param1 << param2 << static_cast<u32>(0); // uid, dst, path
             break;
 
         case MSG_BATTLE_ATTACK:
-            base << static_cast<u32>(param1) << static_cast<u32>(param2) << static_cast<s16>(param3) << static_cast<u8>(param4); // uid, uid, dst, direction
+            base << param1 << param2 << param3 << param4; // uid, uid, dst, direction
             break;
 
         case MSG_BATTLE_MORALE:
-            base << static_cast<u32>(param1) << static_cast<u8>(param2); // uid, state
+            base << param1 << param2; // uid, state
             break;
 
         default: break;

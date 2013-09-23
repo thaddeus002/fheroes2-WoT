@@ -23,11 +23,13 @@
 #include <cmath>
 #include "agg.h"
 #include "luck.h"
+#include "dialog.h"
+#include "text.h"
 #include "morale.h"
 #include "heroes.h"
 #include "heroes_indicator.h"
 
-const char* MoraleString(s8 morale)
+const char* MoraleString(int morale)
 {
     switch(morale)
     {
@@ -49,7 +51,7 @@ const char* MoraleString(s8 morale)
     return NULL;
 }
 
-const char* LuckString(s8 luck)
+const char* LuckString(int luck)
 {
     switch(luck)
     {
@@ -112,10 +114,10 @@ void LuckIndicator::Redraw(void)
     descriptions.append("\n \n");
 
     const Sprite & sprite = AGG::GetICN(ICN::HSICONS, (0 > luck ? 3 : (0 < luck ? 2 : 6)));
-    const u8 inter = 6;
-    u8 count = (0 == luck ? 1 : static_cast<u8>(std::abs(luck)));
-    s16 cx = area.x + (area.w - (sprite.w() + inter * (count - 1))) / 2;
-    s16 cy = area.y + (area.h - sprite.h()) / 2;
+    const int inter = 6;
+    int count = (0 == luck ? 1 : static_cast<u8>(std::abs(luck)));
+    s32 cx = area.x + (area.w - (sprite.w() + inter * (count - 1))) / 2;
+    s32 cy = area.y + (area.h - sprite.h()) / 2;
 
     if(modificators.size())
 	descriptions.append(modificators);
@@ -158,10 +160,10 @@ void MoraleIndicator::Redraw(void)
     descriptions.append("\n \n");
 
     const Sprite & sprite = AGG::GetICN(ICN::HSICONS, (0 > morale ? 5 : (0 < morale ? 4 : 7)));
-    const u8 inter = 6;
-    u8 count = (0 == morale ? 1 : static_cast<u8>(std::abs(morale)));
-    s16 cx = area.x + (area.w - (sprite.w() + inter * (count - 1))) / 2;
-    s16 cy = area.y + (area.h - sprite.h()) / 2;
+    const int inter = 6;
+    int count = (0 == morale ? 1 : static_cast<u8>(std::abs(morale)));
+    s32 cx = area.x + (area.w - (sprite.w() + inter * (count - 1))) / 2;
+    s32 cy = area.y + (area.h - sprite.h()) / 2;
 
     if(modificators.size())
 	descriptions.append(modificators);

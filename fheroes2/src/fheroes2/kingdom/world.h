@@ -29,7 +29,6 @@
 #include "maps.h"
 #include "maps_tiles.h"
 #include "week.h"
-#include "color.h"
 #include "kingdom.h"
 #include "sprite.h"
 #include "castle_heroes.h"
@@ -47,40 +46,41 @@ typedef std::list<EventDate>		EventsDate;
 typedef std::list<EventMaps>		EventsMaps;
 typedef std::list<Riddle>		Riddles;
 typedef std::vector<Maps::Tiles>	MapsTiles;
+typedef std::map<s32, std::string>	MapSigns;
 
 struct CapturedObject
 {
     ObjectColor		objcol;
     Troop		guardians;
-    u8			split;
+    int			split;
 
     CapturedObject() : split(1) {}
 
-    const u8 & GetSplit(void) const { return split; }
-    const u8 & GetObject(void) const { return objcol.first; }
-    const u8 & GetColor(void) const { return objcol.second; }
+    int GetSplit(void) const { return split; }
+    int GetObject(void) const { return objcol.first; }
+    int GetColor(void) const { return objcol.second; }
     Troop & GetTroop(void) { return guardians; }
 
-    void Set(u8 obj, u8 col) { objcol = ObjectColor(obj, col); }
-    void SetColor(u8 col) { objcol.second = col; }
-    void SetSplit(u8 spl) { split = spl; }
+    void Set(int obj, int col) { objcol = ObjectColor(obj, col); }
+    void SetColor(int col) { objcol.second = col; }
+    void SetSplit(int spl) { split = spl; }
 
     bool GuardiansProtected(void) const { return guardians.isValid(); }
 };
 
 struct CapturedObjects : std::map<s32, CapturedObject>
 {
-    void Set(const s32 &, u8, u8);
-    void SetColor(const s32 &, u8);
-    void ClearFog(u8);
-    void ResetColor(u8);
+    void Set(s32, int, int);
+    void SetColor(s32, int);
+    void ClearFog(int);
+    void ResetColor(int);
 
-    CapturedObject & Get(const s32 &);
-    Funds TributeCapturedObject(u8 col, u8 obj);
+    CapturedObject & Get(s32);
+    Funds TributeCapturedObject(int col, int obj);
 
-    u16	 GetCount(u8, u8) const;
-    u16	 GetCountMines(u8, u8) const;
-    u8   GetColor(const s32 &) const;
+    u32	 GetCount(int, int) const;
+    u32	 GetCountMines(int, int) const;
+    int  GetColor(s32) const;
 };
 
 class World : protected Size
@@ -88,110 +88,112 @@ class World : protected Size
 public:
     ~World(){ Reset(); }
 
-    void LoadMaps(const std::string &filename);
-    void NewMaps(const u16 sw, const u16 sh);
+    bool LoadMapMP2(const std::string &);
+    bool LoadMapMAP(const std::string &);
 
-    static World & Get(void);
+    void NewMaps(u32, u32);
 
-    const u16 & w(void){ return width; }
-    const u16 & h(void){ return height; }
+    static World &	Get(void);
 
-    const Maps::Tiles & GetTiles(const Point & pt) const{ return GetTiles(pt.y * width + pt.x); }
-    const Maps::Tiles & GetTiles(u16 ax, u16 ay) const{ return GetTiles(ay * width + ax); }
-#ifdef WITH_DEBUG
-    const Maps::Tiles & GetTiles(s32 index) const{ return vec_tiles.at(index); }
-#else
-    const Maps::Tiles & GetTiles(s32 index) const{ return vec_tiles[index]; }
-#endif
-    Maps::Tiles & GetTiles(const Point & pt) { return GetTiles(pt.y * width + pt.x); }
-    Maps::Tiles & GetTiles(u16 ax, u16 ay) { return GetTiles(ay * width + ax); }
-    Maps::Tiles & GetTiles(s32 index){ return vec_tiles.at(index); }
+    s32			w(void) const;
+    s32			h(void) const;
 
-    Kingdoms & GetKingdoms(void);
-    Kingdom & GetKingdom(u8 color);
-    const Kingdom & GetKingdom(u8 color) const;
+    const Maps::Tiles & GetTiles(u32, u32) const;
+    Maps::Tiles &	GetTiles(u32, u32);
+    const Maps::Tiles & GetTiles(s32) const;
+    Maps::Tiles &	GetTiles(s32);
 
-    const Castle* GetCastle(s32 maps_index) const;
-    Castle* GetCastle(s32 maps_index);
+    void		InitKingdoms(void);
 
-    const Heroes* GetHeroes(Heroes::heroes_t) const;
-    const Heroes* GetHeroes(s32 maps_index) const;
-    Heroes* GetHeroes(Heroes::heroes_t);
-    Heroes* GetHeroes(s32 maps_index);
-    CastleHeroes GetHeroes(const Castle &) const;
+    Kingdom &		GetKingdom(int color);
+    const Kingdom &	GetKingdom(int color) const;
 
-    Heroes* FromJail(s32);
-    const Heroes* GetHeroesCondWins(void) const;
-    const Heroes* GetHeroesCondLoss(void) const;
+    const Castle*	GetCastle(const Point &) const;
+    Castle*		GetCastle(const Point &);
 
-    const UltimateArtifact & GetUltimateArtifact(void) const;
-    bool DiggingForUltimateArtifact(const Point & center);
-    void ActionForMagellanMaps(u8 color);
+    const Heroes*	GetHeroes(int /* hero id */) const;
+    Heroes*		GetHeroes(int /* hero id */);
 
-    u8 GetDay(void) const{ return LastDay() ? DAYOFWEEK : day % DAYOFWEEK; }
-    u8 GetWeek(void) const{ return LastWeek() ? WEEKOFMONTH : week % WEEKOFMONTH; }
-    u8 GetMonth(void) const{ return month; }
-    u16 CountDay(void) const{ return day; }
-    u16 CountWeek(void) const{ return week; }
-    bool BeginWeek(void) const{ return 1 == (day % DAYOFWEEK); }
-    bool BeginMonth(void) const{ return 1 == (week % WEEKOFMONTH) && BeginWeek(); }
-    bool LastDay(void) const{ return (0 == (day % DAYOFWEEK)); }
-    bool LastWeek(void) const{ return (0 == (week % WEEKOFMONTH)); }
-    const Week & GetWeekType(void) const{ return week_current; }
-    std::string DateString(void) const;
+    const Heroes*	GetHeroes(const Point &) const;
+    Heroes*		GetHeroes(const Point &);
 
-    void NewDay(void);
-    void NewWeek(void);
-    void NewMonth(void);
+    Heroes*		FromJailHeroes(s32);
+    Heroes*		GetFreemanHeroes(int race = 0) const;
+
+    const Heroes*	GetHeroesCondWins(void) const;
+    const Heroes*	GetHeroesCondLoss(void) const;
+
+    CastleHeroes	GetHeroes(const Castle &) const;
+
+    const UltimateArtifact &	GetUltimateArtifact(void) const;
+    bool			DiggingForUltimateArtifact(const Point &);
+
+    int			GetDay(void) const;
+    int			GetWeek(void) const;
+    int			GetMonth(void) const;
+    u32			CountDay(void) const;
+    u32			CountWeek(void) const;
+    bool		BeginWeek(void) const;
+    bool		BeginMonth(void) const;
+    bool		LastDay(void) const;
+    bool		LastWeek(void) const;
+    const Week &	GetWeekType(void) const;
+    std::string		DateString(void) const;
+
+    void		NewDay(void);
+    void		NewWeek(void);
+    void		NewMonth(void);
 
     const std::string & GetRumors(void);
     
-    s32 NextTeleport(const s32 &) const;
-    MapsIndexes GetTeleportEndPoints(const s32 &) const;
+    s32			NextTeleport(s32) const;
+    MapsIndexes		GetTeleportEndPoints(s32) const;
 
-    s32 NextWhirlpool(const s32 &) const;
-    MapsIndexes GetWhirlpoolEndPoints(const s32 &) const;
+    s32			NextWhirlpool(s32) const;
+    MapsIndexes		GetWhirlpoolEndPoints(s32) const;
 
-    const std::string & MessageSign(const s32 index);
+    const std::string &	MessageSign(s32);
 
-    void CaptureObject(const s32 & index, u8 col);
-    u16  CountCapturedObject(u8 obj, u8 col) const;
-    u16  CountCapturedMines(u8 type, u8 col) const;
-    u8   ColorCapturedObject(const s32 & index) const;
-    void ResetCapturedObjects(u8);
-    CapturedObject & GetCapturedObject(const s32 &);
+    void		CaptureObject(s32, int col);
+    u32			CountCapturedObject(int obj, int col) const;
+    u32			CountCapturedMines(int type, int col) const;
+    u32			CountObeliskOnMaps(void);
+    int			ColorCapturedObject(s32) const;
+    void		ResetCapturedObjects(int);
+    CapturedObject &	GetCapturedObject(s32);
 
-    void ActionToEyeMagi(u8 color) const;
+    void		ActionForMagellanMaps(int color);
+    void		ActionToEyeMagi(int color) const;
+    void		ClearFog(int color);
+    void		UpdateRecruits(Recruits &) const;
 
-    u16 CountObeliskOnMaps(void);
 
-    void ClearFog(u8 color);
+    int 		CheckKingdomWins(const Kingdom &) const;
+    bool		KingdomIsWins(const Kingdom &, int wins) const;
+    int 		CheckKingdomLoss(const Kingdom &) const;
+    bool		KingdomIsLoss(const Kingdom &, int loss) const;
 
-    u16  CheckKingdomWins(const Kingdom &) const;
-    bool KingdomIsWins(const Kingdom &, u16 wins) const;
-    u16  CheckKingdomLoss(const Kingdom &) const;
-    bool KingdomIsLoss(const Kingdom &, u16 loss) const;
+    void		AddEventDate(const EventDate &);
+    EventsDate		GetEventsDate(int color) const;
+    EventMaps*		GetEventMaps(int color, s32);
+    Riddle*		GetSphinxRiddle(s32);
 
-    void AddEventDate(const EventDate &);
-    EventsDate GetEventsDate(u8 color) const;
-    EventMaps* GetEventMaps(u8 color, s32 index);
-    Riddle* GetSphinxRiddle(s32 index);
-
-    Heroes* GetFreemanHeroes(u8 rc = 0) const;
-    void UpdateRecruits(Recruits &) const;
-
-    static u32 GetUniq(void);
+    static u32		GetUniq(void);
 
 private:
-    World() : Size(0, 0), width(Size::w), height(Size::h) {};
-    void Defaults(void);
-    void Reset(void);
-    void MonthOfMonstersAction(const Monster &);
+    World() : Size(0, 0) {};
+    void		Defaults(void);
+    void		Reset(void);
+    void		MonthOfMonstersAction(const Monster &);
+    void		PostLoad(void);
 
 private:
     friend class Radar;
     friend StreamBase & operator<< (StreamBase &, const World &);
     friend StreamBase & operator>> (StreamBase &, World &);
+#ifdef WITH_XML
+    friend TiXmlElement & operator>> (TiXmlElement &, World &);
+#endif
 
     MapsTiles				vec_tiles;
     AllHeroes				vec_heroes;
@@ -201,26 +203,22 @@ private:
     EventsDate                          vec_eventsday;
     EventsMaps                          vec_eventsmap;
     Riddles				vec_riddles;
-
-    std::map<s32, std::string>		map_sign;
+    MapSigns				map_sign;
 
     // index, object, color
     CapturedObjects			map_captureobj;
 
     UltimateArtifact			ultimate_artifact;
 
-    u16 & width;
-    u16 & height;
+    u32					day;
+    u32					week;
+    u32					month;
 
-    u16 day;
-    u16 week;
-    u8 month;
+    Week				week_current;
+    Week				week_next;
 
-    Week week_current;
-    Week week_next;
-
-    Heroes::heroes_t heroes_cond_wins;
-    Heroes::heroes_t heroes_cond_loss;
+    int					heroes_cond_wins;
+    int					heroes_cond_loss;
 };
 
 StreamBase & operator<< (StreamBase &, const CapturedObject &);

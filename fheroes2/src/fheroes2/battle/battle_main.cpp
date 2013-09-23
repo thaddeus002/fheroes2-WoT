@@ -29,6 +29,8 @@
 #include "heroes_base.h"
 #include "skill.h"
 #include "agg.h"
+#include "text.h"
+#include "dialog.h"
 #include "world.h"
 #include "kingdom.h"
 #include "game.h"
@@ -48,7 +50,7 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
     // pre battle army1
     if(army1.GetCommander())
     {
-	if(Skill::Primary::CAPTAIN == army1.GetCommander()->GetType())
+	if(army1.GetCommander()->isCaptain())
 	    army1.GetCommander()->ActionPreBattle();
 	else
 	if(CONTROL_AI & army1.GetControl())
@@ -60,7 +62,7 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
     // pre battle army2
     if(army2.GetCommander())
     {
-	if(Skill::Primary::CAPTAIN == army2.GetCommander()->GetType())
+	if(army2.GetCommander()->isCaptain())
 	    army2.GetCommander()->ActionPreBattle();
 	else
 	if(CONTROL_AI & army2.GetControl())
@@ -89,7 +91,7 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
 
     HeroBase* hero_wins = (result.army1 & RESULT_WINS ? army1.GetCommander() : (result.army2 & RESULT_WINS ? army2.GetCommander() : NULL));
     HeroBase* hero_loss = (result.army1 & RESULT_LOSS ? army1.GetCommander() : (result.army2 & RESULT_LOSS ? army2.GetCommander() : NULL));
-    const u8 loss_result =  result.army1 & RESULT_LOSS ? result.army1 : result.army2;
+    const u32 loss_result =  result.army1 & RESULT_LOSS ? result.army1 : result.army2;
 
     if(local)
     {
@@ -125,14 +127,14 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
     // pickup artifact
     if(hero_wins && hero_loss &&
 	!((RESULT_RETREAT | RESULT_SURRENDER) & loss_result) &&
-	Skill::Primary::HEROES == hero_wins->GetType() &&
-	Skill::Primary::HEROES == hero_loss->GetType())
+	hero_wins->isHeroes() &&
+	hero_loss->isHeroes())
 	PickupArtifactsAction(*hero_wins, *hero_loss, (CONTROL_HUMAN & hero_wins->GetControl()));
 
     // eagle eye capability
     if(hero_wins && hero_loss &&
 	hero_wins->GetLevelSkill(Skill::Secondary::EAGLEEYE) &&
-	Skill::Primary::HEROES == hero_loss->GetType())
+	hero_loss->isHeroes())
 	    EagleEyeSkillAction(*hero_wins, arena.GetUsageSpells(), (CONTROL_HUMAN & hero_wins->GetControl()));
 
     // necromancy capability
@@ -144,14 +146,14 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
     DEBUG(DBG_BATTLE, DBG_INFO, "army2 " << army1.String());
 
     // update army
-    if(army1.GetCommander() && Skill::Primary::HEROES == army1.GetCommander()->GetType())
+    if(army1.GetCommander() && army1.GetCommander()->isHeroes())
     {
 	// hard reset army
 	if(!army1.isValid() || (result.army1 & RESULT_RETREAT)) army1.Reset(false);
     }
 
     // update army
-    if(army2.GetCommander() && Skill::Primary::HEROES == army2.GetCommander()->GetType())
+    if(army2.GetCommander() && army2.GetCommander()->isHeroes())
     {
 	// hard reset army
         if(!army2.isValid() || (result.army2 & RESULT_RETREAT)) army2.Reset(false);
@@ -167,7 +169,7 @@ void Battle::PickupArtifactsAction(HeroBase & hero1, HeroBase & hero2, bool loca
     BagArtifacts & bag1 = hero1.GetBagArtifacts();
     BagArtifacts & bag2 = hero2.GetBagArtifacts();
 
-    for(u8 ii = 0; ii < bag2.size(); ++ii)
+    for(u32 ii = 0; ii < bag2.size(); ++ii)
     {
 	Artifact & art = bag2[ii];
 
@@ -255,10 +257,10 @@ void Battle::NecromancySkillAction(HeroBase & hero, u32 killed, bool local)
 	(army.isFullHouse() && !army.HasMonster(Monster::SKELETON))) return;
 
     // check necromancy shrine build
-    u16 percent = 10 * world.GetKingdom(army.GetColor()).GetCountNecromancyShrineBuild();
+    u32 percent = 10 * world.GetKingdom(army.GetColor()).GetCountNecromancyShrineBuild();
 
     // check artifact
-    u8 acount = hero.HasArtifact(Artifact::SPADE_NECROMANCY);
+    u32 acount = hero.HasArtifact(Artifact::SPADE_NECROMANCY);
     if(acount) percent += acount * 10;
 
     // fix over 60%
@@ -291,7 +293,7 @@ void Battle::NecromancySkillAction(HeroBase & hero, u32 killed, bool local)
     DEBUG(DBG_BATTLE, DBG_TRACE, "raise: " << count << mons.GetMultiName());
 }
 
-u8 Battle::Result::AttackerResult(void) const
+u32 Battle::Result::AttackerResult(void) const
 {
     if(RESULT_SURRENDER & army1) return RESULT_SURRENDER;
     else
@@ -304,7 +306,7 @@ u8 Battle::Result::AttackerResult(void) const
     return 0;
 }
 
-u8 Battle::Result::DefenderResult(void) const
+u32 Battle::Result::DefenderResult(void) const
 {
     if(RESULT_SURRENDER & army2) return RESULT_SURRENDER;
     else

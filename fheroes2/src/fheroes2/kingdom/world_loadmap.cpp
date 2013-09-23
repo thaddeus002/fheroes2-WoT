@@ -1,0 +1,1267 @@
+/***************************************************************************
+ *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *                                                                         *
+ *   Part of the Free Heroes2 Engine:                                      *
+ *   http://sourceforge.net/projects/fheroes2                              *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
+#include <fstream>
+#include <functional>
+#include <algorithm>
+#include "agg.h" 
+#include "artifact.h"
+#include "resource.h"
+#include "settings.h" 
+#include "kingdom.h" 
+#include "heroes.h" 
+#include "castle.h" 
+#include "game_static.h"
+#include "gameevent.h"
+#include "mp2.h"
+#include "text.h"
+#include "race.h"
+#include "pairs.h"
+#include "game_over.h"
+#include "difficulty.h"
+#include "maps_tiles.h"
+#include "resource.h"
+#include "game.h"
+#include "world.h"
+#include "ai.h"
+
+namespace GameStatic
+{
+    extern u32 uniq;
+}
+
+#ifdef WITH_ZLIB
+#include "zzlib.h"
+std::vector<u8> DecodeBase64AndUncomress(std::string base64)
+{
+    std::vector<u8> zdata = decodeBase64(base64);
+    StreamBuf sb(zdata);
+    sb.skip(4); // editor: version
+    u32 realsz = sb.getLE32();
+    sb.skip(4); // qt uncompress size
+    return zlibDecompress(sb.data(), sb.size(), realsz + 1);
+}
+#endif
+
+
+#ifdef WITH_XML
+
+namespace Maps
+{
+    TiXmlElement & operator>> (TiXmlElement & doc, Addons & levels)
+    {
+	TiXmlElement* xml_sprite = doc.FirstChildElement("sprite");
+	for(; xml_sprite; xml_sprite = xml_sprite->NextSiblingElement("sprite"))
+	{
+	    int uid, ext, index, level, icn;
+
+	    xml_sprite->Attribute("uid", & uid);
+	    xml_sprite->Attribute("ext", & ext);
+	    xml_sprite->Attribute("index", & index);
+	    xml_sprite->Attribute("level", & level);
+	    xml_sprite->Attribute("icn", & icn);
+
+	    levels.push_back(TilesAddon(level, uid, icn, index));
+	}
+
+	return doc;
+    }
+
+    TiXmlElement & operator>> (TiXmlElement & doc, Tiles & tile)
+    {
+	int sprite, shape, object, base, local;
+
+	doc.Attribute("tileSprite", & sprite);
+	doc.Attribute("tileShape", & shape);
+	doc.Attribute("objectID", & object);
+	doc.Attribute("base", & base);
+	doc.Attribute("local", & local);
+
+	tile.SetTile(sprite, shape);
+	tile.SetObject(object);
+
+        TiXmlElement* xml_levels1 = doc.FirstChildElement("levels1");
+	if(xml_levels1) *xml_levels1 >> tile.addons_level1;
+
+        TiXmlElement* xml_levels2 = doc.FirstChildElement("levels2");
+	if(xml_levels2) *xml_levels2 >> tile.addons_level2;
+
+	return doc;
+    }
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, MapsTiles & tiles)
+{
+    TiXmlElement* xml_tile = doc.FirstChildElement("tile");
+    for(; xml_tile; xml_tile = xml_tile->NextSiblingElement("tile"))
+    {
+	int posx, posy;
+	xml_tile->Attribute("posx", & posx);
+	xml_tile->Attribute("posy", & posy);
+
+	Maps::Tiles & tile = world.GetTiles(posx, posy);
+	tile.SetIndex(Maps::GetIndexFromAbsPoint(posx, posy));
+	*xml_tile >> tile;
+    }
+
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, Army & army)
+{
+    TiXmlElement* xml_troop = doc.FirstChildElement("troop");
+    for(; xml_troop; xml_troop = xml_troop->NextSiblingElement("troop"))
+    {
+	int type, count;
+	xml_troop->Attribute("type", & type);
+	xml_troop->Attribute("count", & count);
+
+	army.JoinTroop(type, count);
+    }
+
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, Castle & town)
+{
+    int posx, posy, race, color, build, dwell, custom1, custom2, custom3, forcetown, iscastle, captain;
+    doc.Attribute("posx", & posx);
+    doc.Attribute("posy", & posy);
+    doc.Attribute("race", & race);
+    doc.Attribute("color", & color);
+    doc.Attribute("buildings", & build);
+    doc.Attribute("dwellings", & dwell);
+    doc.Attribute("customTroops", & custom1);
+    doc.Attribute("customDwellings", & custom2);
+    doc.Attribute("customBuildings", & custom3);
+    doc.Attribute("forceTown", & forcetown);
+    doc.Attribute("isCastle", & iscastle);
+    doc.Attribute("captainPresent", & captain);
+
+    town.SetCenter(Point(posx, posy));
+    town.SetColor(color);
+
+    town.building = 0;
+    if(custom3)
+	town.building |= build;
+    if(custom2)
+	town.building |= dwell;
+    town.name = doc.Attribute("name");
+
+    if(1 != forcetown)
+	town.SetModes(Castle::ALLOWCASTLE);
+
+    town.building |= 1 == iscastle ? BUILD_CASTLE : BUILD_TENT;
+
+    if(1 == captain)
+	town.building |= BUILD_CAPTAIN;
+
+    // default building
+    if(1 != custom3 && 1 != custom2)
+    {
+	town.building |= DWELLING_MONSTER1;
+        u32 dwelling2 = 0;
+        switch(Settings::Get().GameDifficulty())
+        {
+            case Difficulty::EASY:      dwelling2 = 80; break;
+            case Difficulty::NORMAL:    dwelling2 = 65; break;
+            case Difficulty::HARD:      dwelling2 = 15; break;
+            default: break;
+        }
+        if(dwelling2 && dwelling2 >= Rand::Get(1, 100))
+	    town.building |= DWELLING_MONSTER2;
+    }
+
+    if(race == Race::RAND)
+    {
+	u32 kingdom_race = Players::GetPlayerRace(town.GetColor());
+	race = Color::NONE != town.GetColor() && (Race::ALL & kingdom_race) ?
+			    kingdom_race : Race::Rand();
+
+        Maps::UpdateRNDSpriteForCastle(town.GetCenter(), race, town.isCastle());
+    }
+
+    town.race = race;
+
+    Maps::MinimizeAreaForCastle(town.GetCenter());
+    world.CaptureObject(town.GetIndex(), town.GetColor());
+
+    TiXmlElement* xml_troops = doc.FirstChildElement("troops");
+    if(xml_troops)
+	*xml_troops >> town.army;
+
+    town.PostLoad();
+
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, AllCastles & castles)
+{
+    TiXmlElement* xml_town = doc.FirstChildElement("town");
+    for(; xml_town; xml_town = xml_town->NextSiblingElement("town"))
+    {
+	Castle* town = new Castle();
+	*xml_town >> *town;
+	castles.push_back(town);
+    }
+
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, Skill::SecSkills & skills)
+{
+    TiXmlElement* xml_skill = doc.FirstChildElement("skill");
+    for(; xml_skill; xml_skill = xml_skill->NextSiblingElement("skill"))
+    {
+	int skill, level;
+	xml_skill->Attribute("id", & skill);
+	xml_skill->Attribute("level", & level);
+
+	skills.AddSkill(Skill::Secondary(skill, level));
+    }
+
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, BagArtifacts & bag)
+{
+    TiXmlElement* xml_art = doc.FirstChildElement("artifact");
+    for(; xml_art; xml_art = xml_art->NextSiblingElement("artifact"))
+    {
+	int art = 0;
+	xml_art->Attribute("id", & art);
+
+	if(art)
+	    bag.PushArtifact(art - 1);
+    }
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, Heroes & hero)
+{
+    int posx, posy, color, portrait, exp, patrol, square;
+
+    doc.Attribute("posx", & posx);
+    doc.Attribute("posy", & posy);
+    hero.SetCenter(Point(posx, posy));
+
+    doc.Attribute("color", & color);
+    hero.SetColor(color);
+
+    doc.Attribute("portrait", & portrait);
+    hero.portrait = portrait;
+
+    doc.Attribute("experience", & exp);
+    hero.experience = exp;
+
+    doc.Attribute("patrolMode", & patrol);
+    if(patrol)
+    {
+	hero.SetModes(Heroes::PATROL);
+	doc.Attribute("patrolSquare", & square);
+	hero.patrol_center = Point(posx, posy);
+	hero.patrol_square = square;
+    }
+
+    hero.name = doc.Attribute("name");
+    if(hero.name == "Random")
+	hero.name = Heroes::GetName(hero.GetID());
+
+    Skill::SecSkills skills;
+
+    TiXmlElement* xml_skills = doc.FirstChildElement("skills");
+    if(xml_skills)
+	*xml_skills >> skills;
+
+    if(skills.size())
+    {
+	hero.SetModes(Heroes::CUSTOMSKILLS);
+	hero.secondary_skills = skills;
+    }
+
+    TiXmlElement* xml_artifacts = doc.FirstChildElement("artifacts");
+    if(xml_artifacts)
+	*xml_artifacts >> hero.bag_artifacts;
+
+    TiXmlElement* xml_troops = doc.FirstChildElement("troops");
+
+    if(xml_troops)
+	*xml_troops >> hero.army;
+
+    hero.PostLoad();
+
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, AllHeroes & heroes)
+{
+    TiXmlElement* xml_hero = doc.FirstChildElement("hero");
+    for(; xml_hero; xml_hero = xml_hero->NextSiblingElement("hero"))
+    {
+	int posx, posy, portrait;
+	xml_hero->Attribute("posx", & posx);
+	xml_hero->Attribute("posy", & posy);
+	xml_hero->Attribute("portrait", & portrait);
+
+	const Maps::Tiles & tile = world.GetTiles(posx, posy);
+	const Maps::TilesAddon* addon = tile.FindObjectConst(MP2::OBJ_HEROES);
+	std::pair<int, int> colorRace = Maps::TilesAddon::ColorRaceFromHeroSprite(*addon);
+	Kingdom & kingdom = world.GetKingdom(colorRace.first);
+
+	if(colorRace.second == Race::RAND &&
+		colorRace.first != Color::NONE)
+		colorRace.second = kingdom.GetRace();
+
+	// check heroes max count
+	if(kingdom.AllowRecruitHero(false, 0))
+	{
+	    Heroes* hero = NULL;
+
+	    if(0 < portrait)
+		hero = world.GetHeroes(portrait);
+
+	    if(!hero || !hero->isFreeman())
+		hero = world.GetFreemanHeroes(colorRace.second);
+
+	    if(hero)
+		*xml_hero >> *hero;
+	}
+    }
+
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, Funds & funds)
+{
+    int ore, mercury, wood, sulfur, crystal, gems, gold;
+    doc.Attribute("ore", & ore);
+    doc.Attribute("mercury", & mercury);
+    doc.Attribute("wood", & wood);
+    doc.Attribute("sulfur", & sulfur);
+    doc.Attribute("crytal", & crystal);
+    doc.Attribute("gems", & gems);
+    doc.Attribute("gold", & gold);
+
+    funds.ore = ore;
+    funds.mercury = mercury;
+    funds.wood = wood;
+    funds.sulfur = crystal;
+    funds.gems = gems;
+    funds.gold = gold;
+
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, Riddle & riddle)
+{
+    int posx, posy, artifact;
+
+    doc.Attribute("posx", & posx);
+    doc.Attribute("posy", & posy);
+    doc.Attribute("artifact", & artifact);
+
+    riddle.SetCenter(Point(posx, posy));
+    riddle.artifact = artifact ? artifact - 1 : Artifact::UNKNOWN;
+    riddle.valid = true;
+
+    TiXmlElement* xml_answers = doc.FirstChildElement("answers");
+    if(xml_answers)
+    {
+	TiXmlElement* xml_answer = doc.FirstChildElement("answer");
+	for(; xml_answer; xml_answer = xml_answer->NextSiblingElement("answer"))
+	    if(xml_answer->GetText()) riddle.answers.push_back(xml_answer->GetText());
+    }
+
+    TiXmlElement* xml_resources = doc.FirstChildElement("resources");
+    if(xml_resources)
+	*xml_resources >> riddle.resource;
+
+    TiXmlElement* xml_msg = doc.FirstChildElement("msg");
+    if(xml_msg && xml_msg->GetText())
+	riddle.message = xml_msg->GetText();
+
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, EventMaps & event)
+{
+    int posx, posy, colors, allow, cancel, artifact;
+
+    doc.Attribute("posx", & posx);
+    doc.Attribute("posy", & posy);
+    doc.Attribute("cancelAfterFirstVisit", & cancel);
+    doc.Attribute("colors", & colors);
+    doc.Attribute("allowComputer", & allow);
+    doc.Attribute("artifact", & artifact);
+
+    event.SetCenter(Point(posx, posy));
+    event.computer = allow;
+    event.colors = colors;
+    event.artifact = artifact ? artifact - 1 : Artifact::UNKNOWN;
+    event.cancel = cancel;
+
+    TiXmlElement* xml_resources = doc.FirstChildElement("resources");
+    if(xml_resources)
+	*xml_resources >> event.resource;
+
+    TiXmlElement* xml_msg = doc.FirstChildElement("msg");
+    if(xml_msg && xml_msg->GetText())
+	event.message = xml_msg->GetText();
+
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, EventsMaps & events)
+{
+    TiXmlElement* xml_event = doc.FirstChildElement("event");
+    for(; xml_event; xml_event = xml_event->NextSiblingElement("event"))
+    {
+	events.push_back(EventMaps());
+	*xml_event >> events.back();
+    }
+
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, EventDate & event)
+{
+    int day1, day2, colors, allow;
+
+    doc.Attribute("dayFirst", & day1);
+    doc.Attribute("daySubsequent", & day2);
+    doc.Attribute("colors", & colors);
+    doc.Attribute("allowComputer", & allow);
+
+    event.computer = allow;
+    event.first = day1;
+    event.subsequent = day2;
+    event.colors = colors;
+
+    TiXmlElement* xml_resources = doc.FirstChildElement("resources");
+    if(xml_resources)
+	*xml_resources >> event.resource;
+
+    TiXmlElement* xml_msg = doc.FirstChildElement("msg");
+    if(xml_msg && xml_msg->GetText())
+	event.message = xml_msg->GetText();
+
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, EventsDate & events)
+{
+    TiXmlElement* xml_event = doc.FirstChildElement("event");
+    for(; xml_event; xml_event = xml_event->NextSiblingElement("event"))
+    {
+	events.push_back(EventDate());
+	*xml_event >> events.back();
+    }
+
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, Riddles & riddles)
+{
+    TiXmlElement* xml_sphinx = doc.FirstChildElement("sphinx");
+    for(; xml_sphinx; xml_sphinx = xml_sphinx->NextSiblingElement("sphinx"))
+    {
+	riddles.push_back(Riddle());
+	*xml_sphinx >> riddles.back();
+    }
+
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, Rumors & rumors)
+{
+    TiXmlElement* xml_msg = doc.FirstChildElement("msg");
+    for(; xml_msg; xml_msg = xml_msg->NextSiblingElement("msg"))
+	if(xml_msg->GetText()) rumors.push_back(xml_msg->GetText());
+
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, MapSigns & signs)
+{
+    TiXmlElement* xml_sign = doc.FirstChildElement("sign");
+    for(; xml_sign; xml_sign = xml_sign->NextSiblingElement("sign"))
+    if(xml_sign->GetText())
+    {
+	int posx, posy;
+
+	xml_sign->Attribute("posx", & posx);
+	xml_sign->Attribute("posy", & posy);
+
+	Maps::Tiles & tile = world.GetTiles(posx, posy);
+	signs[tile.GetIndex()] = xml_sign->GetText();
+    }
+
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, World & w)
+{
+    TiXmlElement* xml_tiles = doc.FirstChildElement("tiles");
+    int value;
+
+    if(!xml_tiles)
+	return doc;
+
+    Size & sw = w;
+
+    xml_tiles->Attribute("width", & value);
+    sw.w = value;
+
+    xml_tiles->Attribute("height", & value);
+    sw.h = value;
+
+    w.vec_tiles.resize(sw.w * sw.h);
+
+    *xml_tiles >> w.vec_tiles;
+
+    TiXmlElement* xml_objects = doc.FirstChildElement("objects");
+    if(xml_objects)
+    {
+	xml_objects->Attribute("lastUID", & value);
+	GameStatic::uniq = value;
+
+	*xml_objects >> w.vec_castles >> w.vec_heroes >>
+	    w.vec_eventsmap >> w.vec_riddles >> w.map_sign;
+    }
+
+    TiXmlElement* xml_events = doc.FirstChildElement("events");
+    if(xml_events)
+	*xml_events >> w.vec_eventsday;
+
+    TiXmlElement* xml_rumors = doc.FirstChildElement("rumors");
+    if(xml_rumors)
+	*xml_rumors >> w.vec_rumors;
+    w.PostLoad();
+
+    return doc;
+}
+
+/* load maps */
+bool World::LoadMapMAP(const std::string & filename)
+{
+#ifdef WITH_ZLIB
+    Reset();
+    Defaults();
+
+    TiXmlDocument doc;
+    TiXmlElement* xml_map = NULL;
+
+    if(doc.LoadFile(filename.c_str()) &&
+        NULL != (xml_map = doc.FirstChildElement("map")))
+    {
+        TiXmlElement* xml_data = xml_map->FirstChildElement("data");
+	if(xml_data->GetText())
+	{
+	    std::vector<u8> raw_data = DecodeBase64AndUncomress(xml_data->GetText());
+	    raw_data.push_back(0);
+	    doc.Parse(reinterpret_cast<const char*>(& raw_data[0]));
+	    if(doc.Error())
+	    {
+		VERBOSE("parse error: " << doc.ErrorDesc());
+		return false;
+	    }
+	    //SaveMemToFile(raw_data, "raw.data");
+	    xml_data = doc.FirstChildElement("data");
+	    *xml_data >> *this;
+	    return true;
+	}
+    }
+    return false;
+}
+#endif
+#else
+bool World::LoadMapMAP(const std::string & filename)
+{
+    return false;
+}
+#endif // WITH_XML
+
+bool World::LoadMapMP2(const std::string & filename)
+{
+    Reset();
+    Defaults();
+
+    std::ifstream fd(filename.c_str(), std::ios::binary);
+    if(!fd.is_open())
+    {
+	 DEBUG(DBG_GAME|DBG_ENGINE, DBG_WARN, "file not found " << filename.c_str());
+	 Error::Except(__FUNCTION__, "load maps");
+    }
+
+    MapsIndexes vec_object; // index maps for OBJ_CASTLE, OBJ_HEROES, OBJ_SIGN, OBJ_BOTTLE, OBJ_EVENT
+    vec_object.reserve(100);
+
+    // check (mp2, mx2) ID
+    if(StreamBuf::getBE32(fd) != 0x5C000000)
+	return false;
+
+    // endof
+    fd.seekg(0, std::ios_base::end);
+    const u32 endof_mp2 = fd.tellg();
+    fd.seekg(endof_mp2 - sizeof(u32), std::ios_base::beg);
+
+    // read uniq
+    GameStatic::uniq = StreamBuf::getLE32(fd);
+
+    // offset data
+    fd.seekg(MP2OFFSETDATA - 2 * sizeof(u32), std::ios_base::beg);
+
+    // width
+    switch(StreamBuf::getLE32(fd))
+    {
+        case Maps::SMALL:  Size::w = Maps::SMALL;  break;
+        case Maps::MEDIUM: Size::w = Maps::MEDIUM; break;
+        case Maps::LARGE:  Size::w = Maps::LARGE;  break;
+        case Maps::XLARGE: Size::w = Maps::XLARGE; break;
+	default: Size::w = 0; break;
+    }
+
+    // height
+    switch(StreamBuf::getLE32(fd))
+    {
+        case Maps::SMALL:  Size::h = Maps::SMALL;  break;
+        case Maps::MEDIUM: Size::h = Maps::MEDIUM; break;
+        case Maps::LARGE:  Size::h = Maps::LARGE;  break;
+        case Maps::XLARGE: Size::h = Maps::XLARGE; break;
+	default: Size::h = 0; break;
+    }
+
+    if(Size::w == 0 || Size::h == 0 || Size::w != Size::h)
+    {
+	DEBUG(DBG_GAME, DBG_WARN, "incrrect maps size");
+	return false;
+    }
+
+    // seek to ADDONS block
+    fd.ignore(w() * h() * SIZEOFMP2TILE);
+
+    // read all addons
+    std::vector<MP2::mp2addon_t> vec_mp2addons(StreamBuf::getLE32(fd) /* count mp2addon_t */);
+
+    for(std::vector<MP2::mp2addon_t>::iterator
+	it = vec_mp2addons.begin(); it != vec_mp2addons.end(); ++it)
+    {
+	MP2::mp2addon_t & mp2addon = *it;
+
+	mp2addon.indexAddon = StreamBuf::getLE16(fd);
+	mp2addon.objectNameN1 = fd.get() * 2;
+	mp2addon.indexNameN1 = fd.get();
+	mp2addon.quantityN = fd.get();
+	mp2addon.objectNameN2 = fd.get();
+	mp2addon.indexNameN2 = fd.get();
+
+	mp2addon.uniqNumberN1 = StreamBuf::getLE32(fd);
+	mp2addon.uniqNumberN2 = StreamBuf::getLE32(fd);
+    }
+
+    const u32 endof_addons = fd.tellg();
+    DEBUG(DBG_GAME, DBG_INFO, "read all tiles addons, tellg: " << endof_addons);
+
+    // offset data
+    fd.seekg(MP2OFFSETDATA, std::ios_base::beg);
+
+    vec_tiles.resize(w() * h());
+
+    // read all tiles
+    for(MapsTiles::iterator
+	it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
+    {
+	const size_t index = std::distance(vec_tiles.begin(), it);
+	Maps::Tiles & tile = *it;
+
+	MP2::mp2tile_t mp2tile;
+
+	mp2tile.tileIndex = StreamBuf::getLE16(fd);
+	mp2tile.objectName1 = fd.get();
+	mp2tile.indexName1 = fd.get();
+	mp2tile.quantity1 = fd.get();
+	mp2tile.quantity2 = fd.get();
+	mp2tile.objectName2 = fd.get();
+	mp2tile.indexName2 = fd.get();
+	mp2tile.shape = fd.get();
+	mp2tile.generalObject = fd.get();
+
+	switch(mp2tile.generalObject)
+	{
+	    case MP2::OBJ_RNDTOWN:
+	    case MP2::OBJ_RNDCASTLE:
+	    case MP2::OBJ_CASTLE:
+	    case MP2::OBJ_HEROES:
+	    case MP2::OBJ_SIGN:
+	    case MP2::OBJ_BOTTLE:
+	    case MP2::OBJ_EVENT:
+	    case MP2::OBJ_SPHINX:
+	    case MP2::OBJ_JAIL:
+		vec_object.push_back(index);
+		break;
+	    default:
+		break;
+	}
+
+	// offset first addon
+	size_t offsetAddonsBlock = StreamBuf::getLE16(fd);
+
+	mp2tile.uniqNumber1 = StreamBuf::getLE32(fd);
+	mp2tile.uniqNumber2 = StreamBuf::getLE32(fd);
+
+	tile.Init(index, mp2tile);
+
+	// load all addon for current tils
+	while(offsetAddonsBlock)
+	{
+	    if(vec_mp2addons.size() <= offsetAddonsBlock){ DEBUG(DBG_GAME, DBG_WARN, "index out of range"); break; }
+	    tile.AddonsPushLevel1(vec_mp2addons[offsetAddonsBlock]);
+	    tile.AddonsPushLevel2(vec_mp2addons[offsetAddonsBlock]);
+	    offsetAddonsBlock = vec_mp2addons[offsetAddonsBlock].indexAddon;
+	}
+
+	tile.AddonsSort();
+    }
+
+    DEBUG(DBG_GAME, DBG_INFO, "read all tiles, tellg: " << fd.tellg());
+
+    // after addons
+    fd.seekg(endof_addons, std::ios_base::beg);
+
+    // cood castles
+    // 72 x 3 byte (cx, cy, id)
+    for(u32 ii = 0; ii < 72; ++ii)
+    {
+	u32 cx = fd.get();
+	u32 cy = fd.get();
+	u32 id = fd.get();
+
+	// empty block
+	if(0xFF == cx && 0xFF == cy) continue;
+
+	switch(id)
+	{
+	    case 0x00: // tower: knight
+	    case 0x80: // castle: knight
+		vec_castles.push_back(new Castle(cx, cy, Race::KNGT));	break;
+
+	    case 0x01: // tower: barbarian
+	    case 0x81: // castle: barbarian
+		vec_castles.push_back(new Castle(cx, cy, Race::BARB));	break;
+
+	    case 0x02: // tower: sorceress
+	    case 0x82: // castle: sorceress
+		vec_castles.push_back(new Castle(cx, cy, Race::SORC));	break;
+
+	    case 0x03: // tower: warlock
+	    case 0x83: // castle: warlock
+		vec_castles.push_back(new Castle(cx, cy, Race::WRLK));	break;
+
+	    case 0x04: // tower: wizard
+	    case 0x84: // castle: wizard
+		vec_castles.push_back(new Castle(cx, cy, Race::WZRD));	break;
+
+	    case 0x05: // tower: necromancer
+	    case 0x85: // castle: necromancer
+		vec_castles.push_back(new Castle(cx, cy, Race::NECR));	break;
+
+	    case 0x06: // tower: random
+	    case 0x86: // castle: random
+		vec_castles.push_back(new Castle(cx, cy, Race::NONE));	break;
+
+	    default:
+		DEBUG(DBG_GAME, DBG_WARN, "castle block: " << "unknown id: " << id << ", maps index: " << cx + cy * w());
+		break;
+	}
+	// preload in to capture objects cache
+	map_captureobj.Set(Maps::GetIndexFromAbsPoint(cx, cy), MP2::OBJ_CASTLE, Color::NONE);
+    }
+
+    DEBUG(DBG_GAME, DBG_INFO, "read coord castles, tellg: " << fd.tellg());
+    fd.seekg(endof_addons + (72 * 3), std::ios_base::beg);
+
+    // cood resource kingdoms
+    // 144 x 3 byte (cx, cy, id)
+    for(u32 ii = 0; ii < 144; ++ii)
+    {
+	u32 cx = fd.get();
+	u32 cy = fd.get();
+	u32 id = fd.get();
+
+	// empty block
+	if(0xFF == cx && 0xFF == cy) continue;
+
+	switch(id)
+	{
+	    // mines: wood
+	    case 0x00:
+		map_captureobj.Set(Maps::GetIndexFromAbsPoint(cx, cy), MP2::OBJ_SAWMILL, Color::NONE);
+		break; 
+	    // mines: mercury
+	    case 0x01:
+		map_captureobj.Set(Maps::GetIndexFromAbsPoint(cx, cy), MP2::OBJ_ALCHEMYLAB, Color::NONE);
+		break;
+	    // mines: ore
+ 	    case 0x02:
+	    // mines: sulfur
+	    case 0x03:
+	    // mines: crystal
+	    case 0x04:
+	    // mines: gems
+	    case 0x05:
+	    // mines: gold
+	    case 0x06:
+		map_captureobj.Set(Maps::GetIndexFromAbsPoint(cx, cy), MP2::OBJ_MINES, Color::NONE);
+		break; 
+	    // lighthouse
+	    case 0x64:
+		map_captureobj.Set(Maps::GetIndexFromAbsPoint(cx, cy), MP2::OBJ_LIGHTHOUSE, Color::NONE);
+		break; 
+	    // dragon city
+	    case 0x65:
+		map_captureobj.Set(Maps::GetIndexFromAbsPoint(cx, cy), MP2::OBJ_DRAGONCITY, Color::NONE);
+		break; 
+	    // abandoned mines
+	    case 0x67:
+		map_captureobj.Set(Maps::GetIndexFromAbsPoint(cx, cy), MP2::OBJ_ABANDONEDMINE, Color::NONE);
+		break;
+	    default:
+		DEBUG(DBG_GAME, DBG_WARN, "kingdom block: " << "unknown id: " << id << ", maps index: " << cx + cy * w());
+		break;
+	}
+    }
+
+    DEBUG(DBG_GAME, DBG_INFO, "read coord other resource, tellg: " << fd.tellg());
+    fd.seekg(endof_addons + (72 * 3) + (144 * 3), std::ios_base::beg);
+
+    // byte: num obelisks (01 default)
+    fd.ignore(1);
+
+    // count final mp2 blocks
+    u32 countblock = 0;
+    while(1)
+    {
+	u32 l = fd.get();
+	u32 h = fd.get();
+
+	//VERBOSE("dump block: 0x" << std::setw(2) << std::setfill('0') << std::hex << l <<
+	//	std::setw(2) << std::setfill('0') << std::hex << h);
+
+	if(0 == h && 0 == l) break;
+	else
+	{
+	    countblock = 256 * h + l - 1;
+	}
+    }
+
+    // castle or heroes or (events, rumors, etc)
+    for(u32 ii = 0; ii < countblock; ++ii)
+    {
+	s32 findobject = -1;
+
+	// read block
+	size_t sizeblock = StreamBuf::getLE16(fd);
+	u8* pblock = new u8[sizeblock];
+	fd.read(reinterpret_cast<char*>(pblock), sizeblock);
+
+	for(MapsIndexes::const_iterator
+	    it_index = vec_object.begin(); it_index != vec_object.end() && findobject < 0; ++it_index)
+	{
+	    const Maps::Tiles & tile = vec_tiles[*it_index];
+
+	    // orders(quantity2, quantity1)
+	    u32 orders = (tile.GetQuantity2() ? tile.GetQuantity2() : 0);
+	    orders <<= 8;
+	    orders |= tile.GetQuantity1();
+
+	    if(orders && !(orders % 0x08) && (ii + 1 == orders / 0x08))
+		findobject = *it_index;
+	}
+
+	if(0 <= findobject)
+	{
+	    const Maps::Tiles & tile = vec_tiles[findobject];
+	    const Maps::TilesAddon* addon = NULL;
+
+	    switch(tile.GetObject())
+	    {
+		case MP2::OBJ_CASTLE:
+		    // add castle
+		    if(SIZEOFMP2CASTLE != sizeblock)
+		    {
+			DEBUG(DBG_GAME, DBG_WARN, "read castle: " << "incorrect size block: " << sizeblock);
+		    }
+		    else
+		    {
+			Castle* castle = GetCastle(Maps::GetPoint(findobject));
+			if(castle)
+			{
+			    castle->LoadFromMP2(pblock, sizeblock);
+			    Maps::MinimizeAreaForCastle(castle->GetCenter());
+			    map_captureobj.SetColor(tile.GetIndex(), castle->GetColor());
+			}
+			else
+			{
+			    DEBUG(DBG_GAME, DBG_WARN, "load castle: " << "not found, index: " << findobject);
+			}
+		    }
+		    break;
+		case MP2::OBJ_RNDTOWN:
+		case MP2::OBJ_RNDCASTLE:
+		    // add rnd castle
+		    if(SIZEOFMP2CASTLE != sizeblock)
+		    {
+			DEBUG(DBG_GAME , DBG_WARN, "read castle: " << "incorrect size block: " << sizeblock);
+		    }
+		    else
+		    {
+			Castle* castle = GetCastle(Maps::GetPoint(findobject));
+			if(castle)
+			{
+			    castle->LoadFromMP2(pblock, sizeblock);
+			    Maps::UpdateRNDSpriteForCastle(castle->GetCenter(), castle->GetRace(), castle->isCastle());
+			    Maps::MinimizeAreaForCastle(castle->GetCenter());
+			    map_captureobj.SetColor(tile.GetIndex(), castle->GetColor());
+			}
+			else
+			{
+			    DEBUG(DBG_GAME , DBG_WARN, "load castle: " << "not found, index: " << findobject);
+			}
+		    }
+		    break;
+		case MP2::OBJ_JAIL:
+		    // add jail
+		    if(SIZEOFMP2HEROES != sizeblock)
+		    {
+			DEBUG(DBG_GAME , DBG_WARN, "read heroes: " << "incorrect size block: " << sizeblock);
+		    }
+		    else
+		    {
+			int race = Race::KNGT;
+			switch(pblock[0x3c])
+			{
+			    case 1: race = Race::BARB; break;
+			    case 2: race = Race::SORC; break;
+			    case 3: race = Race::WRLK; break;
+			    case 4: race = Race::WZRD; break;
+			    case 5: race = Race::NECR; break;
+			    default: break;
+			}
+
+			Heroes* hero = GetFreemanHeroes(race);
+
+			if(hero)
+			{
+			    hero->LoadFromMP2(findobject, Color::NONE, hero->GetRace(), pblock, sizeblock);
+			    hero->SetModes(Heroes::JAIL);
+			}
+		    }
+		    break;
+		case MP2::OBJ_HEROES:
+		    // add heroes
+		    if(SIZEOFMP2HEROES != sizeblock)
+		    {
+			DEBUG(DBG_GAME, DBG_WARN, "read heroes: " << "incorrect size block: " << sizeblock);
+		    }
+		    else
+		    if(NULL != (addon = tile.FindObjectConst(MP2::OBJ_HEROES)))
+		    {
+			std::pair<int, int> colorRace = Maps::TilesAddon::ColorRaceFromHeroSprite(*addon);
+			Kingdom & kingdom = GetKingdom(colorRace.first);
+
+			if(colorRace.second == Race::RAND &&
+			    colorRace.first != Color::NONE)
+			    colorRace.second = kingdom.GetRace();
+
+			// check heroes max count
+			if(kingdom.AllowRecruitHero(false, 0))
+			{
+			    Heroes* hero = NULL;
+
+			    if(pblock[17] &&
+				pblock[18] < Heroes::BAX)
+				hero = vec_heroes.Get(pblock[18]);
+
+			    if(!hero || !hero->isFreeman())
+				hero = vec_heroes.GetFreeman(colorRace.second);
+
+			    if(hero)
+				hero->LoadFromMP2(findobject, colorRace.first, colorRace.second, pblock, sizeblock);
+			}
+			else
+			{
+			    DEBUG(DBG_GAME , DBG_WARN, "load heroes maximum");
+			}
+		    }
+		    break;
+		case MP2::OBJ_SIGN:
+		case MP2::OBJ_BOTTLE:
+		    // add sign or buttle
+		    if(SIZEOFMP2SIGN - 1 < sizeblock && 0x01 == pblock[0])
+			map_sign[findobject] = Game::GetEncodeString(reinterpret_cast<char*>(&pblock[9]));
+		    break;
+		case MP2::OBJ_EVENT:
+		    // add event maps
+		    if(SIZEOFMP2EVENT - 1 < sizeblock && 0x01 == pblock[0])
+			vec_eventsmap.push_back(EventMaps(findobject, pblock, sizeblock));
+		    break;
+		case MP2::OBJ_SPHINX:
+		    // add riddle sphinx
+		    if(SIZEOFMP2RIDDLE - 1 < sizeblock && 0x00 == pblock[0])
+			vec_riddles.push_back(Riddle(findobject, pblock, sizeblock));
+		    break;
+		default:
+		    break;
+	    }
+	}
+	// other events
+	else 
+	if(0x00 == pblock[0])
+	{
+	    // add event day
+	    if(SIZEOFMP2EVENT - 1 < sizeblock && 1 == pblock[42])
+		vec_eventsday.push_back(EventDate(pblock, sizeblock));
+	    // add rumors
+	    else
+	    if(SIZEOFMP2RUMOR - 1 < sizeblock)
+	    {
+		if(pblock[8])
+		{
+		    vec_rumors.push_back(Game::GetEncodeString(reinterpret_cast<char*>(&pblock[8])));
+		    DEBUG(DBG_GAME, DBG_INFO, "add rumors: " << vec_rumors.back());
+		}
+	    }
+	}
+	// debug
+	else
+	{
+	    DEBUG(DBG_GAME, DBG_WARN, "read maps: unknown block addons, size: " << sizeblock);
+	}
+
+	delete [] pblock;
+    }
+
+    // last rumors
+    vec_rumors.push_back(_("You can load the newest version of game from a site:\n http://sf.net/projects/fheroes2"));
+    vec_rumors.push_back(_("This game is now in beta development version. ;)"));
+
+    // close mp2
+    fd.close();
+
+
+    PostLoad();
+
+    DEBUG(DBG_GAME, DBG_INFO, "end load");
+    return true;
+}
+
+void World::PostLoad(void)
+{
+    // modify other objects
+    for(size_t ii = 0; ii < vec_tiles.size(); ++ii)
+    {
+	Maps::Tiles & tile = vec_tiles[ii];
+
+	Maps::Tiles::FixedPreload(tile);
+
+	//
+	switch(tile.GetObject())
+	{
+	    case MP2::OBJ_WITCHSHUT:
+	    case MP2::OBJ_SHRINE1:
+	    case MP2::OBJ_SHRINE2:
+	    case MP2::OBJ_SHRINE3:
+	    case MP2::OBJ_STONELIGHTS:
+	    case MP2::OBJ_FOUNTAIN:
+	    case MP2::OBJ_EVENT:
+    	    case MP2::OBJ_BOAT:
+    	    case MP2::OBJ_RNDARTIFACT:
+    	    case MP2::OBJ_RNDARTIFACT1:
+    	    case MP2::OBJ_RNDARTIFACT2:
+    	    case MP2::OBJ_RNDARTIFACT3:
+	    case MP2::OBJ_RNDRESOURCE:
+	    case MP2::OBJ_WATERCHEST:
+	    case MP2::OBJ_TREASURECHEST:
+	    case MP2::OBJ_ARTIFACT:
+	    case MP2::OBJ_RESOURCE:
+            case MP2::OBJ_MAGICGARDEN:
+            case MP2::OBJ_WATERWHEEL:
+            case MP2::OBJ_WINDMILL:
+            case MP2::OBJ_WAGON:
+            case MP2::OBJ_SKELETON:
+            case MP2::OBJ_LEANTO:
+            case MP2::OBJ_CAMPFIRE:
+            case MP2::OBJ_FLOTSAM:
+            case MP2::OBJ_SHIPWRECKSURVIROR:
+            case MP2::OBJ_DERELICTSHIP:
+            case MP2::OBJ_SHIPWRECK:
+            case MP2::OBJ_GRAVEYARD:
+            case MP2::OBJ_PYRAMID:
+            case MP2::OBJ_DAEMONCAVE:
+            case MP2::OBJ_ABANDONEDMINE:
+	    case MP2::OBJ_ALCHEMYLAB:
+	    case MP2::OBJ_SAWMILL:
+	    case MP2::OBJ_MINES:
+	    case MP2::OBJ_TREEKNOWLEDGE:
+	    case MP2::OBJ_BARRIER:
+	    case MP2::OBJ_TRAVELLERTENT:
+	    case MP2::OBJ_MONSTER:
+	    case MP2::OBJ_RNDMONSTER:
+	    case MP2::OBJ_RNDMONSTER1:
+	    case MP2::OBJ_RNDMONSTER2:
+	    case MP2::OBJ_RNDMONSTER3:
+	    case MP2::OBJ_RNDMONSTER4:
+	    case MP2::OBJ_ANCIENTLAMP:
+    	    case MP2::OBJ_WATCHTOWER:
+            case MP2::OBJ_EXCAVATION:
+            case MP2::OBJ_CAVE:
+            case MP2::OBJ_TREEHOUSE:
+            case MP2::OBJ_ARCHERHOUSE:
+            case MP2::OBJ_GOBLINHUT:
+            case MP2::OBJ_DWARFCOTT:
+            case MP2::OBJ_HALFLINGHOLE:
+            case MP2::OBJ_PEASANTHUT:
+            case MP2::OBJ_THATCHEDHUT:
+	    case MP2::OBJ_RUINS:
+            case MP2::OBJ_TREECITY:
+            case MP2::OBJ_WAGONCAMP:
+            case MP2::OBJ_DESERTTENT:
+            case MP2::OBJ_TROLLBRIDGE:
+            case MP2::OBJ_DRAGONCITY:
+            case MP2::OBJ_CITYDEAD:
+    		tile.QuantityUpdate();
+		break;
+
+	    case MP2::OBJ_WATERALTAR:
+    	    case MP2::OBJ_AIRALTAR:
+    	    case MP2::OBJ_FIREALTAR:
+    	    case MP2::OBJ_EARTHALTAR:
+	    case MP2::OBJ_BARROWMOUNDS:
+    		tile.QuantityReset();
+    		tile.QuantityUpdate();
+		break;
+
+	    case MP2::OBJ_HEROES:
+	    {
+    		Maps::TilesAddon* addon = tile.FindAddonICN1(ICN::MINIHERO);
+    		// remove event sprite
+    		if(addon) tile.Remove(addon->uniq);
+
+    		tile.SetHeroes(GetHeroes(Maps::GetPoint(ii)));
+	    }
+	    break;
+
+	    default:
+		break;
+	}
+    }
+
+    // add heroes to kingdoms
+    vec_kingdoms.AddHeroes(vec_heroes);
+
+    // add castles to kingdoms
+    vec_kingdoms.AddCastles(vec_castles);
+
+    if(Settings::Get().ExtWorldStartHeroLossCond4Humans())
+	vec_kingdoms.AddCondLossHeroes(vec_heroes);
+
+    // update wins, loss conditions
+    if(GameOver::WINS_HERO & Settings::Get().ConditionWins())
+    {
+	Heroes* hero = GetHeroes(Settings::Get().WinsMapsPositionObject());
+	heroes_cond_wins = hero ? hero->GetID() : Heroes::UNKNOWN;
+    }
+    if(GameOver::LOSS_HERO & Settings::Get().ConditionLoss())
+    {
+	Heroes* hero = GetHeroes(Settings::Get().LossMapsPositionObject());
+	if(hero)
+	{
+	    heroes_cond_loss = hero->GetID();
+	    hero->SetModes(Heroes::NOTDISMISS | Heroes::NOTDEFAULTS);
+	}
+    }
+
+    // update tile passable
+    std::for_each(vec_tiles.begin(), vec_tiles.end(),
+	    std::mem_fun_ref(&Maps::Tiles::UpdatePassable));
+
+    // play with hero
+    vec_kingdoms.ApplyPlayWithStartingHero();
+
+    // play with debug hero
+    if(IS_DEVEL())
+    {
+	// get first castle position
+	Kingdom & kingdom = GetKingdom(Color::GetFirst(Players::HumanColors()));
+
+	if(kingdom.GetCastles().size())
+	{
+	    const Castle* castle = kingdom.GetCastles().front();
+	    Heroes* hero = vec_heroes.Get(Heroes::SANDYSANDY);
+
+	    if(hero)
+	    {
+		const Point & cp = castle->GetCenter();
+		hero->Recruit(castle->GetColor(), Point(cp.x, cp.y + 1));
+	    }
+	}
+    }
+
+    // set ultimate
+    MapsTiles::iterator it = std::find_if(vec_tiles.begin(), vec_tiles.end(),
+	    std::bind2nd(std::mem_fun_ref(&Maps::Tiles::isObject), static_cast<int>(MP2::OBJ_RNDULTIMATEARTIFACT)));
+
+    // not found
+    if(vec_tiles.end() == it)
+    {
+	// generate position for ultimate
+	MapsIndexes pools;
+	pools.reserve(vec_tiles.size() / 2);
+
+	for(size_t ii = 0; ii < vec_tiles.size(); ++ii)
+	{
+	    const Maps::Tiles & tile = vec_tiles[ii];
+	    const s32 x = tile.GetIndex() % w();
+	    const s32 y = tile.GetIndex() / w();
+	    if(tile.GoodForUltimateArtifact() &&
+		x > 5 && x < w() - 5 && y > 5 && y < h() - 5) pools.push_back(tile.GetIndex());
+	}
+
+	if(pools.size())
+	{
+	    const s32 pos = *Rand::Get(pools);
+	    ultimate_artifact.Set(pos, Artifact::Rand(Artifact::ART_ULTIMATE));
+	}
+    }
+    else
+    {
+	const Maps::TilesAddon *addon = NULL;
+
+	// remove ultimate artifact sprite
+	if(NULL != (addon = (*it).FindObjectConst(MP2::OBJ_RNDULTIMATEARTIFACT)))
+	{
+	    ultimate_artifact.Set((*it).GetIndex(), Artifact::FromMP2IndexSprite(addon->index));
+	    (*it).Remove(addon->uniq);
+	    (*it).SetObject(MP2::OBJ_ZERO);
+	}
+    }
+}

@@ -41,11 +41,11 @@ void Interface::ButtonsArea::SetRedraw(void) const
     interface.SetRedraw(REDRAW_BUTTONS);
 }
 
-void Interface::ButtonsArea::SetPos(s16 ox, s16 oy)
+void Interface::ButtonsArea::SetPos(s32 ox, s32 oy)
 {
     BorderWindow::SetPosition(ox, oy);
 
-    const ICN::icn_t icnbtn = Settings::Get().ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
+    const int icnbtn = Settings::Get().ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
 
     buttonNextHero.SetSprite(icnbtn, 0, 1);
     buttonMovement.SetSprite(icnbtn, 2, 3);
@@ -78,7 +78,7 @@ void Interface::ButtonsArea::Redraw(void)
 
     if(!conf.ExtGameHideInterface() || conf.ShowButtons())
     {
-	const ICN::icn_t icnbtn = Settings::Get().ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
+	const int icnbtn = Settings::Get().ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
 
 	if(conf.ExtGameHideInterface())
 	    BorderWindow::Redraw();
@@ -103,10 +103,11 @@ void Interface::ButtonsArea::Redraw(void)
     }
 }
 
-void Interface::ButtonsArea::QueueEventProcessing(Game::menu_t & ret)
+int Interface::ButtonsArea::QueueEventProcessing(void)
 {
     Settings & conf = Settings::Get();
     LocalEvent & le = LocalEvent::Get();
+    int res = Game::CANCEL;
 
     le.MousePressLeft(buttonNextHero) ? buttonNextHero.PressDraw() : buttonNextHero.ReleaseDraw();
     le.MousePressLeft(buttonMovement) ? buttonMovement.PressDraw() : buttonMovement.ReleaseDraw();
@@ -155,21 +156,21 @@ void Interface::ButtonsArea::QueueEventProcessing(Game::menu_t & ret)
     {
         // for QVGA: auto hide buttons after click
         if(conf.QVGA()) conf.SetShowButtons(false);
-	interface.EventEndTurn(ret);
+	res = interface.EventEndTurn();
     }
     else
     if(le.MouseClickLeft(buttonAdventure))
     {
         // for QVGA: auto hide buttons after click
         if(conf.QVGA()) conf.SetShowButtons(false);
-	interface.EventAdventureDialog(ret);
+	res = interface.EventAdventureDialog();
     }
     else
     if(le.MouseClickLeft(buttonFile))
     {
         // for QVGA: auto hide buttons after click
         if(conf.QVGA()) conf.SetShowButtons(false);
-	interface.EventFileDialog(ret);
+	res = interface.EventFileDialog();
     }
     else
     if(le.MouseClickLeft(buttonSystem))
@@ -194,4 +195,6 @@ void Interface::ButtonsArea::QueueEventProcessing(Game::menu_t & ret)
     if(le.MousePressRight(buttonFile)) Dialog::Message(_("File Options"), _("Bring up the file options menu, alloving you to load menu, save etc."), Font::BIG);
     else
     if(le.MousePressRight(buttonSystem)) Dialog::Message(_("System Options"), _("Bring up the system options menu, alloving you to customize your game."), Font::BIG);
+
+    return res;
 }

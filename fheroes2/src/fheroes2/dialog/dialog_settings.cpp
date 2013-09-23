@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include "agg.h"
+#include "text.h"
 #include "settings.h"
 #include "cursor.h"
 #include "button.h"
@@ -33,7 +34,7 @@ class SettingsListBox : public Interface::ListBox<u32>
 public:
     SettingsListBox(const Point & pt, bool f) : Interface::ListBox<u32>(pt), readonly(f) {};
 
-    void RedrawItem(const u32 &, s16, s16, bool);
+    void RedrawItem(const u32 &, s32, s32, bool);
     void RedrawBackground(const Point &);
 
     void ActionCurrentUp(void){};
@@ -45,7 +46,7 @@ public:
     bool readonly;
 };
 
-void SettingsListBox::RedrawItem(const u32 & item, s16 ox, s16 oy, bool current)
+void SettingsListBox::RedrawItem(const u32 & item, s32 ox, s32 oy, bool current)
 {
     const Settings & conf = Settings::Get();
 
@@ -68,12 +69,12 @@ void SettingsListBox::RedrawBackground(const Point & top)
 {
     const Settings & conf = Settings::Get();
 
-    const u16 window_h = conf.QVGA() ? 224 : 400;
-    const u16 ah = window_h - 54;
+    const int window_h = conf.QVGA() ? 224 : 400;
+    const int ah = window_h - 54;
 
     AGG::GetICN(ICN::STONEBAK, 0).Blit(Rect(15, 25, 280, ah), top.x + 15, top.y + 25);
 
-    for(u8 ii = 1; ii < (window_h / 25); ++ii)
+    for(int ii = 1; ii < (window_h / 25); ++ii)
 	AGG::GetICN(ICN::DROPLISL, 11).Blit(top.x + 295, top.y + 35 + (19 * ii));
 
     AGG::GetICN(ICN::DROPLISL, 10).Blit(top.x + 295, top.y + 46);
@@ -140,7 +141,7 @@ void Dialog::ExtSettings(bool readonly)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    const u16 window_h = conf.QVGA() ? 224 : 400;
+    const int window_h = conf.QVGA() ? 224 : 400;
     Dialog::FrameBorder frameborder(Size(320, window_h));
     const Rect & area = frameborder.GetArea();
 
@@ -247,7 +248,7 @@ void Dialog::ExtSettings(bool readonly)
 
     SettingsListBox listbox(area, readonly);
 
-    const u16 ah = window_h - 60;
+    const int ah = window_h - 60;
 
     listbox.RedrawBackground(area);
     listbox.SetScrollButtonUp(ICN::DROPLISL, 6, 7, Point(area.x + 295, area.y + 25));
@@ -267,8 +268,7 @@ void Dialog::ExtSettings(bool readonly)
     display.Flip();
 
     // message loop
-    u16 result = Dialog::ZERO;
-
+    int result = Dialog::ZERO;
     while(result == Dialog::ZERO && le.HandleEvents())
     {
 	result = btnGroups.QueueEventProcessing();

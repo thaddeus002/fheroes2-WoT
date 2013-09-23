@@ -173,8 +173,8 @@ class LocalEvent
 public:
     static LocalEvent & Get(void);
 
-    void SetGlobalFilterMouseEvents(void (*pf)(u16, u16));
-    void SetGlobalFilterKeysEvents(void (*pf)(int, u16));
+    void SetGlobalFilterMouseEvents(void (*pf)(s32, s32));
+    void SetGlobalFilterKeysEvents(void (*pf)(int, int));
     void SetGlobalFilter(bool);
     void SetTapMode(bool);
     void SetTapDelayForRightClickEmulation(u32);
@@ -219,7 +219,7 @@ public:
 
     bool MousePressLeft(void) const;
     bool MousePressLeft(const Rect &rt) const;
-    bool MousePressLeft(const Point &pt, u16 w, u16 h) const;
+    bool MousePressLeft(const Point &pt, u32 w, u32 h) const;
     bool MousePressMiddle(void) const;
     bool MousePressMiddle(const Rect &rt) const;
     bool MousePressRight(void) const;
@@ -302,8 +302,8 @@ private:
 
     Point mouse_cu;	// point cursor
 
-    void (*redraw_cursor_func)(u16, u16);
-    void (*keyboard_filter_func)(int, u16);
+    void (*redraw_cursor_func)(s32, s32);
+    void (*keyboard_filter_func)(int, int);
 
     SDL::Time clock;
     u32  clock_delay;

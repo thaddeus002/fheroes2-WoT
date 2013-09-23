@@ -21,11 +21,13 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "text.h"
 #include "settings.h"
 #include "cursor.h"
 #include "button.h"
 #include "world.h"
 #include "gameevent.h"
+#include "game.h"
 #include "dialog.h"
 
 s32 GetIndexClickRects(const Rects & rects)
@@ -38,7 +40,7 @@ s32 GetIndexClickRects(const Rects & rects)
 struct SelectRecipientsColors
 {
     const Colors	colors;
-    u8			recipients;
+    int			recipients;
     Rects		positions;
 
     SelectRecipientsColors(const Point & pos) :
@@ -49,7 +51,7 @@ struct SelectRecipientsColors
 	for(Colors::const_iterator
     	    it = colors.begin(); it != colors.end(); ++it)
 	{
-    	    const u8 current = std::distance(colors.begin(), it);
+    	    const u32 current = std::distance(colors.begin(), it);
 	    const Sprite & sprite = AGG::GetICN(ICN::CELLWIN, 43);
 
     	    positions.push_back(Rect(pos.x + Game::GetStep4Player(current, sprite.w() + 15, colors.size()),
@@ -57,7 +59,7 @@ struct SelectRecipientsColors
 	}
     }
 
-    s8 GetIndexClick(void) const
+    s32 GetIndexClick(void) const
     {
 	return GetIndexClickRects(positions);
     }
@@ -77,11 +79,11 @@ struct SelectRecipientsColors
 
     bool QueueEventProcessing(void)
     {
-	const s8 index = GetIndexClick();
+	const s32 index = GetIndexClick();
 
     	if(index >= 0)
 	{
-	    const u8 & cols = colors[index];
+	    const int & cols = colors[index];
 
 	    if(recipients & cols)
 		recipients &= ~cols;
@@ -101,7 +103,7 @@ struct ResourceBar
     Point	pos;
     Rects	positions;
 
-    ResourceBar(Funds & funds, s16 posx, s16 posy) : resource(funds), pos(posx, posy)
+    ResourceBar(Funds & funds, s32 posx, s32 posy) : resource(funds), pos(posx, posy)
     {
 	positions.reserve(7);
 	const Sprite & sprite = AGG::GetICN(ICN::TRADPOST, 7);
@@ -115,7 +117,7 @@ struct ResourceBar
 	positions.push_back(Rect(posx + 240, posy, sprite.w(), sprite.h()));
     }
 
-    static void RedrawResource(u8 type, s32 count, s16 posx, s16 posy)
+    static void RedrawResource(int type, s32 count, s32 posx, s32 posy)
     {
 	std::ostringstream os;
 
@@ -133,24 +135,24 @@ struct ResourceBar
 	for(Rects::const_iterator
 	    it = positions.begin(); it != positions.end(); ++it)
 	{
-	    u8 rs = Resource::FromIndexSprite2(std::distance(positions.begin(), it));
+	    int rs = Resource::FromIndexSprite2(std::distance(positions.begin(), it));
 	    RedrawResource(rs, res->Get(rs), (*it).x, (*it).y);
 	}
     }
 
-    s8 GetIndexClick(void) const
+    s32 GetIndexClick(void) const
     {
 	return GetIndexClickRects(positions);
     }
 
-    bool QueueEventProcessing(Funds & funds, u8 mul)
+    bool QueueEventProcessing(Funds & funds, u32 mul)
     {
-	const s8 index = GetIndexClick();
+	const s32 index = GetIndexClick();
 
 	if(index >= 0)
 	{
-	    u8 rs = Resource::FromIndexSprite2(index);
-	    u8 step = rs == Resource::GOLD ? 100 : 1;
+	    int rs = Resource::FromIndexSprite2(index);
+	    u32 step = rs == Resource::GOLD ? 100 : 1;
 
 	    u32 cur = resource.Get(rs);
 	    u32 sel = cur;
@@ -240,16 +242,15 @@ void Dialog::MakeGiftResource(void)
     cursor.Show();
     display.Flip();
 
-    u8 count = Color::Count(selector.recipients);
+    u32 count = Color::Count(selector.recipients);
 
     // message loop
-    u16 result = Dialog::ZERO;
-
+    int result = Dialog::ZERO;
     while(result == Dialog::ZERO && le.HandleEvents())
     {
 	if(selector.QueueEventProcessing())
 	{
-	    u8 new_count = Color::Count(selector.recipients);
+	    u32 new_count = Color::Count(selector.recipients);
 	    cursor.Hide();
 	    btnGroups.DisableButton1(0 == new_count || 0 == funds2.GetValidItemsCount());
 	    if(count != new_count)

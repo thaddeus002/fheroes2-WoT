@@ -70,23 +70,23 @@ bool Maps::Tiles::QuantityIsValid(void) const
     return false;
 }
 
-u8 Maps::Tiles::QuantityVariant(void) const
+int Maps::Tiles::QuantityVariant(void) const
 {
     return quantity2 >> 4;
 }
 
-u8 Maps::Tiles::QuantityExt(void) const
+int Maps::Tiles::QuantityExt(void) const
 {
     return 0x0f & quantity2;
 }
 
-void Maps::Tiles::QuantitySetVariant(u8 variant)
+void Maps::Tiles::QuantitySetVariant(int variant)
 {
     quantity2 &= 0x0f;
     quantity2 |= variant << 4;
 }
 
-void Maps::Tiles::QuantitySetExt(u8 ext)
+void Maps::Tiles::QuantitySetExt(int ext)
 {
     quantity2 &= 0xf0;
     quantity2 |= (0x0f & ext);
@@ -116,7 +116,7 @@ Skill::Secondary Maps::Tiles::QuantitySkill(void) const
     return Skill::Secondary();
 }
 
-void Maps::Tiles::QuantitySetSkill(u8 skill)
+void Maps::Tiles::QuantitySetSkill(int skill)
 {
     switch(GetObject(false))
     {
@@ -147,7 +147,7 @@ Spell Maps::Tiles::QuantitySpell(void) const
     return Spell(Spell::NONE);
 }
 
-void Maps::Tiles::QuantitySetSpell(u8 spell)
+void Maps::Tiles::QuantitySetSpell(int spell)
 {
     switch(GetObject(false))
     {
@@ -195,18 +195,18 @@ Artifact Maps::Tiles::QuantityArtifact(void) const
 
 }
 
-void Maps::Tiles::QuantitySetArtifact(u8 art)
+void Maps::Tiles::QuantitySetArtifact(int art)
 {
     quantity1 = art;
 }
 
-void Maps::Tiles::QuantitySetResource(u8 res, u16 count)
+void Maps::Tiles::QuantitySetResource(int res, u32 count)
 {
     quantity1 = res;
     quantity2 = res == Resource::GOLD ? count / 100 : count;
 }
 
-u16 Maps::Tiles::QuantityGold(void) const
+u32 Maps::Tiles::QuantityGold(void) const
 {
     switch(GetObject(false))
     {
@@ -325,7 +325,7 @@ Funds Maps::Tiles::QuantityFunds(void) const
     return Funds(rc);
 }
 
-void Maps::Tiles::QuantitySetColor(u8 col)
+void Maps::Tiles::QuantitySetColor(int col)
 {
     switch(GetObject(false))
     {
@@ -340,7 +340,7 @@ void Maps::Tiles::QuantitySetColor(u8 col)
     }
 }
 
-u8 Maps::Tiles::QuantityColor(void) const
+int Maps::Tiles::QuantityColor(void) const
 {
     switch(GetObject(false))
     {
@@ -355,12 +355,12 @@ u8 Maps::Tiles::QuantityColor(void) const
     return Color::NONE;
 }
 
-u8 Maps::Tiles::QuantityTeleportType(void) const
+int Maps::Tiles::QuantityTeleportType(void) const
 {
     return quantity1;
 }
 
-void Maps::Tiles::QuantitySetTeleportType(u8 type)
+void Maps::Tiles::QuantitySetTeleportType(int type)
 {
     quantity1 = type;
 }
@@ -500,7 +500,7 @@ void Maps::Tiles::QuantityUpdate(void)
 	    TilesAddon* addon = FindObject(MP2::OBJ_ARTIFACT);
             if(addon)
             {
-                u8 art = Artifact::FromMP2IndexSprite(addon->index).GetID();
+                int art = Artifact::FromMP2IndexSprite(addon->index).GetID();
 
                 if(Artifact::UNKNOWN != art)
                 {
@@ -517,7 +517,7 @@ void Maps::Tiles::QuantityUpdate(void)
                         // 4,5 - need have skill wisard or leadership,
                         // 6 - 50 rogues, 7 - 1 gin, 8,9,10,11,12,13 - 1 monster level4,
                         // 15 - spell
-                        u8 cond = Rand::Get(1, 10) < 4 ? Rand::Get(1, 13) : 0;
+                        int cond = Rand::Get(1, 10) < 4 ? Rand::Get(1, 13) : 0;
 
                         // always available
                         if(Settings::Get().ExtWorldNoRequirementsForArtifacts())
@@ -540,7 +540,7 @@ void Maps::Tiles::QuantityUpdate(void)
             if(addon)
             {
                 const u8 res = Resource::FromIndexSprite(addon->index);
-                u16 count = 0;
+                u32 count = 0;
 
                 switch(res)
                 {
@@ -577,7 +577,7 @@ void Maps::Tiles::QuantityUpdate(void)
 
         case MP2::OBJ_WINDMILL:
         {
-            u8 res = Resource::WOOD;
+            int res = Resource::WOOD;
             // except: wood, bugs: #3117478
             while(res == Resource::WOOD) res = Resource::Rand();
 
@@ -637,8 +637,8 @@ void Maps::Tiles::QuantityUpdate(void)
             // 10% - 1000 gold + art
             percents.Push(2, 10);
 
-            u8 art = Artifact::UNKNOWN;
-            u16 gold = 0;
+            int art = Artifact::UNKNOWN;
+            u32 gold = 0;
 
             // variant
             switch(percents.Get())
@@ -673,8 +673,8 @@ void Maps::Tiles::QuantityUpdate(void)
             // 5% - art
             percents.Push(4, 5);
 
-            u8 art = Artifact::UNKNOWN;
-            u16 gold = 0;
+            int art = Artifact::UNKNOWN;
+            u32 gold = 0;
 
             // variant
             switch(percents.Get())
@@ -706,7 +706,7 @@ void Maps::Tiles::QuantityUpdate(void)
             // 10% - 50ghost(2000g+art)
             percents.Push(4, 10);
 
-            u8 cond = percents.Get();
+            int cond = percents.Get();
 
 	    QuantitySetVariant(cond);
 	    QuantitySetArtifact(cond == 4 ? Artifact::Rand(Artifact::ART_LEVEL123) : Artifact::UNKNOWN);
@@ -730,7 +730,7 @@ void Maps::Tiles::QuantityUpdate(void)
         case MP2::OBJ_DAEMONCAVE:
 	{
             // 1000 exp or 1000 exp + 2500 gold or 1000 exp + art or (-2500 or remove hero)
-            u8 cond = Rand::Get(1, 4);
+            int cond = Rand::Get(1, 4);
             QuantitySetVariant(cond);
             QuantitySetArtifact(cond == 3 ? Artifact::Rand(Artifact::ART_LEVEL123) : Artifact::UNKNOWN);
 	}
@@ -889,13 +889,13 @@ void Maps::Tiles::QuantityUpdate(void)
     }
 }
 
-u8 Maps::Tiles::MonsterJoinCondition(void) const
+int Maps::Tiles::MonsterJoinCondition(void) const
 {
     const Maps::TilesAddon *addon = FindObjectConst(MP2::OBJ_MONSTER);
     return addon ? 0x03 & addon->tmp : 0;
 }
 
-void Maps::Tiles::MonsterSetJoinCondition(u8 cond)
+void Maps::Tiles::MonsterSetJoinCondition(int cond)
 {
     Maps::TilesAddon *addon = FindObject(MP2::OBJ_MONSTER);
     if(addon)
@@ -937,18 +937,18 @@ bool Maps::Tiles::MonsterJoinConditionForce(void) const
     return Monster::JOIN_CONDITION_FORCE == MonsterJoinCondition();
 }
 
-u16 Maps::Tiles::MonsterCount(void) const
+u32 Maps::Tiles::MonsterCount(void) const
 {
     return (static_cast<u16>(quantity1) << 8) | quantity2;
 }
 
-void Maps::Tiles::MonsterSetCount(u16 count)
+void Maps::Tiles::MonsterSetCount(u32 count)
 {
     quantity1 = count >> 8;
     quantity2 = 0x00FF & count;
 }
 
-void Maps::Tiles::PlaceMonsterOnTile(Tiles & tile, const Monster & mons, u16 count)
+void Maps::Tiles::PlaceMonsterOnTile(Tiles & tile, const Monster & mons, u32 count)
 {
     tile.SetObject(MP2::OBJ_MONSTER);
     // monster type
@@ -961,7 +961,7 @@ void Maps::Tiles::PlaceMonsterOnTile(Tiles & tile, const Monster & mons, u16 cou
     }
     else
     {
-	u8 mul = 4;
+	int mul = 4;
 
 	// set random count
 	switch(Settings::Get().GameDifficulty())
@@ -1044,7 +1044,7 @@ void Maps::Tiles::UpdateMonsterInfo(Tiles & tile)
 	    addon->index = mons() - 1; // ICN::MONS32 start from PEASANT
     }
 
-    u16 count = 0;
+    u32 count = 0;
 
     // update count (mp2 format)
     if(tile.quantity1 || tile.quantity2)
@@ -1060,8 +1060,8 @@ void Maps::Tiles::UpdateMonsterInfo(Tiles & tile)
 
 void Maps::Tiles::UpdateDwellingPopulation(Tiles & tile)
 {
-    u16 count = 0;
-    const MP2::object_t & obj = tile.GetObject(false);
+    u32 count = 0;
+    const int obj = tile.GetObject(false);
     const Troop & troop = tile.QuantityTroop();
 
     switch(obj)

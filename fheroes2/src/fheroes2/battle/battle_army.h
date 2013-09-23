@@ -64,8 +64,8 @@ namespace Battle
     bool		HasMonster(const Monster &) const;
     u32			GetDeadHitPoints(void) const;
     u32			GetDeadCounts(void) const;
-    u8			GetColor(void) const;
-    u8			GetControl(void) const;
+    int			GetColor(void) const;
+    int			GetControl(void) const;
     u32                 GetSurrenderCost(void) const;
     Troops		GetKilledTroops(void) const;
     bool		SetIdleAnimation(void);

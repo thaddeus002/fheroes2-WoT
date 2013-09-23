@@ -43,19 +43,19 @@
 namespace Battle
 {
     bool	AIApplySpell(const Spell &, const Unit*, const HeroBase &, Actions &);
-    s16		AIShortDistance(s16, const Indexes &);
-    s16		AIAttackPosition(Arena &, const Unit &, const Indexes &);
-    s16		AIMaxQualityPosition(const Indexes &);
-    const Unit* AIGetEnemyAbroadMaxQuality(s16, u8 color);
+    s32		AIShortDistance(s32, const Indexes &);
+    s32		AIAttackPosition(Arena &, const Unit &, const Indexes &);
+    s32		AIMaxQualityPosition(const Indexes &);
+    const Unit* AIGetEnemyAbroadMaxQuality(s32, int color);
     const Unit* AIGetEnemyAbroadMaxQuality(const Unit &);
-    s16		AIAreaSpellDst(const HeroBase &);
+    s32		AIAreaSpellDst(const HeroBase &);
 
-    bool MaxDstCount(const std::pair<s16, u8> & p1, const std::pair<s16, u8> & p2) { return p1.second < p2.second; }
+    bool MaxDstCount(const std::pair<s32, u32> & p1, const std::pair<s32, u32> & p2) { return p1.second < p2.second; }
 }
 
-s16 Battle::AIAreaSpellDst(const HeroBase & hero)
+s32 Battle::AIAreaSpellDst(const HeroBase & hero)
 {
-    std::map<s16, u8> dstcount;
+    std::map<s32, u32> dstcount;
 
     Arena* arena = GetArena();
     Units enemies(arena->GetForce(hero.GetColor(), true), true);
@@ -71,14 +71,14 @@ s16 Battle::AIAreaSpellDst(const HeroBase & hero)
     }
 
     // find max
-    std::map<s16, u8>::const_iterator max = std::max_element(dstcount.begin(), dstcount.end(), MaxDstCount);
+    std::map<s32, u32>::const_iterator max = std::max_element(dstcount.begin(), dstcount.end(), MaxDstCount);
 
     return max != dstcount.end() ? (*max).first : -1;
 }
 
-s16 Battle::AIMaxQualityPosition(const Indexes & positions)
+s32 Battle::AIMaxQualityPosition(const Indexes & positions)
 {
-    s16 res = -1;
+    s32 res = -1;
 
     for(Indexes::const_iterator
 	it = positions.begin(); it != positions.end(); ++it)
@@ -94,7 +94,7 @@ s16 Battle::AIMaxQualityPosition(const Indexes & positions)
     return res;
 }
 
-const Battle::Unit* Battle::AIGetEnemyAbroadMaxQuality(s16 position, u8 color)
+const Battle::Unit* Battle::AIGetEnemyAbroadMaxQuality(s32 position, int color)
 {
     const Unit* res = NULL;
     s32 quality = 0;
@@ -141,15 +141,15 @@ const Battle::Unit* Battle::AIGetEnemyAbroadMaxQuality(const Unit & b)
     return res1;
 }
 
-s16 Battle::AIShortDistance(s16 from, const Indexes & indexes)
+s32 Battle::AIShortDistance(s32 from, const Indexes & indexes)
 {
-    u16 len = MAXU16;
-    s16 res = -1;
+    u32 len = MAXU16;
+    s32 res = -1;
 
     for(Indexes::const_iterator
         it = indexes.begin(); it != indexes.end(); ++it)
     {
-        const u16 length = Board::GetDistance(from, *it);
+        const u32 length = Board::GetDistance(from, *it);
 
         if(len > length)
         {
@@ -163,9 +163,9 @@ s16 Battle::AIShortDistance(s16 from, const Indexes & indexes)
     return res;
 }
 
-s16 Battle::AIAttackPosition(Arena & arena, const Unit & b, const Indexes & positions)
+s32 Battle::AIAttackPosition(Arena & arena, const Unit & b, const Indexes & positions)
 {
-    s16 res = -1;
+    s32 res = -1;
 
     if(b.isMultiCellAttack())
     {
@@ -250,7 +250,7 @@ void AI::BattleTurn(Arena & arena, const Unit & b, Actions & a)
     }
     else
     {
-	s16 move = -1;
+	s32 move = -1;
 
 	if(b.Modes(SP_BERSERKER))
 	{
@@ -288,13 +288,13 @@ void AI::BattleTurn(Arena & arena, const Unit & b, Actions & a)
 
 		if(path.empty())
 		{
-		    const u8 direction = b.GetPosition().GetHead()->GetPos().x > dst.GetHead()->GetPos().x ?
+		    const u32 direction = b.GetPosition().GetHead()->GetPos().x > dst.GetHead()->GetPos().x ?
 						RIGHT : LEFT;
 		    // find near position
 		    while(path.empty() &&
 			Board::isValidDirection(dst.GetHead()->GetIndex(), direction))
 		    {
-			const s16 & pos = Board::GetIndexDirection(dst.GetHead()->GetIndex(), direction);
+			const s32 pos = Board::GetIndexDirection(dst.GetHead()->GetIndex(), direction);
 			if(b.GetHeadIndex() == pos) break;
 
 			dst.Set(pos, b.isWide(), direction == RIGHT);
@@ -306,8 +306,8 @@ void AI::BattleTurn(Arena & arena, const Unit & b, Actions & a)
 		{
 		    if(b.isWide())
 		    {
-			const s16 & head = dst.GetHead()->GetIndex();
-			const s16 & tail = dst.GetTail()->GetIndex();
+			const s32 head = dst.GetHead()->GetIndex();
+			const s32 tail = dst.GetTail()->GetIndex();
 
 			if(path.back() == head || path.back() == tail)
 			{
@@ -378,10 +378,10 @@ bool AI::BattleMagicTurn(Arena & arena, const Unit & b, Actions & a, const Unit*
     // area damage spell
     {
 	const u8 areasp[] = { Spell::METEORSHOWER, Spell::FIREBLAST, Spell::CHAINLIGHTNING, Spell::FIREBALL, Spell::COLDRING };
-	s16 dst = AIAreaSpellDst(*hero);
+	s32 dst = AIAreaSpellDst(*hero);
 
 	if(Board::isValidIndex(dst))
-	for(u8 ii = 0; ii < ARRAY_COUNT(areasp); ++ii)
+	for(u32 ii = 0; ii < ARRAY_COUNT(areasp); ++ii)
 	{
 	    if(hero->CanCastSpell(areasp[ii]))
 	    {
@@ -512,7 +512,7 @@ bool AI::BattleMagicTurn(Arena & arena, const Unit & b, Actions & a, const Unit*
 
 bool Battle::AIApplySpell(const Spell & spell, const Unit* b, const HeroBase & hero, Actions & a)
 {
-    u8 mass = Spell::NONE;
+    u32 mass = Spell::NONE;
 
     switch(spell())
     {

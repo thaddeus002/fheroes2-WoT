@@ -22,20 +22,22 @@
 
 #include <string>
 #include "agg.h"
+#include "text.h"
 #include "world.h"
 #include "button.h"
 #include "cursor.h"
 #include "castle.h"
 #include "kingdom.h"
 #include "settings.h"
+#include "game.h"
 #include "dialog.h"
 #include "payment.h"
 
-Dialog::answer_t Dialog::BuyBoat(bool enable)
+int Dialog::BuyBoat(bool enable)
 {
     Display & display = Display::Get();
 
-    const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+    const int system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
@@ -44,7 +46,7 @@ Dialog::answer_t Dialog::BuyBoat(bool enable)
 
     const Sprite & sprite = AGG::GetICN(ICN::BOATWIND, 0);
     Text text(_("Build a new ship:"), Font::BIG);
-    const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
+    const int spacer = Settings::Get().QVGA() ? 5 : 10;
 
     Dialog::FrameBox box(text.h() + spacer + sprite.h() + spacer + text.h() + spacer + rbs.GetArea().h - 20, true);
 
@@ -96,9 +98,9 @@ Dialog::answer_t Dialog::BuyBoat(bool enable)
         le.MousePressLeft(button2) ? button2.PressDraw() : button2.ReleaseDraw();
 
         if(button1.isEnable() &&
-	    (Game::HotKeyPress(Game::EVENT_DEFAULT_READY) ||le.MouseClickLeft(button1))) return Dialog::OK;
+	    (Game::HotKeyPressEvent(Game::EVENT_DEFAULT_READY) ||le.MouseClickLeft(button1))) return Dialog::OK;
 
-        if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) ||
+        if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT) ||
     	    le.MouseClickLeft(button2)) return Dialog::CANCEL;
     }
 

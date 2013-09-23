@@ -26,16 +26,14 @@
 #include "cursor.h"
 #include "button.h"
 #include "world.h"
+#include "game.h"
 #include "race.h"
+#include "dialog.h"
 #include "kingdom.h"
 #include "payment.h"
 #include "profit.h"
 #include "statusbar.h"
 #include "buildinginfo.h"
-
-#ifdef WITH_XML
-#include "xmlccwrap.h"
-#endif
 
 struct buildstats_t
 {
@@ -178,7 +176,7 @@ void BuildingInfo::UpdateCosts(const std::string & spec)
 #endif
 }
 
-payment_t BuildingInfo::GetCost(u32 build, u8 race)
+payment_t BuildingInfo::GetCost(u32 build, int race)
 {
     payment_t payment;
     const buildstats_t* ptr = &_builds[0];
@@ -199,7 +197,7 @@ payment_t BuildingInfo::GetCost(u32 build, u8 race)
     return payment;
 }
 
-u8 GetIndexBuildingSprite(u32 build)
+int GetIndexBuildingSprite(u32 build)
 {
     switch(build)
     {
@@ -301,7 +299,7 @@ u32 BuildingInfo::operator() (void) const
     return building;
 }
 
-void BuildingInfo::SetPos(s16 x, s16 y)
+void BuildingInfo::SetPos(s32 x, s32 y)
 {
     area.x = x;
     area.y = y;
@@ -367,7 +365,7 @@ void BuildingInfo::Redraw(void)
     }
     else
     {
-	u8 index = GetIndexBuildingSprite(building);
+	int index = GetIndexBuildingSprite(building);
 
 	if(BUILD_DISABLE == bcond)
 	{
@@ -467,7 +465,7 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
 {
     Display & display = Display::Get();
 
-    const ICN::icn_t system = (Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM);
+    const int system = (Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM);
 
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
@@ -510,7 +508,7 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
     Resource::BoxSprite rbs(PaymentConditions::BuyBuilding(castle.GetRace(), building), BOXAREA_WIDTH);
 
     const Sprite & window_icons = AGG::GetICN(ICN::BLDGXTRA, 0);
-    const u8 space = Settings::Get().QVGA() ? 5 : 10;
+    const int space = Settings::Get().QVGA() ? 5 : 10;
     Dialog::FrameBox box(space + window_icons.h() + space + box1.h() + space + (requires_true ? requires_text.h() + box2.h() + space : 0) + rbs.GetArea().h, buttons);
     const Rect & box_rt = box.GetArea();
     LocalEvent & le = LocalEvent::Get();
@@ -581,17 +579,17 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
         le.MousePressLeft(button2) ? button2.PressDraw() : button2.ReleaseDraw();
 
         if(button1.isEnable() &&
-	    (Game::HotKeyPress(Game::EVENT_DEFAULT_READY) ||
+	    (Game::HotKeyPressEvent(Game::EVENT_DEFAULT_READY) ||
     	    le.MouseClickLeft(button1))) return true;
 
-        if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) ||
+        if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT) ||
     	    le.MouseClickLeft(button2)) break;
     }
 
     return false;
 }
 
-const char* GetBuildConditionDescription(s8 bcond)
+const char* GetBuildConditionDescription(int bcond)
 {
     switch(bcond)
     {
@@ -684,16 +682,17 @@ DwellingItem::DwellingItem(Castle & castle, u32 dw)
     mons = Monster(castle.GetRace(), type);
 }
 
-DwellingsBar::DwellingsBar(Castle & cstl, u16 sw, u16 sh, u8 col) : castle(cstl)
+DwellingsBar::DwellingsBar(Castle & cstl, s32 sw, s32 sh, int col) : castle(cstl)
 {
     for(u32 dw = DWELLING_MONSTER1; dw <= DWELLING_MONSTER6; dw <<= 1)
         content.push_back(DwellingItem(castle, dw));
 
     SetContent(content);
 
-    backsf.Set(sw, sh);
-    backsf.Fill(backsf.GetColorIndex(col));
-    Cursor::DrawCursor(backsf, 0x70, true);
+    const u32 fill = backsf.GetColorIndex(col);
+    const u32 color = backsf.GetColorIndex(0x70);
+    backsf = Surface::RectBorder(sw, sh, fill, color, true);
+
     SetItemSize(sw, sh);
 }
 
@@ -713,7 +712,7 @@ void DwellingsBar::RedrawItem(DwellingItem & dwl, const Rect & pos, Surface & ds
         Text text(GetString(castle.GetDwellingLivedCount(dwl.type)), Font::SMALL);
         text.Blit(pos.x + pos.w - text.w() - 3, pos.y + pos.h - text.h() - 1);
 
-        u8 grown = dwl.mons.GetGrown();
+        u32 grown = dwl.mons.GetGrown();
         if(castle.isBuild(BUILD_WELL)) grown += Castle::GetGrownWell();
         if(castle.isBuild(BUILD_WEL2) && DWELLING_MONSTER1 == dwl.type) grown += Castle::GetGrownWel2();
 

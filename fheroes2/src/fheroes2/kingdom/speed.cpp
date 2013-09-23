@@ -20,9 +20,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "gamedefs.h"
 #include "speed.h"
 
-const char* Speed::String(u8 speed)
+const char* Speed::String(int speed)
 {
     const char* str_speed[] = { _("speed|Standing"), _("speed|Crawling"), _("speed|Very Slow"), _("speed|Slow"), _("speed|Average"), _("speed|Fast"),
 	_("speed|Very Fast"), _("speed|Ultra Fast"), _("speed|Blazing"), _("speed|Instant"), "Unknown" };
@@ -45,7 +46,7 @@ const char* Speed::String(u8 speed)
     return str_speed[10];
 }
 
-Speed::speed_t Speed::GetOriginalSlow(u8 speed)
+int Speed::GetOriginalSlow(int speed)
 {
     switch(speed)
     {
@@ -64,7 +65,7 @@ Speed::speed_t Speed::GetOriginalSlow(u8 speed)
     return STANDING;
 }
 
-Speed::speed_t Speed::GetOriginalFast(u8 speed)
+int Speed::GetOriginalFast(int speed)
 {
     switch(speed)
     {
@@ -83,15 +84,21 @@ Speed::speed_t Speed::GetOriginalFast(u8 speed)
     return STANDING;
 }
 
-StreamBase & operator<< (StreamBase & msg, const Speed::speed_t & s)
+int Speed::FromInt(int speed)
 {
-    return msg << static_cast<u8>(s);
-}
+    switch(speed)
+    {
+	case CRAWLING:
+	case VERYSLOW:
+	case SLOW:
+	case AVERAGE:
+	case FAST:
+	case VERYFAST:
+	case ULTRAFAST:
+	case BLAZING:
+	case INSTANT:	return speed;
+	default: break;
+    }
 
-StreamBase & operator>> (StreamBase & msg, Speed::speed_t & s)
-{
-    u8 speed;
-    msg >> speed;
-    s = speed < Speed::INSTANT ? static_cast<Speed::speed_t>(speed) : Speed::STANDING;
-    return msg;
+    return STANDING;
 }

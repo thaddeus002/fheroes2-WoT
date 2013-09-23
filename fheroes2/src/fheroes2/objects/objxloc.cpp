@@ -26,7 +26,7 @@
 #include "direction.h"
 #include "objxloc.h"
 
-u16 ObjXlc1::GetPassable(const u8 & index)
+int ObjXlc1::GetPassable(u32 index)
 {
     const u8 disabled[] = { 40, 49, 50 };
     const u8 restricted[] = { 69, 71, 75, 76,  85, 103, 117, 119, 126, 128, 134, 136 };
@@ -42,19 +42,19 @@ u16 ObjXlc1::GetPassable(const u8 & index)
             DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
 }
 
-bool ObjXlc1::isAction(const u8 & index)
+bool ObjXlc1::isAction(u32 index)
 {
     return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
-bool ObjXlc1::isShadow(const u8 & index)
+bool ObjXlc1::isShadow(u32 index)
 {
     const u8 shadows [] = { 1, 2, 59, 68, 72, 78, 79, 83, 84, 112, 116, 120, 124, 125, 129, 133 };
 
     return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
 }
 
-u16 ObjXlc2::GetPassable(const u8 & index)
+int ObjXlc2::GetPassable(u32 index)
 {
     const u8 restricted[] = { 3, 8, 28, 46, 92, 102 };
 
@@ -69,12 +69,12 @@ u16 ObjXlc2::GetPassable(const u8 & index)
             DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
 }
 
-bool ObjXlc2::isAction(const u8 & index)
+bool ObjXlc2::isAction(u32 index)
 {
     return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
-bool ObjXlc2::isShadow(const u8 & index)
+bool ObjXlc2::isShadow(u32 index)
 {
 #if (__GNUC__ == 4 && __GNUC_MINOR__ == 4)
     // fixed: array subscript is above array bounds
@@ -87,7 +87,7 @@ bool ObjXlc2::isShadow(const u8 & index)
 }
 
 
-u16 ObjXlc3::GetPassable(const u8 & index)
+int ObjXlc3::GetPassable(u32 index)
 {
     if(isShadow(index))
         return DIRECTION_ALL;
@@ -98,12 +98,12 @@ u16 ObjXlc3::GetPassable(const u8 & index)
     return DIRECTION_ALL;
 }
 
-bool ObjXlc3::isAction(const u8 & index)
+bool ObjXlc3::isAction(u32 index)
 {
     return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
-bool ObjXlc3::isShadow(const u8 & index)
+bool ObjXlc3::isShadow(u32 index)
 {
     const u8 shadows [] = { 0, 9, 20, 29, 41, 59, 65, 71, 77, 83, 89, 95, 101,
 	108, 109, 112, 113, 116, 117, 120, 121, 124, 125, 128, 129, 132, 133, 136, 137 };
@@ -111,7 +111,7 @@ bool ObjXlc3::isShadow(const u8 & index)
     return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
 }
 
-u8 ObjXlc1::GetActionObject(const u8 & index)
+int ObjXlc1::GetActionObject(u32 index)
 {
     switch(index)
     {
@@ -128,7 +128,7 @@ u8 ObjXlc1::GetActionObject(const u8 & index)
     return MP2::OBJ_ZERO;
 }
 
-u8 ObjXlc2::GetActionObject(const u8 & index)
+int ObjXlc2::GetActionObject(u32 index)
 {
     switch(index)
     {
@@ -142,7 +142,7 @@ u8 ObjXlc2::GetActionObject(const u8 & index)
     return MP2::OBJ_ZERO;
 }
 
-u8 ObjXlc3::GetActionObject(const u8 & index)
+int ObjXlc3::GetActionObject(u32 index)
 {
     switch(index)
     {

@@ -27,12 +27,14 @@
 #include "button.h"
 #include "cursor.h"
 #include "castle.h"
+#include "dialog.h"
+#include "game.h"
 #include "race.h"
 #include "settings.h"
 #include "mageguild.h"
 #include "text.h"
 
-RowSpells::RowSpells(const Point & pos, const Castle & castle, u8 lvl)
+RowSpells::RowSpells(const Point & pos, const Castle & castle, int lvl)
 {
     const MageGuild & guild = castle.GetMageGuild();
     bool hide = castle.GetLevelMageGuild() < lvl;
@@ -40,7 +42,7 @@ RowSpells::RowSpells(const Point & pos, const Castle & castle, u8 lvl)
     const Sprite & roll_hide = AGG::GetICN(ICN::TOWNWIND, 1);
     const Sprite & roll = (hide ? roll_hide : roll_show);
 
-    u8 count = 0;
+    u32 count = 0;
 
     switch(lvl)
     {
@@ -52,7 +54,7 @@ RowSpells::RowSpells(const Point & pos, const Castle & castle, u8 lvl)
 	default: break;
     }
 
-    for(u8 ii = 0; ii < count; ++ii)
+    for(u32 ii = 0; ii < count; ++ii)
 	coords.push_back(Rect(pos.x + coords.size() * (Settings::Get().QVGA() ? 72 : 110) - roll.w() / 2, pos.y, roll.w(), roll.h()));
 
     if(castle.HaveLibraryCapability())
@@ -134,14 +136,10 @@ bool RowSpells::QueueEventProcessing(void)
 void Castle::OpenMageGuild(void)
 {
     Display & display = Display::Get();
-
-    // cursor
     Cursor & cursor = Cursor::Get();
-
     cursor.Hide();
 
     Dialog::FrameBorder frameborder(Size(640, 480));
-
     const Point & cur_pt = frameborder.GetArea();
     Text text;
 
@@ -152,9 +150,9 @@ void Castle::OpenMageGuild(void)
     text.Set(_("The above spells have been added to your book."), Font::BIG);
     text.Blit(cur_pt.x + 280 - text.w() / 2, cur_pt.y + 461);
 
-    const u8 level = GetLevelMageGuild();
+    const int level = GetLevelMageGuild();
     // sprite
-    ICN::icn_t icn = ICN::UNKNOWN;
+    int icn = ICN::UNKNOWN;
     switch(race)
     {
         case Race::KNGT: icn = ICN::MAGEGLDK; break;

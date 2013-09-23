@@ -35,7 +35,7 @@ namespace Difficulty
         IMPOSSIBLE
     };
 
-    const char* String(u8);
+    const char* String(int);
 }
 
 #endif

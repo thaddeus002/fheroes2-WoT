@@ -23,25 +23,27 @@
 #ifndef H2POCKETPC_H
 #define H2POCKETPC_H
 
-#include "game.h"
-#include "dialog.h"
-#include "maps_fileinfo.h"
 #include "gamedefs.h"
+
+class Heroes;
+class Castle;
+class Troop;
+class Kingdom;
 
 namespace PocketPC
 {
-    Game::menu_t	MainMenu(void);
-    Game::menu_t	NewGame(void);
-    Game::menu_t	NewMulti(void);
-    Game::menu_t	SelectScenario(void);
-    Game::menu_t	ScenarioInfo(void);
-    Game::menu_t	LoadGame(void);
-    Dialog::answer_t	HeroesOpenDialog(Heroes &, bool);
-    Dialog::answer_t	CastleOpenDialog(Castle &, bool);
-    Dialog::answer_t	DialogArmyInfo(const Troop &, u16);
+    int			MainMenu(void);
+    int			NewGame(void);
+    int			NewMulti(void);
+    int			SelectScenario(void);
+    int			ScenarioInfo(void);
+    int			LoadGame(void);
+    int			HeroesOpenDialog(Heroes &, bool);
+    int			CastleOpenDialog(Castle &, bool);
+    int			DialogArmyInfo(const Troop &, u32);
     void		HeroesMeeting(Heroes &, Heroes &);
     void		KeyboardDialog(std::string &);
-    u16			GetCursorAttackDialog(const Point &, u8);
+    u32			GetCursorAttackDialog(const Point &, int direction);
     void		ThievesGuild(bool oracle);
     void		KingdomOverviewDialog(const Kingdom &);
 }

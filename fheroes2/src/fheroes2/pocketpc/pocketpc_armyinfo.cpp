@@ -25,6 +25,8 @@
 #include "settings.h"
 #include "text.h"
 #include "button.h"
+#include "game.h"
+#include "dialog.h"
 #include "army.h"
 #include "army_troop.h"
 #include "pocketpc.h"
@@ -32,7 +34,7 @@
 void DrawMonsterStats(const Point &, const Troop &);
 void DrawBattleStats(const Point &, const Troop &);
 
-Dialog::answer_t PocketPC::DialogArmyInfo(const Troop & troop, u16 flags)
+int PocketPC::DialogArmyInfo(const Troop & troop, u32 flags)
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
@@ -104,7 +106,7 @@ Dialog::answer_t PocketPC::DialogArmyInfo(const Troop & troop, u16 flags)
         else
         if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss)) return Dialog::DISMISS;
         else
-        if(le.MouseClickLeft(buttonExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) return Dialog::CANCEL;
+        if(le.MouseClickLeft(buttonExit) || Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)) return Dialog::CANCEL;
     }
 
     return Dialog::ZERO;

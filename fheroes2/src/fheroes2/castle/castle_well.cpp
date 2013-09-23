@@ -25,16 +25,18 @@
 #include "button.h"
 #include "cursor.h"
 #include "speed.h"
+#include "dialog.h"
 #include "settings.h"
 #include "resource.h"
 #include "castle.h"
 #include "kingdom.h"
+#include "game.h"
 #include "world.h"
 #include "text.h"
 
-struct dwelling_t : public std::pair<u32, u16>
+struct dwelling_t : public std::pair<u32, u32>
 {
-    dwelling_t(u32 type, u16 count) : std::pair<u32, u16>(type, count){};
+    dwelling_t(u32 type, u32 count) : std::pair<u32, u32>(type, count){};
 };
 
 struct dwellings_t : public std::vector<dwelling_t>
@@ -42,14 +44,14 @@ struct dwellings_t : public std::vector<dwelling_t>
     dwellings_t() { reserve(6); };
 };
 
-u16 HowManyRecruitMonster(const Castle & castle, u32 dw, const Funds & add, Funds & res)
+u32 HowManyRecruitMonster(const Castle & castle, u32 dw, const Funds & add, Funds & res)
 {
     const Monster ms(castle.GetRace(), castle.GetActualDwelling(dw));
     const Kingdom & kingdom = castle.GetKingdom();
 
     if(! castle.GetArmy().CanJoinTroop(ms)) return 0;
 
-    u16 count = castle.GetDwellingLivedCount(dw);
+    u32 count = castle.GetDwellingLivedCount(dw);
     payment_t payment;
 
     while(count)
@@ -68,13 +70,10 @@ void Castle::OpenWell(void)
 {
     const Settings & conf = Settings::Get();
     Display & display = Display::Get();
-    // cursor
     Cursor & cursor = Cursor::Get();
-
     cursor.Hide();
 
     Dialog::FrameBorder frameborder(Size(640, 480));
-
     const Point cur_pt = frameborder.GetArea();
     Point dst_pt(cur_pt);
 
@@ -137,7 +136,7 @@ void Castle::OpenWell(void)
 	    {
 		dwellings_t results;
 		Funds cur, total;
-		u16 can_recruit;
+		u32 can_recruit;
 		std::string str;
 
 		for(std::vector<u32>::const_iterator
@@ -230,8 +229,8 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
     {
 	bool present = false;
 	u32 dw_orig = DWELLING_MONSTER1;
-	u8 icnindex = 0;
-	u16 available = 0;
+	u32 icnindex = 0;
+	u32 available = 0;
 
 	switch(dw)
 	{
@@ -345,7 +344,7 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 
 	if(present)
 	{
-	    u8 grown = monster.GetGrown();
+	    u32 grown = monster.GetGrown();
 	    grown += building & BUILD_WELL ? GetGrownWell() : 0;
 	    if(DWELLING_MONSTER1 & dw) grown += building & BUILD_WEL2 ? GetGrownWel2() : 0;
 

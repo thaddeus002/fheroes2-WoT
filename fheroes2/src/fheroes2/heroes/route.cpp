@@ -35,17 +35,17 @@ s32 Route::Step::GetIndex(void) const
     return from < 0 ? -1 : Maps::GetDirectionIndex(from, direction);
 }
 
-const s32 & Route::Step::GetFrom(void) const
+s32 Route::Step::GetFrom(void) const
 {
     return from;
 }
 
-const u16 & Route::Step::GetDirection(void) const
+int Route::Step::GetDirection(void) const
 {
     return direction;
 }
 
-const u16 & Route::Step::GetPenalty(void) const
+u32 Route::Step::GetPenalty(void) const
 {
     return penalty;
 }
@@ -76,14 +76,14 @@ Route::Path & Route::Path::operator= (const Path & p)
     return *this;
 }
 
-u16 Route::Path::GetFrontDirection(void) const
+int Route::Path::GetFrontDirection(void) const
 {
     return empty() ?
 	(dst != hero->GetIndex() ? Direction::Get(hero->GetIndex(), dst)
 					    : Direction::CENTER) : front().GetDirection();
 }
 
-u16 Route::Path::GetFrontPenalty(void) const
+u32 Route::Path::GetFrontPenalty(void) const
 {
     return empty() ? 0 : front().GetPenalty();
 }
@@ -118,7 +118,7 @@ s32 Route::Path::GetDestinedIndex(void) const
 }
 
 /* return length path */
-bool Route::Path::Calculate(const s32 & dst_index, u16 limit /* MAXU16 */)
+bool Route::Path::Calculate(const s32 & dst_index, int limit /* -1 */)
 {
     dst = dst_index;
 
@@ -155,24 +155,11 @@ bool Route::Path::isValid(void) const
     return !empty();
 }
 
-/*
-bool Route::Path::isValid0(void) const
-{
-    return !empty() || (dst != hero->GetIndex() &&
-			Direction::UNKNOWN != Direction::Get(hero->GetIndex(), dst));
-}
-
-bool Route::Path::isBroken(void) const
-{
-    return end() != std::find_if(begin(), end(), std::mem_fun_ref(&Route::Step::isBad));
-}
-*/
-
-u16 Route::Path::GetIndexSprite(u16 from, u16 to, u8 mod)
+int Route::Path::GetIndexSprite(int from, int to, int mod)
 {
     // ICN::ROUTE
     // start index 1, 25, 49, 73, 97, 121 (size arrow path)
-    u16 index = 1;
+    int index = 1;
 
     switch(mod)
     {
@@ -317,10 +304,10 @@ u32 Route::Path::GetTotalPenalty(void) const
     return result;
 }
 
-u16 Route::Path::GetAllowStep(void) const
+s32 Route::Path::GetAllowStep(void) const
 {
-    u16 green = 0;
-    u16 move_point = hero->GetMovePoints();
+    s32 green = 0;
+    u32 move_point = hero->GetMovePoints();
 
     for(const_iterator
 	it = begin(); it != end() && move_point >= (*it).GetPenalty(); ++it)
@@ -350,7 +337,7 @@ std::string Route::Path::String(void) const
 bool StepIsObstacle(const Route::Step & s)
 {
     s32 index = s.GetIndex();
-    u8 obj = 0 <= index ? world.GetTiles(index).GetObject() : MP2::OBJ_ZERO;
+    int obj = 0 <= index ? world.GetTiles(index).GetObject() : MP2::OBJ_ZERO;
 
     switch(obj)
     {
@@ -428,7 +415,19 @@ StreamBase & Route::operator<< (StreamBase & msg, const Path & path)
 
 StreamBase & Route::operator>> (StreamBase & msg, Step & step)
 {
-    return msg >> step.from >> step.direction >> step.penalty;
+    msg >> step.from;
+
+    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
+    {
+	u16 direct, penalty;
+	msg >> direct >> penalty;
+	step.direction = direct;
+	step.penalty = penalty;
+    }
+    else
+	msg >> step.direction >> step.penalty;
+
+    return msg;
 }
 
 StreamBase & Route::operator>> (StreamBase & msg, Path & path)

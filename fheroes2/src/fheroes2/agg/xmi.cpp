@@ -26,7 +26,7 @@ namespace XMI
 {
     const struct
     {
-	xmi_t type;
+	int type;
 	const char* string;
    } xmimap[] = {
         { UNKNOWN,      "UNKNOWN"      },
@@ -50,12 +50,12 @@ namespace XMI
     };
 }
 
-const char* XMI::GetString(const xmi_t xmi)
+const char* XMI::GetString(int xmi)
 {
-    return xmimap[xmi].string;
+    return UNKNOWN < xmi && MIDI0043 >= xmi ? xmimap[xmi].string : xmimap[UNKNOWN].string;
 }
 
-XMI::xmi_t XMI::FromMUS(const MUS::mus_t mus)
+int XMI::FromMUS(int mus)
 {
     switch(mus)
     {

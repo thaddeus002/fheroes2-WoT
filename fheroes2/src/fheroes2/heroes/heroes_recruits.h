@@ -25,20 +25,18 @@
 
 #include <utility>
 #include "gamedefs.h"
-#include "heroes.h"
 
-class Recruits : public std::pair<Heroes::heroes_t, Heroes::heroes_t>
+class Heroes;
+
+class Recruits : public std::pair<int, int>
 {
 public:
     Recruits();
 
     void Reset(void);
 
-    Heroes::heroes_t GetID1(void) const;
-    Heroes::heroes_t GetID2(void) const;
-
-    void SetID1(u8);
-    void SetID2(u8);
+    int GetID1(void) const;
+    int GetID2(void) const;
 
     const Heroes* GetHero1(void) const;
     const Heroes* GetHero2(void) const;
@@ -47,8 +45,8 @@ public:
 
     void SetHero1(const Heroes*);
     void SetHero2(const Heroes*);
-    void SetHero1(Heroes::heroes_t);
-    void SetHero2(Heroes::heroes_t);
 };
+
+StreamBase & operator>> (StreamBase &, Recruits &);
 
 #endif

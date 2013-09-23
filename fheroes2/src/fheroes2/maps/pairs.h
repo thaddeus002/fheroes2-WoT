@@ -28,45 +28,53 @@
 #include "color.h"
 #include "resource.h"
 
-class IndexDistance : public std::pair<s32, u16>
+class IndexDistance : public std::pair<s32, u32>
 {
     public:
-    IndexDistance() : std::pair<s32, u16>(-1, 0) {};
-    IndexDistance(const s32 & i, const u16 & d) : std::pair<s32, u16>(i, d) {};
+    IndexDistance() : std::pair<s32, u32>(-1, 0) {};
+    IndexDistance(s32 i, u32 d) : std::pair<s32, u32>(i, d) {};
 
     static bool Shortest(const IndexDistance & id1, const IndexDistance & id2){ return id1.second < id2.second; };
     static bool Longest(const IndexDistance & id1, const IndexDistance & id2){ return id1.second > id2.second; };
 };
 
-class IndexObject : public std::pair<s32, u8>
+StreamBase & operator>> (StreamBase &, IndexDistance &);
+
+class IndexObject : public std::pair<s32, int>
 {
     public:
-    IndexObject() : std::pair<s32, u8>(-1, MP2::OBJ_ZERO) {};
-    IndexObject(const s32 & index, const u8 & object) : std::pair<s32, u8>(index, object) {};
+    IndexObject() : std::pair<s32, int>(-1, MP2::OBJ_ZERO) {};
+    IndexObject(s32 index, int object) : std::pair<s32, int>(index, object) {};
 
     bool isIndex(s32 index) const { return index == first; };
-    bool isObject(u8 object) const { return object == second; };
+    bool isObject(int object) const { return object == second; };
 };
 
-class ObjectColor : public std::pair<u8, u8>
+StreamBase & operator>> (StreamBase &, IndexObject &);
+
+class ObjectColor : public std::pair<int, int>
 {
     public:
-    ObjectColor() : std::pair<u8, u8>(MP2::OBJ_ZERO, Color::NONE) {};
-    ObjectColor(const u8 & object, const u8 & color) : std::pair<u8, u8>(object, color) {};
+    ObjectColor() : std::pair<int, int>(MP2::OBJ_ZERO, Color::NONE) {};
+    ObjectColor(int object, int color) : std::pair<int, int>(object, color) {};
 
-    bool isObject(u8 object) const { return object == first; };
-    bool isColor(u8 colors) const { return colors & second; };
+    bool isObject(int object) const { return object == first; };
+    bool isColor(int colors) const { return colors & second; };
 };
 
-class ResourceCount : public std::pair<u8, u16>
+StreamBase & operator>> (StreamBase &, ObjectColor &);
+
+class ResourceCount : public std::pair<int, u32>
 {
     public:
-    ResourceCount() : std::pair<u8, u16>(Resource::UNKNOWN, 0) {};
-    ResourceCount(const u8 & res, const u16 & count) : std::pair<u8, u16>(res, count) {};
+    ResourceCount() : std::pair<int, u32>(Resource::UNKNOWN, 0) {};
+    ResourceCount(int res, u32 count) : std::pair<int, u32>(res, count) {};
 
-    bool isResource(u8 res) const { return res == first; };
+    bool isResource(int res) const { return res == first; };
     bool isValid(void) const { return (first & Resource::ALL) && second; };
 };
+
+StreamBase & operator>> (StreamBase &, ResourceCount &);
 
 /*
 template<class T>

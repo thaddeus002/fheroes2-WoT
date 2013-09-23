@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include "agg.h"
+#include "text.h"
 #include "button.h"
 #include "world.h"
 #include "cursor.h"
@@ -30,13 +31,14 @@
 #include "resource.h"
 #include "kingdom.h"
 #include "splitter.h"
-#include "marketplace.h"
+#include "game.h"
 #include "dialog.h"
+#include "marketplace.h"
 
-void RedrawFromResource(const Point & pt, const Funds & rs);
-void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from_resource = 0);
-std::string GetStringTradeCosts(u8 rs_from, u8 rs_to, bool tradingPost);
-u16 GetTradeCosts(u8 rs_from, u8 rs_to, bool tradingPost);
+void RedrawFromResource(const Point &, const Funds &);
+void RedrawToResource(const Point &, bool showcost, bool tradingPost, int from_resource = 0);
+std::string GetStringTradeCosts(int rs_from, int rs_to, bool tradingPost);
+u32 GetTradeCosts(int rs_from, int rs_to, bool tradingPost);
 
 class TradeWindowGUI
 {
@@ -68,7 +70,7 @@ public:
     };
 
     void RedrawInfoBuySell(u32 count_sell, u32 count_buy, u32 max_sell, u32 orig_buy);
-    void ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, u32 max_sell, u32 count_buy, u32 count_sell, bool fromTradingPost);
+    void ShowTradeArea(int resourceFrom, int resourceTo, u32 max_buy, u32 max_sell, u32 count_buy, u32 count_sell, bool fromTradingPost);
 
     Rect   buttonMax;
     Rect   buttonMin;
@@ -81,13 +83,13 @@ public:
 private:
     Rect pos_rt;
     SpriteBack back;
-    ICN::icn_t tradpost;
+    int tradpost;
 
     TextSprite textSell;
     TextSprite textBuy;
 };
 
-void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, u32 max_sell, u32 count_buy, u32 count_sell, bool fromTradingPost)
+void TradeWindowGUI::ShowTradeArea(int resourceFrom, int resourceTo, u32 max_buy, u32 max_sell, u32 count_buy, u32 count_sell, bool fromTradingPost)
 {
     Cursor &cursor = Cursor::Get();
     Display &display = Display::Get();
@@ -121,7 +123,7 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
         dst_pt.y = pos_rt.y + 128;
         bar.Blit(dst_pt);
         splitter.SetRange(0, (Resource::GOLD == resourceTo ? max_sell : max_buy));
-        u16 exchange_rate = GetTradeCosts(resourceFrom, resourceTo, fromTradingPost);
+        u32 exchange_rate = GetTradeCosts(resourceFrom, resourceTo, fromTradingPost);
 	std::string message;
         if(Resource::GOLD == resourceTo)
         {
@@ -206,7 +208,7 @@ void TradeWindowGUI::RedrawInfoBuySell(u32 count_sell, u32 count_buy, u32 max_se
 void Dialog::Marketplace(bool fromTradingPost)
 {
     Display & display = Display::Get();
-    const ICN::icn_t tradpost = Settings::Get().ExtGameEvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
+    const int tradpost = Settings::Get().ExtGameEvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
     const std::string & header = _("Marketplace");
 
     Cursor & cursor = Cursor::Get();
@@ -233,7 +235,7 @@ void Dialog::Marketplace(bool fromTradingPost)
     const std::string & header_from = _("Your Resources");
 
     Funds fundsFrom = kingdom.GetFunds();
-    u8 resourceFrom = 0;
+    int resourceFrom = 0;
     const Point pt1(pos_rt.x, pos_rt.y + 190);
     Rects rectsFrom;
     rectsFrom.reserve(7);
@@ -255,7 +257,7 @@ void Dialog::Marketplace(bool fromTradingPost)
     const std::string & header_to = _("Available Trades");
 
     Funds fundsTo;
-    u8 resourceTo = 0;
+    int resourceTo = 0;
     const Point pt2(138 + pos_rt.x, pos_rt.y + 190);
     Rects rectsTo;
     rectsTo.reserve(7);
@@ -325,7 +327,7 @@ void Dialog::Marketplace(bool fromTradingPost)
 	}
 
         // click from
-        for(u8 ii = 0; ii < rectsFrom.size(); ++ii)
+        for(u32 ii = 0; ii < rectsFrom.size(); ++ii)
         {
             const Rect & rect_from = rectsFrom[ii];
 
@@ -361,7 +363,7 @@ void Dialog::Marketplace(bool fromTradingPost)
         }
 
         // click to
-        for(u8 ii = 0; ii < rectsTo.size(); ++ii)
+        for(u32 ii = 0; ii < rectsTo.size(); ++ii)
         {
             const Rect & rect_to = rectsTo[ii];
 
@@ -397,7 +399,7 @@ void Dialog::Marketplace(bool fromTradingPost)
         // move splitter
         if(buttonLeft.isEnable() && buttonRight.isEnable() && max_buy && le.MousePressLeft(splitter.GetRect()))
         {
-            u32 seek = (le.GetMouseCursor().x - splitter.GetRect().x) * 100 / splitter.GetStep();
+    	    s32 seek = (le.GetMouseCursor().x - splitter.GetRect().x) * 100 / splitter.GetStep();
 
             if(seek < splitter.Min()) seek = splitter.Min();
             else
@@ -493,7 +495,7 @@ void Dialog::Marketplace(bool fromTradingPost)
     }
 }
 
-void RedrawResourceSprite(const Surface & sf, s16 px, s16 py, s32 value)
+void RedrawResourceSprite(const Surface & sf, s32 px, s32 py, s32 value)
 {
     Display & display = Display::Get();
     Text text;
@@ -508,7 +510,7 @@ void RedrawResourceSprite(const Surface & sf, s16 px, s16 py, s32 value)
 
 void RedrawFromResource(const Point & pt, const Funds & rs)
 {
-    const ICN::icn_t tradpost = Settings::Get().ExtGameEvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
+    const int tradpost = Settings::Get().ExtGameEvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
 
     // wood
     RedrawResourceSprite(AGG::GetICN(tradpost, 7), pt.x, pt.y, rs.wood);
@@ -526,7 +528,7 @@ void RedrawFromResource(const Point & pt, const Funds & rs)
     RedrawResourceSprite(AGG::GetICN(tradpost, 13), pt.x + 37, pt.y + 74, rs.gold);
 }
 
-void RedrawResourceSprite2(const Surface & sf, s16 px, s16 py, bool show, u8 from, u8 res, bool trading)
+void RedrawResourceSprite2(const Surface & sf, s32 px, s32 py, bool show, int from, int res, bool trading)
 {
     Display & display = Display::Get();
     Point dst_pt(px, py);
@@ -542,9 +544,9 @@ void RedrawResourceSprite2(const Surface & sf, s16 px, s16 py, bool show, u8 fro
     }
 }
 
-void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from_resource)
+void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, int from_resource)
 {
-    const ICN::icn_t tradpost = Settings::Get().ExtGameEvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
+    const int tradpost = Settings::Get().ExtGameEvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
 
     // wood
     RedrawResourceSprite2(AGG::GetICN(tradpost, 7), pt.x, pt.y, showcost, from_resource, Resource::WOOD, tradingPost);
@@ -562,7 +564,7 @@ void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from
     RedrawResourceSprite2(AGG::GetICN(tradpost, 13), pt.x + 37, pt.y + 74, showcost, from_resource, Resource::GOLD, tradingPost);
 }
 
-std::string GetStringTradeCosts(u8 rs_from, u8 rs_to, bool tradingPost)
+std::string GetStringTradeCosts(int rs_from, int rs_to, bool tradingPost)
 {
     std::string res;
 
@@ -580,9 +582,9 @@ std::string GetStringTradeCosts(u8 rs_from, u8 rs_to, bool tradingPost)
     return res;
 }
 
-u16 GetTradeCosts(u8 rs_from, u8 rs_to, bool tradingPost)
+u32 GetTradeCosts(int rs_from, int rs_to, bool tradingPost)
 {
-    const u8 markets = tradingPost ? 3 : world.GetKingdom(Settings::Get().CurrentColor()).GetCountMarketplace();
+    const u32 markets = tradingPost ? 3 : world.GetKingdom(Settings::Get().CurrentColor()).GetCountMarketplace();
 
     if(rs_from == rs_to) return 0;
 

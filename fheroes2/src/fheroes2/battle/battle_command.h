@@ -57,21 +57,21 @@ namespace Battle
     class Command : protected StreamBuf
     {
     public:
-        Command(u16);
+        Command(u32);
         Command(const Command &);
         explicit Command(const StreamBuf &);
 
-        Command(u16 cmd, s32 param1, s32 param2, const Indexes &);
-        Command(u16 type, s32 param1, s32 param2 = -1, s32 param3 = -1, s32 param4 = -1);
+        Command(u32 cmd, u32 param1, s32 param2, const Indexes &);
+        Command(u32 cmd, u32 param1, s32 param2 = -1, s32 param3 = -1, s32 param4 = -1);
 
         Command & 	operator= (const Command &);
 
-        u16		GetType(void) const { return type; }
-        bool		isType(u16 msg) const { return type == msg; }
+        u32		GetType(void) const { return type; }
+        bool		isType(u32 msg) const { return type == msg; }
 	StreamBuf &	GetStream(void) { return *this; }
 
     protected:
-        u16     	type;
+        u32     	type;
     };
 }
 

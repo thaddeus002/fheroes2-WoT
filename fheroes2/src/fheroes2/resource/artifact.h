@@ -24,7 +24,6 @@
 
 #include <vector>
 #include "gamedefs.h"
-#include "interface_itemsbar.h"
 
 class Spell;
 class Heroes;
@@ -158,54 +157,54 @@ public:
 	UNKNOWN
     };
 
-    Artifact(u8 = UNKNOWN);
+    Artifact(int = UNKNOWN);
 
-    bool operator== (const Spell &) const;
-    bool operator== (const Artifact &) const;
-    bool operator!= (const Artifact &) const;
-    u8 operator() (void) const;
-    u8 GetID(void) const;
+    bool	operator== (const Spell &) const;
+    bool	operator== (const Artifact &) const;
+    bool	operator!= (const Artifact &) const;
+    int		operator() (void) const;
+    int		GetID(void) const;
 
-    bool isUltimate(void) const;
-    bool isAlchemistRemove(void) const;
-    bool isValid(void) const;
+    bool	isUltimate(void) const;
+    bool	isAlchemistRemove(void) const;
+    bool	isValid(void) const;
 
-    void Reset(void);
+    void	Reset(void);
 
-    u16 ExtraValue(void) const;
-    u8 Level(void) const;
-    u8 LoyaltyLevel(void) const;
-    u8 Type(void) const;
+    u32		ExtraValue(void) const;
+    int		Level(void) const;
+    int		LoyaltyLevel(void) const;
+    int		Type(void) const;
 
     /* objnarti.icn */
-    u8 IndexSprite(void) const;
+    u32		IndexSprite(void) const;
     /* artfx.icn */
-    u8 IndexSprite32(void) const;
+    u32		IndexSprite32(void) const;
     /* artifact.icn */
-    u8 IndexSprite64(void) const;
+    u32		IndexSprite64(void) const;
 
-    void SetSpell(u8);
-    u8 GetSpell(void) const;
+    void	SetSpell(int);
+    int		GetSpell(void) const;
 
     const char* GetName(void) const;
     std::string GetDescription(void) const;
 
-    static u8 Rand(level_t);
-    static Artifact FromMP2IndexSprite(u8);
-    static const char* GetScenario(const Artifact &);
-    static void UpdateStats(const std::string &);
+    static int		Rand(level_t);
+    static Artifact	FromMP2IndexSprite(u32);
+    static const char*	GetScenario(const Artifact &);
+    static void		UpdateStats(const std::string &);
 
 private:
     friend StreamBase & operator<< (StreamBase &, const Artifact &);
     friend StreamBase & operator>> (StreamBase &, Artifact &);
 
-    u8 id;
-    u8 ext;
+    int		id;
+    int		ext;
 };
 
 StreamBase & operator<< (StreamBase &, const Artifact &);
 StreamBase & operator>> (StreamBase &, Artifact &);
-u16 GoldInsteadArtifact(u8);
+u32 GoldInsteadArtifact(int);
 
 class BagArtifacts : public std::vector<Artifact>
 {
@@ -221,12 +220,13 @@ public:
 
     void  RemoveScroll(const Artifact &);
 
-    u8   CountArtifacts(void) const;
-    u8   Count(const Artifact &) const;
+    u32   CountArtifacts(void) const;
+    u32   Count(const Artifact &) const;
 
     std::string String(void) const;
 };
 
+#include "interface_itemsbar.h"
 class ArtifactsBar : public Interface::ItemsActionBar<Artifact>
 {
 public:

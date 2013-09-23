@@ -28,10 +28,10 @@
 #include "skill.h"
 #include "spell_book.h"
 #include "artifact.h"
-#include "color.h"
 #include "position.h"
 
 class Army;
+class Castle;
 
 enum { MDF_NONE, MDF_ATTACK, MDF_DEFENSE, MDF_POWER, MDF_KNOWLEDGE, MDF_MORALE, MDF_LUCK };
 enum { PORT_BIG = 1, PORT_MEDIUM = 2, PORT_SMALL = 3 };
@@ -39,69 +39,79 @@ enum { PORT_BIG = 1, PORT_MEDIUM = 2, PORT_SMALL = 3 };
 class HeroBase : public Skill::Primary, public Maps::Position, public BitModes
 {
 public:
-    HeroBase(u8 type, u8 race);
+    HeroBase(int type, int race);
     HeroBase();
 
-    virtual const std::string & GetName(void) const = 0;
-    virtual Color::color_t GetColor(void) const = 0;
-    virtual u8 GetControl(void) const = 0;
-    virtual bool isValid(void) const = 0;
+    enum { UNDEFINED, CAPTAIN, HEROES };
 
-    virtual const Army & GetArmy(void) const = 0;
-    virtual Army & GetArmy(void) = 0;
+    virtual const std::string &	GetName(void) const = 0;
+    virtual int			GetColor(void) const = 0;
+    virtual int			GetControl(void) const = 0;
+    virtual bool		isValid(void) const = 0;
 
-    virtual u16 GetMaxSpellPoints(void) const = 0;
+    virtual const Army &	GetArmy(void) const = 0;
+    virtual Army &		GetArmy(void) = 0;
 
-    virtual u8  GetLevelSkill(u8 skill) const = 0;
-    virtual u16 GetSecondaryValues(u8 skill) const = 0;
+    virtual u32			GetMaxSpellPoints(void) const = 0;
 
-    virtual void ActionAfterBattle(void) = 0;
-    virtual void ActionPreBattle(void) = 0;
+    virtual int			GetLevelSkill(int skill) const = 0;
+    virtual u32			GetSecondaryValues(int skill) const = 0;
 
-    virtual const Castle* inCastle(void) const = 0;
-    virtual void PortraitRedraw(s16, s16, u8 type, Surface &) const = 0;
+    virtual void		ActionAfterBattle(void) = 0;
+    virtual void		ActionPreBattle(void) = 0;
 
-    s8 GetAttackModificator(std::string* = NULL) const;
-    s8 GetDefenseModificator(std::string* = NULL) const;
-    s8 GetPowerModificator(std::string* = NULL) const;
-    s8 GetKnowledgeModificator(std::string* = NULL) const;
-    s8 GetMoraleModificator(std::string* = NULL) const;
-    s8 GetLuckModificator(std::string* = NULL) const;
+    virtual const Castle*	inCastle(void) const = 0;
+    virtual void		PortraitRedraw(s32, s32, int type, Surface &) const = 0;
 
-    u16 GetSpellPoints(void) const;
-    bool HaveSpellPoints(const Spell &) const;
-    bool CanCastSpell(const Spell &, std::string* = NULL) const;
-    bool CanTeachSpell(const Spell &) const;
-    bool CanLearnSpell(const Spell &) const;
-    bool CanTranscribeScroll(const Artifact &) const;
-    void TranscribeScroll(const Artifact &);
-    void SpellCasted(const Spell &);
-    void SetSpellPoints(u16);
+    virtual int			GetType(void) const = 0;
 
-    void EditSpellBook(void);
-    Spell OpenSpellBook(u8 filter, bool) const;
-    bool HaveSpellBook(void) const;
-    bool HaveSpell(const Spell &, bool skip_bag = false) const;
-    void AppendSpellToBook(const Spell &, bool without_wisdom = false);
-    void AppendSpellsToBook(const SpellStorage &, bool without_wisdom = false);
-    bool SpellBookActivate(void);
+    bool			isCaptain(void) const;
+    bool			isHeroes(void) const;
 
-    BagArtifacts & GetBagArtifacts(void);
-    const BagArtifacts & GetBagArtifacts(void) const;
-    u8   HasArtifact(const Artifact &) const;
-    bool PickupArtifact(const Artifact &);
+    int				GetAttackModificator(std::string* = NULL) const;
+    int				GetDefenseModificator(std::string* = NULL) const;
+    int				GetPowerModificator(std::string* = NULL) const;
+    int				GetKnowledgeModificator(std::string* = NULL) const;
+    int				GetMoraleModificator(std::string* = NULL) const;
+    int				GetLuckModificator(std::string* = NULL) const;
 
-    void LoadDefaults(u8 type, u8 race);
+    u32				GetSpellPoints(void) const;
+    bool			HaveSpellPoints(const Spell &) const;
+    bool			CanCastSpell(const Spell &, std::string* = NULL) const;
+    bool			CanTeachSpell(const Spell &) const;
+    bool			CanLearnSpell(const Spell &) const;
+    bool			CanTranscribeScroll(const Artifact &) const;
+    void			TranscribeScroll(const Artifact &);
+    void			SpellCasted(const Spell &);
+    void			SetSpellPoints(u32);
+
+    void			EditSpellBook(void);
+    Spell			OpenSpellBook(int filter, bool) const;
+    bool			HaveSpellBook(void) const;
+    bool			HaveSpell(const Spell &, bool skip_bag = false) const;
+    void			AppendSpellToBook(const Spell &, bool without_wisdom = false);
+    void			AppendSpellsToBook(const SpellStorage &, bool without_wisdom = false);
+    bool			SpellBookActivate(void);
+
+    BagArtifacts &		GetBagArtifacts(void);
+    const BagArtifacts &	GetBagArtifacts(void) const;
+    u32				HasArtifact(const Artifact &) const;
+    bool			PickupArtifact(const Artifact &);
+
+    void			LoadDefaults(int type, int race);
 
 protected:
     friend StreamBase & operator<< (StreamBase &, const HeroBase &);
     friend StreamBase & operator>> (StreamBase &, HeroBase &);
+#ifdef WITH_XML
+    friend TiXmlElement & operator>> (TiXmlElement &, HeroBase &);
+#endif
 
-    u16 magic_point;
-    u16 move_point;
+    u32			magic_point;
+    u32			move_point;
 
-    SpellBook spell_book;
-    BagArtifacts bag_artifacts;
+    SpellBook		spell_book;
+    BagArtifacts	bag_artifacts;
 };
 
 struct HeroHasArtifact : public std::binary_function <const HeroBase*, Artifact, bool>

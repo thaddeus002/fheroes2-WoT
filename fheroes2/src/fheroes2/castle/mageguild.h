@@ -34,17 +34,16 @@ class MageGuild
     public:
 	MageGuild() {};
 
-	void Builds(u8 race, bool libraryCap);
-	void EducateHero(HeroBase &, u8 lvlmage, bool isLibraryBuild) const;
-
-	SpellStorage GetSpells(u8 lvlmage, bool islibrary, u8) const;
+	void		Builds(int race, bool libraryCap);
+	void		EducateHero(HeroBase &, int lvlmage, bool isLibraryBuild) const;
+	SpellStorage	GetSpells(int lvlmage, bool islibrary, int) const;
 
     private:
         friend StreamBase & operator<< (StreamBase &, const MageGuild &);
         friend StreamBase & operator>> (StreamBase &, MageGuild &);
 
-	SpellStorage general;
-	SpellStorage library;
+	SpellStorage	general;
+	SpellStorage	library;
 };
 
 StreamBase & operator<< (StreamBase &, const MageGuild &);
@@ -53,13 +52,13 @@ StreamBase & operator>> (StreamBase &, MageGuild &);
 class RowSpells
 {
 public:
-    RowSpells(const Point &, const Castle &, u8);
-    void Redraw(void);
-    bool QueueEventProcessing(void);
+    RowSpells(const Point &, const Castle &, int);
+    void		Redraw(void);
+    bool		QueueEventProcessing(void);
 
 private:
-    Rects coords;
-    SpellStorage spells;
+    Rects		coords;
+    SpellStorage	spells;
 };
 
 #endif

@@ -30,6 +30,7 @@
 
 #include "system.h"
 #include "gamedefs.h"
+#include "text.h"
 #include "agg.h"
 #include "cursor.h"
 #include "button.h"
@@ -38,8 +39,10 @@
 #include "world.h"
 #include "zzlib.h"
 #include "game.h"
+#include "game_over.h"
 
-#define HGS_ID	0xF1F2
+#define HGS_IDOLD	0xF1F2
+#define HGS_ID	0xF1F3
 #define HGS_MAX	10
 
 struct hgs_t
@@ -51,8 +54,8 @@ struct hgs_t
     std::string	player;
     std::string	land;
     u32		localtime;
-    u16		days;
-    u16		rating;
+    u32		days;
+    u32		rating;
 };
 
 StreamBase & operator<< (StreamBase & msg, const hgs_t & hgs)
@@ -63,6 +66,14 @@ StreamBase & operator<< (StreamBase & msg, const hgs_t & hgs)
 StreamBase & operator>> (StreamBase & msg, hgs_t & hgs)
 {
     return msg >> hgs.player >> hgs.land >> hgs.localtime >> hgs.days >> hgs.rating;
+}
+
+void LoadOldFormat(StreamBase & msg, hgs_t & hgs)
+{
+    u16 days, rating;
+    msg >> hgs.player >> hgs.land >> hgs.localtime >> days >> rating;
+    hgs.days = days;
+    hgs.rating = rating;
 }
 
 bool hgs_t::operator== (const hgs_t & h) const
@@ -83,8 +94,8 @@ public:
     bool LoadOld(const char*);
     bool Load(const char*);
     bool Save(const char*);
-    void ScoreRegistry(const std::string &, const std::string &, u16, u16);
-    void RedrawList(s16, s16);
+    void ScoreRegistry(const std::string &, const std::string &, u32, u32);
+    void RedrawList(s32, s32);
 private:
     std::vector<hgs_t> list;
 };
@@ -128,6 +139,15 @@ bool HGSData::Load(const char* fn)
     u16 hgs_id = 0;
     hdata >> hgs_id;
 
+    if(hgs_id == HGS_IDOLD) /* FORMAT_VERSION_3154 */
+    {
+        const u32 size = hdata.get32();
+        list.resize(size);
+        for(std::vector<hgs_t>::iterator
+            it = list.begin(); it != list.end(); ++it)
+	    LoadOldFormat(hdata, *it);
+	return true;
+    }
     if(hgs_id == HGS_ID)
     {
 	hdata >> list;
@@ -161,7 +181,7 @@ bool HGSData::Save(const char* fn)
     return fs.good();
 }
 
-void HGSData::ScoreRegistry(const std::string & p, const std::string & m, u16 r, u16 s)
+void HGSData::ScoreRegistry(const std::string & p, const std::string & m, u32 r, u32 s)
 {
     hgs_t h;
 
@@ -179,7 +199,7 @@ void HGSData::ScoreRegistry(const std::string & p, const std::string & m, u16 r,
     }
 }
 
-void HGSData::RedrawList(s16 ox, s16 oy)
+void HGSData::RedrawList(s32 ox, s32 oy)
 {
     const Settings & conf = Settings::Get();
 
@@ -221,7 +241,7 @@ void HGSData::RedrawList(s16 ox, s16 oy)
     }
 }
 
-Game::menu_t Game::HighScores(bool fill)
+int Game::HighScores(bool fill)
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
@@ -233,7 +253,7 @@ Game::menu_t Game::HighScores(bool fill)
 #ifdef WITH_DEBUG
     if(IS_DEVEL() && world.CountDay())
     {
-	std::string msg = std::string("Your result: ") + GetString(GetGameOverScores());
+	std::string msg = std::string("Devepoper mode, not save! \n \n Your result: ") + GetString(GetGameOverScores());
 	Dialog::Message("High Scores", msg, Font::BIG, Dialog::OK);
 	return MAINMENU;
     }
@@ -267,8 +287,8 @@ Game::menu_t Game::HighScores(bool fill)
     cursor.Show();
     display.Flip();
 
-    const u16 rating = GetGameOverScores();
-    const u16 days = world.CountDay();
+    const u32 rating = GetGameOverScores();
+    const u32 days = world.CountDay();
     GameOver::Result & gameResult = GameOver::Result::Get();
 
     if(rating && (gameResult.GetResult() & GameOver::WINS))

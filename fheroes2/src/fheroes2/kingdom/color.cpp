@@ -22,10 +22,12 @@
 
 #include <sstream>
 #include "players.h"
+#include "settings.h"
 #include "world.h"
+#include "game.h"
 #include "color.h"
 
-const char* Color::String(u8 color)
+const char* Color::String(int color)
 {
     const char* str_color[] = { "None", _("Blue"), _("Green"), _("Red"), _("Yellow"), _("Orange"), _("Purple"), "uknown" };
 
@@ -43,7 +45,7 @@ const char* Color::String(u8 color)
     return str_color[0];
 }
 
-u8 Color::GetIndex(u8 color)
+int Color::GetIndex(int color)
 {
     switch(color)
     {
@@ -60,33 +62,28 @@ u8 Color::GetIndex(u8 color)
     return 6;
 }
 
-u8 Color::Count(u8 colors)
+int Color::Count(int colors)
 {
-    u8 res = 0;
-
-    for(u8 col = BLUE; col < UNUSED; col <<= 1)
-	if(col & colors) ++res;
-
-    return res;
+    return CountBits(colors & ALL);
 }
 
-Color::color_t Color::Get(u8 index)
+int Color::FromInt(int col)
 {
-    switch(index)
+    switch(col)
     {
-        case BLUE:	return BLUE;
-        case GREEN:	return GREEN;
-        case RED:	return RED;
-        case YELLOW:	return YELLOW;
-	case ORANGE:	return ORANGE;
-	case PURPLE:	return PURPLE;
+        case BLUE:
+        case GREEN:
+        case RED:
+        case YELLOW:
+	case ORANGE:
+	case PURPLE:	return col;
 	default: break;
     }
 
     return NONE;
 }
 
-Color::color_t Color::GetFirst(u8 colors)
+int Color::GetFirst(int colors)
 {
     if(colors & BLUE) return BLUE;
     else
@@ -103,7 +100,7 @@ Color::color_t Color::GetFirst(u8 colors)
     return NONE;
 }
 
-const char* BarrierColor::String(u8 val)
+const char* BarrierColor::String(int val)
 {
     switch(val)
     {
@@ -121,7 +118,7 @@ const char* BarrierColor::String(u8 val)
     return "None";
 }
 
-u8 BarrierColor::FromMP2(u8 val)
+int BarrierColor::FromMP2(int val)
 {
     switch(val)
     {
@@ -139,7 +136,7 @@ u8 BarrierColor::FromMP2(u8 val)
     return NONE;
 }
 
-Colors::Colors(u8 colors)
+Colors::Colors(int colors)
 {
     reserve(6);
 
@@ -162,19 +159,19 @@ std::string Colors::String(void) const
     return os.str();
 }
 
-bool ColorBase::operator== (u8 col) const
+bool ColorBase::operator== (int col) const
 {
     return color == col;
 }
 
-bool ColorBase::isFriends(u8 col) const
+bool ColorBase::isFriends(int col) const
 {
     return (col & Color::ALL) && (color == col || Players::isFriends(color, col));
 }
 
-void ColorBase::SetColor(u8 col)
+void ColorBase::SetColor(int col)
 {
-    color = Color::Get(col);
+    color = Color::FromInt(col);
 }
 
 Kingdom & ColorBase::GetKingdom(void) const
@@ -184,13 +181,19 @@ Kingdom & ColorBase::GetKingdom(void) const
 
 StreamBase & operator<< (StreamBase & msg, const ColorBase & col)
 {
-    return msg << static_cast<u8>(col.color);
+    return msg << col.color;
 }
 
 StreamBase & operator>> (StreamBase & msg, ColorBase & col)
 {
-    u8 color;
-    msg >> color;
-    col.SetColor(color);
+    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
+    {
+	u8 color;
+	msg >> color;
+	col.SetColor(color);
+    }
+    else
+	msg >> col.color;
+
     return msg;
 }

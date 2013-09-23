@@ -25,7 +25,7 @@
 #include "world.h"
 #include "ground.h"
 
-const char* Maps::Ground::String(u16 ground)
+const char* Maps::Ground::String(int ground)
 {
     const char* str_ground[] = { _("Desert"), _("Snow"), _("Swamp"), _("Wasteland"), _("Beach"), 
 	_("Lava"), _("Dirt"), _("Grass"), _("Water"), "Unknown" };
@@ -47,7 +47,7 @@ const char* Maps::Ground::String(u16 ground)
     return str_ground[8];
 }
 
-u16 Maps::Ground::GetPenalty(const s32 & index, Direction::vector_t direct, u8 level)
+u32 Maps::Ground::GetPenalty(s32 index, int direct, u32 level)
 {
     const Maps::Tiles & tile = world.GetTiles(index);
 
@@ -67,7 +67,7 @@ u16 Maps::Ground::GetPenalty(const s32 & index, Direction::vector_t direct, u8 l
 	// road priority: need small value
 	return 59;
 
-    u16 result = 100;
+    u32 result = 100;
 
     switch(tile.GetGround())
     {

@@ -23,6 +23,8 @@
 #include <sstream>
 
 #include "speed.h"
+#include "settings.h"
+#include "game.h"
 #include "luck.h"
 #include "morale.h"
 #include "army.h"
@@ -42,7 +44,7 @@ bool Troop::operator== (const Monster & m) const
     return static_cast<Monster>(*this) == m;
 }
 
-bool Troop::isMonster(u8 mons) const
+bool Troop::isMonster(int mons) const
 {
     return GetID() == mons;
 }
@@ -182,12 +184,12 @@ u32 Troop::GetHitPointsLeft(void) const
     return 0;
 }
 
-u8 Troop::GetSpeed(void) const
+u32 Troop::GetSpeed(void) const
 {
     return Monster::GetSpeed();
 }
 
-u16 Troop::GetAffectedDuration(u32) const
+u32 Troop::GetAffectedDuration(u32) const
 {
     return 0;
 }
@@ -207,27 +209,27 @@ ArmyTroop & ArmyTroop::operator= (const Troop & t)
     return *this;
 }
 
-u16 ArmyTroop::GetAttack(void) const
+u32 ArmyTroop::GetAttack(void) const
 {
     return Troop::GetAttack() + (army && army->GetCommander() ? army->GetCommander()->GetAttack() : 0);
 }
 
-u16 ArmyTroop::GetDefense(void) const
+u32 ArmyTroop::GetDefense(void) const
 {
     return Troop::GetDefense() + (army && army->GetCommander() ? army->GetCommander()->GetDefense() : 0);
 }
 
-u8 ArmyTroop::GetColor(void) const
+int ArmyTroop::GetColor(void) const
 {
     return army ? army->GetColor() : Color::NONE;
 }
 
-s8 ArmyTroop::GetMorale(void) const
+int ArmyTroop::GetMorale(void) const
 {
     return army && isAffectedByMorale() ? army->GetMorale() : Troop::GetMorale();
 }
 
-s8 ArmyTroop::GetLuck(void) const
+int ArmyTroop::GetLuck(void) const
 {
     return army ? army->GetLuck() : Troop::GetLuck();
 }
@@ -264,12 +266,19 @@ std::string ArmyTroop::GetDefenseString(void) const
 
 StreamBase & operator<< (StreamBase & msg, const Troop & troop)
 {
-    msg << troop.id << troop.count;
-    return msg;
+    return msg << troop.id << troop.count;
 }
 
 StreamBase & operator>> (StreamBase & msg, Troop & troop)
 {
-    msg >> troop.id >> troop.count;
+    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
+    {
+	u8 id;
+	msg >> id >> troop.count;
+	troop.id = id;
+    }
+    else
+	msg >> troop.id >> troop.count;
+
     return msg;
 }

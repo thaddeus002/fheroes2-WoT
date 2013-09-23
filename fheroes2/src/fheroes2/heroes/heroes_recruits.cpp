@@ -21,9 +21,12 @@
  ***************************************************************************/
 
 #include "world.h"
+#include "game.h"
+#include "settings.h"
+#include "heroes.h"
 #include "heroes_recruits.h"
 
-Recruits::Recruits() : std::pair<Heroes::heroes_t, Heroes::heroes_t>(Heroes::UNKNOWN, Heroes::UNKNOWN)
+Recruits::Recruits() : std::pair<int, int>(Heroes::UNKNOWN, Heroes::UNKNOWN)
 {
 }
 
@@ -33,24 +36,14 @@ void Recruits::Reset(void)
     second = Heroes::UNKNOWN;
 }
 
-Heroes::heroes_t Recruits::GetID1(void) const
+int Recruits::GetID1(void) const
 {
     return first;
 }
 
-Heroes::heroes_t Recruits::GetID2(void) const
+int Recruits::GetID2(void) const
 {
     return second;
-}
-
-void Recruits::SetID1(u8 i)
-{
-    first = Heroes::UNKNOWN > i ? static_cast<Heroes::heroes_t>(i) : Heroes::UNKNOWN;
-}
-
-void Recruits::SetID2(u8 i)
-{
-    second = Heroes::UNKNOWN > i ? static_cast<Heroes::heroes_t>(i) : Heroes::UNKNOWN;
 }
 
 const Heroes* Recruits::GetHero1(void) const
@@ -83,12 +76,17 @@ void Recruits::SetHero2(const Heroes* hero)
     second = hero ? hero->hid : Heroes::UNKNOWN;
 }
 
-void Recruits::SetHero1(Heroes::heroes_t id)
+StreamBase & operator>> (StreamBase & sb, Recruits & rt)
 {
-    first = id;
-}
+    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
+    {
+        u8 hero1, hero2;
+	sb >> hero1 >> hero2;
+	rt.first = hero1;
+	rt.second = hero2;
+    }
+    else
+	sb >> rt.first >> rt.second;
 
-void Recruits::SetHero2(Heroes::heroes_t id)
-{
-    second = id;
+    return sb;
 }

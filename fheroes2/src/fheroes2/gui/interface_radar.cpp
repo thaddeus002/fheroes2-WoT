@@ -20,6 +20,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <cmath>
+
 #include "agg.h"
 #include "settings.h"
 #include "game.h"
@@ -50,233 +52,7 @@
 #define COLOR_PURPLE	0x87
 #define COLOR_GRAY	0x10
 
-u32 GetPaletteIndexFromGround(const u16 ground);
-
-/* constructor */
-Interface::Radar::Radar(Basic & basic) : BorderWindow(Rect(0, 0, RADARWIDTH, RADARWIDTH)), interface(basic), hide(true)
-{
-}
-
-void Interface::Radar::SavePosition(void)
-{
-    Settings::Get().SetPosRadar(GetRect());
-}
-
-void Interface::Radar::SetPos(s16 ox, s16 oy)
-{
-    BorderWindow::SetPosition(ox, oy);
-}
-
-/* construct gui */
-void Interface::Radar::Build(void)
-{
-    const Rect & area = GetArea();
-
-    spriteArea.Set(area.w, area.h);
-
-    const u8 n = world.w() == Maps::SMALL ? 4 : 2;
-    sf_blue.Set(n, n);
-    sf_green.Set(n, n);
-    sf_red.Set(n, n);
-    sf_yellow.Set(n, n);
-    sf_orange.Set(n, n);
-    sf_purple.Set(n, n);
-    sf_gray.Set(n, n);
-    sf_black.Set(n, n);
-
-    sf_blue.Fill(sf_blue.GetColorIndex(COLOR_BLUE));
-    sf_green.Fill(sf_green.GetColorIndex(COLOR_GREEN));
-    sf_red.Fill(sf_red.GetColorIndex(COLOR_RED));
-    sf_yellow.Fill(sf_yellow.GetColorIndex(COLOR_YELLOW));
-    sf_orange.Fill(sf_orange.GetColorIndex(COLOR_ORANGE));
-    sf_purple.Fill(sf_purple.GetColorIndex(COLOR_PURPLE));
-    sf_gray.Fill(sf_gray.GetColorIndex(COLOR_GRAY));
-    sf_black.Fill(0);
-
-    Generate();
-
-    const Size & rectMaps = interface.GetGameArea().GetRectMaps();
-    const u16 & sw = static_cast<u16>(rectMaps.w * (area.w / static_cast<float>(world.w())));
-    const u16 & sh = static_cast<u16>(rectMaps.h * (area.h / static_cast<float>(world.h())));
-    cursorArea.Set(sw, sh);
-    Cursor::DrawCursor(cursorArea, RADARCOLOR);
-    cursorArea.Move(area.x, area.y);
-}
-
-/* generate mini maps */
-void Interface::Radar::Generate(void)
-{
-    const Rect & area = GetArea();
-    const u16 world_w = world.w();
-    const u16 world_h = world.h();
-
-    const u8 n = world.w() == Maps::SMALL ? 4 : 2;
-    Surface tile_surface(n, n);
-
-    for(s32 index = 0; index < world_w * world_h; ++index)
-    {
-	const Maps::Tiles & tile = world.GetTiles(index);
-	u32 color = COLOR_ROAD;
-
-	if(tile.isRoad())
-		tile_surface.Fill(tile_surface.GetColorIndex(color));
-	else
-	if(0 != (color = GetPaletteIndexFromGround(tile.GetGround())))
-		tile_surface.Fill(tile_surface.GetColorIndex(tile.GetObject() == MP2::OBJ_MOUNTS ? color + 2 : color));
-	else
-	    continue;
-
-	float dstx = (index % world_w) * area.w / world_w;
-	float dsty = (index / world_h) * area.h / world_w;
-
-	tile_surface.Blit(static_cast<u16>(dstx), static_cast<u16>(dsty), spriteArea);
-    }
-}
-
-void Interface::Radar::SetHide(bool f)
-{
-    hide = f;
-}
-
-void Interface::Radar::SetRedraw(void) const
-{
-     interface.SetRedraw(REDRAW_RADAR);
-}
-
-void Interface::Radar::Redraw(void)
-{
-    const Settings & conf = Settings::Get();
-    const Rect & area = GetArea();
-
-    // redraw border
-    if(conf.ExtGameHideInterface() && conf.ShowRadar())
-	BorderWindow::Redraw();
-
-    if(!hide)
-    {
-	RedrawArea(Players::FriendColors());
-	RedrawCursor();
-    }
-    else
-    // hide radar
-    if(!conf.ExtGameHideInterface() || conf.ShowRadar())
-	AGG::GetICN((conf.ExtGameEvilInterface() ? ICN::HEROLOGE : ICN::HEROLOGO), 0).Blit(area.x, area.y);
-}
-
-/* redraw radar area for color */
-void Interface::Radar::RedrawArea(const u8 color)
-{
-    const Settings & conf = Settings::Get();
-
-    if(!conf.ExtGameHideInterface() || conf.ShowRadar())
-    {
-	Display & display = Display::Get();
-	const Rect & area = GetArea();
-
-	const u16 world_w = world.w();
-	const u16 world_h = world.h();
-	Surface tile_surface;
-
-	cursorArea.Hide();
-	spriteArea.Blit(area.x, area.y, display);
-
-	for(s32 index = 0; index < world_w * world_h; ++index)
-	{
-	    const Maps::Tiles & tile = world.GetTiles(index);
-#ifdef WITH_DEBUG
-	    bool show_tile = IS_DEVEL() || ! tile.isFog(color);
-#else
-	    const bool & show_tile = ! tile.isFog(color);
-#endif
-
-	    if(! show_tile)
-		tile_surface = sf_black;
-	    else
-	    switch(tile.GetObject())
-	    {
-		case MP2::OBJ_HEROES:
-		{
-		    const Heroes* hero = tile.GetHeroes();
-		    if(hero) tile_surface = GetSurfaceFromColor(hero->GetColor());
-		}
-		break;
-
-		case MP2::OBJ_CASTLE:
-		case MP2::OBJN_CASTLE:
-		{
-		    const Castle* castle = world.GetCastle(index);
-		    if(castle) tile_surface = GetSurfaceFromColor(castle->GetColor());
-		}
-		break;
-
-		case MP2::OBJ_DRAGONCITY:
-		//case MP2::OBJN_DRAGONCITY:
-		case MP2::OBJ_LIGHTHOUSE:
-		//case MP2::OBJN_LIGHTHOUSE:
-		case MP2::OBJ_ALCHEMYLAB:
-		//case MP2::OBJN_ALCHEMYLAB:
-		case MP2::OBJ_MINES:
-		//case MP2::OBJN_MINES:
-		case MP2::OBJ_SAWMILL:
-		//case MP2::OBJN_SAWMILL:
-		    tile_surface = GetSurfaceFromColor(tile.QuantityColor()); break;
-
-		default: continue;
-	    }
-
-	    if(tile_surface.isValid())
-	    {
-		float dstx = (index % world_w) * area.w / world_w;
-		float dsty = (index / world_h) * area.h / world_w;
-
-		tile_surface.Blit(area.x + static_cast<u16>(dstx), area.y + static_cast<u16>(dsty), display);
-	    }
-	}
-    }
-}
-
-/* redraw radar cursor */
-void Interface::Radar::RedrawCursor(void)
-{
-    const Settings & conf = Settings::Get();
-
-    if(! conf.ExtGameHideInterface() || conf.ShowRadar())
-    {
-	const Rect & area = GetArea();
-	const Rect & rectMaps = interface.GetGameArea().GetRectMaps();
-
-	const u16 & sw = static_cast<u16>(rectMaps.w * (area.w / static_cast<float>(world.w())));
-	const u16 & sh = static_cast<u16>(rectMaps.h * (area.h / static_cast<float>(world.h())));
-
-	// check change game area
-	if(cursorArea.w() != sw && cursorArea.h() != sh)
-	{
-	    cursorArea.Set(sw, sh);
-	    Cursor::DrawCursor(cursorArea, RADARCOLOR);
-	}
-
-        cursorArea.Move(area.x + rectMaps.x * area.w / world.w(),
-            		    area.y + rectMaps.y * area.h / world.h());
-    }
-}
-
-Surface Interface::Radar::GetSurfaceFromColor(u8 color)
-{
-    switch(color)
-    {
-	case Color::BLUE:	return sf_blue;
-	case Color::GREEN:	return sf_green;
-	case Color::RED:	return sf_red;
-	case Color::YELLOW:	return sf_yellow;
-	case Color::ORANGE:	return sf_orange;
-	case Color::PURPLE:	return sf_purple;
-	default:		break;
-    }
-
-    return sf_gray;
-}
-
-u32 GetPaletteIndexFromGround(const u16 ground)
+u32 GetPaletteIndexFromGround(int ground)
 {
     switch(ground)
     {
@@ -293,6 +69,260 @@ u32 GetPaletteIndexFromGround(const u16 ground)
     }
 
     return 0;
+}
+
+u32 GetPaletteIndexFromColor(int color)
+{
+    switch(color)
+    {
+	case Color::BLUE:	return COLOR_BLUE;
+	case Color::GREEN:	return COLOR_GREEN;
+	case Color::RED:	return COLOR_RED;
+	case Color::YELLOW:	return COLOR_YELLOW;
+	case Color::ORANGE:	return COLOR_ORANGE;
+	case Color::PURPLE:	return COLOR_PURPLE;
+	default:		break;
+    }
+
+    return COLOR_GRAY;
+}
+
+/* constructor */
+Interface::Radar::Radar(Basic & basic) : BorderWindow(Rect(0, 0, RADARWIDTH, RADARWIDTH)), interface(basic), hide(true)
+{
+}
+
+void Interface::Radar::SavePosition(void)
+{
+    Settings::Get().SetPosRadar(GetRect());
+}
+
+void Interface::Radar::SetPos(s32 ox, s32 oy)
+{
+    BorderWindow::SetPosition(ox, oy);
+}
+
+/* construct gui */
+void Interface::Radar::Build(void)
+{
+    Generate();
+    RedrawCursor();
+}
+
+/* generate mini maps */
+void Interface::Radar::Generate(void)
+{
+    const Size & area = GetArea();
+    const s32 world_w = world.w();
+    const s32 world_h = world.h();
+
+    spriteArea.Set(world_w, world_h);
+
+    for(s32 yy = 0; yy < world_h; ++yy)
+    {
+	for(s32 xx = 0; xx < world_w; ++xx)
+	{
+	    const Maps::Tiles & tile = world.GetTiles(xx, yy);
+	    u32 color = 0;
+
+	    if(tile.isRoad())
+		color = spriteArea.GetColorIndex(COLOR_ROAD);
+	    else
+	    {
+		color = GetPaletteIndexFromGround(tile.GetGround());
+
+		if(tile.GetObject() == MP2::OBJ_MOUNTS)
+		    color += 2;
+
+		color = spriteArea.GetColorIndex(color);
+	    }
+
+	    if(color)
+		spriteArea.SetPixel(xx, yy, color);
+	}
+    }
+
+    if(spriteArea.GetSize() != area)
+    {
+	s32 new_w, new_h;
+
+	if(world_w < world_h)
+	{
+	    new_w = (world_w * area.h) / world_h;
+	    new_h = area.h;
+	    offset.x = (area.w - new_w) / 2;
+	    offset.y = 0;
+	}
+	else
+	if(world_w > world_h)
+	{
+	    new_w = area.w;
+	    new_h = (world_h * area.w) / world_w;
+	    offset.x = 0;
+	    offset.y = (area.h - new_h) / 2;
+	}
+	else
+	{
+	    new_w = area.w;
+	    new_h = area.h;
+	}
+
+	Surface sf = Surface::Scale(spriteArea, new_w, new_h);
+	Surface::Swap(spriteArea, sf);
+    }
+}
+
+void Interface::Radar::SetHide(bool f)
+{
+    hide = f;
+}
+
+void Interface::Radar::SetRedraw(void) const
+{
+     interface.SetRedraw(REDRAW_RADAR);
+}
+
+void Interface::Radar::Redraw(void)
+{
+    Display & display = Display::Get();
+    const Settings & conf = Settings::Get();
+    const Rect & area = GetArea();
+
+    if(conf.ExtGameHideInterface() && conf.ShowRadar())
+	BorderWindow::Redraw();
+
+    if(! conf.ExtGameHideInterface() || conf.ShowRadar())
+    {
+	if(hide)
+	    AGG::GetICN((conf.ExtGameEvilInterface() ? ICN::HEROLOGE : ICN::HEROLOGO), 0).Blit(area.x, area.y);
+	else
+	{
+	    if(world.w() != world.h()) display.FillRect(0, area);
+	    cursorArea.Hide();
+	    spriteArea.Blit(area.x + offset.x, area.y + offset.y, display);
+	    RedrawObjects(Players::FriendColors());
+	    RedrawCursor();
+	}
+    }
+}
+
+int GetChunkSize(float size1, float size2)
+{
+    int res = 1;
+    if(size1 > size2)
+    {
+	double intpart;
+	double fractpart = std::modf(size1 / size2, & intpart);
+        res = static_cast<int>(intpart);
+
+	if(static_cast<int>(fractpart * 100) > 10)
+	    res += 1;
+    }
+
+    return res;
+}
+
+/* redraw radar area for color */
+void Interface::Radar::RedrawObjects(int color)
+{
+    const Rect & area = GetArea();
+    const s32 world_w = world.w();
+    const s32 world_h = world.h();
+
+    for(s32 yy = 0; yy < world_h; ++yy)
+    {
+	for(s32 xx = 0; xx < world_w; ++xx)
+	{
+	    const Maps::Tiles & tile = world.GetTiles(xx, yy);
+#ifdef WITH_DEBUG
+	    bool show_tile = IS_DEVEL() || ! tile.isFog(color);
+#else
+	    const bool & show_tile = ! tile.isFog(color);
+#endif
+	    u32 color = 0;
+
+	    if(show_tile)
+	    {
+		switch(tile.GetObject())
+		{
+		    case MP2::OBJ_HEROES:
+		    {
+			const Heroes* hero = world.GetHeroes(tile.GetCenter());
+			if(hero) color = GetPaletteIndexFromColor(hero->GetColor());
+		    }
+		    break;
+
+		    case MP2::OBJ_CASTLE:
+		    case MP2::OBJN_CASTLE:
+		    {
+			const Castle* castle = world.GetCastle(tile.GetCenter());
+			if(castle) color = GetPaletteIndexFromColor(castle->GetColor());
+		    }
+		    break;
+
+		    case MP2::OBJ_DRAGONCITY:
+		    //case MP2::OBJN_DRAGONCITY:
+		    case MP2::OBJ_LIGHTHOUSE:
+		    //case MP2::OBJN_LIGHTHOUSE:
+		    case MP2::OBJ_ALCHEMYLAB:
+		    //case MP2::OBJN_ALCHEMYLAB:
+		    case MP2::OBJ_MINES:
+		    //case MP2::OBJN_MINES:
+		    case MP2::OBJ_SAWMILL:
+		    //case MP2::OBJN_SAWMILL:
+			color = GetPaletteIndexFromColor(tile.QuantityColor()); break;
+
+		    default: continue;
+		}
+
+	    }
+
+	    const int areaw = (offset.x ? area.w - 2 * offset.x : area.w);
+	    const int areah = (offset.y ? area.h - 2 * offset.y : area.h);
+	    const int dstx = (xx * areaw) / world_w;
+	    const int dsty = (yy * areah) / world_h;
+
+	    int sw = 0;
+
+	    if(world_w >= world_h)
+		sw = GetChunkSize(areaw, world_w);
+	    else
+		sw = GetChunkSize(areah, world_h);
+
+	    Surface sf(sw, sw);
+
+	    if(color)
+		color = sf.GetColorIndex(color);
+
+	    sf.Fill(color);
+	    sf.Blit(area.x + offset.x + dstx, area.y + offset.y + dsty, Display::Get());
+	}
+    }
+}
+
+/* redraw radar cursor */
+void Interface::Radar::RedrawCursor(void)
+{
+    const Settings & conf = Settings::Get();
+
+    if(! conf.ExtGameHideInterface() || conf.ShowRadar())
+    {
+	const Rect & area = GetArea();
+	const Rect & rectMaps = interface.GetGameArea().GetRectMaps();
+
+	s32 areaw = (offset.x ? area.w - 2 * offset.x : area.w);
+	s32 areah = (offset.y ? area.h - 2 * offset.y : area.h);
+
+	const s32 sw = (rectMaps.w * areaw) / world.w();
+	const s32 sh = (rectMaps.h * areah) / world.h();
+
+	// check change game area
+	if(cursorArea.w() != sw && cursorArea.h() != sh)
+	    cursorArea = Surface::RectBorder(sw, sh, cursorArea.GetColorIndex(RADARCOLOR), false);
+
+        cursorArea.Move(area.x + offset.x + (rectMaps.x * areaw) / world.w(),
+            		    area.y + offset.y + (rectMaps.y * areah) / world.h());
+    }
 }
 
 void Interface::Radar::QueueEventProcessing(void)

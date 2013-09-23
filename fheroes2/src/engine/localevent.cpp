@@ -564,7 +564,7 @@ bool LocalEvent::MousePressLeft(const Rect &rt) const
     return MousePressLeft() && (rt & mouse_pl);
 }
 
-bool LocalEvent::MousePressLeft(const Point &pt, u16 w, u16 h) const
+bool LocalEvent::MousePressLeft(const Point &pt, u32 w, u32 h) const
 {
     return MousePressLeft() && (Rect(pt.x, pt.y, w, h) & mouse_pl);
 }
@@ -685,12 +685,12 @@ bool LocalEvent::KeyPress(KeySym key) const
     return key == key_value && (modes & KEY_PRESSED);
 }
 
-void LocalEvent::SetGlobalFilterMouseEvents(void (*pf)(u16, u16))
+void LocalEvent::SetGlobalFilterMouseEvents(void (*pf)(s32, s32))
 {
     redraw_cursor_func = pf;
 }
 
-void LocalEvent::SetGlobalFilterKeysEvents(void (*pf)(int, u16))
+void LocalEvent::SetGlobalFilterKeysEvents(void (*pf)(int, int))
 {
     keyboard_filter_func = pf;
 }

@@ -32,6 +32,7 @@
 #include "heroes.h"
 #include "castle.h"
 #include "race.h"
+#include "game.h"
 #include "ai_simple.h"
 
 void AICastleDefense(Castle & c)
@@ -170,12 +171,12 @@ void AI::CastleTurn(Castle & castle)
     // skip neutral town
     if(castle.GetColor() != Color::NONE)
     {
-	s8 range = Game::GetViewDistance(castle.isCastle() ? Game::VIEW_CASTLE : Game::VIEW_TOWN);
+	s32 range = Game::GetViewDistance(castle.isCastle() ? Game::VIEW_CASTLE : Game::VIEW_TOWN);
 	const Heroes* enemy = NULL;
 
 	// find enemy hero
-	for(s8 y = -range; y <= range; ++y)
-    	    for(s8 x = -range; x <= range; ++x)
+	for(s32 y = -range; y <= range; ++y)
+    	    for(s32 x = -range; x <= range; ++x)
 	{
     	    if(!y && !x) continue;
 	    const Point & center = castle.GetCenter();

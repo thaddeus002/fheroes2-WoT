@@ -24,8 +24,6 @@
 #define H2MONSTER_H
 
 #include <string>
-#include "icn.h"
-#include "m82.h"
 #include "payment.h"
 #include "gamedefs.h"
 
@@ -117,37 +115,37 @@ public:
 	MONSTER_RND
     };
 
-    Monster(u8 = UNKNOWN);
+    Monster(int = UNKNOWN);
     Monster(const Spell &);
-    Monster(u8 race, u32 dw);
+    Monster(int race, u32 dw);
     virtual ~Monster(){}
 
     bool operator< (const Monster &) const;
     bool operator== (const Monster &) const;
     bool operator!= (const Monster &) const;
 
-    u8 operator() (void) const;
-    u8 GetID(void) const;
+    int operator() (void) const;
+    int GetID(void) const;
 
     void Upgrade(void);
     Monster GetUpgrade(void) const;
     Monster GetDowngrade(void) const;
 
-    virtual u16 GetAttack(void) const;
-    virtual u16 GetDefense(void) const;
-    virtual u8 GetColor(void) const;
-    virtual s8 GetMorale(void) const;
-    virtual s8 GetLuck(void) const;
-    virtual u8 GetRace(void) const;
+    virtual u32 GetAttack(void) const;
+    virtual u32 GetDefense(void) const;
+    virtual int GetColor(void) const;
+    virtual int GetMorale(void) const;
+    virtual int GetLuck(void) const;
+    virtual int GetRace(void) const;
 
-    u8  GetDamageMin(void) const;
-    u8  GetDamageMax(void) const;
-    u8  GetShots(void) const;
-    u16 GetHitPoints(void) const;
-    u8  GetSpeed(void) const;
-    u8  GetGrown(void) const;
-    u8  GetLevel(void) const;
-    u16 GetRNDSize(bool skip) const;
+    u32  GetDamageMin(void) const;
+    u32  GetDamageMax(void) const;
+    u32  GetShots(void) const;
+    u32  GetHitPoints(void) const;
+    u32  GetSpeed(void) const;
+    u32  GetGrown(void) const;
+    int  GetLevel(void) const;
+    u32 GetRNDSize(bool skip) const;
 
     const char* GetName(void) const;
     const char* GetMultiName(void) const;
@@ -170,16 +168,16 @@ public:
     bool isAffectedByMorale(void) const;
     bool isAlive(void) const;
 
-    ICN::icn_t ICNMonh(void) const;
+    int		ICNMonh(void) const;
 
-    u8		GetSpriteIndex(void) const;
+    u32		GetSpriteIndex(void) const;
     payment_t	GetCost(void) const;
     payment_t	GetUpgradeCost(void) const;
     u32		GetDwelling(void) const;
 
     static Monster Rand(level_t = LEVEL0);
-    static u8 Rand4WeekOf(void);
-    static u8 Rand4MonthOf(void);
+    static u32 Rand4WeekOf(void);
+    static u32 Rand4MonthOf(void);
 
     static u32 GetCountFromHitPoints(const Monster &, u32);
 
@@ -187,9 +185,9 @@ public:
     static float GetUpgradeRatio(void);
 
 protected:
-    static Monster FromDwelling(u8 race, u32 dw);
+    static Monster FromDwelling(int race, u32 dw);
 
-    u8 id;
+    int id;
 };
 
 struct MonsterStaticData

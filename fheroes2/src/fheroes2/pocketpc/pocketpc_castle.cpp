@@ -28,10 +28,12 @@
 #include "text.h"
 #include "button.h"
 #include "castle.h"
+#include "dialog.h"
 #include "kingdom.h"
 #include "heroes.h"
 #include "world.h"
 #include "race.h"
+#include "game.h"
 #include "army_bar.h"
 #include "buildinginfo.h"
 #include "profit.h"
@@ -123,7 +125,7 @@ bool ScreenSwitch::QueueEventProcessing(void)
     return result != SCREENOUT;
 }
 
-Dialog::answer_t PocketPC::CastleOpenDialog(Castle & castle, bool readonly)
+int PocketPC::CastleOpenDialog(Castle & castle, bool readonly)
 {
     AGG::PlayMusic(MUS::FromRace(castle.GetRace()));
 
@@ -253,7 +255,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
 	    return screenSwitch.result;
         else
         // exit
-        if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
+        if(le.MouseClickLeft(rectExit) || Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)) break;
 	else
         if(!readonly && buttonNext.isEnable() && le.MouseClickLeft(buttonNext)) return SCREENOUT_NEXT;
         else
@@ -488,7 +490,7 @@ screen_t CastleOpenDialog2(Castle & castle, bool readonly)
 	    return screenSwitch.result;
         else
         // exit
-        if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
+        if(le.MouseClickLeft(rectExit) || Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)) break;
 
 	if(le.MouseCursor(dwelling1.GetArea()) && dwelling1.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(dwelling1()); return SCREEN1; }
 	else
@@ -566,7 +568,7 @@ screen_t CastleOpenDialog3(Castle & castle, bool readonly)
 	    return screenSwitch.result;
         else
         // exit
-        if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
+        if(le.MouseClickLeft(rectExit) || Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)) break;
 
 	if(le.MouseCursor(building1.GetArea()) && building1.QueueEventProcessing())
 	    { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building1()); return SCREEN1; }
@@ -640,7 +642,7 @@ screen_t CastleOpenDialog4(Castle & castle, bool readonly)
 	    return screenSwitch.result;
         else
         // exit
-        if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
+        if(le.MouseClickLeft(rectExit) || Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)) break;
 
 	if(le.MouseCursor(building1.GetArea()) && building1.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building1()); return SCREEN1; }
 	else
@@ -708,7 +710,7 @@ screen_t CastleOpenDialog5(Castle & castle, bool readonly)
 	    return screenSwitch.result;
         else
         // exit
-        if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
+        if(le.MouseClickLeft(rectExit) || Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)) break;
 	else
 	if(need_buy_book && le.MouseClickLeft(book_pos)) { const_cast<Heroes*>(hero)->BuySpellBook(&castle); return SCREEN1; }
 
@@ -779,8 +781,9 @@ screen_t CastleOpenDialog6(Castle & castle, bool readonly)
 
 	// captain
 	crest.Blit(rectCaptain);
-	const Surface & captain = castle.GetCaptain().GetPortrait(PORT_BIG);
-        captain.Blit(Rect((captain.w() - 50) / 2, 15, 50, 47), rectCaptain.x + 4, rectCaptain.y + 4, display);
+	Surface port = castle.GetCaptain().GetPortrait(PORT_BIG);
+	if(port.isValid())
+    	    port.Blit(Rect((port.w() - 50) / 2, 15, 50, 47), rectCaptain.x + 4, rectCaptain.y + 4, display);
     }
 
     // shipyard, shieves guild, marketplace
@@ -825,7 +828,7 @@ screen_t CastleOpenDialog6(Castle & castle, bool readonly)
 	    return screenSwitch.result;
         else
         // exit
-        if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
+        if(le.MouseClickLeft(rectExit) || Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)) break;
 	else
 	if(hero1 && le.MouseClickLeft(rectRecruit1) &&
 	    Dialog::OK == castle.DialogBuyHero(hero1))
@@ -868,12 +871,12 @@ screen_t CastleOpenDialog6(Castle & castle, bool readonly)
 
 
         // animation
-        if(castle.isBuild(BUILD_TAVERN) && Game::AnimateInfrequent(Game::CASTLE_TAVERN_DELAY))
+        if(castle.isBuild(BUILD_TAVERN) && Game::AnimateInfrequentDelay(Game::CASTLE_TAVERN_DELAY))
         {
             cursor.Hide();
 	    const Sprite & s20 = AGG::GetICN(ICN::TAVWIN, 1);
             s20.Blit(dst_pt.x + 3, dst_pt.y + 3);
-            if(const u16 index = ICN::AnimationFrame(ICN::TAVWIN, 0, frame++))
+            if(u32 index = ICN::AnimationFrame(ICN::TAVWIN, 0, frame++))
             {
         	const Sprite & s22 = AGG::GetICN(ICN::TAVWIN, index);
                 s22.Blit(dst_pt.x + s22.x() + 3, dst_pt.y + s22.y() + 3);

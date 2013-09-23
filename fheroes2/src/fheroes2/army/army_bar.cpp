@@ -28,6 +28,7 @@
 #include "dialog_selectitems.h"
 #include "world.h"
 #include "army.h"
+#include "text.h"
 #include "army_troop.h"
 #include "army_bar.h"
 
@@ -45,10 +46,10 @@ void RedistributeArmy(ArmyTroop & troop1 /* from */, ArmyTroop & troop2 /* to */
     }
     else
     {
-	const u8 free_slots = (army1 == army2 ? 1 : 0) + army2->Size() - army2->GetCount();
+	const u32 free_slots = (army1 == army2 ? 1 : 0) + army2->Size() - army2->GetCount();
 	const u32 max_count = save_last_troop ? troop1.GetCount() - 1 : troop1.GetCount();
         u32 redistr_count = troop1.GetCount() / 2;
-        const u8 slots = Dialog::ArmySplitTroop((free_slots > max_count ? max_count : free_slots), max_count, redistr_count, save_last_troop);
+        const u32 slots = Dialog::ArmySplitTroop((free_slots > max_count ? max_count : free_slots), max_count, redistr_count, save_last_troop);
 
         switch(slots)
         {
@@ -103,7 +104,7 @@ void ArmyBar::SetArmy(Army* ptr)
     items.clear();
 
     if(ptr)
-	for(u16 ii = 0; ii < ptr->Size(); ++ii)
+	for(u32 ii = 0; ii < ptr->Size(); ++ii)
 	    items.push_back(reinterpret_cast<ArmyTroop*>(ptr->GetTroop(ii)));
     
     SetContentItems();
@@ -114,16 +115,17 @@ bool ArmyBar::isValid(void) const
     return army != NULL;
 }
 
-void ArmyBar::SetBackground(u16 sw, u16 sh, u8 index)
+void ArmyBar::SetBackground(u32 sw, u32 sh, u32 index)
 {
     if(use_mini_sprite)
     {
         SetItemSize(sw, sh);
-        backsf.Set(sw, sh);
-	backsf.Fill(backsf.GetColorIndex(index));
-        Cursor::DrawCursor(backsf, 0x70, true);
-        spcursor.Set(sw, sh);
-        Cursor::DrawCursor(spcursor, 0xd7, true);
+	const u32 fill = backsf.GetColorIndex(index);
+	const u32 color1 = backsf.GetColorIndex(0x70);
+	const u32 color2 = spcursor.GetColorIndex(0xd7);
+
+	backsf = Surface::RectBorder(sw, sh, fill, color1, true);
+	spcursor = Surface::RectBorder(sw, sh, color2, true);
     }
 }
 
@@ -343,7 +345,7 @@ bool ArmyBar::ActionBarSingleClick(const Point & cursor, ArmyTroop & troop, cons
 	
         if(can_change) // add troop
 	{
-	    u8 cur = Monster::UNKNOWN;
+	    int cur = Monster::UNKNOWN;
 
 	    if(army->GetCommander())
 		switch(army->GetCommander()->GetRace())
@@ -404,7 +406,7 @@ bool ArmyBar::ActionBarDoubleClick(const Point & cursor, ArmyTroop & troop, cons
 
     if(&troop == troop2)
     {
-	u16 flags = (read_only || army->SaveLastTroop() ? Dialog::READONLY | Dialog::BUTTONS : Dialog::BUTTONS);
+	int flags = (read_only || army->SaveLastTroop() ? Dialog::READONLY | Dialog::BUTTONS : Dialog::BUTTONS);
 	const Castle* castle = army->inCastle();
 
 	if(troop.isAllowUpgrade() &&

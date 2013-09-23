@@ -25,9 +25,7 @@
 #include <vector>
 #include <string>
 #include "mageguild.h"
-#include "color.h"
 #include "captain.h"
-#include "dialog.h"
 #include "army.h"
 #include "bitmodes.h"
 #include "heroes.h"
@@ -41,13 +39,13 @@ namespace Maps { class Tiles; }
 class MeetingButton : public ButtonSprite
 {
 public:
-    MeetingButton(s16, s16);
+    MeetingButton(s32, s32);
 };
 
 class SwapButton : public ButtonSprite
 {
 public:
-    SwapButton(s16, s16);
+    SwapButton(s32, s32);
 };
 
 enum building_t
@@ -116,131 +114,134 @@ public:
     };
 
     Castle();
-    Castle(s16 cx, s16 cy, const u8 rs);
-    void LoadFromMP2(const void *ptr);
+    Castle(s32, s32, int rs);
+    void LoadFromMP2(const u8*, size_t);
 
-    Captain & GetCaptain(void) { return captain; }
-    const Captain & GetCaptain(void) const { return captain; }
+    Captain &		GetCaptain(void);
+    const Captain &	GetCaptain(void) const;
 
-    bool isCastle(void) const{ return building & BUILD_CASTLE; }
-    bool isCapital(void) const{ return Modes(CAPITAL); }
-    bool HaveNearlySea(void) const;
-    bool PresentBoat(void) const;
-    bool AllowBuyHero(const Heroes &, std::string* = NULL);
-    bool isPosition(const Point &) const;
-    bool isNecromancyShrineBuild(void) const;
+    bool		isCastle(void) const;
+    bool		isCapital(void) const;
+    bool		HaveNearlySea(void) const;
+    bool		PresentBoat(void) const;
+    bool		AllowBuyHero(const Heroes &, std::string* = NULL);
+    bool		isPosition(const Point &) const;
+    bool		isNecromancyShrineBuild(void) const;
 
-    u32 CountBuildings(void) const;
+    u32			CountBuildings(void) const;
 
-    Heroes* RecruitHero(Heroes*);
-    CastleHeroes GetHeroes(void) const;
+    Heroes*		RecruitHero(Heroes*);
+    CastleHeroes	GetHeroes(void) const;
 
-    u8 GetRace(void) const{ return race; }
-    const std::string & GetName(void) const{ return name; }
-    u8 GetControl(void) const;
+    int			GetRace(void) const;
+    const std::string & GetName(void) const;
+    int			GetControl(void) const;
 
-    u8 GetLevelMageGuild(void) const;
-    const MageGuild & GetMageGuild(void) const;
-    bool HaveLibraryCapability(void) const;
-    bool isLibraryBuild(void) const;
-    void MageGuildEducateHero(HeroBase &) const;
+    int			GetLevelMageGuild(void) const;
+    const MageGuild &	GetMageGuild(void) const;
+    bool		HaveLibraryCapability(void) const;
+    bool		isLibraryBuild(void) const;
+    void		MageGuildEducateHero(HeroBase &) const;
 
-    const Army & GetArmy(void) const;
-    Army & GetArmy(void);
-    const Army & GetActualArmy(void) const;
-    Army & GetActualArmy(void);
-    u16 GetDwellingLivedCount(u32) const;
-    u32 GetActualDwelling(u32) const;
+    const Army &	GetArmy(void) const;
+    Army &		GetArmy(void);
+    const Army &	GetActualArmy(void) const;
+    Army &		GetActualArmy(void);
+    u32			GetDwellingLivedCount(u32) const;
+    u32			GetActualDwelling(u32) const;
 
-    bool RecruitMonsterFromDwelling(u32 dw, u16 count);
-    bool RecruitMonster(const Troop &);
-    void RecruitAllMonster(void);
+    bool		RecruitMonsterFromDwelling(u32 dw, u32 count);
+    bool		RecruitMonster(const Troop &);
+    void		RecruitAllMonster(void);
 
-    void ChangeColor(Color::color_t cl);
+    void		ChangeColor(int);
 
-    void ActionNewDay(void);
-    void ActionNewWeek(void);
-    void ActionNewMonth(void);
+    void		ActionNewDay(void);
+    void		ActionNewWeek(void);
+    void		ActionNewMonth(void);
+    void		ActionPreBattle(void);
+    void		ActionAfterBattle(bool attacker_wins);
 
-    void ActionPreBattle(void);
-    void ActionAfterBattle(bool attacker_wins);
+    void		DrawImageCastle(const Point & pt);
 
-    void DrawImageCastle(const Point & pt);
+    int			OpenDialog(bool readonly = false, bool fade = false);
 
-    Dialog::answer_t OpenDialog(bool readonly = false, bool fade = false);
+    int			GetAttackModificator(std::string*) const;
+    int			GetDefenseModificator(std::string*) const;
+    int			GetPowerModificator(std::string*) const;
+    int			GetKnowledgeModificator(std::string*) const;
+    int			GetMoraleModificator(std::string*) const;
+    int			GetLuckModificator(std::string*) const;
 
-    s8 GetAttackModificator(std::string *strs) const;
-    s8 GetDefenseModificator(std::string *strs) const;
-    s8 GetPowerModificator(std::string *strs) const;
-    s8 GetKnowledgeModificator(std::string *strs) const;
-    s8 GetMoraleModificator(std::string *strs) const;
-    s8 GetLuckModificator(std::string *strs) const;
+    bool		AllowBuild(void) const;
+    bool		AllowBuyBuilding(u32) const;
+    bool		isBuild(u32 bd) const;
+    bool		BuyBuilding(u32);
+    bool		AllowBuyBoat(void) const;
+    bool		BuyBoat(void);
+    u32			GetBuildingRequires(u32) const;
 
-    bool AllowBuild(void) const{ return Modes(ALLOWBUILD); }
-    bool AllowBuyBuilding(u32) const;
-    bool isBuild(u32 bd) const{ return building & bd; }
-    bool BuyBuilding(u32);
-    bool AllowBuyBoat(void) const;
-    bool BuyBoat(void);
-    u32 GetBuildingRequires(u32) const;
+    int			CheckBuyBuilding(u32) const;
+    static int		GetAllBuildingStatus(const Castle &);
 
-    s8 CheckBuyBuilding(u32) const;
-    static s8 GetAllBuildingStatus(const Castle &);
+    void		Scoute(void) const;
 
-    void Scoute(void) const;
+    std::string		GetStringBuilding(u32) const;
+    std::string		GetDescriptionBuilding(u32) const;
 
-    std::string GetStringBuilding(u32) const;
-    std::string GetDescriptionBuilding(u32) const;
+    static const char*	GetStringBuilding(u32, int race);
+    static const char*	GetDescriptionBuilding(u32, int race);
 
-    static const char* GetStringBuilding(u32, u8 race);
-    static const char* GetDescriptionBuilding(u32, u8 race);
+    static int		GetICNBuilding(u32, int race);
+    static int		GetICNBoat(int race);
+    u32			GetUpgradeBuilding(u32) const;
 
-    static ICN::icn_t GetICNBuilding(u32, u8);
-    static ICN::icn_t GetICNBoat(const u8 & race);
-    u32 GetUpgradeBuilding(u32) const;
+    static bool		PredicateIsCastle(const Castle*);
+    static bool		PredicateIsTown(const Castle*);
+    static bool		PredicateIsBuildMarketplace(const Castle*);
+    static bool		PredicateIsCapital(const Castle*);
 
-    static bool PredicateIsCastle(const Castle*);
-    static bool PredicateIsTown(const Castle*);
-    static bool PredicateIsBuildMarketplace(const Castle*);
-    static bool PredicateIsCapital(const Castle*);
+    static u32		GetGrownWell(void);
+    static u32		GetGrownWel2(void);
+    static u32		GetGrownWeekOf(const Monster &);
+    static u32		GetGrownMonthOf(void);
 
-    static u8 GetGrownWell(void);
-    static u8 GetGrownWel2(void);
-    static u8 GetGrownWeekOf(const Monster &);
-    static u8 GetGrownMonthOf(void);
+    std::string		String(void) const;
 
-    std::string String(void) const;
+    int			DialogBuyHero(const Heroes*);
+    int			DialogBuyCaptain(bool fixed = true) const;
+    int			DialogBuyCastle(bool fixed = true) const;
 
-    Dialog::answer_t DialogBuyHero(const Heroes*);
-    Dialog::answer_t DialogBuyCaptain(bool fixed = true) const;
-    Dialog::answer_t DialogBuyCastle(bool fixed = true) const;
-
-    void SwapCastleHeroes(CastleHeroes &);
+    void		SwapCastleHeroes(CastleHeroes &);
 
 private:
-    u16* GetDwelling(u32 dw);
-    void EducateHeroes(void);
-    Rect RedrawResourcePanel(const Point &);
-    u32  OpenTown(void);
-    void OpenTavern(void);
-    void OpenThievesGuild(void);
-    void OpenWell(void);
-    void OpenMageGuild(void);
-    void WellRedrawInfoArea(const Point & cur_pt);
-    void JoinRNDArmy(void);
+    u32*		GetDwelling(u32 dw);
+    void		EducateHeroes(void);
+    Rect		RedrawResourcePanel(const Point &);
+    u32 		OpenTown(void);
+    void		OpenTavern(void);
+    void		OpenThievesGuild(void);
+    void		OpenWell(void);
+    void		OpenMageGuild(void);
+    void		WellRedrawInfoArea(const Point & cur_pt);
+    void		JoinRNDArmy(void);
+    void		PostLoad(void);
 
 private:
     friend StreamBase & operator<< (StreamBase &, const Castle &);
     friend StreamBase & operator>> (StreamBase &, Castle &);
+#ifdef WITH_XML
+    friend TiXmlElement & operator>> (TiXmlElement &, Castle &);
+#endif
 
-    u8			race;
+    int			race;
     u32			building;
     Captain		captain;
 
     std::string		name;
 
     MageGuild		mageguild;
-    u16			dwelling[CASTLEMAXMONSTER];
+    u32			dwelling[CASTLEMAXMONSTER];
     Army        	army;
 };
 
@@ -263,18 +264,17 @@ namespace CastleDialog
 	const Rect & GetRect(building_t) const;
     };
 
-    void RedrawAllBuilding(const Castle &, const Point &, const CacheBuildings &, u32 flash = BUILD_NOTHING);
-    void RedrawAnimationBuilding(const Castle &, const Point &, const CacheBuildings &, u32 build);
-    void RedrawBuildingSpriteToArea(const Sprite &, s16, s16, const Rect &);
+    void	RedrawAllBuilding(const Castle &, const Point &, const CacheBuildings &, u32 flash = BUILD_NOTHING);
+    void	RedrawAnimationBuilding(const Castle &, const Point &, const CacheBuildings &, u32 build);
+    void	RedrawBuildingSpriteToArea(const Sprite &, s32, s32, const Rect &);
 }
 
 struct VecCastles : public std::vector<Castle*>
 {
-    Castle* Get(s32) const;
     Castle* Get(const Point &) const;
     Castle* GetFirstCastle(void) const;
 
-    void ChangeColors(Color::color_t, Color::color_t);
+    void ChangeColors(int, int);
 };
 
 struct AllCastles : public VecCastles
@@ -285,7 +285,7 @@ struct AllCastles : public VecCastles
     void Init(void);
     void clear(void);
 
-    void Scoute(u8) const;
+    void Scoute(int) const;
 };
 
 StreamBase & operator<< (StreamBase &, const VecCastles &);

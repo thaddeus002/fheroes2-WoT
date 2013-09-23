@@ -33,12 +33,8 @@
 #include "engine.h"
 #include "artifact.h"
 #include "dir.h"
-#include "xmi.h"
+#include "game.h"
 #include "agg.h"
-
-#ifdef WITH_XML
-#include "xmlccwrap.h"
-#endif
 
 #ifdef WITH_ZLIB
 #include "images_pack.h"
@@ -77,8 +73,8 @@ namespace AGG
     private:
 	std::string			filename;
 	std::map<std::string, FAT>	fat;
-	u16				count_items;
-	std::ifstream*			stream;
+	u32				count_items;
+	std::ifstream			stream;
 	std::string			key;
 	std::vector<u8>			body;
     };
@@ -107,50 +103,50 @@ namespace AGG
 
     struct loop_sound_t
     {
-	loop_sound_t(M82::m82_t w, int c) : sound(w), channel(c) {}
+	loop_sound_t(int w, int c) : sound(w), channel(c) {}
 
-	bool operator==(const M82::m82_t m82) const { return m82 == sound; }
+	bool operator==(int m82) const { return m82 == sound; }
 
-	M82::m82_t	sound;
+	int		sound;
 	int		channel;
     };
 
     File					heroes2_agg;
     File					heroes2x_agg;
 
-    icn_cache_t					icn_cache[ICN::UNKNOWN + 1];
-    til_cache_t					til_cache[TIL::UNKNOWN + 1];
+    std::vector<icn_cache_t>			icn_cache;
+    std::vector<til_cache_t>			til_cache;
 
-    std::map<M82::m82_t, std::vector<u8> >	wav_cache;
-    std::map<XMI::xmi_t, std::vector<u8> >	mid_cache;
+    std::map<int, std::vector<u8> >		wav_cache;
+    std::map<int, std::vector<u8> >		mid_cache;
     std::vector<loop_sound_t>			loop_sounds;
-    std::map<u16, fnt_cache_t>			fnt_cache;
+    std::map<u32, fnt_cache_t>			fnt_cache;
 
     bool					memlimit_usage = true;
 
 #ifdef WITH_TTF
     SDL::Font*			fonts; /* small, medium */
 
-    void			LoadTTFChar(u16);
-    Surface			GetFNT(u16, u8);
+    void			LoadTTFChar(u32);
+    Surface			GetFNT(u32, u32);
 #endif
 
-    const std::vector<u8> &	GetWAV(M82::m82_t);
-    const std::vector<u8> &	GetMID(XMI::xmi_t);
+    const std::vector<u8> &	GetWAV(int m82);
+    const std::vector<u8> &	GetMID(int xmi);
 
-    void			LoadWAV(M82::m82_t, std::vector<u8> &);
-    void			LoadMID(XMI::xmi_t, std::vector<u8> &);
+    void			LoadWAV(int m82, std::vector<u8> &);
+    void			LoadMID(int xmi, std::vector<u8> &);
 
-    bool			LoadExtICN(ICN::icn_t, u32, bool);
-    bool			LoadAltICN(ICN::icn_t, u32, bool);
-    bool			LoadOrgICN(Sprite &, ICN::icn_t, u32, bool);
-    bool			LoadOrgICN(ICN::icn_t, u32, bool);
-    void			LoadICN(ICN::icn_t icn, u32, bool reflect = false);
-    void			SaveICN(ICN::icn_t);
+    bool			LoadExtICN(int icn, u32, bool);
+    bool			LoadAltICN(int icn, u32, bool);
+    bool			LoadOrgICN(Sprite &, int icn, u32, bool);
+    bool			LoadOrgICN(int icn, u32, bool);
+    void			LoadICN(int icn, u32, bool reflect = false);
+    void			SaveICN(int icn);
 
-    bool			LoadAltTIL(TIL::til_t, u32 max);
-    bool			LoadOrgTIL(TIL::til_t, u32 max);
-    void			LoadTIL(TIL::til_t);
+    bool			LoadAltTIL(int til, u32 max);
+    bool			LoadOrgTIL(int til, u32 max);
+    void			LoadTIL(int til);
 
     void			LoadFNT(void);
     void			ShowError(void);
@@ -159,65 +155,56 @@ namespace AGG
     u32				ClearFreeObjects(void);
 
     bool			ReadDataDir(void);
-    const std::vector<u8> &	ReadICNChunk(ICN::icn_t, u32);
+    const std::vector<u8> &	ReadICNChunk(int icn, u32);
     const std::vector<u8> &	ReadChunk(const std::string &);
 }
 
 /*AGG::File constructor */
-AGG::File::File(void) : count_items(0), stream(NULL)
+AGG::File::File(void) : count_items(0)
 {
 }
 
 bool AGG::File::Open(const std::string & fname)
 {
     filename = fname;
-    stream = new std::ifstream(filename.c_str(), std::ios::binary);
+    stream.open(filename.c_str(), std::ios::binary);
 
-    if(!stream || !stream->is_open())
+    if(! stream.is_open())
     {
 	DEBUG(DBG_ENGINE, DBG_WARN, "error read file: " << filename << ", skipping...");
 	return false;
     }
 
-    stream->seekg(0, std::ios_base::end);
-    const u32 size = stream->tellg();
-    stream->seekg(0, std::ios_base::beg);
+    stream.seekg(0, std::ios_base::end);
+    const u32 size = stream.tellg();
+    stream.seekg(0, std::ios_base::beg);
 
-    stream->read(reinterpret_cast<char *>(&count_items), sizeof(u16));
-    SwapLE16(count_items);
-
+    count_items = StreamBase::getLE16(stream);
     DEBUG(DBG_ENGINE, DBG_INFO, "load: " << filename << ", count items: " << count_items);
 
     char buf[FATSIZENAME + 1];
     buf[FATSIZENAME] = 0;
 
-    for(u16 ii = 0; ii < count_items; ++ii)
+    for(u32 ii = 0; ii < count_items; ++ii)
     {
-	if(! stream->good())
+	if(! stream.good())
 	{
 	    DEBUG(DBG_ENGINE, DBG_WARN, "stream error");
 	    return false;
 	}
 
-        const u32 pos = stream->tellg();
+        const u32 pos = stream.tellg();
 
-        stream->seekg(size - FATSIZENAME * (count_items - ii), std::ios_base::beg);
-        stream->read(buf, FATSIZENAME);
+        stream.seekg(size - FATSIZENAME * (count_items - ii), std::ios_base::beg);
+        stream.read(buf, FATSIZENAME);
 
-        const std::string key(buf);
+        FAT & f = fat[std::string(buf)];
 
-        FAT & f = fat[key];
-		
-        stream->seekg(pos, std::ios_base::beg);
+        stream.seekg(pos, std::ios_base::beg);
 
-        stream->read(reinterpret_cast<char *>(&f.crc), sizeof(u32));
-        SwapLE32(f.crc);
-
-        stream->read(reinterpret_cast<char *>(&f.offset), sizeof(u32));
-        SwapLE32(f.offset);
-
-        stream->read(reinterpret_cast<char *>(&f.size), sizeof(u32));
-        SwapLE32(f.size);
+	f.crc = StreamBase::getLE32(stream);
+	f.offset = StreamBase::getLE32(stream);
+	f.size = StreamBase::getLE32(stream);
     }
 
     return true;
@@ -225,16 +212,12 @@ bool AGG::File::Open(const std::string & fname)
 
 AGG::File::~File()
 {
-    if(stream)
-    {
-	stream->close();
-	delete stream;
-    }
+    stream.close();
 }
 
 bool AGG::File::isGood(void) const
 {
-    return stream && stream->good() && count_items;
+    return stream.good() && count_items;
 }
 
 /* get AGG file name */
@@ -275,8 +258,8 @@ const std::vector<u8> & AGG::File::Read(const std::string & str)
 	    {
 		DEBUG(DBG_ENGINE, DBG_TRACE, key << ":\t" << f.Info());
 
-		stream->seekg(f.offset, std::ios_base::beg);
-		stream->read(reinterpret_cast<char*>(&body[0]), f.size);
+		stream.seekg(f.offset, std::ios_base::beg);
+		stream.read(reinterpret_cast<char*>(&body[0]), f.size);
 	    }
 	}
 	else
@@ -295,7 +278,7 @@ u32 AGG::ClearFreeObjects(void)
     u32 total = 0;
 
     // wav cache
-    for(std::map<M82::m82_t, std::vector<u8> >::iterator
+    for(std::map<int, std::vector<u8> >::iterator
 	it = wav_cache.begin(); it != wav_cache.end(); ++it)
 	total += (*it).second.size();
 
@@ -303,7 +286,7 @@ u32 AGG::ClearFreeObjects(void)
     total = 0;
 
     // mus cache
-    for(std::map<XMI::xmi_t, std::vector<u8> >::iterator
+    for(std::map<int, std::vector<u8> >::iterator
 	it = mid_cache.begin(); it != mid_cache.end(); ++it)
 	total += (*it).second.size();
 
@@ -312,7 +295,7 @@ u32 AGG::ClearFreeObjects(void)
 
 #ifdef WITH_TTF
     // fnt cache
-    for(std::map<u16, fnt_cache_t>::iterator
+    for(std::map<u32, fnt_cache_t>::iterator
 	it = fnt_cache.begin(); it != fnt_cache.end(); ++it)
     {
 	total += (*it).second.sfs[0].GetMemoryUsage();
@@ -326,20 +309,25 @@ u32 AGG::ClearFreeObjects(void)
 #endif
 
     // til cache
-    for(u32 ii = 0; ii < TIL::UNKNOWN; ++ii)
-	for(u32 jj = 0; jj < til_cache[ii].count; ++jj)
-	    if(til_cache[ii].sprites)
-		total += til_cache[ii].sprites[jj].GetMemoryUsage();
+    for(std::vector<til_cache_t>::iterator
+	it = til_cache.begin(); it != til_cache.end(); ++it)
+    {
+	til_cache_t & tils = *it;
 
+	for(u32 jj = 0; jj < tils.count; ++jj)
+	    if(tils.sprites)
+		total += tils.sprites[jj].GetMemoryUsage();
+    }
     DEBUG(DBG_ENGINE, DBG_INFO, "TIL" << " " << "memory: " << total);
     total = 0;
 
     // icn cache
     u32 used = 0;
 
-    for(u32 ii = 0; ii <= ICN::UNKNOWN; ++ii)
+    for(std::vector<icn_cache_t>::iterator
+	it = icn_cache.begin(); it != icn_cache.end(); ++it)
     {
-	icn_cache_t & icns = icn_cache[ii];
+	icn_cache_t & icns = (*it);
 
 	for(u32 jj = 0; jj < icns.count; ++jj)
 	{
@@ -448,10 +436,10 @@ const std::vector<u8> & AGG::ReadChunk(const std::string & key)
 
 
 /* load manual ICN object */
-bool AGG::LoadExtICN(const ICN::icn_t icn, const u32 index, bool reflect)
+bool AGG::LoadExtICN(int icn, u32 index, bool reflect)
 {
     // for animation sprite need update count for ICN::AnimationFrame
-    u8 count = 0;
+    u32 count = 0;
     const Settings & conf = Settings::Get();
 
     switch(icn)
@@ -601,7 +589,7 @@ bool AGG::LoadExtICN(const ICN::icn_t icn, const u32 index, bool reflect)
 		    // wait
 		    Surface src(28, 28);
 		    GetICN(ICN::ADVBTNS, 8 + index).Blit(Rect(5, 4, 28, 28), 0, 0, src);
-		    Surface dst = Surface::ScaleMinifyByTwo(src);
+		    Surface dst = Sprite::ScaleQVGA(src);
 		    dst.Blit((sprite.w() - dst.w()) / 2, 2, sprite);
 		}
 		break;
@@ -609,7 +597,7 @@ bool AGG::LoadExtICN(const ICN::icn_t icn, const u32 index, bool reflect)
 	    case ICN::BOAT12:
 	    {
 		LoadOrgICN(sprite, ICN::ADVMCO, 28 + index, false);
-		Surface dst = Surface::ScaleMinifyByTwo(sprite);
+		Surface dst = Sprite::ScaleQVGA(sprite);
 		Surface::Swap(sprite, dst);
 	    }
 		break;
@@ -634,7 +622,7 @@ bool AGG::LoadExtICN(const ICN::icn_t icn, const u32 index, bool reflect)
     }
 
     // change color
-    for(u8 ii = 0; ii < count; ++ii)
+    for(u32 ii = 0; ii < count; ++ii)
     {
 	Sprite & sprite = reflect ? v.reflect[ii] : v.sprites[ii];
 
@@ -718,7 +706,7 @@ bool AGG::LoadExtICN(const ICN::icn_t icn, const u32 index, bool reflect)
     return true;
 }
 
-bool AGG::LoadAltICN(ICN::icn_t icn, u32 index, bool reflect)
+bool AGG::LoadAltICN(int icn, u32 index, bool reflect)
 {
 #ifdef WITH_XML
     const std::string prefix_images_icn = System::ConcatePath(System::ConcatePath("files", "images"), StringLower(ICN::GetString(icn)));
@@ -782,7 +770,7 @@ bool AGG::LoadAltICN(ICN::icn_t icn, u32 index, bool reflect)
     return false;
 }
 
-void AGG::SaveICN(ICN::icn_t icn)
+void AGG::SaveICN(int icn)
 {
 #ifdef WITH_XML
 #ifdef WITH_DEBUG
@@ -862,7 +850,7 @@ void AGG::SaveICN(ICN::icn_t icn)
 #endif
 }
 
-const std::vector<u8> & AGG::ReadICNChunk(ICN::icn_t icn, u32 index)
+const std::vector<u8> & AGG::ReadICNChunk(int icn, u32 index)
 {
     // hard fix artifact "ultimate stuff" sprite for loyalty version
     if(ICN::ARTIFACT == icn &&
@@ -874,7 +862,31 @@ const std::vector<u8> & AGG::ReadICNChunk(ICN::icn_t icn, u32 index)
     return ReadChunk(ICN::GetString(icn));
 }
 
-bool AGG::LoadOrgICN(Sprite & sp, ICN::icn_t icn, u32 index, bool reflect)
+struct ICNHeader
+{
+    ICNHeader() : offsetX(0), offsetY(0), width(0), height(0), type(0), offsetData(0) {}
+
+    u16 offsetX;
+    u16 offsetY;
+    u16 width;
+    u16 height;
+    u8 type;
+    u32 offsetData;
+};
+
+StreamBuf & operator>> (StreamBuf & st, ICNHeader & icn)
+{
+    icn.offsetX =  st.getLE16();
+    icn.offsetY = st.getLE16();
+    icn.width = st.getLE16();
+    icn.height = st.getLE16();
+    icn.type = st.get();
+    icn.offsetData = st.getLE32();
+
+    return st;
+}
+
+bool AGG::LoadOrgICN(Sprite & sp, int icn, u32 index, bool reflect)
 {
     const std::vector<u8> & body = ReadICNChunk(icn, index);
 
@@ -883,19 +895,29 @@ bool AGG::LoadOrgICN(Sprite & sp, ICN::icn_t icn, u32 index, bool reflect)
 	// loading original
 	DEBUG(DBG_ENGINE, DBG_TRACE, ICN::GetString(icn) << ", " << index);
 
-	const u16 count = ReadLE16(&body[0]);
-	ICN::Header header1, header2;
+	StreamBuf st(body);
 
-	header1.Load(&body[6 + index * ICN::Header::SizeOf()]);
-	if(index + 1 != count) header2.Load(&body[6 + (index + 1) * ICN::Header::SizeOf()]);
+	u32 count = st.getLE16();
+	u32 blockSize = st.getLE32();
+	u32 sizeData = 0;
 
-	const u32 size_data = (index + 1 != count ? header2.OffsetData() - header1.OffsetData() :
-				    // total size
-				    ReadLE32(&body[2]) - header1.OffsetData());
+	if(index) st.skip(index * 13);
 
-	sp.Set(header1.Width(), header1.Height(), false);
-	sp.SetOffset(header1.OffsetX(), header1.OffsetY());
-	Sprite::DrawICN(icn, &body[6 + header1.OffsetData()], size_data, reflect, sp);
+	ICNHeader header1;
+	st >> header1;
+
+	if(index + 1 != count)
+	{
+	    ICNHeader header2;
+	    st >> header2;
+	    sizeData = header2.offsetData - header1.offsetData;
+	}
+	else
+	    sizeData = blockSize - header1.offsetData;
+
+	sp.Set(header1.width, header1.height, false);
+	sp.SetOffset(header1.offsetX, header1.offsetY);
+	Sprite::DrawICN(icn, &body[6 + header1.offsetData], sizeData, reflect, sp);
 	Sprite::AddonExtensionModify(sp, icn, index);
 
 	return true;
@@ -906,7 +928,7 @@ bool AGG::LoadOrgICN(Sprite & sp, ICN::icn_t icn, u32 index, bool reflect)
     return false;
 }
 
-bool AGG::LoadOrgICN(ICN::icn_t icn, u32 index, bool reflect)
+bool AGG::LoadOrgICN(int icn, u32 index, bool reflect)
 {
     icn_cache_t & v = icn_cache[icn];
 
@@ -916,7 +938,7 @@ bool AGG::LoadOrgICN(ICN::icn_t icn, u32 index, bool reflect)
 
 	if(body.size())
 	{
-	    v.count = ReadLE16(&body[0]);
+	    v.count = StreamBase::getLE16(& body[0]);
 	    v.sprites = new Sprite [v.count];
 	    v.reflect = new Sprite [v.count];
 	}
@@ -930,7 +952,7 @@ bool AGG::LoadOrgICN(ICN::icn_t icn, u32 index, bool reflect)
 }
 
 /* load ICN object */
-void AGG::LoadICN(ICN::icn_t icn, u32 index, bool reflect)
+void AGG::LoadICN(int icn, u32 index, bool reflect)
 {
     icn_cache_t & v = icn_cache[icn];
 
@@ -957,49 +979,74 @@ void AGG::LoadICN(ICN::icn_t icn, u32 index, bool reflect)
 	if(Settings::Get().QVGA() && ICN::NeedMinify4PocketPC(icn, index))
 	{
 	    Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
-	    sp.ScaleMinifyByTwo();
+	    sp.ScaleQVGA();
 	}
     }
 }
 
 /* return ICN sprite */
-Sprite AGG::GetICN(ICN::icn_t icn, u32 index, bool reflect)
+Sprite AGG::GetICN(int icn, u32 index, bool reflect)
 {
-    icn_cache_t & v = icn_cache[icn];
+    Sprite result;
 
-    // out of range?
-    if(v.count && index >= v.count)
+    if(icn < static_cast<int>(icn_cache.size()))
     {
-	DEBUG(DBG_ENGINE, DBG_WARN, ICN::GetString(icn) << ", " << "out of range: " << index);
-	index = 0;
-    }
+	icn_cache_t & v = icn_cache[icn];
 
-    // need load?
-    if(0 == v.count || ((reflect && (!v.reflect || !v.reflect[index].isValid())) || (!v.sprites || !v.sprites[index].isValid())))
-    {
-	CheckMemoryLimit();
-	LoadICN(icn, index, reflect);
-    }
+	// out of range?
+	if(v.count && index >= v.count)
+	{
+	    DEBUG(DBG_ENGINE, DBG_WARN, ICN::GetString(icn) << ", " << "out of range: " << index);
+	    index = 0;
+	}
 
-    Sprite result = reflect ? v.reflect[index] : v.sprites[index];
+	// need load?
+	if(0 == v.count || ((reflect && (!v.reflect || !v.reflect[index].isValid())) || (!v.sprites || !v.sprites[index].isValid())))
+	{
+	    CheckMemoryLimit();
+	    LoadICN(icn, index, reflect);
+	}
 
-    // invalid sprite?
-    if(! result.isValid())
-    {
-	DEBUG(DBG_ENGINE, DBG_INFO, "invalid sprite: " << ICN::GetString(icn) << ", index: " << index << ", reflect: " << (reflect ? "true" : "false"));
+	result = reflect ? v.reflect[index] : v.sprites[index];
+
+	// invalid sprite?
+	if(! result.isValid())
+	{
+	    DEBUG(DBG_ENGINE, DBG_INFO, "invalid sprite: " << ICN::GetString(icn) << ", index: " << index << ", reflect: " << (reflect ? "true" : "false"));
+	}
     }
 
     return result;
 }
 
 /* return count of sprites from specific ICN */
-int AGG::GetICNCount(ICN::icn_t icn)
+u32 AGG::GetICNCount(int icn)
 {
     if(icn_cache[icn].count == 0) AGG::GetICN(icn, 0);
     return icn_cache[icn].count;
 }
 
-bool AGG::LoadAltTIL(TIL::til_t til, u32 max)
+
+int AGG::PutICN(const Sprite & sprite, bool init_reflect)
+{
+    icn_cache_t v;
+
+    v.count = 1;
+    v.sprites = new Sprite[1];
+    v.sprites[0] = sprite;
+
+    if(init_reflect)
+    {
+	v.reflect = new Sprite[1];
+        v.reflect[0] = Surface::Reflect(sprite, 2);
+	v.reflect[0].SetOffset(sprite.x(), sprite.y());
+    }
+
+    icn_cache.push_back(v);
+    return icn_cache.size() - 1;
+}
+
+bool AGG::LoadAltTIL(int til, u32 max)
 {
 #ifdef WITH_XML
     const std::string prefix_images_til = System::ConcatePath(System::ConcatePath("files", "images"), StringLower(TIL::GetString(til)));
@@ -1053,25 +1100,27 @@ bool AGG::LoadAltTIL(TIL::til_t til, u32 max)
     return false;
 }
 
-bool AGG::LoadOrgTIL(TIL::til_t til, u32 max)
+bool AGG::LoadOrgTIL(int til, u32 max)
 {
     const std::vector<u8> & body = ReadChunk(TIL::GetString(til));
 
     if(body.size())
     {
-	const u16 count = ReadLE16(&body.at(0));
-	const u16 width = ReadLE16(&body.at(2));
-	const u16 height= ReadLE16(&body.at(4));
+	StreamBuf st(body);
 
-	const u32 tile_size = width * height;
-	const u32 body_size = 6 + count * tile_size;
+	u32 count = st.getLE16();
+	u32 width = st.getLE16();
+	u32 height= st.getLE16();
+
+	u32 tile_size = width * height;
+	u32 body_size = 6 + count * tile_size;
 
 	til_cache_t & v = til_cache[til];
 
 	// check size
 	if(body.size() == body_size && count <= max)
 	{
-	    for(u16 ii = 0; ii < count; ++ii)
+	    for(u32 ii = 0; ii < count; ++ii)
 		v.sprites[ii].Set(&body[6 + ii * tile_size], width, height, 1, false);
 
 	    return true;
@@ -1086,7 +1135,7 @@ bool AGG::LoadOrgTIL(TIL::til_t til, u32 max)
 }
 
 /* load TIL object to AGG::Cache */
-void AGG::LoadTIL(TIL::til_t til)
+void AGG::LoadTIL(int til)
 {
     til_cache_t & v = til_cache[til];
 
@@ -1118,53 +1167,59 @@ void AGG::LoadTIL(TIL::til_t til)
 }
 
 /* return TIL surface from AGG::Cache */
-Surface AGG::GetTIL(TIL::til_t til, u32 index, u8 shape)
+Surface AGG::GetTIL(int til, u32 index, u32 shape)
 {
-    til_cache_t & v = til_cache[til];
+    Surface result;
 
-    if(0 == v.count) LoadTIL(til);
-
-    u32 index2 = index;
-
-    if(shape)
+    if(til < static_cast<int>(til_cache.size()))
     {
-	switch(til)
+	til_cache_t & v = til_cache[til];
+
+	if(0 == v.count) LoadTIL(til);
+	u32 index2 = index;
+
+	if(shape)
 	{
-	    case TIL::STON:     index2 += 36 * (shape % 4); break;
-	    case TIL::CLOF32:   index2 += 4 * (shape % 4); break;
-	    case TIL::GROUND32: index2 += 432 * (shape % 4); break;
-	    default: break;
+	    switch(til)
+	    {
+		case TIL::STON:     index2 += 36 * (shape % 4); break;
+		case TIL::CLOF32:   index2 += 4 * (shape % 4); break;
+		case TIL::GROUND32: index2 += 432 * (shape % 4); break;
+		default: break;
+	    }
 	}
+
+	if(index2 >= v.count)
+	{
+	    DEBUG(DBG_ENGINE, DBG_WARN, TIL::GetString(til) << ", " << "out of range: " << index);
+	    index2 = 0;
+	}
+
+	Surface & surface = v.sprites[index2];
+
+	if(shape && ! surface.isValid())
+	{
+	    const Surface & src = v.sprites[index];
+
+	    if(src.isValid())
+		surface = Surface::Reflect(src, shape);
+	    else
+		DEBUG(DBG_ENGINE, DBG_WARN, "is NULL");
+	}
+
+	if(! surface.isValid())
+	{
+	    DEBUG(DBG_ENGINE, DBG_WARN, "invalid sprite: " << TIL::GetString(til) << ", index: " << index);
+	}
+
+	result = surface;
     }
 
-    if(index2 >= v.count)
-    {
-	DEBUG(DBG_ENGINE, DBG_WARN, TIL::GetString(til) << ", " << "out of range: " << index);
-	index2 = 0;
-    }
-
-    Surface & surface = v.sprites[index2];
-
-    if(shape && ! surface.isValid())
-    {
-	const Surface & src = v.sprites[index];
-
-	if(src.isValid())
-	    surface = Surface::Reflect(src, shape);
-	else
-	    DEBUG(DBG_ENGINE, DBG_WARN, "is NULL");
-    }
-
-    if(! surface.isValid())
-    {
-	DEBUG(DBG_ENGINE, DBG_WARN, "invalid sprite: " << TIL::GetString(til) << ", index: " << index);
-    }
-
-    return surface;
+    return result;
 }
 
 /* load 82M object to AGG::Cache in Audio::CVT */
-void AGG::LoadWAV(M82::m82_t m82, std::vector<u8> & v)
+void AGG::LoadWAV(int m82, std::vector<u8> & v)
 {
 #ifdef WITH_MIXER
     const Settings & conf = Settings::Get();
@@ -1203,23 +1258,24 @@ void AGG::LoadWAV(M82::m82_t m82, std::vector<u8> & v)
     {
 #ifdef WITH_MIXER
 	// create WAV format
-	v.resize(body.size() + 44);
+	StreamBuf wavHeader(44);
+	wavHeader.putLE32(0x46464952);		// RIFF
+	wavHeader.putLE32(body.size() + 0x24);	// size
+	wavHeader.putLE32(0x45564157);		// WAVE
+	wavHeader.putLE32(0x20746D66);		// FMT
+	wavHeader.putLE32(0x10);		// size_t
+	wavHeader.putLE16(0x01);		// format
+	wavHeader.putLE16(0x01);		// channels
+	wavHeader.putLE32(22050);		// samples
+	wavHeader.putLE32(22050);		// byteper
+	wavHeader.putLE16(0x01);		// align
+	wavHeader.putLE16(0x08);		// bitsper
+	wavHeader.putLE32(0x61746164);		// DATA
+	wavHeader.putLE32(body.size());		// size
 
-	WriteLE32(&v[0], 0x46464952);		// RIFF
-	WriteLE32(&v[4], body.size() + 0x24);	// size
-	WriteLE32(&v[8], 0x45564157);		// WAVE
-	WriteLE32(&v[12], 0x20746D66);		// FMT
-	WriteLE32(&v[16], 0x10);		// size_t
-	WriteLE16(&v[20], 0x01);		// format
-	WriteLE16(&v[22], 0x01);		// channels
-	WriteLE32(&v[24], 22050);		// samples
-	WriteLE32(&v[28], 22050);		// byteper
-	WriteLE16(&v[32], 0x01);		// align
-	WriteLE16(&v[34], 0x08);		// bitsper
-	WriteLE32(&v[36], 0x61746164);		// DATA
-	WriteLE32(&v[40], body.size());		// size
-
-	std::copy(body.begin(), body.end(), &v[44]);
+	v.reserve(body.size() + 44);
+	v.assign(wavHeader.data(), wavHeader.data() + 44);
+	v.insert(v.begin() + 44, body.begin(), body.end());
 #else
 	Audio::Spec wav_spec;
 	wav_spec.format = AUDIO_U8;
@@ -1251,7 +1307,7 @@ void AGG::LoadWAV(M82::m82_t m82, std::vector<u8> & v)
 }
 
 /* load XMI object */
-void AGG::LoadMID(XMI::xmi_t xmi, std::vector<u8> & v)
+void AGG::LoadMID(int xmi, std::vector<u8> & v)
 {
     DEBUG(DBG_ENGINE, DBG_INFO, XMI::GetString(xmi));
     const std::vector<u8> & body = ReadChunk(XMI::GetString(xmi));
@@ -1261,7 +1317,7 @@ void AGG::LoadMID(XMI::xmi_t xmi, std::vector<u8> & v)
 }
 
 /* return CVT */
-const std::vector<u8> & AGG::GetWAV(M82::m82_t m82)
+const std::vector<u8> & AGG::GetWAV(int m82)
 {
     std::vector<u8> & v = wav_cache[m82];
     if(Mixer::isValid() && v.empty()) LoadWAV(m82, v);
@@ -1269,49 +1325,50 @@ const std::vector<u8> & AGG::GetWAV(M82::m82_t m82)
 }
 
 /* return MID */
-const std::vector<u8> & AGG::GetMID(XMI::xmi_t xmi)
+const std::vector<u8> & AGG::GetMID(int xmi)
 {
     std::vector<u8> & v = mid_cache[xmi];
     if(Mixer::isValid() && v.empty()) LoadMID(xmi, v);
     return v;
 }
 
-void AGG::LoadLOOPXXSounds(const u16* vols)
+void AGG::LoadLOOPXXSounds(const std::vector<int> & vols)
 {
     const Settings & conf = Settings::Get();
 
-    if(conf.Sound() && vols)
+    if(conf.Sound())
     {
 	// set volume loop sounds
-	for(u8 channel = 0; channel != LOOPXX_COUNT; ++channel)
+	for(std::vector<int>::const_iterator
+	    itv = vols.begin(); itv != vols.end(); ++itv)
 	{
-	    u16 vol = vols[channel];
-	    M82::m82_t m82 = M82::GetLOOP00XX(channel);
+	    int vol = *itv;
+	    int m82 = M82::GetLOOP00XX(std::distance(vols.begin(), itv));
 	    if(M82::UNKNOWN == m82) continue;
 
 	    // find loops
-	    std::vector<loop_sound_t>::iterator it = std::find(loop_sounds.begin(), loop_sounds.end(), m82);
+	    std::vector<loop_sound_t>::iterator itl = std::find(loop_sounds.begin(), loop_sounds.end(), m82);
 
-	    if(it != loop_sounds.end())
+	    if(itl != loop_sounds.end())
 	    {
 		// unused and free
 		if(0 == vol)
 		{
-		    if(Mixer::isPlaying((*it).channel))
+		    if(Mixer::isPlaying((*itl).channel))
 		    {
-			Mixer::Pause((*it).channel);
-			Mixer::Volume((*it).channel, Mixer::MaxVolume() * conf.SoundVolume() / 10);
-			Mixer::Stop((*it).channel);
+			Mixer::Pause((*itl).channel);
+			Mixer::Volume((*itl).channel, Mixer::MaxVolume() * conf.SoundVolume() / 10);
+			Mixer::Stop((*itl).channel);
 		    }
-		    (*it).sound = M82::UNKNOWN;
+		    (*itl).sound = M82::UNKNOWN;
 		}
 		// used and set vols
 		else
-		if(Mixer::isPlaying((*it).channel))
+		if(Mixer::isPlaying((*itl).channel))
 		{
-		    Mixer::Pause((*it).channel);
-		    Mixer::Volume((*it).channel, vol * conf.SoundVolume() / 10);
-		    Mixer::Resume((*it).channel);
+		    Mixer::Pause((*itl).channel);
+		    Mixer::Volume((*itl).channel, vol * conf.SoundVolume() / 10);
+		    Mixer::Resume((*itl).channel);
 		}
 	    }
 	    else
@@ -1328,12 +1385,12 @@ void AGG::LoadLOOPXXSounds(const u16* vols)
 		    Mixer::Resume(ch);
 
 		    // find unused
-		    std::vector<loop_sound_t>::iterator it = std::find(loop_sounds.begin(), loop_sounds.end(), M82::UNKNOWN);
+		    std::vector<loop_sound_t>::iterator itl = std::find(loop_sounds.begin(), loop_sounds.end(), static_cast<int>(M82::UNKNOWN));
 
-		    if(it != loop_sounds.end())
+		    if(itl != loop_sounds.end())
 		    {
-			(*it).sound = m82;
-			(*it).channel = ch;
+			(*itl).sound = m82;
+			(*itl).channel = ch;
 		    }
 		    else
 			loop_sounds.push_back(loop_sound_t(m82, ch));
@@ -1346,7 +1403,7 @@ void AGG::LoadLOOPXXSounds(const u16* vols)
 }
 
 /* wrapper Audio::Play */
-void AGG::PlaySound(M82::m82_t m82)
+void AGG::PlaySound(int m82)
 {
     const Settings & conf = Settings::Get();
 
@@ -1362,7 +1419,7 @@ void AGG::PlaySound(M82::m82_t m82)
 }
 
 /* wrapper Audio::Play */
-void AGG::PlayMusic(MUS::mus_t mus, bool loop)
+void AGG::PlayMusic(int mus, bool loop)
 {
     const Settings & conf = Settings::Get();
 
@@ -1411,7 +1468,7 @@ void AGG::PlayMusic(MUS::mus_t mus, bool loop)
 #endif
     if(conf.MusicMIDI())
     {
-	XMI::xmi_t xmi = XMI::FromMUS(mus);
+	int xmi = XMI::FromMUS(mus);
 	if(XMI::UNKNOWN != xmi)
 	{
 #ifdef WITH_MIXER
@@ -1437,7 +1494,7 @@ void AGG::PlayMusic(MUS::mus_t mus, bool loop)
 }
 
 #ifdef WITH_TTF
-void AGG::LoadTTFChar(u16 ch)
+void AGG::LoadTTFChar(u32 ch)
 {
     const Settings & conf = Settings::Get();
     const RGBColor white = { 0xFF, 0xFF, 0xFF, 0x00 };
@@ -1488,13 +1545,13 @@ void AGG::LoadFNT(void)
     }
 }
 
-int AGG::GetFontHeight(bool small)
+u32 AGG::GetFontHeight(bool small)
 {
     return small ? fonts[0].Height() : fonts[1].Height();
 }
 
 /* return letter sprite */
-Surface AGG::GetUnicodeLetter(u16 ch, u8 ft)
+Surface AGG::GetUnicodeLetter(u32 ch, u32 ft)
 {
     bool ttf_valid = fonts[0].isValid() && fonts[0].isValid();
 
@@ -1520,7 +1577,7 @@ void AGG::LoadFNT(void)
 }
 #endif
 
-Surface AGG::GetLetter(char ch, u8 ft)
+Surface AGG::GetLetter(u32 ch, u32 ft)
 {
     if(ch < 0x21) DEBUG(DBG_ENGINE, DBG_WARN, "unknown letter");
 
@@ -1588,6 +1645,11 @@ bool AGG::Init(void)
     }
 #endif
 
+    icn_cache.reserve(ICN::LASTICN + 256);
+    icn_cache.resize(ICN::LASTICN);
+
+    til_cache.resize(TIL::LASTTIL);
+
     // load font
     LoadFNT();
 
@@ -1596,21 +1658,29 @@ bool AGG::Init(void)
 
 void AGG::Quit(void)
 {
-    for(u32 ii = 0; ii < ICN::UNKNOWN; ++ii)
+    for(std::vector<icn_cache_t>::iterator
+	it = icn_cache.begin(); it != icn_cache.end(); ++it)
     {
-	if(icn_cache[ii].sprites)
+	icn_cache_t & icns = (*it);
+
+	if(icns.sprites)
 	{
-	    if(ii < ICN::UNKNOWN &&
-		Settings::Get().UseAltResource()) SaveICN(static_cast<ICN::icn_t>(ii));
-		delete [] icn_cache[ii].sprites;
+	    int icn_num = std::distance(icn_cache.begin(), it);
+	    if(icn_num < ICN::LASTICN &&
+		Settings::Get().UseAltResource()) SaveICN(icn_num);
+		delete [] icns.sprites;
 	}
-	icn_cache[ii].sprites = NULL;
-	if(icn_cache[ii].reflect) delete [] icn_cache[ii].reflect;
-	icn_cache[ii].reflect = NULL;
+	icns.sprites = NULL;
+	if(icns.reflect) delete [] icns.reflect;
+	icns.reflect = NULL;
     }
 
-    for(u32 ii = 0; ii < TIL::UNKNOWN + 1; ++ii)
-	if(til_cache[ii].sprites) delete [] til_cache[ii].sprites;
+    for(std::vector<til_cache_t>::iterator
+	it = til_cache.begin(); it != til_cache.end(); ++it)
+    {
+	til_cache_t & tils = (*it);
+	if(tils.sprites) delete [] tils.sprites;
+    }
 
 #ifdef WITH_TTF
     delete [] fonts;

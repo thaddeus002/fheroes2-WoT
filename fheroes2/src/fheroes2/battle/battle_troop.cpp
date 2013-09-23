@@ -37,10 +37,6 @@
 #include "battle_troop.h"
 #include "game_static.h"
 
-#ifdef WITH_XML
-#include "xmlccwrap.h"
-#endif
-
 namespace Battle
 {
     monstersprite_t monsters_info[] = {
@@ -134,7 +130,7 @@ namespace Battle
 	{ ICN::UNKNOWN , { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN },
     };
 
-    u8 genie_enemy_half_percent = 10;
+    u32 genie_enemy_half_percent = 10;
 }
 
 void Battle::UpdateMonsterAttributes(const std::string & spec)
@@ -179,7 +175,7 @@ void Battle::UpdateMonsterSpriteAnimation(const std::string & spec)
 	{
 	    std::string icn_name = StringUpper(xml_icn->Attribute("name"));
 	    // find icn name
-	    ICN::icn_t icn = ICN::FromString(icn_name.c_str());
+	    int icn = ICN::FromString(icn_name.c_str());
 	    if(icn == ICN::UNKNOWN) continue;
 
 	    // find monster info position
@@ -236,11 +232,11 @@ void Battle::UpdateMonsterSpriteAnimation(const std::string & spec)
 #endif
 }
 
-Battle::ModeDuration::ModeDuration() : std::pair<u32, u16>(0, 0)
+Battle::ModeDuration::ModeDuration() : std::pair<u32, u32>(0, 0)
 {
 }
 
-Battle::ModeDuration::ModeDuration(u32 mode, u16 duration) : std::pair<u32, u16>(mode, duration)
+Battle::ModeDuration::ModeDuration(u32 mode, u32 duration) : std::pair<u32, u32>(mode, duration)
 {
 }
 
@@ -264,14 +260,14 @@ Battle::ModesAffected::ModesAffected()
     reserve(3);
 }
 
-u16 Battle::ModesAffected::GetMode(u32 mode) const
+u32 Battle::ModesAffected::GetMode(u32 mode) const
 {
     const_iterator it = std::find_if(begin(), end(),
 				std::bind2nd(std::mem_fun_ref(&ModeDuration::isMode), mode));
     return it == end() ? 0 : (*it).second;
 }
 
-void Battle::ModesAffected::AddMode(u32 mode, u16 duration)
+void Battle::ModesAffected::AddMode(u32 mode, u32 duration)
 {
     iterator it = std::find_if(begin(), end(), std::bind2nd(std::mem_fun_ref(&ModeDuration::isMode), mode));
     if(it == end())
@@ -302,7 +298,7 @@ u32 Battle::ModesAffected::FindZeroDuration(void) const
     return it == end() ? 0 : (*it).first;
 }
 
-Battle::Unit::Unit(const Troop & t, s16 pos, bool ref) : ArmyTroop(NULL, t),
+Battle::Unit::Unit(const Troop & t, s32 pos, bool ref) : ArmyTroop(NULL, t),
     uid(World::GetUniq()), hp(t.GetHitPoints()), count0(t.GetCount()), dead(0), shots(t.GetShots()),
     disruptingray(0), reflect(ref), animstate(0), animframe(0), animstep(1), mirror(NULL), blindanswer(false)
 {
@@ -325,7 +321,7 @@ Battle::Unit::~Unit()
     }
 }
 
-void Battle::Unit::SetPosition(s16 pos)
+void Battle::Unit::SetPosition(s32 pos)
 {
     if(position.GetHead()) position.GetHead()->SetUnit(NULL);
     if(position.GetTail()) position.GetTail()->SetUnit(NULL);
@@ -394,18 +390,18 @@ std::string Battle::Unit::GetShotString(void) const
 	return GetString(Troop::GetShots());
 
     std::ostringstream os;
-    os << static_cast<int>(Troop::GetShots()) << " (" << static_cast<int>(GetShots()) << ")";
+    os << Troop::GetShots() << " (" << GetShots() << ")";
     return os.str();
 }
 
 std::string Battle::Unit::GetSpeedString(void) const
 {
     std::ostringstream os;
-    os << Speed::String(GetSpeed()) << " (" << static_cast<int>(GetSpeed()) << ")";
+    os << Speed::String(GetSpeed()) << " (" << GetSpeed() << ")";
     return os.str();
 }
 
-Surface Battle::Unit::GetContour(u8 val) const
+Surface Battle::Unit::GetContour(int val) const
 {
     switch(val)
     {
@@ -429,12 +425,12 @@ u32 Battle::Unit::GetHitPointsLeft(void) const
     return GetHitPoints() - (GetCount() - 1) * Monster::GetHitPoints();
 }
 
-u16 Battle::Unit::GetAffectedDuration(u32 mod) const
+u32 Battle::Unit::GetAffectedDuration(u32 mod) const
 {
     return affected.GetMode(mod);
 }
 
-u8 Battle::Unit::GetSpeed(void) const
+u32 Battle::Unit::GetSpeed(void) const
 {
     return GetSpeed(false);
 }
@@ -476,7 +472,7 @@ void Battle::Unit::SetMirror(Unit* ptr)
     mirror = ptr;
 }
 
-u8 Battle::Unit::GetShots(void) const
+u32 Battle::Unit::GetShots(void) const
 {
     return shots;
 }
@@ -486,12 +482,12 @@ const Battle::Position & Battle::Unit::GetPosition(void) const
     return position;
 }
 
-s16 Battle::Unit::GetHeadIndex(void) const
+s32 Battle::Unit::GetHeadIndex(void) const
 {
     return position.GetHead() ? position.GetHead()->GetIndex() : -1;
 }
 
-s16 Battle::Unit::GetTailIndex(void) const
+s32 Battle::Unit::GetTailIndex(void) const
 {
     return position.GetTail() ? position.GetTail()->GetIndex() : -1;
 }
@@ -512,7 +508,7 @@ void Battle::Unit::SetRandomMorale(void)
 
 void Battle::Unit::SetRandomLuck(void)
 {
-    s8 f = GetLuck();
+    s32 f = GetLuck();
 
     //check enemy: have bone dragon
     if(GetArena()->GetForce(GetArmyColor(), true).HasMonster(Monster::BONE_DRAGON)) --f;
@@ -627,11 +623,11 @@ void Battle::Unit::NewTurn(void)
     }
 }
 
-u8 Battle::Unit::GetSpeed(bool skip_standing_check) const
+u32 Battle::Unit::GetSpeed(bool skip_standing_check) const
 {
     if(!skip_standing_check && (!GetCount() || Modes(TR_MOVED | SP_BLIND | IS_PARALYZE_MAGIC))) return Speed::STANDING;
 
-    const u8 speed = Monster::GetSpeed();
+    int speed = Monster::GetSpeed();
     Spell spell;
 
     if(Modes(SP_HASTE))
@@ -967,7 +963,7 @@ bool Battle::Unit::ApplySpell(const Spell & spell, const HeroBase* hero, TargetI
 
     DEBUG(DBG_BATTLE, DBG_TRACE, spell.GetName() << " to " << String());
 
-    u16 spoint = hero ? hero->GetPower() : 3;
+    u32 spoint = hero ? hero->GetPower() : 3;
 
     if(spell.isDamage())
 	SpellApplyDamage(spell, spoint, hero, target);
@@ -1050,7 +1046,7 @@ StreamBase & Battle::operator<< (StreamBase & msg, const Unit & b)
 
 StreamBase & Battle::operator>> (StreamBase & msg, Unit & b)
 {
-    s16 head = -1;
+    s32 head = -1;
     u32 uid = 0;
 
     msg >>
@@ -1152,18 +1148,18 @@ void Battle::Unit::ResetBlind(void)
     }
 }
 
-u16 Battle::Unit::GetAttack(void) const
+u32 Battle::Unit::GetAttack(void) const
 {
-    u16 res = ArmyTroop::GetAttack();
+    u32 res = ArmyTroop::GetAttack();
 
     if(Modes(SP_BLOODLUST)) res += Spell(Spell::BLOODLUST).ExtraValue();
 
     return res;
 }
 
-u16 Battle::Unit::GetDefense(void) const
+u32 Battle::Unit::GetDefense(void) const
 {
-    u16 res = ArmyTroop::GetDefense();
+    u32 res = ArmyTroop::GetDefense();
 
     if(GetArena()->GetArmyColor2() == GetColor() &&
 	GetArena()->GetForce2().Modes(ARMY_GUARDIANS_OBJECT)) res += 2;
@@ -1178,7 +1174,7 @@ u16 Battle::Unit::GetDefense(void) const
     // disrupting ray accumulate effect
     if(disruptingray)
     {
-	const u16 step = disruptingray * Spell(Spell::DISRUPTINGRAY).ExtraValue();
+	const u32 step = disruptingray * Spell(Spell::DISRUPTINGRAY).ExtraValue();
 	if(step > res)
 	    res = 1;
 	else
@@ -1255,7 +1251,7 @@ u32 Battle::Unit::GetHitPoints(void) const
     return hp;
 }
 
-u8 Battle::Unit::GetControl(void) const
+int Battle::Unit::GetControl(void) const
 {
     return Modes(SP_BERSERKER) || ! GetArmy() ? CONTROL_AI : GetArmy()->GetControl();
 }
@@ -1265,11 +1261,11 @@ bool Battle::Unit::isArchers(void) const
     return ArmyTroop::isArchers() && shots;
 }
 
-void Battle::Unit::SpellModesAction(const Spell & spell, u8 duration, const HeroBase* hero)
+void Battle::Unit::SpellModesAction(const Spell & spell, u32 duration, const HeroBase* hero)
 {
     if(hero)
     {
-	u8 acount = hero->HasArtifact(Artifact::WIZARD_HAT);
+	u32 acount = hero->HasArtifact(Artifact::WIZARD_HAT);
 	if(acount) duration += acount * Artifact(Artifact::WIZARD_HAT).ExtraValue();
 	   acount = hero->HasArtifact(Artifact::ENCHANTED_HOURGLASS);
 	if(acount) duration += acount * Artifact(Artifact::ENCHANTED_HOURGLASS).ExtraValue();
@@ -1393,7 +1389,7 @@ void Battle::Unit::SpellModesAction(const Spell & spell, u8 duration, const Hero
 	case Spell::HYPNOTIZE:
 	{
 	    SetModes(SP_HYPNOTIZE);
-	    u8 acount = hero ? hero->HasArtifact(Artifact::GOLD_WATCH) : 0;
+	    u32 acount = hero ? hero->HasArtifact(Artifact::GOLD_WATCH) : 0;
 	    affected.AddMode(SP_HYPNOTIZE, (acount ? duration * acount * 2 : duration));
 	}
 	    break;
@@ -1415,7 +1411,7 @@ void Battle::Unit::SpellModesAction(const Spell & spell, u8 duration, const Hero
     }
 }
 
-void Battle::Unit::SpellApplyDamage(const Spell & spell, u8 spoint, const HeroBase* hero, TargetInfo & target)
+void Battle::Unit::SpellApplyDamage(const Spell & spell, u32 spoint, const HeroBase* hero, TargetInfo & target)
 {
     u32 dmg = spell.Damage() * spoint;
 
@@ -1480,7 +1476,7 @@ void Battle::Unit::SpellApplyDamage(const Spell & spell, u8 spoint, const HeroBa
     if(hero)
     {
 	const HeroBase* myhero = GetCommander();
-	u8 acount = 0;
+	u32 acount = 0;
 
 	switch(spell())
 	{
@@ -1563,7 +1559,7 @@ void Battle::Unit::SpellApplyDamage(const Spell & spell, u8 spoint, const HeroBa
     }
 }
 
-void Battle::Unit::SpellRestoreAction(const Spell & spell, u8 spoint, const HeroBase* hero)
+void Battle::Unit::SpellRestoreAction(const Spell & spell, u32 spoint, const HeroBase* hero)
 {
     switch(spell())
     {
@@ -1592,7 +1588,7 @@ void Battle::Unit::SpellRestoreAction(const Spell & spell, u8 spoint, const Hero
 		ResetAnimFrame(AS_IDLE);
 	    }
 	    // restore hp
-	    u8 acount = hero ? hero->HasArtifact(Artifact::ANKH) : 0;
+	    u32 acount = hero ? hero->HasArtifact(Artifact::ANKH) : 0;
 	    if(acount) restore *= acount * 2;
 
 	    const u32 resurrect = Resurrect(restore, false, (spell == Spell::RESURRECT));
@@ -1626,12 +1622,12 @@ bool Battle::Unit::isTwiceAttack(void) const
     return ArmyTroop::isTwiceAttack();
 }
 
-bool Battle::Unit::isMagicResist(const Spell & spell, u8 spower) const
+bool Battle::Unit::isMagicResist(const Spell & spell, u32 spower) const
 {
     return 100 <= GetMagicResist(spell, spower);
 }
 
-u8 Battle::Unit::GetMagicResist(const Spell & spell, u8 spower) const
+u32 Battle::Unit::GetMagicResist(const Spell & spell, u32 spower) const
 {
     if(spell.isMindInfluence() &&
         (isUndead() || isElemental() ||
@@ -1765,7 +1761,7 @@ bool Battle::Unit::isMagicAttack(void) const
 }
 
 
-u8 Battle::Unit::GetSpellMagic(bool force) const
+int Battle::Unit::GetSpellMagic(bool force) const
 {
     switch(GetID())
     {
@@ -1812,32 +1808,32 @@ bool Battle::Unit::isHaveDamage(void) const
     return hp < count0 * Monster::GetHitPoints();
 }
 
-u8 Battle::Unit::GetFrameStart(void) const
+int Battle::Unit::GetFrameStart(void) const
 {
     return animstep < 0 ? GetFrameState().start + GetFrameState().count - 1 : GetFrameState().start;
 }
 
-u8 Battle::Unit::GetFrame(void) const
+int Battle::Unit::GetFrame(void) const
 {
     return animframe;
 }
 
-void Battle::Unit::SetFrame(u8 val)
+void Battle::Unit::SetFrame(int val)
 {
     animframe = val;
 }
 
-void Battle::Unit::SetFrameStep(s8 val)
+void Battle::Unit::SetFrameStep(int val)
 {
     animstep = val;
 }
 
-u8 Battle::Unit::GetFrameOffset(void) const
+int Battle::Unit::GetFrameOffset(void) const
 {
     return animframe - GetFrameStart();
 }
 
-u8 Battle::Unit::GetFrameCount(void) const
+int Battle::Unit::GetFrameCount(void) const
 {
     return GetFrameState().count;
 }
@@ -1870,7 +1866,7 @@ bool Battle::Unit::isFinishAnimFrame(void) const
     return true;
 }
 
-const Battle::animframe_t & Battle::Unit::GetFrameState(u8 state) const
+const Battle::animframe_t & Battle::Unit::GetFrameState(int state) const
 {
     const  monstersprite_t & msi = GetMonsterSprite();
 
@@ -1902,7 +1898,7 @@ const Battle::animframe_t & Battle::Unit::GetFrameState(void) const
     return GetFrameState(animstate);
 }
 
-void Battle::Unit::ResetAnimFrame(u8 rule)
+void Battle::Unit::ResetAnimFrame(int rule)
 {
     animstep = 1;
     animstate = rule;
@@ -1916,7 +1912,7 @@ void Battle::Unit::ResetAnimFrame(u8 rule)
     }
 }
 
-M82::m82_t Battle::Unit::M82Attk(void) const
+int Battle::Unit::M82Attk(void) const
 {
     if(isArchers() && !isHandFighting())
     {
@@ -1946,22 +1942,22 @@ M82::m82_t Battle::Unit::M82Attk(void) const
     return GetMonsterSprite().m82_attk;
 }
 
-M82::m82_t Battle::Unit::M82Kill(void) const
+int Battle::Unit::M82Kill(void) const
 {
     return GetMonsterSprite().m82_kill;
 }
 
-M82::m82_t Battle::Unit::M82Move(void) const
+int Battle::Unit::M82Move(void) const
 {
     return GetMonsterSprite().m82_move;
 }
 
-M82::m82_t Battle::Unit::M82Wnce(void) const
+int Battle::Unit::M82Wnce(void) const
 {
     return GetMonsterSprite().m82_wnce;
 }
 
-M82::m82_t Battle::Unit::M82Expl(void) const
+int Battle::Unit::M82Expl(void) const
 {
     switch(GetID())
     {
@@ -1976,12 +1972,12 @@ M82::m82_t Battle::Unit::M82Expl(void) const
     return M82::UNKNOWN;
 }
 
-ICN::icn_t Battle::Unit::ICNFile(void) const
+int Battle::Unit::ICNFile(void) const
 {
     return GetMonsterSprite().icn_file;
 }
 
-ICN::icn_t Battle::Unit::ICNMiss(void) const
+int Battle::Unit::ICNMiss(void) const
 {
     switch(GetID())
     {
@@ -2020,7 +2016,7 @@ Point Battle::Unit::GetBackPoint(void) const
     return reflect ? Point(rt.x + rt.w, rt.y + rt.h / 2) : Point(rt.x, rt.y + rt.h / 2);
 }
 
-s8 Battle::Unit::GetStartMissileOffset(u8 state) const
+int Battle::Unit::GetStartMissileOffset(int state) const
 {
     switch(GetID())
     {
@@ -2123,12 +2119,12 @@ s8 Battle::Unit::GetStartMissileOffset(u8 state) const
     return 0;
 }
 
-u8 Battle::Unit::GetArmyColor(void) const
+int Battle::Unit::GetArmyColor(void) const
 {
     return ArmyTroop::GetColor();
 }
 
-u8 Battle::Unit::GetColor(void) const
+int Battle::Unit::GetColor(void) const
 {
     if(Modes(SP_BERSERKER))
 	return 0;

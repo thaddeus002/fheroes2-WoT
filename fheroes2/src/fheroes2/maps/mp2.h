@@ -23,7 +23,6 @@
 #define H2MP2_H
 
 #include "gamedefs.h"
-#include "icn.h"
 
 #define MP2OFFSETDATA	428
 #define SIZEOFMP2TILE	20
@@ -263,7 +262,7 @@ namespace MP2
         
     ///////////////////////////////////////////////////////////////////////////////
 
-    enum object_t
+    enum
     {
 	OBJ_ZERO		= 0x00,
 	OBJ_UNKNW_02		= 0x02,
@@ -539,30 +538,27 @@ namespace MP2
 
     };
 
-    ICN::icn_t GetICNObject(const u8 type);
-    const char *StringObject(u8 object);
-    
-    bool isActionObject(const u8 obj, const bool water);
-    bool isGroundObject(const u8 obj);
-    bool isWaterObject(const u8 obj);
-    bool isQuantityObject(const u8 obj);
-    bool isCaptureObject(const u8 obj);
-    bool isPickupObject(const u8 obj);
-    bool isRemoveObject(const u8 obj);
-    bool isMoveObject(const u8 obj);
+    int GetICNObject(int type);
+    const char *StringObject(int object);
 
-    bool isNeedStayFront(const u8 obj);
-    bool isClearGroundObject(const u8 obj);
+    bool isActionObject(int obj, bool water);
+    bool isGroundObject(int obj);
+    bool isWaterObject(int obj);
+    bool isQuantityObject(int obj);
+    bool isCaptureObject(int obj);
+    bool isPickupObject(int obj);
+    bool isRemoveObject(int obj);
+    bool isMoveObject(int obj);
 
-    bool isDayLife(const u8 obj);
-    bool isWeekLife(const u8 obj);
-    bool isMonthLife(const u8 obj);
-    bool isBattleLife(const u8 obj);
+    bool isNeedStayFront(int obj);
+    bool isClearGroundObject(int obj);
 
-    u16  GetObjectDirect(const u8 obj);
+    bool isDayLife(int obj);
+    bool isWeekLife(int obj);
+    bool isMonthLife(int obj);
+    bool isBattleLife(int obj);
+
+    int  GetObjectDirect(int obj);
 }
-
-StreamBase & operator<< (StreamBase &, const MP2::object_t &);
-StreamBase & operator>> (StreamBase &, MP2::object_t &);
 
 #endif

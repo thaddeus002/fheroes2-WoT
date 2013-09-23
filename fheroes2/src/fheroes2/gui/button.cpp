@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "game.h"
 #include "cursor.h"
 #include "settings.h"
 #include "dialog.h"
@@ -32,7 +33,7 @@ Button::Button() : flags(0)
 {
 }
 
-Button::Button(s16 ox, s16 oy, ICN::icn_t icn, u16 index1, u16 index2) : flags(0)
+Button::Button(s32 ox, s32 oy, int icn, u32 index1, u32 index2) : flags(0)
 {
     SetPos(ox, oy);
 
@@ -62,13 +63,13 @@ bool Button::isReleased(void) const
     return ! isPressed();
 }
 
-void Button::SetPos(s16 ox, s16 oy)
+void Button::SetPos(s32 ox, s32 oy)
 {
     x = ox;
     y = oy;
 }
 
-void Button::SetSize(u16 ow, u16 oh)
+void Button::SetSize(u32 ow, u32 oh)
 {
     w = ow;
     h = oh;
@@ -79,7 +80,7 @@ void Button::SetPos(const Point & pos)
     SetPos(pos.x, pos.y);
 }
 
-void Button::SetSprite(ICN::icn_t icn, u16 index1, u16 index2)
+void Button::SetSprite(int icn, u32 index1, u32 index2)
 {
     sf1 = AGG::GetICN(icn, index1);
     sf2 = AGG::GetICN(icn, index2);
@@ -154,10 +155,10 @@ void Button::Draw(void)
     if(localcursor) cursor.Show();
 }
 
-ButtonGroups::ButtonGroups(const Rect & pos, u16 btns) : button1(NULL), button2(NULL), result1(Dialog::ZERO), result2(Dialog::ZERO), buttons(btns)
+ButtonGroups::ButtonGroups(const Rect & pos, u32 btns) : button1(NULL), button2(NULL), result1(Dialog::ZERO), result2(Dialog::ZERO), buttons(btns)
 {
     Point pt;
-    const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+    const int system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     switch(buttons)
     {
@@ -214,7 +215,7 @@ void ButtonGroups::Draw(void)
     if(button2) (*button2).Draw();
 }
 
-u16 ButtonGroups::QueueEventProcessing(void)
+int ButtonGroups::QueueEventProcessing(void)
 {
     LocalEvent & le = LocalEvent::Get();
 
@@ -229,13 +230,13 @@ u16 ButtonGroups::QueueEventProcessing(void)
 	if(buttons == (Dialog::YES|Dialog::NO) ||
 	    buttons == (Dialog::OK|Dialog::CANCEL))
 	{
-	    if(Game::HotKeyPress(Game::EVENT_DEFAULT_READY)) return result1;
-    	    if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) return result2;
+	    if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_READY)) return result1;
+    	    if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)) return result2;
 	}
 
-	if(Game::HotKeyPress(Game::EVENT_DEFAULT_LEFT)) return result1;
+	if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_LEFT)) return result1;
 	else
-	if(Game::HotKeyPress(Game::EVENT_DEFAULT_RIGHT)) return result2;
+	if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_RIGHT)) return result2;
     }
     else
     // one button

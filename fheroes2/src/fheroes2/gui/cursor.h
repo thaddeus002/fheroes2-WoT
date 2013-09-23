@@ -28,7 +28,7 @@ class Cursor : public SpriteMove
 {
 public:
 
-    enum themes_t
+    enum
     {
 	NONE               = 0x0000,
 	// ADVMCO.ICN
@@ -134,23 +134,22 @@ public:
 
 	static Cursor &	Get(void);
 
-	static void	Redraw(u16 x, u16 y);
-	static void	DrawCursor(Surface &surface, const u8 indexcolor, bool solid = false);
-	static themes_t DistanceThemes(themes_t, u16);
-	static themes_t WithoutDistanceThemes(themes_t);
+	static void	Redraw(s32, s32);
+	static int	DistanceThemes(int, u32);
+	static int	WithoutDistanceThemes(int);
 
-	themes_t	Themes(void);
-	bool		SetThemes(u16 cursor, bool force = false);
+	int		Themes(void);
+	bool		SetThemes(int, bool force = false);
 	void		Show(void);
 
 private:
 	Cursor();
-	void		SetOffset(u16 name);
-	void		Move(u16 x, u16 y);
+	void		SetOffset(int);
+	void		Move(s32, s32);
 
-	u16		theme;
-        s16		offset_x;
-        s16		offset_y;
+	int		theme;
+        s32		offset_x;
+        s32		offset_y;
 };
 
 #endif

@@ -25,14 +25,16 @@
 #include "cursor.h"
 #include "difficulty.h"
 #include "settings.h"
+#include "dialog.h"
 #include "maps.h"
 #include "maps_fileinfo.h"
+#include "game.h"
 #include "dialog_selectscenario.h"
 #include "text.h"
 #include "tools.h"
 #include "pocketpc.h"
 
-Game::menu_t PocketPC::SelectScenario(void)
+int PocketPC::SelectScenario(void)
 {
     Settings & conf = Settings::Get();
     Cursor & cursor = Cursor::Get();
@@ -112,7 +114,7 @@ Game::menu_t PocketPC::SelectScenario(void)
     buttonSelectXLarge.Draw();
     buttonSelectAll.Draw();
 
-    u16 result = Dialog::ZERO;
+    u32 result = Dialog::ZERO;
 
     cursor.Show();
     display.Flip();

@@ -27,7 +27,7 @@
 
 namespace XMI
 {
-    enum xmi_t
+    enum
     {
 	UNKNOWN,
 	MIDI0002,
@@ -49,8 +49,8 @@ namespace XMI
 	MIDI0043
     };
 
-    const char* GetString(const xmi_t xmi);
-    xmi_t FromMUS(const MUS::mus_t mus);
+    const char* GetString(int);
+    int FromMUS(int);
 }
 
 #endif

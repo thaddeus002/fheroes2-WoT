@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "text.h"
 #include "settings.h"
 #include "cursor.h"
 #include "heroes.h"
@@ -29,6 +30,7 @@
 #include "heroes_indicator.h"
 #include "army_troop.h"
 #include "world.h"
+#include "game.h"
 #include "dialog.h"
 
 class ArmyCell : public Rect
@@ -42,8 +44,7 @@ public:
 	back.Set(w, h);
 	backSprite.Blit(Rect(36, 267, w, h), 0, 0, back);
 
-	curs.Set(w, h - 10);
-	Cursor::DrawCursor(curs, 0xd7, true);
+	curs = Surface::RectBorder(w, h - 10, curs.GetColorIndex(0xD7), true);
     }
 
     void Redraw(void)
@@ -162,7 +163,9 @@ bool Dialog::SetGuardian(Heroes & hero, Troop & troop, CapturedObject & co, bool
     dst_pt.x = area.x + 3;
     dst_pt.y = area.y + 5;
     window.Blit(dst_pt);
-    Heroes::GetPortrait(hero.GetID(), PORT_MEDIUM).Blit(dst_pt.x + 4, dst_pt.y + 4, display);
+
+    Surface port = Heroes::GetPortrait(hero.GetID(), PORT_MEDIUM);
+    if(port.isValid()) port.Blit(dst_pt.x + 4, dst_pt.y + 4, display);
 
     // indicators
     dst_pt.x = area.x + 185;
@@ -210,8 +213,7 @@ bool Dialog::SetGuardian(Heroes & hero, Troop & troop, CapturedObject & co, bool
     display.Flip();
 
     // message loop
-    u16 buttons = Dialog::ZERO;
-
+    int buttons = Dialog::ZERO;
     while(buttons == Dialog::ZERO && le.HandleEvents())
     {
 	buttons = btnGroups.QueueEventProcessing();

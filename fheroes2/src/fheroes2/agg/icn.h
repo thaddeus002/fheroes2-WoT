@@ -27,8 +27,9 @@
 
 namespace ICN
 {
-    enum icn_t
+    enum
     {
+	UNKNOWN,
 	ADVBORDE,
 	ADVBORD,
 	ADVBTNS,
@@ -913,48 +914,22 @@ namespace ICN
 	BTNMIN,
 	CSLMARKER,
 
-	UNKNOWN
-
+	LASTICN
     };
 
-    class Header
-    {
-	public:
-	Header();
-	
-	void Load(const u8* p);
+    const	char* GetString(int);
+    int		FromString(const char*);
+    u32		AnimationFrame(int icn, u32, u32, bool = false);
+    bool	NeedMinify4PocketPC(int icn, u32);
+    bool	HighlyObjectSprite(int icn, u32);
+    int		PORTxxxx(int heroId);
+    u32		GetMissIndex(int icn, s32, s32);
 
-	u16 OffsetX(void) const{ return offset_x; }
-	u16 OffsetY(void) const{ return offset_y; }
-	u16 Width(void) const{ return width; }
-	u16 Height(void) const{ return height; }
-	u8  Type(void) const{ return type; }
-	u32 OffsetData(void) const{ return offset_data; }
+    bool	isBattleMonsterICN(int);
 
-	inline static u8 SizeOf(void){ return 13; }
-
-	private:
-	u16 offset_x;
-	u16 offset_y;
-	u16 width;
-	u16 height;
-	u8  type;
-	u32 offset_data;
-    };
-
-    const char* GetString(const icn_t &);
-    icn_t FromString(const char*);
-    u16 AnimationFrame(const icn_t &, const u8 &, const u32 &, bool = false);
-    bool NeedMinify4PocketPC(const icn_t & , const u16 &);
-    bool HighlyObjectSprite(const icn_t &, const u8 &);
-    icn_t PORTxxxx(u8);
-    u8   GetMissIndex(const icn_t &, const s16 &, const s16 &);
-
-    bool isBattleMonsterICN(u16);
-
-    icn_t Get4Captain(u8 race);
-    icn_t Get4Building(u8 race);
-    icn_t Get4Castle(u8 race);
+    int		Get4Captain(int race);
+    int		Get4Building(int race);
+    int		Get4Castle(int race);
 }
 
 #endif

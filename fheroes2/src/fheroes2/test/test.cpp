@@ -26,6 +26,7 @@
 #include "battle.h"
 #include "world.h"
 #include "army.h"
+#include "game.h"
 #include "castle.h"
 #include "kingdom.h"
 #include "heroes.h"
@@ -133,7 +134,7 @@ void RunTest2(void)
 
     while(le.HandleEvents())
     {
-        if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
+        if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)) break;
     }
 }
 
@@ -143,17 +144,19 @@ void RunTest3(void)
     const std::string amap("/opt/projects/fh2/maps/beltway.mp2");
     Settings & conf = Settings::Get();
 
-    if(! conf.SetCurrentFileInfo(amap)) return;
-
-    world.LoadMaps(amap);
+    Maps::FileInfo fi;
+    if(!fi.ReadMP2(amap)) return;
+    
+    conf.SetCurrentFileInfo(fi);
+    world.LoadMapMP2(amap);
 
     Heroes & hero1 = *world.GetHeroes(Heroes::SANDYSANDY);
     Heroes & hero2 = *world.GetHeroes(Heroes::BAX);
 
     Players & players = conf.GetPlayers();
 
-    const u8 mycolor = Color::GetFirst(players.GetColors(CONTROL_HUMAN));
-    const u8 aicolor = Color::GetFirst(players.GetColors((CONTROL_AI)));
+    int mycolor = Color::GetFirst(players.GetColors(CONTROL_HUMAN));
+    int aicolor = Color::GetFirst(players.GetColors((CONTROL_AI)));
 
     players.SetPlayerControl(mycolor, CONTROL_HUMAN);
     players.SetPlayerControl(aicolor, CONTROL_HUMAN);
@@ -183,8 +186,8 @@ void RunTest3(void)
     castle->BuyBuilding(BUILD_MOAT);
 
     //Army army2;
-    Army & army2 = hero2.GetArmy();
-    //Army & army2 = castle->GetArmy();
+    //Army & army2 = hero2.GetArmy();
+    Army & army2 = castle->GetArmy();
     if(army2.GetCommander())
     {
 	army2.GetCommander()->SpellBookActivate();

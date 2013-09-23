@@ -22,6 +22,7 @@
 
 #include "dialog.h"
 #include "agg.h"
+#include "text.h"
 #include "button.h"
 #include "cursor.h"
 #include "difficulty.h"
@@ -29,15 +30,26 @@
 #include "maps.h"
 #include "text.h"
 #include "tools.h"
+#include "game.h"
 #include "dialog_selectscenario.h"
 
 void LossConditionInfo(const Maps::FileInfo &);
 void VictoryConditionInfo(const Maps::FileInfo &);
 
-void ScenarioListBox::RedrawItem(const Maps::FileInfo & info, s16 dstx, s16 dsty, bool current)
+Surface GetNonStandardSizeIcon(void)
+{
+    Surface res(17, 17);
+    res.Fill(0);
+    res.FillRect(0x8D, 0x73, 0xFF, Rect(1, 1, 15, 15));
+    Text text("N", Font::SMALL);
+    text.Blit((res.w() - text.w()) / 2, (res.h() - text.h()) / 2, res);
+    return res;
+}
+
+void ScenarioListBox::RedrawItem(const Maps::FileInfo & info, s32 dstx, s32 dsty, bool current)
 {
     Text text;
-    u8 index = 19 + Color::Count(info.kingdom_colors);
+    int index = 19 + Color::Count(info.kingdom_colors);
 
     if(!Settings::Get().QVGA())
     {
@@ -48,17 +60,25 @@ void ScenarioListBox::RedrawItem(const Maps::FileInfo & info, s16 dstx, s16 dsty
     const Sprite & spriteCount = AGG::GetICN(ICN::REQUESTS, index);
     spriteCount.Blit(dstx, dsty);
 
-    switch(info.size_w)
+    if(info.size_w != info.size_h ||
+	info.size_w < Maps::SMALL || info.size_w > Maps::XLARGE)
     {
-        case Maps::SMALL:	index = 26; break;
-        case Maps::MEDIUM:	index = 27; break;
-        case Maps::LARGE:	index = 28; break;
-        case Maps::XLARGE:	index = 29; break;
-        default:  		index = 30; break;
+	GetNonStandardSizeIcon().Blit(dstx + spriteCount.w() + 2, dsty, Display::Get());
     }
+    else
+    {
+	switch(info.size_w)
+	{
+    	    case Maps::SMALL:  	index = 26; break;
+    	    case Maps::MEDIUM:	index = 27; break;
+    	    case Maps::LARGE:	index = 28; break;
+    	    case Maps::XLARGE:	index = 29; break;
+	    default: break;
+	}
 
-    const Sprite & spriteSize = AGG::GetICN(ICN::REQUESTS, index);
-    spriteSize.Blit(dstx + spriteCount.w() + 2, dsty);
+	const Sprite & spriteSize = AGG::GetICN(ICN::REQUESTS, index);
+	spriteSize.Blit(dstx + spriteCount.w() + 2, dsty);
+    }
 
     text.Set(info.name, (current ? Font::YELLOW_BIG : Font::BIG));
     text.Blit(dstx + 54, dsty + 2);
@@ -93,7 +113,7 @@ void ScenarioListBox::RedrawBackground(const Point & dst)
 	{
 	    Text text;
 	    const Maps::FileInfo & info = *cur;
-	    u8 index = 19 + Color::Count(info.kingdom_colors);
+	    int index = 19 + Color::Count(info.kingdom_colors);
 
 	    const Sprite & spriteCount = AGG::GetICN(ICN::REQUESTS, index);
 	    spriteCount.Blit(dst.x + 65, dst.y + 265);
@@ -225,8 +245,10 @@ const Maps::FileInfo* Dialog::SelectScenario(const MapsFileInfoList & all)
 	le.MousePressLeft(buttonSelectXLarge) && buttonSelectXLarge.isEnable() ? buttonSelectXLarge.PressDraw() : buttonSelectXLarge.ReleaseDraw();
 	le.MousePressLeft(buttonSelectAll) ? buttonSelectAll.PressDraw() : buttonSelectAll.ReleaseDraw();
 
+	listbox.QueueEventProcessing();
+
         if((buttonOk.isEnable() && le.MouseClickLeft(buttonOk)) ||
-	    Game::HotKeyPress(Game::EVENT_DEFAULT_READY) ||
+	    Game::HotKeyPressEvent(Game::EVENT_DEFAULT_READY) ||
 	    listbox.selectOk)
 	{
 	    MapsFileInfoList::const_iterator it = std::find(all.begin(), all.end(), listbox.GetCurrent());
@@ -234,7 +256,7 @@ const Maps::FileInfo* Dialog::SelectScenario(const MapsFileInfoList & all)
 	    break;
 	}
 	else
-        if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT))
+        if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT))
 	{
 	    result = NULL;
 	    break;
@@ -269,8 +291,6 @@ const Maps::FileInfo* Dialog::SelectScenario(const MapsFileInfoList & all)
 	    listbox.SetListContent(const_cast<MapsFileInfoList &>(all));
 	    cursor.Hide();
 	}
-
-	listbox.QueueEventProcessing();
 
 	// right info
 	if(le.MousePressRight(buttonSelectSmall)) Dialog::Message(_("Small Maps"), _("View only maps of size small (36x36)."), Font::BIG);

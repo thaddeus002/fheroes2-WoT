@@ -30,13 +30,16 @@
 #include "cursor.h"
 #include "castle.h"
 #include "heroes.h"
+#include "game.h"
 #include "gameevent.h"
 #include "game_interface.h"
+#include "game_io.h"
+#include "game_over.h"
 #include "settings.h"
 #include "kingdom.h"
 #include "pocketpc.h"
 
-void Interface::Basic::ShowPathOrStartMoveHero(Heroes* hero, const s32 dst_index)
+void Interface::Basic::ShowPathOrStartMoveHero(Heroes* hero, s32 dst_index)
 {
     if(!hero || hero->Modes(Heroes::GUARDIAN)) return;
 
@@ -66,7 +69,7 @@ void Interface::Basic::ShowPathOrStartMoveHero(Heroes* hero, const s32 dst_index
     }
 }
 
-void Interface::Basic::MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct)
+void Interface::Basic::MoveHeroFromArrowKeys(Heroes & hero, int direct)
 {
     if(Maps::isValidDirection(hero.GetIndex(), direct))
     {
@@ -78,7 +81,7 @@ void Interface::Basic::MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t 
         {
             case MP2::OBJN_CASTLE:
             {
-                const Castle* to_castle = world.GetCastle(dst);
+                const Castle* to_castle = world.GetCastle(hero.GetCenter());
                 if(to_castle)
                 {
                     dst = to_castle->GetIndex();
@@ -162,7 +165,7 @@ void Interface::Basic::EventCastSpell(void)
     }
 }
 
-void Interface::Basic::EventEndTurn(Game::menu_t & ret)
+int Interface::Basic::EventEndTurn(void)
 {
     const Kingdom & myKingdom = world.GetKingdom(Settings::Get().CurrentColor());
 
@@ -171,10 +174,12 @@ void Interface::Basic::EventEndTurn(Game::menu_t & ret)
 
     if(!myKingdom.HeroesMayStillMove() ||
 	Dialog::YES == Dialog::Message("", _("One or more heroes may still move, are you sure you want to end your turn?"), Font::BIG, Dialog::YES | Dialog::NO))
-	ret = Game::ENDTURN;
+	return Game::ENDTURN;
+
+    return Game::CANCEL;
 }
 
-void Interface::Basic::EventAdventureDialog(Game::menu_t & ret)
+int Interface::Basic::EventAdventureDialog(void)
 {
     Mixer::Reduce();
     switch(Dialog::AdventureOptions(GameFocus::HEROES == GetFocusType()))
@@ -191,38 +196,37 @@ void Interface::Basic::EventAdventureDialog(Game::menu_t & ret)
 	    break;
 
 	case Dialog::DIG:
-	    EventDigArtifact(ret);
-	    break;
+	    return EventDigArtifact();
 
 	default: break;
     }
     Mixer::Enhance();
+
+    return Game::CANCEL;
 }
 
-void Interface::Basic::EventFileDialog(Game::menu_t & ret)
+int Interface::Basic::EventFileDialog(void)
 {
     switch(Dialog::FileOptions())
     {
 	case Game::NEWGAME:
 	    if(Dialog::YES == Dialog::Message("", _("Are you sure you want to restart? (Your current game will be lost)"), Font::BIG, Dialog::YES|Dialog::NO))
-    		ret = Game::NEWGAME;
+    		return Game::NEWGAME;
 	    break;
 
 	case Game::QUITGAME:
-	    ret = Game::QUITGAME;
-	    break;
+	    return Game::QUITGAME;
 
 	case Game::LOADGAME:
-	    EventLoadGame(ret);
-	    break;
+	    return EventLoadGame();
 
 	case Game::SAVEGAME:
-	    EventSaveGame();
-	    break;
+	    return EventSaveGame();
 
-	default:
-	break;
+	default:break;
     }
+
+    return Game::CANCEL;
 }
 
 void Interface::Basic::EventSystemDialog(void)
@@ -230,7 +234,7 @@ void Interface::Basic::EventSystemDialog(void)
     const Settings & conf = Settings::Get();
 
     // Change and save system settings
-    const u8 changes = Dialog::SystemOptions();
+    const int changes = Dialog::SystemOptions();
 
     // change scroll
     if(0x10 & changes)
@@ -261,7 +265,7 @@ void Interface::Basic::EventSystemDialog(void)
     }
 }
 
-void Interface::Basic::EventExit(Game::menu_t & ret)
+int Interface::Basic::EventExit(void)
 {
     Heroes* hero = GetFocusHeroes();
 
@@ -270,7 +274,9 @@ void Interface::Basic::EventExit(Game::menu_t & ret)
 	hero->SetMove(false);
     else
     if(Dialog::YES & Dialog::Message("", _("Are you sure you want to quit?"), Font::BIG, Dialog::YES|Dialog::NO))
-	ret = Game::QUITGAME;
+	return Game::QUITGAME;
+
+    return Game::CANCEL;
 }
 
 void Interface::Basic::EventNextTown(void)
@@ -295,17 +301,18 @@ void Interface::Basic::EventNextTown(void)
     }
 }
 
-void Interface::Basic::EventSaveGame(void)
+int Interface::Basic::EventSaveGame(void)
 {
     std::string filename = Dialog::SelectFileSave();
     if(filename.size() && Game::Save(filename))
 	Dialog::Message("", _("Game saved successfully."), Font::BIG, Dialog::OK);
+    return Game::CANCEL;
 }
 
-void Interface::Basic::EventLoadGame(Game::menu_t & ret)
+int Interface::Basic::EventLoadGame(void)
 {
-    if(Dialog::YES == Dialog::Message("", _("Are you sure you want to load a new game? (Your current game will be lost)"), Font::BIG, Dialog::YES|Dialog::NO))
-    ret = Game::LOADGAME;
+    return Dialog::YES == Dialog::Message("", _("Are you sure you want to load a new game? (Your current game will be lost)"),
+	    Font::BIG, Dialog::YES|Dialog::NO) ? Game::LOADGAME : Game::CANCEL;
 }
 
 void Interface::Basic::EventPuzzleMaps(void)
@@ -336,7 +343,7 @@ void Interface::Basic::EventSwitchHeroSleeping(void)
     }
 }
 
-void Interface::Basic::EventDigArtifact(Game::menu_t & ret)
+int Interface::Basic::EventDigArtifact(void)
 {
     Heroes* hero = GetFocusHeroes();
 
@@ -347,7 +354,7 @@ void Interface::Basic::EventDigArtifact(Game::menu_t & ret)
 	else
 	if(hero->GetMaxMovePoints() <= hero->GetMovePoints())
 	{
-	    if(world.GetTiles(hero->GetCenter()).GoodForUltimateArtifact())
+	    if(world.GetTiles(hero->GetIndex()).GoodForUltimateArtifact())
     	    {
     		AGG::PlaySound(M82::DIGSOUND);
 
@@ -382,7 +389,7 @@ void Interface::Basic::EventDigArtifact(Game::menu_t & ret)
     		Display::Get().Flip();
 
 		// check game over for ultimate artifact
-		GameOver::Result::Get().LocalCheckGameOver(ret);
+		return GameOver::Result::Get().LocalCheckGameOver();
     	    }
     	    else
 		Dialog::Message("", _("Try searching on clear ground."), Font::BIG, Dialog::OK);
@@ -390,6 +397,8 @@ void Interface::Basic::EventDigArtifact(Game::menu_t & ret)
     }
     else
         Dialog::Message("", _("Digging for artifacts requires a whole day, try again tomorrow."), Font::BIG, Dialog::OK);
+
+    return Game::CANCEL;
 }
 
 void Interface::Basic::EventDefaultAction(void)
@@ -550,7 +559,7 @@ void Interface::Basic::EventSwitchShowControlPanel(void)
     }
 }
 
-void Interface::Basic::EventKeyArrowPress(Direction::vector_t dir)
+void Interface::Basic::EventKeyArrowPress(int dir)
 {
     Heroes* hero = GetFocusHeroes();
 

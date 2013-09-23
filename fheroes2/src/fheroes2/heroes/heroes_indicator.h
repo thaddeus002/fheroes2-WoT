@@ -24,6 +24,7 @@
 #define H2HEROESIND_H
 
 #include <string>
+#include "gamedefs.h"
 
 class Heroes;
 
@@ -32,9 +33,9 @@ class HeroesIndicator
 public:
     HeroesIndicator(const Heroes &);
 
-    const Rect & GetArea(void) const;
-    const std::string & GetDescriptions(void) const;
-    void SetPos(const Point &, bool skip_back = false);
+    const Rect &	GetArea(void) const;
+    const std::string &	GetDescriptions(void) const;
+    void		SetPos(const Point &, bool skip_back = false);
 
 protected:
     const Heroes & 	hero;
@@ -48,11 +49,11 @@ class LuckIndicator : public HeroesIndicator
 public:
     LuckIndicator(const Heroes &);
 
-    void Redraw(void);
-    static void QueueEventProcessing(LuckIndicator &);
+    void	Redraw(void);
+    static void	QueueEventProcessing(LuckIndicator &);
 
 private:
-    s8 luck;
+    int		luck;
 };
 
 class MoraleIndicator : public HeroesIndicator
@@ -60,11 +61,11 @@ class MoraleIndicator : public HeroesIndicator
 public:
     MoraleIndicator(const Heroes &);
 
-    void Redraw(void);
-    static void QueueEventProcessing(MoraleIndicator &);
+    void	Redraw(void);
+    static void	QueueEventProcessing(MoraleIndicator &);
 
 private:
-    s8 morale;
+    int		morale;
 };
 
 class ExperienceIndicator : public HeroesIndicator
@@ -72,8 +73,8 @@ class ExperienceIndicator : public HeroesIndicator
 public:
     ExperienceIndicator(const Heroes &);
 
-    void Redraw(void);
-    void QueueEventProcessing(void);
+    void	Redraw(void);
+    void	QueueEventProcessing(void);
 };
 
 class SpellPointsIndicator : public HeroesIndicator
@@ -81,8 +82,8 @@ class SpellPointsIndicator : public HeroesIndicator
 public:
     SpellPointsIndicator(const Heroes &);
 
-    void Redraw(void);
-    void QueueEventProcessing(void);
+    void	Redraw(void);
+    void	QueueEventProcessing(void);
 };
 
 #endif

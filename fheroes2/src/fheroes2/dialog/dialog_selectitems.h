@@ -24,18 +24,18 @@
 #define H2EDITOR_DIALOGS_H
 
 #include "dialog.h"
-#include "heroes.h"
 #include "monster.h"
+#include "heroes.h"
 #include "artifact.h"
 #include "spell.h"
 #include "skill.h"
 
 namespace Dialog
 {
-    Monster		SelectMonster(u8 id = Monster::UNKNOWN);
-    Heroes::heroes_t	SelectHeroes(Heroes::heroes_t cur = Heroes::UNKNOWN);
-    Artifact		SelectArtifact(u8 id = Artifact::UNKNOWN);
-    Spell		SelectSpell(u8 id = Spell::NONE);
+    Monster		SelectMonster(int id = Monster::UNKNOWN);
+    int			SelectHeroes(int cur = Heroes::UNKNOWN);
+    Artifact		SelectArtifact(int id = Artifact::UNKNOWN);
+    Spell		SelectSpell(int id = Spell::NONE);
     Skill::Secondary	SelectSecondarySkill(void);
 }
 

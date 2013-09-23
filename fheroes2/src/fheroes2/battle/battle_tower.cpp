@@ -26,7 +26,7 @@
 #include "battle_troop.h"
 #include "battle_tower.h"
 
-Battle::Tower::Tower(const Castle & castle, u8 twr) : Unit(Troop(Monster::ARCHER, 0), -1, false),
+Battle::Tower::Tower(const Castle & castle, int twr) : Unit(Troop(Monster::ARCHER, 0), -1, false),
     type(twr), color(castle.GetColor()), bonus(0), valid(true)
 {
     count += castle.CountBuildings();
@@ -58,22 +58,22 @@ bool Battle::Tower::isValid(void) const
     return valid;
 }
 
-u8 Battle::Tower::GetType(void) const
+u32 Battle::Tower::GetType(void) const
 {
     return type;
 }
 
-u8 Battle::Tower::GetBonus(void) const
+u32 Battle::Tower::GetBonus(void) const
 {
     return bonus;
 }
 
-u16 Battle::Tower::GetAttack(void) const
+u32 Battle::Tower::GetAttack(void) const
 {
     return Unit::GetAttack() + bonus;
 }
 
-u8 Battle::Tower::GetColor(void) const
+int Battle::Tower::GetColor(void) const
 {
     return color;
 }
@@ -99,6 +99,13 @@ Point Battle::Tower::GetPortPosition(void) const
     return res;
 }
 
+Battle::Command Battle::Tower::GetCommand(const Unit & enemy) const
+{
+    Command cmd(MSG_BATTLE_TOWER);
+    cmd.GetStream() << GetType() << enemy.GetUID();
+    return cmd;
+}
+
 void Battle::Tower::SetDestroy(void)
 {
     switch(type)
@@ -115,7 +122,7 @@ std::string Battle::Tower::GetInfo(const Castle & cstl)
     const char* tmpl = _("The %{name} fires with the strength of %{count} Archers");
     const char* addn = _("each with a +%{attack} bonus to their attack skill.");
 
-    std::vector<u8> towers;
+    std::vector<int> towers;
     std::string msg;
 
     if(cstl.isBuild(BUILD_CASTLE))
@@ -125,7 +132,7 @@ std::string Battle::Tower::GetInfo(const Castle & cstl)
 	if(cstl.isBuild(BUILD_LEFTTURRET)) towers.push_back(TWR_LEFT);
 	if(cstl.isBuild(BUILD_RIGHTTURRET)) towers.push_back(TWR_RIGHT);
 
-	for(std::vector<u8>::const_iterator
+	for(std::vector<int>::const_iterator
 	    it = towers.begin(); it != towers.end(); ++it)
 	{
     	    Tower twr = Tower(cstl, *it);

@@ -29,6 +29,7 @@
 #include "agg.h"
 #include "world.h"
 #include "kingdom.h"
+#include "game.h"
 #include "game_interface.h"
 
 void Interface::Basic::SetFocus(Heroes* hero)
@@ -55,7 +56,7 @@ void Interface::Basic::SetFocus(Heroes* hero)
 
 	if(! Game::ChangeMusicDisabled())
 	{
-	    AGG::PlayMusic(MUS::FromGround(world.GetTiles(hero->GetCenter()).GetGround()));
+	    AGG::PlayMusic(MUS::FromGround(world.GetTiles(hero->GetIndex()).GetGround()));
 	    Game::EnvironmentSoundMixer();
 	}
     }
@@ -81,12 +82,12 @@ void Interface::Basic::SetFocus(Castle* castle)
 	gameArea.SetCenter(castle->GetCenter());
 	statusWindow.SetState(STATUS_FUNDS);
 
-	AGG::PlayMusic(MUS::FromGround(world.GetTiles(castle->GetCenter()).GetGround()));
+	AGG::PlayMusic(MUS::FromGround(world.GetTiles(castle->GetIndex()).GetGround()));
 	Game::EnvironmentSoundMixer();
     }
 }
 
-void Interface::Basic::ResetFocus(u8 priority)
+void Interface::Basic::ResetFocus(int priority)
 {
     Player* player = Settings::Get().GetPlayers().GetCurrent();
 
@@ -153,7 +154,7 @@ void Interface::Basic::ResetFocus(u8 priority)
     }
 }
 
-u8 Interface::GetFocusType(void)
+int Interface::GetFocusType(void)
 {
     Player* player = Settings::Get().GetPlayers().GetCurrent();
 
@@ -211,7 +212,7 @@ Point Interface::GetFocusCenter(void)
 
 void Interface::Basic::RedrawFocus(void)
 {
-    u8 type = GetFocusType();
+    int type = GetFocusType();
 
     if(type != FOCUS_HEROES && iconsPanel.IsSelected(ICON_HEROES))
     {

@@ -26,20 +26,18 @@
 #include "splitter.h"
 
 /* splitter constructor */
-Splitter::Splitter() : step(0), min(0), max(0), cur(MAXU16)
+Splitter::Splitter() : step(0), min(0), max(0), cur(0)
 {
-    cursor.SetDefaultHide();
 }
 
 Splitter::Splitter(const Surface & sf, const Rect & rt)
-    : cursor(sf), area(rt), step(0), min(0), max(0), cur(0)
+    : SpriteMove(sf), area(rt), step(0), min(0), max(0), cur(0)
 {
-    cursor.SetDefaultHide();
 }
 
 void Splitter::SetSprite(const Surface & sf)
 {
-    cursor = sf;
+    Set(sf, true);
 }
 
 void Splitter::SetArea(const Rect & rt)
@@ -53,21 +51,26 @@ bool Splitter::isVertical(void) const
 }
 
 /* set range */
-void Splitter::SetRange(u16 smin, u16 smax)
+void Splitter::SetRange(int smin, int smax)
 {
     min = smin;
     max = smax;
+    Point move;
 
     if(min < max)
     {
-        step = 100 * (isVertical() ? (area.h - cursor.h()) : (area.w - cursor.w())) / (max - min);
-	MoveIndex(min);
+        step = 100 * (isVertical() ? (area.h - SpriteMove::h()) : (area.w - SpriteMove::w())) / (max - min);
+	cur = min;
+	move = GetPositionCursor();
     }
     else
     {
 	step = 0;
-	MoveCenter();
+	move = Point(area.x + (area.w - SpriteMove::w()) / 2,
+			    area.y + (area.h - SpriteMove::h()) / 2);
     }
+
+    SpriteMove::background.SetPos(move);
 }
 
 Point Splitter::GetPositionCursor(void)
@@ -76,13 +79,13 @@ Point Splitter::GetPositionCursor(void)
 
     if(isVertical())
     {
-	res.x = area.x + (area.w - cursor.w()) / 2;
+	res.x = area.x + (area.w - SpriteMove::w()) / 2;
     	res.y = area.y + cur * step / 100;
     }
     else
     {
 	res.x = area.x + cur * step / 100;
-	res.y = area.y + (area.h - cursor.h()) / 2;
+	res.y = area.y + (area.h - SpriteMove::h()) / 2;
     }
 
     return res;
@@ -90,27 +93,27 @@ Point Splitter::GetPositionCursor(void)
 
 void Splitter::RedrawCursor(void)
 {
-    cursor.Redraw();
+    Redraw();
 }
 
 void Splitter::HideCursor(void)
 {
-    cursor.Hide();
+    Hide();
 }
 
 void Splitter::ShowCursor(void)
 {
-    cursor.Show();
+    Show();
 }
 
 void Splitter::MoveCenter(void)
 {
-    cursor.Move(area.x + (area.w - cursor.w()) / 2,
-		    area.y + (area.h - cursor.h()) / 2);
+    Move(area.x + (area.w - SpriteMove::w()) / 2,
+		    area.y + (area.h - SpriteMove::h()) / 2);
 }
 
 /* move splitter to pos */
-void Splitter::MoveIndex(u16 num)
+void Splitter::MoveIndex(int num)
 {
     if(num > max || num < min)
     {
@@ -119,7 +122,7 @@ void Splitter::MoveIndex(u16 num)
     else
     {
 	cur = num;
-	cursor.Move(GetPositionCursor());
+	Move(GetPositionCursor());
     }
 }
 
@@ -129,7 +132,7 @@ void Splitter::Forward(void)
     if(cur != max)
     {
 	++cur;
-	cursor.Move(GetPositionCursor());
+	Move(GetPositionCursor());
     }
 }
 
@@ -139,6 +142,6 @@ void Splitter::Backward(void)
     if(cur)
     {
 	--cur;
-	cursor.Move(GetPositionCursor());
+	Move(GetPositionCursor());
     }
 }

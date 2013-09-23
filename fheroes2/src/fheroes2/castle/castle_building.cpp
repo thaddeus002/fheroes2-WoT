@@ -26,17 +26,18 @@
 #include "settings.h"
 #include "cursor.h"
 #include "race.h"
+#include "text.h"
 #include "game.h"
 
 void CastleRedrawTownName(const Castle &, const Point &);
 void CastleRedrawCurrentBuilding(const Castle &, const Point &, const CastleDialog::CacheBuildings &, u32 build, u32 flash);
-void CastleRedrawBuilding(const Castle &, const Point &, u32 build, u32 frame, u8 alpha);
+void CastleRedrawBuilding(const Castle &, const Point &, u32 build, u32 frame, int alpha);
 void CastleRedrawBuildingExtended(const Castle &, const Point &, u32 build, u32 frame);
-Rect CastleGetCoordBuilding(u8, building_t, const Point &);
+Rect CastleGetCoordBuilding(int, building_t, const Point &);
 void CastlePackOrdersBuildings(const Castle &, std::vector<building_t> &);
 Rect CastleGetMaxArea(const Castle &, const Point &);
 
-void CastleDialog::RedrawBuildingSpriteToArea(const Sprite & sprite, s16 dst_x, s16 dst_y, const Rect & max)
+void CastleDialog::RedrawBuildingSpriteToArea(const Sprite & sprite, s32 dst_x, s32 dst_y, const Rect & max)
 {
     std::pair<Rect, Point> res = Rect::Fixed4Blit(Rect(dst_x, dst_y, sprite.w(), sprite.h()), max);
     sprite.Blit(res.first, res.second);
@@ -186,11 +187,11 @@ void CastleRedrawCurrentBuilding(const Castle & castle, const Point & dst_pt,
     if(orders.end() != std::find(orders.begin(), orders.end(), build))
     {
 	LocalEvent & le = LocalEvent::Get();
-	u8 alpha = 1;
+	int alpha = 1;
 
 	while(le.HandleEvents() && alpha < 250)
 	{
-    	    if(Game::AnimateInfrequent(Game::CASTLE_BUILD_DELAY))
+    	    if(Game::AnimateInfrequentDelay(Game::CASTLE_BUILD_DELAY))
     	    {
     		cursor.Hide();
 
@@ -227,7 +228,7 @@ void CastleRedrawCurrentBuilding(const Castle & castle, const Point & dst_pt,
     ++frame;
 }
 
-void CastleRedrawBuilding(const Castle & castle, const Point & dst_pt, u32 build, u32 frame, u8 alpha)
+void CastleRedrawBuilding(const Castle & castle, const Point & dst_pt, u32 build, u32 frame, int alpha)
 {
     const Rect max = CastleGetMaxArea(castle, dst_pt);
 
@@ -243,8 +244,8 @@ void CastleRedrawBuilding(const Castle & castle, const Point & dst_pt, u32 build
 	default: break;
     }
 
-    const ICN::icn_t icn = Castle::GetICNBuilding(build, castle.GetRace());
-    u8 index = 0;
+    const int icn = Castle::GetICNBuilding(build, castle.GetRace());
+    u32 index = 0;
 
     // correct index (mage guild)
     switch(build)
@@ -257,29 +258,32 @@ void CastleRedrawBuilding(const Castle & castle, const Point & dst_pt, u32 build
         default: break;
     }
 
-    // simple first sprite
-    const Sprite & sprite1 = AGG::GetICN(icn, index);
-
-    if(alpha)
-	sprite1.Blit(alpha, dst_pt.x + sprite1.x(), dst_pt.y + sprite1.y());
-    else
-	CastleDialog::RedrawBuildingSpriteToArea(sprite1, dst_pt.x + sprite1.x(), dst_pt.y + sprite1.y(), max);
-
-    // second anime sprite
-    if(const u16 index2 = ICN::AnimationFrame(icn, index, frame))
+    if(icn != ICN::UNKNOWN)
     {
-	const Sprite & sprite2 = AGG::GetICN(icn, index2);
+	// simple first sprite
+	const Sprite & sprite1 = AGG::GetICN(icn, index);
+
 	if(alpha)
-	    sprite2.Blit(alpha, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
+	    sprite1.Blit(alpha, dst_pt.x + sprite1.x(), dst_pt.y + sprite1.y());
 	else
-	    CastleDialog::RedrawBuildingSpriteToArea(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y(), max);
+	    CastleDialog::RedrawBuildingSpriteToArea(sprite1, dst_pt.x + sprite1.x(), dst_pt.y + sprite1.y(), max);
+
+	// second anime sprite
+	if(const u32 index2 = ICN::AnimationFrame(icn, index, frame))
+	{
+	    const Sprite & sprite2 = AGG::GetICN(icn, index2);
+	    if(alpha)
+		sprite2.Blit(alpha, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
+	    else
+	        CastleDialog::RedrawBuildingSpriteToArea(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y(), max);
+	}
     }
 }
 
 void CastleRedrawBuildingExtended(const Castle & castle, const Point & dst_pt, u32 build, u32 frame)
 {
     const Rect max = CastleGetMaxArea(castle, dst_pt);
-    ICN::icn_t icn = Castle::GetICNBuilding(build, castle.GetRace());
+    int icn = Castle::GetICNBuilding(build, castle.GetRace());
 
     // shipyard
     if(BUILD_SHIPYARD == build)
@@ -287,12 +291,12 @@ void CastleRedrawBuildingExtended(const Castle & castle, const Point & dst_pt, u
 	// boat
 	if(castle.PresentBoat())
 	{
-	    const ICN::icn_t icn2 = castle.GetICNBoat(castle.GetRace());
+	    const int icn2 = castle.GetICNBoat(castle.GetRace());
 
     	    const Sprite & sprite40 = AGG::GetICN(icn2, 0);
 	    CastleDialog::RedrawBuildingSpriteToArea(sprite40, dst_pt.x + sprite40.x(), dst_pt.y + sprite40.y(), max);
 
-    	    if(const u16 index2 = ICN::AnimationFrame(icn2, 0, frame))
+    	    if(const u32 index2 = ICN::AnimationFrame(icn2, 0, frame))
 	    {
 		const Sprite & sprite41 = AGG::GetICN(icn2, index2);
 		CastleDialog::RedrawBuildingSpriteToArea(sprite41, dst_pt.x + sprite41.x(), dst_pt.y + sprite41.y(), max);
@@ -300,7 +304,7 @@ void CastleRedrawBuildingExtended(const Castle & castle, const Point & dst_pt, u
 	}
 	else
 	{
-    	    if(const u16 index2 = ICN::AnimationFrame(icn, 0, frame))
+    	    if(const u32 index2 = ICN::AnimationFrame(icn, 0, frame))
 	    {
 		const Sprite & sprite3 = AGG::GetICN(icn, index2);
 		CastleDialog::RedrawBuildingSpriteToArea(sprite3, dst_pt.x + sprite3.x(), dst_pt.y + sprite3.y(), max);
@@ -311,12 +315,12 @@ void CastleRedrawBuildingExtended(const Castle & castle, const Point & dst_pt, u
     // sorc and anime wel2 or statue
     if(Race::SORC == castle.GetRace() && BUILD_WEL2 == build)
     {
-	const ICN::icn_t icn2 = castle.isBuild(BUILD_STATUE) ? ICN::TWNSEXT1 : icn;
+	const int icn2 = castle.isBuild(BUILD_STATUE) ? ICN::TWNSEXT1 : icn;
 
     	const Sprite & sprite20 = AGG::GetICN(icn2, 0);
 	CastleDialog::RedrawBuildingSpriteToArea(sprite20, dst_pt.x + sprite20.x(), dst_pt.y + sprite20.y(), max);
 
-    	if(const u16 index2 = ICN::AnimationFrame(icn2, 0, frame))
+    	if(const u32 index2 = ICN::AnimationFrame(icn2, 0, frame))
 	{
 	    const Sprite & sprite21 = AGG::GetICN(icn2, index2);
 	    CastleDialog::RedrawBuildingSpriteToArea(sprite21, dst_pt.x + sprite21.x(), dst_pt.y + sprite21.y(), max);
@@ -324,7 +328,7 @@ void CastleRedrawBuildingExtended(const Castle & castle, const Point & dst_pt, u
     }
 }
 
-Rect CastleGetCoordBuilding(u8 race, building_t building, const Point & pt)
+Rect CastleGetCoordBuilding(int race, building_t building, const Point & pt)
 {
     switch(building)
     {

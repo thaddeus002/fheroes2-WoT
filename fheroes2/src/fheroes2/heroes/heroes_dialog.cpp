@@ -33,6 +33,7 @@
 #include "kingdom.h"
 #include "text.h"
 #include "castle.h"
+#include "game.h"
 #include "dialog.h"
 #include "heroes_indicator.h"
 #include "army_bar.h"
@@ -40,7 +41,7 @@
 #include "pocketpc.h"
 
 /* readonly: false, fade: false */
-Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
+int Heroes::OpenDialog(bool readonly, bool fade)
 {
     if(Settings::Get().QVGA()) return PocketPC::HeroesOpenDialog(*this, readonly);
 
@@ -246,7 +247,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	}
 
         // exit
-	if(le.MouseClickLeft(buttonExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) return Dialog::CANCEL;
+	if(le.MouseClickLeft(buttonExit) || Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)) return Dialog::CANCEL;
 
         // heroes troops
         if(le.MouseCursor(selectArmy.GetArea()) &&

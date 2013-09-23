@@ -29,25 +29,21 @@
 #include "tinyconfig.h"
 #include "agg.h"
 #include "settings.h"
+#include "game.h"
 #include "game_interface.h"
 
 namespace Game
 {
-    void HotKeysDefaults(void);
-    void HotKeysLoad(const std::string &);
-    const char* EventsName(events_t);
-    void KeyboardGlobalFilter(int, u16);
-
-    events_t & operator++ (events_t & evnt)
-    {
-	return evnt = (EVENT_LAST == evnt ? EVENT_NONE : events_t(evnt + 1));
-    }
+    void	HotKeysDefaults(void);
+    void	HotKeysLoad(const std::string &);
+    const	char* EventsName(int);
+    void	KeyboardGlobalFilter(int, int);
 
     KeySym key_events[EVENT_LAST];
     int key_groups = 0;
 }
 
-const char* Game::EventsName(events_t evnt)
+const char* Game::EventsName(int evnt)
 {
     switch(evnt)
     {
@@ -222,7 +218,7 @@ void Game::HotKeysDefaults(void)
     // key_events[EVENT_SWITCHGROUP] = KEY_NONE;
 }
 
-bool Game::HotKeyPress(events_t evnt)
+bool Game::HotKeyPressEvent(int evnt)
 {
     LocalEvent & le = LocalEvent::Get();
     return le.KeyPress() && le.KeyValue() == key_events[evnt];
@@ -237,7 +233,7 @@ void Game::HotKeysLoad(const std::string & hotkeys)
     {
 	int ival = 0;
 
-	for(events_t evnt = EVENT_NONE; evnt < EVENT_LAST; ++evnt)
+	for(int evnt = EVENT_NONE; evnt < EVENT_LAST; ++evnt)
 	{
 	    const char* name = EventsName(evnt);
 	    if(name)
@@ -276,7 +272,7 @@ void Game::HotKeysLoad(const std::string & hotkeys)
     }
 }
 
-void Game::KeyboardGlobalFilter(int sym, u16 mod)
+void Game::KeyboardGlobalFilter(int sym, int mod)
 {
     Display & display = Display::Get();
 

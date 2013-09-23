@@ -27,10 +27,10 @@
 #include "settings.h"
 #include "mageguild.h"
 
-Spell GetUniqueCombatSpellCompatibility(const SpellStorage &, u8 race, u8 level);
-Spell GetCombatSpellCompatibility(u8 race, u8 level);
+Spell GetUniqueCombatSpellCompatibility(const SpellStorage &, int race, int level);
+Spell GetCombatSpellCompatibility(int race, int level);
 
-void MageGuild::Builds(u8 race, bool libraryCap)
+void MageGuild::Builds(int race, bool libraryCap)
 {
     general.clear();
     library.clear();
@@ -66,7 +66,7 @@ void MageGuild::Builds(u8 race, bool libraryCap)
     }
 }
 
-SpellStorage MageGuild::GetSpells(u8 lvlmage, bool islibrary, u8 level) const
+SpellStorage MageGuild::GetSpells(int lvlmage, bool islibrary, int level) const
 {
     SpellStorage result;
 
@@ -79,13 +79,13 @@ SpellStorage MageGuild::GetSpells(u8 lvlmage, bool islibrary, u8 level) const
     return result;
 }
 
-void MageGuild::EducateHero(HeroBase & hero, u8 lvlmage, bool isLibraryBuild) const
+void MageGuild::EducateHero(HeroBase & hero, int lvlmage, bool isLibraryBuild) const
 {
     if(hero.HaveSpellBook() && lvlmage)
     {
 	SpellStorage spells;
 
-	for(u8 level = 1; level <= 5; ++level) if(level <= lvlmage)
+	for(s32 level = 1; level <= 5; ++level) if(level <= lvlmage)
 	{
 	    spells.Append(general.GetSpells(level));
 	    if(isLibraryBuild) spells.Append(library.GetSpells(level));
@@ -95,14 +95,14 @@ void MageGuild::EducateHero(HeroBase & hero, u8 lvlmage, bool isLibraryBuild) co
     }
 }
 
-Spell GetUniqueCombatSpellCompatibility(const SpellStorage & spells, u8 race, u8 lvl)
+Spell GetUniqueCombatSpellCompatibility(const SpellStorage & spells, int race, int lvl)
 {
     Spell spell = GetCombatSpellCompatibility(race, lvl);
     while(spells.isPresentSpell(spell)) spell = GetCombatSpellCompatibility(race, lvl);
     return spell;
 }
 
-Spell GetCombatSpellCompatibility(u8 race, u8 lvl)
+Spell GetCombatSpellCompatibility(int race, int lvl)
 {
     Spell spell = Spell::RandCombat(lvl);
     while(!spell.isRaceCompatible(race)) spell = Spell::RandCombat(lvl);

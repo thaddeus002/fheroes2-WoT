@@ -24,7 +24,9 @@
 #include "cursor.h"
 #include "text.h"
 #include "button.h"
+#include "dialog.h"
 #include "heroes.h"
+#include "game.h"
 #include "heroes_indicator.h"
 #include "army_bar.h"
 #include "world.h"
@@ -32,7 +34,7 @@
 #include "kingdom.h"
 #include "pocketpc.h"
 
-Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
+int PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
@@ -152,7 +154,7 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
 	else
         // exit
         if(le.MouseClickLeft(buttonExit) ||
-		Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) return Dialog::CANCEL;
+		Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)) return Dialog::CANCEL;
 	else
         // dismiss
 	if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss) &&

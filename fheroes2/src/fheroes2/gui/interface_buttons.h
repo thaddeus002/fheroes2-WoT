@@ -35,12 +35,12 @@ namespace Interface
     public:
 	ButtonsArea(Basic &);
 
-	void SetPos(s16, s16);
-	void SavePosition(void);
-	void SetRedraw(void) const;
+	void		SetPos(s32, s32);
+	void		SavePosition(void);
+	void		SetRedraw(void) const;
 
-	void Redraw(void);
-	void QueueEventProcessing(Game::menu_t &);
+	void		Redraw(void);
+	int		QueueEventProcessing(void);
 
     private:
 	Basic & interface;

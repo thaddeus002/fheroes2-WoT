@@ -21,13 +21,14 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "text.h"
 #include "settings.h"
 #include "cursor.h"
 #include "button.h"
 #include "resource.h"
 #include "dialog.h"
 
-u16 Dialog::ResourceInfo(const std::string &header, const std::string &message, const Funds & rs, u16 buttons)
+int Dialog::ResourceInfo(const std::string &header, const std::string &message, const Funds & rs, int buttons)
 {
     Display & display = Display::Get();
 
@@ -41,7 +42,7 @@ u16 Dialog::ResourceInfo(const std::string &header, const std::string &message, 
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
     Resource::BoxSprite rbs(rs, BOXAREA_WIDTH);
 
-    const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
+    const int spacer = Settings::Get().QVGA() ? 5 : 10;
 
     FrameBox box(box1.h() + spacer + box2.h() + spacer + rbs.GetArea().h, true);
     Point pos = box.GetArea();
@@ -63,7 +64,7 @@ u16 Dialog::ResourceInfo(const std::string &header, const std::string &message, 
     cursor.Show();
     display.Flip();
 
-    u16 result = Dialog::ZERO;
+    int result = Dialog::ZERO;
 
     while(result == Dialog::ZERO && le.HandleEvents())
     {

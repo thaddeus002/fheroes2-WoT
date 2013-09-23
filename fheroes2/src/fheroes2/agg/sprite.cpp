@@ -26,7 +26,7 @@
 #include "display.h"
 #include "sprite.h"
 
-bool SkipLocalAlpha(u16 icn)
+bool SkipLocalAlpha(int icn)
 {
     switch(icn)
     {
@@ -56,7 +56,7 @@ Sprite::Sprite(const Sprite & sp) : offsetX(sp.x()), offsetY(sp.y())
     Set(sp, true);
 }
 
-Sprite::Sprite(const Surface & sf, s16 ox, s16 oy) : offsetX(ox), offsetY(oy)
+Sprite::Sprite(const Surface & sf, s32 ox, s32 oy) : offsetX(ox), offsetY(oy)
 {
     Set(sf, true);
 }
@@ -82,7 +82,7 @@ void Sprite::Reset(void)
     Surface::Reset();
 }
 
-void Sprite::SetOffset(s16 ox, s16 oy)
+void Sprite::SetOffset(s32 ox, s32 oy)
 {
     offsetX = ox;
     offsetY = oy;
@@ -94,9 +94,9 @@ void Sprite::DrawICN(int icn, const u8* cur, int size, bool reflect, Surface & s
 
     const u8 *max = cur + size;
 
-    u8  c = 0;
-    u16 x = reflect ? sf.w() - 1 : 0;
-    u16 y = 0;
+    u32 c = 0;
+    u32 x = reflect ? sf.w() - 1 : 0;
+    u32 y = 0;
 
     Surface sf_tmp;
     Surface* sf_cur = sf.amask() ? &sf : &sf_tmp;
@@ -204,14 +204,14 @@ u32 Sprite::GetMemoryUsage(void) const
     return Surface::GetMemoryUsage() + sizeof(offsetX) + sizeof(offsetY);
 }
 
-void Sprite::ScaleMinifyByTwo(void)
+void Sprite::ScaleQVGA(void)
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
 
     if(w() > 3 && h() > 3)
     {
-	u16 theme = 0;
+	int theme = 0;
 	if(cursor.isVisible() && Cursor::WAIT != cursor.Themes())
 	{
 	    theme = cursor.Themes();
@@ -220,7 +220,7 @@ void Sprite::ScaleMinifyByTwo(void)
 	    display.Flip();
 	}
 
-	Surface mini = Surface::ScaleMinifyByTwo(*this, cursor.isVisible());
+	Surface mini = ScaleQVGA(*this);
 	Surface::Swap(mini, *this);
 
 	if(theme)
@@ -285,4 +285,11 @@ void Sprite::Blit(int alpha, int dstx, int dsty, Surface & dst) const
 void Sprite::Blit(int alpha, const Rect & srt, const Point & dpt, Surface & dst) const
 {
     Surface::Blit(alpha, srt, dpt, dst);
+}
+
+Surface Sprite::ScaleQVGA(const Surface & src)
+{
+    s32 w = src.w() / 2;
+    s32 h = src.h() / 2;
+    return Surface::Scale(src, (w ? w : 1), (h ? h : 1));
 }

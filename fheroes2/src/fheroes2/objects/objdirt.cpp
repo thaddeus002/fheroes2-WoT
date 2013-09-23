@@ -26,7 +26,7 @@
 #include "direction.h"
 #include "objdirt.h"
 
-u16 ObjDirt::GetPassable(const u8 & index)
+int ObjDirt::GetPassable(u32 index)
 {
     const u8 disabled[] = { 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 48, 49, 50, 51 };
     const u8 restricted[] = { 7, 9, 12, 13, 15, 16, 17, 18 ,19, 20, 21, 22, 40, 41, 42, 43, 44, 45,
@@ -45,12 +45,12 @@ u16 ObjDirt::GetPassable(const u8 & index)
             DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
 }
 
-bool ObjDirt::isAction(const u8 & index)
+bool ObjDirt::isAction(u32 index)
 {
     return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
-bool ObjDirt::isShadow(const u8 & index)
+bool ObjDirt::isShadow(u32 index)
 {
     const u8 shadows[] = { 0, 1, 5, 6, 14, 47, 52, 59, 62, 65, 68, 70, 72, 75, 78, 81, 84,
 	    87, 91, 94, 97, 100, 103, 111, 114, 117, 126, 128, 136, 149, 150, 161, 165, 177, 181, 196, 200 };
@@ -58,7 +58,7 @@ bool ObjDirt::isShadow(const u8 & index)
     return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
 }
 
-u8 ObjDirt::GetActionObject(const u8 & index)
+int ObjDirt::GetActionObject(u32 index)
 {
     switch(index)
     {

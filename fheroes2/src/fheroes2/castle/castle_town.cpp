@@ -32,28 +32,28 @@
 #include "heroes.h"
 #include "text.h"
 #include "race.h"
+#include "game.h"
 #include "statusbar.h"
 #include "payment.h"
 #include "buildinginfo.h"
 #include "kingdom.h"
 
-Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
+int Castle::DialogBuyHero(const Heroes* hero)
 {
     if(!hero) return Dialog::CANCEL;
 
-    const ICN::icn_t system = (Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM);
+    const int system = (Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM);
 
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
-
     cursor.Hide();
 
-    const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
+    const int spacer = Settings::Get().QVGA() ? 5 : 10;
     const Sprite & portrait_frame = AGG::GetICN(ICN::SURRENDR, 4);
 
     Text text(_("Recruit Hero"), Font::BIG);
 
-    u8 count = hero->GetCountArtifacts();
+    u32 count = hero->GetCountArtifacts();
     if(hero->HasArtifact(Artifact::MAGIC_BOOK)) count--;
 
     std::string str = _("%{name} is a level %{value} %{race}");
@@ -127,16 +127,16 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
 
         if(button1.isEnable() &&
     	    (le.MouseClickLeft(button1) ||
-    	    Game::HotKeyPress(Game::EVENT_DEFAULT_READY))) return Dialog::OK;
+    	    Game::HotKeyPressEvent(Game::EVENT_DEFAULT_READY))) return Dialog::OK;
 
         if(le.MouseClickLeft(button2) ||
-    	    Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
+    	    Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)) break;
     }
 
     return Dialog::CANCEL;
 }
 
-Dialog::answer_t Castle::DialogBuyCastle(bool buttons) const
+int Castle::DialogBuyCastle(bool buttons) const
 {
     BuildingInfo info(*this, BUILD_CASTLE);
     return info.DialogBuyBuilding(buttons) ? Dialog::OK : Dialog::CANCEL;
@@ -145,8 +145,6 @@ Dialog::answer_t Castle::DialogBuyCastle(bool buttons) const
 u32 Castle::OpenTown(void)
 {
     Display & display = Display::Get();
-
-    // cursor
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
 

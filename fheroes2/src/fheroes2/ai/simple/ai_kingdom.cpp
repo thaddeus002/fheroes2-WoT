@@ -55,7 +55,7 @@ AIKingdoms & AIKingdoms::Get(void)
     return ai_kingdoms;
 }
 
-AIKingdom & AIKingdoms::Get(Color::color_t color)
+AIKingdom & AIKingdoms::Get(int color)
 {
     return AIKingdoms::Get().at(Color::GetIndex(color));
 }
@@ -81,7 +81,7 @@ void IndexObjectMap::DumpObjects(const IndexDistance & id)
 			<< ", maps index: " << id.first << ", dist: " << id.second);
 }
 
-void WorldStoreObjects(u8 color, IndexObjectMap & store)
+void WorldStoreObjects(int color, IndexObjectMap & store)
 {
     for(s32 it = 0; it < world.w() * world.h(); ++it)
     {
@@ -127,7 +127,7 @@ void AI::KingdomTurn(Kingdom & kingdom)
     KingdomHeroes & heroes = kingdom.GetHeroes();
     KingdomCastles & castles = kingdom.GetCastles();
 
-    const Color::color_t & color = kingdom.GetColor();
+    const int color = kingdom.GetColor();
 
     if(kingdom.isLoss() || color == Color::NONE)
     {
@@ -185,7 +185,7 @@ void AI::KingdomTurn(Kingdom & kingdom)
     if(ai.capital && ai.capital->isCastle())
     {
 	u32 modes = 0;
-	const u8 maxhero = Maps::XLARGE > world.w() ? (Maps::LARGE > world.w() ? 3 : 2) : 4;
+	const u32 maxhero = Maps::XLARGE > world.w() ? (Maps::LARGE > world.w() ? 3 : 2) : 4;
 
 	if(heroes.empty())
 	    modes = AI::HEROES_HUNTER|AI::HEROES_SCOUTER;

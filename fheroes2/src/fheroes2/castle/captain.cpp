@@ -28,7 +28,7 @@
 #include "settings.h"
 #include "captain.h"
 
-Captain::Captain(Castle & cstl) : HeroBase(Skill::Primary::CAPTAIN, cstl.GetRace()), home(cstl)
+Captain::Captain(Castle & cstl) : HeroBase(HeroBase::CAPTAIN, cstl.GetRace()), home(cstl)
 {
     SetCenter(home.GetCenter());
 }
@@ -38,29 +38,29 @@ bool Captain::isValid(void) const
     return home.isBuild(BUILD_CAPTAIN);
 }
 
-u8 Captain::GetAttack(void) const
+int Captain::GetAttack(void) const
 {
     return attack + GetAttackModificator(NULL);
 }
 
-u8 Captain::GetDefense(void) const
+int Captain::GetDefense(void) const
 {
     return defense + GetDefenseModificator(NULL);
 }
 
-u8 Captain::GetPower(void) const
+int Captain::GetPower(void) const
 {
    return power + GetPowerModificator(NULL);
 }
 
-u8 Captain::GetKnowledge(void) const
+int Captain::GetKnowledge(void) const
 {
     return knowledge + GetKnowledgeModificator(NULL);
 }
 
-s8 Captain::GetMorale(void) const
+int Captain::GetMorale(void) const
 {
-    s8 result = Morale::NORMAL;
+    int result = Morale::NORMAL;
 
     // global modificator
     result += GetMoraleModificator(NULL);
@@ -81,9 +81,9 @@ s8 Captain::GetMorale(void) const
     return Morale::BLOOD;
 }
 
-s8 Captain::GetLuck(void) const
+int Captain::GetLuck(void) const
 {
-    s8 result = Luck::NORMAL;
+    int result = Luck::NORMAL;
 
     // global modificator
     result += GetLuckModificator(NULL);
@@ -104,12 +104,12 @@ s8 Captain::GetLuck(void) const
     return Luck::IRISH;
 }
 
-u8 Captain::GetRace(void) const
+int Captain::GetRace(void) const
 {
     return home.GetRace();
 }
 
-Color::color_t Captain::GetColor(void) const
+int Captain::GetColor(void) const
 {
     return home.GetColor();
 }
@@ -119,17 +119,17 @@ const std::string & Captain::GetName(void) const
     return home.GetName();
 }
 
-u8 Captain::GetType(void) const
+int Captain::GetType(void) const
 {
-    return Skill::Primary::CAPTAIN;
+    return HeroBase::CAPTAIN;
 }
 
-u8 Captain::GetLevelSkill(u8) const
+int Captain::GetLevelSkill(int) const
 {
     return 0;
 }
 
-u16 Captain::GetSecondaryValues(u8) const
+u32 Captain::GetSecondaryValues(int) const
 {
     return 0;
 }
@@ -144,12 +144,12 @@ Army & Captain::GetArmy(void)
     return home.GetArmy();
 }
 
-u16 Captain::GetMaxSpellPoints(void) const
+u32 Captain::GetMaxSpellPoints(void) const
 {
     return knowledge * 10;
 }
 
-u8 Captain::GetControl(void) const
+int Captain::GetControl(void) const
 {
     return home.GetControl();
 }
@@ -174,7 +174,7 @@ const Castle* Captain::inCastle(void) const
     return &home;
 }
 
-Surface Captain::GetPortrait(u8 type) const
+Surface Captain::GetPortrait(int type) const
 {
     switch(type)
     {
@@ -206,10 +206,10 @@ Surface Captain::GetPortrait(u8 type) const
             break;
     }
 
-    return AGG::GetICN(ICN::PORT0090, 0);
+    return Surface();
 }
 
-void Captain::PortraitRedraw(s16 px, s16 py, u8 type, Surface & dstsf) const
+void Captain::PortraitRedraw(s32 px, s32 py, int type, Surface & dstsf) const
 {
     GetPortrait(type).Blit(px, py, dstsf);
 }

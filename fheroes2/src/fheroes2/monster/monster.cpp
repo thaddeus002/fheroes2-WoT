@@ -31,11 +31,8 @@
 #include "morale.h"
 #include "payment.h"
 #include "game_static.h"
+#include "icn.h"
 #include "monster.h"
-
-#ifdef WITH_XML
-#include "xmlccwrap.h"
-#endif
 
 struct monstats_t
 {
@@ -44,7 +41,7 @@ struct monstats_t
     u8 damageMin;
     u8 damageMax;
     u16 hp;
-    Speed::speed_t speed;
+    u8 speed;
     u8 grown;
     u8 shots;
     const char* name;
@@ -163,9 +160,9 @@ StreamBase & operator>> (StreamBase & msg, monstats_t & obj)
 
 StreamBase & operator<< (StreamBase & msg, const MonsterStaticData & obj)
 {
-    const u16 monsters_size = ARRAY_COUNT(monsters);
+    u16 monsters_size = ARRAY_COUNT(monsters);
     msg << monsters_size;
-    for(u16 ii = 0; ii < monsters_size; ++ii)
+    for(u32 ii = 0; ii < monsters_size; ++ii)
 	msg << monsters[ii];
     return msg;
 }
@@ -174,7 +171,7 @@ StreamBase & operator>> (StreamBase & msg, MonsterStaticData & obj)
 {
     u16 monsters_size;
     msg >> monsters_size;
-    for(u16 ii = 0; ii < monsters_size; ++ii)
+    for(u32 ii = 0; ii < monsters_size; ++ii)
 	msg >> monsters[ii];
     return msg;
 }
@@ -210,7 +207,7 @@ void Monster::UpdateStats(const std::string & spec)
     		xml_monster->Attribute("damage_min", &value); if(value) ptr->damageMin = value;
     		xml_monster->Attribute("damage_max", &value); if(value) ptr->damageMax = value;
     		xml_monster->Attribute("hp", &value); if(value) ptr->hp = value;
-    		xml_monster->Attribute("speed", &value); ptr->speed = Speed::INSTANT < value ? Speed::INSTANT : (Speed::CRAWLING > value ? Speed::CRAWLING : static_cast<Speed::speed_t>(value));
+    		xml_monster->Attribute("speed", &value); ptr->speed = Speed::FromInt(value);
     		xml_monster->Attribute("grown", &value); ptr->grown = value;
     		xml_monster->Attribute("shots", &value); ptr->shots = value;
     		xml_monster->Attribute("gold", &value); cost.gold = value;
@@ -230,7 +227,7 @@ void Monster::UpdateStats(const std::string & spec)
 #endif
 }
 
-Monster::Monster(u8 m) : id(UNKNOWN)
+Monster::Monster(int m) : id(UNKNOWN)
 {
     if(m <= WATER_ELEMENT)
 	id = m;
@@ -272,7 +269,7 @@ Monster::Monster(const Spell & sp) : id(UNKNOWN)
     }
 }
 
-Monster::Monster(u8 race, u32 dw) : id(UNKNOWN)
+Monster::Monster(int race, u32 dw) : id(UNKNOWN)
 {
     id = FromDwelling(race, dw).id;
 }
@@ -297,12 +294,12 @@ bool Monster::operator!= (const Monster & m) const
     return id != m.id;
 }
 
-u8 Monster::operator() (void) const
+int Monster::operator() (void) const
 {
     return id;
 }
 
-u8 Monster::GetID(void) const
+int Monster::GetID(void) const
 {
     return id;
 }
@@ -312,32 +309,32 @@ void Monster::Upgrade(void)
     id = GetUpgrade().id;
 }
 
-u16 Monster::GetAttack(void) const
+u32 Monster::GetAttack(void) const
 {
     return monsters[id].attack;
 }
 
-u16 Monster::GetDefense(void) const
+u32 Monster::GetDefense(void) const
 {
     return monsters[id].defense;
 }
 
-u8 Monster::GetColor(void) const
+int Monster::GetColor(void) const
 {
     return Color::NONE;
 }
 
-s8 Monster::GetMorale(void) const
+int Monster::GetMorale(void) const
 {
     return Morale::NORMAL;
 }
 
-s8 Monster::GetLuck(void) const
+int Monster::GetLuck(void) const
 {
     return Luck::NORMAL;
 }
 
-u8 Monster::GetRace(void) const
+int Monster::GetRace(void) const
 {
     if(UNKNOWN == id)	return Race::NONE;
     else
@@ -356,44 +353,44 @@ u8 Monster::GetRace(void) const
     return Race::NONE;
 }
 
-u8  Monster::GetDamageMin(void) const
+u32 Monster::GetDamageMin(void) const
 {
     return monsters[id].damageMin;
 }
 
-u8  Monster::GetDamageMax(void) const
+u32 Monster::GetDamageMax(void) const
 {
     return monsters[id].damageMax;
 }
 
-u8  Monster::GetShots(void) const
+u32 Monster::GetShots(void) const
 {
     return monsters[id].shots;
 }
 
-u16 Monster::GetHitPoints(void) const
+u32 Monster::GetHitPoints(void) const
 {
     return monsters[id].hp;
 }
 
-u8  Monster::GetSpeed(void) const
+u32 Monster::GetSpeed(void) const
 {
     return monsters[id].speed;
 }
 
-u8  Monster::GetGrown(void) const
+u32 Monster::GetGrown(void) const
 {
     return monsters[id].grown;
 }
 
-u16 Monster::GetRNDSize(bool skip_factor) const
+u32 Monster::GetRNDSize(bool skip_factor) const
 {
     const u32 hps = (GetGrown() ? GetGrown() : 1) * GetHitPoints();
     u32 res = Rand::Get(hps, hps + hps / 2);
 
     if(!skip_factor)
     {
-	u16 factor = 100;
+	u32 factor = 100;
 
 	switch(Settings::Get().GameDifficulty()) 	 
 	{
@@ -410,7 +407,7 @@ u16 Monster::GetRNDSize(bool skip_factor) const
 	if(res == 0) res = 1;
     }
 
-    return GetCountFromHitPoints(id, res);
+    return isValid() ? GetCountFromHitPoints(id, res) : 0;
 }
 
 bool Monster::isUndead(void) const
@@ -674,7 +671,7 @@ Monster Monster::GetUpgrade(void) const
     return Monster(id);
 }
 
-Monster Monster::FromDwelling(u8 race, u32 dwelling)
+Monster Monster::FromDwelling(int race, u32 dwelling)
 {
     switch(dwelling)
     {
@@ -856,7 +853,7 @@ Monster Monster::Rand(level_t level)
     std::vector<Monster> monsters;
     monsters.reserve(30);
 
-    for(u8 ii = PEASANT; ii <= WATER_ELEMENT; ++ii)
+    for(u32 ii = PEASANT; ii <= WATER_ELEMENT; ++ii)
     {
 	Monster mons(ii);
 	if(mons.GetLevel() == level) monsters.push_back(mons);
@@ -865,7 +862,7 @@ Monster Monster::Rand(level_t level)
     return monsters.size() ? *Rand::Get(monsters) : UNKNOWN;
 }
 
-u8 Monster::Rand4WeekOf(void)
+u32 Monster::Rand4WeekOf(void)
 {
     switch(Rand::Get(1, 47))
     {
@@ -921,7 +918,7 @@ u8 Monster::Rand4WeekOf(void)
     return UNKNOWN;
 }
 
-u8 Monster::Rand4MonthOf(void)
+u32 Monster::Rand4MonthOf(void)
 {
     switch(Rand::Get(1, 30))
     {
@@ -960,7 +957,7 @@ u8 Monster::Rand4MonthOf(void)
     return UNKNOWN;
 }
 
-u8 Monster::GetLevel(void) const
+int Monster::GetLevel(void) const
 {
     switch(id)
     {
@@ -1226,15 +1223,15 @@ const char* Monster::GetPluralName(u32 count) const
     return 1 == count ? GetName() : GetMultiName();
 }
 
-u8 Monster::GetSpriteIndex(void) const
+u32 Monster::GetSpriteIndex(void) const
 {
     return UNKNOWN < id ? id - 1 : 0;
 }
 
-ICN::icn_t Monster::ICNMonh(void) const
+int Monster::ICNMonh(void) const
 {
 
-    return id >= PEASANT && id <= WATER_ELEMENT ? static_cast<ICN::icn_t>(ICN::MONH0000 + id - PEASANT) : ICN::UNKNOWN;
+    return id >= PEASANT && id <= WATER_ELEMENT ? ICN::MONH0000 + id - PEASANT : ICN::UNKNOWN;
 }
 
 payment_t Monster::GetCost(void) const
@@ -1262,7 +1259,7 @@ u32 Monster::GetCountFromHitPoints(const Monster & mons, u32 hp)
 {
     if(hp)
     {
-	const u16 hp1 = mons.GetHitPoints();
+	const u32 hp1 = mons.GetHitPoints();
 	const u32 count = hp / hp1;
 	return (count * hp1) < hp ? count + 1 : count;
     }

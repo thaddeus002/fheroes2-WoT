@@ -27,6 +27,10 @@
 #define MAJOR_VERSION 0
 #define MINOR_VERSION 6
 
+#ifdef WITH_XML
+#include "xmlccwrap.h"
+#endif
+
 const char* strip_context(const char* c);
 
 /*

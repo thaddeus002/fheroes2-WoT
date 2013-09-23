@@ -34,6 +34,7 @@
 #include "payment.h"
 #include "profit.h"
 #include "kingdom.h"
+#include "game.h"
 #include "race.h"
 #include "tools.h"
 #include "text.h"
@@ -89,7 +90,7 @@ bool AllowFlashBuilding(u32 build)
 
 Sprite GetActualSpriteBuilding(const Castle & castle, u32 build)
 {
-    u8 index = 0;
+    u32 index = 0;
     // correct index (mage guild)
     switch(build)
     {
@@ -118,7 +119,7 @@ building_t GetCurrentFlash(const Castle & castle, CastleDialog::CacheBuildings &
 	{
 	    if((*it).id & BUILD_MAGEGUILD)
 	    {
-		const u8 & lvl = castle.GetLevelMageGuild();
+		u32 lvl = castle.GetLevelMageGuild();
 
 		if(((*it).id == BUILD_MAGEGUILD1 && lvl > 1) ||
 		   ((*it).id == BUILD_MAGEGUILD2 && lvl > 2) ||
@@ -171,8 +172,10 @@ void RedrawIcons(const Castle & castle, const CastleHeroes & heroes, const Point
 	else
 	    icon2 = AGG::GetICN(ICN::BRCREST, Color::GetIndex(castle.GetColor()));
 
-	icon1.Blit(Rect((icon1.w() - 41) / 2, (icon1.h() - 41) / 2, 41, 41), pt.x + 3, pt.y + 80, display);
-    	icon2.Blit(Rect((icon2.w() - 41) / 2, (icon2.h() - 41) / 2, 41, 41), pt.x + 3, pt.y + 125, display);
+	if(icon1.isValid())
+	    icon1.Blit(Rect((icon1.w() - 41) / 2, (icon1.h() - 41) / 2, 41, 41), pt.x + 3, pt.y + 80, display);
+	if(icon2.isValid())
+    	    icon2.Blit(Rect((icon2.w() - 41) / 2, (icon2.h() - 41) / 2, 41, 41), pt.x + 3, pt.y + 125, display);
 
         if(! hero2)
 	    AGG::GetICN(ICN::STONEBAK, 0).Blit(Rect(0, 0, 223, 53), pt.x + 47, pt.y + 124);
@@ -196,8 +199,10 @@ void RedrawIcons(const Castle & castle, const CastleHeroes & heroes, const Point
 	else
 	    icon2 = AGG::GetICN(ICN::STRIP, 3);
 
-	icon1.Blit(pt.x + 5, pt.y + 262, display);
-	icon2.Blit(pt.x + 5, pt.y + 361, display);
+	if(icon1.isValid())
+	    icon1.Blit(pt.x + 5, pt.y + 262, display);
+	if(icon2.isValid())
+	    icon2.Blit(pt.x + 5, pt.y + 361, display);
 
 	if(! hero2)
     	    AGG::GetICN(ICN::STRIP, 11).Blit(pt.x + 112, pt.y + 361);
@@ -207,17 +212,14 @@ void RedrawIcons(const Castle & castle, const CastleHeroes & heroes, const Point
 Surface GetMeetingSprite(void)
 {
     const Sprite & sprite = AGG::GetICN(ICN::ADVMCO, 8);
-
-    Surface res(sprite.w() + 4, sprite.h() + 4);
-    res.Fill(0);
-
-    Cursor::DrawCursor(res, 0xDB, true);
+    
+    Surface res = Surface::RectBorder(sprite.w() + 4, sprite.h() + 4, 0, sprite.GetColorIndex(0xDB), true);
     sprite.Blit(2, 2, res);
 
     return res;
 }
 
-MeetingButton::MeetingButton(s16 px, s16 py)
+MeetingButton::MeetingButton(s32 px, s32 py)
 {
     sf = GetMeetingSprite();
 
@@ -226,7 +228,7 @@ MeetingButton::MeetingButton(s16 px, s16 py)
     SetSprite(sf, sf);
 }
 
-SwapButton::SwapButton(s16 px, s16 py)
+SwapButton::SwapButton(s32 px, s32 py)
 {
     Surface sf2 = GetMeetingSprite();
     sf = Surface::Rotate(sf2, 1);
@@ -236,7 +238,7 @@ SwapButton::SwapButton(s16 px, s16 py)
     SetSprite(sf, sf);
 }
 
-Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
+int Castle::OpenDialog(bool readonly, bool fade)
 {
     Settings & conf = Settings::Get();
 
@@ -369,19 +371,17 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     AGG::PlayMusic(MUS::FromRace(race));
 
     LocalEvent & le = LocalEvent::Get();
-
     cursor.Show();
-
     display.Flip();
 
-    Dialog::answer_t result = Dialog::ZERO;
+    int result = Dialog::ZERO;
     bool need_redraw = false;
 
     // dialog menu loop
     while(le.HandleEvents())
     {
         // exit
-	if(le.MouseClickLeft(buttonExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)){ result = Dialog::CANCEL; break; }
+	if(le.MouseClickLeft(buttonExit) || Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)){ result = Dialog::CANCEL; break; }
 
         if(buttonPrevCastle.isEnable()) le.MousePressLeft(buttonPrevCastle) ? buttonPrevCastle.PressDraw() : buttonPrevCastle.ReleaseDraw();
         if(buttonNextCastle.isEnable()) le.MousePressLeft(buttonNextCastle) ? buttonNextCastle.PressDraw() : buttonNextCastle.ReleaseDraw();
@@ -651,8 +651,8 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 				const Rect rt(0, 98, 552, 107);
 				Surface sf(rt.w, rt.h, false);
             			AGG::GetICN(ICN::STRIP, 0).Blit(rt, 0, 0, sf);
-				const Surface & port = Heroes::GetPortrait(heroes.Guest()->GetID(), PORT_BIG);
-				port.Blit(6, 6, sf);
+				Surface port = Heroes::GetPortrait(heroes.Guest()->GetID(), PORT_BIG);
+				if(port.isValid()) port.Blit(6, 6, sf);
 				const Point savept = selectArmy2.GetPos();
 				selectArmy2.SetPos(112, 5);
 				selectArmy2.Redraw(sf);
@@ -660,10 +660,10 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 
 				RedrawResourcePanel(cur_pt);
 
-				u8 alpha = 0;
+				int alpha = 0;
 				while(le.HandleEvents() && alpha < 240)
 				{
-    				    if(Game::AnimateInfrequent(Game::CASTLE_BUYHERO_DELAY))
+    				    if(Game::AnimateInfrequentDelay(Game::CASTLE_BUYHERO_DELAY))
     				    {
         				cursor.Hide();
         				sf.Blit(alpha, cur_pt.x, cur_pt.y + 356, display);
@@ -745,7 +745,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	}
 
 	// animation sprite
-	if(Game::AnimateInfrequent(Game::CASTLE_AROUND_DELAY))
+	if(Game::AnimateInfrequentDelay(Game::CASTLE_AROUND_DELAY))
 	{
 	    cursor.Hide();
 	    CastleDialog::RedrawAllBuilding(*this, cur_pt, cacheBuildings,

@@ -73,7 +73,6 @@ public:
     void Hide(void);
     void Show(void);
     void Redraw(void);
-    void SetDefaultHide(void);
 
     bool isVisible(void) const;
 

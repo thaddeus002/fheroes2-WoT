@@ -64,10 +64,10 @@ void TestMonsterSprite(void)
 
     u32 ticket = 0;
 
-    u8 start = 0;
-    u8 count = AGG::GetICNCount(troop.ICNFile());
-    u8 frame = 0;
-    u8 speed = 100;
+    u32 start = 0;
+    u32 count = AGG::GetICNCount(troop.ICNFile());
+    u32 frame = 0;
+    u32 speed = 100;
 
     frame_bar.ShowMessage("frame: " + GetString(frame));
     speed_bar.ShowMessage("speed: " + GetString(speed));
@@ -80,7 +80,7 @@ void TestMonsterSprite(void)
     // mainmenu loop
     while(le.HandleEvents())
     {
-	if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
+	if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)) break;
 
 	if(le.MouseClickLeft(pos))
 	{

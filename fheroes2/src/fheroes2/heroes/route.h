@@ -34,12 +34,12 @@ namespace Route
     {
 	public:
 	    Step() : from(-1), direction(Direction::CENTER), penalty(0) {}
-	    Step(s32 index, u16 dir, u16 cost) : from(index), direction(dir), penalty(cost) {}
+	    Step(s32 index, int dir, u32 cost) : from(index), direction(dir), penalty(cost) {}
 
 	    s32		GetIndex(void) const;
-	    const u16 &	GetPenalty(void) const;
-	    const s32 &	GetFrom(void) const;
-	    const u16 &	GetDirection(void) const;
+	    u32		GetPenalty(void) const;
+	    s32 	GetFrom(void) const;
+	    int 	GetDirection(void) const;
 	    bool	isBad(void) const;
 
 	protected:
@@ -47,8 +47,8 @@ namespace Route
     	    friend StreamBase & operator>> (StreamBase &, Step &);
 
 	    s32		from;
-	    u16		direction;
-	    u16		penalty;
+	    int		direction;
+	    u32		penalty;
     };
 
     class Path : public std::list<Step>
@@ -62,10 +62,10 @@ namespace Route
 	    s32		GetDestinationIndex(void) const;
 	    s32		GetLastIndex(void) const;
 	    s32		GetDestinedIndex(void) const;
-	    u16		GetFrontDirection(void) const;
-	    u16		GetFrontPenalty(void) const;
+	    int		GetFrontDirection(void) const;
+	    u32		GetFrontPenalty(void) const;
 	    u32		GetTotalPenalty(void) const;
-	    bool	Calculate(const s32 &, u16 limit = MAXU16);
+	    bool	Calculate(const s32 &, int limit = -1);
 
 	    void	Show(void){ hide = false; }
 	    void	Hide(void){ hide = true; }
@@ -82,12 +82,11 @@ namespace Route
 
 	    std::string	String(void) const;
 
-	    u16		GetAllowStep(void) const;
-
-    	    static u16	GetIndexSprite(u16 from, u16 to, u8 mod);
+	    s32		GetAllowStep(void) const;
+    	    static int	GetIndexSprite(int from, int to, int mod);
 
 	private:
-	    bool	Find(const s32 &, const u16 limit = MAXU16);
+	    bool	Find(s32, int limit = -1);
 
 	    friend StreamBase & operator<< (StreamBase &, const Path &);
 	    friend StreamBase & operator>> (StreamBase &, Path &);

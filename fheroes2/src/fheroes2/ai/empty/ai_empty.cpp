@@ -96,7 +96,7 @@ std::string AI::HeroesString(const Heroes &)
     return "";
 }
 
-void AI::HeroesActionComplete(Heroes &, const s32 &)
+void AI::HeroesActionComplete(Heroes &, s32)
 {
 }
 
@@ -161,7 +161,7 @@ void AI::KingdomTurn(Kingdom & kingdom)
     KingdomHeroes & heroes = kingdom.GetHeroes();
     KingdomCastles & castles = kingdom.GetCastles();
 
-    const Color::color_t & color = kingdom.GetColor();
+    const int color = kingdom.GetColor();
 
     if(kingdom.isLoss() || color == Color::NONE)
     {

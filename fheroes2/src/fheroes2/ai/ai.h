@@ -59,7 +59,7 @@ namespace AI
     bool HeroesValidObject(const Heroes &, s32);
     bool HeroesCanMove(const Heroes &);
     void HeroesAction(Heroes &, s32);
-    void HeroesActionComplete(Heroes &, const s32 &);
+    void HeroesActionComplete(Heroes &, s32);
     void HeroesActionNewPosition(Heroes &);
     void HeroesLevelUp(Heroes &);
     void HeroesClearTask(const Heroes &);

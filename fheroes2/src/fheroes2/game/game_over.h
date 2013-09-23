@@ -24,7 +24,6 @@
 #define H2GAMEOVER_H
 
 #include <string>
-#include "game.h"
 
 namespace GameOver
 {
@@ -48,21 +47,20 @@ namespace GameOver
 	LOSS            = LOSS_ALL | LOSS_TOWN | LOSS_HERO | LOSS_TIME | LOSS_STARTHERO
     };
 
-    const char* GetString(conditions_t);
-    std::string GetActualDescription(u16);
-
-    void DialogWins(u16);
-    void DialogLoss(u16);
+    const char*		GetString(int);
+    std::string		GetActualDescription(int);
+    void		DialogWins(int);
+    void		DialogLoss(int);
 
     class Result
     {
     public:
 	static Result & Get(void);
 
-	void Reset(void);
-	void SetResult(u16);
-	u16  GetResult(void) const;
-	bool LocalCheckGameOver(Game::menu_t &);
+	void		Reset(void);
+	void		SetResult(int);
+	int		GetResult(void) const;
+	int		LocalCheckGameOver(void);
 
     private:
 	friend StreamBase & operator<< (StreamBase &, const Result &);
@@ -70,9 +68,9 @@ namespace GameOver
 
 	Result();
 
-	u8  colors;
-	u16 result;
-	bool continue_game;
+	int	colors;
+	int	result;
+	bool	continue_game;
     };
 
     StreamBase & operator<< (StreamBase &, const Result &);

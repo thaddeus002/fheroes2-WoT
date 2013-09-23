@@ -41,19 +41,19 @@ namespace Interface
 	Rect		barsz;
 	Size		itemsz;
 	Size		colrows;
-	s8		hspace;
-	s8		vspace;
+	int		hspace;
+	int		vspace;
 
     public:
 	ItemsBar() : colrows(0, 0), hspace(0), vspace(0) {}
 	virtual ~ItemsBar(){}
 
 /*
-	void		SetColRows(u8, u8);
-	void        	SetPos(s16, s16);
-	void        	SetItemSize(s16, s16);
-	void		SetHSpace(s8);
-	void		SetVSpace(s8);
+	void		SetColRows(u32, u32);
+	void        	SetPos(s32, s32);
+	void        	SetItemSize(u32, u32);
+	void		SetHSpace(int);
+	void		SetVSpace(int);
 	void		SetContent(const std::list<Item> &);
 	void		SetContent(const std::vector<Item> &);
 	
@@ -75,7 +75,7 @@ namespace Interface
         virtual bool	ActionBarCursor(const Point &, Item &, const Rect &){ return false; }
 
 	//body
-	void SetColRows(u8 col, u8 row)
+	void SetColRows(u32 col, u32 row)
 	{
 	    colrows.w = col;
 	    colrows.h = row;
@@ -100,26 +100,26 @@ namespace Interface
 	    SetContentItems();
 	}
 
-	void SetPos(s16 px, s16 py)
+	void SetPos(s32 px, s32 py)
 	{
 	    barsz.x = px;
 	    barsz.y = py;
 	}
 
-	void SetItemSize(u16 pw, u16 ph)
+	void SetItemSize(u32 pw, u32 ph)
 	{
 	    itemsz.w = pw;
 	    itemsz.h = ph;
 	    RescanSize();
 	}
 
-	void SetHSpace(s8 val)
+	void SetHSpace(int val)
 	{
 	    hspace = val;
 	    RescanSize();
 	}
 
-	void SetVSpace(s8 val)
+	void SetVSpace(int val)
 	{
 	    vspace = val;
 	    RescanSize();
@@ -137,7 +137,7 @@ namespace Interface
 	    return posItem.first != items.end() ? &posItem.second : NULL;
 	}
 
-	s8 GetIndex(const Point & pt)
+	s32 GetIndex(const Point & pt)
 	{
 	    ItemsIterator posItem = GetItemIter(pt);
 	    return posItem != items.end() ? std::distance(items.end(), posItem) : -1;
@@ -162,9 +162,9 @@ namespace Interface
 	{
 	    Point dstpt(barsz);
 
-	    for(u16 yy = 0; yy < colrows.h; ++yy)
+	    for(u32 yy = 0; yy < colrows.h; ++yy)
 	    {
-		for(u16 xx = 0; xx < colrows.w; ++xx)
+		for(u32 xx = 0; xx < colrows.w; ++xx)
 		{
 		    RedrawBackground(Rect(dstpt, itemsz.w, itemsz.h), dstsf);
 
@@ -178,9 +178,9 @@ namespace Interface
 	    dstpt = barsz;
 	    ItemsIterator posItem = GetTopItemIter();
 
-	    for(u16 yy = 0; yy < colrows.h; ++yy)
+	    for(u32 yy = 0; yy < colrows.h; ++yy)
 	    {
-		for(u16 xx = 0; xx < colrows.w; ++xx)
+		for(u32 xx = 0; xx < colrows.w; ++xx)
 		{
 		    if(posItem != items.end())
 		    {
@@ -269,9 +269,9 @@ namespace Interface
 	    Rect dstrt(barsz, itemsz.w, itemsz.h);
 	    ItemsIterator posItem = GetTopItemIter();
 
-	    for(u16 yy = 0; yy < colrows.h; ++yy)
+	    for(u32 yy = 0; yy < colrows.h; ++yy)
 	    {
-		for(u16 xx = 0; xx < colrows.w; ++xx)
+		for(u32 xx = 0; xx < colrows.w; ++xx)
 		{
 		    if(posItem != items.end())
 		    {
@@ -319,7 +319,7 @@ namespace Interface
 /*
 	Item*		GetSelectedItem(void);
 	Rect*		GetSelectedPos(void);
-	s8		GetSelectedIndex(void);
+	s32		GetSelectedIndex(void);
 
 	bool		isSelected(void);
 	void		ResetSelected(void);
@@ -351,7 +351,7 @@ namespace Interface
 	    return &curItemPos.second;
 	}
 
-	s8 GetSelectedIndex(void)
+	s32 GetSelectedIndex(void)
 	{
 	    return std::distance(ItemsBar<Item>::GetBeginItemIter(), GetCurItemIter());
 	}
@@ -488,81 +488,6 @@ namespace Interface
     public:
 	ItemsScroll() {}
     };
-
-/*
-            //Cursor & cursor = Cursor::Get();
-
-            //le.MousePressLeft(buttonPgUp) ? buttonPgUp.PressDraw() : buttonPgUp.ReleaseDraw();
-            //le.MousePressLeft(buttonPgDn) ? buttonPgDn.PressDraw() : buttonPgDn.ReleaseDraw();
-
-            if((le.MouseClickLeft(buttonPgUp) || (useHotkeys && le.KeyPress(KEY_PAGEUP))) &&
-                    (top > content->begin()))
-            {
-                cursor.Hide();
-                top = (top - content->begin() > maxItems ? top - maxItems : content->begin());
-                UpdateSplitterRange();
-                splitter.Move(top - content->begin());
-                return true;
-            }
-            else
-            if((le.MouseClickLeft(buttonPgDn) || (useHotkeys && le.KeyPress(KEY_PAGEDOWN))) &&
-                    (top + maxItems < content->end()))
-            {
-                cursor.Hide();
-                top += maxItems;
-                if(top + maxItems > content->end()) top = content->end() - maxItems;
-                UpdateSplitterRange();
-                splitter.Move(top - content->begin());
-                return true;
-            }
-            else
-            if(useHotkeys && le.KeyPress(KEY_UP) && (cur > content->begin()))
-            {
-                cursor.Hide();
-                --cur;
-                SetCurrentVisible();
-                ActionCurrentUp();
-                return true;
-            }
-            else
-            if(useHotkeys && le.KeyPress(KEY_DOWN) && (cur < (content->end() - 1)))
-            {
-                cursor.Hide();
-                ++cur;
-                SetCurrentVisible();
-                ActionCurrentDn();
-                return true;
-            }
-            else
-            if((le.MouseWheelUp(rtAreaItems) || le.MouseWheelUp(splitter.GetRect())) && (top > content->begin()))
-            {
-                cursor.Hide();
-                --top;
-                splitter.Backward();
-                return true;
-            }
-            else
-            if((le.MouseWheelDn(rtAreaItems) || le.MouseWheelDn(splitter.GetRect())) && (top < (content->end() - maxItems)))
-            {
-                cursor.Hide();
-                ++top;
-                splitter.Forward();
-                return true;
-            }
-            else
-            if(le.MousePressLeft(splitter.GetRect()) && (content->size() > maxItems))
-            {
-                cursor.Hide();
-                UpdateSplitterRange();
-                s16 seek = (le.GetMouseCursor().y - splitter.GetRect().y) * 100 / splitter.GetStep();
-                if(seek < splitter.Min()) seek = splitter.Min();
-                else
-                if(seek > splitter.Max()) seek = splitter.Max();
-                top = content->begin() + seek;
-                splitter.Move(seek);
-                return true;
-            }
-*/
 }
 
 #endif

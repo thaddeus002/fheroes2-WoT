@@ -39,7 +39,7 @@ public:
     bool Load(int w, int h, int b, int pitch, u32 rmask, u32 gmask, u32 bmask, u32 amask, const u8* p, size_t s);
 
 private:
-    std::vector<char> buf;
+    std::vector<u8> buf;
 };
 
 class ZStreamBuf : protected StreamBuf
@@ -61,8 +61,8 @@ protected:
 std::ostream & operator<< (std::ostream &, ZStreamBuf &);
 std::istream & operator>> (std::istream &, ZStreamBuf &);
 
-std::vector<char> zlibCompress(const char* src, size_t srcsz);
-std::vector<char> zlibDecompress(const char* src, size_t srcsz, size_t realsz = 0);
+std::vector<u8> zlibCompress(const u8*, size_t srcsz);
+std::vector<u8> zlibDecompress(const u8*, size_t srcsz, size_t realsz = 0);
 
 #endif
 #endif

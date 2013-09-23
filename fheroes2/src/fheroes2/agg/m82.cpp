@@ -28,7 +28,7 @@ namespace M82
 {
     const struct
     {
-	m82_t type;
+	int type;
     	const char* string;
     } m82map[] = {
 	{ AELMATTK,	"AELMATTK.82M" },
@@ -344,12 +344,12 @@ namespace M82
     };
 }
 
-const char* M82::GetString(const m82_t m82)
+const char* M82::GetString(int m82)
 {
-    return m82map[m82].string;
+    return AELMATTK <= m82 && UNKNOWN > m82 ? m82map[m82].string : m82map[UNKNOWN].string;
 }
 
-M82::m82_t M82::FromSpell(u8 spell)
+int M82::FromSpell(int spell)
 {
     switch(spell)
     {
@@ -406,7 +406,7 @@ M82::m82_t M82::FromSpell(u8 spell)
     return UNKNOWN;
 }
 
-u8 M82::GetIndexLOOP00XXFromObject(u8 obj)
+u32 M82::GetIndexLOOP00XXFromObject(int obj)
 {
     switch(obj)
     {
@@ -445,7 +445,7 @@ u8 M82::GetIndexLOOP00XXFromObject(u8 obj)
     return 0xFF;
 }
 
-M82::m82_t M82::GetLOOP00XX(u8 index)
+int M82::GetLOOP00XX(int index)
 {
     switch(index)
     {

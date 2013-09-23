@@ -34,6 +34,7 @@
 #include "dialog_selectitems.h"
 #include "button.h"
 #include "race.h"
+#include "text.h"
 #include "game.h"
 #include "army_bar.h"
 #include "battle_only.h"
@@ -63,8 +64,7 @@ Battle::Only::Only() : hero1(NULL), hero2(NULL), player1(Color::BLUE), player2(C
 	luckIndicator1(NULL), luckIndicator2(NULL), primskill_bar1(NULL), primskill_bar2(NULL),
 	secskill_bar1(NULL), secskill_bar2(NULL), selectArmy1(NULL), selectArmy2(NULL),
 	selectArtifacts1(NULL), selectArtifacts2(NULL), cinfo2(NULL),
-	rt1(36, 267, 43, 53), sfb1(rt1.w, rt1.h), sfc1(rt1.w, rt1.h - 10),
-	rt2(23, 347, 34, 34), sfb2(rt2.w, rt2.h), sfc2(rt2.w, rt2.h)
+	rt1(36, 267, 43, 53), sfb1(rt1.w, rt1.h), rt2(23, 347, 34, 34), sfb2(rt2.w, rt2.h)
 {
     player1.SetControl(CONTROL_HUMAN);
     player2.SetControl(CONTROL_AI);
@@ -74,8 +74,8 @@ Battle::Only::Only() : hero1(NULL), hero2(NULL), player1(Color::BLUE), player2(C
     backSprite.Blit(rt1, 0, 0, sfb1);
     backSprite.Blit(rt2, 0, 0, sfb2);
 
-    Cursor::DrawCursor(sfc1, 0x10, true);
-    Cursor::DrawCursor(sfc2, 0x10, true);
+    sfc1 = Surface::RectBorder(rt1.w, rt1.h - 10, sfc1.GetIndexColor(0x10), true);
+    sfc2 = Surface::RectBorder(rt2.w, rt2.h, sfc2.GetIndexColor(0x10), true);
 }
 
 StreamBase & operator<< (StreamBase & msg, const Battle::Only & b)
@@ -89,17 +89,17 @@ StreamBase & operator<< (StreamBase & msg, const Battle::Only & b)
 
 StreamBase & operator>> (StreamBase & msg, Battle::Only & b)
 {
-    u8 id = 0;
+    int id = 0;
 
     msg >> id;
-    b.hero1 = world.GetHeroes(Heroes::ConvertID(id));
+    b.hero1 = world.GetHeroes(id);
     if(b.hero1)
 	msg >> *b.hero1;
     else
        DEBUG(DBG_NETWORK, DBG_WARN, "unknown id");
 
     msg >> id;
-    b.hero2 = world.GetHeroes(Heroes::ConvertID(id));
+    b.hero2 = world.GetHeroes(id);
     if(b.hero2)
 	msg >> *b.hero2;
     else
@@ -221,17 +221,17 @@ bool Battle::Only::ChangeSettings(void)
 	    le.MousePressLeft(buttonStart) ? buttonStart.PressDraw() : buttonStart.ReleaseDraw();
 
 	if((buttonStart.isEnable() && le.MouseClickLeft(buttonStart)) ||
-	    Game::HotKeyPress(Game::EVENT_DEFAULT_READY))
+	    Game::HotKeyPressEvent(Game::EVENT_DEFAULT_READY))
 	{
 	    result = true;
 	    exit = true;
 	}
         else
-	if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) exit = true;
+	if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)) exit = true;
 
 	if(allow1 && le.MouseClickLeft(rtPortrait1))
 	{
-	    Heroes::heroes_t hid = Dialog::SelectHeroes(hero1->GetID());
+	    int hid = Dialog::SelectHeroes(hero1->GetID());
 	    if(hero2 && hid == hero2->GetID())
 	    {
 		Dialog::Message("Error", "Please, select other hero.", Font::BIG, Dialog::OK);
@@ -248,7 +248,7 @@ bool Battle::Only::ChangeSettings(void)
 	else
 	if(allow2 && le.MouseClickLeft(rtPortrait2))
 	{
-	    Heroes::heroes_t hid = Dialog::SelectHeroes(hero2 ? hero2->GetID() : Heroes::UNKNOWN);
+	    int hid = Dialog::SelectHeroes(hero2 ? hero2->GetID() : Heroes::UNKNOWN);
 	    if(hid == hero1->GetID())
 	    {
 		Dialog::Message("Error", "Please, select other hero.", Font::BIG, Dialog::OK);
@@ -657,10 +657,14 @@ void Battle::Only::RedrawBaseInfo(const Point & top)
     text.Blit(top.x + 320 - text.w() / 2, top.y + 26);
 
     // portrait
-    Heroes::GetPortrait(hero1->GetID(), PORT_BIG).Blit(rtPortrait1.x, rtPortrait1.y, display);
+    Surface port1 = Heroes::GetPortrait(hero1->GetID(), PORT_BIG);
+    if(port1.isValid()) port1.Blit(rtPortrait1.x, rtPortrait1.y, display);
 
     if(hero2)
-	Heroes::GetPortrait(hero2->GetID(), PORT_BIG).Blit(rtPortrait2.x, rtPortrait2.y, display);
+    {
+	Surface port2 = Heroes::GetPortrait(hero2->GetID(), PORT_BIG);
+	if(port2.isValid()) port2.Blit(rtPortrait2.x, rtPortrait2.y, display);
+    }
     else
     {
       display.FillRect(0, 0, 0, rtPortrait2);
@@ -678,7 +682,7 @@ void Battle::Only::StartBattle(void)
 
     Players & players = conf.GetPlayers();
     players.Init(player1.color | player2.color);
-    world.GetKingdoms().Init();
+    world.InitKingdoms();
 
     players.SetPlayerRace(player1.color, player1.race);
     players.SetPlayerRace(player2.color, player2.race);

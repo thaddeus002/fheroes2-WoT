@@ -31,7 +31,7 @@ class ScenarioListBox : public Interface::ListBox<Maps::FileInfo>
 public:
     ScenarioListBox(const Point & pt) : Interface::ListBox<Maps::FileInfo>(pt), selectOk(false) {};
 
-    void RedrawItem(const Maps::FileInfo &, s16, s16, bool);
+    void RedrawItem(const Maps::FileInfo &, s32, s32, bool);
     void RedrawBackground(const Point &);
 
     void ActionCurrentUp(void){};

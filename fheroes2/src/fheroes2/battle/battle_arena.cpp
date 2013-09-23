@@ -29,6 +29,7 @@
 #include "world.h"
 #include "agg.h"
 #include "speed.h"
+#include "ground.h"
 #include "race.h"
 #include "army_troop.h"
 #include "spell_storage.h"
@@ -47,9 +48,9 @@ namespace Battle
     Arena* arena = NULL;
 }
 
-ICN::icn_t GetCovr(u16 ground)
+int GetCovr(int ground)
 {
-    std::vector<ICN::icn_t> covrs;
+    std::vector<int> covrs;
 
     switch(ground)
     {
@@ -174,7 +175,7 @@ Battle::Interface* Battle::Arena::GetInterface(void)
     return arena->interface;
 }
 
-Battle::Tower* Battle::Arena::GetTower(u8 type)
+Battle::Tower* Battle::Arena::GetTower(int type)
 {
     switch(type)
     {
@@ -198,7 +199,7 @@ Battle::Arena::Arena(Army & a1, Army & a2, s32 index, bool local) :
     army2 = new Force(a2, true);
 
     // init castle (interface ahead)
-    castle = world.GetCastle(index);
+    castle = world.GetCastle(Maps::GetPoint(index));
 
     if(castle)
     {
@@ -358,7 +359,8 @@ void Battle::Arena::TurnTroop(Unit* current_troop)
 	    actions.pop_front();
 
 	    // rescan orders
-	    if(armies_order) Force::UpdateOrderUnits(*army1, *army2, *armies_order);
+	    if(armies_order)
+		Force::UpdateOrderUnits(*army1, *army2, *armies_order);
 
     	    // check end battle
     	    if(! BattleValid())
@@ -507,19 +509,14 @@ void Battle::Arena::TowerAction(const Tower & twr)
     const Unit* enemy = GetEnemyMaxQuality(twr.GetColor());
 
     if(enemy)
-    {
-	Command cmd(MSG_BATTLE_TOWER);
-	cmd.GetStream() << twr.GetType() << enemy->GetUID();
-
-	ApplyAction(cmd.GetStream());
-    }
+	ApplyAction(twr.GetCommand(*enemy).GetStream());
 }
 
 void Battle::Arena::CatapultAction(void)
 {
     if(catapult)
     {
-	ApplyAction(catapult->GetAction(*this).GetStream());
+	ApplyAction(catapult->GetCommand(*this).GetStream());
     }
 }
 
@@ -532,7 +529,7 @@ Battle::Indexes Battle::Arena::GetPath(const Unit & b, const Position & dst)
 	if(IS_DEBUG(DBG_BATTLE, DBG_TRACE))
 	{
     	    std::stringstream ss;
-	    for(u16 ii = 0; ii < result.size(); ++ii) ss << result[ii] << ", ";
+	    for(u32 ii = 0; ii < result.size(); ++ii) ss << result[ii] << ", ";
 	    DEBUG(DBG_BATTLE, DBG_TRACE, ss.str());
 	}
     }
@@ -540,12 +537,12 @@ Battle::Indexes Battle::Arena::GetPath(const Unit & b, const Position & dst)
     return result;
 }
 
-Battle::Unit* Battle::Arena::GetTroopBoard(s16 index)
+Battle::Unit* Battle::Arena::GetTroopBoard(s32 index)
 {
     return Board::isValidIndex(index) ? board[index].GetUnit() : NULL;
 }
 
-const Battle::Unit* Battle::Arena::GetTroopBoard(s16 index) const
+const Battle::Unit* Battle::Arena::GetTroopBoard(s32 index) const
 {
     return Board::isValidIndex(index) ? board[index].GetUnit() : NULL;
 }
@@ -560,22 +557,22 @@ const HeroBase* Battle::Arena::GetCommander2(void) const
     return army2->GetCommander();
 }
 
-u8 Battle::Arena::GetArmyColor1(void) const
+int Battle::Arena::GetArmyColor1(void) const
 {
     return army1->GetColor();
 }
 
-u8 Battle::Arena::GetArmyColor2(void) const
+int Battle::Arena::GetArmyColor2(void) const
 {
     return army2->GetColor();
 }
 
-u8 Battle::Arena::GetCurrentColor(void) const
+int Battle::Arena::GetCurrentColor(void) const
 {
     return current_color;
 }
 
-u8 Battle::Arena::GetOppositeColor(u8 col) const
+int Battle::Arena::GetOppositeColor(int col) const
 {
     return col == GetArmyColor1() ? GetArmyColor2() : GetArmyColor1();
 }
@@ -606,7 +603,7 @@ const Battle::Unit* Battle::Arena::GetTroopUID(u32 uid) const
     return it != army2->end() ? *it : NULL;
 }
 
-const Battle::Unit* Battle::Arena::GetEnemyMaxQuality(u8 my_color) const
+const Battle::Unit* Battle::Arena::GetEnemyMaxQuality(int my_color) const
 {
     const Unit* res = NULL;
     s32 quality = 0;
@@ -638,34 +635,34 @@ const SpellStorage & Battle::Arena::GetUsageSpells(void) const
     return usage_spells;
 }
 
-s16 Battle::Arena::GetFreePositionNearHero(u8 color) const
+s32 Battle::Arena::GetFreePositionNearHero(int color) const
 {
-    const u8 cells1[] = { 11, 22, 33 };
-    const u8 cells2[] = { 21, 32, 43 };
-    const u8* cells = NULL;
+    const int cells1[] = { 11, 22, 33 };
+    const int cells2[] = { 21, 32, 43 };
+    const int* cells = NULL;
 
     if(army1->GetColor() == color) cells = cells1;
     else
     if(army2->GetColor() == color) cells = cells2;
 
-    if(cells) for(u8 ii = 0; ii < 3; ++ii)
+    if(cells) for(u32 ii = 0; ii < 3; ++ii)
 	if(board[cells[ii]].isPassable1(true) && NULL == board[cells[ii]].GetUnit()) return cells[ii];
 
     return -1;
 }
 
-bool Battle::Arena::CanSurrenderOpponent(u8 color) const
+bool Battle::Arena::CanSurrenderOpponent(int color) const
 {
     const HeroBase* hero1 = GetCommander(color, false); // enemy
     const HeroBase* hero2 = GetCommander(color, true);
-    return hero1 && hero1->GetType() == Skill::Primary::HEROES && hero2 &&
+    return hero1 && hero1->isHeroes() && hero2 &&
 	world.GetKingdom(hero2->GetColor()).GetCastles().size();
 }
 
-bool Battle::Arena::CanRetreatOpponent(u8 color) const
+bool Battle::Arena::CanRetreatOpponent(int color) const
 {
     const HeroBase* hero = army1->GetColor() == color ? army1->GetCommander() : army2->GetCommander();
-    return hero && hero->GetType() == Skill::Primary::HEROES && NULL == hero->inCastle() &&
+    return hero && hero->isHeroes() && NULL == hero->inCastle() &&
 	world.GetKingdom(hero->GetColor()).GetCastles().size();
 }
 
@@ -754,7 +751,7 @@ bool Battle::Arena::isDisableCastSpell(const Spell & spell, std::string* msg)
     return false;
 }
 
-bool Battle::Arena::GraveyardAllowResurrect(s16 index, const Spell & spell) const
+bool Battle::Arena::GraveyardAllowResurrect(s32 index, const Spell & spell) const
 {
     const HeroBase* hero = GetCurrentCommander();
     const Unit* killed = GetTroopUID(graveyard.GetLastTroopUID(index));
@@ -765,7 +762,7 @@ bool Battle::Arena::GraveyardAllowResurrect(s16 index, const Spell & spell) cons
 	hero && spell.isResurrect() && killed->AllowApplySpell(spell, hero, NULL);
 }
 
-const Battle::Unit* Battle::Arena::GraveyardLastTroop(s16 index) const
+const Battle::Unit* Battle::Arena::GraveyardLastTroop(s32 index) const
 {
     return GetTroopUID(graveyard.GetLastTroopUID(index));
 }
@@ -775,7 +772,7 @@ Battle::Indexes Battle::Arena::GraveyardClosedCells(void) const
     return graveyard.GetClosedCells();
 }
 
-void Battle::Arena::SetCastleTargetValue(u8 target, u8 value)
+void Battle::Arena::SetCastleTargetValue(int target, u32 value)
 {
     switch(target)
     {
@@ -801,7 +798,7 @@ void Battle::Arena::SetCastleTargetValue(u8 target, u8 value)
     }
 }
 
-u8 Battle::Arena::GetCastleTargetValue(u8 target) const
+u32 Battle::Arena::GetCastleTargetValue(int target) const
 {
     switch(target)
     {
@@ -821,9 +818,9 @@ u8 Battle::Arena::GetCastleTargetValue(u8 target) const
     return 0;
 }
 
-std::vector<u8> Battle::Arena::GetCastleTargets(void) const
+std::vector<int> Battle::Arena::GetCastleTargets(void) const
 {
-    std::vector<u8> targets;
+    std::vector<int> targets;
     targets.reserve(8);
 
     // check walls
@@ -851,12 +848,12 @@ StreamBase & Battle::operator<< (StreamBase & msg, const Arena & a)
     if(hero1)
 	msg << hero1->GetType() << *hero1;
     else
-	msg << static_cast<u8>(Skill::Primary::UNDEFINED);
+	msg << static_cast<int>(HeroBase::UNDEFINED);
 
     if(hero2)
 	msg << hero1->GetType() << *hero2;
     else
-	msg << static_cast<u8>(Skill::Primary::UNDEFINED);
+	msg << static_cast<int>(HeroBase::UNDEFINED);
 
     return msg;
 }
@@ -866,7 +863,7 @@ StreamBase & Battle::operator>> (StreamBase & msg, Arena & a)
     msg >> a.current_turn >> a.board >>
 	*a.army1 >> *a.army2;
 
-    u8 type;
+    int type;
     HeroBase* hero1 = a.army1->GetCommander();
     HeroBase* hero2 = a.army2->GetCommander();
 
@@ -879,7 +876,7 @@ StreamBase & Battle::operator>> (StreamBase & msg, Arena & a)
     return msg;
 }
 
-const HeroBase* Battle::Arena::GetCommander(u8 color, bool invert) const
+const HeroBase* Battle::Arena::GetCommander(int color, bool invert) const
 {
     const HeroBase* commander = NULL;
 
@@ -908,7 +905,7 @@ bool Battle::Arena::NetworkTurn(void)
 Battle::Unit* Battle::Arena::CreateElemental(const Spell & spell)
 {
     const HeroBase* hero = GetCurrentCommander();
-    const s16 pos = GetFreePositionNearHero(current_color);
+    const s32 pos = GetFreePositionNearHero(current_color);
 
     if(0 > pos || !hero)
     {
@@ -944,8 +941,8 @@ Battle::Unit* Battle::Arena::CreateElemental(const Spell & spell)
     }
 
     DEBUG(DBG_BATTLE, DBG_TRACE, mons.GetName() << ", position: " << pos);
-    u16 count = spell.ExtraValue() * hero->GetPower();
-    u8 acount = hero->HasArtifact(Artifact::BOOK_ELEMENTS);
+    u32 count = spell.ExtraValue() * hero->GetPower();
+    u32 acount = hero->HasArtifact(Artifact::BOOK_ELEMENTS);
     if(acount) count *= acount * 2;
 
     elem = new Unit(Troop(mons, count), pos, hero == army2->GetCommander());
@@ -965,7 +962,7 @@ Battle::Unit* Battle::Arena::CreateElemental(const Spell & spell)
     return elem;
 }
 
-Battle::Unit* Battle::Arena::CreateMirrorImage(Unit & b, s16 pos)
+Battle::Unit* Battle::Arena::CreateMirrorImage(Unit & b, s32 pos)
 {
     Unit* image = new Unit(b, pos, b.isReflect());
 
@@ -988,7 +985,7 @@ Battle::Unit* Battle::Arena::CreateMirrorImage(Unit & b, s16 pos)
     return image;
 }
 
-u8 Battle::Arena::GetObstaclesPenalty(const Unit & attacker, const Unit & defender) const
+u32 Battle::Arena::GetObstaclesPenalty(const Unit & attacker, const Unit & defender) const
 {
     if(defender.Modes(CAP_TOWER) || attacker.Modes(CAP_TOWER)) return 0;
 
@@ -996,8 +993,8 @@ u8 Battle::Arena::GetObstaclesPenalty(const Unit & attacker, const Unit & defend
     const HeroBase* enemy = attacker.GetCommander();
     if(enemy && enemy->HasArtifact(Artifact::GOLDEN_BOW)) return 0;
 
-    u8 result = 0;
-    const u8 step = Settings::Get().QVGA() ? CELLW2 / 3 : CELLW / 3;
+    u32 result = 0;
+    const u32 step = Settings::Get().QVGA() ? CELLW2 / 3 : CELLW / 3;
 
     if(castle)
     {
@@ -1038,7 +1035,7 @@ u8 Battle::Arena::GetObstaclesPenalty(const Unit & attacker, const Unit & defend
 	for(Points::const_iterator
 	    it = points.begin(); it != points.end(); ++it)
 	{
-	    const s16 index = board.GetIndexAbsPosition(*it);
+	    const s32 index = board.GetIndexAbsPosition(*it);
 	    if(Board::isValidIndex(index)) indexes.push_back(index);
 	}
 
@@ -1101,7 +1098,7 @@ Battle::Force & Battle::Arena::GetForce2(void)
     return *army2;
 }
 
-Battle::Force & Battle::Arena::GetForce(u8 color, bool invert)
+Battle::Force & Battle::Arena::GetForce(int color, bool invert)
 {
     if(army1->GetColor() == color)
         return invert ? *army2 : *army1;
@@ -1114,12 +1111,12 @@ Battle::Force & Battle::Arena::GetCurrentForce(void)
     return GetForce(current_color, false);
 }
 
-ICN::icn_t Battle::Arena::GetICNCovr(void) const
+int Battle::Arena::GetICNCovr(void) const
 {
     return icn_covr;
 }
 
-u16 Battle::Arena::GetCurrentTurn(void) const
+u32 Battle::Arena::GetCurrentTurn(void) const
 {
     return current_turn;
 }

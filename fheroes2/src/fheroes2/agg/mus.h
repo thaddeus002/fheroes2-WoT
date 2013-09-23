@@ -27,7 +27,7 @@
 
 namespace MUS
 {
-    enum mus_t
+    enum
     {
         UNUSED,
         DATATRACK,
@@ -77,13 +77,13 @@ namespace MUS
         UNKNOWN
     };
 
-    const std::string GetString(const mus_t mus, bool shortname = false);
+    const std::string GetString(int, bool shortname = false);
 
-    mus_t FromGround(const u16 ground);
-    mus_t FromRace(const u8 race);
-    mus_t FromMapObject(u8 object);
+    int FromGround(int);
+    int FromRace(int);
+    int FromMapObject(int);
 
-    mus_t GetBattleRandom(void);
+    int GetBattleRandom(void);
 }
 
 #endif

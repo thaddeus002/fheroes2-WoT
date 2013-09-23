@@ -22,9 +22,6 @@
 #ifndef H2RACE_H
 #define H2RACE_H
 
-#include <string>
-#include "gamedefs.h"
-
 namespace Race
 {
     enum
@@ -41,9 +38,9 @@ namespace Race
 	ALL	= KNGT | BARB | SORC | WRLK | WZRD | NECR
     };
 
-    const char* String(u8);
-    u8 Rand(void);
-    u8 Get(u8);
+    const char* String(int);
+    int		Rand(void);
+    int		FromInt(int);
 }
 
 #endif

@@ -24,7 +24,6 @@
 #define H2INTERFACE_GAMEAREA_H
 
 #include "gamedefs.h"
-#include "cursor.h"
 
 class Sprite;
 
@@ -58,37 +57,37 @@ namespace Interface
     {
     public:
 	GameArea(Basic &);
-	void Build(void);
+	void		Build(void);
 
-	const Rect & GetArea(void) const;
-	const Point& GetMapsPos(void) const;
-	const Rect & GetRectMaps(void) const;
+	const Rect &	GetArea(void) const;
+	const Point &	GetMapsPos(void) const;
+	const Rect &	GetRectMaps(void) const;
 
-	Cursor::themes_t GetScrollCursor(void) const;
-	bool NeedScroll(void) const;
-	void Scroll(void);
-	void SetScroll(scroll_t);
+	int		GetScrollCursor(void) const;
+	bool		NeedScroll(void) const;
+	void		Scroll(void);
+	void		SetScroll(int);
 
-	void SetCenter(s16, s16);
-	void SetCenter(const Point &);
-	void SetRedraw(void) const;
+	void		SetCenter(s32, s32);
+	void		SetCenter(const Point &);
+	void		SetRedraw(void) const;
 
-	void Redraw(Surface & dst, u8) const;
-	void Redraw(Surface & dst, u8, const Rect &) const;
+	void		Redraw(Surface & dst, int) const;
+	void		Redraw(Surface & dst, int, const Rect &) const;
 
-	void BlitOnTile(Surface &, const Surface &, const s16, const s16, const Point &) const;
-	void BlitOnTile(Surface &, const Sprite &, const Point &) const;
+	void		BlitOnTile(Surface &, const Surface &, s32, s32, const Point &) const;
+	void		BlitOnTile(Surface &, const Sprite &, const Point &) const;
 
-	void SetUpdateCursor(void);
-        void QueueEventProcessing(void);
+	void		SetUpdateCursor(void);
+        void		QueueEventProcessing(void);
         
-	s32 GetIndexFromMousePoint(const Point & pt) const;
-	Rect RectFixed(Point & dst, int rw, int rh) const;
+	s32		GetIndexFromMousePoint(const Point &) const;
+	Rect		RectFixed(Point & dst, int rw, int rh) const;
 
-	static void GenerateUltimateArtifactAreaSurface(const s32, Surface &);
+	static void	GenerateUltimateArtifactAreaSurface(s32, Surface &);
 
     private:
-	void SetAreaPosition(s16, s16, u16, u16);
+	void SetAreaPosition(s32, s32, u32, u32);
 
 	Basic & interface;
 
@@ -96,12 +95,12 @@ namespace Interface
 	Rect	rectMaps;
 	Point	rectMapsPosition;
 	Point	scrollOffset;
-	u16	oldIndexPos;
-	u8	scrollDirection;
-	u8	scrollStepX;
-	u8	scrollStepY;
-	u8	tailX;
-	u8	tailY;
+	s32	oldIndexPos;
+	int	scrollDirection;
+	int	scrollStepX;
+	int	scrollStepY;
+	int	tailX;
+	int	tailY;
 	bool    updateCursor;
 
 	SDL::Time scrollTime;

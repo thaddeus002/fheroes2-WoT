@@ -24,7 +24,7 @@
 #include "maps.h"
 #include "direction.h"
 
-std::string Direction::String(u16 direct)
+std::string Direction::String(int direct)
 {
     const char* str_direct[] = { "unknown", "center", "top", "top right", "right", "bottom right", "bottom", "bottom left", "left", "top left" };
     std::ostringstream os;
@@ -53,17 +53,19 @@ std::string Direction::String(u16 direct)
     return res.empty() ? str_direct[0] : res;
 }
 
-
-Direction::vector_t Direction::Get(s32 from, s32 to)
+int Direction::Get(s32 from, s32 to)
 {
-    for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
-	if(to == Maps::GetDirectionIndex(from, direct))
-	    return direct;
+    const Directions directions = Direction::All();
+
+    for(Directions::const_iterator
+            it = directions.begin(); it != directions.end(); ++it)
+	if(to == Maps::GetDirectionIndex(from, *it))
+	    return *it;
 
     return to == from ? CENTER : UNKNOWN;
 }
 
-bool Direction::ShortDistanceClockWise(u16 from , u16 to)
+bool Direction::ShortDistanceClockWise(int from , int to)
 {
    switch(from)
    {
@@ -168,9 +170,9 @@ bool Direction::ShortDistanceClockWise(u16 from , u16 to)
     return false;
 }
 
-Direction::vector_t Direction::Reflect(u16 from)
+int Direction::Reflect(int direct)
 {
-    switch(from)
+    switch(direct)
     {
 	case TOP_LEFT:		return BOTTOM_RIGHT;
 	case TOP:		return BOTTOM;
@@ -185,4 +187,10 @@ Direction::vector_t Direction::Reflect(u16 from)
     }
 
     return UNKNOWN;
+}
+
+Directions Direction::All(void)
+{
+    const int directs[] = { TOP_LEFT, TOP, TOP_RIGHT, RIGHT, BOTTOM_RIGHT, BOTTOM, BOTTOM_LEFT, LEFT };
+    return Directions(directs, directs + 8);
 }

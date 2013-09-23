@@ -54,7 +54,7 @@ void Maps::Position::SetIndex(s32 index)
 		Maps::GetPoint(index) : Point(-1, -1);
 }
 
-bool Maps::Position::isPosition(s32 index) const
+bool Maps::Position::isPosition(const Point & pt) const
 {
-    return index == GetIndex();
+    return pt == center;
 }

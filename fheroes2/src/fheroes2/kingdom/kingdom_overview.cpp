@@ -30,6 +30,7 @@
 #include "world.h"
 #include "kingdom.h"
 #include "skill.h"
+#include "game.h"
 #include "army.h"
 #include "army_bar.h"
 #include "buildinginfo.h"
@@ -96,7 +97,7 @@ class StatsHeroesList : public Interface::ListBox<HeroRow>
 public:
     StatsHeroesList(const Point & pt, KingdomHeroes &);
 
-    void RedrawItem(const HeroRow &, s16, s16, bool);
+    void RedrawItem(const HeroRow &, s32, s32, bool);
     void RedrawBackground(const Point &);
 
     void ActionCurrentUp(void){};
@@ -105,10 +106,10 @@ public:
     void ActionListDoubleClick(HeroRow &){};
     void ActionListPressRight(HeroRow &){};
 
-    void ActionListSingleClick(HeroRow &, const Point &, s16, s16);
-    void ActionListDoubleClick(HeroRow &, const Point &, s16, s16);
-    void ActionListPressRight(HeroRow &, const Point &, s16, s16);
-    bool ActionListCursor(HeroRow &, const Point &, s16, s16);
+    void ActionListSingleClick(HeroRow &, const Point &, s32, s32);
+    void ActionListDoubleClick(HeroRow &, const Point &, s32, s32);
+    void ActionListPressRight(HeroRow &, const Point &, s32, s32);
+    bool ActionListCursor(HeroRow &, const Point &, s32, s32);
 };
 
 StatsHeroesList::StatsHeroesList(const Point & pt, KingdomHeroes & heroes) : Interface::ListBox<HeroRow>(pt)
@@ -134,24 +135,24 @@ StatsHeroesList::StatsHeroesList(const Point & pt, KingdomHeroes & heroes) : Int
     SetListContent(content);
 }
 
-void StatsHeroesList::ActionListDoubleClick(HeroRow & row, const Point & cursor, s16 ox, s16 oy)
+void StatsHeroesList::ActionListDoubleClick(HeroRow & row, const Point & cursor, s32 ox, s32 oy)
 {
     ActionListSingleClick(row, cursor, ox, oy);
 }
 
-void StatsHeroesList::ActionListSingleClick(HeroRow & row, const Point & cursor, s16 ox, s16 oy)
+void StatsHeroesList::ActionListSingleClick(HeroRow & row, const Point & cursor, s32 ox, s32 oy)
 {
     if(row.hero && (Rect(ox + 5, oy + 4, Interface::IconsBar::GetItemWidth(), Interface::IconsBar::GetItemHeight()) & cursor))
 	Game::OpenHeroesDialog(*row.hero);
 }
 
-void StatsHeroesList::ActionListPressRight(HeroRow & row, const Point & cursor, s16 ox, s16 oy)
+void StatsHeroesList::ActionListPressRight(HeroRow & row, const Point & cursor, s32 ox, s32 oy)
 {
     if(row.hero && (Rect(ox + 5, oy + 4, Interface::IconsBar::GetItemWidth(), Interface::IconsBar::GetItemHeight()) & cursor))
 	Dialog::QuickInfo(*row.hero);
 }
 
-bool StatsHeroesList::ActionListCursor(HeroRow & row, const Point & cursor, s16 ox, s16 oy)
+bool StatsHeroesList::ActionListCursor(HeroRow & row, const Point & cursor, s32 ox, s32 oy)
 {
     if((row.armyBar->GetArea() & cursor) &&
 	row.armyBar->QueueEventProcessing())
@@ -186,7 +187,7 @@ bool StatsHeroesList::ActionListCursor(HeroRow & row, const Point & cursor, s16 
     return false;
 }
 
-void StatsHeroesList::RedrawItem(const HeroRow & row, s16 dstx, s16 dsty, bool current)
+void StatsHeroesList::RedrawItem(const HeroRow & row, s32 dstx, s32 dsty, bool current)
 {
     if(row.hero)
     {
@@ -247,7 +248,7 @@ void StatsHeroesList::RedrawBackground(const Point & dst)
     AGG::GetICN(ICN::OVERVIEW, 13).Blit(dst.x + 628, dst.y + 17);
 
     // items background
-    for(u8 ii = 0; ii < maxItems; ++ii)
+    for(u32 ii = 0; ii < maxItems; ++ii)
     {
 	const Sprite & back = AGG::GetICN(ICN::OVERVIEW, 8);
 	back.Blit(dst.x + 30, dst.y + 17 + ii * (back.h() + 4));
@@ -308,7 +309,7 @@ class StatsCastlesList : public Interface::ListBox<CstlRow>
 public:
     StatsCastlesList(const Point & pt, KingdomCastles &);
 
-    void RedrawItem(const CstlRow &, s16, s16, bool);
+    void RedrawItem(const CstlRow &, s32, s32, bool);
     void RedrawBackground(const Point &);
 
     void ActionCurrentUp(void){};
@@ -317,10 +318,10 @@ public:
     void ActionListSingleClick(CstlRow &){};
     void ActionListPressRight(CstlRow &){};
 
-    void ActionListSingleClick(CstlRow &, const Point &, s16, s16);
-    void ActionListDoubleClick(CstlRow &, const Point &, s16, s16);
-    void ActionListPressRight(CstlRow &, const Point &, s16, s16);
-    bool ActionListCursor(CstlRow &, const Point &, s16, s16);
+    void ActionListSingleClick(CstlRow &, const Point &, s32, s32);
+    void ActionListDoubleClick(CstlRow &, const Point &, s32, s32);
+    void ActionListPressRight(CstlRow &, const Point &, s32, s32);
+    bool ActionListCursor(CstlRow &, const Point &, s32, s32);
 };
 
 StatsCastlesList::StatsCastlesList(const Point & pt, KingdomCastles & castles) : Interface::ListBox<CstlRow>(pt)
@@ -346,12 +347,12 @@ StatsCastlesList::StatsCastlesList(const Point & pt, KingdomCastles & castles) :
     SetListContent(content);
 }
 
-void StatsCastlesList::ActionListDoubleClick(CstlRow & row, const Point & cursor, s16 ox, s16 oy)
+void StatsCastlesList::ActionListDoubleClick(CstlRow & row, const Point & cursor, s32 ox, s32 oy)
 {
     ActionListSingleClick(row, cursor, ox, oy);
 }
 
-void StatsCastlesList::ActionListSingleClick(CstlRow & row, const Point & cursor, s16 ox, s16 oy)
+void StatsCastlesList::ActionListSingleClick(CstlRow & row, const Point & cursor, s32 ox, s32 oy)
 {
     if(row.castle)
     {
@@ -375,7 +376,7 @@ void StatsCastlesList::ActionListSingleClick(CstlRow & row, const Point & cursor
     }
 }
 
-void StatsCastlesList::ActionListPressRight(CstlRow & row, const Point & cursor, s16 ox, s16 oy)
+void StatsCastlesList::ActionListPressRight(CstlRow & row, const Point & cursor, s32 ox, s32 oy)
 {
     if(row.castle)
     {
@@ -390,7 +391,7 @@ void StatsCastlesList::ActionListPressRight(CstlRow & row, const Point & cursor,
     }
 }
 
-bool StatsCastlesList::ActionListCursor(CstlRow & row, const Point & cursor, s16 ox, s16 oy)
+bool StatsCastlesList::ActionListCursor(CstlRow & row, const Point & cursor, s32 ox, s32 oy)
 {
     if(row.armyBarGuard && (row.armyBarGuard->GetArea() & cursor) &&
 	(row.armyBarGuest ? row.armyBarGuard->QueueEventProcessing(*row.armyBarGuest) : row.armyBarGuard->QueueEventProcessing()))
@@ -420,7 +421,7 @@ bool StatsCastlesList::ActionListCursor(CstlRow & row, const Point & cursor, s16
     return false;
 }
 
-void StatsCastlesList::RedrawItem(const CstlRow & row, s16 dstx, s16 dsty, bool current)
+void StatsCastlesList::RedrawItem(const CstlRow & row, s32 dstx, s32 dsty, bool current)
 {
     if(row.castle)
     {
@@ -481,7 +482,7 @@ void StatsCastlesList::RedrawBackground(const Point & dst)
     AGG::GetICN(ICN::OVERVIEW, 13).Blit(dst.x + 628, dst.y + 17);
 
     // items background
-    for(u8 ii = 0; ii < maxItems; ++ii)
+    for(u32 ii = 0; ii < maxItems; ++ii)
     {
 	const Sprite & back = AGG::GetICN(ICN::OVERVIEW, 8);
 	back.Blit(dst.x + 30, dst.y + 17 + ii * (back.h() + 4));
@@ -490,7 +491,7 @@ void StatsCastlesList::RedrawBackground(const Point & dst)
     }
 }
 
-std::string CapturedExtInfoString(u8 res, u8 color, const Funds & funds)
+std::string CapturedExtInfoString(int res, int color, const Funds & funds)
 {
     std::ostringstream os;
     os << world.CountCapturedMines(res, color);
@@ -665,7 +666,7 @@ void Kingdom::OverviewDialog(void)
 
 	// exit event
 	if(le.MouseClickLeft(buttonExit) ||
-	    Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
+	    Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)) break;
 
 	listStats->QueueEventProcessing();
 

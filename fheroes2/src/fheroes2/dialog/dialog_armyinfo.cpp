@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "text.h"
 #include "button.h"
 #include "cursor.h"
 #include "settings.h"
@@ -40,12 +41,12 @@
 void DrawMonsterStats(const Point &, const Troop &);
 void DrawBattleStats(const Point &, const Troop &);
 
-u16 Dialog::ArmyInfo(const Troop & troop, u16 flags)
+int Dialog::ArmyInfo(const Troop & troop, int flags)
 {
     if(Settings::Get().QVGA()) return PocketPC::DialogArmyInfo(troop, flags);
     Display & display = Display::Get();
 
-    const ICN::icn_t viewarmy = Settings::Get().ExtGameEvilInterface() ? ICN::VIEWARME : ICN::VIEWARMY;
+    const int viewarmy = Settings::Get().ExtGameEvilInterface() ? ICN::VIEWARME : ICN::VIEWARMY;
     const Surface & sprite_dialog = AGG::GetICN(viewarmy, 0);
 
     Cursor & cursor = Cursor::Get();
@@ -132,7 +133,7 @@ u16 Dialog::ArmyInfo(const Troop & troop, u16 flags)
     }
 
     LocalEvent & le = LocalEvent::Get();
-    Dialog::answer_t result = Dialog::ZERO;
+    int result = Dialog::ZERO;
 
     cursor.Show();
     display.Flip();
@@ -169,7 +170,7 @@ u16 Dialog::ArmyInfo(const Troop & troop, u16 flags)
     	    }
     	    else
 	    // exit
-    	    if(le.MouseClickLeft(buttonExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)){ result = Dialog::CANCEL; break; }
+    	    if(le.MouseClickLeft(buttonExit) || Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)){ result = Dialog::CANCEL; break; }
         }
         else
         {
@@ -195,7 +196,7 @@ void DrawMonsterStats(const Point & dst, const Troop & troop)
     dst_pt.y = dst.y;
     text.Blit(dst_pt);
 
-    const u8 ox = 10;
+    const int ox = 10;
 
     text.Set(troop.GetAttackString());
     dst_pt.x = dst.x + ox;
@@ -326,9 +327,9 @@ void DrawBattleStats(const Point & dst, const Troop & b)
     };
 
     // accumulate width
-    u16 ow = 0;
+    u32 ow = 0;
 
-    for(u8 ii = 0; ii < ARRAY_COUNT(modes); ++ii)
+    for(u32 ii = 0; ii < ARRAY_COUNT(modes); ++ii)
 	if(b.isModes(modes[ii]))
 	{
 	    const Sprite & sprite = GetModesSprite(modes[ii]);
@@ -341,7 +342,7 @@ void DrawBattleStats(const Point & dst, const Troop & b)
     Text text;
 
     // blit centered
-    for(u8 ii = 0; ii < ARRAY_COUNT(modes); ++ii)
+    for(u32 ii = 0; ii < ARRAY_COUNT(modes); ++ii)
 	if(b.isModes(modes[ii]))
 	{
 	    const Sprite & sprite = GetModesSprite(modes[ii]);
@@ -349,7 +350,7 @@ void DrawBattleStats(const Point & dst, const Troop & b)
 	    {
 		sprite.Blit(ow, dst.y);
 
-		const u16 duration = b.GetAffectedDuration(modes[ii]);
+		const u32 duration = b.GetAffectedDuration(modes[ii]);
 		if(duration)
 		{
 		    text.Set(GetString(duration), Font::SMALL);
@@ -361,14 +362,14 @@ void DrawBattleStats(const Point & dst, const Troop & b)
 	}
 }
 
-u16 Dialog::ArmyJoinWithCost(const Troop & troop, u32 join, u32 gold, Heroes & hero)
+int Dialog::ArmyJoinWithCost(const Troop & troop, u32 join, u32 gold, Heroes & hero)
 {
     Display & display = Display::Get();
     const Settings & conf = Settings::Get();
 
     // cursor
     Cursor & cursor = Cursor::Get();
-    Cursor::themes_t oldthemes = cursor.Themes();
+    int oldthemes = cursor.Themes();
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
@@ -392,9 +393,9 @@ u16 Dialog::ArmyJoinWithCost(const Troop & troop, u32 join, u32 gold, Heroes & h
     StringReplace(message, "%{gold}", gold);
 
     TextBox textbox(message, Font::BIG, BOXAREA_WIDTH);
-    const u16 buttons = Dialog::YES | Dialog::NO;
+    const int buttons = Dialog::YES | Dialog::NO;
     const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 6);
-    u16 posy = 0;
+    int posy = 0;
     Text text;
 
     message = _("(Rate: %{percent})");
@@ -414,14 +415,11 @@ u16 Dialog::ArmyJoinWithCost(const Troop & troop, u32 join, u32 gold, Heroes & h
     posy += text.h() + 40;
     sprite.Blit(pos.x + (pos.w - sprite.w()) / 2, posy);
 
-    text.Set(GetString(gold) + " " + "(" + "total: " + GetString(world.GetKingdom(hero.GetColor()).GetFunds().Get(Resource::GOLD)) + ")", Font::SMALL);
-    text.Blit(pos.x + (pos.w - text.w()) / 2, posy + sprite.h() + 5);
-
-    LocalEvent & le = LocalEvent::Get();
+    TextSprite tsTotal(GetString(gold) + " " + "(" + "total: " + GetString(world.GetKingdom(hero.GetColor()).GetFunds().Get(Resource::GOLD)) + ")", Font::SMALL,
+	    pos.x + (pos.w - text.w()) / 2, posy + sprite.h() + 5);
+    tsTotal.Show();
 
     ButtonGroups btnGroups(pos, buttons);
-    btnGroups.Draw();
-
     Button btnMarket(pos.x + pos.w / 2 - 60 - 36, posy, (conf.ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS), 4, 5);
     Button btnHeroes(pos.x + pos.w / 2 + 60, posy, (conf.ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS), 0, 1);
     const Kingdom & kingdom = hero.GetKingdom();
@@ -429,16 +427,19 @@ u16 Dialog::ArmyJoinWithCost(const Troop & troop, u32 join, u32 gold, Heroes & h
     if(! kingdom.AllowPayment(payment_t(Resource::GOLD, gold)))
 	btnGroups.DisableButton1(true);
 
+    TextSprite tsEnough;
+
     if(kingdom.GetCountMarketplace())
     {
 	if(kingdom.AllowPayment(payment_t(Resource::GOLD, gold)))
 	    btnMarket.SetDisable(true);
 	else
 	{
-	    std::string msg = _("Not enough\ngold (%{gold})");
+	    std::string msg = _("Not enough gold (%{gold})");
 	    StringReplace(msg, "%{gold}", gold - kingdom.GetFunds().Get(Resource::GOLD));
-	    TextBox textbox2(msg, Font::SMALL, 100);
-	    textbox2.Blit(btnMarket.x - 35, btnMarket.y - 30);
+	    tsEnough.SetText(msg, Font::YELLOW_SMALL);
+	    tsEnough.SetPos(btnMarket.x - 25, btnMarket.y - 17);
+	    tsEnough.Show();
 	    btnMarket.Draw();
 	}
     }
@@ -454,11 +455,14 @@ u16 Dialog::ArmyJoinWithCost(const Troop & troop, u32 join, u32 gold, Heroes & h
 	btnGroups.DisableButton1(true);
     }
 
+    btnGroups.Draw();
     cursor.Show();
     display.Flip();
 
+    LocalEvent & le = LocalEvent::Get();
+
     // message loop
-    u16 result = Dialog::ZERO;
+    int result = Dialog::ZERO;
 
     while(result == Dialog::ZERO && le.HandleEvents())
     {
@@ -476,18 +480,42 @@ u16 Dialog::ArmyJoinWithCost(const Troop & troop, u32 join, u32 gold, Heroes & h
 	{
 	    Marketplace(false);
 
+	    cursor.Hide();
+	    tsTotal.Hide();
+	    tsTotal.SetText(GetString(gold) + " " + "(" + "total: " + GetString(world.GetKingdom(hero.GetColor()).GetFunds().Get(Resource::GOLD)) + ")");
+	    tsTotal.Show();
+
 	    if(kingdom.AllowPayment(payment_t(Resource::GOLD, gold)))
+	    {
+		tsEnough.Hide();
     		btnGroups.DisableButton1(false);
+		btnGroups.Draw();
+	    }
+	    else
+	    {
+		tsEnough.Hide();
+		std::string msg = _("Not enough gold (%{gold})");
+		StringReplace(msg, "%{gold}", gold - kingdom.GetFunds().Get(Resource::GOLD));
+		tsEnough.SetText(msg, Font::SMALL);
+		tsEnough.Show();
+	    }
+
+	    cursor.Show();
+	    display.Flip();
 	}
 	else
 	if(btnHeroes.isEnable() && le.MouseClickLeft(btnHeroes))
 	{
 	    hero.OpenDialog(false, false);
-	    cursor.Show();
-	    display.Flip();
 
 	    if(hero.GetArmy().GetCount() < hero.GetArmy().Size())
+	    {
     		btnGroups.DisableButton1(false);
+		btnGroups.Draw();
+	    }
+
+	    cursor.Show();
+	    display.Flip();
 	}
     }
 

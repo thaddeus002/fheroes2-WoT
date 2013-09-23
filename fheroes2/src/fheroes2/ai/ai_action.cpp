@@ -30,8 +30,10 @@
 #include "battle.h"
 #include "luck.h"
 #include "morale.h"
+#include "game.h"
 #include "race.h"
 #include "difficulty.h"
+#include "dialog.h"
 #include "world.h"
 #include "payment.h"
 #include "gameevent.h"
@@ -42,50 +44,50 @@
 #include "maps_tiles.h"
 #include "ai.h"
 
-void AIToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToPickupResource(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToTreasureChest(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToArtifact(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToResource(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToWagon(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToSkeleton(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToFlotSam(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToObservationTower(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToMagellanMaps(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToTeleports(Heroes & hero, const s32 & dst_index);
-void AIToWhirlpools(Heroes & hero, const s32 & dst_index);
-void AIToPrimarySkillObject(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToExperienceObject(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToWitchsHut(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToShrine(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToGoodMoraleObject(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToMagicWell(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToArtesianSpring(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToXanadu(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToEvent(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToUpgradeArmyObject(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToPoorMoraleObject(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToPoorLuckObject(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToGoodLuckObject(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToObelisk(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToTreeKnowledge(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToDaemonCave(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToCastle(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToSign(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToDwellingJoinMonster(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToHeroes(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToDwellingRecruitMonster(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToStables(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToAbandoneMine(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToBarrier(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToTravellersTent(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToShipwreckSurvivor(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToBoat(Heroes & hero, const u8 & obj, const s32 & dst_index);
-void AIToCoast(Heroes & hero, const u8 & obj, const s32 & dst_index);
+void AIToMonster(Heroes & hero, u32 obj, s32 dst_index);
+void AIToPickupResource(Heroes & hero, u32 obj, s32 dst_index);
+void AIToTreasureChest(Heroes & hero, u32 obj, s32 dst_index);
+void AIToArtifact(Heroes & hero, u32 obj, s32 dst_index);
+void AIToResource(Heroes & hero, u32 obj, s32 dst_index);
+void AIToWagon(Heroes & hero, u32 obj, s32 dst_index);
+void AIToSkeleton(Heroes & hero, u32 obj, s32 dst_index);
+void AIToCaptureObject(Heroes & hero, u32 obj, s32 dst_index);
+void AIToFlotSam(Heroes & hero, u32 obj, s32 dst_index);
+void AIToObservationTower(Heroes & hero, u32 obj, s32 dst_index);
+void AIToMagellanMaps(Heroes & hero, u32 obj, s32 dst_index);
+void AIToTeleports(Heroes & hero, s32 dst_index);
+void AIToWhirlpools(Heroes & hero, s32 dst_index);
+void AIToPrimarySkillObject(Heroes & hero, u32 obj, s32 dst_index);
+void AIToExperienceObject(Heroes & hero, u32 obj, s32 dst_index);
+void AIToWitchsHut(Heroes & hero, u32 obj, s32 dst_index);
+void AIToShrine(Heroes & hero, u32 obj, s32 dst_index);
+void AIToGoodMoraleObject(Heroes & hero, u32 obj, s32 dst_index);
+void AIToMagicWell(Heroes & hero, u32 obj, s32 dst_index);
+void AIToArtesianSpring(Heroes & hero, u32 obj, s32 dst_index);
+void AIToXanadu(Heroes & hero, u32 obj, s32 dst_index);
+void AIToEvent(Heroes & hero, u32 obj, s32 dst_index);
+void AIToUpgradeArmyObject(Heroes & hero, u32 obj, s32 dst_index);
+void AIToPoorMoraleObject(Heroes & hero, u32 obj, s32 dst_index);
+void AIToPoorLuckObject(Heroes & hero, u32 obj, s32 dst_index);
+void AIToGoodLuckObject(Heroes & hero, u32 obj, s32 dst_index);
+void AIToObelisk(Heroes & hero, u32 obj, s32 dst_index);
+void AIToTreeKnowledge(Heroes & hero, u32 obj, s32 dst_index);
+void AIToDaemonCave(Heroes & hero, u32 obj, s32 dst_index);
+void AIToCastle(Heroes & hero, u32 obj, s32 dst_index);
+void AIToSign(Heroes & hero, u32 obj, s32 dst_index);
+void AIToDwellingJoinMonster(Heroes & hero, u32 obj, s32 dst_index);
+void AIToHeroes(Heroes & hero, u32 obj, s32 dst_index);
+void AIToDwellingRecruitMonster(Heroes & hero, u32 obj, s32 dst_index);
+void AIToStables(Heroes & hero, u32 obj, s32 dst_index);
+void AIToAbandoneMine(Heroes & hero, u32 obj, s32 dst_index);
+void AIToBarrier(Heroes & hero, u32 obj, s32 dst_index);
+void AIToTravellersTent(Heroes & hero, u32 obj, s32 dst_index);
+void AIToShipwreckSurvivor(Heroes & hero, u32 obj, s32 dst_index);
+void AIToBoat(Heroes & hero, u32 obj, s32 dst_index);
+void AIToCoast(Heroes & hero, u32 obj, s32 dst_index);
 void AIMeeting(Heroes & hero1, Heroes & hero2);
 
-Skill::Primary::skill_t AISelectPrimarySkill(Heroes &hero)
+int AISelectPrimarySkill(Heroes &hero)
 {
     switch(hero.GetRace())
     {
@@ -142,9 +144,9 @@ Skill::Primary::skill_t AISelectPrimarySkill(Heroes &hero)
     return Skill::Primary::UNKNOWN;
 }
 
-void AIBattleLose(Heroes &hero, const Battle::Result & res, bool attacker, Color::color_t color = Color::NONE)
+void AIBattleLose(Heroes &hero, const Battle::Result & res, bool attacker, int color = Color::NONE)
 {
-    u8 reason = attacker ? res.AttackerResult() : res.DefenderResult();
+    u32 reason = attacker ? res.AttackerResult() : res.DefenderResult();
 
     if(Settings::Get().ExtHeroSurrenderingGiveExp() &&
 	Battle::RESULT_SURRENDER == reason)
@@ -168,7 +170,7 @@ void AIBattleLose(Heroes &hero, const Battle::Result & res, bool attacker, Color
 void AI::HeroesAction(Heroes & hero, s32 dst_index)
 {
     const Maps::Tiles & tile = world.GetTiles(dst_index);
-    const MP2::object_t object = (dst_index == hero.GetIndex() ?
+    const int object = (dst_index == hero.GetIndex() ?
 	tile.GetObject(false) : tile.GetObject());
 
     if(MP2::isActionObject(object, hero.isShipMaster())) hero.SetModes(Heroes::ACTION);
@@ -320,7 +322,7 @@ void AI::HeroesAction(Heroes & hero, s32 dst_index)
     HeroesActionComplete(hero, dst_index);
 }
 
-void AIToHeroes(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToHeroes(Heroes & hero, u32 obj, s32 dst_index)
 {
     const Settings & conf = Settings::Get();
     Heroes* other_hero = world.GetTiles(dst_index).GetHeroes();
@@ -394,10 +396,10 @@ void AIToHeroes(Heroes & hero, const u8 & obj, const s32 & dst_index)
     }
 }
 
-void AIToCastle(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToCastle(Heroes & hero, u32 obj, s32 dst_index)
 {
     const Settings & conf = Settings::Get();
-    Castle* castle = world.GetCastle(dst_index);
+    Castle* castle = world.GetCastle(Maps::GetPoint(dst_index));
 
     if(! castle) return;
 
@@ -486,18 +488,17 @@ void AIToCastle(Heroes & hero, const u8 & obj, const s32 & dst_index)
     }
 }
 
-void AIToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToMonster(Heroes & hero, u32 obj, s32 dst_index)
 {
     bool destroy = false;
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const Troop & troop = tile.QuantityTroop();
     //const Settings & conf = Settings::Get();
 
-    u32 join = 0;
-    u8 reason = Army::GetJoinSolution(hero, tile, join);
+    JoinCount join = Army::GetJoinSolution(hero, tile);
 
     // free join
-    if(1 == reason)
+    if(JOIN_FREE == join.first)
     {
     	// join if ranged or flying monsters present
     	if(hero.GetArmy().HasMonster(troop()) || troop.isArchers() || troop.isFly())
@@ -507,29 +508,29 @@ void AIToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    destroy = true;
     	}
 	else
-	    reason = 0;
+	    join.first = JOIN_NONE;
     }
     else
     // join with cost
-    if(2 == reason)
+    if(JOIN_COST == join.first)
     {
     	// join if archers or fly or present
     	if(hero.GetArmy().HasMonster(troop()) || troop.isArchers() || troop.isFly())
     	{
 	    u32 gold = troop.GetCost().gold;
-    	    DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " join monster " << troop.GetName() << ", count: " << join << ", cost: " << gold);
-    	    hero.GetArmy().JoinTroop(troop(), join);
+    	    DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " join monster " << troop.GetName() << ", count: " << join.second << ", cost: " << gold);
+    	    hero.GetArmy().JoinTroop(troop(), join.second);
 	    hero.GetKingdom().OddFundsResource(Funds(Resource::GOLD, gold));
 	    destroy = true;
     	}
 	else
-	    reason = 0;
+	    join.first = JOIN_NONE;
     }
 
     //bool allow_move = false;
 
     // fight
-    if(0 == reason)
+    if(JOIN_NONE == join.first)
     {
 	DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " attack monster " << troop.GetName());
 
@@ -584,7 +585,7 @@ void AIToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
     }
 }
 
-void AIToPickupResource(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToPickupResource(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
@@ -600,10 +601,10 @@ void AIToPickupResource(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " pickup small resource");
 }
 
-void AIToTreasureChest(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToTreasureChest(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    u16 gold = tile.QuantityGold();
+    u32 gold = tile.QuantityGold();
 
     if(tile.isWater())
     {
@@ -621,7 +622,7 @@ void AIToTreasureChest(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
         if(gold)
 	{
-            const u16 expr = gold > 500 ? gold - 500 : 500;
+            const u32 expr = gold > 500 ? gold - 500 : 500;
 	    // select gold or exp
 	    if(Rand::Get(1))
 	    {
@@ -643,7 +644,7 @@ void AIToTreasureChest(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToResource(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToResource(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const ResourceCount & rc = tile.QuantityResourceCount();
@@ -660,7 +661,7 @@ void AIToResource(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToSkeleton(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToSkeleton(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
@@ -671,7 +672,7 @@ void AIToSkeleton(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 	if(! hero.PickupArtifact(art))
 	{
-            u16 gold = GoldInsteadArtifact(obj);
+            u32 gold = GoldInsteadArtifact(obj);
             hero.GetKingdom().AddFundsResource(Funds(Resource::GOLD, gold));
         }
 
@@ -683,7 +684,7 @@ void AIToSkeleton(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToWagon(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToWagon(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
@@ -704,7 +705,7 @@ void AIToWagon(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToCaptureObject(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
@@ -758,7 +759,7 @@ void AIToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " captured: " << MP2::StringObject(obj));
 }
 
-void AIToFlotSam(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToFlotSam(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
@@ -769,20 +770,20 @@ void AIToFlotSam(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToSign(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToSign(Heroes & hero, u32 obj, s32 dst_index)
 {
     hero.SetVisited(dst_index, Visit::LOCAL);
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToObservationTower(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToObservationTower(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::ClearFog(dst_index, Game::GetViewDistance(Game::VIEW_OBSERVATION_TOWER), hero.GetColor());
     hero.SetVisited(dst_index, Visit::GLOBAL);
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToMagellanMaps(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToMagellanMaps(Heroes & hero, u32 obj, s32 dst_index)
 {
     const Funds payment(Resource::GOLD, 1000);
     Kingdom & kingdom = hero.GetKingdom();
@@ -798,7 +799,7 @@ void AIToMagellanMaps(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToTeleports(Heroes & hero, const s32 & index_from)
+void AIToTeleports(Heroes & hero, s32 index_from)
 {
     s32 index_to = world.NextTeleport(index_from);
     hero.ApplyPenaltyMovement();
@@ -833,7 +834,7 @@ void AIToTeleports(Heroes & hero, const s32 & index_from)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToWhirlpools(Heroes & hero, const s32 & index_from)
+void AIToWhirlpools(Heroes & hero, s32 index_from)
 {
     s32 index_to = world.NextWhirlpool(index_from);
     hero.ApplyPenaltyMovement();
@@ -857,11 +858,11 @@ void AIToWhirlpools(Heroes & hero, const s32 & index_from)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToPrimarySkillObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToPrimarySkillObject(Heroes & hero, u32 obj, s32 dst_index)
 {
     const Maps::Tiles & tile = world.GetTiles(dst_index);
 
-    Skill::Primary::skill_t skill = Skill::Primary::UNKNOWN;
+    int skill = Skill::Primary::UNKNOWN;
 
     switch(obj)
     {
@@ -905,7 +906,7 @@ void AIToPrimarySkillObject(Heroes & hero, const u8 & obj, const s32 & dst_index
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToExperienceObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToExperienceObject(Heroes & hero, u32 obj, s32 dst_index)
 {
     const Maps::Tiles & tile = world.GetTiles(dst_index);
 
@@ -927,7 +928,7 @@ void AIToExperienceObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToWitchsHut(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToWitchsHut(Heroes & hero, u32 obj, s32 dst_index)
 {
     const Skill::Secondary & skill = world.GetTiles(dst_index).QuantitySkill();
 
@@ -940,10 +941,10 @@ void AIToWitchsHut(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToShrine(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToShrine(Heroes & hero, u32 obj, s32 dst_index)
 {
     const Spell & spell = world.GetTiles(dst_index).QuantitySpell();
-    const u8 spell_level = spell.Level();
+    const u32 spell_level = spell.Level();
 
     if(spell.isValid() &&
     // check spell book
@@ -959,16 +960,16 @@ void AIToShrine(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToGoodLuckObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToGoodLuckObject(Heroes & hero, u32 obj, s32 dst_index)
 {
     // check already visited
     if(!hero.isVisited(obj)) hero.SetVisited(dst_index);
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToGoodMoraleObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToGoodMoraleObject(Heroes & hero, u32 obj, s32 dst_index)
 {
-    u16 move = 0;
+    u32 move = 0;
 
     switch(obj)
     {
@@ -991,9 +992,9 @@ void AIToGoodMoraleObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToMagicWell(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToMagicWell(Heroes & hero, u32 obj, s32 dst_index)
 {
-    const u16 max = hero.GetMaxSpellPoints();
+    const u32 max = hero.GetMaxSpellPoints();
 
     if(hero.GetSpellPoints() != max &&
 	// check already visited
@@ -1006,9 +1007,9 @@ void AIToMagicWell(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToArtesianSpring(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToArtesianSpring(Heroes & hero, u32 obj, s32 dst_index)
 {
-    const u16 max = hero.GetMaxSpellPoints();
+    const u32 max = hero.GetMaxSpellPoints();
 
     if(!hero.isVisited(MP2::OBJ_ARTESIANSPRING) &&
        hero.GetSpellPoints() < max * 2)
@@ -1025,11 +1026,11 @@ void AIToArtesianSpring(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToXanadu(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToXanadu(Heroes & hero, u32 obj, s32 dst_index)
 {
     const Maps::Tiles & tile = world.GetTiles(dst_index);
-    const u8 level1 = hero.GetLevelSkill(Skill::Secondary::DIPLOMACY);
-    const u8 level2 = hero.GetLevel();
+    const u32 level1 = hero.GetLevelSkill(Skill::Secondary::DIPLOMACY);
+    const u32 level2 = hero.GetLevel();
 
     if(!hero.isVisited(tile) &&
       ((level1 == Skill::Level::BASIC && 7 < level2) ||
@@ -1047,7 +1048,7 @@ void AIToXanadu(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToEvent(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToEvent(Heroes & hero, u32 obj, s32 dst_index)
 {
     // check event maps
     EventMaps* event_maps = world.GetEventMaps(hero.GetColor(), dst_index);
@@ -1066,7 +1067,7 @@ void AIToEvent(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToUpgradeArmyObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToUpgradeArmyObject(Heroes & hero, u32 obj, s32 dst_index)
 {
     switch(obj)
     {
@@ -1094,10 +1095,10 @@ void AIToUpgradeArmyObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToPoorMoraleObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToPoorMoraleObject(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    u16  gold = tile.QuantityGold();
+    u32  gold = tile.QuantityGold();
     bool complete = false;
 
     if(gold)
@@ -1136,7 +1137,7 @@ void AIToPoorMoraleObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToPoorLuckObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToPoorLuckObject(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const Spell & spell = tile.QuantitySpell();
@@ -1177,7 +1178,7 @@ void AIToPoorLuckObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToObelisk(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToObelisk(Heroes & hero, u32 obj, s32 dst_index)
 {
     if(!hero.isVisited(obj, Visit::GLOBAL))
     {
@@ -1189,7 +1190,7 @@ void AIToObelisk(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToTreeKnowledge(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToTreeKnowledge(Heroes & hero, u32 obj, s32 dst_index)
 {
     const Maps::Tiles & tile = world.GetTiles(dst_index);
 
@@ -1211,7 +1212,7 @@ void AIToTreeKnowledge(Heroes & hero, const u8 & obj, const s32 & dst_index)
 }
 
 
-void AIToDaemonCave(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToDaemonCave(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
@@ -1236,7 +1237,7 @@ void AIToDaemonCave(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToDwellingJoinMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToDwellingJoinMonster(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const Troop & troop = tile.QuantityTroop();
@@ -1246,7 +1247,7 @@ void AIToDwellingJoinMonster(Heroes & hero, const u8 & obj, const s32 & dst_inde
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToDwellingRecruitMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToDwellingRecruitMonster(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const Troop & troop = tile.QuantityTroop();
@@ -1273,7 +1274,7 @@ void AIToDwellingRecruitMonster(Heroes & hero, const u8 & obj, const s32 & dst_i
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToStables(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToStables(Heroes & hero, u32 obj, s32 dst_index)
 {
     // check already visited
     if(!hero.isVisited(obj))
@@ -1287,12 +1288,12 @@ void AIToStables(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToAbandoneMine(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToAbandoneMine(Heroes & hero, u32 obj, s32 dst_index)
 {
     AIToCaptureObject(hero, obj, dst_index);
 }
 
-void AIToBarrier(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToBarrier(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     Kingdom & kingdom = hero.GetKingdom();
@@ -1306,7 +1307,7 @@ void AIToBarrier(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToTravellersTent(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToTravellersTent(Heroes & hero, u32 obj, s32 dst_index)
 {
     const Maps::Tiles & tile = world.GetTiles(dst_index);
     Kingdom & kingdom = hero.GetKingdom();
@@ -1316,7 +1317,7 @@ void AIToTravellersTent(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToShipwreckSurvivor(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToShipwreckSurvivor(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
@@ -1331,13 +1332,13 @@ void AIToShipwreckSurvivor(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToArtifact(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToArtifact(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
     if(! hero.IsFullBagArtifacts())
     {
-	const u8 cond = tile.QuantityVariant();
+	const u32 cond = tile.QuantityVariant();
 	const Artifact & art = tile.QuantityArtifact();
 
         bool result = false;
@@ -1393,7 +1394,7 @@ void AIToArtifact(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToBoat(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToBoat(Heroes & hero, u32 obj, s32 dst_index)
 {
     if(hero.isShipMaster()) return;
 
@@ -1417,7 +1418,7 @@ void AIToBoat(Heroes & hero, const u8 & obj, const s32 & dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToCoast(Heroes & hero, const u8 & obj, const s32 & dst_index)
+void AIToCoast(Heroes & hero, u32 obj, s32 dst_index)
 {
     if(! hero.isShipMaster()) return;
 
@@ -1457,7 +1458,7 @@ void AIMeeting(Heroes & hero1, Heroes & hero2)
 bool AI::HeroesValidObject(const Heroes & hero, s32 index)
 {
     Maps::Tiles & tile = world.GetTiles(index);
-    const u8 obj = tile.GetObject();
+    const u32 obj = tile.GetObject();
     const Army & army = hero.GetArmy();
     const Kingdom & kingdom = hero.GetKingdom();
 
@@ -1543,7 +1544,7 @@ bool AI::HeroesValidObject(const Heroes & hero, s32 index)
 
 	case MP2::OBJ_ARTIFACT:
 	{
-	    const u8 variants = tile.QuantityVariant();
+	    const u32 variants = tile.QuantityVariant();
 
 	    if(hero.IsFullBagArtifacts()) return false;
 
@@ -1653,8 +1654,8 @@ bool AI::HeroesValidObject(const Heroes & hero, s32 index)
 
 	case MP2::OBJ_XANADU:
 	{
-	    const u8 level1 = hero.GetLevelSkill(Skill::Secondary::DIPLOMACY);
-	    const u8 level2 = hero.GetLevel();
+	    const u32 level1 = hero.GetLevelSkill(Skill::Secondary::DIPLOMACY);
+	    const u32 level2 = hero.GetLevel();
 
 	    if(!hero.isVisited(tile) &&
 		((level1 == Skill::Level::BASIC && 7 < level2) ||
@@ -1788,7 +1789,7 @@ bool AI::HeroesValidObject(const Heroes & hero, s32 index)
 
 	case MP2::OBJ_CASTLE:
 	{
-	    const Castle* castle = world.GetCastle(index);
+	    const Castle* castle = world.GetCastle(Maps::GetPoint(index));
 	    if(castle)
 	    {
 		if(hero.GetColor() == castle->GetColor())
@@ -1836,7 +1837,7 @@ bool AIHeroesShowAnimation(const Heroes & hero)
     const Settings & conf = Settings::Get();
 
     // accumulate colors
-    u8 colors = 0;
+    u32 colors = 0;
 
     if(conf.GameType() & Game::TYPE_HOTSEAT)
     {
@@ -1912,7 +1913,7 @@ void AI::HeroesMove(Heroes & hero)
 		    hero.Move(true);
 		}
 		else
-		if(Game::AnimateInfrequent(Game::CURRENT_AI_DELAY))
+		if(Game::AnimateInfrequentDelay(Game::CURRENT_AI_DELAY))
 		{
 		    cursor.Hide();
 		    hero.Move();
@@ -1923,7 +1924,7 @@ void AI::HeroesMove(Heroes & hero)
 		    display.Flip();
 		}
 
-    		if(Game::AnimateInfrequent(Game::MAPS_DELAY))
+    		if(Game::AnimateInfrequentDelay(Game::MAPS_DELAY))
 		{
 		    u32 & frame = Game::MapsAnimationFrame();
 		    ++frame;

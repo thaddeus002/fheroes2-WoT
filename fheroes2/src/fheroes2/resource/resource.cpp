@@ -23,6 +23,7 @@
 #include "mp2.h"
 #include "world.h"
 #include "agg.h"
+#include "text.h"
 #include "settings.h"
 #include "pairs.h"
 #include "resource.h"
@@ -37,7 +38,7 @@ Funds::Funds(s32 _ore, s32 _wood, s32 _mercury, s32 _sulfur, s32 _crystal, s32 _
 {
 }
 
-Funds::Funds(u8 rs, u32 count) : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0)
+Funds::Funds(int rs, u32 count) : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0)
 {
     switch(rs)
     {
@@ -65,7 +66,7 @@ Funds::Funds(const ResourceCount & rs)
     if(ptr) *ptr = rs.second;
 }
 
-u8 Resource::Rand(bool with_gold)
+int Resource::Rand(bool with_gold)
 {
     switch(Rand::Get(1, (with_gold ? 7 : 6)))
     {
@@ -82,7 +83,7 @@ u8 Resource::Rand(bool with_gold)
     return Resource::UNKNOWN;
 }
 
-s32* Funds::GetPtr(u8 rs)
+s32* Funds::GetPtr(int rs)
 {
     switch(rs)
     {
@@ -98,7 +99,7 @@ s32* Funds::GetPtr(u8 rs)
     return NULL;
 }
 
-s32 Funds::Get(u8 rs) const
+s32 Funds::Get(int rs) const
 {
     switch(rs)
     {
@@ -277,7 +278,7 @@ std::string Funds::String(void) const
 }
 
 /* name resource */
-const char* Resource::String(u8 resource)
+const char* Resource::String(int resource)
 {
     const char* res[] = { "Unknown", _("Wood"), _("Mercury"), _("Ore"), _("Sulfur"), _("Crystal"), _("Gems"), _("Gold") };
 
@@ -296,7 +297,7 @@ const char* Resource::String(u8 resource)
 }
 
 /* return index sprite objnrsrc.icn */
-u8 Resource::GetIndexSprite(u8 resource)
+u32 Resource::GetIndexSprite(int resource)
 {
     switch(resource){
         case Resource::WOOD:	return  1;
@@ -313,7 +314,7 @@ u8 Resource::GetIndexSprite(u8 resource)
     return 0;
 }
 
-u8 Resource::FromIndexSprite(u8 index)
+int Resource::FromIndexSprite(u32 index)
 {
     switch(index)
     {
@@ -332,7 +333,7 @@ u8 Resource::FromIndexSprite(u8 index)
 }
 
 /* return index sprite resource.icn */
-u8 Resource::GetIndexSprite2(u8 resource)
+u32 Resource::GetIndexSprite2(int resource)
 {
     switch(resource)
     {
@@ -350,7 +351,7 @@ u8 Resource::GetIndexSprite2(u8 resource)
     return 0;
 }
 
-u8 Resource::FromIndexSprite2(u8 index)
+int Resource::FromIndexSprite2(u32 index)
 {
     switch(index)
     {
@@ -368,9 +369,9 @@ u8 Resource::FromIndexSprite2(u8 index)
     return UNKNOWN;
 }
 
-u8 Funds::GetValidItems(void) const
+int Funds::GetValidItems(void) const
 {
-    u8 rs = 0;
+    int rs = 0;
 
     if(wood)	rs |= Resource::WOOD;
     if(ore)	rs |= Resource::ORE;
@@ -383,9 +384,9 @@ u8 Funds::GetValidItems(void) const
     return rs;
 }
 
-u8 Funds::GetValidItemsCount(void) const
+u32 Funds::GetValidItemsCount(void) const
 {
-    u8 result = 0;
+    u32 result = 0;
 
     if(wood) ++result;
     if(ore) ++result;
@@ -409,9 +410,9 @@ void Funds::Reset(void)
     gold = 0;
 }
 
-Resource::BoxSprite::BoxSprite(const Funds & f, u16 w) : Rect(0, 0, w, 0), rs(f)
+Resource::BoxSprite::BoxSprite(const Funds & f, u32 w) : Rect(0, 0, w, 0), rs(f)
 {
-    const u8 count = rs.GetValidItemsCount();
+    const u32 count = rs.GetValidItemsCount();
     h = 4 > count ? 45 : (7 > count ? 90 : 135);
 }
 
@@ -420,14 +421,14 @@ const Rect & Resource::BoxSprite::GetArea(void) const
     return *this;
 }
 
-void Resource::BoxSprite::SetPos(s16 px, s16 py)
+void Resource::BoxSprite::SetPos(s32 px, s32 py)
 {
     x = px;
     y = py;
 }
 
 void RedrawResourceSprite(const Surface & sf, const Point & pos,
-		    u8 count, u16 width, u8 offset, s32 value)
+		    u32 count, u32 width, u32 offset, s32 value)
 {
     Display & display = Display::Get();
     Point dst_pt;
@@ -444,13 +445,13 @@ void RedrawResourceSprite(const Surface & sf, const Point & pos,
 
 void Resource::BoxSprite::Redraw(void) const
 {
-    const u8 valid_resource = rs.GetValidItemsCount();
+    const u32 valid_resource = rs.GetValidItemsCount();
     if(0 == valid_resource) return;
 
-    u16 width = 2 < valid_resource ? w / 3 : w / valid_resource;
+    u32 width = 2 < valid_resource ? w / 3 : w / valid_resource;
 
-    u8 count = 0;
-    u8 offset = 35;
+    u32 count = 0;
+    u32 offset = 35;
 
     if(rs.wood)
     {

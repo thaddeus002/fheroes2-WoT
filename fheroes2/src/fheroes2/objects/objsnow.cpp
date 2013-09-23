@@ -26,7 +26,7 @@
 #include "direction.h"
 #include "objsnow.h"
 
-u16 ObjSnow::GetPassable(const u8 & index)
+int ObjSnow::GetPassable(u32 index)
 {
     const u8 disabled[] = { 22, 26, 27, 28, 30, 32, 34, 35, 37, 38, 39, 81, 82, 83, 84, 197, 198 };
     const u8 restricted[] = { 2, 12, 41, 42, 43, 44, 45, 49, 50, 55, 56, 57, 60, 64, 65, 68, 71, 74, 77, 80,
@@ -43,12 +43,12 @@ u16 ObjSnow::GetPassable(const u8 & index)
             DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
 }
 
-bool ObjSnow::isAction(const u8 & index)
+bool ObjSnow::isAction(u32 index)
 {
     return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
-bool ObjSnow::isShadow(const u8 & index)
+bool ObjSnow::isShadow(u32 index)
 {
     const u8 shadows [] = { 21, 25, 29, 31, 33, 36, 40, 48, 54, 59, 63, 67, 70, 73, 76, 79,
 	    104, 108, 120, 124, 137, 140, 142, 144, 148, 193, 203, 207 };
@@ -56,7 +56,7 @@ bool ObjSnow::isShadow(const u8 & index)
     return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
 }
 
-u8 ObjSnow::GetActionObject(const u8 & index)
+int ObjSnow::GetActionObject(u32 index)
 {
     switch(index)
     {

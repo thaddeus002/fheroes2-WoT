@@ -20,9 +20,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "gamedefs.h"
 #include "morale.h"
 
-const char* Morale::String(s8 morale)
+const char* Morale::String(int morale)
 {
     const char* str_morale[] = { "Unknown", _("morale|Treason"), _("morale|Awful"), _("morale|Poor"), _("morale|Normal"), _("morale|Good"), _("morale|Great"), _("morale|Blood!") };
 
@@ -41,7 +42,7 @@ const char* Morale::String(s8 morale)
     return str_morale[0];
 }
 
-const char* Morale::Description(s8 morale)
+const char* Morale::Description(int morale)
 {
     const char* str_desc_morale[] = { "Unknown",
 	_("Bad morale may cause your armies to freeze in combat."),

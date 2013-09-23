@@ -37,15 +37,15 @@ namespace Battle
     public:
 	Catapult(const HeroBase &, bool);
 
-	static Point	GetTargetPosition(u8);
-	Command		GetAction(Arena &) const;
+	static Point	GetTargetPosition(int);
+	Command		GetCommand(Arena &) const;
 
     private:
-	u8		GetTarget(const std::vector<u8> &) const;
-	u8		GetDamage(u8, u8) const;
+	int		GetTarget(const std::vector<u32> &) const;
+	u32		GetDamage(int, u32) const;
 
-	u8	cat_shots;
-	u8	cat_first;
+	u32	cat_shots;
+	u32	cat_first;
 	bool	cat_miss;
 	bool	cat_fort;
     };

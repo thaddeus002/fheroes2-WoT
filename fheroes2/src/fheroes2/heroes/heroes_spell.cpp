@@ -48,14 +48,14 @@ bool ActionSpellDimensionDoor(Heroes &);
 bool ActionSpellTownGate(Heroes &);
 bool ActionSpellTownPortal(Heroes &);
 bool ActionSpellVisions(Heroes &);
-bool ActionSpellSetGuardian(Heroes &, const Spell &, u8 id);
+bool ActionSpellSetGuardian(Heroes &, const Spell &, int mons);
 
 class CastleIndexListBox : public Interface::ListBox<s32>
 {
 public:
-    CastleIndexListBox(const Point & pt, u16 & res) : Interface::ListBox<s32>(pt), result(res) {};
+    CastleIndexListBox(const Point & pt, int & res) : Interface::ListBox<s32>(pt), result(res) {};
 
-    void RedrawItem(const s32 &, s16, s16, bool);
+    void RedrawItem(const s32 &, s32, s32, bool);
     void RedrawBackground(const Point &);
 
     void ActionCurrentUp(void){};
@@ -64,12 +64,12 @@ public:
     void ActionListSingleClick(s32 &){};
     void ActionListPressRight(s32 &){};
 
-    u16 & result;
+    int & result;
 };
 
-void CastleIndexListBox::RedrawItem(const s32 & index, s16 dstx, s16 dsty, bool current)
+void CastleIndexListBox::RedrawItem(const s32 & index, s32 dstx, s32 dsty, bool current)
 {
-    const Castle* castle =world.GetCastle(index);
+    const Castle* castle = world.GetCastle(Maps::GetPoint(index));
 
     if(castle)
     {
@@ -87,12 +87,12 @@ void CastleIndexListBox::RedrawBackground(const Point & dst)
     text.Blit(dst.x + 140 - text.w() / 2, dst.y + 30);
 
     AGG::GetICN(ICN::LISTBOX, 0).Blit(dst.x + 2, dst.y + 55);
-    for(u8 ii = 1; ii < 5; ++ii)
+    for(u32 ii = 1; ii < 5; ++ii)
 	AGG::GetICN(ICN::LISTBOX, 1).Blit(dst.x + 2, dst.y + 55 + (ii * 19));
     AGG::GetICN(ICN::LISTBOX, 2).Blit(dst.x + 2, dst.y + 145);
 
     AGG::GetICN(ICN::LISTBOX, 7).Blit(dst.x + 256, dst.y + 75);
-    for(u8 ii = 1; ii < 3; ++ii)
+    for(u32 ii = 1; ii < 3; ++ii)
 	AGG::GetICN(ICN::LISTBOX, 8).Blit(dst.x + 256, dst.y + 74 + (ii * 19));
     AGG::GetICN(ICN::LISTBOX, 9).Blit(dst.x + 256, dst.y + 126);
 }
@@ -240,7 +240,7 @@ bool ActionSpellIdentifyHero(Heroes & hero)
 
 bool ActionSpellSummonBoat(Heroes & hero)
 {
-    u8 chance = 0;
+    u32 chance = 0;
 
     switch(hero.GetLevelSkill(Skill::Secondary::WISDOM))
     {
@@ -286,7 +286,7 @@ bool ActionSpellSummonBoat(Heroes & hero)
 
 bool ActionSpellDimensionDoor(Heroes & hero)
 {
-    const u8 distance = Spell::CalculateDimensionDoorDistance(hero.GetPower(), hero.GetArmy().GetHitPoints());
+    const u32 distance = Spell::CalculateDimensionDoorDistance(hero.GetPower(), hero.GetArmy().GetHitPoints());
 
     Interface::Basic & I = Interface::Basic::Get();
     Cursor & cursor = Cursor::Get();
@@ -340,7 +340,7 @@ bool ActionSpellTownGate(Heroes & hero)
     // find the nearest castle
     for(it = castles.begin(); it != castles.end(); ++it) if(*it && !(*it)->GetHeroes().Guest())
     {
-	const u16 min2 = Maps::GetApproximateDistance(center, (*it)->GetIndex());
+	int min2 = Maps::GetApproximateDistance(center, (*it)->GetIndex());
 	if(0 > min || min2 < min)
 	{
 	    min = min2;
@@ -390,7 +390,7 @@ bool ActionSpellTownPortal(Heroes & hero)
     Dialog::FrameBorder* frameborder = new Dialog::FrameBorder(Size(280, 200));
 
     const Rect & area = frameborder->GetArea();
-    u16 result = Dialog::ZERO;
+    int result = Dialog::ZERO;
 
     CastleIndexListBox listbox(area, result);
 
@@ -412,7 +412,6 @@ bool ActionSpellTownPortal(Heroes & hero)
     while(result == Dialog::ZERO && le.HandleEvents())
     {
         result = btnGroups.QueueEventProcessing();
-
         listbox.QueueEventProcessing();
 
         if(!cursor.isVisible())
@@ -427,14 +426,14 @@ bool ActionSpellTownPortal(Heroes & hero)
 
     // store
     if(result == Dialog::OK)
-	return HeroesTownGate(hero, world.GetCastle(listbox.GetCurrent()));
+	return HeroesTownGate(hero, world.GetCastle(Maps::GetPoint(listbox.GetCurrent())));
 
     return false;
 }
 
 bool ActionSpellVisions(Heroes & hero)
 {
-    const u16 dist = hero.GetVisionsDistance();
+    const u32 dist = hero.GetVisionsDistance();
     const MapsIndexes & monsters = Maps::ScanAroundObject(hero.GetIndex(), dist, MP2::OBJ_MONSTER);
 
     if(monsters.size())
@@ -445,39 +444,39 @@ bool ActionSpellVisions(Heroes & hero)
 	    const Maps::Tiles & tile = world.GetTiles(*it);
 	    const Troop & troop = tile.QuantityTroop();
 
-    	    u32 join = troop.GetCount();
+    	    //u32 join = troop.GetCount();
     	    Funds cost;
 
-	    const u8 reason = Army::GetJoinSolution(hero, tile, join);
+	    JoinCount join = Army::GetJoinSolution(hero, tile);
 	    std::string hdr, msg;
 
-	    hdr = std::string("%{count} ") + StringLower(troop.GetPluralName(join));
-	    StringReplace(hdr, "%{count}", join);
+	    hdr = std::string("%{count} ") + StringLower(troop.GetPluralName(join.second));
+	    StringReplace(hdr, "%{count}", join.second);
 
-	    switch(reason)
+	    switch(join.first)
 	    {
-		case 0:
+		default:
 		    msg = _("I fear these creatures are in the mood for a fight.");
 		    break;
 
-		case 1:
+		case JOIN_FREE:
 		    msg = _("The creatures are willing to join us!");
 		    break;
 
-		case 2:
-		    if(join == troop.GetCount())
+		case JOIN_COST:
+		    if(join.second == troop.GetCount())
 			msg = _("All the creatures will join us...");
 		    else
 		    {
-			msg = ngettext("The creature will join us...", "%{count} of the creatures will join us...", join);
-			StringReplace(msg, "%{count}", join);
+			msg = ngettext("The creature will join us...", "%{count} of the creatures will join us...", join.second);
+			StringReplace(msg, "%{count}", join.second);
 		    }
 		    msg.append("\n");
 		    msg.append("\n for a fee of %{gold} gold.");
 		    StringReplace(msg, "%{gold}", troop.GetCost().gold);
 		    break;
 
-		default:
+		case JOIN_FLEE:
 		    msg = _("These weak creatures will surely flee before us.");
 		    break;
 	    }
@@ -498,7 +497,7 @@ bool ActionSpellVisions(Heroes & hero)
     return true;
 }
 
-bool ActionSpellSetGuardian(Heroes & hero, const Spell & spell, u8 id)
+bool ActionSpellSetGuardian(Heroes & hero, const Spell & spell, int mons)
 {
     Maps::Tiles & tile = world.GetTiles(hero.GetIndex());
 
@@ -508,7 +507,7 @@ bool ActionSpellSetGuardian(Heroes & hero, const Spell & spell, u8 id)
 	return false;
     }
 
-    const u16 count = hero.GetPower() * spell.ExtraValue();
+    const u32 count = hero.GetPower() * spell.ExtraValue();
 
     if(count)
     {

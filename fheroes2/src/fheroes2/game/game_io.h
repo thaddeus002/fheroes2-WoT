@@ -23,8 +23,6 @@
 #ifndef H2GAMEIO_H
 #define H2GAMEIO_H
 
-#include "game.h"
-
 namespace Maps { class FileInfo; }
 
 namespace Game

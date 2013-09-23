@@ -21,10 +21,12 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "text.h"
 #include "settings.h"
 #include "cursor.h"
 #include "button.h"
 #include "pocketpc.h"
+#include "game.h"
 #include "dialog.h"
 
 class SelectValue : public Rect
@@ -119,7 +121,7 @@ protected:
     Button	btnDn;
 };
 
-bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur, u8 step)
+bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur, int step)
 {
     Display & display = Display::Get();
 
@@ -128,7 +130,7 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur,
     cursor.Hide();
 
     Text text(header, Font::BIG);
-    const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
+    const int spacer = Settings::Get().QVGA() ? 5 : 10;
 
     FrameBox box(text.h() + spacer + 30, true);
     SelectValue sel(min, max, cur, step);
@@ -154,8 +156,7 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur,
     display.Flip();
 
     // message loop
-    u16 result = Dialog::ZERO;
-
+    int result = Dialog::ZERO;
     while(result == Dialog::ZERO && le.HandleEvents())
     {
 	if(PressIntKey(min, max, cur))
@@ -191,14 +192,14 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur,
     return result == Dialog::OK;
 }
 
-bool Dialog::InputString(const std::string &header, std::string &res)
+bool Dialog::InputString(const std::string & header, std::string & res)
 {
-    const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+    const int system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
-    Cursor::themes_t oldcursor = cursor.Themes();
+    int oldcursor = cursor.Themes();
     cursor.SetThemes(cursor.POINTER);
 
     //const bool pda = Settings::Get().PocketPC();
@@ -257,9 +258,9 @@ bool Dialog::InputString(const std::string &header, std::string &res)
 	    redraw = true;
 	}
 
-        if(Game::HotKeyPress(Game::EVENT_DEFAULT_READY) || (buttonOk.isEnable() && le.MouseClickLeft(buttonOk))) break;
+        if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_READY) || (buttonOk.isEnable() && le.MouseClickLeft(buttonOk))) break;
 	else
-	if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonCancel)){ res.clear(); break; }
+	if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonCancel)){ res.clear(); break; }
 	else
 	if(le.KeyPress())
 	{
@@ -292,7 +293,7 @@ bool Dialog::InputString(const std::string &header, std::string &res)
     return res.size();
 }
 
-u8 Dialog::ArmySplitTroop(u8 free_slots, u32 max, u32 & cur, bool savelast)
+int Dialog::ArmySplitTroop(int free_slots, u32 max, u32 & cur, bool savelast)
 {
     Display & display = Display::Get();
 
@@ -301,14 +302,14 @@ u8 Dialog::ArmySplitTroop(u8 free_slots, u32 max, u32 & cur, bool savelast)
     cursor.Hide();
 
     const u32 min = 1;
-    const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
+    const int spacer = Settings::Get().QVGA() ? 5 : 10;
 
     FrameBox box(free_slots > 2 ? 90 + spacer : 45, true);
     SelectValue sel(min, max, cur, 1);
     Text text;
 
     const Rect & pos = box.GetArea();
-    const u16 center = pos.x + pos.w / 2;
+    const int center = pos.x + pos.w / 2;
 
     text.Set(_("Move how many troops?"), Font::BIG);
     text.Blit(center - text.w() / 2, pos.y);
@@ -361,8 +362,7 @@ u8 Dialog::ArmySplitTroop(u8 free_slots, u32 max, u32 & cur, bool savelast)
 	if(sp4.isValid()) sp4.Blit(rt4, display);
 	if(sp5.isValid()) sp5.Blit(rt5, display);
 
-	ssp.Set(sp3.w(), sp3.h());
-	Cursor::DrawCursor(ssp, 0xD7, true);
+	ssp = Surface::RectBorder(sp3.w(), sp3.h(), ssp.GetColorIndex(0xD7), true);
     }
 
     ButtonGroups btnGroups(box.GetArea(), Dialog::OK | Dialog::CANCEL);
@@ -386,8 +386,7 @@ u8 Dialog::ArmySplitTroop(u8 free_slots, u32 max, u32 & cur, bool savelast)
     display.Flip();
 
     // message loop
-    u16 bres = Dialog::ZERO;
-
+    int bres = Dialog::ZERO;
     while(bres == Dialog::ZERO && le.HandleEvents())
     {
 	if(PressIntKey(min, max, cur))
@@ -438,7 +437,7 @@ u8 Dialog::ArmySplitTroop(u8 free_slots, u32 max, u32 & cur, bool savelast)
         bres = btnGroups.QueueEventProcessing();
     }
 
-    u8 result = 0;
+    int result = 0;
 
     if(bres == Dialog::OK)
     {

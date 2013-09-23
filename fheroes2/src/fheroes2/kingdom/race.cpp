@@ -21,9 +21,10 @@
  ***************************************************************************/
 
 #include "engine.h"
+#include "gamedefs.h"
 #include "race.h"
 
-const char* Race::String(u8 race)
+const char* Race::String(int race)
 {
     const char* str_race[] = { _("Knight"), _("Barbarian"), _("Sorceress"),
 	_("Warlock"), _("Wizard"), _("Necromancer"), _("Multi"), "Random", "Neutral" };
@@ -45,7 +46,7 @@ const char* Race::String(u8 race)
     return str_race[8];
 }
 
-u8 Race::Rand(void)
+int Race::Rand(void)
 {
     switch(Rand::Get(1, 6))
     {
@@ -60,18 +61,18 @@ u8 Race::Rand(void)
     return Race::NECR;
 }
 
-u8 Race::Get(u8 index)
+int Race::FromInt(int race)
 {
-    switch(index)
+    switch(race)
     {
-	case KNGT:	return KNGT;
-	case BARB:	return BARB;
-	case SORC:	return SORC;
-	case WRLK:	return WRLK;
-	case WZRD:	return WZRD;
-	case NECR:	return NECR;
-	case MULT:	return MULT;
-	case RAND:	return RAND;
+	case KNGT:
+	case BARB:
+	case SORC:
+	case WRLK:
+	case WZRD:
+	case NECR:
+	case MULT:
+	case RAND:	return race;
 	default: break;
     }
 

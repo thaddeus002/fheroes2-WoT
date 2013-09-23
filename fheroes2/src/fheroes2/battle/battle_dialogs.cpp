@@ -29,6 +29,7 @@
 #include "text.h"
 #include "morale.h"
 #include "luck.h"
+#include "game.h"
 #include "race.h"
 #include "heroes.h"
 #include "battle_interface.h"
@@ -39,13 +40,13 @@
 
 namespace Battle
 {
-    void GetSummaryParams(u8 res1, u8 res2, const HeroBase &, u32 exp, ICN::icn_t &, std::string &);
+    void GetSummaryParams(int res1, int res2, const HeroBase &, u32 exp, int &, std::string &);
     void SpeedRedraw(const Point &);
 }
 
 void Battle::SpeedRedraw(const Point & dst)
 {
-    u8 speed = Settings::Get().BattleSpeed();
+    int speed = Settings::Get().BattleSpeed();
     std::string str = _("speed: %{speed}");
 
     StringReplace(str, "%{speed}", speed);
@@ -97,7 +98,6 @@ void Battle::DialogBattleSettings(void)
     opt_shadow_movement.Draw();
     opt_shadow_cursor.Draw();
 
-
     cursor.Show();
     display.Flip();
 
@@ -146,7 +146,7 @@ void Battle::DialogBattleSettings(void)
 	}
 
         // exit
-	if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(btn_ok)) break;
+	if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(btn_ok)) break;
     }
 
     // restore background
@@ -156,7 +156,7 @@ void Battle::DialogBattleSettings(void)
     display.Flip();
 }
 
-void Battle::GetSummaryParams(u8 res1, u8 res2, const HeroBase & hero, u32 exp, ICN::icn_t & icn_anim, std::string & msg)
+void Battle::GetSummaryParams(int res1, int res2, const HeroBase & hero, u32 exp, int & icn_anim, std::string & msg)
 {
     if(res1 & RESULT_WINS)
     {
@@ -169,7 +169,7 @@ void Battle::GetSummaryParams(u8 res1, u8 res2, const HeroBase & hero, u32 exp, 
 	else
 	    msg.append(_("A glorious victory!"));
 
-	if(Skill::Primary::HEROES == hero.GetType())
+	if(hero.isHeroes())
 	{
     	    msg.append("\n");
     	    msg.append(_("For valor in combat, %{name} receives %{exp} experience"));
@@ -213,7 +213,7 @@ void Battle::Arena::DialogBattleSummary(const Result & res) const
     cursor.SetThemes(Cursor::POINTER);
 
     std::string msg;
-    ICN::icn_t icn_anim = ICN::UNKNOWN;
+    int icn_anim = ICN::UNKNOWN;
 
     if((res.army1 & RESULT_WINS) && army1->GetCommander() && (CONTROL_HUMAN & army1->GetCommander()->GetControl()))
     {
@@ -275,8 +275,8 @@ void Battle::Arena::DialogBattleSummary(const Result & res) const
     else
 	dialog.Blit(pos_rt.x, pos_rt.y);
 
-    const u8 anime_ox = 47;
-    const u8 anime_oy = 36;
+    const int anime_ox = 47;
+    const int anime_oy = 36;
 
     if(!conf.QVGA())
     {
@@ -335,7 +335,7 @@ void Battle::Arena::DialogBattleSummary(const Result & res) const
 	if(HotKeyCloseWindow || le.MouseClickLeft(btn_ok)) break;
 
         // animation
-	if(!conf.QVGA() && Game::AnimateInfrequent(Game::BATTLE_DIALOG_DELAY))
+	if(!conf.QVGA() && Game::AnimateInfrequentDelay(Game::BATTLE_DIALOG_DELAY))
         {
 	    if(0 == frame || 1 != ICN::AnimationFrame(icn_anim, 1, frame))
 	    {
@@ -359,7 +359,7 @@ void Battle::Arena::DialogBattleSummary(const Result & res) const
     display.Flip();
 }
 
-u8 Battle::Arena::DialogBattleHero(const HeroBase & hero, bool buttons) const
+int Battle::Arena::DialogBattleHero(const HeroBase & hero, bool buttons) const
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
@@ -383,7 +383,7 @@ u8 Battle::Arena::DialogBattleHero(const HeroBase & hero, bool buttons) const
     dialog.Blit(pos_rt.x, pos_rt.y);
     hero.PortraitRedraw(pos_rt.x + 27, pos_rt.y + 42, PORT_BIG, display);
 
-    u8 col = (Color::NONE == hero.GetColor() ? 1 : Color::GetIndex(hero.GetColor()) + 1);
+    int col = (Color::NONE == hero.GetColor() ? 1 : Color::GetIndex(hero.GetColor()) + 1);
     AGG::GetICN(ICN::VIEWGEN, col).Blit(pos_rt.x + 148, pos_rt.y + 36);
 
     Point tp(pos_rt);
@@ -458,7 +458,7 @@ u8 Battle::Arena::DialogBattleHero(const HeroBase & hero, bool buttons) const
 	if(btnSurrender.isDisable()) shadow.Blit(btnSurrender, display);
     }
 
-    u8 result = 0;
+    int result = 0;
 
     cursor.Show();
     display.Flip();
@@ -472,13 +472,13 @@ u8 Battle::Arena::DialogBattleHero(const HeroBase & hero, bool buttons) const
 
 	if(!buttons && !le.MousePressRight()) break;
 
-	if(Game::HotKeyPress(Game::EVENT_BATTLE_CASTSPELL) ||
+	if(Game::HotKeyPressEvent(Game::EVENT_BATTLE_CASTSPELL) ||
 		(btnCast.isEnable() && le.MouseClickLeft(btnCast))) result = 1;
 
-	if(Game::HotKeyPress(Game::EVENT_BATTLE_RETREAT) ||
+	if(Game::HotKeyPressEvent(Game::EVENT_BATTLE_RETREAT) ||
 		(btnRetreat.isEnable() && le.MouseClickLeft(btnRetreat))) result = 2;
 
-	if(Game::HotKeyPress(Game::EVENT_BATTLE_SURRENDER) ||
+	if(Game::HotKeyPressEvent(Game::EVENT_BATTLE_SURRENDER) ||
 		(btnSurrender.isEnable() && le.MouseClickLeft(btnSurrender))) result = 3;
 
 	if(le.MousePressRight(btnCast))
@@ -527,7 +527,7 @@ bool Battle::DialogBattleSurrender(const HeroBase & hero, u32 cost)
 
     dialog.Blit(pos_rt.x, pos_rt.y);
 
-    const ICN::icn_t icn = conf.ExtGameEvilInterface() ? ICN::SURRENDE : ICN::SURRENDR;
+    const int icn = conf.ExtGameEvilInterface() ? ICN::SURRENDE : ICN::SURRENDR;
 
     Button btnAccept(pos_rt.x + 90, pos_rt.y + 150, icn, 0, 1);
     Button btnDecline(pos_rt.x + 295, pos_rt.y + 150, icn, 2, 3);
@@ -599,7 +599,7 @@ bool Battle::DialogBattleSurrender(const HeroBase & hero, u32 cost)
         }
 
         // exit
-	if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(btnDecline)) break;
+	if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(btnDecline)) break;
     }
 
     cursor.Hide();

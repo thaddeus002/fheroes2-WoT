@@ -37,7 +37,7 @@ namespace Battle
 	TroopUIDs(){ reserve(4); }
     };
 
-    class Graveyard : public std::map<s16, TroopUIDs>
+    class Graveyard : public std::map<s32, TroopUIDs>
     {
     public:
 	Graveyard() {}
@@ -45,7 +45,7 @@ namespace Battle
 	Indexes		GetClosedCells(void) const;
 	void		AddTroop(const Unit &);
 	void		RemoveTroop(const Unit &);
-	u32		GetLastTroopUID(s16) const;
+	u32		GetLastTroopUID(s32) const;
     };
 }
 

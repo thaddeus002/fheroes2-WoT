@@ -31,20 +31,20 @@
 
 #include "system.h"
 #include "gamedefs.h"
-#include "maps_fileinfo.h"
-#include "game.h"
 #include "players.h"
 #include "dir.h"
+#include "maps_fileinfo.h"
 #include "bitmodes.h"
 
 #ifdef ANDROID
 #include <android/log.h>
 #endif
 
-#define FORMAT_VERSION_2945 0x0B81
-#define FORMAT_VERSION_2864 0x0B30
-#define FORMAT_VERSION_2850 0x0B22
-#define CURRENT_FORMAT_VERSION FORMAT_VERSION_2945
+#define FORMAT_VERSION_3154 3154
+#define FORMAT_VERSION_2945 2945
+#define FORMAT_VERSION_2864 2864
+#define FORMAT_VERSION_2850 2850
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_3154
 #define LAST_FORMAT_VERSION FORMAT_VERSION_2850
 
 enum
@@ -212,72 +212,72 @@ public:
 
     static Settings & Get(void);
 
-    bool Read(const std::string & filename);
-    bool Save(const std::string & filename) const;
+    bool Read(const std::string &);
+    bool Save(const std::string &) const;
 
-    std::string String(void) const;
-    bool SetCurrentFileInfo(const std::string &);
-    void SetCurrentFileInfo(const Maps::FileInfo &);
-    Maps::FileInfo & CurrentFileInfo(void);
-    const Maps::FileInfo & CurrentFileInfo(void) const;
+    std::string		String(void) const;
+    void		SetCurrentFileInfo(const Maps::FileInfo &);
+    const Maps::FileInfo &
+			CurrentFileInfo(void) const;
 
-    u16 Debug(void) const;
-    u8 HeroesMoveSpeed(void) const;
-    u8 AIMoveSpeed(void) const;
-    u8 BattleSpeed(void) const;
-    u8 ScrollSpeed(void) const;
-    u32 MemoryLimit(void) const;
+    int			Debug(void) const;
+    int			HeroesMoveSpeed(void) const;
+    int			AIMoveSpeed(void) const;
+    int			BattleSpeed(void) const;
+    int			ScrollSpeed(void) const;
+    u32			MemoryLimit(void) const;
 
     const std::string & PlayMusCommand(void) const;
     const std::string & SelectVideoDriver(void) const;
 
-    u8 GameDifficulty(void) const;
+    int			GameDifficulty(void) const;
 
     const std::string & MapsCharset(void) const;
     const std::string & ForceLang(void) const;
     const std::string & FontsNormal(void) const;
     const std::string & FontsSmall(void) const;
-    u8 FontsNormalSize(void) const;
-    u8 FontsSmallSize(void) const;
-    bool FontSmallRenderBlended(void) const;
-    bool FontNormalRenderBlended(void) const;
+    int			FontsNormalSize(void) const;
+    int			FontsSmallSize(void) const;
+    bool		FontSmallRenderBlended(void) const;
+    bool		FontNormalRenderBlended(void) const;
 
-    const Point & PosRadar(void) const;
-    const Point & PosButtons(void) const;
-    const Point & PosIcons(void) const;
-    const Point & PosStatus(void) const;
+    const Point &	PosRadar(void) const;
+    const Point &	PosButtons(void) const;
+    const Point &	PosIcons(void) const;
+    const Point &	PosStatus(void) const;
 
-    void SetPosRadar(const Point &);
-    void SetPosButtons(const Point &);
-    void SetPosIcons(const Point &);
-    void SetPosStatus(const Point &);
+    void		SetPosRadar(const Point &);
+    void		SetPosButtons(const Point &);
+    void		SetPosIcons(const Point &);
+    void		SetPosStatus(const Point &);
 
-    u32  DisplayFlags(void) const;
+    u32			DisplayFlags(void) const;
 
-    bool QVGA(void) const;
-    bool Sound(void) const;
-    bool Music(void) const;
-    bool ShowControlPanel(void) const;
-    bool ShowRadar(void) const;
-    bool ShowIcons(void) const;
-    bool ShowButtons(void) const;
-    bool ShowStatus(void) const;
-    bool Unicode(void) const;
-    bool PocketPC(void) const;
-    bool UseAltResource(void) const;
-    bool PriceLoyaltyVersion(void) const;
-    bool LoadedGameVersion(void) const;
-    bool MusicExt(void) const;
-    bool MusicMIDI(void) const;
-    bool MusicCD(void) const;
-    void BinarySave(void) const;
-    void BinaryLoad(void);
+    bool		QVGA(void) const;
+    bool		Sound(void) const;
+    bool		Music(void) const;
+    bool		ShowControlPanel(void) const;
+    bool		ShowRadar(void) const;
+    bool		ShowIcons(void) const;
+    bool		ShowButtons(void) const;
+    bool		ShowStatus(void) const;
+    bool		Unicode(void) const;
+    bool		PocketPC(void) const;
+    bool		UseAltResource(void) const;
+    bool		PriceLoyaltyVersion(void) const;
+    bool		LoadedGameVersion(void) const;
+    bool		MusicExt(void) const;
+    bool		MusicMIDI(void) const;
+    bool		MusicCD(void) const;
+    void		BinarySave(void) const;
+    void		BinaryLoad(void);
 
-    bool CanChangeInGame(u32) const;
-    bool ExtModes(u32) const;
-    void ExtSetModes(u32);
-    void ExtResetModes(u32);
-    const char* ExtName(u32) const;
+    bool		CanChangeInGame(u32) const;
+    bool		ExtModes(u32) const;
+    void		ExtSetModes(u32);
+    void		ExtResetModes(u32);
+    const char*		ExtName(u32) const;
+
     bool ExtHeroLearnSpellsWithDay(void) const;
     bool ExtHeroBuySpellBookFromShrine(void) const;
     bool ExtHeroRecruitCostDependedFromLevel(void) const;
@@ -351,86 +351,87 @@ public:
     bool ExtPocketDragDropScroll(void) const;
     bool ExtPocketLowResolution(void) const;
 
-    const Size & VideoMode(void) const;
-    void SetAutoVideoMode(void);
+    const Size &	VideoMode(void) const;
+    void		SetAutoVideoMode(void);
 
-    u8   SoundVolume(void) const;
-    u8   MusicVolume(void) const;
+    void		SetDebug(int);
+    void		SetUnicode(bool);
+    void		SetPriceLoyaltyVersion(void);
+    void		SetGameDifficulty(int);
+    void		SetEvilInterface(bool);
+    void		SetHideInterface(bool);
+    void		SetBattleGrid(bool);
+    void		SetBattleMovementShaded(bool);
+    void		SetBattleMouseShaded(bool);
+    void		SetShowPanel(bool);
+    void		SetShowRadar(bool);
+    void		SetShowIcons(bool);
+    void		SetShowButtons(bool);
+    void		SetShowStatus(bool);
+    void		SetMemoryLimit(u32);
+    void		SetAIMoveSpeed(int);
+    void		SetScrollSpeed(int);
+    void		SetHeroesMoveSpeed(int);
+    void		SetBattleSpeed(int);
 
-    void SetDebug(const u16 d);
-    void SetUnicode(bool);
-    void SetPriceLoyaltyVersion(void);
-    void SetGameDifficulty(u8);
-    void SetEvilInterface(bool);
-    void SetHideInterface(bool);
-    void SetBattleGrid(bool);
-    void SetBattleMovementShaded(bool);
-    void SetBattleMouseShaded(bool);
-    void SetShowPanel(bool);
-    void SetShowRadar(bool);
-    void SetShowIcons(bool);
-    void SetShowButtons(bool);
-    void SetShowStatus(bool);
-    void SetMemoryLimit(u32);
-    void SetAIMoveSpeed(u8);
-    void SetScrollSpeed(u8);
-    void SetHeroesMoveSpeed(u8);
-    void SetBattleSpeed(u8);
+    void		SetSoundVolume(int v);
+    void		SetMusicVolume(int v);
+    void		ResetSound(void);
+    void		ResetMusic(void);
 
-    void SetSoundVolume(const u8 v);
-    void SetMusicVolume(const u8 v);
-    void ResetSound(void);
-    void ResetMusic(void);
+    int			SoundVolume(void) const;
+    int 		MusicVolume(void) const;
 
-    bool GameType(u8) const;
-    u8   GameType(void) const;
-    void SetGameType(u8);
+    bool		GameType(int) const;
+    int			GameType(void) const;
+    void		SetGameType(int);
 
-    Players & GetPlayers(void);
-    const Players & GetPlayers(void) const;
+    Players &		GetPlayers(void);
+    const Players &	GetPlayers(void) const;
 
-    const u8 & CurrentColor(void) const;
-    void SetCurrentColor(u8);
-    u8   PreferablyCountPlayers(void) const;
-    void SetPreferablyCountPlayers(u8 c);
+    int			CurrentColor(void) const;
+    void		SetCurrentColor(int);
+    int			PreferablyCountPlayers(void) const;
+    void		SetPreferablyCountPlayers(int);
 
-    u16	GetPort(void) const;
+    int			GetPort(void) const;
 
     // from maps info
-    bool AllowChangeRace(u8) const;
+    bool		AllowChangeRace(int) const;
     const std::string & MapsFile(void) const;
     const std::string & MapsName(void) const;
     const std::string & MapsDescription(void) const;
-    u8  MapsDifficulty(void) const;
-    u16 MapsWidth(void) const;
-    bool GameStartWithHeroes(void) const;
-    u16 ConditionWins(void) const;
-    u16 ConditionLoss(void) const;
-    bool WinsCompAlsoWins(void) const;
-    bool WinsAllowNormalVictory(void) const;
-    u8 WinsFindArtifactID(void) const;
-    bool WinsFindUltimateArtifact(void) const;
-    u32 WinsAccumulateGold(void) const;
-    u32 WinsMapsIndexObject(void) const;
-    u32 LossMapsIndexObject(void) const;
-    u16 LossCountDays(void) const;
+    int			MapsDifficulty(void) const;
+    int			MapsWidth(void) const;
+    int			MapsHeight(void) const;
+    bool		GameStartWithHeroes(void) const;
+    int			ConditionWins(void) const;
+    int			ConditionLoss(void) const;
+    bool		WinsCompAlsoWins(void) const;
+    bool		WinsAllowNormalVictory(void) const;
+    int			WinsFindArtifactID(void) const;
+    bool		WinsFindUltimateArtifact(void) const;
+    u32			WinsAccumulateGold(void) const;
+    Point		WinsMapsPositionObject(void) const;
+    Point		LossMapsPositionObject(void) const;
+    u32			LossCountDays(void) const;
 
-    std::string GetProgramPath(void) const { return path_program; }
-    void SetProgramPath(const char*);
+    std::string		GetProgramPath(void) const { return path_program; }
+    void		SetProgramPath(const char*);
 
-    static std::string GetVersion(void);
+    static std::string	GetVersion(void);
 
-    static ListFiles GetListFiles(const std::string & prefix, const std::string & filter);
-    static ListDirs GetRootDirs(void);
-    static std::string GetLastFile(const std::string & prefix, const std::string & name);
-    static std::string GetWriteableDir(const char*);
-    static std::string GetSaveDir(void);
-    static std::string GetLangDir(void);
-    static std::string GetHomeDir(void);
+    static ListFiles	GetListFiles(const std::string & prefix, const std::string & filter);
+    static ListDirs	GetRootDirs(void);
+    static std::string	GetLastFile(const std::string & prefix, const std::string & name);
+    static std::string	GetWriteableDir(const char*);
+    static std::string	GetSaveDir(void);
+    static std::string	GetLangDir(void);
+    static std::string	GetHomeDir(void);
 
     // deprecated
     const std::string & GetDataParams(void) const { return data_params; }
-    const ListDirs GetMapsParams(void) const { return maps_params; }
+    const ListDirs	GetMapsParams(void) const { return maps_params; }
 
 protected:
     void Parse(const std::string & left, const std::string & right);
@@ -443,18 +444,15 @@ private:
     Settings();
     ~Settings();
 
-    BitModes opt_global;
+    BitModes	opt_global;
+    BitModes	opt_game;
+    BitModes	opt_battle;
+    BitModes	opt_world;
+    BitModes	opt_addons;
 
-    BitModes opt_game;
-    BitModes opt_battle;
-    BitModes opt_world;
-    BitModes opt_addons;
-
-    u16 debug;
-
-    Size video_mode;
-
-    u8 game_difficulty;
+    int		debug;
+    Size	video_mode;
+    int		game_difficulty;
 
     std::string path_program;
     std::string data_params;
@@ -464,34 +462,34 @@ private:
     std::string font_small;
     std::string force_lang;
     std::string maps_charset;
-    u8 size_normal;
-    u8 size_small;
+    int		size_normal;
+    int		size_small;
 
-    Maps::FileInfo current_maps_file;
+    Maps::FileInfo
+                current_maps_file;
 
-    u8 sound_volume;
-    u8 music_volume;
-    u8 heroes_speed;
-    u8 ai_speed;
-    u8 scroll_speed;
-    u8 battle_speed;
+    int		sound_volume;
+    int		music_volume;
+    int		heroes_speed;
+    int		ai_speed;
+    int		scroll_speed;
+    int		battle_speed;
 
-    u8 game_type;
-    u8 preferably_count_players;
+    int		game_type;
+    int		preferably_count_players;
 
     std::string playmus_command;
     std::string video_driver;
 
-    u16 port;
+    int		port;
+    u32		memory_limit;
 
-    u32 memory_limit;
+    Point	pos_radr;
+    Point	pos_bttn;
+    Point	pos_icon;
+    Point	pos_stat;
 
-    Point pos_radr;
-    Point pos_bttn;
-    Point pos_icon;
-    Point pos_stat;
-
-    Players players;
+    Players	players;
 };
 
 StreamBase & operator<< (StreamBase &, const Settings &);

@@ -27,17 +27,17 @@ namespace TIL
 {
     const struct
     {
-	til_t type;
+	int type;
 	const char* string;
     } tilmap[] = {
+	{ UNKNOWN,	"UNKNOWN"      },
 	{ CLOF32,	"CLOF32.TIL"   },
 	{ GROUND32,	"GROUND32.TIL" },
 	{ STON,		"STON.TIL"     },
-	{ UNKNOWN,	"UNKNOWN"      }
     };
 }
 
-const char* TIL::GetString(const til_t til)
+const char* TIL::GetString(int til)
 {
-    return tilmap[til].string;
+    return UNKNOWN <= til && LASTTIL > til ? tilmap[til].string : "CUSTOM";
 }

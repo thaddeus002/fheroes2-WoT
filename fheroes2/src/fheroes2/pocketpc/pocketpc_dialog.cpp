@@ -23,6 +23,7 @@
 #include "cursor.h"
 #include "battle.h"
 #include "battle_board.h"
+#include "game.h"
 #include "text.h"
 #include "settings.h"
 #include "pocketpc.h"
@@ -31,7 +32,7 @@
 #include <SDL/SDL_screenkeyboard.h>
 #endif
 
-u16 PocketPC::GetCursorAttackDialog(const Point & dst, u8 allow)
+u32 PocketPC::GetCursorAttackDialog(const Point & dst, int allow)
 {
     Display & display = Display::Get();
     LocalEvent & le = LocalEvent::Get();
@@ -114,8 +115,8 @@ Surface CreateTouchButton(void)
 {
     Surface sf(24, 24);
 
-    const u8 ww = sf.w() / 2;
-    const u8 hh = sf.h() / 2;
+    const u32 ww = sf.w() / 2;
+    const u32 hh = sf.h() / 2;
 
     const Sprite & sp0 = AGG::GetICN(ICN::LOCATORS, 22);
 
@@ -133,13 +134,13 @@ void RedrawTouchButton(const Surface & sf, const Rect & rt, const char* lb)
 
     if(sf.w() != rt.w)
     {
-	const u8 ww = 4;
+	const u32 ww = 4;
 	sf.Blit(Rect(0, 0, ww, sf.h()), rt.x, rt.y, display);
 
 	if(rt.w > 8)
 	{
-	    const u16 count = (rt.w - ww) / ww;
-	    for(u16 ii = 0; ii < count; ++ii)
+	    const u32 count = (rt.w - ww) / ww;
+	    for(u32 ii = 0; ii < count; ++ii)
 		sf.Blit(Rect(ww, 0, ww, sf.h()), rt.x + ww * (ii + 1), rt.y, display);
 	}
 
@@ -162,8 +163,8 @@ void PocketPC::KeyboardDialog(std::string & str)
     LocalEvent & le = LocalEvent::Get();
     cursor.Hide();
 
-    const u16 width = 337;
-    const u16 height = 118;
+    const u32 width = 337;
+    const u32 height = 118;
 
     SpriteBack back(Rect((display.w() - width) / 2, 0, width, height));
     const Rect & top = back.GetArea();
@@ -336,7 +337,7 @@ void PocketPC::KeyboardDialog(std::string & str)
     // mainmenu loop
     while(le.HandleEvents())
     {
-        if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT))
+        if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT))
 	{
 	    str.clear();
 	    break;

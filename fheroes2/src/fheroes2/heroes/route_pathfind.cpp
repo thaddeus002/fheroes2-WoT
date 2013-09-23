@@ -27,6 +27,7 @@
 #include "direction.h"
 #include "settings.h"
 #include "heroes.h"
+#include "ground.h"
 #include "route.h"
 
 struct cell_t
@@ -42,9 +43,9 @@ struct cell_t
     s32		parent;
 };
 
-u16 GetCurrentLength(std::map<s32, cell_t> & list, s32 from)
+int GetCurrentLength(std::map<s32, cell_t> & list, s32 from)
 {
-    u16 res = 0;
+    int res = 0;
     while(0 <= list[from].parent)
     {
 	from = list[from].parent;
@@ -59,7 +60,7 @@ bool CheckMonsterProtectionAndNotDst(const s32 & to, const s32 & dst)
     return monsters.size() && monsters.end() == std::find(monsters.begin(), monsters.end(), dst);
 }
 
-bool PassableToTile(const Heroes & hero, const Maps::Tiles & toTile, const Direction::vector_t & direct, const s32 & dst)
+bool PassableToTile(const Heroes & hero, const Maps::Tiles & toTile, int direct, s32 dst)
 {
     // check end point
     if(toTile.GetIndex() == dst)
@@ -104,7 +105,7 @@ bool PassableToTile(const Heroes & hero, const Maps::Tiles & toTile, const Direc
     return true;
 }
 
-bool PassableFromToTile(const Heroes & hero, const s32 & from, const s32 & to, const Direction::vector_t & direct, const s32 & dst)
+bool PassableFromToTile(const Heroes & hero, s32 from, const s32 & to, int direct, s32 dst)
 {
     const Maps::Tiles & fromTile = world.GetTiles(from);
     const Maps::Tiles & toTile = world.GetTiles(to);
@@ -216,17 +217,17 @@ bool PassableFromToTile(const Heroes & hero, const s32 & from, const s32 & to, c
     return PassableToTile(hero, toTile, direct, dst);
 }
 
-u16 GetPenaltyFromTo(const s32 & from, const s32 & to, const Direction::vector_t & direct, const u8 & pathfinding)
+u32 GetPenaltyFromTo(s32 from, s32 to, int direct, int pathfinding)
 {
-    const u16 & cost1 = Maps::Ground::GetPenalty(from, direct, pathfinding); // penalty: for [cur] out
-    const u16 & cost2 = Maps::Ground::GetPenalty(to, Direction::Reflect(direct), pathfinding); // penalty: for [tmp] in
+    const u32 cost1 = Maps::Ground::GetPenalty(from, direct, pathfinding); // penalty: for [cur] out
+    const u32 cost2 = Maps::Ground::GetPenalty(to, Direction::Reflect(direct), pathfinding); // penalty: for [tmp] in
     return (cost1 + cost2) >> 1;
 }
 
-bool Route::Path::Find(const s32 & to, const u16 limit)
+bool Route::Path::Find(s32 to, int limit)
 {
-    const u8 pathfinding = hero->GetLevelSkill(Skill::Secondary::PATHFINDING);
-    const s32 & from = hero->GetIndex();
+    const int pathfinding = hero->GetLevelSkill(Skill::Secondary::PATHFINDING);
+    const s32 from = hero->GetIndex();
 
     s32 cur = from;
     s32 alt = 0;
@@ -240,32 +241,32 @@ bool Route::Path::Find(const s32 & to, const u16 limit)
     list[cur].parent = -1;
     list[cur].open   = 0;
 
+    const Directions directions = Direction::All();
     clear();
 
     while(cur != to)
     {
 	LocalEvent::Get().HandleEvents(false);
-
-	for(Direction::vector_t
-	    direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
+    	for(Directions::const_iterator
+	    it = directions.begin(); it != directions.end(); ++it)
 	{
-    	    if(Maps::isValidDirection(cur, direct))
+    	    if(Maps::isValidDirection(cur, *it))
 	    {
-		tmp = Maps::GetDirectionIndex(cur, direct);
+		tmp = Maps::GetDirectionIndex(cur, *it);
 
 		if(list[tmp].open)
 		{
-		    const u16 costg = GetPenaltyFromTo(cur, tmp, direct, pathfinding);
+		    const u32 costg = GetPenaltyFromTo(cur, tmp, *it, pathfinding);
 
 		    // new
 		    if(-1 == list[tmp].parent)
 		    {
-			if((list[cur].passbl & direct) ||
-			   PassableFromToTile(*hero, cur, tmp, direct, to))
+			if((list[cur].passbl & *it) ||
+			   PassableFromToTile(*hero, cur, tmp, *it, to))
 			{
-			    list[cur].passbl |= direct;
+			    list[cur].passbl |= *it;
 
-			    list[tmp].direct = direct;
+			    list[tmp].direct = *it;
 	    		    list[tmp].cost_g = costg;
 			    list[tmp].parent = cur;
 			    list[tmp].open   = 1;
@@ -277,11 +278,11 @@ bool Route::Path::Find(const s32 & to, const u16 limit)
 		    else
 		    {
 			if(list[tmp].cost_t > list[cur].cost_t + costg &&
-			   ((list[cur].passbl & direct) || PassableFromToTile(*hero, cur, tmp, direct, to)))
+			   ((list[cur].passbl & *it) || PassableFromToTile(*hero, cur, tmp, *it, to)))
 			{
-			    list[cur].passbl |= direct;
+			    list[cur].passbl |= *it;
 
-			    list[tmp].direct = direct;
+			    list[tmp].direct = *it;
 			    list[tmp].parent = cur;
 			    list[tmp].cost_g = costg;
 			    list[tmp].cost_t = list[cur].cost_t + costg;
@@ -306,7 +307,7 @@ bool Route::Path::Find(const s32 & to, const u16 limit)
 #ifdef WITH_DEBUG
 	    if(IS_DEBUG(DBG_OTHER, DBG_TRACE) && cell2.cost_g != MAXU16)
 	    {
-		const u16 direct = Direction::Get(cur, (*it1).first);
+		int direct = Direction::Get(cur, (*it1).first);
 
 		if(Direction::UNKNOWN != direct)
 		{
@@ -334,7 +335,7 @@ bool Route::Path::Find(const s32 & to, const u16 limit)
 #endif
 	cur = alt;
 
-	if(GetCurrentLength(list, cur) > limit) break;
+	if(0 < limit && GetCurrentLength(list, cur) > limit) break;
     }
 
     // save path

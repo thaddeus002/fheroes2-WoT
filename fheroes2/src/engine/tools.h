@@ -32,6 +32,7 @@ std::string		GetString(const Point &);
 std::string		GetString(const Size &);
 std::string		GetString(const Rect &);
 std::string		GetString(double, u8);
+std::string		GetString(const std::vector<u8> &);
 
 int			GetInt(const std::string &);
 int			Sign(int);
@@ -42,6 +43,8 @@ std::string		StringUpper(std::string);
 
 void			StringReplace(std::string &, const char*, const std::string &);
 void			StringReplace(std::string &, const char*, int);
+
+int			CountBits(u32);
 
 std::string		EncodeString(const std::string &, const char* charset);
 std::vector<u16>	StringUTF8_to_UNICODE(const std::string &);

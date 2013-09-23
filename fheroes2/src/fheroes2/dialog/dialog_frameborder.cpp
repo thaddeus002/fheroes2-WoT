@@ -21,13 +21,14 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "text.h"
 #include "settings.h"
 #include "cursor.h"
 #include "dialog.h"
 
 #define  ANGLEWIDTH 44
 
-Dialog::FrameBorder::FrameBorder(u8 brd) : border(brd)
+Dialog::FrameBorder::FrameBorder(int brd) : border(brd)
 {
 }
 
@@ -51,7 +52,7 @@ Dialog::FrameBorder::FrameBorder(const Size & sz) : border(BORDERWIDTH)
     RedrawRegular(GetRect());
 }
 
-Dialog::FrameBorder::FrameBorder(s16 posx, s16 posy, u16 encw, u16 ench) : border(BORDERWIDTH)
+Dialog::FrameBorder::FrameBorder(s32 posx, s32 posy, u32 encw, u32 ench) : border(BORDERWIDTH)
 {
     SetPosition(posx, posy, encw, ench);
     RedrawRegular(GetRect());
@@ -62,7 +63,7 @@ bool Dialog::FrameBorder::isValid(void) const
     return background.isValid();
 }
 
-void Dialog::FrameBorder::SetPosition(s16 posx, s16 posy, u16 encw, u16 ench)
+void Dialog::FrameBorder::SetPosition(s32 posx, s32 posy, u32 encw, u32 ench)
 {
     if(background.isValid())
 	background.Restore();
@@ -107,45 +108,45 @@ const Rect & Dialog::FrameBorder::GetArea(void) const
 void Dialog::FrameBorder::RedrawRegular(const Rect & dstrt)
 {
     const Surface & sf = AGG::GetICN((Settings::Get().ExtGameEvilInterface() ? ICN::SURDRBKE : ICN::SURDRBKG), 0);
-    const u16 shadow = 16;
+    const u32 shadow = 16;
 
     Redraw(sf, Rect(shadow, 0, sf.w() - shadow, sf.h() - shadow), Display::Get(), dstrt);
 }
 
 void Dialog::FrameBorder::Redraw(const Surface & srcsf, const Rect & srcrt, Surface & dstsf, const Rect & dstrt)
 {
-    const u16 mw = dstrt.w < srcrt.w ? dstrt.w : srcrt.w;
-    const u16 mh = dstrt.h < srcrt.h ? dstrt.h : srcrt.h;
+    u32 mw = dstrt.w < srcrt.w ? dstrt.w : srcrt.w;
+    u32 mh = dstrt.h < srcrt.h ? dstrt.h : srcrt.h;
 
-    const u16 cw = mw / 3;
-    const u16 ch = mh / 3;
-    const s16 cx = srcrt.x + (srcrt.w - cw) / 2;
-    const s16 cy = srcrt.y + (srcrt.h - ch) / 2;
-    const u16 bw = mw - 2 * cw;
-    const u16 bh = mh - 2 * ch;
+    u32 cw = mw / 3;
+    u32 ch = mh / 3;
+    s32 cx = srcrt.x + (srcrt.w - cw) / 2;
+    s32 cy = srcrt.y + (srcrt.h - ch) / 2;
+    u32 bw = mw - 2 * cw;
+    u32 bh = mh - 2 * ch;
 
 
-    const u16 ox = (dstrt.w - (dstrt.w / bw) * bw) / 2;
-    const u16 oy = (dstrt.h - (dstrt.h / bh) * bh) / 2;
+    u32 ox = (dstrt.w - (dstrt.w / bw) * bw) / 2;
+    u32 oy = (dstrt.h - (dstrt.h / bh) * bh) / 2;
 
     // body
     if(bw < dstrt.w && bh < dstrt.h)
-	for(u16 yy = 0; yy < (dstrt.h / bh); ++yy)
-	    for(u16 xx = 0; xx < (dstrt.w / bw); ++xx)
+	for(u32 yy = 0; yy < (dstrt.h / bh); ++yy)
+	    for(u32 xx = 0; xx < (dstrt.w / bw); ++xx)
 		srcsf.Blit(Rect(cx, cy, bw, bh), dstrt.x + ox + xx * bw, dstrt.y + oy + yy * bh, dstsf);
 
     // top, bottom bar
-    for(u16 xx = 0; xx < (dstrt.w / bw); ++xx)
+    for(u32 xx = 0; xx < (dstrt.w / bw); ++xx)
     {
-	const s16 dstx = dstrt.x + ox + xx * bw;
+	s32 dstx = dstrt.x + ox + xx * bw;
 	srcsf.Blit(Rect(cx, srcrt.y, bw, ch), dstx, dstrt.y, dstsf);
 	srcsf.Blit(Rect(cx, srcrt.y + srcrt.h - ch, bw, ch), dstx, dstrt.y + dstrt.h - ch, dstsf);
     }
 
     // left, right bar
-    for(u16 yy = 0; yy < (dstrt.h / bh); ++yy)
+    for(u32 yy = 0; yy < (dstrt.h / bh); ++yy)
     {
-	const s16 dsty = dstrt.y + oy + yy * bh;
+	s32 dsty = dstrt.y + oy + yy * bh;
 	srcsf.Blit(Rect(srcrt.x, cy, cw, bh), dstrt.x, dsty, dstsf);
 	srcsf.Blit(Rect(srcrt.x + srcrt.w - cw, cy, cw, bh), dstrt.x + dstrt.w - cw, dsty, dstsf);
     }

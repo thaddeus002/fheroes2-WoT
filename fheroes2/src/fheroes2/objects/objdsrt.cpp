@@ -26,7 +26,7 @@
 #include "direction.h"
 #include "objdsrt.h"
 
-u16 ObjDsrt::GetPassable(const u8 & index)
+int ObjDsrt::GetPassable(u32 index)
 {
 #if (__GNUC__ == 4 && __GNUC_MINOR__ == 4)
     // fixed: array subscript is above array bounds
@@ -48,19 +48,19 @@ u16 ObjDsrt::GetPassable(const u8 & index)
             DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
 }
 
-bool ObjDsrt::isAction(const u8 & index)
+bool ObjDsrt::isAction(u32 index)
 {
     return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
-bool ObjDsrt::isShadow(const u8 & index)
+bool ObjDsrt::isShadow(u32 index)
 {
     const u8 shadows[] = { 11, 13, 16, 19, 23, 25, 27, 29, 33, 35, 38, 41, 44, 46, 47,
 		50, 52, 54, 71, 75, 77, 80, 86, 103, 115, 118 };
     return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
 }
 
-u8 ObjDsrt::GetActionObject(const u8 & index)
+int ObjDsrt::GetActionObject(u32 index)
 {
     switch(index)
     {

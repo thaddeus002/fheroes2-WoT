@@ -24,18 +24,16 @@
 #include <vector>
 #include <algorithm>
 #include "agg.h"
+#include "text.h"
 #include "cursor.h"
 #include "settings.h"
 #include "world.h"
+#include "game.h"
 #include "spell.h"
 #include "heroes.h"
 #include "dialog.h"
 #include "dialog_selectitems.h"
 #include "artifact.h"
-
-#ifdef WITH_XML
-#include "xmlccwrap.h"
-#endif
 
 enum { ART_DISABLED = 0x01, ART_RNDUSED = 0x02 };
 enum { TYPE0, TYPE1, TYPE2, TYPE3, TYPE4 }; /*TYPE0: unique, TYPE1: morale/luck, TYPE2: resource, TYPE3: primary/mp/sp, TYPE4: secskills */
@@ -160,7 +158,7 @@ artifactstats_t artifacts[] = {
 	{ 0, 0, TYPE0, "Unknown", "Unknown" },
 };
 
-const char* GetPluralDescription(const Artifact & art, u16 count)
+const char* GetPluralDescription(const Artifact & art, u32 count)
 {
     switch(art())
     {
@@ -196,7 +194,7 @@ const char* GetPluralDescription(const Artifact & art, u16 count)
     return _(artifacts[art()].description);
 }
 
-bool SkipExtra(u8 art)
+bool SkipExtra(int art)
 {
     switch(art)
     {
@@ -257,7 +255,7 @@ void Artifact::UpdateStats(const std::string & spec)
 #endif
 }
 
-Artifact::Artifact(u8 art) : id(art < UNKNOWN ? art : UNKNOWN), ext(0)
+Artifact::Artifact(int art) : id(art < UNKNOWN ? art : UNKNOWN), ext(0)
 {
 }
 
@@ -292,12 +290,12 @@ bool Artifact::operator!= (const Artifact & art) const
     return id != art.id;
 }
 
-u8 Artifact::operator() (void) const
+int Artifact::operator() (void) const
 {
     return id;
 }
 
-u8 Artifact::GetID(void) const
+int Artifact::GetID(void) const
 {
     return id;
 }
@@ -307,14 +305,14 @@ const char* Artifact::GetName(void) const
     return _(artifacts[id].name);
 }
 
-u8 Artifact::Type(void) const
+int Artifact::Type(void) const
 {
     return artifacts[id].type;
 }
 
 std::string Artifact::GetDescription(void) const
 {
-    u16 count = ExtraValue();
+    u32 count = ExtraValue();
     std::string str = GetPluralDescription(*this, count);
 
     StringReplace(str, "%{name}", GetName());
@@ -327,7 +325,7 @@ std::string Artifact::GetDescription(void) const
     return str;
 }
 
-u16 Artifact::ExtraValue(void) const
+u32 Artifact::ExtraValue(void) const
 {
     switch(id)
     {
@@ -387,7 +385,7 @@ bool Artifact::isValid(void) const
     return id != UNKNOWN;
 }
 
-u8 Artifact::LoyaltyLevel(void) const
+int Artifact::LoyaltyLevel(void) const
 {
     switch(id)
     {
@@ -420,7 +418,7 @@ u8 Artifact::LoyaltyLevel(void) const
     return ART_NONE;
 }
 
-u8 Artifact::Level(void) const
+int Artifact::Level(void) const
 {
     switch(id)
     {
@@ -544,27 +542,27 @@ u8 Artifact::Level(void) const
 }
 
 /* return index sprite objnarti.icn */
-u8 Artifact::IndexSprite(void) const
+u32 Artifact::IndexSprite(void) const
 {
     return id < UNKNOWN ? id * 2 + 1 : 0;
 }
 
-u8 Artifact::IndexSprite32(void) const
+u32 Artifact::IndexSprite32(void) const
 {
     return id;
 }
 
-u8 Artifact::IndexSprite64(void) const
+u32 Artifact::IndexSprite64(void) const
 {
     return id + 1;
 }
 
-u8 Artifact::GetSpell(void) const
+int Artifact::GetSpell(void) const
 {
     return id == SPELL_SCROLL ? ext : Spell::NONE;
 }
 
-void Artifact::SetSpell(u8 v)
+void Artifact::SetSpell(int v)
 {
     ext = v;
 }
@@ -576,13 +574,13 @@ void Artifact::Reset(void)
 }
 
 /* get rand all artifact */
-u8 Artifact::Rand(level_t lvl)
+int Artifact::Rand(level_t lvl)
 {
-    std::vector<u8> v;
+    std::vector<int> v;
     v.reserve(25);
 
     // if possibly: make unique on map
-    for(u8 art = ULTIMATE_BOOK; art < UNKNOWN; ++art)
+    for(u32 art = ULTIMATE_BOOK; art < UNKNOWN; ++art)
         if((lvl & Artifact(art).Level()) &&
             !(artifacts[art].bits & ART_DISABLED) &&
 	    !(artifacts[art].bits & ART_RNDUSED)) v.push_back(art);
@@ -590,18 +588,18 @@ u8 Artifact::Rand(level_t lvl)
     //
     if(v.empty())
     {
-	for(u8 art = ULTIMATE_BOOK; art < UNKNOWN; ++art)
+	for(u32 art = ULTIMATE_BOOK; art < UNKNOWN; ++art)
     	if((lvl & Artifact(art).Level()) &&
             !(artifacts[art].bits & ART_DISABLED)) v.push_back(art);
     }
 
-    u8 res = v.size() ? *Rand::Get(v) : Artifact::UNKNOWN;
+    int res = v.size() ? *Rand::Get(v) : Artifact::UNKNOWN;
     artifacts[res].bits |= ART_RNDUSED;
 
     return res;
 }
 
-Artifact Artifact::FromMP2IndexSprite(u8 index)
+Artifact Artifact::FromMP2IndexSprite(u32 index)
 {
     if(0xA2 > index) return Artifact((index - 1) / 2);
     else
@@ -657,7 +655,16 @@ StreamBase & operator<< (StreamBase & msg, const Artifact & art)
 
 StreamBase & operator>> (StreamBase & msg, Artifact & art)
 {
-    return msg >> art.id >> art.ext;
+    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
+    {
+	u8 id, ext;
+	msg >> id >> ext;
+	art.id = id; art.ext = ext;
+    }
+    else
+	msg >> art.id >> art.ext;
+
+    return msg;
 }
 
 BagArtifacts::BagArtifacts() : std::vector<Artifact>(HEROESMAXARTIFACT, Artifact::UNKNOWN)
@@ -676,17 +683,21 @@ bool BagArtifacts::isPresentArtifact(const Artifact & art) const
 
 bool BagArtifacts::PushArtifact(const Artifact & art)
 {
-    iterator it = std::find(begin(), end(), Artifact(Artifact::UNKNOWN));
- 
-    if(it == end()) return false;
+    if(art.isValid())
+    {
+	iterator it = std::find(begin(), end(), Artifact(Artifact::UNKNOWN));
+	if(it == end()) return false;
 
-    *it = art;
+	*it = art;
 
-    // book insert first
-    if(art() == Artifact::MAGIC_BOOK)
-	std::swap(*it, front());
+	// book insert first
+	if(art() == Artifact::MAGIC_BOOK)
+	    std::swap(*it, front());
 
-    return true;
+	return true;
+    }
+
+    return false;
 }
 
 bool BagArtifacts::isFull(void) const
@@ -711,7 +722,7 @@ bool BagArtifacts::MakeBattleGarb(void)
     return true;
 }
 
-u8 BagArtifacts::CountArtifacts(void) const
+u32 BagArtifacts::CountArtifacts(void) const
 {
     return std::count_if(begin(), end(), std::mem_fun_ref(&Artifact::isValid));
 }
@@ -741,12 +752,12 @@ std::string BagArtifacts::String(void) const
     return os.str();
 }
 
-u8 BagArtifacts::Count(const Artifact & art) const
+u32 BagArtifacts::Count(const Artifact & art) const
 {
     return std::count(begin(), end(), art);
 }
 
-u16 GoldInsteadArtifact(u8 obj)
+u32 GoldInsteadArtifact(int obj)
 {
     switch(obj)
     {
@@ -767,13 +778,13 @@ ArtifactsBar::ArtifactsBar(const Heroes* ptr, bool mini, bool ro, bool change /*
     if(use_mini_sprite)
     {
         const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 0);
-        const Rect rt(25, 20, 34, 34);
-        SetItemSize(rt.w, rt.h);
-        backsf.Set(rt.w, rt.h);
-        sprite.Blit(rt, 0, 0, backsf);
-        Cursor::DrawCursor(backsf, 0x70, true);
-	spcursor.Set(rt.w, rt.h);
-	Cursor::DrawCursor(spcursor, 0x10, true);
+        const Rect rt(26, 21, 32, 32);
+
+	backsf = Surface::RectBorder(rt.w + 2, rt.h + 2, backsf.GetColorIndex(0x70), true);
+	sprite.Blit(rt, 1, 1, backsf);
+
+	SetItemSize(backsf.w(), backsf.h());
+	spcursor = Surface::RectBorder(backsf.w(), backsf.h(), spcursor.GetColorIndex(0x10), true);
     }
     else
     {
@@ -877,7 +888,7 @@ bool ArtifactsBar::ActionBarDoubleClick(const Point & cursor, Artifact & art, co
         if(hero->CanLearnSpell(spell))
         {
 	    payment_t cost = spell.GetCost();
-            u16 answer = 0;
+            u32 answer = 0;
             std::string msg = _("Do you want to use your knowledge of magical secrets to transcribe the %{spell} Scroll into your spell book?\nThe Scroll will be consumed.\n Spell point: %{sp}");
 
             StringReplace(msg, "%{spell}", spell.GetName());

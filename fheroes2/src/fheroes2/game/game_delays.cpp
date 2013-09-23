@@ -103,14 +103,15 @@ void Game::AnimateDelaysInitialize(void)
     UpdateBattleSpeed();
 }
 
-void Game::AnimateDelayReset(delay_t dl)
+void Game::AnimateResetDelay(int dl)
 {
-    delays[dl].Reset();
+    if(dl < LAST_DELAY)
+	delays[dl].Reset();
 }
 
-bool Game::AnimateInfrequent(delay_t dl)
+bool Game::AnimateInfrequentDelay(int dl)
 {
-    return delays[dl].Trigger();
+    return dl < LAST_DELAY ? delays[dl].Trigger() : false;
 }
 
 void Game::UpdateHeroesMoveSpeed(void)

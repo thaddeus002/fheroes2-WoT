@@ -24,6 +24,7 @@
 #define H2BATTLE_TOWER_H
 
 #include "gamedefs.h"
+#include "battle_command.h"
 #include "battle_troop.h"
 
 class Castle;
@@ -35,25 +36,26 @@ namespace Battle
     class Tower : public Unit
     {
     public:
-	Tower(const Castle &, u8);
+	Tower(const Castle &, int);
 
 	bool	isValid(void) const;
-	u8	GetColor(void) const;
-	u8	GetType(void) const;
-	u8	GetBonus(void) const;
-	u16	GetAttack(void) const;
+	int	GetColor(void) const;
+	u32	GetType(void) const;
+	u32	GetBonus(void) const;
+	u32	GetAttack(void) const;
 
 	const char* GetName(void) const;
 
 	void	SetDestroy(void);
 	Point	GetPortPosition(void) const;
+	Command GetCommand(const Unit &) const;
 
 	static std::string GetInfo(const Castle &);
 
     private:
-	u8	type;
-	u8	color;
-	u8	bonus;
+	int	type;
+	int	color;
+	u32	bonus;
 	bool	valid;
     };
 }

@@ -29,12 +29,12 @@ class Sprite : public Surface
 public:
     Sprite();
     Sprite(const Sprite &);
-    Sprite(const Surface &, s16, s16);
+    Sprite(const Surface &, s32, s32);
 
     Sprite & operator= (const Surface &);
     Sprite & operator= (const Sprite &);
 
-    void SetOffset(s16, s16);
+    void SetOffset(s32, s32);
     void Reset(void);
 
     int x(void) const{ return offsetX; }
@@ -48,11 +48,12 @@ public:
     void Blit(int alpha, int dstx, int dsty, Surface & = Display::Get()) const;
     void Blit(int alpha, const Rect & srt, const Point &, Surface & = Display::Get()) const;
 
+    void ScaleQVGA(void);
     u32 GetMemoryUsage(void) const;
-    void ScaleMinifyByTwo(void);
 
     static void DrawICN(int icn, const u8* buf, int size, bool reflect, Surface & sf);
     static void AddonExtensionModify(Sprite & sp, int icn, int index);
+    static Surface ScaleQVGA(const Surface &);
 
 private:
     s16		offsetX;

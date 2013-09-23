@@ -51,11 +51,11 @@ Battle::Catapult::Catapult(const HeroBase & hero, bool fortification) : cat_shot
 	default: break;
     }
 
-    u8 acount = hero.HasArtifact(Artifact::BALLISTA);
+    u32 acount = hero.HasArtifact(Artifact::BALLISTA);
     if(acount) cat_shots += acount * Artifact(Artifact::BALLISTA).ExtraValue();
 }
 
-u8 Battle::Catapult::GetDamage(u8 target, u8 value) const
+u32 Battle::Catapult::GetDamage(int target, u32 value) const
 {
     switch(target)
     {
@@ -83,7 +83,7 @@ u8 Battle::Catapult::GetDamage(u8 target, u8 value) const
     return value;
 }
 
-Point Battle::Catapult::GetTargetPosition(u8 target)
+Point Battle::Catapult::GetTargetPosition(int target)
 {
     Point res;
 
@@ -105,9 +105,9 @@ Point Battle::Catapult::GetTargetPosition(u8 target)
     return res;
 }
 
-u8 Battle::Catapult::GetTarget(const std::vector<u8> & values) const
+int Battle::Catapult::GetTarget(const std::vector<u32> & values) const
 {
-    std::vector<u8> targets;
+    std::vector<u32> targets;
     targets.reserve(4);
 
     // check walls
@@ -146,10 +146,10 @@ u8 Battle::Catapult::GetTarget(const std::vector<u8> & values) const
     return 0;
 }
 
-Battle::Command Battle::Catapult::GetAction(Arena & arena) const
+Battle::Command Battle::Catapult::GetCommand(Arena & arena) const
 {
-    u8 shots = cat_shots;
-    std::vector<u8> values(CAT_MISS + 1, 0);
+    u32 shots = cat_shots;
+    std::vector<u32> values(CAT_MISS + 1, 0);
 
     values[CAT_WALL1] = arena.GetCastleTargetValue(CAT_WALL1);
     values[CAT_WALL2] = arena.GetCastleTargetValue(CAT_WALL2);
@@ -165,8 +165,8 @@ Battle::Command Battle::Catapult::GetAction(Arena & arena) const
 
     while(shots--)
     {
-        const u8 & target = GetTarget(values);
-        const u8 & damage = GetDamage(target, arena.GetCastleTargetValue(target));
+        int target = GetTarget(values);
+        u32 damage = GetDamage(target, arena.GetCastleTargetValue(target));
         cmd.GetStream() << target << damage;
         values[target] -= damage;
     }

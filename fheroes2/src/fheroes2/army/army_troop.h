@@ -43,7 +43,7 @@ public:
     void		SetCount(u32);
     void		Reset(void);
 
-    bool		isMonster(u8) const;
+    bool		isMonster(int) const;
     const char*		GetName(void) const;
     virtual u32		GetCount(void) const;
     u32			GetHitPoints(void) const;
@@ -65,8 +65,8 @@ public:
     virtual std::string	GetShotString(void) const;
     virtual std::string	GetSpeedString(void) const;
     virtual u32		GetHitPointsLeft(void) const;
-    virtual u8		GetSpeed(void) const;
-    virtual u16		GetAffectedDuration(u32) const;
+    virtual u32		GetSpeed(void) const;
+    virtual u32		GetAffectedDuration(u32) const;
 
 protected:
     friend StreamBase & operator<< (StreamBase &, const Troop &);
@@ -86,11 +86,11 @@ public:
 
     ArmyTroop &		operator= (const Troop &);
 
-    u16			GetAttack(void) const;
-    u16			GetDefense(void) const;
-    u8			GetColor(void) const;
-    s8			GetMorale(void) const;
-    s8			GetLuck(void) const;
+    u32			GetAttack(void) const;
+    u32			GetDefense(void) const;
+    int			GetColor(void) const;
+    int			GetMorale(void) const;
+    int			GetLuck(void) const;
 
     void		SetArmy(const Army &);
     const Army*		GetArmy(void) const;

@@ -29,16 +29,16 @@ class Surface;
 
 namespace TIL
 {
-    enum til_t
+    enum
     {
+	UNKNOWN,
 	CLOF32,
 	GROUND32,
 	STON,
-	
-	UNKNOWN
+	LASTTIL
     };
 
-    const char* GetString(const til_t til);
+    const char* GetString(int);
 }
 
 #endif

@@ -29,6 +29,8 @@
 #include "text.h"
 #include "world.h"
 #include "kingdom.h"
+#include "game.h"
+#include "dialog.h"
 #include "castle.h"
 #include "pocketpc.h"
 
@@ -39,7 +41,7 @@ struct ValueColors : std::pair<int, int>
     ValueColors(int v, int c);
 
     bool IsValue(int v) const;
-    bool IsColor(Color::color_t c) const;
+    bool IsColor(int c) const;
 
     static bool SortValueGreat(const ValueColors & v1, const ValueColors & v2);
 };
@@ -54,8 +56,10 @@ void GetObelisksInfo(std::vector<ValueColors> &, const Colors &);
 void GetArmyInfo(std::vector<ValueColors> &, const Colors &);
 void GetIncomesInfo(std::vector<ValueColors> &, const Colors &);
 void GetBestHeroArmyInfo(std::vector<ValueColors> &, const Colors &);
-void DrawFlags(const std::vector<ValueColors> &, const Point &, const u16 width, const u8 count);
-void DrawHeroIcons(const std::vector<ValueColors> &, const Point &, const u16 width);
+
+// from dialog_thievesguild.cpp
+void DrawFlags(const std::vector<ValueColors> &, const Point &, u32 width, u32 count);
+void DrawHeroIcons(const std::vector<ValueColors> &, const Point &, u32 width);
 
 void PocketPC::ThievesGuild(bool oracle)
 {
@@ -72,19 +76,19 @@ void PocketPC::ThievesGuild(bool oracle)
     const Point & cur_pt = dst_rt;
     Point dst_pt(cur_pt);
 
-    const u8 count = oracle ? 0xFF : world.GetKingdom(Settings::Get().CurrentColor()).GetCountBuilding(BUILD_THIEVESGUILD);
+    const u32 count = oracle ? 0xFF : world.GetKingdom(Settings::Get().CurrentColor()).GetCountBuilding(BUILD_THIEVESGUILD);
 
     std::vector<ValueColors> v;
     v.reserve(KINGDOMMAX);
     const Colors colors(Game::GetActualKingdomColors());
-    u16 textx = 115;
-    u16 startx = 120;
-    u16 maxw = 200;
+    u32 textx = 115;
+    u32 startx = 120;
+    u32 maxw = 200;
     Text text;
     text.Set(Font::SMALL);
 
     // head 1
-    u8 ii = 0;
+    u32 ii = 0;
     for(ii = 0; ii < colors.size(); ++ii)
     {
 	switch(ii+1)

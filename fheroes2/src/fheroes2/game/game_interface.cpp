@@ -23,11 +23,14 @@
 #include <ctime>
 #include <sstream>
 #include "agg.h"
+#include "direction.h"
 #include "settings.h"
 #include "maps.h"
 #include "mp2.h"
 #include "world.h"
+#include "game.h"
 #include "dialog.h"
+#include "players.h"
 #include "game_interface.h"
 
 Interface::Basic::Basic() : gameArea(*this), radar(*this),
@@ -35,7 +38,7 @@ Interface::Basic::Basic() : gameArea(*this), radar(*this),
 {
     Settings & conf = Settings::Get().Get();
     const Display & display = Display::Get();
-    const u8 scroll_width = conf.QVGA() ? 12 : BORDERWIDTH;
+    const int scroll_width = conf.QVGA() ? 12 : BORDERWIDTH;
 
     SetHideInterface(conf.ExtGameHideInterface());
 
@@ -81,8 +84,8 @@ void Interface::Basic::SetHideInterface(bool f)
 {
     Settings & conf = Settings::Get().Get();
     const Display & display = Display::Get();
-    const u16 & px = display.w() - BORDERWIDTH - RADARWIDTH;
-    const u8 scroll_width = conf.QVGA() ? 12 : BORDERWIDTH;
+    const u32 px = display.w() - BORDERWIDTH - RADARWIDTH;
+    const u32 scroll_width = conf.QVGA() ? 12 : BORDERWIDTH;
 
     conf.SetHideInterface(f);
 
@@ -154,12 +157,12 @@ bool Interface::Basic::NeedRedraw(void) const
     return redraw;
 }
 
-void Interface::Basic::SetRedraw(u8 f)
+void Interface::Basic::SetRedraw(int f)
 {
     redraw |= f;
 }
 
-void Interface::Basic::Redraw(u8 force)
+void Interface::Basic::Redraw(int force)
 {
     Settings & conf = Settings::Get();
 
@@ -189,7 +192,7 @@ void Interface::Basic::Redraw(u8 force)
     redraw = 0;
 }
 
-void Interface::Basic::RedrawSystemInfo(s16 cx, s16 cy, u32 usage)
+void Interface::Basic::RedrawSystemInfo(s32 cx, s32 cy, u32 usage)
 {
     std::ostringstream os;
 
@@ -207,7 +210,7 @@ void Interface::Basic::RedrawSystemInfo(s16 cx, s16 cy, u32 usage)
     system_info.Blit(cx, cy);
 }
 
-s32 Interface::Basic::GetDimensionDoorDestination(const s32 from, const u8 distance, bool water) const
+s32 Interface::Basic::GetDimensionDoorDestination(s32 from, u32 distance, bool water) const
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();

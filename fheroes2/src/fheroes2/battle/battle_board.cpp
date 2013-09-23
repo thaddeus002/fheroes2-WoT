@@ -25,6 +25,7 @@
 #include <functional>
 #include <algorithm>
 #include "world.h"
+#include "ground.h"
 #include "castle.h"
 #include "settings.h"
 #include "battle_arena.h"
@@ -34,12 +35,12 @@
 
 namespace Battle
 {
-    s16 GetObstaclePosition(void)
+    int GetObstaclePosition(void)
     {
 	return Rand::Get(3, 6) + (11 * Rand::Get(1, 7));
     }
 
-    bool WideDifficultDirection(u8 where, u8 whereto)
+    bool WideDifficultDirection(int where, int whereto)
     {
 	return
 	((TOP_LEFT == where) && (whereto & (LEFT | TOP_RIGHT))) ||
@@ -52,7 +53,7 @@ namespace Battle
 Battle::Board::Board()
 {
     reserve(ARENASIZE);
-    for(u16 ii = 0; ii < ARENASIZE; ++ii) push_back(Cell(ii));
+    for(u32 ii = 0; ii < ARENASIZE; ++ii) push_back(Cell(ii));
 }
 
 void Battle::Board::SetArea(const Rect & area)
@@ -129,12 +130,12 @@ void Battle::Board::SetEnemyQuality(const Unit & b)
     }
 }
 
-u16 Battle::Board::GetDistance(s16 index1, s16 index2)
+s32 Battle::Board::GetDistance(s32 index1, s32 index2)
 {
     if(isValidIndex(index1) && isValidIndex(index2))
     {
-	const s16 dx = (index1 % ARENAW) - (index2 % ARENAW);
-	const s16 dy = (index1 / ARENAW) - (index2 / ARENAW);
+	const s32 dx = (index1 % ARENAW) - (index2 % ARENAW);
+	const s32 dy = (index1 / ARENAW) - (index2 / ARENAW);
 
 	return Sign(dx) == Sign(dy) ? std::max(std::abs(dx), std::abs(dy)) : std::abs(dx) + std::abs(dy);
     }
@@ -168,8 +169,8 @@ void Battle::Board::SetScanPassability(const Unit & b)
 
 struct bcell_t
 {
-    u16		cost;
-    s16		prnt;
+    s32		cost;
+    s32		prnt;
     bool	open;
 
     bcell_t() : cost(MAXU16), prnt(-1), open(true) {}
@@ -179,8 +180,8 @@ Battle::Indexes Battle::Board::GetAStarPath(const Unit & b, const Position & dst
 {
     const Castle* castle = Arena::GetCastle();
     const Bridge* bridge = Arena::GetBridge();
-    std::map<s16, bcell_t> list;
-    s16 cur = b.GetHeadIndex();
+    std::map<s32, bcell_t> list;
+    s32 cur = b.GetHeadIndex();
 
     list[cur].prnt = -1;
     list[cur].cost = 0;
@@ -203,7 +204,7 @@ Battle::Indexes Battle::Board::GetAStarPath(const Unit & b, const Position & dst
 		// check bridge
 	        (!bridge || !Board::isBridgeIndex(*it) || bridge->isPassable(b.GetColor())))
 	    {
-		const s16 cost = 100 * Board::GetDistance(*it, dst.GetHead()->GetIndex()) +
+		const s32 cost = 100 * Board::GetDistance(*it, dst.GetHead()->GetIndex()) +
 		    (b.isWide() && WideDifficultDirection(center.GetDirection(), GetDirection(*it, cur)) ? 100 : 0) +
 		    (castle && castle->isBuild(BUILD_MOAT) && Board::isMoatIndex(*it) ? 100 : 0);
 
@@ -224,10 +225,10 @@ Battle::Indexes Battle::Board::GetAStarPath(const Unit & b, const Position & dst
 	}
 
 	list[cur].open = false;
-	u16 cost = MAXU16;
+	s32 cost = MAXU16;
 
 	// find min cost opens
-	for(std::map<s16, bcell_t>::const_iterator
+	for(std::map<s32, bcell_t>::const_iterator
 	    it = list.begin(); it != list.end(); ++it)
 	if((*it).second.open && cost > (*it).second.cost)
 	{
@@ -256,13 +257,13 @@ Battle::Indexes Battle::Board::GetAStarPath(const Unit & b, const Position & dst
 	// correct wide position
 	if(b.isWide() && result.size())
 	{
-	    const s16 & head = dst.GetHead()->GetIndex();
-	    const s16 & tail = dst.GetTail()->GetIndex();
-	    const s16 & prev = 1 < result.size() ? result[result.size() - 2] : b.GetHeadIndex();
+	    const s32 head = dst.GetHead()->GetIndex();
+	    const s32 tail = dst.GetTail()->GetIndex();
+	    const s32 prev = 1 < result.size() ? result[result.size() - 2] : b.GetHeadIndex();
 
 	    if(result.back() == head)
 	    {
-		u8 side = RIGHT == GetDirection(head, tail) ? RIGHT_SIDE : LEFT_SIDE;
+		int side = RIGHT == GetDirection(head, tail) ? RIGHT_SIDE : LEFT_SIDE;
 
 		if(! (side & GetDirection(head, prev)))
 		    result.push_back(tail);
@@ -270,7 +271,7 @@ Battle::Indexes Battle::Board::GetAStarPath(const Unit & b, const Position & dst
 	    else
 	    if(result.back() == tail)
 	    {
-		u8 side = RIGHT == GetDirection(head, tail) ? LEFT_SIDE : RIGHT_SIDE;
+		int side = RIGHT == GetDirection(head, tail) ? LEFT_SIDE : RIGHT_SIDE;
 
 		if(! (side & GetDirection(tail, prev)))
 		    result.push_back(head);
@@ -298,8 +299,8 @@ Battle::Indexes Battle::Board::GetAStarPath(const Unit & b, const Position & dst
 
 	    if(b.isWide())
 	    {
-		const s16 & head = *it;
-		const s16 & prev = it != result.begin() ? *(it - 1) : b.GetHeadIndex();
+		const s32 head = *it;
+		const s32 prev = it != result.begin() ? *(it - 1) : b.GetHeadIndex();
 		Cell* tail = GetCell(head, LEFT_SIDE & GetDirection(head, prev) ? LEFT : RIGHT);
 
 		if(tail && UNKNOWN == tail->GetDirection())
@@ -352,12 +353,12 @@ Battle::Indexes Battle::Board::GetPassableQualityPositions(const Unit & b)
     return result;
 }
 
-struct IndexDistanceEqualDistance : std::binary_function<IndexDistance, u16, bool>
+struct IndexDistanceEqualDistance : std::binary_function<IndexDistance, u32, bool>
 {
-    bool operator() (const IndexDistance & id, u16 dist) const { return id.second == dist; };
+    bool operator() (const IndexDistance & id, u32 dist) const { return id.second == dist; };
 };
 
-Battle::Indexes Battle::Board::GetNearestTroopIndexes(s16 pos, const Indexes* black) const
+Battle::Indexes Battle::Board::GetNearestTroopIndexes(s32 pos, const Indexes* black) const
 {
     Indexes result;
     std::vector<IndexDistance> dists;
@@ -395,7 +396,7 @@ Battle::Indexes Battle::Board::GetNearestTroopIndexes(s16 pos, const Indexes* bl
     return result;
 }
 
-Battle::direction_t Battle::Board::GetDirection(s16 index1, s16 index2)
+int Battle::Board::GetDirection(s32 index1, s32 index2)
 {
     if(isValidIndex(index1) && isValidIndex(index2))
     {
@@ -409,13 +410,13 @@ Battle::direction_t Battle::Board::GetDirection(s16 index1, s16 index2)
     return UNKNOWN;
 }
 
-bool Battle::Board::isNearIndexes(s16 index1, s16 index2)
+bool Battle::Board::isNearIndexes(s32 index1, s32 index2)
 {
     return index1 != index2 &&
 	UNKNOWN != GetDirection(index1, index2);
 }
 
-Battle::direction_t Battle::Board::GetReflectDirection(u8 d)
+int Battle::Board::GetReflectDirection(int d)
 {
     switch(d)
     {
@@ -431,7 +432,7 @@ Battle::direction_t Battle::Board::GetReflectDirection(u8 d)
     return UNKNOWN;
 }
 
-bool Battle::Board::isReflectDirection(u8 d)
+bool Battle::Board::isReflectDirection(int d)
 {
     switch(d)
     {
@@ -444,12 +445,12 @@ bool Battle::Board::isReflectDirection(u8 d)
     return false;
 }
 
-bool Battle::Board::isValidDirection(s16 index, u8 dir)
+bool Battle::Board::isValidDirection(s32 index, int dir)
 {
     if(isValidIndex(index))
     {
-        const u16 x = index % ARENAW;
-        const u16 y = index / ARENAW;
+        const s32 x = index % ARENAW;
+        const s32 y = index / ARENAW;
 
         switch(dir)
         {
@@ -467,11 +468,11 @@ bool Battle::Board::isValidDirection(s16 index, u8 dir)
     return false;
 }
 
-s16 Battle::Board::GetIndexDirection(s16 index, u8 dir)
+s32 Battle::Board::GetIndexDirection(s32 index, int dir)
 {
     if(isValidIndex(index))
     {
-        const u16 y = index / ARENAW;
+        const s32 y = index / ARENAW;
 
         switch(dir)
         {
@@ -489,7 +490,7 @@ s16 Battle::Board::GetIndexDirection(s16 index, u8 dir)
     return -1;
 }
 
-s16 Battle::Board::GetIndexAbsPosition(const Point & pt) const
+s32 Battle::Board::GetIndexAbsPosition(const Point & pt) const
 {
     const_iterator it = begin();
 
@@ -499,12 +500,12 @@ s16 Battle::Board::GetIndexAbsPosition(const Point & pt) const
     return it != end() ? (*it).GetIndex() : -1;
 }
 
-bool Battle::Board::isValidIndex(s16 index)
+bool Battle::Board::isValidIndex(s32 index)
 {
     return 0 <= index && index < ARENASIZE;
 }
 
-bool Battle::Board::isCastleIndex(s16 index)
+bool Battle::Board::isCastleIndex(s32 index)
 {
  return((8 < index && index <= 10) ||
        (19 < index && index <= 21) ||
@@ -517,7 +518,7 @@ bool Battle::Board::isCastleIndex(s16 index)
        (96 < index && index <= 98));
 }
 
-bool Battle::Board::isOutOfWallsIndex(s16 index)
+bool Battle::Board::isOutOfWallsIndex(s32 index)
 {
     return ((index <=  8) ||
             (11 <= index && index <= 19) ||
@@ -530,13 +531,13 @@ bool Battle::Board::isOutOfWallsIndex(s16 index)
             (88 <= index && index <= 96));
 }
 
-bool Battle::Board::isImpassableIndex(s16 index)
+bool Battle::Board::isImpassableIndex(s32 index)
 {
     const Cell* cell = Board::GetCell(index);
     return ! cell || ! cell->isPassable1(true);
 }
 
-bool Battle::Board::isBridgeIndex(s16 index)
+bool Battle::Board::isBridgeIndex(s32 index)
 {
     switch(index)
     {
@@ -549,7 +550,7 @@ bool Battle::Board::isBridgeIndex(s16 index)
     return false;
 }
 
-bool Battle::Board::isMoatIndex(s16 index)
+bool Battle::Board::isMoatIndex(s32 index)
 {
     switch(index)
     {
@@ -573,8 +574,8 @@ void Battle::Board::SetCobjObjects(const Maps::Tiles & tile)
 {
 //    bool trees = Maps::ScanAroundObject(center, MP2::OBJ_TREES).size();
     bool grave = MP2::OBJ_GRAVEYARD == tile.GetObject(false);
-    u16 ground = tile.GetGround();
-    std::vector<ICN::icn_t> objs;
+    int ground = tile.GetGround();
+    std::vector<int> objs;
 
     if(grave)
     {
@@ -646,7 +647,7 @@ void Battle::Board::SetCobjObjects(const Maps::Tiles & tile)
     if(objs.size() && 2 < Rand::Get(1, 10))
     {
 	// 80% 1 obj
-	s16 dst = GetObstaclePosition();
+	s32 dst = GetObstaclePosition();
 	SetCobjObject(*Rand::Get(objs), dst);
 
 	// 50% 2 obj
@@ -659,7 +660,7 @@ void Battle::Board::SetCobjObjects(const Maps::Tiles & tile)
     }
 }
 
-void Battle::Board::SetCobjObject(u16 icn, s16 dst)
+void Battle::Board::SetCobjObject(int icn, s32 dst)
 {
     switch(icn)
     {
@@ -721,7 +722,7 @@ void Battle::Board::SetCobjObject(u16 icn, s16 dst)
     }
 }
 
-void Battle::Board::SetCovrObjects(u16 icn)
+void Battle::Board::SetCovrObjects(int icn)
 {
     switch(icn)
     {
@@ -839,7 +840,7 @@ void Battle::Board::SetCovrObjects(u16 icn)
     }
 }
 
-Battle::Cell* Battle::Board::GetCell(s16 position, direction_t dir)
+Battle::Cell* Battle::Board::GetCell(s32 position, int dir)
 {
     Board* board = Arena::GetBoard();
 
@@ -855,7 +856,7 @@ Battle::Cell* Battle::Board::GetCell(s16 position, direction_t dir)
     return NULL;
 }
 
-Battle::Indexes Battle::Board::GetMoveWideIndexes(s16 center, bool reflect)
+Battle::Indexes Battle::Board::GetMoveWideIndexes(s32 center, bool reflect)
 {
     Indexes result;
     result.reserve(8);
@@ -880,7 +881,7 @@ Battle::Indexes Battle::Board::GetMoveWideIndexes(s16 center, bool reflect)
     return result;
 }
 
-Battle::Indexes Battle::Board::GetAroundIndexes(s16 center)
+Battle::Indexes Battle::Board::GetAroundIndexes(s32 center)
 {
     Indexes result;
     result.reserve(12);
@@ -913,13 +914,13 @@ Battle::Indexes Battle::Board::GetAroundIndexes(const Unit & b)
     return GetAroundIndexes(b.GetHeadIndex());
 }
 
-Battle::Indexes Battle::Board::GetDistanceIndexes(s16 center, u8 radius)
+Battle::Indexes Battle::Board::GetDistanceIndexes(s32 center, u32 radius)
 {
     Indexes result;
 
     if(isValidIndex(center))
     {
-        std::set<s16> st;
+        std::set<s32> st;
         Indexes abroad;
 
         st.insert(center);
@@ -927,7 +928,7 @@ Battle::Indexes Battle::Board::GetDistanceIndexes(s16 center, u8 radius)
 
         while(abroad.size() && radius)
         {
-            std::set<s16> tm = st;
+            std::set<s32> tm = st;
 
             for(Indexes::const_iterator
                 it = abroad.begin(); it != abroad.end(); ++it)
@@ -955,7 +956,7 @@ Battle::Indexes Battle::Board::GetDistanceIndexes(s16 center, u8 radius)
     return result;
 }
 
-bool Battle::Board::isValidMirrorImageIndex(s16 index, const Unit* b)
+bool Battle::Board::isValidMirrorImageIndex(s32 index, const Unit* b)
 {
     return b && GetCell(index) &&
 	index != b->GetHeadIndex() && (!b->isWide() || index != b->GetTailIndex()) &&

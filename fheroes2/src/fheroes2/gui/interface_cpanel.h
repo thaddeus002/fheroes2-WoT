@@ -24,7 +24,6 @@
 #define H2INTERFACE_CPANEL_H
 
 #include "gamedefs.h"
-#include "game.h"
 
 namespace Interface
 {
@@ -35,12 +34,12 @@ namespace Interface
     public:
 	ControlPanel(Basic &);
 
-	void SetPos(s16, s16);
-	void Redraw(void);
-	void ResetTheme(void);
-	void QueueEventProcessing(Game::menu_t &);
+	void		SetPos(s32, s32);
+	void		Redraw(void);
+	void		ResetTheme(void);
+	int		QueueEventProcessing(void);
 
-	const Rect & GetArea(void);
+	const Rect &	GetArea(void);
 
     private:
 	Basic & interface;
@@ -56,8 +55,6 @@ namespace Interface
 	Rect rt_bttn;
 	Rect rt_stat;
 	Rect rt_quit;
-
-	const u8 alpha;
     };
 }
 

@@ -45,13 +45,13 @@ void RedrawScenarioStaticInfo(const Rect &);
 void RedrawRatingInfo(TextSprite &);
 void RedrawDifficultyInfo(const Point & dst, bool label = true);
 
-Game::menu_t Game::SelectScenario(void)
+int Game::SelectScenario(void)
 {
     if(Settings::Get().QVGA()) return PocketPC::SelectScenario();
     return SCENARIOINFO;
 }
 
-Game::menu_t Game::ScenarioInfo(void)
+int Game::ScenarioInfo(void)
 {
     Settings & conf = Settings::Get();
 
@@ -64,7 +64,7 @@ Game::menu_t Game::ScenarioInfo(void)
         return MAINMENU;
     }
 
-    menu_t result = QUITGAME;
+    int result = QUITGAME;
     LocalEvent & le = LocalEvent::Get();
 
     // cursor
@@ -185,7 +185,7 @@ Game::menu_t Game::ScenarioInfo(void)
 
 	// click select
 	if(buttonSelectMaps &&
-	  (Game::HotKeyPress(Game::EVENT_BUTTON_SELECT) || le.MouseClickLeft(*buttonSelectMaps)))
+	  (HotKeyPressEvent(Game::EVENT_BUTTON_SELECT) || le.MouseClickLeft(*buttonSelectMaps)))
 	{
 	    levelCursor.Hide();
 	    const Maps::FileInfo* fi = Dialog::SelectScenario(lists);
@@ -210,14 +210,14 @@ Game::menu_t Game::ScenarioInfo(void)
 	}
 	else
 	// click cancel
-	if(HotKeyPress(EVENT_DEFAULT_EXIT) || le.MouseClickLeft(*buttonCancel))
+	if(HotKeyPressEvent(EVENT_DEFAULT_EXIT) || le.MouseClickLeft(*buttonCancel))
 	{
 	    result = MAINMENU;
 	    break;
 	}
 	else
 	// click ok
-	if(HotKeyPress(EVENT_DEFAULT_READY) || le.MouseClickLeft(*buttonOk))
+	if(HotKeyPressEvent(EVENT_DEFAULT_READY) || le.MouseClickLeft(*buttonOk))
 	{
 	    DEBUG(DBG_GAME, DBG_INFO, "select maps: " << conf.MapsFile() << \
 		    ", difficulty: " << Difficulty::String(conf.GameDifficulty()));
@@ -286,7 +286,23 @@ Game::menu_t Game::ScenarioInfo(void)
 	if(conf.ExtGameUseFade()) display.Fade();
 	Game::ShowLoadMapsText();
 	// Load maps
-	world.LoadMaps(conf.MapsFile());
+	std::string lower = StringLower(conf.MapsFile());
+
+	if(lower.size() > 3)
+	{
+	    std::string ext = lower.substr(lower.size() - 3);
+
+	    if(ext == "mp2" || ext == "mx2")
+		result = world.LoadMapMP2(conf.MapsFile()) ? STARTGAME : MAINMENU;
+	    else
+	    if(ext == "map")
+		result = world.LoadMapMAP(conf.MapsFile()) ? STARTGAME : MAINMENU;
+	}
+	else
+	{
+	    result = MAINMENU;
+	    DEBUG(DBG_GAME, DBG_WARN, conf.MapsFile() << ", " << "unknown map format");
+	}
     }
 
     if(frameborder) delete frameborder;
@@ -298,26 +314,10 @@ Game::menu_t Game::ScenarioInfo(void)
     return result;
 }
 
-u16 Game::GetStep4Player(u16 current, u16 width, u16 count)
+u32 Game::GetStep4Player(u32 current, u32 width, u32 count)
 {
     return current * width * KINGDOMMAX / count + (width * (KINGDOMMAX - count) / (2 * count));
 }
-
-/*
-void UpdateCoordInfo(const Point & dst, Rects & rects)
-{
-    const Sprite &sprite = AGG::GetICN(ICN::NGEXTRA, 3);
-    u8 current = 0;
-
-    std::fill(rects.begin(), rects.end(), Rect());
-
-    const Colors colors(Game::GetKingdomColors());
-
-    for(Colors::const_iterator
-	it = colors.begin(); it != colors.end(); ++it)
-	rects[Color::GetIndex(*it)] = Rect(dst.x + Game::GetStep4Player(current++, sprite.w(), colors.size()), dst.y, sprite.w(), sprite.h());
-}
-*/
 
 void RedrawScenarioStaticInfo(const Rect & rt)
 {
@@ -362,11 +362,11 @@ void RedrawScenarioStaticInfo(const Rect & rt)
 
 void RedrawDifficultyInfo(const Point & dst, bool label)
 {
-    for(u8 current = Difficulty::EASY; current <= Difficulty::IMPOSSIBLE; ++current)
+    for(u32 current = Difficulty::EASY; current <= Difficulty::IMPOSSIBLE; ++current)
     {
     	const Sprite & sprite = AGG::GetICN(ICN::NGHSBKG, 0);
     	Rect src_rt(24, 94, 65, 65);
-    	u16 offset = current * (src_rt.w + 12);
+    	u32 offset = current * (src_rt.w + 12);
     	src_rt.x = src_rt.x + offset;
 	sprite.Blit(src_rt, dst.x + offset, dst.y);
 

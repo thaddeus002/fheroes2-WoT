@@ -44,8 +44,8 @@ namespace Battle
 
     struct Result
     {
-	u8	army1;
-	u8	army2;
+	u32	army1;
+	u32	army2;
 	u32	exp1;
 	u32	exp2;
 	u32	killed;
@@ -54,8 +54,8 @@ namespace Battle
 
 	bool	AttackerWins(void) const;
 	bool	DefenderWins(void) const;
-	u8	AttackerResult(void) const;
-	u8	DefenderResult(void) const;
+	u32	AttackerResult(void) const;
+	u32	DefenderResult(void) const;
 	u32	GetExperienceAttacker(void) const;
 	u32	GetExperienceDefender(void) const;
     };
@@ -71,13 +71,13 @@ namespace Battle
 
     struct animframe_t
     {
-        u8		start;
-        u8		count;
+        int		start;
+        int		count;
     };
 
     struct monstersprite_t
     {
-        ICN::icn_t	icn_file;
+        int		icn_file;
         animframe_t	frm_idle;
         animframe_t	frm_move;
         animframe_t	frm_fly1;
@@ -93,10 +93,10 @@ namespace Battle
         animframe_t	frm_attk3;
         animframe_t	frm_wnce;
         animframe_t	frm_kill;
-        M82::m82_t	m82_attk;
-        M82::m82_t	m82_kill;
-        M82::m82_t	m82_move;
-        M82::m82_t	m82_wnce;
+        int		m82_attk;
+        int		m82_kill;
+        int		m82_move;
+        int		m82_wnce;
     };
 
     struct TargetInfo

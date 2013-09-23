@@ -32,19 +32,18 @@ Cursor::Cursor() : theme(NONE), offset_x(0), offset_y(0)
 
 Cursor & Cursor::Get(void)
 {
-    static Cursor cursor;
-
-    return cursor;
+    static Cursor _cursor;
+    return _cursor;
 }
 
 /* get theme cursor */
-Cursor::themes_t Cursor::Themes(void)
+int Cursor::Themes(void)
 {
-    return SP_ARROW >= theme ? static_cast<themes_t>(theme) : NONE;
+    return SP_ARROW >= theme ? theme : NONE;
 }
 
 /* set cursor theme */
-bool Cursor::SetThemes(u16 name, bool force)
+bool Cursor::SetThemes(int name, bool force)
 {
     if(force || theme != name)
     {
@@ -55,17 +54,17 @@ bool Cursor::SetThemes(u16 name, bool force)
 	{
 	    case 0x3000:
             Set(AGG::GetICN(ICN::SPELCO, 0xFF & name), true);
-		DEBUG(DBG_ENGINE, DBG_TRACE, ICN::GetString(ICN::SPELCO) << ", " << static_cast<int>(0xFF & name));
+		DEBUG(DBG_ENGINE, DBG_TRACE, ICN::GetString(ICN::SPELCO) << ", " << (name & 0xFF));
 		break;
 	    
 	    case 0x2000:
             Set(AGG::GetICN(ICN::CMSECO, 0xFF & name), true);
-		DEBUG(DBG_ENGINE , DBG_TRACE, ICN::GetString(ICN::CMSECO) << ", " << static_cast<int>(0xFF & name));
+		DEBUG(DBG_ENGINE , DBG_TRACE, ICN::GetString(ICN::CMSECO) << ", " << (name & 0xFF));
 		break;
 	    
 	    case 0x1000:
             Set(AGG::GetICN(ICN::ADVMCO, 0xFF & name), true);
-		DEBUG(DBG_ENGINE , DBG_TRACE, ICN::GetString(ICN::ADVMCO) << ", " << static_cast<int>(0xFF & name));
+		DEBUG(DBG_ENGINE , DBG_TRACE, ICN::GetString(ICN::ADVMCO) << ", " << (name & 0xFF));
 		break;
 
 	    default:
@@ -82,7 +81,7 @@ bool Cursor::SetThemes(u16 name, bool force)
 }
 
 /* redraw cursor wrapper for local event */
-void Cursor::Redraw(u16 x, u16 y)
+void Cursor::Redraw(s32 x, s32 y)
 {
     Cursor & cur = Cursor::Get();
     
@@ -95,106 +94,106 @@ void Cursor::Redraw(u16 x, u16 y)
 }
 
 /* move cursor */
-void Cursor::Move(u16 x, u16 y)
+void Cursor::Move(s32 x, s32 y)
 {
     if(isVisible()) SpriteMove::Move(x + offset_x, y + offset_y);
 }
 
 /* set offset big cursor */
-void Cursor::SetOffset(u16 name)
+void Cursor::SetOffset(int name)
 {
     switch(name)
     {
-	    case Cursor::MOVE:
-	    case Cursor::MOVE2:
-	    case Cursor::MOVE3:
-	    case Cursor::MOVE4:
-		offset_x = -12;
-		offset_y = -8;
-		break;
+	case Cursor::MOVE:
+	case Cursor::MOVE2:
+	case Cursor::MOVE3:
+	case Cursor::MOVE4:
+	    offset_x = -12;
+	    offset_y = -8;
+	    break;
 
-	    case Cursor::ACTION:
-	    case Cursor::ACTION2:
-	    case Cursor::ACTION3:
-	    case Cursor::ACTION4:
-		offset_x = -14;
-		offset_y = -10;
-		break;
+	case Cursor::ACTION:
+	case Cursor::ACTION2:
+	case Cursor::ACTION3:
+	case Cursor::ACTION4:
+	    offset_x = -14;
+	    offset_y = -10;
+	    break;
 
-	    case Cursor::BOAT:
-	    case Cursor::BOAT2:
-	    case Cursor::BOAT3:
-	    case Cursor::BOAT4:
-	    case Cursor::REDBOAT:
-	    case Cursor::REDBOAT2:
-	    case Cursor::REDBOAT3:
-	    case Cursor::REDBOAT4:
-		offset_x = -12;
-		offset_y = -12;
-		break;
+	case Cursor::BOAT:
+	case Cursor::BOAT2:
+	case Cursor::BOAT3:
+	case Cursor::BOAT4:
+	case Cursor::REDBOAT:
+	case Cursor::REDBOAT2:
+	case Cursor::REDBOAT3:
+	case Cursor::REDBOAT4:
+	    offset_x = -12;
+	    offset_y = -12;
+	    break;
 
-	    case Cursor::CASTLE:
-		offset_x = -6;
-		offset_y = -4;
-		break;
+	case Cursor::CASTLE:
+	    offset_x = -6;
+	    offset_y = -4;
+	    break;
 
-	    case Cursor::SCROLL_TOPRIGHT:
-            case Cursor::SCROLL_RIGHT:
-		offset_x = -15;
-		offset_y = 0;
-		break;
+	case Cursor::SCROLL_TOPRIGHT:
+        case Cursor::SCROLL_RIGHT:
+	    offset_x = -15;
+	    offset_y = 0;
+	    break;
 
-	    case Cursor::SCROLL_BOTTOM:
-            case Cursor::SCROLL_BOTTOMLEFT:
-		offset_x = 0;
-		offset_y = -15;
-		break;
+	case Cursor::SCROLL_BOTTOM:
+        case Cursor::SCROLL_BOTTOMLEFT:
+	    offset_x = 0;
+	    offset_y = -15;
+	    break;
+
+        case Cursor::SCROLL_BOTTOMRIGHT:
+        case Cursor::SWORD_BOTTOMRIGHT:
+    	    offset_x = -20;
+            offset_y = -20;
+            break;
+
+        case Cursor::SWORD_BOTTOMLEFT:
+            offset_x = -5;
+            offset_y = -20;
+            break;
+
+        case Cursor::SWORD_TOPLEFT:
+    	    offset_x = -5;
+            offset_y = -5;
+            break;
+
+        case Cursor::SWORD_TOPRIGHT:
+    	    offset_x = -20;
+            offset_y = -5;
+            break;
+
+        case Cursor::SWORD_LEFT:
+            offset_x = -5;
+            offset_y = -7;
+            break;
+
+        case Cursor::SWORD_RIGHT:
+            offset_x = -25;
+            offset_y = -7;
+            break;
+
+        case Cursor::WAR_MOVE:
+        case Cursor::WAR_FLY:
+            offset_x = -7;
+            offset_y = -14;
+            break;
             
-            case Cursor::SCROLL_BOTTOMRIGHT:
-            case Cursor::SWORD_BOTTOMRIGHT:
-                offset_x = -20;
-                offset_y = -20;
-                break;
-
-            case Cursor::SWORD_BOTTOMLEFT:
-                offset_x = -5;
-                offset_y = -20;
-                break;
-
-            case Cursor::SWORD_TOPLEFT:
-                offset_x = -5;
-                offset_y = -5;
-                break;
-
-            case Cursor::SWORD_TOPRIGHT:
-                offset_x = -20;
-                offset_y = -5;
-                break;
-
-            case Cursor::SWORD_LEFT:
-                offset_x = -5;
-                offset_y = -7;
-                break;
-
-            case Cursor::SWORD_RIGHT:
-                offset_x = -25;
-                offset_y = -7;
-                break;
-
-            case Cursor::WAR_MOVE:
-            case Cursor::WAR_FLY:
-                offset_x = -7;
-                offset_y = -14;
-                break;
-            
-            case Cursor::WAR_NONE:
-            case Cursor::WAR_HERO:
-            case Cursor::WAR_ARROW:
-            case Cursor::WAR_INFO:
-            case Cursor::WAR_BROKENARROW:
-                offset_x = -7;
-                offset_y = -7;
-                break;
+        case Cursor::WAR_NONE:
+        case Cursor::WAR_HERO:
+        case Cursor::WAR_ARROW:
+        case Cursor::WAR_INFO:
+        case Cursor::WAR_BROKENARROW:
+            offset_x = -7;
+            offset_y = -7;
+            break;
 
         case Cursor::SP_SLOW:
         case Cursor::SP_UNKNOWN:
@@ -241,66 +240,11 @@ void Cursor::SetOffset(u16 name)
             break;
         }
 
-	    default:
-		offset_x = 0;
-		offset_y = 0;
-		break;
+	default:
+	    offset_x = 0;
+	    offset_y = 0;
+	    break;
     }
-}
-
-/* draw simple cursor */
-void Cursor::DrawCursor(Surface &surface, const u8 indexcolor, bool solid)
-{
-    if(! surface.isValid()) return;
-
-    u16 width  = surface.w();
-    u16 height = surface.h();
-
-    // draw cursor
-    u32 color = surface.GetColorIndex(indexcolor);
-    surface.Lock();
-    if(solid)
-    {
-	for(u16 i = 0; i < width; ++i)
-        {
-    	    surface.SetPixel(i, 0, color);
-            surface.SetPixel(i, height - 1, color);
-        }
-
-        for(u16 i = 0; i < height; ++i)
-        {
-            surface.SetPixel(0, i, color);
-    	    surface.SetPixel(width - 1, i, color);
-        }
-    }
-    else
-    {
-	for(u16 i = 0; i < width; ++i)
-	{
-    	    surface.SetPixel(i, 0, color);
-    	    if(i + 1 < width) surface.SetPixel(i + 1, 0, color);
-    	    i += 3;
-	}
-	for(u16 i = 0; i < width; ++i)
-	{
-    	    surface.SetPixel(i, height - 1, color);
-    	    if(i + 1 < width) surface.SetPixel(i + 1, height - 1, color);
-    	    i += 3;
-	}
-	for(u16 i = 0; i < height; ++i)
-	{
-    	    surface.SetPixel(0, i, color);
-    	    if(i + 1 < height) surface.SetPixel(0, i + 1, color);
-    	    i += 3;
-	}
-	for(u16 i = 0; i < height; ++i)
-	{
-    	    surface.SetPixel(width - 1, i, color);
-    	    if(i + 1 < height) surface.SetPixel(width - 1, i + 1, color);
-    	    i += 3;
-	}
-    }
-    surface.Unlock();
 }
 
 void Cursor::Show(void)
@@ -308,7 +252,7 @@ void Cursor::Show(void)
     if(! Settings::Get().ExtPocketHideCursor()) SpriteMove::Show();
 }
 
-Cursor::themes_t Cursor::DistanceThemes(themes_t theme, u16 dist)
+int Cursor::DistanceThemes(int theme, u32 dist)
 {
     if(0 == dist) return POINTER;
     else
@@ -322,10 +266,10 @@ Cursor::themes_t Cursor::DistanceThemes(themes_t theme, u16 dist)
 	case ANCHOR:
 	case CHANGE:
 	case ACTION:
-	    return static_cast<themes_t>(theme + 6 * (dist - 1));
+	    return theme + 6 * (dist - 1);
 
 	case REDBOAT:
-	    return static_cast<themes_t>(REDBOAT + dist - 1);
+	    return REDBOAT + dist - 1;
 
 	default: break;
     }
@@ -333,31 +277,31 @@ Cursor::themes_t Cursor::DistanceThemes(themes_t theme, u16 dist)
     return theme;
 }
 
-Cursor::themes_t Cursor::WithoutDistanceThemes(themes_t theme)
+int Cursor::WithoutDistanceThemes(int theme)
 {
     switch(theme)
     {
 	case MOVE2:
 	case MOVE3:
-	case MOVE4: return MOVE;
+	case MOVE4:	return MOVE;
 	case FIGHT2:
 	case FIGHT3:
-	case FIGHT4: return FIGHT;
+	case FIGHT4:	return FIGHT;
 	case BOAT2:
 	case BOAT3:
-	case BOAT4: return BOAT;
+	case BOAT4:	return BOAT;
 	case ANCHOR2:
 	case ANCHOR3:
-	case ANCHOR4: return ANCHOR;
+	case ANCHOR4:	return ANCHOR;
 	case CHANGE2:
 	case CHANGE3:
-	case CHANGE4: return CHANGE;
+	case CHANGE4:	return CHANGE;
 	case ACTION2:
 	case ACTION3:
-	case ACTION4: return ACTION;
+	case ACTION4:	return ACTION;
 	case REDBOAT2:
 	case REDBOAT3:
-	case REDBOAT4: return REDBOAT;
+	case REDBOAT4:	return REDBOAT;
 
 	default: break;
     }

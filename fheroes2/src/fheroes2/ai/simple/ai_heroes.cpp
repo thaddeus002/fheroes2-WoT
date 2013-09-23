@@ -80,7 +80,7 @@ bool AI::HeroesSkipFog(void)
     return false;
 }
 
-void AI::HeroesActionComplete(Heroes &, const s32 &)
+void AI::HeroesActionComplete(Heroes &, s32)
 {
 }
 
@@ -123,8 +123,8 @@ void AI::HeroesLevelUp(Heroes & hero)
 
 void AI::HeroesPreBattle(HeroBase & hero)
 {
-    Castle* castle = world.GetCastle(hero.GetIndex());
-    if(castle && hero.GetType() != Skill::Primary::CAPTAIN)
+    Castle* castle = world.GetCastle(hero.GetCenter());
+    if(castle && hero.GetType() != HeroBase::CAPTAIN)
 	hero.GetArmy().JoinTroops(castle->GetArmy());
 }
 
@@ -150,7 +150,7 @@ bool AIHeroesPriorityObject(const Heroes & hero, s32 index)
 
     if(MP2::OBJ_CASTLE == tile.GetObject())
     {
-	const Castle* castle = world.GetCastle(index);
+	const Castle* castle = world.GetCastle(Maps::GetPoint(index));
 	if(castle)
 	{
 	    if(hero.GetColor() == castle->GetColor())
@@ -195,7 +195,7 @@ bool AIHeroesPriorityObject(const Heroes & hero, s32 index)
     return false;
 }
 
-s32  FindUncharteredTerritory(Heroes & hero, const u8 & scoute)
+s32  FindUncharteredTerritory(Heroes & hero, u32 scoute)
 {
     Maps::Indexes v = Maps::GetAroundIndexes(hero.GetIndex(), scoute, true);
     Maps::Indexes res;
@@ -232,7 +232,7 @@ s32  FindUncharteredTerritory(Heroes & hero, const u8 & scoute)
     return result;
 }
 
-s32  GetRandomHeroesPosition(Heroes & hero, const u8 & scoute)
+s32  GetRandomHeroesPosition(Heroes & hero, u32 scoute)
 {
     Maps::Indexes v = Maps::GetAroundIndexes(hero.GetIndex(), scoute, true);
     Maps::Indexes res;
@@ -273,7 +273,7 @@ void AIHeroesAddedRescueTask(Heroes & hero)
 
     DEBUG(DBG_AI, DBG_TRACE, hero.GetName());
 
-    u8 scoute = hero.GetScoute();
+    u32 scoute = hero.GetScoute();
 
     switch(Settings::Get().GameDifficulty())
     {
@@ -318,7 +318,7 @@ void AIHeroesAddedTask(Heroes & hero)
     std::vector<IndexDistance> objs;
     objs.reserve(ai_objects.size());
 
-    for(std::map<s32, MP2::object_t>::const_iterator
+    for(std::map<s32, int>::const_iterator
 	it = ai_objects.begin(); it != ai_objects.end(); ++it)
     {
 	const Maps::Tiles & tile = world.GetTiles((*it).first);
@@ -528,7 +528,7 @@ bool AI::HeroesGetTask(Heroes & hero)
 
 	    const Castle* castle = NULL;
 
-	    if(NULL != (castle = world.GetCastle(ai_hero.primary_target)) &&
+	    if(NULL != (castle = world.GetCastle(Maps::GetPoint(ai_hero.primary_target))) &&
 		NULL != castle->GetHeroes().Guest() && castle->isFriends(hero.GetColor()))
 	    {
 		hero.SetModes(AI::HEROES_WAITING);
@@ -717,7 +717,7 @@ bool AIHeroesScheduledVisit(const Kingdom & kingdom, s32 index)
     return false;
 }
 
-bool IsPriorityAndNotVisitAndNotPresent(const std::pair<s32, MP2::object_t> indexObj, const Heroes* hero) /* GCC_REFERENCE_FAIL: GCC_VERSION < 40300 */
+bool IsPriorityAndNotVisitAndNotPresent(const std::pair<s32, int> & indexObj, const Heroes* hero)
 {
     AIHero & ai_hero = AIHeroes::Get(*hero);
     Queue & task = ai_hero.sheduled_visit;
@@ -744,9 +744,13 @@ void AIHeroesEnd(Heroes* hero)
 
 	IndexObjectMap::iterator it;
 
-	while(ai_objects.end() != (it = std::find_if(ai_objects.begin(), ai_objects.end(),
-		    std::bind2nd(std::ptr_fun(&IsPriorityAndNotVisitAndNotPresent), hero))))
+	while(true)
 	{
+	    for(it = ai_objects.begin(); it != ai_objects.end(); ++it)
+		if(IsPriorityAndNotVisitAndNotPresent(*it, hero)) break;
+
+	    if(ai_objects.end() == it) break;
+
 	    DEBUG(DBG_AI, DBG_TRACE, hero->GetName() << ", added priority object: " <<
 		MP2::StringObject((*it).second) << ", index: " << (*it).first);
 	    task.push_front((*it).first);
@@ -784,7 +788,7 @@ void AIHeroesCaptureNearestTown(Heroes* hero)
 	    for(MapsIndexes::const_iterator
 		it = castles.begin(); it != castles.end(); ++it)
 	    {
-		const Castle* castle = world.GetCastle(*it);
+		const Castle* castle = world.GetCastle(Maps::GetPoint(*it));
 
 		if(castle)
 		    DEBUG(DBG_AI, DBG_TRACE, hero->GetName() << ", to castle: " << castle->GetName());

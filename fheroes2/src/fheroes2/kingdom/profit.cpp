@@ -28,10 +28,6 @@
 #include "settings.h"
 #include "profit.h"
 
-#ifdef WITH_XML
-#include "xmlccwrap.h"
-#endif
-
 struct profitstats_t
 {
     const char* id;
@@ -94,7 +90,7 @@ void ProfitConditions::UpdateCosts(const std::string & spec)
 #endif
 }
 
-payment_t ProfitConditions::FromBuilding(u32 building, u8 race)
+payment_t ProfitConditions::FromBuilding(u32 building, int race)
 {
     payment_t result;
     const char* id = NULL;
@@ -118,7 +114,7 @@ payment_t ProfitConditions::FromBuilding(u32 building, u8 race)
     return result;
 }
 
-payment_t ProfitConditions::FromArtifact(u8 artifact)
+payment_t ProfitConditions::FromArtifact(int artifact)
 {
     payment_t result;
     const char* id = NULL;
@@ -149,7 +145,7 @@ payment_t ProfitConditions::FromArtifact(u8 artifact)
     return result;
 }
 
-payment_t ProfitConditions::FromMine(u8 type)
+payment_t ProfitConditions::FromMine(int type)
 {
     payment_t result;
     const char* id = NULL;

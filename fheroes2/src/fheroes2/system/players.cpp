@@ -22,9 +22,11 @@
 
 #include <algorithm>
 #include "agg.h"
+#include "text.h"
 #include "game.h"
 #include "color.h"
 #include "race.h"
+#include "dialog.h"
 #include "world.h"
 #include "maps_fileinfo.h"
 #include "settings.h"
@@ -33,7 +35,7 @@
 namespace
 {
     Player* _players[KINGDOMMAX + 1] = { NULL };
-    u8 human_colors = 0;
+    int human_colors = 0;
 
     enum { ST_INGAME = 0x2000 };
 }
@@ -53,7 +55,7 @@ void PlayerFixRandomRace(Player* player)
     if(player && player->race == Race::RAND) player->race = Race::Rand();
 }
 
-Player::Player(u8 col) : control(CONTROL_NONE), color(col), race(Race::NONE), friends(col), id(World::GetUniq())
+Player::Player(int col) : control(CONTROL_NONE), color(col), race(Race::NONE), friends(col), id(World::GetUniq())
 {
     name  = Color::String(color);
 }
@@ -83,7 +85,7 @@ bool Player::isID(u32 id2) const
     return id2 == id;
 }
 
-bool Player::isColor(u8 col) const
+bool Player::isColor(int col) const
 {
     return col == color;
 }
@@ -98,7 +100,7 @@ bool Player::isPlay(void) const
     return Modes(ST_INGAME);
 }
 
-void Player::SetControl(u8 ctl)
+void Player::SetControl(int ctl)
 {
     control = ctl;
 }
@@ -125,12 +127,19 @@ StreamBase & operator<< (StreamBase & msg, const Focus & focus)
 StreamBase & operator>> (StreamBase & msg, Focus & focus)
 {
     s32 index;
-    msg >> focus.first >> index;
+    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
+    {
+	u8 first;
+	msg >> first >> index;
+	focus.first = first;
+    }
+    else
+	msg >> focus.first >> index;
 
     switch(focus.first)
     {
-	case FOCUS_HEROES: focus.second = world.GetHeroes(index); break;
-	case FOCUS_CASTLE: focus.second = world.GetCastle(index); break;
+	case FOCUS_HEROES: focus.second = world.GetHeroes(Maps::GetPoint(index)); break;
+	case FOCUS_CASTLE: focus.second = world.GetCastle(Maps::GetPoint(index)); break;
 	default: focus.second = NULL; break;
     }
 
@@ -156,15 +165,31 @@ StreamBase & operator>> (StreamBase & msg, Player & player)
 {
     BitModes & modes = player;
 
-    return msg >>
+    msg >>
 	modes >>
-	player.id >>
-	player.control >>
-	player.color >>
-	player.race >>
-	player.friends >>
+	player.id;
+
+    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
+    {
+	u8 control, color, race, friends;
+
+	msg >>
+	    control >> color >> race >> friends;
+
+	player.control  = control;
+	player.color = color;
+	player.race = race;
+	player.friends = friends;
+    }
+    else
+	msg >>
+	    player.control >> player.color >> player.race >> player.friends;
+
+    msg >>
 	player.name >>
 	player.focus;
+
+    return msg;
 }
 
 Players::Players() : current_color(0)
@@ -184,14 +209,14 @@ void Players::clear(void)
 
     std::vector<Player*>::clear();
 
-    for(u8 ii = 0 ;ii < KINGDOMMAX + 1; ++ii)
+    for(u32 ii = 0 ;ii < KINGDOMMAX + 1; ++ii)
 	_players[ii] = NULL;
 
     current_color = 0;
     human_colors = 0;
 }
 
-void Players::Init(u8 colors)
+void Players::Init(int colors)
 {
     clear();
 
@@ -248,18 +273,18 @@ void Players::Init(const Maps::FileInfo & fi)
     }
 }
 
-Player* Players::Get(u8 color)
+Player* Players::Get(int color)
 {
     return _players[Color::GetIndex(color)];
 }
 
-bool Players::isFriends(u8 player, u8 colors)
+bool Players::isFriends(int player, int colors)
 {
     const Player* ptr = Get(player);
     return ptr ? ptr->friends & colors : false;
 }
 
-void Players::SetPlayerRace(u8 color, u8 race)
+void Players::SetPlayerRace(int color, int race)
 {
     Player* player = Get(color);
 
@@ -267,7 +292,7 @@ void Players::SetPlayerRace(u8 color, u8 race)
 	player->race = race;
 }
 
-void Players::SetPlayerControl(u8 color, u8 ctrl)
+void Players::SetPlayerControl(int color, int ctrl)
 {
     Player* player = Get(color);
 
@@ -275,9 +300,9 @@ void Players::SetPlayerControl(u8 color, u8 ctrl)
 	player->control = ctrl;
 }
 
-u8 Players::GetColors(u8 control, bool strong) const
+int Players::GetColors(int control, bool strong) const
 {
-    u8 res = 0;
+    int res = 0;
 
     for(const_iterator it = begin(); it != end(); ++it)
 	if(control == 0xFF ||
@@ -287,9 +312,9 @@ u8 Players::GetColors(u8 control, bool strong) const
     return res;
 }
 
-u8 Players::GetActualColors(void) const
+int Players::GetActualColors(void) const
 {
-    u8 res = 0;
+    int res = 0;
 
     for(const_iterator it = begin(); it != end(); ++it)
 	if((*it)->isPlay()) res |= (*it)->color;
@@ -307,40 +332,34 @@ const Player* Players::GetCurrent(void) const
     return Get(current_color);
 }
 
-u8 Players::GetPlayerFriends(u8 color)
+int Players::GetPlayerFriends(int color)
 {
     const Player* player = Get(color);
     return player ? player->friends : 0;
 }
 
-u8 Players::GetPlayerControl(u8 color)
+int Players::GetPlayerControl(int color)
 {
     const Player* player = Get(color);
     return player ? player->control : CONTROL_NONE;
 }
 
-u8 Players::GetPlayerRace(u8 color)
+int Players::GetPlayerRace(int color)
 {
     const Player* player = Get(color);
     return player ? player->race : Race::NONE;
 }
 
-bool Players::GetPlayerInGame(u8 color)
+bool Players::GetPlayerInGame(int color)
 {
     const Player* player = Get(color);
     return player && player->isPlay();
 }
 
-void Players::SetPlayerInGame(u8 color, bool f)
+void Players::SetPlayerInGame(int color, bool f)
 {
     Player* player = Get(color);
     if(player) player->SetPlay(f);
-}
-
-void Players::SetHumanColors(u8 cols) /* remove: server.cpp */
-{
-    for(iterator it = begin(); it != end(); ++it)
-	(*it)->control = (*it)->color & cols ? CONTROL_HUMAN : CONTROL_AI;
 }
 
 void Players::SetStartGame(void)
@@ -356,16 +375,16 @@ void Players::SetStartGame(void)
     DEBUG(DBG_GAME, DBG_INFO, String());
 }
 
-u8 Players::HumanColors(void)
+int Players::HumanColors(void)
 {
     if(0 == human_colors)
 	human_colors = Settings::Get().GetPlayers().GetColors(CONTROL_HUMAN, true);
     return human_colors;
 }
 
-u8 Players::FriendColors(void)
+int Players::FriendColors(void)
 {
-    u8 colors = 0;
+    int colors = 0;
     const Players & players = Settings::Get().GetPlayers();
 
     if(players.current_color & Players::HumanColors())
@@ -432,15 +451,23 @@ StreamBase & operator<< (StreamBase & msg, const Players & players)
 
 StreamBase & operator>> (StreamBase & msg, Players & players)
 {
-    u8 colors, current;
+    int colors, current;
 
-    msg >> colors >> current;
+    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
+    {
+	u8 colors2, current2;
+	msg >> colors2 >> current2;
+	colors = colors2;
+	current = current2;
+    }
+    else
+	msg >> colors >> current;
 
     players.clear();
     players.current_color = current;
     const Colors vcolors(colors);
 
-    for(u8 ii = 0; ii < vcolors.size(); ++ii)
+    for(u32 ii = 0; ii < vcolors.size(); ++ii)
     {
 	Player* player = new Player();
 	msg >> *player;
@@ -470,7 +497,7 @@ void Interface::PlayersInfo::UpdateInfo(Players & players, const Point & pt1, co
     for(Players::iterator
         it = players.begin(); it != players.end(); ++it)
     {
-        const u8 current = std::distance(players.begin(), it);
+        const u32 current = std::distance(players.begin(), it);
         PlayerInfo info;
 
         info.player = *it;
@@ -531,8 +558,8 @@ void Interface::PlayersInfo::RedrawInfo(bool show_play_info) const /* show_play_
     const Settings & conf = Settings::Get();
     const Maps::FileInfo & fi = conf.CurrentFileInfo();
 
-    const u8 humans_colors = conf.GetPlayers().GetColors(CONTROL_HUMAN, true);
-    u8 index = 0;
+    const u32 humans_colors = conf.GetPlayers().GetColors(CONTROL_HUMAN, true);
+    u32 index = 0;
 
     for(const_iterator it = begin(); it != end(); ++it)
     {
@@ -651,7 +678,7 @@ bool Interface::PlayersInfo::QueueEventProcessing(void)
     	    if((player->color & fi.AllowHumanColors()) &&
                 (! Settings::Get().GameType(Game::TYPE_MULTI) || ! (player->color & fi.HumanOnlyColors())))
             {
-                u8 humans = players.GetColors(CONTROL_HUMAN, true);
+                u32 humans = players.GetColors(CONTROL_HUMAN, true);
 
                 if(conf.GameType(Game::TYPE_MULTI))
                 {

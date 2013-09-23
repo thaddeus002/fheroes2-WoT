@@ -32,6 +32,7 @@
 #include "army_bar.h"
 #include "heroes_indicator.h"
 #include "pocketpc.h"
+#include "game.h"
 #include "game_interface.h"
 
 void RedrawPrimarySkillInfo(const Point &, PrimarySkillsBar*, PrimarySkillsBar*);
@@ -324,9 +325,9 @@ void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
 	return;
     }
 
-    const u8 scholar1 = hero1.GetLevelSkill(Skill::Secondary::EAGLEEYE);
-    const u8 scholar2 = hero2.GetLevelSkill(Skill::Secondary::EAGLEEYE);
-    u8 scholar = 0;
+    const int scholar1 = hero1.GetLevelSkill(Skill::Secondary::EAGLEEYE);
+    const int scholar2 = hero2.GetLevelSkill(Skill::Secondary::EAGLEEYE);
+    int scholar = 0;
 
     Heroes* teacher = NULL;
     Heroes* learner = NULL;

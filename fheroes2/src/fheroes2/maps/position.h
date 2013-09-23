@@ -39,7 +39,7 @@ namespace Maps
 	void SetCenter(const Point &);
 	void SetIndex(s32);
 
-	bool isPosition(s32) const;
+	bool isPosition(const Point &) const;
 
 	Point center;
     };

@@ -34,35 +34,25 @@ namespace Interface
     public:
 	Radar(Basic &);
 
-	void SetPos(s16, s16);
-	void SavePosition(void);
+	void SetPos(s32, s32);
 	void SetRedraw(void) const;
-
 	void Build(void);
-	void Generate(void);
 	void Redraw(void);
-	void RedrawArea(const u8 color = 0xFF);
 	void SetHide(bool);
-	void RedrawCursor(void);
-
 	void QueueEventProcessing(void);
 
     private:
-	Surface GetSurfaceFromColor(u8);
+	void SavePosition(void);
+	void Generate(void);
+	void RedrawObjects(int color = 0xFF);
+	void RedrawCursor(void);
 
 	Basic & interface;
 
         Surface spriteArea;
 	SpriteMove cursorArea;
 
-        Surface sf_blue;
-	Surface sf_green;
-        Surface sf_red;
-	Surface sf_yellow;
-        Surface sf_orange;
-	Surface sf_purple;
-        Surface sf_gray;
-	Surface sf_black;
+	Point offset;
 
 	bool hide;
     };

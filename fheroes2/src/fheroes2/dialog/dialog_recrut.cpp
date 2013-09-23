@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "text.h"
 #include "settings.h"
 #include "cursor.h"
 #include "payment.h"
@@ -28,9 +29,10 @@
 #include "button.h"
 #include "kingdom.h"
 #include "monster.h"
+#include "game.h"
 #include "dialog.h"
 
-void RedrawCurrentInfo(const Point & pos, u16 available, u32 result,
+void RedrawCurrentInfo(const Point & pos, u32 available, u32 result,
 	    const payment_t & paymentMonster, const payment_t & paymentCosts, const Funds & funds, const std::string & label)
 {
     Text text;
@@ -42,7 +44,7 @@ void RedrawCurrentInfo(const Point & pos, u16 available, u32 result,
     text.Set(GetString(result), Font::BIG);
     text.Blit(pos.x + 167 - text.w() / 2, pos.y + 160);
     const std::string sgold = GetString(paymentCosts.gold) + " " + "(" + GetString(funds.gold - paymentCosts.gold) + ")";
-    u8 rsext = paymentMonster.GetValidItems() & ~Resource::GOLD;
+    int rsext = paymentMonster.GetValidItems() & ~Resource::GOLD;
 
     if(rsext)
     {
@@ -63,7 +65,7 @@ void RedrawCurrentInfo(const Point & pos, u16 available, u32 result,
 }
 
 void RedrawResourceInfo(const Surface & sres, const Point & pos, s32 value,
-	u8 px1, u8 py1, u8 px2, u8 py2)
+	s32 px1, s32 py1, s32 px2, s32 py2)
 {
     Display & display = Display::Get();
     Point dst_pt;
@@ -241,14 +243,14 @@ u32 CalculateMax(const Monster & monster, const Kingdom & kingdom, u32 available
     return max;
 }
 
-Troop Dialog::RecruitMonster(const Monster & monster0, u16 available, bool ext)
+Troop Dialog::RecruitMonster(const Monster & monster0, u32 available, bool ext)
 {
     Display & display = Display::Get();
     LocalEvent & le = LocalEvent::Get();
 
     // cursor
     Cursor & cursor = Cursor::Get();
-    const Cursor::themes_t oldcursor = cursor.Themes();
+    const int oldcursor = cursor.Themes();
     cursor.Hide();
     cursor.SetThemes(Cursor::POINTER);
 
@@ -460,9 +462,9 @@ Troop Dialog::RecruitMonster(const Monster & monster0, u16 available, bool ext)
 	    redraw = false;
 	}
 
-	if(le.MouseClickLeft(buttonOk) || Game::HotKeyPress(Game::EVENT_DEFAULT_READY)) break;
+	if(le.MouseClickLeft(buttonOk) || Game::HotKeyPressEvent(Game::EVENT_DEFAULT_READY)) break;
 
-	if(le.MouseClickLeft(buttonCancel) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)){ result = 0; break; }
+	if(le.MouseClickLeft(buttonCancel) || Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)){ result = 0; break; }
     }
 
     cursor.Hide();
@@ -476,13 +478,13 @@ Troop Dialog::RecruitMonster(const Monster & monster0, u16 available, bool ext)
     return Troop(monster, result);
 }
 
-void Dialog::DwellingInfo(const Monster & monster, u16 available)
+void Dialog::DwellingInfo(const Monster & monster, u32 available)
 {
     Display & display = Display::Get();
 
     // cursor
     Cursor & cursor = Cursor::Get();
-    const Cursor::themes_t oldcursor = cursor.Themes();
+    const int oldcursor = cursor.Themes();
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 

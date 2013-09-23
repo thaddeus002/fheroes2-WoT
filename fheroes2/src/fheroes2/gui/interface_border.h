@@ -23,8 +23,8 @@
 #ifndef H2INTERFACE_BORDER_H
 #define H2INTERFACE_BORDER_H
 
-#include "dialog.h"
 #include "gamedefs.h"
+#include "dialog.h"
 
 namespace Interface
 {
@@ -36,18 +36,18 @@ namespace Interface
 	BorderWindow(const Rect &);
 	virtual ~BorderWindow(){}
 
-        virtual void SetPos(s16, s16) = 0;
-	virtual void SavePosition(void) = 0;
+        virtual void	SetPos(s32, s32) = 0;
+	virtual void	SavePosition(void) = 0;
 
-        void Redraw(void);
-        bool QueueEventProcessing(void);
+        void		Redraw(void);
+        bool		QueueEventProcessing(void);
 
-        const Rect & GetArea(void) const;
-	const Rect & GetRect(void) const;
+        const Rect &	GetArea(void) const;
+	const Rect &	GetRect(void) const;
 
     protected:
-        void SetPosition(s16, s16, u16, u16);
-        void SetPosition(s16, s16);
+        void		SetPosition(s32, s32, u32, u32);
+        void		SetPosition(s32, s32);
 
 	Rect			area;
         Dialog::FrameBorder	border;

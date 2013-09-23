@@ -24,6 +24,7 @@
 #include "settings.h"
 #include "world.h"
 #include "maps.h"
+#include "ground.h"
 #include "game.h"
 #include "game_interface.h"
 #include "route.h"
@@ -35,7 +36,7 @@
 namespace Game
 {
     // game_startgame.cpp
-    Cursor::themes_t GetCursor(s32);
+    int GetCursor(s32);
     void MouseCursorAreaClickLeft(s32);
     void MouseCursorAreaPressRight(s32);
 }
@@ -73,7 +74,7 @@ void Interface::GameArea::Build(void)
 		    Display::Get().h() - 2 * BORDERWIDTH);
 }
 
-void Interface::GameArea::SetAreaPosition(s16 x, s16 y, u16 w, u16 h)
+void Interface::GameArea::SetAreaPosition(s32 x, s32 y, u32 w, u32 h)
 {
     areaPosition.x = x;
     areaPosition.y = y;
@@ -115,7 +116,7 @@ void Interface::GameArea::BlitOnTile(Surface & dst, const Sprite & src, const Po
     BlitOnTile(dst, src, src.x(), src.y(), mp);
 }
 
-void Interface::GameArea::BlitOnTile(Surface & dst, const Surface & src, const s16 ox, const s16 oy, const Point & mp) const
+void Interface::GameArea::BlitOnTile(Surface & dst, const Surface & src, s32 ox, s32 oy, const Point & mp) const
 {
     Point dstpt(rectMapsPosition.x + TILEWIDTH * (mp.x - rectMaps.x) + ox,
 		rectMapsPosition.y + TILEWIDTH * (mp.y - rectMaps.y) + oy);
@@ -126,39 +127,39 @@ void Interface::GameArea::BlitOnTile(Surface & dst, const Surface & src, const s
     }
 }
 
-void Interface::GameArea::Redraw(Surface & dst, u8 flag) const
+void Interface::GameArea::Redraw(Surface & dst, int flag) const
 {
     return Redraw(dst, flag, Rect(0, 0, rectMaps.w, rectMaps.h));
 }
 
-void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
+void Interface::GameArea::Redraw(Surface & dst, int flag, const Rect & rt) const
 {
     // tile
-    for(s16 oy = rt.y; oy < rt.y + rt.h; ++oy)
-	for(s16 ox = rt.x; ox < rt.x + rt.w; ++ox)
+    for(s32 oy = rt.y; oy < rt.y + rt.h; ++oy)
+	for(s32 ox = rt.x; ox < rt.x + rt.w; ++ox)
 	    world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawTile(dst);
 
     // bottom
     if(flag & LEVEL_BOTTOM)
-    for(s16 oy = rt.y; oy < rt.y + rt.h; ++oy)
-	for(s16 ox = rt.x; ox < rt.x + rt.w; ++ox)
+    for(s32 oy = rt.y; oy < rt.y + rt.h; ++oy)
+	for(s32 ox = rt.x; ox < rt.x + rt.w; ++ox)
 	    world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawBottom(dst, !(flag & LEVEL_OBJECTS));
 
     // ext object
     if(flag & LEVEL_OBJECTS)
-    for(s16 oy = rt.y; oy < rt.y + rt.h; ++oy)
-	for(s16 ox = rt.x; ox < rt.x + rt.w; ++ox)
+    for(s32 oy = rt.y; oy < rt.y + rt.h; ++oy)
+	for(s32 ox = rt.x; ox < rt.x + rt.w; ++ox)
 	    world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawObjects(dst);
 
     // top
     if(flag & LEVEL_TOP)
-    for(s16 oy = rt.y; oy < rt.y + rt.h; ++oy)
-	for(s16 ox = rt.x; ox < rt.x + rt.w; ++ox)
+    for(s32 oy = rt.y; oy < rt.y + rt.h; ++oy)
+	for(s32 ox = rt.x; ox < rt.x + rt.w; ++ox)
 	    world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawTop(dst);
 
     // heroes
-    for(s16 oy = rt.y; oy < rt.y + rt.h; ++oy)
-	for(s16 ox = rt.x; ox < rt.x + rt.w; ++ox)
+    for(s32 oy = rt.y; oy < rt.y + rt.h; ++oy)
+	for(s32 ox = rt.x; ox < rt.x + rt.w; ++ox)
     {
 	const Maps::Tiles & tile = world.GetTiles(rectMaps.x + ox, rectMaps.y + oy);
 
@@ -175,7 +176,7 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
     if(hero && hero->GetPath().isShow())
     {
 	s32 from = hero->GetIndex();
-	s16 green = hero->GetPath().GetAllowStep();
+	s32 green = hero->GetPath().GetAllowStep();
 
 	const bool skipfirst = hero->isEnableMove() && 45 > hero->GetSpriteIndex() && 2 < (hero->GetSpriteIndex() % 9);
 
@@ -196,7 +197,7 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
 	    // check skip first?
 	       ! (it1 == hero->GetPath().begin() && skipfirst))
 	    {
-		const u16 index = (it3 == it2 ? 0 :
+		const u32 index = (it3 == it2 ? 0 :
 		    Route::Path::GetIndexSprite((*it1).GetDirection(), (*it3).GetDirection(), 
 			Maps::Ground::GetPenalty(from, Direction::CENTER, hero->GetLevelSkill(Skill::Secondary::PATHFINDING))));
 
@@ -214,8 +215,8 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
 	{
 	    u32 col = dst.GetColorIndex(0x40);
 
-	    for(s16 oy = rt.y; oy < rt.y + rt.h; ++oy)
-		for(s16 ox = rt.x; ox < rt.x + rt.w; ++ox)
+	    for(s32 oy = rt.y; oy < rt.y + rt.h; ++oy)
+		for(s32 ox = rt.x; ox < rt.x + rt.w; ++ox)
 	    {
     		const Point dstpt(rectMapsPosition.x + TILEWIDTH * ox,
 				rectMapsPosition.y + TILEWIDTH * oy);
@@ -235,10 +236,10 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
     // redraw fog
     if(flag & LEVEL_FOG)
     {
-	const u8 colors = Players::FriendColors();
+	const int colors = Players::FriendColors();
 
-	for(s16 oy = rt.y; oy < rt.y + rt.h; ++oy)
-	    for(s16 ox = rt.x; ox < rt.x + rt.w; ++ox)
+	for(s32 oy = rt.y; oy < rt.y + rt.h; ++oy)
+	    for(s32 ox = rt.x; ox < rt.x + rt.w; ++ox)
 	{
 	    const Maps::Tiles & tile = world.GetTiles(rectMaps.x + ox, rectMaps.y + oy);
 
@@ -316,7 +317,7 @@ void Interface::GameArea::SetCenter(const Point &pt)
     SetCenter(pt.x, pt.y);
 }
 
-void Interface::GameArea::SetCenter(s16 px, s16 py)
+void Interface::GameArea::SetCenter(s32 px, s32 py)
 {
     Point pos(px - rectMaps.w / 2, py - rectMaps.h / 2);
 
@@ -404,7 +405,7 @@ void Interface::GameArea::SetCenter(s16 px, s16 py)
     if(scrollDirection) Scroll();
 }
 
-void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const s32 index, Surface & sf)
+void Interface::GameArea::GenerateUltimateArtifactAreaSurface(s32 index, Surface & sf)
 {
     if(Maps::isValidAbsIndex(index))
     {
@@ -422,12 +423,12 @@ void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const s32 index, S
 	gamearea.Redraw(sf, LEVEL_BOTTOM | LEVEL_TOP);
 
 	// blit marker
-	for(u8 ii = 0; ii < rectMaps.h; ++ii) if(index < Maps::GetIndexFromAbsPoint(rectMaps.x + rectMaps.w - 1, rectMaps.y + ii))
+	for(u32 ii = 0; ii < rectMaps.h; ++ii) if(index < Maps::GetIndexFromAbsPoint(rectMaps.x + rectMaps.w - 1, rectMaps.y + ii))
 	{
 	    pt.y = ii;
 	    break;
 	}
-	for(u8 ii = 0; ii < rectMaps.w; ++ii) if(index == Maps::GetIndexFromAbsPoint(rectMaps.x + ii, rectMaps.y + pt.y))
+	for(u32 ii = 0; ii < rectMaps.w; ++ii) if(index == Maps::GetIndexFromAbsPoint(rectMaps.x + ii, rectMaps.y + pt.y))
 	{
 	    pt.x = ii;
 	    break;
@@ -441,7 +442,7 @@ void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const s32 index, S
 
 	if(Settings::Get().QVGA())
 	{
-    	    Surface sf2 = Surface::ScaleMinifyByTwo(sf);
+    	    Surface sf2 = Sprite::ScaleQVGA(sf);
     	    Surface::Swap(sf2, sf);
 	}
 
@@ -456,7 +457,7 @@ bool Interface::GameArea::NeedScroll(void) const
     return scrollDirection;
 }
 
-Cursor::themes_t Interface::GameArea::GetScrollCursor(void) const
+int Interface::GameArea::GetScrollCursor(void) const
 {
     switch(scrollDirection)
     {
@@ -475,7 +476,7 @@ Cursor::themes_t Interface::GameArea::GetScrollCursor(void) const
     return Cursor::NONE;
 }
 
-void Interface::GameArea::SetScroll(scroll_t direct)
+void Interface::GameArea::SetScroll(int direct)
 {
     switch(direct)
     {
@@ -545,8 +546,8 @@ void Interface::GameArea::QueueEventProcessing(void)
     // out of range
     if(index < 0) return;
 
-    const Rect tile_pos(rectMapsPosition.x + ((u16) (mp.x - rectMapsPosition.x) / TILEWIDTH) * TILEWIDTH,
-	                rectMapsPosition.y + ((u16) (mp.y - rectMapsPosition.y) / TILEWIDTH) * TILEWIDTH,
+    const Rect tile_pos(rectMapsPosition.x + ((mp.x - rectMapsPosition.x) / TILEWIDTH) * TILEWIDTH,
+	                rectMapsPosition.y + ((mp.y - rectMapsPosition.y) / TILEWIDTH) * TILEWIDTH,
 	                TILEWIDTH, TILEWIDTH);
 
     // change cusor if need
@@ -574,10 +575,10 @@ void Interface::GameArea::QueueEventProcessing(void)
 
 		if(pt1 != pt2)
 		{
-		    s16 dx = pt2.x - pt1.x;
-		    s16 dy = pt2.y - pt1.y;
-		    s16 d2x = scrollStepX;
-		    s16 d2y = scrollStepY;
+		    s32 dx = pt2.x - pt1.x;
+		    s32 dy = pt2.y - pt1.y;
+		    s32 d2x = scrollStepX;
+		    s32 d2y = scrollStepY;
 
 		    while(1)
 		    {

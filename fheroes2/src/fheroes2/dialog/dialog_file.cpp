@@ -21,21 +21,23 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "text.h"
 #include "button.h"
 #include "cursor.h"
 #include "settings.h"
+#include "game.h"
 #include "dialog.h"
 
-Game::menu_t Dialog::FileOptions(void)
+int Dialog::FileOptions(void)
 {
     Display & display = Display::Get();
     // preload
-    const ICN::icn_t cpanbkg = Settings::Get().ExtGameEvilInterface() ? ICN::CPANBKGE : ICN::CPANBKG;
-    const ICN::icn_t cpanel  = Settings::Get().ExtGameEvilInterface() ? ICN::CPANELE : ICN::CPANEL;
+    const int cpanbkg = Settings::Get().ExtGameEvilInterface() ? ICN::CPANBKGE : ICN::CPANBKG;
+    const int cpanel  = Settings::Get().ExtGameEvilInterface() ? ICN::CPANELE : ICN::CPANEL;
 
     // cursor
     Cursor & cursor = Cursor::Get();
-    const Cursor::themes_t oldcursor = cursor.Themes();
+    const int oldcursor = cursor.Themes();
     cursor.Hide();
     cursor.SetThemes(Cursor::POINTER);
 
@@ -63,7 +65,7 @@ Game::menu_t Dialog::FileOptions(void)
     cursor.Show();
     display.Flip();
 
-    Game::menu_t result = Game::QUITGAME;
+    int result = Game::QUITGAME;
 
     // dialog menu loop
     while(le.HandleEvents())
@@ -78,7 +80,7 @@ Game::menu_t Dialog::FileOptions(void)
         if(le.MouseClickLeft(buttonLoad)){ result = Game::LOADGAME; break; }
         if(le.MouseClickLeft(buttonSave)){ result = Game::SAVEGAME; break; }
         if(le.MouseClickLeft(buttonQuit)){ result = Game::QUITGAME; break; }
-        if(le.MouseClickLeft(buttonCancel) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)){ result = Game::CANCEL; break; }
+        if(le.MouseClickLeft(buttonCancel) || Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)){ result = Game::CANCEL; break; }
     }
 
     // restore background

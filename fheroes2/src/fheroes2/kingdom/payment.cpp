@@ -27,10 +27,6 @@
 #include "settings.h"
 #include "payment.h"
 
-#ifdef WITH_XML
-#include "xmlccwrap.h"
-#endif
-
 struct paymentstats_t
 {
     const char* id;
@@ -92,7 +88,7 @@ void PaymentConditions::UpdateCosts(const std::string & spec)
 #endif
 }
 
-payment_t PaymentConditions::BuyBuilding(u8 race, u32 build)
+payment_t PaymentConditions::BuyBuilding(int race, u32 build)
 {
     return BuildingInfo::GetCost(build, race);
 }
@@ -108,7 +104,7 @@ payment_t PaymentConditions::BuyBoat(void)
     return result;
 }
 
-payment_t PaymentConditions::BuySpellBook(u8 shrine)
+payment_t PaymentConditions::BuySpellBook(int shrine)
 {
     payment_t result;
     paymentstats_t* ptr = &_payments[0];
@@ -128,7 +124,7 @@ payment_t PaymentConditions::BuySpellBook(u8 shrine)
     return result;
 }
 
-payment_t PaymentConditions::RecruitHero(u8 level)
+payment_t PaymentConditions::RecruitHero(int level)
 {
     payment_t result;
     paymentstats_t* ptr = &_payments[0];
@@ -155,7 +151,7 @@ payment_t PaymentConditions::RecruitHero(u8 level)
     return result;
 }
 
-payment_t PaymentConditions::ForAlchemist(u8 arts)
+payment_t PaymentConditions::ForAlchemist(int arts)
 {
     payment_t result;
     paymentstats_t* ptr = &_payments[0];

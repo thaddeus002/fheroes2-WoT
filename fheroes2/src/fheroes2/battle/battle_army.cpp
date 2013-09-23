@@ -85,10 +85,10 @@ namespace Battle
 
 	if(result && orders_mode)
 	{
-	    if(result == *it1)
+	    if(result == *it1 && it1 != units1.end())
 		units1.erase(it1);
 	    else
-	    if(result == *it2)
+	    if(result == *it2 && it2 != units2.end())
 		units2.erase(it2);
 	}
 
@@ -204,10 +204,10 @@ Battle::Force::Force(Army & parent, bool opposite) : army(parent)
 {
     uids.reserve(army.Size());
 
-    for(u8 index = 0; index < army.Size(); ++index)
+    for(u32 index = 0; index < army.Size(); ++index)
     {
 	const Troop* troop = army.GetTroop(index);
-	const u16 position = army.isSpreadFormat() ? index * 22 : 22 + index * 11;
+	const u32 position = army.isSpreadFormat() ? index * 22 : 22 + index * 11;
 	u32 uid = 0;
 
 	if(troop && troop->isValid())
@@ -236,12 +236,12 @@ HeroBase* Battle::Force::GetCommander(void)
     return army.GetCommander();
 }
 
-u8 Battle::Force::GetColor(void) const
+int Battle::Force::GetColor(void) const
 {
     return army.GetColor();
 }
 
-u8 Battle::Force::GetControl(void) const
+int Battle::Force::GetControl(void) const
 {
     return army.GetControl();
 }
@@ -299,7 +299,7 @@ void Battle::Force::NewTurn(void)
     std::for_each(begin(), end(), std::mem_fun(&Unit::NewTurn));
 }
 
-bool isUnitFirst(const Battle::Unit* last, bool part1, u8 army2_color)
+bool isUnitFirst(const Battle::Unit* last, bool part1, int army2_color)
 {
     return (!last && part1) || (last && army2_color == last->GetColor());
 }
@@ -479,7 +479,7 @@ u32 Battle::Force::GetDeadHitPoints(void) const
 
 void Battle::Force::SyncArmyCount(void)
 {
-    for(u8 index = 0; index < army.Size(); ++index)
+    for(u32 index = 0; index < army.Size(); ++index)
     {
 	Troop* troop = army.GetTroop(index);
 

@@ -27,6 +27,8 @@
 #include "heroes.h"
 #include "difficulty.h"
 #include "gameevent.h"
+#include "color.h"
+#include "game.h"
 #include "profit.h"
 #include "world.h"
 #include "visit.h"
@@ -48,7 +50,7 @@ Kingdom::Kingdom() : color(Color::NONE), lost_town_days(0), visited_tents_colors
     heroes_cond_loss.reserve(4);
 }
 
-void Kingdom::Init(u8 clr)
+void Kingdom::Init(int clr)
 {
     clear();
     color = clr;
@@ -83,17 +85,17 @@ void Kingdom::clear(void)
     heroes_cond_loss.clear();
 }
 
-u8 Kingdom::GetControl(void) const
+int Kingdom::GetControl(void) const
 {
     return Players::GetPlayerControl(color);
 }
 
-Color::color_t Kingdom::GetColor(void) const
+int Kingdom::GetColor(void) const
 {
-    return Color::Get(color);
+    return color;
 }
 
-u8 Kingdom::GetRace(void) const
+int Kingdom::GetRace(void) const
 {
     return Players::GetPlayerRace(GetColor());
 }
@@ -306,31 +308,30 @@ void Kingdom::RemoveCastle(const Castle* castle)
     if(isLoss()) LossPostActions();
 }
 
-u8 Kingdom::GetCountCastle(void) const
+u32 Kingdom::GetCountCastle(void) const
 {
     return std::count_if(castles.begin(), castles.end(), Castle::PredicateIsCastle);
 }
 
-u8 Kingdom::GetCountTown(void) const
+u32 Kingdom::GetCountTown(void) const
 {
     return std::count_if(castles.begin(), castles.end(), Castle::PredicateIsTown);
 }
 
-u8 Kingdom::GetCountMarketplace(void) const
+u32 Kingdom::GetCountMarketplace(void) const
 {
     return std::count_if(castles.begin(), castles.end(), Castle::PredicateIsBuildMarketplace);
 }
 
-u8 Kingdom::GetCountNecromancyShrineBuild(void) const
+u32 Kingdom::GetCountNecromancyShrineBuild(void) const
 {
     return std::count_if(castles.begin(), castles.end(), std::mem_fun(&Castle::isNecromancyShrineBuild));
 }
 
-u8 Kingdom::GetCountBuilding(u32 build) const
+u32 Kingdom::GetCountBuilding(u32 build) const
 {
     return std::count_if(castles.begin(), castles.end(), std::bind2nd(std::mem_fun(&Castle::isBuild), build));
 }
-
 
 bool Kingdom::AllowPayment(const Funds & funds) const
 {
@@ -350,25 +351,25 @@ bool Kingdom::isVisited(const Maps::Tiles & tile) const
     return isVisited(tile.GetIndex(), tile.GetObject());
 }
 
-bool Kingdom::isVisited(s32 index, u8 object) const
+bool Kingdom::isVisited(s32 index, int object) const
 {
     std::list<IndexObject>::const_iterator it = std::find_if(visit_object.begin(), visit_object.end(), std::bind2nd(std::mem_fun_ref(&IndexObject::isIndex), index));
     return visit_object.end() != it && (*it).isObject(object);
 }
 
 /* return true if object visited */
-bool Kingdom::isVisited(const u8 object) const
+bool Kingdom::isVisited(int object) const
 {
     return visit_object.end() != std::find_if(visit_object.begin(), visit_object.end(), std::bind2nd(std::mem_fun_ref(&IndexObject::isObject), object));
 }
 
-u16 Kingdom::CountVisitedObjects(const MP2::object_t object) const
+u32 Kingdom::CountVisitedObjects(int object) const
 {
     return std::count_if(visit_object.begin(), visit_object.end(), std::bind2nd(std::mem_fun_ref(&IndexObject::isObject), object));
 }
 
 /* set visited cell */
-void Kingdom::SetVisited(const s32 index, const MP2::object_t object)
+void Kingdom::SetVisited(s32 index, int object)
 {
     if(!isVisited(index, object) && object != MP2::OBJ_ZERO) visit_object.push_front(IndexObject(index, object));
 }
@@ -378,7 +379,7 @@ bool Kingdom::HeroesMayStillMove(void) const
     return heroes.end() != std::find_if(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::MayStillMove));
 }
 
-u8 Kingdom::GetCountCapital(void) const
+u32 Kingdom::GetCountCapital(void) const
 {
     return std::count_if(castles.begin(), castles.end(), Castle::PredicateIsCapital);
 }
@@ -393,7 +394,7 @@ void Kingdom::OddFundsResource(const Funds & funds)
     resource = resource - funds;
 }
 
-u8 Kingdom::GetLostTownDays(void) const
+u32 Kingdom::GetLostTownDays(void) const
 {
     return lost_town_days;
 }
@@ -431,17 +432,17 @@ Puzzle & Kingdom::PuzzleMaps(void)
     return puzzle_maps;
 }
 
-void Kingdom::SetVisitTravelersTent(u8 col)
+void Kingdom::SetVisitTravelersTent(int col)
 {
     visited_tents_colors |= col;
 }
 
-bool Kingdom::IsVisitTravelersTent(u8 col) const
+bool Kingdom::IsVisitTravelersTent(int col) const
 {
     return visited_tents_colors & col;
 }
 
-bool Kingdom::AllowRecruitHero(bool check_payment, u8 level) const
+bool Kingdom::AllowRecruitHero(bool check_payment, int level) const
 {
     return (heroes.size() < GetMaxHeroes()) && (!check_payment || AllowPayment(PaymentConditions::RecruitHero(level)));
 }
@@ -480,7 +481,7 @@ void Kingdom::ApplyPlayWithStartingHero(void)
     }
 }
 
-u8 Kingdom::GetMaxHeroes(void)
+u32 Kingdom::GetMaxHeroes(void)
 {
     return GameStatic::GetKingdomMaxHeroes();
 }
@@ -492,7 +493,7 @@ void Kingdom::HeroesActionNewPosition(void)
     std::for_each(heroes2.begin(), heroes2.end(), std::mem_fun(&Heroes::ActionNewPosition));
 }
 
-Funds Kingdom::GetIncome(u8 type /* INCOME_ALL */) const
+Funds Kingdom::GetIncome(int type /* INCOME_ALL */) const
 {
     Funds resource;
 
@@ -502,7 +503,7 @@ Funds Kingdom::GetIncome(u8 type /* INCOME_ALL */) const
 	const u8 resources[] = { Resource::WOOD, Resource::ORE, Resource::MERCURY, Resource::SULFUR,
                                     Resource::CRYSTAL, Resource::GEMS, Resource::GOLD, Resource::UNKNOWN };
 
-	for(u8 index = 0; resources[index] != Resource::UNKNOWN; ++index)
+	for(u32 index = 0; resources[index] != Resource::UNKNOWN; ++index)
     	    resource += ProfitConditions::FromMine(resources[index]) *
                             	    world.CountCapturedMines(resources[index], GetColor());
     }
@@ -536,7 +537,7 @@ Funds Kingdom::GetIncome(u8 type /* INCOME_ALL */) const
                 Artifact::ENDLESS_POUCH_GEMS, Artifact::ENDLESS_CORD_WOOD, Artifact::ENDLESS_CART_ORE,
                 Artifact::ENDLESS_POUCH_CRYSTAL, Artifact::UNKNOWN };
 
-	for(u8 index = 0; artifacts[index] != Artifact::UNKNOWN; ++index)
+	for(u32 index = 0; artifacts[index] != Artifact::UNKNOWN; ++index)
 	    for(KingdomHeroes::const_iterator
 		ith = heroes.begin(); ith != heroes.end(); ++ith)
     		resource += ProfitConditions::FromArtifact(artifacts[index]) * 
@@ -595,24 +596,24 @@ void Kingdoms::Init(void)
 	GetKingdom(*it).Init(*it);
 }
 
-u8 Kingdoms::size(void) const
+u32 Kingdoms::size(void) const
 {
     return KINGDOMMAX + 1;
 }
 
 void Kingdoms::clear(void)
 {
-    for(u8 ii = 0; ii < size(); ++ii)
+    for(u32 ii = 0; ii < size(); ++ii)
 	kingdoms[ii].clear();
 }
 
 void Kingdoms::ApplyPlayWithStartingHero(void)
 {
-    for(u8 ii = 0; ii < size(); ++ii)
+    for(u32 ii = 0; ii < size(); ++ii)
 	if(kingdoms[ii].isPlay()) kingdoms[ii].ApplyPlayWithStartingHero();
 }
 
-const Kingdom & Kingdoms::GetKingdom(u8 color) const
+const Kingdom & Kingdoms::GetKingdom(int color) const
 {
     switch(color)
     {
@@ -628,7 +629,7 @@ const Kingdom & Kingdoms::GetKingdom(u8 color) const
     return kingdoms[6];
 }
 
-Kingdom & Kingdoms::GetKingdom(u8 color)
+Kingdom & Kingdoms::GetKingdom(int color)
 {
     switch(color)
     {
@@ -664,43 +665,43 @@ Heroes* Kingdom::GetLastLostHero(void) const
 
 void Kingdoms::NewDay(void)
 {
-    for(u8 ii = 0; ii < size(); ++ii)
+    for(u32 ii = 0; ii < size(); ++ii)
 	if(kingdoms[ii].isPlay()) kingdoms[ii].ActionNewDay();
 }
 
 void Kingdoms::NewWeek(void)
 {
-    for(u8 ii = 0; ii < size(); ++ii)
+    for(u32 ii = 0; ii < size(); ++ii)
 	if(kingdoms[ii].isPlay()) kingdoms[ii].ActionNewWeek();
 }
 
 void Kingdoms::NewMonth(void)
 {
-    for(u8 ii = 0; ii < size(); ++ii)
+    for(u32 ii = 0; ii < size(); ++ii)
 	if(kingdoms[ii].isPlay()) kingdoms[ii].ActionNewMonth();
 }
 
-u8 Kingdoms::GetNotLossColors(void) const
+int Kingdoms::GetNotLossColors(void) const
 {
-    u8 result = 0;
-    for(u8 ii = 0; ii < size(); ++ii)
+    int result = 0;
+    for(u32 ii = 0; ii < size(); ++ii)
 	if(kingdoms[ii].GetColor() &&
 	    ! kingdoms[ii].isLoss()) result |= kingdoms[ii].GetColor();
     return result;
 }
 
-u8 Kingdoms::GetLossColors(void) const
+int Kingdoms::GetLossColors(void) const
 {
-    u8 result = 0;
-    for(u8 ii = 0; ii < size(); ++ii)
+    int result = 0;
+    for(u32 ii = 0; ii < size(); ++ii)
 	if(kingdoms[ii].GetColor() &&
 	    kingdoms[ii].isLoss()) result |= kingdoms[ii].GetColor();
     return result;
 }
 
-u8 Kingdoms::FindWins(u16 cond) const
+int Kingdoms::FindWins(int cond) const
 {
-    for(u8 ii = 0; ii < size(); ++ii)
+    for(u32 ii = 0; ii < size(); ++ii)
 	if(kingdoms[ii].GetColor() &&
 	    world.KingdomIsWins(kingdoms[ii], cond))
 		return kingdoms[ii].GetColor();
@@ -740,12 +741,12 @@ void Kingdoms::AddCastles(const AllCastles & castles)
         if((*it)->GetColor()) GetKingdom((*it)->GetColor()).AddCastle(*it);
 }
 
-void Kingdoms::AddTributeEvents(CapturedObjects & captureobj, u16 day, u8 obj)
+void Kingdoms::AddTributeEvents(CapturedObjects & captureobj, u32 day, int obj)
 {
-    for(u8 ii = 0; ii < size(); ++ii)
+    for(u32 ii = 0; ii < size(); ++ii)
 	if(kingdoms[ii].isPlay())
     {
-	const u8 & color = kingdoms[ii].GetColor();
+	const int color = kingdoms[ii].GetColor();
 	const Funds & funds = captureobj.TributeCapturedObject(color, obj);
 
 	kingdoms[ii].AddFundsResource(funds);
@@ -785,7 +786,30 @@ StreamBase & operator<< (StreamBase & msg, const Kingdom & kingdom)
 
 StreamBase & operator>> (StreamBase & msg, Kingdom & kingdom)
 {
-    return msg >>
+    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
+    {
+	u8 color, days, tents;
+	msg >>
+	kingdom.modes >>
+	color >>
+	kingdom.resource >>
+	days >>
+	kingdom.castles >>
+	kingdom.heroes >>
+	kingdom.recruits >>
+	kingdom.lost_hero >>
+	kingdom.visit_object >>
+	kingdom.puzzle_maps >>
+	tents >>
+	kingdom.heroes_cond_loss;
+
+	kingdom.color = color;
+	kingdom.lost_town_days = days;
+	kingdom.visited_tents_colors = tents;
+    }
+    else
+    {
+	msg >>
 	kingdom.modes >>
 	kingdom.color >>
 	kingdom.resource >>
@@ -798,12 +822,15 @@ StreamBase & operator>> (StreamBase & msg, Kingdom & kingdom)
 	kingdom.puzzle_maps >>
 	kingdom.visited_tents_colors >>
 	kingdom.heroes_cond_loss;
+    }
+
+    return msg;
 }
 
 StreamBase & operator<< (StreamBase & msg, const Kingdoms & obj)
 {
     msg << static_cast<u8>(obj.size());
-    for(u8 ii = 0; ii < obj.size(); ++ii)
+    for(u32 ii = 0; ii < obj.size(); ++ii)
 	msg << obj.kingdoms[ii];
 
     return msg;
@@ -815,8 +842,23 @@ StreamBase & operator>> (StreamBase & msg, Kingdoms & obj)
 
     msg >> kingdomscount; // FIXME: check kingdomscount
 
-    for(u8 ii = 0; ii < kingdomscount; ++ii)
+    for(u32 ii = 0; ii < kingdomscount; ++ii)
 	msg >> obj.kingdoms[ii];
 
     return msg;
+}
+
+StreamBase & operator>> (StreamBase & sb, LastLoseHero & st)
+{
+    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
+    {
+        u8 type; u16 days;
+        sb >> type >> days;
+        st.first = type;
+        st.second = days;
+    }
+    else
+        sb >> st.first >> st.second;
+
+    return sb;
 }

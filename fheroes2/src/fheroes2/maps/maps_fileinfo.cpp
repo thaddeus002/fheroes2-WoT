@@ -31,14 +31,13 @@
 #include "settings.h"
 #include "dir.h"
 #include "artifact.h"
+#include "game.h"
+#include "game_io.h"
+#include "game_over.h"
 #include "maps_fileinfo.h"
 
 #define LENGTHNAME		16
 #define LENGTHDESCRIPTION	143
-
-#ifdef WITH_XML
-#include "xmlccwrap.h"
-#endif
 
 template <typename CharType>
 bool AlphabeticalCompare(const std::basic_string<CharType> & lhs, const std::basic_string<CharType> & rhs)
@@ -54,7 +53,7 @@ namespace Editor
     	Loss = 0x2000, LoseTown = 0x2001, LoseHero = 0x2002, OutTime = 0x2003 };
 }
 
-u8 ByteToColor(u8 byte)
+int ByteToColor(int byte)
 {
     switch(byte)
     {
@@ -71,7 +70,7 @@ u8 ByteToColor(u8 byte)
     return Color::NONE;
 }
 
-u8 ByteToRace(u8 byte)
+int ByteToRace(int byte)
 {
     switch(byte)
     {
@@ -118,7 +117,7 @@ void Maps::FileInfo::Reset(void)
     localtime = 0;
     with_heroes = false;
 
-    for(u8 ii = 0; ii < KINGDOMMAX; ++ii)
+    for(u32 ii = 0; ii < KINGDOMMAX; ++ii)
     {
 	races[ii] = Race::NONE;
 	unions[ii] = ByteToColor(ii);
@@ -152,26 +151,26 @@ bool Maps::FileInfo::ReadMAP(const std::string & filename)
 	const TiXmlElement* xml;
 
 	xml = xml_header->FirstChildElement("name");
-	if(xml) name = xml->GetText();
+	if(xml && xml->GetText()) name = xml->GetText();
 
 	xml = xml_header->FirstChildElement("description");
-	if(xml) description = xml->GetText();
+	if(xml && xml->GetText()) description = xml->GetText();
 
 	xml = xml_header->FirstChildElement("info");
 
-	if(xml)
+	if(xml && xml->GetText())
 	{
-	    std::string info = xml->GetText();
-	    std::vector<u8> bytes = decodeBase64(info);
-	
+	    std::vector<u8> bytes = decodeBase64(xml->GetText());
+	    StreamBuf st(bytes);
+
 	    if(bytes.size() >= 89)
 	    {
-		ReadLE32(& bytes[0]); // version
-		localtime = ReadLE32(& bytes[4]);
-		size_w = ReadLE32(& bytes[8]);
-		size_h = ReadLE32(& bytes[12]);
+		st.skip(4); // version
+		localtime = st.getLE32();
+		size_w = st.getLE32();
+		size_h = st.getLE32();
 
-		switch(ReadLE32(& bytes[16]))
+		switch(st.getLE32())
 		{
 		    case 0x00:	difficulty = Difficulty::EASY; break;
 		    case 0x01:  difficulty = Difficulty::NORMAL; break;
@@ -180,13 +179,13 @@ bool Maps::FileInfo::ReadMAP(const std::string & filename)
 		    default:	difficulty = Difficulty::NORMAL; break;
 		}
 
-		kingdom_colors = ReadLE32(& bytes[20]);
-		allow_human_colors = ReadLE32(& bytes[24]);
-		allow_comp_colors = ReadLE32(& bytes[28]);
+		kingdom_colors = st.getLE32();
+		allow_human_colors = st.getLE32();
+		allow_comp_colors = st.getLE32();
 
-		for(int col = 0; col < 6; ++col)
+		for(u32 col = 0; col < 6; ++col)
 		{
-		    int v = ReadLE32(& bytes[32] + col * 4);
+		    int v = st.getLE32();
 		    races[col] = 1 < CountBits(v) ? Race::MULT : v;
 
 		    if(v & Race::RAND)
@@ -202,15 +201,15 @@ bool Maps::FileInfo::ReadMAP(const std::string & filename)
 		    }
 		}
 
-		with_heroes = 0 != bytes[56];
+		with_heroes = 0 != st.get();
 
 		int cond1[4], cond2[4];
 
-		for(int it = 0; it < 4; ++it)
-		    cond1[it] = ReadLE32(& bytes[57 + it * 4]);
+		for(u32 it = 0; it < 4; ++it)
+		    cond1[it] = st.getLE32();
 
-		for(int it = 0; it < 4; ++it)
-		    cond2[it] = ReadLE32(& bytes[73 + it * 4]);
+		for(u32 it = 0; it < 4; ++it)
+		    cond2[it] = st.getLE32();
 
 		comp_also_wins = cond1[0] & Editor::CompAlsoWins;
 		allow_normal_victory = cond1[0] & Editor::AllowNormalVictory;
@@ -315,15 +314,8 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
     rnd_races = 0;
     localtime = 0;
 
-    u8  byte8;
-    u16 byte16;
-    u32 byte32;
-
     // magic byte
-    fd.read(reinterpret_cast<char *>(&byte32), sizeof(byte32));
-    SwapLE32(byte32);
-
-    if(byte32 != 0x0000005C)
+    if(StreamBuf::getBE32(fd) != 0x5C000000)
     {
 	DEBUG(DBG_GAME, DBG_WARN, "incorrect maps file " << filename);
 	fd.close();
@@ -331,10 +323,7 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
     }
 
     // level
-    fd.read(reinterpret_cast<char *>(&byte16), sizeof(byte16));
-    SwapLE16(byte16);
-
-    switch(byte16)
+    switch(StreamBuf::getLE16(fd))
     {
 	case 0x00:	difficulty = Difficulty::EASY; break;
 	case 0x01:  	difficulty = Difficulty::NORMAL; break;
@@ -344,89 +333,63 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
     }
 
     // width
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    size_w = byte8;
+    size_w = fd.get();
 
     // height
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    size_h = byte8;
+    size_h = fd.get();
 
     Colors colors(Color::ALL);
 
     // kingdom color - blue, green, red, yellow, orange, purple
     for(Colors::const_iterator
 	it = colors.begin(); it != colors.end(); ++it)
-    {
-	fd.read(reinterpret_cast<char *>(&byte8), 1);
-	if(byte8) kingdom_colors |= *it;
-    }
+	if(fd.get()) kingdom_colors |= *it;
 
     // allow human color - blue, green, red, yellow, orange, purple
     for(Colors::const_iterator
 	it = colors.begin(); it != colors.end(); ++it)
-    {
-	fd.read(reinterpret_cast<char *>(&byte8), 1);
-	if(byte8) allow_human_colors |= *it;
-    }
+	if(fd.get()) allow_human_colors |= *it;
 
     // allow comp color - blue, green, red, yellow, orange, purple
     for(Colors::const_iterator
 	it = colors.begin(); it != colors.end(); ++it)
-    {
-	fd.read(reinterpret_cast<char *>(&byte8), 1);
-	if(byte8) allow_comp_colors |= *it;
-    }
+	if(fd.get()) allow_comp_colors |= *it;
 
     // kingdom count
     // fd.seekg(0x1A, std::ios_base::beg);
-    // fd.read(&byte8, 1);
+    // fd.get();
 
     // wins
     fd.seekg(0x1D, std::ios_base::beg);
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    conditions_wins = byte8;
-
+    conditions_wins = fd.get();
     // data wins
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    comp_also_wins = byte8;
+    comp_also_wins = fd.get();
     // data wins
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    allow_normal_victory = byte8;
+    allow_normal_victory = fd.get();
     // data wins
-    fd.read(reinterpret_cast<char *>(&byte16), 2);
-    SwapLE16(byte16);
-    wins1 = byte16;
+    wins1 = StreamBuf::getLE16(fd);
     // data wins
     fd.seekg(0x2c, std::ios_base::beg);
-    fd.read(reinterpret_cast<char *>(&byte16), 2);
-    SwapLE16(byte16);
-    wins2 = byte16;
+    wins2 = StreamBuf::getLE16(fd);
 
     // loss
     fd.seekg(0x22, std::ios_base::beg);
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    conditions_loss = byte8;
+    conditions_loss = fd.get();
     // data loss
-    fd.read(reinterpret_cast<char *>(&byte16), 2);
-    SwapLE16(byte16);
-    loss1 = byte16;
+    loss1 = StreamBuf::getLE16(fd);
     // data loss
     fd.seekg(0x2e, std::ios_base::beg);
-    fd.read(reinterpret_cast<char *>(&byte16), 2);
-    SwapLE16(byte16);
-    loss2 = byte16;
+    loss2 = StreamBuf::getLE16(fd);
 
     // start with hero
     fd.seekg(0x25, std::ios_base::beg);
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    with_heroes = 0 == byte8;
+    with_heroes = 0 == fd.get();
 
     // race color
     for(Colors::const_iterator
 	it = colors.begin(); it != colors.end(); ++it)
     {
-	fd.read(reinterpret_cast<char *>(&byte8), 1);
-	u8 race = ByteToRace(byte8);
+	int race = ByteToRace(fd.get());
 	races[Color::GetIndex(*it)] = race;
 	if(Race::RAND == race) rnd_races |= *it;
     }
@@ -456,8 +419,8 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
 
 void Maps::FileInfo::FillUnions(void)
 {
-    u8 side1 = 0;
-    u8 side2 = 0;
+    int side1 = 0;
+    int side2 = 0;
 
     const Colors colors(kingdom_colors);
 
@@ -470,10 +433,10 @@ void Maps::FileInfo::FillUnions(void)
 	    side2 |= *it;
     }
 
-    for(u8 ii = 0; ii < KINGDOMMAX; ++ii)
+    for(u32 ii = 0; ii < KINGDOMMAX; ++ii)
     {
-	u8 cl = ByteToColor(ii);
-	
+	int cl = ByteToColor(ii);
+
 	if(side1 & cl)
 	    unions[ii] = side1;
 	else
@@ -499,7 +462,7 @@ bool Maps::FileInfo::NameCompare(const FileInfo & fi1, const FileInfo & fi2)
     return fi1.name == fi2.name;
 }
 
-u8 Maps::FileInfo::KingdomRace(u8 color) const
+int Maps::FileInfo::KingdomRace(int color) const
 {
     switch(color)
     {
@@ -514,7 +477,7 @@ u8 Maps::FileInfo::KingdomRace(u8 color) const
     return 0;
 }
 
-u16 Maps::FileInfo::ConditionWins(void) const
+int Maps::FileInfo::ConditionWins(void) const
 {
     switch(conditions_wins)
     {
@@ -530,7 +493,7 @@ u16 Maps::FileInfo::ConditionWins(void) const
     return GameOver::COND_NONE;
 }
 
-u16 Maps::FileInfo::ConditionLoss(void) const
+int Maps::FileInfo::ConditionLoss(void) const
 {
     switch(conditions_loss)
     {
@@ -554,7 +517,7 @@ bool Maps::FileInfo::WinsAllowNormalVictory(void) const
     return allow_normal_victory && ((GameOver::WINS_TOWN | GameOver::WINS_ARTIFACT | GameOver::WINS_GOLD) & ConditionWins());
 }
 
-u8 Maps::FileInfo::WinsFindArtifactID(void) const
+int Maps::FileInfo::WinsFindArtifactID(void) const
 {
     return wins1 ? wins1 - 1 : Artifact::UNKNOWN;
 }
@@ -569,50 +532,50 @@ u32 Maps::FileInfo::WinsAccumulateGold(void) const
     return wins1 * 1000;
 }
 
-u32 Maps::FileInfo::WinsMapsIndexObject(void) const
+Point Maps::FileInfo::WinsMapsPositionObject(void) const
 {
-    return wins2 * world.w() + wins1;
+    return Point(wins1, wins2);
 }
 
-u32 Maps::FileInfo::LossMapsIndexObject(void) const
+Point Maps::FileInfo::LossMapsPositionObject(void) const
 {
-    return loss2 * world.w() + loss1;
+    return Point(loss1, loss2);
 }
 
-u16 Maps::FileInfo::LossCountDays(void) const
+u32 Maps::FileInfo::LossCountDays(void) const
 {
     return loss1;
 }
 
-u8 Maps::FileInfo::AllowCompHumanColors(void) const
+int Maps::FileInfo::AllowCompHumanColors(void) const
 {
     return allow_human_colors & allow_comp_colors;
 }
 
-u8 Maps::FileInfo::AllowHumanColors(void) const
+int Maps::FileInfo::AllowHumanColors(void) const
 {
     return allow_human_colors;
 }
 
-u8 Maps::FileInfo::AllowComputerColors(void) const
+int Maps::FileInfo::AllowComputerColors(void) const
 {
     return allow_comp_colors;
 }
 
-u8 Maps::FileInfo::HumanOnlyColors(void) const
+int Maps::FileInfo::HumanOnlyColors(void) const
 {
     return allow_human_colors & ~(allow_comp_colors);
 }
 
-u8 Maps::FileInfo::ComputerOnlyColors(void) const
+int Maps::FileInfo::ComputerOnlyColors(void) const
 {
     return allow_comp_colors & ~(allow_human_colors);
 }
 
-bool Maps::FileInfo::isAllowCountPlayers(u8 colors) const
+bool Maps::FileInfo::isAllowCountPlayers(u32 colors) const
 {
-    const u8 human_only = Color::Count(HumanOnlyColors());
-    const u8 comp_human = Color::Count(AllowCompHumanColors());
+    u32 human_only = Color::Count(HumanOnlyColors());
+    u32 comp_human = Color::Count(AllowCompHumanColors());
 
     return human_only <= colors && colors <= human_only + comp_human;
 }
@@ -707,7 +670,7 @@ StreamBase & Maps::operator<< (StreamBase & msg, const FileInfo & fi)
     msg << System::GetBasename(fi.file) << fi.name << fi.description <<
 	fi.size_w << fi.size_h << fi.difficulty << static_cast<u8>(KINGDOMMAX);
 
-    for(u8 ii = 0; ii < KINGDOMMAX; ++ii)
+    for(u32 ii = 0; ii < KINGDOMMAX; ++ii)
 	msg << fi.races[ii] << fi.unions[ii];
 
     msg << fi.kingdom_colors << fi.allow_human_colors << fi.allow_comp_colors <<
@@ -724,7 +687,7 @@ StreamBase & Maps::operator>> (StreamBase & msg, FileInfo & fi)
     msg >> fi.file >> fi.name >> fi.description >>
 	fi.size_w >> fi.size_h >> fi.difficulty >> kingdommax;
 
-    for(u8 ii = 0; ii < kingdommax; ++ii)
+    for(u32 ii = 0; ii < kingdommax; ++ii)
 	msg >> fi.races[ii] >> fi.unions[ii];
 
     msg >> fi.kingdom_colors >> fi.allow_human_colors >> fi.allow_comp_colors >>

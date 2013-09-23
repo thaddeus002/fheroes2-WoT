@@ -21,16 +21,18 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "text.h"
 #include "settings.h"
 #include "cursor.h"
 #include "button.h"
 #include "world.h"
+#include "game.h"
 #include "dialog.h"
 
-bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &message, const u16 gold, const u16 expr, const  Heroes & hero)
+bool Dialog::SelectGoldOrExp(const std::string & header, const std::string & message, u32 gold, u32 expr, const  Heroes & hero)
 {
     Display & display = Display::Get();
-    const ICN::icn_t system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+    const int system = Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
     // cursor
     Cursor & cursor = Cursor::Get();
@@ -48,8 +50,7 @@ bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &messa
     Text text;
     text.Set(GetString(gold) + " " + "(" + "total: " + GetString(world.GetKingdom(hero.GetColor()).GetFunds().Get(Resource::GOLD)) + ")", Font::SMALL);
 
-    const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
-
+    const int spacer = Settings::Get().QVGA() ? 5 : 10;
     FrameBox box(box1.h() + spacer + box2.h() + spacer + sprite_expr.h() + 2 + text.h(), true);
 
     pt.x = box.GetArea().x + box.GetArea().w / 2 - AGG::GetICN(system, 9).w() - 20;
@@ -96,8 +97,8 @@ bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &messa
 	le.MousePressLeft(button_yes) ? button_yes.PressDraw() : button_yes.ReleaseDraw();
 	le.MousePressLeft(button_no) ? button_no.PressDraw() : button_no.ReleaseDraw();
 
-        if(Game::HotKeyPress(Game::EVENT_DEFAULT_READY) || le.MouseClickLeft(button_yes)){ result = true; break; }
-        if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(button_no)){ result = false; break; }
+        if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_READY) || le.MouseClickLeft(button_yes)){ result = true; break; }
+        if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(button_no)){ result = false; break; }
     }
 
     cursor.Hide();

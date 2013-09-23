@@ -26,7 +26,7 @@
 #include "direction.h"
 #include "objwatr.h"
 
-u16 ObjWat2::GetPassable(const u8 & index)
+int ObjWat2::GetPassable(u32 index)
 {
 #if (__GNUC__ == 4 && __GNUC_MINOR__ == 4)
     // fixed: array subscript is above array bounds
@@ -53,7 +53,7 @@ u16 ObjWat2::GetPassable(const u8 & index)
             DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
 }
 
-u16 ObjWatr::GetPassable(const u8 & index)
+int ObjWatr::GetPassable(u32 index)
 {
 #if (__GNUC__ == 4 && __GNUC_MINOR__ == 4)
     // fixed: array subscript is above array bounds
@@ -74,17 +74,17 @@ u16 ObjWatr::GetPassable(const u8 & index)
             DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
 }
 
-bool ObjWat2::isAction(const u8 & index)
+bool ObjWat2::isAction(u32 index)
 {
     return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
-bool ObjWatr::isAction(const u8 & index)
+bool ObjWatr::isAction(u32 index)
 {
     return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
-bool ObjWatr::isShadow(const u8 & index)
+bool ObjWatr::isShadow(u32 index)
 {
 #if (__GNUC__ == 4 && __GNUC_MINOR__ == 4)
     // fixed: array subscript is above array bounds
@@ -96,12 +96,12 @@ bool ObjWatr::isShadow(const u8 & index)
     return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
 }
 
-bool ObjWat2::isShadow(const u8 & index)
+bool ObjWat2::isShadow(u32 index)
 {
     return index == 1;
 }
 
-u8 ObjWatr::GetActionObject(const u8 & index)
+int ObjWatr::GetActionObject(u32 index)
 {
     switch(index)
     {
@@ -120,7 +120,7 @@ u8 ObjWatr::GetActionObject(const u8 & index)
     return MP2::OBJ_ZERO;
 }
 
-u8 ObjWat2::GetActionObject(const u8 & index)
+int ObjWat2::GetActionObject(u32 index)
 {
     switch(index)
     {

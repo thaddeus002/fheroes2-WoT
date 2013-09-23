@@ -21,9 +21,11 @@
  ***************************************************************************/
 
 #include "agg.h"
+#include "text.h"
 #include "button.h"
 #include "cursor.h"
 #include "settings.h"
+#include "game.h"
 #include "dialog.h"
 
 namespace Dialog
@@ -32,14 +34,14 @@ namespace Dialog
 }
 
 /* return 0x01 - change speed, 0x02 - change sound, 0x04 - change music, 0x08 - change interface, 0x10 - change scroll  */
-u8 Dialog::SystemOptions(void)
+int Dialog::SystemOptions(void)
 {
     Display & display = Display::Get();
     Settings & conf = Settings::Get();
 
     // cursor
     Cursor & cursor = Cursor::Get();
-    const Cursor::themes_t oldcursor = cursor.Themes();
+    const int oldcursor = cursor.Themes();
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
@@ -48,7 +50,7 @@ u8 Dialog::SystemOptions(void)
     const Rect & area = frameborder.GetArea();
 
     Rects rects;
-    const u16 posx = (area.w - 256) / 2;
+    const s32 posx = (area.w - 256) / 2;
     rects.push_back(Rect(area.x + posx,  area.y + 17,  64, 64));
     rects.push_back(Rect(area.x + posx + 92, area.y + 17,  64, 64));
     rects.push_back(Rect(area.x + posx + 184, area.y + 17,  64, 64));
@@ -82,8 +84,8 @@ u8 Dialog::SystemOptions(void)
     cursor.Show();
     display.Flip();
 
-    u16 btnres = Dialog::ZERO;
-    u8 result = 0;
+    int btnres = Dialog::ZERO;
+    int result = 0;
     bool redraw = false;
 
     // dialog menu loop
@@ -216,7 +218,7 @@ void Dialog::DrawSystemInfo(const Rects & rects)
     text.Blit(rect3.x + (rect3.w - text.w()) / 2, rect3.y + rect3.h + 5);
 
     // hero move speed
-    const u8 is4 = conf.HeroesMoveSpeed() ? (conf.HeroesMoveSpeed() < 9 ? (conf.HeroesMoveSpeed() < 7 ? (conf.HeroesMoveSpeed() < 4 ? 4 : 5) : 6) : 7) : 9;
+    const u32 is4 = conf.HeroesMoveSpeed() ? (conf.HeroesMoveSpeed() < 9 ? (conf.HeroesMoveSpeed() < 7 ? (conf.HeroesMoveSpeed() < 4 ? 4 : 5) : 6) : 7) : 9;
     const Sprite & sprite4 = AGG::GetICN(ICN::SPANEL, is4);
     const Rect & rect4 = rects[3];
     sprite4.Blit(rect4);
@@ -230,7 +232,7 @@ void Dialog::DrawSystemInfo(const Rects & rects)
     text.Blit(rect4.x + (rect4.w - text.w()) / 2, rect4.y + rect4.h + 5);
 
     // ai move speed
-    const u8 is5 = conf.AIMoveSpeed() ? (conf.AIMoveSpeed() < 9 ? (conf.AIMoveSpeed() < 7 ? (conf.AIMoveSpeed() < 4 ? 4 : 5) : 6) : 7) : 9;
+    const u32 is5 = conf.AIMoveSpeed() ? (conf.AIMoveSpeed() < 9 ? (conf.AIMoveSpeed() < 7 ? (conf.AIMoveSpeed() < 4 ? 4 : 5) : 6) : 7) : 9;
     const Sprite & sprite5 = AGG::GetICN(ICN::SPANEL, is5);
     const Rect & rect5 = rects[4];
     sprite5.Blit(rect5);
@@ -244,7 +246,7 @@ void Dialog::DrawSystemInfo(const Rects & rects)
     text.Blit(rect5.x + (rect5.w - text.w()) / 2, rect5.y + rect5.h + 5);
 
     // scroll speed
-    const u8 is6 = (conf.ScrollSpeed() < SCROLL_FAST2 ? (conf.ScrollSpeed() < SCROLL_FAST1 ? (conf.ScrollSpeed() < SCROLL_NORMAL ? 4 : 5) : 6) : 7);
+    const u32 is6 = (conf.ScrollSpeed() < SCROLL_FAST2 ? (conf.ScrollSpeed() < SCROLL_FAST1 ? (conf.ScrollSpeed() < SCROLL_NORMAL ? 4 : 5) : 6) : 7);
     const Sprite & sprite6 = AGG::GetICN(ICN::SPANEL, is6);
     const Rect & rect6 = rects[5];
     sprite6.Blit(rect6);

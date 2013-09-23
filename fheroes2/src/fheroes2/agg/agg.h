@@ -23,29 +23,32 @@
 #ifndef H2AGG_H
 #define H2AGG_H
 
+#include <vector>
 #include "gamedefs.h"
 #include "icn.h"
 #include "til.h"
 #include "m82.h"
-#include "sprite.h"
 #include "mus.h"
+#include "xmi.h"
+#include "sprite.h"
 
 namespace AGG
 {	
     bool	Init(void);
     void	Quit(void);
 
-    Sprite	GetICN(ICN::icn_t, u32 index, bool reflect = false);
-    int		GetICNCount(ICN::icn_t);
-    Surface	GetTIL(TIL::til_t, u32 index, u8 shape);
-    Surface	GetLetter(char ch, u8 ft);
+    int		PutICN(const Sprite &, bool init_reflect = false);
+    Sprite	GetICN(int icn, u32 index, bool reflect = false);
+    u32		GetICNCount(int icn);
+    Surface	GetTIL(int til, u32 index, u32 shape);
+    Surface	GetLetter(u32 ch, u32 ft);
 #ifdef WITH_TTF
-    Surface	GetUnicodeLetter(u16 ch, u8 ft);
-    int		GetFontHeight(bool small);
+    Surface	GetUnicodeLetter(u32 ch, u32 ft);
+    u32		GetFontHeight(bool small);
 #endif
-    void	LoadLOOPXXSounds(const u16*);
-    void	PlaySound(M82::m82_t);
-    void	PlayMusic(MUS::mus_t, bool loop = true);
+    void	LoadLOOPXXSounds(const std::vector<int> &);
+    void	PlaySound(int m82);
+    void	PlayMusic(int mus, bool loop = true);
     void	ResetMixer(void);
 }
 

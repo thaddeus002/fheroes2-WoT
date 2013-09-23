@@ -23,6 +23,7 @@
 #include <string>
 #include <algorithm>
 #include "agg.h"
+#include "text.h"
 #include "button.h"
 #include "cursor.h"
 #include "settings.h"
@@ -32,6 +33,7 @@
 #include "castle.h"
 #include "pocketpc.h"
 #include "monster.h"
+#include "game.h"
 #include "dialog.h"
 
 struct ValueColors : std::pair<int, int>
@@ -40,7 +42,7 @@ struct ValueColors : std::pair<int, int>
     ValueColors(int v, int c) : std::pair<int, int>(v, c){};
 
     bool IsValue(int v) const { return v == first; };
-    //bool IsColor(Color::color_t c) const { return (c & second); };
+    //bool IsColor(int c) const { return (c & second); };
 
     static bool SortValueGreat(const ValueColors & v1, const ValueColors & v2) { return v1.first > v2.first; };
 };
@@ -197,18 +199,18 @@ void GetBestHeroArmyInfo(std::vector<ValueColors> & v, const Colors & colors)
     }
 }
 
-void DrawFlags(const std::vector<ValueColors> & v, const Point & pos, const u16 width, const u8 count)
+void DrawFlags(const std::vector<ValueColors> & v, const Point & pos, u32 width, u32 count)
 {
-    const u16 chunk = width / count;
+    const u32 chunk = width / count;
     bool qvga = Settings::Get().QVGA();
 
-    for(u8 ii = 0; ii < count; ++ii)
+    for(u32 ii = 0; ii < count; ++ii)
     {
 	if(ii < v.size())
 	{
 	    const Colors colors(v[ii].second);
-	    const u8 sw = qvga ? AGG::GetICN(ICN::MISC6, 7).w() : AGG::GetICN(ICN::FLAG32, 1).w();
-	    u16 px = pos.x + chunk / 2 + ii * chunk - (colors.size() * sw) / 2;
+	    const u32 sw = qvga ? AGG::GetICN(ICN::MISC6, 7).w() : AGG::GetICN(ICN::FLAG32, 1).w();
+	    s32 px = pos.x + chunk / 2 + ii * chunk - (colors.size() * sw) / 2;
 
 	    for(Colors::const_iterator
 		color = colors.begin(); color != colors.end(); ++color)
@@ -223,22 +225,20 @@ void DrawFlags(const std::vector<ValueColors> & v, const Point & pos, const u16 
     }
 }
 
-void DrawHeroIcons(const std::vector<ValueColors> & v, const Point & pos, const u16 width)
+void DrawHeroIcons(const std::vector<ValueColors> & v, const Point & pos, u32 width)
 {
     if(v.size())
     {
 	Display & display = Display::Get();
-	const u16 chunk = width / v.size();
+	const int chunk = width / v.size();
 
-	for(u8 ii = 0; ii < v.size(); ++ii)
+	for(u32 ii = 0; ii < v.size(); ++ii)
 	{
-	    Heroes::heroes_t id = Heroes::ConvertID(v[ii].first);
-	    u16 px = pos.x + chunk / 2 + ii * chunk;
-
-	    if(Heroes::UNKNOWN != id)
+	    Surface icons = Heroes::GetPortrait(v[ii].first, PORT_SMALL);
+	    if(icons.isValid())
 	    {
+		s32 px = pos.x + chunk / 2 + ii * chunk;
 		const Sprite & window = AGG::GetICN(ICN::LOCATORS, 22);
-		const Surface & icons = Heroes::GetPortrait(id, PORT_SMALL);
 		window.Blit(px - window.w() / 2, pos.y - 4, display);
 		icons.Blit(px - icons.w() / 2, pos.y, display);
 	    }
@@ -266,18 +266,18 @@ void Dialog::ThievesGuild(bool oracle)
     const Point & cur_pt = frameborder.GetArea();
     Point dst_pt(cur_pt);
 
-    const u8 count = oracle ? 0xFF : world.GetKingdom(Settings::Get().CurrentColor()).GetCountBuilding(BUILD_THIEVESGUILD);
+    const u32 count = oracle ? 0xFF : world.GetKingdom(Settings::Get().CurrentColor()).GetCountBuilding(BUILD_THIEVESGUILD);
 
     std::vector<ValueColors> v;
     v.reserve(KINGDOMMAX);
     const Colors colors(Game::GetActualKingdomColors());
-    const u16 textx = 185;
-    const u16 startx = 210;
-    const u16 maxw = 430;
+    const int textx = 185;
+    const int startx = 210;
+    const int maxw = 430;
     Text text;
 
     // head 1
-    u8 ii = 0;
+    u32 ii = 0;
     for(ii = 0; ii < colors.size(); ++ii)
     {
 	switch(ii+1)

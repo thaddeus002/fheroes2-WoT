@@ -30,19 +30,19 @@
 #include "game_io.h"
 #include "game.h"
 
-Game::menu_t Game::LoadCampain(void)
+int Game::LoadCampain(void)
 {
     VERBOSE("Load Campain Game: under construction.");
     return Game::LOADGAME;
 }
 
-Game::menu_t Game::LoadMulti(void)
+int Game::LoadMulti(void)
 {
     VERBOSE("Load Multi Game: under construction.");
     return Game::LOADGAME;
 }
 
-Game::menu_t Game::LoadGame(void)
+int Game::LoadGame(void)
 {
     return LOADSTANDARD;
 /*
@@ -99,7 +99,7 @@ Game::menu_t Game::LoadGame(void)
 */
 }
 
-Game::menu_t Game::LoadStandard(void)
+int Game::LoadStandard(void)
 {
     // cursor
     Cursor & cursor = Cursor::Get();

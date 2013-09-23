@@ -26,6 +26,7 @@
 #include "settings.h"
 #include "agg.h"
 #include "button.h"
+#include "game.h"
 #include "game_interface.h"
 #include "interface_gamearea.h"
 #include "interface_radar.h"
@@ -38,10 +39,10 @@ const u8 zone3_index[] = { 14, 15, 32, 33 };
 const u8 zone4_index[] = { 20, 21, 26, 27 };
 
 bool ClosedTilesExists(const Puzzle &, const u8*, const u8*);
-void ZoneOpenFirstTiles(Puzzle &, u8 &, const u8*, const u8*);
+void ZoneOpenFirstTiles(Puzzle &, u32 &, const u8*, const u8*);
 void ShowStandardDialog(const Puzzle &, const Surface &);
 void ShowExtendedDialog(const Puzzle &, const Surface &);
-void PuzzlesDraw(const Puzzle &, const Surface &, s16, s16);
+void PuzzlesDraw(const Puzzle &, const Surface &, s32, s32);
 
 Puzzle::Puzzle()
 {
@@ -68,10 +69,10 @@ Puzzle & Puzzle::operator= (const char* str)
     return *this;
 }
 
-void Puzzle::Update(u8 open_obelisk, u8 total_obelisk)
+void Puzzle::Update(u32 open_obelisk, u32 total_obelisk)
 {
-    u8 open_puzzle = open_obelisk * PUZZLETILES / total_obelisk;
-    u8 need_puzzle = open_puzzle > count() ? open_puzzle - count() : 0;
+    u32 open_puzzle = open_obelisk * PUZZLETILES / total_obelisk;
+    u32 need_puzzle = open_puzzle > count() ? open_puzzle - count() : 0;
 
 	if(need_puzzle && ClosedTilesExists(*this, zone1_order, ARRAY_COUNT_END(zone1_order)))
 	    ZoneOpenFirstTiles(*this, need_puzzle, zone1_order, ARRAY_COUNT_END(zone1_order));
@@ -90,7 +91,7 @@ void Puzzle::ShowMapsDialog(void) const
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
-    Cursor::themes_t old_cursor = cursor.Themes();
+    int old_cursor = cursor.Themes();
 
     if(! Settings::Get().MusicMIDI()) AGG::PlayMusic(MUS::PUZZLE);
 
@@ -117,7 +118,7 @@ bool ClosedTilesExists(const Puzzle & pzl, const u8* it1, const u8* it2)
     return false;
 }
 
-void ZoneOpenFirstTiles(Puzzle & pzl, u8 & opens, const u8* it1, const u8* it2)
+void ZoneOpenFirstTiles(Puzzle & pzl, u32 & opens, const u8* it1, const u8* it2)
 {
     while(opens)
     {
@@ -208,7 +209,7 @@ void ShowExtendedDialog(const Puzzle & pzl, const Surface & sf)
     }
 }
 
-void PuzzlesDraw(const Puzzle & pzl, const Surface & sf, s16 dstx, s16 dsty)
+void PuzzlesDraw(const Puzzle & pzl, const Surface & sf, s32 dstx, s32 dsty)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
@@ -216,12 +217,12 @@ void PuzzlesDraw(const Puzzle & pzl, const Surface & sf, s16 dstx, s16 dsty)
     // show all for debug
     if(IS_DEVEL()) return;
 
-    u8 alpha = 250;
+    int alpha = 250;
     LocalEvent & le = LocalEvent::Get();
 
     while(le.HandleEvents() && 0 < alpha)
     {
-        if(Game::AnimateInfrequent(Game::PUZZLE_FADE_DELAY))
+        if(Game::AnimateInfrequentDelay(Game::PUZZLE_FADE_DELAY))
         {
     	    cursor.Hide();
 	    sf.Blit(dstx, dsty, display);
@@ -257,16 +258,16 @@ StreamBase & operator<< (StreamBase & msg, const Puzzle & pzl)
 
     // orders
     msg << static_cast<u8>(ARRAY_COUNT(pzl.zone1_order));
-    for(u8 ii = 0; ii < ARRAY_COUNT(pzl.zone1_order); ++ii) msg << pzl.zone1_order[ii];
+    for(u32 ii = 0; ii < ARRAY_COUNT(pzl.zone1_order); ++ii) msg << pzl.zone1_order[ii];
 
     msg << static_cast<u8>(ARRAY_COUNT(pzl.zone2_order));
-    for(u8 ii = 0; ii < ARRAY_COUNT(pzl.zone2_order); ++ii) msg << pzl.zone2_order[ii];
+    for(u32 ii = 0; ii < ARRAY_COUNT(pzl.zone2_order); ++ii) msg << pzl.zone2_order[ii];
 
     msg << static_cast<u8>(ARRAY_COUNT(pzl.zone3_order));
-    for(u8 ii = 0; ii < ARRAY_COUNT(pzl.zone3_order); ++ii) msg << pzl.zone3_order[ii];
+    for(u32 ii = 0; ii < ARRAY_COUNT(pzl.zone3_order); ++ii) msg << pzl.zone3_order[ii];
 
     msg << static_cast<u8>(ARRAY_COUNT(pzl.zone4_order));
-    for(u8 ii = 0; ii < ARRAY_COUNT(pzl.zone4_order); ++ii) msg << pzl.zone4_order[ii];
+    for(u32 ii = 0; ii < ARRAY_COUNT(pzl.zone4_order); ++ii) msg << pzl.zone4_order[ii];
 
     return msg;
 }
@@ -281,16 +282,16 @@ StreamBase & operator>> (StreamBase & msg, Puzzle & pzl)
     u8 size;
 
     msg >> size;
-    for(u8 ii = 0; ii < size; ++ii) msg >> pzl.zone1_order[ii];
+    for(u32 ii = 0; ii < size; ++ii) msg >> pzl.zone1_order[ii];
 
     msg >> size;
-    for(u8 ii = 0; ii < size; ++ii) msg >> pzl.zone2_order[ii];
+    for(u32 ii = 0; ii < size; ++ii) msg >> pzl.zone2_order[ii];
 
     msg >> size;
-    for(u8 ii = 0; ii < size; ++ii) msg >> pzl.zone3_order[ii];
+    for(u32 ii = 0; ii < size; ++ii) msg >> pzl.zone3_order[ii];
 
     msg >> size;
-    for(u8 ii = 0; ii < size; ++ii) msg >> pzl.zone4_order[ii];
+    for(u32 ii = 0; ii < size; ++ii) msg >> pzl.zone4_order[ii];
 
     return msg;
 }

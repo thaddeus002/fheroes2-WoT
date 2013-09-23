@@ -22,12 +22,9 @@
 #ifndef H2LUCK_H
 #define H2LUCK_H
 
-#include <string>
-#include "gamedefs.h"
-
 namespace Luck
 {
-    enum luck_t
+    enum
     {
 	UNKNOWN    = -4,
         CURSED     = -3,
@@ -39,11 +36,8 @@ namespace Luck
         IRISH      = 3
     };
 
-    const char* String(s8);
-    const char* Description(s8);
-
-    inline luck_t & operator++ (luck_t & luck){ return luck = IRISH == luck ? IRISH : luck_t(luck + 1); }
-    inline luck_t & operator-- (luck_t & luck){ return luck = CURSED == luck ? CURSED : luck_t(luck - 1); }
+    const char* String(int);
+    const char* Description(int);
 }
 
 #endif

@@ -34,7 +34,7 @@
 #include "battle_command.h"
 #include "battle_interface.h"
 
-void Battle::Arena::BattleProcess(Unit & attacker, Unit & defender, s16 dst, u8 dir)
+void Battle::Arena::BattleProcess(Unit & attacker, Unit & defender, s32 dst, int dir)
 {
     if(0 > dst) dst = defender.GetHeadIndex();
 
@@ -117,10 +117,7 @@ void Battle::Arena::ApplyAction(StreamBuf & sb)
 
 void Battle::Arena::ApplyActionSpellCast(StreamBuf & stream)
 {
-    u8 byte8;
-    stream >> byte8;
-
-    const Spell spell(byte8);
+    const Spell spell(stream.get32());
     HeroBase* current_commander = GetCurrentForce().GetCommander();
 
     if(current_commander && current_commander->HaveSpellBook() &&
@@ -172,8 +169,8 @@ void Battle::Arena::ApplyActionSpellCast(StreamBuf & stream)
 void Battle::Arena::ApplyActionAttack(StreamBuf & stream)
 {
     u32 uid1, uid2;
-    s16 dst;
-    u8 dir;
+    s32 dst;
+    int dir;
 
     stream >> uid1 >> uid2 >> dst >> dir;
 
@@ -231,8 +228,8 @@ void Battle::Arena::ApplyActionAttack(StreamBuf & stream)
 void Battle::Arena::ApplyActionMove(Command & cmd)
 {
     u32 uid = 0;
-    s16 dst = -1;
-    u8 with_path = 0;
+    s32 dst = -1;
+    int with_path = 0;
 
     cmd.GetStream() >> uid >> dst >> with_path;
 
@@ -243,7 +240,7 @@ void Battle::Arena::ApplyActionMove(Command & cmd)
 	cell && cell->isPassable3(*b, false))
     {
 	Position pos1, pos2;
-	const s16 head = b->GetHeadIndex();
+	const s32 head = b->GetHeadIndex();
 	pos1 = Position::GetCorrect(*b, dst);
 
 	DEBUG(DBG_BATTLE, DBG_TRACE, b->String() << ", dst: " << dst << ", (head: " <<
@@ -289,8 +286,8 @@ void Battle::Arena::ApplyActionMove(Command & cmd)
 
 	    if(b->isWide())
 	    {
-        	const s16 & dst1 = path.back();
-        	const s16 & dst2 = 1 < path.size() ? path[path.size() - 2] : head;
+        	const s32 dst1 = path.back();
+        	const s32 dst2 = 1 < path.size() ? path[path.size() - 2] : head;
 
 		pos2.Set(dst1, b->isWide(), RIGHT_SIDE & Board::GetDirection(dst1, dst2));
 	    }
@@ -311,8 +308,7 @@ void Battle::Arena::ApplyActionMove(Command & cmd)
 
 void Battle::Arena::ApplyActionSkip(StreamBuf & stream)
 {
-    u32 uid;
-    u8 hard;
+    u32 uid, hard;
     stream >> uid >> hard;
 
     Battle::Unit* battle = GetTroopUID(uid);
@@ -372,8 +368,7 @@ void Battle::Arena::ApplyActionEnd(StreamBuf & stream)
 
 void Battle::Arena::ApplyActionMorale(StreamBuf & stream)
 {
-    u32 uid;
-    u8  morale;
+    u32 uid, morale;
     stream >> uid >> morale;
 
     Battle::Unit* b = GetTroopUID(uid);
@@ -469,7 +464,7 @@ void Battle::Arena::TargetsApplyDamage(Unit & attacker, Unit & defender, Targets
     }
 }
 
-Battle::TargetsInfo Battle::Arena::GetTargetsForDamage(Unit & attacker, Unit & defender, s16 dst)
+Battle::TargetsInfo Battle::Arena::GetTargetsForDamage(Unit & attacker, Unit & defender, s32 dst)
 {
     TargetsInfo targets;
     targets.reserve(8);
@@ -486,7 +481,7 @@ Battle::TargetsInfo Battle::Arena::GetTargetsForDamage(Unit & attacker, Unit & d
     // long distance attack
     if(attacker.isDoubleCellAttack())
     {
-        const direction_t dir = Board::GetDirection(attacker.GetHeadIndex(), dst);
+        const int dir = Board::GetDirection(attacker.GetHeadIndex(), dst);
         if(!defender.isWide() || 0 == ((RIGHT | LEFT) & dir))
 	{
 	    if(NULL != (cell = Board::GetCell(dst, dir)) &&
@@ -552,7 +547,7 @@ void Battle::Arena::TargetsApplySpell(const HeroBase* hero, const Spell & spell,
     }
 }
 
-Battle::TargetsInfo Battle::Arena::GetTargetsForSpells(const HeroBase* hero, const Spell & spell, s16 dst)
+Battle::TargetsInfo Battle::Arena::GetTargetsForSpells(const HeroBase* hero, const Spell & spell, s32 dst)
 {
     TargetsInfo targets;
     targets.reserve(8);
@@ -601,7 +596,7 @@ Battle::TargetsInfo Battle::Arena::GetTargetsForSpells(const HeroBase* hero, con
 	    trgts.push_back(dst);
 
 	    // find targets
-	    for(u8 ii = 0; ii < 3; ++ii)
+	    for(u32 ii = 0; ii < 3; ++ii)
 	    {
 		const Indexes reslt = board.GetNearestTroopIndexes(dst, &trgts);
 		if(reslt.empty()) break;
@@ -687,7 +682,7 @@ Battle::TargetsInfo Battle::Arena::GetTargetsForSpells(const HeroBase* hero, con
     TargetsInfo::iterator it = targets.begin();
     while(it != targets.end())
     {
-	const u8 resist = (*it).defender->GetMagicResist(spell, hero ? hero->GetPower() : 0);
+	const u32 resist = (*it).defender->GetMagicResist(spell, hero ? hero->GetPower() : 0);
 
 	if(0 < resist && 100 > resist && resist >= Rand::Get(1, 100))
 	{
@@ -705,17 +700,15 @@ Battle::TargetsInfo Battle::Arena::GetTargetsForSpells(const HeroBase* hero, con
 
 void Battle::Arena::ApplyActionTower(StreamBuf & stream)
 {
-    u8 type;
-    u32 uid;
-
+    u32 type, uid;
     stream >> type >> uid;
 
-    Battle::Unit* b2 = GetTroopUID(uid);
     Tower* tower = GetTower(type);
+    Battle::Unit* b2 = GetTroopUID(uid);
 
     if(b2 && b2->isValid() && tower)
     {
-	DEBUG(DBG_BATTLE, DBG_TRACE, "tower: " << static_cast<int>(type) << \
+	DEBUG(DBG_BATTLE, DBG_TRACE, "tower: " << type << \
 		", attack to " << b2->String());
 
 	TargetInfo target;
@@ -729,7 +722,7 @@ void Battle::Arena::ApplyActionTower(StreamBuf & stream)
 	if(b2->Modes(SP_BLIND)) b2->ResetBlind();
     }
     else
-	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param" << ": " << "tower: " << static_cast<int>(type) << ", uid: " <<
+	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param" << ": " << "tower: " << type << ", uid: " <<
 	    "0x" << std::setw(8) << std::setfill('0') << std::hex << uid);
 }
 
@@ -737,7 +730,7 @@ void Battle::Arena::ApplyActionCatapult(StreamBuf & stream)
 {
     if(catapult)
     {
-	u8 shots, target, damage;
+	u32 shots, target, damage;
 
 	stream >> shots;
 
@@ -749,7 +742,7 @@ void Battle::Arena::ApplyActionCatapult(StreamBuf & stream)
 	    {
 		if(interface) interface->RedrawActionCatapult(target);
 		SetCastleTargetValue(target, GetCastleTargetValue(target) - damage);
-		DEBUG(DBG_BATTLE, DBG_TRACE, "target: " << static_cast<int>(target));
+		DEBUG(DBG_BATTLE, DBG_TRACE, "target: " << target);
 	    }
 	}
     }
@@ -759,7 +752,7 @@ void Battle::Arena::ApplyActionCatapult(StreamBuf & stream)
 
 void Battle::Arena::ApplyActionAutoBattle(StreamBuf & stream)
 {
-    u8 color;
+    int color;
     stream >> color;
 
     if(current_color == color)
@@ -790,7 +783,7 @@ void Battle::Arena::ApplyActionSpellDefaults(StreamBuf & stream, const Spell & s
     const HeroBase* current_commander = GetCurrentCommander();
     if(!current_commander) return;
 
-    s16 dst;
+    s32 dst;
     stream >> dst;
 
     TargetsInfo targets = GetTargetsForSpells(current_commander, spell, dst);
@@ -802,7 +795,7 @@ void Battle::Arena::ApplyActionSpellDefaults(StreamBuf & stream, const Spell & s
 
 void Battle::Arena::ApplyActionSpellTeleport(StreamBuf & stream)
 {
-    s16 src, dst;
+    s32 src, dst;
 
     stream >> src >> dst;
 
@@ -829,7 +822,7 @@ void Battle::Arena::ApplyActionSpellTeleport(StreamBuf & stream)
 
 void Battle::Arena::ApplyActionSpellEarthQuake(StreamBuf & stream)
 {
-    std::vector<u8> targets = GetCastleTargets();
+    std::vector<int> targets = GetCastleTargets();
 
     if(interface) interface->RedrawActionEarthQuakeSpell(targets);
 
@@ -849,7 +842,7 @@ void Battle::Arena::ApplyActionSpellEarthQuake(StreamBuf & stream)
 
 void Battle::Arena::ApplyActionSpellMirrorImage(StreamBuf & stream)
 {
-    s16 who;
+    s32 who;
     stream >> who;
     Unit* b = GetTroopBoard(who);
 
@@ -873,7 +866,7 @@ void Battle::Arena::ApplyActionSpellMirrorImage(StreamBuf & stream)
         if(it != distances.end())
         {
 		const Position pos = Position::GetCorrect(*b, *it);
-		const s16 & dst = pos.GetHead()->GetIndex();
+		const s32 dst = pos.GetHead()->GetIndex();
     		DEBUG(DBG_BATTLE, DBG_TRACE, "set position: " << dst);
 		if(interface) interface->RedrawActionMirrorImageSpell(*b, pos);
 		Unit* mirror = CreateMirrorImage(*b, dst);

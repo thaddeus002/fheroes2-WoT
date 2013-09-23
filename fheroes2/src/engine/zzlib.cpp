@@ -25,12 +25,13 @@
 #include <zlib.h>
 #include "zzlib.h"
 
-std::vector<char> zlibDecompress(const char* src, size_t srcsz, size_t realsz)
+std::vector<u8> zlibDecompress(const u8* src, size_t srcsz, size_t realsz)
 {
-    std::vector<char> res;
+    std::vector<u8> res;
 
     if(src && srcsz)
     {
+	if(realsz) res.reserve(realsz);
 	res.resize((realsz ? realsz : srcsz * 7), 0);
 	uLong dstsz = res.size();
 	int ret = Z_BUF_ERROR;
@@ -45,15 +46,18 @@ std::vector<char> zlibDecompress(const char* src, size_t srcsz, size_t realsz)
 	if(ret == Z_OK)
 	    res.resize(dstsz);
 	else
+	{
 	    res.clear();
+	    std::cerr << "zlib error: " << ret << std::endl;
+	}
     }
 
     return res;
 }
 
-std::vector<char> zlibCompress(const char* src, size_t srcsz)
+std::vector<u8> zlibCompress(const u8* src, size_t srcsz)
 {
-    std::vector<char> res;
+    std::vector<u8> res;
 
     if(src && srcsz)
     {
@@ -64,7 +68,10 @@ std::vector<char> zlibCompress(const char* src, size_t srcsz)
 	if(ret == Z_OK)
 	    res.resize(dstsz);
 	else
+	{
 	    res.clear();
+	    std::cerr << "zlib error: " << ret << std::endl;
+	}
     }
 
     return res;
@@ -72,7 +79,7 @@ std::vector<char> zlibCompress(const char* src, size_t srcsz)
 
 bool ZSurface::Load(int w, int h, int bpp, int pitch, u32 rmask, u32 gmask, u32 bmask, u32 amask, const u8* p, size_t s)
 {
-    buf = zlibDecompress(reinterpret_cast<const char*>(p), s);
+    buf = zlibDecompress(p, s);
 
     if(! buf.empty())
     {
@@ -101,7 +108,7 @@ std::istream & operator>> (std::istream & is, ZStreamBuf & zb)
 ZStreamBuf & ZStreamBuf::operator<< (StreamBuf & sb)
 {
     const u32 size0 = sb.sizeg();
-    std::vector<char> v = zlibCompress(sb.itget, size0);
+    std::vector<u8> v = zlibCompress(sb.itget, size0);
 
     if(! v.empty())
     {
@@ -128,7 +135,7 @@ ZStreamBuf & ZStreamBuf::operator>> (StreamBuf & sb)
     {
         const u32 size0 = get32();
         const u32 size1 = get32();
-        std::vector<char> v = zlibDecompress(itget, size1, size0);
+        std::vector<u8> v = zlibDecompress(itget, size1, size0);
 
         if(size1 <= sizeg() &&
             ! v.empty())

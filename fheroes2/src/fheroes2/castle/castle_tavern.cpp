@@ -25,24 +25,25 @@
 #include "button.h"
 #include "world.h"
 #include "cursor.h"
+#include "dialog.h"
 #include "settings.h"
 #include "resource.h"
 #include "castle.h"
 #include "heroes.h"
 #include "kingdom.h"
+#include "game.h"
 #include "text.h"
 
 void Castle::OpenTavern(void)
 {
     const std::string & header = _("A generous tip for the barkeep yields the following rumor:");
-    const ICN::icn_t system = (Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM);
-    const ICN::icn_t tavwin = ICN::TAVWIN;
+    const int system = (Settings::Get().ExtGameEvilInterface() ? ICN::SYSTEME : ICN::SYSTEM);
+    const int tavwin = ICN::TAVWIN;
     const std::string & tavern = GetStringBuilding(BUILD_TAVERN);
     const std::string & message = world.GetRumors();
 
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
-
     cursor.Hide();
 
     Text text(tavern, Font::BIG);
@@ -67,7 +68,7 @@ void Castle::OpenTavern(void)
     const Sprite & s20 = AGG::GetICN(tavwin, 1);
     s20.Blit(dst_pt);
 
-    if(const u16 index = ICN::AnimationFrame(tavwin, 0, 0))
+    if(const u32 index = ICN::AnimationFrame(tavwin, 0, 0))
     {
 	const Sprite & s21 = AGG::GetICN(tavwin, index);
 	s21.Blit(dst_pt.x + s21.x(), dst_pt.y + s21.y());
@@ -92,18 +93,15 @@ void Castle::OpenTavern(void)
     while(le.HandleEvents())
     {
         le.MousePressLeft(buttonYes) ? buttonYes.PressDraw() : buttonYes.ReleaseDraw();
-
         if(le.MouseClickLeft(buttonYes) || HotKeyCloseWindow) break;
 
-
         // animation
-	if(Game::AnimateInfrequent(Game::CASTLE_TAVERN_DELAY))
+	if(Game::AnimateInfrequentDelay(Game::CASTLE_TAVERN_DELAY))
 	{
 	    cursor.Hide();
-
 	    s20.Blit(dst_pt);
 
-	    if(const u16 index = ICN::AnimationFrame(tavwin, 0, frame++))
+	    if(const u32 index = ICN::AnimationFrame(tavwin, 0, frame++))
 	    {
 		const Sprite & s22 = AGG::GetICN(tavwin, index);
 		s22.Blit(dst_pt.x + s22.x(), dst_pt.y + s22.y());

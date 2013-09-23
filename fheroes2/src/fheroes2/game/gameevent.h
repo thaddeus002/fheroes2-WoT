@@ -32,16 +32,16 @@
 struct EventDate
 {
     EventDate() : computer(false), first(0), subsequent(0), colors(0) {}
-    EventDate(const void *ptr);
+    EventDate(const u8*, size_t);
 
-    bool isAllow(u8 color, u16 date) const;
-    bool isDeprecated(u16 date) const;
+    bool	isAllow(int color, u32 date) const;
+    bool	isDeprecated(u32 date) const;
 
-    Funds resource;
-    bool computer;
-    u16 first;
-    u16 subsequent;
-    u8 colors;
+    Funds	resource;
+    bool	computer;
+    u32		first;
+    u32		subsequent;
+    int		colors;
     std::string message;
 };
 
@@ -51,16 +51,16 @@ StreamBase & operator>> (StreamBase &, EventDate &);
 struct EventMaps : public Maps::Position
 {
     EventMaps() : computer(false), cancel(false), colors(0) {}
-    EventMaps(s32 index, const void *ptr);
+    EventMaps(s32 index, const u8*, size_t);
 
-    bool isAllow(u8 color, s32 index) const;
-    void SetVisited(u8 color);
+    bool	isAllow(int color, s32 index) const;
+    void	SetVisited(int color);
 
-    Funds resource;
-    Artifact artifact;
-    bool computer;
-    bool cancel;
-    u8 colors;
+    Funds	resource;
+    Artifact	artifact;
+    bool	computer;
+    bool	cancel;
+    int		colors;
     std::string message;
 };
 
@@ -72,16 +72,16 @@ typedef std::list<std::string>    RiddleAnswers;
 struct Riddle : public Maps::Position
 {
     Riddle() : valid(false) {}
-    Riddle(s32 index, const void *ptr);
+    Riddle(s32 index, const u8*, size_t);
 
-    bool AnswerCorrect(const std::string & answer);
-    void SetQuiet(void);
+    bool	AnswerCorrect(const std::string & answer);
+    void	SetQuiet(void);
 
-    Funds resource;
-    Artifact artifact;
+    Funds	resource;
+    Artifact	artifact;
     RiddleAnswers answers;
     std::string message;
-    bool valid;
+    bool	valid;
 };
 
 StreamBase & operator<< (StreamBase &, const Riddle &);

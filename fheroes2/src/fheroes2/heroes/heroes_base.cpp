@@ -24,7 +24,9 @@
 #include <utility>
 #include <sstream>
 #include "artifact.h"
+#include "game.h"
 #include "race.h"
+#include "color.h"
 #include "army.h"
 #include "world.h"
 #include "kingdom.h"
@@ -32,17 +34,17 @@
 #include "settings.h"
 #include "heroes_base.h"
 
-s8 ArtifactsModifiersResult(u8 type, const u8* arts, u8 size, const HeroBase & base, std::string* strs)
+int ArtifactsModifiersResult(int type, const u8* arts, u32 size, const HeroBase & base, std::string* strs)
 {
-    s8 result = 0;
+    int result = 0;
 
-    for(u8 ii = 0; ii < size; ++ii)
+    for(u32 ii = 0; ii < size; ++ii)
     {
 	    const Artifact art(arts[ii]);
 
     	    if(art.isValid())
     	    {
-		u8 acount = base.HasArtifact(art);
+		int acount = base.HasArtifact(art);
 		if(acount)
 		{
 		    s32 mod = art.ExtraValue();
@@ -75,7 +77,7 @@ s8 ArtifactsModifiersResult(u8 type, const u8* arts, u8 size, const HeroBase & b
     return result;
 }
 
-s8 ArtifactsModifiersAttack(const HeroBase & base, std::string* strs)
+int ArtifactsModifiersAttack(const HeroBase & base, std::string* strs)
 {
     const u8 arts[] = {
             Artifact::SPIKED_HELM, Artifact::THUNDER_MACE, Artifact::GIANT_FLAIL,
@@ -87,7 +89,7 @@ s8 ArtifactsModifiersAttack(const HeroBase & base, std::string* strs)
     return ArtifactsModifiersResult(MDF_ATTACK, arts, ARRAY_COUNT(arts), base, strs);
 }
 
-s8 ArtifactsModifiersDefense(const HeroBase & base, std::string* strs)
+int ArtifactsModifiersDefense(const HeroBase & base, std::string* strs)
 {
     const u8 arts[] = {
 	    Artifact::SPIKED_HELM, Artifact::ARMORED_GAUNTLETS, Artifact::DEFENDER_HELM,
@@ -99,7 +101,7 @@ s8 ArtifactsModifiersDefense(const HeroBase & base, std::string* strs)
     return ArtifactsModifiersResult(MDF_DEFENSE, arts, ARRAY_COUNT(arts), base, strs);
 }
 
-s8 ArtifactsModifiersPower(const HeroBase & base, std::string* strs)
+int ArtifactsModifiersPower(const HeroBase & base, std::string* strs)
 {
     const u8 arts[] = {
 	    Artifact::WHITE_PEARL, Artifact::BLACK_PEARL, Artifact::CASTER_BRACELET,
@@ -111,7 +113,7 @@ s8 ArtifactsModifiersPower(const HeroBase & base, std::string* strs)
     return ArtifactsModifiersResult(MDF_POWER, arts, ARRAY_COUNT(arts), base, strs);
 }
 
-s8 ArtifactsModifiersKnowledge(const HeroBase & base, std::string* strs)
+int ArtifactsModifiersKnowledge(const HeroBase & base, std::string* strs)
 {
     const u8 arts[] = {
 	    Artifact::WHITE_PEARL, Artifact::BLACK_PEARL, Artifact::MINOR_SCROLL,
@@ -122,7 +124,7 @@ s8 ArtifactsModifiersKnowledge(const HeroBase & base, std::string* strs)
     return ArtifactsModifiersResult(MDF_KNOWLEDGE, arts, ARRAY_COUNT(arts), base, strs);
 }
 
-s8 ArtifactsModifiersMorale(const HeroBase & base, std::string* strs)
+int ArtifactsModifiersMorale(const HeroBase & base, std::string* strs)
 {
     const u8 arts[] = {
 	    Artifact::MEDAL_VALOR, Artifact::MEDAL_COURAGE, Artifact::MEDAL_HONOR,
@@ -132,7 +134,7 @@ s8 ArtifactsModifiersMorale(const HeroBase & base, std::string* strs)
     return ArtifactsModifiersResult(MDF_MORALE, arts, ARRAY_COUNT(arts), base, strs);
 }
 
-s8 ArtifactsModifiersLuck(const HeroBase & base, std::string* strs)
+int ArtifactsModifiersLuck(const HeroBase & base, std::string* strs)
 {
     const u8 arts[] = {
 	    Artifact::RABBIT_FOOT, Artifact::GOLDEN_HORSESHOE, Artifact::GAMBLER_LUCKY_COIN,
@@ -141,14 +143,14 @@ s8 ArtifactsModifiersLuck(const HeroBase & base, std::string* strs)
     return ArtifactsModifiersResult(MDF_LUCK, arts, ARRAY_COUNT(arts), base, strs);
 }
 
-HeroBase::HeroBase(u8 type, u8 race)
+HeroBase::HeroBase(int type, int race)
     : magic_point(0), move_point(0), spell_book()
 {
     bag_artifacts.assign(HEROESMAXARTIFACT, Artifact::UNKNOWN);
     LoadDefaults(type, race);
 }
 
-void HeroBase::LoadDefaults(u8 type, u8 race)
+void HeroBase::LoadDefaults(int type, int race)
 {
     if(Race::ALL & race)
     {
@@ -158,7 +160,7 @@ void HeroBase::LoadDefaults(u8 type, u8 race)
 	// fixed default spell
 	switch(type)
 	{
-	    case Skill::Primary::CAPTAIN:
+	    case HeroBase::CAPTAIN:
 	    {
 		// force add spell book
 		SpellBookActivate();
@@ -169,7 +171,7 @@ void HeroBase::LoadDefaults(u8 type, u8 race)
 	    }
     	    break;
 
-	    case Skill::Primary::HEROES:
+	    case HeroBase::HEROES:
 	    {
 		Spell spell = Skill::Primary::GetInitialSpell(race);
 		if(spell.isValid())
@@ -189,13 +191,22 @@ HeroBase::HeroBase() : magic_point(0), move_point(0), spell_book()
 {
 }
 
+bool HeroBase::isCaptain(void) const
+{
+    return GetType() == CAPTAIN;
+}
 
-u16 HeroBase::GetSpellPoints(void) const
+bool HeroBase::isHeroes(void) const
+{
+    return GetType() == HEROES;
+}
+
+u32 HeroBase::GetSpellPoints(void) const
 {
     return magic_point;
 }
 
-void HeroBase::SetSpellPoints(u16 points)
+void HeroBase::SetSpellPoints(u32 points)
 {
     magic_point = points;
 }
@@ -210,7 +221,7 @@ void HeroBase::EditSpellBook(void)
     spell_book.Edit(*this);
 }
 
-Spell HeroBase::OpenSpellBook(u8 filter, bool canselect) const
+Spell HeroBase::OpenSpellBook(int filter, bool canselect) const
 {
     return spell_book.Open(*this, filter, canselect);
 }
@@ -255,7 +266,7 @@ BagArtifacts & HeroBase::GetBagArtifacts(void)
     return bag_artifacts;
 }
 
-u8 HeroBase::HasArtifact(const Artifact & art) const
+u32 HeroBase::HasArtifact(const Artifact & art) const
 {
     bool unique = true;
 
@@ -272,9 +283,9 @@ u8 HeroBase::HasArtifact(const Artifact & art) const
         (bag_artifacts.isPresentArtifact(art) ? 1 : 0);
 }
 
-s8 HeroBase::GetAttackModificator(std::string* strs) const
+int HeroBase::GetAttackModificator(std::string* strs) const
 {
-    s8 result = ArtifactsModifiersAttack(*this, strs);
+    int result = ArtifactsModifiersAttack(*this, strs);
 
     // check castle modificator
     const Castle* castle = inCastle();
@@ -285,9 +296,9 @@ s8 HeroBase::GetAttackModificator(std::string* strs) const
     return result;
 }
 
-s8 HeroBase::GetDefenseModificator(std::string* strs) const
+int HeroBase::GetDefenseModificator(std::string* strs) const
 {
-    s8 result = ArtifactsModifiersDefense(*this, strs);
+    int result = ArtifactsModifiersDefense(*this, strs);
 
     // check castle modificator
     const Castle* castle = inCastle();
@@ -298,9 +309,9 @@ s8 HeroBase::GetDefenseModificator(std::string* strs) const
     return result;
 }
 
-s8 HeroBase::GetPowerModificator(std::string* strs) const
+int HeroBase::GetPowerModificator(std::string* strs) const
 {
-    s8 result = ArtifactsModifiersPower(*this, strs);
+    int result = ArtifactsModifiersPower(*this, strs);
 
     // check castle modificator
     const Castle* castle = inCastle();
@@ -311,9 +322,9 @@ s8 HeroBase::GetPowerModificator(std::string* strs) const
     return result;
 }
 
-s8 HeroBase::GetKnowledgeModificator(std::string* strs) const
+int HeroBase::GetKnowledgeModificator(std::string* strs) const
 {
-    s8 result = ArtifactsModifiersKnowledge(*this, strs);
+    int result = ArtifactsModifiersKnowledge(*this, strs);
 
     // check castle modificator
     const Castle* castle = inCastle();
@@ -324,9 +335,9 @@ s8 HeroBase::GetKnowledgeModificator(std::string* strs) const
     return result;
 }
 
-s8 HeroBase::GetMoraleModificator(std::string* strs) const
+int HeroBase::GetMoraleModificator(std::string* strs) const
 {
-    s8 result = ArtifactsModifiersMorale(*this, strs);
+    int result = ArtifactsModifiersMorale(*this, strs);
 
     // check castle modificator
     const Castle* castle = inCastle();
@@ -346,9 +357,9 @@ s8 HeroBase::GetMoraleModificator(std::string* strs) const
     return result;
 }
 
-s8 HeroBase::GetLuckModificator(std::string* strs) const
+int HeroBase::GetLuckModificator(std::string* strs) const
 {
-    s8 result = ArtifactsModifiersLuck(*this, strs);
+    int result = ArtifactsModifiersLuck(*this, strs);
 
     // check castle modificator
     const Castle* castle = inCastle();
@@ -397,6 +408,7 @@ bool HeroBase::CanCastSpell(const Spell & spell, std::string* res) const
 	*res = os.str();
 	return false;
     }
+
     return HaveSpellBook() && HaveSpell(spell) && HaveSpellPoints(spell) && kingdom.AllowPayment(spell.GetCost());
 }
 
@@ -421,7 +433,7 @@ bool HeroBase::CanTranscribeScroll(const Artifact & art) const
 
     if(spell.isValid() && CanCastSpell(spell))
     {
-	u8 learning = GetLevelSkill(Skill::Secondary::LEARNING);
+	int learning = GetLevelSkill(Skill::Secondary::LEARNING);
 
 	return ((3 <  spell.Level() && Skill::Level::EXPERT == learning) ||
 	    (3 == spell.Level() && Skill::Level::ADVANCED <= learning) ||
@@ -433,7 +445,7 @@ bool HeroBase::CanTranscribeScroll(const Artifact & art) const
 
 bool HeroBase::CanTeachSpell(const Spell & spell) const
 {
-    u8 learning = GetLevelSkill(Skill::Secondary::LEARNING);
+    int learning = GetLevelSkill(Skill::Secondary::LEARNING);
 
     return ((4 == spell.Level() && Skill::Level::EXPERT == learning) ||
 	    (3 == spell.Level() && Skill::Level::ADVANCED <= learning) ||
@@ -442,7 +454,7 @@ bool HeroBase::CanTeachSpell(const Spell & spell) const
 
 bool HeroBase::CanLearnSpell(const Spell & spell) const
 {
-    u8 wisdom = GetLevelSkill(Skill::Secondary::WISDOM);
+    int wisdom = GetLevelSkill(Skill::Secondary::WISDOM);
 
     return ((4 < spell.Level() && Skill::Level::EXPERT == wisdom) ||
             (4 == spell.Level() && Skill::Level::ADVANCED <= wisdom) ||
@@ -488,14 +500,23 @@ StreamBase & operator>> (StreamBase & msg, HeroBase & hero)
 {
     Skill::Primary & base = hero;
 
-    return
-	// primary
-	msg >> base >>
+    // primary
+    msg >> base >>
 	// position
 	hero.center >>
 	// modes
-	hero.modes >>
-	// hero base
-	hero.magic_point >> hero.move_point >>
-	hero.spell_book >> hero.bag_artifacts;
+	hero.modes;
+
+    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
+    {
+	u16 point1, point2;
+	msg >> point1 >> point2;
+	hero.magic_point = point1;
+	hero.move_point = point2;
+    }
+    else
+	msg >> hero.magic_point >> hero.move_point;
+
+    return msg >>
+	    hero.spell_book >> hero.bag_artifacts;
 }

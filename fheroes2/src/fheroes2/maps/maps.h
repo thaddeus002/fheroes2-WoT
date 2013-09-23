@@ -51,55 +51,54 @@ namespace Maps
 
     class IndexesDistance : public std::vector<IndexDistance>
     {
-	void Assign(const s32 & from, const Indexes &, u8 sort /* 0: none, 1: short first, 2: long first */);
+	void Assign(s32, const Indexes &, int sort /* 0: none, 1: short first, 2: long first */);
 
     public:
-	IndexesDistance(const s32 &, const Indexes &, u8 sort = 0);
-	IndexesDistance(const s32 &, const s32 &, u16 dist, u8 sort = 0);
+	IndexesDistance(s32, const Indexes &, int sort = 0);
+	IndexesDistance(s32, s32, u32 dist, int sort = 0);
     };
 
-    const char* SizeString(u16);
-    const char* GetMinesName(u8);
+    const char* SizeString(int size);
+    const char* GetMinesName(int res);
 
-    s32 GetDirectionIndex(const s32 & from, u16 direct);
-    bool isValidDirection(const s32 & from, u16 direct);
+    s32 GetDirectionIndex(s32, int direct);
+    bool isValidDirection(s32, int direct);
 
-    bool isValidAbsIndex(const s32 &);
+    bool isValidAbsIndex(s32);
     bool isValidAbsPoint(const Point & pt);
-    bool isValidAbsPoint(s16 x, s16 y);
+    bool isValidAbsPoint(s32 x, s32 y);
 
-    Point GetPoint(const s32 &);
+    Point GetPoint(s32);
 
     s32 GetIndexFromAbsPoint(const Point & mp);
-    s32 GetIndexFromAbsPoint(s16 px, s16 py);
+    s32 GetIndexFromAbsPoint(s32 px, s32 py);
 
     Indexes GetAllIndexes(void);
-    Indexes GetAroundIndexes(const s32 &);
-    Indexes GetAroundIndexes(const s32 &, u16 dist, bool sort = false); // sorting distance
-    Indexes GetDistanceIndexes(const s32 & center, u16 dist);
+    Indexes GetAroundIndexes(s32);
+    Indexes GetAroundIndexes(s32, int dist, bool sort = false); // sorting distance
+    Indexes GetDistanceIndexes(s32 center, int dist);
 
-    Indexes ScanAroundObject(const s32 &, u8 obj);
-    Indexes ScanAroundObjects(const s32 &, const u8* objs);
-    Indexes ScanAroundObject(const s32 &, u16 dist, u8 obj);
-    Indexes ScanAroundObjects(const s32 &, u16 dist, const u8* objs);
+    Indexes ScanAroundObject(s32, int obj);
+    Indexes ScanAroundObjects(s32, const u8* objs);
+    Indexes ScanAroundObject(s32, u32 dist, int obj);
+    Indexes ScanAroundObjects(s32, u32 dist, const u8* objs);
 
-    Indexes	GetTilesUnderProtection(const s32 &);
-    bool	TileIsUnderProtection(const s32 &);
-    bool	IsNearTiles(const s32 &, const s32 &);
+    Indexes	GetTilesUnderProtection(s32);
+    bool	TileIsUnderProtection(s32);
+    bool	IsNearTiles(s32, s32);
 
-    Indexes GetObjectPositions(u8 obj, bool check_hero);
-    Indexes GetObjectPositions(const s32 &, u8 obj, bool check_hero);
+    Indexes GetObjectPositions(int obj, bool check_hero);
+    Indexes GetObjectPositions(s32, int obj, bool check_hero);
     Indexes GetObjectsPositions(const u8* objs);
 
-    u16 TileIsCoast(const s32 &, u16 direct = DIRECTION_ALL);
+    int TileIsCoast(s32, int direct = DIRECTION_ALL);
 
-    void ClearFog(const s32 &, u8 scoute, u8 color);
-    u16 GetApproximateDistance(const s32 &, const s32 &);
+    void ClearFog(s32, int scoute, int color);
+    u32 GetApproximateDistance(s32, s32);
 
-
-    void UpdateRNDSpriteForCastle(const Point & center, u8 race, bool castle);
-    void UpdateSpritesFromTownToCastle(const Point & center);
-    void MinimizeAreaForCastle(const Point & center);
+    void UpdateRNDSpriteForCastle(const Point &, int race, bool castle);
+    void UpdateSpritesFromTownToCastle(const Point &);
+    void MinimizeAreaForCastle(const Point &);
 }
 
 #endif

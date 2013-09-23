@@ -22,11 +22,13 @@
 
 #include "agg.h"
 #include "maps.h"
+#include "text.h"
 #include "army.h"
 #include "heroes.h"
 #include "castle.h"
 #include "monster.h"
 #include "race.h"
+#include "ground.h"
 #include "interface_gamearea.h"
 #include "game_interface.h"
 #include "cursor.h"
@@ -35,9 +37,10 @@
 #include "kingdom.h"
 #include "profit.h"
 #include "spell.h"
+#include "game.h"
 #include "dialog.h"
 
-std::string GetMinesIncomeString(u8 type)
+std::string GetMinesIncomeString(int type)
 {
     const payment_t income = ProfitConditions::FromMine(type);
     const s32 value = income.Get(type);
@@ -55,7 +58,7 @@ std::string GetMinesIncomeString(u8 type)
     return res;
 }
 
-std::string ShowGuardiansInfo(const Maps::Tiles & tile, u8 scoute)
+std::string ShowGuardiansInfo(const Maps::Tiles & tile, int scoute)
 {
     std::string str;
     const Troop & troop = tile.QuantityTroop();
@@ -80,7 +83,7 @@ std::string ShowGuardiansInfo(const Maps::Tiles & tile, u8 scoute)
     return str;
 }
 
-std::string ShowMonsterInfo(const Maps::Tiles & tile, u8 scoute)
+std::string ShowMonsterInfo(const Maps::Tiles & tile, int scoute)
 {
     std::string str;
     const Troop & troop = tile.QuantityTroop();
@@ -111,7 +114,7 @@ std::string ShowArtifactInfo(const Maps::Tiles & tile, bool show)
     return str;
 }
 
-std::string ShowResourceInfo(const Maps::Tiles & tile, bool show, u8 scoute)
+std::string ShowResourceInfo(const Maps::Tiles & tile, bool show, int scoute)
 {
     std::string str = MP2::StringObject(tile.GetObject());
 
@@ -133,7 +136,7 @@ std::string ShowResourceInfo(const Maps::Tiles & tile, bool show, u8 scoute)
     return str;
 }
 
-std::string ShowDwellingInfo(const Maps::Tiles & tile, u8 scoute)
+std::string ShowDwellingInfo(const Maps::Tiles & tile, int scoute)
 {
     std::string str = MP2::StringObject(tile.GetObject());
 
@@ -153,7 +156,7 @@ std::string ShowDwellingInfo(const Maps::Tiles & tile, u8 scoute)
     return str;
 }
 
-std::string ShowShrineInfo(const Maps::Tiles & tile, const Heroes* hero, u8 scoute)
+std::string ShowShrineInfo(const Maps::Tiles & tile, const Heroes* hero, int scoute)
 {
     std::string str = MP2::StringObject(tile.GetObject());
     bool show = false;
@@ -282,10 +285,10 @@ std::string ShowGroundInfo(const Maps::Tiles & tile, bool show, const Heroes* he
 
     if(show && hero)
     {
-	Direction::vector_t dir = Direction::Get(hero->GetIndex(), tile.GetIndex());
+	int dir = Direction::Get(hero->GetIndex(), tile.GetIndex());
 	if(dir != Direction::UNKNOWN)
 	{
-	    u16 cost = Maps::Ground::GetPenalty(tile.GetIndex(), Direction::Reflect(dir),
+	    u32 cost = Maps::Ground::GetPenalty(tile.GetIndex(), Direction::Reflect(dir),
 				    hero->GetLevelSkill(Skill::Secondary::PATHFINDING));
 	    if(cost)
 	    {
@@ -334,7 +337,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     cursor.Hide();
 
     // preload
-    const ICN::icn_t qwikinfo = ICN::QWIKINFO;
+    const int qwikinfo = ICN::QWIKINFO;
 
     // image box
     const Sprite &box = AGG::GetICN(qwikinfo, 0);
@@ -345,9 +348,9 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     const Point & mp = le.GetMouseCursor();
 
     Rect pos;
-    s16 mx = (mp.x - BORDERWIDTH) / TILEWIDTH;
+    s32 mx = (mp.x - BORDERWIDTH) / TILEWIDTH;
     mx *= TILEWIDTH;
-    s16 my = (mp.y - BORDERWIDTH) / TILEWIDTH;
+    s32 my = (mp.y - BORDERWIDTH) / TILEWIDTH;
     my *= TILEWIDTH;
 
     // top left
@@ -372,8 +375,8 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 
     const Heroes* from_hero = Interface::GetFocusHeroes();
     const Kingdom & kingdom = world.GetKingdom(settings.CurrentColor());
-    u8 scoute = from_hero ? from_hero->CanScouteTile(tile.GetIndex()) : 0;
-    const bool & show = settings.ExtWorldShowVisitedContent();
+    int scoute = from_hero ? from_hero->CanScouteTile(tile.GetIndex()) : 0;
+    const bool show = settings.ExtWorldShowVisitedContent();
 
     if(tile.isFog(settings.CurrentColor()))
 	name_object = _("Unchartered Territory");
@@ -538,7 +541,7 @@ void Dialog::QuickInfo(const Castle & castle)
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
 
-    const ICN::icn_t qwiktown = ICN::QWIKTOWN;
+    const int qwiktown = ICN::QWIKTOWN;
 
     // image box
     const Sprite &box = AGG::GetICN(qwiktown, 0);
@@ -549,9 +552,9 @@ void Dialog::QuickInfo(const Castle & castle)
     const Point & mp = le.GetMouseCursor();
 
     Rect cur_rt;
-    s16 mx = (mp.x - BORDERWIDTH) / TILEWIDTH;
+    s32 mx = (mp.x - BORDERWIDTH) / TILEWIDTH;
     mx *= TILEWIDTH;
-    s16 my = (mp.y - BORDERWIDTH) / TILEWIDTH;
+    s32 my = (mp.y - BORDERWIDTH) / TILEWIDTH;
     my *= TILEWIDTH;
 
     // top left
@@ -587,7 +590,7 @@ void Dialog::QuickInfo(const Castle & castle)
     dst_pt.y = cur_rt.y + 5;
     text.Blit(dst_pt);
 
-    u8 index = 0;
+    u32 index = 0;
 
     switch(castle.GetRace())
     {
@@ -635,7 +638,7 @@ void Dialog::QuickInfo(const Castle & castle)
     text.Blit(dst_pt);
 
     //
-    u8 count = castle.GetArmy().GetCount();
+    u32 count = castle.GetArmy().GetCount();
     const Settings & conf = Settings::Get();
 
     const Heroes* from_hero = Interface::GetFocusHeroes();
@@ -656,10 +659,13 @@ void Dialog::QuickInfo(const Castle & castle)
 	text.Blit(dst_pt);
 
 	// mini port heroes
-	const Surface & port = Heroes::GetPortrait(guardian->GetID(), PORT_SMALL);
-	dst_pt.x = cur_rt.x + (cur_rt.w - port.w()) / 2;
-	dst_pt.y += 15;
-	port.Blit(dst_pt, display);
+	Surface port = Heroes::GetPortrait(guardian->GetID(), PORT_SMALL);
+	if(port.isValid())
+	{
+	    dst_pt.x = cur_rt.x + (cur_rt.w - port.w()) / 2;
+	    dst_pt.y += 15;
+	    port.Blit(dst_pt, display);
+	}
     }
 
     // draw defenders
@@ -700,7 +706,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
 
-    const ICN::icn_t qwikhero = ICN::QWIKHERO;
+    const int qwikhero = ICN::QWIKHERO;
 
     // image box
     const Sprite &box = AGG::GetICN(qwikhero, 0);
@@ -711,9 +717,9 @@ void Dialog::QuickInfo(const Heroes & hero)
     const Point & mp = le.GetMouseCursor();
 
     Rect cur_rt;
-    s16 mx = (mp.x - BORDERWIDTH) / TILEWIDTH;
+    s32 mx = (mp.x - BORDERWIDTH) / TILEWIDTH;
     mx *= TILEWIDTH;
-    s16 my = (mp.y - BORDERWIDTH) / TILEWIDTH;
+    s32 my = (mp.y - BORDERWIDTH) / TILEWIDTH;
     my *= TILEWIDTH;
 
     // top left
@@ -759,17 +765,20 @@ void Dialog::QuickInfo(const Heroes & hero)
     text.Blit(dst_pt);
 
     // mini port heroes
-    const Surface & port = Heroes::GetPortrait(hero.GetID(), PORT_SMALL);
-    dst_pt.x = cur_rt.x + (cur_rt.w - port.w()) / 2;
-    dst_pt.y = cur_rt.y + 13;
-    port.Blit(dst_pt, display);
+    Surface port = Heroes::GetPortrait(hero.GetID(), PORT_SMALL);
+    if(port.isValid())
+    {
+	dst_pt.x = cur_rt.x + (cur_rt.w - port.w()) / 2;
+	dst_pt.y = cur_rt.y + 13;
+	port.Blit(dst_pt, display);
+    }
 
     // luck
     if(hero.isFriends(conf.CurrentColor()))
     {
-	const s8 luck = hero.GetLuckWithModificators(NULL);
+	const s32 luck = hero.GetLuckWithModificators(NULL);
 	const Sprite & sprite = AGG::GetICN(ICN::MINILKMR, (0 > luck ? 0 : (0 < luck ? 1 : 2)));
-	u8 count = (0 == luck ? 1 : static_cast<u8>(std::abs(luck)));
+	u32 count = (0 == luck ? 1 : std::abs(luck));
 	dst_pt.x = cur_rt.x + 120;
 	dst_pt.y = cur_rt.y + (count == 1 ? 20 : 13);
 
@@ -783,9 +792,9 @@ void Dialog::QuickInfo(const Heroes & hero)
     // morale
     if(hero.isFriends(conf.CurrentColor()))
     {
-	const s8 morale = hero.GetMoraleWithModificators(NULL);
+	const s32 morale = hero.GetMoraleWithModificators(NULL);
 	const Sprite & sprite = AGG::GetICN(ICN::MINILKMR, (0 > morale ? 3 : (0 < morale ? 4 : 5)));
-	u8 count = (0 == morale ? 1 : static_cast<u8>(std::abs(morale)));
+	u32 count = (0 == morale ? 1 : std::abs(morale));
 	dst_pt.x = cur_rt.x + 10;
 	dst_pt.y = cur_rt.y + (count == 1 ? 20 : 13);
 
@@ -797,7 +806,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     }
 
     // color flags
-    u8 index = 0;
+    u32 index = 0;
 
     switch(hero.GetColor())
     {

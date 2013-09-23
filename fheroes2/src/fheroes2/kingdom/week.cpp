@@ -24,6 +24,7 @@
 #include "gamedefs.h"
 #include "settings.h"
 #include "world.h"
+#include "game.h"
 #include "week.h"
 
 const char* Week::GetName(void) const
@@ -67,14 +68,29 @@ const char* Week::GetName(void) const
     return str_name[0];
 }
 
-Week::type_t Week::WeekRand(void)
+int Week::WeekRand(void)
 {
     return (0 == (world.CountWeek() + 1) % 3) && (! Settings::Get().ExtWorldBanWeekOf()) ?  MONSTERS :
-		static_cast<type_t>(Rand::Get(ANT, CONDOR));
+		Rand::Get(ANT, CONDOR);
 }
 
-Week::type_t Week::MonthRand(void)
+int Week::MonthRand(void)
 {
     return (0 == (world.GetMonth() + 1) % 3) && (! Settings::Get().ExtWorldBanWeekOf()) ?  MONSTERS :
-		static_cast<type_t>(Rand::Get(Settings::Get().ExtWorldBanPlagues() ? ANT : PLAGUE, CONDOR));
+		Rand::Get(Settings::Get().ExtWorldBanPlagues() ? ANT : PLAGUE, CONDOR);
+}
+
+StreamBase & operator>> (StreamBase & sb, Week & st)
+{
+    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
+    {
+        u8 type, mon;
+        sb >> type >> mon;
+        st.first = type;
+        st.second = mon;
+    }
+    else
+        sb >> st.first >> st.second;
+
+    return sb;
 }

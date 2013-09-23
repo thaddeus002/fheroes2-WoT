@@ -26,12 +26,9 @@
 #include <string>
 #include <vector>
 #include <list>
-#include "mp2.h"
-#include "dialog.h"
 #include "route.h"
 #include "pairs.h"
 #include "visit.h"
-#include "direction.h"
 #include "heroes_base.h"
 #include "army.h"
 #include "gamedefs.h"
@@ -44,7 +41,7 @@ namespace Battle { class Only; }
 class Heroes : public HeroBase, public ColorBase
 {
 public:
-    enum heroes_t
+    enum
     {
 	// knight
 	LORDKILBURN, SIRGALLANTH, ECTOR, GVENNETH, TYRO, AMBROSE, RUBY, MAXIMUS, DIMITRY,
@@ -66,8 +63,8 @@ public:
 	SANDYSANDY, UNKNOWN
     };
 
-    static heroes_t ConvertID(u8);
-    static Surface GetPortrait(heroes_t, u8);
+    static Surface	GetPortrait(int heroid, int type);
+    static const char*	GetName(int heroid);
 
     enum flags_t
     {
@@ -87,164 +84,168 @@ public:
 	NOTDISMISS	= 0x00002000,
 	VISIONS		= 0x00004000,
 	PATROL		= 0x00008000,
-	CUSTOMARMY	= 0x00010000
+	CUSTOMARMY	= 0x00010000,
+	CUSTOMSKILLS	= 0x00020000
     };
 
     Heroes();
-    Heroes(heroes_t ht, u8 rc);
+    Heroes(int heroid, int rc);
 
-    bool isValid(void) const;
-    bool isFreeman(void) const;
-    void SetFreeman(const u8 reason);
+    bool		isValid(void) const;
+    bool		isFreeman(void) const;
+    void		SetFreeman(int reason);
 
-    const Castle* inCastle(void) const;
-    Castle* inCastle(void);
+    const Castle*	inCastle(void) const;
+    Castle*		inCastle(void);
 
-    void LoadFromMP2(s32 map_index, const void *ptr,  const Color::color_t cl, const u8 rc);
+    void		LoadFromMP2(s32 map_index, int cl, int rc, const u8*, size_t);
+    void		PostLoad(void);
 
-    u8 GetRace(void) const{ return race; }
-    const std::string & GetName(void) const{ return name; }
-    Color::color_t GetColor(void) const{ return ColorBase::GetColor(); }
-    static const char* GetName(Heroes::heroes_t);
-    u8 GetType(void) const { return Skill::Primary::HEROES; }
-    u8 GetControl(void) const;
+    int			GetRace(void) const;
+    const std::string &	GetName(void) const;
+    int			GetColor(void) const;
+    int			GetType(void) const;
+    int			GetControl(void) const;
 
-    const Color::color_t & GetKillerColor(void) const;
-    void SetKillerColor(u8);
+    int			GetKillerColor(void) const;
+    void		SetKillerColor(int);
 
-    const Army & GetArmy(void) const{ return army; }
-    Army & GetArmy(void) { return army; }
+    const Army &	GetArmy(void) const;
+    Army &		GetArmy(void);
 
-    heroes_t GetID(void) const;
+    int			GetID(void) const;
 
-    u8 GetAttack(void) const;
-    u8 GetDefense(void) const;
-    u8 GetPower(void) const;
-    u8 GetKnowledge(void) const;
+    int			GetAttack(void) const;
+    int			GetDefense(void) const;
+    int			GetPower(void) const;
+    int			GetKnowledge(void) const;
 
-    u8 GetAttack(std::string*) const;
-    u8 GetDefense(std::string*) const;
-    u8 GetPower(std::string*) const;
-    u8 GetKnowledge(std::string*) const;
+    int			GetAttack(std::string*) const;
+    int			GetDefense(std::string*) const;
+    int			GetPower(std::string*) const;
+    int			GetKnowledge(std::string*) const;
 
-    void IncreasePrimarySkill(const Skill::Primary::skill_t skill);
+    void		IncreasePrimarySkill(int skill);
 
-    s8 GetMorale(void) const;
-    s8 GetLuck(void) const;
-    s8 GetMoraleWithModificators(std::string *str = NULL) const;
-    s8 GetLuckWithModificators(std::string *str = NULL) const;
-    u8 GetLevel(void) const;
+    int			GetMorale(void) const;
+    int			GetLuck(void) const;
+    int			GetMoraleWithModificators(std::string *str = NULL) const;
+    int			GetLuckWithModificators(std::string *str = NULL) const;
+    int			GetLevel(void) const;
 
-    u8 GetMapsObject(void) const;
-    void SetMapsObject(u8);
+    int			GetMapsObject(void) const;
+    void		SetMapsObject(int);
 
-    const Point & GetCenterPatrol(void) const;
-    void SetCenterPatrol(const Point &);
-    u8 GetSquarePatrol(void) const;
+    const Point &	GetCenterPatrol(void) const;
+    void		SetCenterPatrol(const Point &);
+    int			GetSquarePatrol(void) const;
 
-    u16 GetMaxSpellPoints(void) const;
+    u32			GetMaxSpellPoints(void) const;
+    u32			GetMaxMovePoints(void) const;
 
-    u16 GetMaxMovePoints(void) const;
-    u16 GetMovePoints(void) const;
-    void IncreaseMovePoints(const u16 point);
-    bool MayStillMove(void) const;
-    void ResetMovePoints(void) { move_point = 0; };
-    void MovePointsScaleFixed(void);
-    void RecalculateMovePoints(void);
+    u32			GetMovePoints(void) const;
+    void		IncreaseMovePoints(u32);
+    bool		MayStillMove(void) const;
+    void		ResetMovePoints(void);
+    void		MovePointsScaleFixed(void);
+    void		RecalculateMovePoints(void);
 
-    bool HasSecondarySkill(u8) const;
-    bool HasMaxSecondarySkill(void) const;
-    u8   GetLevelSkill(u8) const;
-    u16  GetSecondaryValues(u8) const;
-    void LearnSkill(const Skill::Secondary &);
-    Skill::SecSkills & GetSecondarySkills(void);
+    bool		HasSecondarySkill(int) const;
+    bool		HasMaxSecondarySkill(void) const;
+    int			GetLevelSkill(int) const;
+    u32			GetSecondaryValues(int) const;
+    void		LearnSkill(const Skill::Secondary &);
+    Skill::SecSkills &	GetSecondarySkills(void);
 
-    bool PickupArtifact(const Artifact &);
-    bool HasUltimateArtifact(void) const;
-    u8 GetCountArtifacts(void) const;
-    bool IsFullBagArtifacts(void) const;
+    bool		PickupArtifact(const Artifact &);
+    bool		HasUltimateArtifact(void) const;
+    u32			GetCountArtifacts(void) const;
+    bool		IsFullBagArtifacts(void) const;
 
-    u8 GetMobilityIndexSprite(void) const;
-    u8 GetManaIndexSprite(void) const;
+    int			GetMobilityIndexSprite(void) const;
+    int			GetManaIndexSprite(void) const;
 
-    Dialog::answer_t OpenDialog(bool readonly = false, bool fade = false);
-    void MeetingDialog(Heroes &);
+    int			OpenDialog(bool readonly = false, bool fade = false);
+    void		MeetingDialog(Heroes &);
 
-    bool Recruit(u8 col, const Point & pt);
-    bool Recruit(const Castle & castle);
+    bool		Recruit(int col, const Point & pt);
+    bool		Recruit(const Castle & castle);
 
-    void ActionNewDay(void);
-    void ActionNewWeek(void);
-    void ActionNewMonth(void);
-    void ActionAfterBattle(void);
-    void ActionPreBattle(void);
+    void		ActionNewDay(void);
+    void		ActionNewWeek(void);
+    void		ActionNewMonth(void);
+    void		ActionAfterBattle(void);
+    void		ActionPreBattle(void);
 
-    bool BuySpellBook(const Castle*, u8 shrine = 0);
+    bool		BuySpellBook(const Castle*, int shrine = 0);
 
-    const Route::Path & GetPath(void) const{ return path; }
-    Route::Path & GetPath(void) { return path; }
-    u8 GetRangeRouteDays(const s32 dst) const;
-    void ShowPath(bool f){ f ? path.Show() : path.Hide(); }
-    void RescanPath(void);
-    void RescanPathPassable(void);
+    const Route::Path &	GetPath(void) const;
+    Route::Path &	GetPath(void);
+    int			GetRangeRouteDays(s32) const;
+    void		ShowPath(bool);
+    void		RescanPath(void);
+    void		RescanPathPassable(void);
 
-    u16 GetDirection(void) const{ return direction; }
+    int			GetDirection(void) const;
 
-    void SetVisited(const s32 index, const Visit::type_t type = Visit::LOCAL);
-    void SetVisitedWideTile(const s32 index, const u8 object, const Visit::type_t type = Visit::LOCAL);
-    bool isVisited(const u8 object, const Visit::type_t type = Visit::LOCAL) const;
-    bool isVisited(const Maps::Tiles & tile, const Visit::type_t type = Visit::LOCAL) const;
+    void		SetVisited(s32, Visit::type_t = Visit::LOCAL);
+    void		SetVisitedWideTile(s32, int object, Visit::type_t = Visit::LOCAL);
+    bool		isVisited(int object, Visit::type_t = Visit::LOCAL) const;
+    bool		isVisited(const Maps::Tiles &, Visit::type_t = Visit::LOCAL) const;
 
-    bool Move(bool fast = false);
-    void Move2Dest(const s32 &, bool skip_action = false);
-    bool isEnableMove(void) const;
-    bool CanMove(void) const;
-    void SetMove(bool f);
-    bool isAction(void) const { return Modes(ACTION); }
-    void ResetAction(void) { ResetModes(ACTION); }
-    void Action(const s32 dst_index);
-    void ActionNewPosition(void);
-    bool ApplyPenaltyMovement(void);
-    bool ActionSpellCast(const Spell &);
+    bool		Move(bool fast = false);
+    void		Move2Dest(const s32 &, bool skip_action = false);
+    bool		isEnableMove(void) const;
+    bool		CanMove(void) const;
+    void		SetMove(bool);
+    bool		isAction(void) const;
+    void		ResetAction(void);
+    void		Action(s32);
+    void		ActionNewPosition(void);
+    bool		ApplyPenaltyMovement(void);
+    bool		ActionSpellCast(const Spell &);
 
-    void Redraw(Surface &, bool) const;
-    void Redraw(Surface &, const s16, const s16, bool) const;
-    void PortraitRedraw(s16, s16, u8 type, Surface &) const;
-    u8   GetSpriteIndex(void) const{ return sprite_index; }
-    void FadeOut(void) const;
-    void FadeIn(void) const;
-    void Scoute(void) const;
-    u8   GetScoute(void) const;
-    u8   CanScouteTile(s32) const;
-    u16  GetVisionsDistance(void) const;
+    void		Redraw(Surface &, bool) const;
+    void		Redraw(Surface &, s32, s32, bool) const;
+    void		PortraitRedraw(s32, s32, int type, Surface &) const;
+    int			GetSpriteIndex(void) const;
+    void		FadeOut(void) const;
+    void		FadeIn(void) const;
+    void		Scoute(void) const;
+    int			GetScoute(void) const;
+    int			CanScouteTile(s32) const;
+    u32			GetVisionsDistance(void) const;
 
-    bool isShipMaster(void) const;
-    void SetShipMaster(bool f);
+    bool		isShipMaster(void) const;
+    void		SetShipMaster(bool);
 
-    u32 GetExperience(void) const;
-    void IncreaseExperience(const u32 exp);
+    u32			GetExperience(void) const;
+    void		IncreaseExperience(u32);
 
-    bool AllowBattle(bool attacker) const;
+    bool		AllowBattle(bool attacker) const;
 
-    std::string String(void) const;
+    std::string		String(void) const;
 
-    static u8 GetLevelFromExperience(u32 exp);
-    static u32 GetExperienceFromLevel(u8 lvl);
+    static int		GetLevelFromExperience(u32);
+    static u32		GetExperienceFromLevel(int);
 
-    static void ScholarAction(Heroes &, Heroes &);
+    static void		ScholarAction(Heroes &, Heroes &);
 
 private:
     friend StreamBase & operator<< (StreamBase &, const Heroes &);
     friend StreamBase & operator>> (StreamBase &, Heroes &);
+#ifdef WITH_XML
+    friend TiXmlElement & operator>> (TiXmlElement &, Heroes &);
+#endif
     friend class Recruits;
     friend class Battle::Only;
 
-    void LevelUp(bool skipsecondary, bool autoselect = false);
-    u8   LevelUpPrimarySkill(void);
-    void LevelUpSecondarySkill(u8, bool autoselect = false);
-    void AngleStep(u16 to_direct);
-    bool MoveStep(bool fast = false);
-    static void MoveStep(Heroes &, s32 from, s32 to, bool newpos);
+    void		LevelUp(bool skipsecondary, bool autoselect = false);
+    int			LevelUpPrimarySkill(void);
+    void		LevelUpSecondarySkill(int, bool autoselect = false);
+    void		AngleStep(int);
+    bool		MoveStep(bool fast = false);
+    static void		MoveStep(Heroes &, s32 from, s32 to, bool newpos);
 
     std::string		name;
     ColorBase		killer_color;
@@ -255,27 +256,27 @@ private:
 
     Army        	army;
 
-    heroes_t		hid;
-    heroes_t		portrait;
-    u8			race;
-
-    u8			save_maps_object;
+    int			hid; 		/* hero id */
+    int			portrait;	/* hero id */
+    int			race;
+    int			save_maps_object;
 
     Route::Path		path;
 
-    u16			direction;
-    u8			sprite_index;
+    int			direction;
+    int			sprite_index;
 
     Point		patrol_center;
-    u8			patrol_square;
+    int			patrol_square;
 
-    std::list<IndexObject> visit_object;
+    std::list<IndexObject>
+			visit_object;
 };
 
 struct VecHeroes : public std::vector<Heroes*>
 {
-    Heroes* Get(Heroes::heroes_t) const;
-    Heroes* Get(s32) const;
+    Heroes* Get(int /* hero id */) const;
+    Heroes* Get(const Point &) const;
 };
 
 struct AllHeroes : public VecHeroes
@@ -283,24 +284,21 @@ struct AllHeroes : public VecHeroes
     AllHeroes();
     ~AllHeroes();
 
-    void Init(void);
-    void clear(void);
+    void	Init(void);
+    void	clear(void);
 
-    void Scoute(u8) const;
+    void	Scoute(int) const;
 
-    Heroes* GetGuest(const Castle &) const;
-    Heroes* GetGuard(const Castle &) const;
-    Heroes* GetFreeman(u8) const;
-    Heroes* FromJail(s32) const;
+    Heroes*	GetGuest(const Castle &) const;
+    Heroes*	GetGuard(const Castle &) const;
+    Heroes*	GetFreeman(int race) const;
+    Heroes*	FromJail(s32) const;
 
     bool HaveTwoFreemans(void) const;
 };
 
 StreamBase & operator<< (StreamBase &, const VecHeroes &);
 StreamBase & operator>> (StreamBase &, VecHeroes &);
-
-StreamBase & operator<< (StreamBase &, const Heroes::heroes_t &);
-StreamBase & operator>> (StreamBase &, Heroes::heroes_t &);
 
 StreamBase & operator<< (StreamBase &, const Heroes &);
 StreamBase & operator>> (StreamBase &, Heroes &);

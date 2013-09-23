@@ -23,12 +23,11 @@
 #ifndef H2WEEK_H
 #define H2WEEK_H
 
-#include <string>
 #include "monster.h"
 
-struct Week : std::pair<u8, u8>
+struct Week : std::pair<int, int>
 {
-    enum type_t
+    enum
     {
 	UNNAMED,
 	PLAGUE,
@@ -59,14 +58,16 @@ struct Week : std::pair<u8, u8>
 	MONSTERS	// week of monsters game
     };
 
-    Week(u8 type = UNNAMED, u8 mons = Monster::UNKNOWN) : std::pair<u8, u8>(type, mons){}
+    Week(int type = UNNAMED, int mons = Monster::UNKNOWN) : std::pair<int, int>(type, mons){}
 
-    u8 GetType(void) const { return first; }
-    u8 GetMonster(void) const { return second; }
+    int GetType(void) const { return first; }
+    int GetMonster(void) const { return second; }
     const char* GetName(void) const;
 
-    static type_t WeekRand(void);
-    static type_t MonthRand(void);
+    static int WeekRand(void);
+    static int MonthRand(void);
 };
+
+StreamBase & operator>> (StreamBase &, Week &);
 
 #endif

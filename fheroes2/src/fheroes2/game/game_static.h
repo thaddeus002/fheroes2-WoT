@@ -65,7 +65,6 @@ namespace GameStatic
 }
 
 #ifdef WITH_XML
-#include "xmlccwrap.h"
 namespace Game
 {
     void	CastleUpdateGrowth(const TiXmlElement*);

@@ -25,7 +25,7 @@
 #include "direction.h"
 #include "objtown.h"
 
-u16 ObjTown::GetPassable(const u8 & index0)
+int ObjTown::GetPassable(u32 index0)
 {
     u8 index = index0 % 32;
 
@@ -40,7 +40,7 @@ u16 ObjTown::GetPassable(const u8 & index0)
     return DIRECTION_ALL;
 }
 
-u16 ObjTwba::GetPassable(const u8 & index0)
+int ObjTwba::GetPassable(u32 index0)
 {
     u8 index = index0 % 10;
 
@@ -61,27 +61,27 @@ u16 ObjTwba::GetPassable(const u8 & index0)
     return DIRECTION_ALL;
 }
 
-bool ObjTown::isAction(const u8 & index)
+bool ObjTown::isAction(u32 index)
 {
     return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
-bool ObjTwba::isAction(const u8 & index)
+bool ObjTwba::isAction(u32 index)
 {
     return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
-bool ObjTown::isShadow(const u8 & index)
+bool ObjTown::isShadow(u32 index)
 {
     return false;
 }
 
-bool ObjTwba::isShadow(const u8 & index)
+bool ObjTwba::isShadow(u32 index)
 {
     return false;
 }
 
-u8 ObjTown::GetActionObject(const u8 & index)
+int ObjTown::GetActionObject(u32 index)
 {
     switch(index % 32)
     {
@@ -93,7 +93,7 @@ u8 ObjTown::GetActionObject(const u8 & index)
     return MP2::OBJ_ZERO;
 }
 
-u8 ObjTwba::GetActionObject(const u8 & index)
+int ObjTwba::GetActionObject(u32 index)
 {
     return MP2::OBJ_ZERO;
 }

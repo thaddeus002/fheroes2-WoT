@@ -24,216 +24,126 @@
 #include "color.h"
 #include "dialog.h"
 #include "settings.h"
+#include "game.h"
 #include "gameevent.h"
 
 #define SIZEMESSAGE 400
 
-EventDate::EventDate(const void *ptr)
+EventDate::EventDate(const u8* ptr, size_t sz)
 {
-    const u8  *ptr8  = static_cast<const u8 *>(ptr);
-    u16 byte16 = 0;
-    u32 byte32 = 0;
+    StreamBuf st(ptr, sz);
 
     // id
-    if(0x00 != *ptr8)
+    if(0 == st.get())
     {
-	DEBUG(DBG_GAME , DBG_WARN, "unknown id");
-	return;
+	// resource
+	resource.wood = st.getLE32();
+	resource.mercury = st.getLE32();
+	resource.ore = st.getLE32();
+	resource.sulfur = st.getLE32();
+	resource.crystal = st.getLE32();
+	resource.gems = st.getLE32();
+	resource.gold = st.getLE32();
+
+	st.skip(2);
+
+	// allow computer
+	computer = st.getLE16();
+
+	// day of first occurent
+	first = st.getLE16();
+
+	// subsequent occurrences
+	subsequent = st.getLE16();
+
+	st.skip(6);
+
+	colors = 0;
+	// blue
+	if(st.get()) colors |= Color::BLUE;
+	// green
+	if(st.get()) colors |= Color::GREEN;
+	// red
+	if(st.get()) colors |= Color::RED;
+	// yellow
+	if(st.get()) colors |= Color::YELLOW;
+	// orange
+	if(st.get()) colors |= Color::ORANGE;
+	// purple
+	if(st.get()) colors |= Color::PURPLE;
+
+	// message
+	message = Game::GetEncodeString(GetString(st.getRaw()));
+	DEBUG(DBG_GAME, DBG_INFO, "add: " << message);
     }
-    ++ptr8;
-
-    // resource
-    byte32 = ReadLE32(ptr8);
-    ptr8 += 4;;
-    resource.wood = byte32;
-
-    byte32 = ReadLE32(ptr8);
-    ptr8 += 4;;
-    resource.mercury = byte32;
-
-    byte32 = ReadLE32(ptr8);
-    ptr8 += 4;;
-    resource.ore = byte32;
-
-    byte32 = ReadLE32(ptr8);
-    ptr8 += 4;;
-    resource.sulfur = byte32;
-
-    byte32 = ReadLE32(ptr8);
-    ptr8 += 4;;
-    resource.crystal = byte32;
-
-    byte32 = ReadLE32(ptr8);
-    ptr8 += 4;;
-    resource.gems = byte32;
-
-    byte32 = ReadLE32(ptr8);
-    ptr8 += 4;;
-    resource.gold = byte32;
-
-    // skip artifact
-    byte16 = ReadLE16(ptr8);
-    ++ptr8;
-    ++ptr8;
-
-    // allow computer
-    byte16 = ReadLE16(ptr8);
-    ++ptr8;
-    ++ptr8;
-    computer = byte16;
-
-    // day of first occurent
-    byte16 = ReadLE16(ptr8);
-    ++ptr8;
-    ++ptr8;
-    first = byte16;
-
-    // subsequent occurrences
-    byte16 = ReadLE16(ptr8);
-    ++ptr8;
-    ++ptr8;
-    subsequent = byte16;
-
-    ptr8 += 6;
-
-    colors = 0;
-
-    // blue
-    if(*ptr8) colors |= Color::BLUE;
-    ++ptr8;
-
-    // green
-    if(*ptr8) colors |= Color::GREEN;
-    ++ptr8;
-
-    // red
-    if(*ptr8) colors |= Color::RED;
-    ++ptr8;
-
-    // yellow
-    if(*ptr8) colors |= Color::YELLOW;
-    ++ptr8;
-
-    // orange
-    if(*ptr8) colors |= Color::ORANGE;
-    ++ptr8;
-
-    // purple
-    if(*ptr8) colors |= Color::PURPLE;
-    ++ptr8;
-
-    // message
-    message = Game::GetEncodeString(reinterpret_cast<const char *>(ptr8));
-
-    //if(SIZEMESSAGE < message.size()) DEBUG(DBG_GAME , DBG_WARN, "long message, incorrect block?");
-
-    DEBUG(DBG_GAME, DBG_INFO, "add: " << message);
+    else
+	DEBUG(DBG_GAME , DBG_WARN, "unknown id");
 }
 
-bool EventDate::isDeprecated(u16 date) const
+bool EventDate::isDeprecated(u32 date) const
 {
     return 0 == subsequent && first < date;
 }
 
-bool EventDate::isAllow(u8 col, u16 date) const
+bool EventDate::isAllow(int col, u32 date) const
 {
     return ((first == date ||
 	    (subsequent && (first < date && 0 == ((date - first) % subsequent)))) &&
 	    (col & colors));
 }
 
-EventMaps::EventMaps(s32 index, const void *ptr)
+EventMaps::EventMaps(s32 index, const u8* ptr, const size_t sz)
 {
-    SetIndex(index);
-
-    const u8  *ptr8  = static_cast<const u8 *>(ptr);
-    u16 byte16 = 0;
-    u32 byte32 = 0;
+    StreamBuf st(ptr, sz);
 
     // id
-    if(0x01 != *ptr8)
+    if(1 == st.get())
     {
-	DEBUG(DBG_GAME, DBG_WARN, "unknown id");
-	return;
+	SetIndex(index);
+
+	// resource
+	resource.wood = st.getLE32();
+	resource.mercury = st.getLE32();
+	resource.ore = st.getLE32();
+	resource.sulfur = st.getLE32();
+	resource.crystal = st.getLE32();
+	resource.gems = st.getLE32();
+	resource.gold = st.getLE32();
+
+	// artifact
+	artifact = st.getLE16();
+
+	// allow computer
+	computer = st.get();
+
+	// cancel event after first visit
+	cancel = st.get();
+
+	st.skip(10);
+
+	colors = 0;
+	// blue
+	if(st.get()) colors |= Color::BLUE;
+	// green
+	if(st.get()) colors |= Color::GREEN;
+	// red
+	if(st.get()) colors |= Color::RED;
+	// yellow
+	if(st.get()) colors |= Color::YELLOW;
+	// orange
+	if(st.get()) colors |= Color::ORANGE;
+	// purple
+	if(st.get()) colors |= Color::PURPLE;
+
+	// message
+        message = Game::GetEncodeString(GetString(st.getRaw()));
+        DEBUG(DBG_GAME , DBG_INFO, "add: " << message);
     }
-    ++ptr8;
-
-    // resource
-    byte32 = ReadLE32(ptr8);
-    ptr8 += 4;;
-    resource.wood = byte32;
-
-    byte32 = ReadLE32(ptr8);
-    ptr8 += 4;;
-    resource.mercury = byte32;
-
-    byte32 = ReadLE32(ptr8);
-    ptr8 += 4;;
-    resource.ore = byte32;
-
-    byte32 = ReadLE32(ptr8);
-    ptr8 += 4;;
-    resource.sulfur = byte32;
-
-    byte32 = ReadLE32(ptr8);
-    ptr8 += 4;;
-    resource.crystal = byte32;
-
-    byte32 = ReadLE32(ptr8);
-    ptr8 += 4;;
-    resource.gems = byte32;
-
-    byte32 = ReadLE32(ptr8);
-    ptr8 += 4;;
-    resource.gold = byte32;
-
-    // artifact
-    byte16 = ReadLE16(ptr8);
-    ++ptr8;
-    ++ptr8;
-    artifact = byte16;
-
-    // allow computer
-    computer = *ptr8;
-    ++ptr8;
-
-    // cancel event after first visit
-    cancel = *ptr8;
-    ptr8 += 11;
-
-    colors = 0;
-
-    // blue
-    if(*ptr8) colors |= Color::BLUE;
-    ++ptr8;
-
-    // green
-    if(*ptr8) colors |= Color::GREEN;
-    ++ptr8;
-
-    // red
-    if(*ptr8) colors |= Color::RED;
-    ++ptr8;
-
-    // yellow
-    if(*ptr8) colors |= Color::YELLOW;
-    ++ptr8;
-
-    // orange
-    if(*ptr8) colors |= Color::ORANGE;
-    ++ptr8;
-
-    // purple
-    if(*ptr8) colors |= Color::PURPLE;
-    ++ptr8;
-
-    // message
-    message = Game::GetEncodeString(reinterpret_cast<const char *>(ptr8));
-
-    DEBUG(DBG_GAME , DBG_INFO, "add: " << message);
+    else
+	DEBUG(DBG_GAME, DBG_WARN, "unknown id");
 }
 
-void EventMaps::SetVisited(u8 color)
+void EventMaps::SetVisited(int color)
 {
     if(cancel)
 	colors = 0;
@@ -241,90 +151,57 @@ void EventMaps::SetVisited(u8 color)
 	colors &= ~color;
 }
 
-bool EventMaps::isAllow(u8 col, s32 ii) const
+bool EventMaps::isAllow(int col, s32 ii) const
 {
     return ii == GetIndex() && (col & colors);
 }
 
-Riddle::Riddle(s32 index, const void *ptr) : valid(false)
+Riddle::Riddle(s32 index, const u8* ptr, size_t sz) : valid(false)
 {
-    SetIndex(index);
-
-    const u8  *ptr8  = static_cast<const u8 *>(ptr);
-    u16 byte16 = 0;
-    u32 byte32 = 0;
+    StreamBuf st(ptr, sz);
 
     // id
-    if(0x00 != *ptr8)
+    if(0 == st.get())
     {
-	DEBUG(DBG_GAME , DBG_WARN, "unknown id");
-	return;
-    }
-    ++ptr8;
+	SetIndex(index);
 
-    // resource
-    byte32 = ReadLE32(ptr8);
-    ptr8 += 4;;
-    resource.wood = byte32;
+	// resource
+	resource.wood = st.getLE32();
+	resource.mercury = st.getLE32();
+	resource.ore = st.getLE32();
+	resource.sulfur = st.getLE32();
+	resource.crystal = st.getLE32();
+	resource.gems = st.getLE32();
+	resource.gold = st.getLE32();
 
-    byte32 = ReadLE32(ptr8);
-    ptr8 += 4;;
-    resource.mercury = byte32;
+	// artifact
+	artifact = st.getLE16();
 
-    byte32 = ReadLE32(ptr8);
-    ptr8 += 4;;
-    resource.ore = byte32;
+	// count answers
+	u32 count = st.get();
 
-    byte32 = ReadLE32(ptr8);
-    ptr8 += 4;;
-    resource.sulfur = byte32;
-
-    byte32 = ReadLE32(ptr8);
-    ptr8 += 4;;
-    resource.crystal = byte32;
-
-    byte32 = ReadLE32(ptr8);
-    ptr8 += 4;;
-    resource.gems = byte32;
-
-    byte32 = ReadLE32(ptr8);
-    ptr8 += 4;;
-    resource.gold = byte32;
-
-    // artifact
-    byte16 = ReadLE16(ptr8);
-    ++ptr8;
-    ++ptr8;
-    artifact = byte16;
-
-    // count answers
-    u8 count = *ptr8;
-    ++ptr8;
-
-    // answers
-    for(u8 i = 0; i < 8; ++i)
-    {
-	std::string str = StringLower(reinterpret_cast<const char *>(ptr8));
-
-	if(count-- && str.size())
+	// answers
+	for(u32 i = 0; i < 8; ++i)
 	{
-	    answers.push_back(Game::GetEncodeString(str.c_str()));
-	    answers.push_back(Game::GetEncodeString(reinterpret_cast<const char *>(ptr8)));
-	};
-	ptr8 += 13;
+	    std::string answer = Game::GetEncodeString(GetString(st.getRaw(13)));
+
+	    if(count-- && answer.size())
+		answers.push_back(StringLower(answer));
+	}
+
+	// message
+	message = Game::GetEncodeString(GetString(st.getRaw()));
+
+	valid = true;
+	DEBUG(DBG_GAME, DBG_INFO, "add: " << message);
     }
-
-    // message
-    message = Game::GetEncodeString(reinterpret_cast<const char *>(ptr8));
-
-    valid = true;
-
-    DEBUG(DBG_GAME, DBG_INFO, "add: " << message);
+    else
+	DEBUG(DBG_GAME , DBG_WARN, "unknown id");
 }
 
 bool Riddle::AnswerCorrect(const std::string & answer)
 {
-    return answers.end() != std::find(answers.begin(), answers.end(), answer);
+    return answers.end() != std::find(answers.begin(), answers.end(), StringLower(answer));
 }
 
 void Riddle::SetQuiet(void)
@@ -347,13 +224,30 @@ StreamBase & operator<< (StreamBase & msg, const EventDate & obj)
 
 StreamBase & operator>> (StreamBase & msg, EventDate & obj)
 {
-    return msg >>
+    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
+    {
+        u16 first, subseq; u8 colors;
+	msg >>
+	    obj.resource >>
+	    obj.computer >>
+	    first >>
+	    subseq >>
+	    colors >>
+	    obj.message;
+	obj.first = first;
+	obj.subsequent = subseq;
+	obj.colors = colors;
+    }
+    else
+    msg >>
 	obj.resource >>
 	obj.computer >>
 	obj.first >>
 	obj.subsequent >>
 	obj.colors >>
 	obj.message;
+
+    return msg;
 }
 
 
@@ -371,7 +265,21 @@ StreamBase & operator<< (StreamBase & msg, const EventMaps & obj)
 
 StreamBase & operator>> (StreamBase & msg, EventMaps & obj)
 {
-    return msg >>
+    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
+    {
+	u8  colors;
+	msg >>
+	obj.center >>
+	obj.resource >>
+	obj.artifact >>
+	obj.computer >>
+	obj.cancel >>
+	colors >>
+	obj.message;
+	obj.colors = colors;
+    }
+    else
+    msg >>
 	obj.center >>
 	obj.resource >>
 	obj.artifact >>
@@ -379,6 +287,8 @@ StreamBase & operator>> (StreamBase & msg, EventMaps & obj)
 	obj.cancel >>
 	obj.colors >>
 	obj.message;
+
+    return msg;
 }
 
 StreamBase & operator<< (StreamBase & msg, const Riddle & obj)

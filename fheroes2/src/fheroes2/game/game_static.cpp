@@ -224,22 +224,22 @@ StreamBase & GameStatic::operator<< (StreamBase & msg, const Data & obj)
 
     u8 array_size = ARRAY_COUNT(overview_distance);
     msg << array_size;
-    for(u8 ii = 0; ii < array_size; ++ii)
+    for(u32 ii = 0; ii < array_size; ++ii)
 	msg << overview_distance[ii];
 
     array_size = ARRAY_COUNT(kingdom_starting_resource);
     msg << array_size;
-    for(u8 ii = 0; ii < array_size; ++ii)
+    for(u32 ii = 0; ii < array_size; ++ii)
 	msg << kingdom_starting_resource[ii];
 
     array_size = ARRAY_COUNT(mageguild_restore_spell_points_day);
     msg << array_size;
-    for(u8 ii = 0; ii < array_size; ++ii)
+    for(u32 ii = 0; ii < array_size; ++ii)
 	msg << mageguild_restore_spell_points_day[ii];
 
     array_size = ARRAY_COUNT(objects_mod);
     msg << array_size;
-    for(u8 ii = 0; ii < array_size; ++ii)
+    for(u32 ii = 0; ii < array_size; ++ii)
 	msg << objects_mod[ii];
 
     msg << monster_upgrade_ratio << uniq;
@@ -247,12 +247,12 @@ StreamBase & GameStatic::operator<< (StreamBase & msg, const Data & obj)
     // skill statics
     array_size = ARRAY_COUNT(Skill::_stats);
     msg << array_size;
-    for(u8 ii = 0; ii < array_size; ++ii)
+    for(u32 ii = 0; ii < array_size; ++ii)
         msg << Skill::_stats[ii];
 
     array_size = ARRAY_COUNT(Skill::_values);
     msg << array_size;
-    for(u8 ii = 0; ii < array_size; ++ii)
+    for(u32 ii = 0; ii < array_size; ++ii)
         msg << Skill::_values[ii];
 
     msg << Skill::_from_witchs_hut;
@@ -278,19 +278,19 @@ StreamBase & GameStatic::operator>> (StreamBase & msg, Data & obj)
     u8 array_size = 0;
 
     msg >> array_size;
-    for(u8 ii = 0; ii < array_size; ++ii)
+    for(u32 ii = 0; ii < array_size; ++ii)
 	msg >> overview_distance[ii];
 
     msg >> array_size;
-    for(u8 ii = 0; ii < array_size; ++ii)
+    for(u32 ii = 0; ii < array_size; ++ii)
 	msg >> kingdom_starting_resource[ii];
 
     msg >> array_size;
-    for(u8 ii = 0; ii < array_size; ++ii)
+    for(u32 ii = 0; ii < array_size; ++ii)
 	msg >> mageguild_restore_spell_points_day[ii];
 
     msg >> array_size;
-    for(u8 ii = 0; ii < array_size; ++ii)
+    for(u32 ii = 0; ii < array_size; ++ii)
 	msg >> objects_mod[ii];
 
     msg >> monster_upgrade_ratio >> uniq;
@@ -300,11 +300,11 @@ StreamBase & GameStatic::operator>> (StreamBase & msg, Data & obj)
         return msg;
 
     msg >> array_size;
-    for(u8 ii = 0; ii < array_size; ++ii)
+    for(u32 ii = 0; ii < array_size; ++ii)
         msg >> Skill::_stats[ii];
 
     msg >> array_size;
-    for(u8 ii = 0; ii < array_size; ++ii)
+    for(u32 ii = 0; ii < array_size; ++ii)
         msg >> Skill::_values[ii];
 
     msg >> Skill::_from_witchs_hut;
@@ -453,8 +453,6 @@ const Skill::secondary_t* GameStatic::GetSkillForWitchsHut(void)
 */
 
 #ifdef WITH_XML
-#include "xmlccwrap.h"
-
 void Game::CastleUpdateGrowth(const TiXmlElement* xml)
 {
     if(xml)
@@ -482,7 +480,7 @@ void Game::KingdomUpdateStartingResource(const TiXmlElement* xml)
 	const char* ai_always = xml->Attribute("ai_always");
 	const char* level[] = { "easy", "normal", "hard", "expert", "impossible", NULL };
 
-	for(u8 ii = 0; ii < 5; ++ii)
+	for(u32 ii = 0; ii < 5; ++ii)
 	{
 	    if(NULL != (xml_difficult = xml->FirstChildElement(level[ii])))
 	    {

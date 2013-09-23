@@ -22,6 +22,7 @@
 
 #include "gamedefs.h"
 #include "agg.h"
+#include "game.h"
 #include "dialog.h"
 #include "world.h"
 #include "kingdom.h"
@@ -30,7 +31,7 @@
 #include "game_interface.h"
 #include "game_over.h"
 
-const char* GameOver::GetString(conditions_t cond)
+const char* GameOver::GetString(int cond)
 {
     const char* cond_str[] = { "None",
 	_("Defeat all enemy heroes and capture all enemy towns and castles."), _("Capture a specific town."), _("Defeat a specific hero."), _("Find a specific artifact."), _("Your side defeats the opposing side."), _("Accumulate a large amount of gold."),
@@ -56,7 +57,7 @@ const char* GameOver::GetString(conditions_t cond)
     return cond_str[0];
 }
 
-std::string GameOver::GetActualDescription(u16 cond)
+std::string GameOver::GetActualDescription(int cond)
 {
     const Settings & conf = Settings::Get();
     std::string msg;
@@ -66,7 +67,7 @@ std::string GameOver::GetActualDescription(u16 cond)
     else
     if(WINS_TOWN & cond)
     {
-	const Castle* town = world.GetCastle(conf.WinsMapsIndexObject());
+	const Castle* town = world.GetCastle(conf.WinsMapsPositionObject());
 	if(town)
 	{
     	    msg = town->isCastle() ? _("Capture the castle '%{name}'") : _("Capture the town '%{name}'");;
@@ -109,7 +110,7 @@ std::string GameOver::GetActualDescription(u16 cond)
     else
     if(LOSS_TOWN & cond)
     {
-	const Castle* town = world.GetCastle(conf.LossMapsIndexObject());
+	const Castle* town = world.GetCastle(conf.LossMapsPositionObject());
 	if(town)
 	{
     	    msg = town->isCastle() ? _("Lose the castle '%{name}'.") : _("Lose the town '%{name}'.");
@@ -147,7 +148,7 @@ std::string GameOver::GetActualDescription(u16 cond)
     return msg;
 }
 
-void GameOver::DialogWins(u16 cond)
+void GameOver::DialogWins(int cond)
 {
     const Settings & conf = Settings::Get();
     std::string body;
@@ -160,7 +161,7 @@ void GameOver::DialogWins(u16 cond)
 	case WINS_TOWN:
 	{
 	    body = _("You captured %{name}!\nYou are victorious.");
-	    const Castle* town = world.GetCastle(conf.WinsMapsIndexObject());
+	    const Castle* town = world.GetCastle(conf.WinsMapsPositionObject());
 	    if(town) StringReplace(body, "%{name}", town->GetName());
 	}
 	break;
@@ -205,7 +206,7 @@ void GameOver::DialogWins(u16 cond)
     if(body.size()) Dialog::Message("", body, Font::BIG, Dialog::OK);
 }
 
-void GameOver::DialogLoss(u16 cond)
+void GameOver::DialogLoss(int cond)
 {
     const Settings & conf = Settings::Get();
     std::string body;
@@ -241,7 +242,7 @@ void GameOver::DialogLoss(u16 cond)
 	case LOSS_TOWN:
 	{
 	    body = _("The enemy has captured %{name}!\nThey are triumphant.");
-	    const Castle* town = world.GetCastle(conf.WinsMapsIndexObject());
+	    const Castle* town = world.GetCastle(conf.WinsMapsPositionObject());
 	    if(town) StringReplace(body, "%{name}", town->GetName());
 	}
 
@@ -289,20 +290,20 @@ void GameOver::Result::Reset(void)
     result = GameOver::COND_NONE;
 }
 
-void GameOver::Result::SetResult(u16 r)
+void GameOver::Result::SetResult(int r)
 {
     result = r;
 }
 
-u16  GameOver::Result::GetResult(void) const
+int  GameOver::Result::GetResult(void) const
 {
     return result;
 }
 
-bool GameOver::Result::LocalCheckGameOver(Game::menu_t & res)
+int GameOver::Result::LocalCheckGameOver(void)
 {
     if(continue_game)
-	return false;
+	return Game::CANCEL;
 
     const Colors colors2(colors);
 
@@ -314,14 +315,12 @@ bool GameOver::Result::LocalCheckGameOver(Game::menu_t & res)
         colors &= (~*it);
     }
 
-    Game::menu_t old = res;
-    bool game_over = false;
+    int res = Game::CANCEL;
 
     // local players miss
     if( !(colors & Players::HumanColors()))
     {
         res = Game::MAINMENU;
-	game_over = true;
     }
     else
     // check normal wins
@@ -333,19 +332,17 @@ bool GameOver::Result::LocalCheckGameOver(Game::menu_t & res)
 	{
     	    GameOver::DialogWins(result);
     	    res = Game::HIGHSCORES;
-	    game_over = true;
 	}
 	else
 	if(GameOver::COND_NONE != (result = world.CheckKingdomLoss(myKingdom)))
 	{
     	    GameOver::DialogLoss(result);
     	    res = Game::MAINMENU;
-	    game_over = true;
 	}
     }
 
     // set: continue after victory
-    if(game_over &&
+    if(Game::CANCEL != res &&
 	(Settings::Get().CurrentColor() & Players::HumanColors()) &&
 	Settings::Get().ExtGameContinueAfterVictory())
     {
@@ -353,17 +350,13 @@ bool GameOver::Result::LocalCheckGameOver(Game::menu_t & res)
 							Font::BIG, Dialog::YES | Dialog::NO))
 	{
 	    continue_game = true;
-
     	    if(res == Game::HIGHSCORES) Game::HighScores(false);
-
-	    res = old;
-	    game_over = false;
-
+	    res = Game::CANCEL;
 	    Interface::Basic::Get().SetRedraw(REDRAW_ALL);
 	}
     }
 
-    return game_over;
+    return res;
 }
 
 StreamBase & GameOver::operator<< (StreamBase & msg, const Result & res)
@@ -373,5 +366,15 @@ StreamBase & GameOver::operator<< (StreamBase & msg, const Result & res)
 
 StreamBase & GameOver::operator>> (StreamBase & msg, Result & res)
 {
-    return msg >> res.colors >> res.result >> res.continue_game;
+    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
+    {
+	u8 colors; u16 result;
+	msg >> colors >> result >> res.continue_game;
+	res.colors = colors;
+	res.result = result;
+    }
+    else
+	msg >> res.colors >> res.result >> res.continue_game;
+
+    return msg;
 }

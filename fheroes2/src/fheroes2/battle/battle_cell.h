@@ -55,13 +55,13 @@ namespace Battle
     {
     public:
 	Cell();
-	Cell(const s16 &);
+	Cell(s32);
 
 	void		ResetQuality(void);
 	void		ResetDirection(void);
 
-	void		SetObject(u8);
-	void		SetDirection(u8);
+	void		SetObject(int);
+	void		SetDirection(int);
 	void		SetQuality(u32);
 
 	void		SetArea(const Rect &);
@@ -71,11 +71,11 @@ namespace Battle
 	bool		isPassable1(bool check_troop) const;
 	bool		isPositionIncludePoint(const Point &) const;
 
-	const s16 &	GetIndex(void) const;
+	s32		GetIndex(void) const;
 	const Rect &	GetPos(void) const;
-	const u8 &	GetObject(void) const;
-	const u8 &	GetDirection(void) const;
-	const s32 &	GetQuality(void) const;
+	int		GetObject(void) const;
+	int		GetDirection(void) const;
+	s32		GetQuality(void) const;
 	direction_t	GetTriangleDirection(const Point &) const;
 
 	const Unit*	GetUnit(void) const;
@@ -86,10 +86,10 @@ namespace Battle
 	friend StreamBase & operator<< (StreamBase &, const Cell &);
 	friend StreamBase & operator>> (StreamBase &, Cell &);
 
-	s16		index;
+	s32		index;
 	Rect		pos;
-	u8		object;
-	u8		direction;
+	int		object;
+	int		direction;
 	s32		quality;
 	Unit*		troop;
 	Point		coord[7];
@@ -103,12 +103,12 @@ namespace Battle
     public:
 	Position() : std::pair<Cell*, Cell*>(NULL, NULL) {}
 
-	void		Set(s16 head, bool wide, bool reflect);
+	void		Set(s32 head, bool wide, bool reflect);
 	void		Swap(void);
 	bool		isReflect(void) const;
 	bool		isValid(void) const;
 
-	static Position	GetCorrect(const Unit &, s16);
+	static Position	GetCorrect(const Unit &, s32);
 
 	Rect		GetRect(void) const;
 	Cell*		GetHead(void);

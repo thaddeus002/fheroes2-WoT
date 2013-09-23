@@ -48,7 +48,7 @@ namespace Battle
     class Actions : public std::list<Command>
     {
     public:
-	bool		HaveCommand(u16) const;
+	bool		HaveCommand(u32) const;
     };
 
     class Arena
@@ -64,56 +64,56 @@ namespace Battle
 	bool		CanBreakAutoBattle(void) const;
 	void		BreakAutoBattle(void);
 
-	u16		GetCurrentTurn(void) const;
+	u32		GetCurrentTurn(void) const;
 	Result &	GetResult(void);
 
-	const HeroBase*	GetCommander(u8 color, bool invert = false) const;
+	const HeroBase*	GetCommander(int color, bool invert = false) const;
 	const HeroBase*	GetCommander1(void) const;
 	const HeroBase*	GetCommander2(void) const;
 	const HeroBase* GetCurrentCommander(void) const;
 
 	Force &		GetForce1(void);
 	Force &		GetForce2(void);
-	Force &		GetForce(u8 color, bool invert = false);
+	Force &		GetForce(int color, bool invert = false);
 	Force &		GetCurrentForce(void);
 
-	u8		GetArmyColor1(void) const;
-	u8		GetArmyColor2(void) const;
-	u8		GetCurrentColor(void) const;
-	u8		GetOppositeColor(u8) const;
+	int		GetArmyColor1(void) const;
+	int		GetArmyColor2(void) const;
+	int		GetCurrentColor(void) const;
+	int		GetOppositeColor(int) const;
 
-	Unit*		GetTroopBoard(s16);
-	const Unit*	GetTroopBoard(s16) const;
+	Unit*		GetTroopBoard(s32);
+	const Unit*	GetTroopBoard(s32) const;
 
 	Unit*		GetTroopUID(u32);
 	const Unit*	GetTroopUID(u32) const;
 
-	const Unit*	GetEnemyMaxQuality(u8) const;
+	const Unit*	GetEnemyMaxQuality(int) const;
 
 	const SpellStorage &
 			GetUsageSpells(void) const;
 
 	void		DialogBattleSummary(const Result &) const;
-	u8		DialogBattleHero(const HeroBase &, bool) const;
+	int		DialogBattleHero(const HeroBase &, bool) const;
 
 	void		FadeArena(void) const;
 
 	Indexes		GetPath(const Unit &, const Position &);
 	void		ApplyAction(StreamBuf &);
 
-	TargetsInfo	GetTargetsForDamage(Unit &, Unit &, s16);
+	TargetsInfo	GetTargetsForDamage(Unit &, Unit &, s32);
 	void		TargetsApplyDamage(Unit &, Unit &, TargetsInfo &);
-	TargetsInfo	GetTargetsForSpells(const HeroBase*, const Spell &, s16);
+	TargetsInfo	GetTargetsForSpells(const HeroBase*, const Spell &, s32);
 	void		TargetsApplySpell(const HeroBase*, const Spell &, TargetsInfo &);
 
 	bool		isDisableCastSpell(const Spell &, std::string *msg);
 
-	bool		GraveyardAllowResurrect(s16, const Spell &) const;
-	const Unit*	GraveyardLastTroop(s16) const;
+	bool		GraveyardAllowResurrect(s32, const Spell &) const;
+	const Unit*	GraveyardLastTroop(s32) const;
 	Indexes		GraveyardClosedCells(void) const;
 
-	bool		CanSurrenderOpponent(u8 color) const;
-	bool		CanRetreatOpponent(u8 color) const;
+	bool		CanSurrenderOpponent(int color) const;
+	bool		CanRetreatOpponent(int color) const;
 
 	void		ApplyActionSpellSummonElemental(StreamBuf &, const Spell &);
 	void		ApplyActionSpellMirrorImage(StreamBuf &);
@@ -121,13 +121,13 @@ namespace Battle
 	void		ApplyActionSpellEarthQuake(StreamBuf &);
 	void		ApplyActionSpellDefaults(StreamBuf &, const Spell &);
 
-	u8		GetObstaclesPenalty(const Unit &, const Unit &) const;
-	ICN::icn_t	GetICNCovr(void) const;
+	u32		GetObstaclesPenalty(const Unit &, const Unit &) const;
+	int		GetICNCovr(void) const;
 
-        u8		GetCastleTargetValue(u8) const;
+        u32		GetCastleTargetValue(int) const;
 
 	static Board*		GetBoard(void);
-	static Tower*		GetTower(u8);
+	static Tower*		GetTower(int);
 	static Bridge*		GetBridge(void);
 	static const Castle*	GetCastle(void);
 	static Interface*	GetInterface(void);
@@ -143,11 +143,12 @@ namespace Battle
 	void		TurnTroop(Unit*);
 	void		TowerAction(const Tower &);
 
-        void		SetCastleTargetValue(u8, u8);
+        void		SetCastleTargetValue(int, u32);
 	void		CatapultAction(void);
 
-	s16		GetFreePositionNearHero(u8) const;
-	std::vector<u8>	GetCastleTargets(void) const;
+	s32		GetFreePositionNearHero(int) const;
+	std::vector<int>
+			GetCastleTargets(void) const;
 
 	void		ApplyActionRetreat(StreamBuf &);
 	void		ApplyActionSurrender(StreamBuf &);
@@ -162,17 +163,17 @@ namespace Battle
 	void		ApplyActionCatapult(StreamBuf &);
 	void		ApplyActionAutoBattle(StreamBuf &);
 
-	void		BattleProcess(Unit &, Unit & b2, s16 = -1, u8 = 0);
+	void		BattleProcess(Unit &, Unit & b2, s32 = -1, int = 0);
 
 	Unit*		CreateElemental(const Spell &);
-	Unit*		CreateMirrorImage(Unit &, s16);
+	Unit*		CreateMirrorImage(Unit &, s32);
 
 	Force*		army1;
         Force*		army2;
 	Units*		armies_order;
 
 	const Castle*	castle;
-	u8		current_color;
+	int		current_color;
 
 	Tower*		towers[3];
 	Catapult*	catapult;
@@ -185,10 +186,10 @@ namespace Battle
 	SpellStorage	usage_spells;
 
 	Board		board;
-	ICN::icn_t	icn_covr;
+	int		icn_covr;
 
-	u16		current_turn;
-	u8		auto_battle;
+	u32		current_turn;
+	int		auto_battle;
 
 	bool		end_turn;
     };

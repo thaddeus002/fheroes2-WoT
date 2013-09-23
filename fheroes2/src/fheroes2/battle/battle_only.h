@@ -38,12 +38,12 @@ namespace Battle
 {
     struct ControlInfo
     {
-	ControlInfo(const Point & pt, u8 & ctrl) : result(ctrl),
+	ControlInfo(const Point & pt, int ctrl) : result(ctrl),
     	    rtLocal(pt.x, pt.y, 24, 24), rtAI(pt.x + 75, pt.y, 24, 24) {};
 
 	void Redraw(void);
 
-	const u8 & result;
+	int result;
 
 	const Rect rtLocal;
 	const Rect rtAI;

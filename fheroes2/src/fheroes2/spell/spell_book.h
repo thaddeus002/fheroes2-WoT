@@ -32,10 +32,10 @@ struct SpellBook : public SpellStorage
 {
     enum { ADVN = 0x01, CMBT = 0x02, ALL  = ADVN | CMBT };
 
-    Spell Open(const HeroBase &, const u8, bool canselect) const;
+    Spell Open(const HeroBase &, int filter, bool canselect) const;
     void  Edit(const HeroBase &);
 
-    SpellStorage SetFilter(u8, const HeroBase* = NULL) const;
+    SpellStorage SetFilter(int, const HeroBase* = NULL) const;
 };
 
 #endif

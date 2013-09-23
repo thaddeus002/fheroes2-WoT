@@ -26,7 +26,7 @@
 #include "direction.h"
 #include "objmult.h"
 
-u16 ObjMult::GetPassable(const u8 & index)
+int ObjMult::GetPassable(u32 index)
 {
     const u8 restricted[] = { 2, 4, 58, 63, 64, 65, 70, 72, 73, 89, 104 };
 
@@ -40,12 +40,12 @@ u16 ObjMult::GetPassable(const u8 & index)
             DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
 }
 
-bool ObjMult::isAction(const u8 & index)
+bool ObjMult::isAction(u32 index)
 {
     return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
-bool ObjMult::isShadow(const u8 & index)
+bool ObjMult::isShadow(u32 index)
 {
     const u8 shadows2[] = { 1, 3, 15, 25, 45, 54, 57, 61, 67, 68, 75, 77, 79, 81, 83,
 		    97, 98, 105, 113, 115, 121, 122, 124 };
@@ -53,7 +53,7 @@ bool ObjMult::isShadow(const u8 & index)
     return ARRAY_COUNT_END(shadows2) != std::find(shadows2, ARRAY_COUNT_END(shadows2), index);
 }
 
-u16 ObjMul2::GetPassable(const u8 & index)
+int ObjMul2::GetPassable(u32 index)
 {
 #if (__GNUC__ == 4 && __GNUC_MINOR__ == 4)
     // fixed: array subscript is above array bounds
@@ -74,12 +74,12 @@ u16 ObjMul2::GetPassable(const u8 & index)
             DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
 }
 
-bool ObjMul2::isAction(const u8 & index)
+bool ObjMul2::isAction(u32 index)
 {
     return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
-bool ObjMul2::isShadow(const u8 & index)
+bool ObjMul2::isShadow(u32 index)
 {
     const u8 shadows1[] = { 14, 17, 20, 24, 34, 36, 42, 43, 49, 50, 60, 71, 72, 113, 115, 118, 121, 123, 127,
 		    161, 164, 180, 181, 189, 199, 200, 202, 206 };
@@ -87,7 +87,7 @@ bool ObjMul2::isShadow(const u8 & index)
     return ARRAY_COUNT_END(shadows1) != std::find(shadows1, ARRAY_COUNT_END(shadows1), index);
 }
 
-u8 ObjMul2::GetActionObject(const u8 & index)
+int ObjMul2::GetActionObject(u32 index)
 {
     switch(index)
     {
@@ -116,7 +116,7 @@ u8 ObjMul2::GetActionObject(const u8 & index)
     return MP2::OBJ_ZERO;
 }
 
-u8 ObjMult::GetActionObject(const u8 & index)
+int ObjMult::GetActionObject(u32 index)
 {
     switch(index)
     {
