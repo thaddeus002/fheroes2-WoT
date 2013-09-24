@@ -1297,7 +1297,7 @@ void Surface::Swap(Surface & sf1, Surface & sf2)
 
 Surface Surface::RectBorder(u32 width, u32 height, u32 color, bool solid)
 {
-    return RectBorder(width, height, 0xFF00FF /* color key */, color, solid);
+    return RectBorder(width, height, Surface(1, 1).MapRGB(0xFF, 0, 0xFF) /* color key */, color, solid);
 }
 
 Surface Surface::RectBorder(u32 width, u32 height, u32 fill, u32 color, bool solid)
