@@ -367,7 +367,7 @@ void Battle::Arena::TurnTroop(Unit* current_troop)
 		end_turn = true;
 
 	    // good morale
-	    if(end_turn &&
+	    if(!end_turn &&
 		    !current_troop->Modes(TR_SKIPMOVE) &&
 		    current_troop->Modes(TR_MOVED) &&
 		    current_troop->Modes(MORALE_GOOD) &&

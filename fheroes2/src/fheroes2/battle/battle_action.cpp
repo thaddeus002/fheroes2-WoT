@@ -380,6 +380,7 @@ void Battle::Arena::ApplyActionMorale(StreamBuf & stream)
 	{
 	    b->ResetModes(TR_MOVED);
     	    b->ResetModes(MORALE_GOOD);
+	    end_turn = false;
         }
 	// bad morale
         else
@@ -387,6 +388,7 @@ void Battle::Arena::ApplyActionMorale(StreamBuf & stream)
         {
 	    b->SetModes(TR_MOVED);
 	    b->ResetModes(MORALE_BAD);
+	    end_turn = true;
 	}
 
 	if(interface) interface->RedrawActionMorale(*b, morale);
@@ -396,8 +398,6 @@ void Battle::Arena::ApplyActionMorale(StreamBuf & stream)
     else
 	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param" << ": " << "uid: " <<
 	    "0x" << std::setw(8) << std::setfill('0') << std::hex << uid);
-
-    end_turn = true;
 }
 
 void Battle::Arena::ApplyActionRetreat(StreamBuf & stream)
