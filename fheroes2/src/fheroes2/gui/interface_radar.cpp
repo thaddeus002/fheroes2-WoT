@@ -225,13 +225,31 @@ int GetChunkSize(float size1, float size2)
 /* redraw radar area for color */
 void Interface::Radar::RedrawObjects(int color)
 {
+    Display & display = Display::Get();
     const Rect & area = GetArea();
     const s32 world_w = world.w();
     const s32 world_h = world.h();
+    const int areaw = (offset.x ? area.w - 2 * offset.x : area.w);
+    const int areah = (offset.y ? area.h - 2 * offset.y : area.h);
 
-    for(s32 yy = 0; yy < world_h; ++yy)
+    int stepx = world_w / area.w;
+    int stepy = world_h / area.h;
+
+    if(0 == stepx) stepx = 1;
+    if(0 == stepy) stepy = 1;
+
+    int sw = 0;
+
+    if(world_w >= world_h)
+	sw = GetChunkSize(areaw, world_w);
+    else
+	sw = GetChunkSize(areah, world_h);
+
+    Surface sf(sw, sw);
+
+    for(s32 yy = 0; yy < world_h; yy += stepy)
     {
-	for(s32 xx = 0; xx < world_w; ++xx)
+	for(s32 xx = 0; xx < world_w; xx += stepx)
 	{
 	    const Maps::Tiles & tile = world.GetTiles(xx, yy);
 #ifdef WITH_DEBUG
@@ -277,25 +295,31 @@ void Interface::Radar::RedrawObjects(int color)
 
 	    }
 
-	    const int areaw = (offset.x ? area.w - 2 * offset.x : area.w);
-	    const int areah = (offset.y ? area.h - 2 * offset.y : area.h);
-	    const int dstx = (xx * areaw) / world_w;
-	    const int dsty = (yy * areah) / world_h;
+	    const int dstx = area.x + offset.x + (xx * areaw) / world_w;
+	    const int dsty = area.y + offset.y + (yy * areah) / world_h;
 
-	    int sw = 0;
+	    if(sw > 1)
+	    {
+		if(color)
+		    color = sf.GetColorIndex(color);
 
-	    if(world_w >= world_h)
-		sw = GetChunkSize(areaw, world_w);
+		sf.Fill(color);
+		sf.Blit(dstx, dsty, display);
+	    }
 	    else
-		sw = GetChunkSize(areah, world_h);
+	    {
+		display.Lock();
 
-	    Surface sf(sw, sw);
+		if(color)
+		    color = display.GetColorIndex(color);
 
-	    if(color)
-		color = sf.GetColorIndex(color);
+		u32 pixel = display.GetPixel(dstx, dsty);
 
-	    sf.Fill(color);
-	    sf.Blit(area.x + offset.x + dstx, area.y + offset.y + dsty, Display::Get());
+		if(pixel != color)
+		    display.SetPixel(dstx, dsty, color);
+
+		display.Unlock();
+	    }
 	}
     }
 }
