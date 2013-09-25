@@ -57,7 +57,7 @@ void MapWindow::newFile(const QSize & sz, int sequenceNumber)
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
-    mapData.newMap(sz, curFile);
+    mapData.newMap(sz, curFile, sequenceNumber);
     setScene(& mapData);
 
     QApplication::restoreOverrideCursor();

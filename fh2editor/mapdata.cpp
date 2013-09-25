@@ -1791,11 +1791,12 @@ void MapData::removeObjectsAction(QAction* act)
     }
 }
 
-void MapData::newMap(const QSize & msz, const QString &)
+void MapData::newMap(const QSize & msz, const QString &, int seq)
 {
     const QSize & tileSize = EditorTheme::tileSize();
 
     mapArea = MapArea(msz);
+    mapHeader.mapName = QString("New Map").append(" ").append(QString::number(seq));
 
     // insert tiles
     for(MapTiles::iterator

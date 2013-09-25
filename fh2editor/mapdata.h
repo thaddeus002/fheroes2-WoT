@@ -337,7 +337,7 @@ public:
     static QPair<int, int>
 			versions(void);
 
-    void		newMap(const QSize &, const QString &);
+    void		newMap(const QSize &, const QString &, int);
     bool		loadMap(const QString &);
 
     bool		saveMapXML(const QString &) const;
