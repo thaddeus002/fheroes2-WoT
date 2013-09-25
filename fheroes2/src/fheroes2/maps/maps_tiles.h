@@ -282,7 +282,7 @@ namespace Maps
         Addons addons_level1;
         Addons addons_level2; // 16
 
-	u32	pack_maps_index;
+	u32	maps_index;
 	u16	pack_sprite_index;
 
 	u16	tile_passable;
@@ -291,6 +291,7 @@ namespace Maps
 
         u8      quantity1;
         u8      quantity2;
+        u8      quantity3;
 
 #ifdef WITH_DEBUG
 	u8	passable_disable;

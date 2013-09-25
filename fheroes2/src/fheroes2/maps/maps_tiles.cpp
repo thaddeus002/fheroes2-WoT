@@ -1031,8 +1031,8 @@ u32 PackTileSpriteIndex(u32 index, u32 shape) /* index max: 0x3FFF, shape value:
 }
 
 /* Maps::Tiles */
-Maps::Tiles::Tiles() : pack_maps_index(0), pack_sprite_index(0), tile_passable(DIRECTION_ALL),
-    mp2_object(0), fog_colors(Color::ALL), quantity1(0), quantity2(0)
+Maps::Tiles::Tiles() : maps_index(0), pack_sprite_index(0), tile_passable(DIRECTION_ALL),
+    mp2_object(0), fog_colors(Color::ALL), quantity1(0), quantity2(0), quantity3(0)
 #ifdef WITH_DEBUG
     , passable_disable(0)
 #endif
@@ -1044,6 +1044,7 @@ void Maps::Tiles::Init(s32 index, const MP2::mp2tile_t & mp2)
     tile_passable = DIRECTION_ALL;
     quantity1	= mp2.quantity1;
     quantity2	= mp2.quantity2;
+    quantity3	= 0;
     fog_colors	= Color::ALL;
 
     SetTile(mp2.tileIndex, mp2.shape);
@@ -1059,18 +1060,17 @@ void Maps::Tiles::Init(s32 index, const MP2::mp2tile_t & mp2)
 
 void Maps::Tiles::SetIndex(int index)
 {
-    pack_maps_index	= 0x00FFFFFF & index; // high reserver: for modes
+    maps_index	= index;
 }
 
 int Maps::Tiles::GetQuantity3(void) const
 {
-    return pack_maps_index >> 24;
+    return quantity3;
 }
 
 void Maps::Tiles::SetQuantity3(int mod)
 {
-    pack_maps_index &= 0x00FFFFFF;
-    pack_maps_index |= mod << 24;
+    quantity3 = mod;
 }
 
 Heroes* Maps::Tiles::GetHeroes(void) const
@@ -1110,7 +1110,7 @@ Point Maps::Tiles::GetCenter(void) const
 
 s32 Maps::Tiles::GetIndex(void) const
 {
-    return 0x00FFFFFF & pack_maps_index;
+    return maps_index;
 }
 
 int Maps::Tiles::GetObject(bool skip_hero  /* true */) const
@@ -2817,13 +2817,14 @@ StreamBase & Maps::operator>> (StreamBase & msg, TilesAddon & ta)
 StreamBase & Maps::operator<< (StreamBase & msg, const Tiles & tile)
 {
     return msg <<
-	tile.pack_maps_index <<
+	tile.maps_index <<
 	tile.pack_sprite_index <<
 	tile.tile_passable <<
 	tile.mp2_object <<
 	tile.fog_colors <<
 	tile.quantity1 <<
 	tile.quantity2 <<
+	tile.quantity3 <<
         // addons 1
 	tile.addons_level1 <<
         // addons 2
@@ -2833,13 +2834,22 @@ StreamBase & Maps::operator<< (StreamBase & msg, const Tiles & tile)
 StreamBase & Maps::operator>> (StreamBase & msg, Tiles & tile)
 {
     msg >>
-	tile.pack_maps_index >>
+	tile.maps_index >>
 	tile.pack_sprite_index >>
 	tile.tile_passable >>
 	tile.mp2_object >>
 	tile.fog_colors >>
 	tile.quantity1 >>
-	tile.quantity2 >>
+	tile.quantity2;
+
+    if(FORMAT_VERSION_3161 > Game::GetLoadVersion())
+    {
+	tile.quantity3 = tile.maps_index >> 24;
+    }
+    else
+	msg >> tile.quantity3;
+
+    msg >>
         // addons 1
 	tile.addons_level1 >>
         // addons 2

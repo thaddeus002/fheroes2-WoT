@@ -65,6 +65,7 @@ bool SDL::Init(const u32 system)
 
     System::CreateTrayIcon(true);
     System::PowerManagerOff(true);
+    Surface::SetDefaultColorKey(0xFF, 0, 0xFF);
 
     return true;
 }

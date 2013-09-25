@@ -44,6 +44,7 @@
 namespace
 {
     u32 default_depth = 16;
+    u32 default_color_key = 0;
     std::vector<SDL_Color> pal_colors;
 }
 
@@ -250,6 +251,16 @@ bool Surface::operator== (const Surface & bs)
     return surface && bs.surface ? surface == bs.surface : false;
 }
 
+void Surface::SetDefaultColorKey(int r, int g, int b)
+{
+    default_color_key = Surface(1, 1).MapRGB(r, g, b);
+}
+
+u32 Surface::GetDefaultColorKey(void)
+{
+    return default_color_key;
+}
+
 void Surface::SetDefaultDepth(u32 depth)
 {
     switch(depth)
@@ -266,14 +277,14 @@ void Surface::SetDefaultDepth(u32 depth)
     }
 }
 
-Size Surface::GetSize(void) const
-{
-    return Size(w(), h());
-}
-
 u32 Surface::GetDefaultDepth(void)
 {
     return default_depth;
+}
+
+Size Surface::GetSize(void) const
+{
+    return Size(w(), h());
 }
 
 void Surface::Reset(void)
@@ -325,9 +336,11 @@ void Surface::Set(u32 sw, u32 sh, u32 bpp /* bpp: 8, 16, 24, 32 */, bool amask0)
 
     if(8 == bpp) LoadPalette();
 
-    u32 clkey = MapRGB(0xFF, 0, 0xFF);
-    Fill(clkey);
-    SetColorKey(clkey);
+    if(default_color_key)
+    {
+	Fill(default_color_key);
+	SetColorKey(default_color_key);
+    }
 }
 
 void Surface::Set(const void* pixels, u32 width, u32 height, u32 bytes_per_pixel, bool amask0)
@@ -445,7 +458,7 @@ u32 Surface::alpha(void) const
     return 0;
 }
 
-u32 Surface::MapRGB(u8 r, u8 g, u8 b, u8 a) const
+u32 Surface::MapRGB(int r, int g, int b, int a) const
 {
     return amask() ? SDL_MapRGBA(surface->format, r, g, b, a) : SDL_MapRGB(surface->format, r, g, b);
 }
@@ -631,7 +644,7 @@ void Surface::Fill(u32 color)
     FillRect(color, Rect(0, 0, w(), h()));
 }
 
-void Surface::Fill(u8 r, u8 g, u8 b)
+void Surface::Fill(int r, int g, int b)
 {
     Fill(MapRGB(r, g, b));
 }
@@ -646,7 +659,7 @@ void Surface::FillRect(u32 color, const Rect & rect)
     if(isDisplay()) Display::Get().AddUpdateRect(rect.x, rect.y, rect.w, rect.h);
 }
 
-void Surface::FillRect(u8 r, u8 g, u8 b, const Rect & src)
+void Surface::FillRect(int r, int g, int b, const Rect & src)
 {
     FillRect(MapRGB(r, g, b), src);
 }
@@ -1297,7 +1310,7 @@ void Surface::Swap(Surface & sf1, Surface & sf2)
 
 Surface Surface::RectBorder(u32 width, u32 height, u32 color, bool solid)
 {
-    return RectBorder(width, height, Surface(1, 1).MapRGB(0xFF, 0, 0xFF) /* color key */, color, solid);
+    return RectBorder(width, height, default_color_key, color, solid);
 }
 
 Surface Surface::RectBorder(u32 width, u32 height, u32 fill, u32 color, bool solid)

@@ -44,15 +44,17 @@ protected:
     virtual int		get8(void) = 0;
     virtual void	put8(int) = 0;
 
-    virtual size_t	sizeg(void) const = 0;
-    virtual size_t	sizep(void) const = 0;
-
 public:
     enum { EndianBig = 0x80000000 };
 
     StreamBase() {}
     virtual ~StreamBase() {}
 
+    virtual size_t	sizeg(void) const = 0;
+    virtual size_t	sizep(void) const = 0;
+
+    virtual size_t	tellg(void) const = 0;
+    virtual size_t	tellp(void) const = 0;
 
     virtual bool	bigendian(void) const;
 
@@ -235,11 +237,12 @@ public:
     void	put(int);
 
     void	skip(size_t);
-
-protected:
     size_t	tellg(void) const;
     size_t	tellp(void) const;
+    size_t	sizeg(void) const;
+    size_t	sizep(void) const;
 
+protected:
     void	copy(const StreamBuf &);
     void	realloc(size_t);
     void	setfail(void);
@@ -247,8 +250,6 @@ protected:
     int		get8(void);
     void	put8(int);
 
-    size_t	sizeg(void) const;
-    size_t	sizep(void) const;
 
     friend std::ostream & operator<< (std::ostream &, StreamBuf &);
     friend std::istream & operator>> (std::istream &, StreamBuf &);

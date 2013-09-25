@@ -157,7 +157,7 @@ bool Game::Load(const std::string & fn)
 	    std::string strver;
 	    u16 binver = 0;
 	    StreamBuf hinfo(1024);
-	    StreamBuf gdata((Maps::MEDIUM < conf.MapsWidth() ? 1024 :512) * 1024);
+	    StreamBuf gdata((Maps::MEDIUM < conf.MapsWidth() ? 1024 : 512) * 1024);
 	    HeaderSAV header;
 
 	    hinfo.setbigendian(true);
@@ -218,6 +218,7 @@ bool Game::Load(const std::string & fn)
 		Dialog::Message("Warning", _("This file is saved in the \"Price Loyalty\" version.\nSome items may be unavailable."), Font::BIG, Dialog::OK);
 	    }
 
+	    // SaveMemToFile(std::vector<u8>(gdata.data(), gdata.data() + gdata.size()), "gdata.bin");
 	    gdata >> binver;
 
 	    // check version: false
@@ -228,6 +229,12 @@ bool Game::Load(const std::string & fn)
      		"game version: " << CURRENT_FORMAT_VERSION << std::endl <<
      		"last version: " << LAST_FORMAT_VERSION;
  		Dialog::Message("Error", os.str(), Font::BIG, Dialog::OK);
+ 		return false;
+	    }
+
+	    if(binver == FORMAT_VERSION_3154)
+	    {
+ 		Dialog::Message("Error", "File is broken. version: 3154", Font::BIG, Dialog::OK);
  		return false;
 	    }
 

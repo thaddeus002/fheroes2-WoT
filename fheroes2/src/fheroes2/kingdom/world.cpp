@@ -1067,7 +1067,16 @@ StreamBase & operator>> (StreamBase & msg, World & w)
     Size & sz = w;
 
     msg >> sz >>
-	w.vec_tiles >>
+	w.vec_tiles;
+
+    if(FORMAT_VERSION_3161 > Game::GetLoadVersion())
+    {
+	for(MapsTiles::iterator
+	    it = w.vec_tiles.begin();  it != w.vec_tiles.end(); ++it)
+	    (*it).SetIndex(std::distance(w.vec_tiles.begin(), it));
+    }
+
+    msg >>
 	w.vec_heroes >>
 	w.vec_castles >>
 	w.vec_kingdoms >>

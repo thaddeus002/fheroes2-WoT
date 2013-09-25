@@ -239,20 +239,14 @@ void StreamBase::put16(u16 v)
 
 void StreamBase::putBE16(u16 v)
 {
-    if(sizep() > 1)
-    {
-	put8(v >> 8);
-	put8(v);
-    }
+    put8(v >> 8);
+    put8(v);
 }
 
 void StreamBase::putLE16(u16 v)
 {
-    if(sizep() > 1)
-    {
-	put8(v);
-	put8(v >> 8);
-    }
+    put8(v);
+    put8(v >> 8);
 }
 
 void StreamBase::put32(u32 v)
@@ -262,24 +256,18 @@ void StreamBase::put32(u32 v)
 
 void StreamBase::putBE32(u32 v)
 {
-    if(sizep() > 3)
-    {
-	put8(v >> 24);
-	put8(v >> 16);
-        put8(v >> 8);
-	put8(v);
-    }
+    put8(v >> 24);
+    put8(v >> 16);
+    put8(v >> 8);
+    put8(v);
 }
 
 void StreamBase::putLE32(u32 v)
 {
-    if(sizep() > 3)
-    {
-	put8(v);
-        put8(v >> 8);
-	put8(v >> 16);
-	put8(v >> 24);
-    }
+    put8(v);
+    put8(v >> 8);
+    put8(v >> 16);
+    put8(v >> 24);
 }
 
 void StreamBase::putBE32(std::ostream & os, u32 v)
@@ -476,6 +464,16 @@ size_t StreamBuf::tellp(void) const
     return itput - itbeg;
 }
 
+size_t StreamBuf::sizeg(void) const
+{
+    return itput - itget;
+}
+
+size_t StreamBuf::sizep(void) const
+{
+    return itend - itput;
+}
+
 void StreamBuf::realloc(size_t sz)
 {
     setconstbuf(false);
@@ -493,7 +491,6 @@ void StreamBuf::realloc(size_t sz)
     else
     if(sizep() < sz)
     {
-	sz = tellp() + sz;
 	if(sz < MINCAPACITY) sz = MINCAPACITY;
 
 	u8* ptr = new u8 [sz];
@@ -593,16 +590,6 @@ int StreamBuf::get8(void)
 	res = 0x000000FF & *itget++;
 
     return res;
-}
-
-size_t StreamBuf::sizeg(void) const
-{
-    return itput - itget;
-}
-
-size_t StreamBuf::sizep(void) const
-{
-    return itend - itput;
 }
 
 std::ostream & operator<< (std::ostream & os, StreamBuf & sb)

@@ -69,7 +69,7 @@ public:
     bool isRefCopy(void) const;
 
     bool isValid(void) const;
-    u32 MapRGB(u8 r, u8 g, u8 b, u8 a = 0) const;
+    u32 MapRGB(int r, int g, int b, int a = 0) const;
     void GetRGB(u32 pixel, u8 *r, u8 *g, u8 *b, u8 *a = NULL) const;
 
     void Blit(Surface &) const;
@@ -83,10 +83,10 @@ public:
     const SDL_Surface* SDLSurface(void) const{ return surface; };
 
     void Fill(u32 color);
-    void Fill(u8 r, u8 g, u8 b);
+    void Fill(int r, int g, int b);
 
     void FillRect(u32 color, const Rect & src);
-    void FillRect(u8 r, u8 g, u8 b, const Rect & src);
+    void FillRect(int r, int g, int b, const Rect & src);
 
     void SetDisplayFormat(void);
     void SetColorKey(u32 color);
@@ -123,6 +123,8 @@ public:
 
     static void SetDefaultDepth(u32);
     static u32  GetDefaultDepth(void);
+    static void SetDefaultColorKey(int r, int g, int b);
+    static u32  GetDefaultColorKey(void);
     static void FreeSurface(Surface &);
     static void Swap(Surface &, Surface &);
     
