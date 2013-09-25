@@ -31,6 +31,9 @@ namespace Maps
   {
   public:
     FileInfo();
+    FileInfo(const FileInfo &);
+
+    FileInfo & operator= (const FileInfo &);
 
     bool ReadMAP(const std::string &);
     bool ReadMP2(const std::string &);

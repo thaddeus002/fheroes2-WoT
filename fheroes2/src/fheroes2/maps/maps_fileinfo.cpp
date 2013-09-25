@@ -94,6 +94,44 @@ Maps::FileInfo::FileInfo()
     Reset();
 }
 
+Maps::FileInfo::FileInfo(const FileInfo & f)
+{
+    *this = f;
+}
+
+Maps::FileInfo & Maps::FileInfo::operator= (const FileInfo & f)
+{
+    file = f.file;
+    name = f.name;
+    description = f.description;
+    size_w = f.size_w;
+    size_h = f.size_h;
+    difficulty = f.difficulty;
+
+    for(u32 ii = 0; ii < KINGDOMMAX; ++ii)
+    {
+	races[ii] = f.races[ii];
+	unions[ii] = f.unions[ii];
+    }
+
+    kingdom_colors = f.kingdom_colors;
+    allow_human_colors = f.allow_human_colors;
+    allow_comp_colors = f.allow_comp_colors;
+    rnd_races = f.rnd_races;
+    conditions_wins = f.conditions_wins;
+    comp_also_wins = f.comp_also_wins;
+    allow_normal_victory = f.allow_normal_victory;
+    wins1 = f.wins1;
+    wins2 = f.wins2;
+    conditions_loss = f.conditions_loss;
+    loss1 = f.loss1;
+    loss2 = f.loss2;
+    localtime = f.localtime;
+    with_heroes = f.with_heroes;
+
+    return *this;
+}
+
 void Maps::FileInfo::Reset(void)
 {
     file.clear();

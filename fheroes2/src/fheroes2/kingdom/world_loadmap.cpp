@@ -199,7 +199,6 @@ TiXmlElement & operator>> (TiXmlElement & doc, Castle & town)
 
         Maps::UpdateRNDSpriteForCastle(town.GetCenter(), race, town.isCastle());
     }
-
     town.race = race;
 
     Maps::MinimizeAreaForCastle(town.GetCenter());
@@ -283,7 +282,7 @@ TiXmlElement & operator>> (TiXmlElement & doc, Heroes & hero)
     }
 
     hero.name = doc.Attribute("name");
-    if(hero.name == "Random")
+    if(hero.name == "Random" || hero.name == "Unknown")
 	hero.name = Heroes::GetName(hero.GetID());
 
     Skill::SecSkills skills;
