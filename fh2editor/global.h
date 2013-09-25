@@ -45,10 +45,11 @@ struct DefaultValues
 QDomElement & operator<< (QDomElement &, const DefaultValues &);
 QDomElement & operator>> (QDomElement &, DefaultValues &);
 
+#define FH2ENGINE_VERSION_3165		3165
 #define FH2ENGINE_VERSION_3156		3156
 #define FH2ENGINE_VERSION_3141		3141
 #define FH2ENGINE_VERSION_3140		3140
-#define FH2ENGINE_CURRENT_VERSION	FH2ENGINE_VERSION_3156
+#define FH2ENGINE_CURRENT_VERSION	FH2ENGINE_VERSION_3165
 #define FH2ENGINE_LAST_VERSION		FH2ENGINE_VERSION_3140 
 
 #endif

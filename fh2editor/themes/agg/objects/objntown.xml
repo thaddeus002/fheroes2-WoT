@@ -15,8 +15,8 @@
     <template section="castle" name="Town (wizard)" index="144" />
     <template section="castle" name="Town (necromant)" index="176" />
 
-    <template section="rndtown" name="Castle (random)" index="0" />
-    <template section="rndtown" name="Town (random)" index="16" />
+    <template section="rndtown" name="Castle (random)" index="0" cid="0x31" />
+    <template section="rndtown" name="Town (random)" index="16" cid="0x30" />
 
     <template section="twba" hide="1" name="twba 0" index="0" />
     <template section="twba" hide="1" name="twba 10" index="10" />
