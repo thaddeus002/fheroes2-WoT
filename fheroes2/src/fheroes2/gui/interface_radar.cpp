@@ -90,6 +90,12 @@ u32 GetPaletteIndexFromColor(int color)
 /* constructor */
 Interface::Radar::Radar(Basic & basic) : BorderWindow(Rect(0, 0, RADARWIDTH, RADARWIDTH)), interface(basic), hide(true)
 {
+    if(Settings::Get().QVGA())
+    {
+	// for QVGA set small radar, 1 pixel = 1 tile
+	if(RADARWIDTH > world.w() && RADARWIDTH > world.h())
+	    SetPosition(0, 0, world.w(), world.h());
+    }
 }
 
 void Interface::Radar::SavePosition(void)
@@ -189,7 +195,12 @@ void Interface::Radar::Redraw(void)
     const Rect & area = GetArea();
 
     if(conf.ExtGameHideInterface() && conf.ShowRadar())
+    {
 	BorderWindow::Redraw();
+	//const Rect & rect = GetRect();
+	//AGG::GetICN(ICN::CELLWIN, 4).Blit(rect.x + 2, rect.y + 2);
+	//AGG::GetICN(ICN::CELLWIN, 5).Blit(rect.x + 5, rect.y + 5);
+    }
 
     if(! conf.ExtGameHideInterface() || conf.ShowRadar())
     {
@@ -386,5 +397,35 @@ void Interface::Radar::QueueEventProcessing(void)
 	else
 	if(!conf.ExtPocketTapMode() && le.MousePressRight(GetRect()))
 	    Dialog::Message(_("World Map"), _("A miniature view of the known world. Left click to move viewing area."), Font::BIG);
+	else
+	if(! conf.QVGA())
+	{
+	    const Rect & area = GetArea();
+	    Size newSize(area.w, area.h);
+
+	    if(le.MouseWheelUp())
+	    {
+		if(area.w != world.w() ||
+	    		    area.h != world.h())
+		    newSize = Size(world.w(), world.h());
+	    }
+	    else
+	    if(le.MouseWheelDn())
+	    {
+		if(area.w != RADARWIDTH ||
+	    		    area.h != RADARWIDTH)
+		    newSize = Size(RADARWIDTH, RADARWIDTH);
+	    }
+
+	    if(newSize != area)
+	    {
+		const Rect & rect = GetRect();
+		Cursor::Get().Hide();
+		SetPosition(rect.x, rect.y, newSize.w, newSize.h);
+		Generate();
+		RedrawCursor();
+        	gamearea.SetRedraw();
+	    }
+	}
     }
 }

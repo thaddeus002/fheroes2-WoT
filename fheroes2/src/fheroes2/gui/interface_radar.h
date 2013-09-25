@@ -49,12 +49,10 @@ namespace Interface
 
 	Basic & interface;
 
-        Surface spriteArea;
-	SpriteMove cursorArea;
-
-	Point offset;
-
-	bool hide;
+        Surface		spriteArea;
+	SpriteMove	cursorArea;
+	Point		offset;
+	bool		hide;
     };
 }
 

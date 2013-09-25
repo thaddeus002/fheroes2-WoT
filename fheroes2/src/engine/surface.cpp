@@ -384,7 +384,7 @@ void Surface::CreateSurface(u32 sw, u32 sh, u32 bpp, bool amask0)
 
 bool Surface::isValid(void) const
 {
-    return surface;
+    return surface && surface->format;
 }
 
 bool Surface::Load(const char* fn)
@@ -508,6 +508,18 @@ u32 Surface::GetColorIndex(u32 index) const
 	res.Set(1, 1, false);
     else
 	res = *this;
+
+    index *= 3;
+
+    if(ARRAY_COUNT(kb_pal) > index + 2)
+	return res.MapRGB(kb_pal[index] << 2, kb_pal[index + 1] << 2, kb_pal[index + 2] << 2);
+
+    return 0;
+}
+
+u32 Surface::GetDefaultColorIndex(u32 index)
+{
+    Surface res(1, 1, false);
 
     index *= 3;
 

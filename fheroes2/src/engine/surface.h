@@ -125,6 +125,7 @@ public:
     static u32  GetDefaultDepth(void);
     static void SetDefaultColorKey(int r, int g, int b);
     static u32  GetDefaultColorKey(void);
+    static u32  GetDefaultColorIndex(u32);
     static void FreeSurface(Surface &);
     static void Swap(Surface &, Surface &);
     
