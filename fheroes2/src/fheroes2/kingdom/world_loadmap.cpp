@@ -1059,10 +1059,6 @@ bool World::LoadMapMP2(const std::string & filename)
 	delete [] pblock;
     }
 
-    // last rumors
-    vec_rumors.push_back(_("You can load the newest version of game from a site:\n http://sf.net/projects/fheroes2"));
-    vec_rumors.push_back(_("This game is now in beta development version. ;)"));
-
     // close mp2
     fd.close();
 
@@ -1228,6 +1224,7 @@ void World::PostLoad(void)
     // set ultimate
     MapsTiles::iterator it = std::find_if(vec_tiles.begin(), vec_tiles.end(),
 	    std::bind2nd(std::mem_fun_ref(&Maps::Tiles::isObject), static_cast<int>(MP2::OBJ_RNDULTIMATEARTIFACT)));
+    Point ultimate_pos;
 
     // not found
     if(vec_tiles.end() == it)
@@ -1249,6 +1246,7 @@ void World::PostLoad(void)
 	{
 	    const s32 pos = *Rand::Get(pools);
 	    ultimate_artifact.Set(pos, Artifact::Rand(Artifact::ART_ULTIMATE));
+	    ultimate_pos = Maps::GetPoint(pos);
 	}
     }
     else
@@ -1261,6 +1259,56 @@ void World::PostLoad(void)
 	    ultimate_artifact.Set((*it).GetIndex(), Artifact::FromMP2IndexSprite(addon->index));
 	    (*it).Remove(addon->uniq);
 	    (*it).SetObject(MP2::OBJ_ZERO);
+	    ultimate_pos = (*it).GetCenter();
 	}
     }
+
+    std::string rumor = _("The ultimate artifact is really the %{name}");
+    StringReplace(rumor, "%{name}", ultimate_artifact.GetName());
+    vec_rumors.push_back(rumor);
+
+    rumor = _("The ultimate artifact may be found in the %{name} regions of the world.");
+
+    if(world.h() / 3 > ultimate_pos.y)
+    {
+	if(world.w() / 3 > ultimate_pos.x)
+	    StringReplace(rumor, "%{name}", _("north-west"));
+	else
+	if(2 * world.w() / 3 > ultimate_pos.x)
+	    StringReplace(rumor, "%{name}", _("north"));
+	else
+	    StringReplace(rumor, "%{name}", _("north-east"));
+    }
+    else
+    if(2 * world.h() / 3 > ultimate_pos.y)
+    {
+	if(world.w() / 3 > ultimate_pos.x)
+	    StringReplace(rumor, "%{name}", _("west"));
+	else
+	if(2 * world.w() / 3 > ultimate_pos.x)
+	    StringReplace(rumor, "%{name}", _("center"));
+	else
+	    StringReplace(rumor, "%{name}", _("east"));
+    }
+    else
+    {
+	if(world.w() / 3 > ultimate_pos.x)
+	    StringReplace(rumor, "%{name}", _("south-west"));
+	else
+	if(2 * world.w() / 3 > ultimate_pos.x)
+	    StringReplace(rumor, "%{name}", _("south"));
+	else
+	    StringReplace(rumor, "%{name}", _("south-east"));
+    }
+    vec_rumors.push_back(rumor);
+
+    vec_rumors.push_back(_("The truth is out there."));
+    vec_rumors.push_back(_("The dark side is stronger."));
+    vec_rumors.push_back(_("The end of the world is near."));
+    vec_rumors.push_back(_("The bones of Lord Slayer are buried in the foundation of the arena."));
+    vec_rumors.push_back(_("A Black Dragon will take out a Titan any day of the week."));
+    vec_rumors.push_back(_("He told her: Yada yada yada...  and then she said: Blah, blah, blah..."));
+
+    vec_rumors.push_back(_("You can load the newest version of game from a site:\n http://sf.net/projects/fheroes2"));
+    vec_rumors.push_back(_("This game is now in beta development version. ;)"));
 }
