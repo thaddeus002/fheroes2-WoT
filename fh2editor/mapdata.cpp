@@ -1668,6 +1668,25 @@ void MapData::pasteFromBuffer(void)
 	const MapArea & selMapArea = *_selectedArea.data();
 	mapArea.importArea(selMapArea, QRect(QPoint(0, 0), selMapArea.size()), tileOverMouse->mapPos());
 
+	updateKingdomColors(0);
+	updatePlayersRaces();
+
+	// update heroes sprites
+	QList<SharedMapObject> listHeroes = mapObjects.list(MapObj::Heroes);
+
+	for(QList<SharedMapObject>::const_iterator
+    	    it = listHeroes.begin(); it != listHeroes.end(); ++it)
+	{
+	    MapHero* hero = dynamic_cast<MapHero*>((*it).data());
+
+	    if(hero)
+	    {
+		const MapTile* tile = mapTiles.tileConst(hero->pos());
+		const MapTileExt* ext = tile ? tile->levels1Const().findConst(MapTileExt::isMiniHero) : NULL;
+		if(ext) addHeroItem(tile->mapPos(), *ext);
+	    }
+	}
+
 	emit dataModified();
     }
 }
@@ -2815,6 +2834,9 @@ void MapData::updateKingdomColors(int color)
 
     mapHeader.mapCompColors |= color;
     mapHeader.mapHumanColors |= color;
+
+    if(0 == mapHeader.mapHumanColors)
+	mapHeader.mapHumanColors = mapHeader.mapKingdomColors;
 }
 
 void MapData::showPassableTriggered(void)

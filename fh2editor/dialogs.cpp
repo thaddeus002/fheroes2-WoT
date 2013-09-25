@@ -3206,14 +3206,18 @@ void Form::HeroDialog::widgetSkillsVisible(bool f)
 void Form::HeroDialog::setPortrait(int val)
 {
     labelPortrait->setPixmap(EditorTheme::getImageICN("PORTMEDI.ICN", val).first);
-    lineEditName->setText(Portrait::transcribe(val));
     if(val)
     {
 	int curRace = (val - 1) / 9;
 	comboBoxRace->setCurrentIndex(curRace > 5 ? 6 : curRace);
+	lineEditName->setText(Portrait::transcribe(val));
     }
     else
+    {
 	comboBoxRace->setCurrentIndex(6);
+	lineEditName->setText("Random");
+    }
+
     setEnableOKButton();
 }
 
