@@ -37,6 +37,11 @@
 #include "mapwindow.h"
 #include "mapdata.h"
 
+namespace GraphicsPixmapItemType
+{
+    enum { None = 0, Tile, Building, Mount, Tree, Resource, Artifact, Monster, Hero, Other };
+};
+
 MapTileExt::MapTileExt(int lvl, const mp2lev_t & ext)
     : spriteICN(H2::MP2ICN(ext.object, false)), spriteExt(ext.object), spriteIndex(ext.index), spriteLevelInt(lvl), spriteUID(ext.uniq)
 {
@@ -504,6 +509,7 @@ void MapTile::setGraphicsPixmapItemValues(void)
     setOffset(mpos.x() * tileSize.width(), mpos.y() * tileSize.height());
     setFlags(QGraphicsItem::ItemIsSelectable);
     setTileSprite(tileSprite, tileShape);
+    setData(0, GraphicsPixmapItemType::Tile);
 }
 
 void MapTile::setTileSprite(int index, int rotate)
@@ -1645,9 +1651,7 @@ void MapData::cellInfoDialog(void)
 
 void MapData::copyToBuffer(void)
 {
-    QList<QGraphicsItem*> selected = selectedItems();
-
-    if(selected.size())
+    if(selectedItems().size())
     {
 	const QRect srcrt = mapToRect(selectionArea().boundingRect().toRect());
 	MapArea* ptr = new MapArea(srcrt.size());
@@ -1672,7 +1676,7 @@ void MapData::pasteFromBuffer(void)
 	updatePlayersRaces();
 
 	// update heroes sprites
-	QList<SharedMapObject> listHeroes = mapObjects.list(MapObj::Heroes);
+	QList<SharedMapObject> listHeroes = mapArea.objects.list(MapObj::Heroes);
 
 	for(QList<SharedMapObject>::const_iterator
     	    it = listHeroes.begin(); it != listHeroes.end(); ++it)
@@ -1738,8 +1742,6 @@ void MapData::fillGroundAction(QAction* act)
 
 void MapData::removeObjectsAction(QAction* act)
 {
-    QList<QGraphicsItem*> selected = selectedItems();
-
     if(act)
     {
         int type = act->data().toInt();
@@ -1753,8 +1755,11 @@ void MapData::removeObjectsAction(QAction* act)
 	    if(tile) uids += tile->uids();
 	}
 
+	bool removeHeroesItems = false;
+
 	switch(type)
 	{
+/*
 	    // remove buildings
 	    case 1:
 	    // remove mounts/rocs
@@ -1767,13 +1772,15 @@ void MapData::removeObjectsAction(QAction* act)
 	    case 5:
 	    // remove monsters
 	    case 6:
+		break;
 	    // remove heroes
 	    case 7:
-		uids.clear();
+		removeHeroesItems = true;
 		break;
-
+*/
 	    // Remove all objects
 	    case 10:
+		removeHeroesItems = true;
 		break;
 
 	    default: uids.clear(); break;
@@ -1786,7 +1793,38 @@ void MapData::removeObjectsAction(QAction* act)
 	    mapObjects.remove(*it);
 	}
 
+	if(removeHeroesItems)
+	for(QList<QGraphicsItem*>::iterator
+	    it = selected.begin(); it != selected.end(); ++it)
+	{
+	    MapTile* tile = qgraphicsitem_cast<MapTile*>(*it);
+	    if(tile) removeHeroItem(*tile);
+	}
+
 	update();
+	emit dataModified();
+    }
+
+}
+
+void MapData::removeCurrentObject(void)
+{
+    if(tileOverMouse)
+    {
+	// remove object info
+	MapObject* obj = mapObjects.find(tileOverMouse->mapPos()).data();
+	if(obj) mapObjects.remove(obj->uid());
+
+	// remove sprites
+	if(! tileOverMouse->levels1Const().empty())
+	{
+    	    // get uid from level 1 (last sprite)
+	    mapTiles.removeSprites(tileOverMouse->levels1Const().back().uid());
+	    update();
+	}
+
+	removeHeroItem(*tileOverMouse);
+
 	emit dataModified();
     }
 }
@@ -2045,10 +2083,11 @@ bool MapData::saveMapXML(const QString & mapFile) const
 
     {
 	QByteArray bdata;
+	bdata.reserve(size().width() * size().height() * 1024);
 	QTextStream ts(&bdata);
 	QDomElement edata0 = doc.createElement("data");
         edata0 << *this;
-        edata0.save(ts, 5);
+        edata0.save(ts, 4);
 
 	QDataStream ds(&cdata, QIODevice::WriteOnly);
 	ds.setByteOrder(QDataStream::LittleEndian);
@@ -2419,7 +2458,6 @@ QDomElement & operator>> (QDomElement & emap, MapData & data)
     return emap;
 }
 
-
 void MapData::selectObjectImage(void)
 {
     Form::SelectImageObject form;
@@ -2506,26 +2544,6 @@ void MapData::editObjectAttributes(void)
     }
 }
 
-void MapData::removeCurrentObject(void)
-{
-    if(tileOverMouse)
-    {
-	// remove object info
-	MapObject* obj = mapObjects.find(tileOverMouse->mapPos()).data();
-	if(obj) mapObjects.remove(obj->uid());
-
-	// remove sprites
-	if(! tileOverMouse->levels1Const().empty())
-	{
-    	    // get uid from level 1 (last sprite)
-	    mapTiles.removeSprites(tileOverMouse->levels1Const().back().uid());
-	    update();
-	}
-
-	emit dataModified();
-    }
-}
-
 void MapData::editOtherMapEventsDialog(const MapTile & tile)
 {
     Form::ObjectEventsDialog form;
@@ -2604,9 +2622,20 @@ void MapData::addHeroItem(const QPoint & mpos, const MapTileExt & ext)
 {
     const QSize & tileSize = EditorTheme::tileSize();
     QGraphicsPixmapItem* item = new QGraphicsPixmapItem();
+    item->setData(0, GraphicsPixmapItemType::Hero);
     item->setOffset(mpos.x() * tileSize.width(), mpos.y() * tileSize.height() - 15);
     item->setPixmap(EditorTheme::getImageICN(ext.icn(), ext.index()).first);
     addItem(item);
+}
+
+void MapData::removeHeroItem(const MapTile & tile)
+{
+    // remove hero sprite
+    QList<QGraphicsItem*> itemsList = items(tile.boundingRect(), Qt::IntersectsItemShape, Qt::AscendingOrder);
+
+    for(QList<QGraphicsItem*>::iterator
+	it = itemsList.begin(); it != itemsList.end(); ++it)
+	if(GraphicsPixmapItemType::Hero == (*it)->data(0)) removeItem(*it);
 }
 
 void MapData::editHeroDialog(const QPoint & pt)
@@ -2837,7 +2866,10 @@ void MapData::updateKingdomColors(int color)
     mapHeader.mapHumanColors |= color;
 
     if(0 == mapHeader.mapHumanColors)
+    {
 	mapHeader.mapHumanColors = mapHeader.mapKingdomColors;
+	mapHeader.mapCompColors |= mapHeader.mapKingdomColors;
+    }
 }
 
 void MapData::showPassableTriggered(void)

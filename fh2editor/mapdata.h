@@ -389,6 +389,7 @@ protected:
 
     void		addMapObject(const QPoint &, const CompositeObject &, quint32);
     void		addHeroItem(const QPoint &, const MapTileExt &);
+    void		removeHeroItem(const MapTile &);
 
     void		editMapEventDialog(const MapTile &);
     void		editTownDialog(const MapTile &);
