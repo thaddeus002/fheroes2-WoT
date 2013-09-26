@@ -25,8 +25,8 @@ CFLAGS := $(CFLAGS) -DID_ICON=$(IDICON)
 export IDICON
 endif
 
-AR := i686-pc-mingw32-ar
-CXX := i686-pc-mingw32-g++
-WINDRES := i686-pc-mingw32-windres
+AR := i686-w64-mingw32-ar
+CXX := i686-w64-mingw32-g++
+WINDRES := i686-w64-mingw32-windres
 CFLAGS := $(CFLAGS) -O2 -static
 LIBS := -static -Wl,-Bstatic $(LIBS) -lwinmm -ldxguid

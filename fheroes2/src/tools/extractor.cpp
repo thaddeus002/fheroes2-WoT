@@ -59,10 +59,8 @@ int main(int argc, char **argv)
 
     System::MakeDirectory(argv[2]);
 
-    u16 count;
+    u16 count = StreamBase::getLE16(fd_data);
     u16 total = 0;
-    fd_data.read(reinterpret_cast<char *>(&count), sizeof(u16));
-    SwapLE16(count);
 
     char buf[AGGSIZENAME];
     std::vector<aggfat_t> vector(count);
@@ -81,11 +79,8 @@ int main(int argc, char **argv)
 	fd_data.seekg(sizeof(u16) + cur * (3 * sizeof(u32)), std::ios_base::beg);
 	fd_data.seekg(sizeof(u32), std::ios_base::cur);
 
-        fd_data.read(reinterpret_cast<char *>(&fat.offset), sizeof(u32));
-	SwapLE32(fat.offset);
-
-        fd_data.read(reinterpret_cast<char *>(&fat.size), sizeof(u32));
-        SwapLE32(fat.size);
+	fat.offset = StreamBase::getLE32(fd_data);
+	fat.size = StreamBase::getLE32(fd_data);
 
 	fd_data.seekg(fat.offset, std::ios_base::beg);
 

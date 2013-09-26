@@ -71,14 +71,9 @@ int main(int argc, char **argv)
 
     u16 count, width, height;
     
-    fd_data.read(reinterpret_cast<char *>(&count), sizeof(u16));
-    SwapLE16(count);
-
-    fd_data.read(reinterpret_cast<char *>(&width), sizeof(u16));
-    SwapLE16(width);
-
-    fd_data.read(reinterpret_cast<char *>(&height), sizeof(u16));
-    SwapLE16(height);
+    count = StreamBase::getLE16(fd_data);
+    width = StreamBase::getLE16(fd_data);
+    height = StreamBase::getLE16(fd_data);
 
     char *body = new char[size];
 

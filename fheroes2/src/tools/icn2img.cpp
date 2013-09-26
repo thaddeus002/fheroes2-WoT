@@ -27,7 +27,6 @@
 #include <cstring>
 #include <iomanip>
 
-#include "SDL.h"
 #include "engine.h"
 #include "system.h"
 
@@ -38,24 +37,15 @@ class icnheader
 
     void read(std::fstream & fd)
     {
-        if(fd.fail()) return;
-
-        fd.read(reinterpret_cast<char *>(& offsetX), sizeof(s16));
-        SwapLE16(offsetX);
-
-        fd.read(reinterpret_cast<char *>(& offsetY), sizeof(s16));
-        SwapLE16(offsetY);
-
-	fd.read(reinterpret_cast<char *>(& width), sizeof(u16));
-	SwapLE16(width);
-
-	fd.read(reinterpret_cast<char *>(& height), sizeof(u16));
-	SwapLE16(height);
-
-	fd.read(reinterpret_cast<char *>(& type), 1);
-
-	fd.read(reinterpret_cast<char *>(& offsetData), sizeof(u32));
-	SwapLE32(offsetData);
+        if(! fd.fail())
+	{
+	    offsetX = StreamBase::getLE16(fd);
+    	    offsetY = StreamBase::getLE16(fd);
+    	    width = StreamBase::getLE16(fd);
+    	    height = StreamBase::getLE16(fd);
+    	    type = fd.get();
+    	    offsetData = StreamBase::getLE32(fd);
+	}
     };
 
     s16	offsetX;
@@ -79,7 +69,7 @@ int main(int argc, char **argv)
     }
 
     bool debug = false;
-    bool shadow = true;
+    //bool shadow = true;
 
     char** ptr = argv;
     ++ptr;
@@ -88,9 +78,9 @@ int main(int argc, char **argv)
     {
 	if(0 == strcmp("-d", *ptr))
 	    debug = true;
-	else
-	if(0 == strcmp("-s", *ptr))
-	    shadow = false;
+	//else
+	//if(0 == strcmp("-s", *ptr))
+	//    shadow = false;
 	else
 	    break;
 
@@ -134,11 +124,8 @@ int main(int argc, char **argv)
     u16 count_sprite;
     u32 total_size;
 
-    fd_data.read(reinterpret_cast<char *>(& count_sprite), sizeof(u16));
-    SwapLE16(count_sprite);
-
-    fd_data.read(reinterpret_cast<char *>(& total_size), sizeof(u32));
-    SwapLE32(total_size);
+    count_sprite = StreamBase::getLE16(fd_data);
+    total_size = StreamBase::getLE32(fd_data);
 
     fd_spec << "<?xml version=\"1.0\" ?>" << std::endl <<
 		"<icn name=\"" << shortname << ".icn\" count=\"" << count_sprite << "\">" << std::endl;
@@ -155,9 +142,9 @@ int main(int argc, char **argv)
 	u32 data_size = (ii + 1 != count_sprite ? headers[ii + 1].offsetData - head.offsetData : total_size - head.offsetData);
 	fd_data.seekg(save_pos + head.offsetData, std::ios_base::beg);
     
-        char *buf = new char[data_size + 100];
+        u8* buf = new u8[data_size + 100];
         std::memset(buf, 0x80, data_size + 100);
-        fd_data.read(buf, data_size);
+        fd_data.read((char*) buf, data_size);
 
 	Surface sf(head.width, head.height, /*false*/true); // accepting transparency
 
@@ -169,9 +156,9 @@ int main(int argc, char **argv)
 	sf.Fill(0); // filling with transparent color
 
 	if(0x20 == head.type)
-	    SpriteDrawICNv2(sf, reinterpret_cast<const u8*>(buf), data_size, debug);
+	    SpriteDrawICNv2(sf, buf, data_size, debug);
 	else
-	    SpriteDrawICNv1(sf, reinterpret_cast<const u8*>(buf), data_size, debug);
+	    SpriteDrawICNv1(sf, buf, data_size, debug);
         delete [] buf;
 
 	std::ostringstream stream;
