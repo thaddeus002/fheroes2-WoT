@@ -28,7 +28,7 @@
 
 #define  ANGLEWIDTH 44
 
-Dialog::FrameBorder::FrameBorder(int brd) : border(brd)
+Dialog::FrameBorder::FrameBorder(int v) : border(v)
 {
 }
 
@@ -41,14 +41,14 @@ Dialog::FrameBorder::~FrameBorder()
 Dialog::FrameBorder::FrameBorder(const Size & sz, const Surface & sf) : border(BORDERWIDTH)
 {
     Display & display = Display::Get();
-    SetPosition((display.w() - sz.w - BORDERWIDTH * 2) / 2, (display.h() - sz.h - BORDERWIDTH * 2) / 2, sz.w, sz.h);
+    SetPosition((display.w() - sz.w - border * 2) / 2, (display.h() - sz.h - border * 2) / 2, sz.w, sz.h);
     Redraw(sf, Rect(0, 0, sf.w(), sf.h()), Display::Get(), GetRect());
 }
 
 Dialog::FrameBorder::FrameBorder(const Size & sz) : border(BORDERWIDTH)
 {
     Display & display = Display::Get();
-    SetPosition((display.w() - sz.w - BORDERWIDTH * 2) / 2, (display.h() - sz.h - BORDERWIDTH * 2) / 2, sz.w, sz.h);
+    SetPosition((display.w() - sz.w - border * 2) / 2, (display.h() - sz.h - border * 2) / 2, sz.w, sz.h);
     RedrawRegular(GetRect());
 }
 
@@ -56,6 +56,16 @@ Dialog::FrameBorder::FrameBorder(s32 posx, s32 posy, u32 encw, u32 ench) : borde
 {
     SetPosition(posx, posy, encw, ench);
     RedrawRegular(GetRect());
+}
+
+int Dialog::FrameBorder::BorderWidth(void) const
+{
+    return border;
+}
+
+int Dialog::FrameBorder::BorderHeight(void) const
+{
+    return border;
 }
 
 bool Dialog::FrameBorder::isValid(void) const
@@ -88,6 +98,11 @@ void Dialog::FrameBorder::SetPosition(s32 posx, s32 posy, u32 encw, u32 ench)
     area.y = posy + border;
 
     top = Rect(posx, posy, area.w, border);
+}
+
+void Dialog::FrameBorder::SetBorder(int v)
+{
+    border = v;
 }
 
 const Rect & Dialog::FrameBorder::GetTop(void) const

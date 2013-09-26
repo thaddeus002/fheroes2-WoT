@@ -166,6 +166,8 @@ void Interface::GameBorderRedraw(void)
 
 Interface::BorderWindow::BorderWindow(const Rect & rt) : area(rt)
 {
+    if(Settings::Get().QVGA())
+        border.SetBorder(6);
 }
 
 const Rect & Interface::BorderWindow::GetRect(void) const
@@ -181,7 +183,13 @@ const Rect & Interface::BorderWindow::GetArea(void) const
 
 void Interface::BorderWindow::Redraw(void)
 {
-    Dialog::FrameBorder::RedrawRegular(border.GetRect());
+    if(Settings::Get().QVGA())
+    {
+	const Surface & sf = AGG::GetICN(ICN::RESOURCE, 7);
+        Dialog::FrameBorder::Redraw(sf, Rect(0, 0, sf.w(), sf.h()), Display::Get(), border.GetRect());
+    }
+    else
+	Dialog::FrameBorder::RedrawRegular(border.GetRect());
 }
 
 void Interface::BorderWindow::SetPosition(s32 px, s32 py, u32 pw, u32 ph)
@@ -200,14 +208,14 @@ void Interface::BorderWindow::SetPosition(s32 px, s32 py)
 
 	if(px + area.w < 0) px = 0;
 	else
-	if(px > display.w() - area.w + BORDERWIDTH) px = display.w() - area.w;
+	if(px > display.w() - area.w + border.BorderWidth()) px = display.w() - area.w;
 
 	if(py + area.h < 0) py = 0;
 	else
-	if(py > display.h() - area.h + BORDERWIDTH) py = display.h() - area.h;
+	if(py > display.h() - area.h + border.BorderHeight()) py = display.h() - area.h;
 
-        area.x = px + BORDERWIDTH;
-        area.y = py + BORDERWIDTH;
+        area.x = px + border.BorderWidth();
+        area.y = py + border.BorderHeight();
 
         border.SetPosition(px, py, area.w, area.h);
 	SavePosition();

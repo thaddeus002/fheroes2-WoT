@@ -127,6 +127,7 @@ int PocketPC::SelectScenario(void)
 	le.MousePressLeft(buttonSelectXLarge) && buttonSelectXLarge.isEnable() ? buttonSelectXLarge.PressDraw() : buttonSelectXLarge.ReleaseDraw();
 	le.MousePressLeft(buttonSelectAll) ? buttonSelectAll.PressDraw() : buttonSelectAll.ReleaseDraw();
 
+	listbox.QueueEventProcessing();
 	result = btnGroups.QueueEventProcessing();
 
 	if(((le.MouseClickLeft(buttonSelectSmall) || le.KeyPress(KEY_s)) && buttonSelectSmall.isEnable()) && buttonSelectSmall.isEnable())
@@ -158,8 +159,6 @@ int PocketPC::SelectScenario(void)
 	    listbox.SetListContent(all);
 	    cursor.Hide();
 	}
-
-	listbox.QueueEventProcessing();
 
 	if(!cursor.isVisible())
 	{

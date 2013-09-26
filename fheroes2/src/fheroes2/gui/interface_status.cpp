@@ -109,7 +109,10 @@ void Interface::StatusWindow::Redraw(void)
     if(!conf.ExtGameHideInterface() || conf.ShowStatus())
     {
 	if(conf.ExtGameHideInterface())
+	{
+	    Display::Get().FillRect(0x51, 0x31, 0x18, GetArea());
 	    BorderWindow::Redraw();
+	}
 	else
 	    DrawBackground();
 

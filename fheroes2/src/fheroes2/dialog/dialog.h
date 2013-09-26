@@ -130,15 +130,17 @@ namespace Dialog
     class FrameBorder
     {
     public:
-	FrameBorder(int brd = BORDERWIDTH);
+	FrameBorder(int v = BORDERWIDTH);
 	FrameBorder(const Size &);
 	FrameBorder(const Size &, const Surface &);
 	FrameBorder(s32, s32, u32, u32);
 	~FrameBorder();
 
-	bool isValid(void) const;
-
-	void SetPosition(s32, s32, u32 = 0, u32 = 0);
+	void	SetBorder(int);
+	int	BorderWidth(void) const;
+	int	BorderHeight(void) const;
+	bool	isValid(void) const;
+	void	SetPosition(s32, s32, u32 = 0, u32 = 0);
 
 	const Rect & GetRect(void) const;
 	const Rect & GetArea(void) const;
