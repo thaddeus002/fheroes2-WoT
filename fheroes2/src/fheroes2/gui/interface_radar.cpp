@@ -318,6 +318,7 @@ void Interface::Radar::RedrawObjects(int color)
 		sf.Blit(dstx, dsty, display);
 	    }
 	    else
+	    if(dstx < display.w() && dsty < display.h())
 	    {
 		display.Lock();
 
@@ -421,7 +422,7 @@ void Interface::Radar::QueueEventProcessing(void)
 	    {
 		const Rect & rect = GetRect();
 		Cursor::Get().Hide();
-		SetPosition(rect.x, rect.y, newSize.w, newSize.h);
+		SetPosition(rect.x < 0 ? 0 : rect.x, rect.y < 0 ? 0 : rect.y, newSize.w, newSize.h);
 		Generate();
 		RedrawCursor();
         	gamearea.SetRedraw();
