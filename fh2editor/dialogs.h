@@ -316,7 +316,10 @@ namespace Form
         QSpacerItem*		horizontalSpacer;
         QPushButton*		pushButtonCancel;
 
-        AccessResult           	result(void) const;
+        ActionAccess           	result(void) const;
+
+	void			fillItem(QListWidgetItem &) const;
+	static void		fillItem(QListWidgetItem &, const ActionAccess &);
 
     protected slots:
 	void			enableButtonOk(void);
@@ -358,6 +361,10 @@ namespace Form
         QPushButton*		pushButtonCancel;
 
         int               	artifact(void) const;
+	ActionArtifact		result(void) const;
+
+	void			fillItem(QListWidgetItem &) const;
+	static void		fillItem(QListWidgetItem &, const ActionArtifact &);
 
     protected slots:
 	void			enableButtonOk(void);
@@ -419,6 +426,10 @@ namespace Form
         QPushButton*		pushButtonCancel;
 
         Resources               resources(void) const;
+        ActionResources         result(void) const;
+
+	void			fillItem(QListWidgetItem &) const;
+	static void		fillItem(QListWidgetItem &, const ActionResources &);
 
     protected slots:
 	void			enableButtonOk(void);
@@ -529,6 +540,10 @@ namespace Form
 	QPlainTextEdit*		plainText;
 
 	QString			message(void) const;
+	ActionMessage		result(void) const;
+
+	void			fillItem(QListWidgetItem &) const;
+	static void		fillItem(QListWidgetItem &, const ActionMessage &);
 
     protected slots:
 	void			enableButtonOk(void);
@@ -952,9 +967,10 @@ namespace Form
 
 	bool			limit(void) const;
 
-	void			addItem(void){}
+	void			addItem(void) {}
 	void			editItem(QListWidgetItem*);
 	void			checkLimit(void);
+	void			addItems(const MapActionList &);
 
     protected slots:
 	void			addEventsAction(QAction*);
@@ -970,7 +986,7 @@ namespace Form
 	Q_OBJECT
 
     public:
-	ObjectEventsDialog();
+	ObjectEventsDialog(const MapActions*);
 
 	QVBoxLayout*		verticalLayoutForm;
 	QHBoxLayout*		horizontalLayoutList;
@@ -984,6 +1000,8 @@ namespace Form
 	QPushButton*		pushButtonOk;
 	QSpacerItem*		horizontalSpacerButtons;
 	QPushButton*		pushButtonCancel;
+
+	MapActionList		results(void) const;
 
     protected slots:
 	void			checkUpDownButtons(void);
@@ -1076,6 +1094,29 @@ namespace Form
 
     public slots:
 	void			update(const MapTile*);
+    };
+
+    class DefaultActionDialog : public QDialog
+    {
+        Q_OBJECT
+
+    public:
+        DefaultActionDialog(bool);
+
+	QComboBox*		comboBoxResult;
+        QVBoxLayout*            formLayout;
+        QHBoxLayout*            buttonsLayout;
+        QPushButton*            pushButtonOk;
+        QSpacerItem*            horizontalSpacer;
+        QPushButton*            pushButtonCancel;
+
+        ActionDefault           result(void) const;
+
+	void			fillItem(QListWidgetItem &) const;
+	static void		fillItem(QListWidgetItem &, const ActionDefault &);
+
+    protected slots:
+        void                    enableButtonOk(void);
     };
 }
 

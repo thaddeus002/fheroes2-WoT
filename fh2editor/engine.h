@@ -800,6 +800,94 @@ struct MapSphinx : public MapObject
     MapObject*	copy(void) const { return new MapSphinx(*this); }
 };
 
+struct ActionSimple;
+
+class SharedActionSimple : public QSharedPointer<ActionSimple>
+{
+public:
+    SharedActionSimple(ActionSimple* ptr) : QSharedPointer<ActionSimple>(ptr) {}
+
+    int	type(void) const;
+};
+
+class MapActionList : public QList<SharedActionSimple>
+{
+};
+
+struct MapActions : public MapObject
+{
+    enum { DefaultAction = 0, Access, Message, Resources, Artifact, Troops, Morale, Luck, Experience, Skill, Unknown };
+    static QString transcribe(int);
+
+    MapActions(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1);
+    QString	object(void) const { return "actions"; }
+    MapObject*	copy(void) const { return new MapActions(*this); }
+
+    MapActionList list;
+};
+
+struct ActionSimple
+{
+    int type;
+
+    ActionSimple(int v = MapActions::DefaultAction) : type(v) {}
+    virtual ~ActionSimple() {}
+};
+
+struct ActionMessage : public ActionSimple
+{
+    QString message;
+
+    ActionMessage() : ActionSimple(MapActions::Message) {}
+    ActionMessage(const QString & m) : ActionSimple(MapActions::Message), message(m) {}
+};
+
+Q_DECLARE_METATYPE(ActionMessage);
+
+struct ActionDefault : public ActionSimple
+{
+    ActionMessage msg;
+    bool result;
+
+    ActionDefault() : ActionSimple(MapActions::DefaultAction) {}
+    ActionDefault(const QString & m, bool v) : ActionSimple(MapActions::DefaultAction), msg(m), result(v) {}
+};
+
+Q_DECLARE_METATYPE(ActionDefault);
+
+struct ActionAccess : public ActionSimple
+{
+    ActionMessage msg;
+    AccessResult access;
+
+    ActionAccess() : ActionSimple(MapActions::Access) {}
+    ActionAccess(const QString & m, const AccessResult & v) : ActionSimple(MapActions::Access), msg(m), access(v) {}
+};
+
+Q_DECLARE_METATYPE(ActionAccess);
+
+struct ActionResources : public ActionSimple
+{
+    ActionMessage msg;
+    Resources resources;
+
+    ActionResources() : ActionSimple(MapActions::Resources) {}
+    ActionResources(const QString & m, const Resources & v) : ActionSimple(MapActions::Resources), msg(m), resources(v) {}
+};
+
+Q_DECLARE_METATYPE(ActionResources);
+
+struct ActionArtifact : public ActionSimple
+{
+    ActionMessage msg;
+    int artifact;
+
+    ActionArtifact() : ActionSimple(MapActions::Artifact) {}
+    ActionArtifact(const QString & m, int v) : ActionSimple(MapActions::Artifact), msg(m), artifact(v) {}
+};
+
+Q_DECLARE_METATYPE(ActionArtifact);
+
 struct DayEvent
 {
     Resources	resources;
@@ -946,6 +1034,9 @@ QDomElement & operator>> (QDomElement &, MapEvent &);
 QDomElement & operator<< (QDomElement &, const MapSphinx &);
 QDomElement & operator>> (QDomElement &, MapSphinx &);
 
+QDomElement & operator<< (QDomElement &, const MapActions &);
+QDomElement & operator>> (QDomElement &, MapActions &);
+
 QDomElement & operator<< (QDomElement &, const MapHero &);
 QDomElement & operator>> (QDomElement &, MapHero &);
 
@@ -960,5 +1051,20 @@ QDomElement & operator>> (QDomElement &, Skills &);
 
 QDataStream & operator<< (QDataStream &, const GameCondition &);
 QDataStream & operator>> (QDataStream &, GameCondition &);
+
+QDomElement & operator<< (QDomElement &, const ActionMessage &);
+QDomElement & operator>> (QDomElement &, ActionMessage &);
+
+QDomElement & operator<< (QDomElement &, const ActionDefault &);
+QDomElement & operator>> (QDomElement &, ActionDefault &);
+
+QDomElement & operator<< (QDomElement &, const ActionAccess &);
+QDomElement & operator>> (QDomElement &, ActionAccess &);
+
+QDomElement & operator<< (QDomElement &, const ActionResources &);
+QDomElement & operator>> (QDomElement &, ActionResources &);
+
+QDomElement & operator<< (QDomElement &, const ActionArtifact &);
+QDomElement & operator>> (QDomElement &, ActionArtifact &);
 
 #endif

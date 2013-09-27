@@ -2507,6 +2507,20 @@ QDomElement & operator>> (QDomElement & el, MapSphinx & sphinx)
     return el;
 }
 
+MapActions::MapActions(const QPoint & pos, quint32 id)
+    : MapObject(pos, id, MapObj::None)
+{
+}
+
+
+QString MapActions::transcribe(int v)
+{
+    const char* actionName[] = { "DefaultAction", "Access", "Message", "Resources", "Artifact",
+	"Troops", "Morale", "Luck", "Experience", "Skill", "Unknown" };
+
+    return v < Unknown ? actionName[v] : actionName[Unknown];
+}
+
 DayEvent::DayEvent(const mp2dayevent_t & mp2)
     : allowComputer(mp2.allowComputer), dayFirstOccurent(mp2.dayFirstOccurent),
 	daySubsequentOccurrences(mp2.subsequentOccurrences), colors(0), message(mp2.text)
@@ -2643,7 +2657,7 @@ QDomElement & operator<< (QDomElement & el, const MapObjects & objects)
 	    case MapObj::Sign:   { MapSign* obj = dynamic_cast<MapSign*>((*it).data());	if(obj) elem << *obj; } break;
 	    case MapObj::Event:  { MapEvent* obj = dynamic_cast<MapEvent*>((*it).data()); if(obj) elem << *obj; } break;
 	    case MapObj::Sphinx: { MapSphinx* obj = dynamic_cast<MapSphinx*>((*it).data()); if(obj) elem << *obj; } break;
-	    default: elem << *(*it).data(); break;
+	    default:{ MapActions* obj = dynamic_cast<MapActions*>((*it).data()); if(obj) elem << *obj; else elem << *(*it).data(); } break;
 	}
     }
 
@@ -2674,6 +2688,9 @@ QDomElement & operator>> (QDomElement & el, MapObjects & objects)
 	else
 	if(elem.tagName() == "sphinx")
 	{ MapSphinx* obj = new MapSphinx(); elem >> *obj; objects.push_back(obj); }
+	else
+	if(elem.tagName() == "actions")
+	{ MapActions* obj = new MapActions(); elem >> *obj; objects.push_back(obj); }
     }
 
     return el;
@@ -3467,3 +3484,184 @@ QString AccessResult::transcribe(void) const
     return NULL;
 }
 
+QDomElement & operator<< (QDomElement & el, const MapActions & actions)
+{
+    el << static_cast<const MapObject &>(actions);
+
+    QDomDocument doc = el.ownerDocument();
+
+    for(MapActionList::const_iterator
+	it = actions.list.begin(); it != actions.list.end(); ++it)
+    {
+	QDomElement typeElem = doc.createElement(MapActions::transcribe((*it)->type).toLower());
+
+	switch((*it)->type)
+	{
+	    case MapActions::DefaultAction:
+	    {
+		const ActionDefault* act = dynamic_cast<const ActionDefault*>((*it).data());
+		if(act) typeElem << *act;
+	    }
+	    break;
+
+	    case MapActions::Access:
+	    {
+		const ActionAccess* act = dynamic_cast<const ActionAccess*>((*it).data());
+		if(act) typeElem << *act;
+	    }
+
+	    case MapActions::Message:
+	    {
+		const ActionMessage* act = dynamic_cast<const ActionMessage*>((*it).data());
+		if(act) typeElem << *act;
+	    }
+
+	    case MapActions::Resources:
+	    {
+		const ActionResources* act = dynamic_cast<const ActionResources*>((*it).data());
+		if(act) typeElem << *act;
+	    }
+
+	    case MapActions::Artifact:
+	    {
+		const ActionArtifact* act = dynamic_cast<const ActionArtifact*>((*it).data());
+		if(act) typeElem << *act;
+	    }
+
+	    case MapActions::Troops:
+	    case MapActions::Morale:
+	    case MapActions::Luck:
+	    case MapActions::Experience:
+	    case MapActions::Skill:
+	    default: break;
+	}
+
+	el.appendChild(typeElem);
+    }
+
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, MapActions & actions)
+{
+    el >> static_cast<MapObject &>(actions);
+
+    QDomNodeList list = el.childNodes();
+    for(int pos = 0; pos < list.size(); ++pos)
+    {
+	QDomElement elem = list.item(pos).toElement();
+	QString tagName = elem.nodeName();
+	ActionSimple* ptr = NULL;
+
+	if(tagName == "defaultaction")
+	{
+	    ActionDefault* act = new ActionDefault();
+	    elem >> *act; ptr = act;
+	}
+	else
+	if(tagName == "access")
+	{
+	    ActionAccess* act = new ActionAccess();
+	    elem >> *act; ptr = act;
+	}
+	else
+	if(tagName == "message")
+	{
+	    ActionMessage* act = new ActionMessage();
+	    elem >> *act; ptr = act;
+	}
+	else
+	if(tagName == "resources")
+	{
+	    ActionResources* act = new ActionResources();
+	    elem >> *act; ptr = act;
+	}
+	else
+	if(tagName == "artifact")
+	{
+	    ActionArtifact* act = new ActionArtifact();
+	    elem >> *act; ptr = act;
+	}
+
+	if(ptr) actions.list.push_back(SharedActionSimple(ptr));
+    }
+
+    return el;
+}
+
+QDomElement & operator<< (QDomElement & el, const ActionMessage & am)
+{
+    el.appendChild(el.ownerDocument().createTextNode(am.message));
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, ActionMessage & am)
+{
+    am.message = el.text();
+    return el;
+}
+
+QDomElement & operator<< (QDomElement & el, const ActionDefault & ad)
+{
+    el << ad.msg;
+    el.setAttribute("enabled", ad.result);
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, ActionDefault & ad)
+{
+    el >> ad.msg;
+    ad.result = el.hasAttribute("enabled") && el.attribute("enabled").toInt() == 1;
+    return el;
+}
+
+QDomElement & operator<< (QDomElement & el, const ActionAccess & aa)
+{
+    el << aa.msg;
+    el.setAttribute("allowPlayers", aa.access.allowPlayers);
+    el.setAttribute("allowComputer", aa.access.allowComputer);
+    el.setAttribute("cancelAfterFirstVisit", aa.access.cancelAfterFirstVisit);
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, ActionAccess & aa)
+{
+    el >> aa.msg;
+    aa.access.allowPlayers = el.hasAttribute("allowPlayers") ? el.attribute("allowPlayers").toInt() : 0;
+    aa.access.allowComputer = el.hasAttribute("allowComputer") && el.attribute("allowComputer").toInt() == 1;
+    aa.access.cancelAfterFirstVisit = el.hasAttribute("cancelAfterFirstVisit") && el.attribute("cancelAfterFirstVisit").toInt() == 1;
+    return el;
+}
+
+QDomElement & operator<< (QDomElement & el, const ActionResources & ar)
+{
+    el << ar.msg;
+    el << ar.resources;
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, ActionResources & ar)
+{
+    el >> ar.msg;
+    el >> ar.resources;
+    return el;
+}
+
+QDomElement & operator<< (QDomElement & el, const ActionArtifact & aa)
+{
+    el << aa.msg;
+    el.setAttribute("artifact", aa.artifact);
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, ActionArtifact & aa)
+{
+    el >> aa.msg;
+    aa.artifact = el.hasAttribute("artifact") ? el.attribute("artifact").toInt() : Artifact::Unknown;
+    return el;
+}
+
+int SharedActionSimple::type(void) const
+{
+    return data() ? data()->type : MapActions::Unknown;
+}

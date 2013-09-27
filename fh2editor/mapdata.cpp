@@ -357,6 +357,11 @@ int MapTileLevels::topObjectID(void) const
     return id;
 }
 
+quint32 MapTileLevels::topSpriteUID(void) const
+{
+    return size() ? back().uid() : 0;
+}
+
 bool MapTileLevels::removeSprite(quint32 uid)
 {
     return removeAll(MapTileExt(uid));
@@ -2089,6 +2094,17 @@ bool MapData::saveMapXML(const QString & mapFile) const
         edata0 << *this;
         edata0.save(ts, 4);
 
+	// Dump uncomressed data block
+	if(0)
+	{
+	    QFile file("data.xml");
+	    if(file.open(QFile::WriteOnly | QFile::Truncate))
+	    {
+		QTextStream qt(&file);
+    		edata0.save(qt, 4);
+	    }
+	}
+
 	QDataStream ds(&cdata, QIODevice::WriteOnly);
 	ds.setByteOrder(QDataStream::LittleEndian);
 	ds << static_cast<int>(FH2ENGINE_CURRENT_VERSION) << bdata.size();
@@ -2535,22 +2551,27 @@ void MapData::editObjectAttributes(void)
     	case MapObj::Heroes:	editHeroDialog(*tileOverMouse); break;
 	case MapObj::Sphinx:	editSphinxDialog(*tileOverMouse); break;
 
-    	default:
-	{
-	    QMessageBox::information(qobject_cast<MapWindow*>(parent()), "Object Attributes",
-		    "Sorry!\nChange attributes of the object is not yet available."); break;
-	    // editOtherMapEventsDialog(*tileOverMouse); break;
-	}
+    	default:		editOtherMapEventsDialog(*tileOverMouse); break;
     }
 }
 
 void MapData::editOtherMapEventsDialog(const MapTile & tile)
 {
-    Form::ObjectEventsDialog form;
+    MapActions* actions = dynamic_cast<MapActions*>(mapObjects.find(tile.mapPos()).data());
+
+    Form::ObjectEventsDialog form(actions);
 
     if(QDialog::Accepted == form.exec())
     {
-	// store map object
+	if(!actions)
+	{
+	    actions = new MapActions(tile.mapPos(), tile.levels1Const().topSpriteUID());
+	    mapObjects.push_back(actions);
+	}
+
+	actions->list = form.results();
+
+	emit dataModified();
     }
 }
 

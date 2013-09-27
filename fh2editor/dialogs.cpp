@@ -58,7 +58,6 @@ Form::SelectMapSize::SelectMapSize()
     vboxLayout->setMargin(9);
 
     comboBoxSize = new QComboBox(this);
-    comboBoxSize->clear();
     comboBoxSize->addItem(QApplication::translate("SelectMapSize", "Small (36x36)", 0, QApplication::UnicodeUTF8), 36);
     comboBoxSize->addItem(QApplication::translate("SelectMapSize", "Medium (72x72)", 0, QApplication::UnicodeUTF8), 72);
     comboBoxSize->addItem(QApplication::translate("SelectMapSize", "Large (108x108)", 0, QApplication::UnicodeUTF8), 108);
@@ -1244,6 +1243,23 @@ QString Form::MessageDialog::message(void) const
     return plainText->toPlainText();
 }
 
+ActionMessage Form::MessageDialog::result(void) const
+{
+    return ActionMessage(message());
+}
+
+void Form::MessageDialog::fillItem(QListWidgetItem & item) const
+{
+    fillItem(item, result());
+}
+
+void Form::MessageDialog::fillItem(QListWidgetItem & item, const ActionMessage & act)
+{
+    const int type = MapActions::Message;
+    item.setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(act))));
+    item.setText(MapActions::transcribe(type).append(" - ").append(act.message));
+}
+
 Form::PlayerAllow::PlayerAllow(int c, bool v, QWidget* parent) : QLabel(parent), col(c), stat(v)
 {
     updatePlayers();
@@ -1389,9 +1405,21 @@ void Form::AccessDialog::enableButtonOk(void)
     pushButtonOk->setEnabled(true);
 }
 
-AccessResult Form::AccessDialog::result(void) const
+ActionAccess Form::AccessDialog::result(void) const
 {
-    return AccessResult(accessGroup->colors(), accessGroup->allowComputer(), accessGroup->cancelAfterFirstVisit());
+    return ActionAccess(QString(), AccessResult(accessGroup->colors(), accessGroup->allowComputer(), accessGroup->cancelAfterFirstVisit()));
+}
+
+void Form::AccessDialog::fillItem(QListWidgetItem & item) const
+{
+    fillItem(item, result());
+}
+
+void Form::AccessDialog::fillItem(QListWidgetItem & item, const ActionAccess & act)
+{
+    const int type = MapActions::Access;
+    item.setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(act))));
+    item.setText(MapActions::transcribe(type).append(" - ").append(act.access.transcribe()));
 }
 
 Form::ArtifactGroup::ArtifactGroup(QWidget* parent, int artifact) : QGroupBox(parent)
@@ -1472,6 +1500,23 @@ void Form::ArtifactDialog::enableButtonOk(void)
 int Form::ArtifactDialog::artifact(void) const
 {
     return artifactGroup->result();
+}
+
+ActionArtifact Form::ArtifactDialog::result(void) const
+{
+    return ActionArtifact(QString(), artifact());
+}
+
+void Form::ArtifactDialog::fillItem(QListWidgetItem & item) const
+{
+    fillItem(item, result());
+}
+
+void Form::ArtifactDialog::fillItem(QListWidgetItem & item, const ActionArtifact & act)
+{
+    const int type = MapActions::Artifact;
+    item.setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(act))));
+    item.setText(MapActions::transcribe(type).append(" - ").append(Artifact::transcribe(act.artifact)));
 }
 
 Form::ResourcesGroup::ResourcesGroup(QWidget* parent, const Resources & resources) : QGroupBox(parent)
@@ -1673,6 +1718,23 @@ void Form::ResourcesDialog::enableButtonOk(void)
 Resources Form::ResourcesDialog::resources(void) const
 {
     return resourcesGroup->result();
+}
+
+ActionResources Form::ResourcesDialog::result(void) const
+{
+    return ActionResources(QString(), resources());
+}
+
+void Form::ResourcesDialog::fillItem(QListWidgetItem & item) const
+{
+    fillItem(item, result());
+}
+
+void Form::ResourcesDialog::fillItem(QListWidgetItem & item, const ActionResources & act)
+{
+    const int type = MapActions::Resources;
+    item.setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(act))));
+    item.setText(MapActions::transcribe(type).append(" - ").append(act.resources.describe()));
 }
 
 Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors)
@@ -3565,7 +3627,7 @@ MapSphinx Form::MapSphinxDialog::result(const QPoint & pos, quint32 uid) const
     return res;
 }
 
-Form::ObjectEventsDialog::ObjectEventsDialog()
+Form::ObjectEventsDialog::ObjectEventsDialog(const MapActions* actions)
 {
     setWindowTitle(QApplication::translate("ObjectEventsDialog", "Object Events", 0, QApplication::UnicodeUTF8));
 
@@ -3585,6 +3647,16 @@ Form::ObjectEventsDialog::ObjectEventsDialog()
     verticalLayoutButtons->addItem(verticalSpacerButtons);
 
     listWidgetEvents = new ObjectEventsList(this);
+
+    if(actions)
+	listWidgetEvents->addItems(actions->list);
+    else
+    {
+	QListWidgetItem* item = new QListWidgetItem();
+        DefaultActionDialog::fillItem(*item, ActionDefault(QString(), true));
+        qobject_cast<QListWidget*>(listWidgetEvents)->addItem(item);
+	listWidgetEvents->setCurrentItem(0);
+    }
 
     horizontalLayoutList = new QHBoxLayout();
     horizontalLayoutList->addWidget(listWidgetEvents);
@@ -3681,13 +3753,11 @@ Form::ObjectEventsList::ObjectEventsList(QWidget* parent) : ItemsList(parent)
     delItemAct->setStatusTip(tr("Delete event"));
 
     eventsGroupAct = new QActionGroup(this);
-    QString eventsName[] = { tr("Access"), tr("Message"), tr("Resources"), tr("Artifact"), tr("Troops"), tr("Morale"), tr("Luck"), tr("Experience"), tr("Skill"), tr("Action") };
-    const int eventsCount = sizeof(eventsName) / sizeof(eventsName[0]);
 
-    for(int ii = 0; ii < eventsCount; ++ii)
+    for(int ii = MapActions::DefaultAction; ii < MapActions::Unknown; ++ii)
     {
-	QAction* curAct = new QAction(eventsName[ii], this);
-	curAct->setData(ii + 1);
+	QAction* curAct = new QAction(MapActions::transcribe(ii), this);
+	curAct->setData(ii);
 	eventsGroupAct->addAction(curAct);
     }
 
@@ -3714,160 +3784,9 @@ void Form::ObjectEventsList::createMenuItems(QMenu* menu)
         eventsSubMenu->addAction(*it);
 }
 
-void Form::ObjectEventsList::addEventsAction(QAction* act)
-{
-    if(act)
-    {
-        int type = act->data().toInt();
-	QListWidgetItem* item = NULL;
-
-	switch(type)
-	{
-	    // access
-	    case 1:
-	    {
-	        AccessDialog dialog(Color::All, Color::All, true, false);
-		if(QDialog::Accepted == dialog.exec())
-		{
-		    item = new QListWidgetItem();
-		    item->setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(dialog.result()))));
-		    item->setText(QString("access - ").append(dialog.result().transcribe()));
-		}
-	    }
-	    break;
-	    // message
-	    case 2:
-	    {
-	        MessageDialog dialog;
-		if(QDialog::Accepted == dialog.exec())
-		{
-		    item = new QListWidgetItem();
-		    item->setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(dialog.message()))));
-		    item->setText(QString("message - ").append(dialog.message()));
-		}
-	    }
-	    break;
-	    // resources
-	    case 3:
-	    {
-	        ResourcesDialog dialog;
-		if(QDialog::Accepted == dialog.exec())
-		{
-		    item = new QListWidgetItem();
-		    item->setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(dialog.resources()))));
-		    item->setText(QString("resources - ").append(dialog.resources().describe()));
-		}
-	    }
-	    break;
-	    // artifact
-	    case 4:
-	    {
-	        ArtifactDialog dialog;
-		if(QDialog::Accepted == dialog.exec())
-		{
-		    item = new QListWidgetItem();
-		    item->setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(dialog.artifact()))));
-		    item->setText(QString("artifact - ").append(Artifact::transcribe(dialog.artifact())));
-		}
-	    }
-	    break;
-	    // troops
-	    case 5:
-	    // morale
-	    case 6:
-	    break;
-	    // luck
-	    case 7:
-	    break;
-	    // experience
-	    case 8:
-	    break;
-	    // skill
-	    case 9:
-	    break;
-	    // action
-	    case 10:
-	    break;
-	    // unknown
-	    default: break;
-	}
-
-	if(item)
-	{
-    	    QListWidget::addItem(item);
-    	    setCurrentItem(count() - 1);
-	}
-    }
-}
-
 bool Form::ObjectEventsList::limit(void) const
 {
     return count() >= 15;
-}
-
-void Form::ObjectEventsList::editItem(QListWidgetItem* item)
-{
-    TypeVariant data = qvariant_cast<TypeVariant>(item->data(Qt::UserRole));
-
-    switch(data.type)
-    {
-	// access
-	case 1:
-	break;
-	// message
-	case 2:
-	{
-	    MessageDialog dialog(qvariant_cast<QString>(data.variant));
-	    if(QDialog::Accepted == dialog.exec())
-	    {
-		item->setData(Qt::UserRole, QVariant::fromValue(TypeVariant(data.type, QVariant::fromValue(dialog.message()))));
-		item->setText(QString("message - ").append(dialog.message()));
-	    }
-	}
-	break;
-	// resources
-	case 3:
-	{
-	    ResourcesDialog dialog(qvariant_cast<Resources>(data.variant));
-	    if(QDialog::Accepted == dialog.exec())
-	    {
-		item->setData(Qt::UserRole, QVariant::fromValue(TypeVariant(data.type, QVariant::fromValue(dialog.resources()))));
-		item->setText(QString("resources - ").append(dialog.resources().describe()));
-	    }
-	}
-	break;
-	// artifact
-	case 4:
-	{
-	    ArtifactDialog dialog(qvariant_cast<int>(data.variant));
-	    if(QDialog::Accepted == dialog.exec())
-	    {
-		item->setData(Qt::UserRole, QVariant::fromValue(TypeVariant(data.type, QVariant::fromValue(dialog.artifact()))));
-		item->setText(QString("artifact - ").append(Artifact::transcribe(dialog.artifact())));
-	    }
-	}
-	break;
-	// troops
-	case 5:
-	break;
-	// morale
-	case 6:
-	break;
-	// luck
-	case 7:
-	break;
-	// experience
-	case 8:
-	break;
-	// skill
-	case 9:
-	break;
-	// action
-	case 10:
-	break;
-	// unknown
-	default: break;
-    }
 }
 
 void Form::ObjectEventsList::checkLimit(void)
@@ -4041,4 +3960,296 @@ void Form::InfoForm::update(const MapTile* tile)
     {
 	labelInfo->setText(MapObj::transcribe(tile->object()));
     }
+}
+
+MapActionList Form::ObjectEventsDialog::results(void) const
+{
+    MapActionList res;
+
+    for(int ii = 0; ii < listWidgetEvents->count(); ++ii)
+    {
+	const QListWidgetItem* item = listWidgetEvents->item(ii);
+
+	if(item)
+	{
+	    TypeVariant v = qvariant_cast<TypeVariant>(item->data(Qt::UserRole));
+	    ActionSimple* ptr = NULL;
+
+	    switch(v.type)
+	    {
+		case MapActions::DefaultAction:	ptr = new ActionDefault(qvariant_cast<ActionDefault>(v.variant)); break;
+		case MapActions::Access:	ptr = new ActionAccess(qvariant_cast<ActionAccess>(v.variant)); break;
+		case MapActions::Message:	ptr = new ActionMessage(qvariant_cast<ActionMessage>(v.variant)); break;
+		case MapActions::Resources:	ptr = new ActionResources(qvariant_cast<ActionResources>(v.variant)); break;
+		case MapActions::Artifact:	ptr = new ActionArtifact(qvariant_cast<ActionArtifact>(v.variant)); break;
+		default: break;
+	    }
+
+	    res.push_back(SharedActionSimple(ptr));
+	}
+    }
+
+    return res;
+}
+
+void Form::ObjectEventsList::addEventsAction(QAction* act)
+{
+    if(act)
+    {
+        int type = act->data().toInt();
+	QListWidgetItem* item = NULL;
+
+	switch(type)
+	{
+	    case MapActions::DefaultAction:
+	    {
+	        DefaultActionDialog dialog(true);
+		if(QDialog::Accepted == dialog.exec())
+		{
+		    item = new QListWidgetItem();
+		    dialog.fillItem(*item);
+		}
+	    }
+	    break;
+	    case MapActions::Access:
+	    {
+	        AccessDialog dialog(Color::All, Color::All, true, false);
+		if(QDialog::Accepted == dialog.exec())
+		{
+		    item = new QListWidgetItem();
+		    dialog.fillItem(*item);
+		}
+	    }
+	    break;
+	    case MapActions::Message:
+	    {
+	        MessageDialog dialog;
+		if(QDialog::Accepted == dialog.exec())
+		{
+		    item = new QListWidgetItem();
+		    dialog.fillItem(*item);
+		}
+	    }
+	    break;
+	    case MapActions::Resources:
+	    {
+	        ResourcesDialog dialog;
+		if(QDialog::Accepted == dialog.exec())
+		{
+		    item = new QListWidgetItem();
+		    dialog.fillItem(*item);
+		}
+	    }
+	    break;
+	    case MapActions::Artifact:
+	    {
+	        ArtifactDialog dialog;
+		if(QDialog::Accepted == dialog.exec())
+		{
+		    item = new QListWidgetItem();
+		    dialog.fillItem(*item);
+		}
+	    }
+	    break;
+	    case MapActions::Troops:
+	    break;
+	    case MapActions::Morale:
+	    break;
+	    case MapActions::Luck:
+	    break;
+	    case MapActions::Experience:
+	    break;
+	    case MapActions::Skill:
+	    break;
+	    // unknown
+	    default: break;
+	}
+
+	if(item)
+	{
+    	    QListWidget::addItem(item);
+    	    setCurrentItem(count() - 1);
+	}
+    }
+}
+
+void Form::ObjectEventsList::editItem(QListWidgetItem* item)
+{
+    TypeVariant data = qvariant_cast<TypeVariant>(item->data(Qt::UserRole));
+
+    switch(data.type)
+    {
+        case MapActions::DefaultAction:
+	{
+	    ActionDefault act = qvariant_cast<ActionDefault>(data.variant);
+	    DefaultActionDialog dialog(act.result);
+	    if(QDialog::Accepted == dialog.exec()) dialog.fillItem(*item);
+	}
+	break;
+        case MapActions::Access:
+	{
+	    ActionAccess act = qvariant_cast<ActionAccess>(data.variant);
+	    AccessDialog dialog(Color::All, act.access.allowPlayers, act.access.allowComputer, act.access.cancelAfterFirstVisit);
+	    if(QDialog::Accepted == dialog.exec()) dialog.fillItem(*item);
+	}
+	break;
+        case MapActions::Message:
+	{
+	    ActionMessage act = qvariant_cast<ActionMessage>(data.variant);
+	    MessageDialog dialog(act.message);
+	    if(QDialog::Accepted == dialog.exec()) dialog.fillItem(*item);
+	}
+	break;
+	case MapActions::Resources:
+	{
+	    ActionResources act = qvariant_cast<ActionResources>(data.variant);
+	    ResourcesDialog dialog(act.resources);
+	    if(QDialog::Accepted == dialog.exec()) dialog.fillItem(*item);
+	}
+	break;
+        case MapActions::Artifact:
+	{
+	    ActionArtifact act = qvariant_cast<ActionArtifact>(data.variant);
+	    ArtifactDialog dialog(act.artifact);
+	    if(QDialog::Accepted == dialog.exec()) dialog.fillItem(*item);
+	}
+	break;
+
+        case MapActions::Troops:
+        break;
+        case MapActions::Morale:
+        break;
+        case MapActions::Luck:
+        break;
+        case MapActions::Experience:
+        break;
+        case MapActions::Skill:
+	break;
+
+	default: break;
+    }
+}
+
+void Form::ObjectEventsList::addItems(const MapActionList & list)
+{
+    for(MapActionList::const_iterator
+	it = list.begin(); it != list.end(); ++it)
+    {
+	QListWidgetItem* item = NULL;
+
+	switch((*it).type())
+	{
+	    case MapActions::DefaultAction:
+	    {
+		item = new QListWidgetItem();
+		const ActionDefault* act = dynamic_cast<ActionDefault*>((*it).data());
+		if(act) DefaultActionDialog::fillItem(*item, *act);
+	    }
+	    break;
+	    case MapActions::Access:
+	    {
+	        item = new QListWidgetItem();
+		const ActionAccess* act = dynamic_cast<ActionAccess*>((*it).data());
+		if(act) AccessDialog::fillItem(*item, *act);
+	    }
+	    break;
+	    case MapActions::Message:
+	    {
+		item = new QListWidgetItem();
+		const ActionMessage* act = dynamic_cast<ActionMessage*>((*it).data());
+		if(act) MessageDialog::fillItem(*item, *act);
+	    }
+	    break;
+	    case MapActions::Resources:
+	    {
+		item = new QListWidgetItem();
+		const ActionResources* act = dynamic_cast<ActionResources*>((*it).data());
+		if(act) ResourcesDialog::fillItem(*item, *act);
+	    }
+	    break;
+	    case MapActions::Artifact:
+	    {
+		item = new QListWidgetItem();
+		const ActionArtifact* act = dynamic_cast<ActionArtifact*>((*it).data());
+		if(act) ArtifactDialog::fillItem(*item, *act);
+	    }
+	    break;
+	    case MapActions::Troops:
+	    break;
+	    case MapActions::Morale:
+	    break;
+	    case MapActions::Luck:
+	    break;
+	    case MapActions::Experience:
+	    break;
+	    case MapActions::Skill:
+	    break;
+	    // unknown
+	    default: break;
+	}
+
+	if(item)
+    	    QListWidget::addItem(item);
+    }
+
+    setCurrentItem(count() - 1);
+}
+
+Form::DefaultActionDialog::DefaultActionDialog(bool enabled)
+{
+    setWindowTitle(QApplication::translate("DefaultActionDialog", "DefaultAction", 0, QApplication::UnicodeUTF8));
+
+    comboBoxResult = new QComboBox(this);
+    comboBoxResult->addItem("disable", 0);
+    comboBoxResult->addItem("enable", 1);
+    comboBoxResult->setCurrentIndex(enabled ? 1 : 0);
+
+    pushButtonOk = new QPushButton(this);
+    pushButtonOk->setText(QApplication::translate("DefaultActionDialog", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setEnabled(false);
+
+    horizontalSpacer = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    pushButtonCancel = new QPushButton(this);
+    pushButtonCancel->setText(QApplication::translate("DefaultActionDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+
+    buttonsLayout = new QHBoxLayout();
+    buttonsLayout->addWidget(pushButtonOk);
+    buttonsLayout->addItem(horizontalSpacer);
+    buttonsLayout->addWidget(pushButtonCancel);
+
+    formLayout = new QVBoxLayout(this);
+    formLayout->addWidget(comboBoxResult);
+    formLayout->addLayout(buttonsLayout);
+
+    QSize minSize = minimumSizeHint();
+
+    resize(minSize);
+    setMinimumSize(minSize);
+
+    connect(comboBoxResult, SIGNAL(currentIndexChanged(int)), this, SLOT(enableButtonOk()));
+    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
+}
+
+void Form::DefaultActionDialog::enableButtonOk(void)
+{
+    pushButtonOk->setEnabled(true);
+}
+
+ActionDefault Form::DefaultActionDialog::result(void) const
+{
+    return ActionDefault(QString(), comboBoxResult->currentIndex());
+}
+
+void Form::DefaultActionDialog::fillItem(QListWidgetItem & item) const
+{
+    fillItem(item, result());
+}
+
+void Form::DefaultActionDialog::fillItem(QListWidgetItem & item, const ActionDefault & act)
+{
+    const int type = MapActions::DefaultAction;
+    item.setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(act))));
+    item.setText(MapActions::transcribe(type).append(" - ").append(act.result ? "enable" : "disable"));
 }

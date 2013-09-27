@@ -148,6 +148,7 @@ public:
     void		paint(QPainter &, const QPoint &, const QPoint &) const;
     QString		infoString(void) const;
     int			topObjectID(void) const;
+    quint32		topSpriteUID(void) const;
     bool		removeSprite(quint32);
     void		changeUIDs(QMap<quint32, quint32> &);
     QSet<quint32>	uids(void) const;
