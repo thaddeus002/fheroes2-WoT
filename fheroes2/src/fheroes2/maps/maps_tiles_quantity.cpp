@@ -747,9 +747,14 @@ void Maps::Tiles::QuantityUpdate(void)
 	break;
 
         case MP2::OBJ_BARRIER:
+	    if(addons_level1.size())
+        	QuantitySetColor(TilesAddon::ColorFromBarrierSprite(addons_level1.front()));
+	    break;
+
         case MP2::OBJ_TRAVELLERTENT:
-            QuantitySetColor(BarrierColor::FromMP2(quantity1));
-        break;
+	    if(addons_level1.size())
+        	QuantitySetColor(TilesAddon::ColorFromTravellerTentSprite(addons_level1.front()));
+    	    break;
 
         case MP2::OBJ_ALCHEMYLAB:
 	    QuantitySetResource(Resource::MERCURY, 1);

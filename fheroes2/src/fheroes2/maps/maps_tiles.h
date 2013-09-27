@@ -68,7 +68,6 @@ namespace Maps
 	static bool isArtifact(const TilesAddon &);
 	static bool isCampFire(const TilesAddon &);
 	static bool isMonster(const TilesAddon &);
-	static bool isBarrier(const TilesAddon &);
 	static bool isArtesianSpring(const TilesAddon &);
 	static bool isOasis(const TilesAddon &);
 	static bool isWateringHole(const TilesAddon &);
@@ -102,6 +101,10 @@ namespace Maps
 	static int  GetPassable(const TilesAddon &);
 	static int  GetActionObject(const TilesAddon &);
 	static int  GetLoyaltyObject(const TilesAddon &);
+
+	static bool isBarrier(const TilesAddon &);
+	static int  ColorFromBarrierSprite(const TilesAddon &);
+	static int  ColorFromTravellerTentSprite(const TilesAddon &);
 
 	static std::pair<int, int>
 		    ColorRaceFromHeroSprite(const TilesAddon &);

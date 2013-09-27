@@ -27,21 +27,8 @@
 
 namespace BarrierColor
 {
-    enum
-    {
-	NONE	= 0x00,
-        AQUA	= 0x01,
-        BLUE	= 0x02,
-        BROWN	= 0x04,
-        GOLD	= 0x08,
-        GREEN	= 0x10,
-        ORANGE	= 0x20,
-        PURPLE	= 0x40,
-        RED	= 0x80
-    };
-
+    enum { NONE = 0, AQUA = 1, BLUE = 2, BROWN = 3, GOLD = 4, GREEN = 5, ORANGE = 6, PURPLE = 7, RED = 8 };
     const char* String(int);
-    int		FromMP2(int);
 }
 
 namespace Color

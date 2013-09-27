@@ -608,15 +608,22 @@ bool Maps::TilesAddon::isRandomMonster(const TilesAddon & ta)
 
 bool Maps::TilesAddon::isBarrier(const TilesAddon & ta)
 {
-    return (ICN::X_LOC3 == MP2::GetICNObject(ta.object) && 
-		(60 == ta.index ||
-		66 == ta.index ||
-		72 == ta.index ||
-		78 == ta.index ||
-		84 == ta.index ||
-		90 == ta.index ||
-		96 == ta.index ||
-		102 == ta.index));
+    return ICN::X_LOC3 == MP2::GetICNObject(ta.object) && 
+		60 <= ta.index && 102 >= ta.index && 0 ==  (ta.index % 6);
+}
+
+int Maps::TilesAddon::ColorFromBarrierSprite(const TilesAddon & ta)
+{
+    // 60, 66, 72, 78, 84, 90, 96, 102
+    return ICN::X_LOC3 == MP2::GetICNObject(ta.object) && 
+		60 <= ta.index && 102 >= ta.index ? ((ta.index - 60) / 6) + 1 : 0;
+}
+
+int Maps::TilesAddon::ColorFromTravellerTentSprite(const TilesAddon & ta)
+{
+    // 110, 114, 118, 122, 126, 130, 134, 138
+    return ICN::X_LOC3 == MP2::GetICNObject(ta.object) && 
+		110 <= ta.index && 138 >= ta.index ? ((ta.index - 110) / 4) + 1 : 0;
 }
 
 bool Maps::TilesAddon::isAbandoneMineSprite(const TilesAddon & ta)
@@ -2873,6 +2880,30 @@ StreamBase & Maps::operator>> (StreamBase & msg, Tiles & tile)
 		case ICN::TELEPORT3: tile.mp2_object = MP2::OBJ_STONELIGHTS; break;
 		default: break;
 	    }
+	}
+    }
+
+    
+    if(FORMAT_VERSION_3165 > Game::GetLoadVersion())
+    {
+	switch(tile.mp2_object)
+	{
+    	    case MP2::OBJ_BARRIER:
+    	    case MP2::OBJ_TRAVELLERTENT:
+		switch(tile.quantity1)
+		{
+		    case 0x01: tile.quantity1 = BarrierColor::AQUA; break;
+		    case 0x02: tile.quantity1 = BarrierColor::BLUE; break;
+		    case 0x04: tile.quantity1 = BarrierColor::BROWN; break;
+		    case 0x08: tile.quantity1 = BarrierColor::GOLD; break;
+		    case 0x10: tile.quantity1 = BarrierColor::GREEN; break;
+		    case 0x20: tile.quantity1 = BarrierColor::ORANGE; break;
+		    case 0x40: tile.quantity1 = BarrierColor::PURPLE; break;
+		    case 0x80: tile.quantity1 = BarrierColor::RED; break;
+		    default: break;
+		}
+		break;
+	    default: break;
 	}
     }
 
