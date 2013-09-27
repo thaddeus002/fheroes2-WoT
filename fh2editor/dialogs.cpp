@@ -1243,23 +1243,6 @@ QString Form::MessageDialog::message(void) const
     return plainText->toPlainText();
 }
 
-ActionMessage Form::MessageDialog::result(void) const
-{
-    return ActionMessage(message());
-}
-
-void Form::MessageDialog::fillItem(QListWidgetItem & item) const
-{
-    fillItem(item, result());
-}
-
-void Form::MessageDialog::fillItem(QListWidgetItem & item, const ActionMessage & act)
-{
-    const int type = MapActions::Message;
-    item.setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(act))));
-    item.setText(MapActions::transcribe(type).append(" - ").append(act.message));
-}
-
 Form::PlayerAllow::PlayerAllow(int c, bool v, QWidget* parent) : QLabel(parent), col(c), stat(v)
 {
     updatePlayers();
@@ -1364,64 +1347,6 @@ bool Form::AccessGroup::cancelAfterFirstVisit(void) const
     return checkBoxCancelAfterFirstVisit->isChecked();
 }
 
-Form::AccessDialog::AccessDialog(int kingdomColors, int checkedColors, bool allowComp, bool cancelAfterVisit)
-{
-    setWindowTitle(QApplication::translate("AccessDialog", "Access", 0, QApplication::UnicodeUTF8));
-
-    accessGroup = new AccessGroup(this, kingdomColors, checkedColors);
-    accessGroup->setAllowComputer(allowComp);
-    accessGroup->setCancelAfterFirstVisit(cancelAfterVisit);
-
-    pushButtonOk = new QPushButton(this);
-    pushButtonOk->setText(QApplication::translate("AccessDialog", "Ok", 0, QApplication::UnicodeUTF8));
-    pushButtonOk->setEnabled(false);
-
-    horizontalSpacer = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-    pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("AccessDialog", "Cancel", 0, QApplication::UnicodeUTF8));
-
-    buttonsLayout = new QHBoxLayout();
-    buttonsLayout->addWidget(pushButtonOk);
-    buttonsLayout->addItem(horizontalSpacer);
-    buttonsLayout->addWidget(pushButtonCancel);
-
-    formLayout = new QVBoxLayout(this);
-    formLayout->addWidget(accessGroup);
-    formLayout->addLayout(buttonsLayout);
-
-    QSize minSize = minimumSizeHint();
-
-    resize(minSize);
-    setMinimumSize(minSize);
-
-    connect(accessGroup, SIGNAL(formChanged()), this, SLOT(enableButtonOk()));
-    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
-    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
-}
-
-void Form::AccessDialog::enableButtonOk(void)
-{
-    pushButtonOk->setEnabled(true);
-}
-
-ActionAccess Form::AccessDialog::result(void) const
-{
-    return ActionAccess(QString(), AccessResult(accessGroup->colors(), accessGroup->allowComputer(), accessGroup->cancelAfterFirstVisit()));
-}
-
-void Form::AccessDialog::fillItem(QListWidgetItem & item) const
-{
-    fillItem(item, result());
-}
-
-void Form::AccessDialog::fillItem(QListWidgetItem & item, const ActionAccess & act)
-{
-    const int type = MapActions::Access;
-    item.setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(act))));
-    item.setText(MapActions::transcribe(type).append(" - ").append(act.access.transcribe()));
-}
-
 Form::ArtifactGroup::ArtifactGroup(QWidget* parent, int artifact) : QGroupBox(parent)
 {
     setFlat(true);
@@ -1456,67 +1381,6 @@ void Form::ArtifactGroup::changeLabelArtifact(int index)
 int Form::ArtifactGroup::result(void) const
 {
     return comboBoxArtifact->currentIndex();
-}
-
-Form::ArtifactDialog::ArtifactDialog(int artifact)
-{
-    setWindowTitle(QApplication::translate("ArtifactDialog", "Artifact", 0, QApplication::UnicodeUTF8));
-
-    artifactGroup = new ArtifactGroup(this, artifact);
-
-    pushButtonOk = new QPushButton(this);
-    pushButtonOk->setText(QApplication::translate("ArtifactDialog", "Ok", 0, QApplication::UnicodeUTF8));
-    pushButtonOk->setEnabled(false);
-
-    horizontalSpacer = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-    pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("ArtifactDialog", "Cancel", 0, QApplication::UnicodeUTF8));
-
-    buttonsLayout = new QHBoxLayout();
-    buttonsLayout->addWidget(pushButtonOk);
-    buttonsLayout->addItem(horizontalSpacer);
-    buttonsLayout->addWidget(pushButtonCancel);
-
-    formLayout = new QVBoxLayout(this);
-    formLayout->addWidget(artifactGroup);
-    formLayout->addLayout(buttonsLayout);
-
-    QSize minSize = minimumSizeHint();
-
-    resize(minSize);
-    setMinimumSize(minSize);
-
-    connect(artifactGroup, SIGNAL(formChanged()), this, SLOT(enableButtonOk()));
-    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
-    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
-}
-
-void Form::ArtifactDialog::enableButtonOk(void)
-{
-    pushButtonOk->setEnabled(true);
-}
-
-int Form::ArtifactDialog::artifact(void) const
-{
-    return artifactGroup->result();
-}
-
-ActionArtifact Form::ArtifactDialog::result(void) const
-{
-    return ActionArtifact(QString(), artifact());
-}
-
-void Form::ArtifactDialog::fillItem(QListWidgetItem & item) const
-{
-    fillItem(item, result());
-}
-
-void Form::ArtifactDialog::fillItem(QListWidgetItem & item, const ActionArtifact & act)
-{
-    const int type = MapActions::Artifact;
-    item.setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(act))));
-    item.setText(MapActions::transcribe(type).append(" - ").append(Artifact::transcribe(act.artifact)));
 }
 
 Form::ResourcesGroup::ResourcesGroup(QWidget* parent, const Resources & resources) : QGroupBox(parent)
@@ -1676,66 +1540,6 @@ Resources Form::ResourcesGroup::result(void) const
     return res;
 }
 
-Form::ResourcesDialog::ResourcesDialog(const Resources & resources)
-{
-    setWindowTitle(QApplication::translate("ResourcesDialog", "Resources", 0, QApplication::UnicodeUTF8));
-
-    resourcesGroup = new ResourcesGroup(this, resources);
-
-    pushButtonOk = new QPushButton(this);
-    pushButtonOk->setText(QApplication::translate("ResourcesDialog", "Ok", 0, QApplication::UnicodeUTF8));
-    pushButtonOk->setEnabled(false);
-
-    horizontalSpacer = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-    pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("ResourcesDialog", "Cancel", 0, QApplication::UnicodeUTF8));
-
-    buttonsLayout = new QHBoxLayout();
-    buttonsLayout->addWidget(pushButtonOk);
-    buttonsLayout->addItem(horizontalSpacer);
-    buttonsLayout->addWidget(pushButtonCancel);
-
-    formLayout = new QVBoxLayout(this);
-    formLayout->addWidget(resourcesGroup);
-    formLayout->addLayout(buttonsLayout);
-
-    QSize minSize = minimumSizeHint();
-
-    resize(minSize);
-    setMinimumSize(minSize);
-
-    connect(resourcesGroup, SIGNAL(formChanged()), this, SLOT(enableButtonOk()));
-    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
-    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
-}
-
-void Form::ResourcesDialog::enableButtonOk(void)
-{
-    pushButtonOk->setEnabled(true);
-}
-
-Resources Form::ResourcesDialog::resources(void) const
-{
-    return resourcesGroup->result();
-}
-
-ActionResources Form::ResourcesDialog::result(void) const
-{
-    return ActionResources(QString(), resources());
-}
-
-void Form::ResourcesDialog::fillItem(QListWidgetItem & item) const
-{
-    fillItem(item, result());
-}
-
-void Form::ResourcesDialog::fillItem(QListWidgetItem & item, const ActionResources & act)
-{
-    const int type = MapActions::Resources;
-    item.setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(act))));
-    item.setText(MapActions::transcribe(type).append(" - ").append(act.resources.describe()));
-}
 
 Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors)
 {
@@ -3754,7 +3558,7 @@ Form::ObjectEventsList::ObjectEventsList(QWidget* parent) : ItemsList(parent)
 
     eventsGroupAct = new QActionGroup(this);
 
-    for(int ii = MapActions::DefaultAction; ii < MapActions::Unknown; ++ii)
+    for(int ii = MapActions::DefaultAction; ii < 5/* MapActions::Unknown */; ++ii)
     {
 	QAction* curAct = new QAction(MapActions::transcribe(ii), this);
 	curAct->setData(ii);
@@ -4003,7 +3807,7 @@ void Form::ObjectEventsList::addEventsAction(QAction* act)
 	{
 	    case MapActions::DefaultAction:
 	    {
-	        DefaultActionDialog dialog(true);
+	        DefaultActionDialog dialog;
 		if(QDialog::Accepted == dialog.exec())
 		{
 		    item = new QListWidgetItem();
@@ -4013,7 +3817,7 @@ void Form::ObjectEventsList::addEventsAction(QAction* act)
 	    break;
 	    case MapActions::Access:
 	    {
-	        AccessDialog dialog(Color::All, Color::All, true, false);
+	        AccessDialog dialog;
 		if(QDialog::Accepted == dialog.exec())
 		{
 		    item = new QListWidgetItem();
@@ -4023,7 +3827,7 @@ void Form::ObjectEventsList::addEventsAction(QAction* act)
 	    break;
 	    case MapActions::Message:
 	    {
-	        MessageDialog dialog;
+	        MessageTabDialog dialog;
 		if(QDialog::Accepted == dialog.exec())
 		{
 		    item = new QListWidgetItem();
@@ -4082,35 +3886,35 @@ void Form::ObjectEventsList::editItem(QListWidgetItem* item)
         case MapActions::DefaultAction:
 	{
 	    ActionDefault act = qvariant_cast<ActionDefault>(data.variant);
-	    DefaultActionDialog dialog(act.result);
+	    DefaultActionDialog dialog(act);
 	    if(QDialog::Accepted == dialog.exec()) dialog.fillItem(*item);
 	}
 	break;
         case MapActions::Access:
 	{
 	    ActionAccess act = qvariant_cast<ActionAccess>(data.variant);
-	    AccessDialog dialog(Color::All, act.access.allowPlayers, act.access.allowComputer, act.access.cancelAfterFirstVisit);
+	    AccessDialog dialog(act);
 	    if(QDialog::Accepted == dialog.exec()) dialog.fillItem(*item);
 	}
 	break;
         case MapActions::Message:
 	{
 	    ActionMessage act = qvariant_cast<ActionMessage>(data.variant);
-	    MessageDialog dialog(act.message);
+	    MessageTabDialog dialog(act);
 	    if(QDialog::Accepted == dialog.exec()) dialog.fillItem(*item);
 	}
 	break;
 	case MapActions::Resources:
 	{
 	    ActionResources act = qvariant_cast<ActionResources>(data.variant);
-	    ResourcesDialog dialog(act.resources);
+	    ResourcesDialog dialog(act);
 	    if(QDialog::Accepted == dialog.exec()) dialog.fillItem(*item);
 	}
 	break;
         case MapActions::Artifact:
 	{
 	    ActionArtifact act = qvariant_cast<ActionArtifact>(data.variant);
-	    ArtifactDialog dialog(act.artifact);
+	    ArtifactDialog dialog(act);
 	    if(QDialog::Accepted == dialog.exec()) dialog.fillItem(*item);
 	}
 	break;
@@ -4157,7 +3961,7 @@ void Form::ObjectEventsList::addItems(const MapActionList & list)
 	    {
 		item = new QListWidgetItem();
 		const ActionMessage* act = dynamic_cast<ActionMessage*>((*it).data());
-		if(act) MessageDialog::fillItem(*item, *act);
+		if(act) MessageTabDialog::fillItem(*item, *act);
 	    }
 	    break;
 	    case MapActions::Resources:
@@ -4195,32 +3999,89 @@ void Form::ObjectEventsList::addItems(const MapActionList & list)
     setCurrentItem(count() - 1);
 }
 
-Form::DefaultActionDialog::DefaultActionDialog(bool enabled)
+Form::MessageTabDialog::MessageTabDialog(const ActionMessage & act)
 {
-    setWindowTitle(QApplication::translate("DefaultActionDialog", "DefaultAction", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("MessageTabDialog", "Message Detail", 0, QApplication::UnicodeUTF8));
 
-    comboBoxResult = new QComboBox(this);
-    comboBoxResult->addItem("disable", 0);
-    comboBoxResult->addItem("enable", 1);
-    comboBoxResult->setCurrentIndex(enabled ? 1 : 0);
+    tabMessage = new QWidget();
+
+    plainText = new QPlainTextEdit(tabMessage);
+    plainText->setPlainText(act.message);
+
+    verticalLayoutMessage = new QVBoxLayout(tabMessage);
+    verticalLayoutMessage->addWidget(plainText);
 
     pushButtonOk = new QPushButton(this);
-    pushButtonOk->setText(QApplication::translate("DefaultActionDialog", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setText(QApplication::translate("MessageTabDialog", "Ok", 0, QApplication::UnicodeUTF8));
     pushButtonOk->setEnabled(false);
 
     horizontalSpacer = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("DefaultActionDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+    pushButtonCancel->setText(QApplication::translate("MessageTabDialog", "Cancel", 0, QApplication::UnicodeUTF8));
 
-    buttonsLayout = new QHBoxLayout();
-    buttonsLayout->addWidget(pushButtonOk);
-    buttonsLayout->addItem(horizontalSpacer);
-    buttonsLayout->addWidget(pushButtonCancel);
+    horizontalLayoutButton = new QHBoxLayout();
+    horizontalLayoutButton->addWidget(pushButtonOk);
+    horizontalLayoutButton->addItem(horizontalSpacer);
+    horizontalLayoutButton->addWidget(pushButtonCancel);
 
-    formLayout = new QVBoxLayout(this);
-    formLayout->addWidget(comboBoxResult);
-    formLayout->addLayout(buttonsLayout);
+    tabWidget = new QTabWidget(this);
+    tabWidget->addTab(tabMessage, "Message");
+
+    verticalLayoutForm = new QVBoxLayout(this);
+    verticalLayoutForm->addWidget(tabWidget);
+    verticalLayoutForm->addLayout(horizontalLayoutButton);
+
+    resize(250, 160);
+
+    connect(plainText, SIGNAL(textChanged()), this, SLOT(enableButtonOk()));
+    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
+}
+
+void Form::MessageTabDialog::enableButtonOk(void)
+{
+    pushButtonOk->setEnabled(true);
+}
+
+QString Form::MessageTabDialog::message(void) const
+{
+    return plainText->toPlainText();
+}
+
+ActionMessage Form::MessageTabDialog::result(void) const
+{
+    return ActionMessage(message());
+}
+
+void Form::MessageTabDialog::fillItem(QListWidgetItem & item) const
+{
+    fillItem(item, result());
+}
+
+void Form::MessageTabDialog::fillItem(QListWidgetItem & item, const ActionMessage & act)
+{
+    const int type = MapActions::Message;
+    item.setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(act))));
+    item.setText(MapActions::transcribe(type).append(" - ").append(act.message));
+}
+
+Form::DefaultActionDialog::DefaultActionDialog(const ActionDefault & act) : MessageTabDialog(act.msg)
+{
+    setWindowTitle(QApplication::translate("DefaultActionDialog", "Default Action", 0, QApplication::UnicodeUTF8));
+
+    tabAction = new QWidget();
+
+    comboBoxResult = new QComboBox(tabAction);
+    comboBoxResult->addItem("disable", 0);
+    comboBoxResult->addItem("enable", 1);
+    comboBoxResult->setCurrentIndex(act.result ? 1 : 0);
+
+    verticalLayoutAction = new QVBoxLayout(tabAction);
+    verticalLayoutAction->addWidget(comboBoxResult);
+
+    tabWidget->addTab(tabAction, "Default Action");
+    tabWidget->setCurrentIndex(1);
 
     QSize minSize = minimumSizeHint();
 
@@ -4228,18 +4089,11 @@ Form::DefaultActionDialog::DefaultActionDialog(bool enabled)
     setMinimumSize(minSize);
 
     connect(comboBoxResult, SIGNAL(currentIndexChanged(int)), this, SLOT(enableButtonOk()));
-    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
-    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
-}
-
-void Form::DefaultActionDialog::enableButtonOk(void)
-{
-    pushButtonOk->setEnabled(true);
 }
 
 ActionDefault Form::DefaultActionDialog::result(void) const
 {
-    return ActionDefault(QString(), comboBoxResult->currentIndex());
+    return ActionDefault(message(), comboBoxResult->currentIndex());
 }
 
 void Form::DefaultActionDialog::fillItem(QListWidgetItem & item) const
@@ -4252,4 +4106,121 @@ void Form::DefaultActionDialog::fillItem(QListWidgetItem & item, const ActionDef
     const int type = MapActions::DefaultAction;
     item.setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(act))));
     item.setText(MapActions::transcribe(type).append(" - ").append(act.result ? "enable" : "disable"));
+}
+
+Form::AccessDialog::AccessDialog(const ActionAccess & act) : MessageTabDialog(act.msg)
+{
+    setWindowTitle(QApplication::translate("AccessDialog", "Access", 0, QApplication::UnicodeUTF8));
+
+    tabAccess = new QWidget();
+
+    accessGroup = new AccessGroup(tabAccess, Color::All, act.access.allowPlayers);
+    accessGroup->setAllowComputer(act.access.allowComputer);
+    accessGroup->setCancelAfterFirstVisit(act.access.cancelAfterFirstVisit);
+
+    verticalLayoutAccess = new QVBoxLayout(tabAccess);
+    verticalLayoutAccess->addWidget(accessGroup);
+
+    tabWidget->addTab(tabAccess, "Access");
+    tabWidget->setCurrentIndex(1);
+
+    QSize minSize = minimumSizeHint();
+
+    resize(minSize);
+    setMinimumSize(minSize);
+
+    connect(accessGroup, SIGNAL(formChanged()), this, SLOT(enableButtonOk()));
+}
+
+ActionAccess Form::AccessDialog::result(void) const
+{
+    return ActionAccess(message(), AccessResult(accessGroup->colors(), accessGroup->allowComputer(), accessGroup->cancelAfterFirstVisit()));
+}
+
+void Form::AccessDialog::fillItem(QListWidgetItem & item) const
+{
+    fillItem(item, result());
+}
+
+void Form::AccessDialog::fillItem(QListWidgetItem & item, const ActionAccess & act)
+{
+    const int type = MapActions::Access;
+    item.setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(act))));
+    item.setText(MapActions::transcribe(type).append(" - ").append(act.access.transcribe()));
+}
+
+Form::ResourcesDialog::ResourcesDialog(const ActionResources & act) : MessageTabDialog(act.msg)
+{
+    setWindowTitle(QApplication::translate("ResourcesDialog", "Resources", 0, QApplication::UnicodeUTF8));
+
+    tabResources = new QWidget();
+    resourcesGroup = new ResourcesGroup(tabResources, act.resources);
+
+    verticalLayoutResources = new QVBoxLayout(tabResources);
+    verticalLayoutResources->addWidget(resourcesGroup);
+
+    tabWidget->addTab(tabResources, "Resources");
+    tabWidget->setCurrentIndex(1);
+
+    QSize minSize = minimumSizeHint();
+
+    resize(minSize);
+    setMinimumSize(minSize);
+
+    connect(resourcesGroup, SIGNAL(formChanged()), this, SLOT(enableButtonOk()));
+}
+
+ActionResources Form::ResourcesDialog::result(void) const
+{
+    return ActionResources(message(), resourcesGroup->result());
+}
+
+void Form::ResourcesDialog::fillItem(QListWidgetItem & item) const
+{
+    fillItem(item, result());
+}
+
+void Form::ResourcesDialog::fillItem(QListWidgetItem & item, const ActionResources & act)
+{
+    const int type = MapActions::Resources;
+    item.setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(act))));
+    item.setText(MapActions::transcribe(type).append(" - ").append(act.resources.describe()));
+}
+
+Form::ArtifactDialog::ArtifactDialog(const ActionArtifact & act) : MessageTabDialog(act.msg)
+{
+    setWindowTitle(QApplication::translate("ArtifactDialog", "Artifact", 0, QApplication::UnicodeUTF8));
+
+    tabArtifact = new QWidget();
+    artifactGroup = new ArtifactGroup(tabArtifact, act.artifact);
+
+    verticalLayoutArtifact = new QVBoxLayout(tabArtifact);
+    verticalLayoutArtifact->addWidget(artifactGroup);
+
+    tabWidget->addTab(tabArtifact, "Artifact");
+    tabWidget->setCurrentIndex(1);
+
+    QSize minSize = minimumSizeHint();
+
+    resize(minSize);
+    setMinimumSize(minSize);
+
+    connect(artifactGroup, SIGNAL(formChanged()), this, SLOT(enableButtonOk()));
+}
+
+ActionArtifact Form::ArtifactDialog::result(void) const
+{
+    return ActionArtifact(message(), artifactGroup->result());
+}
+
+void Form::ArtifactDialog::fillItem(QListWidgetItem & item) const
+{
+    fillItem(item, result());
+}
+
+void Form::ArtifactDialog::fillItem(QListWidgetItem & item, const ActionArtifact & act)
+{
+    const int type = MapActions::Artifact;
+    item.setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(act))));
+    item.setText(MapActions::transcribe(type).append(" - ").append(Artifact::transcribe(act.artifact)));
 }

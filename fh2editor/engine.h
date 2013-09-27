@@ -849,7 +849,7 @@ struct ActionDefault : public ActionSimple
     ActionMessage msg;
     bool result;
 
-    ActionDefault() : ActionSimple(MapActions::DefaultAction) {}
+    ActionDefault() : ActionSimple(MapActions::DefaultAction), result(true) {}
     ActionDefault(const QString & m, bool v) : ActionSimple(MapActions::DefaultAction), msg(m), result(v) {}
 };
 

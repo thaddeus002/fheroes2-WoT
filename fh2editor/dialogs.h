@@ -302,29 +302,6 @@ namespace Form
         void                    setFormChanged(void);
     };
 
-    class AccessDialog : public QDialog
-    {
-        Q_OBJECT
-
-    public:
-        AccessDialog(int, int, bool, bool);
-
-        AccessGroup*		accessGroup;
-        QVBoxLayout*		formLayout;
-        QHBoxLayout*		buttonsLayout;
-        QPushButton*		pushButtonOk;
-        QSpacerItem*		horizontalSpacer;
-        QPushButton*		pushButtonCancel;
-
-        ActionAccess           	result(void) const;
-
-	void			fillItem(QListWidgetItem &) const;
-	static void		fillItem(QListWidgetItem &, const ActionAccess &);
-
-    protected slots:
-	void			enableButtonOk(void);
-    };
-
     class ArtifactGroup : public QGroupBox
     {
         Q_OBJECT
@@ -344,30 +321,6 @@ namespace Form
     protected slots:
         void                    changeLabelArtifact(int);
         void                    setFormChanged(void);
-    };
-
-    class ArtifactDialog : public QDialog
-    {
-        Q_OBJECT
-
-    public:
-        ArtifactDialog(int = Artifact::None);
-
-        ArtifactGroup*		artifactGroup;
-        QVBoxLayout*		formLayout;
-        QHBoxLayout*		buttonsLayout;
-        QPushButton*		pushButtonOk;
-        QSpacerItem*		horizontalSpacer;
-        QPushButton*		pushButtonCancel;
-
-        int               	artifact(void) const;
-	ActionArtifact		result(void) const;
-
-	void			fillItem(QListWidgetItem &) const;
-	static void		fillItem(QListWidgetItem &, const ActionArtifact &);
-
-    protected slots:
-	void			enableButtonOk(void);
     };
 
     class ResourcesGroup : public QGroupBox
@@ -409,30 +362,6 @@ namespace Form
 
     protected slots:
         void                    setFormChanged(void);
-    };
-
-    class ResourcesDialog : public QDialog
-    {
-        Q_OBJECT
-
-    public:
-        ResourcesDialog(const Resources & = Resources());
-
-        ResourcesGroup*	resourcesGroup;
-        QVBoxLayout*		formLayout;
-        QHBoxLayout*		buttonsLayout;
-        QPushButton*		pushButtonOk;
-        QSpacerItem*		horizontalSpacer;
-        QPushButton*		pushButtonCancel;
-
-        Resources               resources(void) const;
-        ActionResources         result(void) const;
-
-	void			fillItem(QListWidgetItem &) const;
-	static void		fillItem(QListWidgetItem &, const ActionResources &);
-
-    protected slots:
-	void			enableButtonOk(void);
     };
 
     class MapOptions : public QDialog
@@ -540,15 +469,10 @@ namespace Form
 	QPlainTextEdit*		plainText;
 
 	QString			message(void) const;
-	ActionMessage		result(void) const;
-
-	void			fillItem(QListWidgetItem &) const;
-	static void		fillItem(QListWidgetItem &, const ActionMessage &);
 
     protected slots:
 	void			enableButtonOk(void);
     };
-
 
     class DayEventDialog : public QDialog
     {
@@ -1096,27 +1020,101 @@ namespace Form
 	void			update(const MapTile*);
     };
 
-    class DefaultActionDialog : public QDialog
+    class MessageTabDialog : public QDialog
     {
         Q_OBJECT
 
     public:
-        DefaultActionDialog(bool);
+        MessageTabDialog(const ActionMessage & = ActionMessage());
+	virtual ~MessageTabDialog() {}
 
+	QTabWidget*		tabWidget;
+        QVBoxLayout*		verticalLayoutForm;
+        QHBoxLayout*		horizontalLayoutButton;
+        QPushButton*		pushButtonOk;
+        QSpacerItem*		horizontalSpacer;
+        QPushButton*		pushButtonCancel;
+
+	QWidget*		tabMessage;
+        QVBoxLayout*		verticalLayoutMessage;
+	QPlainTextEdit*		plainText;
+
+	QString			message(void) const;
+	ActionMessage		result(void) const;
+
+	void			fillItem(QListWidgetItem &) const;
+	static void		fillItem(QListWidgetItem &, const ActionMessage &);
+
+    public slots:
+	void			enableButtonOk(void);
+    };
+
+    class DefaultActionDialog : public MessageTabDialog
+    {
+        Q_OBJECT
+
+    public:
+        DefaultActionDialog(const ActionDefault & = ActionDefault());
+
+	QWidget*		tabAction;
+        QVBoxLayout*            verticalLayoutAction;
 	QComboBox*		comboBoxResult;
-        QVBoxLayout*            formLayout;
-        QHBoxLayout*            buttonsLayout;
-        QPushButton*            pushButtonOk;
-        QSpacerItem*            horizontalSpacer;
-        QPushButton*            pushButtonCancel;
 
         ActionDefault           result(void) const;
 
 	void			fillItem(QListWidgetItem &) const;
 	static void		fillItem(QListWidgetItem &, const ActionDefault &);
+    };
 
-    protected slots:
-        void                    enableButtonOk(void);
+    class AccessDialog : public MessageTabDialog
+    {
+        Q_OBJECT
+
+    public:
+        AccessDialog(const ActionAccess & = ActionAccess());
+
+	QWidget*		tabAccess;
+        QVBoxLayout*            verticalLayoutAccess;
+        AccessGroup*		accessGroup;
+
+        ActionAccess           	result(void) const;
+
+	void			fillItem(QListWidgetItem &) const;
+	static void		fillItem(QListWidgetItem &, const ActionAccess &);
+    };
+
+    class ResourcesDialog : public MessageTabDialog
+    {
+        Q_OBJECT
+
+    public:
+        ResourcesDialog(const ActionResources & = ActionResources());
+
+	QWidget*		tabResources;
+        QVBoxLayout*            verticalLayoutResources;
+        ResourcesGroup*		resourcesGroup;
+
+        ActionResources         result(void) const;
+
+	void			fillItem(QListWidgetItem &) const;
+	static void		fillItem(QListWidgetItem &, const ActionResources &);
+    };
+
+    class ArtifactDialog : public MessageTabDialog
+    {
+        Q_OBJECT
+
+    public:
+        ArtifactDialog(const ActionArtifact & = ActionArtifact());
+
+	QWidget*		tabArtifact;
+        QVBoxLayout*            verticalLayoutArtifact;
+        ArtifactGroup*		artifactGroup;
+
+	ActionArtifact		result(void) const;
+
+	void			fillItem(QListWidgetItem &) const;
+	static void		fillItem(QListWidgetItem &, const ActionArtifact &);
     };
 }
 
