@@ -3750,6 +3750,63 @@ void Form::HeroList::open(QListWidgetItem* item)
 	mapData->editHeroDialog(item->data(Qt::UserRole).toPoint());
 }
 
+Form::CustomList::CustomList(QWidget* parent) : QListWidget(parent), mapData(NULL)
+{
+    connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(open(QListWidgetItem*)));
+}
+
+void Form::CustomList::update(MapData* data)
+{
+    clear();
+
+    if(data)
+    {
+	const MapObjects & listObjects = data->objects();
+
+	for(MapObjects::const_iterator
+    	    it = listObjects.begin(); it != listObjects.end(); ++it)
+	{
+	    switch((*it).data()->type())
+	    {
+    		case MapObj::Event:
+    		case MapObj::RndCastle:
+    		case MapObj::RndTown:
+    		case MapObj::Castle:
+    		case MapObj::Bottle:
+    		case MapObj::Sign:
+    		case MapObj::Jail:
+    		case MapObj::Heroes:
+    		case MapObj::Sphinx:
+		    break;
+
+		default:
+		{
+		    const MapActions* obj = dynamic_cast<const MapActions*>((*it).data());
+		    if(obj && ! obj->isDefault())
+		    {
+			const QPoint & pos = (*it).data()->pos();
+			const MapTile* tile = mapData->tiles().tileConst(pos);
+			QString str; QTextStream ts(& str);
+			ts << "(" << pos.x() << "," << pos.y() << ")" << "\t" << MapObj::transcribe(tile ? tile->object() : MapObj::None);
+			QListWidgetItem* item = new QListWidgetItem(str);
+			item->setData(Qt::UserRole, pos);
+			addItem(item);
+		    }
+		}
+	        break;
+	    }
+	}
+    }
+
+    mapData = data;
+}
+
+void Form::CustomList::open(QListWidgetItem* item)
+{
+    if(item && mapData)
+	mapData->editOtherMapEventsDialog(item->data(Qt::UserRole).toPoint());
+}
+
 Form::InfoForm::InfoForm(QWidget* parent) : QFrame(parent)
 {
     verticalLayoutForm = new QVBoxLayout(this);

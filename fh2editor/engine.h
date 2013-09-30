@@ -822,6 +822,7 @@ struct MapActions : public MapObject
     MapActions(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1);
     QString	object(void) const { return "actions"; }
     MapObject*	copy(void) const { return new MapActions(*this); }
+    bool	isDefault(void) const;
 
     MapActionList list;
 };
@@ -882,7 +883,7 @@ struct ActionArtifact : public ActionSimple
     ActionMessage msg;
     int artifact;
 
-    ActionArtifact() : ActionSimple(MapActions::Artifact) {}
+    ActionArtifact() : ActionSimple(MapActions::Artifact), artifact(Artifact::None) {}
     ActionArtifact(const QString & m, int v) : ActionSimple(MapActions::Artifact), msg(m), artifact(v) {}
 };
 

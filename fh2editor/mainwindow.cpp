@@ -137,6 +137,9 @@ void MainWindow::updateDockWidgets(void)
     disconnect(heroList, SIGNAL(itemClicked(QListWidgetItem*)));
     disconnect(heroList, SLOT(update(MapData*)));
 
+    disconnect(objectsList, SIGNAL(itemClicked(QListWidgetItem*)));
+    disconnect(objectsList, SLOT(update(MapData*)));
+
     disconnect(infoForm, SLOT(update(const MapTile*)));
 
     if(activeWindow)
@@ -150,6 +153,7 @@ void MainWindow::updateDockWidgets(void)
 
 	townList->update(qobject_cast<MapData*>(activeWindow->scene()));
 	heroList->update(qobject_cast<MapData*>(activeWindow->scene()));
+	objectsList->update(qobject_cast<MapData*>(activeWindow->scene()));
 
 	connect(townList, SIGNAL(itemClicked(QListWidgetItem*)), activeWindow, SLOT(viewportSetPositionFromListWidget(QListWidgetItem*)));
 	connect(activeWindow, SIGNAL(windowModified(MapData*)), townList, SLOT(update(MapData*)));
@@ -157,12 +161,17 @@ void MainWindow::updateDockWidgets(void)
 	connect(heroList, SIGNAL(itemClicked(QListWidgetItem*)), activeWindow, SLOT(viewportSetPositionFromListWidget(QListWidgetItem*)));
 	connect(activeWindow, SIGNAL(windowModified(MapData*)), heroList, SLOT(update(MapData*)));
 
+	connect(objectsList, SIGNAL(itemClicked(QListWidgetItem*)), activeWindow, SLOT(viewportSetPositionFromListWidget(QListWidgetItem*)));
+	connect(activeWindow, SIGNAL(windowModified(MapData*)), objectsList, SLOT(update(MapData*)));
+
+	if(activeWindow->scene())
 	connect(activeWindow->scene(), SIGNAL(currentTilePosChanged(const MapTile*)), infoForm, SLOT(update(const MapTile*)));
 
 	dockMiniMap->widget()->show();
 	dockTownList->widget()->show();
 	dockInfoWidget->widget()->show();
 	dockHeroList->widget()->show();
+	dockObjectsList->widget()->show();
     }
     else
     {
@@ -170,6 +179,7 @@ void MainWindow::updateDockWidgets(void)
 	dockTownList->widget()->hide();
 	dockInfoWidget->widget()->hide();
 	dockHeroList->widget()->hide();
+	dockObjectsList->widget()->hide();
     }
 }
 
@@ -371,6 +381,14 @@ void MainWindow::createMenus(void)
     heroList = new Form::HeroList(dockHeroList);
     dockHeroList->setWidget(heroList);
 
+    dockObjectsList = new QDockWidget(tr("Custom Objects"), this);
+    dockObjectsList->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    addDockWidget(Qt::RightDockWidgetArea, dockObjectsList);
+    mapMenu->addAction(dockObjectsList->toggleViewAction());
+
+    objectsList = new Form::CustomList(dockObjectsList);
+    dockObjectsList->setWidget(objectsList);
+
     dockInfoWidget = new QDockWidget(tr("Info Window"), this);
     dockInfoWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     addDockWidget(Qt::RightDockWidgetArea, dockInfoWidget);
@@ -381,9 +399,15 @@ void MainWindow::createMenus(void)
 
     connect(townList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(updateInfoForm(QListWidgetItem*)));
     connect(townList, SIGNAL(itemClicked(QListWidgetItem*)), heroList, SLOT(clearSelection()));
+    connect(townList, SIGNAL(itemClicked(QListWidgetItem*)), objectsList, SLOT(clearSelection()));
 
     connect(heroList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(updateInfoForm(QListWidgetItem*)));
     connect(heroList, SIGNAL(itemClicked(QListWidgetItem*)), townList, SLOT(clearSelection()));
+    connect(heroList, SIGNAL(itemClicked(QListWidgetItem*)), objectsList, SLOT(clearSelection()));
+
+    connect(objectsList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(updateInfoForm(QListWidgetItem*)));
+    connect(objectsList, SIGNAL(itemClicked(QListWidgetItem*)), heroList, SLOT(clearSelection()));
+    connect(objectsList, SIGNAL(itemClicked(QListWidgetItem*)), townList, SLOT(clearSelection()));
 }
 
 void MainWindow::updateInfoForm(QListWidgetItem* item)

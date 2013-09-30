@@ -353,6 +353,7 @@ public:
 
     void		editTownDialog(const QPoint &);
     void		editHeroDialog(const QPoint &);
+    void		editOtherMapEventsDialog(const QPoint &);
 
     const MapTile*	currentTile(void) const;
 

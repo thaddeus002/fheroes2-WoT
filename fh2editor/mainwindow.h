@@ -37,7 +37,7 @@ class QDockWidget;
 class QListWidgetItem;
 QT_END_NAMESPACE
 
-namespace Form { class MiniMap; class TownList; class HeroList; class InfoForm; }
+namespace Form { class MiniMap; class TownList; class HeroList; class CustomList; class InfoForm; }
 class MapWindow;
 class MapTile;
 
@@ -108,6 +108,7 @@ private:
     QDockWidget*	dockMiniMap;
     QDockWidget*	dockTownList;
     QDockWidget*	dockHeroList;
+    QDockWidget*	dockObjectsList;
     QDockWidget*	dockInfoWidget;
 
     QLabel*		labelTileX;
@@ -116,6 +117,7 @@ private:
     Form::MiniMap*      miniMap;
     Form::TownList*     townList;
     Form::HeroList*     heroList;
+    Form::CustomList*	objectsList;
     Form::InfoForm*     infoForm;
 
     int			sequenceMapNumber;

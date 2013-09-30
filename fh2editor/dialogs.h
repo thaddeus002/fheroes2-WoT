@@ -1006,6 +1006,22 @@ namespace Form
 	void			open(QListWidgetItem*);
     };
 
+    class CustomList : public QListWidget
+    {
+	Q_OBJECT
+
+	MapData*		mapData;
+
+    public:
+	CustomList(QWidget*);
+
+    public slots:
+	void			update(MapData*);
+
+    protected slots:
+	void			open(QListWidgetItem*);
+    };
+
     class InfoForm : public QFrame
     {
 	Q_OBJECT

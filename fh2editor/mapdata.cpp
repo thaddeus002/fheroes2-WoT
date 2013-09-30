@@ -2555,6 +2555,12 @@ void MapData::editObjectAttributes(void)
     }
 }
 
+void MapData::editOtherMapEventsDialog(const QPoint & pt)
+{
+    const MapTile* tile = mapTiles.tile(pt);
+    if(tile) editOtherMapEventsDialog(*tile);
+}
+
 void MapData::editOtherMapEventsDialog(const MapTile & tile)
 {
     MapActions* actions = dynamic_cast<MapActions*>(mapObjects.find(tile.mapPos()).data());

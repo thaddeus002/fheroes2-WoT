@@ -2521,6 +2521,20 @@ QString MapActions::transcribe(int v)
     return v < Unknown ? actionName[v] : actionName[Unknown];
 }
 
+bool MapActions::isDefault(void) const
+{
+    if(list.empty())
+	return true;
+    else
+    if(1 == list.size())
+    {
+	const ActionDefault* act = dynamic_cast<const ActionDefault*>(list.front().data());
+	return act && act->result;
+    }
+
+    return false;
+}
+
 DayEvent::DayEvent(const mp2dayevent_t & mp2)
     : allowComputer(mp2.allowComputer), dayFirstOccurent(mp2.dayFirstOccurent),
 	daySubsequentOccurrences(mp2.subsequentOccurrences), colors(0), message(mp2.text)
