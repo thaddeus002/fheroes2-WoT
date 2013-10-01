@@ -3785,7 +3785,7 @@ void Form::CustomList::update(MapData* data)
 		    if(obj && ! obj->isDefault())
 		    {
 			const QPoint & pos = (*it).data()->pos();
-			const MapTile* tile = mapData->tiles().tileConst(pos);
+			const MapTile* tile = data->tiles().tileConst(pos);
 			QString str; QTextStream ts(& str);
 			ts << "(" << pos.x() << "," << pos.y() << ")" << "\t" << MapObj::transcribe(tile ? tile->object() : MapObj::None);
 			QListWidgetItem* item = new QListWidgetItem(str);

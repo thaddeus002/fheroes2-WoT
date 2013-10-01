@@ -39,6 +39,7 @@
 #include "game_over.h"
 #include "difficulty.h"
 #include "maps_tiles.h"
+#include "maps_actions.h"
 #include "resource.h"
 #include "game.h"
 #include "world.h"
@@ -64,7 +65,6 @@ std::vector<u8> DecodeBase64AndUncomress(std::string base64)
 
 
 #ifdef WITH_XML
-
 namespace Maps
 {
     TiXmlElement & operator>> (TiXmlElement & doc, Addons & levels)
@@ -517,6 +517,114 @@ TiXmlElement & operator>> (TiXmlElement & doc, MapSigns & signs)
     return doc;
 }
 
+TiXmlElement & operator>> (TiXmlElement & doc, ActionDefault & st)
+{
+    int enabled;
+    doc.Attribute("enabled", & enabled);
+    st.enabled = enabled;
+    if(doc.GetText()) st.message = doc.GetText();
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, ActionAccess & st)
+{
+    int colors, comp, cancel;
+    doc.Attribute("allowPlayers", & colors);
+    doc.Attribute("allowComputer", &comp);
+    doc.Attribute("cancelAfterFirstVisit", & cancel);
+    st.allowPlayers = colors;
+    st.allowComputer = comp;
+    st.cancelAfterFirstVisit = cancel;
+    if(doc.GetText()) st.message = doc.GetText();
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, ActionMessage & st)
+{
+    if(doc.GetText()) st.message = doc.GetText();
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, ActionResources & st)
+{
+    doc >> st.resources;
+    if(doc.GetText()) st.message = doc.GetText();
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, ActionArtifact & st)
+{
+    int artifact;
+    doc.Attribute("artifact", & artifact);
+    st.artifact = artifact ? artifact - 1 : Artifact::UNKNOWN;
+    if(doc.GetText()) st.message = doc.GetText();
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, MapActionObjects & objects)
+{
+    TiXmlElement* xml_actions = doc.FirstChildElement("actions");
+    for(; xml_actions; xml_actions = xml_actions->NextSiblingElement("actions"))
+    {
+	int posx, posy, uid;
+
+	xml_actions->Attribute("posx", & posx);
+	xml_actions->Attribute("posy", & posy);
+	xml_actions->Attribute("uid", & uid);
+
+	s32 index = Maps::GetIndexFromAbsPoint(posx, posy);
+
+	if(Maps::isValidAbsIndex(index))
+	{
+	    ActionsObject & list = objects[index];
+	    list.clear();
+
+	    TiXmlElement* xml_action = xml_actions->FirstChildElement();
+	    for(; xml_action; xml_action = xml_action->NextSiblingElement())
+	    {
+		const std::string name = StringLower(xml_action->Value());
+
+		if(name == "defaultaction")
+		{
+		    ActionDefault* ptr = new ActionDefault();
+		    *xml_action >> *ptr;
+		    list.push_back(ptr);
+		}
+		else
+		if(name == "access")
+		{
+		    ActionAccess* ptr = new ActionAccess();
+		    *xml_action >> *ptr;
+		    list.push_back(ptr);
+		}
+		else
+		if(name == "message")
+		{
+		    ActionMessage* ptr = new ActionMessage();
+		    *xml_action >> *ptr;
+		    list.push_back(ptr);
+		}
+		else
+		if(name == "resources")
+		{
+		    ActionResources* ptr = new ActionResources();
+		    *xml_action >> *ptr;
+		    list.push_back(ptr);
+		}
+		else
+		if(name == "artifact")
+		{
+		    ActionArtifact* ptr = new ActionArtifact();
+		    *xml_action >> *ptr;
+		    list.push_back(ptr);
+		}
+	    }
+	}
+    }
+
+    return doc;
+}
+
 TiXmlElement & operator>> (TiXmlElement & doc, World & w)
 {
     TiXmlElement* xml_tiles = doc.FirstChildElement("tiles");
@@ -544,7 +652,7 @@ TiXmlElement & operator>> (TiXmlElement & doc, World & w)
 	GameStatic::uniq = value;
 
 	*xml_objects >> w.vec_castles >> w.vec_heroes >>
-	    w.vec_eventsmap >> w.vec_riddles >> w.map_sign;
+	    w.vec_eventsmap >> w.vec_riddles >> w.map_sign >> w.map_action_objects;
     }
 
     TiXmlElement* xml_events = doc.FirstChildElement("events");

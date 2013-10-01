@@ -38,6 +38,7 @@
 #include "payment.h"
 #include "profit.h"
 #include "gameevent.h"
+#include "maps_actions.h"
 #include "ai.h"
 
 #define PlayMusicReplacement(m82) if(MUS::FromMapObject(obj) == MUS::UNKNOWN) \
@@ -378,6 +379,57 @@ void Heroes::Action(s32 dst_index)
 	SetModes(ACTION);
     }
 
+    /* new format map only */
+    ActionsObject* list = world.GetActionsObject(dst_index);
+    bool cancel_default = false;
+
+    if(list)
+    {
+	for(ActionsObject::const_iterator
+	    it = list->begin(); it != list->end(); ++it)
+	{
+	    switch((*it)->type)
+	    {
+		case ACTION_ACCESS:
+		    if(! ActionAccess::Action(dynamic_cast<ActionAccess*>(*it), dst_index, *this))
+			cancel_default = true;
+		    break;
+
+		case ACTION_DEFAULT:
+		    if(! ActionDefault::Action(dynamic_cast<ActionDefault*>(*it), dst_index, *this))
+			cancel_default = true;
+		    break;
+
+		case ACTION_MESSAGE:
+		    ActionMessage::Action(dynamic_cast<ActionMessage*>(*it), dst_index, *this);
+		    break;
+
+		case ACTION_RESOURCES:
+		    ActionResources::Action(dynamic_cast<ActionResources*>(*it), dst_index, *this);
+		    break;
+
+		case ACTION_ARTIFACT:
+		    ActionArtifact::Action(dynamic_cast<ActionArtifact*>(*it), dst_index, *this);
+		    break;
+
+		default: break;
+	    }
+	}
+    }
+
+    /* default actions */
+    if(cancel_default)
+    {
+	if(MP2::isPickupObject(object))
+	{
+	    Maps::Tiles & tile = world.GetTiles(dst_index);
+	    AnimationRemoveObject(tile);
+	    tile.RemoveObjectSprite();
+	    tile.QuantityReset();
+    	    tile.SetObject(MP2::OBJ_ZERO);
+	}
+    }
+    else
     switch(object)
     {
 	case MP2::OBJ_MONSTER:	ActionToMonster(*this, object, dst_index); break;

@@ -40,12 +40,25 @@
 #include "game.h"
 #include "game_over.h"
 #include "resource.h"
-#include "world.h"
+#include "maps_actions.h"
 #include "ai.h"
+#include "world.h"
 
 namespace GameStatic
 {
     extern u32 uniq;
+}
+
+ActionsObject::~ActionsObject()
+{
+    clear();
+}
+
+void ActionsObject::clear(void)
+{
+    for(iterator it = begin(); it != end(); ++it)
+	delete *it;
+    std::list<ActionSimple*>::clear();
 }
 
 CapturedObject & CapturedObjects::Get(s32 index)
@@ -233,6 +246,7 @@ void World::Reset(void)
     // extra
     map_sign.clear();
     map_captureobj.clear();
+    map_action_objects.clear();
 
     ultimate_artifact.Reset();
 
@@ -729,6 +743,12 @@ int World::ColorCapturedObject(s32 index) const
     return map_captureobj.GetColor(index);
 }
 
+ActionsObject* World::GetActionsObject(s32 index)
+{
+    MapActionObjects::iterator it = map_action_objects.find(index);
+    return it != map_action_objects.end() ? & (*it).second : NULL;
+}
+
 CapturedObject & World::GetCapturedObject(s32 index)
 {
     return map_captureobj.Get(index);
@@ -1059,7 +1079,8 @@ StreamBase & operator<< (StreamBase & msg, const World & w)
 	w.week_current <<
 	w.week_next <<
 	w.heroes_cond_wins <<
-	w.heroes_cond_loss;
+	w.heroes_cond_loss <<
+	w.map_action_objects;
 }
 
 StreamBase & operator>> (StreamBase & msg, World & w)
@@ -1116,6 +1137,9 @@ StreamBase & operator>> (StreamBase & msg, World & w)
 	msg >>
 	    w.heroes_cond_wins >>
 	    w.heroes_cond_loss;
+
+    if(FORMAT_VERSION_3177 <= Game::GetLoadVersion())
+	msg >> w.map_action_objects;
 
     // update tile passable
     std::for_each(w.vec_tiles.begin(), w.vec_tiles.end(),

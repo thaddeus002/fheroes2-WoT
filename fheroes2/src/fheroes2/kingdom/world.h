@@ -40,6 +40,7 @@ class Castle;
 class Kingdom;
 class Recruits;
 class Radar;
+class ActionSimple;
 
 typedef std::list<std::string>		Rumors;
 typedef std::list<EventDate>		EventsDate;
@@ -47,6 +48,14 @@ typedef std::list<EventMaps>		EventsMaps;
 typedef std::list<Riddle>		Riddles;
 typedef std::vector<Maps::Tiles>	MapsTiles;
 typedef std::map<s32, std::string>	MapSigns;
+
+struct ActionsObject : public std::list<ActionSimple*>
+{
+    ~ActionsObject();
+    void clear(void);
+};
+
+typedef std::map<s32, ActionsObject>	MapActionObjects;
 
 struct CapturedObject
 {
@@ -161,6 +170,7 @@ public:
     int			ColorCapturedObject(s32) const;
     void		ResetCapturedObjects(int);
     CapturedObject &	GetCapturedObject(s32);
+    ActionsObject*	GetActionsObject(s32);
 
     void		ActionForMagellanMaps(int color);
     void		ActionToEyeMagi(int color) const;
@@ -219,12 +229,17 @@ private:
 
     int					heroes_cond_wins;
     int					heroes_cond_loss;
+
+    MapActionObjects			map_action_objects;
 };
 
 StreamBase & operator<< (StreamBase &, const CapturedObject &);
 StreamBase & operator>> (StreamBase &, CapturedObject &);
 StreamBase & operator<< (StreamBase &, const World &);
 StreamBase & operator>> (StreamBase &, World &);
+
+StreamBase & operator<< (StreamBase &, const ActionsObject &);
+StreamBase & operator>> (StreamBase &, ActionsObject &);
 
 extern World & world;
 
