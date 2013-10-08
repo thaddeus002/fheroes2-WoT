@@ -2732,7 +2732,7 @@ void ActionToDaemonCave(Heroes & hero, u32 obj, s32 dst_index)
 
 	if(variant)
 	{
-	    const u32 gold = tile.QuantityGold();
+	    u32 gold = tile.QuantityGold();
 	    std::string msg;
 
 	    if(variant == 2 && hero.IsFullBagArtifacts())
@@ -2742,6 +2742,7 @@ void ActionToDaemonCave(Heroes & hero, u32 obj, s32 dst_index)
 	    {
 		// battle with earth elements
 		Army army(tile);
+		gold = 2500;
 
 		Battle::Result res = Battle::Loader(hero.GetArmy(), army, dst_index);
     		if(res.AttackerWins())
