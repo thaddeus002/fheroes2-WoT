@@ -1485,7 +1485,7 @@ void AGG::PlayMusic(int mus, bool loop)
 		    Music::Play(run.c_str(), loop);
 		}
 		else
-		    SaveMemToFile(AGG::Cache::Get().GetMID(xmi), file);
+		    SaveMemToFile(GetMID(xmi), file);
 	    }
 #endif
 	}

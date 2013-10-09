@@ -1284,9 +1284,6 @@ void World::PostLoad(void)
     // add castles to kingdoms
     vec_kingdoms.AddCastles(vec_castles);
 
-    if(Settings::Get().ExtWorldStartHeroLossCond4Humans())
-	vec_kingdoms.AddCondLossHeroes(vec_heroes);
-
     // update wins, loss conditions
     if(GameOver::WINS_HERO & Settings::Get().ConditionWins())
     {
@@ -1309,6 +1306,9 @@ void World::PostLoad(void)
 
     // play with hero
     vec_kingdoms.ApplyPlayWithStartingHero();
+
+    if(Settings::Get().ExtWorldStartHeroLossCond4Humans())
+	vec_kingdoms.AddCondLossHeroes(vec_heroes);
 
     // play with debug hero
     if(IS_DEVEL())

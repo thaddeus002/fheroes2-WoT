@@ -493,8 +493,8 @@ u32 Text::height(const std::string & str, int ft, u32 width)
 	    TextUnicode text(str, ft);
 	    return text.h(width);
 	}
-#endif
 	else
+#endif
 	{
 	    TextAscii text(str, ft);
 	    return text.h(width);
