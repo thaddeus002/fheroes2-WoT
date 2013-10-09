@@ -315,13 +315,16 @@ bool Maps::FileInfo::ReadMAP(const std::string & filename)
 		}
 
 		file = filename;
-
 		return true;
 	    }
 	    else
 	    {
 		DEBUG(DBG_GAME, DBG_WARN, filename << ", " << "incorrect header decode" << ", " << "size: " << bytes.size());
 	    }
+	}
+	else
+	{
+	    DEBUG(DBG_GAME, DBG_WARN, filename << ", " << "incorrect info");
 	}
 
 	return false;

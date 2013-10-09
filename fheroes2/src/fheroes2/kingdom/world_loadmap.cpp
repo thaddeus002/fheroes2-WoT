@@ -316,33 +316,61 @@ TiXmlElement & operator>> (TiXmlElement & doc, AllHeroes & heroes)
     TiXmlElement* xml_hero = doc.FirstChildElement("hero");
     for(; xml_hero; xml_hero = xml_hero->NextSiblingElement("hero"))
     {
-	int posx, posy, portrait;
+	int posx, posy, portrait, race;
 	xml_hero->Attribute("posx", & posx);
 	xml_hero->Attribute("posy", & posy);
 	xml_hero->Attribute("portrait", & portrait);
+	xml_hero->Attribute("race", & race);
 
 	const Maps::Tiles & tile = world.GetTiles(posx, posy);
-	const Maps::TilesAddon* addon = tile.FindObjectConst(MP2::OBJ_HEROES);
-	std::pair<int, int> colorRace = Maps::TilesAddon::ColorRaceFromHeroSprite(*addon);
-	Kingdom & kingdom = world.GetKingdom(colorRace.first);
+	bool jail = false;
 
-	if(colorRace.second == Race::RAND &&
+	const Maps::TilesAddon* addon = tile.FindObjectConst(MP2::OBJ_HEROES);
+
+	if(! addon)
+	{
+	    addon = tile.FindObjectConst(MP2::OBJ_JAIL);
+	    jail = addon;
+	}
+
+	if(! addon)
+	{
+	    VERBOSE("xml error: heroes not found" << ", " << "posx: " << posx << ", " << "posy: " << posy);
+	    continue;
+	}
+
+	std::pair<int, int> colorRace(Color::NONE, race);
+	Heroes* hero = NULL;
+
+	if(! jail)
+	{
+	    colorRace = Maps::TilesAddon::ColorRaceFromHeroSprite(*addon);
+	    Kingdom & kingdom = world.GetKingdom(colorRace.first);
+
+	    if(colorRace.second == Race::RAND &&
 		colorRace.first != Color::NONE)
 		colorRace.second = kingdom.GetRace();
 
-	// check heroes max count
-	if(kingdom.AllowRecruitHero(false, 0))
+	    // check heroes max count
+	    if(! kingdom.AllowRecruitHero(false, 0))
+	    {
+		DEBUG(DBG_GAME, DBG_WARN, "kingdom recruil full, skip hero" << ", " << "posx: " << posx << ", " << "posy: " << posy);
+		continue;
+	    }
+	}
+
+	if(0 < portrait)
+	    hero = world.GetHeroes(portrait);
+
+	if(!hero || !hero->isFreeman())
+	    hero = world.GetFreemanHeroes(colorRace.second);
+
+	if(hero)
 	{
-	    Heroes* hero = NULL;
+	    *xml_hero >> *hero;
 
-	    if(0 < portrait)
-		hero = world.GetHeroes(portrait);
-
-	    if(!hero || !hero->isFreeman())
-		hero = world.GetFreemanHeroes(colorRace.second);
-
-	    if(hero)
-		*xml_hero >> *hero;
+	    if(jail)
+		hero->SetModes(Heroes::JAIL);
 	}
     }
 
