@@ -247,8 +247,7 @@ int Maps::TilesAddon::GetLoyaltyObject(const Maps::TilesAddon & addon)
 
 int Maps::TilesAddon::GetPassable(const Maps::TilesAddon & ta)
 {
-    const int icn = MP2::GetICNObject(ta.object);
-    const u16 & index = ta.index;
+    int icn = MP2::GetICNObject(ta.object);
 
     switch(icn)
     {
@@ -257,39 +256,38 @@ int Maps::TilesAddon::GetPassable(const Maps::TilesAddon & ta)
         case ICN::MTNLAVA:
         case ICN::MTNDSRT:
         case ICN::MTNMULT:
-        case ICN::MTNGRAS:      return ObjMnts1::GetPassable(icn, index);
+        case ICN::MTNGRAS:      return ObjMnts1::GetPassable(icn, ta.index);
 
         case ICN::MTNCRCK:
-        case ICN::MTNDIRT:      return ObjMnts2::GetPassable(icn, index);
+        case ICN::MTNDIRT:      return ObjMnts2::GetPassable(icn, ta.index);
 
         case ICN::TREJNGL:
         case ICN::TREEVIL:
         case ICN::TRESNOW:
         case ICN::TREFIR:
         case ICN::TREFALL:
-        case ICN::TREDECI:      return ObjTree::GetPassable(index);
+        case ICN::TREDECI:      return ObjTree::GetPassable(ta.index);
+        case ICN::OBJNSNOW:     return ObjSnow::GetPassable(ta.index);
+        case ICN::OBJNSWMP:     return ObjSwmp::GetPassable(ta.index);
+        case ICN::OBJNGRAS:     return ObjGras::GetPassable(ta.index);
+        case ICN::OBJNGRA2:     return ObjGra2::GetPassable(ta.index);
+        case ICN::OBJNCRCK:     return ObjCrck::GetPassable(ta.index);
+        case ICN::OBJNDIRT:     return ObjDirt::GetPassable(ta.index);
+        case ICN::OBJNDSRT:     return ObjDsrt::GetPassable(ta.index);
+        case ICN::OBJNMUL2:	return ObjMul2::GetPassable(ta.index);
+        case ICN::OBJNMULT:     return ObjMult::GetPassable(ta.index);
+        case ICN::OBJNLAVA:     return ObjLava::GetPassable(ta.index);
+        case ICN::OBJNLAV3:     return ObjLav3::GetPassable(ta.index);
+        case ICN::OBJNLAV2:     return ObjLav2::GetPassable(ta.index);
+        case ICN::OBJNWAT2:	return ObjWat2::GetPassable(ta.index);
+        case ICN::OBJNWATR:     return ObjWatr::GetPassable(ta.index);
 
-        case ICN::OBJNSNOW:     return ObjSnow::GetPassable(index);
-        case ICN::OBJNSWMP:     return ObjSwmp::GetPassable(index);
-        case ICN::OBJNGRAS:     return ObjGras::GetPassable(index);
-        case ICN::OBJNGRA2:     return ObjGra2::GetPassable(index);
-        case ICN::OBJNCRCK:     return ObjCrck::GetPassable(index);
-        case ICN::OBJNDIRT:     return ObjDirt::GetPassable(index);
-        case ICN::OBJNDSRT:     return ObjDsrt::GetPassable(index);
-        case ICN::OBJNMUL2:	return ObjMul2::GetPassable(index);
-        case ICN::OBJNMULT:     return ObjMult::GetPassable(index);
-        case ICN::OBJNLAVA:     return ObjLava::GetPassable(index);
-        case ICN::OBJNLAV3:     return ObjLav3::GetPassable(index);
-        case ICN::OBJNLAV2:     return ObjLav2::GetPassable(index);
-        case ICN::OBJNWAT2:	return ObjWat2::GetPassable(index);
-        case ICN::OBJNWATR:     return ObjWatr::GetPassable(index);
+        case ICN::OBJNTWBA:	return ObjTwba::GetPassable(ta.index);
+        case ICN::OBJNTOWN:     return ObjTown::GetPassable(ta.index);
 
-        case ICN::OBJNTWBA:	return ObjTwba::GetPassable(index);
-        case ICN::OBJNTOWN:     return ObjTown::GetPassable(index);
-
-        case ICN::X_LOC1:       return ObjXlc1::GetPassable(index);
-        case ICN::X_LOC2:       return ObjXlc2::GetPassable(index);
-        case ICN::X_LOC3:       return ObjXlc3::GetPassable(index);
+        case ICN::X_LOC1:       return ObjXlc1::GetPassable(ta.index);
+        case ICN::X_LOC2:       return ObjXlc2::GetPassable(ta.index);
+        case ICN::X_LOC3:       return ObjXlc3::GetPassable(ta.index);
 
         // MANUAL.ICN
         case ICN::TELEPORT1:
@@ -2832,80 +2830,21 @@ StreamBase & Maps::operator<< (StreamBase & msg, const Tiles & tile)
 	tile.quantity1 <<
 	tile.quantity2 <<
 	tile.quantity3 <<
-        // addons 1
 	tile.addons_level1 <<
-        // addons 2
 	tile.addons_level2;
 }
 
 StreamBase & Maps::operator>> (StreamBase & msg, Tiles & tile)
 {
-    msg >>
+    return msg >>
 	tile.maps_index >>
 	tile.pack_sprite_index >>
 	tile.tile_passable >>
 	tile.mp2_object >>
 	tile.fog_colors >>
 	tile.quantity1 >>
-	tile.quantity2;
-
-    if(FORMAT_VERSION_3161 > Game::GetLoadVersion())
-    {
-	tile.quantity3 = tile.maps_index >> 24;
-    }
-    else
-	msg >> tile.quantity3;
-
-    msg >>
-        // addons 1
+	tile.quantity2 >>
+	tile.quantity3 >>
 	tile.addons_level1 >>
-        // addons 2
 	tile.addons_level2;
-
-    // fix old format: GetHeroes
-    if(FORMAT_VERSION_2945 > Game::GetLoadVersion())
-    {
-	if(MP2::OBJ_HEROES == tile.mp2_object)
-	    tile.SetQuantity3(tile.GetQuantity3() + 1);
-	else
-	// fix old format: teleports
-	if(MP2::OBJ_ZERO == tile.mp2_object && 1 == tile.addons_level1.size())
-	{
-	    const TilesAddon & ta = tile.addons_level1.front();
-
-	    switch(MP2::GetICNObject(ta.object))
-	    {
-		case ICN::TELEPORT1:
-		case ICN::TELEPORT2:
-		case ICN::TELEPORT3: tile.mp2_object = MP2::OBJ_STONELIGHTS; break;
-		default: break;
-	    }
-	}
-    }
-
-    
-    if(FORMAT_VERSION_3165 > Game::GetLoadVersion())
-    {
-	switch(tile.mp2_object)
-	{
-    	    case MP2::OBJ_BARRIER:
-    	    case MP2::OBJ_TRAVELLERTENT:
-		switch(tile.quantity1)
-		{
-		    case 0x01: tile.quantity1 = BarrierColor::AQUA; break;
-		    case 0x02: tile.quantity1 = BarrierColor::BLUE; break;
-		    case 0x04: tile.quantity1 = BarrierColor::BROWN; break;
-		    case 0x08: tile.quantity1 = BarrierColor::GOLD; break;
-		    case 0x10: tile.quantity1 = BarrierColor::GREEN; break;
-		    case 0x20: tile.quantity1 = BarrierColor::ORANGE; break;
-		    case 0x40: tile.quantity1 = BarrierColor::PURPLE; break;
-		    case 0x80: tile.quantity1 = BarrierColor::RED; break;
-		    default: break;
-		}
-		break;
-	    default: break;
-	}
-    }
-
-    return msg;
 }

@@ -42,7 +42,7 @@ struct artifactstats_t
 {
     u8 bits;
     u8 extra;
-    const u8 type;
+    u8 type;
     const char* name;
     const char* description;
 };
@@ -655,16 +655,7 @@ StreamBase & operator<< (StreamBase & msg, const Artifact & art)
 
 StreamBase & operator>> (StreamBase & msg, Artifact & art)
 {
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u8 id, ext;
-	msg >> id >> ext;
-	art.id = id; art.ext = ext;
-    }
-    else
-	msg >> art.id >> art.ext;
-
-    return msg;
+    return msg >> art.id >> art.ext;
 }
 
 BagArtifacts::BagArtifacts() : std::vector<Artifact>(HEROESMAXARTIFACT, Artifact::UNKNOWN)

@@ -232,12 +232,6 @@ bool Game::Load(const std::string & fn)
  		return false;
 	    }
 
-	    if(binver == FORMAT_VERSION_3154)
-	    {
- 		Dialog::Message("Error", "File is broken. version: 3154", Font::BIG, Dialog::OK);
- 		return false;
-	    }
-
     	    DEBUG(DBG_GAME, DBG_TRACE, "load version: " << binver);
 	    SetLoadVersion(binver);
 	    u16 end_check = 0;

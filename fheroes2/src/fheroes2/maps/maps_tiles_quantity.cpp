@@ -539,7 +539,7 @@ void Maps::Tiles::QuantityUpdate(void)
 	    TilesAddon* addon = FindObject(MP2::OBJ_RESOURCE);
             if(addon)
             {
-                const u8 res = Resource::FromIndexSprite(addon->index);
+                int res = Resource::FromIndexSprite(addon->index);
                 u32 count = 0;
 
                 switch(res)

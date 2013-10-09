@@ -1672,7 +1672,7 @@ std::string Heroes::String(void) const
 	"max magic point : " << GetMaxSpellPoints() << std::endl <<
 	"max move point  : " << GetMaxMovePoints() << std::endl <<
 	"direction       : " << Direction::String(direction) << std::endl <<
-	"index sprite    : " << static_cast<u16>(sprite_index) << std::endl <<
+	"index sprite    : " << sprite_index << std::endl <<
 	"in castle       : " << (inCastle() ? "true" : "false") << std::endl <<
 	"save object     : " << MP2::StringObject(world.GetTiles(GetIndex()).GetObject(false)) << std::endl <<
 	"flags           : " << (Modes(SHIPMASTER) ? "SHIPMASTER," : "") <<
@@ -1680,7 +1680,7 @@ std::string Heroes::String(void) const
 
     if(Modes(PATROL))
     {
-	os << "patrol square   : " << static_cast<u16>(patrol_square) << std::endl;
+	os << "patrol square   : " << patrol_square << std::endl;
     }
 
     if(! visit_object.empty())
@@ -1945,18 +1945,9 @@ StreamBase & operator>> (StreamBase & msg, VecHeroes & heroes)
     for(AllHeroes::iterator
         it = heroes.begin(); it != heroes.end(); ++it)
     {
-	if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-	{
-	    u8 hid;
-    	    msg >> hid;
-    	    *it = (hid != Heroes::UNKNOWN ? world.GetHeroes(hid) : NULL);
-	}
-	else
-	{
-	    u32 hid;
-    	    msg >> hid;
-    	    *it = (hid != Heroes::UNKNOWN ? world.GetHeroes(hid) : NULL);
-	}
+	u32 hid;
+    	msg >> hid;
+	*it = (hid != Heroes::UNKNOWN ? world.GetHeroes(hid) : NULL);
     }
 
     return msg;
@@ -2009,78 +2000,17 @@ StreamBase & operator>> (StreamBase & msg, Heroes & hero)
 	hero.experience >>
 	hero.move_point_scale >>
 	hero.secondary_skills >>
-	hero.army;
-
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-        u8 hid, portrait, race, save;
-	msg >> hid >> portrait >> race >> save;
-	hero.hid = hid;
-	hero.portrait = portrait;
-	hero.race = race;
-	hero.save_maps_object = save;
-    }
-    else
-	msg >>
+	hero.army >>
 	hero.hid >>
 	hero.portrait >>
 	hero.race >>
-	hero.save_maps_object;
-
-    msg >>
-	hero.path;
-
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u16 direct; u8 index;
-	msg >> direct >> index;
-	hero.direction = direct;
-	hero.sprite_index = index;
-    }
-    else
-	msg >>
+	hero.save_maps_object >>
+	hero.path >>
 	hero.direction >>
-	hero.sprite_index;
-
-    msg >>
-	hero.patrol_center;
-
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u8 square;
-	msg >> square;
-	hero.patrol_square = square;
-    }
-    else
-	msg >>
-	hero.patrol_square;
-
-    msg >>
+	hero.sprite_index >>
+	hero.patrol_center >>
+	hero.patrol_square >>
 	hero.visit_object;
-
-    if(FORMAT_VERSION_2850 > Game::GetLoadVersion())
-    {
-	if(hero.Modes(AIWAITING))
-	{
-	    hero.ResetModes(AIWAITING);
-	    hero.SetModes(AI::HEROES_WAITING);
-	}
-	if(hero.Modes(HUNTER))
-	{
-	    hero.ResetModes(HUNTER);
-	    hero.SetModes(AI::HEROES_HUNTER);
-	}
-	if(hero.Modes(SCOUTER))
-	{
-	    hero.ResetModes(SCOUTER);
-	    hero.SetModes(AI::HEROES_SCOUTER);
-	}
-	if(hero.Modes(STUPID))
-	{
-	    hero.ResetModes(STUPID);
-	    hero.SetModes(AI::HEROES_STUPID);
-	}
-    }
 
     hero.army.SetCommander(&hero);
 

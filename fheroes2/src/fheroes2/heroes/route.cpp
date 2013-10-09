@@ -415,19 +415,7 @@ StreamBase & Route::operator<< (StreamBase & msg, const Path & path)
 
 StreamBase & Route::operator>> (StreamBase & msg, Step & step)
 {
-    msg >> step.from;
-
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u16 direct, penalty;
-	msg >> direct >> penalty;
-	step.direction = direct;
-	step.penalty = penalty;
-    }
-    else
-	msg >> step.direction >> step.penalty;
-
-    return msg;
+    return msg >> step.from >> step.direction >> step.penalty;
 }
 
 StreamBase & Route::operator>> (StreamBase & msg, Path & path)

@@ -78,15 +78,5 @@ void Recruits::SetHero2(const Heroes* hero)
 
 StreamBase & operator>> (StreamBase & sb, Recruits & rt)
 {
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-        u8 hero1, hero2;
-	sb >> hero1 >> hero2;
-	rt.first = hero1;
-	rt.second = hero2;
-    }
-    else
-	sb >> rt.first >> rt.second;
-
-    return sb;
+    return sb >> rt.first >> rt.second;
 }

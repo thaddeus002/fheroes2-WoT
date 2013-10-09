@@ -39,29 +39,37 @@ namespace GameStatic
     StreamBase & operator<< (StreamBase &, const Data &);
     StreamBase & operator>> (StreamBase &, Data &);
 
-    u8		GetLostOnWhirlpoolPercent(void);
-    u8		GetGameOverLostDays(void);
-    u8		GetOverViewDistance(u8);
+    u32		GetLostOnWhirlpoolPercent(void);
+    u32		GetGameOverLostDays(void);
+    u32		GetOverViewDistance(u32);
 
-    cost_t &	GetKingdomStartingResource(u8);
-    u8		GetKingdomMaxHeroes(void);
+    cost_t &	GetKingdomStartingResource(int difficulty);
+    u32		GetKingdomMaxHeroes(void);
 
-    u8		GetCastleGrownWell(void);
-    u8		GetCastleGrownWel2(void);
-    u8		GetCastleGrownWeekOf(void);
-    u8		GetCastleGrownMonthOf(void);
+    u32		GetCastleGrownWell(void);
+    u32		GetCastleGrownWel2(void);
+    u32		GetCastleGrownWeekOf(void);
+    u32		GetCastleGrownMonthOf(void);
 
-    u8		GetHeroesRestoreSpellPointsPerDay(void);
-    u8		GetMageGuildRestoreSpellPointsPercentDay(u8);
+    u32		GetHeroesRestoreSpellPointsPerDay(void);
+    u32		GetMageGuildRestoreSpellPointsPercentDay(int level);
 
     float	GetMonsterUpgradeRatio(void);
-    s8		ObjectVisitedModifiers(u8);
+    s32		ObjectVisitedModifiers(int obj);
 
-    u8		GetBattleMoatReduceDefense(void);
+    int		GetBattleMoatReduceDefense(void);
 
-    const Skill::stats_t*     GetSkillStats(u8);
-    const Skill::values_t*    GetSkillValues(u8);
+    const Skill::stats_t*     GetSkillStats(int race);
+    const Skill::values_t*    GetSkillValues(int skill);
     const Skill::secondary_t* GetSkillForWitchsHut(void);
+
+    u32		Spell_DD_Distance(void);
+    u32		Spell_DD_SP(void);
+    u32		Spell_DD_HP(void);
+
+    void	SetSpell_DD_Distance(int);
+    void	SetSpell_DD_SP(int);
+    void	SetSpell_DD_HP(int);
 }
 
 #ifdef WITH_XML

@@ -27,6 +27,7 @@
 #include "army.h"
 #include "resource.h"
 #include "game.h"
+#include "game_static.h"
 #include "spell.h"
 
 enum { SP_DISABLE = 0x01 };
@@ -42,14 +43,6 @@ struct spellstats_t
 	cost_t cost;
         const char* description;
 };
-
-// game_static.cpp
-namespace GameStatic
-{
-    extern u16 spell_dd_distance;
-    extern u16 spell_dd_sp;
-    extern u16 spell_dd_hp;
-}
 
 spellstats_t spells[] = {
 	//  name                      sp   mp  spr value  bits cost     description
@@ -157,9 +150,9 @@ void Spell::UpdateStats(const std::string & spec)
             // load dimension door params
             if(index == DIMENSIONDOOR)
             {
-		xml_spell->Attribute("conf_distance", &value); GameStatic::spell_dd_distance = value;
-		xml_spell->Attribute("conf_sp", &value); GameStatic::spell_dd_sp = value;
-		xml_spell->Attribute("conf_hp", &value); GameStatic::spell_dd_hp = value;
+		xml_spell->Attribute("conf_distance", &value); GameStatic::SetSpell_DD_Distance(value);
+		xml_spell->Attribute("conf_sp", &value); GameStatic::SetSpell_DD_SP(value);
+		xml_spell->Attribute("conf_hp", &value); GameStatic::SetSpell_DD_HP(value);
             }
 
 	    // load spell cost
@@ -742,9 +735,9 @@ bool Spell::isRaceCompatible(int race) const
 
 u32 Spell::CalculateDimensionDoorDistance(u32 current_sp, u32 total_hp)
 {
-    if(GameStatic::spell_dd_distance && GameStatic::spell_dd_hp && GameStatic::spell_dd_sp && total_hp)
+    if(GameStatic::Spell_DD_Distance() && GameStatic::Spell_DD_HP() && GameStatic::Spell_DD_SP() && total_hp)
     {
-	const u32 res = (GameStatic::spell_dd_distance * current_sp * GameStatic::spell_dd_hp) / (GameStatic::spell_dd_sp * total_hp);
+	const u32 res = (GameStatic::Spell_DD_Distance() * current_sp * GameStatic::Spell_DD_HP()) / (GameStatic::Spell_DD_SP() * total_hp);
 	return res ? (res < 255 ? res : 255) : 1;
     }
     // original h2 variant
@@ -758,13 +751,5 @@ StreamBase & operator<< (StreamBase & msg, const Spell & spell)
 
 StreamBase & operator>> (StreamBase & msg, Spell & spell)
 {
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u8 id;
-	return msg >> id;
-	spell.id = id;
-    }
-    else
-	msg >> spell.id;
-    return msg;
+    return msg >> spell.id;
 }

@@ -271,14 +271,5 @@ StreamBase & operator<< (StreamBase & msg, const Troop & troop)
 
 StreamBase & operator>> (StreamBase & msg, Troop & troop)
 {
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u8 id;
-	msg >> id >> troop.count;
-	troop.id = id;
-    }
-    else
-	msg >> troop.id >> troop.count;
-
-    return msg;
+    return msg >> troop.id >> troop.count;
 }

@@ -224,30 +224,13 @@ StreamBase & operator<< (StreamBase & msg, const EventDate & obj)
 
 StreamBase & operator>> (StreamBase & msg, EventDate & obj)
 {
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-        u16 first, subseq; u8 colors;
-	msg >>
-	    obj.resource >>
-	    obj.computer >>
-	    first >>
-	    subseq >>
-	    colors >>
-	    obj.message;
-	obj.first = first;
-	obj.subsequent = subseq;
-	obj.colors = colors;
-    }
-    else
-    msg >>
+    return msg >>
 	obj.resource >>
 	obj.computer >>
 	obj.first >>
 	obj.subsequent >>
 	obj.colors >>
 	obj.message;
-
-    return msg;
 }
 
 
@@ -265,21 +248,7 @@ StreamBase & operator<< (StreamBase & msg, const EventMaps & obj)
 
 StreamBase & operator>> (StreamBase & msg, EventMaps & obj)
 {
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u8  colors;
-	msg >>
-	obj.center >>
-	obj.resource >>
-	obj.artifact >>
-	obj.computer >>
-	obj.cancel >>
-	colors >>
-	obj.message;
-	obj.colors = colors;
-    }
-    else
-    msg >>
+    return msg >>
 	obj.center >>
 	obj.resource >>
 	obj.artifact >>
@@ -287,8 +256,6 @@ StreamBase & operator>> (StreamBase & msg, EventMaps & obj)
 	obj.cancel >>
 	obj.colors >>
 	obj.message;
-
-    return msg;
 }
 
 StreamBase & operator<< (StreamBase & msg, const Riddle & obj)

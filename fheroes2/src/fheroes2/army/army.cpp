@@ -1244,32 +1244,13 @@ StreamBase & operator<< (StreamBase & msg, const Army & army)
 
 StreamBase & operator>> (StreamBase & msg, Army & army)
 {
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	// Army: fixed size
-	for(Army::iterator it = army.begin(); it != army.end(); ++it)
-    	    msg >> **it;
+    u32 armysz;
+    msg >> armysz;
 
-	u8 color, type; s32 index;
-	msg >> army.combat_format >> color >> type >> index;
+    for(Army::iterator it = army.begin(); it != army.end(); ++it)
+	msg >> **it;
 
-	army.color = color;
-    }
-    else
-    {
-	u32 armysz;
-	msg >> armysz;
-
-	if(army.size() != armysz)
-	{
-	    VERBOSE("incorrect army size");
-	}
-
-	for(Army::iterator it = army.begin(); it != army.end(); ++it)
-	    msg >> **it;
-
-	msg >> army.combat_format >> army.color;
-    }
+    msg >> army.combat_format >> army.color;
 
     // set army
     for(Army::iterator it = army.begin(); it != army.end(); ++it)

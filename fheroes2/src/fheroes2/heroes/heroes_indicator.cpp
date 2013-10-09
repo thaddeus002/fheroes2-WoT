@@ -115,7 +115,7 @@ void LuckIndicator::Redraw(void)
 
     const Sprite & sprite = AGG::GetICN(ICN::HSICONS, (0 > luck ? 3 : (0 < luck ? 2 : 6)));
     const int inter = 6;
-    int count = (0 == luck ? 1 : static_cast<u8>(std::abs(luck)));
+    int count = (0 == luck ? 1 : std::abs(luck));
     s32 cx = area.x + (area.w - (sprite.w() + inter * (count - 1))) / 2;
     s32 cy = area.y + (area.h - sprite.h()) / 2;
 
@@ -161,7 +161,7 @@ void MoraleIndicator::Redraw(void)
 
     const Sprite & sprite = AGG::GetICN(ICN::HSICONS, (0 > morale ? 5 : (0 < morale ? 4 : 7)));
     const int inter = 6;
-    int count = (0 == morale ? 1 : static_cast<u8>(std::abs(morale)));
+    int count = (0 == morale ? 1 : std::abs(morale));
     s32 cx = area.x + (area.w - (sprite.w() + inter * (count - 1))) / 2;
     s32 cy = area.y + (area.h - sprite.h()) / 2;
 

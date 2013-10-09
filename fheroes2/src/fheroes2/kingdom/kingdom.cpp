@@ -124,7 +124,7 @@ void Kingdom::LossPostActions(void)
 	if(heroes.size())
 	{
 	    std::for_each(heroes.begin(), heroes.end(),
-		std::bind2nd(std::mem_fun(&Heroes::SetFreeman), static_cast<u8>(Battle::RESULT_LOSS)));
+		std::bind2nd(std::mem_fun(&Heroes::SetFreeman), static_cast<int>(Battle::RESULT_LOSS)));
 	    heroes.clear();
 	}
 	if(castles.size())
@@ -500,7 +500,7 @@ Funds Kingdom::GetIncome(int type /* INCOME_ALL */) const
     if(INCOME_CAPTURED & type)
     {
 	// captured object
-	const u8 resources[] = { Resource::WOOD, Resource::ORE, Resource::MERCURY, Resource::SULFUR,
+	const int resources[] = { Resource::WOOD, Resource::ORE, Resource::MERCURY, Resource::SULFUR,
                                     Resource::CRYSTAL, Resource::GEMS, Resource::GOLD, Resource::UNKNOWN };
 
 	for(u32 index = 0; resources[index] != Resource::UNKNOWN; ++index)
@@ -532,7 +532,7 @@ Funds Kingdom::GetIncome(int type /* INCOME_ALL */) const
     if(INCOME_ARTIFACTS & type)
     {
 	// find artifacts                                                                                            
-	const u8 artifacts[] = { Artifact::GOLDEN_GOOSE, Artifact::ENDLESS_SACK_GOLD, Artifact::ENDLESS_BAG_GOLD,
+	const int artifacts[] = { Artifact::GOLDEN_GOOSE, Artifact::ENDLESS_SACK_GOLD, Artifact::ENDLESS_BAG_GOLD,
                 Artifact::ENDLESS_PURSE_GOLD, Artifact::ENDLESS_POUCH_SULFUR, Artifact::ENDLESS_VIAL_MERCURY,
                 Artifact::ENDLESS_POUCH_GEMS, Artifact::ENDLESS_CORD_WOOD, Artifact::ENDLESS_CART_ORE,
                 Artifact::ENDLESS_POUCH_CRYSTAL, Artifact::UNKNOWN };
@@ -786,30 +786,7 @@ StreamBase & operator<< (StreamBase & msg, const Kingdom & kingdom)
 
 StreamBase & operator>> (StreamBase & msg, Kingdom & kingdom)
 {
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u8 color, days, tents;
-	msg >>
-	kingdom.modes >>
-	color >>
-	kingdom.resource >>
-	days >>
-	kingdom.castles >>
-	kingdom.heroes >>
-	kingdom.recruits >>
-	kingdom.lost_hero >>
-	kingdom.visit_object >>
-	kingdom.puzzle_maps >>
-	tents >>
-	kingdom.heroes_cond_loss;
-
-	kingdom.color = color;
-	kingdom.lost_town_days = days;
-	kingdom.visited_tents_colors = tents;
-    }
-    else
-    {
-	msg >>
+    return msg >>
 	kingdom.modes >>
 	kingdom.color >>
 	kingdom.resource >>
@@ -822,14 +799,11 @@ StreamBase & operator>> (StreamBase & msg, Kingdom & kingdom)
 	kingdom.puzzle_maps >>
 	kingdom.visited_tents_colors >>
 	kingdom.heroes_cond_loss;
-    }
-
-    return msg;
 }
 
 StreamBase & operator<< (StreamBase & msg, const Kingdoms & obj)
 {
-    msg << static_cast<u8>(obj.size());
+    msg << static_cast<u32>(obj.size());
     for(u32 ii = 0; ii < obj.size(); ++ii)
 	msg << obj.kingdoms[ii];
 
@@ -838,9 +812,14 @@ StreamBase & operator<< (StreamBase & msg, const Kingdoms & obj)
 
 StreamBase & operator>> (StreamBase & msg, Kingdoms & obj)
 {
-    u8 	kingdomscount;
+    u32 kingdomscount;
 
-    msg >> kingdomscount; // FIXME: check kingdomscount
+    if(FORMAT_VERSION_3182 > Game::GetLoadVersion())
+    {
+	u8 count; msg >> count; kingdomscount = count;
+    }
+    else
+        msg >> kingdomscount; // FIXME: check kingdomscount
 
     for(u32 ii = 0; ii < kingdomscount; ++ii)
 	msg >> obj.kingdoms[ii];
@@ -850,15 +829,5 @@ StreamBase & operator>> (StreamBase & msg, Kingdoms & obj)
 
 StreamBase & operator>> (StreamBase & sb, LastLoseHero & st)
 {
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-        u8 type; u16 days;
-        sb >> type >> days;
-        st.first = type;
-        st.second = days;
-    }
-    else
-        sb >> st.first >> st.second;
-
-    return sb;
+    return sb >> st.first >> st.second;
 }

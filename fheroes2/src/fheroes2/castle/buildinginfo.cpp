@@ -37,8 +37,8 @@
 
 struct buildstats_t
 {
-    const u32   id2;
-    const u8    race;
+    u32		id2;
+    u8		race;
     cost_t      cost;
 };
 

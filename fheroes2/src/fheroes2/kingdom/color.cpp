@@ -168,14 +168,5 @@ StreamBase & operator<< (StreamBase & msg, const ColorBase & col)
 
 StreamBase & operator>> (StreamBase & msg, ColorBase & col)
 {
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u8 color;
-	msg >> color;
-	col.SetColor(color);
-    }
-    else
-	msg >> col.color;
-
-    return msg;
+    return msg >> col.color;
 }

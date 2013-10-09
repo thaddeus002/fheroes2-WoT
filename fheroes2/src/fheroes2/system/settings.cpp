@@ -1546,26 +1546,11 @@ StreamBase & operator>> (StreamBase & msg, Settings & conf)
     u32 opt_game = 0; // skip: settings
 
     // map file
-    msg >> conf.current_maps_file;
-
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u8 difficulty, game_type, count_players;
-	u16 debug2;
-	msg >>
-	    difficulty >> game_type >> count_players >> debug2;
-	conf.game_difficulty = difficulty;
-	conf.game_type = game_type;
-	conf.preferably_count_players = count_players;
-	debug = debug2;
-    }
-    else
-	msg >>
-	    conf.game_difficulty >> conf.game_type >> conf.preferably_count_players >> debug;
-
-    msg >>
-       opt_game >> conf.opt_world >> conf.opt_battle >> conf.opt_addons >>
-       conf.players;
+    msg >> conf.current_maps_file >>
+	conf.game_difficulty >> conf.game_type >>
+	conf.preferably_count_players >> debug >>
+	opt_game >> conf.opt_world >> conf.opt_battle >> conf.opt_addons >>
+	conf.players;
 
 #ifndef WITH_DEBUG
     conf.debug = debug;

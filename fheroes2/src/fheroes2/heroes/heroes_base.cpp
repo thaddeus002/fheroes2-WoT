@@ -501,22 +501,11 @@ StreamBase & operator>> (StreamBase & msg, HeroBase & hero)
     Skill::Primary & base = hero;
 
     // primary
-    msg >> base >>
+    return msg >> base >>
 	// position
 	hero.center >>
 	// modes
-	hero.modes;
-
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u16 point1, point2;
-	msg >> point1 >> point2;
-	hero.magic_point = point1;
-	hero.move_point = point2;
-    }
-    else
-	msg >> hero.magic_point >> hero.move_point;
-
-    return msg >>
-	    hero.spell_book >> hero.bag_artifacts;
+	hero.modes >>
+	hero.magic_point >> hero.move_point >>
+        hero.spell_book >> hero.bag_artifacts;
 }

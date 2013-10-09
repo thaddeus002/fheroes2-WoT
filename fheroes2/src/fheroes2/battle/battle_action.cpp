@@ -229,7 +229,7 @@ void Battle::Arena::ApplyActionMove(Command & cmd)
 {
     u32 uid = 0;
     s32 dst = -1;
-    int with_path = 0;
+    bool with_path = 0;
 
     cmd.GetStream() >> uid >> dst >> with_path;
 

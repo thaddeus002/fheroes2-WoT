@@ -92,7 +92,7 @@ void Sprite::DrawICN(int icn, const u8* cur, int size, bool reflect, Surface & s
 {
     if(NULL == cur || 0 == size) return;
 
-    const u8 *max = cur + size;
+    const u8* max = cur + size;
 
     u32 c = 0;
     u32 x = reflect ? sf.w() - 1 : 0;

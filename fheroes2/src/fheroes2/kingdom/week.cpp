@@ -82,15 +82,5 @@ int Week::MonthRand(void)
 
 StreamBase & operator>> (StreamBase & sb, Week & st)
 {
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-        u8 type, mon;
-        sb >> type >> mon;
-        st.first = type;
-        st.second = mon;
-    }
-    else
-        sb >> st.first >> st.second;
-
-    return sb;
+    return sb >> st.first >> st.second;
 }

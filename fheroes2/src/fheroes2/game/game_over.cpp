@@ -370,15 +370,5 @@ StreamBase & GameOver::operator<< (StreamBase & msg, const Result & res)
 
 StreamBase & GameOver::operator>> (StreamBase & msg, Result & res)
 {
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u8 colors; u16 result;
-	msg >> colors >> result >> res.continue_game;
-	res.colors = colors;
-	res.result = result;
-    }
-    else
-	msg >> res.colors >> res.result >> res.continue_game;
-
-    return msg;
+    return msg >> res.colors >> res.result >> res.continue_game;
 }

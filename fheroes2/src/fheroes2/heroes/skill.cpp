@@ -726,18 +726,7 @@ StreamBase & Skill::operator<< (StreamBase & msg, const Primary & skill)
 
 StreamBase & Skill::operator>> (StreamBase & msg, Primary & skill)
 {
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u8 attack, defense, knowledge, power;
-	msg >> attack >> defense >> knowledge >> power;
-	skill.attack = attack;
-	skill.defense = defense;
-	skill.knowledge = knowledge;
-	skill.power = power;
-    }
-    else
-	msg >> skill.attack >> skill.defense >> skill.knowledge >> skill.power;
-    return msg;
+    return msg >> skill.attack >> skill.defense >> skill.knowledge >> skill.power;
 }
 
 Surface GetBarBackgroundSprite(void)
@@ -1000,15 +989,5 @@ bool SecondarySkillsBar::QueueEventProcessing(std::string* str)
 
 StreamBase & Skill::operator>> (StreamBase & sb, Secondary & st)
 {
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-        u8 first, second;
-        sb >> first >> second;
-        st.first = first;
-        st.second = second;
-    }
-    else
-        sb >> st.first >> st.second;
-
-    return sb;
+    return sb >> st.first >> st.second;
 }

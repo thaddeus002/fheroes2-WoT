@@ -127,14 +127,7 @@ StreamBase & operator<< (StreamBase & msg, const Focus & focus)
 StreamBase & operator>> (StreamBase & msg, Focus & focus)
 {
     s32 index;
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u8 first;
-	msg >> first >> index;
-	focus.first = first;
-    }
-    else
-	msg >> focus.first >> index;
+    msg >> focus.first >> index;
 
     switch(focus.first)
     {
@@ -165,31 +158,15 @@ StreamBase & operator>> (StreamBase & msg, Player & player)
 {
     BitModes & modes = player;
 
-    msg >>
+    return msg >>
 	modes >>
-	player.id;
-
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u8 control, color, race, friends;
-
-	msg >>
-	    control >> color >> race >> friends;
-
-	player.control  = control;
-	player.color = color;
-	player.race = race;
-	player.friends = friends;
-    }
-    else
-	msg >>
-	    player.control >> player.color >> player.race >> player.friends;
-
-    msg >>
+	player.id >>
+	player.control >>
+	player.color >>
+	player.race >>
+	player.friends >>
 	player.name >>
 	player.focus;
-
-    return msg;
 }
 
 Players::Players() : current_color(0)
@@ -452,16 +429,7 @@ StreamBase & operator<< (StreamBase & msg, const Players & players)
 StreamBase & operator>> (StreamBase & msg, Players & players)
 {
     int colors, current;
-
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u8 colors2, current2;
-	msg >> colors2 >> current2;
-	colors = colors2;
-	current = current2;
-    }
-    else
-	msg >> colors >> current;
+    msg >> colors >> current;
 
     players.clear();
     players.current_color = current;

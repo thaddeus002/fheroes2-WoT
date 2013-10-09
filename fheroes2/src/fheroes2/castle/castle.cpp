@@ -2146,7 +2146,7 @@ StreamBase & operator<< (StreamBase & msg, const Castle & castle)
 	color <<
 	castle.name <<
 	castle.mageguild <<
-	static_cast<u8>(CASTLEMAXMONSTER);
+	static_cast<u32>(CASTLEMAXMONSTER);
 
     for(u32 ii = 0; ii < CASTLEMAXMONSTER; ++ii)
 	msg << castle.dwelling[ii];
@@ -2158,41 +2158,27 @@ StreamBase & operator<< (StreamBase & msg, const Castle & castle)
 StreamBase & operator>> (StreamBase & msg, Castle & castle)
 {
     ColorBase & color = castle;
-
-    u8 dwellingcount;
+    u32 dwellingcount;
 
     msg >>
 	castle.center >>
-	castle.modes;
-
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u8 race;
-	msg >> race;
-	castle.race = race;
-    }
-    else
-	msg >> castle.race;
-
-    msg >>
+	castle.modes >>
+	castle.race >>
 	castle.building >>
 	castle.captain >>
 	color >>
 	castle.name >>
-	castle.mageguild >>
-	dwellingcount;
+	castle.mageguild;
+
+    if(FORMAT_VERSION_3182 > Game::GetLoadVersion())
+    {
+	u8 count; msg >> count; dwellingcount = count;
+    }
+    else
+	msg >> dwellingcount;
 
     for(u32 ii = 0; ii < dwellingcount; ++ii)
-    {
-	if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-	{
-	    u16 count;
-	    msg >> count;
-	    castle.dwelling[ii] = count;
-	}
-	else
-	    msg >> castle.dwelling[ii];
-    }
+	msg >> castle.dwelling[ii];
 
     msg >> castle.army;
     castle.army.SetCommander(& castle.captain);

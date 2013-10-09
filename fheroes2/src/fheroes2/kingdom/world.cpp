@@ -1043,18 +1043,7 @@ StreamBase & operator<< (StreamBase & msg, const CapturedObject & obj)
 
 StreamBase & operator>> (StreamBase & msg, CapturedObject & obj)
 {
-    msg >> obj.objcol >> obj.guardians;
-
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-        u8 val;
-	msg >> val;
-	obj.split = val;
-    }
-    else
-	msg >> obj.split;
-
-    return msg;
+    return msg >> obj.objcol >> obj.guardians >> obj.split;
 }
 
 StreamBase & operator<< (StreamBase & msg, const World & w)
@@ -1088,16 +1077,7 @@ StreamBase & operator>> (StreamBase & msg, World & w)
     Size & sz = w;
 
     msg >> sz >>
-	w.vec_tiles;
-
-    if(FORMAT_VERSION_3161 > Game::GetLoadVersion())
-    {
-	for(MapsTiles::iterator
-	    it = w.vec_tiles.begin();  it != w.vec_tiles.end(); ++it)
-	    (*it).SetIndex(std::distance(w.vec_tiles.begin(), it));
-    }
-
-    msg >>
+	w.vec_tiles >>
 	w.vec_heroes >>
 	w.vec_castles >>
 	w.vec_kingdoms >>
@@ -1107,39 +1087,13 @@ StreamBase & operator>> (StreamBase & msg, World & w)
 	w.vec_riddles >>
 	w.map_sign >>
 	w.map_captureobj >>
-	w.ultimate_artifact;
-
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u16 day, week; u8 month;
-	msg >>
-	    day >> week >> month;
-	w.day = day;
-	w.week = week;
-	w.month = month;
-    }
-    else
-	msg >>
-	    w.day >> w.week >> w.month;
-
-    msg >>
+	w.ultimate_artifact >>
+	w.day >> w.week >> w.month >>
 	w.week_current >>
-	w.week_next;
-
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u8 hero1, hero2;
-	msg >> hero1 >> hero2;
-	w.heroes_cond_wins = hero1;
-	w.heroes_cond_loss = hero2;
-    }
-    else
-	msg >>
-	    w.heroes_cond_wins >>
-	    w.heroes_cond_loss;
-
-    if(FORMAT_VERSION_3177 <= Game::GetLoadVersion())
-	msg >> w.map_action_objects;
+	w.week_next >>
+        w.heroes_cond_wins >>
+        w.heroes_cond_loss >>
+	w.map_action_objects;
 
     // update tile passable
     std::for_each(w.vec_tiles.begin(), w.vec_tiles.end(),

@@ -66,7 +66,7 @@ Battle::Command::Command(u32 cmd, u32 param1, s32 param2, const Indexes & param3
     switch(type)
     {
         case MSG_BATTLE_MOVE:
-            base << param1 << param2 << static_cast<u8>(1) << param3; // uid, dst, path
+            base << param1 << param2 << static_cast<bool>(true) << param3; // uid, dst, path
             break;
 
         default: break;
@@ -119,7 +119,7 @@ Battle::Command::Command(u32 cmd, u32 param1, s32 param2, s32 param3, s32 param4
             break;
 
         case MSG_BATTLE_MOVE:
-            base << param1 << param2 << static_cast<u32>(0); // uid, dst, path
+            base << param1 << param2 << static_cast<bool>(false); // uid, dst, path
             break;
 
         case MSG_BATTLE_ATTACK:

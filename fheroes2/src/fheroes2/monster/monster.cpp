@@ -32,6 +32,7 @@
 #include "payment.h"
 #include "game_static.h"
 #include "icn.h"
+#include "game.h"
 #include "monster.h"
 
 struct monstats_t
@@ -160,7 +161,7 @@ StreamBase & operator>> (StreamBase & msg, monstats_t & obj)
 
 StreamBase & operator<< (StreamBase & msg, const MonsterStaticData & obj)
 {
-    u16 monsters_size = ARRAY_COUNT(monsters);
+    u32 monsters_size = ARRAY_COUNT(monsters);
     msg << monsters_size;
     for(u32 ii = 0; ii < monsters_size; ++ii)
 	msg << monsters[ii];
@@ -169,8 +170,14 @@ StreamBase & operator<< (StreamBase & msg, const MonsterStaticData & obj)
 
 StreamBase & operator>> (StreamBase & msg, MonsterStaticData & obj)
 {
-    u16 monsters_size;
-    msg >> monsters_size;
+    u32 monsters_size;
+    if(FORMAT_VERSION_3182 > Game::GetLoadVersion())
+    {
+	u16 size; msg >> size; monsters_size = size;
+    }
+    else
+	msg >> monsters_size;
+
     for(u32 ii = 0; ii < monsters_size; ++ii)
 	msg >> monsters[ii];
     return msg;

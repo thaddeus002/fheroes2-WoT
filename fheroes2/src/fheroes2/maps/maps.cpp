@@ -69,7 +69,7 @@ void Maps::IndexesDistance::Assign(s32 from, const Indexes & indexes, int sort)
         std::sort(begin(), end(), IndexDistance::Longest);
 }
 
-bool TileIsObject(s32 index, u8 obj)
+bool TileIsObject(s32 index, int obj)
 {
     return obj == world.GetTiles(index).GetObject();
 }
@@ -92,7 +92,7 @@ Maps::Indexes & MapsIndexesFilteredObjects(Maps::Indexes & indexes, const u8* ob
     return indexes;
 }
 
-Maps::Indexes & MapsIndexesFilteredObject(Maps::Indexes & indexes, u8 obj)
+Maps::Indexes & MapsIndexesFilteredObject(Maps::Indexes & indexes, int obj)
 {
     indexes.resize(std::distance(indexes.begin(),
 	    std::remove_if(indexes.begin(), indexes.end(), std::not1(std::bind2nd(std::ptr_fun(&TileIsObject), obj)))));
@@ -310,7 +310,7 @@ void Maps::ClearFog(s32 index, int scoute, int color)
 	    }
 	}
 
-	u8 colors = conf.ExtUnionsAllowViewMaps() ? Players::GetPlayerFriends(color) : color;
+	int colors = conf.ExtUnionsAllowViewMaps() ? Players::GetPlayerFriends(color) : color;
 
 	for(s32 y = center.y - scoute; y <= center.y + scoute; ++y)
     	    for(s32 x = center.x - scoute; x <= center.x + scoute; ++x)
@@ -604,58 +604,20 @@ int Maps::TileIsCoast(s32 center, int filter)
 
 StreamBase & operator>> (StreamBase & sb, IndexObject & st)
 {
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u8 obj;
-	sb >> st.first >> obj;
-	st.second = obj;
-    }
-    else
-    	sb >> st.first >> st.second;
-
-    return sb;
+    return sb >> st.first >> st.second;
 }
 
 StreamBase & operator>> (StreamBase & sb, IndexDistance & st)
 {
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u16 obj;
-	sb >> st.first >> obj;
-	st.second = obj;
-    }
-    else
-    	sb >> st.first >> st.second;
-
-    return sb;
+    return sb >> st.first >> st.second;
 }
 
 StreamBase & operator>> (StreamBase & sb, ObjectColor & st)
 {
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u8 obj, col;
-	sb >> obj >> col;
-	st.first = obj;
-	st.second = col;
-    }
-    else
-    	sb >> st.first >> st.second;
-
-    return sb;
+    return sb >> st.first >> st.second;
 }
 
 StreamBase & operator>> (StreamBase & sb, ResourceCount & st)
 {
-    if(FORMAT_VERSION_3154 > Game::GetLoadVersion())
-    {
-	u8 res; u16 count;
-	sb >> res >> count;
-	st.first = res;
-	st.second = count;
-    }
-    else
-    	sb >> st.first >> st.second;
-
-    return sb;
+    return sb >> st.first >> st.second;
 }

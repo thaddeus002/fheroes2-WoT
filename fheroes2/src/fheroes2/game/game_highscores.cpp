@@ -41,7 +41,6 @@
 #include "game.h"
 #include "game_over.h"
 
-#define HGS_IDOLD	0xF1F2
 #define HGS_ID	0xF1F3
 #define HGS_MAX	10
 
@@ -66,14 +65,6 @@ StreamBase & operator<< (StreamBase & msg, const hgs_t & hgs)
 StreamBase & operator>> (StreamBase & msg, hgs_t & hgs)
 {
     return msg >> hgs.player >> hgs.land >> hgs.localtime >> hgs.days >> hgs.rating;
-}
-
-void LoadOldFormat(StreamBase & msg, hgs_t & hgs)
-{
-    u16 days, rating;
-    msg >> hgs.player >> hgs.land >> hgs.localtime >> days >> rating;
-    hgs.days = days;
-    hgs.rating = rating;
 }
 
 bool hgs_t::operator== (const hgs_t & h) const
@@ -139,15 +130,6 @@ bool HGSData::Load(const char* fn)
     u16 hgs_id = 0;
     hdata >> hgs_id;
 
-    if(hgs_id == HGS_IDOLD) /* FORMAT_VERSION_3154 */
-    {
-        const u32 size = hdata.get32();
-        list.resize(size);
-        for(std::vector<hgs_t>::iterator
-            it = list.begin(); it != list.end(); ++it)
-	    LoadOldFormat(hdata, *it);
-	return true;
-    }
     if(hgs_id == HGS_ID)
     {
 	hdata >> list;
