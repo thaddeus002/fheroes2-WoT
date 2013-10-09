@@ -10,29 +10,29 @@ msgstr ""
 "Project-Id-Version: fheroes2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-10-18 15:30+0900\n"
-"PO-Revision-Date: 2012-04-10 15:52+0000\n"
-"Last-Translator: Jerry <Unknown>\n"
+"PO-Revision-Date: 2013-10-04 21:15+0000\n"
+"Last-Translator: Łukasz Cieliński <lukasc@mp.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
+"Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2012-04-11 03:18+0000\n"
-"X-Generator: Launchpad (build 15070)\n"
+"X-Launchpad-Export-Date: 2013-10-09 02:01+0000\n"
+"X-Generator: Launchpad (build 16799)\n"
 
 #: ../fheroes2/ai/ai_action.cpp:156 ../fheroes2/heroes/heroes_action.cpp:247
 msgid "Hero %{name} also got a %{count} experience."
-msgstr "Bochater %{name} otrzymał także %{count} doświadczenia."
+msgstr "Bohater %{name} otrzymał także %{count} doświadczenia."
 
 #: ../fheroes2/army/army_bar.cpp:220 ../fheroes2/resource/artifact.cpp:954
 msgid "View %{name}"
 msgstr "Obejrzyj jednostkę (%{name})"
 
 #: ../fheroes2/army/army_bar.cpp:226 ../fheroes2/army/army_bar.cpp:309
-#, fuzzy
 msgid "Move or right click Redistribute %{name}"
-msgstr "Rozdziel jednostkę (%{name})"
+msgstr ""
 
 #: ../fheroes2/army/army_bar.cpp:232 ../fheroes2/army/army_bar.cpp:300
 msgid "Combine %{name} armies"
@@ -48,9 +48,8 @@ msgid "Select %{name}"
 msgstr "Wybierz jednostkę (%{name})"
 
 #: ../fheroes2/army/army_bar.cpp:297 ../fheroes2/army/army_bar.cpp:306
-#, fuzzy
 msgid "Cannot move last troop"
-msgstr "Nie stać cię na bohatera."
+msgstr ""
 
 #: ../fheroes2/army/army.cpp:84
 msgid ""
@@ -73,7 +72,7 @@ msgid ""
 "A pack of\n"
 "%{monster}"
 msgstr ""
-"Sfora\n"
+"Grupa\n"
 "%{monster}"
 
 #: ../fheroes2/army/army.cpp:87
@@ -126,7 +125,7 @@ msgstr ""
 
 #: ../fheroes2/army/army.cpp:101
 msgid "army|Few"
-msgstr "Armia|Niewiele"
+msgstr "army|Niewiele"
 
 #: ../fheroes2/army/army.cpp:101
 msgid "army|Several"
@@ -166,7 +165,7 @@ msgstr "Wszystkie %{race} oddziały +1"
 
 #: ../fheroes2/army/army.cpp:912
 msgid "Entire unit is undead, so morale does not apply."
-msgstr "Wszystkie oddziały to nieumarli, na których nie wpływa morale."
+msgstr "Cały oddział nie jest martwy, więc morali nie przybyło."
 
 #: ../fheroes2/army/army.cpp:922
 msgid "Troops of 3 alignments -1"
@@ -228,6 +227,8 @@ msgid ""
 "The Moat reduces by -%{count} the defense skill of any unit and slows to "
 "half movement rate."
 msgstr ""
+"Fosa zmniejsza współczynnik obrony o -%{count} oraz spowalnia jednostki o "
+"połowę."
 
 #: ../fheroes2/battle/battle_dialogs.cpp:50
 msgid "speed: %{speed}"
@@ -394,8 +395,8 @@ msgid ""
 "I will accept your surrender and grant you and your troops safe passage for "
 "the price of %{price} gold."
 msgstr ""
-"Przystanę na Twoją propozycję i oszczędzę Ciebie oraz Twój oddział za %"
-"{price} złota."
+"Przystanę na Twoją propozycję i oszczędzę Ciebie oraz Twój oddział za "
+"%{price} złota."
 
 #: ../fheroes2/battle/battle_interface.cpp:1337
 msgid "View %{monster} info."
@@ -447,15 +448,13 @@ msgid "Spell cast"
 msgstr "Zaklęcie zostało rzucone"
 
 #: ../fheroes2/battle/battle_interface.cpp:1622
-#, fuzzy
 msgid "View Ballista Info"
-msgstr "Morale - informacje"
+msgstr ""
 
 #: ../fheroes2/battle/battle_interface.cpp:1635
 #: ../fheroes2/battle/battle_tower.cpp:53
-#, fuzzy
 msgid "Ballista"
-msgstr "Balistyka"
+msgstr ""
 
 #: ../fheroes2/battle/battle_interface.cpp:1642
 msgid "Auto combat"
@@ -575,8 +574,8 @@ msgstr "Atak cyklopów paraliżuje jednostkę (%{name})!"
 #: ../fheroes2/battle/battle_interface.cpp:2711
 msgid "The Archmagi dispel all good spells on your %{name}!"
 msgstr ""
-"Arcymagowie rozpraszają wszystkie korzystne zaklęcia u tej jednostki (%"
-"{name})!"
+"Arcymagowie rozpraszają wszystkie korzystne zaklęcia u tej jednostki "
+"(%{name})!"
 
 #: ../fheroes2/battle/battle_interface.cpp:2731
 msgid "Good luck shines on the  %{attacker}"
@@ -640,8 +639,8 @@ msgstr "Udało ci się zdobyć artfeakt przeciwnika!"
 
 #: ../fheroes2/battle/battle_main.cpp:240
 msgid ""
-"Through eagle-eyed observation, %{name} is able to learn the magic spell %"
-"{spell}."
+"Through eagle-eyed observation, %{name} is able to learn the magic spell "
+"%{spell}."
 msgstr ""
 "Dzięki swemu sokolemu wzrokowi, %{name} może nauczyć się zaklęcia '%{spell}'."
 
@@ -662,9 +661,8 @@ msgid "Right Turret"
 msgstr "Prawa wieżyczka"
 
 #: ../fheroes2/battle/battle_tower.cpp:115
-#, fuzzy
 msgid "The %{name} fires with the strength of %{count} Archers"
-msgstr "%{name} zwiększa czas trwania twoich czarów o %{count} tur."
+msgstr ""
 
 #: ../fheroes2/battle/battle_tower.cpp:116
 msgid "each with a +%{attack} bonus to their attack skill."
@@ -1205,9 +1203,8 @@ msgstr ""
 "nekromantów."
 
 #: ../fheroes2/castle/castle.cpp:629
-#, fuzzy
 msgid "Cannot recruit - you already recruit hero in current week."
-msgstr "Nie możesz rekrutować - w mieście jest już bohater."
+msgstr "Nie możesz rekrutować - w tym tygodniu wynająłeś już nowego bohatera"
 
 #: ../fheroes2/castle/castle.cpp:637
 msgid "Cannot recruit - you already have a Hero in this town."
@@ -1260,9 +1257,8 @@ msgid "Swap Heroes"
 msgstr "Zamień bohaterów"
 
 #: ../fheroes2/castle/castle_dialog.cpp:731
-#, fuzzy
 msgid "Meeting Heroes"
-msgstr "Pokaż bohaterów"
+msgstr ""
 
 #: ../fheroes2/castle/castle_dialog.cpp:736
 msgid "View Hero"
@@ -1494,9 +1490,8 @@ msgstr ""
 "Zgadzasz się?"
 
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:410
-#, fuzzy
 msgid "(Rate: %{percent})"
-msgstr "(dostępne: %{count})"
+msgstr ""
 
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:448
 msgid ""
@@ -1971,14 +1966,12 @@ msgid "Good"
 msgstr "Dobry"
 
 #: ../fheroes2/dialog/dialog_system.cpp:293
-#, fuzzy
 msgid "Hide"
-msgstr "Ukryj logi"
+msgstr ""
 
 #: ../fheroes2/dialog/dialog_system.cpp:299
-#, fuzzy
 msgid "Show"
-msgstr "Śnieg"
+msgstr ""
 
 #: ../fheroes2/dialog/dialog_thievesguild.cpp:290
 #: ../fheroes2/pocketpc/pocketpc_thievesguild.cpp:100
@@ -2642,11 +2635,8 @@ msgid "Play with 6 human players."
 msgstr "Graj z 6 innymi osobami."
 
 #: ../fheroes2/game/game_over.cpp:36
-#, fuzzy
 msgid "Defeat all enemy heroes and capture all enemy towns and castles."
 msgstr ""
-", możesz także wygrać pokonując wszystkich bohaterów wroga i przechwytując "
-"wszystkie jego miasta i zamki."
 
 #: ../fheroes2/game/game_over.cpp:37
 msgid "Run out of time. (Fail to win by a certain point.)"
@@ -3237,8 +3227,8 @@ msgstr "Kaplica pierwszego kręgu"
 #: ../fheroes2/heroes/heroes_action.cpp:1090
 msgid ""
 "You come across a small shrine attended by a group of novice acolytes.\n"
-"In exchange for your protection, they agree to teach you a simple spell - '%"
-"{spell}'."
+"In exchange for your protection, they agree to teach you a simple spell - "
+"'%{spell}'."
 msgstr ""
 "Trafiasz do małej kaplicy, którą opiekuje się grupa akolitów.\n"
 "W zamian za ochronę proponują nauczyć cię prostego zaklęcia - '%{spell}'."
@@ -3250,8 +3240,8 @@ msgstr "Kaplica drugiego kręgu"
 #: ../fheroes2/heroes/heroes_action.cpp:1094
 msgid ""
 "You come across an ornate shrine attended by a group of rotund friars.\n"
-"In exchange for your protection, they agree to teach you a spell - '%"
-"{spell}'."
+"In exchange for your protection, they agree to teach you a spell - "
+"'%{spell}'."
 msgstr ""
 "Trafiasz do bogato zdobionej kaplicy, którą opiekuje się grupa pulchnych "
 "mnichów.\n"
@@ -3269,8 +3259,8 @@ msgid ""
 msgstr ""
 "Zbliżasz się do urządzonej z przepychem kaplicy, którą opiekuje się kilku "
 "wysokich rangą kapłanów.\n"
-"W zamian za ochronę proponują nauczyć cię skomplikowanego zaklęcia - '%"
-"{spell}'."
+"W zamian za ochronę proponują nauczyć cię skomplikowanego zaklęcia - "
+"'%{spell}'."
 
 #: ../fheroes2/heroes/heroes_action.cpp:1111
 msgid ""
@@ -3302,8 +3292,8 @@ msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:1153
 msgid ""
-"You approach the hut and observe a witch inside studying an ancient tome on %"
-"{skill}.\n"
+"You approach the hut and observe a witch inside studying an ancient tome on "
+"%{skill}.\n"
 " \n"
 msgstr ""
 "Wchodzisz do chaty i widzisz wiedźmę uczącą umiejętności %{skill}.\n"
@@ -3664,11 +3654,11 @@ msgstr ""
 #: ../fheroes2/heroes/heroes_action.cpp:1605
 msgid ""
 "You've pulled a shipwreck survivor from certain death in an unforgiving "
-"ocean. Grateful, he rewards you for your act of kindness by giving you the %"
-"{art}."
+"ocean. Grateful, he rewards you for your act of kindness by giving you the "
+"%{art}."
 msgstr ""
-"Uratowałeś rozbitka przed utonięciem. W podzięce za uratowanie, dostajesz %"
-"{art}."
+"Uratowałeś rozbitka przed utonięciem. W podzięce za uratowanie, dostajesz "
+"%{art}."
 
 #: ../fheroes2/heroes/heroes_action.cpp:1624 ../fheroes2/heroes/heroes.cpp:918
 msgid "You have no room to carry another artifact!"
@@ -3682,8 +3672,8 @@ msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:1645
 msgid ""
-"A leprechaun offers you the %{art} for the small price of %{gold} Gold and %"
-"{count} %{res}."
+"A leprechaun offers you the %{art} for the small price of %{gold} Gold and "
+"%{count} %{res}."
 msgstr ""
 "%{art} - leprekaun proponuje, że sprzeda ci ten artefakt za %{gold} sztuk "
 "złota i %{count} jednostki surowca (%{res})."
@@ -3718,8 +3708,8 @@ msgid ""
 "You've found the humble dwelling of a withered hermit. The hermit tells you "
 "that he is willing to give the %{art} to the first wise person he meets."
 msgstr ""
-"Trafiasz do skromnego domku starego pustelnika. Pustelnik oznajmia, że  %"
-"{art} będzie należeć do pierwszej mądrej osoby, która go odwiedzi."
+"Trafiasz do skromnego domku starego pustelnika. Pustelnik oznajmia, że  "
+"%{art} będzie należeć do pierwszej mądrej osoby, która go odwiedzi."
 
 #: ../fheroes2/heroes/heroes_action.cpp:1695
 msgid ""
@@ -3796,8 +3786,8 @@ msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:1845
 msgid ""
-"After scouring the area, you fall upon a hidden chest, containing the %"
-"{gold} gold pieces."
+"After scouring the area, you fall upon a hidden chest, containing the "
+"%{gold} gold pieces."
 msgstr ""
 "Przeszukując okolicę odnajdujesz ukrytą skrzynię zawierającą %{gold} sztuk "
 "złota."
@@ -4363,8 +4353,8 @@ msgstr ""
 #: ../fheroes2/heroes/heroes_action.cpp:2724
 msgid ""
 "The Demon screams its challenge and attacks! After a short, desperate "
-"battle, you slay the monster and receive %{exp) experience points and %"
-"{count} gold."
+"battle, you slay the monster and receive %{exp) experience points and "
+"%{count} gold."
 msgstr ""
 "Demon wykrzykując wyzywa Cię na pojedynek po czym atakuje. Po krótkiej, "
 "rozpaczliwej walce, zabijasz potwora i otrzymujesz %{exp) punktów "
@@ -5036,24 +5026,24 @@ msgstr " i "
 
 #: ../fheroes2/heroes/heroes_meeting.cpp:416
 msgid ""
-"%{teacher}, whose %{level} %{scholar} knows many magical secrets, learns %"
-"{spells1} from %{learner}, and teaches %{spells2} to %{learner}."
+"%{teacher}, whose %{level} %{scholar} knows many magical secrets, learns "
+"%{spells1} from %{learner}, and teaches %{spells2} to %{learner}."
 msgstr ""
 "%{teacher}, którego %{level} %{scholar} zna wiele magicznych sekretów,  uczy "
 "%{spells1} z %{learner}, i uczy %{spells2} do %{learner}."
 
 #: ../fheroes2/heroes/heroes_meeting.cpp:419
 msgid ""
-"%{teacher}, whose %{level} %{scholar} knows many magical secrets, learns %"
-"{spells1} from %{learner}."
+"%{teacher}, whose %{level} %{scholar} knows many magical secrets, learns "
+"%{spells1} from %{learner}."
 msgstr ""
 "%{teacher}, którego %{level} %{scholar} zna wiele magicznych sekretów,  uczy "
 "%{spells1} od %{learner}."
 
 #: ../fheroes2/heroes/heroes_meeting.cpp:422
 msgid ""
-"%{teacher}, whose %{level} %{scholar} knows many magical secrets, teaches %"
-"{spells2} to %{learner}."
+"%{teacher}, whose %{level} %{scholar} knows many magical secrets, teaches "
+"%{spells2} to %{learner}."
 msgstr ""
 "%{teacher}, którego %{level} %{scholar} zna wiele magicznych sekretów,  uczy "
 "%{spells2} do %{learner}."
@@ -5443,12 +5433,10 @@ msgstr[1] "Zwiększa punkty ruchu bohatera na wodzie o %{count} procent."
 msgstr[2] "Zwiększa punkty ruchu bohatera na wodzie o %{count} procent."
 
 #: ../fheroes2/heroes/skill.cpp:415
-#, fuzzy
 msgid "Increases your hero's troops morale by %{count}."
 msgid_plural "Increases your hero's troops morale by %{count}."
-msgstr[0] "Zwiększa morale wojska twojego bohatera o %{count}."
-msgstr[1] "Zwiększa morale wojska twojego bohatera o %{count}."
-msgstr[2] "Zwiększa morale wojska twojego bohatera o %{count}."
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../fheroes2/heroes/skill.cpp:422
 msgid "Allows your hero to learn third level spells."
@@ -8111,8 +8099,8 @@ msgstr ""
 
 #: ../fheroes2/resource/artifact.cpp:882
 msgid ""
-"Do you want to use your knowledge of magical secrets to transcribe the %"
-"{spell} Scroll into your spell book?\n"
+"Do you want to use your knowledge of magical secrets to transcribe the "
+"%{spell} Scroll into your spell book?\n"
 "The Scroll will be consumed.\n"
 " Spell point: %{sp}"
 msgstr ""
@@ -8128,14 +8116,12 @@ msgid "Transcribe scroll"
 msgstr ""
 
 #: ../fheroes2/resource/artifact.cpp:961 ../fheroes2/resource/artifact.cpp:994
-#, fuzzy
 msgid "Move %{name}"
-msgstr "Obejrzyj jednostkę (%{name})"
+msgstr ""
 
 #: ../fheroes2/resource/artifact.cpp:984
-#, fuzzy
 msgid "Cannot move artifact"
-msgstr " z jednym artefaktem"
+msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:15
 msgid ""
@@ -8584,21 +8570,23 @@ msgstr "Mnóstwo kryształu!"
 
 #: ../fheroes2/resource/maps_text.cpp:86
 msgid "A quantity of mercury!"
-msgstr ""
+msgstr "Nieco rtęci!"
 
 #: ../fheroes2/resource/maps_text.cpp:87
 msgid "A quantity of sulfur!"
-msgstr ""
+msgstr "Nieco siarki!"
 
 #: ../fheroes2/resource/maps_text.cpp:89
 msgid ""
 "Archibald has also sent an army to find the Crown, you must find it first or "
 "all is lost."
 msgstr ""
+"Archibald również wysłał armię by odnaleźć Koronę, musisz odnaleźć ją "
+"pierwszy w innym razie wszystko przepadnie."
 
 #: ../fheroes2/resource/maps_text.cpp:90
 msgid "Archibald is hiding at the end of the river."
-msgstr ""
+msgstr "Archibald kryje się na skraju rzeki."
 
 #: ../fheroes2/resource/maps_text.cpp:91
 msgid ""
@@ -8630,11 +8618,11 @@ msgstr "Armia Tytanów"
 
 #: ../fheroes2/resource/maps_text.cpp:97
 msgid "Arr' Here be pirates gold buried."
-msgstr ""
+msgstr "Tutaj pochowano złoto piratów"
 
 #: ../fheroes2/resource/maps_text.cpp:98
 msgid "A shipment of wood has arrived from your kingdom!"
-msgstr ""
+msgstr "Transport drewna z twojego królestwa został dostarczony!"
 
 #: ../fheroes2/resource/maps_text.cpp:99
 msgid ""
@@ -8643,14 +8631,17 @@ msgid ""
 "herself. \"Well, if you meet him, give him these treasures I have collected."
 "\""
 msgstr ""
+"Plusk w wodorostach zwraca twoją uwagę na syrenkę machająca przyjaźnie do "
+"ciebie. \"O, myślałam że jesteś Ahab.\" Jest zaskoczona, lecz opanowana. "
+"\"Jeśli go spotkasz, daj mu skarby które zebrałam.\""
 
 #: ../fheroes2/resource/maps_text.cpp:100
 msgid "Assassins tried to kill our ally."
-msgstr ""
+msgstr "Zabójcy próbowali zabić naszego sprzymierzeńca."
 
 #: ../fheroes2/resource/maps_text.cpp:101
 msgid "Astircaer"
-msgstr ""
+msgstr "Astircaer"
 
 #: ../fheroes2/resource/maps_text.cpp:102
 msgid ""
@@ -8663,6 +8654,8 @@ msgid ""
 "A supply ship has arrived from the homeland!  You send word home that all is "
 "well."
 msgstr ""
+"Statek transportowy z ojczyzny dotarł. Wysyłasz wiadomość, że wszystko jest "
+"w porządku."
 
 #: ../fheroes2/resource/maps_text.cpp:104
 msgid ""
@@ -8725,6 +8718,8 @@ msgid ""
 "As you lay down to nap after a long battle, you notice a lucky four-leaf "
 "clover."
 msgstr ""
+"Postanowiłeś zdrzemnąć się po wygranej bitwie. Układając się do snu "
+"znajdujesz w trawie czterolistną koniczynkę."
 
 #: ../fheroes2/resource/maps_text.cpp:111
 msgid ""
@@ -8819,11 +8814,11 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:126
 msgid "Basenji"
-msgstr ""
+msgstr "Basenji"
 
 #: ../fheroes2/resource/maps_text.cpp:127
 msgid "Bayside"
-msgstr ""
+msgstr "Bayside"
 
 #: ../fheroes2/resource/maps_text.cpp:128
 msgid "Baywatch"
@@ -8834,6 +8829,9 @@ msgid ""
 "Because the Darkscale Valley is so barren, the Emperor will be sending wood "
 "to you every week. Use it wisely, for it is all you shall have."
 msgstr ""
+"Ponieważ Dolina Darkscale jest taka jałowa, Imperator będzie wysyłał tobie "
+"drewno każdego tygodnia. Używaj go mądrze, to wszystko co powinieneś mieć do "
+"osiągnięcia celu."
 
 #: ../fheroes2/resource/maps_text.cpp:130
 msgid ""
@@ -8847,10 +8845,11 @@ msgstr ""
 msgid ""
 "Before you may pass, the spirit guardian of this valley demands tribute."
 msgstr ""
+"Zanim przejdziesz, dusza strażnika tej doliny oczekuje wyrazów uznania."
 
 #: ../fheroes2/resource/maps_text.cpp:132
 msgid "Being held...."
-msgstr ""
+msgstr "Jest przetrzymywany..."
 
 #: ../fheroes2/resource/maps_text.cpp:133
 msgid "Beltway"
@@ -8858,11 +8857,11 @@ msgstr "Okrężna droga"
 
 #: ../fheroes2/resource/maps_text.cpp:134
 msgid "\"Betrayal!\""
-msgstr ""
+msgstr "Zdrada!"
 
 #: ../fheroes2/resource/maps_text.cpp:135
 msgid "Beware -- Entering Hyrda Country"
-msgstr ""
+msgstr "Strzeż się Wchodząc do Krainy Hydr"
 
 #: ../fheroes2/resource/maps_text.cpp:136
 msgid "Beware for whom the bell trolls."
@@ -8870,51 +8869,51 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:137
 msgid "Beware of Pirates!"
-msgstr ""
+msgstr "Strzeż się piratów!"
 
 #: ../fheroes2/resource/maps_text.cpp:138
 msgid "Beware of thieves!"
-msgstr ""
+msgstr "Strzeż się złodzieji!"
 
 #: ../fheroes2/resource/maps_text.cpp:139
 msgid "Beware of traps ahead."
-msgstr ""
+msgstr "Strzeż się pułapek."
 
 #: ../fheroes2/resource/maps_text.cpp:140
 msgid "Beware of Warlocks"
-msgstr ""
+msgstr "Strzeż się Czarnoksiężników."
 
 #: ../fheroes2/resource/maps_text.cpp:141
 msgid "Beware the deadly swamps!"
-msgstr ""
+msgstr "Strzeż się śmiertelnych bagien!"
 
 #: ../fheroes2/resource/maps_text.cpp:142
 msgid "Beware the Domain of Dragons"
-msgstr ""
+msgstr "Strzeż się  Królestwa Smoków!"
 
 #: ../fheroes2/resource/maps_text.cpp:143
 msgid "Beware the Dragon Leader"
-msgstr ""
+msgstr "Strzeż się Smoczego Przywódcy!"
 
 #: ../fheroes2/resource/maps_text.cpp:144
 msgid "Beware the edge of the world!"
-msgstr ""
+msgstr "Strzeż się skraju świata!"
 
 #: ../fheroes2/resource/maps_text.cpp:145
 msgid "Beware the moors and stick to the roads."
-msgstr ""
+msgstr "Strzeż się mokradeł, korzystaj z dróg!"
 
 #: ../fheroes2/resource/maps_text.cpp:146
 msgid "Beware the rocks"
-msgstr ""
+msgstr "Uważaj na skały."
 
 #: ../fheroes2/resource/maps_text.cpp:147
 msgid "Beware the sirens!!!"
-msgstr ""
+msgstr "Uważaj na syreny!!!"
 
 #: ../fheroes2/resource/maps_text.cpp:148
 msgid "Beware the sirens!"
-msgstr ""
+msgstr "Uważaj na syreny!"
 
 #: ../fheroes2/resource/maps_text.cpp:149
 msgid "Beware the whiporwill..."
@@ -8922,83 +8921,83 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:150
 msgid "Beware, the whirlpool may not take you into a friendly embrace."
-msgstr ""
+msgstr "Strzeż się, wir wodny może nie być dla ciebie zbyt przyjazny."
 
 #: ../fheroes2/resource/maps_text.cpp:151
 msgid "Beyond here be Dragons!"
-msgstr ""
+msgstr "Dalej są Smoki!"
 
 #: ../fheroes2/resource/maps_text.cpp:152
 msgid "Beyond the door, there be Dragons. BEWARE!"
-msgstr ""
+msgstr "Za drzwiami, są Smoki, STRZEŻ SIĘ!"
 
 #: ../fheroes2/resource/maps_text.cpp:153
 msgid "Big Oak"
-msgstr ""
+msgstr "Wielki Dąb \"Bartek\""
 
 #: ../fheroes2/resource/maps_text.cpp:154
 msgid "Blackburn"
-msgstr ""
+msgstr "Blackburn"
 
 #: ../fheroes2/resource/maps_text.cpp:155
 msgid "Blackfang"
-msgstr ""
+msgstr "Czarny Kieł"
 
 #: ../fheroes2/resource/maps_text.cpp:156
 msgid "Black Fang"
-msgstr ""
+msgstr "Czarny Kieł"
 
 #: ../fheroes2/resource/maps_text.cpp:157
 msgid "Black Oak"
-msgstr ""
+msgstr "Czarny Dąb"
 
 #: ../fheroes2/resource/maps_text.cpp:158
 msgid "Blackridge"
-msgstr ""
+msgstr "Blackridge"
 
 #: ../fheroes2/resource/maps_text.cpp:159
 msgid "Blacksford"
-msgstr ""
+msgstr "Blacksford"
 
 #: ../fheroes2/resource/maps_text.cpp:160
 msgid "Black Vein"
-msgstr ""
+msgstr "Black Vein"
 
 #: ../fheroes2/resource/maps_text.cpp:161
 msgid "Blackwind"
-msgstr ""
+msgstr "Blackwind"
 
 #: ../fheroes2/resource/maps_text.cpp:162
 msgid "Bloodreign"
-msgstr ""
+msgstr "Bloodreign"
 
 #: ../fheroes2/resource/maps_text.cpp:163
 msgid "Boats my be needed to access some parts of this peninsula."
-msgstr ""
+msgstr "Łodzie mogą być niezbędne by dotrzeć w niektóre części  półwyspu."
 
 #: ../fheroes2/resource/maps_text.cpp:164
 msgid "Boats Sold Here            Inquire Within"
-msgstr ""
+msgstr "Tutaj sprzedawane są łodzie"
 
 #: ../fheroes2/resource/maps_text.cpp:165
 msgid "BoneVille"
-msgstr ""
+msgstr "BoneVille"
 
 #: ../fheroes2/resource/maps_text.cpp:166
 msgid "Borderlands"
-msgstr ""
+msgstr "Borderlands"
 
 #: ../fheroes2/resource/maps_text.cpp:167
 msgid "Bridge out!"
-msgstr ""
+msgstr "Zniszczony most!"
 
 #: ../fheroes2/resource/maps_text.cpp:168
 msgid "Bridge Out!"
-msgstr ""
+msgstr "Zniszczony most!"
 
 #: ../fheroes2/resource/maps_text.cpp:169
 msgid "Brindamoor"
-msgstr ""
+msgstr "Brindamoor"
 
 #: ../fheroes2/resource/maps_text.cpp:170
 msgid "Broken Alliance"
@@ -9006,19 +9005,19 @@ msgstr "Zerwany sojusz"
 
 #: ../fheroes2/resource/maps_text.cpp:171
 msgid "Brownston"
-msgstr ""
+msgstr "Brownston"
 
 #: ../fheroes2/resource/maps_text.cpp:172
 msgid "Buried Treasure!"
-msgstr ""
+msgstr "Zakopany skarb"
 
 #: ../fheroes2/resource/maps_text.cpp:173
 msgid "Burlock"
-msgstr ""
+msgstr "Burlock"
 
 #: ../fheroes2/resource/maps_text.cpp:174
 msgid "Burton"
-msgstr ""
+msgstr "Burton"
 
 #: ../fheroes2/resource/maps_text.cpp:175
 msgid ""
@@ -9033,30 +9032,32 @@ msgid ""
 "Capture the town on the island off the southeast shore in order to construct "
 "a boat and travel back towards the mainland."
 msgstr ""
+"Przejmij miasto na wyspie południowo-wschodniego wybrzeża aby zbudować łódź "
+"i wrócić z powrotem na ląd."
 
 #: ../fheroes2/resource/maps_text.cpp:177
 msgid "\"Carator Mines\""
-msgstr ""
+msgstr "Kopalnie Caratora"
 
 #: ../fheroes2/resource/maps_text.cpp:178
 msgid "Cathcart"
-msgstr ""
+msgstr "Cathcart"
 
 #: ../fheroes2/resource/maps_text.cpp:180
 msgid "Chandler"
-msgstr ""
+msgstr "Chandler"
 
 #: ../fheroes2/resource/maps_text.cpp:181
 msgid "Chilton"
-msgstr ""
+msgstr "Chilton"
 
 #: ../fheroes2/resource/maps_text.cpp:182
 msgid "Chronos"
-msgstr ""
+msgstr "Chronos"
 
 #: ../fheroes2/resource/maps_text.cpp:183
 msgid "Come and...."
-msgstr ""
+msgstr "Podejdź i..."
 
 #: ../fheroes2/resource/maps_text.cpp:184
 msgid ""
@@ -9064,72 +9065,78 @@ msgid ""
 "but in any other land it would seem poor. From here you can see the tall "
 "spires of the Warlock's tower of Dragons."
 msgstr ""
+"Porównując z resztą wiosek na tej wyspie, ta wioska wydaje się być wielka, "
+"ale w innych krainach nie byłaby taka. Stąd możesz zobaczyć wysokie iglice "
+"Wieży Smoków"
 
 #: ../fheroes2/resource/maps_text.cpp:185
 msgid "Complete"
-msgstr ""
+msgstr "Zrobione"
 
 #: ../fheroes2/resource/maps_text.cpp:186
 msgid "Condemned!"
-msgstr ""
+msgstr "Potępiony!"
 
 #: ../fheroes2/resource/maps_text.cpp:187
 msgid ""
 "Congratulations! After navigating the treacherous coast, you have "
 "established trade between the north and south."
 msgstr ""
+"Gratulacje!  Po dotarciu do zdradzieckiego wybrzeża, dokonałeś wymiany "
+"pomiędzy północą i południem."
 
 #: ../fheroes2/resource/maps_text.cpp:188
 msgid "Corackston"
-msgstr ""
+msgstr "Corackston"
 
 #: ../fheroes2/resource/maps_text.cpp:189
 msgid "Corlagon"
-msgstr ""
+msgstr "Corlagon"
 
 #: ../fheroes2/resource/maps_text.cpp:190
 msgid "\"Country Lords\""
-msgstr ""
+msgstr "Kraina Władców"
 
 #: ../fheroes2/resource/maps_text.cpp:191
 msgid "Crossroads"
-msgstr ""
+msgstr "Rozdroża"
 
 #: ../fheroes2/resource/maps_text.cpp:192
 msgid "Crossroads North"
-msgstr ""
+msgstr "Rozdroża Północy"
 
 #: ../fheroes2/resource/maps_text.cpp:193
 msgid "Crossroads South"
-msgstr ""
+msgstr "Rozdroża  Południa"
 
 #: ../fheroes2/resource/maps_text.cpp:195
 msgid "Danger a whirlpool destroyed my ship."
-msgstr ""
+msgstr "Niebezpieczny wir wodny zniszczył mój statek."
 
 #: ../fheroes2/resource/maps_text.cpp:196
 msgid "Danger, Dragons abound!"
-msgstr ""
+msgstr "Niebezpieczeństwo Smoki mnożą się!"
 
 #: ../fheroes2/resource/maps_text.cpp:197
 msgid "DANGER!  QUICKSAND!"
-msgstr ""
+msgstr "UWAGA! Ruchome piaski!"
 
 #: ../fheroes2/resource/maps_text.cpp:198
 msgid "Danger! Troll bridge ahead!"
-msgstr ""
+msgstr "Uwaga! Most Trolli!"
 
 #: ../fheroes2/resource/maps_text.cpp:199
 msgid "Danger - Turn Back Now"
-msgstr ""
+msgstr "Niebezpieczeństwo - Zawróć natychmiast."
 
 #: ../fheroes2/resource/maps_text.cpp:200
 msgid "Dark clouds loom overhead as you enter this valley."
 msgstr ""
+"Ciemne chmury wyłaniają się nad głową z chwilą gdy wkroczyłeś do doliny"
 
 #: ../fheroes2/resource/maps_text.cpp:201
 msgid "Dead Pine"
-msgstr ""
+msgstr "Martwa Sosna"
 
 #: ../fheroes2/resource/maps_text.cpp:202
 msgid ""
@@ -9149,11 +9156,11 @@ msgstr "Brama Śmierci"
 
 #: ../fheroes2/resource/maps_text.cpp:205
 msgid "Decisions"
-msgstr ""
+msgstr "Decyzje"
 
 #: ../fheroes2/resource/maps_text.cpp:206
 msgid "\"Defender\""
-msgstr ""
+msgstr "Obrońca"
 
 #: ../fheroes2/resource/maps_text.cpp:207
 msgid ""
@@ -9173,39 +9180,39 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:211
 msgid "DirtWater"
-msgstr ""
+msgstr "Brudna Woda"
 
 #: ../fheroes2/resource/maps_text.cpp:212
 msgid "Dominion"
-msgstr ""
+msgstr "Dominium"
 
 #: ../fheroes2/resource/maps_text.cpp:213
 msgid "Do Not Enter!"
-msgstr ""
+msgstr "Nie wchodzić!"
 
 #: ../fheroes2/resource/maps_text.cpp:214
 msgid "Do not remove coins from fountain."
-msgstr ""
+msgstr "Nie zabierać monet z fontanny!"
 
 #: ../fheroes2/resource/maps_text.cpp:215
 msgid "Dragadune"
-msgstr ""
+msgstr "Dragadune"
 
 #: ../fheroes2/resource/maps_text.cpp:216
 msgid "Dragonburg"
-msgstr ""
+msgstr "Dragonburg"
 
 #: ../fheroes2/resource/maps_text.cpp:218
 msgid "Dragon City lies beyond the Scorpion Hills."
-msgstr ""
+msgstr "Miasto Smoków leży poniżej wzgórz Skorpiona"
 
 #: ../fheroes2/resource/maps_text.cpp:219
 msgid "Dragon Hill"
-msgstr ""
+msgstr "Wzgórze Smoków"
 
 #: ../fheroes2/resource/maps_text.cpp:220
 msgid "\"Dragon Master\""
-msgstr ""
+msgstr "Władca Smoków"
 
 #: ../fheroes2/resource/maps_text.cpp:221
 msgid "Dragon Rider"
@@ -9213,23 +9220,23 @@ msgstr "Smoczy Jeździec"
 
 #: ../fheroes2/resource/maps_text.cpp:222
 msgid "Dragons Everywhere!"
-msgstr ""
+msgstr "Smoki! Wszędzie Smoki!"
 
 #: ../fheroes2/resource/maps_text.cpp:223
 msgid "Dragon's Eye"
-msgstr ""
+msgstr "Oko Smoka!"
 
 #: ../fheroes2/resource/maps_text.cpp:224
 msgid "Dragontooth"
-msgstr ""
+msgstr "Dragontooth"
 
 #: ../fheroes2/resource/maps_text.cpp:225
 msgid "Dragon Town"
-msgstr ""
+msgstr "Miasto Smoka"
 
 #: ../fheroes2/resource/maps_text.cpp:226
 msgid "Dragonville"
-msgstr ""
+msgstr "Dragonville"
 
 #: ../fheroes2/resource/maps_text.cpp:227
 msgid "Dragon Wars"
@@ -9444,7 +9451,7 @@ msgstr "Zapomn. Krainy"
 
 #: ../fheroes2/resource/maps_text.cpp:274
 msgid "For sale."
-msgstr ""
+msgstr "Na sprzedaż."
 
 #: ../fheroes2/resource/maps_text.cpp:275
 msgid "Fortress Isle"
@@ -12630,23 +12637,23 @@ msgstr ""
 
 #: ../fheroes2/resource/resource.cpp:282
 msgid "Mercury"
-msgstr ""
+msgstr "Rtęć"
 
 #: ../fheroes2/resource/resource.cpp:282
 msgid "Ore"
-msgstr ""
+msgstr "Ruda Żelaza"
 
 #: ../fheroes2/resource/resource.cpp:282
 msgid "Sulfur"
-msgstr ""
+msgstr "Siarka"
 
 #: ../fheroes2/resource/resource.cpp:282
 msgid "Crystal"
-msgstr ""
+msgstr "Kryształ"
 
 #: ../fheroes2/resource/resource.cpp:282
 msgid "Gems"
-msgstr ""
+msgstr "Klejnoty"
 
 #: ../fheroes2/spell/spell_book.cpp:59 ../fheroes2/spell/spell_book.cpp:77
 msgid "No spell to cast."
@@ -12658,35 +12665,39 @@ msgstr "Twój bohater ma jeszcze %{point} pkt. magii"
 
 #: ../fheroes2/spell/spell.cpp:60
 msgid "Fireball"
-msgstr ""
+msgstr "Kula Ognia"
 
 #: ../fheroes2/spell/spell.cpp:60
 msgid ""
 "Causes a giant fireball to strike the selected area, damaging all nearby "
 "creatures."
 msgstr ""
+"Tworzy wielką kulę ognia w wybranym obszarze uszkadzając wszystkie pobliskie "
+"jednostki."
 
 #: ../fheroes2/spell/spell.cpp:61
 msgid "Fireblast"
-msgstr ""
+msgstr "Eksplozja Ognia"
 
 #: ../fheroes2/spell/spell.cpp:61
 msgid ""
 "An improved version of fireball, fireblast affects two hexes around the "
 "center point of the spell, rather than one."
 msgstr ""
+"Wzmocniona wersja Kuli Ognia, Eksplozja oddziaływuje na dwa pola wokół "
+"punktu centralnego czaru, zamiast na jeden."
 
 #: ../fheroes2/spell/spell.cpp:62
 msgid "Lightning Bolt"
-msgstr ""
+msgstr "Błyskawica"
 
 #: ../fheroes2/spell/spell.cpp:62
 msgid "Causes a bolt of electrical energy to strike the selected creature."
-msgstr ""
+msgstr "Uderza w wybrane stworzenie za pomocą energii elektrycznej."
 
 #: ../fheroes2/spell/spell.cpp:63
 msgid "Chain Lightning"
-msgstr ""
+msgstr "Łańcuch piorunów"
 
 #: ../fheroes2/spell/spell.cpp:63
 msgid ""
@@ -12695,15 +12706,20 @@ msgid ""
 "creature with half again damage, and so on, until it becomes too weak to be "
 "harmful.  Warning:  This spell can hit your own creatures!"
 msgstr ""
+"Uderza w wybrane stworzenie za pomocą energii elektrycznej następnie "
+"przeskakując na kolejne stworzenie z połową uszkodzeń i tak dalej dopóki "
+"energia się nie wyczerpie.\r\n"
+"Uwaga: Czar może uszkodzić twoje stworzenia!"
 
 #: ../fheroes2/spell/spell.cpp:64
 msgid "Teleport"
-msgstr ""
+msgstr "Teleportacja"
 
 #: ../fheroes2/spell/spell.cpp:64
 msgid ""
 "Teleports the creature you select to any open position on the battlefield."
 msgstr ""
+"Teleportuje stworzenia które wybierzesz do dowolnego miejsca na polu walki."
 
 #: ../fheroes2/spell/spell.cpp:65
 msgid "Cure"
@@ -12711,35 +12727,40 @@ msgstr "Oczyszczenie"
 
 #: ../fheroes2/spell/spell.cpp:65
 msgid ""
-"Removes all negative spells cast upon one of your units, and restores up to %"
-"{count} HP per level of spell power."
+"Removes all negative spells cast upon one of your units, and restores up to "
+"%{count} HP per level of spell power."
 msgstr ""
+"Usuwa wszelkie negatywne efekty czarów z wybranej jednostki, i przywraca  do "
+"%{count} punktów życia na poziom Mocy."
 
 #: ../fheroes2/spell/spell.cpp:66
 msgid "Mass Cure"
-msgstr ""
+msgstr "Masowe Leczenie"
 
 #: ../fheroes2/spell/spell.cpp:66
 msgid ""
-"Removes all negative spells cast upon your forces, and restores up to %"
-"{count} HP per level of spell power, per creature."
+"Removes all negative spells cast upon your forces, and restores up to "
+"%{count} HP per level of spell power, per creature."
 msgstr ""
+"Usuwa wszystkie negatywne efekty czarów z twoich jednostek i przywraca  "
+"%{count}  punktów życia na poziom Mocy, każdemu stworzeniu."
 
 #: ../fheroes2/spell/spell.cpp:67
 msgid "Resurrect"
-msgstr ""
+msgstr "Wskrzeszenie"
 
 #: ../fheroes2/spell/spell.cpp:67
 msgid "Resurrects creatures from a damaged or dead unit until end of combat."
 msgstr ""
+"Wskrzesza stworzenia z uszkodzonej lub martwej jednostki do końca walki."
 
 #: ../fheroes2/spell/spell.cpp:68
 msgid "Resurrect True"
-msgstr ""
+msgstr "Prawdziwe wskrzeszenie"
 
 #: ../fheroes2/spell/spell.cpp:68
 msgid "Resurrects creatures from a damaged or dead unit permanently."
-msgstr ""
+msgstr "Na stałe wskrzesza zabite/uszkodzone jednostki."
 
 #: ../fheroes2/spell/spell.cpp:69
 msgid "Haste"
@@ -12747,15 +12768,15 @@ msgstr "Przyspieszenie"
 
 #: ../fheroes2/spell/spell.cpp:69
 msgid "Increases the speed of any creature by %{count}."
-msgstr ""
+msgstr "zwiększa szybkość wszystkich Twoich jednostek o %{count}."
 
 #: ../fheroes2/spell/spell.cpp:70
 msgid "Mass Haste"
-msgstr ""
+msgstr "Grupowe przyspieszenie"
 
 #: ../fheroes2/spell/spell.cpp:70
 msgid "Increases the speed of all of your creatures by %{count}."
-msgstr ""
+msgstr "Zwiększa szybkość wszystkich twoich stworzeń o %{count}."
 
 #: ../fheroes2/spell/spell.cpp:71
 msgid "spell|Slow"
@@ -13261,7 +13282,7 @@ msgstr "Kamień"
 
 #: ../fheroes2/spell/spell.cpp:126
 msgid "Stone spell from Medusa."
-msgstr ""
+msgstr "Czar Kamień od Meduzy"
 
 #: ../fheroes2/system/players.cpp:610
 msgid "Necroman"
@@ -13289,11 +13310,11 @@ msgstr ""
 
 #: ../fheroes2/system/players.cpp:679
 msgid "%{color} player"
-msgstr ""
+msgstr "%{color} Gracz"
 
 #: ../fheroes2/system/settings.cpp:124
 msgid "game: always confirm for rewrite savefile"
-msgstr ""
+msgstr "gra: zawsze potwierdzaj nadpisanie zapisu stanu gry"
 
 #: ../fheroes2/system/settings.cpp:125
 msgid "game: also confirm autosave"
@@ -13305,15 +13326,15 @@ msgstr ""
 
 #: ../fheroes2/system/settings.cpp:127
 msgid "game: battle show grid"
-msgstr ""
+msgstr "gra: pokaż siatkę podczas walki"
 
 #: ../fheroes2/system/settings.cpp:128
 msgid "game: battle mouse shadow"
-msgstr ""
+msgstr "gra: podczas walki pokaż cień myszy"
 
 #: ../fheroes2/system/settings.cpp:129
 msgid "game: battle move shadow"
-msgstr ""
+msgstr "gra: podczas walki cień ruchu"
 
 #: ../fheroes2/system/settings.cpp:130
 msgid "game: battle show damage info"
@@ -13330,10 +13351,11 @@ msgstr ""
 #: ../fheroes2/system/settings.cpp:133
 msgid "world: scouting skill show extended content info"
 msgstr ""
+"świat: umiejętność zwiedzania pokazuje dodatkowe informacje o zawartości"
 
 #: ../fheroes2/system/settings.cpp:134
 msgid "world: abandoned mine random resource"
-msgstr ""
+msgstr "świat: losowe surowce w opuszczonej kopalni"
 
 #: ../fheroes2/system/settings.cpp:135
 msgid "world: save count monster after battle"
@@ -13341,11 +13363,11 @@ msgstr ""
 
 #: ../fheroes2/system/settings.cpp:136
 msgid "world: allow set guardian to objects"
-msgstr ""
+msgstr "świat: pozwól zostawiać strażników w obiektach"
 
 #: ../fheroes2/system/settings.cpp:137
 msgid "world: guardian objects gets +2 defense"
-msgstr ""
+msgstr "świat: strażnicy obiektów zyskują +2 obrony"
 
 #: ../fheroes2/system/settings.cpp:138
 msgid "world: no in-built requirements or guardians for placed artifacts"
@@ -13353,35 +13375,36 @@ msgstr ""
 
 #: ../fheroes2/system/settings.cpp:139
 msgid "world: only the first monster will attack (H2 bug)."
-msgstr ""
+msgstr "świat: tylko pierwszy potwór zaatakuje (Bug Heroes 2)"
 
 #: ../fheroes2/system/settings.cpp:140
 msgid "world: Eagle Eye also works like Scholar in H3."
-msgstr ""
+msgstr "świat: Orli Wzrok działa jak \"Naukowiec\" z Heroes 3."
 
 #: ../fheroes2/system/settings.cpp:141
 msgid "world: ban for WeekOf/MonthOf Monsters"
-msgstr ""
+msgstr "świat: zabroń Tygodnie/Miesiące potworów"
 
 #: ../fheroes2/system/settings.cpp:142
 msgid "world: new version WeekOf (+growth)"
-msgstr ""
+msgstr "świat: nowa wersja Tygodnia... (+wzrost)"
 
 #: ../fheroes2/system/settings.cpp:143
 msgid "world: ban plagues months"
-msgstr ""
+msgstr "świat: wyłącz miesiące plagi"
 
 #: ../fheroes2/system/settings.cpp:144
 msgid "world: Months Of Monsters do not place creatures on map"
-msgstr ""
+msgstr "świat: podczas Miesiąca Potworów nie umieszczaj stworzeń na mapie"
 
 #: ../fheroes2/system/settings.cpp:145
 msgid "world: Crystal Ball also added Identify Hero and Visions spells"
 msgstr ""
+"świat: Kryształowa Kula dodaje zaklęcia: identyfikacja bohatera oraz Wizje"
 
 #: ../fheroes2/system/settings.cpp:146
 msgid "world: Artesian Springs have two separately visitable squares (h3 ver)"
-msgstr ""
+msgstr "świat: Artezjańskie Wiosny mają dwa oddzielne miejsca wizyt"
 
 #: ../fheroes2/system/settings.cpp:147
 msgid "world: Starting heroes as Loss Conditions for Human Players"
@@ -13390,22 +13413,25 @@ msgstr ""
 #: ../fheroes2/system/settings.cpp:148
 msgid "world: Only 1 hero can be hired by the one player every week"
 msgstr ""
+"świat: W ciągu tygodnia może być najęty tylko 1 bohater przez każdego gracza."
 
 #: ../fheroes2/system/settings.cpp:149
 msgid "world: each castle allows one hero to be recruited every week"
 msgstr ""
+"świat: każdy zamek umożliwia wynajęcie jednego bohatera w ciągu całego "
+"tygodnia"
 
 #: ../fheroes2/system/settings.cpp:150
 msgid "world: Outer creature dwellings should accumulate units"
-msgstr ""
+msgstr "świat: zewnętrzne posiadłości stworzeń powinny gromadzić jednostki"
 
 #: ../fheroes2/system/settings.cpp:151
 msgid "world: use unique artifacts for morale/luck"
-msgstr ""
+msgstr "świat: użyj unikatowych artefaktów dla morale/szczęścia"
 
 #: ../fheroes2/system/settings.cpp:152
 msgid "world: use unique artifacts for resource affecting"
-msgstr ""
+msgstr "świat: użyj unikalnych artefaktów do pozyskania zasobów"
 
 #: ../fheroes2/system/settings.cpp:153
 msgid "world: use unique artifacts for primary skills"
@@ -13475,7 +13501,7 @@ msgstr ""
 
 #: ../fheroes2/system/settings.cpp:169
 msgid "heroes: allow transcribing scrolls (needs: Eye Eagle skill)"
-msgstr ""
+msgstr "bohaterowie: pozwól transkrybować zwoje (potrzeba: Umj. Orli Wzrok)"
 
 #: ../fheroes2/system/settings.cpp:170
 msgid "heroes: allow banned sec. skills upgrade"
@@ -13484,14 +13510,15 @@ msgstr ""
 #: ../fheroes2/system/settings.cpp:171
 msgid "heroes: in Arena can choose any of primary skills"
 msgstr ""
+"bohaterowie: na Arenie pozwól wybrać dowolną z podstawowych umiejętności"
 
 #: ../fheroes2/system/settings.cpp:172
 msgid "unions: allow meeting heroes"
-msgstr ""
+msgstr "sojusze: pozwól poznać bohaterów"
 
 #: ../fheroes2/system/settings.cpp:173
 msgid "unions: allow castle visiting"
-msgstr ""
+msgstr "sojusze: pozwól odwiedzać zamki"
 
 #: ../fheroes2/system/settings.cpp:174
 msgid "battle: soft wait troop"
@@ -13499,7 +13526,7 @@ msgstr ""
 
 #: ../fheroes2/system/settings.cpp:175
 msgid "battle: high objects are an obstacle for archers"
-msgstr ""
+msgstr "walka: wysokie obiekty są przeszkodą dla jednostek strzelających"
 
 #: ../fheroes2/system/settings.cpp:176
 msgid "battle: merge armies for hero from castle"
@@ -13512,10 +13539,11 @@ msgstr ""
 #: ../fheroes2/system/settings.cpp:178
 msgid "battle: magical creature resists (20%) the same magic"
 msgstr ""
+"Walka: magiczne stwory otrzymują 20% odporności na magię tego samego typu"
 
 #: ../fheroes2/system/settings.cpp:179
 msgid "battle: skip increase +2 defense"
-msgstr ""
+msgstr "Walka: pominięcie kolejki zwiększa obronę o 2pkt"
 
 #: ../fheroes2/system/settings.cpp:180
 msgid "battle: reverse wait order (fast, average, slow)"
@@ -13531,7 +13559,7 @@ msgstr "game: autozapis włączony"
 
 #: ../fheroes2/system/settings.cpp:183
 msgid "game: autosave will be made at the beginning of the day"
-msgstr ""
+msgstr "Gra: Autozapis nastąpi na początku każdego dnia"
 
 #: ../fheroes2/system/settings.cpp:184
 msgid "game: use fade"
@@ -13556,6 +13584,7 @@ msgstr "game: ukryj interfejs"
 #: ../fheroes2/system/settings.cpp:189
 msgid "game: offer to continue the game afer victory condition"
 msgstr ""
+"Gra: zaproponuj kontynuację rozgrywki po spełnieniu warunków zwycięstwa."
 
 #: ../fheroes2/system/settings.cpp:190
 msgid "pocketpc: hide cursor"
@@ -13576,36 +13605,3 @@ msgstr "pocketpc: niska rozdzielczość ekranu (wymaga restartu)"
 #: ../fheroes2/system/settings.cpp:194
 msgid "pocketpc: low memory"
 msgstr "pocketpc: mało pamięci"
-
-#~ msgid "View Attack Skill Info"
-#~ msgstr "Atak - informacje"
-
-#~ msgid "View Defense Skill Info"
-#~ msgstr "Obrona - informacje"
-
-#~ msgid "View Spell Power Info"
-#~ msgstr "Moc zaklęć - informacje"
-
-#~ msgid "View Knowledge Info"
-#~ msgstr "Wiedza - informacje"
-
-#~ msgid "View %{art} Info"
-#~ msgstr "Informacje o artefakcie: %{art}"
-
-#~ msgid "View %{monster}"
-#~ msgstr "Pokaż jednostkę (%{monster})"
-
-#~ msgid "Combine %{monster1} armies"
-#~ msgstr "Połącz jednostki (%{monster1})"
-
-#~ msgid "Exchange %{monster2} with %{monster1}"
-#~ msgstr "Zamień pozycje jednostek: %{monster2} i %{monster1}"
-
-#~ msgid "Move and right click Redistribute %{monster}"
-#~ msgstr "Rozdziel jednostkę (%{monster})"
-
-#~ msgid "Select %{monster}"
-#~ msgstr "Wybierz jednostkę (%{monster})"
-
-#~ msgid "Empty"
-#~ msgstr "Wolne miejsce"

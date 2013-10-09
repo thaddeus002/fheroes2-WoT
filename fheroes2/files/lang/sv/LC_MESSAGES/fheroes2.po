@@ -8,16 +8,16 @@ msgstr ""
 "Project-Id-Version: fheroes2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-10-18 15:30+0900\n"
-"PO-Revision-Date: 2011-05-24 17:24+0000\n"
+"PO-Revision-Date: 2013-04-25 12:49+0000\n"
 "Last-Translator: Phoenix <Unknown>\n"
 "Language-Team: Swedish <sv@li.org>\n"
+"Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: sv\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-06-02 03:12+0000\n"
-"X-Generator: Launchpad (build 13144)\n"
+"X-Launchpad-Export-Date: 2013-10-09 02:01+0000\n"
+"X-Generator: Launchpad (build 16799)\n"
 
 #: ../fheroes2/ai/ai_action.cpp:156 ../fheroes2/heroes/heroes_action.cpp:247
 msgid "Hero %{name} also got a %{count} experience."
@@ -28,9 +28,8 @@ msgid "View %{name}"
 msgstr "Visa %{name}"
 
 #: ../fheroes2/army/army_bar.cpp:226 ../fheroes2/army/army_bar.cpp:309
-#, fuzzy
 msgid "Move or right click Redistribute %{name}"
-msgstr "Flytta och högerklicka Omfördela %{name}"
+msgstr ""
 
 #: ../fheroes2/army/army_bar.cpp:232 ../fheroes2/army/army_bar.cpp:300
 msgid "Combine %{name} armies"
@@ -46,9 +45,8 @@ msgid "Select %{name}"
 msgstr "Välj %{name}"
 
 #: ../fheroes2/army/army_bar.cpp:297 ../fheroes2/army/army_bar.cpp:306
-#, fuzzy
 msgid "Cannot move last troop"
-msgstr "Kan inte flytta senaste armé till besättning"
+msgstr ""
 
 #: ../fheroes2/army/army.cpp:84
 msgid ""
@@ -327,7 +325,7 @@ msgstr "Tur"
 #: ../fheroes2/dialog/dialog_quickinfo.cpp:844
 #: ../fheroes2/heroes/heroes_indicator.cpp:246
 msgid "Spell Points"
-msgstr "Magipoäng"
+msgstr "Besvärjelsepoäng"
 
 #: ../fheroes2/battle/battle_dialogs.cpp:489
 #: ../fheroes2/gui/interface_buttons.cpp:226
@@ -352,6 +350,9 @@ msgid ""
 "for you to recruit again, however, the hero will have only a novice hero's "
 "forces."
 msgstr ""
+"Retirera din hjälte, överge dina kreatur. Din hjälte kommer att vara "
+"tillgänglig för dig att rekrytera igen, men hjälten kommer endast att ha en "
+"novishjältes styrkor."
 
 #: ../fheroes2/battle/battle_dialogs.cpp:495
 msgid "Surrender"
@@ -387,20 +388,18 @@ msgid "%{name} states:"
 msgstr "%{name}s status:"
 
 #: ../fheroes2/battle/battle_dialogs.cpp:574
-#, fuzzy
 msgid ""
 "I will accept your surrender and grant you and your troops safe passage for "
 "the price of %{price} gold."
 msgstr ""
-"Jag accepterar din kapitulation och låter dig och dina trupper passera "
-"säkert för ett pris på %{price} guld."
+"Jag kommer att acceptera din kapitulation och bevilja dig och dina trupper "
+"en säker passage för ett pris på %{price} guld."
 
 #: ../fheroes2/battle/battle_interface.cpp:1337
 msgid "View %{monster} info."
 msgstr "Visa information om %{monster}."
 
 #: ../fheroes2/battle/battle_interface.cpp:1345
-#, fuzzy
 msgid "Shoot %{monster} (%{count} shot(s) left)"
 msgstr "Skjut %{monster} (%{count} skott kvar)"
 
@@ -446,14 +445,13 @@ msgid "Spell cast"
 msgstr "Besvärjelsekastning"
 
 #: ../fheroes2/battle/battle_interface.cpp:1622
-#, fuzzy
 msgid "View Ballista Info"
-msgstr "Visa information för moral"
+msgstr ""
 
 #: ../fheroes2/battle/battle_interface.cpp:1635
 #: ../fheroes2/battle/battle_tower.cpp:53
 msgid "Ballista"
-msgstr "Kastmaskin"
+msgstr ""
 
 #: ../fheroes2/battle/battle_interface.cpp:1642
 msgid "Auto combat"
@@ -465,7 +463,7 @@ msgstr "Skräddarsy systeminställningarna."
 
 #: ../fheroes2/battle/battle_interface.cpp:1657
 msgid "Wait this unit"
-msgstr ""
+msgstr "Vänta denna enhet"
 
 #: ../fheroes2/battle/battle_interface.cpp:1664
 msgid "Skip this unit"
@@ -524,9 +522,8 @@ msgstr[0] "en %{defender} dör."
 msgstr[1] "%{count} %{defender} dör."
 
 #: ../fheroes2/battle/battle_interface.cpp:2406
-#, fuzzy
 msgid "Moved %{monster}: %{src}, %{dst}"
-msgstr "Flytta %{monster} hit."
+msgstr "Flyttade %{monster}: %{src}, %{dst}"
 
 #: ../fheroes2/battle/battle_interface.cpp:2521
 msgid "The %{name} resist the spell!"
@@ -574,11 +571,11 @@ msgstr ""
 
 #: ../fheroes2/battle/battle_interface.cpp:2731
 msgid "Good luck shines on the  %{attacker}"
-msgstr ""
+msgstr "God lycka skiner på %{attacker}"
 
 #: ../fheroes2/battle/battle_interface.cpp:2783
 msgid "Bad luck descends on the %{attacker}"
-msgstr ""
+msgstr "Dålig lycka stiger ned på %{attacker}"
 
 #: ../fheroes2/battle/battle_interface.cpp:2795
 msgid "High morale enables the %{monster} to attack again."
@@ -598,7 +595,7 @@ msgstr "Spegelbild skapad"
 
 #: ../fheroes2/battle/battle_interface.cpp:3718
 msgid "MirrorImage ended"
-msgstr ""
+msgstr "Spegelbild avslutades"
 
 #: ../fheroes2/battle/battle_interface.cpp:4057
 msgid "No spells to cast."
@@ -634,8 +631,8 @@ msgstr "Du har tillfångatagit fiendens artefakt!"
 
 #: ../fheroes2/battle/battle_main.cpp:240
 msgid ""
-"Through eagle-eyed observation, %{name} is able to learn the magic spell %"
-"{spell}."
+"Through eagle-eyed observation, %{name} is able to learn the magic spell "
+"%{spell}."
 msgstr ""
 "Genom en falkblicksobservation, %{name} kan lära sig besvärjelsen %{spell}."
 
@@ -753,7 +750,7 @@ msgstr "Telt"
 
 #: ../fheroes2/castle/castle.cpp:464
 msgid "Captain's Quarters"
-msgstr ""
+msgstr "Kaptenens bostad"
 
 #: ../fheroes2/castle/castle.cpp:464
 msgid "Mage Guild, Level 1"
@@ -1063,6 +1060,8 @@ msgid ""
 "The Well increases the growth rate of all dwellings by %{count} creatures "
 "per week."
 msgstr ""
+"Brunnen höjer tillväxthastigheten för alla bostäder med %{count} varelser "
+"per vecka."
 
 #: ../fheroes2/castle/castle.cpp:553
 msgid "The Statue increases your town's income by %{count} per day."
@@ -1183,9 +1182,8 @@ msgid ""
 msgstr ""
 
 #: ../fheroes2/castle/castle.cpp:629
-#, fuzzy
 msgid "Cannot recruit - you already recruit hero in current week."
-msgstr "Kan inte rekrytera - du har redan en hjälte i denna stad."
+msgstr "Kan inte rekrytera - du har redan rekryterat en hjälte denna vecka."
 
 #: ../fheroes2/castle/castle.cpp:637
 msgid "Cannot recruit - you already have a Hero in this town."
@@ -1234,14 +1232,12 @@ msgid "Show next town"
 msgstr "Visa nästa stad"
 
 #: ../fheroes2/castle/castle_dialog.cpp:728
-#, fuzzy
 msgid "Swap Heroes"
-msgstr "Visa hjältar"
+msgstr "Byt hjältar"
 
 #: ../fheroes2/castle/castle_dialog.cpp:731
-#, fuzzy
 msgid "Meeting Heroes"
-msgstr "Visa hjältar"
+msgstr ""
 
 #: ../fheroes2/castle/castle_dialog.cpp:736
 msgid "View Hero"
@@ -1399,6 +1395,9 @@ msgid ""
 "difference in cost for each troop, rounded up to next highest number. Do you "
 "wish to upgrade them?"
 msgstr ""
+"Dina trupper kan uppgraderas, men det kommer att kosta dig %{ratio} gånger "
+"skillnad i kostnad för varje trupp, avrundat uppåt till det nästa högsta "
+"numret. Vill du uppgradera dem?"
 
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:160
 msgid ""
@@ -1458,14 +1457,13 @@ msgid ""
 "gold.\n"
 "Do you accept?"
 msgstr ""
-"Alla %{offer} %{monster} vill förena sig med din armé för en summa på %"
-"{gold} guld.\n"
+"Alla %{offer} %{monster} vill förena sig med din armé för en summa på "
+"%{gold} guld.\n"
 "Accepterar du det?"
 
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:410
-#, fuzzy
 msgid "(Rate: %{percent})"
-msgstr "(tillgängligt: %{count})"
+msgstr ""
 
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:448
 msgid ""
@@ -1544,12 +1542,11 @@ msgstr ""
 
 #: ../fheroes2/dialog/dialog_giftresources.cpp:166
 msgid "You cannot select %{resource}!"
-msgstr ""
+msgstr "Du kan inte välja %{resource}!"
 
 #: ../fheroes2/dialog/dialog_giftresources.cpp:172
-#, fuzzy
 msgid "Select count %{resource}:"
-msgstr "Välj %{monster}"
+msgstr "Välj antalet %{resource}:"
 
 #: ../fheroes2/dialog/dialog_guardian.cpp:207
 msgid "Set Guardian"
@@ -1573,18 +1570,16 @@ msgid "%{skill} Skill +1"
 msgstr "Färdighet %{skill} +1"
 
 #: ../fheroes2/dialog/dialog_levelup.cpp:49
-#, fuzzy
 msgid "You have learned %{skill}."
-msgstr "Du har lärt dig %{level} %{skill}."
+msgstr "Du har lärt dig %{skill}."
 
 #: ../fheroes2/dialog/dialog_levelup.cpp:95
 msgid "You may learn either:"
-msgstr ""
+msgstr "Du kan lära dig antingen:"
 
 #: ../fheroes2/dialog/dialog_levelup.cpp:98
-#, fuzzy
 msgid "or"
-msgstr "Fort"
+msgstr "eller"
 
 #: ../fheroes2/dialog/dialog_marketplace.cpp:65
 msgid ""
@@ -1679,9 +1674,8 @@ msgid "None"
 msgstr "Inga"
 
 #: ../fheroes2/dialog/dialog_quickinfo.cpp:729
-#, fuzzy
 msgid "%{name} ( Level %{level} )"
-msgstr "%{name} av %{race} ( Level %{level} )"
+msgstr "%{name} (Level %{level})"
 
 #: ../fheroes2/dialog/dialog_quickinfo.cpp:854
 msgid "Move Points"
@@ -1939,14 +1933,12 @@ msgid "Good"
 msgstr "God"
 
 #: ../fheroes2/dialog/dialog_system.cpp:293
-#, fuzzy
 msgid "Hide"
-msgstr "Hord"
+msgstr ""
 
 #: ../fheroes2/dialog/dialog_system.cpp:299
-#, fuzzy
 msgid "Show"
-msgstr "Snö"
+msgstr ""
 
 #: ../fheroes2/dialog/dialog_thievesguild.cpp:290
 #: ../fheroes2/pocketpc/pocketpc_thievesguild.cpp:100
@@ -2234,12 +2226,16 @@ msgid ""
 "Cost 1.5 times normal movement for all heroes. (Pathfinding reduces or "
 "eliminates the penalty.)"
 msgstr ""
+"Kostar 1.5 gånger normal förflyttning för alla hjältar. (Vägledning "
+"reducerar eller eliminerar straffet.)"
 
 #: ../fheroes2/editor/editor_startgame.cpp:1156
 msgid ""
 "Cost 1.75 times normal movement for all heroes. (Pathfinding reduces or "
 "eliminates the penalty.)"
 msgstr ""
+"Kostar 1.75 gånger normal förflyttning för alla hjältar. (Vägledning "
+"reducerar eller eliminerar straffet.)"
 
 #: ../fheroes2/editor/editor_startgame.cpp:1159 ../fheroes2/maps/ground.cpp:31
 msgid "Lava"
@@ -2255,6 +2251,8 @@ msgid ""
 "Cost 1.25 times normal movement for all heroes. (Pathfinding reduces or "
 "eliminates the penalty.)"
 msgstr ""
+"Kostar 1.25 gånger normal förflyttning för alla hjältar. (Vägledning "
+"reducerar eller eliminerar straffet.)"
 
 #: ../fheroes2/editor/editor_startgame.cpp:1165 ../fheroes2/maps/ground.cpp:31
 #: ../fheroes2/resource/maps_text.cpp:210
@@ -2274,6 +2272,8 @@ msgid ""
 "Cost 2 times normal movement for all heroes. (Pathfinding reduces or "
 "eliminates the penalty.)"
 msgstr ""
+"Kostar 2 gånger normal förflyttning för alla hjältar. (Vägledning reducerar "
+"eller eliminerar straffet.)"
 
 #: ../fheroes2/editor/editor_startgame.cpp:1174
 msgid "Water Objects"
@@ -2600,11 +2600,8 @@ msgid "Play with 6 human players."
 msgstr "Spela med 6 mänskliga spelare."
 
 #: ../fheroes2/game/game_over.cpp:36
-#, fuzzy
 msgid "Defeat all enemy heroes and capture all enemy towns and castles."
 msgstr ""
-", eller så kan du vinna genom att besegra alla fiendehjältar och tillfångata "
-"alla fiendestäder och slott."
 
 #: ../fheroes2/game/game_over.cpp:37
 msgid "Run out of time. (Fail to win by a certain point.)"
@@ -2651,20 +2648,18 @@ msgid "Lose the town '%{name}'."
 msgstr "Förlora staden '%{name}'."
 
 #: ../fheroes2/game/game_over.cpp:125 ../fheroes2/game/game_over.cpp:141
-#, fuzzy
 msgid "Lose the hero: %{name}."
-msgstr "Förlora hjälten '%{name}'."
+msgstr "Förlora hjälten: %{name}."
 
 #: ../fheroes2/game/game_over.cpp:132
 msgid "Fail to win by the end of month %{month}, week %{week}, day %{day}."
 msgstr ""
-"Misslyckas att vinna vid slutet av månaden %{month}, vecka %{week}, dag %"
-"{day}."
+"Misslyckas att vinna vid slutet av månaden %{month}, vecka %{week}, dag "
+"%{day}."
 
 #: ../fheroes2/game/game_over.cpp:141
-#, fuzzy
 msgid "Lose the heroes: %{name}."
-msgstr "Förlora hjälten '%{name}'."
+msgstr "Förlora hjältarna: %{name}."
 
 #: ../fheroes2/game/game_over.cpp:162
 msgid ""
@@ -2791,6 +2786,8 @@ msgid ""
 "The difficulty rating reflects a combination of various settings for your "
 "game. This number will be applied to your final score."
 msgstr ""
+"Svårighetsgraden reflekterar en kombination av blandande inställningar för "
+"ditt spel. Denna siffra kommer att läggas till i dina slutpoäng."
 
 #: ../fheroes2/game/game_scenarioinfo.cpp:281
 msgid "Click to accept these settings and start a new game."
@@ -2834,17 +2831,18 @@ msgstr ""
 
 #: ../fheroes2/game/game_startgame.cpp:1063
 msgid "Try looking on land!!!"
-msgstr ""
+msgstr "Försök att titta på land!!!"
 
 #: ../fheroes2/game/game_startgame.cpp:1069
 msgid "Try searching on clear ground."
 msgstr "Försök att söka på bar mark."
 
 #: ../fheroes2/game/game_startgame.cpp:1082
-#, fuzzy
 msgid ""
 "After spending many hours digging here, you have uncovered the %{artifact}"
-msgstr "Efter att ha spenderat flera timmar på att gräva här, har du hittat "
+msgstr ""
+"Efter att ha spenderat många timmar på att gräva här, har du avtäckt "
+"%{artifact}"
 
 #: ../fheroes2/game/game_startgame.cpp:1084
 msgid "Congratulations!"
@@ -2883,18 +2881,16 @@ msgstr ""
 "att försvinna)"
 
 #: ../fheroes2/game/game_startgame.cpp:1533
-#, fuzzy
 msgid "Astrologers proclaim Month of the %{name}."
-msgstr "Astrologerna utropar månaden %{name}."
+msgstr "Astrologerna utropar %{name} månad."
 
 #: ../fheroes2/game/game_startgame.cpp:1533
-#, fuzzy
 msgid "Astrologers proclaim Week of the %{name}."
-msgstr "Astrologerna utlyser %{name}s vecka."
+msgstr "Astrologerna utropar %{name} vecka."
 
 #: ../fheroes2/game/game_startgame.cpp:1547
 msgid "After regular growth, population of %{monster} is doubled!"
-msgstr ""
+msgstr "Efter en vanlig ökning har beståndet av %{monster} fördubblats!"
 
 #: ../fheroes2/game/game_startgame.cpp:1548
 msgid ""
@@ -2902,14 +2898,17 @@ msgid ""
 msgid_plural ""
 "After regular growth, population of %{monter} increase on %{count} percent!"
 msgstr[0] ""
+"Efter en vanlig ökning har beståndet av %{monster} fördubblats med %{count} "
+"procent!"
 msgstr[1] ""
+"Efter en vanlig ökning har beståndet av %{monster} fördubblats med %{count} "
+"procent!"
 
 #: ../fheroes2/game/game_startgame.cpp:1551
-#, fuzzy
 msgid "%{monster} population increases by +%{count}."
 msgid_plural "%{monster} population increases by +%{count}."
-msgstr[0] "Byt ut %{monster2} mot %{monster1}"
-msgstr[1] "Byt ut %{monster2} mot %{monster1}"
+msgstr[0] "Populationen av %{monster} ökar med +%{count}."
+msgstr[1] "Populationen av %{monster} ökar med +%{count}."
 
 #: ../fheroes2/game/game_startgame.cpp:1559
 msgid " All populations are halved."
@@ -3114,10 +3113,13 @@ msgid ""
 "You've found an abandoned lean-to.\n"
 "Poking about, you discover some resources hidden nearby."
 msgstr ""
+"Du har hittat ett övergivet skjul.\n"
+"Efter att ha kikat igenom hittar du några gömda resurser i närheten."
 
 #: ../fheroes2/heroes/heroes_action.cpp:918
 msgid "The lean-to is long abandoned. There is nothing of value here."
 msgstr ""
+"Skjulet är övergivet sedan länge tillbaka. Det finns ingenting av värde här."
 
 #: ../fheroes2/heroes/heroes_action.cpp:923
 msgid ""
@@ -3135,48 +3137,41 @@ msgid ""
 msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:961
-#, fuzzy
 msgid "You come upon the remains of an unfortunate adventurer."
-msgstr ""
-"Du stöter på kvarlevor från en olycksdrabbad äventyrare.\n"
-"När du söker igenom de trasiga kläderna hittar du ingenting."
+msgstr "Du stöter på kvarlevorna av en olycklig äventyrare."
 
 #: ../fheroes2/heroes/heroes_action.cpp:972
-#, fuzzy
 msgid "Treasure"
-msgstr "Skatter"
+msgstr "Skatt"
 
 #: ../fheroes2/heroes/heroes_action.cpp:979
-#, fuzzy
 msgid "Searching through the tattered clothing, you find %{artifact}."
-msgstr ""
-"Du stöter på kvarlevor från en olycksdrabbad äventyrare.\n"
-"När du söker igenom de trasiga kläderna hittar du %{artifact}."
+msgstr "När du söker igenom de trasiga kläderna hittar du %{artifact}."
 
 #: ../fheroes2/heroes/heroes_action.cpp:990
-#, fuzzy
 msgid "Searching through the tattered clothing, you find nothing."
-msgstr "Du söker igenom vrakgodset, men du hittar ingenting."
+msgstr "När du söker igenom de trasiga kläderna hittar du ingenting."
 
 #: ../fheroes2/heroes/heroes_action.cpp:1002
 msgid ""
 "You come across an old wagon left by a trader who didn't quite make it to "
 "safe terrain."
 msgstr ""
+"Du stöter på en gammal vagn som har övergetts av en försäljare som inte "
+"riktig lyckades komma in på säker terräng."
 
 #: ../fheroes2/heroes/heroes_action.cpp:1013
 #: ../fheroes2/heroes/heroes_action.cpp:1041
 msgid "Unfortunately, others have found it first, and the wagon is empty."
-msgstr ""
+msgstr "Tyvärr har andra hittat den tidigare, och vagnen är tom."
 
 #: ../fheroes2/heroes/heroes_action.cpp:1020
-#, fuzzy
 msgid "Searching inside, you find the %{artifact}."
-msgstr "Du hittade %{artifact}."
+msgstr "När du söker igenom den, hittar du %{artifact}."
 
 #: ../fheroes2/heroes/heroes_action.cpp:1031
 msgid "Inside, you find some of the wagon's cargo still intact."
-msgstr ""
+msgstr "Inuti ser du att några av vagnens packningar fortfarande är orörda."
 
 #: ../fheroes2/heroes/heroes_action.cpp:1061
 msgid "You search through the flotsam, and find some wood and some gold."
@@ -3197,8 +3192,8 @@ msgstr "1:a kretsens tempel"
 #: ../fheroes2/heroes/heroes_action.cpp:1090
 msgid ""
 "You come across a small shrine attended by a group of novice acolytes.\n"
-"In exchange for your protection, they agree to teach you a simple spell - '%"
-"{spell}'."
+"In exchange for your protection, they agree to teach you a simple spell - "
+"'%{spell}'."
 msgstr ""
 "Du hittar ett litet tempel, bevistat av en grupp följeslagare.\n"
 "I utbyte mot ditt beskyddande går de med på att lära dig en komplicerad "
@@ -3211,8 +3206,8 @@ msgstr "2:a kretsens tempel"
 #: ../fheroes2/heroes/heroes_action.cpp:1094
 msgid ""
 "You come across an ornate shrine attended by a group of rotund friars.\n"
-"In exchange for your protection, they agree to teach you a spell - '%"
-"{spell}'."
+"In exchange for your protection, they agree to teach you a spell - "
+"'%{spell}'."
 msgstr ""
 "Du hittar ett utsmyckat tempel, bevistat av en grupp runda munkar.\n"
 "I utbyte mot ditt beskyddande går de med på att lära dig en komplicerad "
@@ -3261,8 +3256,8 @@ msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:1153
 msgid ""
-"You approach the hut and observe a witch inside studying an ancient tome on %"
-"{skill}.\n"
+"You approach the hut and observe a witch inside studying an ancient tome on "
+"%{skill}.\n"
 " \n"
 msgstr ""
 "Du närmar dig hyddan och ser en häxa där inne som studerar en uråldrig volym "
@@ -3293,8 +3288,8 @@ msgid ""
 "An ancient and immortal witch living in a hut with bird's legs for stilts "
 "teaches you %{skill} for her own inscrutable purposes."
 msgstr ""
-"En gammal och odödlig häxa bor i en hydda med fågelben som styltor lär dig %"
-"{skill} för hennes egna gåtfulla ändamål."
+"En gammal och odödlig häxa bor i en hydda med fågelben som styltor lär dig "
+"%{skill} för hennes egna gåtfulla ändamål."
 
 #: ../fheroes2/heroes/heroes_action.cpp:1193
 msgid "You drink from the enchanted fountain, but nothing happens."
@@ -3322,6 +3317,9 @@ msgid ""
 "It is supposed to grant luck to visitors, but since the stars are already "
 "smiling upon you, it does nothing."
 msgstr ""
+"Du har hittat en uråldrig och väderbiten stenavgud.\n"
+"Den är menad för att lyckoönska besökare, men eftersom stjärnorna redan ler "
+"åt dig gör den ingenting."
 
 #: ../fheroes2/heroes/heroes_action.cpp:1204
 msgid ""
@@ -3363,6 +3361,8 @@ msgid ""
 "You come upon the pyramid of a great and ancient king.\n"
 "Routine exploration reveals that the pyramid is completely empty."
 msgstr ""
+"Du stöter på en pyramid av en stor och gammal kung.\n"
+"En rutinerad utforskning avslöjar att pyramiden är helt tom."
 
 #: ../fheroes2/heroes/heroes_action.cpp:1267
 msgid "Unfortunately, you have no Magic Book to record the spell with."
@@ -3443,12 +3443,17 @@ msgid ""
 "edifices. Silently, the Druids turn you away, indicating they have nothing "
 "new to teach you."
 msgstr ""
+"Du har hittat en grupp druider som dyrkar en av deras mystiska "
+"stenbyggnader. Under tystnad avvisar de dig och påpekar att de inte har "
+"någonting nytt att lära dig."
 
 #: ../fheroes2/heroes/heroes_action.cpp:1380
 msgid ""
 "You've found a group of Druids worshipping at one of their strange stone "
 "edifices. Silently, they teach you new ways to cast spells."
 msgstr ""
+"Du har hittat en grupp druider som dyrkar en av deras mystiska "
+"stenbyggnader. Under tystnad lär de dig nya sätt att kasta besvärjelser."
 
 #: ../fheroes2/heroes/heroes_action.cpp:1417
 msgid ""
@@ -3531,24 +3536,32 @@ msgid ""
 "The drink at the oasis is refreshing, but offers no further benefit. The "
 "oasis might help again if you fought a battle first."
 msgstr ""
+"En klunk från oasen är uppfriskande, men den erbjuder ingen ytterligare "
+"förmån. Oasen kan hjälpa till igen om du slåss i en strid först."
 
 #: ../fheroes2/heroes/heroes_action.cpp:1506
 msgid ""
 "A drink at the oasis fills your troops with strength and lifts their "
 "spirits.  You can travel a bit further today."
 msgstr ""
+"En klunk från oasen fyller din trupper med styrka och lyfter deras stämning. "
+"Du kan resa en bit till idag."
 
 #: ../fheroes2/heroes/heroes_action.cpp:1511
 msgid ""
 "The drink at the watering hole is refreshing, but offers no further benefit. "
 "The watering hole might help again if you fought a battle first."
 msgstr ""
+"En klunk från vattenhålet är uppfriskande, men den erbjuder ingen "
+"ytterligare förmån. Oasen kan hjälpa till igen om du slåss i en strid först."
 
 #: ../fheroes2/heroes/heroes_action.cpp:1512
 msgid ""
 "A drink at the watering hole fills your troops with strength and lifts their "
 "spirits. You can travel a bit further today."
 msgstr ""
+"En klunk från vattenhålet fyller din trupper med styrka och lyfter deras "
+"stämning. Du kan resa en bit till idag."
 
 #: ../fheroes2/heroes/heroes_action.cpp:1517
 msgid ""
@@ -3590,8 +3603,8 @@ msgstr ""
 #: ../fheroes2/heroes/heroes_action.cpp:1605
 msgid ""
 "You've pulled a shipwreck survivor from certain death in an unforgiving "
-"ocean. Grateful, he rewards you for your act of kindness by giving you the %"
-"{art}."
+"ocean. Grateful, he rewards you for your act of kindness by giving you the "
+"%{art}."
 msgstr ""
 "Du har dragit ut en skeppsbruten man från en säker död i en oförlåtande "
 "ocean. Tacksamt ger han dig  %{art} för din vänlighet."
@@ -3606,11 +3619,11 @@ msgstr "En pyssling erbjuder dig en %{art} för en lite summa på %{gold} guld."
 
 #: ../fheroes2/heroes/heroes_action.cpp:1645
 msgid ""
-"A leprechaun offers you the %{art} for the small price of %{gold} Gold and %"
-"{count} %{res}."
+"A leprechaun offers you the %{art} for the small price of %{gold} Gold and "
+"%{count} %{res}."
 msgstr ""
-"En pyssling erbjuder dig en %{art} för en lite summa på %{gold} guld och %"
-"{count} %{res}."
+"En pyssling erbjuder dig en %{art} för en lite summa på %{gold} guld och "
+"%{count} %{res}."
 
 #: ../fheroes2/heroes/heroes_action.cpp:1654
 msgid "Do you wish to buy this artifact?"
@@ -3674,6 +3687,8 @@ msgid ""
 "Discretion is the better part of valor, and you decide to avoid this fight "
 "for today."
 msgstr ""
+"Det är bättre att fly än att illa fäkta, så du bestämmer dig för att undvika "
+"denna strid för idag."
 
 #: ../fheroes2/heroes/heroes_action.cpp:1799
 #: ../fheroes2/heroes/heroes_action.cpp:1814
@@ -3709,11 +3724,11 @@ msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:1845
 msgid ""
-"After scouring the area, you fall upon a hidden chest, containing the %"
-"{gold} gold pieces."
+"After scouring the area, you fall upon a hidden chest, containing the "
+"%{gold} gold pieces."
 msgstr ""
-"Efter att ha renskrubbat området, finner du en gömd kista som innehåller de %"
-"{gold} guldmynten."
+"Efter att ha renskrubbat området, finner du en gömd kista som innehåller de "
+"%{gold} guldmynten."
 
 #: ../fheroes2/heroes/heroes_action.cpp:1851
 msgid ""
@@ -3752,6 +3767,8 @@ msgid ""
 "You have taken control of the local Alchemist shop. It will provide you with "
 "%{count} unit of Mercury per day."
 msgstr ""
+"Du har tagit kontroll över den lokala Alkemistaffären. Den kommer att förse "
+"dig med %{count} enheter kvicksilver per dag."
 
 #: ../fheroes2/heroes/heroes_action.cpp:2003
 msgid ""
@@ -3790,8 +3807,8 @@ msgid ""
 "You gain control of a gem mine. It will provide you with %{count} unit of "
 "gems per day."
 msgstr ""
-"Du får kontroll över en ädelstensgruva. Den kommer att förse dig med %"
-"{count} enheter av ädelstenar per dag."
+"Du får kontroll över en ädelstensgruva. Den kommer att förse dig med "
+"%{count} enheter av ädelstenar per dag."
 
 #: ../fheroes2/heroes/heroes_action.cpp:2022
 msgid ""
@@ -3815,7 +3832,7 @@ msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:2038
 msgid "You gain control of a %{name}."
-msgstr ""
+msgstr "Du fick kontroll över en %{name}."
 
 #: ../fheroes2/heroes/heroes_action.cpp:2121
 msgid ""
@@ -3933,10 +3950,13 @@ msgid ""
 "You peer into the pool, and a face that is not your own peers back. It asks: "
 "\"Would you like to call upon the powers of water?\""
 msgstr ""
+"Kristallstrukturer kastar skuggor över en liten reflekterande vattenpöl. Du "
+"tittar ned i pölen och ett ansikte som inte är ditt tittar tillbaka. Den "
+"frågar: \"Vill du kalla på vattnets krafter?\""
 
 #: ../fheroes2/heroes/heroes_action.cpp:2209
 msgid "This burial site is deathly still."
-msgstr ""
+msgstr "Denna begravningsplats är dödligt tyst."
 
 #: ../fheroes2/heroes/heroes_action.cpp:2210
 msgid ""
@@ -3961,6 +3981,8 @@ msgid ""
 "You've found the ruins of an ancient city, now inhabited solely by the "
 "undead. Will you search?"
 msgstr ""
+"Du har hittat ruinerna av en antik stad, som nu är endast är bebodd av de "
+"odöda. Vill du söka?"
 
 #: ../fheroes2/heroes/heroes_action.cpp:2249
 msgid ""
@@ -4015,12 +4037,16 @@ msgid ""
 "You stand before the Dragon City, a place off-limits to mere humans. Do you "
 "wish to violate this rule and challenge the Dragons to a fight?"
 msgstr ""
+"Du står inför Drakstaden, en plats på förbjudet område för människor. Vill "
+"du strida mot denna regel och utmana drakarna i en strid?"
 
 #: ../fheroes2/heroes/heroes_action.cpp:2263
 msgid ""
 "Having defeated the Dragon champions, the city's leaders agree to supply "
 "some Dragons to your army for a price. Do you wish to recruit Dragons?"
 msgstr ""
+"Efter att ha besegrat Drakkrigarna går stadens ledare med på att förse några "
+"Drakar till din armé till ett pris. Vill du rekrytera Drakar?"
 
 #: ../fheroes2/heroes/heroes_action.cpp:2322
 msgid "From the observation tower, you are able to see distant lands."
@@ -4081,6 +4107,8 @@ msgid ""
 "All of the %{monsters} you have in your army have been trained by the battle "
 "masters of the fort. Your army now contains %{monsters2}."
 msgstr ""
+"Alla %{monsters} du har i din armé har tränats av stridsmästarna i fortet. "
+"Din armé innehåller nu %{monsters2}."
 
 #: ../fheroes2/heroes/heroes_action.cpp:2446
 msgid ""
@@ -4165,13 +4193,12 @@ msgid "Upon your approach, the tree opens its eyes in delight."
 msgstr "När du närmar dig öppnar trädet sina ögon i glädje."
 
 #: ../fheroes2/heroes/heroes_action.cpp:2625
-#, fuzzy
 msgid ""
 "\"Ahh, an adventurer! I will be happy to teach you a little of what I have "
 "learned over the ages for a mere %{count} %{res}.\""
 msgstr ""
-"\"Åh, en äventyrare! Det skulle glädja mig att lära dig lite grann om vad "
-"jag har lärt mig under åren för endast 10 ädelstenar.\""
+"\"Aha, en äventyrare! Jag skulle gladeligen lära dig lite om vad jag har "
+"lärt mig under alla år för endast %{count} %{res}.\""
 
 #: ../fheroes2/heroes/heroes_action.cpp:2627
 msgid "(Just bury it around my roots.)"
@@ -4182,9 +4209,8 @@ msgid "Tears brim in the eyes of the tree."
 msgstr "Tårar fyller trädets ögon."
 
 #: ../fheroes2/heroes/heroes_action.cpp:2636
-#, fuzzy
 msgid "\"I need %{count} %{res}.\""
-msgstr "\"Jag behöver 10 ädelstenar.\""
+msgstr "\"Jag behöver %{count} %{res}.\""
 
 #: ../fheroes2/heroes/heroes_action.cpp:2638
 msgid "it whispers. (sniff) \"Well, come back when you can pay me.\""
@@ -4195,6 +4221,8 @@ msgid ""
 "The entrance to the cave is dark, and a foul, sulfurous smell issues from "
 "the cave mouth. Will you enter?"
 msgstr ""
+"Ingången till grottan är mörk och en otäck, svavelaktig lukt strömmar från "
+"grottans mynning. Vill du gå in?"
 
 #: ../fheroes2/heroes/heroes_action.cpp:2680
 msgid ""
@@ -4205,12 +4233,12 @@ msgid ""
 msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:2689
-#, fuzzy
 msgid ""
 "Upon defeating the daemon's servants, you find a hidden cache with %{count} "
 "gold."
 msgstr ""
-"Medan du besegrar demonens tjänare hittar du ett gömt förråd med 2500 guld."
+"Medan du besegrar demonens underhuggare hittar du en dolt förråd med "
+"%{count} guld."
 
 #: ../fheroes2/heroes/heroes_action.cpp:2704
 msgid ""
@@ -4227,29 +4255,22 @@ msgstr ""
 #: ../fheroes2/heroes/heroes_action.cpp:2724
 msgid ""
 "The Demon screams its challenge and attacks! After a short, desperate "
-"battle, you slay the monster and receive %{exp) experience points and %"
-"{count} gold."
+"battle, you slay the monster and receive %{exp) experience points and "
+"%{count} gold."
 msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:2739
-#, fuzzy
 msgid ""
 "The Demon leaps upon you and has its claws at your throat before you can "
 "even draw your sword. \"Your life is mine,\" it says. \"I will sell it back "
 "to you for %{count} gold.\""
 msgstr ""
-"Demonen springer på dig och slänger upp sina klor på din hals innan du ens "
-"kan dra ditt svärd. \"Ditt liv är mitt,\" säger den. \"Jag kan sälja "
-"tillbaka det för 2500 guld.\""
 
 #: ../fheroes2/heroes/heroes_action.cpp:2740
-#, fuzzy
 msgid ""
 "Seeing that you do not have %{count} gold, the demon slashes you with its "
 "claws, and the last thing you see is a red haze."
 msgstr ""
-"När den inte ser att du har 2500 guld, sliter demonen dig i stycken med sina "
-"klor. Det sista du ser är en röd dimma."
 
 #: ../fheroes2/heroes/heroes_action.cpp:2765
 msgid "Except for evidence of a terrible battle, the cave is empty."
@@ -4262,17 +4283,22 @@ msgid "He checks your pack, and sees that you have 1 cursed item."
 msgid_plural ""
 "He checks your pack, and sees that you have %{count} cursed items."
 msgstr[0] ""
+"Han kontrollerar din packning, och upptäcker att du har 1 förbannat objekt."
 msgstr[1] ""
+"Han kontrollerar din packning, och upptäcker att du har %{count} förbannade "
+"objekt."
 
 #: ../fheroes2/heroes/heroes_action.cpp:2790
 msgid "For %{gold} gold, the alchemist will remove it for you. Do you pay?"
-msgstr ""
+msgstr "För %{gold} guld kan alkemisten ta bort den åt dig. Vill du betala?"
 
 #: ../fheroes2/heroes/heroes_action.cpp:2801
 msgid ""
 "You hear a voice from behind the locked door, \"You don't have enough gold "
 "to pay for my services.\""
 msgstr ""
+"Du hör en röst bakom den låsta dörren, \"Du har inte tillräckligt mycket "
+"guld att betala mina tjänster.\""
 
 #: ../fheroes2/heroes/heroes_action.cpp:2804
 msgid ""
@@ -4325,6 +4351,8 @@ msgid ""
 "As the sirens sing their eerie song, your small, determined army manages to "
 "overcome the urge to dive headlong into the sea."
 msgstr ""
+"När sirenerna sjunger sin spökliga sång lyckas din din lilla beslutsamma "
+"armé överkomma uppmaningen att dyka med huvudet först i havet."
 
 #: ../fheroes2/heroes/heroes_action.cpp:2874
 msgid ""
@@ -4334,6 +4362,11 @@ msgid ""
 "under its spell, and dive into the water where they drown. You are now wiser "
 "for the visit, and gain %{exp} experience."
 msgstr ""
+"Du låter din besättning stoppa sina öron med vax innan sirenernas spökliga "
+"sång får tillfälle att lura dem in i en vattengrav. En spöklik jämrande sång "
+"kommer från sirenerna som balanserar på stenarna. Många i din besättning "
+"faller i trans och dyker i vattnet, där de drunknar. Du är nu klokare för "
+"besöket och tjänar %{exp} erfarenhet."
 
 #: ../fheroes2/heroes/heroes_action.cpp:2894
 msgid ""
@@ -4346,6 +4379,8 @@ msgid ""
 "You already have %{count} heroes, and regretfully must leave the prisoner in "
 "this jail to languish in agony for untold days."
 msgstr ""
+"Du har redan %{count} hjältar och måste ångerfullt lämna fångarna i detta "
+"fängelse för att tvina i smärta för outsägliga dagar."
 
 #: ../fheroes2/heroes/heroes_action.cpp:2921
 msgid ""
@@ -4734,8 +4769,8 @@ msgstr "De tre Anduranartefakterna kombineras magiskt till en."
 #: ../fheroes2/heroes/heroes.cpp:1018
 msgid "To cast spells, you must first buy a spell book for %{gold} gold."
 msgstr ""
-"För att kasta besvärjelser måste du först och främst köpa en magibok för %"
-"{gold} guld."
+"För att kasta besvärjelser måste du först och främst köpa en magibok för "
+"%{gold} guld."
 
 #: ../fheroes2/heroes/heroes.cpp:1026
 msgid "Unfortunately, you seem to be a little short of cash at the moment."
@@ -4755,6 +4790,8 @@ msgid ""
 "'Grouped' combat formation bunches your army together in the center of your "
 "side of the battlefield."
 msgstr ""
+"'Grupperad' stridsformation samlar ihop din armé tillsammans i mitten på din "
+"sida av stridsfältet."
 
 #: ../fheroes2/heroes/heroes_dialog.cpp:290
 #: ../fheroes2/pocketpc/pocketpc_heroes.cpp:167
@@ -4787,7 +4824,7 @@ msgstr "Ställ in arméns stridsformation på 'Grupperad'"
 
 #: ../fheroes2/heroes/heroes_dialog.cpp:359
 msgid "Exit hero"
-msgstr ""
+msgstr "Avsluta hjälte"
 
 #: ../fheroes2/heroes/heroes_dialog.cpp:366
 msgid "Dismiss hero"
@@ -4862,27 +4899,27 @@ msgstr " och "
 
 #: ../fheroes2/heroes/heroes_meeting.cpp:416
 msgid ""
-"%{teacher}, whose %{level} %{scholar} knows many magical secrets, learns %"
-"{spells1} from %{learner}, and teaches %{spells2} to %{learner}."
+"%{teacher}, whose %{level} %{scholar} knows many magical secrets, learns "
+"%{spells1} from %{learner}, and teaches %{spells2} to %{learner}."
 msgstr ""
-"%{teacher}, vars %{level} %{scholar} vet många magiska hemligheter, lär sig %"
-"{spells1} från %{learner}, och lär %{spells2} till %{learner}."
+"%{teacher}, vars %{level} %{scholar} vet många magiska hemligheter, lär sig "
+"%{spells1} från %{learner}, och lär %{spells2} till %{learner}."
 
 #: ../fheroes2/heroes/heroes_meeting.cpp:419
 msgid ""
-"%{teacher}, whose %{level} %{scholar} knows many magical secrets, learns %"
-"{spells1} from %{learner}."
+"%{teacher}, whose %{level} %{scholar} knows many magical secrets, learns "
+"%{spells1} from %{learner}."
 msgstr ""
-"%{teacher}, vars %{level} %{scholar} vet många magiska hemligheter, lär sig %"
-"{spells1} från %{learner}."
+"%{teacher}, vars %{level} %{scholar} vet många magiska hemligheter, lär sig "
+"%{spells1} från %{learner}."
 
 #: ../fheroes2/heroes/heroes_meeting.cpp:422
 msgid ""
-"%{teacher}, whose %{level} %{scholar} knows many magical secrets, teaches %"
-"{spells2} to %{learner}."
+"%{teacher}, whose %{level} %{scholar} knows many magical secrets, teaches "
+"%{spells2} to %{learner}."
 msgstr ""
-"%{teacher}, vars %{level} %{scholar} vet många magiska hemligheter, lär sig %"
-"{spells2} till %{learner}."
+"%{teacher}, vars %{level} %{scholar} vet många magiska hemligheter, lär sig "
+"%{spells2} till %{learner}."
 
 #: ../fheroes2/heroes/heroes_meeting.cpp:433
 msgid "Scholar Ability"
@@ -4947,7 +4984,7 @@ msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:152
 msgid "Power"
-msgstr ""
+msgstr "Effekt"
 
 #: ../fheroes2/heroes/skill.cpp:173
 msgid "Your attack skill is a bonus added to each creature's attack skill."
@@ -4971,23 +5008,20 @@ msgid ""
 msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:215
-#, fuzzy
 msgid "skill|Basic"
-msgstr "Grundläggande"
+msgstr "färdighet|Grundläggande"
 
 #: ../fheroes2/heroes/skill.cpp:215
-#, fuzzy
 msgid "skill|Advanced"
-msgstr "Avancerat"
+msgstr "färdighet|Avancerad"
 
 #: ../fheroes2/heroes/skill.cpp:215
-#, fuzzy
 msgid "skill|Expert"
-msgstr "Professionell"
+msgstr "färdighet|Expert"
 
 #: ../fheroes2/heroes/skill.cpp:338
 msgid "Pathfinding"
-msgstr ""
+msgstr "Vägledning"
 
 #: ../fheroes2/heroes/skill.cpp:338
 msgid "Archery"
@@ -5039,308 +5073,238 @@ msgstr "Rang"
 
 #: ../fheroes2/heroes/skill.cpp:368
 msgid "Basic Pathfinding"
-msgstr ""
+msgstr "Grundläggande vägledning"
 
 #: ../fheroes2/heroes/skill.cpp:368
 msgid "Advanced Pathfinding"
-msgstr ""
+msgstr "Avancerad vägledning"
 
 #: ../fheroes2/heroes/skill.cpp:368
 msgid "Expert Pathfinding"
+msgstr "Professionell vägledning"
+
+#: ../fheroes2/heroes/skill.cpp:369
+msgid "Basic Archery"
+msgstr "Grundläggande bågskytte"
+
+#: ../fheroes2/heroes/skill.cpp:369
+msgid "Advanced Archery"
+msgstr "Avancerat bågskytte"
+
+#: ../fheroes2/heroes/skill.cpp:369
+msgid "Expert Archery"
+msgstr "Professionellt bågskytte"
+
+#: ../fheroes2/heroes/skill.cpp:370
+msgid "Basic Logistics"
+msgstr "Grundläggande logistik"
+
+#: ../fheroes2/heroes/skill.cpp:370
+msgid "Advanced Logistics"
+msgstr "Avancerad logistik"
+
+#: ../fheroes2/heroes/skill.cpp:370
+msgid "Expert Logistics"
+msgstr "Professionell logistik"
+
+#: ../fheroes2/heroes/skill.cpp:371
+msgid "Basic Scouting"
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:369
-#, fuzzy
-msgid "Basic Archery"
-msgstr "Bågskytte"
-
-#: ../fheroes2/heroes/skill.cpp:369
-#, fuzzy
-msgid "Advanced Archery"
-msgstr "Avancerat"
-
-#: ../fheroes2/heroes/skill.cpp:369
-#, fuzzy
-msgid "Expert Archery"
-msgstr "Bågskytte"
-
-#: ../fheroes2/heroes/skill.cpp:370
-#, fuzzy
-msgid "Basic Logistics"
-msgstr "Logistik"
-
-#: ../fheroes2/heroes/skill.cpp:370
-#, fuzzy
-msgid "Advanced Logistics"
-msgstr "Logistik"
-
-#: ../fheroes2/heroes/skill.cpp:370
-#, fuzzy
-msgid "Expert Logistics"
-msgstr "Logistik"
-
 #: ../fheroes2/heroes/skill.cpp:371
-#, fuzzy
-msgid "Basic Scouting"
-msgstr "Spaning"
-
-#: ../fheroes2/heroes/skill.cpp:371
-#, fuzzy
 msgid "Advanced Scouting"
-msgstr "Avancerat"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:371
-#, fuzzy
 msgid "Expert Scouting"
-msgstr "Spaning"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:372
-#, fuzzy
 msgid "Basic Diplomacy"
-msgstr "Diplomati"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:372
-#, fuzzy
 msgid "Advanced Diplomacy"
-msgstr "Diplomati"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:372
-#, fuzzy
 msgid "Expert Diplomacy"
-msgstr "Diplomati"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:373
-#, fuzzy
 msgid "Basic Navigation"
-msgstr "Navigering"
+msgstr "Grundläggande navigering"
 
 #: ../fheroes2/heroes/skill.cpp:373
-#, fuzzy
 msgid "Advanced Navigation"
-msgstr "Navigering"
+msgstr "Avancerad navigering"
 
 #: ../fheroes2/heroes/skill.cpp:373
-#, fuzzy
 msgid "Expert Navigation"
-msgstr "Navigering"
+msgstr "Professionell navigering"
 
 #: ../fheroes2/heroes/skill.cpp:374
-#, fuzzy
 msgid "Basic Leadership"
-msgstr "Ledarskap"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:374
-#, fuzzy
 msgid "Advanced Leadership"
-msgstr "Ledarskap"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:374
-#, fuzzy
 msgid "Expert Leadership"
-msgstr "Ledarskap"
+msgstr "Professionellt ledarskap"
 
 #: ../fheroes2/heroes/skill.cpp:375
-#, fuzzy
 msgid "Basic Wisdom"
-msgstr "Visdom"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:375
-#, fuzzy
 msgid "Advanced Wisdom"
-msgstr "Avancerat"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:375
-#, fuzzy
 msgid "Expert Wisdom"
-msgstr "Professionell"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:376
-#, fuzzy
 msgid "Basic Mysticism"
-msgstr "Mystik"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:376
-#, fuzzy
 msgid "Advanced Mysticism"
-msgstr "Mystik"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:376
-#, fuzzy
 msgid "Expert Mysticism"
-msgstr "Mystik"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:377
-#, fuzzy
 msgid "Basic Luck"
-msgstr "Otur"
+msgstr "Grundläggande tur"
 
 #: ../fheroes2/heroes/skill.cpp:377
-#, fuzzy
 msgid "Advanced Luck"
-msgstr "Avancerat"
+msgstr "Avancerad tur"
 
 #: ../fheroes2/heroes/skill.cpp:377
-#, fuzzy
 msgid "Expert Luck"
-msgstr "Professionell"
+msgstr "Professionell tur"
 
 #: ../fheroes2/heroes/skill.cpp:378
-#, fuzzy
 msgid "Basic Ballistics"
-msgstr "Ballistik"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:378
-#, fuzzy
 msgid "Advanced Ballistics"
-msgstr "Ballistik"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:378
-#, fuzzy
 msgid "Expert Ballistics"
-msgstr "Ballistik"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:379
-#, fuzzy
 msgid "Basic Eagle Eye"
-msgstr "Falkblick"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:379
-#, fuzzy
 msgid "Advanced Eagle Eye"
-msgstr "Falkblick"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:379
-#, fuzzy
 msgid "Expert Eagle Eye"
-msgstr "Falkblick"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:380
-#, fuzzy
 msgid "Basic Necromancy"
-msgstr "Svartkonst"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:380
-#, fuzzy
 msgid "Advanced Necromancy"
-msgstr "Svartkonst"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:380
-#, fuzzy
 msgid "Expert Necromancy"
-msgstr "Svartkonst"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:381
-#, fuzzy
 msgid "Basic Estates"
-msgstr "Rang"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:381
-#, fuzzy
 msgid "Advanced Estates"
-msgstr "Avancerat"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:381
-#, fuzzy
 msgid "Expert Estates"
-msgstr "Rang"
+msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:395
-#, fuzzy
 msgid "Reduces the movement penalty for rough terrain by %{count} percent."
 msgid_plural ""
 "Reduces the movement penalty for rough terrain by %{count} percent."
 msgstr[0] ""
-"Avancerad Navigering höjer din hjältes förflyttningspoäng över vatten med %"
-"{count} %."
+"Reducerar förflyttningsstraffet för grov terräng med %{count} procent."
 msgstr[1] ""
-"Avancerad Navigering höjer din hjältes förflyttningspoäng över vatten med %"
-"{count} %."
+"Reducerar förflyttningsstraffet för grov terräng med %{count} procent."
 
 #: ../fheroes2/heroes/skill.cpp:398
-#, fuzzy
 msgid ""
 "Increases the damage done by range attacking creatures by %{count} percent."
 msgid_plural ""
 "Increases the damage done by range attacking creatures by %{count} percent."
-msgstr[0] "Höjer en varelses hastighet med %{count}."
-msgstr[1] "Höjer en varelses hastighet med %{count}."
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../fheroes2/heroes/skill.cpp:401
-#, fuzzy
 msgid "Increases your hero's movement points by %{count} percent."
 msgid_plural "Increases your hero's movement points by %{count} percent."
-msgstr[0] ""
-"Grundläggande Logistik ökar din hjältes förflyttningspoäng med %{count} %."
-msgstr[1] ""
-"Grundläggande Logistik ökar din hjältes förflyttningspoäng med %{count} %."
+msgstr[0] "Ökar din hjältes förflyttningspoäng med %{count} procent."
+msgstr[1] "Ökar din hjältes förflyttningspoäng med %{count} procent."
 
 #: ../fheroes2/heroes/skill.cpp:404
-#, fuzzy
 msgid "Increases your hero's viewable area by %{count} square."
 msgid_plural "Increases your hero's viewable area by %{count} squares."
-msgstr[0] "Grundläggande tur höjer din hjältes tur med %{count}."
-msgstr[1] "Grundläggande tur höjer din hjältes tur med %{count}."
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../fheroes2/heroes/skill.cpp:407
-#, fuzzy
 msgid "Allows you to negotiate with monsters who are weaker than your group."
 msgstr ""
-"Professionell Diplomati låter dig förhandla med monster som är svagare än "
-"din grupp. Ungefär %{count} % av varelserna kan erbjuda sig att förena sig "
-"med dig."
 
 #: ../fheroes2/heroes/skill.cpp:409
-#, fuzzy
 msgid "Approximately %{count} percent of the creatures may offer to join you."
 msgid_plural ""
 "Approximately %{count} percent of the creatures may offer to join you."
 msgstr[0] ""
-"Grundläggande Diplomati låter dig förhandla med monster som är svagare än "
-"din grupp. Ungefär %{count} % av varelserna kan erbjuda sig att förena sig "
-"med dig."
 msgstr[1] ""
-"Grundläggande Diplomati låter dig förhandla med monster som är svagare än "
-"din grupp. Ungefär %{count} % av varelserna kan erbjuda sig att förena sig "
-"med dig."
 
 #: ../fheroes2/heroes/skill.cpp:412
-#, fuzzy
 msgid "Increases your hero's movement points over water by %{count} percent."
 msgid_plural ""
 "Increases your hero's movement points over water by %{count} percent."
 msgstr[0] ""
-"Grundläggande Navigering höjer din hjältes förflyttningspoäng över vatten "
-"med %{count} %."
+"Ökar din hjältes förflyttningspoäng över vatten med %{count} procent."
 msgstr[1] ""
-"Grundläggande Navigering höjer din hjältes förflyttningspoäng över vatten "
-"med %{count} %."
+"Ökar din hjältes förflyttningspoäng över vatten med %{count} procent."
 
 #: ../fheroes2/heroes/skill.cpp:415
-#, fuzzy
 msgid "Increases your hero's troops morale by %{count}."
 msgid_plural "Increases your hero's troops morale by %{count}."
 msgstr[0] ""
-"Grundläggande Ledarskap höjer dina hjältars truppers moral med %{count}."
 msgstr[1] ""
-"Grundläggande Ledarskap höjer dina hjältars truppers moral med %{count}."
 
 #: ../fheroes2/heroes/skill.cpp:422
-#, fuzzy
 msgid "Allows your hero to learn third level spells."
-msgstr ""
-"Grundläggande Visdom låter din hjälte lära sig tredje gradens besvärjelser."
+msgstr "Låter din hjälte lära sig tredje nivåns besvärjelser."
 
 #: ../fheroes2/heroes/skill.cpp:424
-#, fuzzy
 msgid "Allows your hero to learn fourth level spells."
-msgstr ""
-"Avancerad Visdom låter din hjälte lära sig fjärde gradens besvärjelser."
+msgstr "Låter din hjälte lära sig fjärde nivåns besvärjelser."
 
 #: ../fheroes2/heroes/skill.cpp:426
-#, fuzzy
 msgid "Allows your hero to learn fifth level spells."
-msgstr ""
-"Professionell Visdom låter din hjälte lära sig femte gradens besvärjelser."
+msgstr "Låter din hjälte lära sig femte nivåns besvärjelser."
 
 #: ../fheroes2/heroes/skill.cpp:432
 msgid "Regenerates %{count} of your hero's spell point per day."
@@ -5349,11 +5313,10 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: ../fheroes2/heroes/skill.cpp:435
-#, fuzzy
 msgid "Increases your hero's luck by %{count}."
 msgid_plural "Increases your hero's luck by %{count}."
-msgstr[0] "Grundläggande tur höjer din hjältes tur med %{count}."
-msgstr[1] "Grundläggande tur höjer din hjältes tur med %{count}."
+msgstr[0] "Höjer din hjältes tur med %{count}."
+msgstr[1] "Höjer din hjältes tur med %{count}."
 
 #: ../fheroes2/heroes/skill.cpp:441
 msgid ""
@@ -5374,7 +5337,6 @@ msgid ""
 msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:453
-#, fuzzy
 msgid ""
 "Gives your hero a %{count} percent chance to learn any given 1st or 2nd "
 "level enemy spell used against him in a combat."
@@ -5382,14 +5344,9 @@ msgid_plural ""
 "Gives your hero a %{count} percent chance to learn any given 1st or 2nd "
 "level enemy spell used against him in a combat."
 msgstr[0] ""
-"Avancerad Falkblick ger din hjälte %{count} % chans att lära sig någon given "
-"3:e nivås besvärjelse (eller lägre) som används mot honom i strid."
 msgstr[1] ""
-"Avancerad Falkblick ger din hjälte %{count} % chans att lära sig någon given "
-"3:e nivås besvärjelse (eller lägre) som används mot honom i strid."
 
 #: ../fheroes2/heroes/skill.cpp:456
-#, fuzzy
 msgid ""
 "Gives your hero a %{count} percent chance to learn any given 3rd level spell "
 "(or below) used against him in combat."
@@ -5397,14 +5354,9 @@ msgid_plural ""
 "Gives your hero a %{count} percent chance to learn any given 3rd level spell "
 "(or below) used against him in combat."
 msgstr[0] ""
-"Avancerad Falkblick ger din hjälte %{count} % chans att lära sig någon given "
-"3:e nivås besvärjelse (eller lägre) som används mot honom i strid."
 msgstr[1] ""
-"Avancerad Falkblick ger din hjälte %{count} % chans att lära sig någon given "
-"3:e nivås besvärjelse (eller lägre) som används mot honom i strid."
 
 #: ../fheroes2/heroes/skill.cpp:459
-#, fuzzy
 msgid ""
 "Gives your hero a %{count} percent chance to learn any given 4th level spell "
 "(or below) used against him in combat."
@@ -5412,11 +5364,7 @@ msgid_plural ""
 "Gives your hero a %{count} percent chance to learn any given 4th level spell "
 "(or below) used against him in combat."
 msgstr[0] ""
-"Professionell Falkblick ger din hjälte %{count} % chans att lära sig någon "
-"given 4:e nivås besvärjelse (eller lägre) som används mot honom i strid."
 msgstr[1] ""
-"Professionell Falkblick ger din hjälte %{count} % chans att lära sig någon "
-"given 4:e nivås besvärjelse (eller lägre) som används mot honom i strid."
 
 #: ../fheroes2/heroes/skill.cpp:465
 msgid ""
@@ -5437,9 +5385,8 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: ../fheroes2/heroes/skill.cpp:866 ../fheroes2/heroes/skill.cpp:971
-#, fuzzy
 msgid "View %{skill} Info"
-msgstr "Visa %{level}s%{skill}s-info"
+msgstr "Visa info om %{skill}"
 
 #: ../fheroes2/kingdom/color.cpp:30 ../fheroes2/kingdom/color.cpp:111
 msgid "Blue"
@@ -5478,33 +5425,28 @@ msgid "Gold"
 msgstr "Guld"
 
 #: ../fheroes2/kingdom/kingdom_overview.cpp:237
-#, fuzzy
 msgid "Hero/Stats"
-msgstr "Status för Bästa hjälte:"
+msgstr ""
 
 #: ../fheroes2/kingdom/kingdom_overview.cpp:240
-#, fuzzy
 msgid "Skills"
-msgstr "Sågverk"
+msgstr "Färdigheter"
 
 #: ../fheroes2/kingdom/kingdom_overview.cpp:243
-#, fuzzy
 msgid "Artifacts"
-msgstr "Artefakt"
+msgstr "Artifakter"
 
 #: ../fheroes2/kingdom/kingdom_overview.cpp:471
-#, fuzzy
 msgid "Town/Castle"
-msgstr "Slott"
+msgstr ""
 
 #: ../fheroes2/kingdom/kingdom_overview.cpp:474
 msgid "Garrison"
 msgstr ""
 
 #: ../fheroes2/kingdom/kingdom_overview.cpp:558
-#, fuzzy
 msgid "Gold Per Day:"
-msgstr "Guld i skattkammaren:"
+msgstr "Guld per dag!"
 
 #: ../fheroes2/kingdom/luck.cpp:27
 msgid "luck|Cursed"
@@ -5614,7 +5556,7 @@ msgstr "Häxa"
 
 #: ../fheroes2/kingdom/race.cpp:29
 msgid "Warlock"
-msgstr "Magiker"
+msgstr "Krigstrollkarl"
 
 #: ../fheroes2/kingdom/race.cpp:29
 msgid "Wizard"
@@ -6164,9 +6106,8 @@ msgid "Flotsam"
 msgstr "Vrakgods"
 
 #: ../fheroes2/maps/mp2.cpp:520
-#, fuzzy
 msgid "Shipwreck Survivor"
-msgstr "Skeppsbruten överlevare"
+msgstr ""
 
 #: ../fheroes2/maps/mp2.cpp:521
 msgid "Bottle"
@@ -6918,23 +6859,23 @@ msgstr ""
 
 #: ../fheroes2/resource/artifact.cpp:54
 msgid "Ultimate Sword of Dominion"
-msgstr ""
+msgstr "Ultimata Herraväldessvärdet"
 
 #: ../fheroes2/resource/artifact.cpp:54 ../fheroes2/resource/artifact.cpp:70
 #: ../fheroes2/resource/artifact.cpp:73 ../fheroes2/resource/artifact.cpp:76
 #: ../fheroes2/resource/artifact.cpp:77 ../fheroes2/resource/artifact.cpp:151
 #: ../fheroes2/resource/artifact.cpp:157
 msgid "The %{name} increases your attack skill by %{count}."
-msgstr ""
+msgstr "%{name} höjer din attackförmåga med %{count}."
 
 #: ../fheroes2/resource/artifact.cpp:55
 msgid "Ultimate Cloak of Protection"
-msgstr ""
+msgstr "Ultimata Skyddsmanteln"
 
 #: ../fheroes2/resource/artifact.cpp:55 ../fheroes2/resource/artifact.cpp:72
 #: ../fheroes2/resource/artifact.cpp:75 ../fheroes2/resource/artifact.cpp:78
 msgid "The %{name} increases your defense skill by %{count}."
-msgstr ""
+msgstr "%{name} höjer din försvarsfärdighet med %{count}."
 
 #: ../fheroes2/resource/artifact.cpp:56
 msgid "Ultimate Wand of Magic"
@@ -6944,25 +6885,26 @@ msgstr "Ultimata trollstaven"
 #: ../fheroes2/resource/artifact.cpp:62 ../fheroes2/resource/artifact.cpp:63
 #: ../fheroes2/resource/artifact.cpp:64 ../fheroes2/resource/artifact.cpp:150
 msgid "The %{name} increases your spell power by %{count}."
-msgstr ""
+msgstr "%{name} höjer din besvärjelsestyrka med %{count}."
 
 #: ../fheroes2/resource/artifact.cpp:57
 msgid "Ultimate Shield"
-msgstr ""
+msgstr "Ultimata skölden"
 
 #: ../fheroes2/resource/artifact.cpp:57 ../fheroes2/resource/artifact.cpp:130
 #: ../fheroes2/resource/artifact.cpp:131
 msgid "The %{name} increases your attack and defense skills by %{count} each."
 msgstr ""
+"%{name} höjer dina attack- och försvarsfärdigheter med %{count} vardera."
 
 #: ../fheroes2/resource/artifact.cpp:58
 msgid "Ultimate Staff"
-msgstr ""
+msgstr "Ultimata skölden"
 
 #: ../fheroes2/resource/artifact.cpp:58 ../fheroes2/resource/artifact.cpp:132
 #: ../fheroes2/resource/artifact.cpp:133
 msgid "The %{name} increases your spell power and knowledge by %{count} each."
-msgstr ""
+msgstr "%{name} höjer din besvärjelsestyrka och kunskap med %{count} vardera."
 
 #: ../fheroes2/resource/artifact.cpp:59
 msgid "Ultimate Crown"
@@ -6970,7 +6912,7 @@ msgstr "Ultimata Kronan"
 
 #: ../fheroes2/resource/artifact.cpp:59
 msgid "The %{name} increases each of your basic skills by %{count} points."
-msgstr ""
+msgstr "%{name} höjer alla dina grundläggande färdigheter med %{count} poäng."
 
 #: ../fheroes2/resource/artifact.cpp:60
 msgid "Golden Goose"
@@ -6978,7 +6920,7 @@ msgstr "Gyllene gås"
 
 #: ../fheroes2/resource/artifact.cpp:60
 msgid "The %{name} brings in an income of %{count} gold per turn."
-msgstr ""
+msgstr "%{name} medför en inkomst på %{count} guld per runda."
 
 #: ../fheroes2/resource/artifact.cpp:61
 msgid "Arcane Necklace of Magic"
@@ -7003,7 +6945,7 @@ msgstr "Tapperhetens medalj"
 #: ../fheroes2/resource/artifact.cpp:65 ../fheroes2/resource/artifact.cpp:66
 #: ../fheroes2/resource/artifact.cpp:67 ../fheroes2/resource/artifact.cpp:68
 msgid "The %{name} increases your morale."
-msgstr ""
+msgstr "%{name} höjer din moral."
 
 #: ../fheroes2/resource/artifact.cpp:66
 msgid "Medal of Courage"
@@ -7023,7 +6965,7 @@ msgstr "Olycksfizbin"
 
 #: ../fheroes2/resource/artifact.cpp:69
 msgid "The %{name} greatly decreases your morale by %{count}."
-msgstr ""
+msgstr "%{name} minskar kraftigt din moral med %{count}."
 
 #: ../fheroes2/resource/artifact.cpp:70
 msgid "Thunder Mace of Dominion"
@@ -7801,8 +7743,8 @@ msgstr ""
 
 #: ../fheroes2/resource/artifact.cpp:882
 msgid ""
-"Do you want to use your knowledge of magical secrets to transcribe the %"
-"{spell} Scroll into your spell book?\n"
+"Do you want to use your knowledge of magical secrets to transcribe the "
+"%{spell} Scroll into your spell book?\n"
 "The Scroll will be consumed.\n"
 " Spell point: %{sp}"
 msgstr ""
@@ -7820,14 +7762,12 @@ msgid "Transcribe scroll"
 msgstr ""
 
 #: ../fheroes2/resource/artifact.cpp:961 ../fheroes2/resource/artifact.cpp:994
-#, fuzzy
 msgid "Move %{name}"
-msgstr "Visa %{name}"
+msgstr ""
 
 #: ../fheroes2/resource/artifact.cpp:984
-#, fuzzy
 msgid "Cannot move artifact"
-msgstr " med en artefakt"
+msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:15
 msgid ""
@@ -7936,11 +7876,11 @@ msgstr "En drake, en cyklop eller en odöd. Kentaurernas kung. Hans namn är...?
 
 #: ../fheroes2/resource/maps_text.cpp:37
 msgid "A flight of dragons circles overhead."
-msgstr ""
+msgstr "En grupp drakar cirkulerar ovanför."
 
 #: ../fheroes2/resource/maps_text.cpp:38
 msgid "A flock of seagulls circle overhead."
-msgstr ""
+msgstr "En flock fiskmåsar cirkulerar ovanför."
 
 #: ../fheroes2/resource/maps_text.cpp:39
 msgid "A friendly dolphin splashes alongside the ship."
@@ -7985,7 +7925,7 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:44
 msgid "A ghostly pirate ship appears and sails on by."
-msgstr ""
+msgstr "En spökligt piratskepp dyker upp och seglar förbi."
 
 #: ../fheroes2/resource/maps_text.cpp:45
 msgid ""
@@ -8067,6 +8007,8 @@ msgid ""
 "Ah, you stumble across something buried in the sand.  As you dig it up you "
 "discover a small pile of gems and crystal."
 msgstr ""
+"Åh, du stöter på någonting som är begravt i sanden. När du gräver upp det "
+"upptäcker du att det är en liten hög med ädelstenar och kristaller."
 
 #: ../fheroes2/resource/maps_text.cpp:58
 msgid ""
@@ -8105,7 +8047,7 @@ msgstr "Lite närmare..."
 
 #: ../fheroes2/resource/maps_text.cpp:65
 msgid "All mines are grouped by type. Trade is your only hope."
-msgstr ""
+msgstr "Alla gruvor är grupperade efter typ. Byteshandel är ditt enda hopp."
 
 #: ../fheroes2/resource/maps_text.cpp:66
 msgid "A lump of crystal!"
@@ -8521,7 +8463,7 @@ msgstr "Se upp för fällor framöver."
 
 #: ../fheroes2/resource/maps_text.cpp:140
 msgid "Beware of Warlocks"
-msgstr "Varning för magiker"
+msgstr "Varning för krigstrollkarlar"
 
 #: ../fheroes2/resource/maps_text.cpp:141
 msgid "Beware the deadly swamps!"
@@ -8703,6 +8645,9 @@ msgid ""
 "but in any other land it would seem poor. From here you can see the tall "
 "spires of the Warlock's tower of Dragons."
 msgstr ""
+"Jämfört med resten av byarna i detta land verkar denna by vara ståtlig. Men "
+"i ett annat land skulle det verka fattigt. Härifrån kan du se de höga "
+"spirorna från Krigstrollkarlarnas Draktorn."
 
 #: ../fheroes2/resource/maps_text.cpp:185
 msgid "Complete"
@@ -9307,6 +9252,10 @@ msgid ""
 "of yours, gives you a powerful magical object she used to use as a footstool "
 "before she was exiled into the mountains by her own townspeople."
 msgstr ""
+"Högt upp bland de snöiga klippor möter du en gammal häxa som, i utbyte mot "
+"en av dina fasader, ger dig ett kraftfullt magiskt objekt som hon brukade "
+"använda som en fotpall innan hon förvisades till bergen av de andra "
+"stadsborna."
 
 #: ../fheroes2/resource/maps_text.cpp:327
 msgid "Hillstone"
@@ -10814,8 +10763,8 @@ msgid ""
 "surely give us what we seek in exchange for their feeble lives."
 msgstr ""
 "Den första delen av artefakten ligger i händerna på den oheliga "
-"Magikerordern. Du måste förstöra dem och deras allierade i norr. De skulle "
-"säkert ge oss vad vi söker efter i utbyte mot deras kraftlösa liv."
+"Krigstrollkarlsordern. Du måste förstöra dem och deras allierade i norr. De "
+"skulle säkert ge oss vad vi söker efter i utbyte mot deras kraftlösa liv."
 
 #: ../fheroes2/resource/maps_text.cpp:650
 msgid ""
@@ -11105,7 +11054,7 @@ msgstr ""
 msgid ""
 "The Southern Witch is biding her time.  She will strike when your armies are "
 "weak."
-msgstr ""
+msgstr "Häxan i söder tar sin tid. Hon attackerar när dina arméer är svaga."
 
 #: ../fheroes2/resource/maps_text.cpp:708
 msgid "the stairs"
@@ -11684,7 +11633,7 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:825
 msgid "Wicked Warlock Way"
-msgstr "Onde magikerns väg"
+msgstr "Onde krigstrollkarlens väg"
 
 #: ../fheroes2/resource/maps_text.cpp:826
 msgid "Wilasher"
@@ -11716,7 +11665,7 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:833
 msgid "Witch Hunt"
-msgstr ""
+msgstr "Häxjakt"
 
 #: ../fheroes2/resource/maps_text.cpp:834
 msgid ""
@@ -11876,8 +11825,8 @@ msgid ""
 "You find an old signpost in the midst of a thicket that reads \"Warlock "
 "Wood, West.  Barbarian Fields, East.\""
 msgstr ""
-"Du hittar en gammal skylt mitt i buskaget där det står \"Magikerskogen, "
-"väst. Barbarfälten, öst.\""
+"Du hittar en gammal skylt mitt i buskaget där det står "
+"\"Krigstrollkarlsskogen, väst. Barbarfälten, öst.\""
 
 #: ../fheroes2/resource/maps_text.cpp:864
 msgid ""
@@ -12491,8 +12440,8 @@ msgstr "Hela"
 
 #: ../fheroes2/spell/spell.cpp:65
 msgid ""
-"Removes all negative spells cast upon one of your units, and restores up to %"
-"{count} HP per level of spell power."
+"Removes all negative spells cast upon one of your units, and restores up to "
+"%{count} HP per level of spell power."
 msgstr ""
 
 #: ../fheroes2/spell/spell.cpp:66
@@ -12501,8 +12450,8 @@ msgstr ""
 
 #: ../fheroes2/spell/spell.cpp:66
 msgid ""
-"Removes all negative spells cast upon your forces, and restores up to %"
-"{count} HP per level of spell power, per creature."
+"Removes all negative spells cast upon your forces, and restores up to "
+"%{count} HP per level of spell power, per creature."
 msgstr ""
 "Tar bort alla negativa besvärjelser som har kastats på dina trupper och "
 "återställer upp till %{count} HP per besvärjelse-level, per varelse."
@@ -13024,6 +12973,9 @@ msgid ""
 "color will always start in a particular location. Some positions may only be "
 "played by a computer player or only by a human player."
 msgstr ""
+"Detta låter dig ändra spelarnas startpositioner och färger. En speciell färg "
+"startar alltid vid en speciell plats. Vissa positioner kan endast spelas av "
+"en datorstyrd eller mänsklig spelare."
 
 #: ../fheroes2/system/players.cpp:640
 msgid ""
@@ -13033,9 +12985,8 @@ msgid ""
 msgstr ""
 
 #: ../fheroes2/system/players.cpp:679
-#, fuzzy
 msgid "%{color} player"
-msgstr "%{color} spelares tur"
+msgstr ""
 
 #: ../fheroes2/system/settings.cpp:124
 msgid "game: always confirm for rewrite savefile"
@@ -13090,9 +13041,8 @@ msgid "world: allow set guardian to objects"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:137
-#, fuzzy
 msgid "world: guardian objects gets +2 defense"
-msgstr ", och får +2 i försvar"
+msgstr ""
 
 #: ../fheroes2/system/settings.cpp:138
 msgid "world: no in-built requirements or guardians for placed artifacts"
@@ -13176,7 +13126,7 @@ msgstr "Slott: Tillåt att köpa från brunnar"
 
 #: ../fheroes2/system/settings.cpp:158
 msgid "castle: allow guardians"
-msgstr ""
+msgstr "slott: tillåt väktare"
 
 #: ../fheroes2/system/settings.cpp:159
 msgid ""
@@ -13189,13 +13139,12 @@ msgid "castle: allow recruits special/expansion heroes"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:161
-#, fuzzy
 msgid "heroes: allow buy a spellbook from Shrines"
-msgstr "Värld: Tillåt att köpa magiböcker från tempel"
+msgstr ""
 
 #: ../fheroes2/system/settings.cpp:162
 msgid "heroes: learn new spells with day"
-msgstr ""
+msgstr "hjältar: få nya besvärjelser varje dag"
 
 #: ../fheroes2/system/settings.cpp:163
 msgid "heroes: recruit cost to be dependent on hero level"
@@ -13267,7 +13216,7 @@ msgstr "Strid: Skippning höjer försvar med 2"
 
 #: ../fheroes2/system/settings.cpp:180
 msgid "battle: reverse wait order (fast, average, slow)"
-msgstr ""
+msgstr "strid: omvänd väntordning (snabb, medel, långsam)"
 
 #: ../fheroes2/system/settings.cpp:181
 msgid "game: show system info"
@@ -13279,7 +13228,7 @@ msgstr "spel: Autospara på"
 
 #: ../fheroes2/system/settings.cpp:183
 msgid "game: autosave will be made at the beginning of the day"
-msgstr ""
+msgstr "spel: automatisk sparning kommer att utföras i början på dagen"
 
 #: ../fheroes2/system/settings.cpp:184
 msgid "game: use fade"
@@ -13303,7 +13252,7 @@ msgstr "spel: Göm gränssnitt"
 
 #: ../fheroes2/system/settings.cpp:189
 msgid "game: offer to continue the game afer victory condition"
-msgstr ""
+msgstr "spel: erbjud att fortsätta spelet efter att spelaren har segrat"
 
 #: ../fheroes2/system/settings.cpp:190
 msgid "pocketpc: hide cursor"
@@ -13319,773 +13268,8 @@ msgstr "pocketpc: Dra och släpp spelarea vid skroll"
 
 #: ../fheroes2/system/settings.cpp:193
 msgid "pocketpc: low display resolution (needs restart)"
-msgstr ""
+msgstr "pocketpc: låg upplösning (kräver omstart)"
 
 #: ../fheroes2/system/settings.cpp:194
 msgid "pocketpc: low memory"
 msgstr "pocketpc: Lågt minne"
-
-#~ msgid "View Attack Skill Info"
-#~ msgstr "Visa attackfärdighets-info"
-
-#~ msgid "View Defense Skill Info"
-#~ msgstr "Visa försvarsfärdighets-info"
-
-#~ msgid "View Spell Power Info"
-#~ msgstr "Visa information för besvärjelsestyrka"
-
-#~ msgid "View Knowledge Info"
-#~ msgstr "Visa information för kunskap"
-
-#~ msgid "View %{art} Info"
-#~ msgstr "Visa %{art}-info"
-
-#~ msgid "View %{monster}"
-#~ msgstr "Visa %{monster}"
-
-#~ msgid "Combine %{monster1} armies"
-#~ msgstr "Kombinera %{monster1}arméer"
-
-#~ msgid "Exchange %{monster2} with %{monster1}"
-#~ msgstr "Byt ut %{monster2} mot %{monster1}"
-
-#~ msgid "Move and right click Redistribute %{monster}"
-#~ msgstr "Flytta och högerklicka Omfördela %{monster}"
-
-#~ msgid "Select %{monster}"
-#~ msgstr "Välj %{monster}"
-
-#~ msgid "Empty"
-#~ msgstr "Tom"
-
-#~ msgid "Damg"
-#~ msgstr "Skador"
-
-#, fuzzy
-#~ msgid "All dwellings increase population."
-#~ msgstr " Alla bostäder höjer folkmängden."
-
-#~ msgid "You search through the flotsam, and find some gold."
-#~ msgstr "Du söker igenom vrakgodset, du hittar lite guld."
-
-#~ msgid "Witch's Hut"
-#~ msgstr "Häxans hydda"
-
-#~ msgid ""
-#~ "\"Ahh, an adventurer! I will be happy to teach you a little of what I "
-#~ "have learned over the ages for a mere 2000 gold.\""
-#~ msgstr ""
-#~ "\"Åh, en äventyrare! Det skulle glädja mig att lära dig lite grann om vad "
-#~ "jag har lärt mig under åren för endast 2000 guld.\""
-
-#~ msgid "\"I need 2000 gold.\""
-#~ msgstr "\"Jag behöver 2000 guld.\""
-
-#~ msgid "Gray"
-#~ msgstr "Grå"
-
-#~ msgid "game: remember last filename"
-#~ msgstr "spel: Kom ihåg senaste filnamnet"
-
-#~ msgid "heroes: fixed race with custom portrait"
-#~ msgstr "Hjältar: Bestämd ras med anpassat porträtt"
-
-#~ msgid "unions: allow view maps"
-#~ msgstr "unioner: Tillåt att visa kartor"
-
-#~ msgid "battle: troop direction to move"
-#~ msgstr "strid: Riktning att flytta trupp"
-
-#~ msgid "You may learn either %{level1} %{skill1} or %{level2} %{skill2}."
-#~ msgstr ""
-#~ "Du kan lära dig antingen %{level1} %{skill1} eller %{level2} %{skill2}."
-
-#~ msgid "%{name} has gained a level. %{skill} Skill +1"
-#~ msgstr "%{name} har gått upp en level. %{skill}färdighet +1"
-
-#~ msgid ""
-#~ "Advanced Logistics increases your hero's movement points by %{count} "
-#~ "percent."
-#~ msgstr ""
-#~ "Avancerad Logistik ökar din hjältes förflyttningspoäng med %{count} %."
-
-#~ msgid ""
-#~ "Expert Logistics increases your hero's movement points by %{count} "
-#~ "percent."
-#~ msgstr ""
-#~ "Professionell Logistik ökar din hjältes förflyttningspoäng med %{count} %."
-
-#~ msgid ""
-#~ "Advanced Diplomacy allows you to negotiate with monsters who are weaker "
-#~ "than your group. Approximately %{count} percent of the creatures may "
-#~ "offer to join you."
-#~ msgstr ""
-#~ "Avancerad Diplomati låter dig förhandla med monster som är svagare än din "
-#~ "grupp. Ungefär %{count} % av varelserna kan erbjuda sig att förena sig "
-#~ "med dig."
-
-#~ msgid ""
-#~ "Expert Navigation increases your hero's movement points over water by %"
-#~ "{count} percent."
-#~ msgstr ""
-#~ "Professionell Navigering höjer din hjältes förflyttningspoäng över vatten "
-#~ "med %{count} %."
-
-#~ msgid ""
-#~ "Advanced Leadership increases your hero's troops' morale by %{count}."
-#~ msgstr ""
-#~ "Avancerad Ledarskap höjer dina hjältars truppers moral med %{count}."
-
-#~ msgid "Expert Leadership increases your hero's troops' morale by %{count}."
-#~ msgstr ""
-#~ "Professionellt Ledarskap höjer dina hjältars truppers moral med %{count}."
-
-#~ msgid "Advanced Luck increases your hero's luck by %{count}."
-#~ msgstr "Avancerad tur höjer din hjältes tur med %{count}."
-
-#~ msgid "Expert Luck increases your hero's luck by %{count}."
-#~ msgstr "Professionell Tur höjer din hjältes tur med %{count}."
-
-#~ msgid "Pack"
-#~ msgstr "Flock"
-
-#~ msgid "Lots"
-#~ msgstr "Massor"
-
-#~ msgid "Few"
-#~ msgstr "Några"
-
-#~ msgid "Several"
-#~ msgstr "Flera"
-
-#~ msgid "Swarm"
-#~ msgstr "Svärm"
-
-#~ msgid "Legion"
-#~ msgstr "Legion"
-
-#~ msgid "%{tower} does %{dmg} damage."
-#~ msgstr "%{tower} gör %{dmg} skada"
-
-#~ msgid "High morale enables the %{name} to attack again."
-#~ msgstr "Hög moral tillåter %{name} att attakera igen."
-
-#~ msgid "Low morale causes the %{name} to freeze in panic."
-#~ msgstr "Låg moral gjorde att %{name} frös i panik."
-
-#~ msgid "destroy"
-#~ msgstr "förgör"
-
-#~ msgid "%{name} %{destroys} half the enemy troops!"
-#~ msgstr "%{name} %{destroys} halva fiende truppen"
-
-#~ msgid "destroys"
-#~ msgstr "förgör"
-
-#~ msgid "%{name} %{does} %{value} damage."
-#~ msgstr "%{name} %{does} %{value} skada."
-
-#~ msgid "do"
-#~ msgstr "gör"
-
-#~ msgid "does"
-#~ msgstr "gör"
-
-#~ msgid " %{value} %{name} %{perishes}."
-#~ msgstr " %{value} %{name} %{perishes}."
-
-#~ msgid "Attack %{name}"
-#~ msgstr "Attakera %{name}"
-
-#~ msgid "perish"
-#~ msgstr "förgås"
-
-#~ msgid "perishes"
-#~ msgstr "förgicks"
-
-#~ msgid "Fly"
-#~ msgstr "Flyg"
-
-#~ msgid "Move"
-#~ msgstr "Flytta"
-
-#~ msgid ""
-#~ "In exchange for his freedom, he guides you to a small pot filled with "
-#~ "precious things."
-#~ msgstr ""
-#~ "I utbyte av sin frihet leder han dig till en liten kruka fylld med "
-#~ "värdesaker."
-
-#~ msgid "There is nothing of value here."
-#~ msgstr "Det finns inget av värde här."
-
-#~ msgid ""
-#~ "Removes all negative spells cast upon your forces, and restores up to 5 "
-#~ "HP per level of spell power, per creature."
-#~ msgstr ""
-#~ "Tar bort alla negativa besvärjelser som har kastats på dina trupper, och "
-#~ "återställer upp till 5 HP per level av besvärjelsestyrka, per varelse."
-
-#~ msgid ""
-#~ "Removes all negative spells cast upon one of your units, and restores up "
-#~ "to 5 HP per level of spell power."
-#~ msgstr ""
-#~ "Tar bort alla negativa besvärjelser som har kastats på en av dina "
-#~ "enheter, och återställer upp till 5 HP per level av besvärjelsestyrka."
-
-#~ msgid "The Helmet increases your spell power by 5."
-#~ msgstr "Hjälmen höjer din besvärjelsestyrka med 5."
-
-#~ msgid "The Black Pearl increases your spell power and knowledge by 2 each."
-#~ msgstr ""
-#~ "Den svarta pärlan höjer din besvärjelsestyrka och kunskap med 2 vardera."
-
-#~ msgid "The Ice Cloak halves all damage your troops take from cold spells."
-#~ msgstr ""
-#~ "Ismanteln halverar all skada som dina trupper tar från kalla besvärjelser."
-
-#~ msgid ""
-#~ "The Lightning Helm halves all damage your troops take from lightning "
-#~ "spells."
-#~ msgstr ""
-#~ "Blixthjälmen halverar all skada som dina trupper tar från "
-#~ "blixtbesvärjelser."
-
-#~ msgid "The Fire Cloak halves all damage your troops take from fire spells."
-#~ msgstr ""
-#~ "Eldmanteln halverar all skada som dina trupper tar från eldbesvärjelser."
-
-#~ msgid "The Golden Horseshoe increases your luck in combat."
-#~ msgstr "Den Gyllene hästskon höjer din tur i strid."
-
-#~ msgid "Dragon Sword"
-#~ msgstr "Draksvärd"
-
-#~ msgid "The Sword Breaker increases your defense by 4 and attack by 1."
-#~ msgstr "Svärdsbrytaren höjer ditt försvar med 4 och attack med 1."
-
-#~ msgid ""
-#~ "You can load the newest version of game from a site: http://sourceforge."
-#~ "net/projects/fheroes2"
-#~ msgstr ""
-#~ "Du kan ladda ned den nyaste versionen av spelet från följande sida: "
-#~ "http://sourceforge.net/projects/fheroes2"
-
-#~ msgid "To cast spells, you must first buy a spell book for %{gold} gold"
-#~ msgstr ""
-#~ "För att kunna kasta besvärjelser måste du först och främst köpa en "
-#~ "besvärjelsebok för %{gold} guld"
-
-#~ msgid "The Golden Goose brings in an income of 10,000 gold per turn."
-#~ msgstr "Den gyllene gåsen har en inkomst på 10,000 guld per runda."
-
-#~ msgid "The Endless Sack of Gold provides you with 1000 gold per day."
-#~ msgstr "Den Bottenlösa säcken av guld förser dig med 1000 guld per dag."
-
-#~ msgid "The Endless Purse of Gold provides you with 500 gold per day."
-#~ msgstr "Den Bottenlösa börsen av guld förser dig med 500 guld per dag."
-
-#~ msgid "The Endless Bag of Gold provides you with 750 gold per day."
-#~ msgstr "Den Bottenlösa väskan av guld förser dig med 750 guld per dag."
-
-#~ msgid "Gold Wath"
-#~ msgstr "Gyllene klocka"
-
-#~ msgid "Dragonfly"
-#~ msgstr "Trollslända"
-
-#~ msgid "The Wizard's Hat increases the duration of your spells by 10 turns!"
-#~ msgstr "Trollkarlshatten ökar dina besvärjelsers varaktighet med 10 rundor!"
-
-#~ msgid "Perhaps you should try again next week."
-#~ msgstr "Kanske du ska försöka igen nästa vecka."
-
-#~ msgid "Victory Condition Icon"
-#~ msgstr "Segertillståndsikon"
-
-#~ msgid "Loss Condition Icon"
-#~ msgstr "Förlusttillståndsikon"
-
-#~ msgid "animation"
-#~ msgstr "animation"
-
-#~ msgid "Easy"
-#~ msgstr "Lätt"
-
-#~ msgid "Hard"
-#~ msgstr "Svårt"
-
-#~ msgid "Impossible"
-#~ msgstr "Omöjligt"
-
-#~ msgid "A single player game playing through a series of maps."
-#~ msgstr "En ensam spelare går igenom en serie av kartor."
-
-#~ msgid "The leprechaun stamps his foot and ignores you."
-#~ msgstr "Pysslingen stampar med sin fot och ignorerar dig."
-
-#~ msgid "You try to pay the leprechaun, but realize that you can't afford it."
-#~ msgstr "Du försöker att betala pysslingen, men inser att du har inte råd."
-
-#~ msgid ""
-#~ "You've found a magic garden, the kind of place that leprechauns and "
-#~ "faeries like to cavort in, but there is no one here today."
-#~ msgstr ""
-#~ "Du har hittat en magisk trädgård, den sorts plats där pysslingar och feer "
-#~ "gillar att hoppa omkring, men det är ingen här idag."
-
-#~ msgid ""
-#~ "You catch a leprechaun foolishly sleeping amidst a cluster of magic "
-#~ "mushrooms."
-#~ msgstr ""
-#~ "Du fångar en pyssling som dåraktigt sover mitt i en samling av magiska "
-#~ "svampar."
-
-#~ msgid "The mine appears to be haunted. Do you wish to enter?"
-#~ msgstr "Det verkar som gruvan är hemsökt. Vill du gå in?"
-
-#~ msgid "The Magic Book enables you to cast spells."
-#~ msgstr "Magiboken gör det möjligt för dig att kasta besvärjelser."
-
-#~ msgid "Mirror Image spell failed!"
-#~ msgstr "Spegelbildsbesvärjelsen misslyckades!"
-
-#~ msgid "Awful"
-#~ msgstr "Förfärlig"
-
-#~ msgid "Bad"
-#~ msgstr "Dålig"
-
-#~ msgid "Great"
-#~ msgstr "Utmärkt"
-
-#~ msgid "Irish"
-#~ msgstr "Irländsk"
-
-#~ msgid "Instant"
-#~ msgstr "Omedelbar"
-
-#~ msgid "Very Slow"
-#~ msgstr "Mycket långsam"
-
-#~ msgid "Standing"
-#~ msgstr "Stående"
-
-#~ msgid "Crawling"
-#~ msgstr "Krypa"
-
-#~ msgid "Very Fast"
-#~ msgstr "Mycket snabb"
-
-#~ msgid "Ultra Fast"
-#~ msgstr "Extremt snabbt"
-
-#~ msgid "Average"
-#~ msgstr "Medelvärde"
-
-#~ msgid "Fast"
-#~ msgstr "Snabb"
-
-#~ msgid "Hornet"
-#~ msgstr "Bålgeting"
-
-#~ msgid "Earthworm"
-#~ msgstr "Daggmask"
-
-#~ msgid "Ant"
-#~ msgstr "Myra"
-
-#~ msgid "PLAGUE"
-#~ msgstr "PEST"
-
-#~ msgid "Grasshopper"
-#~ msgstr "Gräshoppa"
-
-#~ msgid "Butterfly"
-#~ msgstr "Fjäril"
-
-#~ msgid "Spider"
-#~ msgstr "Spindel"
-
-#~ msgid "Locust"
-#~ msgstr "Gräshoppa"
-
-#~ msgid "Bumblebee"
-#~ msgstr "Humla"
-
-#~ msgid "Aardvark"
-#~ msgstr "Jordsvin"
-
-#~ msgid "Mongoose"
-#~ msgstr "Mungo"
-
-#~ msgid "Gopher"
-#~ msgstr "Jordekorre"
-
-#~ msgid "Rabbit"
-#~ msgstr "Kanin"
-
-#~ msgid "Squirrel"
-#~ msgstr "Ekorre"
-
-#~ msgid "Beetle"
-#~ msgstr "Skalbagge"
-
-#~ msgid "Raven"
-#~ msgstr "Korp"
-
-#~ msgid "Weasel"
-#~ msgstr "Vessla"
-
-#~ msgid "Eagle"
-#~ msgstr "Örn"
-
-#~ msgid "Badger"
-#~ msgstr "Grävling"
-
-#~ msgid "Small"
-#~ msgstr "Liten"
-
-#~ msgid "Medium"
-#~ msgstr "Mellan"
-
-#~ msgid "Lizard"
-#~ msgstr "Ödla"
-
-#~ msgid "Tortoise"
-#~ msgstr "Sköldpadda"
-
-#~ msgid "Hedgehog"
-#~ msgstr "Igelkott"
-
-#~ msgid "Condor"
-#~ msgstr "Kondor"
-
-#~ msgid "Large"
-#~ msgstr "Stor"
-
-#~ msgid "Extra Large"
-#~ msgstr "Extra stor"
-
-#~ msgid "Archer House"
-#~ msgstr "Bågskyttshus"
-
-#~ msgid "Camp Fire"
-#~ msgstr "Lägereld"
-
-#~ msgid "The Mage's Ring of Power increases your spell power by 2."
-#~ msgstr "Magikerns ring av styrka höjer din besvärjelsestyrka med 2."
-
-#~ msgid "Mage's Ring"
-#~ msgstr "Magikerns ring"
-
-#~ msgid "The Fizbin of Misfortune greatly decreases your morale."
-#~ msgstr "Olycksfizbin minskar kraftigt din moral."
-
-#~ msgid "The Medal of Valor increases your morale."
-#~ msgstr "Tapperhetens medalj höjer din moral."
-
-#~ msgid "The Medal of Courage increases your morale."
-#~ msgstr "Modets medalj höjer din moral."
-
-#~ msgid "The Medal of Honor increases your morale."
-#~ msgstr "Hedersmedaljen höjer din moral."
-
-#~ msgid "The Medal of Distinction increases your morale."
-#~ msgstr "Utmärkelsens medalj höjer din moral."
-
-#~ msgid "Giant Flail"
-#~ msgstr "Gigantisk slaga"
-
-#~ msgid ""
-#~ "The Ballista of Quickness lets your catapult fire twice per combat round."
-#~ msgstr "Snabbhetens kastmaskin låter dig slunga eld två gänger per runda."
-
-#~ msgid "Thunder Mace"
-#~ msgstr "Åskspikklubba"
-
-#~ msgid "Armored Gauntlets"
-#~ msgstr "Armerade stridshandskar"
-
-#~ msgid "Defender Helm"
-#~ msgstr "Försvararhjälm"
-
-#~ msgid "Rabbit's Foot"
-#~ msgstr "Hartass"
-
-#~ msgid "The Lucky Rabbit's Foot increases your luck in combat."
-#~ msgstr "Hartassen höjer din tur i strid."
-
-#~ msgid "The Evil Eye reduces the casting cost of curse spells by half."
-#~ msgstr "Det ondskefulla ögat halverar kostnaden för förbannelser."
-
-#~ msgid "The Gambler's Lucky Coin increases your luck in combat."
-#~ msgstr "Spelarens turmynt höjer din tur i strid."
-
-#~ msgid "The Four_Leaf Clover increases your luck in combat."
-#~ msgstr "Fyrklövern höjer din tur i strid."
-
-#~ msgid ""
-#~ "The True Compass of Mobility increases your movement on land and sea."
-#~ msgstr ""
-#~ "Mobilitetens sanna kompass ökar din förflyttning på land och vatten."
-
-#~ msgid "The Sailors' Astrolabe of Mobility increases your movement on sea."
-#~ msgstr "Seglarens mobila astrolabium höjer din rörlighet på vatten."
-
-#~ msgid "The Snake Ring halves the casting cost of all your bless spells."
-#~ msgstr ""
-#~ "Ormringen halverar kostnaden för alla dina välsignelsesbesvärjelser."
-
-#~ msgid ""
-#~ "The Lightning Rod causes your lightning spells to do 50 percent more "
-#~ "damage to enemy troops."
-#~ msgstr ""
-#~ "Blixtstaven låter dina blixtbesvärjelser ta 50 procent mer skada på "
-#~ "fiendetrupper."
-
-#~ msgid "The Pendant of Life makes all your troops immune to death spells."
-#~ msgstr "Livets hängsmycke gör dina trupper immuna mot dödsbesvärjelser."
-
-#~ msgid ""
-#~ "The Statesman's Quill reduces the cost of surrender to 10 percent of the "
-#~ "total cost of troops you have in your army."
-#~ msgstr ""
-#~ "Statsmannens fjäderpenna reducerar kostnaden av att ge upp på 10 procent "
-#~ "av den totala kostnaden du har i din armé."
-
-#~ msgid "The Endless Pouch of Crystal provides 1 unit of crystal/day."
-#~ msgstr ""
-#~ "Den bottenlösa påsen av kristaller förser dig med 1 enhet kristaller per "
-#~ "dag."
-
-#~ msgid "The Endless Cart of Ore provides 1 unit of ore per day."
-#~ msgstr "Den bottenlösa kärran av malm förser dig med 1 enhet malm per dag."
-
-#~ msgid "The Endless Pouch of Gems provides 1 unit of gems per day."
-#~ msgstr ""
-#~ "Den bottenlösa påsen av ädelstenar förser dig med 1 enhet ädelstenar per "
-#~ "dag."
-
-#~ msgid "The Endless Vial of Mercury provides 1 unit of mercury per day."
-#~ msgstr ""
-#~ "Den bottenlösa flaskan av kvicksilver förse dig med 1 enhet kvicksilver "
-#~ "per dag."
-
-#~ msgid "The White Pearl increases your spell power and knowledge by 1 each."
-#~ msgstr "Den vita pärlan höjer din besvärjelsestyrka med 1 var."
-
-#~ msgid "Dummy 3"
-#~ msgstr "Docka 3"
-
-#~ msgid "Dummy 4"
-#~ msgstr "Docka 4"
-
-#~ msgid "The reserved artifact."
-#~ msgstr "Reserverad artefakt."
-
-#~ msgid "Dummy 2"
-#~ msgstr "Docka 2"
-
-#~ msgid "Dummy 1"
-#~ msgstr "Docka 1"
-
-#~ msgid "Throng"
-#~ msgstr "Myller"
-
-#~ msgid "Normal"
-#~ msgstr "Normalt"
-
-#~ msgid "Defence"
-#~ msgstr "Försvar"
-
-#~ msgid "battle: show grid"
-#~ msgstr "strid: Visa rutnät"
-
-#~ msgid "battle: show mouse shadow"
-#~ msgstr "strid: Visa musskugga"
-
-#~ msgid "battle: show move shadow"
-#~ msgstr "strid: Visa förflyttningsskugga"
-
-#~ msgid "battle: show damage info"
-#~ msgstr "strid: Visa skadeinfo"
-
-#~ msgid "game: hide AI move"
-#~ msgstr "spel: Göm AI-förflyttning"
-
-#~ msgid "game: fast load game dialog (L hot key)"
-#~ msgstr "spel: Snabb spelladdnings-dialog (tangent L)"
-
-#~ msgid "The Masthead boosts your luck and morale by 1 each in sea combat."
-#~ msgstr "Masttoppen höjer din tur och moral med 1 var i havsstrider."
-
-#~ msgid ""
-#~ "The Heart of Ice provides 50 percent protection from cold, but doubles "
-#~ "the damage taken from fire."
-#~ msgstr ""
-#~ "Ishjärtat ger 50 procents skydd från kyla, men fördubblar skada från eld."
-
-#~ msgid ""
-#~ "The Crystal Ball lets you get more specific information about monsters, "
-#~ "enemy heroes, and castles nearby the hero who holds it."
-#~ msgstr ""
-#~ "Kristallbollen låter dig få veta mer specifik information om monster, "
-#~ "fiendehjältar och slott i närheten av den hjälte som håller i den."
-
-#~ msgid ""
-#~ "The Heart of Fire provides 50 percent protection from fire, but doubles "
-#~ "the damage taken from cold."
-#~ msgstr ""
-#~ "Eldhjärtat ger 50 procents skydd från eld, men fördubblar skada från kyla."
-
-#~ msgid ""
-#~ "The Arm of the Martyr increases your spell power by 3 but adds the undead "
-#~ "morale penalty."
-#~ msgstr ""
-#~ "Martyrens arm höjer din besvärjelsestyrka med 3, men höjer de odödas "
-#~ "moral."
-
-#~ msgid "The Breastplate increases your defense by 5."
-#~ msgstr "Bröstharnesket höjer ditt försvar med 5."
-
-#~ msgid ""
-#~ "The Spiked Shield increases your attack and defense skills by 2 each."
-#~ msgstr ""
-#~ "Spikade skölden höjer dina attack- och försvarsfärdigheter med 2 var."
-
-#~ msgid "The Spiked Helm increases your attack and defense skills by 1 each."
-#~ msgstr ""
-#~ "Spikade hjälmen höjer dina attack- och försvarsfärdigheter med 1 var."
-
-#~ msgid ""
-#~ "The Hideous Mask prevents all 'wandering' armies from joining your hero."
-#~ msgstr ""
-#~ "Otäcka masken förhindrar alla 'vandrande' arméer från att förena sig med "
-#~ "dina hjältar."
-
-#~ msgid "The Endless Pouch of Sulfur provides 1 unit of sulfur per day."
-#~ msgstr "Bottenlösa påsen av svavel förser dig med 1 enhet svavel per dag."
-
-#~ msgid ""
-#~ "The Ammo Cart provides endless ammunition for all your troops that shoot."
-#~ msgstr ""
-#~ "Ammunitionsvagnen förser dig med endless ammunition för alla dina trupper "
-#~ "som skjuter."
-
-#~ msgid "%{name} waiting"
-#~ msgstr "%{name} väntar"
-
-#~ msgid "one creature perish."
-#~ msgid_plural "%{count} creatures perished."
-#~ msgstr[0] "en varelse har dött."
-#~ msgstr[1] "%{count} varelser har dött."
-
-#~ msgid "one %{defender} perish."
-#~ msgid_plural "%{count} %{defender} perished."
-#~ msgstr[0] "en %{defender} har dött."
-#~ msgstr[1] "%{count} %{defender} har dött."
-
-#~ msgid "%{count} creatures perished."
-#~ msgstr "%{count} varelser har dött."
-
-#~ msgid "The Ultimate Crown increases each of your basic skills by 4 points."
-#~ msgstr ""
-#~ "Ultimata Kronan höjer alla dina grundläggande färdigheter med 4 poäng."
-
-#~ msgid "The Four-Leaf Clover increases your luck in combat."
-#~ msgstr "Fyrklövern höjer din tur i strid."
-
-#~ msgid "pocketpc: very very slow"
-#~ msgstr "pocketpc: riktigt, riktigt långsamt"
-
-#~ msgid ""
-#~ "Create a map that is 144 squares wide by 144 squares high. (For "
-#~ "reference, all the maps in Heroes where 72 x 72)"
-#~ msgstr ""
-#~ "Skapa en karta som är 144 rutor bred och 144 rutor hög. (Hänvisning, alla "
-#~ "kartor i Heroes var 72 x 72)"
-
-#~ msgid ""
-#~ "Create a map that is 72 squares wide by 72 squares high. (For reference, "
-#~ "all the maps in Heroes where 72 x 72)"
-#~ msgstr ""
-#~ "Skapa en karta som är 72 rutor bred och 72 rutor hög. (Hänvisning, alla "
-#~ "kartor i Heroes var 72 x 72)"
-
-#~ msgid ""
-#~ "Create a map that is 108 squares wide by 108 squares high. (For "
-#~ "reference, all the maps in Heroes where 72 x 72)"
-#~ msgstr ""
-#~ "Skapa en karta som är 108 rutor bred och 108 rutor hög. (Hänvisning, alla "
-#~ "kartor i Heroes var 72 x 72)"
-
-#~ msgid ""
-#~ "Create a map that is 36 squares wide by 36 squares high. (For reference, "
-#~ "all the maps in Heroes where 72 x 72)"
-#~ msgstr ""
-#~ "Skapa en karta som är 36 rutor bred och 36 rutor hög. (Hänvisning, alla "
-#~ "kartor i Heroes var 72 x 72)"
-
-#~ msgid "The Defender Helm of Protection increases your defense skill by 1."
-#~ msgstr "Beskyddandets försvararhjälm höjer din försvarsfärdighet med 1."
-
-#~ msgid "The Giant Flail of Dominion increases your attack skill by 1."
-#~ msgstr "Herraväldets gigantiska slaga höjer din attackfärdighet med 1."
-
-#~ msgid "The Thunder Mace of Dominion increases your attack skill by 1."
-#~ msgstr "Herraväldets åskspikklubba höjer din attackfärdighet med 1."
-
-#~ msgid ""
-#~ "The Armored Gauntlets of Protection increase your defense skill by 1."
-#~ msgstr ""
-#~ "Beskyddandets armerade stridshandskar höjer din försvarsfärdighet med 1."
-
-#~ msgid "The Sword increases your attack skill by 5."
-#~ msgstr "Svärdet höjer din attackfärdighet med 5."
-
-#~ msgid "The Holy Hammer increases your attack skill by 5."
-#~ msgstr "Den heliga hammaren höjer din attackfärdighet med 5."
-
-#~ msgid ""
-#~ "The Ultimate Shield increases your attack and defense skills by 6 each."
-#~ msgstr "Ultimata Skölden höjer din attack- och försvarsfärdighet med 6 var."
-
-#~ msgid ""
-#~ "The Enchanted Hourglass extends the duration of all your spells by 2 "
-#~ "turns."
-#~ msgstr ""
-#~ "Förvandlade timglaset förlänger alla din besvärjelsers varaktighet med 2 "
-#~ "rundor."
-
-#~ msgid "Summon Elemental spell failed!"
-#~ msgstr "Inkallningsbesvärjelse misslyckades!"
-
-#~ msgid "The Elemental Ring halves the casting cost of all summoning spells."
-#~ msgstr ""
-#~ "Elementringen halverar kostnaden av alla dina inkallningsbesvärjelser."
-
-#~ msgid ""
-#~ "The Book of Elements doubles the effectiveness of all your summoning "
-#~ "spells."
-#~ msgstr ""
-#~ "Elementboken fördubblar effekten av alla dina inkallningsbesvärjelser."
-
-#~ msgid "The Legendary Scepter adds 2 points to all attributes."
-#~ msgstr "Legendariska spiran lägger till 2 poäng på alla egenskaper."
-
-#~ msgid "The Ultimate Book of Knowledge increases your knowledge by 12."
-#~ msgstr "Den Ultimata kunskapsboken höjer din kunskap med 12."
-
-#~ msgid "The Ultimate Wand of Magic increases your spell power by 12."
-#~ msgstr "Den Ultimata trollstaven höjer dina magipoäng med 12."
-
-#~ msgid "The Gold Watch doubles the effectiveness of your hypnotize spells."
-#~ msgstr ""
-#~ "Den Gyllene klockan dubblerar effektiviteten av dina hypnosbesvärjelser."
-
-#~ msgid ""
-#~ "This Spell Scroll gives your hero the ability to cast the %{spell} spell."
-#~ msgstr ""
-#~ "Denna Besvärjelserulle ger din hjälte förmågan att kasta besvärjelsen %"
-#~ "{spell}."
