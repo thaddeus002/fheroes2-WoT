@@ -127,11 +127,31 @@ int MapTileExt::resource(const MapTileExt & te)
 	    case 11:	return Resource::Gems;
 	    case 13:	return Resource::Gold;
 	    case 17:	return Resource::Random;
-	    default: break;
+	    default:	break;
 	}
     }
 
     return Resource::Unknown;
+}
+
+bool MapTileExt::isMonster(const MapTileExt & te)
+{
+    return Monster::None != monster(te);
+}
+
+int MapTileExt::monster(const MapTileExt & te)
+{
+    return ICN::MONS32 == te.spriteICN ? 1 + te.spriteIndex : Monster::None;
+}
+
+bool MapTileExt::isArtifact(const MapTileExt & te)
+{
+    return Artifact::None != artifact(te);
+}
+
+int MapTileExt::artifact(const MapTileExt & te)
+{
+    return ICN::OBJNARTI == te.spriteICN && 0 != (te.spriteIndex % 2) ? 1 + te.spriteIndex / 2 : Artifact::None;
 }
 
 bool MapTileExt::isButtle(const MapTileExt & te)
@@ -619,7 +639,30 @@ void MapTile::loadSpriteLevel(MapTileLevels & list, int level, const mp2lev_t & 
     }
 }
 
-bool MapTile::isAction(void) const
+bool MapTile::isObjectEdit(void) const
+{
+    switch(object())
+    {
+	case MapObj::Bottle:
+	case MapObj::Sign:
+	case MapObj::Event:
+    	case MapObj::Sphinx:
+	case MapObj::Heroes:
+	case MapObj::RndCastle:
+	case MapObj::RndTown:
+	case MapObj::Castle:
+	case MapObj::Artifact:
+	case MapObj::Monster:
+	case MapObj::Resource:
+	    return isObjectAction();
+
+	default: break;
+    }
+
+    return false;
+}
+
+bool MapTile::isObjectAction(void) const
 {
     return objectID & MapObj::IsAction;
 }
@@ -1166,9 +1209,13 @@ MapData::MapData(MapWindow* parent) : QGraphicsScene(parent), tileOverMouse(NULL
     addObjectAct->setStatusTip(tr("Select map object"));
     connect(addObjectAct, SIGNAL(triggered()), this, SLOT(selectObjectImage()));
 
-    editObjectAct = new QAction(QIcon(":/images/edit_objects.png"), tr("Edit object..."), this);
-    editObjectAct->setStatusTip(tr("Edit map object"));
-    connect(editObjectAct, SIGNAL(triggered()), this, SLOT(editObjectAttributes()));
+    editObjectAttrbAct = new QAction(QIcon(":/images/edit_objects.png"), tr("Edit object..."), this);
+    editObjectAttrbAct->setStatusTip(tr("Edit map object"));
+    connect(editObjectAttrbAct, SIGNAL(triggered()), this, SLOT(editObjectAttributes()));
+
+    editObjectEventsAct = new QAction(QIcon(":/images/edit_events.png"), tr("Edit events..."), this);
+    editObjectEventsAct->setStatusTip(tr("Edit object events"));
+    connect(editObjectEventsAct, SIGNAL(triggered()), this, SLOT(editObjectEvents()));
 
     removeObjectAct = new QAction(QIcon(":/images/clear_objects.png"), tr("Remove object..."), this);
     removeObjectAct->setStatusTip(tr("Remove map object"));
@@ -1482,12 +1529,14 @@ void MapData::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 
     	    menu.addSeparator();
     	    menu.addAction(editPassableAct);
-    	    menu.addAction(editObjectAct);
+    	    menu.addAction(editObjectAttrbAct);
+    	    menu.addAction(editObjectEventsAct);
     	    menu.addAction(removeObjectAct);
     	    menu.addAction(cellInfoAct);
 
-    	    editObjectAct->setEnabled(tileOverMouse && tileOverMouse->isAction());
-    	    removeObjectAct->setEnabled(tileOverMouse && tileOverMouse->isAction());
+    	    editObjectAttrbAct->setEnabled(tileOverMouse && tileOverMouse->isObjectEdit());
+    	    editObjectEventsAct->setEnabled(tileOverMouse && tileOverMouse->isObjectAction());
+    	    removeObjectAct->setEnabled(tileOverMouse && tileOverMouse->isObjectAction());
 
     	    menu.addSeparator();
     	    menu.addAction(selectAllAct);
@@ -1547,14 +1596,13 @@ void MapData::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 {
     if(tileOverMouse)
     {
-	if(tileOverMouse->isAction())
-	{
+	if(tileOverMouse->isObjectEdit())
 	    editObjectAttributes();
-	}
 	else
-	{
+	if(tileOverMouse->isObjectAction())
+	    editObjectEvents();
+	else
 	    cellInfoDialog();
-	}
     }
 
     event->accept();
@@ -1629,7 +1677,7 @@ void MapData::drawForeground(QPainter* painter, const QRectF & rect)
 	else
 	// paint: selected item over mouse
 	{
-	    painter->setPen(QPen(tileOverMouse->isAction() ? QColor(0, 255, 0) : QColor(255, 255, 0), 1));
+	    painter->setPen(QPen(tileOverMouse->isObjectAction() ? QColor(0, 255, 0) : QColor(255, 255, 0), 1));
 	    painter->setBrush(QBrush(QColor(0, 0, 0, 0)));
 	    const QRectF & rt = tileOverMouse->boundingRect();
 	    painter->drawRect(QRectF(rt.x(), rt.y(), rt.width() - 1, rt.height() - 1));
@@ -1983,6 +2031,42 @@ bool MapData::loadMapMP2(const QString & mapFile)
     for(QVector<mp2rumor_t>::const_iterator
 	    it = mp2.rumors.begin(); it != mp2.rumors.end(); ++it)
 	    tavernRumors << Rumor(*it);
+
+    for(MapTiles::const_iterator
+	it = mapTiles.begin(); it != mapTiles.end(); ++it)
+    if((*it).isObjectAction())
+    {
+	// import artifacts
+	if(MapObj::Artifact == (*it).object())
+	{
+	    const MapTileExt* ext = mapTiles.tileConst((*it).mapPos())->levels1Const().findConst(MapTileExt::isArtifact);
+	    if(ext)
+	    {
+		MapArtifact* art = new MapArtifact((*it).mapPos(), ext->uid(), MapTileExt::artifact(*ext));
+		art->updateInfo(mp2.tiles[it - mapTiles.begin()]);
+		mapObjects.push_back(art);
+	    }
+	}
+	else
+	// import resources
+	if(MapObj::Resource == (*it).object())
+	{
+	    const MapTileExt* ext = mapTiles.tileConst((*it).mapPos())->levels1Const().findConst(MapTileExt::isResource);
+	    if(ext) mapObjects.push_back(new MapResource((*it).mapPos(), ext->uid(), MapTileExt::resource(*ext)));
+	}
+	else
+	// import monsters
+	if(MapObj::Monster == (*it).object())
+	{
+	    const MapTileExt* ext = mapTiles.tileConst((*it).mapPos())->levels1Const().findConst(MapTileExt::isMonster);
+	    if(ext)
+	    {
+		MapMonster* mons = new MapMonster((*it).mapPos(), ext->uid(), MapTileExt::monster(*ext));
+		mons->updateInfo(mp2.tiles[it - mapTiles.begin()]);
+		mapObjects.push_back(mons);
+	    }
+	}
+    }
 
     return true;
 }
@@ -2536,6 +2620,12 @@ const DayEvents & MapData::dayEvents(void) const
     return mapDayEvents;
 }
 
+void MapData::editObjectEvents(void)
+{
+    if(tileOverMouse)
+	editOtherMapEventsDialog(*tileOverMouse);
+}
+
 void MapData::editObjectAttributes(void)
 {
     if(tileOverMouse)
@@ -2551,7 +2641,11 @@ void MapData::editObjectAttributes(void)
     	case MapObj::Heroes:	editHeroDialog(*tileOverMouse); break;
 	case MapObj::Sphinx:	editSphinxDialog(*tileOverMouse); break;
 
-    	default:		editOtherMapEventsDialog(*tileOverMouse); break;
+	case MapObj::Monster:	editMonsterDialog(*tileOverMouse); break;
+	case MapObj::Resource:	editResourceDialog(*tileOverMouse); break;
+	case MapObj::Artifact:	editArtifactDialog(*tileOverMouse); break;
+
+    	default:		break;
     }
 }
 
@@ -2559,6 +2653,58 @@ void MapData::editOtherMapEventsDialog(const QPoint & pt)
 {
     const MapTile* tile = mapTiles.tile(pt);
     if(tile) editOtherMapEventsDialog(*tile);
+}
+
+void MapData::editMonsterDialog(const MapTile & tile)
+{
+    MapMonster* monster = dynamic_cast<MapMonster*>(mapObjects.find(tile.mapPos()).data());
+
+    if(monster)
+    {
+	Form::MapMonsterDialog form(*monster);
+
+	if(QDialog::Accepted == form.exec())
+	{
+	    QPair<int, int> /* join condition, count */ res = form.result();
+	    monster->condition = res.first;
+	    monster->count = res.second;
+	    emit dataModified();
+	}
+    }
+}
+
+void MapData::editResourceDialog(const MapTile & tile)
+{
+    MapResource* resource = dynamic_cast<MapResource*>(mapObjects.find(tile.mapPos()).data());
+
+    if(resource)
+    {
+	Form::MapResourceDialog form(*resource);
+
+	if(QDialog::Accepted == form.exec())
+	{
+	    resource->count = form.result();
+	    emit dataModified();
+	}
+    }
+}
+
+void MapData::editArtifactDialog(const MapTile & tile)
+{
+    MapArtifact* artifact = dynamic_cast<MapArtifact*>(mapObjects.find(tile.mapPos()).data());
+
+    if(artifact)
+    {
+	Form::MapArtifactDialog form(*artifact);
+
+	if(QDialog::Accepted == form.exec())
+	{
+	    QPair<int, int> /* pickup condition, spell */ res = form.result();
+	    artifact->condition = res.first;
+	    artifact->spell = res.second;
+	    emit dataModified();
+	}
+    }
 }
 
 void MapData::editOtherMapEventsDialog(const MapTile & tile)
@@ -2597,6 +2743,7 @@ void MapData::editMapEventDialog(const MapTile & tile)
 	}
     }
 }
+
 void MapData::editTownDialog(const QPoint & pt)
 {
     const MapTile* tile = mapTiles.tile(pt);
@@ -2609,7 +2756,7 @@ void MapData::editTownDialog(const MapTile & tile)
 
     if(town)
     {
-	Form::TownDialog form(*town);
+	Form::MapTownDialog form(*town);
 
 	if(QDialog::Accepted == form.exec())
 	{
@@ -2677,7 +2824,7 @@ void MapData::editHeroDialog(const MapTile & tile)
 
     if(hero)
     {
-	Form::HeroDialog form(*hero);
+	Form::MapHeroDialog form(*hero);
 
 	if(QDialog::Accepted == form.exec())
 	{
@@ -2765,6 +2912,30 @@ void MapData::addMapObject(const QPoint & pos, const CompositeObject & obj, quin
 		case MapObj::Sign:	objPtr = new MapSign(tile->mapPos(), uid); break;
 		case MapObj::Event:	objPtr = new MapEvent(tile->mapPos(), uid); break;
     		case MapObj::Sphinx:	objPtr = new MapSphinx(tile->mapPos(), uid); break;
+
+		case MapObj::Resource:
+		{
+		    const MapTileExt* ext = tile->levels1Const().findConst(MapTileExt::isResource);
+		    if(ext)
+			objPtr = new MapResource(tile->mapPos(), uid, MapTileExt::resource(*ext));
+		}
+		break;
+
+		case MapObj::Monster:
+		{
+		    const MapTileExt* ext = tile->levels1Const().findConst(MapTileExt::isMonster);
+		    if(ext)
+			objPtr = new MapMonster(tile->mapPos(), uid, MapTileExt::monster(*ext));
+		}
+		break;
+
+		case MapObj::Artifact:
+		{
+		    const MapTileExt* ext = tile->levels1Const().findConst(MapTileExt::isArtifact);
+		    if(ext)
+			objPtr = new MapArtifact(tile->mapPos(), uid, MapTileExt::artifact(*ext));
+		}
+		break;
 
     		case MapObj::Heroes:
 		{

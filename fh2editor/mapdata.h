@@ -129,7 +129,11 @@ public:
     static bool		isRandomTown(const MapTileExt &);
     static int		loyaltyObject(const MapTileExt &);
     static bool		isResource(const MapTileExt &);
+    static bool		isMonster(const MapTileExt &);
+    static bool		isArtifact(const MapTileExt &);
     static int		resource(const MapTileExt &);
+    static int		monster(const MapTileExt &);
+    static int		artifact(const MapTileExt &);
 
     static void		updateFlagColor(MapTileExt &, int);
     static void		updateMiniHero(MapTileExt &, int, int);
@@ -194,7 +198,8 @@ public:
     const MapTileLevels & levels1Const(void) const { return spritesLevel1; }
     const MapTileLevels & levels2Const(void) const { return spritesLevel2; }
 
-    bool		isAction(void) const;
+    bool		isObjectAction(void) const;
+    bool		isObjectEdit(void) const;
     int			object(void) const;
 
 protected:
@@ -375,6 +380,7 @@ protected slots:
     void		removeObjectsAction(QAction*);
     void		selectObjectImage(void);
     void		editObjectAttributes(void);
+    void		editObjectEvents(void);
     void		removeCurrentObject(void);
 
 protected:
@@ -398,6 +404,9 @@ protected:
     void		editSignDialog(const MapTile &);
     void		editSphinxDialog(const MapTile &);
     void		editHeroDialog(const MapTile &);
+    void		editMonsterDialog(const MapTile &);
+    void		editResourceDialog(const MapTile &);
+    void		editArtifactDialog(const MapTile &);
     void		editOtherMapEventsDialog(const MapTile &);
 
     bool		loadMapMP2(const QString &);
@@ -432,7 +441,8 @@ protected:
     QAction*            cellInfoAct;
     QAction*            selectAllAct;
     QAction*            addObjectAct;
-    QAction*            editObjectAct;
+    QAction*            editObjectAttrbAct;
+    QAction*            editObjectEventsAct;
     QAction*            removeObjectAct;
 
     QActionGroup*       fillGroundAct;

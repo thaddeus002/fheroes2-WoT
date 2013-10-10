@@ -2666,11 +2666,14 @@ QDomElement & operator<< (QDomElement & el, const MapObjects & objects)
 
 	switch((*it).data()->type())
 	{
-	    case MapObj::Castle: { MapTown* obj = dynamic_cast<MapTown*>((*it).data()); if(obj) elem << *obj; } break;
-	    case MapObj::Heroes: { MapHero* obj = dynamic_cast<MapHero*>((*it).data());	if(obj) elem << *obj; } break;
-	    case MapObj::Sign:   { MapSign* obj = dynamic_cast<MapSign*>((*it).data());	if(obj) elem << *obj; } break;
-	    case MapObj::Event:  { MapEvent* obj = dynamic_cast<MapEvent*>((*it).data()); if(obj) elem << *obj; } break;
-	    case MapObj::Sphinx: { MapSphinx* obj = dynamic_cast<MapSphinx*>((*it).data()); if(obj) elem << *obj; } break;
+	    case MapObj::Castle:  { MapTown* obj = dynamic_cast<MapTown*>((*it).data()); if(obj) elem << *obj; } break;
+	    case MapObj::Heroes:  { MapHero* obj = dynamic_cast<MapHero*>((*it).data());	if(obj) elem << *obj; } break;
+	    case MapObj::Sign:    { MapSign* obj = dynamic_cast<MapSign*>((*it).data());	if(obj) elem << *obj; } break;
+	    case MapObj::Event:   { MapEvent* obj = dynamic_cast<MapEvent*>((*it).data()); if(obj) elem << *obj; } break;
+	    case MapObj::Sphinx:  { MapSphinx* obj = dynamic_cast<MapSphinx*>((*it).data()); if(obj) elem << *obj; } break;
+	    case MapObj::Resource:{ MapResource* obj = dynamic_cast<MapResource*>((*it).data()); if(obj) elem << *obj; } break;
+	    case MapObj::Monster: { MapMonster* obj = dynamic_cast<MapMonster*>((*it).data()); if(obj) elem << *obj; } break;
+	    case MapObj::Artifact:{ MapArtifact* obj = dynamic_cast<MapArtifact*>((*it).data()); if(obj) elem << *obj; } break;
 	    default:{ MapActions* obj = dynamic_cast<MapActions*>((*it).data()); if(obj) elem << *obj; else elem << *(*it).data(); } break;
 	}
     }
@@ -2702,6 +2705,15 @@ QDomElement & operator>> (QDomElement & el, MapObjects & objects)
 	else
 	if(elem.tagName() == "sphinx")
 	{ MapSphinx* obj = new MapSphinx(); elem >> *obj; objects.push_back(obj); }
+	else
+	if(elem.tagName() == "artifact")
+	{ MapArtifact* obj = new MapArtifact(); elem >> *obj; objects.push_back(obj); }
+	else
+	if(elem.tagName() == "resource")
+	{ MapResource* obj = new MapResource(); elem >> *obj; objects.push_back(obj); }
+	else
+	if(elem.tagName() == "monster")
+	{ MapMonster* obj = new MapMonster(); elem >> *obj; objects.push_back(obj); }
 	else
 	if(elem.tagName() == "actions")
 	{ MapActions* obj = new MapActions(); elem >> *obj; objects.push_back(obj); }
@@ -3748,4 +3760,67 @@ bool Spell::isBattle(int spell)
 QString Spell::tips(int spell)
 {
     return transcribe(spell);
+}
+
+void MapArtifact::updateInfo(const mp2til_t & til)
+{
+    if(artifact == Artifact::SpellScroll)
+	spell = til.quantity1;
+}
+
+QDomElement & operator<< (QDomElement & el, const MapArtifact & obj)
+{
+    el << static_cast<const MapObject &>(obj);
+    el.setAttribute("artifact", obj.artifact);
+    el.setAttribute("condition", obj.condition);
+    if(obj.artifact == Artifact::SpellScroll) el.setAttribute("spell", obj.spell);
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, MapArtifact & obj)
+{
+    el >> static_cast<MapObject &>(obj);
+    obj.artifact = el.hasAttribute("artifact") ? el.attribute("artifact").toInt() : 0;
+    obj.condition = el.hasAttribute("condition") ? el.attribute("condition").toInt() : 0;
+    obj.spell = el.hasAttribute("spell") ? el.attribute("spell").toInt() : 0;
+    return el;
+}
+
+QDomElement & operator<< (QDomElement & el, const MapResource & obj)
+{
+    el << static_cast<const MapObject &>(obj);
+    el.setAttribute("resource", obj.resource);
+    el.setAttribute("count", obj.count);
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, MapResource & obj)
+{
+    el >> static_cast<MapObject &>(obj);
+    obj.resource = el.hasAttribute("resource") ? el.attribute("resource").toInt() : 0;
+    obj.count = el.hasAttribute("count") ? el.attribute("count").toInt() : 0;
+    return el;
+}
+
+void MapMonster::updateInfo(const mp2til_t & til)
+{
+    count = (static_cast<quint32>(til.quantity1) << 8) | til.quantity2;
+}
+
+QDomElement & operator<< (QDomElement & el, const MapMonster & obj)
+{
+    el << static_cast<const MapObject &>(obj);
+    el.setAttribute("monster", obj.monster);
+    el.setAttribute("condition", obj.condition);
+    el.setAttribute("count", obj.count);
+    return el;
+}
+
+QDomElement & operator>> (QDomElement & el, MapMonster & obj)
+{
+    el >> static_cast<MapObject &>(obj);
+    obj.monster = el.hasAttribute("monster") ? el.attribute("monster").toInt() : 0;
+    obj.condition = el.hasAttribute("condition") ? el.attribute("condition").toInt() : 0;
+    obj.count = el.hasAttribute("count") ? el.attribute("count").toInt() : 0;
+    return el;
 }

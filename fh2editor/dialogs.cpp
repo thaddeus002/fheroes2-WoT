@@ -20,6 +20,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <algorithm>
 #include <QtGui>
 #include <QApplication>
 #include <QComboBox>
@@ -1981,15 +1982,15 @@ MapEvent Form::MapEventDialog::result(const QPoint & pos, quint32 uid) const
     return res;
 }
 
-Form::TownDialog::TownDialog(const MapTown & town)
+Form::MapTownDialog::MapTownDialog(const MapTown & town)
 {
-    setWindowTitle(QApplication::translate("TownDialog", "Town Detail", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("MapTownDialog", "Town Detail", 0, QApplication::UnicodeUTF8));
 
     // tab: info
     tabInfo = new QWidget();
 
     labelName = new QLabel(tabInfo);
-    labelName->setText(QApplication::translate("TownDialog", "Name", 0, QApplication::UnicodeUTF8));
+    labelName->setText(QApplication::translate("MapTownDialog", "Name", 0, QApplication::UnicodeUTF8));
 
     comboBoxName = new QComboBox(tabInfo);
     comboBoxName->setEditable(true);
@@ -2001,7 +2002,7 @@ Form::TownDialog::TownDialog(const MapTown & town)
     horizontalLayoutName->addWidget(comboBoxName);
 
     labelColor = new QLabel(tabInfo);
-    labelColor->setText(QApplication::translate("TownDialog", "Color", 0, QApplication::UnicodeUTF8));
+    labelColor->setText(QApplication::translate("MapTownDialog", "Color", 0, QApplication::UnicodeUTF8));
 
     comboBoxColor = new QComboBox(tabInfo);
     comboBoxColor->addItem(Editor::pixmapBorder(QSize(24, 24), QColor(130, 130, 130), QColor(0, 0, 0)), "Gray", Color::None);
@@ -2018,7 +2019,7 @@ Form::TownDialog::TownDialog(const MapTown & town)
     horizontalLayoutColor->addWidget(comboBoxColor);
 
     checkBoxCaptain = new QCheckBox(tabInfo);
-    checkBoxCaptain->setText(QApplication::translate("TownDialog", "Captain", 0, QApplication::UnicodeUTF8));
+    checkBoxCaptain->setText(QApplication::translate("MapTownDialog", "Captain", 0, QApplication::UnicodeUTF8));
     checkBoxCaptain->setChecked(town.captainPresent);
 #ifndef QT_NO_TOOLTIP
     checkBoxCaptain->setToolTip(Building::description(Building::Captain, town.race));
@@ -2027,7 +2028,7 @@ Form::TownDialog::TownDialog(const MapTown & town)
     checkBoxAllowCastle = new QCheckBox(tabInfo);
     checkBoxAllowCastle->setVisible(! town.isCastle);
     checkBoxAllowCastle->setChecked(! town.forceTown);
-    checkBoxAllowCastle->setText(QApplication::translate("TownDialog", "Allow castle", 0, QApplication::UnicodeUTF8));
+    checkBoxAllowCastle->setText(QApplication::translate("MapTownDialog", "Allow castle", 0, QApplication::UnicodeUTF8));
 
     verticalSpacerInfo = new QSpacerItem(20, 142, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
@@ -2044,12 +2045,12 @@ Form::TownDialog::TownDialog(const MapTown & town)
 
     checkBoxTroopsDefault = new QCheckBox(tabTroops);
     checkBoxTroopsDefault->setChecked(defaultTroops);
-    checkBoxTroopsDefault->setText(QApplication::translate("TownDialog", "Default", 0, QApplication::UnicodeUTF8));
+    checkBoxTroopsDefault->setText(QApplication::translate("MapTownDialog", "Default", 0, QApplication::UnicodeUTF8));
 
     // troop 1
     labelSlot1 = new QLabel(tabTroops);
     labelSlot1->setEnabled(! defaultTroops);
-    labelSlot1->setText(QApplication::translate("TownDialog", "Slot 1", 0, QApplication::UnicodeUTF8));
+    labelSlot1->setText(QApplication::translate("MapTownDialog", "Slot 1", 0, QApplication::UnicodeUTF8));
 
     comboBoxTroop1 = new QComboBox(tabTroops);
     comboBoxTroop1->setEnabled(! defaultTroops);
@@ -2067,7 +2068,7 @@ Form::TownDialog::TownDialog(const MapTown & town)
     // troop 2
     labelSlot2 = new QLabel(tabTroops);
     labelSlot2->setEnabled(! defaultTroops);
-    labelSlot2->setText(QApplication::translate("TownDialog", "Slot 2", 0, QApplication::UnicodeUTF8));
+    labelSlot2->setText(QApplication::translate("MapTownDialog", "Slot 2", 0, QApplication::UnicodeUTF8));
 
     comboBoxTroop2 = new QComboBox(tabTroops);
     comboBoxTroop2->setEnabled(! defaultTroops);
@@ -2085,7 +2086,7 @@ Form::TownDialog::TownDialog(const MapTown & town)
     // troop 3
     labelSlot3 = new QLabel(tabTroops);
     labelSlot3->setEnabled(! defaultTroops);
-    labelSlot3->setText(QApplication::translate("TownDialog", "Slot 3", 0, QApplication::UnicodeUTF8));
+    labelSlot3->setText(QApplication::translate("MapTownDialog", "Slot 3", 0, QApplication::UnicodeUTF8));
 
     comboBoxTroop3 = new QComboBox(tabTroops);
     comboBoxTroop3->setEnabled(! defaultTroops);
@@ -2103,7 +2104,7 @@ Form::TownDialog::TownDialog(const MapTown & town)
     // troop 4
     labelSlot4 = new QLabel(tabTroops);
     labelSlot4->setEnabled(! defaultTroops);
-    labelSlot4->setText(QApplication::translate("TownDialog", "Slot 4", 0, QApplication::UnicodeUTF8));
+    labelSlot4->setText(QApplication::translate("MapTownDialog", "Slot 4", 0, QApplication::UnicodeUTF8));
 
     comboBoxTroop4 = new QComboBox(tabTroops);
     comboBoxTroop4->setEnabled(! defaultTroops);
@@ -2121,7 +2122,7 @@ Form::TownDialog::TownDialog(const MapTown & town)
     // troop 5
     labelSlot5 = new QLabel(tabTroops);
     labelSlot5->setEnabled(! defaultTroops);
-    labelSlot5->setText(QApplication::translate("TownDialog", "Slot 5", 0, QApplication::UnicodeUTF8));
+    labelSlot5->setText(QApplication::translate("MapTownDialog", "Slot 5", 0, QApplication::UnicodeUTF8));
 
     comboBoxTroop5 = new QComboBox(tabTroops);
     comboBoxTroop5->setEnabled(! defaultTroops);
@@ -2185,20 +2186,20 @@ Form::TownDialog::TownDialog(const MapTown & town)
 
     checkBoxBuildingsDefault = new QCheckBox(tabBuildings);
     checkBoxBuildingsDefault->setChecked(defaultBuildings);
-    checkBoxBuildingsDefault->setText(QApplication::translate("TownDialog", "Default", 0, QApplication::UnicodeUTF8));
+    checkBoxBuildingsDefault->setText(QApplication::translate("MapTownDialog", "Default", 0, QApplication::UnicodeUTF8));
 
     labelMageGuild = new QLabel(tabBuildings);
-    labelMageGuild->setText(QApplication::translate("TownDialog", "Mage Guild", 0, QApplication::UnicodeUTF8));
+    labelMageGuild->setText(QApplication::translate("MapTownDialog", "Mage Guild", 0, QApplication::UnicodeUTF8));
     labelMageGuild->setEnabled(! defaultBuildings);
 
     comboBoxMageGuild = new QComboBox(tabBuildings);
     comboBoxMageGuild->setEnabled(! defaultBuildings);
-    comboBoxMageGuild->addItem(QApplication::translate("TownDialog", "None", 0, QApplication::UnicodeUTF8), 0);
-    comboBoxMageGuild->addItem(QApplication::translate("TownDialog", "Level 1", 0, QApplication::UnicodeUTF8), 1);
-    comboBoxMageGuild->addItem(QApplication::translate("TownDialog", "Level 2", 0, QApplication::UnicodeUTF8), 2);
-    comboBoxMageGuild->addItem(QApplication::translate("TownDialog", "Level 3", 0, QApplication::UnicodeUTF8), 3);
-    comboBoxMageGuild->addItem(QApplication::translate("TownDialog", "Level 4", 0, QApplication::UnicodeUTF8), 4);
-    comboBoxMageGuild->addItem(QApplication::translate("TownDialog", "Level 5", 0, QApplication::UnicodeUTF8), 5);
+    comboBoxMageGuild->addItem(QApplication::translate("MapTownDialog", "None", 0, QApplication::UnicodeUTF8), 0);
+    comboBoxMageGuild->addItem(QApplication::translate("MapTownDialog", "Level 1", 0, QApplication::UnicodeUTF8), 1);
+    comboBoxMageGuild->addItem(QApplication::translate("MapTownDialog", "Level 2", 0, QApplication::UnicodeUTF8), 2);
+    comboBoxMageGuild->addItem(QApplication::translate("MapTownDialog", "Level 3", 0, QApplication::UnicodeUTF8), 3);
+    comboBoxMageGuild->addItem(QApplication::translate("MapTownDialog", "Level 4", 0, QApplication::UnicodeUTF8), 4);
+    comboBoxMageGuild->addItem(QApplication::translate("MapTownDialog", "Level 5", 0, QApplication::UnicodeUTF8), 5);
     comboBoxMageGuild->setCurrentIndex(0);
 
     horizontalLayoutMageGuild = new QHBoxLayout();
@@ -2207,11 +2208,11 @@ Form::TownDialog::TownDialog(const MapTown & town)
 
     checkBoxMarket = new QCheckBox(tabBuildings);
     checkBoxMarket->setEnabled(! defaultBuildings);
-    checkBoxMarket->setText(QApplication::translate("TownDialog", "Marketplace", 0, QApplication::UnicodeUTF8));
+    checkBoxMarket->setText(QApplication::translate("MapTownDialog", "Marketplace", 0, QApplication::UnicodeUTF8));
 
     checkBoxLeftTurret = new QCheckBox(tabBuildings);
     checkBoxLeftTurret->setEnabled(! defaultBuildings);
-    checkBoxLeftTurret->setText(QApplication::translate("TownDialog", "Left Turret", 0, QApplication::UnicodeUTF8));
+    checkBoxLeftTurret->setText(QApplication::translate("MapTownDialog", "Left Turret", 0, QApplication::UnicodeUTF8));
 
     horizontalLayoutB1 = new QHBoxLayout();
     horizontalLayoutB1->addWidget(checkBoxMarket);
@@ -2219,11 +2220,11 @@ Form::TownDialog::TownDialog(const MapTown & town)
 
     checkBoxTavern = new QCheckBox(tabBuildings);
     checkBoxTavern->setEnabled(! defaultBuildings);
-    checkBoxTavern->setText(QApplication::translate("TownDialog", "Tavern", 0, QApplication::UnicodeUTF8));
+    checkBoxTavern->setText(QApplication::translate("MapTownDialog", "Tavern", 0, QApplication::UnicodeUTF8));
 
     checkBoxRightTurret = new QCheckBox(tabBuildings);
     checkBoxRightTurret->setEnabled(! defaultBuildings);
-    checkBoxRightTurret->setText(QApplication::translate("TownDialog", "Right Turret", 0, QApplication::UnicodeUTF8));
+    checkBoxRightTurret->setText(QApplication::translate("MapTownDialog", "Right Turret", 0, QApplication::UnicodeUTF8));
 
     horizontalLayoutB2 = new QHBoxLayout();
     horizontalLayoutB2->addWidget(checkBoxTavern);
@@ -2231,11 +2232,11 @@ Form::TownDialog::TownDialog(const MapTown & town)
 
     checkBoxShipyard = new QCheckBox(tabBuildings);
     checkBoxShipyard->setEnabled(! defaultBuildings);
-    checkBoxShipyard->setText(QApplication::translate("TownDialog", "Shipyard", 0, QApplication::UnicodeUTF8));
+    checkBoxShipyard->setText(QApplication::translate("MapTownDialog", "Shipyard", 0, QApplication::UnicodeUTF8));
 
     checkBoxMoat = new QCheckBox(tabBuildings);
     checkBoxMoat->setEnabled(! defaultBuildings);
-    checkBoxMoat->setText(QApplication::translate("TownDialog", "Moat", 0, QApplication::UnicodeUTF8));
+    checkBoxMoat->setText(QApplication::translate("MapTownDialog", "Moat", 0, QApplication::UnicodeUTF8));
 
     horizontalLayoutB3 = new QHBoxLayout();
     horizontalLayoutB3->addWidget(checkBoxShipyard);
@@ -2243,7 +2244,7 @@ Form::TownDialog::TownDialog(const MapTown & town)
 
     checkBoxWell = new QCheckBox(tabBuildings);
     checkBoxWell->setEnabled(! defaultBuildings);
-    checkBoxWell->setText(QApplication::translate("TownDialog", "Well", 0, QApplication::UnicodeUTF8));
+    checkBoxWell->setText(QApplication::translate("MapTownDialog", "Well", 0, QApplication::UnicodeUTF8));
 
     checkBoxExt = new QCheckBox(tabBuildings);
     checkBoxExt->setEnabled(! defaultBuildings);
@@ -2255,7 +2256,7 @@ Form::TownDialog::TownDialog(const MapTown & town)
 
     checkBoxStatue = new QCheckBox(tabBuildings);
     checkBoxStatue->setEnabled(! defaultBuildings);
-    checkBoxStatue->setText(QApplication::translate("TownDialog", "Statue", 0, QApplication::UnicodeUTF8));
+    checkBoxStatue->setText(QApplication::translate("MapTownDialog", "Statue", 0, QApplication::UnicodeUTF8));
 
     checkBoxSpec = new QCheckBox(tabBuildings);
     checkBoxSpec->setEnabled(! defaultBuildings);
@@ -2267,7 +2268,7 @@ Form::TownDialog::TownDialog(const MapTown & town)
 
     checkBoxThievesGuild = new QCheckBox(tabBuildings);
     checkBoxThievesGuild->setEnabled(! defaultBuildings);
-    checkBoxThievesGuild->setText(QApplication::translate("TownDialog", "Thieves Guild", 0, QApplication::UnicodeUTF8));
+    checkBoxThievesGuild->setText(QApplication::translate("MapTownDialog", "Thieves Guild", 0, QApplication::UnicodeUTF8));
 
     verticalSpacerBuildings = new QSpacerItem(20, 45, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
@@ -2335,20 +2336,20 @@ Form::TownDialog::TownDialog(const MapTown & town)
 
     checkBoxDwellingsDefault = new QCheckBox(tabDwellings);
     checkBoxDwellingsDefault->setChecked(defaultDwellings);
-    checkBoxDwellingsDefault->setText(QApplication::translate("TownDialog", "Default", 0, QApplication::UnicodeUTF8));
+    checkBoxDwellingsDefault->setText(QApplication::translate("MapTownDialog", "Default", 0, QApplication::UnicodeUTF8));
 
     checkBoxDwelling1 = new QCheckBox(tabDwellings);
     checkBoxDwelling1->setEnabled(! defaultDwellings);
-    checkBoxDwelling1->setText(QApplication::translate("TownDialog", "Dwelling 1", 0, QApplication::UnicodeUTF8));
+    checkBoxDwelling1->setText(QApplication::translate("MapTownDialog", "Dwelling 1", 0, QApplication::UnicodeUTF8));
 
     checkBoxDwelling2 = new QCheckBox(tabDwellings);
     checkBoxDwelling2->setEnabled(! defaultDwellings);
-    checkBoxDwelling2->setText(QApplication::translate("TownDialog", "Dwelling 2", 0, QApplication::UnicodeUTF8));
+    checkBoxDwelling2->setText(QApplication::translate("MapTownDialog", "Dwelling 2", 0, QApplication::UnicodeUTF8));
 
     checkBoxUpgrade2 = new QCheckBox(tabDwellings);
     checkBoxUpgrade2->setEnabled(! defaultDwellings);
     checkBoxUpgrade2->setVisible(dwellingMap & Building::Upgrade2);
-    checkBoxUpgrade2->setText(QApplication::translate("TownDialog", "Upgrade 2", 0, QApplication::UnicodeUTF8));
+    checkBoxUpgrade2->setText(QApplication::translate("MapTownDialog", "Upgrade 2", 0, QApplication::UnicodeUTF8));
 
     horizontalLayoutD2 = new QHBoxLayout();
     horizontalLayoutD2->addWidget(checkBoxDwelling2);
@@ -2356,12 +2357,12 @@ Form::TownDialog::TownDialog(const MapTown & town)
 
     checkBoxDwelling3 = new QCheckBox(tabDwellings);
     checkBoxDwelling3->setEnabled(! defaultDwellings);
-    checkBoxDwelling3->setText(QApplication::translate("TownDialog", "Dwelling 3", 0, QApplication::UnicodeUTF8));
+    checkBoxDwelling3->setText(QApplication::translate("MapTownDialog", "Dwelling 3", 0, QApplication::UnicodeUTF8));
 
     checkBoxUpgrade3 = new QCheckBox(tabDwellings);
     checkBoxUpgrade3->setEnabled(! defaultDwellings);
     checkBoxUpgrade3->setVisible(dwellingMap & Building::Upgrade3);
-    checkBoxUpgrade3->setText(QApplication::translate("TownDialog", "Upgrade 3", 0, QApplication::UnicodeUTF8));
+    checkBoxUpgrade3->setText(QApplication::translate("MapTownDialog", "Upgrade 3", 0, QApplication::UnicodeUTF8));
 
     horizontalLayoutD3 = new QHBoxLayout();
     horizontalLayoutD3->addWidget(checkBoxDwelling3);
@@ -2369,12 +2370,12 @@ Form::TownDialog::TownDialog(const MapTown & town)
 
     checkBoxDwelling4 = new QCheckBox(tabDwellings);
     checkBoxDwelling4->setEnabled(! defaultDwellings);
-    checkBoxDwelling4->setText(QApplication::translate("TownDialog", "Dwelling 4", 0, QApplication::UnicodeUTF8));
+    checkBoxDwelling4->setText(QApplication::translate("MapTownDialog", "Dwelling 4", 0, QApplication::UnicodeUTF8));
 
     checkBoxUpgrade4 = new QCheckBox(tabDwellings);
     checkBoxUpgrade4->setEnabled(! defaultDwellings);
     checkBoxUpgrade4->setVisible(dwellingMap & Building::Upgrade4);
-    checkBoxUpgrade4->setText(QApplication::translate("TownDialog", "Upgrade 4", 0, QApplication::UnicodeUTF8));
+    checkBoxUpgrade4->setText(QApplication::translate("MapTownDialog", "Upgrade 4", 0, QApplication::UnicodeUTF8));
 
     horizontalLayoutD4 = new QHBoxLayout();
     horizontalLayoutD4->addWidget(checkBoxDwelling4);
@@ -2382,12 +2383,12 @@ Form::TownDialog::TownDialog(const MapTown & town)
 
     checkBoxDwelling5 = new QCheckBox(tabDwellings);
     checkBoxDwelling5->setEnabled(! defaultDwellings);
-    checkBoxDwelling5->setText(QApplication::translate("TownDialog", "Dwelling 5", 0, QApplication::UnicodeUTF8));
+    checkBoxDwelling5->setText(QApplication::translate("MapTownDialog", "Dwelling 5", 0, QApplication::UnicodeUTF8));
 
     checkBoxUpgrade5 = new QCheckBox(tabDwellings);
     checkBoxUpgrade5->setEnabled(! defaultDwellings);
     checkBoxUpgrade5->setVisible(dwellingMap & Building::Upgrade5);
-    checkBoxUpgrade5->setText(QApplication::translate("TownDialog", "Upgrade 5", 0, QApplication::UnicodeUTF8));
+    checkBoxUpgrade5->setText(QApplication::translate("MapTownDialog", "Upgrade 5", 0, QApplication::UnicodeUTF8));
 
     horizontalLayoutD5 = new QHBoxLayout();
     horizontalLayoutD5->addWidget(checkBoxDwelling5);
@@ -2395,12 +2396,12 @@ Form::TownDialog::TownDialog(const MapTown & town)
 
     checkBoxDwelling6 = new QCheckBox(tabDwellings);
     checkBoxDwelling6->setEnabled(! defaultDwellings);
-    checkBoxDwelling6->setText(QApplication::translate("TownDialog", "Dwelling 6", 0, QApplication::UnicodeUTF8));
+    checkBoxDwelling6->setText(QApplication::translate("MapTownDialog", "Dwelling 6", 0, QApplication::UnicodeUTF8));
 
     checkBoxUpgrade6 = new QCheckBox(tabDwellings);
     checkBoxUpgrade6->setEnabled(! defaultDwellings);
     checkBoxUpgrade6->setVisible(dwellingMap & Building::Upgrade6);
-    checkBoxUpgrade6->setText(QApplication::translate("TownDialog", "Upgrade 6", 0, QApplication::UnicodeUTF8));
+    checkBoxUpgrade6->setText(QApplication::translate("MapTownDialog", "Upgrade 6", 0, QApplication::UnicodeUTF8));
 
     horizontalLayoutD6 = new QHBoxLayout();
     horizontalLayoutD6->addWidget(checkBoxDwelling6);
@@ -2444,12 +2445,12 @@ Form::TownDialog::TownDialog(const MapTown & town)
 
     pushButtonOk = new QPushButton(this);
     pushButtonOk->setEnabled(false);
-    pushButtonOk->setText(QApplication::translate("TownDialog", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setText(QApplication::translate("MapTownDialog", "Ok", 0, QApplication::UnicodeUTF8));
 
     horizontalSpacerButton = new QSpacerItem(48, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("TownDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+    pushButtonCancel->setText(QApplication::translate("MapTownDialog", "Cancel", 0, QApplication::UnicodeUTF8));
 
     horizontalLayoutButtons = new QHBoxLayout();
     horizontalLayoutButtons->addWidget(pushButtonOk);
@@ -2515,7 +2516,7 @@ Form::TownDialog::TownDialog(const MapTown & town)
     connect(checkBoxUpgrade6, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
 }
 
-Troops Form::TownDialog::troops(void) const
+Troops Form::MapTownDialog::troops(void) const
 {
     Troops res;
 
@@ -2528,7 +2529,7 @@ Troops Form::TownDialog::troops(void) const
     return res;
 }
 
-uint Form::TownDialog::buildings(void) const
+uint Form::MapTownDialog::buildings(void) const
 {
     uint res = 0;
 
@@ -2559,7 +2560,7 @@ uint Form::TownDialog::buildings(void) const
     return res;
 }
 
-uint Form::TownDialog::dwellings(void) const
+uint Form::MapTownDialog::dwellings(void) const
 {
     uint res = 0;
 
@@ -2579,7 +2580,7 @@ uint Form::TownDialog::dwellings(void) const
     return res;
 }
 
-void Form::TownDialog::setDefaultBuildings(bool f)
+void Form::MapTownDialog::setDefaultBuildings(bool f)
 {
     if(f)
     {
@@ -2616,7 +2617,7 @@ void Form::TownDialog::setDefaultBuildings(bool f)
     setEnableOKButton();
 }
 
-void Form::TownDialog::setDefaultDwellings(bool f)
+void Form::MapTownDialog::setDefaultDwellings(bool f)
 {
     if(f)
     {
@@ -2650,7 +2651,7 @@ void Form::TownDialog::setDefaultDwellings(bool f)
     setEnableOKButton();
 }
 
-void Form::TownDialog::setDefaultTroops(bool f)
+void Form::MapTownDialog::setDefaultTroops(bool f)
 {
     if(f)
     {
@@ -2688,7 +2689,7 @@ void Form::TownDialog::setDefaultTroops(bool f)
     setEnableOKButton();
 }
 
-void Form::TownDialog::setEnableOKButton(void)
+void Form::MapTownDialog::setEnableOKButton(void)
 {
     pushButtonOk->setEnabled(true);
 }
@@ -2733,15 +2734,15 @@ void Form::SignDialog::setEnableOKButton(void)
     pushButtonOk->setEnabled(true);
 }
 
-Form::HeroDialog::HeroDialog(const MapHero & hero)
+Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
 {
-    setWindowTitle(QApplication::translate("HeroDialog", "Hero Detail", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("MapHeroDialog", "Hero Detail", 0, QApplication::UnicodeUTF8));
 
     // tab: info
     tabInfo = new QWidget();
 
     labelName = new QLabel(tabInfo);
-    labelName->setText(QApplication::translate("HeroDialog", "Name", 0, QApplication::UnicodeUTF8));
+    labelName->setText(QApplication::translate("MapHeroDialog", "Name", 0, QApplication::UnicodeUTF8));
 
     lineEditName = new QLineEdit(tabInfo);
     lineEditName->setText(hero.nameHero);
@@ -2751,7 +2752,7 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
     horizontalLayoutName->addWidget(lineEditName);
 
     labelColor = new QLabel(tabInfo);
-    labelColor->setText(QApplication::translate("HeroDialog", "Color", 0, QApplication::UnicodeUTF8));
+    labelColor->setText(QApplication::translate("MapHeroDialog", "Color", 0, QApplication::UnicodeUTF8));
 
     comboBoxColor = new QComboBox(tabInfo);
 
@@ -2767,7 +2768,7 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
     horizontalLayoutColor->addWidget(comboBoxColor);
 
     labelRace = new QLabel(tabInfo);
-    labelRace->setText(QApplication::translate("HeroDialog", "Race", 0, QApplication::UnicodeUTF8));
+    labelRace->setText(QApplication::translate("MapHeroDialog", "Race", 0, QApplication::UnicodeUTF8));
 
     comboBoxRace = new QComboBox(tabInfo);
     comboBoxRace->addItem(Race::transcribe(Race::Knight), Race::Knight);
@@ -2784,7 +2785,7 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
     horizontalLayoutRace->addWidget(comboBoxRace);
 
     labelExperience = new QLabel(tabInfo);
-    labelExperience->setText(QApplication::translate("HeroDialog", "Experience", 0, QApplication::UnicodeUTF8));
+    labelExperience->setText(QApplication::translate("MapHeroDialog", "Experience", 0, QApplication::UnicodeUTF8));
 
     lineEditExperience = new QLineEdit(tabInfo);
     lineEditExperience->setInputMethodHints(Qt::ImhDigitsOnly);
@@ -2832,11 +2833,11 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
 
     checkBoxTroopsDefault = new QCheckBox(tabTroops);
     checkBoxTroopsDefault->setChecked(defaultTroops);
-    checkBoxTroopsDefault->setText(QApplication::translate("HeroDialog", "Default", 0, QApplication::UnicodeUTF8));
+    checkBoxTroopsDefault->setText(QApplication::translate("MapHeroDialog", "Default", 0, QApplication::UnicodeUTF8));
 
     labelSlot1 = new QLabel(tabTroops);
     labelSlot1->setEnabled(! defaultTroops);
-    labelSlot1->setText(QApplication::translate("HeroDialog", "Slot 1", 0, QApplication::UnicodeUTF8));
+    labelSlot1->setText(QApplication::translate("MapHeroDialog", "Slot 1", 0, QApplication::UnicodeUTF8));
 
     comboBoxTroop1 = new QComboBox(tabTroops);
     comboBoxTroop1->setEnabled(! defaultTroops);
@@ -2853,7 +2854,7 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
 
     labelSlot2 = new QLabel(tabTroops);
     labelSlot2->setEnabled(! defaultTroops);
-    labelSlot2->setText(QApplication::translate("HeroDialog", "Slot 2", 0, QApplication::UnicodeUTF8));
+    labelSlot2->setText(QApplication::translate("MapHeroDialog", "Slot 2", 0, QApplication::UnicodeUTF8));
 
     comboBoxTroop2 = new QComboBox(tabTroops);
     comboBoxTroop2->setEnabled(! defaultTroops);
@@ -2870,7 +2871,7 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
 
     labelSlot3 = new QLabel(tabTroops);
     labelSlot3->setEnabled(! defaultTroops);
-    labelSlot3->setText(QApplication::translate("HeroDialog", "Slot 3", 0, QApplication::UnicodeUTF8));
+    labelSlot3->setText(QApplication::translate("MapHeroDialog", "Slot 3", 0, QApplication::UnicodeUTF8));
 
     comboBoxTroop3 = new QComboBox(tabTroops);
     comboBoxTroop3->setEnabled(! defaultTroops);
@@ -2887,7 +2888,7 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
 
     labelSlot4 = new QLabel(tabTroops);
     labelSlot4->setEnabled(! defaultTroops);
-    labelSlot4->setText(QApplication::translate("HeroDialog", "Slot 4", 0, QApplication::UnicodeUTF8));
+    labelSlot4->setText(QApplication::translate("MapHeroDialog", "Slot 4", 0, QApplication::UnicodeUTF8));
 
     comboBoxTroop4 = new QComboBox(tabTroops);
     comboBoxTroop4->setEnabled(! defaultTroops);
@@ -2904,7 +2905,7 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
 
     labelSlot5 = new QLabel(tabTroops);
     labelSlot5->setEnabled(! defaultTroops);
-    labelSlot5->setText(QApplication::translate("HeroDialog", "Slot 5", 0, QApplication::UnicodeUTF8));
+    labelSlot5->setText(QApplication::translate("MapHeroDialog", "Slot 5", 0, QApplication::UnicodeUTF8));
 
     comboBoxTroop5 = new QComboBox(tabTroops);
     comboBoxTroop5->setEnabled(! defaultTroops);
@@ -2989,7 +2990,7 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
 
     checkBoxDefaultSkills = new QCheckBox(tabSkills);
     checkBoxDefaultSkills->setChecked(defaultSkills);
-    checkBoxDefaultSkills->setText(QApplication::translate("HeroDialog", "Default", 0, QApplication::UnicodeUTF8));
+    checkBoxDefaultSkills->setText(QApplication::translate("MapHeroDialog", "Default", 0, QApplication::UnicodeUTF8));
 
     listWidgetSkills = new SkillsList(tabSkills);
     listWidgetSkills->setVisible(! defaultSkills);
@@ -3016,26 +3017,26 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
     tabOther = new QWidget();
 
     groupBoxPatrol = new QGroupBox(tabOther);
-    groupBoxPatrol->setTitle(QApplication::translate("HeroDialog", "Patrol", 0, QApplication::UnicodeUTF8));
+    groupBoxPatrol->setTitle(QApplication::translate("MapHeroDialog", "Patrol", 0, QApplication::UnicodeUTF8));
 
     checkBoxEnablePatrol = new QCheckBox(groupBoxPatrol);
     checkBoxEnablePatrol->setChecked(hero.patrolMode);
 
-    checkBoxEnablePatrol->setText(QApplication::translate("HeroDialog", "Enable", 0, QApplication::UnicodeUTF8));
+    checkBoxEnablePatrol->setText(QApplication::translate("MapHeroDialog", "Enable", 0, QApplication::UnicodeUTF8));
 
     comboBoxPatrol = new QComboBox(groupBoxPatrol);
     comboBoxPatrol->setEnabled(hero.patrolMode);
-    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Stand still", 0, QApplication::UnicodeUTF8), 0);
-    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Radius 1 square", 0, QApplication::UnicodeUTF8), 1);
-    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Radius 2 squares", 0, QApplication::UnicodeUTF8), 2);
-    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Radius 3 squares", 0, QApplication::UnicodeUTF8), 3);
-    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Radius 4 squares", 0, QApplication::UnicodeUTF8), 4);
-    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Radius 5 squares", 0, QApplication::UnicodeUTF8), 5);
-    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Radius 6 squares", 0, QApplication::UnicodeUTF8), 6);
-    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Radius 7 squares", 0, QApplication::UnicodeUTF8), 7);
-    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Radius 8 squares", 0, QApplication::UnicodeUTF8), 8);
-    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Radius 9 squares", 0, QApplication::UnicodeUTF8), 9);
-    comboBoxPatrol->addItem(QApplication::translate("HeroDialog", "Radius 10 squares", 0, QApplication::UnicodeUTF8), 10);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Stand still", 0, QApplication::UnicodeUTF8), 0);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 1 square", 0, QApplication::UnicodeUTF8), 1);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 2 squares", 0, QApplication::UnicodeUTF8), 2);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 3 squares", 0, QApplication::UnicodeUTF8), 3);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 4 squares", 0, QApplication::UnicodeUTF8), 4);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 5 squares", 0, QApplication::UnicodeUTF8), 5);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 6 squares", 0, QApplication::UnicodeUTF8), 6);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 7 squares", 0, QApplication::UnicodeUTF8), 7);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 8 squares", 0, QApplication::UnicodeUTF8), 8);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 9 squares", 0, QApplication::UnicodeUTF8), 9);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 10 squares", 0, QApplication::UnicodeUTF8), 10);
     comboBoxPatrol->setCurrentIndex(hero.patrolSquare < comboBoxPatrol->count() ? hero.patrolSquare : 0);
 
     verticalLayoutPatrol = new QVBoxLayout(groupBoxPatrol);
@@ -3051,12 +3052,12 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
     // buttons
     pushButtonOk = new QPushButton(this);
     pushButtonOk->setEnabled(false);
-    pushButtonOk->setText(QApplication::translate("HeroDialog", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setText(QApplication::translate("MapHeroDialog", "Ok", 0, QApplication::UnicodeUTF8));
 
     horizontalSpacerButtons = new QSpacerItem(68, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("HeroDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+    pushButtonCancel->setText(QApplication::translate("MapHeroDialog", "Cancel", 0, QApplication::UnicodeUTF8));
 
     horizontalLayoutButtons = new QHBoxLayout();
     horizontalLayoutButtons->addWidget(pushButtonOk);
@@ -3109,14 +3110,14 @@ Form::HeroDialog::HeroDialog(const MapHero & hero)
     connect(comboBoxPatrol, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
 }
 
-void Form::HeroDialog::widgetSkillsVisible(bool f)
+void Form::MapHeroDialog::widgetSkillsVisible(bool f)
 {
     if(f) listWidgetSkills->clear();
     listWidgetSkills->setVisible(! f);
     setEnableOKButton();
 }
 
-void Form::HeroDialog::setPortrait(int val)
+void Form::MapHeroDialog::setPortrait(int val)
 {
     labelPortrait->setPixmap(EditorTheme::getImageICN("PORTMEDI.ICN", val).first);
     if(val)
@@ -3134,12 +3135,12 @@ void Form::HeroDialog::setPortrait(int val)
     setEnableOKButton();
 }
 
-void Form::HeroDialog::setEnableOKButton(void)
+void Form::MapHeroDialog::setEnableOKButton(void)
 {
     pushButtonOk->setEnabled(true);
 }
 
-void Form::HeroDialog::setDefaultTroops(bool f)
+void Form::MapHeroDialog::setDefaultTroops(bool f)
 {
     if(f)
     {
@@ -3177,7 +3178,7 @@ void Form::HeroDialog::setDefaultTroops(bool f)
     setEnableOKButton();
 }
 
-Troops Form::HeroDialog::troops(void) const
+Troops Form::MapHeroDialog::troops(void) const
 {
     Troops res;
 
@@ -3190,7 +3191,7 @@ Troops Form::HeroDialog::troops(void) const
     return res;
 }
 
-QVector<int> Form::HeroDialog::artifacts(void) const
+QVector<int> Form::MapHeroDialog::artifacts(void) const
 {
     QVector<int> res;
 
@@ -3200,7 +3201,7 @@ QVector<int> Form::HeroDialog::artifacts(void) const
     return res;
 }
 
-Skills Form::HeroDialog::skills(void) const
+Skills Form::MapHeroDialog::skills(void) const
 {
     Skills res;
 
@@ -4306,10 +4307,10 @@ Form::ArtifactDialog::ArtifactDialog(const ActionArtifact & act) : MessageTabDia
     tabWidget->addTab(tabArtifact, "Artifact");
     tabWidget->setCurrentIndex(1);
 
-//    QSize minSize = minimumSizeHint();
-//
-//    resize(minSize);
-//    setMinimumSize(minSize);
+    QSize minSize = minimumSizeHint();
+
+    resize(minSize);
+    setMinimumSize(minSize);
 
     if(act.artifact == Artifact::SpellScroll)
     {
@@ -4321,9 +4322,9 @@ Form::ArtifactDialog::ArtifactDialog(const ActionArtifact & act) : MessageTabDia
 	spellGroup->setVisible(false);
 	spellGroup->setValue(Spell::None);
     }
-    resize(minimumSizeHint());
 
     connect(artifactGroup, SIGNAL(formChanged()), this, SLOT(artifactFormChanged()));
+    connect(spellGroup, SIGNAL(formChanged()), this, SLOT(enableButtonOK()));
 }
 
 ActionArtifact Form::ArtifactDialog::result(void) const
@@ -4366,4 +4367,247 @@ void Form::ArtifactDialog::artifactFormChanged(void)
     }
 
     resize(minimumSizeHint());
+}
+
+Form::MapArtifactDialog::MapArtifactDialog(const MapArtifact & obj)
+{
+    setWindowTitle(QApplication::translate("MapArtifact", "Artifact Detail", 0, QApplication::UnicodeUTF8));
+
+    variantRandom = new QCheckBox("Random", this);
+
+    variantCondition.push_back(new QRadioButton("no condition", this));
+    variantCondition.push_back(new QRadioButton("cost: 2000 gold", this));
+    variantCondition.push_back(new QRadioButton("cost: 2500 gold + 3 random resource", this));
+    variantCondition.push_back(new QRadioButton("cost: 3000 gold + 5 random resource", this));
+    variantCondition.push_back(new QRadioButton("need skill: Wizard", this));
+    variantCondition.push_back(new QRadioButton("need skill: LeaderShip", this));
+    variantCondition.push_back(new QRadioButton("fight: 50 Rogues", this));
+    variantCondition.push_back(new QRadioButton("fight: 1 Genie", this));
+    variantCondition.push_back(new QRadioButton("fight: 1 Paladin", this));
+    variantCondition.push_back(new QRadioButton("fight: 1 Cyclops", this));
+    variantCondition.push_back(new QRadioButton("fight: 1 Phoenix", this));
+    variantCondition.push_back(new QRadioButton("fight: 1 Green Dragon", this));
+    variantCondition.push_back(new QRadioButton("fight: 1 Giant", this));
+    variantCondition.push_back(new QRadioButton("fight: 1 Bone Dragon", this));
+
+    if(obj.condition < 0)
+    {
+        variantRandom->setChecked(true);
+	setDefaultCondition(variantRandom->isChecked());
+    }
+    else
+    if(obj.condition < variantCondition.size())
+	variantCondition[obj.condition]->setChecked(true);
+
+    labelSpell = new QLabel("spell:", this);
+    spellGroup = new SpellGroup(this, Spell::Random);
+    if(obj.artifact == Artifact::SpellScroll)
+    {
+	labelSpell->setVisible(true);
+	spellGroup->setVisible(true);
+	spellGroup->setValue(Spell::None < obj.spell && Spell::Unknown > obj.spell ? obj.spell : Spell::Random);
+    }
+    else
+    {
+	labelSpell->setVisible(false);
+	spellGroup->setVisible(false);
+	spellGroup->setValue(Spell::None);
+    }
+
+    pushButtonOk = new QPushButton(this);
+    pushButtonOk->setText(QApplication::translate("MapArtifact", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setEnabled(false);
+
+    horizontalSpacerButtons = new QSpacerItem(238, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    pushButtonCancel = new QPushButton(this);
+    pushButtonCancel->setText(QApplication::translate("MapArtifact", "Cancel", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutButtons = new QHBoxLayout();
+    horizontalLayoutButtons->addWidget(pushButtonOk);
+    horizontalLayoutButtons->addItem(horizontalSpacerButtons);
+    horizontalLayoutButtons->addWidget(pushButtonCancel);
+
+    verticalLayoutForm = new QVBoxLayout(this);
+    verticalLayoutForm->addWidget(variantRandom);
+    for(QVector<QRadioButton*>::iterator
+	it = variantCondition.begin(); it != variantCondition.end(); ++it)
+	verticalLayoutForm->addWidget(*it);
+    verticalLayoutForm->addWidget(labelSpell);
+    verticalLayoutForm->addWidget(spellGroup);
+    verticalLayoutForm->addLayout(horizontalLayoutButtons);
+
+    QSize minSize = minimumSizeHint();
+
+    resize(minSize);
+    setMinimumSize(minSize);
+
+    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(spellGroup, SIGNAL(formChanged()), this, SLOT(setEnableOKButton()));
+    connect(variantRandom, SIGNAL(toggled(bool)), this, SLOT(setDefaultCondition(bool)));
+    connect(variantRandom, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    for(QVector<QRadioButton*>::iterator
+	it = variantCondition.begin(); it != variantCondition.end(); ++it)
+	connect(*it, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+}
+
+QPair<int, int> Form::MapArtifactDialog::result(void) const
+{
+    QPair<int, int> res(-1, spellGroup->result());
+
+    if(! variantRandom->isChecked())
+    {
+	QVector<QRadioButton*>::const_iterator it = std::find_if(variantCondition.begin(), variantCondition.end(), std::mem_fun(&QRadioButton::isChecked));
+	if(it != variantCondition.end())
+	    res.first = it - variantCondition.begin();
+    }
+
+    return res;
+}
+
+void Form::MapArtifactDialog::setEnableOKButton(void)
+{
+    pushButtonOk->setEnabled(true);
+}
+
+void Form::MapArtifactDialog::setDefaultCondition(bool f)
+{
+    std::for_each(variantCondition.begin(), variantCondition.end(), std::bind2nd(std::mem_fun(&QRadioButton::setDisabled), f));
+    variantCondition.front()->setChecked(f);
+}
+
+Form::MapMonsterDialog::MapMonsterDialog(const MapMonster & obj)
+{
+    setWindowTitle(QApplication::translate("MapMonster", "Monster Detail", 0, QApplication::UnicodeUTF8));
+
+    joinDefault = new QCheckBox("Default", this);
+
+    joinCondition.push_back(new QRadioButton("join: fight only", this));
+    joinCondition.push_back(new QRadioButton("join: all joined", this));
+    joinCondition.push_back(new QRadioButton("join: just for the money", this));
+
+    if(obj.condition < 0)
+    {
+        joinDefault->setChecked(true);
+	setDefaultCondition(joinDefault->isChecked());
+    }
+    else
+    if(obj.condition < joinCondition.size())
+	joinCondition[obj.condition]->setChecked(true);
+
+    labelCount = new QLabel("count:", this);
+    editCount = new QLineEdit(this);
+    editCount->setText(QString::number(obj.count));
+    editCount->setValidator(new QIntValidator(0, 65535, this));
+
+    pushButtonOk = new QPushButton(this);
+    pushButtonOk->setText(QApplication::translate("MapMonster", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setEnabled(false);
+
+    horizontalSpacerButtons = new QSpacerItem(238, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    pushButtonCancel = new QPushButton(this);
+    pushButtonCancel->setText(QApplication::translate("MapMonster", "Cancel", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutButtons = new QHBoxLayout();
+    horizontalLayoutButtons->addWidget(pushButtonOk);
+    horizontalLayoutButtons->addItem(horizontalSpacerButtons);
+    horizontalLayoutButtons->addWidget(pushButtonCancel);
+
+    verticalLayoutForm = new QVBoxLayout(this);
+    verticalLayoutForm->addWidget(joinDefault);
+    for(QVector<QRadioButton*>::iterator
+	it = joinCondition.begin(); it != joinCondition.end(); ++it)
+	verticalLayoutForm->addWidget(*it);
+    verticalLayoutForm->addWidget(labelCount);
+    verticalLayoutForm->addWidget(editCount);
+    verticalLayoutForm->addLayout(horizontalLayoutButtons);
+
+    QSize minSize = minimumSizeHint();
+
+    resize(minSize);
+    setMinimumSize(minSize);
+
+    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(editCount, SIGNAL(textChanged(QString)), this, SLOT(setEnableOKButton()));
+    connect(joinDefault, SIGNAL(toggled(bool)), this, SLOT(setDefaultCondition(bool)));
+    connect(joinDefault, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+    for(QVector<QRadioButton*>::iterator
+	it = joinCondition.begin(); it != joinCondition.end(); ++it)
+	connect(*it, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
+}
+
+QPair<int, int> Form::MapMonsterDialog::result(void) const
+{
+    QPair<int, int> res(-1, editCount->text().toInt());
+
+    if(! joinDefault->isChecked())
+    {
+	QVector<QRadioButton*>::const_iterator it = std::find_if(joinCondition.begin(), joinCondition.end(), std::mem_fun(&QRadioButton::isChecked));
+	if(it != joinCondition.end())
+	    res.first = it - joinCondition.begin();
+    }
+
+    return res;
+}
+
+void Form::MapMonsterDialog::setEnableOKButton(void)
+{
+    pushButtonOk->setEnabled(true);
+}
+
+void Form::MapMonsterDialog::setDefaultCondition(bool f)
+{
+    std::for_each(joinCondition.begin(), joinCondition.end(), std::bind2nd(std::mem_fun(&QRadioButton::setDisabled), f));
+    joinCondition.front()->setChecked(f);
+}
+
+Form::MapResourceDialog::MapResourceDialog(const MapResource & obj)
+{
+    setWindowTitle(QApplication::translate("MapResource", "Resource Detail", 0, QApplication::UnicodeUTF8));
+
+    labelCount = new QLabel("count:", this);
+    editCount = new QLineEdit(this);
+    editCount->setText(QString::number(obj.count));
+    editCount->setValidator(new QIntValidator(0, 65535, this));
+
+    pushButtonOk = new QPushButton(this);
+    pushButtonOk->setText(QApplication::translate("MapResource", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setEnabled(false);
+
+    horizontalSpacerButtons = new QSpacerItem(238, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    pushButtonCancel = new QPushButton(this);
+    pushButtonCancel->setText(QApplication::translate("MapResource", "Cancel", 0, QApplication::UnicodeUTF8));
+
+    horizontalLayoutButtons = new QHBoxLayout();
+    horizontalLayoutButtons->addWidget(pushButtonOk);
+    horizontalLayoutButtons->addItem(horizontalSpacerButtons);
+    horizontalLayoutButtons->addWidget(pushButtonCancel);
+
+    verticalLayoutForm = new QVBoxLayout(this);
+    verticalLayoutForm->addWidget(labelCount);
+    verticalLayoutForm->addWidget(editCount);
+    verticalLayoutForm->addLayout(horizontalLayoutButtons);
+
+    QSize minSize = minimumSizeHint();
+
+    resize(minSize);
+    setMinimumSize(minSize);
+
+    connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(editCount, SIGNAL(textChanged(QString)), this, SLOT(setEnableOKButton()));
+}
+
+int Form::MapResourceDialog::result(void) const
+{
+    return editCount->text().toInt();
+}
+
+void Form::MapResourceDialog::setEnableOKButton(void)
+{
+    pushButtonOk->setEnabled(true);
 }

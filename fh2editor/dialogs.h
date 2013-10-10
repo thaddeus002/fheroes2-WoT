@@ -52,6 +52,7 @@ class QListWidget;
 class QListWidgetItem;
 class QDomElement;
 class QGraphicsScene;
+class QRadioButton;
 class QDialogButtonBox;
 QT_END_NAMESPACE
 
@@ -598,12 +599,12 @@ namespace Form
     };
 
 
-    class TownDialog : public QDialog
+    class MapTownDialog : public QDialog
     {
 	Q_OBJECT
 
     public:
-	TownDialog(const MapTown &);
+	MapTownDialog(const MapTown &);
 
 	QVBoxLayout*		verticalLayoutWidget;
 	QTabWidget*		tabWidget;
@@ -747,12 +748,12 @@ namespace Form
 	void			checkLimit(void);
     };
 
-    class HeroDialog : public QDialog
+    class MapHeroDialog : public QDialog
     {
 	Q_OBJECT
 
     public:
-	HeroDialog(const MapHero &);
+	MapHeroDialog(const MapHero &);
 
 	QVBoxLayout* 		verticalLayoutWidget;
 	QTabWidget* 		tabWidget;
@@ -1160,6 +1161,80 @@ namespace Form
 
     protected slots:
 	void			artifactFormChanged(void);
+    };
+
+    class MapArtifactDialog : public QDialog
+    {
+	Q_OBJECT
+
+    public:
+	MapArtifactDialog(const MapArtifact &);
+
+	QCheckBox*		variantRandom;
+	QVector<QRadioButton*>	variantCondition;
+
+	QLabel*			labelSpell;
+        SpellGroup*		spellGroup;
+
+	QVBoxLayout*		verticalLayoutForm;
+	QHBoxLayout*		horizontalLayoutButtons;
+	QPushButton*		pushButtonOk;
+	QSpacerItem*		horizontalSpacerButtons;
+	QPushButton*		pushButtonCancel;
+
+	QPair<int, int>		result(void) const; /* return pickup condition, spell */
+
+    protected slots:
+	void			setEnableOKButton(void);
+	void			setDefaultCondition(bool);
+    };
+
+    class MapMonsterDialog : public QDialog
+    {
+	Q_OBJECT
+
+    public:
+	MapMonsterDialog(const MapMonster &);
+
+	QLabel*			labelCount;
+        QLineEdit*		editCount;
+
+	QCheckBox*		joinDefault;
+	QVector<QRadioButton*>	joinCondition;
+
+	QVBoxLayout*		verticalLayoutForm;
+	QHBoxLayout*		horizontalLayoutButtons;
+	QPushButton*		pushButtonOk;
+	QSpacerItem*		horizontalSpacerButtons;
+	QPushButton*		pushButtonCancel;
+
+	QPair<int, int>		result(void) const; /* return join condition, count */
+
+    protected slots:
+	void			setEnableOKButton(void);
+	void			setDefaultCondition(bool);
+    };
+
+    class MapResourceDialog : public QDialog
+    {
+	Q_OBJECT
+
+    public:
+	MapResourceDialog(const MapResource &);
+
+	QLabel*			labelCount;
+        QLineEdit*		editCount;
+
+	QVBoxLayout*		verticalLayoutForm;
+	QHBoxLayout*		horizontalLayoutButtons;
+	QPushButton*		pushButtonOk;
+	QSpacerItem*		horizontalSpacerButtons;
+	QPushButton*		pushButtonCancel;
+
+	int			result(void) const;
+
+    protected slots:
+	void			setEnableOKButton(void);
     };
 }
 

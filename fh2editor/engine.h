@@ -813,8 +813,47 @@ struct MapSphinx : public MapObject
     MapSphinx(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1);
 
     QString	object(void) const { return "sphinx"; }
-
     MapObject*	copy(void) const { return new MapSphinx(*this); }
+};
+
+struct MapResource : public MapObject
+{
+    int		resource;
+    int		count;
+
+    MapResource(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1, int res = Resource::Unknown) :
+	MapObject(pos, uid, MapObj::Resource), resource(res), count(0) {}
+
+    QString	object(void) const { return "resource"; }
+    MapObject*	copy(void) const { return new MapResource(*this); }
+};
+
+struct MapMonster : public MapObject
+{
+    int		monster;
+    int		count;
+    int		condition;
+
+    MapMonster(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1, int mons = Monster::None) :
+	MapObject(pos, uid, MapObj::Monster), monster(mons), count(0), condition(-1) {}
+
+    QString	object(void) const { return "monster"; }
+    MapObject*	copy(void) const { return new MapMonster(*this); }
+    void	updateInfo(const mp2til_t &);
+};
+
+struct MapArtifact : public MapObject
+{
+    int		artifact;
+    int		spell;
+    int		condition;
+
+    MapArtifact(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1, int art = Artifact::None) :
+	MapObject(pos, uid, MapObj::Artifact), artifact(art), spell(Spell::None), condition(-1) {}
+
+    QString	object(void) const { return "artifact"; }
+    MapObject*	copy(void) const { return new MapArtifact(*this); }
+    void	updateInfo(const mp2til_t &);
 };
 
 struct ActionSimple;
@@ -1061,6 +1100,15 @@ QDomElement & operator>> (QDomElement &, MapHero &);
 
 QDomElement & operator<< (QDomElement &, const MapTown &);
 QDomElement & operator>> (QDomElement &, MapTown &);
+
+QDomElement & operator<< (QDomElement &, const MapResource &);
+QDomElement & operator>> (QDomElement &, MapResource &);
+
+QDomElement & operator<< (QDomElement &, const MapArtifact &);
+QDomElement & operator>> (QDomElement &, MapArtifact &);
+
+QDomElement & operator<< (QDomElement &, const MapMonster &);
+QDomElement & operator>> (QDomElement &, MapMonster &);
 
 QDomElement & operator<< (QDomElement &, const Troops &);
 QDomElement & operator>> (QDomElement &, Troops &);
