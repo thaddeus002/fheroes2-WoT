@@ -174,6 +174,23 @@ namespace SkillLevel
     QString transcribe(int);
 }
 
+namespace Spell
+{
+    enum { None,
+	    FireBall, FireBlast, LightningBolt, ChainLightning, Teleport, Cure, MassCure, Resurrect, ResurrectTrue, Haste, MassHaste, Slow, MassSlow,
+	    Blind, Bless, MassBless, StoneSkin, SteelSkin, Curse, MassCurse, HolyWord, HolyShout, AntiMagic, Dispel, MassDispel, Arrow, Berserker,
+	    Armageddon, ElementalStorm, MeteorShower, Paralyze, Hypnotize, ColdRay, ColdRing, DisruptingRay, DeathRipple, DeathWave, DragonSlayer,
+	    BloodLust, AnimateDead, MirrorImage, Shield, MassShield, SummonEElement, SummonAElement, SummonFElement, SummonWElement, EarthQuake,
+	    ViewMines, ViewResources, ViewArtifacts, ViewTowns, ViewHeroes, ViewAll, IdentifyHero, SummonBoat, DimensionDoor, TownGate, TownPortal,
+	    Visions, Haunt, SetEGuardian, SetAGuardian, SetFGuardian, SetWGuardian,
+	    Random, Random1, Random2, Random3, Random4, Random5, Unknown };
+
+    int		level(int);
+    bool	isBattle(int);
+    QString	transcribe(int);
+    QString	tips(int);
+}
+
 namespace Monster
 {
     enum { None,
@@ -882,9 +899,10 @@ struct ActionArtifact : public ActionSimple
 {
     ActionMessage msg;
     int artifact;
+    int spell;
 
-    ActionArtifact() : ActionSimple(MapActions::Artifact), artifact(Artifact::None) {}
-    ActionArtifact(const QString & m, int v) : ActionSimple(MapActions::Artifact), msg(m), artifact(v) {}
+    ActionArtifact() : ActionSimple(MapActions::Artifact), artifact(Artifact::None), spell(Spell::None) {}
+    ActionArtifact(const QString & m, int v) : ActionSimple(MapActions::Artifact), msg(m), artifact(v), spell(Spell::None) {}
 };
 
 Q_DECLARE_METATYPE(ActionArtifact);

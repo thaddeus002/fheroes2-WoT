@@ -3665,6 +3665,8 @@ QDomElement & operator<< (QDomElement & el, const ActionArtifact & aa)
 {
     el << aa.msg;
     el.setAttribute("artifact", aa.artifact);
+    if(aa.artifact == Artifact::SpellScroll)
+	el.setAttribute("spell", aa.spell);
     return el;
 }
 
@@ -3672,10 +3674,78 @@ QDomElement & operator>> (QDomElement & el, ActionArtifact & aa)
 {
     el >> aa.msg;
     aa.artifact = el.hasAttribute("artifact") ? el.attribute("artifact").toInt() : Artifact::Unknown;
+    aa.spell = el.hasAttribute("spell") ? el.attribute("spell").toInt() : 0;
     return el;
 }
 
 int SharedActionSimple::type(void) const
 {
     return data() ? data()->type : MapActions::Unknown;
+}
+
+QString Spell::transcribe(int index)
+{
+    const char* names[] = { "None",
+            "Fire Ball", "Fire Blast", "Lightning Bolt", "Chain Lightning", "Teleport", "Cure", "Mass Cure", "Resurrect", "Resurrect True", "Haste", "Mass Haste", "Slow", "Mass Slow",
+            "Blind", "Bless", "Mass Bless", "Stone Skin", "Steel Skin", "Curse", "Mass Curse", "Holy Word", "Holy Shout", "Anti Magic", "Dispel", "Mass Dispel", "Arrow", "Berserker",
+            "Armageddon", "Elemental Storm", "Meteor Shower", "Paralyze", "Hypnotize", "Cold Ray", "Cold Ring", "Disrupting Ray", "Death Ripple", "Death Wave", "Dragon Slayer",
+            "Blood Lust", "Animate Dead", "Mirror Image", "Shield", "Mass Shield", "Summon Earth Element", "Summon Air Element", "Summon Fire Element", "Summon Water Element", "Earth Quake",
+            "View Mines", "View Resources", "View Artifacts", "View Towns", "View Heroes", "View All", "Identify Hero", "Summon Boat", "Dimension Door", "Town Gate", "Town Portal",
+            "Visions", "Haunt", "Set Earth Guardian", "Set Air Guardian", "Set Fire Guardian", "Set Water Guardian",
+            "Random", "Random Level1", "Random Level2", "Random Level3", "Random Level4", "Random Level5", "Unknown" };
+
+    return index < Unknown && index >= None ? names[index] : names[None];
+}
+
+int Spell::level(int spell)
+{
+    switch(spell)
+    {
+	case Bless: case BloodLust: case Cure: case Curse: case Dispel: case Haste: case Arrow: case Slow: case Shield: case StoneSkin:
+	case ViewMines: case ViewResources:
+	    return 1;
+
+	case Blind: case ColdRay: case DeathRipple: case DisruptingRay: case DragonSlayer: case LightningBolt: case SteelSkin:
+	case Visions: case Haunt: case SummonBoat: case ViewArtifacts:
+	    return 2;
+
+	case AnimateDead: case AntiMagic: case ColdRing: case DeathWave: case EarthQuake: case FireBall: case HolyWord: case MassCure: case MassBless: case MassHaste: case MassDispel: case Paralyze: case Teleport:
+	case ViewTowns: case ViewHeroes: case IdentifyHero:
+	    return 3;
+
+        case FireBlast: case ChainLightning: case Resurrect: case MassSlow: case MassCurse: case HolyShout: case Berserker: case ElementalStorm: case MeteorShower: case MassShield:
+	case SetEGuardian: case SetAGuardian: case SetFGuardian: case SetWGuardian: case ViewAll: case TownGate:
+	    return 4;
+
+	case ResurrectTrue: case Armageddon: case Hypnotize: case MirrorImage: case SummonEElement: case SummonAElement: case SummonFElement: case SummonWElement:
+	case DimensionDoor: case TownPortal:
+
+	default : break;
+    }
+
+    return 0;
+}
+
+bool Spell::isBattle(int spell)
+{
+    switch(spell)
+    {
+	case ViewMines: case ViewResources:
+	case Visions: case Haunt: case SummonBoat: case ViewArtifacts:
+	case ViewTowns: case ViewHeroes: case IdentifyHero:
+	case SetEGuardian: case SetAGuardian: case SetFGuardian: case SetWGuardian: case ViewAll: case TownGate:
+	case DimensionDoor: case TownPortal:
+
+	case None: case Random: case Random1: case Random2: case Random3: case Random4: case Random5: case Unknown:
+	    return false;
+
+	default : break;
+    }
+
+    return true;
+}
+
+QString Spell::tips(int spell)
+{
+    return transcribe(spell);
 }

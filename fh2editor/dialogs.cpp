@@ -1363,8 +1363,8 @@ Form::ArtifactGroup::ArtifactGroup(QWidget* parent, int artifact) : QGroupBox(pa
     horizontalLayout->addWidget(labelArtifact);
     horizontalLayout->addWidget(comboBoxArtifact);
 
-    connect(comboBoxArtifact , SIGNAL(currentIndexChanged(int)), this, SLOT(setFormChanged()));
-    connect(comboBoxArtifact , SIGNAL(currentIndexChanged(int)), this, SLOT(changeLabelArtifact(int)));
+    connect(comboBoxArtifact, SIGNAL(currentIndexChanged(int)), this, SLOT(setFormChanged()));
+    connect(comboBoxArtifact, SIGNAL(currentIndexChanged(int)), this, SLOT(changeLabelArtifact(int)));
 }
 
 void Form::ArtifactGroup::setFormChanged(void)
@@ -1372,15 +1372,62 @@ void Form::ArtifactGroup::setFormChanged(void)
     emit formChanged();
 }
 
+void Form::ArtifactGroup::setValue(int art)
+{
+    if(art >= Artifact::MagicBook && art <= Artifact::Dummy4)
+	art = Artifact::None;
+
+    comboBoxArtifact->setCurrentIndex(art >= Artifact::None && art < Artifact::Unknown ? art : Artifact::None);
+    emit formChanged();
+}
+
 void Form::ArtifactGroup::changeLabelArtifact(int index)
 {
     labelArtifact->setPixmap(EditorTheme::getImageICN("ARTIFACT.ICN", index).first.scaled(48, 48));
+#ifndef QT_NO_TOOLTIP
     labelArtifact->setToolTip(Artifact::transcribe(index));
+#endif
 }
 
 int Form::ArtifactGroup::result(void) const
 {
     return comboBoxArtifact->currentIndex();
+}
+
+Form::SpellGroup::SpellGroup(QWidget* parent, int spell) : QGroupBox(parent)
+{
+    setFlat(true);
+
+    comboBoxSpell = new QComboBox(this);
+    for(int index = Spell::None; index < Spell::Unknown; ++index)
+    {
+	comboBoxSpell->addItem(Spell::transcribe(index), index);
+#ifndef QT_NO_TOOLTIP
+	comboBoxSpell->setItemData(index, Spell::tips(index), Qt::ToolTipRole);
+#endif
+    }
+    comboBoxSpell->setCurrentIndex(spell);
+
+    horizontalLayout = new QHBoxLayout(this);
+    horizontalLayout->addWidget(comboBoxSpell);
+
+    connect(comboBoxSpell, SIGNAL(currentIndexChanged(int)), this, SLOT(setFormChanged()));
+}
+
+void Form::SpellGroup::setFormChanged(void)
+{
+    emit formChanged();
+}
+
+void Form::SpellGroup::setValue(int spell)
+{
+    comboBoxSpell->setCurrentIndex(spell >= Spell::None && spell < Spell::Unknown ? spell : Spell::None);
+    emit formChanged();
+}
+
+int Form::SpellGroup::result(void) const
+{
+    return comboBoxSpell->currentIndex();
 }
 
 Form::ResourcesGroup::ResourcesGroup(QWidget* parent, const Resources & resources) : QGroupBox(parent)
@@ -4250,24 +4297,45 @@ Form::ArtifactDialog::ArtifactDialog(const ActionArtifact & act) : MessageTabDia
 
     tabArtifact = new QWidget();
     artifactGroup = new ArtifactGroup(tabArtifact, act.artifact);
+    spellGroup = new SpellGroup(tabArtifact, Spell::Random);
 
     verticalLayoutArtifact = new QVBoxLayout(tabArtifact);
     verticalLayoutArtifact->addWidget(artifactGroup);
+    verticalLayoutArtifact->addWidget(spellGroup);
 
     tabWidget->addTab(tabArtifact, "Artifact");
     tabWidget->setCurrentIndex(1);
 
-    QSize minSize = minimumSizeHint();
+//    QSize minSize = minimumSizeHint();
+//
+//    resize(minSize);
+//    setMinimumSize(minSize);
 
-    resize(minSize);
-    setMinimumSize(minSize);
+    if(act.artifact == Artifact::SpellScroll)
+    {
+	spellGroup->setVisible(true);
+	spellGroup->setValue(Spell::None < act.spell && Spell::Unknown > act.spell ? act.spell : Spell::Random);
+    }
+    else
+    {
+	spellGroup->setVisible(false);
+	spellGroup->setValue(Spell::None);
+    }
+    resize(minimumSizeHint());
 
-    connect(artifactGroup, SIGNAL(formChanged()), this, SLOT(enableButtonOk()));
+    connect(artifactGroup, SIGNAL(formChanged()), this, SLOT(artifactFormChanged()));
 }
 
 ActionArtifact Form::ArtifactDialog::result(void) const
 {
-    return ActionArtifact(message(), artifactGroup->result());
+    ActionArtifact res(message(), artifactGroup->result());
+
+    if(res.artifact == Artifact::SpellScroll)
+	res.spell = spellGroup->result();
+    else
+	res.spell = 0;
+
+    return res;
 }
 
 void Form::ArtifactDialog::fillItem(QListWidgetItem & item) const
@@ -4280,4 +4348,22 @@ void Form::ArtifactDialog::fillItem(QListWidgetItem & item, const ActionArtifact
     const int type = MapActions::Artifact;
     item.setData(Qt::UserRole, QVariant::fromValue(TypeVariant(type, QVariant::fromValue(act))));
     item.setText(MapActions::transcribe(type).append(" - ").append(Artifact::transcribe(act.artifact)));
+}
+
+void Form::ArtifactDialog::artifactFormChanged(void)
+{
+    enableButtonOk();
+
+    if(artifactGroup->result() == Artifact::SpellScroll)
+    {
+	spellGroup->setVisible(true);
+	spellGroup->setValue(Spell::Random);
+    }
+    else
+    {
+	spellGroup->setVisible(false);
+	spellGroup->setValue(Spell::None);
+    }
+
+    resize(minimumSizeHint());
 }

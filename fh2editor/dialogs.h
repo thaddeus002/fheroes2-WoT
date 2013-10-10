@@ -318,8 +318,33 @@ namespace Form
     signals:
         void                    formChanged(void);
 
+    public slots:
+	void			setValue(int);
+
     protected slots:
         void                    changeLabelArtifact(int);
+        void                    setFormChanged(void);
+    };
+
+    class SpellGroup : public QGroupBox
+    {
+        Q_OBJECT
+
+    public:
+	SpellGroup(QWidget*, int = Spell::None);
+
+        QComboBox*              comboBoxSpell;
+        QHBoxLayout*		horizontalLayout;
+
+        int                     result(void) const;
+
+    signals:
+        void                    formChanged(void);
+
+    public slots:
+	void			setValue(int);
+
+    protected slots:
         void                    setFormChanged(void);
     };
 
@@ -1126,11 +1151,15 @@ namespace Form
 	QWidget*		tabArtifact;
         QVBoxLayout*            verticalLayoutArtifact;
         ArtifactGroup*		artifactGroup;
+        SpellGroup*		spellGroup;
 
 	ActionArtifact		result(void) const;
 
 	void			fillItem(QListWidgetItem &) const;
 	static void		fillItem(QListWidgetItem &, const ActionArtifact &);
+
+    protected slots:
+	void			artifactFormChanged(void);
     };
 }
 
