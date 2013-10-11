@@ -215,32 +215,32 @@ void Battle::Arena::DialogBattleSummary(const Result & res) const
     std::string msg;
     int icn_anim = ICN::UNKNOWN;
 
-    if((res.army1 & RESULT_WINS) && army1->GetCommander() && (CONTROL_HUMAN & army1->GetCommander()->GetControl()))
+    if((res.army1 & RESULT_WINS) && army1->GetCommander() && army1->GetCommander()->isControlHuman())
     {
     	GetSummaryParams(res.army1, res.army2, *army1->GetCommander(), res.exp1, icn_anim, msg);
 	if(conf.Music()) AGG::PlayMusic(MUS::BATTLEWIN, false);
     }
     else
-    if((res.army2 & RESULT_WINS) && army2->GetCommander() && (CONTROL_HUMAN & army2->GetCommander()->GetControl()))
+    if((res.army2 & RESULT_WINS) && army2->GetCommander() && army2->GetCommander()->isControlHuman())
     {
     	GetSummaryParams(res.army2, res.army1, *army2->GetCommander(), res.exp2, icn_anim, msg);
 	if(conf.Music()) AGG::PlayMusic(MUS::BATTLEWIN, false);
     }
     else
-    if(army1->GetCommander() && (CONTROL_HUMAN & army1->GetCommander()->GetControl()))
+    if(army1->GetCommander() && army1->GetCommander()->isControlHuman())
     {
     	GetSummaryParams(res.army1, res.army2, *army1->GetCommander(), res.exp1, icn_anim, msg);
 	if(conf.Music()) AGG::PlayMusic(MUS::BATTLELOSE, false);
     }
     else
-    if(army2->GetCommander() && (CONTROL_HUMAN & army2->GetCommander()->GetControl()))
+    if(army2->GetCommander() && army2->GetCommander()->isControlHuman())
     {
     	GetSummaryParams(res.army2, res.army1, *army2->GetCommander(), res.exp2, icn_anim, msg);
 	if(conf.Music()) AGG::PlayMusic(MUS::BATTLELOSE, false);
     }
     else
     // AI move
-    if(army1->GetCommander() && (CONTROL_AI & army1->GetCommander()->GetControl()))
+    if(army1->GetCommander() && army1->GetCommander()->isControlAI())
     {
 	// AI wins
 	if(res.army1 & RESULT_WINS)

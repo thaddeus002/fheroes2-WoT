@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *   Copyright (C) 2013 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
@@ -24,75 +24,17 @@
 #include "color.h"
 #include "dialog.h"
 #include "settings.h"
+#include "mp2.h"
 #include "game.h"
-#include "gameevent.h"
+#include "maps_objects.h"
 
 #define SIZEMESSAGE 400
 
-EventDate::EventDate(const u8* ptr, size_t sz)
+MapEvent::MapEvent() : ObjectSimple(MP2::OBJ_EVENT), computer(false), cancel(true), colors(0)
 {
-    StreamBuf st(ptr, sz);
-
-    // id
-    if(0 == st.get())
-    {
-	// resource
-	resource.wood = st.getLE32();
-	resource.mercury = st.getLE32();
-	resource.ore = st.getLE32();
-	resource.sulfur = st.getLE32();
-	resource.crystal = st.getLE32();
-	resource.gems = st.getLE32();
-	resource.gold = st.getLE32();
-
-	st.skip(2);
-
-	// allow computer
-	computer = st.getLE16();
-
-	// day of first occurent
-	first = st.getLE16();
-
-	// subsequent occurrences
-	subsequent = st.getLE16();
-
-	st.skip(6);
-
-	colors = 0;
-	// blue
-	if(st.get()) colors |= Color::BLUE;
-	// green
-	if(st.get()) colors |= Color::GREEN;
-	// red
-	if(st.get()) colors |= Color::RED;
-	// yellow
-	if(st.get()) colors |= Color::YELLOW;
-	// orange
-	if(st.get()) colors |= Color::ORANGE;
-	// purple
-	if(st.get()) colors |= Color::PURPLE;
-
-	// message
-	message = Game::GetEncodeString(GetString(st.getRaw()));
-	DEBUG(DBG_GAME, DBG_INFO, "add: " << message);
-    }
-    else
-	DEBUG(DBG_GAME , DBG_WARN, "unknown id");
 }
 
-bool EventDate::isDeprecated(u32 date) const
-{
-    return 0 == subsequent && first < date;
-}
-
-bool EventDate::isAllow(int col, u32 date) const
-{
-    return ((first == date ||
-	    (subsequent && (first < date && 0 == ((date - first) % subsequent)))) &&
-	    (col & colors));
-}
-
-EventMaps::EventMaps(s32 index, const u8* ptr, const size_t sz)
+MapEvent::MapEvent(s32 index, const u8* ptr, const size_t sz) : ObjectSimple(MP2::OBJ_EVENT)
 {
     StreamBuf st(ptr, sz);
 
@@ -143,7 +85,7 @@ EventMaps::EventMaps(s32 index, const u8* ptr, const size_t sz)
 	DEBUG(DBG_GAME, DBG_WARN, "unknown id");
 }
 
-void EventMaps::SetVisited(int color)
+void MapEvent::SetVisited(int color)
 {
     if(cancel)
 	colors = 0;
@@ -151,12 +93,16 @@ void EventMaps::SetVisited(int color)
 	colors &= ~color;
 }
 
-bool EventMaps::isAllow(int col, s32 ii) const
+bool MapEvent::isAllow(int col) const
 {
-    return ii == GetIndex() && (col & colors);
+    return col & colors;
 }
 
-Riddle::Riddle(s32 index, const u8* ptr, size_t sz) : valid(false)
+MapSphinx::MapSphinx() : ObjectSimple(MP2::OBJ_SPHINX), valid(false)
+{
+}
+
+MapSphinx::MapSphinx(s32 index, const u8* ptr, size_t sz) : ObjectSimple(MP2::OBJ_SPHINX), valid(false)
 {
     StreamBuf st(ptr, sz);
 
@@ -199,45 +145,23 @@ Riddle::Riddle(s32 index, const u8* ptr, size_t sz) : valid(false)
 	DEBUG(DBG_GAME , DBG_WARN, "unknown id");
 }
 
-bool Riddle::AnswerCorrect(const std::string & answer)
+bool MapSphinx::AnswerCorrect(const std::string & answer)
 {
     return answers.end() != std::find(answers.begin(), answers.end(), StringLower(answer));
 }
 
-void Riddle::SetQuiet(void)
+void MapSphinx::SetQuiet(void)
 {
     valid = false;
     artifact = Artifact::UNKNOWN;
     resource.Reset();
 }
 
-StreamBase & operator<< (StreamBase & msg, const EventDate & obj)
+StreamBase & operator<< (StreamBase & msg, const MapEvent & obj)
 {
     return msg <<
-	obj.resource <<
-	obj.computer <<
-	obj.first <<
-	obj.subsequent <<
-	obj.colors <<
-	obj.message;
-}
-
-StreamBase & operator>> (StreamBase & msg, EventDate & obj)
-{
-    return msg >>
-	obj.resource >>
-	obj.computer >>
-	obj.first >>
-	obj.subsequent >>
-	obj.colors >>
-	obj.message;
-}
-
-
-StreamBase & operator<< (StreamBase & msg, const EventMaps & obj)
-{
-    return msg <<
-	obj.center <<
+	static_cast<const ObjectSimple &>(obj) <<
+	static_cast<const MapPosition &>(obj) <<
 	obj.resource <<
 	obj.artifact <<
 	obj.computer <<
@@ -246,10 +170,18 @@ StreamBase & operator<< (StreamBase & msg, const EventMaps & obj)
 	obj.message;
 }
 
-StreamBase & operator>> (StreamBase & msg, EventMaps & obj)
+StreamBase & operator>> (StreamBase & msg, MapEvent & obj)
 {
+    if(FORMAT_VERSION_3186 > Game::GetLoadVersion())
+    {
+	static_cast<ObjectSimple &>(obj) = ObjectSimple(MP2::OBJ_EVENT);
+    }
+    else
+	msg >>
+	    static_cast<ObjectSimple &>(obj);
+
     return msg >>
-	obj.center >>
+	static_cast<MapPosition &>(obj) >>
 	obj.resource >>
 	obj.artifact >>
 	obj.computer >>
@@ -258,10 +190,11 @@ StreamBase & operator>> (StreamBase & msg, EventMaps & obj)
 	obj.message;
 }
 
-StreamBase & operator<< (StreamBase & msg, const Riddle & obj)
+StreamBase & operator<< (StreamBase & msg, const MapSphinx & obj)
 {
     return msg <<
-	obj.center <<
+	static_cast<const ObjectSimple &>(obj) <<
+	static_cast<const MapPosition &>(obj) <<
 	obj.resource <<
 	obj.artifact <<
 	obj.answers <<
@@ -269,13 +202,58 @@ StreamBase & operator<< (StreamBase & msg, const Riddle & obj)
 	obj.valid;
 }
 
-StreamBase & operator>> (StreamBase & msg, Riddle & obj)
+StreamBase & operator>> (StreamBase & msg, MapSphinx & obj)
 {
+    if(FORMAT_VERSION_3186 > Game::GetLoadVersion())
+    {
+	static_cast<ObjectSimple &>(obj) = ObjectSimple(MP2::OBJ_SPHINX);
+    }
+    else
+	msg >>
+	    static_cast<ObjectSimple &>(obj);
+
     return msg >>
-	obj.center >>
+	static_cast<MapPosition &>(obj) >>
 	obj.resource >>
 	obj.artifact >>
 	obj.answers >>
 	obj.message >>
 	obj.valid;
+}
+
+MapSign::MapSign() : ObjectSimple(MP2::OBJ_SIGN)
+{
+}
+
+MapSign::MapSign(s32 index, const char* msg) : ObjectSimple(MP2::OBJ_SIGN)
+{
+    SetIndex(index);
+    if(msg) message = msg;
+}
+
+MapSign::MapSign(s32 index, const u8* ptr, size_t sz) : ObjectSimple(MP2::OBJ_SIGN)
+{
+    StreamBuf st(ptr, sz);
+
+    st.skip(9);
+    message = GetString(st.getRaw());
+
+    SetIndex(index);
+    message = Game::GetEncodeString(message);
+}
+
+StreamBase & operator<< (StreamBase & msg, const MapSign & obj)
+{
+    return msg <<
+	static_cast<const ObjectSimple &>(obj) <<
+	static_cast<const MapPosition &>(obj) <<
+	obj.message;
+}
+
+StreamBase & operator>> (StreamBase & msg, MapSign & obj)
+{
+    return msg >>
+	static_cast<ObjectSimple &>(obj) >>
+	static_cast<MapPosition &>(obj) >>
+	obj.message;
 }

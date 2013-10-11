@@ -22,39 +22,68 @@
 
 #include "maps.h"
 #include "world.h"
+#include "game.h"
+#include "settings.h"
 #include "position.h"
 
-Maps::Position::Position(const Point & pt) : center(pt)
+MapPosition::MapPosition(const Point & pt) : center(pt)
 {
 }
 
-bool Maps::Position::operator== (s32 index) const
+bool MapPosition::operator== (s32 index) const
 {
     return index == GetIndex();
 }
 
-const Point & Maps::Position::GetCenter(void) const
+const Point & MapPosition::GetCenter(void) const
 {
     return center;
 }
 
-s32 Maps::Position::GetIndex(void) const
+s32 MapPosition::GetIndex(void) const
 {
     return center.x < 0 && center.y < 0 ? -1 : Maps::GetIndexFromAbsPoint(center);
 }
 
-void Maps::Position::SetCenter(const Point & pt)
+void MapPosition::SetCenter(const Point & pt)
 {
     center = pt;
 }
 
-void Maps::Position::SetIndex(s32 index)
+void MapPosition::SetIndex(s32 index)
 {
     center = Maps::isValidAbsIndex(index) ?
 		Maps::GetPoint(index) : Point(-1, -1);
 }
 
-bool Maps::Position::isPosition(const Point & pt) const
+StreamBase & operator<< (StreamBase & sb, const MapPosition & st)
+{
+    return sb << st.center;
+}
+
+StreamBase & operator>> (StreamBase & sb, MapPosition & st)
+{
+    return sb >> st.center;
+}
+
+bool MapPosition::isPosition(const Point & pt) const
 {
     return pt == center;
+}
+
+StreamBase & operator<< (StreamBase & sb, const ObjectSimple & st)
+{
+    return sb << st.type << st.uid;
+}
+
+StreamBase & operator>> (StreamBase & sb, ObjectSimple & st)
+{
+    if(FORMAT_VERSION_3186 > Game::GetLoadVersion())
+    {
+        int old;
+        sb >> old;
+    }
+    else
+	sb >> st.type >> st.uid;
+    return sb;
 }

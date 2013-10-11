@@ -1193,7 +1193,7 @@ JoinCount Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile)
     if(ratios >= 5)
     {
 	// ... surely flee before us
-	if(! hero.GetControl() & CONTROL_AI ||
+	if(! hero.isControlAI() ||
 	    Rand::Get(0, 10) < 5)
 	    return JoinCount(JOIN_FLEE, 0);
     }

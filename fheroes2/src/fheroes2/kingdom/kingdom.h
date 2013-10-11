@@ -56,7 +56,7 @@ struct KingdomHeroes : public VecHeroes
 {
 };
 
-class Kingdom : public BitModes
+class Kingdom : public BitModes, public Control
 {
 public:
     enum

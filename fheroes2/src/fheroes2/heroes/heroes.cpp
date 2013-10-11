@@ -410,7 +410,7 @@ void Heroes::PostLoad(void)
     SetSpellPoints(GetMaxSpellPoints());
     move_point = GetMaxMovePoints();
 
-    if(CONTROL_AI == GetControl())
+    if(isControlAI())
     {
 	AI::HeroesPostLoad(*this);
     }
@@ -811,7 +811,7 @@ void Heroes::RescanPath(void)
 
     if(path.isValid())
     {
-	if(CONTROL_AI & GetControl())
+	if(isControlAI())
 	{
 	    if(path.hasObstacle()) path.Reset();
 	}
@@ -930,7 +930,7 @@ bool Heroes::PickupArtifact(const Artifact & art)
 
     if(! bag_artifacts.PushArtifact(art))
     {
-	if(CONTROL_HUMAN == GetControl())
+	if(isControlHuman())
 	{
 	    art() == Artifact::MAGIC_BOOK ?
 	    Dialog::Message("", _("You must purchase a spell book to use the mage guild, but you currently have no room for a spell book. Try giving one of your artifacts to another hero."), Font::BIG, Dialog::OK) :
@@ -942,7 +942,7 @@ bool Heroes::PickupArtifact(const Artifact & art)
     // check: anduran garb
     if(bag_artifacts.MakeBattleGarb())
     {
-	if(CONTROL_HUMAN == GetControl())
+	if(isControlHuman())
 	    Dialog::ArtifactInfo("", _("The three Anduran artifacts magically combine into one."), Artifact::BATTLE_GARB);
     }
 
@@ -1054,7 +1054,7 @@ bool Heroes::BuySpellBook(const Castle* castle, int shrine)
 
     if( ! kingdom.AllowPayment(payment))
     {
-	if(CONTROL_HUMAN == GetControl())
+	if(isControlHuman())
 	{
 	    header.append(" ");
 	    header.append(_("Unfortunately, you seem to be a little short of cash at the moment."));
@@ -1063,7 +1063,7 @@ bool Heroes::BuySpellBook(const Castle* castle, int shrine)
 	return false;
     }
 
-    if(CONTROL_HUMAN == GetControl())
+    if(isControlHuman())
     {
 	const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
 	Surface sprite(border.w(), border.h());
@@ -1237,8 +1237,8 @@ void Heroes::LevelUp(bool skipsecondary, bool autoselect)
 {
     int primary = LevelUpPrimarySkill();
     if(! skipsecondary)
-	LevelUpSecondarySkill(primary, (autoselect || (CONTROL_AI & GetControl())));
-    if(CONTROL_AI & GetControl()) AI::HeroesLevelUp(*this);
+	LevelUpSecondarySkill(primary, (autoselect || isControlAI()));
+    if(isControlAI()) AI::HeroesLevelUp(*this);
 }
 
 int Heroes::LevelUpPrimarySkill(void)
@@ -1417,7 +1417,7 @@ void Heroes::ActionPreBattle(void)
 void RedrawGameAreaAndHeroAttackMonster(Heroes & hero, s32 dst)
 {
     // redraw gamearea for monster action sprite
-    if(CONTROL_HUMAN == hero.GetControl())
+    if(hero.isControlHuman())
     {
 	Interface::Basic & I = Interface::Basic::Get();
         Cursor::Get().Hide();
@@ -1463,14 +1463,18 @@ void Heroes::ActionNewPosition(void)
     }
 
     if(! isFreeman() &&
-	GetMapsObject() == MP2::OBJ_EVENT &&
-	world.GetEventMaps(GetColor(), GetIndex()))
+	GetMapsObject() == MP2::OBJ_EVENT)
     {
-	Action(GetIndex());
-	SetMove(false);
+	const MapEvent* event = world.GetMapEvent(GetIndex());
+
+	if(event && event->isAllow(GetColor()))
+	{
+	    Action(GetIndex());
+	    SetMove(false);
+	}
     }
 
-    if(CONTROL_AI == GetControl())
+    if(isControlAI())
 	AI::HeroesActionNewPosition(*this);
 
     ResetModes(VISIONS);
@@ -1692,7 +1696,7 @@ std::string Heroes::String(void) const
 	os << std::endl;
     }
 
-    if(GetControl() & CONTROL_AI)
+    if(isControlAI())
     {
 	os <<
 	    "skills          : " << secondary_skills.String() << std::endl <<

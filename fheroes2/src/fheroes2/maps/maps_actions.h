@@ -22,71 +22,58 @@
 #ifndef H2MAPS_ACTIONS_H
 #define H2MAPS_ACTIONS_H
 
-#include "gamedefs.h"
+#include "position.h"
 #include "artifact.h"
 #include "resource.h"
 #include "color.h"
 
 class Heroes;
-enum { ACTION_UNKNOWN, ACTION_DEFAULT, ACTION_ACCESS, ACTION_MESSAGE, ACTION_RESOURCES, ACTION_ARTIFACT };
+enum { ACTION_UNKNOWN = 0, ACTION_DEFAULT, ACTION_ACCESS, ACTION_MESSAGE, ACTION_RESOURCES, ACTION_ARTIFACT };
 
-struct ActionSimple
-{
-    u32         uid;
-    int         object;
-    int		type;
-
-    ActionSimple(int v = ACTION_UNKNOWN) : uid(0), object(0), type(v) {}
-    virtual ~ActionSimple() {}
-};
-
-struct ActionMessage : public ActionSimple
+struct ActionMessage : public ObjectSimple
 {
     std::string message;
 
-    ActionMessage() : ActionSimple(ACTION_MESSAGE) {}
+    ActionMessage() : ObjectSimple(ACTION_MESSAGE) {}
     static bool Action(ActionMessage*, s32, Heroes &);
 };
 
-struct ActionDefault : public ActionSimple
+struct ActionDefault : public ObjectSimple
 {
     bool        enabled;
     std::string message;
 
-    ActionDefault() : ActionSimple(ACTION_DEFAULT), enabled(true) {}
+    ActionDefault() : ObjectSimple(ACTION_DEFAULT), enabled(true) {}
     static bool Action(ActionDefault*, s32, Heroes &);
 };
 
-struct ActionAccess : public ActionSimple
+struct ActionAccess : public ObjectSimple
 {
     int         allowPlayers;
     bool        allowComputer;
     bool        cancelAfterFirstVisit;
     std::string message;
 
-    ActionAccess() : ActionSimple(ACTION_ACCESS), allowPlayers(Color::ALL), allowComputer(true), cancelAfterFirstVisit(false) {}
+    ActionAccess() : ObjectSimple(ACTION_ACCESS), allowPlayers(Color::ALL), allowComputer(true), cancelAfterFirstVisit(false) {}
     static bool Action(ActionAccess*, s32, Heroes &);
 };
 
-struct ActionArtifact : public ActionSimple
+struct ActionArtifact : public ObjectSimple
 {
     Artifact    artifact;
     std::string message;
 
-    ActionArtifact() : ActionSimple(ACTION_ARTIFACT) {}
+    ActionArtifact() : ObjectSimple(ACTION_ARTIFACT) {}
     static bool Action(ActionArtifact*, s32, Heroes &);
 };
 
-struct ActionResources : public ActionSimple
+struct ActionResources : public ObjectSimple
 {
     Funds       resources;
     std::string message;
 
-    ActionResources() : ActionSimple(ACTION_RESOURCES) {}
+    ActionResources() : ObjectSimple(ACTION_RESOURCES) {}
     static bool Action(ActionResources*, s32, Heroes &);
 };
-
-StreamBase & operator<< (StreamBase &, const ActionSimple &);
-StreamBase & operator>> (StreamBase &, ActionSimple &);
 
 #endif

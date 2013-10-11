@@ -1081,7 +1081,7 @@ void Battle::Interface::RedrawCover(void)
 
     // shadow
     if(!b_move && conf.ExtBattleShowMoveShadow() && b_current &&
-	CONTROL_AI != b_current->GetControl())
+	! b_current->isControlAI())
     {
 	for(Board::const_iterator
 	    it = board.begin(); it != board.end(); ++it)

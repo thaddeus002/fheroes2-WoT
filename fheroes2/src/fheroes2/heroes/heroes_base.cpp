@@ -481,13 +481,10 @@ void HeroBase::TranscribeScroll(const Artifact & art)
 /* pack hero base */
 StreamBase & operator<< (StreamBase & msg, const HeroBase & hero)
 {
-    const Skill::Primary & base = hero;
-
     return
-	// primary
-	msg << base <<
-	// position
-	hero.center <<
+	msg << 
+	static_cast<const Skill::Primary &>(hero) <<
+	static_cast<const MapPosition &>(hero) <<
 	// modes
 	hero.modes <<
 	// hero base
@@ -498,12 +495,9 @@ StreamBase & operator<< (StreamBase & msg, const HeroBase & hero)
 /* unpack hero base */
 StreamBase & operator>> (StreamBase & msg, HeroBase & hero)
 {
-    Skill::Primary & base = hero;
-
-    // primary
-    return msg >> base >>
-	// position
-	hero.center >>
+    return msg >>
+	static_cast<Skill::Primary &>(hero) >>
+	static_cast<MapPosition &>(hero) >>
 	// modes
 	hero.modes >>
 	hero.magic_point >> hero.move_point >>

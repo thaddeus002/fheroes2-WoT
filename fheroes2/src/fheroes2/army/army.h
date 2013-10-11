@@ -26,6 +26,7 @@
 #include <utility>
 #include <string>
 #include <vector>
+#include "bitmodes.h"
 #include "army_troop.h"
 
 class Castle;
@@ -102,7 +103,7 @@ struct JoinCount : std::pair<int, u32>
     JoinCount(int reason, u32 count) : std::pair<int, u32>(reason, count) {}
 };
 
-class Army : public Troops
+class Army : public Troops, public Control
 {
 public:
     static std::string	SizeString(u32);

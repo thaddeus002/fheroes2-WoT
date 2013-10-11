@@ -26,7 +26,6 @@
 #include "castle.h"
 #include "heroes.h"
 #include "difficulty.h"
-#include "gameevent.h"
 #include "color.h"
 #include "game.h"
 #include "profit.h"
@@ -102,7 +101,7 @@ int Kingdom::GetRace(void) const
 
 void Kingdom::UpdateStartingResource(void)
 {
-    resource = GameStatic::GetKingdomStartingResource(CONTROL_AI == GetControl() ? 5 : Settings::Get().GameDifficulty());
+    resource = GameStatic::GetKingdomStartingResource(isControlAI() ? 5 : Settings::Get().GameDifficulty());
 }
 
 bool Kingdom::isLoss(void) const
@@ -193,7 +192,7 @@ void Kingdom::ActionNewWeek(void)
 	std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::ActionNewWeek));
 
 	// debug an gift
-	if(IS_DEVEL() && (CONTROL_HUMAN & GetControl()))
+	if(IS_DEVEL() && isControlHuman())
 	{
 	    Funds gift(20, 20, 10, 10, 10, 10, 5000);
 	    DEBUG(DBG_GAME, DBG_INFO, "debug gift: " << gift.String());
@@ -725,7 +724,7 @@ void Kingdoms::AddCondLossHeroes(const AllHeroes & heroes)
     {
 	Kingdom & kingdom = GetKingdom((*it)->GetColor());
 
-	if(CONTROL_HUMAN & kingdom.GetControl())
+	if(kingdom.isControlHuman())
 	{
 	    (*it)->SetModes(Heroes::NOTDISMISS | Heroes::NOTDEFAULTS);
 	    kingdom.AddHeroStartCondLoss(*it);
@@ -752,7 +751,7 @@ void Kingdoms::AddTributeEvents(CapturedObjects & captureobj, u32 day, int obj)
 	kingdoms[ii].AddFundsResource(funds);
 
 	// for show dialogs
-        if(funds.GetValidItemsCount() && kingdoms[ii].GetControl() == CONTROL_HUMAN)
+        if(funds.GetValidItemsCount() && kingdoms[ii].isControlHuman())
         {
             EventDate event;
 

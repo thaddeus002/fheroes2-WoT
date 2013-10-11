@@ -31,7 +31,6 @@
 #include "heroes.h" 
 #include "castle.h" 
 #include "game_static.h"
-#include "gameevent.h"
 #include "mp2.h"
 #include "text.h"
 #include "race.h"
@@ -398,15 +397,17 @@ TiXmlElement & operator>> (TiXmlElement & doc, Funds & funds)
     return doc;
 }
 
-TiXmlElement & operator>> (TiXmlElement & doc, Riddle & riddle)
+TiXmlElement & operator>> (TiXmlElement & doc, MapSphinx & riddle)
 {
-    int posx, posy, artifact;
+    int posx, posy, uid, artifact;
 
     doc.Attribute("posx", & posx);
     doc.Attribute("posy", & posy);
+    doc.Attribute("uid", & uid);
     doc.Attribute("artifact", & artifact);
 
     riddle.SetCenter(Point(posx, posy));
+    riddle.SetUID(uid);
     riddle.artifact = artifact ? artifact - 1 : Artifact::UNKNOWN;
     riddle.valid = true;
 
@@ -429,18 +430,20 @@ TiXmlElement & operator>> (TiXmlElement & doc, Riddle & riddle)
     return doc;
 }
 
-TiXmlElement & operator>> (TiXmlElement & doc, EventMaps & event)
+TiXmlElement & operator>> (TiXmlElement & doc, MapEvent & event)
 {
-    int posx, posy, colors, allow, cancel, artifact;
+    int posx, posy, uid, colors, allow, cancel, artifact;
 
     doc.Attribute("posx", & posx);
     doc.Attribute("posy", & posy);
+    doc.Attribute("uid", & uid);
     doc.Attribute("cancelAfterFirstVisit", & cancel);
     doc.Attribute("colors", & colors);
     doc.Attribute("allowComputer", & allow);
     doc.Attribute("artifact", & artifact);
 
     event.SetCenter(Point(posx, posy));
+    event.SetUID(uid);
     event.computer = allow;
     event.colors = colors;
     event.artifact = artifact ? artifact - 1 : Artifact::UNKNOWN;
@@ -453,18 +456,6 @@ TiXmlElement & operator>> (TiXmlElement & doc, EventMaps & event)
     TiXmlElement* xml_msg = doc.FirstChildElement("msg");
     if(xml_msg && xml_msg->GetText())
 	event.message = xml_msg->GetText();
-
-    return doc;
-}
-
-TiXmlElement & operator>> (TiXmlElement & doc, EventsMaps & events)
-{
-    TiXmlElement* xml_event = doc.FirstChildElement("event");
-    for(; xml_event; xml_event = xml_event->NextSiblingElement("event"))
-    {
-	events.push_back(EventMaps());
-	*xml_event >> events.back();
-    }
 
     return doc;
 }
@@ -506,18 +497,6 @@ TiXmlElement & operator>> (TiXmlElement & doc, EventsDate & events)
     return doc;
 }
 
-TiXmlElement & operator>> (TiXmlElement & doc, Riddles & riddles)
-{
-    TiXmlElement* xml_sphinx = doc.FirstChildElement("sphinx");
-    for(; xml_sphinx; xml_sphinx = xml_sphinx->NextSiblingElement("sphinx"))
-    {
-	riddles.push_back(Riddle());
-	*xml_sphinx >> riddles.back();
-    }
-
-    return doc;
-}
-
 TiXmlElement & operator>> (TiXmlElement & doc, Rumors & rumors)
 {
     TiXmlElement* xml_msg = doc.FirstChildElement("msg");
@@ -527,19 +506,50 @@ TiXmlElement & operator>> (TiXmlElement & doc, Rumors & rumors)
     return doc;
 }
 
-TiXmlElement & operator>> (TiXmlElement & doc, MapSigns & signs)
+TiXmlElement & operator>> (TiXmlElement & doc, MapSign & sign)
 {
-    TiXmlElement* xml_sign = doc.FirstChildElement("sign");
-    for(; xml_sign; xml_sign = xml_sign->NextSiblingElement("sign"))
-    if(xml_sign->GetText())
+    int posx, posy, uid;
+    doc.Attribute("posx", & posx);
+    doc.Attribute("posy", & posy);
+    doc.Attribute("uid", & uid);
+
+    sign.SetCenter(Point(posx, posy));
+    sign.SetUID(uid);
+    if(doc.GetText()) sign.message = doc.GetText();
+
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, MapObjects & objects)
+{
+    TiXmlElement* xml_objects = doc.FirstChildElement();
+    for(; xml_objects; xml_objects = xml_objects->NextSiblingElement())
     {
+	const std::string name = StringLower(xml_objects->Value());
 	int posx, posy;
+	xml_objects->Attribute("posx", & posx);
+        xml_objects->Attribute("posy", & posy);
 
-	xml_sign->Attribute("posx", & posx);
-	xml_sign->Attribute("posy", & posy);
-
-	Maps::Tiles & tile = world.GetTiles(posx, posy);
-	signs[tile.GetIndex()] = xml_sign->GetText();
+	if(name == "sign")
+	{
+	    MapSign* ptr = new MapSign();
+	    *xml_objects >> *ptr;
+	    objects.add(Maps::GetIndexFromAbsPoint(posx, posy), ptr);
+	}
+	else
+	if(name == "sphinx")
+	{
+	    MapSphinx* ptr = new MapSphinx();
+	    *xml_objects >> *ptr;
+	    objects.add(Maps::GetIndexFromAbsPoint(posx, posy), ptr);
+	}
+	else
+	if("event")
+	{
+	    MapEvent* ptr = new MapEvent();
+	    *xml_objects >> *ptr;
+	    objects.add(Maps::GetIndexFromAbsPoint(posx, posy), ptr);
+	}
     }
 
     return doc;
@@ -585,11 +595,18 @@ TiXmlElement & operator>> (TiXmlElement & doc, ActionArtifact & st)
     int artifact;
     doc.Attribute("artifact", & artifact);
     st.artifact = artifact ? artifact - 1 : Artifact::UNKNOWN;
+    if(st.artifact() == Artifact::SPELL_SCROLL)
+    {
+	int spell = 0;
+	doc.Attribute("spell", & spell);
+	if(0 == spell) spell = Spell::RANDOM;
+	st.artifact.SetSpell(spell);
+    }
     if(doc.GetText()) st.message = doc.GetText();
     return doc;
 }
 
-TiXmlElement & operator>> (TiXmlElement & doc, MapActionObjects & objects)
+TiXmlElement & operator>> (TiXmlElement & doc, MapActions & objects)
 {
     TiXmlElement* xml_actions = doc.FirstChildElement("actions");
     for(; xml_actions; xml_actions = xml_actions->NextSiblingElement("actions"))
@@ -604,7 +621,7 @@ TiXmlElement & operator>> (TiXmlElement & doc, MapActionObjects & objects)
 
 	if(Maps::isValidAbsIndex(index))
 	{
-	    ActionsObject & list = objects[index];
+	    ListActions & list = objects[index];
 	    list.clear();
 
 	    TiXmlElement* xml_action = xml_actions->FirstChildElement();
@@ -679,8 +696,7 @@ TiXmlElement & operator>> (TiXmlElement & doc, World & w)
 	xml_objects->Attribute("lastUID", & value);
 	GameStatic::uniq = value;
 
-	*xml_objects >> w.vec_castles >> w.vec_heroes >>
-	    w.vec_eventsmap >> w.vec_riddles >> w.map_sign >> w.map_action_objects;
+	*xml_objects >> w.vec_castles >> w.vec_heroes >> w.map_objects >> w.map_actions;
     }
 
     TiXmlElement* xml_events = doc.FirstChildElement("events");
@@ -1152,17 +1168,17 @@ bool World::LoadMapMP2(const std::string & filename)
 		case MP2::OBJ_BOTTLE:
 		    // add sign or buttle
 		    if(SIZEOFMP2SIGN - 1 < sizeblock && 0x01 == pblock[0])
-			map_sign[findobject] = Game::GetEncodeString(reinterpret_cast<char*>(&pblock[9]));
+			map_objects.add(findobject, new MapSign(findobject, pblock, sizeblock));
 		    break;
 		case MP2::OBJ_EVENT:
 		    // add event maps
 		    if(SIZEOFMP2EVENT - 1 < sizeblock && 0x01 == pblock[0])
-			vec_eventsmap.push_back(EventMaps(findobject, pblock, sizeblock));
+			map_objects.add(findobject, new MapEvent(findobject, pblock, sizeblock));
 		    break;
 		case MP2::OBJ_SPHINX:
 		    // add riddle sphinx
 		    if(SIZEOFMP2RIDDLE - 1 < sizeblock && 0x00 == pblock[0])
-			vec_riddles.push_back(Riddle(findobject, pblock, sizeblock));
+			map_objects.add(findobject, new MapSphinx(findobject, pblock, sizeblock));
 		    break;
 		default:
 		    break;

@@ -37,7 +37,6 @@
 #include "cursor.h"
 #include "payment.h"
 #include "profit.h"
-#include "gameevent.h"
 #include "maps_actions.h"
 #include "ai.h"
 
@@ -244,7 +243,7 @@ void BattleLose(Heroes &hero, const Battle::Result & res, bool attacker, int col
     {
 	const u32 & exp = attacker ? res.GetExperienceAttacker() : res.GetExperienceDefender();
 
-	if(CONTROL_HUMAN == hero.GetControl())
+	if(hero.isControlHuman())
 	{
 	    std::string msg = _("Hero %{name} also got a %{count} experience.");
 	    StringReplace(msg, "%{name}", hero.GetName());
@@ -363,7 +362,7 @@ void RecruitMonsterFromTile(Heroes & hero, Maps::Tiles & tile, const std::string
 // action to next cell
 void Heroes::Action(s32 dst_index)
 {
-    if(CONTROL_AI == GetKingdom().GetControl())
+    if(GetKingdom().isControlAI())
 	return AI::HeroesAction(*this, dst_index);
 
     const Maps::Tiles & tile = world.GetTiles(dst_index);
@@ -380,15 +379,15 @@ void Heroes::Action(s32 dst_index)
     }
 
     /* new format map only */
-    ActionsObject* list = world.GetActionsObject(dst_index);
+    ListActions* list = world.GetListActions(dst_index);
     bool cancel_default = false;
 
     if(list)
     {
-	for(ActionsObject::const_iterator
+	for(ListActions::const_iterator
 	    it = list->begin(); it != list->end(); ++it)
 	{
-	    switch((*it)->type)
+	    switch((*it)->GetType())
 	    {
 		case ACTION_ACCESS:
 		    if(! ActionAccess::Action(dynamic_cast<ActionAccess*>(*it), dst_index, *this))
@@ -917,7 +916,10 @@ void ActionToPickupResource(Heroes & hero, u32 obj, s32 dst_index)
     tile.RemoveObjectSprite();
 
     if(obj == MP2::OBJ_BOTTLE)
-        Dialog::Message(MP2::StringObject(obj), world.MessageSign(dst_index), Font::BIG, Dialog::OK);
+    {
+	const MapSign* sign = world.GetMapSign(dst_index);
+        Dialog::Message(MP2::StringObject(obj), (sign ? sign->message : ""), Font::BIG, Dialog::OK);
+    }
     else
     {
 	const Funds & funds = tile.QuantityFunds();
@@ -1367,7 +1369,8 @@ void ActionToPoorLuckObject(Heroes & hero, u32 obj, s32 dst_index)
 void ActionToSign(Heroes & hero, u32 obj, s32 dst_index)
 {
     PlaySoundWarning;
-    Dialog::Message("Sign", world.MessageSign(dst_index), Font::BIG, Dialog::OK);
+    const MapSign* sign = world.GetMapSign(dst_index);
+    Dialog::Message("Sign", (sign ? sign->message : ""), Font::BIG, Dialog::OK);
     DEBUG(DBG_GAME, DBG_INFO, hero.GetName());
 }
 
@@ -2597,11 +2600,12 @@ void ActionToMagellanMaps(Heroes & hero, u32 obj, s32 dst_index)
 void ActionToEvent(Heroes & hero, u32 obj, s32 dst_index)
 {
     // check event maps
-    EventMaps* event_ptr = world.GetEventMaps(hero.GetColor(), dst_index);
+    MapEvent* event_ptr = world.GetMapEvent(dst_index);
 
-    if(event_ptr)
+
+    if(event_ptr && event_ptr->isAllow(hero.GetColor()))
     {
-	EventMaps & event_maps = *event_ptr;
+	MapEvent & event_maps = *event_ptr;
 
 	hero.SetMove(false);
 
@@ -3000,7 +3004,7 @@ void ActionToEyeMagi(Heroes & hero, u32 obj, s32 dst_index)
 
 void ActionToSphinx(Heroes & hero, u32 obj, s32 dst_index)
 {
-    Riddle* riddle = world.GetSphinxRiddle(dst_index);
+    MapSphinx* riddle = world.GetMapSphinx(dst_index);
 
     if(riddle && riddle->valid)
     {

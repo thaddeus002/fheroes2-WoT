@@ -36,7 +36,7 @@ class Castle;
 enum { MDF_NONE, MDF_ATTACK, MDF_DEFENSE, MDF_POWER, MDF_KNOWLEDGE, MDF_MORALE, MDF_LUCK };
 enum { PORT_BIG = 1, PORT_MEDIUM = 2, PORT_SMALL = 3 };
 
-class HeroBase : public Skill::Primary, public Maps::Position, public BitModes
+class HeroBase : public Skill::Primary, public MapPosition, public BitModes, public Control
 {
 public:
     HeroBase(int type, int race);

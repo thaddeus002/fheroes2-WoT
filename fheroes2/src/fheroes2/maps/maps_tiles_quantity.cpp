@@ -944,7 +944,7 @@ bool Maps::Tiles::MonsterJoinConditionForce(void) const
 
 u32 Maps::Tiles::MonsterCount(void) const
 {
-    return (static_cast<u16>(quantity1) << 8) | quantity2;
+    return (static_cast<u32>(quantity1) << 8) | quantity2;
 }
 
 void Maps::Tiles::MonsterSetCount(u32 count)

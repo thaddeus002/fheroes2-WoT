@@ -41,7 +41,6 @@
 #include "maps_tiles.h"
 #include "ground.h"
 #include "game.h"
-#include "gameevent.h"
 #include "game_interface.h"
 #include "game_io.h"
 #include "game_over.h"

@@ -53,7 +53,7 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
 	if(army1.GetCommander()->isCaptain())
 	    army1.GetCommander()->ActionPreBattle();
 	else
-	if(CONTROL_AI & army1.GetControl())
+	if(army1.isControlAI())
     	    AI::HeroesPreBattle(*army1.GetCommander());
         else
 	    army1.GetCommander()->ActionPreBattle();
@@ -65,14 +65,14 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
 	if(army2.GetCommander()->isCaptain())
 	    army2.GetCommander()->ActionPreBattle();
 	else
-	if(CONTROL_AI & army2.GetControl())
+	if(army2.isControlAI())
     	    AI::HeroesPreBattle(*army2.GetCommander());
         else
 	    army2.GetCommander()->ActionPreBattle();
     }
 
     AGG::ResetMixer();
-    bool local = (CONTROL_HUMAN & army1.GetControl()) || (CONTROL_HUMAN & army2.GetControl());
+    bool local = army1.isControlHuman() || army2.isControlHuman();
 
 #ifdef DEBUG
     if(IS_DEBUG(DBG_BATTLE, DBG_TRACE)) local = true;
@@ -109,7 +109,7 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
     // after battle army1
     if(army1.GetCommander())
     {
-	if(CONTROL_AI & army1.GetControl())
+	if(army1.isControlAI())
     	    AI::HeroesAfterBattle(*army1.GetCommander());
         else
 	    army1.GetCommander()->ActionAfterBattle();
@@ -118,7 +118,7 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
     // after battle army2
     if(army2.GetCommander())
     {
-	if(CONTROL_AI & army2.GetControl())
+	if(army2.isControlAI())
     	    AI::HeroesAfterBattle(*army2.GetCommander());
         else
 	    army2.GetCommander()->ActionAfterBattle();
@@ -129,18 +129,18 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
 	!((RESULT_RETREAT | RESULT_SURRENDER) & loss_result) &&
 	hero_wins->isHeroes() &&
 	hero_loss->isHeroes())
-	PickupArtifactsAction(*hero_wins, *hero_loss, (CONTROL_HUMAN & hero_wins->GetControl()));
+	PickupArtifactsAction(*hero_wins, *hero_loss, hero_wins->isControlHuman());
 
     // eagle eye capability
     if(hero_wins && hero_loss &&
 	hero_wins->GetLevelSkill(Skill::Secondary::EAGLEEYE) &&
 	hero_loss->isHeroes())
-	    EagleEyeSkillAction(*hero_wins, arena.GetUsageSpells(), (CONTROL_HUMAN & hero_wins->GetControl()));
+	    EagleEyeSkillAction(*hero_wins, arena.GetUsageSpells(), hero_wins->isControlHuman());
 
     // necromancy capability
     if(hero_wins &&
 	hero_wins->GetLevelSkill(Skill::Secondary::NECROMANCY))
-	    NecromancySkillAction(*hero_wins, result.killed, (CONTROL_HUMAN & hero_wins->GetControl()));
+	    NecromancySkillAction(*hero_wins, result.killed, hero_wins->isControlHuman());
 
     DEBUG(DBG_BATTLE, DBG_INFO, "army1 " << army1.String());
     DEBUG(DBG_BATTLE, DBG_INFO, "army2 " << army1.String());

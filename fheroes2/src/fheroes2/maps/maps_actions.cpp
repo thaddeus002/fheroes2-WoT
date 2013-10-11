@@ -30,72 +30,62 @@
 
 StreamBase & operator<< (StreamBase & sb, const ActionResources & st)
 {
-    return sb << static_cast<const ActionSimple &>(st) << st.resources << st.message;
+    return sb << static_cast<const ObjectSimple &>(st) << st.resources << st.message;
 }
 
 StreamBase & operator>> (StreamBase & sb, ActionResources & st)
 {
-    return sb >> static_cast<ActionSimple &>(st) >> st.resources >> st.message;
+    return sb >> static_cast<ObjectSimple &>(st) >> st.resources >> st.message;
 }
 
 StreamBase & operator<< (StreamBase & sb, const ActionArtifact & st)
 {
-    return sb << static_cast<const ActionSimple &>(st) << st.artifact << st.message;
+    return sb << static_cast<const ObjectSimple &>(st) << st.artifact << st.message;
 }
 
 StreamBase & operator>> (StreamBase & sb, ActionArtifact & st)
 {
-    return sb >> static_cast<ActionSimple &>(st) >> st.artifact >> st.message;
+    return sb >> static_cast<ObjectSimple &>(st) >> st.artifact >> st.message;
 }
 
 StreamBase & operator<< (StreamBase & sb, const ActionAccess & st)
 {
-    return sb << static_cast<const ActionSimple &>(st) << st.allowPlayers << st.allowComputer << st.cancelAfterFirstVisit << st.message;
+    return sb << static_cast<const ObjectSimple &>(st) << st.allowPlayers << st.allowComputer << st.cancelAfterFirstVisit << st.message;
 }
 
 StreamBase & operator>> (StreamBase & sb, ActionAccess & st)
 {
-    return sb >> static_cast<ActionSimple &>(st) >> st.allowPlayers >> st.allowComputer >> st.cancelAfterFirstVisit >> st.message;
+    return sb >> static_cast<ObjectSimple &>(st) >> st.allowPlayers >> st.allowComputer >> st.cancelAfterFirstVisit >> st.message;
 }
 
 StreamBase & operator<< (StreamBase & sb, const ActionDefault & st)
 {
-    return sb << static_cast<const ActionSimple &>(st) << st.enabled << st.message;
+    return sb << static_cast<const ObjectSimple &>(st) << st.enabled << st.message;
 }
 
 StreamBase & operator>> (StreamBase & sb, ActionDefault & st)
 {
-    return sb >> static_cast<ActionSimple &>(st) >> st.enabled >> st.message;
+    return sb >> static_cast<ObjectSimple &>(st) >> st.enabled >> st.message;
 }
 
 StreamBase & operator<< (StreamBase & sb, const ActionMessage & st)
 {
-    return sb << static_cast<const ActionSimple &>(st) << st.message;
+    return sb << static_cast<const ObjectSimple &>(st) << st.message;
 }
 
 StreamBase & operator>> (StreamBase & sb, ActionMessage & st)
 {
-    return sb >> static_cast<ActionSimple &>(st) >> st.message;
+    return sb >> static_cast<ObjectSimple &>(st) >> st.message;
 }
 
-StreamBase & operator<< (StreamBase & sb, const ActionSimple & st)
-{
-    return sb << st.type << st.uid << st.object;
-}
-
-StreamBase & operator>> (StreamBase & sb, ActionSimple & st)
-{
-    return sb >> st.type >> st.uid >> st.object;
-}
-
-StreamBase & operator<< (StreamBase & sb, const ActionsObject & st)
+StreamBase & operator<< (StreamBase & sb, const ListActions & st)
 {
     sb << static_cast<u32>(st.size());
-    for(ActionsObject::const_iterator it = st.begin(); it != st.end(); ++it)
+    for(ListActions::const_iterator it = st.begin(); it != st.end(); ++it)
     {
-        sb << (*it)->type;
+        sb << (*it)->GetType();
 
-        switch((*it)->type)
+        switch((*it)->GetType())
         {
             case ACTION_DEFAULT:        { const ActionDefault* ptr = dynamic_cast<const ActionDefault*>(*it); if(ptr) sb << *ptr; } break;
             case ACTION_ACCESS:         { const ActionAccess* ptr = dynamic_cast<const ActionAccess*>(*it); if(ptr) sb << *ptr; } break;
@@ -109,7 +99,7 @@ StreamBase & operator<< (StreamBase & sb, const ActionsObject & st)
     return sb;
 }
 
-StreamBase & operator>> (StreamBase & sb, ActionsObject & st)
+StreamBase & operator>> (StreamBase & sb, ListActions & st)
 {
     u32 size = 0;
     sb >> size;
@@ -129,7 +119,7 @@ StreamBase & operator>> (StreamBase & sb, ActionsObject & st)
             case ACTION_RESOURCES:      { ActionResources* ptr = new ActionResources(); sb >> *ptr; st.push_back(ptr); } break;
             case ACTION_ARTIFACT:       { ActionArtifact* ptr = new ActionArtifact(); sb >> *ptr; st.push_back(ptr); } break;
 
-            default: { ActionSimple* ptr = new ActionSimple(); sb >> *ptr; st.push_back(ptr); } break;
+            default: { ObjectSimple* ptr = new ObjectSimple(); sb >> *ptr; st.push_back(ptr); } break;
         }
     }
 
@@ -147,7 +137,7 @@ bool ActionAccess::Action(ActionAccess* act, s32 index, Heroes & hero)
 	if(! act->message.empty())
 	    Dialog::Message("", act->message, Font::BIG, Dialog::OK);
 
-	if(hero.GetControl() == CONTROL_AI && ! act->allowComputer)
+	if(hero.isControlAI() && ! act->allowComputer)
 	    return false;
 
 	if(act->cancelAfterFirstVisit)

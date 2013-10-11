@@ -41,7 +41,6 @@
 #include "difficulty.h"
 #include "world.h"
 #include "payment.h"
-#include "gameevent.h"
 #include "heroes.h"
 #include "cursor.h"
 #include "game_interface.h"

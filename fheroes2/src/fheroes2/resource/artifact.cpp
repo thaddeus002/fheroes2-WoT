@@ -564,7 +564,18 @@ int Artifact::GetSpell(void) const
 
 void Artifact::SetSpell(int v)
 {
-    ext = v;
+    bool adv = Rand::Get(1);
+
+    switch(v)
+    {
+	case Spell::RANDOM:  ext = Spell::Rand(Rand::Get(1, 5), adv).GetID(); break;
+	case Spell::RANDOM1: ext = Spell::Rand(1, adv).GetID(); break;
+	case Spell::RANDOM2: ext = Spell::Rand(2, adv).GetID(); break;
+	case Spell::RANDOM3: ext = Spell::Rand(3, adv).GetID(); break;
+	case Spell::RANDOM4: ext = Spell::Rand(4, adv).GetID(); break;
+	case Spell::RANDOM5: ext = Spell::Rand(5, adv).GetID(); break;
+	default: ext = v; break;
+    }
 }
 
 void Artifact::Reset(void)

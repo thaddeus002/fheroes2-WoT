@@ -32,7 +32,7 @@
 #include "kingdom.h"
 #include "sprite.h"
 #include "castle_heroes.h"
-#include "gameevent.h"
+#include "maps_objects.h"
 #include "artifact_ultimate.h"
 
 class Heroes;
@@ -40,22 +40,24 @@ class Castle;
 class Kingdom;
 class Recruits;
 class Radar;
-class ActionSimple;
+class ObjectSimple;
 
-typedef std::list<std::string>		Rumors;
-typedef std::list<EventDate>		EventsDate;
-typedef std::list<EventMaps>		EventsMaps;
-typedef std::list<Riddle>		Riddles;
-typedef std::vector<Maps::Tiles>	MapsTiles;
-typedef std::map<s32, std::string>	MapSigns;
-
-struct ActionsObject : public std::list<ActionSimple*>
+struct ListActions : public std::list<ObjectSimple*>
 {
-    ~ActionsObject();
+    ~ListActions();
     void clear(void);
 };
 
-typedef std::map<s32, ActionsObject>	MapActionObjects;
+struct MapObjects : public std::map<s32, ObjectSimple*>
+{
+    ~MapObjects();
+    void		clear(void);
+    void		add(s32, ObjectSimple*);
+    ObjectSimple*	get(s32);
+    const ObjectSimple*	get(s32) const;
+};
+
+typedef std::map<s32, ListActions>	MapActions;
 
 struct CapturedObject
 {
@@ -91,6 +93,30 @@ struct CapturedObjects : std::map<s32, CapturedObject>
     u32	 GetCountMines(int, int) const;
     int  GetColor(s32) const;
 };
+
+struct EventDate
+{
+    EventDate() : computer(false), first(0), subsequent(0), colors(0) {}
+    EventDate(const u8*, size_t);
+
+    bool        isAllow(int color, u32 date) const;
+    bool        isDeprecated(u32 date) const;
+
+    Funds       resource;
+    bool        computer;
+    u32         first;
+    u32         subsequent;
+    int         colors;
+    std::string message;
+};
+
+StreamBase & operator<< (StreamBase &, const EventDate &);
+StreamBase & operator>> (StreamBase &, EventDate &);
+
+typedef std::list<std::string>		Rumors;
+typedef std::list<EventDate>		EventsDate;
+typedef std::vector<Maps::Tiles>	MapsTiles;
+
 
 class World : protected Size
 {
@@ -161,7 +187,6 @@ public:
     s32			NextWhirlpool(s32) const;
     MapsIndexes		GetWhirlpoolEndPoints(s32) const;
 
-    const std::string &	MessageSign(s32);
 
     void		CaptureObject(s32, int col);
     u32			CountCapturedObject(int obj, int col) const;
@@ -170,7 +195,7 @@ public:
     int			ColorCapturedObject(s32) const;
     void		ResetCapturedObjects(int);
     CapturedObject &	GetCapturedObject(s32);
-    ActionsObject*	GetActionsObject(s32);
+    ListActions*	GetListActions(s32);
 
     void		ActionForMagellanMaps(int color);
     void		ActionToEyeMagi(int color) const;
@@ -185,8 +210,10 @@ public:
 
     void		AddEventDate(const EventDate &);
     EventsDate		GetEventsDate(int color) const;
-    EventMaps*		GetEventMaps(int color, s32);
-    Riddle*		GetSphinxRiddle(s32);
+
+    MapEvent*		GetMapEvent(s32);
+    MapSphinx*		GetMapSphinx(s32);
+    const MapSign*	GetMapSign(s32) const;
 
     static u32		GetUniq(void);
 
@@ -211,9 +238,6 @@ private:
     Kingdoms				vec_kingdoms;
     Rumors				vec_rumors;
     EventsDate                          vec_eventsday;
-    EventsMaps                          vec_eventsmap;
-    Riddles				vec_riddles;
-    MapSigns				map_sign;
 
     // index, object, color
     CapturedObjects			map_captureobj;
@@ -230,7 +254,8 @@ private:
     int					heroes_cond_wins;
     int					heroes_cond_loss;
 
-    MapActionObjects			map_action_objects;
+    MapActions				map_actions;
+    MapObjects				map_objects;
 };
 
 StreamBase & operator<< (StreamBase &, const CapturedObject &);
@@ -238,8 +263,11 @@ StreamBase & operator>> (StreamBase &, CapturedObject &);
 StreamBase & operator<< (StreamBase &, const World &);
 StreamBase & operator>> (StreamBase &, World &);
 
-StreamBase & operator<< (StreamBase &, const ActionsObject &);
-StreamBase & operator>> (StreamBase &, ActionsObject &);
+StreamBase & operator<< (StreamBase &, const ListActions &);
+StreamBase & operator>> (StreamBase &, ListActions &);
+
+StreamBase & operator<< (StreamBase &, const MapObjects &);
+StreamBase & operator>> (StreamBase &, MapObjects &);
 
 extern World & world;
 

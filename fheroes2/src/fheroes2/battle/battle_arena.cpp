@@ -336,17 +336,17 @@ void Battle::Arena::TurnTroop(Unit* current_troop)
 	else
 	{
 	    // turn opponents
-	    if(CONTROL_REMOTE & current_troop->GetControl())
+	    if(current_troop->isControlRemote())
 		RemoteTurn(*current_troop, actions);
 	    else
 	    {
-		if((CONTROL_AI & current_troop->GetControl()) ||
+		if(current_troop->isControlAI() ||
 		    (current_color & auto_battle))
 		    {
 			AI::BattleTurn(*this, *current_troop, actions);
 		    }
     		else
-		if(CONTROL_HUMAN & current_troop->GetControl())
+		if(current_troop->isControlHuman())
 		    HumanTurn(*current_troop, actions);
 	    }
 	}
@@ -1129,7 +1129,7 @@ Battle::Result & Battle::Arena::GetResult(void)
 bool Battle::Arena::CanBreakAutoBattle(void) const
 {
     return (auto_battle & current_color) && GetCurrentCommander() &&
-	CONTROL_AI != GetCurrentCommander()->GetControl();
+	! GetCurrentCommander()->isControlAI();
 }
 
 void Battle::Arena::BreakAutoBattle(void)

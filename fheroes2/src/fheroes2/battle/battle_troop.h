@@ -65,7 +65,7 @@ namespace Battle
     enum { CONTOUR_MAIN = 0, CONTOUR_BLACK = 0x01, CONTOUR_REFLECT = 0x02 };
 
     // battle troop stats
-    class Unit : public ArmyTroop, public BitModes
+    class Unit : public ArmyTroop, public BitModes, public Control
     {
     public:
 	Unit(const Troop &, s32 pos, bool reflect);

@@ -386,7 +386,7 @@ void Route::Path::RescanPassable(void)
 	if(! world.GetTiles((*it).GetFrom()).isPassable(NULL, (*it).GetDirection(), false))
 	break;
 
-    if(hero->GetControl() == CONTROL_AI)
+    if(hero->isControlAI())
     {
 	Reset();
     }

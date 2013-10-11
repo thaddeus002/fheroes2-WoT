@@ -26,7 +26,6 @@
 #include "cursor.h"
 #include "button.h"
 #include "world.h"
-#include "gameevent.h"
 #include "game.h"
 #include "dialog.h"
 

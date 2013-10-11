@@ -447,7 +447,7 @@ void Interface::IconsPanel::ResetIcons(icons_t type)
 {
     Kingdom & kingdom = world.GetKingdom(Settings::Get().CurrentColor());
 
-    if(CONTROL_AI != kingdom.GetControl())
+    if(! kingdom.isControlAI())
     {
 	if(type & ICON_HEROES)
 	{

@@ -48,7 +48,7 @@ Castle::Castle() : race(Race::NONE), building(0), captain(*this), army(NULL)
     army.SetCommander(&captain);
 }
 
-Castle::Castle(s32 cx, s32 cy, int rc) : Position(Point(cx, cy)), race(rc), building(0), captain(*this),
+Castle::Castle(s32 cx, s32 cy, int rc) : MapPosition(Point(cx, cy)), race(rc), building(0), captain(*this),
     army(NULL)
 {
     std::fill(dwelling, dwelling + CASTLEMAXMONSTER, 0);
@@ -1880,7 +1880,7 @@ void Castle::RecruitAllMonster(void)
 
     // skip recruit: AI with customization of empty army
     if(Modes(CUSTOMARMY) &&
-	CONTROL_AI == GetControl() &&
+	isControlAI() &&
 	! army.isValid() && ! army.HasMonster(Monster(Monster::UNKNOWN)))
 	skip_recruit = true;
 
@@ -1924,7 +1924,7 @@ bool Castle::AllowBuyBoat(void) const
 bool Castle::BuyBoat(void)
 {
     if(!AllowBuyBoat()) return false;
-    if(CONTROL_HUMAN & GetControl()) AGG::PlaySound(M82::BUILDTWN);
+    if(isControlHuman()) AGG::PlaySound(M82::BUILDTWN);
 
     if(! Maps::isValidAbsPoint(center.x, center.y + 2))
 	return false;
@@ -2050,7 +2050,7 @@ void Castle::JoinRNDArmy(void)
 
 void Castle::ActionPreBattle(void)
 {
-    if(CONTROL_AI & GetControl())
+    if(isControlAI())
 	AI::CastlePreBattle(*this);
     else
     if(Settings::Get().ExtBattleMergeArmies())
@@ -2070,7 +2070,7 @@ void Castle::ActionAfterBattle(bool attacker_wins)
 	ResetModes(CUSTOMARMY);
     }
 
-    if(CONTROL_AI & GetControl())
+    if(isControlAI())
 	AI::CastleAfterBattle(*this, attacker_wins);
 }
 
@@ -2138,7 +2138,7 @@ StreamBase & operator<< (StreamBase & msg, const Castle & castle)
     const ColorBase & color = castle;
 
     msg <<
-	castle.center <<
+	static_cast<const MapPosition &>(castle) <<
 	castle.modes <<
 	castle.race <<
 	castle.building <<
@@ -2161,7 +2161,7 @@ StreamBase & operator>> (StreamBase & msg, Castle & castle)
     u32 dwellingcount;
 
     msg >>
-	castle.center >>
+	static_cast<MapPosition &>(castle) >>
 	castle.modes >>
 	castle.race >>
 	castle.building >>

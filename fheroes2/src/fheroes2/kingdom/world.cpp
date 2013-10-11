@@ -31,7 +31,6 @@
 #include "heroes.h" 
 #include "castle.h" 
 #include "game_static.h"
-#include "gameevent.h"
 #include "mp2.h"
 #include "text.h"
 #include "race.h"
@@ -49,16 +48,49 @@ namespace GameStatic
     extern u32 uniq;
 }
 
-ActionsObject::~ActionsObject()
+ListActions::~ListActions()
 {
     clear();
 }
 
-void ActionsObject::clear(void)
+void ListActions::clear(void)
 {
     for(iterator it = begin(); it != end(); ++it)
 	delete *it;
-    std::list<ActionSimple*>::clear();
+    std::list<ObjectSimple*>::clear();
+}
+
+MapObjects::~MapObjects()
+{
+    clear();
+}
+
+void MapObjects::clear(void)
+{
+    for(iterator it = begin(); it != end(); ++it)
+	delete (*it).second;
+    std::map<s32, ObjectSimple*>::clear();
+}
+
+const ObjectSimple* MapObjects::get(s32 index) const
+{
+    const std::map<s32, ObjectSimple*> & obj = *this;
+    const_iterator it = obj.find(index);
+    return it != end() ? (*it).second : NULL;
+}
+
+void MapObjects::add(s32 index, ObjectSimple* ptr)
+{
+    std::map<s32, ObjectSimple*> & obj = *this;
+    if(obj[index]) delete obj[index];
+    obj[index] = ptr;
+}
+
+ObjectSimple* MapObjects::get(s32 index)
+{
+    std::map<s32, ObjectSimple*> & obj = *this;
+    iterator it = obj.find(index);
+    return it != end() ? (*it).second : NULL;
 }
 
 CapturedObject & CapturedObjects::Get(s32 index)
@@ -228,12 +260,6 @@ void World::Reset(void)
     // event day
     vec_eventsday.clear();
 
-    // event maps
-    vec_eventsmap.clear();
-
-    // riddle
-    vec_riddles.clear();
-
     // rumors
     vec_rumors.clear();
 
@@ -244,9 +270,9 @@ void World::Reset(void)
     vec_heroes.clear();
 
     // extra
-    map_sign.clear();
     map_captureobj.clear();
-    map_action_objects.clear();
+    map_actions.clear();
+    map_objects.clear();
 
     ultimate_artifact.Reset();
 
@@ -697,10 +723,6 @@ s32 World::NextWhirlpool(s32 index) const
 }
 
 /* return message from sign */
-const std::string & World::MessageSign(s32 index)
-{
-    return map_sign[index];
-}
 
 /* return count captured object */
 u32 World::CountCapturedObject(int obj, int col) const
@@ -743,10 +765,10 @@ int World::ColorCapturedObject(s32 index) const
     return map_captureobj.GetColor(index);
 }
 
-ActionsObject* World::GetActionsObject(s32 index)
+ListActions* World::GetListActions(s32 index)
 {
-    MapActionObjects::iterator it = map_action_objects.find(index);
-    return it != map_action_objects.end() ? & (*it).second : NULL;
+    MapActions::iterator it = map_actions.find(index);
+    return it != map_actions.end() ? & (*it).second : NULL;
 }
 
 CapturedObject & World::GetCapturedObject(s32 index)
@@ -823,15 +845,6 @@ EventsDate World::GetEventsDate(int color) const
     return res;
 }
 
-EventMaps* World::GetEventMaps(int color, s32 index)
-{
-    for(EventsMaps::iterator
-	it = vec_eventsmap.begin(); it != vec_eventsmap.end(); ++it)
-	if((*it).isAllow(color, index)) return &(*it);
-
-    return NULL;
-}
-
 std::string World::DateString(void) const
 {
     std::ostringstream os;
@@ -870,11 +883,19 @@ void World::ActionToEyeMagi(int color) const
     }
 }
 
-Riddle* World::GetSphinxRiddle(s32 index)
+MapSphinx* World::GetMapSphinx(s32 index)
 {
-    Riddles::iterator
-	it = std::find(vec_riddles.begin(), vec_riddles.end(), index);
-    return it != vec_riddles.end() ? &(*it) : NULL;
+    return dynamic_cast<MapSphinx*>(map_objects.get(index));
+}
+
+const MapSign* World::GetMapSign(s32 index) const
+{
+    return dynamic_cast<const MapSign*>(map_objects.get(index));
+}
+
+MapEvent* World::GetMapEvent(s32 index)
+{
+    return dynamic_cast<MapEvent*>(map_objects.get(index));
 }
 
 void World::UpdateRecruits(Recruits & recruits) const
@@ -908,8 +929,8 @@ bool World::KingdomIsWins(const Kingdom & kingdom, int wins) const
 	{
 	    const Castle* town = GetCastle(conf.WinsMapsPositionObject());
 	    // check comp also wins
-	    return (((CONTROL_HUMAN & kingdom.GetControl()) || conf.WinsCompAlsoWins()) &&
-    	       (town && town->GetColor() == kingdom.GetColor()));
+	    return (kingdom.isControlHuman() || conf.WinsCompAlsoWins()) &&
+    	       (town && town->GetColor() == kingdom.GetColor());
 	}
 
 	case GameOver::WINS_HERO:
@@ -943,7 +964,7 @@ bool World::KingdomIsWins(const Kingdom & kingdom, int wins) const
 
 	case GameOver::WINS_GOLD:
 	    // check comp also wins
-	    return (((CONTROL_HUMAN & kingdom.GetControl()) || conf.WinsCompAlsoWins()) &&
+	    return ((kingdom.isControlHuman() || conf.WinsCompAlsoWins()) &&
 		    0 < kingdom.GetFunds().Get(Resource::GOLD) &&
 		    static_cast<u32>(kingdom.GetFunds().Get(Resource::GOLD)) >= conf.WinsAccumulateGold());
 
@@ -977,7 +998,7 @@ bool World::KingdomIsLoss(const Kingdom & kingdom, int loss) const
 	}
 
 	case GameOver::LOSS_TIME:
-    	    return (CountDay() > conf.LossCountDays() && (CONTROL_HUMAN & kingdom.GetControl()));
+    	    return (CountDay() > conf.LossCountDays() && kingdom.isControlHuman());
 
 	default: break;
     }
@@ -1046,6 +1067,50 @@ StreamBase & operator>> (StreamBase & msg, CapturedObject & obj)
     return msg >> obj.objcol >> obj.guardians >> obj.split;
 }
 
+StreamBase & operator<< (StreamBase & msg, const MapObjects & objs)
+{
+    msg << static_cast<u32>(objs.size());
+    for(MapObjects::const_iterator it = objs.begin(); it != objs.end(); ++it)
+    if((*it).second)
+    {
+	const ObjectSimple & obj = *(*it).second;
+        msg << (*it).first << obj.GetType();
+
+        switch(obj.GetType())
+        {
+	    case MP2::OBJ_RESOURCE:
+	    case MP2::OBJ_ARTIFACT:
+	    case MP2::OBJ_MONSTER:
+//            case ACTION_DEFAULT:        { const ActionDefault* ptr = dynamic_cast<const ActionDefault*>(*it); if(ptr) sb << *ptr; } break;
+            default: msg << obj; break;
+        }
+    }
+
+    return msg;
+}
+
+StreamBase & operator>> (StreamBase & msg, MapObjects & objs)
+{
+    u32 size = 0;
+    msg >> size;
+
+    objs.clear();
+
+    for(u32 ii = 0; ii < size; ++ii)
+    {
+        s32 index; int type;
+        msg >> index >> type;
+
+        switch(type)
+        {
+//            case ACTION_DEFAULT:        { ActionDefault* ptr = new ActionDefault(); sb >> *ptr; st.push_back(ptr); } break;
+            default: { ObjectSimple* ptr = new ObjectSimple(); msg >> *ptr; objs[index] = ptr; } break;
+        }
+    }
+
+    return msg;
+}
+
 StreamBase & operator<< (StreamBase & msg, const World & w)
 {
     const Size & sz = w;
@@ -1057,9 +1122,6 @@ StreamBase & operator<< (StreamBase & msg, const World & w)
 	w.vec_kingdoms <<
 	w.vec_rumors <<
 	w.vec_eventsday <<
-	w.vec_eventsmap <<
-	w.vec_riddles <<
-	w.map_sign <<
 	w.map_captureobj <<
 	w.ultimate_artifact <<
 	w.day <<
@@ -1069,7 +1131,8 @@ StreamBase & operator<< (StreamBase & msg, const World & w)
 	w.week_next <<
 	w.heroes_cond_wins <<
 	w.heroes_cond_loss <<
-	w.map_action_objects;
+	w.map_actions <<
+	w.map_objects;
 }
 
 StreamBase & operator>> (StreamBase & msg, World & w)
@@ -1082,10 +1145,33 @@ StreamBase & operator>> (StreamBase & msg, World & w)
 	w.vec_castles >>
 	w.vec_kingdoms >>
 	w.vec_rumors >>
-	w.vec_eventsday >>
-	w.vec_eventsmap >>
-	w.vec_riddles >>
-	w.map_sign >>
+	w.vec_eventsday;
+
+    if(FORMAT_VERSION_3186 > Game::GetLoadVersion())
+    {
+	std::list<MapEvent> vec_eventsmap;
+	msg >> vec_eventsmap;
+
+	for(std::list<MapEvent>::const_iterator
+	    it = vec_eventsmap.begin(); it != vec_eventsmap.end(); ++it)
+	    w.map_objects.add((*it).GetIndex(), new MapEvent(*it));
+
+	std::list<MapSphinx> vec_riddles;
+	msg >> vec_riddles;
+
+	for(std::list<MapSphinx>::const_iterator
+	    it = vec_riddles.begin(); it != vec_riddles.end(); ++it)
+	    w.map_objects.add((*it).GetIndex(), new MapSphinx(*it));
+
+	std::map<s32, std::string> map_sign;
+	msg >> map_sign;
+
+	for(std::map<s32, std::string>::const_iterator
+	    it = map_sign.begin(); it != map_sign.end(); ++it)
+	    w.map_objects.add((*it).first, new MapSign((*it).first, (*it).second.c_str()));
+    }
+
+    msg >>
 	w.map_captureobj >>
 	w.ultimate_artifact >>
 	w.day >> w.week >> w.month >>
@@ -1093,7 +1179,10 @@ StreamBase & operator>> (StreamBase & msg, World & w)
 	w.week_next >>
         w.heroes_cond_wins >>
         w.heroes_cond_loss >>
-	w.map_action_objects;
+	w.map_actions;
+
+    if(FORMAT_VERSION_3186 <= Game::GetLoadVersion())
+	msg >> w.map_objects;
 
     // update tile passable
     std::for_each(w.vec_tiles.begin(), w.vec_tiles.end(),
@@ -1104,4 +1193,89 @@ StreamBase & operator>> (StreamBase & msg, World & w)
 	std::mem_fun(&Heroes::RescanPathPassable));
 
     return msg;
+}
+
+EventDate::EventDate(const u8* ptr, size_t sz)
+{
+    StreamBuf st(ptr, sz);
+
+    // id
+    if(0 == st.get())
+    {
+	// resource
+	resource.wood = st.getLE32();
+	resource.mercury = st.getLE32();
+	resource.ore = st.getLE32();
+	resource.sulfur = st.getLE32();
+	resource.crystal = st.getLE32();
+	resource.gems = st.getLE32();
+	resource.gold = st.getLE32();
+
+	st.skip(2);
+
+	// allow computer
+	computer = st.getLE16();
+
+	// day of first occurent
+	first = st.getLE16();
+
+	// subsequent occurrences
+	subsequent = st.getLE16();
+
+	st.skip(6);
+
+	colors = 0;
+	// blue
+	if(st.get()) colors |= Color::BLUE;
+	// green
+	if(st.get()) colors |= Color::GREEN;
+	// red
+	if(st.get()) colors |= Color::RED;
+	// yellow
+	if(st.get()) colors |= Color::YELLOW;
+	// orange
+	if(st.get()) colors |= Color::ORANGE;
+	// purple
+	if(st.get()) colors |= Color::PURPLE;
+
+	// message
+	message = Game::GetEncodeString(GetString(st.getRaw()));
+	DEBUG(DBG_GAME, DBG_INFO, "add: " << message);
+    }
+    else
+	DEBUG(DBG_GAME , DBG_WARN, "unknown id");
+}
+
+bool EventDate::isDeprecated(u32 date) const
+{
+    return 0 == subsequent && first < date;
+}
+
+bool EventDate::isAllow(int col, u32 date) const
+{
+    return ((first == date ||
+	    (subsequent && (first < date && 0 == ((date - first) % subsequent)))) &&
+	    (col & colors));
+}
+
+StreamBase & operator<< (StreamBase & msg, const EventDate & obj)
+{
+    return msg <<
+        obj.resource <<
+        obj.computer <<
+        obj.first <<
+        obj.subsequent <<
+        obj.colors <<
+        obj.message;
+}
+
+StreamBase & operator>> (StreamBase & msg, EventDate & obj)
+{
+    return msg >>
+        obj.resource >>
+        obj.computer >>
+        obj.first >>
+        obj.subsequent >>
+        obj.colors >>
+        obj.message;
 }

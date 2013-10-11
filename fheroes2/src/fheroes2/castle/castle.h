@@ -101,7 +101,7 @@ enum buildcond_t
     ALLOW_BUILD		= 1
 };
 
-class Castle : public Maps::Position, public BitModes, public ColorBase
+class Castle : public MapPosition, public BitModes, public ColorBase, public Control
 {
 public:
     enum flags_t

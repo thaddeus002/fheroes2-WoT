@@ -36,7 +36,6 @@
 #include "dialog.h"
 #include "world.h"
 #include "payment.h"
-#include "gameevent.h"
 #include "heroes.h"
 #include "cursor.h"
 #include "game_interface.h"
@@ -153,7 +152,7 @@ void AIBattleLose(Heroes &hero, const Battle::Result & res, bool attacker, int c
     {
         const u32 & exp = attacker ? res.GetExperienceAttacker() : res.GetExperienceDefender();
 
-        if(CONTROL_HUMAN == hero.GetControl())
+        if(hero.isControlHuman())
         {
             std::string msg = _("Hero %{name} also got a %{count} experience.");
             StringReplace(msg, "%{name}", hero.GetName());
@@ -1051,8 +1050,9 @@ void AIToXanadu(Heroes & hero, u32 obj, s32 dst_index)
 void AIToEvent(Heroes & hero, u32 obj, s32 dst_index)
 {
     // check event maps
-    EventMaps* event_maps = world.GetEventMaps(hero.GetColor(), dst_index);
-    if(event_maps && event_maps->computer)
+    MapEvent* event_maps = world.GetMapEvent(dst_index);
+
+    if(event_maps && event_maps->isAllow(hero.GetColor()) && event_maps->computer)
     {
         if(event_maps->resource.GetValidItemsCount())
     	    hero.GetKingdom().AddFundsResource(event_maps->resource);

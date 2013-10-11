@@ -298,7 +298,7 @@ void Maps::ClearFog(s32 index, int scoute, int color)
 	const Settings & conf = Settings::Get();
 
 	// AI advantage
-	if(CONTROL_AI & world.GetKingdom(color).GetControl())
+	if(world.GetKingdom(color).isControlAI())
 	{
 	    switch(conf.GameDifficulty())
 	    {

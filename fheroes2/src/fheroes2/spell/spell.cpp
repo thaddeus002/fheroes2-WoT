@@ -113,7 +113,13 @@ spellstats_t spells[] = {
 	{ _("Set Air Guardian"),       15, 0, 53,     4, 0, COST_NONE,  _("Sets Air Elementals to guard a mine against enemy armies.") },
 	{ _("Set Fire Guardian"),      15, 0, 54,     4, 0, COST_NONE,  _("Sets Fire Elementals to guard a mine against enemy armies.") },
 	{ _("Set Water Guardian"),     15, 0, 55,     4, 0, COST_NONE,  _("Sets Water Elementals to guard a mine against enemy armies.") },
-	{ _("Stone"),  		        0, 0,  0,     0, 0, COST_NONE,  _("Stone spell from Medusa.") },
+	{ "Random",			0, 0,  0,     0, 0, COST_NONE,  "Random" },
+	{ "Random 1",			0, 0,  0,     0, 0, COST_NONE,  "Random 1" },
+	{ "Random 2",			0, 0,  0,     0, 0, COST_NONE,  "Random 2" },
+	{ "Random 3",			0, 0,  0,     0, 0, COST_NONE,  "Random 3" },
+	{ "Random 4",			0, 0,  0,     0, 0, COST_NONE,  "Random 4" },
+	{ "Random 5",			0, 0,  0,     0, 0, COST_NONE,  "Random 5" },
+	{ "Stone",  		        0, 0,  0,     0, 0, COST_NONE,  "Stone spell from Medusa." },
 };
 
 void Spell::UpdateStats(const std::string & spec)
