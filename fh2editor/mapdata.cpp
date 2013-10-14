@@ -651,7 +651,16 @@ bool MapTile::isObjectEdit(void) const
 	case MapObj::RndCastle:
 	case MapObj::RndTown:
 	case MapObj::Castle:
+	case MapObj::RndArtifact:
+	case MapObj::RndArtifact1:
+	case MapObj::RndArtifact2:
+	case MapObj::RndArtifact3:
 	case MapObj::Artifact:
+	case MapObj::RndMonster:
+	case MapObj::RndMonster1:
+	case MapObj::RndMonster2:
+	case MapObj::RndMonster3:
+	case MapObj::RndMonster4:
 	case MapObj::Monster:
 	case MapObj::Resource:
 	    return isObjectAction();
@@ -2037,7 +2046,9 @@ bool MapData::loadMapMP2(const QString & mapFile)
     if((*it).isObjectAction())
     {
 	// import artifacts
-	if(MapObj::Artifact == (*it).object())
+	if(MapObj::Artifact == (*it).object() ||
+	    MapObj::RndArtifact == (*it).object() ||
+	    MapObj::RndArtifact1 == (*it).object() || MapObj::RndArtifact2 == (*it).object() || MapObj::RndArtifact3 == (*it).object())
 	{
 	    const MapTileExt* ext = mapTiles.tileConst((*it).mapPos())->levels1Const().findConst(MapTileExt::isArtifact);
 	    if(ext)
@@ -2056,7 +2067,9 @@ bool MapData::loadMapMP2(const QString & mapFile)
 	}
 	else
 	// import monsters
-	if(MapObj::Monster == (*it).object())
+	if(MapObj::Monster == (*it).object() ||
+	    MapObj::RndMonster == (*it).object() ||
+	    MapObj::RndMonster1 == (*it).object() || MapObj::RndMonster2 == (*it).object() || MapObj::RndMonster3 == (*it).object() || MapObj::RndMonster4 == (*it).object())
 	{
 	    const MapTileExt* ext = mapTiles.tileConst((*it).mapPos())->levels1Const().findConst(MapTileExt::isMonster);
 	    if(ext)
@@ -2641,8 +2654,17 @@ void MapData::editObjectAttributes(void)
     	case MapObj::Heroes:	editHeroDialog(*tileOverMouse); break;
 	case MapObj::Sphinx:	editSphinxDialog(*tileOverMouse); break;
 
+	case MapObj::RndMonster:
+	case MapObj::RndMonster1:
+	case MapObj::RndMonster2:
+	case MapObj::RndMonster3:
+	case MapObj::RndMonster4:
 	case MapObj::Monster:	editMonsterDialog(*tileOverMouse); break;
 	case MapObj::Resource:	editResourceDialog(*tileOverMouse); break;
+	case MapObj::RndArtifact:
+	case MapObj::RndArtifact1:
+	case MapObj::RndArtifact2:
+	case MapObj::RndArtifact3:
 	case MapObj::Artifact:	editArtifactDialog(*tileOverMouse); break;
 
     	default:		break;

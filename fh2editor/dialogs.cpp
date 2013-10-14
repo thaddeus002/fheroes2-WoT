@@ -4373,7 +4373,7 @@ Form::MapArtifactDialog::MapArtifactDialog(const MapArtifact & obj)
 {
     setWindowTitle(QApplication::translate("MapArtifact", "Artifact Detail", 0, QApplication::UnicodeUTF8));
 
-    variantRandom = new QCheckBox("Random", this);
+    variantRandom = new QCheckBox("Random condition", this);
 
     variantCondition.push_back(new QRadioButton("no condition", this));
     variantCondition.push_back(new QRadioButton("cost: 2000 gold", this));
