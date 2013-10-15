@@ -275,10 +275,10 @@ int Game::HighScores(bool fill)
 
     if(rating && (gameResult.GetResult() & GameOver::WINS))
     {
-	std::string player("Unknown Hero");
-	Dialog::InputString("Your Name", player);
+	std::string player(_("Unknown Hero"));
+	Dialog::InputString(_("Your Name"), player);
 	cursor.Hide();
-	if(player.empty()) player = "Unknown Hero";
+	if(player.empty()) player = _("Unknown Hero");
 	hgs.ScoreRegistry(player, Settings::Get().CurrentFileInfo().name, days, rating);
 	hgs.Save(stream.str().c_str());
 	hgs.RedrawList(top.x, top.y);

@@ -137,7 +137,6 @@ Spell SpellBook::Open(const HeroBase & hero, int filt, bool canselect) const
 	{
 	    std::string str = _("Your hero has %{point} spell points remaining");
 	    StringReplace(str, "%{point}", hero.GetSpellPoints());
-	    str += " spell points remaining";
 	    cursor.Hide();
 	    Dialog::Message("", str, Font::BIG, Dialog::OK);
 	    cursor.Show();

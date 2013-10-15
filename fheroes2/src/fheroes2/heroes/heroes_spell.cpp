@@ -184,7 +184,7 @@ bool HeroesTownGate(Heroes & hero, const Castle* castle)
 void DialogSpellFailed(const Spell & spell)
 {
     // failed
-    std::string str = "%{spell} failed!!!";
+    std::string str = _("%{spell} failed!!!");
     StringReplace(str, "%{spell}", spell.GetName());
     Dialog::Message("", str, Font::BIG, Dialog::OK);
 }

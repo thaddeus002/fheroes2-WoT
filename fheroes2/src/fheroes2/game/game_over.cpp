@@ -263,6 +263,7 @@ void GameOver::DialogLoss(int cond)
 	    body = _("You have lost the hero %{name}.\nYour quest is over.");
 	    const Heroes* hero = world.GetHeroesCondLoss();
 	    if(hero) StringReplace(body, "%{name}", hero->GetName());
+	    else StringReplace(body, "%{name}", "");
 	    break;
 	}
 

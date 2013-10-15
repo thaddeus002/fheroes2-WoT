@@ -1369,16 +1369,18 @@ int Battle::Interface::GetBattleCursor(std::string & status)
 	    if(b_current->GetColor() == b_enemy->GetColor() && !b_enemy->Modes(SP_HYPNOTIZE))
 	    {
 		status = _("View %{monster} info.");
-		StringReplace(status, "%{monster}", b_enemy->GetName());
+		StringReplace(status, "%{monster}", b_enemy->GetMultiName());
 		return Cursor::WAR_INFO;
 	    }
 	    else
 	    {
 		if(b_current->isArchers() && !b_current->isHandFighting())
 		{
-		    status = _("Shoot %{monster} (%{count} shot(s) left)");
-		    StringReplace(status, "%{monster}", b_enemy->GetName());
-		    StringReplace(status, "%{count}", b_current->GetShots());
+		    status = _("Shoot %{monster}");
+		    status.append(" ");
+		    status.append(ngettext("(one shot left)", "(%{count} shots left)", b_current->GetShots()));
+		    StringReplace(status, "%{monster}", b_enemy->GetMultiName());
+ 		    StringReplace(status, "%{count}", b_current->GetShots());
 
 		    return arena.GetObstaclesPenalty(*b_current, *b_enemy) ? Cursor::WAR_BROKENARROW : Cursor::WAR_ARROW;
 		}
@@ -4044,7 +4046,7 @@ void Battle::Interface::CheckGlobalEvents(LocalEvent & le)
     if(arena.CanBreakAutoBattle() &&
 	(le.MouseClickLeft(btn_auto) ||
 	(le.KeyPress() && (Game::HotKeyPressEvent(Game::EVENT_BATTLE_AUTOSWITCH) ||
-	    (Game::HotKeyPressEvent(Game::EVENT_BATTLE_RETREAT) && Dialog::YES == Dialog::Message("", "break auto battle?", Font::BIG, Dialog::YES | Dialog::NO))))))
+	    (Game::HotKeyPressEvent(Game::EVENT_BATTLE_RETREAT) && Dialog::YES == Dialog::Message("", _("Break auto battle?"), Font::BIG, Dialog::YES | Dialog::NO))))))
     {
 	arena.BreakAutoBattle();
     }
@@ -4110,7 +4112,7 @@ void Battle::Interface::ProcessingHeroDialogResult(int res, Actions & a)
 		}
 	    }
 	    else
-		Dialog::Message("", "Retreat disabled", Font::BIG, Dialog::OK);
+		Dialog::Message("", _("Retreat disabled"), Font::BIG, Dialog::OK);
 	    break;
 
 	//surrender
@@ -4135,7 +4137,7 @@ void Battle::Interface::ProcessingHeroDialogResult(int res, Actions & a)
 		}
 	    }
 	    else
-		Dialog::Message("", "Surrender disabled", Font::BIG, Dialog::OK);
+		Dialog::Message("", _("Surrender disabled"), Font::BIG, Dialog::OK);
         break;
 
 	default: break;

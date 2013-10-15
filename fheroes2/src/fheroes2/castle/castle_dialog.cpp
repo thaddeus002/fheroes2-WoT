@@ -389,10 +389,10 @@ int Castle::OpenDialog(bool readonly, bool fade)
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
 	if(le.MouseClickLeft(rectResource))
-	    Dialog::ResourceInfo("", "income:", world.GetKingdom(GetColor()).GetIncome(INCOME_ALL), Dialog::OK);
+	    Dialog::ResourceInfo("", _("Income:"), world.GetKingdom(GetColor()).GetIncome(INCOME_ALL), Dialog::OK);
 	else
 	if(le.MousePressRight(rectResource))
-	    Dialog::ResourceInfo("", "income:", world.GetKingdom(GetColor()).GetIncome(INCOME_ALL), 0);
+	    Dialog::ResourceInfo("", _("Income:"), world.GetKingdom(GetColor()).GetIncome(INCOME_ALL), 0);
 
         // selector troops event
         if((selectArmy2.isValid() &&
@@ -432,7 +432,7 @@ int Castle::OpenDialog(bool readonly, bool fade)
 		if(! heroes.Guest()->GetArmy().CanJoinTroops(army))
 		{
 		    // FIXME: correct message
-		    Dialog::Message("Join Error", "Army is full", Font::BIG, Dialog::OK);
+		    Dialog::Message(_("Join Error"), _("Army is full"), Font::BIG, Dialog::OK);
 		}
 		else
 		{

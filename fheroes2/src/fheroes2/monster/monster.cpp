@@ -88,7 +88,7 @@ namespace
 	{     7,   5,   5,   8,  25,      Speed::FAST,   3,     8, _("Druid")          , _("Druids")        , { 350, 0, 0, 0, 0, 0, 0} },
 	{     7,   7,   5,   8,  25,  Speed::VERYFAST,   3,    16, _("Greater Druid")  , _("Greater Druids"), { 400, 0, 0, 0, 0, 0, 0} },
 	{    10,   9,   7,  14,  40,      Speed::FAST,   2,     0, _("Unicorn")        , _("Unicorns")      , { 500, 0, 0, 0, 0, 0, 0} },
-	{    12,  10,  20,  40, 100, Speed::ULTRAFAST,   1,     0, _("Phoenix")        , _("Phoenix")       , { 1500, 0, 1, 0, 0, 0, 0} },
+	{    12,  10,  20,  40, 100, Speed::ULTRAFAST,   1,     0, _("Phoenix")        , _("Phoenix's")       , { 1500, 0, 1, 0, 0, 0, 0} },
 
 	// atck dfnc  min  max   hp             speed grwn  shots  name                  multiname            cost
 	{     3,   1,   1,   2,   5,   Speed::AVERAGE,   8,     8, _("Centaur")        , _("Centaurs")      , { 60, 0, 0, 0, 0, 0, 0} },
@@ -1181,7 +1181,7 @@ const char* Monster::GetPluralName(u32 count) const
 	case DRUID:		return ngettext("Druid", "Druids", count);
 	case GREATER_DRUID:	return ngettext("Greater Druid", "Greater Druids", count);
 	case UNICORN:		return ngettext("Unicorn", "Unicorns", count);
-	case PHOENIX:		return ngettext("Phoenix", "Phoenix", count);
+	case PHOENIX:		return ngettext("Phoenix", "Phoenix's", count);
 
 	case CENTAUR:		return ngettext("Centaur", "Centaurs", count);
 	case GARGOYLE:		return ngettext("Gargoyle", "Gargoyles", count);

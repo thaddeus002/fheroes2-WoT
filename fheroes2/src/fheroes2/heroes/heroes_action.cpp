@@ -1370,7 +1370,7 @@ void ActionToSign(Heroes & hero, u32 obj, s32 dst_index)
 {
     PlaySoundWarning;
     const MapSign* sign = world.GetMapSign(dst_index);
-    Dialog::Message("Sign", (sign ? sign->message : ""), Font::BIG, Dialog::OK);
+    Dialog::Message(_("Sign"), (sign ? sign->message : ""), Font::BIG, Dialog::OK);
     DEBUG(DBG_GAME, DBG_INFO, hero.GetName());
 }
 
