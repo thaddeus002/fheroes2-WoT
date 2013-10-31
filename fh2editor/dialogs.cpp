@@ -1229,12 +1229,12 @@ Form::MessageDialog::MessageDialog(const QString & msg)
 
     resize(250, 160);
 
-    connect(plainText, SIGNAL(textChanged()), this, SLOT(enableButtonOk()));
+    connect(plainText, SIGNAL(textChanged()), this, SLOT(enableButtonOK()));
     connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
     connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
 }
 
-void Form::MessageDialog::enableButtonOk(void)
+void Form::MessageDialog::enableButtonOK(void)
 {
     pushButtonOk->setEnabled(! plainText->toPlainText().isEmpty());
 }
@@ -2788,7 +2788,8 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
     labelExperience->setText(QApplication::translate("MapHeroDialog", "Experience", 0, QApplication::UnicodeUTF8));
 
     lineEditExperience = new QLineEdit(tabInfo);
-    lineEditExperience->setInputMethodHints(Qt::ImhDigitsOnly);
+    //lineEditExperience->setInputMethodHints(Qt::ImhDigitsOnly);
+    lineEditExperience->setValidator(new QDoubleValidator(0, 100000, 1, this));
     lineEditExperience->setText(QString::number(hero.experience));
 
     horizontalLayoutExp = new QHBoxLayout();
@@ -2826,6 +2827,77 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
     verticalLayoutInfo = new QVBoxLayout(tabInfo);
     verticalLayoutInfo->addLayout(horizontalLayout);
     verticalLayoutInfo->addItem(verticalSpacerInfo);
+
+    // tab: primary skills
+    tabPrimarySkills = new QWidget();
+
+    verticalLayoutAttack = new QVBoxLayout();
+    verticalLayoutDefence = new QVBoxLayout();
+    verticalLayoutPower = new QVBoxLayout();
+    verticalLayoutKnowledge = new QVBoxLayout();
+
+    spinBoxAttack = new QSpinBox(tabPrimarySkills);
+    spinBoxAttack->setMaximum(20);
+    spinBoxAttack->setValue(hero.attack);
+
+    labelAttack = new QLabel("Attack", tabPrimarySkills);
+    labelAttack->setPixmap(EditorTheme::getImageICN("PRIMSKIL.ICN", 0).first);
+
+    verticalLayoutAttack->addWidget(labelAttack);
+    verticalLayoutAttack->addWidget(spinBoxAttack);
+
+    spinBoxDefence = new QSpinBox(tabPrimarySkills);
+    spinBoxDefence->setMaximum(20);
+    spinBoxDefence->setValue(hero.defence);
+
+    labelDefence = new QLabel("Defence", tabPrimarySkills);
+    labelDefence->setPixmap(EditorTheme::getImageICN("PRIMSKIL.ICN", 1).first);
+
+    verticalLayoutDefence->addWidget(labelDefence);
+    verticalLayoutDefence->addWidget(spinBoxDefence);
+
+    spinBoxPower = new QSpinBox(tabPrimarySkills);
+    spinBoxPower->setMaximum(20);
+    spinBoxPower->setValue(hero.power);
+
+    labelPower = new QLabel("Power", tabPrimarySkills);
+    labelPower->setPixmap(EditorTheme::getImageICN("PRIMSKIL.ICN", 2).first);
+
+    verticalLayoutPower->addWidget(labelPower);
+    verticalLayoutPower->addWidget(spinBoxPower);
+
+    spinBoxKnowledge = new QSpinBox(tabPrimarySkills);
+    spinBoxKnowledge->setMaximum(20);
+    spinBoxKnowledge->setValue(hero.knowledge);
+
+    labelKnowledge = new QLabel("Knowledge", tabPrimarySkills);
+    labelKnowledge->setPixmap(EditorTheme::getImageICN("PRIMSKIL.ICN", 3).first);
+
+    verticalLayoutKnowledge->addWidget(labelKnowledge);
+    verticalLayoutKnowledge->addWidget(spinBoxKnowledge);
+
+#ifndef QT_NO_TOOLTIP
+    labelAttack->setToolTip("Attack");
+    labelDefence->setToolTip("Defence");
+    labelPower->setToolTip("Power");
+    labelKnowledge->setToolTip("Knowledge");
+    spinBoxAttack->setToolTip("Attack");
+    spinBoxDefence->setToolTip("Defence");
+    spinBoxPower->setToolTip("Power");
+    spinBoxKnowledge->setToolTip("Knowledge");
+#endif
+
+    horizontalLayoutPrimarySkills = new QHBoxLayout();
+    horizontalLayoutPrimarySkills->addLayout(verticalLayoutAttack);
+    horizontalLayoutPrimarySkills->addLayout(verticalLayoutDefence);
+    horizontalLayoutPrimarySkills->addLayout(verticalLayoutPower);
+    horizontalLayoutPrimarySkills->addLayout(verticalLayoutKnowledge);
+
+    verticalSpacerPrimSkills = new QSpacerItem(20, 121, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    verticalLayoutPrimSkills = new QVBoxLayout(tabPrimarySkills);
+    verticalLayoutPrimSkills->addLayout(horizontalLayoutPrimarySkills);
+    verticalLayoutPrimSkills->addItem(verticalSpacerPrimSkills);
 
     // tab: troops
     tabTroops = new QWidget();
@@ -2985,19 +3057,19 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
     }
 
     // tab: skills
-    tabSkills = new QWidget();
+    tabSecSkills = new QWidget();
     bool defaultSkills = 0 == hero.skills.size();
 
-    checkBoxDefaultSkills = new QCheckBox(tabSkills);
+    checkBoxDefaultSkills = new QCheckBox(tabSecSkills);
     checkBoxDefaultSkills->setChecked(defaultSkills);
     checkBoxDefaultSkills->setText(QApplication::translate("MapHeroDialog", "Default", 0, QApplication::UnicodeUTF8));
 
-    listWidgetSkills = new SkillsList(tabSkills);
+    listWidgetSkills = new SkillsList(tabSecSkills);
     listWidgetSkills->setVisible(! defaultSkills);
 
     verticalSpacerSkills = new QSpacerItem(20, 6, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-    verticalLayoutSkills = new QVBoxLayout(tabSkills);
+    verticalLayoutSkills = new QVBoxLayout(tabSecSkills);
     verticalLayoutSkills->addWidget(checkBoxDefaultSkills);
     verticalLayoutSkills->addWidget(listWidgetSkills);
     verticalLayoutSkills->addItem(verticalSpacerSkills);
@@ -3011,6 +3083,28 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
 	item->setToolTip((*it).description());
 #endif
 	static_cast<QListWidget*>(listWidgetSkills)->addItem(item);
+    }
+
+    // tab: spells
+    tabSpells = new QWidget();
+
+    listWidgetSpells = new SpellsList(tabSpells);
+    verticalSpacerSpells = new QSpacerItem(20, 6, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    verticalLayoutSpells = new QVBoxLayout(tabSpells);
+    verticalLayoutSpells->addWidget(listWidgetSpells);
+    verticalLayoutSpells->addItem(verticalSpacerSpells);
+
+    if(hero.haveMagicBook())
+    for(QVector<int>::const_iterator
+	it = hero.spells.begin(); it != hero.spells.end(); ++it)
+    {
+	QListWidgetItem* item = new QListWidgetItem(Spell::pixmap(*it), Spell::transcribe(*it));
+	item->setData(Qt::UserRole, QVariant::fromValue(*it));
+#ifndef QT_NO_TOOLTIP
+	item->setToolTip(Spell::tips(*it));
+#endif
+	static_cast<QListWidget*>(listWidgetSpells)->addItem(item);
     }
 
     // tab: other
@@ -3066,11 +3160,18 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
 
     tabWidget = new QTabWidget(this);
     tabWidget->addTab(tabInfo, "Info");
+    tabWidget->addTab(tabPrimarySkills, "Primary Skills");
+    tabWidget->addTab(tabSecSkills, "Secondary Skills");
     tabWidget->addTab(tabTroops, "Troops");
     tabWidget->addTab(tabArtifacts, "Artifacts");
-    tabWidget->addTab(tabSkills, "Skills");
+    tabWidget->addTab(tabSpells, "Spells");
     tabWidget->addTab(tabOther, "Other");
     tabWidget->setCurrentIndex(0);
+
+    tabSpellsIndex = 5;
+
+    if(! hero.haveMagicBook())
+	tabWidget->removeTab(tabSpellsIndex);
 
     verticalLayoutWidget = new QVBoxLayout(this);
     verticalLayoutWidget->addWidget(tabWidget);
@@ -3090,6 +3191,11 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
     connect(comboBoxRace, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
     connect(verticalScrollBarPort, SIGNAL(valueChanged(int)), this, SLOT(setPortrait(int)));
 
+    connect(spinBoxAttack, SIGNAL(valueChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(spinBoxDefence, SIGNAL(valueChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(spinBoxPower, SIGNAL(valueChanged(int)), this, SLOT(setEnableOKButton()));
+    connect(spinBoxKnowledge, SIGNAL(valueChanged(int)), this, SLOT(setEnableOKButton()));
+
     connect(checkBoxTroopsDefault, SIGNAL(toggled(bool)), this, SLOT(setDefaultTroops(bool)));
     connect(comboBoxTroop1, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
     connect(comboBoxTroop2, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
@@ -3103,7 +3209,8 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
     connect(spinBoxCount5, SIGNAL(valueChanged(int)), this, SLOT(setEnableOKButton()));
 
     connect(checkBoxDefaultSkills, SIGNAL(toggled(bool)), this, SLOT(widgetSkillsVisible(bool)));
-    connect(listWidgetArtifacts, SIGNAL(currentTextChanged(const QString &)), this, SLOT(setEnableOKButton()));
+    connect(listWidgetArtifacts, SIGNAL(listChanged()), this, SLOT(artifactsChanged()));
+    connect(listWidgetSpells, SIGNAL(listChanged()), this, SLOT(setEnableOKButton()));
 
     connect(checkBoxEnablePatrol, SIGNAL(toggled(bool)), comboBoxPatrol, SLOT(setEnabled(bool)));
     connect(checkBoxEnablePatrol, SIGNAL(toggled(bool)), this, SLOT(setEnableOKButton()));
@@ -3115,6 +3222,21 @@ void Form::MapHeroDialog::widgetSkillsVisible(bool f)
     if(f) listWidgetSkills->clear();
     listWidgetSkills->setVisible(! f);
     setEnableOKButton();
+}
+
+void Form::MapHeroDialog::artifactsChanged(void)
+{
+    setEnableOKButton();
+
+    QVector<int> arts = artifacts();
+
+    if(arts.end() == std::find(arts.begin(), arts.end(), static_cast<int>(Artifact::MagicBook)))
+    {
+	listWidgetSpells->clear();
+	tabWidget->removeTab(tabSpellsIndex);
+    }
+    else
+	tabWidget->insertTab(tabSpellsIndex, tabSpells, "Spells");
 }
 
 void Form::MapHeroDialog::setPortrait(int val)
@@ -3201,6 +3323,16 @@ QVector<int> Form::MapHeroDialog::artifacts(void) const
     return res;
 }
 
+QVector<int> Form::MapHeroDialog::spells(void) const
+{
+    QVector<int> res;
+
+    for(int index = 0; index < listWidgetSpells->count(); ++index)
+	res.push_back(listWidgetSpells->item(index)->data(Qt::UserRole).toInt());
+
+    return res;
+}
+
 Skills Form::MapHeroDialog::skills(void) const
 {
     Skills res;
@@ -3231,7 +3363,7 @@ void Form::ArtifactsList::addItem(void)
 
 bool Form::ArtifactsList::limit(void) const
 {
-    return count() >= 3;
+    return count() >= 14;
 }
 
 void Form::ArtifactsList::editItem(QListWidgetItem* item)
@@ -3279,6 +3411,42 @@ void Form::SkillsList::editItem(QListWidgetItem* item)
 }
 
 void Form::SkillsList::checkLimit(void)
+{
+    addItemAct->setDisabled(limit());
+}
+
+Form::SpellsList::SpellsList(QWidget* parent) : ItemsList(parent)
+{
+    addItemAct->setStatusTip(tr("Add spell"));
+    editItemAct->setStatusTip(tr("Edit spell"));
+    delItemAct->setStatusTip(tr("Delete spell"));
+}
+
+void Form::SpellsList::addItem(void)
+{
+    SelectSpellDialog dialog;
+
+    if(QDialog::Accepted == dialog.exec())
+    {
+	QListWidget::addItem(new QListWidgetItem(*dialog.listWidget->currentItem()));
+	setCurrentRow(count() - 1);
+    }
+}
+
+bool Form::SpellsList::limit(void) const
+{
+    return count() >= 20;
+}
+
+void Form::SpellsList::editItem(QListWidgetItem* item)
+{
+    SelectSpellDialog dialog(qvariant_cast<int>(item->data(Qt::UserRole)));
+
+    if(QDialog::Accepted == dialog.exec())
+	*item = *dialog.listWidget->currentItem();
+}
+
+void Form::SpellsList::checkLimit(void)
 {
     addItemAct->setDisabled(limit());
 }
@@ -3357,6 +3525,23 @@ Form::SelectSkillDialog::SelectSkillDialog(const Skill & current)
     }
 
     if(current.isValid()) listWidget->setCurrentRow(3 * (current.skill() - 1) + (current.level() - 1));
+}
+
+Form::SelectSpellDialog::SelectSpellDialog(int spell)
+{
+    setWindowTitle(QApplication::translate("SelectSpellDialog", "Select spell", 0, QApplication::UnicodeUTF8));
+
+    for(int sp = Spell::None + 1; sp < Spell::Random; ++sp)
+    {
+	QListWidgetItem* item = new QListWidgetItem(Spell::pixmap(sp), Spell::transcribe(sp));
+	item->setData(Qt::UserRole, QVariant::fromValue(sp));
+#ifndef QT_NO_TOOLTIP
+	item->setToolTip(Spell::tips(sp));
+#endif
+	listWidget->addItem(item);
+    }
+
+    if(Spell::None < spell && spell < Spell::Random) listWidget->setCurrentRow(spell - 1);
 }
 
 Form::RiddlesList::RiddlesList(QWidget* parent) : ItemsList(parent)
@@ -4139,12 +4324,12 @@ Form::MessageTabDialog::MessageTabDialog(const ActionMessage & act)
 
     resize(250, 160);
 
-    connect(plainText, SIGNAL(textChanged()), this, SLOT(enableButtonOk()));
+    connect(plainText, SIGNAL(textChanged()), this, SLOT(enableButtonOK()));
     connect(pushButtonCancel, SIGNAL(clicked()), this, SLOT(reject()));
     connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(accept()));
 }
 
-void Form::MessageTabDialog::enableButtonOk(void)
+void Form::MessageTabDialog::enableButtonOK(void)
 {
     pushButtonOk->setEnabled(true);
 }
@@ -4193,7 +4378,7 @@ Form::DefaultActionDialog::DefaultActionDialog(const ActionDefault & act) : Mess
     resize(minSize);
     setMinimumSize(minSize);
 
-    connect(comboBoxResult, SIGNAL(currentIndexChanged(int)), this, SLOT(enableButtonOk()));
+    connect(comboBoxResult, SIGNAL(currentIndexChanged(int)), this, SLOT(enableButtonOK()));
 }
 
 ActionDefault Form::DefaultActionDialog::result(void) const
@@ -4234,7 +4419,7 @@ Form::AccessDialog::AccessDialog(const ActionAccess & act) : MessageTabDialog(ac
     resize(minSize);
     setMinimumSize(minSize);
 
-    connect(accessGroup, SIGNAL(formChanged()), this, SLOT(enableButtonOk()));
+    connect(accessGroup, SIGNAL(formChanged()), this, SLOT(enableButtonOK()));
 }
 
 ActionAccess Form::AccessDialog::result(void) const
@@ -4272,7 +4457,7 @@ Form::ResourcesDialog::ResourcesDialog(const ActionResources & act) : MessageTab
     resize(minSize);
     setMinimumSize(minSize);
 
-    connect(resourcesGroup, SIGNAL(formChanged()), this, SLOT(enableButtonOk()));
+    connect(resourcesGroup, SIGNAL(formChanged()), this, SLOT(enableButtonOK()));
 }
 
 ActionResources Form::ResourcesDialog::result(void) const
@@ -4353,7 +4538,7 @@ void Form::ArtifactDialog::fillItem(QListWidgetItem & item, const ActionArtifact
 
 void Form::ArtifactDialog::artifactFormChanged(void)
 {
-    enableButtonOk();
+    enableButtonOK();
 
     if(artifactGroup->result() == Artifact::SpellScroll)
     {

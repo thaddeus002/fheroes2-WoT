@@ -2850,6 +2850,10 @@ void MapData::editHeroDialog(const MapTile & tile)
 
 	if(QDialog::Accepted == form.exec())
 	{
+	    hero->attack = form.spinBoxAttack->value();
+	    hero->defence = form.spinBoxDefence->value();
+	    hero->power = form.spinBoxPower->value();
+	    hero->knowledge = form.spinBoxKnowledge->value();
 	    hero->nameHero = form.lineEditName->text();
 	    hero->troops = form.troops();
 	    hero->portrait = form.verticalScrollBarPort->value();
@@ -2858,6 +2862,7 @@ void MapData::editHeroDialog(const MapTile & tile)
 	    hero->patrolMode = form.checkBoxEnablePatrol->isChecked();
 	    hero->patrolSquare = qvariant_cast<int>(comboBoxCurrentData(form.comboBoxPatrol));
 	    hero->skills = form.skills();
+	    hero->spells = form.spells();
 	    hero->col = qvariant_cast<int>(comboBoxCurrentData(form.comboBoxColor));
 	    hero->race = qvariant_cast<int>(comboBoxCurrentData(form.comboBoxRace));
 

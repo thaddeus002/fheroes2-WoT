@@ -2248,6 +2248,11 @@ MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2, int spri
     }
 }
 
+bool MapHero::haveMagicBook(void) const
+{
+    return artifacts.end() != std::find(artifacts.begin(), artifacts.end(), static_cast<int>(Artifact::MagicBook));
+}
+
 void MapHero::updateInfo(int spriteIndex)
 {
     switch(spriteIndex / 7)
@@ -2279,12 +2284,44 @@ void MapHero::updateInfo(int spriteIndex)
 	portrait = 1 + (Race::index(race) - 1) * 9 + Editor::Rand(9);
 	nameHero = Portrait::transcribe(portrait);
     }
+
+    artifacts.clear();
+    spells.clear();
+
+    attack = 0;
+    defence = 0;
+    power = 0;
+    knowledge = 0;
+
+    switch(race)
+    {
+	case Race::Sorceress: artifacts.push_back(Artifact::MagicBook);  spells.push_back(Spell::Bless); break;
+	case Race::Warlock: artifacts.push_back(Artifact::MagicBook);  spells.push_back(Spell::Curse); break;
+	case Race::Wizard: artifacts.push_back(Artifact::MagicBook);  spells.push_back(Spell::StoneSkin); break;
+	case Race::Necromancer: artifacts.push_back(Artifact::MagicBook); spells.push_back(Spell::Haste); break;
+	default: break;
+    }
+
+    switch(race)
+    {
+	case Race::Knight: attack = 2; defence = 2; power = 1; knowledge = 1; break;
+	case Race::Barbarian: attack = 3; defence = 1; power = 1; knowledge = 1; break;
+	case Race::Sorceress: attack = 0; defence = 0; power = 2; knowledge = 3; break;
+	case Race::Warlock: attack = 0; defence = 0; power = 3; knowledge = 2; break;
+	case Race::Wizard: attack = 0; defence = 1; power = 2; knowledge = 2; break;
+	case Race::Necromancer: attack = 1; defence = 0; power = 2; knowledge = 2; break;
+	default: break;
+    }
 }
 
 QDomElement & operator<< (QDomElement & el, const MapHero & hero)
 {
     el << static_cast<const MapObject &>(hero);
 
+    el.setAttribute("attack", hero.attack);
+    el.setAttribute("defence", hero.defence);
+    el.setAttribute("power", hero.power);
+    el.setAttribute("knowledge", hero.knowledge);
     el.setAttribute("name", hero.nameHero);
     el.setAttribute("color", hero.col);
     el.setAttribute("race", hero.race);
@@ -2309,6 +2346,20 @@ QDomElement & operator<< (QDomElement & el, const MapHero & hero)
 	}
     }
 
+    if(hero.spells.size())
+    {
+	QDomElement spellsElem = doc.createElement("spells");
+	el.appendChild(spellsElem);
+
+	for(QVector<int>::const_iterator
+	    it = hero.spells.begin(); it != hero.spells.end(); ++it)
+	{
+	    QDomElement spellElem = doc.createElement("spell");
+	    spellsElem.appendChild(spellElem);
+	    spellElem.setAttribute("id", *it);
+	}
+    }
+
     if(hero.skills.size())
     {
 	QDomElement skillsElem = doc.createElement("skills");
@@ -2330,6 +2381,10 @@ QDomElement & operator>> (QDomElement & el, MapHero & hero)
 {
     el >> static_cast<MapObject &>(hero);
 
+    hero.attack = el.hasAttribute("attack") ? el.attribute("attack").toInt() : 0;
+    hero.defence = el.hasAttribute("defence") ? el.attribute("defence").toInt() : 0;
+    hero.power = el.hasAttribute("power") ? el.attribute("power").toInt() : 0;
+    hero.knowledge = el.hasAttribute("knowledge") ? el.attribute("knowledge").toInt() : 0;
     hero.nameHero = el.hasAttribute("name") ? el.attribute("name") : "Unknown";
     hero.col = el.hasAttribute("color") ? el.attribute("color").toInt() : Color::None;
     hero.race =  el.hasAttribute("race") ? el.attribute("race").toInt() : Race::Unknown;
@@ -2345,6 +2400,15 @@ QDomElement & operator>> (QDomElement & el, MapHero & hero)
 	QDomElement artElem = artList.item(pos).toElement();
 	if(artElem.hasAttribute("id"))
 	    hero.artifacts.push_back(artElem.attribute("id").toInt());
+    }
+
+    hero.spells.clear();
+    QDomNodeList spellList = el.firstChildElement("spells").elementsByTagName("spell");
+    for(int pos = 0; pos < spellList.size(); ++pos)
+    {
+	QDomElement spellElem = spellList.item(pos).toElement();
+	if(spellElem.hasAttribute("id"))
+	    hero.spells.push_back(spellElem.attribute("id").toInt());
     }
 
     QDomElement skillsElem = el.firstChildElement("skills");
@@ -3736,6 +3800,84 @@ int Spell::level(int spell)
     }
 
     return 0;
+}
+
+QPixmap Spell::pixmap(int spell)
+{
+    int index = -1;
+
+    switch(spell)
+    {
+	case FireBall:		index = 8; break;
+	case FireBlast:		index = 9; break;
+	case LightningBolt:	index = 4; break;
+	case ChainLightning:	index = 5; break;
+	case Teleport:		index = 10; break;
+	case Cure:		index = 6; break;
+	case MassCure:		index = 2; break;
+	case Resurrect:		index = 13; break;
+	case ResurrectTrue:	index = 12; break;
+	case Haste:		index = 14; break;
+	case MassHaste:		index = 14; break;
+	case Slow:		index = 1; break;
+	case MassSlow:		index = 1; break;
+        case Blind:		index = 21; break;
+	case Bless:		index = 7; break;
+	case MassBless:		index = 7; break;
+	case StoneSkin:		index = 31; break;
+	case SteelSkin:		index = 30; break;
+	case Curse:		index = 3; break;
+	case MassCurse:		index = 3; break;
+	case HolyWord:		index = 22; break;
+	case HolyShout:		index = 23; break;
+	case AntiMagic:		index = 17; break;
+	case Dispel:		index = 18; break;
+	case MassDispel:	index = 18; break;
+	case Arrow:		index = 38; break;
+	case Berserker:		index = 19; break;
+        case Armageddon:	index = 16; break;
+	case ElementalStorm:	index = 11; break;
+	case MeteorShower:	index = 24; break;
+	case Paralyze:		index = 20; break;
+	case Hypnotize:		index = 37; break;
+	case ColdRay:		index = 36; break;
+	case ColdRing:		index = 35; break;
+	case DisruptingRay:	index = 34; break;
+	case DeathRipple:	index = 28; break;
+	case DeathWave:		index = 29; break;
+	case DragonSlayer:	index = 32; break;
+        case BloodLust:		index = 27; break;
+	case AnimateDead:	index = 25; break;
+	case MirrorImage:	index = 26; break;
+	case Shield:		index = 15; break;
+	case MassShield:	index = 15; break;
+	case SummonEElement:	index = 56; break;
+	case SummonAElement:	index = 57; break;
+	case SummonFElement:	index = 58; break;
+	case SummonWElement:	index = 59; break;
+	case EarthQuake:	index = 33; break;
+        case ViewMines:		index = 39; break;
+	case ViewResources:	index = 40; break;
+	case ViewArtifacts:	index = 41; break;
+	case ViewTowns:		index = 42; break;
+	case ViewHeroes:	index = 43; break;
+	case ViewAll:		index = 44; break;
+	case IdentifyHero:	index = 45; break;
+	case SummonBoat:	index = 46; break;
+	case DimensionDoor:	index = 47; break;
+	case TownGate:		index = 48; break;
+	case TownPortal:	index = 49; break;
+        case Visions:		index = 50; break;
+	case Haunt:		index = 51; break;
+	case SetEGuardian:	index = 52; break;
+	case SetAGuardian:	index = 53; break;
+	case SetFGuardian:	index = 54; break;
+	case SetWGuardian:	index = 55; break;
+
+	default: break;
+    }
+
+    return index < 0 ? NULL : EditorTheme::getImageICN("SPELLS.ICN", index).first;
 }
 
 bool Spell::isBattle(int spell)

@@ -497,7 +497,7 @@ namespace Form
 	QString			message(void) const;
 
     protected slots:
-	void			enableButtonOk(void);
+	void			enableButtonOK(void);
     };
 
     class DayEventDialog : public QDialog
@@ -748,6 +748,20 @@ namespace Form
 	void			checkLimit(void);
     };
 
+    class SpellsList : public ItemsList
+    {
+	Q_OBJECT
+
+    public:
+	SpellsList(QWidget*);
+
+	bool			limit(void) const;
+
+	void			addItem(void);
+	void			editItem(QListWidgetItem*);
+	void			checkLimit(void);
+    };
+
     class MapHeroDialog : public QDialog
     {
 	Q_OBJECT
@@ -777,6 +791,22 @@ namespace Form
 	QLabel* 		labelPortrait;
 	QScrollBar* 		verticalScrollBarPort;
 	QSpacerItem* 		verticalSpacerInfo;
+	QWidget* 		tabPrimarySkills;
+	QHBoxLayout* 		horizontalLayoutPrimarySkills;
+	QVBoxLayout* 		verticalLayoutAttack;
+	QVBoxLayout* 		verticalLayoutDefence;
+	QVBoxLayout* 		verticalLayoutPower;
+	QVBoxLayout* 		verticalLayoutKnowledge;
+	QLabel*			labelAttack;
+	QLabel*			labelDefence;
+	QLabel*			labelPower;
+	QLabel*			labelKnowledge;
+	QSpinBox* 		spinBoxAttack;
+	QSpinBox* 		spinBoxDefence;
+	QSpinBox* 		spinBoxPower;
+	QSpinBox* 		spinBoxKnowledge;
+	QSpacerItem* 		verticalSpacerPrimSkills;
+	QVBoxLayout* 		verticalLayoutPrimSkills;
 	QWidget* 		tabTroops;
 	QVBoxLayout* 		verticalLayoutTroops;
 	QCheckBox* 		checkBoxTroopsDefault;
@@ -805,11 +835,16 @@ namespace Form
 	QVBoxLayout* 		verticalLayoutArtifacts;
         ArtifactsList* 		listWidgetArtifacts;
 	QSpacerItem* 		verticalSpacerArtifacts;
-        QWidget* 		tabSkills;
+        QWidget* 		tabSecSkills;
 	QVBoxLayout* 		verticalLayoutSkills;
 	QCheckBox* 		checkBoxDefaultSkills;
 	SkillsList* 		listWidgetSkills;
 	QSpacerItem* 		verticalSpacerSkills;
+        QWidget* 		tabSpells;
+        int 			tabSpellsIndex;
+	QVBoxLayout* 		verticalLayoutSpells;
+	SpellsList* 		listWidgetSpells;
+	QSpacerItem* 		verticalSpacerSpells;
         QWidget* 		tabOther;
 	QVBoxLayout* 		verticalLayoutOther;
 	QGroupBox* 		groupBoxPatrol;
@@ -824,6 +859,7 @@ namespace Form
 
 	Troops			troops(void) const;
 	QVector<int>		artifacts(void) const;
+	QVector<int>		spells(void) const;
 	Skills			skills(void) const;
 
     protected slots:
@@ -831,6 +867,7 @@ namespace Form
 	void			setPortrait(int);
 	void			setDefaultTroops(bool);
 	void			widgetSkillsVisible(bool);
+	void			artifactsChanged(void);
     };
 
     class ListDialog : public QDialog
@@ -857,6 +894,14 @@ namespace Form
 
     public:
 	SelectArtifactDialog(int = 0);
+    };
+
+    class SelectSpellDialog : public ListDialog
+    {
+	Q_OBJECT
+
+    public:
+	SelectSpellDialog(int spell = Spell::None);
     };
 
     class SelectSkillDialog : public ListDialog
@@ -1088,7 +1133,7 @@ namespace Form
 	static void		fillItem(QListWidgetItem &, const ActionMessage &);
 
     public slots:
-	void			enableButtonOk(void);
+	void			enableButtonOK(void);
     };
 
     class DefaultActionDialog : public MessageTabDialog

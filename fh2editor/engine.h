@@ -189,6 +189,7 @@ namespace Spell
     bool	isBattle(int);
     QString	transcribe(int);
     QString	tips(int);
+    QPixmap	pixmap(int);
 }
 
 namespace Monster
@@ -751,11 +752,16 @@ struct MapTown : public MapObject
 
 struct MapHero : public MapObject
 {
+    int		attack;
+    int		defence;
+    int		power;
+    int		knowledge;
     int		col;
     int		race;
     Troops	troops;
     int		portrait;
     QVector<int> artifacts;
+    QVector<int> spells;
     Skills	skills;
     quint32	experience;
     bool	patrolMode;
@@ -771,6 +777,7 @@ struct MapHero : public MapObject
     int		color(void) const { return col; }
     MapObject*	copy(void) const { return new MapHero(*this); }
     void	updateInfo(int);
+    bool	haveMagicBook(void) const;
 };
 
 struct MapSign : public MapObject
