@@ -565,7 +565,9 @@ u32 Heroes::GetMaxMovePoints(void) const
     }
     else
     {
-    	switch(const_cast<Army &>(army).GetSlowestTroop().GetSpeed())
+	Troop* troop = const_cast<Army &>(army).GetSlowestTroop();
+
+    	switch(troop->GetSpeed())
 	{
 	    default: break;
 	    case Speed::CRAWLING:
@@ -2017,6 +2019,12 @@ StreamBase & operator>> (StreamBase & msg, Heroes & hero)
 	hero.visit_object;
 
     hero.army.SetCommander(&hero);
+    
+    if(! hero.army.isValid() && FORMAT_VERSION_3186 > Game::GetLoadVersion())
+    {
+	VERBOSE("invalid army: " << hero.GetName() << ", pos: " << GetString(hero.GetCenter()));
+	hero.army.Reset();
+    }
 
     return msg;
 }

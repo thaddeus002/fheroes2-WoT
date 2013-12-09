@@ -392,14 +392,13 @@ void Troops::UpgradeTroops(const Castle & castle)
     }
 }
 
-Troop & Troops::GetFirstValid(void)
+Troop* Troops::GetFirstValid(void)
 {
     iterator it = std::find_if(begin(), end(), std::mem_fun(&Troop::isValid));
-    if(it == end()) it = begin();
-    return **it;
+    return it == end() ? NULL : *it;
 }
 
-Troop & Troops::GetWeakestTroop(void)
+Troop* Troops::GetWeakestTroop(void)
 {
     iterator first, last, lowest;
 
@@ -408,15 +407,16 @@ Troop & Troops::GetWeakestTroop(void)
 
     while(first != last) if((*first)->isValid()) break; else ++first;
 
+    if(first == end()) return NULL;
     lowest = first;
 
     if(first != last)
     while(++first != last) if((*first)->isValid() && Army::WeakestTroop(*first, *lowest)) lowest = first;
 
-    return **lowest;
+    return *lowest;
 }
 
-Troop & Troops::GetSlowestTroop(void)
+Troop* Troops::GetSlowestTroop(void)
 {
     iterator first, last, lowest;
 
@@ -425,12 +425,13 @@ Troop & Troops::GetSlowestTroop(void)
 
     while(first != last) if((*first)->isValid()) break; else ++first;
 
+    if(first == end()) return NULL;
     lowest = first;
 
     if(first != last)
     while(++first != last) if((*first)->isValid() && Army::SlowestTroop(*first, *lowest)) lowest = first;
 
-    return **lowest;
+    return *lowest;
 }
 
 Troops Troops::GetOptimized(void) const

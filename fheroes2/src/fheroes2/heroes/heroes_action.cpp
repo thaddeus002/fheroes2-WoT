@@ -1769,17 +1769,20 @@ void ActionToArtifact(Heroes & hero, u32 obj, s32 dst_index)
         {
 	    bool battle = true;
 	    Army army(tile);
-	    const Troop & troop = army.GetFirstValid();
+	    Troop* troop = army.GetFirstValid();
 
 	    PlaySoundWarning;
 
-	    if(Monster::ROGUE  == troop().GetID())
-		Dialog::Message("", _("You come upon an ancient artifact. As you reach for it, a pack of Rogues leap out of the brush to guard their stolen loot."), Font::BIG, Dialog::OK);
-	    else
+	    if(troop)
 	    {
-		msg = _("Through a clearing you observe an ancient artifact. Unfortunately, it's guarded by a nearby %{monster}. Do you want to fight the %{monster} for the artifact?");
-		StringReplace(msg, "%{monster}", troop.GetName());
-		battle = (Dialog::YES == Dialog::Message("", msg, Font::BIG, Dialog::YES | Dialog::NO));
+		if(Monster::ROGUE  == troop->GetID())
+		    Dialog::Message("", _("You come upon an ancient artifact. As you reach for it, a pack of Rogues leap out of the brush to guard their stolen loot."), Font::BIG, Dialog::OK);
+		else
+		{
+	    	    msg = _("Through a clearing you observe an ancient artifact. Unfortunately, it's guarded by a nearby %{monster}. Do you want to fight the %{monster} for the artifact?");
+		    StringReplace(msg, "%{monster}", troop->GetName());
+		    battle = (Dialog::YES == Dialog::Message("", msg, Font::BIG, Dialog::YES | Dialog::NO));
+		}
 	    }
 
 	    if(battle)
@@ -2018,13 +2021,13 @@ void ActionToWhirlpools(Heroes & hero, u32 obj, s32 index_from)
     hero.GetPath().Hide();
     hero.FadeIn();
 
-    Troop & troops = hero.GetArmy().GetWeakestTroop();
+    Troop* troop = hero.GetArmy().GetWeakestTroop();
 
-    if(Rand::Get(1) && 1 < troops.GetCount())
+    if(troop && Rand::Get(1) && 1 < troop->GetCount())
     {
 	PlaySoundWarning;
 	Dialog::Message(_("A whirlpool engulfs your ship."), _("Some of your army has fallen overboard."), Font::BIG, Dialog::OK);
-	troops.SetCount(Monster::GetCountFromHitPoints(troops(), troops.GetHitPoints() - troops.GetHitPoints() * Game::GetWhirlpoolPercent() / 100));
+	troop->SetCount(Monster::GetCountFromHitPoints(troop->GetID(), troop->GetHitPoints() - troop->GetHitPoints() * Game::GetWhirlpoolPercent() / 100));
     }
 
     hero.GetPath().Reset();
