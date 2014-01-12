@@ -21,7 +21,9 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include <iterator>
 #include <ctime>
+#include <cctype>
 #include <sstream>
 #include <string>
 
@@ -156,12 +158,18 @@ MapsFileInfoList GetSortedMapsFileInfoList(void)
     return list2;
 }
 
+bool IsPunct(char c)
+{
+    return true;
+}
+
 std::string Dialog::SelectFileSave(void)
 {
     const Settings & conf = Settings::Get();
     const std::string & name = conf.CurrentFileInfo().name;
 
     std::string base = name.size() ? name : "newgame";
+    base.resize(std::distance(base.begin(), std::find_if(base.begin(), base.end(), ::ispunct)));
     std::replace_if(base.begin(), base.end(), ::isspace, '_');
     std::ostringstream os;
 
