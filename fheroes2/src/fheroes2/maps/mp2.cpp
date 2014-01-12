@@ -669,6 +669,11 @@ bool MP2::isWeekLife(int obj)
         case OBJ_TREECITY:
         case OBJ_WAGONCAMP:
         case OBJ_DESERTTENT:
+        case OBJ_WATERALTAR:
+        case OBJ_AIRALTAR:
+        case OBJ_FIREALTAR:
+        case OBJ_EARTHALTAR:
+        case OBJ_BARROWMOUNDS:
 
         // battle and recruit army
         case OBJ_DRAGONCITY:
