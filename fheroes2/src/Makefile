@@ -70,6 +70,10 @@ endif
 ifeq ($(OS),Linux)
 PLATFORM := all
 endif
+ifeq ($(OS),Haiku)
+PLATFORM := all
+LIBS := -lintl -liconv
+endif
 endif
 
 include Makefile.$(PLATFORM)
