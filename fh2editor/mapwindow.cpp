@@ -22,6 +22,10 @@
 
 #include <QtGui>
 #include <QContextMenuEvent>
+#include <QMessageBox>
+#include <QtWidgets>
+#include <QFileDialog>
+#include <QScrollBar>
 
 #include "dialogs.h"
 #include "mainwindow.h"

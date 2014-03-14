@@ -719,7 +719,7 @@ struct Troop : public QPair<int, int>
 
 struct Troops : public QVector<Troop>
 {
-    Troops() { resize(5); /* five slots */ }
+    Troops() : QVector<Troop>(5) { /* five slots */ }
 
     int validCount(void) const;
 };

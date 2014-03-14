@@ -38,6 +38,13 @@
 #include <QTabWidget>
 #include <QTreeWidget>
 #include <QListWidget>
+#include <QSpinBox>
+#include <QLineEdit>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QScrollBar>
+#include <QRadioButton>
+#include <QProxyStyle>
 
 #include "global.h"
 #include "program.h"
@@ -52,17 +59,17 @@ QVariant comboBoxCurrentData(const QComboBox* box)
 
 Form::SelectMapSize::SelectMapSize()
 {
-    setWindowTitle(QApplication::translate("SelectMapSize", "Select Size", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("SelectMapSize", "Select Size", 0));
 
     vboxLayout = new QVBoxLayout(this);
     vboxLayout->setSpacing(6);
     vboxLayout->setMargin(9);
 
     comboBoxSize = new QComboBox(this);
-    comboBoxSize->addItem(QApplication::translate("SelectMapSize", "Small (36x36)", 0, QApplication::UnicodeUTF8), 36);
-    comboBoxSize->addItem(QApplication::translate("SelectMapSize", "Medium (72x72)", 0, QApplication::UnicodeUTF8), 72);
-    comboBoxSize->addItem(QApplication::translate("SelectMapSize", "Large (108x108)", 0, QApplication::UnicodeUTF8), 108);
-    comboBoxSize->addItem(QApplication::translate("SelectMapSize", "Extra Large (144x144)", 0, QApplication::UnicodeUTF8), 144);
+    comboBoxSize->addItem(QApplication::translate("SelectMapSize", "Small (36x36)", 0), 36);
+    comboBoxSize->addItem(QApplication::translate("SelectMapSize", "Medium (72x72)", 0), 72);
+    comboBoxSize->addItem(QApplication::translate("SelectMapSize", "Large (108x108)", 0), 108);
+    comboBoxSize->addItem(QApplication::translate("SelectMapSize", "Extra Large (144x144)", 0), 144);
     comboBoxSize->setCurrentIndex(1);
     vboxLayout->addWidget(comboBoxSize);
 
@@ -80,7 +87,7 @@ Form::SelectMapSize::SelectMapSize()
     labelWidth = new QLabel(this);
     labelWidth->setEnabled(true);
     labelWidth->setVisible(false);
-    labelWidth->setText(QApplication::translate("SelectMapSize", "width", 0, QApplication::UnicodeUTF8));
+    labelWidth->setText(QApplication::translate("SelectMapSize", "width", 0));
     labelWidth->setBuddy(spinBoxWidth);
 
     spacerItem2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -103,7 +110,7 @@ Form::SelectMapSize::SelectMapSize()
     spinBoxHeight->setVisible(false);
 
     labelHeight = new QLabel(this);
-    labelHeight->setText(QApplication::translate("SelectMapSize", "height", 0, QApplication::UnicodeUTF8));
+    labelHeight->setText(QApplication::translate("SelectMapSize", "height", 0));
     labelHeight->setVisible(false);
     labelHeight->setBuddy(spinBoxHeight);
 
@@ -129,14 +136,14 @@ Form::SelectMapSize::SelectMapSize()
     hboxLayout2->addItem(spacerItem6);
 
     pushButtonOk = new QPushButton(this);
-    pushButtonOk->setText(QApplication::translate("SelectMapSize", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setText(QApplication::translate("SelectMapSize", "Ok", 0));
     hboxLayout2->addWidget(pushButtonOk);
 
     spacerItem7 = new QSpacerItem(61, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     hboxLayout2->addItem(spacerItem7);
 
     pushButtonExpert = new QPushButton(this);
-    pushButtonExpert->setText(QApplication::translate("SelectMapSize", "Expert", 0, QApplication::UnicodeUTF8));
+    pushButtonExpert->setText(QApplication::translate("SelectMapSize", "Expert", 0));
     hboxLayout2->addWidget(pushButtonExpert);
 
     spacerItem8 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -198,13 +205,13 @@ void Form::SelectMapSize::clickOk(void)
 
 Form::SelectDataFile::SelectDataFile(const QString & dataFile, const QStringList & dirList)
 {
-    setWindowTitle(QApplication::translate("DialogSelectDataFile", "Warning", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("DialogSelectDataFile", "Warning", 0));
 
     verticalLayout = new QVBoxLayout(this);
 
     labelHeader = new QLabel(this);
     labelHeader->setAlignment(Qt::AlignCenter);
-    labelHeader->setText(QApplication::translate("DialogSelectDataFile", "Cannot find resource file: ", 0, QApplication::UnicodeUTF8) + dataFile);
+    labelHeader->setText(QApplication::translate("DialogSelectDataFile", "Cannot find resource file: ", 0) + dataFile);
     verticalLayout->addWidget(labelHeader);
 
     horizontalLayout2 = new QHBoxLayout();
@@ -216,7 +223,7 @@ Form::SelectDataFile::SelectDataFile(const QString & dataFile, const QStringList
 
     labelBody = new QLabel(this);
     labelBody->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
-    labelBody->setText(QApplication::translate("DialogSelectDataFile", "Scan directories: ", 0, QApplication::UnicodeUTF8) + "\n" + dirList.join("\n"));
+    labelBody->setText(QApplication::translate("DialogSelectDataFile", "Scan directories: ", 0) + "\n" + dirList.join("\n"));
     horizontalLayout2->addWidget(labelBody);
     verticalLayout->addLayout(horizontalLayout2);
 
@@ -226,11 +233,11 @@ Form::SelectDataFile::SelectDataFile(const QString & dataFile, const QStringList
     horizontalLayout1 = new QHBoxLayout();
 
     pushButtonSelect = new QPushButton(this);
-    pushButtonSelect->setText(QApplication::translate("DialogSelectDataFile", "Select", 0, QApplication::UnicodeUTF8));
+    pushButtonSelect->setText(QApplication::translate("DialogSelectDataFile", "Select", 0));
     horizontalLayout1->addWidget(pushButtonSelect);
 
     pushButtonSave = new QPushButton(this);
-    pushButtonSave->setText(QApplication::translate("DialogSelectDataFile", "Save", 0, QApplication::UnicodeUTF8));
+    pushButtonSave->setText(QApplication::translate("DialogSelectDataFile", "Save", 0));
     pushButtonSave->setEnabled(false);
     horizontalLayout1->addWidget(pushButtonSave);
 
@@ -238,7 +245,7 @@ Form::SelectDataFile::SelectDataFile(const QString & dataFile, const QStringList
     horizontalLayout1->addItem(horizontalSpacer);
 
     pushButtonExit = new QPushButton(this);
-    pushButtonExit->setText(QApplication::translate("DialogSelectDataFile", "Exit", 0, QApplication::UnicodeUTF8));
+    pushButtonExit->setText(QApplication::translate("DialogSelectDataFile", "Exit", 0));
     horizontalLayout1->addWidget(pushButtonExit);
     verticalLayout->addLayout(horizontalLayout1);
 
@@ -343,7 +350,7 @@ Form::TabWidgetWest::TabWidgetWest(QWidget* parent) : QTabWidget(parent)
 
 Form::SelectImageObject::SelectImageObject()
 {
-    setWindowTitle(QApplication::translate("SelectImage", "Select Object", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("SelectImage", "Select Object", 0));
 
     tabWidget = new TabWidgetWest(this);
 
@@ -370,7 +377,7 @@ Form::SelectImageObject::SelectImageObject()
     verticalLayout->addWidget(tabWidget);
 
     pushButtonSelect = new QPushButton(this);
-    pushButtonSelect->setText(QApplication::translate("SelectImage", "Select", 0, QApplication::UnicodeUTF8));
+    pushButtonSelect->setText(QApplication::translate("SelectImage", "Select", 0));
     pushButtonSelect->setEnabled(false);
 
     horizontalLayout = new QHBoxLayout();
@@ -380,7 +387,7 @@ Form::SelectImageObject::SelectImageObject()
     horizontalLayout->addItem(horizontalSpacer);
 
     pushButtonClose = new QPushButton(this);
-    pushButtonClose->setText(QApplication::translate("SelectImage", "Close", 0, QApplication::UnicodeUTF8));
+    pushButtonClose->setText(QApplication::translate("SelectImage", "Close", 0));
 
     horizontalLayout->addWidget(pushButtonClose);
     verticalLayout->addLayout(horizontalLayout);
@@ -493,7 +500,7 @@ void Form::PlayerStatus::updatePlayers(void)
 Form::MapOptions::MapOptions(MapData & map)
 {
     QSettings & settings = Resource::localSettings();
-    setWindowTitle(QApplication::translate("MapOptions", "Map Options", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("MapOptions", "Map Options", 0));
 
     /* tab info block */
     tabInfo = new QWidget();
@@ -501,25 +508,25 @@ Form::MapOptions::MapOptions(MapData & map)
 
     labelName = new QLabel(tabInfo);
     labelName->setAlignment(Qt::AlignCenter);
-    labelName->setText(QApplication::translate("MapOptions", "Map Name:", 0, QApplication::UnicodeUTF8));
+    labelName->setText(QApplication::translate("MapOptions", "Map Name:", 0));
 
     lineEditName = new QLineEdit(tabInfo);
     lineEditName->setText(map.name());
 
     labelDifficulty = new QLabel(tabInfo);
     labelDifficulty->setAlignment(Qt::AlignCenter);
-    labelDifficulty->setText(QApplication::translate("MapOptions", "Map Difficulty:", 0, QApplication::UnicodeUTF8));
+    labelDifficulty->setText(QApplication::translate("MapOptions", "Map Difficulty:", 0));
 
     comboBoxDifficulty = new QComboBox(tabInfo);
-    comboBoxDifficulty->addItem(QApplication::translate("MapOptions", "Easy", 0, QApplication::UnicodeUTF8), Difficulty::Easy);
-    comboBoxDifficulty->addItem(QApplication::translate("MapOptions", "Normal", 0, QApplication::UnicodeUTF8), Difficulty::Normal);
-    comboBoxDifficulty->addItem(QApplication::translate("MapOptions", "Tough", 0, QApplication::UnicodeUTF8), Difficulty::Tough);
-    comboBoxDifficulty->addItem(QApplication::translate("MapOptions", "Expert", 0, QApplication::UnicodeUTF8), Difficulty::Expert);
+    comboBoxDifficulty->addItem(QApplication::translate("MapOptions", "Easy", 0), Difficulty::Easy);
+    comboBoxDifficulty->addItem(QApplication::translate("MapOptions", "Normal", 0), Difficulty::Normal);
+    comboBoxDifficulty->addItem(QApplication::translate("MapOptions", "Tough", 0), Difficulty::Tough);
+    comboBoxDifficulty->addItem(QApplication::translate("MapOptions", "Expert", 0), Difficulty::Expert);
     comboBoxDifficulty->setCurrentIndex(map.difficulty());
 
     labelDescription = new QLabel(tabInfo);
     labelDescription->setAlignment(Qt::AlignCenter);
-    labelDescription->setText(QApplication::translate("MapOptions", "Map Description:", 0, QApplication::UnicodeUTF8));
+    labelDescription->setText(QApplication::translate("MapOptions", "Map Description:", 0));
 
     plainTextEditDescription = new QPlainTextEdit(tabInfo);
     plainTextEditDescription->setPlainText(map.description());
@@ -535,15 +542,15 @@ Form::MapOptions::MapOptions(MapData & map)
     tabConditions = new QWidget();
 
     groupBoxWinsCond = new QGroupBox(tabConditions);
-    groupBoxWinsCond->setTitle(QApplication::translate("MapOptions", "Victory Condition", 0, QApplication::UnicodeUTF8));
+    groupBoxWinsCond->setTitle(QApplication::translate("MapOptions", "Victory Condition", 0));
 
     comboBoxWinsCond = new QComboBox(groupBoxWinsCond);
-    comboBoxWinsCond->addItem(QApplication::translate("MapOptions", "Default", 0, QApplication::UnicodeUTF8), Conditions::Wins);
-    comboBoxWinsCond->addItem(QApplication::translate("MapOptions", "Capture a particular castle", 0, QApplication::UnicodeUTF8), Conditions::CaptureTown);
-    comboBoxWinsCond->addItem(QApplication::translate("MapOptions", "Defeat a particular hero", 0, QApplication::UnicodeUTF8), Conditions::DefeatHero);
-    comboBoxWinsCond->addItem(QApplication::translate("MapOptions", "Find a particular artifact", 0, QApplication::UnicodeUTF8), Conditions::FindArtifact);
-    comboBoxWinsCond->addItem(QApplication::translate("MapOptions", "One side defeats another", 0, QApplication::UnicodeUTF8), Conditions::SideWins);
-    comboBoxWinsCond->addItem(QApplication::translate("MapOptions", "Accumulate gold", 0, QApplication::UnicodeUTF8), Conditions::AccumulateGold);
+    comboBoxWinsCond->addItem(QApplication::translate("MapOptions", "Default", 0), Conditions::Wins);
+    comboBoxWinsCond->addItem(QApplication::translate("MapOptions", "Capture a particular castle", 0), Conditions::CaptureTown);
+    comboBoxWinsCond->addItem(QApplication::translate("MapOptions", "Defeat a particular hero", 0), Conditions::DefeatHero);
+    comboBoxWinsCond->addItem(QApplication::translate("MapOptions", "Find a particular artifact", 0), Conditions::FindArtifact);
+    comboBoxWinsCond->addItem(QApplication::translate("MapOptions", "One side defeats another", 0), Conditions::SideWins);
+    comboBoxWinsCond->addItem(QApplication::translate("MapOptions", "Accumulate gold", 0), Conditions::AccumulateGold);
 
     comboBoxWinsCondExt = new QComboBox(groupBoxWinsCond);
     comboBoxWinsCondExt->setEnabled(false);
@@ -554,11 +561,11 @@ Form::MapOptions::MapOptions(MapData & map)
 
     checkBoxAllowNormalVictory = new QCheckBox(groupBoxWinsCond);
     checkBoxAllowNormalVictory->setEnabled(false);
-    checkBoxAllowNormalVictory->setText(QApplication::translate("MapOptions", "Allow normal victory condition", 0, QApplication::UnicodeUTF8));
+    checkBoxAllowNormalVictory->setText(QApplication::translate("MapOptions", "Allow normal victory condition", 0));
 
     checkBoxCompAlsoWins = new QCheckBox(groupBoxWinsCond);
     checkBoxCompAlsoWins->setEnabled(false);
-    checkBoxCompAlsoWins->setText(QApplication::translate("MapOptions", "Comp also wins via Special VC", 0, QApplication::UnicodeUTF8));
+    checkBoxCompAlsoWins->setText(QApplication::translate("MapOptions", "Comp also wins via Special VC", 0));
 
     horizontalLayoutVictoryCheck = new QHBoxLayout();
     horizontalLayoutVictoryCheck->addWidget(checkBoxAllowNormalVictory);
@@ -569,13 +576,13 @@ Form::MapOptions::MapOptions(MapData & map)
     verticalLayout3->addLayout(horizontalLayoutVictoryCheck);
 
     groupBoxLossCond = new QGroupBox(tabConditions);
-    groupBoxLossCond->setTitle(QApplication::translate("MapOptions", "Loss Condition", 0, QApplication::UnicodeUTF8));
+    groupBoxLossCond->setTitle(QApplication::translate("MapOptions", "Loss Condition", 0));
 
     comboBoxLossCond = new QComboBox(groupBoxLossCond);
-    comboBoxLossCond->addItem(QApplication::translate("MapOptions", "Default", 0, QApplication::UnicodeUTF8), Conditions::Loss);
-    comboBoxLossCond->addItem(QApplication::translate("MapOptions", "Lose a particuclar castle", 0, QApplication::UnicodeUTF8), Conditions::LoseTown);
-    comboBoxLossCond->addItem(QApplication::translate("MapOptions", "Lose a particular hero", 0, QApplication::UnicodeUTF8), Conditions::LoseHero);
-    comboBoxLossCond->addItem(QApplication::translate("MapOptions", "Run out of time", 0, QApplication::UnicodeUTF8), Conditions::OutTime);
+    comboBoxLossCond->addItem(QApplication::translate("MapOptions", "Default", 0), Conditions::Loss);
+    comboBoxLossCond->addItem(QApplication::translate("MapOptions", "Lose a particuclar castle", 0), Conditions::LoseTown);
+    comboBoxLossCond->addItem(QApplication::translate("MapOptions", "Lose a particular hero", 0), Conditions::LoseHero);
+    comboBoxLossCond->addItem(QApplication::translate("MapOptions", "Run out of time", 0), Conditions::OutTime);
 
     horizontalLayoutLossCond = new QHBoxLayout();
     horizontalLayoutLossCond->addWidget(comboBoxLossCond);
@@ -590,7 +597,7 @@ Form::MapOptions::MapOptions(MapData & map)
     verticalLayout4 = new QVBoxLayout(groupBoxLossCond);
     verticalLayout4->addLayout(horizontalLayoutLossCond);
     groupBoxPlayers = new QGroupBox(tabConditions);
-    groupBoxPlayers->setTitle(QApplication::translate("MapOptions", "Players", 0, QApplication::UnicodeUTF8));
+    groupBoxPlayers->setTitle(QApplication::translate("MapOptions", "Players", 0));
 
     horizontalSpacerPlayersLeft = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     horizontalSpacerPlayersRight = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -626,7 +633,7 @@ Form::MapOptions::MapOptions(MapData & map)
     horizontalLayoutPlayers->addItem(horizontalSpacerPlayersRight);
 
     checkBoxStartWithHero = new QCheckBox(groupBoxPlayers);
-    checkBoxStartWithHero->setText(QApplication::translate("MapOptions", "Start with hero in each player's main castle", 0, QApplication::UnicodeUTF8));
+    checkBoxStartWithHero->setText(QApplication::translate("MapOptions", "Start with hero in each player's main castle", 0));
     checkBoxStartWithHero->setChecked(map.startWithHero());
 
     verticalLayout5 = new QVBoxLayout(groupBoxPlayers);
@@ -643,10 +650,10 @@ Form::MapOptions::MapOptions(MapData & map)
     tabRumorsEvents = new QWidget();
 
     groupBoxRumors = new QGroupBox(tabRumorsEvents);
-    groupBoxRumors->setTitle(QApplication::translate("MapOptions", "Rumors", 0, QApplication::UnicodeUTF8));
+    groupBoxRumors->setTitle(QApplication::translate("MapOptions", "Rumors", 0));
 
     groupBoxEvents = new QGroupBox(tabRumorsEvents);
-    groupBoxEvents->setTitle(QApplication::translate("MapOptions", "Events", 0, QApplication::UnicodeUTF8));
+    groupBoxEvents->setTitle(QApplication::translate("MapOptions", "Events", 0));
 
     listWidgetRumors = new RumorsList(groupBoxRumors);
     listWidgetEvents = new DayEventsList(map.kingdomColors(), groupBoxEvents);
@@ -679,7 +686,7 @@ Form::MapOptions::MapOptions(MapData & map)
     spinBoxResourceGoldMax->setValue(Default::resourceGoldMax());
 
     labelResourceGold = new QLabel(this);
-    labelResourceGold->setText(QApplication::translate("MapOptions", "Resource (gold)", 0, QApplication::UnicodeUTF8));
+    labelResourceGold->setText(QApplication::translate("MapOptions", "Resource (gold)", 0));
 
     horizontalLayoutResourceGold = new QHBoxLayout();
     horizontalLayoutResourceGold->addWidget(labelResourceGold);
@@ -699,7 +706,7 @@ Form::MapOptions::MapOptions(MapData & map)
     spinBoxResourceWoodOreMax->setValue(Default::resourceWoodOreMax());
 
     labelResourceWoodOre = new QLabel(this);
-    labelResourceWoodOre->setText(QApplication::translate("MapOptions", "Resource (wood, ore)", 0, QApplication::UnicodeUTF8));
+    labelResourceWoodOre->setText(QApplication::translate("MapOptions", "Resource (wood, ore)", 0));
 
     horizontalLayoutResourceWoodOre = new QHBoxLayout();
     horizontalLayoutResourceWoodOre->addWidget(labelResourceWoodOre);
@@ -719,7 +726,7 @@ Form::MapOptions::MapOptions(MapData & map)
     spinBoxResourceOtherMax->setValue(Default::resourceOtherMax());
 
     labelResourceOther = new QLabel(this);
-    labelResourceOther->setText(QApplication::translate("MapOptions", "Resource (other)", 0, QApplication::UnicodeUTF8));
+    labelResourceOther->setText(QApplication::translate("MapOptions", "Resource (other)", 0));
 
     horizontalLayoutResourceOther = new QHBoxLayout();
     horizontalLayoutResourceOther->addWidget(labelResourceOther);
@@ -739,14 +746,14 @@ Form::MapOptions::MapOptions(MapData & map)
 
     labelAuthors = new QLabel(tabAuthorsLicense);
     labelAuthors->setAlignment(Qt::AlignCenter);
-    labelAuthors->setText(QApplication::translate("MapOptions", "Authors:", 0, QApplication::UnicodeUTF8));
+    labelAuthors->setText(QApplication::translate("MapOptions", "Authors:", 0));
 
     plainTextEditAuthors = new QPlainTextEdit(tabAuthorsLicense);
     plainTextEditAuthors->setPlainText(map.authors());
 
     labelLicense = new QLabel(tabAuthorsLicense);
     labelLicense->setAlignment(Qt::AlignCenter);
-    labelLicense->setText(QApplication::translate("MapOptions", "License:", 0, QApplication::UnicodeUTF8));
+    labelLicense->setText(QApplication::translate("MapOptions", "License:", 0));
 
     plainTextEditLicense = new QPlainTextEdit(tabAuthorsLicense);
     plainTextEditLicense->setPlainText(map.license());
@@ -758,17 +765,17 @@ Form::MapOptions::MapOptions(MapData & map)
 
     /* end */
     tabWidget = new QTabWidget(this);
-    tabWidget->addTab(tabInfo, QApplication::translate("MapOptions", "General Info", 0, QApplication::UnicodeUTF8));
-    tabWidget->addTab(tabConditions, QApplication::translate("MapOptions", "Wins/Loss Condition", 0, QApplication::UnicodeUTF8));
-    tabWidget->addTab(tabRumorsEvents, QApplication::translate("MapOptions", "Rumors and Events", 0, QApplication::UnicodeUTF8));
-    //tabWidget->addTab(tabDefaults, QApplication::translate("MapOptions", "Default Values", 0, QApplication::UnicodeUTF8));
-    tabWidget->addTab(tabAuthorsLicense, QApplication::translate("MapOptions", "Authors and License", 0, QApplication::UnicodeUTF8));
+    tabWidget->addTab(tabInfo, QApplication::translate("MapOptions", "General Info", 0));
+    tabWidget->addTab(tabConditions, QApplication::translate("MapOptions", "Wins/Loss Condition", 0));
+    tabWidget->addTab(tabRumorsEvents, QApplication::translate("MapOptions", "Rumors and Events", 0));
+    //tabWidget->addTab(tabDefaults, QApplication::translate("MapOptions", "Default Values", 0));
+    tabWidget->addTab(tabAuthorsLicense, QApplication::translate("MapOptions", "Authors and License", 0));
 
     pushButtonSave = new QPushButton(this);
-    pushButtonSave->setText(QApplication::translate("MapOptions", "Save", 0, QApplication::UnicodeUTF8));
+    pushButtonSave->setText(QApplication::translate("MapOptions", "Save", 0));
 
     pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("MapOptions", "Cancel", 0, QApplication::UnicodeUTF8));
+    pushButtonCancel->setText(QApplication::translate("MapOptions", "Cancel", 0));
     pushButtonSave->setEnabled(false);
 
     horizontalLayoutButton = new QHBoxLayout();
@@ -979,7 +986,7 @@ void Form::MapOptions::winsConditionsSelected(int index)
 	case 5:
 	    comboBoxWinsCondExt->setEnabled(true);
 	    for(int ii = 50000; ii < 1005000; ii += 50000)
-		comboBoxWinsCondExt->addItem(QApplication::translate("MapOptions", "%n golds", 0, QApplication::UnicodeUTF8, ii), ii);
+		comboBoxWinsCondExt->addItem(QApplication::translate("MapOptions", "%n golds", 0, ii), ii);
 	    checkBoxAllowNormalVictory->setEnabled(true);
 	    checkBoxCompAlsoWins->setEnabled(true);
 	    break;
@@ -1011,11 +1018,11 @@ void Form::MapOptions::lossConditionsSelected(int index)
 	case 3:
 	    comboBoxLossCondExt->setEnabled(true);
 	    for(int ii = 2; ii < 8; ++ii) // 2-7 days
-		comboBoxLossCondExt->addItem(QApplication::translate("MapOptions", "%n days", 0, QApplication::UnicodeUTF8, ii), ii);
+		comboBoxLossCondExt->addItem(QApplication::translate("MapOptions", "%n days", 0, ii), ii);
 	    for(int ii = 2; ii < 9; ++ii) // 2-8 weeks
-		comboBoxLossCondExt->addItem(QApplication::translate("MapOptions", "%n weeks", 0, QApplication::UnicodeUTF8, ii), ii * 7);
+		comboBoxLossCondExt->addItem(QApplication::translate("MapOptions", "%n weeks", 0, ii), ii * 7);
 	    for(int ii = 3; ii < 13; ++ii) // 3-12 months
-		comboBoxLossCondExt->addItem(QApplication::translate("MapOptions", "%n months", 0, QApplication::UnicodeUTF8, ii), ii * 7 * 4);
+		comboBoxLossCondExt->addItem(QApplication::translate("MapOptions", "%n months", 0, ii), ii * 7 * 4);
 	    break;
 	default: break;
     }
@@ -1204,7 +1211,7 @@ DayEvents Form::DayEventsList::results(void) const
 
 Form::MessageDialog::MessageDialog(const QString & msg)
 {
-    setWindowTitle(QApplication::translate("MessageDialog", "Message Detail", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("MessageDialog", "Message Detail", 0));
 
     plainText = new QPlainTextEdit(this);
     plainText->setPlainText(msg);
@@ -1213,13 +1220,13 @@ Form::MessageDialog::MessageDialog(const QString & msg)
     verticalLayout->addWidget(plainText);
 
     pushButtonOk = new QPushButton(this);
-    pushButtonOk->setText(QApplication::translate("MessageDialog", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setText(QApplication::translate("MessageDialog", "Ok", 0));
     pushButtonOk->setEnabled(false);
 
     horizontalSpacer = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("MessageDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+    pushButtonCancel->setText(QApplication::translate("MessageDialog", "Cancel", 0));
 
     horizontalLayout = new QHBoxLayout();
     horizontalLayout->addWidget(pushButtonOk);
@@ -1293,11 +1300,11 @@ Form::AccessGroup::AccessGroup(QWidget* parent, int kingdomColors, int checkedCo
 
     checkBoxAllowComp = new QCheckBox(this);
     checkBoxAllowComp->setLayoutDirection(Qt::LeftToRight);
-    checkBoxAllowComp->setText(QApplication::translate("AccessGroup", "Allow computer", 0, QApplication::UnicodeUTF8));
+    checkBoxAllowComp->setText(QApplication::translate("AccessGroup", "Allow computer", 0));
 
     checkBoxCancelAfterFirstVisit = new QCheckBox(this);
     checkBoxCancelAfterFirstVisit->setLayoutDirection(Qt::LeftToRight);
-    checkBoxCancelAfterFirstVisit->setText(QApplication::translate("AccessGroup", "Cancel after first visit", 0, QApplication::UnicodeUTF8));
+    checkBoxCancelAfterFirstVisit->setText(QApplication::translate("AccessGroup", "Cancel after first visit", 0));
 
     verticalLayoutAllowCols = new QVBoxLayout(this);
     verticalLayoutAllowCols->addLayout(horizontalLayoutPlayers);
@@ -1543,20 +1550,20 @@ Form::ResourcesGroup::ResourcesGroup(QWidget* parent, const Resources & resource
     verticalLayoutBox->addLayout(horizontalLayoutGold);
 
 #ifndef QT_NO_TOOLTIP
-    labelResWood->setToolTip(QApplication::translate("DayEventDialog", "wood", 0, QApplication::UnicodeUTF8));
-    spinBoxResWood->setToolTip(QApplication::translate("DayEventDialog", "wood", 0, QApplication::UnicodeUTF8));
-    labelResSulfur->setToolTip(QApplication::translate("DayEventDialog", "sulfur", 0, QApplication::UnicodeUTF8));
-    spinBoxResSulfur->setToolTip(QApplication::translate("DayEventDialog", "sulfur", 0, QApplication::UnicodeUTF8));
-    labelResMercury->setToolTip(QApplication::translate("DayEventDialog", "mercury", 0, QApplication::UnicodeUTF8));
-    spinBoxResMercury->setToolTip(QApplication::translate("DayEventDialog", "mercury", 0, QApplication::UnicodeUTF8));
-    labelResCrystal->setToolTip(QApplication::translate("DayEventDialog", "crystal", 0, QApplication::UnicodeUTF8));
-    spinBoxResCrystal->setToolTip(QApplication::translate("DayEventDialog", "crystal", 0, QApplication::UnicodeUTF8));
-    labelResOre->setToolTip(QApplication::translate("DayEventDialog", "ore", 0, QApplication::UnicodeUTF8));
-    spinBoxResOre->setToolTip(QApplication::translate("DayEventDialog", "ore", 0, QApplication::UnicodeUTF8));
-    labelResGems->setToolTip(QApplication::translate("DayEventDialog", "gems", 0, QApplication::UnicodeUTF8));
-    spinBoxResGems->setToolTip(QApplication::translate("DayEventDialog", "gems", 0, QApplication::UnicodeUTF8));
-    labelResGold->setToolTip(QApplication::translate("DayEventDialog", "gold", 0, QApplication::UnicodeUTF8));
-    spinBoxResGold->setToolTip(QApplication::translate("DayEventDialog", "gold", 0, QApplication::UnicodeUTF8));
+    labelResWood->setToolTip(QApplication::translate("DayEventDialog", "wood", 0));
+    spinBoxResWood->setToolTip(QApplication::translate("DayEventDialog", "wood", 0));
+    labelResSulfur->setToolTip(QApplication::translate("DayEventDialog", "sulfur", 0));
+    spinBoxResSulfur->setToolTip(QApplication::translate("DayEventDialog", "sulfur", 0));
+    labelResMercury->setToolTip(QApplication::translate("DayEventDialog", "mercury", 0));
+    spinBoxResMercury->setToolTip(QApplication::translate("DayEventDialog", "mercury", 0));
+    labelResCrystal->setToolTip(QApplication::translate("DayEventDialog", "crystal", 0));
+    spinBoxResCrystal->setToolTip(QApplication::translate("DayEventDialog", "crystal", 0));
+    labelResOre->setToolTip(QApplication::translate("DayEventDialog", "ore", 0));
+    spinBoxResOre->setToolTip(QApplication::translate("DayEventDialog", "ore", 0));
+    labelResGems->setToolTip(QApplication::translate("DayEventDialog", "gems", 0));
+    spinBoxResGems->setToolTip(QApplication::translate("DayEventDialog", "gems", 0));
+    labelResGold->setToolTip(QApplication::translate("DayEventDialog", "gold", 0));
+    spinBoxResGold->setToolTip(QApplication::translate("DayEventDialog", "gold", 0));
 #endif // QT_NO_TOOLTIP
 
     connect(spinBoxResWood, SIGNAL(valueChanged(int)), this, SLOT(setFormChanged()));
@@ -1591,13 +1598,13 @@ Resources Form::ResourcesGroup::result(void) const
 
 Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors)
 {
-    setWindowTitle(QApplication::translate("DayEventDialog", "Event Detail", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("DayEventDialog", "Event Detail", 0));
 
     // tab 1
     tabDay = new QWidget();
 
     labelDayFirst = new QLabel(tabDay);
-    labelDayFirst->setText(QApplication::translate("DayEventDialog", "Day of first occurent", 0, QApplication::UnicodeUTF8));
+    labelDayFirst->setText(QApplication::translate("DayEventDialog", "Day of first occurent", 0));
 
     horizontalLayout = new QHBoxLayout();
     horizontalLayout->addWidget(labelDayFirst);
@@ -1610,30 +1617,30 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors)
     horizontalLayout->addWidget(spinBoxDayFirst);
 
     labelSubsequent = new QLabel(tabDay);
-    labelSubsequent->setText(QApplication::translate("DayEventDialog", "Subsequent occurrences", 0, QApplication::UnicodeUTF8));
+    labelSubsequent->setText(QApplication::translate("DayEventDialog", "Subsequent occurrences", 0));
 
     horizontalLayout2 = new QHBoxLayout();
     horizontalLayout2->addWidget(labelSubsequent);
 
     comboBoxSubsequent = new QComboBox(tabDay);
-    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Never", 0, QApplication::UnicodeUTF8), 0);
-    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every Day", 0, QApplication::UnicodeUTF8), 1);
-    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 2 Days", 0, QApplication::UnicodeUTF8), 2);
-    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 3 Days", 0, QApplication::UnicodeUTF8), 3);
-    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 4 Days", 0, QApplication::UnicodeUTF8), 4);
-    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 5 Days", 0, QApplication::UnicodeUTF8), 5);
-    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 6 Days", 0, QApplication::UnicodeUTF8), 6);
-    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 7 Days", 0, QApplication::UnicodeUTF8), 7);
-    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 14 Days", 0, QApplication::UnicodeUTF8), 14);
-    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 21 Days", 0, QApplication::UnicodeUTF8), 21);
-    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 28 Days", 0, QApplication::UnicodeUTF8), 28);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Never", 0), 0);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every Day", 0), 1);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 2 Days", 0), 2);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 3 Days", 0), 3);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 4 Days", 0), 4);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 5 Days", 0), 5);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 6 Days", 0), 6);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 7 Days", 0), 7);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 14 Days", 0), 14);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 21 Days", 0), 21);
+    comboBoxSubsequent->addItem(QApplication::translate("DayEventDialog", "Every 28 Days", 0), 28);
     int find = comboBoxSubsequent->findData(event.daySubsequentOccurrences);
     if(0 <= find)
 	comboBoxSubsequent->setCurrentIndex(find);
     horizontalLayout2->addWidget(comboBoxSubsequent);
 
     groupBoxAllowedColors = new QGroupBox(tabDay);
-    groupBoxAllowedColors->setTitle(QApplication::translate("DayEventDialog", "Colors allowed to get event", 0, QApplication::UnicodeUTF8));
+    groupBoxAllowedColors->setTitle(QApplication::translate("DayEventDialog", "Colors allowed to get event", 0));
 
     horizontalLayout4 = new QHBoxLayout();
     horizontalSpacerPlayersLeft = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -1654,7 +1661,7 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors)
 
     checkBoxAllowComp = new QCheckBox(groupBoxAllowedColors);
     checkBoxAllowComp->setLayoutDirection(Qt::LeftToRight);
-    checkBoxAllowComp->setText(QApplication::translate("DayEventDialog", "Allow computer", 0, QApplication::UnicodeUTF8));
+    checkBoxAllowComp->setText(QApplication::translate("DayEventDialog", "Allow computer", 0));
     checkBoxAllowComp->setChecked(event.allowComputer);
 
     verticalLayout3 = new QVBoxLayout(groupBoxAllowedColors);
@@ -1688,13 +1695,13 @@ Form::DayEventDialog::DayEventDialog(const DayEvent & event, int kingdomColors)
     tabWidget->addTab(tabMessage, "Message");
 
     pushButtonOk = new QPushButton(this);
-    pushButtonOk->setText(QApplication::translate("DayEventDialog", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setText(QApplication::translate("DayEventDialog", "Ok", 0));
     pushButtonOk->setEnabled(false);
 
     horizontalSpacer = new QSpacerItem(238, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("DayEventDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+    pushButtonCancel->setText(QApplication::translate("DayEventDialog", "Cancel", 0));
 
     horizontalLayout3 = new QHBoxLayout();
     horizontalLayout3->addWidget(pushButtonOk);
@@ -1880,13 +1887,13 @@ void Form::MiniMap::mousePressEvent(QMouseEvent* event)
 
 Form::MapEventDialog::MapEventDialog(const MapEvent & event, int kingdomColors)
 {
-    setWindowTitle(QApplication::translate("MapEventDialog", "Event Detail", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("MapEventDialog", "Event Detail", 0));
 
     // tab 1
     tabAccess = new QWidget();
 
     accessGroup = new AccessGroup(tabAccess, kingdomColors, event.colors);
-    accessGroup->setTitle(QApplication::translate("MapEventDialog", "Colors allowed to get event", 0, QApplication::UnicodeUTF8));
+    accessGroup->setTitle(QApplication::translate("MapEventDialog", "Colors allowed to get event", 0));
     accessGroup->setFlat(false);
     accessGroup->setAllowComputer(event.allowComputer);
     accessGroup->setCancelAfterFirstVisit(event.cancelAfterFirstVisit);
@@ -1902,10 +1909,10 @@ Form::MapEventDialog::MapEventDialog(const MapEvent & event, int kingdomColors)
 
     resourcesGroup = new ResourcesGroup(tabGift, event.resources);
     resourcesGroup->setFlat(false);
-    resourcesGroup->setTitle(QApplication::translate("MapEventDialog", "Resources", 0, QApplication::UnicodeUTF8));
+    resourcesGroup->setTitle(QApplication::translate("MapEventDialog", "Resources", 0));
 
     artifactGroup = new ArtifactGroup(tabGift, event.artifact);
-    artifactGroup->setTitle(QApplication::translate("MapEventDialog", "Artifact to give", 0, QApplication::UnicodeUTF8));
+    artifactGroup->setTitle(QApplication::translate("MapEventDialog", "Artifact to give", 0));
     artifactGroup->setFlat(false);
 
     verticalLayoutGift = new QVBoxLayout(tabGift);
@@ -1929,13 +1936,13 @@ Form::MapEventDialog::MapEventDialog(const MapEvent & event, int kingdomColors)
     tabWidget->addTab(tabMessage, "Message");
 
     pushButtonOk = new QPushButton(this);
-    pushButtonOk->setText(QApplication::translate("MapEventDialog", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setText(QApplication::translate("MapEventDialog", "Ok", 0));
     pushButtonOk->setEnabled(false);
 
     horizontalSpacerButtons = new QSpacerItem(238, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("MapEventDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+    pushButtonCancel->setText(QApplication::translate("MapEventDialog", "Cancel", 0));
 
     horizontalLayoutButtons = new QHBoxLayout();
     horizontalLayoutButtons->addWidget(pushButtonOk);
@@ -1984,13 +1991,13 @@ MapEvent Form::MapEventDialog::result(const QPoint & pos, quint32 uid) const
 
 Form::MapTownDialog::MapTownDialog(const MapTown & town)
 {
-    setWindowTitle(QApplication::translate("MapTownDialog", "Town Detail", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("MapTownDialog", "Town Detail", 0));
 
     // tab: info
     tabInfo = new QWidget();
 
     labelName = new QLabel(tabInfo);
-    labelName->setText(QApplication::translate("MapTownDialog", "Name", 0, QApplication::UnicodeUTF8));
+    labelName->setText(QApplication::translate("MapTownDialog", "Name", 0));
 
     comboBoxName = new QComboBox(tabInfo);
     comboBoxName->setEditable(true);
@@ -2002,7 +2009,7 @@ Form::MapTownDialog::MapTownDialog(const MapTown & town)
     horizontalLayoutName->addWidget(comboBoxName);
 
     labelColor = new QLabel(tabInfo);
-    labelColor->setText(QApplication::translate("MapTownDialog", "Color", 0, QApplication::UnicodeUTF8));
+    labelColor->setText(QApplication::translate("MapTownDialog", "Color", 0));
 
     comboBoxColor = new QComboBox(tabInfo);
     comboBoxColor->addItem(Editor::pixmapBorder(QSize(24, 24), QColor(130, 130, 130), QColor(0, 0, 0)), "Gray", Color::None);
@@ -2019,7 +2026,7 @@ Form::MapTownDialog::MapTownDialog(const MapTown & town)
     horizontalLayoutColor->addWidget(comboBoxColor);
 
     checkBoxCaptain = new QCheckBox(tabInfo);
-    checkBoxCaptain->setText(QApplication::translate("MapTownDialog", "Captain", 0, QApplication::UnicodeUTF8));
+    checkBoxCaptain->setText(QApplication::translate("MapTownDialog", "Captain", 0));
     checkBoxCaptain->setChecked(town.captainPresent);
 #ifndef QT_NO_TOOLTIP
     checkBoxCaptain->setToolTip(Building::description(Building::Captain, town.race));
@@ -2028,7 +2035,7 @@ Form::MapTownDialog::MapTownDialog(const MapTown & town)
     checkBoxAllowCastle = new QCheckBox(tabInfo);
     checkBoxAllowCastle->setVisible(! town.isCastle);
     checkBoxAllowCastle->setChecked(! town.forceTown);
-    checkBoxAllowCastle->setText(QApplication::translate("MapTownDialog", "Allow castle", 0, QApplication::UnicodeUTF8));
+    checkBoxAllowCastle->setText(QApplication::translate("MapTownDialog", "Allow castle", 0));
 
     verticalSpacerInfo = new QSpacerItem(20, 142, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
@@ -2045,12 +2052,12 @@ Form::MapTownDialog::MapTownDialog(const MapTown & town)
 
     checkBoxTroopsDefault = new QCheckBox(tabTroops);
     checkBoxTroopsDefault->setChecked(defaultTroops);
-    checkBoxTroopsDefault->setText(QApplication::translate("MapTownDialog", "Default", 0, QApplication::UnicodeUTF8));
+    checkBoxTroopsDefault->setText(QApplication::translate("MapTownDialog", "Default", 0));
 
     // troop 1
     labelSlot1 = new QLabel(tabTroops);
     labelSlot1->setEnabled(! defaultTroops);
-    labelSlot1->setText(QApplication::translate("MapTownDialog", "Slot 1", 0, QApplication::UnicodeUTF8));
+    labelSlot1->setText(QApplication::translate("MapTownDialog", "Slot 1", 0));
 
     comboBoxTroop1 = new QComboBox(tabTroops);
     comboBoxTroop1->setEnabled(! defaultTroops);
@@ -2068,7 +2075,7 @@ Form::MapTownDialog::MapTownDialog(const MapTown & town)
     // troop 2
     labelSlot2 = new QLabel(tabTroops);
     labelSlot2->setEnabled(! defaultTroops);
-    labelSlot2->setText(QApplication::translate("MapTownDialog", "Slot 2", 0, QApplication::UnicodeUTF8));
+    labelSlot2->setText(QApplication::translate("MapTownDialog", "Slot 2", 0));
 
     comboBoxTroop2 = new QComboBox(tabTroops);
     comboBoxTroop2->setEnabled(! defaultTroops);
@@ -2086,7 +2093,7 @@ Form::MapTownDialog::MapTownDialog(const MapTown & town)
     // troop 3
     labelSlot3 = new QLabel(tabTroops);
     labelSlot3->setEnabled(! defaultTroops);
-    labelSlot3->setText(QApplication::translate("MapTownDialog", "Slot 3", 0, QApplication::UnicodeUTF8));
+    labelSlot3->setText(QApplication::translate("MapTownDialog", "Slot 3", 0));
 
     comboBoxTroop3 = new QComboBox(tabTroops);
     comboBoxTroop3->setEnabled(! defaultTroops);
@@ -2104,7 +2111,7 @@ Form::MapTownDialog::MapTownDialog(const MapTown & town)
     // troop 4
     labelSlot4 = new QLabel(tabTroops);
     labelSlot4->setEnabled(! defaultTroops);
-    labelSlot4->setText(QApplication::translate("MapTownDialog", "Slot 4", 0, QApplication::UnicodeUTF8));
+    labelSlot4->setText(QApplication::translate("MapTownDialog", "Slot 4", 0));
 
     comboBoxTroop4 = new QComboBox(tabTroops);
     comboBoxTroop4->setEnabled(! defaultTroops);
@@ -2122,7 +2129,7 @@ Form::MapTownDialog::MapTownDialog(const MapTown & town)
     // troop 5
     labelSlot5 = new QLabel(tabTroops);
     labelSlot5->setEnabled(! defaultTroops);
-    labelSlot5->setText(QApplication::translate("MapTownDialog", "Slot 5", 0, QApplication::UnicodeUTF8));
+    labelSlot5->setText(QApplication::translate("MapTownDialog", "Slot 5", 0));
 
     comboBoxTroop5 = new QComboBox(tabTroops);
     comboBoxTroop5->setEnabled(! defaultTroops);
@@ -2186,20 +2193,20 @@ Form::MapTownDialog::MapTownDialog(const MapTown & town)
 
     checkBoxBuildingsDefault = new QCheckBox(tabBuildings);
     checkBoxBuildingsDefault->setChecked(defaultBuildings);
-    checkBoxBuildingsDefault->setText(QApplication::translate("MapTownDialog", "Default", 0, QApplication::UnicodeUTF8));
+    checkBoxBuildingsDefault->setText(QApplication::translate("MapTownDialog", "Default", 0));
 
     labelMageGuild = new QLabel(tabBuildings);
-    labelMageGuild->setText(QApplication::translate("MapTownDialog", "Mage Guild", 0, QApplication::UnicodeUTF8));
+    labelMageGuild->setText(QApplication::translate("MapTownDialog", "Mage Guild", 0));
     labelMageGuild->setEnabled(! defaultBuildings);
 
     comboBoxMageGuild = new QComboBox(tabBuildings);
     comboBoxMageGuild->setEnabled(! defaultBuildings);
-    comboBoxMageGuild->addItem(QApplication::translate("MapTownDialog", "None", 0, QApplication::UnicodeUTF8), 0);
-    comboBoxMageGuild->addItem(QApplication::translate("MapTownDialog", "Level 1", 0, QApplication::UnicodeUTF8), 1);
-    comboBoxMageGuild->addItem(QApplication::translate("MapTownDialog", "Level 2", 0, QApplication::UnicodeUTF8), 2);
-    comboBoxMageGuild->addItem(QApplication::translate("MapTownDialog", "Level 3", 0, QApplication::UnicodeUTF8), 3);
-    comboBoxMageGuild->addItem(QApplication::translate("MapTownDialog", "Level 4", 0, QApplication::UnicodeUTF8), 4);
-    comboBoxMageGuild->addItem(QApplication::translate("MapTownDialog", "Level 5", 0, QApplication::UnicodeUTF8), 5);
+    comboBoxMageGuild->addItem(QApplication::translate("MapTownDialog", "None", 0), 0);
+    comboBoxMageGuild->addItem(QApplication::translate("MapTownDialog", "Level 1", 0), 1);
+    comboBoxMageGuild->addItem(QApplication::translate("MapTownDialog", "Level 2", 0), 2);
+    comboBoxMageGuild->addItem(QApplication::translate("MapTownDialog", "Level 3", 0), 3);
+    comboBoxMageGuild->addItem(QApplication::translate("MapTownDialog", "Level 4", 0), 4);
+    comboBoxMageGuild->addItem(QApplication::translate("MapTownDialog", "Level 5", 0), 5);
     comboBoxMageGuild->setCurrentIndex(0);
 
     horizontalLayoutMageGuild = new QHBoxLayout();
@@ -2208,11 +2215,11 @@ Form::MapTownDialog::MapTownDialog(const MapTown & town)
 
     checkBoxMarket = new QCheckBox(tabBuildings);
     checkBoxMarket->setEnabled(! defaultBuildings);
-    checkBoxMarket->setText(QApplication::translate("MapTownDialog", "Marketplace", 0, QApplication::UnicodeUTF8));
+    checkBoxMarket->setText(QApplication::translate("MapTownDialog", "Marketplace", 0));
 
     checkBoxLeftTurret = new QCheckBox(tabBuildings);
     checkBoxLeftTurret->setEnabled(! defaultBuildings);
-    checkBoxLeftTurret->setText(QApplication::translate("MapTownDialog", "Left Turret", 0, QApplication::UnicodeUTF8));
+    checkBoxLeftTurret->setText(QApplication::translate("MapTownDialog", "Left Turret", 0));
 
     horizontalLayoutB1 = new QHBoxLayout();
     horizontalLayoutB1->addWidget(checkBoxMarket);
@@ -2220,11 +2227,11 @@ Form::MapTownDialog::MapTownDialog(const MapTown & town)
 
     checkBoxTavern = new QCheckBox(tabBuildings);
     checkBoxTavern->setEnabled(! defaultBuildings);
-    checkBoxTavern->setText(QApplication::translate("MapTownDialog", "Tavern", 0, QApplication::UnicodeUTF8));
+    checkBoxTavern->setText(QApplication::translate("MapTownDialog", "Tavern", 0));
 
     checkBoxRightTurret = new QCheckBox(tabBuildings);
     checkBoxRightTurret->setEnabled(! defaultBuildings);
-    checkBoxRightTurret->setText(QApplication::translate("MapTownDialog", "Right Turret", 0, QApplication::UnicodeUTF8));
+    checkBoxRightTurret->setText(QApplication::translate("MapTownDialog", "Right Turret", 0));
 
     horizontalLayoutB2 = new QHBoxLayout();
     horizontalLayoutB2->addWidget(checkBoxTavern);
@@ -2232,11 +2239,11 @@ Form::MapTownDialog::MapTownDialog(const MapTown & town)
 
     checkBoxShipyard = new QCheckBox(tabBuildings);
     checkBoxShipyard->setEnabled(! defaultBuildings);
-    checkBoxShipyard->setText(QApplication::translate("MapTownDialog", "Shipyard", 0, QApplication::UnicodeUTF8));
+    checkBoxShipyard->setText(QApplication::translate("MapTownDialog", "Shipyard", 0));
 
     checkBoxMoat = new QCheckBox(tabBuildings);
     checkBoxMoat->setEnabled(! defaultBuildings);
-    checkBoxMoat->setText(QApplication::translate("MapTownDialog", "Moat", 0, QApplication::UnicodeUTF8));
+    checkBoxMoat->setText(QApplication::translate("MapTownDialog", "Moat", 0));
 
     horizontalLayoutB3 = new QHBoxLayout();
     horizontalLayoutB3->addWidget(checkBoxShipyard);
@@ -2244,7 +2251,7 @@ Form::MapTownDialog::MapTownDialog(const MapTown & town)
 
     checkBoxWell = new QCheckBox(tabBuildings);
     checkBoxWell->setEnabled(! defaultBuildings);
-    checkBoxWell->setText(QApplication::translate("MapTownDialog", "Well", 0, QApplication::UnicodeUTF8));
+    checkBoxWell->setText(QApplication::translate("MapTownDialog", "Well", 0));
 
     checkBoxExt = new QCheckBox(tabBuildings);
     checkBoxExt->setEnabled(! defaultBuildings);
@@ -2256,7 +2263,7 @@ Form::MapTownDialog::MapTownDialog(const MapTown & town)
 
     checkBoxStatue = new QCheckBox(tabBuildings);
     checkBoxStatue->setEnabled(! defaultBuildings);
-    checkBoxStatue->setText(QApplication::translate("MapTownDialog", "Statue", 0, QApplication::UnicodeUTF8));
+    checkBoxStatue->setText(QApplication::translate("MapTownDialog", "Statue", 0));
 
     checkBoxSpec = new QCheckBox(tabBuildings);
     checkBoxSpec->setEnabled(! defaultBuildings);
@@ -2268,7 +2275,7 @@ Form::MapTownDialog::MapTownDialog(const MapTown & town)
 
     checkBoxThievesGuild = new QCheckBox(tabBuildings);
     checkBoxThievesGuild->setEnabled(! defaultBuildings);
-    checkBoxThievesGuild->setText(QApplication::translate("MapTownDialog", "Thieves Guild", 0, QApplication::UnicodeUTF8));
+    checkBoxThievesGuild->setText(QApplication::translate("MapTownDialog", "Thieves Guild", 0));
 
     verticalSpacerBuildings = new QSpacerItem(20, 45, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
@@ -2336,20 +2343,20 @@ Form::MapTownDialog::MapTownDialog(const MapTown & town)
 
     checkBoxDwellingsDefault = new QCheckBox(tabDwellings);
     checkBoxDwellingsDefault->setChecked(defaultDwellings);
-    checkBoxDwellingsDefault->setText(QApplication::translate("MapTownDialog", "Default", 0, QApplication::UnicodeUTF8));
+    checkBoxDwellingsDefault->setText(QApplication::translate("MapTownDialog", "Default", 0));
 
     checkBoxDwelling1 = new QCheckBox(tabDwellings);
     checkBoxDwelling1->setEnabled(! defaultDwellings);
-    checkBoxDwelling1->setText(QApplication::translate("MapTownDialog", "Dwelling 1", 0, QApplication::UnicodeUTF8));
+    checkBoxDwelling1->setText(QApplication::translate("MapTownDialog", "Dwelling 1", 0));
 
     checkBoxDwelling2 = new QCheckBox(tabDwellings);
     checkBoxDwelling2->setEnabled(! defaultDwellings);
-    checkBoxDwelling2->setText(QApplication::translate("MapTownDialog", "Dwelling 2", 0, QApplication::UnicodeUTF8));
+    checkBoxDwelling2->setText(QApplication::translate("MapTownDialog", "Dwelling 2", 0));
 
     checkBoxUpgrade2 = new QCheckBox(tabDwellings);
     checkBoxUpgrade2->setEnabled(! defaultDwellings);
     checkBoxUpgrade2->setVisible(dwellingMap & Building::Upgrade2);
-    checkBoxUpgrade2->setText(QApplication::translate("MapTownDialog", "Upgrade 2", 0, QApplication::UnicodeUTF8));
+    checkBoxUpgrade2->setText(QApplication::translate("MapTownDialog", "Upgrade 2", 0));
 
     horizontalLayoutD2 = new QHBoxLayout();
     horizontalLayoutD2->addWidget(checkBoxDwelling2);
@@ -2357,12 +2364,12 @@ Form::MapTownDialog::MapTownDialog(const MapTown & town)
 
     checkBoxDwelling3 = new QCheckBox(tabDwellings);
     checkBoxDwelling3->setEnabled(! defaultDwellings);
-    checkBoxDwelling3->setText(QApplication::translate("MapTownDialog", "Dwelling 3", 0, QApplication::UnicodeUTF8));
+    checkBoxDwelling3->setText(QApplication::translate("MapTownDialog", "Dwelling 3", 0));
 
     checkBoxUpgrade3 = new QCheckBox(tabDwellings);
     checkBoxUpgrade3->setEnabled(! defaultDwellings);
     checkBoxUpgrade3->setVisible(dwellingMap & Building::Upgrade3);
-    checkBoxUpgrade3->setText(QApplication::translate("MapTownDialog", "Upgrade 3", 0, QApplication::UnicodeUTF8));
+    checkBoxUpgrade3->setText(QApplication::translate("MapTownDialog", "Upgrade 3", 0));
 
     horizontalLayoutD3 = new QHBoxLayout();
     horizontalLayoutD3->addWidget(checkBoxDwelling3);
@@ -2370,12 +2377,12 @@ Form::MapTownDialog::MapTownDialog(const MapTown & town)
 
     checkBoxDwelling4 = new QCheckBox(tabDwellings);
     checkBoxDwelling4->setEnabled(! defaultDwellings);
-    checkBoxDwelling4->setText(QApplication::translate("MapTownDialog", "Dwelling 4", 0, QApplication::UnicodeUTF8));
+    checkBoxDwelling4->setText(QApplication::translate("MapTownDialog", "Dwelling 4", 0));
 
     checkBoxUpgrade4 = new QCheckBox(tabDwellings);
     checkBoxUpgrade4->setEnabled(! defaultDwellings);
     checkBoxUpgrade4->setVisible(dwellingMap & Building::Upgrade4);
-    checkBoxUpgrade4->setText(QApplication::translate("MapTownDialog", "Upgrade 4", 0, QApplication::UnicodeUTF8));
+    checkBoxUpgrade4->setText(QApplication::translate("MapTownDialog", "Upgrade 4", 0));
 
     horizontalLayoutD4 = new QHBoxLayout();
     horizontalLayoutD4->addWidget(checkBoxDwelling4);
@@ -2383,12 +2390,12 @@ Form::MapTownDialog::MapTownDialog(const MapTown & town)
 
     checkBoxDwelling5 = new QCheckBox(tabDwellings);
     checkBoxDwelling5->setEnabled(! defaultDwellings);
-    checkBoxDwelling5->setText(QApplication::translate("MapTownDialog", "Dwelling 5", 0, QApplication::UnicodeUTF8));
+    checkBoxDwelling5->setText(QApplication::translate("MapTownDialog", "Dwelling 5", 0));
 
     checkBoxUpgrade5 = new QCheckBox(tabDwellings);
     checkBoxUpgrade5->setEnabled(! defaultDwellings);
     checkBoxUpgrade5->setVisible(dwellingMap & Building::Upgrade5);
-    checkBoxUpgrade5->setText(QApplication::translate("MapTownDialog", "Upgrade 5", 0, QApplication::UnicodeUTF8));
+    checkBoxUpgrade5->setText(QApplication::translate("MapTownDialog", "Upgrade 5", 0));
 
     horizontalLayoutD5 = new QHBoxLayout();
     horizontalLayoutD5->addWidget(checkBoxDwelling5);
@@ -2396,12 +2403,12 @@ Form::MapTownDialog::MapTownDialog(const MapTown & town)
 
     checkBoxDwelling6 = new QCheckBox(tabDwellings);
     checkBoxDwelling6->setEnabled(! defaultDwellings);
-    checkBoxDwelling6->setText(QApplication::translate("MapTownDialog", "Dwelling 6", 0, QApplication::UnicodeUTF8));
+    checkBoxDwelling6->setText(QApplication::translate("MapTownDialog", "Dwelling 6", 0));
 
     checkBoxUpgrade6 = new QCheckBox(tabDwellings);
     checkBoxUpgrade6->setEnabled(! defaultDwellings);
     checkBoxUpgrade6->setVisible(dwellingMap & Building::Upgrade6);
-    checkBoxUpgrade6->setText(QApplication::translate("MapTownDialog", "Upgrade 6", 0, QApplication::UnicodeUTF8));
+    checkBoxUpgrade6->setText(QApplication::translate("MapTownDialog", "Upgrade 6", 0));
 
     horizontalLayoutD6 = new QHBoxLayout();
     horizontalLayoutD6->addWidget(checkBoxDwelling6);
@@ -2445,12 +2452,12 @@ Form::MapTownDialog::MapTownDialog(const MapTown & town)
 
     pushButtonOk = new QPushButton(this);
     pushButtonOk->setEnabled(false);
-    pushButtonOk->setText(QApplication::translate("MapTownDialog", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setText(QApplication::translate("MapTownDialog", "Ok", 0));
 
     horizontalSpacerButton = new QSpacerItem(48, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("MapTownDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+    pushButtonCancel->setText(QApplication::translate("MapTownDialog", "Cancel", 0));
 
     horizontalLayoutButtons = new QHBoxLayout();
     horizontalLayoutButtons->addWidget(pushButtonOk);
@@ -2696,19 +2703,19 @@ void Form::MapTownDialog::setEnableOKButton(void)
 
 Form::SignDialog::SignDialog(const QString & msg)
 {
-    setWindowTitle(QApplication::translate("SignDialog", "Sign Detail", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("SignDialog", "Sign Detail", 0));
 
     plainTextEdit = new QPlainTextEdit(this);
     plainTextEdit->setPlainText(msg);
 
     pushButtonOk = new QPushButton(this);
     pushButtonOk->setEnabled(false);
-    pushButtonOk->setText(QApplication::translate("SignDialog", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setText(QApplication::translate("SignDialog", "Ok", 0));
 
     horizontalSpacerButtons = new QSpacerItem(88, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("SignDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+    pushButtonCancel->setText(QApplication::translate("SignDialog", "Cancel", 0));
 
     horizontalLayout = new QHBoxLayout();
     horizontalLayout->addWidget(pushButtonOk);
@@ -2736,13 +2743,13 @@ void Form::SignDialog::setEnableOKButton(void)
 
 Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
 {
-    setWindowTitle(QApplication::translate("MapHeroDialog", "Hero Detail", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("MapHeroDialog", "Hero Detail", 0));
 
     // tab: info
     tabInfo = new QWidget();
 
     labelName = new QLabel(tabInfo);
-    labelName->setText(QApplication::translate("MapHeroDialog", "Name", 0, QApplication::UnicodeUTF8));
+    labelName->setText(QApplication::translate("MapHeroDialog", "Name", 0));
 
     lineEditName = new QLineEdit(tabInfo);
     lineEditName->setText(hero.nameHero);
@@ -2752,7 +2759,7 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
     horizontalLayoutName->addWidget(lineEditName);
 
     labelColor = new QLabel(tabInfo);
-    labelColor->setText(QApplication::translate("MapHeroDialog", "Color", 0, QApplication::UnicodeUTF8));
+    labelColor->setText(QApplication::translate("MapHeroDialog", "Color", 0));
 
     comboBoxColor = new QComboBox(tabInfo);
 
@@ -2768,7 +2775,7 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
     horizontalLayoutColor->addWidget(comboBoxColor);
 
     labelRace = new QLabel(tabInfo);
-    labelRace->setText(QApplication::translate("MapHeroDialog", "Race", 0, QApplication::UnicodeUTF8));
+    labelRace->setText(QApplication::translate("MapHeroDialog", "Race", 0));
 
     comboBoxRace = new QComboBox(tabInfo);
     comboBoxRace->addItem(Race::transcribe(Race::Knight), Race::Knight);
@@ -2785,7 +2792,7 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
     horizontalLayoutRace->addWidget(comboBoxRace);
 
     labelExperience = new QLabel(tabInfo);
-    labelExperience->setText(QApplication::translate("MapHeroDialog", "Experience", 0, QApplication::UnicodeUTF8));
+    labelExperience->setText(QApplication::translate("MapHeroDialog", "Experience", 0));
 
     lineEditExperience = new QLineEdit(tabInfo);
     //lineEditExperience->setInputMethodHints(Qt::ImhDigitsOnly);
@@ -2905,11 +2912,11 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
 
     checkBoxTroopsDefault = new QCheckBox(tabTroops);
     checkBoxTroopsDefault->setChecked(defaultTroops);
-    checkBoxTroopsDefault->setText(QApplication::translate("MapHeroDialog", "Default", 0, QApplication::UnicodeUTF8));
+    checkBoxTroopsDefault->setText(QApplication::translate("MapHeroDialog", "Default", 0));
 
     labelSlot1 = new QLabel(tabTroops);
     labelSlot1->setEnabled(! defaultTroops);
-    labelSlot1->setText(QApplication::translate("MapHeroDialog", "Slot 1", 0, QApplication::UnicodeUTF8));
+    labelSlot1->setText(QApplication::translate("MapHeroDialog", "Slot 1", 0));
 
     comboBoxTroop1 = new QComboBox(tabTroops);
     comboBoxTroop1->setEnabled(! defaultTroops);
@@ -2926,7 +2933,7 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
 
     labelSlot2 = new QLabel(tabTroops);
     labelSlot2->setEnabled(! defaultTroops);
-    labelSlot2->setText(QApplication::translate("MapHeroDialog", "Slot 2", 0, QApplication::UnicodeUTF8));
+    labelSlot2->setText(QApplication::translate("MapHeroDialog", "Slot 2", 0));
 
     comboBoxTroop2 = new QComboBox(tabTroops);
     comboBoxTroop2->setEnabled(! defaultTroops);
@@ -2943,7 +2950,7 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
 
     labelSlot3 = new QLabel(tabTroops);
     labelSlot3->setEnabled(! defaultTroops);
-    labelSlot3->setText(QApplication::translate("MapHeroDialog", "Slot 3", 0, QApplication::UnicodeUTF8));
+    labelSlot3->setText(QApplication::translate("MapHeroDialog", "Slot 3", 0));
 
     comboBoxTroop3 = new QComboBox(tabTroops);
     comboBoxTroop3->setEnabled(! defaultTroops);
@@ -2960,7 +2967,7 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
 
     labelSlot4 = new QLabel(tabTroops);
     labelSlot4->setEnabled(! defaultTroops);
-    labelSlot4->setText(QApplication::translate("MapHeroDialog", "Slot 4", 0, QApplication::UnicodeUTF8));
+    labelSlot4->setText(QApplication::translate("MapHeroDialog", "Slot 4", 0));
 
     comboBoxTroop4 = new QComboBox(tabTroops);
     comboBoxTroop4->setEnabled(! defaultTroops);
@@ -2977,7 +2984,7 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
 
     labelSlot5 = new QLabel(tabTroops);
     labelSlot5->setEnabled(! defaultTroops);
-    labelSlot5->setText(QApplication::translate("MapHeroDialog", "Slot 5", 0, QApplication::UnicodeUTF8));
+    labelSlot5->setText(QApplication::translate("MapHeroDialog", "Slot 5", 0));
 
     comboBoxTroop5 = new QComboBox(tabTroops);
     comboBoxTroop5->setEnabled(! defaultTroops);
@@ -3062,7 +3069,7 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
 
     checkBoxDefaultSkills = new QCheckBox(tabSecSkills);
     checkBoxDefaultSkills->setChecked(defaultSkills);
-    checkBoxDefaultSkills->setText(QApplication::translate("MapHeroDialog", "Default", 0, QApplication::UnicodeUTF8));
+    checkBoxDefaultSkills->setText(QApplication::translate("MapHeroDialog", "Default", 0));
 
     listWidgetSkills = new SkillsList(tabSecSkills);
     listWidgetSkills->setVisible(! defaultSkills);
@@ -3111,26 +3118,26 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
     tabOther = new QWidget();
 
     groupBoxPatrol = new QGroupBox(tabOther);
-    groupBoxPatrol->setTitle(QApplication::translate("MapHeroDialog", "Patrol", 0, QApplication::UnicodeUTF8));
+    groupBoxPatrol->setTitle(QApplication::translate("MapHeroDialog", "Patrol", 0));
 
     checkBoxEnablePatrol = new QCheckBox(groupBoxPatrol);
     checkBoxEnablePatrol->setChecked(hero.patrolMode);
 
-    checkBoxEnablePatrol->setText(QApplication::translate("MapHeroDialog", "Enable", 0, QApplication::UnicodeUTF8));
+    checkBoxEnablePatrol->setText(QApplication::translate("MapHeroDialog", "Enable", 0));
 
     comboBoxPatrol = new QComboBox(groupBoxPatrol);
     comboBoxPatrol->setEnabled(hero.patrolMode);
-    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Stand still", 0, QApplication::UnicodeUTF8), 0);
-    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 1 square", 0, QApplication::UnicodeUTF8), 1);
-    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 2 squares", 0, QApplication::UnicodeUTF8), 2);
-    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 3 squares", 0, QApplication::UnicodeUTF8), 3);
-    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 4 squares", 0, QApplication::UnicodeUTF8), 4);
-    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 5 squares", 0, QApplication::UnicodeUTF8), 5);
-    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 6 squares", 0, QApplication::UnicodeUTF8), 6);
-    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 7 squares", 0, QApplication::UnicodeUTF8), 7);
-    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 8 squares", 0, QApplication::UnicodeUTF8), 8);
-    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 9 squares", 0, QApplication::UnicodeUTF8), 9);
-    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 10 squares", 0, QApplication::UnicodeUTF8), 10);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Stand still", 0), 0);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 1 square", 0), 1);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 2 squares", 0), 2);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 3 squares", 0), 3);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 4 squares", 0), 4);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 5 squares", 0), 5);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 6 squares", 0), 6);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 7 squares", 0), 7);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 8 squares", 0), 8);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 9 squares", 0), 9);
+    comboBoxPatrol->addItem(QApplication::translate("MapHeroDialog", "Radius 10 squares", 0), 10);
     comboBoxPatrol->setCurrentIndex(hero.patrolSquare < comboBoxPatrol->count() ? hero.patrolSquare : 0);
 
     verticalLayoutPatrol = new QVBoxLayout(groupBoxPatrol);
@@ -3146,12 +3153,12 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
     // buttons
     pushButtonOk = new QPushButton(this);
     pushButtonOk->setEnabled(false);
-    pushButtonOk->setText(QApplication::translate("MapHeroDialog", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setText(QApplication::translate("MapHeroDialog", "Ok", 0));
 
     horizontalSpacerButtons = new QSpacerItem(68, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("MapHeroDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+    pushButtonCancel->setText(QApplication::translate("MapHeroDialog", "Cancel", 0));
 
     horizontalLayoutButtons = new QHBoxLayout();
     horizontalLayoutButtons->addWidget(pushButtonOk);
@@ -3457,12 +3464,12 @@ Form::ListDialog::ListDialog()
 
     pushButtonOk = new QPushButton(this);
     pushButtonOk->setEnabled(false);
-    pushButtonOk->setText(QApplication::translate("ListDialog", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setText(QApplication::translate("ListDialog", "Ok", 0));
 
     horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("ListDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+    pushButtonCancel->setText(QApplication::translate("ListDialog", "Cancel", 0));
 
     horizontalLayout = new QHBoxLayout();
     horizontalLayout->addWidget(pushButtonOk);
@@ -3491,7 +3498,7 @@ void Form::ListDialog::setEnableOKButton(void)
 
 Form::SelectArtifactDialog::SelectArtifactDialog(int current)
 {
-    setWindowTitle(QApplication::translate("SelectArtifactDialog", "Select artifact", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("SelectArtifactDialog", "Select artifact", 0));
 
     for(int index = Artifact::None + 1; index < Artifact::Unknown; ++index)
     {
@@ -3508,7 +3515,7 @@ Form::SelectArtifactDialog::SelectArtifactDialog(int current)
 
 Form::SelectSkillDialog::SelectSkillDialog(const Skill & current)
 {
-    setWindowTitle(QApplication::translate("SelectSkillDialog", "Select skill", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("SelectSkillDialog", "Select skill", 0));
 
     for(int skill = SkillType::None + 1; skill < SkillType::Unknown; ++skill)
     {
@@ -3529,7 +3536,7 @@ Form::SelectSkillDialog::SelectSkillDialog(const Skill & current)
 
 Form::SelectSpellDialog::SelectSpellDialog(int spell)
 {
-    setWindowTitle(QApplication::translate("SelectSpellDialog", "Select spell", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("SelectSpellDialog", "Select spell", 0));
 
     for(int sp = Spell::None + 1; sp < Spell::Random; ++sp)
     {
@@ -3572,7 +3579,7 @@ void Form::RiddlesList::editItem(QListWidgetItem* item)
 
 Form::MapSphinxDialog::MapSphinxDialog(const MapSphinx & sphinx)
 {
-    setWindowTitle(QApplication::translate("MapSphinxDialog", "Sphinx Detail", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("MapSphinxDialog", "Sphinx Detail", 0));
 
     // tab message
     tabMessage = new QWidget();
@@ -3588,10 +3595,10 @@ Form::MapSphinxDialog::MapSphinxDialog(const MapSphinx & sphinx)
 
     resourcesGroup = new ResourcesGroup(tabGift, sphinx.resources);
     resourcesGroup->setFlat(false);
-    resourcesGroup->setTitle(QApplication::translate("MapSphinxDialog", "Resources", 0, QApplication::UnicodeUTF8));
+    resourcesGroup->setTitle(QApplication::translate("MapSphinxDialog", "Resources", 0));
 
     artifactGroup = new ArtifactGroup(tabGift, sphinx.artifact);
-    artifactGroup->setTitle(QApplication::translate("MapSphinxDialog", "Artifact to give", 0, QApplication::UnicodeUTF8));
+    artifactGroup->setTitle(QApplication::translate("MapSphinxDialog", "Artifact to give", 0));
     artifactGroup->setFlat(false);
 
     verticalLayoutGift = new QVBoxLayout(tabGift);
@@ -3613,13 +3620,13 @@ Form::MapSphinxDialog::MapSphinxDialog(const MapSphinx & sphinx)
     tabWidget->addTab(tabAnswers, "Answers");
 
     pushButtonOk = new QPushButton(this);
-    pushButtonOk->setText(QApplication::translate("MapSphinxDialog", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setText(QApplication::translate("MapSphinxDialog", "Ok", 0));
     pushButtonOk->setEnabled(false);
 
     horizontalSpacerButtons = new QSpacerItem(238, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("MapSphinxDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+    pushButtonCancel->setText(QApplication::translate("MapSphinxDialog", "Cancel", 0));
 
     horizontalLayoutButtons = new QHBoxLayout();
     horizontalLayoutButtons->addWidget(pushButtonOk);
@@ -3666,7 +3673,7 @@ MapSphinx Form::MapSphinxDialog::result(const QPoint & pos, quint32 uid) const
 
 Form::ObjectEventsDialog::ObjectEventsDialog(const MapActions* actions)
 {
-    setWindowTitle(QApplication::translate("ObjectEventsDialog", "Object Events", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("ObjectEventsDialog", "Object Events", 0));
 
     pushButtonUp = new QPushButton(this);
     pushButtonUp->setIcon(QIcon(":/images/uparrow.png"));
@@ -3703,12 +3710,12 @@ Form::ObjectEventsDialog::ObjectEventsDialog(const MapActions* actions)
 
     pushButtonOk = new QPushButton(this);
     pushButtonOk->setEnabled(false);
-    pushButtonOk->setText(QApplication::translate("ObjectEventsDialog", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setText(QApplication::translate("ObjectEventsDialog", "Ok", 0));
 
     horizontalSpacerButtons = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("ObjectEventsDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+    pushButtonCancel->setText(QApplication::translate("ObjectEventsDialog", "Cancel", 0));
 
     horizontalLayoutButtons = new QHBoxLayout();
     horizontalLayoutButtons->addWidget(pushButtonOk);
@@ -3833,7 +3840,7 @@ void Form::ObjectEventsList::checkLimit(void)
 
 Form::EditPassableDialog::EditPassableDialog(const MapTile & tile)
 {
-    setWindowTitle(QApplication::translate("EditPassableDialog", "Edit Passable", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("EditPassableDialog", "Edit Passable", 0));
 
     horizontalSpacer2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -3891,12 +3898,12 @@ Form::EditPassableDialog::EditPassableDialog(const MapTile & tile)
     verticalSpacer = new QSpacerItem(20, 10, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
     pushButtonOk = new QPushButton(this);
-    pushButtonOk->setText(QApplication::translate("EditPassableDialog", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setText(QApplication::translate("EditPassableDialog", "Ok", 0));
 
     horizontalSpacerButtons = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("EditPassableDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+    pushButtonCancel->setText(QApplication::translate("EditPassableDialog", "Cancel", 0));
 
     horizontalLayout = new QHBoxLayout();
     horizontalLayout->addWidget(pushButtonOk);
@@ -4291,7 +4298,7 @@ void Form::ObjectEventsList::addItems(const MapActionList & list)
 
 Form::MessageTabDialog::MessageTabDialog(const ActionMessage & act)
 {
-    setWindowTitle(QApplication::translate("MessageTabDialog", "Message Detail", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("MessageTabDialog", "Message Detail", 0));
 
     tabMessage = new QWidget();
 
@@ -4302,13 +4309,13 @@ Form::MessageTabDialog::MessageTabDialog(const ActionMessage & act)
     verticalLayoutMessage->addWidget(plainText);
 
     pushButtonOk = new QPushButton(this);
-    pushButtonOk->setText(QApplication::translate("MessageTabDialog", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setText(QApplication::translate("MessageTabDialog", "Ok", 0));
     pushButtonOk->setEnabled(false);
 
     horizontalSpacer = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("MessageTabDialog", "Cancel", 0, QApplication::UnicodeUTF8));
+    pushButtonCancel->setText(QApplication::translate("MessageTabDialog", "Cancel", 0));
 
     horizontalLayoutButton = new QHBoxLayout();
     horizontalLayoutButton->addWidget(pushButtonOk);
@@ -4358,7 +4365,7 @@ void Form::MessageTabDialog::fillItem(QListWidgetItem & item, const ActionMessag
 
 Form::DefaultActionDialog::DefaultActionDialog(const ActionDefault & act) : MessageTabDialog(act.msg)
 {
-    setWindowTitle(QApplication::translate("DefaultActionDialog", "Default Action", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("DefaultActionDialog", "Default Action", 0));
 
     tabAction = new QWidget();
 
@@ -4400,7 +4407,7 @@ void Form::DefaultActionDialog::fillItem(QListWidgetItem & item, const ActionDef
 
 Form::AccessDialog::AccessDialog(const ActionAccess & act) : MessageTabDialog(act.msg)
 {
-    setWindowTitle(QApplication::translate("AccessDialog", "Access", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("AccessDialog", "Access", 0));
 
     tabAccess = new QWidget();
 
@@ -4441,7 +4448,7 @@ void Form::AccessDialog::fillItem(QListWidgetItem & item, const ActionAccess & a
 
 Form::ResourcesDialog::ResourcesDialog(const ActionResources & act) : MessageTabDialog(act.msg)
 {
-    setWindowTitle(QApplication::translate("ResourcesDialog", "Resources", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("ResourcesDialog", "Resources", 0));
 
     tabResources = new QWidget();
     resourcesGroup = new ResourcesGroup(tabResources, act.resources);
@@ -4479,7 +4486,7 @@ void Form::ResourcesDialog::fillItem(QListWidgetItem & item, const ActionResourc
 
 Form::ArtifactDialog::ArtifactDialog(const ActionArtifact & act) : MessageTabDialog(act.msg)
 {
-    setWindowTitle(QApplication::translate("ArtifactDialog", "Artifact", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("ArtifactDialog", "Artifact", 0));
 
     tabArtifact = new QWidget();
     artifactGroup = new ArtifactGroup(tabArtifact, act.artifact);
@@ -4556,7 +4563,7 @@ void Form::ArtifactDialog::artifactFormChanged(void)
 
 Form::MapArtifactDialog::MapArtifactDialog(const MapArtifact & obj)
 {
-    setWindowTitle(QApplication::translate("MapArtifact", "Artifact Detail", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("MapArtifact", "Artifact Detail", 0));
 
     variantRandom = new QCheckBox("Random condition", this);
 
@@ -4600,13 +4607,13 @@ Form::MapArtifactDialog::MapArtifactDialog(const MapArtifact & obj)
     }
 
     pushButtonOk = new QPushButton(this);
-    pushButtonOk->setText(QApplication::translate("MapArtifact", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setText(QApplication::translate("MapArtifact", "Ok", 0));
     pushButtonOk->setEnabled(false);
 
     horizontalSpacerButtons = new QSpacerItem(238, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("MapArtifact", "Cancel", 0, QApplication::UnicodeUTF8));
+    pushButtonCancel->setText(QApplication::translate("MapArtifact", "Cancel", 0));
 
     horizontalLayoutButtons = new QHBoxLayout();
     horizontalLayoutButtons->addWidget(pushButtonOk);
@@ -4664,7 +4671,7 @@ void Form::MapArtifactDialog::setDefaultCondition(bool f)
 
 Form::MapMonsterDialog::MapMonsterDialog(const MapMonster & obj)
 {
-    setWindowTitle(QApplication::translate("MapMonster", "Monster Detail", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("MapMonster", "Monster Detail", 0));
 
     joinDefault = new QCheckBox("Default", this);
 
@@ -4687,13 +4694,13 @@ Form::MapMonsterDialog::MapMonsterDialog(const MapMonster & obj)
     editCount->setValidator(new QIntValidator(0, 65535, this));
 
     pushButtonOk = new QPushButton(this);
-    pushButtonOk->setText(QApplication::translate("MapMonster", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setText(QApplication::translate("MapMonster", "Ok", 0));
     pushButtonOk->setEnabled(false);
 
     horizontalSpacerButtons = new QSpacerItem(238, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("MapMonster", "Cancel", 0, QApplication::UnicodeUTF8));
+    pushButtonCancel->setText(QApplication::translate("MapMonster", "Cancel", 0));
 
     horizontalLayoutButtons = new QHBoxLayout();
     horizontalLayoutButtons->addWidget(pushButtonOk);
@@ -4751,7 +4758,7 @@ void Form::MapMonsterDialog::setDefaultCondition(bool f)
 
 Form::MapResourceDialog::MapResourceDialog(const MapResource & obj)
 {
-    setWindowTitle(QApplication::translate("MapResource", "Resource Detail", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("MapResource", "Resource Detail", 0));
 
     labelCount = new QLabel("count:", this);
     editCount = new QLineEdit(this);
@@ -4759,13 +4766,13 @@ Form::MapResourceDialog::MapResourceDialog(const MapResource & obj)
     editCount->setValidator(new QIntValidator(0, 65535, this));
 
     pushButtonOk = new QPushButton(this);
-    pushButtonOk->setText(QApplication::translate("MapResource", "Ok", 0, QApplication::UnicodeUTF8));
+    pushButtonOk->setText(QApplication::translate("MapResource", "Ok", 0));
     pushButtonOk->setEnabled(false);
 
     horizontalSpacerButtons = new QSpacerItem(238, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     pushButtonCancel = new QPushButton(this);
-    pushButtonCancel->setText(QApplication::translate("MapResource", "Cancel", 0, QApplication::UnicodeUTF8));
+    pushButtonCancel->setText(QApplication::translate("MapResource", "Cancel", 0));
 
     horizontalLayoutButtons = new QHBoxLayout();
     horizontalLayoutButtons->addWidget(pushButtonOk);

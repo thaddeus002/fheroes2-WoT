@@ -22,12 +22,18 @@
 
 #include <algorithm>
 #include <QtGui>
+#include <QtWidgets>
 #include <QPainter>
 #include <QDomDocument>
 #include <QDebug>
 #include <QMessageBox>
 #include <QGraphicsSceneMouseEvent>
 #include <QStyleOptionGraphicsItem>
+#include <QSpinBox>
+#include <QLineEdit>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QPlainTextEdit>
 
 #include "engine.h"
 #include "global.h"
@@ -2228,7 +2234,7 @@ bool MapData::saveMapXML(const QString & mapFile) const
 
 QPoint MapData::mapToPoint(const QPoint & pt) const
 {
-    const MapTile* tile = qgraphicsitem_cast<const MapTile*>(itemAt(pt));
+    const MapTile* tile = qgraphicsitem_cast<const MapTile*>(itemAt(pt, QTransform()));
     return tile ? tile->mapPos() : QPoint(-1, -1);
 }
 

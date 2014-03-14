@@ -21,6 +21,14 @@
  ***************************************************************************/
 
 #include <QtGui>
+#include <QMdiArea>
+#include <QMdiSubWindow>
+#include <QDockWidget>
+#include <QStatusBar>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QMenuBar>
+#include <QToolBar>
 
 #include "dialogs.h"
 #include "mainwindow.h"

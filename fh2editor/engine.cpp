@@ -614,7 +614,7 @@ QPixmap AGG::File::getImageTIL(const QString & id, int index, QVector<QRgb> & co
 	    qCritical() << "AGG::File::getImageTIL:" << "out of range" << index;
     }
 
-    return NULL;
+    return QPixmap();
 }
 
 QPair<QPixmap, QPoint> AGG::File::getImageICN(const QString & id, int index, QVector<QRgb> & colors)
@@ -705,7 +705,7 @@ bool AGG::Spool::isHeroes2XMode(void) const
 QPixmap AGG::Spool::getImageTIL(const QString & til, int index)
 {
     QString key = til + QString::number(index);
-    QPixmap result = NULL;
+    QPixmap result;
 
     if(! QPixmapCache::find(key, & result))
     {
@@ -765,7 +765,7 @@ QPair<QPixmap, QPoint> AGG::Spool::getImageICN(const QString & icn, int index)
 QPixmap AGG::Spool::getImage(const CompositeObject & obj, const QSize & tileSize)
 {
     const QString key = obj.icn + obj.name;
-    QPixmap result = NULL;
+    QPixmap result;
 
     if(! QPixmapCache::find(key, & result))
     {
@@ -823,7 +823,7 @@ QPixmap Editor::pixmapBorder(const QSize & size, const QColor & fillCol, const Q
 
 QPixmap Editor::pixmapBorderPassable(int passable)
 {
-    QPixmap result = NULL;
+    QPixmap result;
     QString key = "passable_" + QString::number(passable);
 
     if(! QPixmapCache::find(key, & result))
@@ -3475,7 +3475,7 @@ QString Skill::description(void) const
 
 QPixmap Skill::pixmap(void) const
 {
-    return isValid() ? EditorTheme::getImageICN("MINISS.ICN", skill() - 1).first : NULL;
+    return isValid() ? EditorTheme::getImageICN("MINISS.ICN", skill() - 1).first : QPixmap();
 }
 
 QDataStream & operator<< (QDataStream & ds, const GameCondition & cond)
@@ -3877,7 +3877,7 @@ QPixmap Spell::pixmap(int spell)
 	default: break;
     }
 
-    return index < 0 ? NULL : EditorTheme::getImageICN("SPELLS.ICN", index).first;
+    return index < 0 ? QPixmap() : EditorTheme::getImageICN("SPELLS.ICN", index).first;
 }
 
 bool Spell::isBattle(int spell)

@@ -28,6 +28,7 @@
 #include <QtGui>
 #include <QTextStream>
 #include <ctime>
+#include <QtWidgets>
 
 #include "engine.h"
 #include "mainwindow.h"

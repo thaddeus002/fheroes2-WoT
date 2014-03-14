@@ -3,12 +3,18 @@
 ######################################################################
 
 TEMPLATE = app
-TARGET =
+TARGET = fh2editor
+
 DEPENDPATH += .
 INCLUDEPATH += .
-QMAKE_LIBDIR += $(QTLIB)
-QT+= xml
+
+QT += widgets
+QT += xml
+
 CONFIG += qt
+
+QMAKE_LIBDIR += $(QTLIB)
+QMAKE_CXXFLAGS += -fno-strict-aliasing
 
 RESOURCES = resources.qrc
 FORMS +=
