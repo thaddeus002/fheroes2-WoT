@@ -51,7 +51,7 @@ int ArtifactsModifiersResult(int type, const u8* arts, u32 size, const HeroBase 
 
 		    switch(art())
 		    {
-			case Artifact::SWORD_BREAKER:		if(type == MDF_ATTACK); mod = 1; break;
+			case Artifact::SWORD_BREAKER:		if(type == MDF_ATTACK) mod = 1; break;
 			// power
 			case Artifact::BROACH_SHIELDING:	if(type == MDF_POWER) mod = -2; break;
 			// morale/luck

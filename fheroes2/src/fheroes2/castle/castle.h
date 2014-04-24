@@ -115,6 +115,7 @@ public:
 
     Castle();
     Castle(s32, s32, int rs);
+    virtual ~Castle(){}
     void LoadFromMP2(const u8*, size_t);
 
     Captain &		GetCaptain(void);

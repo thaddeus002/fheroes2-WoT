@@ -175,7 +175,7 @@ void Interface::GameArea::Redraw(Surface & dst, int flag, const Rect & rt) const
 
     if(hero && hero->GetPath().isShow())
     {
-	s32 from = hero->GetIndex();
+	//s32 from = hero->GetIndex();
 	s32 green = hero->GetPath().GetAllowStep();
 
 	const bool skipfirst = hero->isEnableMove() && 45 > hero->GetSpriteIndex() && 2 < (hero->GetSpriteIndex() % 9);
@@ -186,7 +186,7 @@ void Interface::GameArea::Redraw(Surface & dst, int flag, const Rect & rt) const
 
 	for(; it1 != it2; ++it1)
 	{
-	    from = (*it1).GetIndex();
+	    const s32 & from = (*it1).GetIndex();
     	    const Point mp = Maps::GetPoint(from);
 
  	    ++it3;

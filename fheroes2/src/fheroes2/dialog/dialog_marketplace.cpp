@@ -219,7 +219,7 @@ void Dialog::Marketplace(bool fromTradingPost)
 
     const Rect & pos_rt = box.GetArea();
     Point dst_pt(pos_rt.x, pos_rt.y);
-    Rect dst_rt(pos_rt);
+    //Rect dst_rt(pos_rt);
     Text text;
 
     // header

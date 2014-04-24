@@ -651,7 +651,8 @@ void Battle::Only::RedrawBaseInfo(const Point & top)
     std::string message = "%{name1} vs %{name2}";
 
     StringReplace(message, "%{name1}", std::string(Race::String(hero1->GetRace())) + " " + hero1->GetName());
-    StringReplace(message, "%{name2}", (hero2 ? std::string(Race::String(hero2->GetRace())) + " " + hero2->GetName() : "Monsters"));
+    if(hero2)
+	StringReplace(message, "%{name2}", (hero2 ? std::string(Race::String(hero2->GetRace())) + " " + hero2->GetName() : "Monsters"));
 
     Text text(message, Font::BIG);
     text.Blit(top.x + 320 - text.w() / 2, top.y + 26);
@@ -696,13 +697,13 @@ void Battle::Only::StartBattle(void)
     {
 	hero1->SetSpellPoints(hero1->GetMaxSpellPoints());
 	hero1->Recruit(player1.color, Point(5, 5));
-    }
 
-    if(hero2)
-    {
-      hero2->SetSpellPoints(hero2->GetMaxSpellPoints());
-      hero2->Recruit(player2.color, Point(5, 6));
-    }
+	if(hero2)
+	{
+    	    hero2->SetSpellPoints(hero2->GetMaxSpellPoints());
+    	    hero2->Recruit(player2.color, Point(5, 6));
+	}
 
-    Battle::Loader(hero1->GetArmy(), (hero2 ? hero2->GetArmy() : monsters), hero1->GetIndex() + 1);
+	Battle::Loader(hero1->GetArmy(), (hero2 ? hero2->GetArmy() : monsters), hero1->GetIndex() + 1);
+    }
 }

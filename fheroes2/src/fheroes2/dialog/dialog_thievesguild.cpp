@@ -201,11 +201,11 @@ void GetBestHeroArmyInfo(std::vector<ValueColors> & v, const Colors & colors)
 
 void DrawFlags(const std::vector<ValueColors> & v, const Point & pos, u32 width, u32 count)
 {
-    const u32 chunk = width / count;
     bool qvga = Settings::Get().QVGA();
 
     for(u32 ii = 0; ii < count; ++ii)
     {
+	const u32 chunk = width / count;
 	if(ii < v.size())
 	{
 	    const Colors colors(v[ii].second);

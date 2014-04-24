@@ -27,7 +27,7 @@
 #include "battle_command.h"
 #include "battle_catapult.h"
 
-Battle::Catapult::Catapult(const HeroBase & hero, bool fortification) : cat_shots(1), cat_first(20), cat_miss(true), cat_fort(fortification)
+Battle::Catapult::Catapult(const HeroBase & hero, bool fortification) : cat_shots(1), cat_first(20), cat_miss(true) /*, cat_fort(fortification) */
 {
     switch(hero.GetLevelSkill(Skill::Secondary::BALLISTICS))
     {

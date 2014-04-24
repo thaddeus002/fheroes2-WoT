@@ -34,7 +34,7 @@ class SelectValue : public Rect
 public:
     SelectValue(u32 min, u32 max, u32 cur, u32 st) : vmin(min), vmax(max), vcur(cur), step(st)
     {
-	if(vmin >= vmax) min = 0;
+	if(vmin >= vmax) vmin = 0;
 	if(vcur > vmax || vcur < vmin) vcur = vmin;
 
 	btnUp.SetSprite(ICN::TOWNWIND, 5, 6);

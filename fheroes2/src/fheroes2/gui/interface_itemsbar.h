@@ -328,6 +328,7 @@ namespace Interface
 	bool QueueEventProcessing(ItemsActionBar<Item> &);
 */
 
+	virtual void	RedrawItem(Item &, const Rect &, Surface &) {}
 	virtual void	RedrawItem(Item &, const Rect &, bool, Surface &) {}
 
         virtual bool	ActionBarSingleClick(const Point &, Item &, const Rect &, Item &, const Rect &){ return false; }

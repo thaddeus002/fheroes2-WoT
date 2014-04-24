@@ -741,9 +741,9 @@ bool World::LoadMapMAP(const std::string & filename)
 	    return true;
 	}
     }
+#endif
     return false;
 }
-#endif
 #else
 bool World::LoadMapMAP(const std::string & filename)
 {

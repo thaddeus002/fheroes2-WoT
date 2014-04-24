@@ -851,7 +851,7 @@ StreamBase & Battle::operator<< (StreamBase & msg, const Arena & a)
 	msg << static_cast<int>(HeroBase::UNDEFINED);
 
     if(hero2)
-	msg << hero1->GetType() << *hero2;
+	msg << hero2->GetType() << *hero2;
     else
 	msg << static_cast<int>(HeroBase::UNDEFINED);
 

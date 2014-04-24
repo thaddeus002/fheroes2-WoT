@@ -47,7 +47,7 @@ namespace Battle
 	u32	cat_shots;
 	u32	cat_first;
 	bool	cat_miss;
-	bool	cat_fort;
+	//bool	cat_fort;
     };
 }
 
