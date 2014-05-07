@@ -508,8 +508,8 @@ int Castle::OpenDialog(bool readonly, bool fade)
 	if(buttonNextCastle.isEnable() && le.MouseClickLeft(buttonNextCastle)){ result = Dialog::NEXT; break; }
 
 	// buildings event
-	for(CastleDialog::CacheBuildings::const_iterator
-    	    it = cacheBuildings.begin(); it != cacheBuildings.end(); ++it)
+	for(CastleDialog::CacheBuildings::const_reverse_iterator
+    	    it = cacheBuildings.rbegin(); it != cacheBuildings.rend(); ++it)
 	{
     	    if((*it).id == GetActualDwelling((*it).id) && isBuild((*it).id))
     	    {
@@ -524,7 +524,11 @@ int Castle::OpenDialog(bool readonly, bool fade)
 		if(le.MouseCursor((*it).coord))
 		    msg_status = Monster(race, (*it).id).GetName();
 	    }
-    	    else
+	}
+
+	for(CastleDialog::CacheBuildings::const_iterator
+    	    it = cacheBuildings.begin(); it != cacheBuildings.end(); ++it)
+	{
     	    if(BUILD_MAGEGUILD & (*it).id)
     	    {
         	for(u32 id = BUILD_MAGEGUILD5; id >= BUILD_MAGEGUILD1; id >>= 1)

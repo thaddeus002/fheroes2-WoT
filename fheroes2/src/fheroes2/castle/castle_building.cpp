@@ -749,7 +749,6 @@ void CastlePackOrdersBuildings(const Castle & castle, std::vector<building_t> & 
 	    ordersBuildings.push_back(DWELLING_MONSTER5);
 	    break;
 	case Race::WRLK:
-	    ordersBuildings.push_back(DWELLING_UPGRADE5);
 	    ordersBuildings.push_back(DWELLING_MONSTER5);
 	    ordersBuildings.push_back(DWELLING_MONSTER3);
 	    ordersBuildings.push_back(BUILD_TENT);
