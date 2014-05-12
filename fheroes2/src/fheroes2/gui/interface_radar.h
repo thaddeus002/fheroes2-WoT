@@ -39,6 +39,7 @@ namespace Interface
 	void Build(void);
 	void Redraw(void);
 	void SetHide(bool);
+	void ResetAreaSize(void);
 	void QueueEventProcessing(void);
 
     private:
@@ -46,6 +47,7 @@ namespace Interface
 	void Generate(void);
 	void RedrawObjects(int color = 0xFF);
 	void RedrawCursor(void);
+	void ChangeAreaSize(const Size &);
 
 	Basic & interface;
 

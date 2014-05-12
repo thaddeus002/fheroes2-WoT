@@ -418,15 +418,25 @@ void Interface::Radar::QueueEventProcessing(void)
 		    newSize = Size(RADARWIDTH, RADARWIDTH);
 	    }
 
-	    if(newSize != area)
-	    {
-		const Rect & rect = GetRect();
-		Cursor::Get().Hide();
-		SetPosition(rect.x < 0 ? 0 : rect.x, rect.y < 0 ? 0 : rect.y, newSize.w, newSize.h);
-		Generate();
-		RedrawCursor();
-        	gamearea.SetRedraw();
-	    }
+	    ChangeAreaSize(newSize);
 	}
+    }
+}
+
+void Interface::Radar::ResetAreaSize(void)
+{
+    ChangeAreaSize(Size(RADARWIDTH, RADARWIDTH));
+}
+
+void Interface::Radar::ChangeAreaSize(const Size & newSize)
+{
+    if(newSize != area)
+    {
+	const Rect & rect = GetRect();
+	Cursor::Get().Hide();
+	SetPosition(rect.x < 0 ? 0 : rect.x, rect.y < 0 ? 0 : rect.y, newSize.w, newSize.h);
+	Generate();
+	RedrawCursor();
+	interface.GetGameArea().SetRedraw();
     }
 }

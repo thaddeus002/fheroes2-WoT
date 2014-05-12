@@ -257,6 +257,7 @@ void Interface::Basic::EventSystemDialog(void)
     // interface hide/show
     if(0x04 & changes)
     {
+	GetRadar().ResetAreaSize();
 	SetHideInterface(conf.ExtGameHideInterface());
         SetRedraw(REDRAW_ALL);
 	ResetFocus(GameFocus::HEROES);
