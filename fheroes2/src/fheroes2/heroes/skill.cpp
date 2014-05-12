@@ -650,7 +650,7 @@ void Skill::SecSkills::FindSkillsForLevelUp(int race, Secondary & sec1, Secondar
     }
 
     // exclude is full, add other.
-    if(HEROESMAXSKILL <= size())
+    if(HEROESMAXSKILL <= exclude_skills.size())
     {
 	for(u32 ii = 0; ii < ARRAY_COUNT(secskills); ++ii)
 	    if(Level::NONE == GetLevel(secskills[ii])) exclude_skills.push_back(secskills[ii]);

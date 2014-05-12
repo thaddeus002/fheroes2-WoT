@@ -345,6 +345,10 @@ void Heroes::LoadFromMP2(s32 map_index, int cl, int rc, const u8* ptr, size_t sz
 	for(Skill::SecSkills::iterator
 	    it = secondary_skills.begin(); it != secondary_skills.end(); ++it)
 	    (*it).SetLevel(st.get());
+
+	for(Skill::SecSkills::iterator
+	    it = secondary_skills.begin(); it != secondary_skills.end(); ++it)
+	    if(! (*it).isValid()) (*it).Reset();
     }
     else
 	st.skip(16);
