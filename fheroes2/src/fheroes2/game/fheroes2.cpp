@@ -42,6 +42,7 @@ void SetTimidityEnvPath(const Settings &);
 void SetLangEnvPath(const Settings &);
 void InitHomeDir(void);
 void ReadConfigs(void);
+int TestBlitSpeed(void);
 
 int PrintHelp(const char *basename)
 {
@@ -160,6 +161,7 @@ int main(int argc, char **argv)
 
 	    atexit(&AGG::Quit);
 
+	    conf.SetBlitSpeed(TestBlitSpeed());
 #ifdef WITH_ZLIB
 	    LoadZLogo();
 #endif
@@ -209,6 +211,33 @@ int main(int argc, char **argv)
 	}
 #endif
 	return EXIT_SUCCESS;
+}
+
+int TestBlitSpeed(void)
+{
+    Display & display = Display::Get();
+    Surface sf(display.w(), display.h(), true);
+    Rect srcrt(0, 0, display.w() / 3, display.h());
+    SDL::Time t;
+
+    t.Start();
+    sf.Fill(0xFF, 0, 0);
+    sf.Blit(srcrt, Point(0, 0), display);
+    display.Flip();
+    sf.Fill(0, 0xFF, 0);
+    sf.Blit(srcrt, Point(srcrt.w, 0), display);
+    display.Flip();
+    sf.Fill(0, 0, 0xFF);
+    sf.Blit(srcrt, Point(display.w() - srcrt.w, 0), display);
+    display.Flip();
+    sf.Fill(0, 0, 0);
+    sf.Blit(display);
+    display.Flip();
+    t.Stop();
+
+    int res = t.Get();
+    DEBUG(DBG_GAME|DBG_ENGINE, DBG_INFO, res);
+    return res;
 }
 
 void LoadZLogo(void)

@@ -175,9 +175,10 @@ namespace Battle
 
 	void	RedrawBorder(void);
 	void	RedrawCover(void);
-	void	RedrawLowObjects(s32) const;
+	void	RedrawCoverStatic(Surface &);
+	void	RedrawLowObjects(s32, Surface &) const;
 	void	RedrawHighObjects(s32) const;
-	void	RedrawCastle1(const Castle &) const;
+	void	RedrawCastle1(const Castle &, Surface &) const;
 	void	RedrawCastle2(const Castle &, s32) const;
 	void	RedrawCastle3(const Castle &) const;
 	void	RedrawKilled(void);
@@ -231,8 +232,10 @@ namespace Battle
 	Surface		sf_hexagon;
 	Surface		sf_shadow;
 	Surface		sf_cursor;
-	int	icn_cbkg;
-	int	icn_frng;
+	Surface		sf_cover;
+
+	int		icn_cbkg;
+	int		icn_frng;
 
 	Button		btn_auto;
 	Button		btn_settings;
@@ -247,7 +250,7 @@ namespace Battle
 	Spell		humanturn_spell;
 	bool		humanturn_exit;
 	bool		humanturn_redraw;
-	u32		animation_frame;
+	u32		animation_flags_frame;
 	int		catapult_frame;
 
 	const Unit*	b_current;

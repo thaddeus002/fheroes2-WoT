@@ -138,10 +138,16 @@ void RunTest2(void)
     }
 }
 
+ListFiles GetMapsFiles(const char*);
+
 void RunTest3(void)
 {
     VERBOSE("Run Test3");
-    const std::string amap("/opt/projects/fh2/maps/beltway.mp2");
+
+    ListFiles maps = GetMapsFiles(".mp2");
+    if(maps.empty()) return;
+
+    const std::string & amap = maps.front();
     Settings & conf = Settings::Get();
 
     Maps::FileInfo fi;
@@ -171,9 +177,12 @@ void RunTest3(void)
 
     hero1.SetSpellPoints(150);
 
+    int xx = world.w() / 2;
+    int yy = world.h() / 2;
+
     if(kingdom1.GetCastles().size())
-    hero1.Recruit(kingdom1.GetColor(), Point(20, 20));
-    hero2.Recruit(kingdom2.GetColor(), Point(20, 21));
+    hero1.Recruit(kingdom1.GetColor(), Point(xx, yy));
+    hero2.Recruit(kingdom2.GetColor(), Point(xx, yy + 1));
 
     Army & army1 = hero1.GetArmy();
 
@@ -217,7 +226,7 @@ void RunTest3(void)
 //    army2.JoinTroop(static_cast<Monster::monster_t>(6), 10);
 //    army2.JoinTroop(static_cast<Monster::monster_t>(8), 10);
 
-    Battle::Loader(army1, army2, army2.GetCommander()->GetIndex());
+    Battle::Loader(army1, army2, army1.GetCommander()->GetIndex());
 }
 
 #endif

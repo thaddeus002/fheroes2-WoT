@@ -217,7 +217,7 @@ std::string Settings::GetVersion(void)
 Settings::Settings() : debug(DEFAULT_DEBUG), video_mode(0, 0), game_difficulty(Difficulty::NORMAL),
     font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), force_lang("en"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), heroes_speed(DEFAULT_SPEED_DELAY), ai_speed(DEFAULT_SPEED_DELAY), scroll_speed(SCROLL_NORMAL), battle_speed(DEFAULT_SPEED_DELAY),
-    game_type(0), preferably_count_players(0), port(DEFAULT_PORT), memory_limit(0)
+    blit_speed(0), game_type(0), preferably_count_players(0), port(DEFAULT_PORT), memory_limit(0)
 {
     ExtSetModes(GAME_SHOW_SDL_LOGO);
     ExtSetModes(GAME_AUTOSAVE_ON);
@@ -776,6 +776,10 @@ void Settings::SetHeroesMoveSpeed(int speed){ heroes_speed = (10 <= speed ? 10 :
 
 /* set battle speed: 0 - 10 */
 void Settings::SetBattleSpeed(int speed) { battle_speed = (10 <= speed ? 10 : speed); }
+
+void Settings::SetBlitSpeed(int speed) { blit_speed = speed; }
+
+int Settings::BlitSpeed(void) const { return blit_speed; }
 
 /* set scroll speed: 1 - 4 */
 void Settings::SetScrollSpeed(int speed)
