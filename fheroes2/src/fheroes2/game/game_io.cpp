@@ -298,7 +298,7 @@ bool Game::LoadSAV2FileInfo(const std::string & fn,  Maps::FileInfo & finfo)
 
 #ifndef WITH_ZLIB
 	    // check: compress game data
-	    if(header.status & IS_COMPRESS)
+	    if(header.status & HeaderSAV::IS_COMPRESS)
 	    {
 		DEBUG(DBG_GAME, DBG_INFO, fn << ", zlib: unsupported");
 		return false;
