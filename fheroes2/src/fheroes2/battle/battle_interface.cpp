@@ -2065,16 +2065,20 @@ void Battle::Interface::MousePressRightBoardAction(u32 themes, const Cell & cell
 	if(arena.GetCurrentColor() == b->GetColor() || !conf.ExtPocketTapMode() || !allow)
 	    Dialog::ArmyInfo(*b, Dialog::READONLY);
 	else
-	switch(PocketPC::GetCursorAttackDialog(cell.GetPos(), allow))
 	{
-	    case Cursor::SWORD_TOPLEFT:     MouseLeftClickBoardAction(Cursor::SWORD_TOPLEFT, cell, a); break;
-	    case Cursor::SWORD_TOPRIGHT:    MouseLeftClickBoardAction(Cursor::SWORD_TOPRIGHT, cell, a); break;
-	    case Cursor::SWORD_RIGHT:       MouseLeftClickBoardAction(Cursor::SWORD_RIGHT, cell, a); break;
-	    case Cursor::SWORD_BOTTOMRIGHT: MouseLeftClickBoardAction(Cursor::SWORD_BOTTOMRIGHT, cell, a); break;
-	    case Cursor::SWORD_BOTTOMLEFT:  MouseLeftClickBoardAction(Cursor::SWORD_BOTTOMLEFT, cell, a); break;
-	    case Cursor::SWORD_LEFT:        MouseLeftClickBoardAction(Cursor::SWORD_LEFT, cell, a); break;
+	    int res = PocketPC::GetCursorAttackDialog(cell.GetPos(), allow);
 
-	    default: Dialog::ArmyInfo(*b, Dialog::READONLY|Dialog::BUTTONS); break;
+	    switch(res)
+	    {
+		case Cursor::SWORD_TOPLEFT:
+		case Cursor::SWORD_TOPRIGHT:
+		case Cursor::SWORD_RIGHT:
+		case Cursor::SWORD_BOTTOMRIGHT:
+		case Cursor::SWORD_BOTTOMLEFT:
+		case Cursor::SWORD_LEFT: MouseLeftClickBoardAction(res, cell, a); break;
+
+		default: Dialog::ArmyInfo(*b, Dialog::READONLY|Dialog::BUTTONS); break;
+	    }
 	}
     }
 }
@@ -2083,6 +2087,30 @@ void Battle::Interface::MouseLeftClickBoardAction(u32 themes, const Cell & cell,
 {
     const s32 index = cell.GetIndex();
     const Unit* b = cell.GetUnit();
+
+    if(Settings::Get().ExtPocketTapMode())
+    {
+        // fast tap; attack
+        if(Board::isNearIndexes(index_pos, b_current->GetHeadIndex()))
+            themes = GetSwordCursorDirection(Board::GetDirection(index, b_current->GetHeadIndex()));
+        // or show direction attack
+        else
+	{
+	    int res = PocketPC::GetCursorAttackDialog(cell.GetPos(), GetAllowSwordDirection(index));
+
+            switch(res)
+	    {
+		case Cursor::SWORD_TOPLEFT:
+		case Cursor::SWORD_TOPRIGHT:
+		case Cursor::SWORD_RIGHT:
+		case Cursor::SWORD_BOTTOMRIGHT:
+		case Cursor::SWORD_BOTTOMLEFT:
+		case Cursor::SWORD_LEFT: themes = res; break;
+
+		default: Dialog::ArmyInfo(*b, Dialog::READONLY|Dialog::BUTTONS); break;
+	    }
+	}
+    }
 
     if(b_current)
     switch(themes)
