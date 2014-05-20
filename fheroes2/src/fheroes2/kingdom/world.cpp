@@ -885,17 +885,17 @@ void World::ActionToEyeMagi(int color) const
 
 MapSphinx* World::GetMapSphinx(s32 index)
 {
-    return dynamic_cast<MapSphinx*>(map_objects.get(index));
+    return static_cast<MapSphinx*>(map_objects.get(index));
 }
 
 const MapSign* World::GetMapSign(s32 index) const
 {
-    return dynamic_cast<const MapSign*>(map_objects.get(index));
+    return static_cast<const MapSign*>(map_objects.get(index));
 }
 
 MapEvent* World::GetMapEvent(s32 index)
 {
-    return dynamic_cast<MapEvent*>(map_objects.get(index));
+    return static_cast<MapEvent*>(map_objects.get(index));
 }
 
 void World::UpdateRecruits(Recruits & recruits) const
@@ -1081,7 +1081,7 @@ StreamBase & operator<< (StreamBase & msg, const MapObjects & objs)
 	    case MP2::OBJ_RESOURCE:
 	    case MP2::OBJ_ARTIFACT:
 	    case MP2::OBJ_MONSTER:
-//            case ACTION_DEFAULT:        { const ActionDefault* ptr = dynamic_cast<const ActionDefault*>(*it); if(ptr) sb << *ptr; } break;
+//            case ACTION_DEFAULT:        { const ActionDefault* ptr = static_cast<const ActionDefault*>(*it); if(ptr) sb << *ptr; } break;
             default: msg << obj; break;
         }
     }

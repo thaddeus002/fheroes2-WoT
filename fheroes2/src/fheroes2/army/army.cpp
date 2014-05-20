@@ -1256,7 +1256,7 @@ StreamBase & operator>> (StreamBase & msg, Army & army)
     // set army
     for(Army::iterator it = army.begin(); it != army.end(); ++it)
     {
-	ArmyTroop* troop = dynamic_cast<ArmyTroop*>(*it);
+	ArmyTroop* troop = static_cast<ArmyTroop*>(*it);
 	if(troop) troop->SetArmy(army);
     }
 

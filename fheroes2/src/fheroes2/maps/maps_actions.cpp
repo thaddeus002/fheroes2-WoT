@@ -87,11 +87,11 @@ StreamBase & operator<< (StreamBase & sb, const ListActions & st)
 
         switch((*it)->GetType())
         {
-            case ACTION_DEFAULT:        { const ActionDefault* ptr = dynamic_cast<const ActionDefault*>(*it); if(ptr) sb << *ptr; } break;
-            case ACTION_ACCESS:         { const ActionAccess* ptr = dynamic_cast<const ActionAccess*>(*it); if(ptr) sb << *ptr; } break;
-            case ACTION_MESSAGE:        { const ActionMessage* ptr = dynamic_cast<const ActionMessage*>(*it); if(ptr) sb << *ptr; } break;
-            case ACTION_RESOURCES:      { const ActionResources* ptr = dynamic_cast<const ActionResources*>(*it); if(ptr) sb << *ptr; } break;
-            case ACTION_ARTIFACT:       { const ActionArtifact* ptr = dynamic_cast<const ActionArtifact*>(*it); if(ptr) sb << *ptr; } break;
+            case ACTION_DEFAULT:        { const ActionDefault* ptr = static_cast<const ActionDefault*>(*it); if(ptr) sb << *ptr; } break;
+            case ACTION_ACCESS:         { const ActionAccess* ptr = static_cast<const ActionAccess*>(*it); if(ptr) sb << *ptr; } break;
+            case ACTION_MESSAGE:        { const ActionMessage* ptr = static_cast<const ActionMessage*>(*it); if(ptr) sb << *ptr; } break;
+            case ACTION_RESOURCES:      { const ActionResources* ptr = static_cast<const ActionResources*>(*it); if(ptr) sb << *ptr; } break;
+            case ACTION_ARTIFACT:       { const ActionArtifact* ptr = static_cast<const ActionArtifact*>(*it); if(ptr) sb << *ptr; } break;
             default: sb << **it; break;
         }
     }
