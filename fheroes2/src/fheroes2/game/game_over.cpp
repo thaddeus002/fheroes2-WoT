@@ -321,6 +321,7 @@ int GameOver::Result::LocalCheckGameOver(void)
     }
 
     int res = Game::CANCEL;
+    const Kingdom & myKingdom = world.GetKingdom(Settings::Get().CurrentColor());
 
     // local players miss
     if( !(colors & Players::HumanColors()))
@@ -331,8 +332,6 @@ int GameOver::Result::LocalCheckGameOver(void)
     // check normal wins
     if(Settings::Get().CurrentColor() & Players::HumanColors())
     {
-	const Kingdom & myKingdom = world.GetKingdom(Settings::Get().CurrentColor());
-
 	if(GameOver::COND_NONE != (result = world.CheckKingdomWins(myKingdom)))
 	{
     	    GameOver::DialogWins(result);
@@ -349,7 +348,8 @@ int GameOver::Result::LocalCheckGameOver(void)
     // set: continue after victory
     if(Game::CANCEL != res &&
 	(Settings::Get().CurrentColor() & Players::HumanColors()) &&
-	Settings::Get().ExtGameContinueAfterVictory())
+	Settings::Get().ExtGameContinueAfterVictory() &&
+	(myKingdom.GetCastles().size() || myKingdom.GetHeroes().size()))
     {
 	if(Dialog::YES == Dialog::Message("", "Do you wish to continue the game?",
 							Font::BIG, Dialog::YES | Dialog::NO))
