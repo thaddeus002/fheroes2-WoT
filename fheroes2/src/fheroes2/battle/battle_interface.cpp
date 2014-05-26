@@ -2088,7 +2088,8 @@ void Battle::Interface::MouseLeftClickBoardAction(u32 themes, const Cell & cell,
     const s32 index = cell.GetIndex();
     const Unit* b = cell.GetUnit();
 
-    if(Settings::Get().ExtPocketTapMode())
+    if(Settings::Get().ExtPocketTapMode() &&
+	! b_current->isArchers()) // archers always attack
     {
         // fast tap; attack
         if(Board::isNearIndexes(index_pos, b_current->GetHeadIndex()))

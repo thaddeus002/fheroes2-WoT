@@ -286,6 +286,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
 	    cursor.Hide();
 	    dwellingsBar.Redraw();
 	    selectArmy1.Redraw();
+    	    if(selectArmy2.isValid()) selectArmy2.Redraw();
 	    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 176), kingdom.GetFunds());
 	    cursor.Show();
 	    display.Flip();
