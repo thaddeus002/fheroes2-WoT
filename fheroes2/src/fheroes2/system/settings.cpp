@@ -226,6 +226,9 @@ Settings::Settings() : debug(DEFAULT_DEBUG), video_mode(0, 0), game_difficulty(D
     opt_global.SetModes(GLOBAL_SHOWICONS);
     opt_global.SetModes(GLOBAL_SHOWBUTTONS);
     opt_global.SetModes(GLOBAL_SHOWSTATUS);
+#ifdef ANDROID
+    opt_global.SetModes(GLOBAL_POCKETPC);
+#endif
 }
 
 Settings::~Settings()
