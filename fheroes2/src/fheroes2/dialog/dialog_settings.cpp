@@ -241,9 +241,6 @@ void Dialog::ExtSettings(bool readonly)
 	states.push_back(Settings::POCKETPC_TAP_MODE);
 	states.push_back(Settings::POCKETPC_LOW_MEMORY);
 	states.push_back(Settings::POCKETPC_DRAG_DROP_SCROLL);
-#ifdef ANDROID
-	states.push_back(Settings::POCKETPC_LOW_RESOLUTION);
-#endif
     }
 
     SettingsListBox listbox(area, readonly);

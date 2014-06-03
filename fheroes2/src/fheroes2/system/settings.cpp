@@ -193,7 +193,6 @@ const settings_t settingsFHeroes2[] =
     { Settings::POCKETPC_HIDE_CURSOR,		_("pocketpc: hide cursor"),				},
     { Settings::POCKETPC_TAP_MODE,		_("pocketpc: tap mode"),				},
     { Settings::POCKETPC_DRAG_DROP_SCROLL,	_("pocketpc: drag&drop gamearea as scroll"),		},
-    { Settings::POCKETPC_LOW_RESOLUTION,	_("pocketpc: low display resolution (needs restart)"),},
     { Settings::POCKETPC_LOW_MEMORY,		_("pocketpc: low memory"),				},
 
     { 0, NULL },
@@ -226,9 +225,8 @@ Settings::Settings() : debug(DEFAULT_DEBUG), video_mode(0, 0), game_difficulty(D
     opt_global.SetModes(GLOBAL_SHOWICONS);
     opt_global.SetModes(GLOBAL_SHOWBUTTONS);
     opt_global.SetModes(GLOBAL_SHOWSTATUS);
-#ifdef ANDROID
-    opt_global.SetModes(GLOBAL_POCKETPC);
-#endif
+    if(System::isEmbededDevice())
+	opt_global.SetModes(GLOBAL_POCKETPC);
 }
 
 Settings::~Settings()
@@ -474,21 +472,8 @@ bool Settings::Read(const std::string & filename)
     if(video_driver.size())
 	video_driver = StringLower(video_driver);
 
-    if(video_mode.w && video_mode.h) PostLoad();
-
-    if(opt_global.Modes(GLOBAL_POCKETPC))
-    {
-	sval = config.StrParams("fullscreen");
-	if(sval.empty() || sval != "off")
-	    opt_global.SetModes(GLOBAL_FULLSCREEN);
-	if(ExtPocketLowResolution())
-	{
-#ifdef ANDROID
-	    video_mode.w = 480;
-	    video_mode.h = 320;
-#endif
-	}
-    }
+    if(video_mode.w && video_mode.h)
+	PostLoad();
 
     return true;
 }
@@ -501,7 +486,9 @@ void Settings::PostLoad(void)
 	ExtSetModes(GAME_HIDE_INTERFACE);
     }
 
-    if(! opt_global.Modes(GLOBAL_POCKETPC))
+    if(opt_global.Modes(GLOBAL_POCKETPC))
+        opt_global.SetModes(GLOBAL_FULLSCREEN);
+    else
     {
 	ExtResetModes(POCKETPC_HIDE_CURSOR);
 	ExtResetModes(POCKETPC_TAP_MODE);
@@ -1329,11 +1316,6 @@ bool Settings::ExtPocketDragDropScroll(void) const
     return ExtModes(POCKETPC_DRAG_DROP_SCROLL);
 }
 
-bool Settings::ExtPocketLowResolution(void) const
-{
-    return ExtModes(POCKETPC_LOW_RESOLUTION);
-}
-
 bool Settings::ExtCastleAllowRecruitSpecialHeroes(void) const
 {
     return PriceLoyaltyVersion() && ExtModes(CASTLE_ALLOW_RECRUITS_SPECIAL);
@@ -1509,11 +1491,12 @@ u32 Settings::MemoryLimit(void) const
 u32 Settings::DisplayFlags(void) const
 {
     u32 flags = opt_global.Modes(GLOBAL_USESWSURFACE) ? SDL_SWSURFACE : SDL_SWSURFACE | SDL_HWSURFACE;
-    if(opt_global.Modes(GLOBAL_FULLSCREEN)) flags |= SDL_FULLSCREEN;
 
-#ifdef ANDROID
-    flags = SDL_SWSURFACE;
-#endif
+    if(System::isEmbededDevice())
+	flags = SDL_SWSURFACE | SDL_FULLSCREEN;
+
+    if(opt_global.Modes(GLOBAL_FULLSCREEN))
+	flags |= SDL_FULLSCREEN;
 
     return flags;
 }

@@ -23,11 +23,8 @@
 #ifndef H2SETTINGS_H
 #define H2SETTINGS_H
 
-#include <string>
 #include <list>
-#include <iostream>
 #include <iomanip>
-#include <sstream>
 
 #include "system.h"
 #include "gamedefs.h"
@@ -35,10 +32,6 @@
 #include "dir.h"
 #include "maps_fileinfo.h"
 #include "bitmodes.h"
-
-#ifdef ANDROID
-#include <android/log.h>
-#endif
 
 #define FORMAT_VERSION_3205 3205
 #define FORMAT_VERSION_3186 3186
@@ -98,21 +91,6 @@ enum
     SCROLL_FAST1  = 16,
     SCROLL_FAST2  = 32
 };
-
-#if defined(__SYMBIAN32__)
- #define VERBOSE(x)
- #undef DEBUG
- #define DEBUG(x, y, z)
-#elif defined(ANDROID)
-namespace std
-{
- static const char* android_endl = "\n";
-}
- #define endl android_endl
- #define VERBOSE(x) if(true) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "FHeroes", "%s", osss.str().c_str()); } else System::GetTime()
-#else
- #define VERBOSE(x) std::cout << x << std::endl
-#endif
 
 #ifdef WITH_DEBUG
 #define DEBUG(x, y, z) if(IS_DEBUG(x, y)) VERBOSE(System::GetTime() << ": [" << StringDebug(x) << "]\t" << __FUNCTION__ << ":  " << z)
@@ -349,7 +327,6 @@ public:
     bool ExtPocketLowMemory(void) const;
     bool ExtPocketTapMode(void) const;
     bool ExtPocketDragDropScroll(void) const;
-    bool ExtPocketLowResolution(void) const;
 
     const Size &	VideoMode(void) const;
     void		SetAutoVideoMode(void);

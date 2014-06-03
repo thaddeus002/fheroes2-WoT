@@ -23,7 +23,25 @@
 #ifndef H2SYSTEM_H
 #define H2SYSTEM_H
 
+#include <sstream>
+#include <iostream>
 #include <string>
+
+#if defined(__SYMBIAN32__)
+#define VERBOSE(x)
+#undef DEBUG
+#define DEBUG(x, y, z)
+#elif defined(ANDROID)
+#include <android/log.h>
+namespace std
+{
+    static const char* android_endl = "\n";
+}
+#define endl android_endl
+#define VERBOSE(x) if(true) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "FHeroes", "%s", osss.str().c_str()); }
+#else
+#define VERBOSE(x) std::cout << x << std::endl
+#endif
 
 namespace System
 {
@@ -48,6 +66,7 @@ namespace System
     bool	IsDirectory(const std::string & name, bool writable = false);
     int		Unlink(const std::string &);
 
+    bool	isEmbededDevice(void);
     bool	isRunning(void);
     int		CreateTrayIcon(bool);
     void	PowerManagerOff(bool);

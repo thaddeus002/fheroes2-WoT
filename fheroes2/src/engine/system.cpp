@@ -169,9 +169,9 @@ char* System::GetOptionsArgument(void)
 
 size_t System::GetMemoryUsage(void)
 {
-#if defined __SYMBIAN32__
+#if defined(__SYMBIAN32__)
     return 0;
-#elif defined __WIN32__
+#elif defined(__WIN32__)
     static MEMORYSTATUS ms;
 
     ZeroMemory(&ms, sizeof(ms));
@@ -179,7 +179,7 @@ size_t System::GetMemoryUsage(void)
     GlobalMemoryStatus(&ms);
 
     return (ms.dwTotalVirtual - ms.dwAvailVirtual);
-#elif defined __LINUX__
+#elif defined(__LINUX__)
     unsigned int size = 0;
     std::ostringstream os;
     os << "/proc/" << getpid() << "/statm";
@@ -361,4 +361,12 @@ int System::ShellCommand(const char* cmd)
 #else
     return system(cmd);
 #endif
+}
+
+bool System::isEmbededDevice(void)
+{
+#if defined(__MINGW32CE__) || defined(ANDROID) || defined(__SYMBIAN32__)
+    return true;
+#endif
+    return false;
 }
