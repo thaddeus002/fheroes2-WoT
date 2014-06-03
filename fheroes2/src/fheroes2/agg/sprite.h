@@ -24,21 +24,20 @@
 
 #include "gamedefs.h"
 
-class Sprite : public Surface
+class Sprite : public SpritePos
 {
 public:
     Sprite();
     Sprite(const Sprite &);
     Sprite(const Surface &, s32, s32);
 
-    Sprite & operator= (const Surface &);
     Sprite & operator= (const Sprite &);
+    Sprite & operator= (const Surface &);
 
-    void SetOffset(s32, s32);
     void Reset(void);
 
-    int x(void) const{ return offsetX; }
-    int y(void) const{ return offsetY; }
+    int x(void) const;
+    int y(void) const;
 
     void Blit(Surface & = Display::Get()) const;
     void Blit(int, int, Surface & = Display::Get()) const;
@@ -49,15 +48,10 @@ public:
     void Blit(int alpha, const Rect & srt, const Point &, Surface & = Display::Get()) const;
 
     void ScaleQVGA(void);
-    u32 GetMemoryUsage(void) const;
 
     static void DrawICN(int icn, const u8* buf, int size, bool reflect, Surface & sf);
     static void AddonExtensionModify(Sprite & sp, int icn, int index);
     static Surface ScaleQVGA(const Surface &);
-
-private:
-    s16		offsetX;
-    s16		offsetY;
 };
 
 #endif

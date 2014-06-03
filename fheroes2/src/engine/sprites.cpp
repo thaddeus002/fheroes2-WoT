@@ -27,13 +27,30 @@ SpritePos::SpritePos()
 {
 }
 
-SpritePos::SpritePos(const Point & pos, const Size & sz, bool amask) : Surface(sz.w, sz.h, amask), Point(pos)
+SpritePos::SpritePos(const Surface & sf, const Point & pt) : Surface(sf), pos(pt)
 {
+}
+
+SpritePos::SpritePos(const SpritePos & sp) : Surface(sp), pos(sp.pos)
+{
+}
+
+SpritePos & SpritePos::operator= (const Surface & sf)
+{
+    Set(sf, true);
+    return *this;
+}
+
+SpritePos & SpritePos::operator= (const SpritePos & sp)
+{
+    Set(sp, true);
+    pos = sp.pos;
+    return *this;
 }
 
 const Point & SpritePos::GetPos(void) const
 {
-    return *this;
+    return pos;
 }
 
 Rect SpritePos::GetArea(void) const
@@ -41,15 +58,14 @@ Rect SpritePos::GetArea(void) const
     return Rect(GetPos(), GetSize());
 }
 
-void SpritePos::SetPos(const Point & pos)
+void SpritePos::SetPos(const Point & pt)
 {
-    Point::x = pos.x;
-    Point::y = pos.y;
+    pos = pt;
 }
 
 u32 SpritePos::GetMemoryUsage(void) const
 {
-    return Surface::GetMemoryUsage() + sizeof(x) + sizeof(y);
+    return Surface::GetMemoryUsage() + sizeof(pos);
 }
 
 SpriteBack::SpriteBack()
@@ -58,18 +74,18 @@ SpriteBack::SpriteBack()
 
 u32 SpriteBack::GetMemoryUsage(void) const
 {
-    return Surface::GetMemoryUsage() + sizeof(Rect::x) + sizeof(Rect::y) + sizeof(Rect::w) + sizeof(Rect::h);
+    return Surface::GetMemoryUsage() + sizeof(pos);
 }
 
-SpriteBack::SpriteBack(const Rect & pos)
+SpriteBack::SpriteBack(const Rect & rt)
 {
-    Save(pos);
+    Save(rt);
 }
 
-void SpriteBack::SetPos(const Point & pos)
+void SpriteBack::SetPos(const Point & pt)
 {
-    Rect::x = pos.x;
-    Rect::y = pos.y;
+    pos.x = pt.x;
+    pos.y = pt.y;
 }
 
 bool SpriteBack::isValid(void) const
@@ -93,12 +109,12 @@ void SpriteBack::Save(const Rect & rt)
 
 	Display::Get().Blit(rt, 0, 0, *this);
 
-	Rect::w = rt.w;
-	Rect::h = rt.h;
+	pos.w = rt.w;
+	pos.h = rt.h;
     }
 
-    Rect::x = rt.x;
-    Rect::y = rt.y;
+    pos.x = rt.x;
+    pos.y = rt.y;
 }
 
 void SpriteBack::Save(const Point & pt)
@@ -115,26 +131,23 @@ void SpriteBack::Restore(void)
 void SpriteBack::Destroy(void)
 {
     Surface::FreeSurface(*this);
-    Rect::w = 0;
-    Rect::h = 0;
+    pos.w = 0;
+    pos.h = 0;
 }
 
 const Point & SpriteBack::GetPos(void) const
 {
-    const Point & pt = *this;
-    return pt;
+    return pos;
 }
 
 const Size & SpriteBack::GetSize(void) const
 {
-    const Size & sz = *this;
-    return sz;
+    return pos;
 }
 
 const Rect & SpriteBack::GetArea(void) const
 {
-    const Rect & rt = *this;
-    return rt;
+    return pos;
 }
 
 enum { _VISIBLE = 0x00001 };

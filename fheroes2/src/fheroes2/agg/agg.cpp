@@ -750,15 +750,14 @@ bool AGG::LoadAltICN(int icn, u32 index, bool reflect)
 
 	    if(! sp1.isValid() && System::IsFile(name) && sp1.Load(name.c_str()))
 	    {
-		sp1.SetOffset(ox, oy);
+		sp1.SetPos(Point(ox, oy));
 		DEBUG(DBG_ENGINE, DBG_TRACE, xml_spec << ", " << index);
 		if(!reflect) return sp1.isValid();
 	    }
 
 	    if(reflect && sp1.isValid() && ! sp2.isValid())
 	    {
-		sp2 = Surface::Reflect(sp1, 2);
-		sp2.SetOffset(ox, oy);
+		sp2 = Sprite(Surface::Reflect(sp1, 2), ox, oy);
 		return sp2.isValid();
 	    }
 	}
@@ -915,8 +914,7 @@ bool AGG::LoadOrgICN(Sprite & sp, int icn, u32 index, bool reflect)
 	else
 	    sizeData = blockSize - header1.offsetData;
 
-	sp.Set(header1.width, header1.height, false);
-	sp.SetOffset(header1.offsetX, header1.offsetY);
+	sp = Sprite(Surface(header1.width, header1.height, false), header1.offsetX, header1.offsetY);
 	Sprite::DrawICN(icn, &body[6 + header1.offsetData], sizeData, reflect, sp);
 	Sprite::AddonExtensionModify(sp, icn, index);
 
@@ -1038,8 +1036,7 @@ int AGG::PutICN(const Sprite & sprite, bool init_reflect)
     if(init_reflect)
     {
 	v.reflect = new Sprite[1];
-        v.reflect[0] = Surface::Reflect(sprite, 2);
-	v.reflect[0].SetOffset(sprite.x(), sprite.y());
+        v.reflect[0] = Sprite(Surface::Reflect(sprite, 2), sprite.x(), sprite.y());
     }
 
     icn_cache.push_back(v);

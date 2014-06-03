@@ -25,11 +25,15 @@
 
 #include "surface.h"
 
-class SpritePos : public Surface, protected Point
+class SpritePos : public Surface
 {
 public:
     SpritePos();
-    SpritePos(const Point &, const Size &, bool amask);
+    SpritePos(const SpritePos &);
+    SpritePos(const Surface &, const Point &);
+
+    SpritePos & operator= (const SpritePos &);
+    SpritePos & operator= (const Surface &);
 
     void SetPos(const Point &);
 
@@ -37,9 +41,12 @@ public:
     Rect GetArea(void) const;
 
     u32  GetMemoryUsage(void) const;
+
+protected:
+    Point pos;
 };
 
-class SpriteBack : protected Surface, protected Rect
+class SpriteBack : protected Surface
 {
 public:
     SpriteBack();
@@ -58,6 +65,9 @@ public:
     const Rect & GetArea(void) const;
 
     u32  GetMemoryUsage(void) const;
+
+protected:
+    Rect pos;
 };
 
 

@@ -3284,9 +3284,7 @@ void Battle::Interface::RedrawActionBloodLustSpell(Unit & target)
     const monstersprite_t & msi = target.GetMonsterSprite();
     const Sprite & sprite1 = AGG::GetICN(msi.icn_file, msi.frm_idle.start, target.isReflect());
 
-    Sprite sprite2;
-    sprite2.Set(sprite1.w(), sprite1.h(), false);
-    sprite2.SetOffset(sprite1.x(), sprite1.y());
+    Sprite sprite2(Surface(sprite1.w(), sprite1.h(), false), sprite1.x(), sprite1.y());
     sprite1.Blit(sprite2);
 
     Surface sprite3 = Surface::Stencil(sprite1, sprite1.GetColorIndex(0xD8));
@@ -3491,7 +3489,7 @@ void Battle::Interface::RedrawActionDisruptingRaySpell(Unit & target)
 	if(Battle::AnimateInfrequentDelay(Game::BATTLE_DISRUPTING_DELAY))
     	{
 	    cursor.Hide();
-	    sprite2.SetOffset(sprite1.x() + (frame % 2 ? -1 : 1), sprite1.y());
+	    sprite2.SetPos(Point(sprite1.x() + (frame % 2 ? -1 : 1), sprite1.y()));
 	    Redraw();
 	    cursor.Show();
 	    display.Flip();

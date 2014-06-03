@@ -47,18 +47,16 @@ bool SkipLocalAlpha(int icn)
     return false;
 }
 
-Sprite::Sprite() : offsetX(0), offsetY(0)
+Sprite::Sprite()
 {
 }
 
-Sprite::Sprite(const Sprite & sp) : offsetX(sp.x()), offsetY(sp.y())
+Sprite::Sprite(const Surface & sf, s32 ox, s32 oy) : SpritePos(sf, Point(ox, oy))
 {
-    Set(sp, true);
 }
 
-Sprite::Sprite(const Surface & sf, s32 ox, s32 oy) : offsetX(ox), offsetY(oy)
+Sprite::Sprite(const Sprite & sp) : SpritePos(sp, sp.GetPos())
 {
-    Set(sf, true);
 }
 
 Sprite & Sprite::operator= (const Surface & sf)
@@ -70,22 +68,24 @@ Sprite & Sprite::operator= (const Surface & sf)
 Sprite & Sprite::operator= (const Sprite & sp)
 {
     Set(sp, true);
-    offsetX = sp.x();
-    offsetY = sp.y();
+    SetPos(sp.GetPos());
     return *this;
 }
 
 void Sprite::Reset(void)
 {
-    offsetX = 0;
-    offsetY = 0;
+    SetPos(Point(0, 0));
     Surface::Reset();
 }
 
-void Sprite::SetOffset(s32 ox, s32 oy)
+int Sprite::x(void) const
 {
-    offsetX = ox;
-    offsetY = oy;
+    return pos.x;
+}
+
+int Sprite::y(void) const
+{
+    return pos.y;
 }
 
 void Sprite::DrawICN(int icn, const u8* cur, int size, bool reflect, Surface & sf)
@@ -199,11 +199,6 @@ void Sprite::DrawICN(int icn, const u8* cur, int size, bool reflect, Surface & s
     }
 }
 
-u32 Sprite::GetMemoryUsage(void) const
-{
-    return Surface::GetMemoryUsage() + sizeof(offsetX) + sizeof(offsetY);
-}
-
 void Sprite::ScaleQVGA(void)
 {
     Cursor & cursor = Cursor::Get();
@@ -231,8 +226,8 @@ void Sprite::ScaleQVGA(void)
 	}
     }
 
-    offsetX /= 2;
-    offsetY /= 2;
+    const Point pt = GetPos();
+    SetPos(Point(pt.x / 2, pt.y / 2));
 }
 
 void Sprite::AddonExtensionModify(Sprite & sp, int icn, int index)
