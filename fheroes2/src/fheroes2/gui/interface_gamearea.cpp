@@ -442,7 +442,7 @@ void Interface::GameArea::GenerateUltimateArtifactAreaSurface(s32 index, Surface
 
 	if(Settings::Get().QVGA())
 	{
-    	    Surface sf2 = Sprite::ScaleQVGA(sf);
+    	    Surface sf2 = Sprite::ScaleQVGASurface(sf);
     	    Surface::Swap(sf2, sf);
 	}
 

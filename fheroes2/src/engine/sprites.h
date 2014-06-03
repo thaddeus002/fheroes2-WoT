@@ -23,19 +23,36 @@
 #ifndef H2SPRITES_H
 #define H2SPRITES_H
 
+#include "display.h"
 #include "surface.h"
 
-class SpritePos : public Surface
+class Texture : public Surface /* SDL2 texture wrapper */
+{
+public:
+    Texture();
+    Texture(const Surface &);
+
+    Texture & operator= (const Surface &);
+
+    void Blit(Surface & = Display::Get()) const;
+    void Blit(int, int, Surface & = Display::Get()) const;
+    void Blit(const Point &, Surface & = Display::Get()) const;
+    void Blit(const Rect & srt, int dstx, int dsty, Surface & = Display::Get()) const;
+    void Blit(const Rect & srt, const Point &, Surface & = Display::Get()) const;
+    void Blit(int alpha, int dstx, int dsty, Surface & = Display::Get()) const;
+    void Blit(int alpha, const Rect & srt, const Point &, Surface & = Display::Get()) const;
+};
+
+class SpritePos : public Texture
 {
 public:
     SpritePos();
-    SpritePos(const SpritePos &);
-    SpritePos(const Surface &, const Point &);
+    SpritePos(const Texture &, const Point &);
 
-    SpritePos & operator= (const SpritePos &);
-    SpritePos & operator= (const Surface &);
+    SpritePos & operator= (const Texture &);
 
     void SetPos(const Point &);
+    void Reset(void);
 
     const Point & GetPos(void) const;
     Rect GetArea(void) const;

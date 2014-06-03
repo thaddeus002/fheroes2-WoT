@@ -256,7 +256,7 @@ void LoadZLogo(void)
 	    // scale logo
 	    if(Settings::Get().QVGA())
 	    {
-		Surface small = Sprite::ScaleQVGA(zlogo);
+		Surface small = Sprite::ScaleQVGASurface(zlogo);
 		Surface::Swap(zlogo, small);
 	    }
 

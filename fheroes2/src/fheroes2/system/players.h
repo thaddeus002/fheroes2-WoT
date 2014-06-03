@@ -65,6 +65,7 @@ class Player : public BitModes, public Control
 {
 public:
     Player(int col = Color::NONE);
+    virtual ~Player() {}
 
     bool isID(u32) const;
     bool isColor(int) const;

@@ -51,31 +51,14 @@ Sprite::Sprite()
 {
 }
 
-Sprite::Sprite(const Surface & sf, s32 ox, s32 oy) : SpritePos(sf, Point(ox, oy))
+Sprite::Sprite(const Texture & sf, s32 ox, s32 oy) : SpritePos(sf, Point(ox, oy))
 {
 }
 
-Sprite::Sprite(const Sprite & sp) : SpritePos(sp, sp.GetPos())
-{
-}
-
-Sprite & Sprite::operator= (const Surface & sf)
+Sprite & Sprite::operator= (const Texture & sf)
 {
     Set(sf, true);
     return *this;
-}
-
-Sprite & Sprite::operator= (const Sprite & sp)
-{
-    Set(sp, true);
-    SetPos(sp.GetPos());
-    return *this;
-}
-
-void Sprite::Reset(void)
-{
-    SetPos(Point(0, 0));
-    Surface::Reset();
 }
 
 int Sprite::x(void) const
@@ -199,37 +182,6 @@ void Sprite::DrawICN(int icn, const u8* cur, int size, bool reflect, Surface & s
     }
 }
 
-void Sprite::ScaleQVGA(void)
-{
-    Cursor & cursor = Cursor::Get();
-    Display & display = Display::Get();
-
-    if(w() > 3 && h() > 3)
-    {
-	int theme = 0;
-	if(cursor.isVisible() && Cursor::WAIT != cursor.Themes())
-	{
-	    theme = cursor.Themes();
-	    cursor.SetThemes(Cursor::WAIT);
-	    cursor.Show();
-	    display.Flip();
-	}
-
-	Surface mini = ScaleQVGA(*this);
-	Surface::Swap(mini, *this);
-
-	if(theme)
-	{
-	    cursor.SetThemes(theme);
-	    cursor.Show();
-	    display.Flip();
-	}
-    }
-
-    const Point pt = GetPos();
-    SetPos(Point(pt.x / 2, pt.y / 2));
-}
-
 void Sprite::AddonExtensionModify(Sprite & sp, int icn, int index)
 {
     switch(icn)
@@ -246,45 +198,43 @@ void Sprite::AddonExtensionModify(Sprite & sp, int icn, int index)
     }
 }
 
-
-void Sprite::Blit(Surface & dst) const
-{
-    Surface::Blit(dst);
-}
-
-void Sprite::Blit(int dstx, int dsty, Surface & dst) const
-{
-    Surface::Blit(dstx, dsty, dst);
-}
-
-void Sprite::Blit(const Point & dpt, Surface & dst) const
-{
-    Surface::Blit(dpt, dst);
-}
-
-void Sprite::Blit(const Rect & srt, int dstx, int dsty, Surface & dst) const
-{
-    Surface::Blit(srt, dstx, dsty, dst);
-}
-
-void Sprite::Blit(const Rect & srt, const Point & dpt, Surface & dst) const
-{
-    Surface::Blit(srt, dpt, dst);
-}
-
-void Sprite::Blit(int alpha, int dstx, int dsty, Surface & dst) const
-{
-    Surface::Blit(alpha, dstx, dsty, dst);
-}
-
-void Sprite::Blit(int alpha, const Rect & srt, const Point & dpt, Surface & dst) const
-{
-    Surface::Blit(alpha, srt, dpt, dst);
-}
-
-Surface Sprite::ScaleQVGA(const Surface & src)
+Surface Sprite::ScaleQVGASurface(const Surface & src)
 {
     s32 w = src.w() / 2;
     s32 h = src.h() / 2;
     return Surface::Scale(src, (w ? w : 1), (h ? h : 1));
+}
+
+Sprite Sprite::ScaleQVGASprite(const Sprite & sp)
+{
+    Cursor & cursor = Cursor::Get();
+    Display & display = Display::Get();
+    Sprite res;
+
+    if(sp.w() > 3 && sp.h() > 3)
+    {
+	int theme = 0;
+	if(cursor.isVisible() && Cursor::WAIT != cursor.Themes())
+	{
+	    theme = cursor.Themes();
+	    cursor.SetThemes(Cursor::WAIT);
+	    cursor.Show();
+	    display.Flip();
+	}
+
+	Surface mini = ScaleQVGASurface(sp);
+	Surface::Swap(mini, res);
+
+	if(theme)
+	{
+	    cursor.SetThemes(theme);
+	    cursor.Show();
+	    display.Flip();
+	}
+    }
+
+    const Point pt = sp.GetPos();
+    res.SetPos(Point(pt.x / 2, pt.y / 2));
+
+    return res;
 }

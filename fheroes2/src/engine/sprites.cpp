@@ -23,28 +23,66 @@
 #include "sprites.h"
 #include "display.h"
 
-SpritePos::SpritePos()
+Texture::Texture()
 {
 }
 
-SpritePos::SpritePos(const Surface & sf, const Point & pt) : Surface(sf), pos(pt)
+Texture::Texture(const Surface & sf) : Surface(sf)
 {
 }
 
-SpritePos::SpritePos(const SpritePos & sp) : Surface(sp), pos(sp.pos)
-{
-}
-
-SpritePos & SpritePos::operator= (const Surface & sf)
+Texture & Texture::operator= (const Surface & sf)
 {
     Set(sf, true);
     return *this;
 }
 
-SpritePos & SpritePos::operator= (const SpritePos & sp)
+void Texture::Blit(Surface & dst) const
 {
-    Set(sp, true);
-    pos = sp.pos;
+    Surface::Blit(dst);
+}
+
+void Texture::Blit(int dstx, int dsty, Surface & dst) const
+{
+    Surface::Blit(dstx, dsty, dst);
+}
+
+void Texture::Blit(const Point & dpt, Surface & dst) const
+{
+    Surface::Blit(dpt, dst);
+}
+
+void Texture::Blit(const Rect & srt, int dstx, int dsty, Surface & dst) const
+{
+    Surface::Blit(srt, dstx, dsty, dst);
+}
+        
+void Texture::Blit(const Rect & srt, const Point & dpt, Surface & dst) const
+{
+    Surface::Blit(srt, dpt, dst);
+}
+
+void Texture::Blit(int alpha, int dstx, int dsty, Surface & dst) const
+{
+    Surface::Blit(alpha, dstx, dsty, dst);
+}
+
+void Texture::Blit(int alpha, const Rect & srt, const Point & dpt, Surface & dst) const
+{
+    Surface::Blit(alpha, srt, dpt, dst);
+}
+
+SpritePos::SpritePos()
+{
+}
+
+SpritePos::SpritePos(const Texture & sf, const Point & pt) : Texture(sf), pos(pt)
+{
+}
+
+SpritePos & SpritePos::operator= (const Texture & sf)
+{
+    Set(sf, true);
     return *this;
 }
 
@@ -61,6 +99,12 @@ Rect SpritePos::GetArea(void) const
 void SpritePos::SetPos(const Point & pt)
 {
     pos = pt;
+}
+
+void SpritePos::Reset(void)
+{
+    pos = Point(0, 0);
+    Surface::Reset();
 }
 
 u32 SpritePos::GetMemoryUsage(void) const

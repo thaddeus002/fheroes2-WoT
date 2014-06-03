@@ -28,30 +28,17 @@ class Sprite : public SpritePos
 {
 public:
     Sprite();
-    Sprite(const Sprite &);
-    Sprite(const Surface &, s32, s32);
+    Sprite(const Texture &, s32, s32);
 
-    Sprite & operator= (const Sprite &);
-    Sprite & operator= (const Surface &);
-
-    void Reset(void);
+    Sprite & operator= (const Texture &);
 
     int x(void) const;
     int y(void) const;
 
-    void Blit(Surface & = Display::Get()) const;
-    void Blit(int, int, Surface & = Display::Get()) const;
-    void Blit(const Point &, Surface & = Display::Get()) const;
-    void Blit(const Rect & srt, int dstx, int dsty, Surface & = Display::Get()) const;
-    void Blit(const Rect & srt, const Point &, Surface & = Display::Get()) const;
-    void Blit(int alpha, int dstx, int dsty, Surface & = Display::Get()) const;
-    void Blit(int alpha, const Rect & srt, const Point &, Surface & = Display::Get()) const;
-
-    void ScaleQVGA(void);
-
-    static void DrawICN(int icn, const u8* buf, int size, bool reflect, Surface & sf);
+    static void DrawICN(int icn, const u8* buf, int size, bool reflect, Surface &);
     static void AddonExtensionModify(Sprite & sp, int icn, int index);
-    static Surface ScaleQVGA(const Surface &);
+    static Surface ScaleQVGASurface(const Surface &);
+    static Sprite ScaleQVGASprite(const Sprite &);
 };
 
 #endif

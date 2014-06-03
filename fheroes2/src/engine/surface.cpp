@@ -246,7 +246,7 @@ Surface & Surface::operator= (const Surface & bs)
     return *this;
 }
 
-bool Surface::operator== (const Surface & bs)
+bool Surface::operator== (const Surface & bs) const
 {
     return surface && bs.surface ? surface == bs.surface : false;
 }

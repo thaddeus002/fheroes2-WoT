@@ -43,7 +43,7 @@ public:
     Surface(const Surface &);
 
     Surface & operator= (const Surface &);
-    bool operator== (const Surface &);
+    bool operator== (const Surface &) const;
 
     virtual ~Surface();
     virtual bool isDisplay(void) const;

@@ -589,7 +589,7 @@ bool AGG::LoadExtICN(int icn, u32 index, bool reflect)
 		    // wait
 		    Surface src(28, 28);
 		    GetICN(ICN::ADVBTNS, 8 + index).Blit(Rect(5, 4, 28, 28), 0, 0, src);
-		    Surface dst = Sprite::ScaleQVGA(src);
+		    Surface dst = Sprite::ScaleQVGASurface(src);
 		    dst.Blit((sprite.w() - dst.w()) / 2, 2, sprite);
 		}
 		break;
@@ -597,7 +597,7 @@ bool AGG::LoadExtICN(int icn, u32 index, bool reflect)
 	    case ICN::BOAT12:
 	    {
 		LoadOrgICN(sprite, ICN::ADVMCO, 28 + index, false);
-		Surface dst = Sprite::ScaleQVGA(sprite);
+		Surface dst = Sprite::ScaleQVGASurface(sprite);
 		Surface::Swap(sprite, dst);
 	    }
 		break;
@@ -977,7 +977,7 @@ void AGG::LoadICN(int icn, u32 index, bool reflect)
 	if(Settings::Get().QVGA() && ICN::NeedMinify4PocketPC(icn, index))
 	{
 	    Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
-	    sp.ScaleQVGA();
+	    sp = Sprite::ScaleQVGASprite(sp);
 	}
     }
 }
