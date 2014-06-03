@@ -43,18 +43,3 @@ StreamBase & operator>> (StreamBase & msg, BitModes & b)
 {
     return msg >> b.modes;
 }
-
-bool Control::isControlAI(void) const
-{
-    return CONTROL_AI & GetControl();
-}
-
-bool Control::isControlHuman(void) const
-{
-    return CONTROL_HUMAN & GetControl();
-}
-
-bool Control::isControlRemote(void) const
-{
-    return CONTROL_REMOTE & GetControl();
-}

@@ -1201,7 +1201,7 @@ void World::PostFixLoad(void)
     {
 	for(AllCastles::iterator
 	    it = vec_castles.begin(); it != vec_castles.end(); ++it)
-	if(*it && (*it)->GetControl() != CONTROL_HUMAN)
+	if(*it && ! (*it)->isControlHuman())
 	{
     	    CastleHeroes castleHeroes = (*it)->GetHeroes();
 

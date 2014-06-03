@@ -38,7 +38,7 @@ void Interface::Basic::SetFocus(Heroes* hero)
 
     if(player)
     {
-	Focus & focus = player->focus;
+	Focus & focus = player->GetFocus();
 
 	if(focus.GetHeroes() && focus.GetHeroes() != hero)
 	{
@@ -68,7 +68,7 @@ void Interface::Basic::SetFocus(Castle* castle)
 
     if(player)
     {
-	Focus & focus = player->focus;
+	Focus & focus = player->GetFocus();
 
 	if(focus.GetHeroes())
 	{
@@ -93,8 +93,8 @@ void Interface::Basic::ResetFocus(int priority)
 
     if(player)
     {
-	Focus & focus = player->focus;
-	Kingdom & myKingdom = world.GetKingdom(player->color);
+	Focus & focus = player->GetFocus();
+	Kingdom & myKingdom = world.GetKingdom(player->GetColor());
 
 	iconsPanel.ResetIcons();
 
@@ -116,7 +116,7 @@ void Interface::Basic::ResetFocus(int priority)
 	    break;
 
 	    case GameFocus::HEROES:
-		if(focus.GetHeroes() && focus.GetHeroes()->GetColor() == player->color)
+		if(focus.GetHeroes() && focus.GetHeroes()->GetColor() == player->GetColor())
         	    SetFocus(focus.GetHeroes());
 		else
 		if(myKingdom.GetHeroes().size())
@@ -132,7 +132,7 @@ void Interface::Basic::ResetFocus(int priority)
 	    break;
 
 	    case GameFocus::CASTLE:
-		if(focus.GetCastle() && focus.GetCastle()->GetColor() == player->color)
+		if(focus.GetCastle() && focus.GetCastle()->GetColor() == player->GetColor())
         	    SetFocus(focus.GetCastle());
 		else
 		if(myKingdom.GetCastles().size())
@@ -160,7 +160,7 @@ int Interface::GetFocusType(void)
 
     if(player)
     {
-	Focus & focus = player->focus;
+	Focus & focus = player->GetFocus();
 
 	if(focus.GetHeroes()) return GameFocus::HEROES;
 	else
@@ -174,22 +174,16 @@ Castle* Interface::GetFocusCastle(void)
 {
     Player* player = Settings::Get().GetPlayers().GetCurrent();
 
-    if(player)
-    {
-	return player->focus.GetCastle();
-    }
-
-    return NULL;
+    return player ?
+	    player->GetFocus().GetCastle() : NULL;
 }
 
 Heroes* Interface::GetFocusHeroes(void)
 {
     Player* player = Settings::Get().GetPlayers().GetCurrent();
 
-    if(player)
-    {
-	return player->focus.GetHeroes();
-    }
+    return player ?
+	    player->GetFocus().GetHeroes() : NULL;
 
     return NULL;
 }
@@ -200,7 +194,7 @@ Point Interface::GetFocusCenter(void)
 
     if(player)
     {
-	Focus & focus = player->focus;
+	Focus & focus = player->GetFocus();
 
 	if(focus.GetHeroes()) return focus.GetHeroes()->GetCenter();
 	else

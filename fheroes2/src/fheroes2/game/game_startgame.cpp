@@ -82,7 +82,7 @@ int Game::StartGame(void)
 void Game::DialogPlayers(int color, std::string str)
 {
     const Player* player = Settings::Get().GetPlayers().Get(color);
-    StringReplace(str, "%{color}", (player ? player->name : Color::String(color)));
+    StringReplace(str, "%{color}", (player ? player->GetName() : Color::String(color)));
 
     const Sprite & border = AGG::GetICN(ICN::BRCREST, 6);
 
@@ -560,18 +560,18 @@ int Interface::Basic::StartGame(void)
 	    it = players.begin(); it != players.end(); ++it) if(*it)
 	{
 	    const Player & player = (**it);
-	    Kingdom & kingdom = world.GetKingdom(player.color);
+	    Kingdom & kingdom = world.GetKingdom(player.GetColor());
 
 	    if(!kingdom.isPlay() ||
-		(skip_turns && player.color != conf.CurrentColor())) continue;
+		(skip_turns && ! player.isColor(conf.CurrentColor()))) continue;
 
 	    DEBUG(DBG_GAME, DBG_INFO, std::endl << world.DateString() << ", " << "color: " <<
-		    Color::String(player.color) << ", resource: " << kingdom.GetFunds().String());
+		    Color::String(player.GetColor()) << ", resource: " << kingdom.GetFunds().String());
 
 	    radar.SetHide(true);
 	    radar.SetRedraw();
-	    conf.SetCurrentColor(player.color);
-	    world.ClearFog(player.color);
+	    conf.SetCurrentColor(player.GetColor());
+	    world.ClearFog(player.GetColor());
 	    kingdom.ActionBeforeTurn();
 
 	    switch(kingdom.GetControl())
@@ -585,7 +585,7 @@ int Interface::Basic::StartGame(void)
 			SetRedraw(REDRAW_GAMEAREA | REDRAW_STATUS | REDRAW_ICONS);
 			Redraw();
 			display.Flip();
-			Game::DialogPlayers(player.color, _("%{color} player's turn"));
+			Game::DialogPlayers(player.GetColor(), _("%{color} player's turn"));
 		    }
 		    iconsPanel.SetRedraw();
 		    iconsPanel.ShowIcons();

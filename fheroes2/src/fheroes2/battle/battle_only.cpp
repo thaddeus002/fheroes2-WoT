@@ -83,8 +83,7 @@ StreamBase & operator<< (StreamBase & msg, const Battle::Only & b)
     return msg <<
 	b.hero1->GetID() << *b.hero1 <<
 	b.hero2->GetID() << *b.hero2 <<
-	b.player1.color << b.player1.control <<
-	b.player2.color << b.player2.control;
+	b.player1 << b.player2;
 }
 
 StreamBase & operator>> (StreamBase & msg, Battle::Only & b)
@@ -106,8 +105,7 @@ StreamBase & operator>> (StreamBase & msg, Battle::Only & b)
 	DEBUG(DBG_NETWORK, DBG_WARN, "unknown id");
 
     msg >>
-	b.player1.color >> b.player1.control >>
-	b.player2.color >> b.player2.control;
+	b.player1 >> b.player2;
 
     return msg;
 }
@@ -153,7 +151,7 @@ bool Battle::Only::ChangeSettings(void)
 
     if(conf.GameType(Game::TYPE_NETWORK))
     {
-	player2.color = Color::RED;
+	player2.SetColor(Color::RED);
 
 	player1.SetControl(CONTROL_REMOTE);
 	player2.SetControl(CONTROL_REMOTE);
@@ -259,8 +257,8 @@ bool Battle::Only::ChangeSettings(void)
 		hero2 = world.GetHeroes(hid);
 		if(hero2) hero2->GetSecondarySkills().FillMax(Skill::Secondary());
 		UpdateHero2(cur_pt);
-		if(player2.isLocal() && NULL == cinfo2)
-		    cinfo2 = new ControlInfo(Point(cur_pt.x + 500, cur_pt.y + 425), player2.control);
+		if(player2.isControlLocal() && NULL == cinfo2)
+		    cinfo2 = new ControlInfo(Point(cur_pt.x + 500, cur_pt.y + 425), player2.GetControl());
 		redraw = true;
 	    }
 	}
@@ -427,13 +425,13 @@ bool Battle::Only::ChangeSettings(void)
 
 	if(cinfo2 && allow1)
 	{
-	    if(hero2 && le.MouseClickLeft(cinfo2->rtLocal) && player2.isAI())
+	    if(hero2 && le.MouseClickLeft(cinfo2->rtLocal) && player2.isControlAI())
 	    {
 		player2.SetControl(CONTROL_HUMAN);
 		redraw = true;
 	    }
 	    else
-	    if(le.MouseClickLeft(cinfo2->rtAI) && player2.isHuman())
+	    if(le.MouseClickLeft(cinfo2->rtAI) && player2.isControlHuman())
 	    {
 		player2.SetControl(CONTROL_AI);
 		redraw = true;
@@ -527,8 +525,8 @@ void Battle::Only::UpdateHero1(const Point & cur_pt)
 
     if(hero1)
     {
-      player1.color = Color::BLUE;
-      player1.race  = hero1->GetRace();
+      player1.SetColor(Color::BLUE);
+      player1.SetRace(hero1->GetRace());
 
       moraleIndicator1 = new MoraleIndicator(*hero1);
       moraleIndicator1->SetPos(Point(cur_pt.x + 34, cur_pt.y + 75), true);
@@ -604,8 +602,8 @@ void Battle::Only::UpdateHero2(const Point & cur_pt)
 
     if(hero2)
     {
-      player2.color = Color::RED;
-      player2.race  = hero2->GetRace();
+      player2.SetColor(Color::RED);
+      player2.SetRace(hero2->GetRace());
 
       moraleIndicator2 = new MoraleIndicator(*hero2);
       moraleIndicator2->SetPos(Point(cur_pt.x + 566, cur_pt.y + 75), true);
@@ -682,26 +680,26 @@ void Battle::Only::StartBattle(void)
     Settings & conf = Settings::Get();
 
     Players & players = conf.GetPlayers();
-    players.Init(player1.color | player2.color);
+    players.Init(player1.GetColor() | player2.GetColor());
     world.InitKingdoms();
 
-    players.SetPlayerRace(player1.color, player1.race);
-    players.SetPlayerRace(player2.color, player2.race);
+    players.SetPlayerRace(player1.GetColor(), player1.GetRace());
+    players.SetPlayerRace(player2.GetColor(), player2.GetRace());
 
-    conf.SetCurrentColor(player1.color);
+    conf.SetCurrentColor(player1.GetColor());
 
-    players.SetPlayerControl(player1.color, player1.control);
-    players.SetPlayerControl(player2.color, player2.control);
+    players.SetPlayerControl(player1.GetColor(), player1.GetControl());
+    players.SetPlayerControl(player2.GetColor(), player2.GetControl());
 
     if(hero1)
     {
 	hero1->SetSpellPoints(hero1->GetMaxSpellPoints());
-	hero1->Recruit(player1.color, Point(5, 5));
+	hero1->Recruit(player1.GetColor(), Point(5, 5));
 
 	if(hero2)
 	{
     	    hero2->SetSpellPoints(hero2->GetMaxSpellPoints());
-    	    hero2->Recruit(player2.color, Point(5, 6));
+    	    hero2->Recruit(player2.GetColor(), Point(5, 6));
 	}
 
 	Battle::Loader(hero1->GetArmy(), (hero2 ? hero2->GetArmy() : monsters), hero1->GetIndex() + 1);

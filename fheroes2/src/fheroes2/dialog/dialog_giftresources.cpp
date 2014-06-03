@@ -292,7 +292,7 @@ void Dialog::MakeGiftResource(void)
 	event.message = "Gift from %{name}";
 	const Player* player = Settings::Get().GetPlayers().GetCurrent();
 	if(player)
-	    StringReplace(event.message, "%{name}", player->name);
+	    StringReplace(event.message, "%{name}", player->GetName());
 
 	world.AddEventDate(event);
 

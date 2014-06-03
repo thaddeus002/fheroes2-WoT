@@ -52,12 +52,4 @@ protected:
 StreamBase & operator<< (StreamBase &, const BitModes &);
 StreamBase & operator>> (StreamBase &, BitModes &);
 
-struct Control
-{
-    virtual int         GetControl(void) const = 0;
-    bool                isControlAI(void) const;
-    bool                isControlHuman(void) const;
-    bool                isControlRemote(void) const;
-};
-
 #endif

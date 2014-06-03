@@ -52,7 +52,16 @@ struct Focus : std::pair<int, void*>
     Heroes*	GetHeroes(void) { return first == FOCUS_HEROES && second ? reinterpret_cast<Heroes*>(second) : NULL; }
 };
 
-class Player : public BitModes
+struct Control
+{
+    virtual int         GetControl(void) const = 0;
+    bool                isControlAI(void) const;
+    bool                isControlHuman(void) const;
+    bool                isControlRemote(void) const;
+    bool                isControlLocal(void) const;
+};
+
+class Player : public BitModes, public Control
 {
 public:
     Player(int col = Color::NONE);
@@ -62,13 +71,26 @@ public:
     bool isName(const std::string &) const;
     bool isPlay(void) const;
 
+    void SetColor(int);
+    void SetRace(int);
     void SetControl(int);
     void SetPlay(bool);
+    void SetFriends(int);
+    void SetName(const std::string &);
 
-    bool isRemote(void) const;
-    bool isLocal(void) const;
-    bool isHuman(void) const;
-    bool isAI(void) const;
+    int  GetControl(void) const;
+    int  GetColor(void) const;
+    int  GetRace(void) const;
+    int  GetFriends(void) const;
+    int  GetID(void) const;
+
+    const std::string & GetName(void) const;
+    Focus & GetFocus(void);
+    const Focus & GetFocus(void) const;
+
+protected:
+    friend StreamBase & operator<< (StreamBase &, const Player &);
+    friend StreamBase & operator>> (StreamBase &, Player &);
 
     int		control;
     int		color;

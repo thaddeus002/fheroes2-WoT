@@ -1847,13 +1847,13 @@ bool AIHeroesShowAnimation(const Heroes & hero)
             it = vcolors.begin(); it != vcolors.end(); ++it)
         {
             const Player* player = conf.GetPlayers().Get(*it);
-            if(player) colors |= player->friends;
+            if(player) colors |= player->GetFriends();
         }
     }
     else
     {
         const Player* player = conf.GetPlayers().Get(Players::HumanColors());
-        if(player) colors = player->friends;
+        if(player) colors = player->GetFriends();
     }
 
     // get result

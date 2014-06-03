@@ -29,6 +29,7 @@
 #include "spell_book.h"
 #include "artifact.h"
 #include "position.h"
+#include "players.h"
 
 class Army;
 class Castle;
