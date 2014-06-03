@@ -217,6 +217,8 @@ public:
 
     static u32		GetUniq(void);
 
+    void		PostFixLoad(void);
+
 private:
     World() : Size(0, 0) {};
     void		Defaults(void);

@@ -1195,6 +1195,25 @@ StreamBase & operator>> (StreamBase & msg, World & w)
     return msg;
 }
 
+void World::PostFixLoad(void)
+{
+    if(FORMAT_VERSION_3205 > Game::GetLoadVersion())
+    {
+	for(AllCastles::iterator
+	    it = vec_castles.begin(); it != vec_castles.end(); ++it)
+	if(*it && (*it)->GetControl() != CONTROL_HUMAN)
+	{
+    	    CastleHeroes castleHeroes = (*it)->GetHeroes();
+
+            if(!castleHeroes.Guest() && castleHeroes.Guard())
+            {
+                (*it)->SwapCastleHeroes(castleHeroes);
+                VERBOSE(castleHeroes.Guest()->GetName() << ", " << Color::String((*it)->GetColor()) << ", " << (*it)->GetControl());
+            }
+	}
+    }
+}
+
 EventDate::EventDate(const u8* ptr, size_t sz)
 {
     StreamBuf st(ptr, sz);

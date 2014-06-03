@@ -1810,7 +1810,7 @@ std::string Maps::Tiles::String(void) const
 
     os <<
 	"----------------:--------" << std::endl <<
-	"maps index      : " << GetIndex() << std::endl <<
+	"maps index      : " << GetIndex() << ", " << GetString(GetCenter()) << std::endl <<
 	"tile index      : " << TileSpriteIndex() << std::endl <<
 	"ground          : " << Ground::String(GetGround());
     if(isRoad())

@@ -198,43 +198,47 @@ void AI::CastleTurn(Castle & castle)
 	enemy ? AICastleDefense(castle) : AICastleDevelopment(castle);
 
 	Kingdom & kingdom = castle.GetKingdom();
-	bool can_recruit = castle.isCastle() && kingdom.GetHeroes().size() < Kingdom::GetMaxHeroes();
+	Heroes* hero = castle.GetHeroes().Guest();
+	bool can_recruit = castle.isCastle() && !hero && kingdom.GetHeroes().size() < Kingdom::GetMaxHeroes();
 
 	// part II
 	if(enemy &&
 	    castle.GetArmy().isValid() &&
 	    Army::TroopsStrongerEnemyTroops(castle.GetArmy(), enemy->GetArmy()))
 	{
-    	    if(!castle.GetHeroes().Guest() && can_recruit)
+    	    if(can_recruit)
     	    {
         	Recruits & rec = kingdom.GetRecruits();
 
-        	if(rec.GetHero1()) castle.RecruitHero(rec.GetHero1());
+        	if(rec.GetHero1())
+		    hero = castle.RecruitHero(rec.GetHero1());
         	else
-        	if(rec.GetHero2()) castle.RecruitHero(rec.GetHero2());
+        	if(rec.GetHero2())
+		    hero = castle.RecruitHero(rec.GetHero2());
     	    }
 
-    	    if(castle.GetHeroes().Guest())
-		castle.GetHeroes().Guest()->SetModes(AI::HEROES_HUNTER);
+    	    if(hero)
+		hero->SetModes(AI::HEROES_HUNTER);
 	}
 
 	// part III
 	AIKingdom & ai = AIKingdoms::Get(castle.GetColor());
 	if(ai.capital != &castle &&
-	    castle.GetArmy().isValid() &&
-	    ! castle.GetHeroes().Guest() &&
+	    castle.GetArmy().isValid() && ! hero &&
 	    2 < castle.GetArmy().GetCount() &&
 	    150 < castle.GetArmy().GetHitPoints() &&
 	    can_recruit)
 	{
     	    Recruits & rec = kingdom.GetRecruits();
 
-    	    if(rec.GetHero1()) castle.RecruitHero(rec.GetHero1());
+    	    if(rec.GetHero1())
+		hero = castle.RecruitHero(rec.GetHero1());
     	    else
-    	    if(rec.GetHero2()) castle.RecruitHero(rec.GetHero2());
+    	    if(rec.GetHero2())
+		hero = castle.RecruitHero(rec.GetHero2());
 
-    	    if(castle.GetHeroes().Guest())
-		castle.GetHeroes().Guest()->SetModes(AI::HEROES_HUNTER|AI::HEROES_SCOUTER);
+    	    if(hero)
+		hero->SetModes(AI::HEROES_HUNTER|AI::HEROES_SCOUTER);
 	}
     }
 }

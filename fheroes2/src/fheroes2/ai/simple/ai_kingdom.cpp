@@ -190,7 +190,7 @@ void AI::KingdomTurn(Kingdom & kingdom)
 	if(heroes.empty())
 	    modes = AI::HEROES_HUNTER|AI::HEROES_SCOUTER;
 	else
-	if((!ai.capital->GetHeroes().Guest() && heroes.size() < maxhero) ||
+	if(heroes.size() < maxhero ||
 	    0 == std::count_if(heroes.begin(), heroes.end(), std::bind2nd(std::mem_fun(&Heroes::Modes), AI::HEROES_SCOUTER)))
 	    modes = AI::HEROES_SCOUTER;
 
@@ -198,19 +198,22 @@ void AI::KingdomTurn(Kingdom & kingdom)
 	    heroes.size() < Kingdom::GetMaxHeroes())
 	{
 	    Recruits & rec = kingdom.GetRecruits();
-	    Heroes* hero = NULL;
+	    Heroes* hero = ai.capital->GetHeroes().Guest();
 
-	    if(rec.GetHero1() && rec.GetHero2())
-		hero = ai.capital->RecruitHero(rec.GetHero1()->GetLevel() >= rec.GetHero2()->GetLevel() ? rec.GetHero1() : rec.GetHero2());
-	    else
-	    if(rec.GetHero1())
-		hero = ai.capital->RecruitHero(rec.GetHero1());
-	    else
-	    if(rec.GetHero2())
-		hero = ai.capital->RecruitHero(rec.GetHero2());
+	    if(!hero)
+	    {
+		if(rec.GetHero1() && rec.GetHero2())
+		    hero = ai.capital->RecruitHero(rec.GetHero1()->GetLevel() >= rec.GetHero2()->GetLevel() ? rec.GetHero1() : rec.GetHero2());
+		else
+		if(rec.GetHero1())
+		    hero = ai.capital->RecruitHero(rec.GetHero1());
+		else
+		if(rec.GetHero2())
+		    hero = ai.capital->RecruitHero(rec.GetHero2());
 
-	    if(hero)
-		hero->SetModes(modes);
+		if(hero)
+		    hero->SetModes(modes);
+	    }
 	}
     }
 

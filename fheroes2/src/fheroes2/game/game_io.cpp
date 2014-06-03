@@ -238,6 +238,8 @@ bool Game::Load(const std::string & fn)
 	    gdata >> World::Get() >> Settings::Get() >>
 		GameOver::Result::Get() >> GameStatic::Data::Get() >> MonsterStaticData::Get() >> end_check;
 
+	    World::Get().PostFixLoad();
+
 	    if(end_check == SAV2ID)
 	    {
         	DEBUG(DBG_GAME, DBG_TRACE, "correct block, " << "monsters data");
