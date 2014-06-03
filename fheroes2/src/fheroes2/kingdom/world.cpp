@@ -1206,10 +1206,7 @@ void World::PostFixLoad(void)
     	    CastleHeroes castleHeroes = (*it)->GetHeroes();
 
             if(!castleHeroes.Guest() && castleHeroes.Guard())
-            {
                 (*it)->SwapCastleHeroes(castleHeroes);
-                VERBOSE(castleHeroes.Guest()->GetName() << ", " << Color::String((*it)->GetColor()) << ", " << (*it)->GetControl());
-            }
 	}
     }
 }
