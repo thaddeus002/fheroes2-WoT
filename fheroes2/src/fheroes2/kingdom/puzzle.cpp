@@ -184,9 +184,9 @@ void ShowExtendedDialog(const Puzzle & pzl, const Surface & sf)
 				    sf.w(), sf.h() + (Settings::Get().QVGA() ? 25 : 32));
 
     if(conf.ExtGameEvilInterface())
-	display.FillRect(80, 80, 80, frameborder.GetArea());
+	display.FillRect(frameborder.GetArea(), RGBA(80, 80, 80));
     else
-	display.FillRect(128, 64, 32, frameborder.GetArea());
+	display.FillRect(frameborder.GetArea(), RGBA(128, 64, 32));
     sf.Blit(frameborder.GetArea(), display);
 
     Button buttonExit(frameborder.GetArea().x + sf.w() / 2 - 40,

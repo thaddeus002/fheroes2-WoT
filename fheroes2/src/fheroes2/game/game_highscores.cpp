@@ -230,7 +230,7 @@ int Game::HighScores(bool fill)
     const Settings & conf = Settings::Get();
 
     cursor.Hide();
-    if(fill) display.Fill(0, 0, 0);
+    if(fill) display.Fill(ColorBlack);
 
 #ifdef WITH_DEBUG
     if(IS_DEVEL() && world.CountDay())

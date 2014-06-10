@@ -362,7 +362,7 @@ int Dialog::ArmySplitTroop(int free_slots, u32 max, u32 & cur, bool savelast)
 	if(sp4.isValid()) sp4.Blit(rt4, display);
 	if(sp5.isValid()) sp5.Blit(rt5, display);
 
-	ssp = Surface::RectBorder(sp3.w(), sp3.h(), ssp.GetColorIndex(0xD7), true);
+	ssp = Surface::RectBorder(sp3.GetSize(), RGBA(0xC0, 0x2C, 0), true);
     }
 
     ButtonGroups btnGroups(box.GetArea(), Dialog::OK | Dialog::CANCEL);

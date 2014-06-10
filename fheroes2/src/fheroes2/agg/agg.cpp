@@ -34,6 +34,7 @@
 #include "artifact.h"
 #include "dir.h"
 #include "game.h"
+#include "palette_h2.h"
 #include "agg.h"
 
 #ifdef WITH_ZLIB
@@ -124,6 +125,8 @@ namespace AGG
 
     bool					memlimit_usage = true;
 
+    std::vector<SDL_Color>			pal_colors;
+
 #ifdef WITH_TTF
     SDL::Font*			fonts; /* small, medium */
 
@@ -157,6 +160,7 @@ namespace AGG
     bool			ReadDataDir(void);
     const std::vector<u8> &	ReadICNChunk(int icn, u32);
     const std::vector<u8> &	ReadChunk(const std::string &);
+
 }
 
 /*AGG::File constructor */
@@ -338,7 +342,7 @@ u32 AGG::ClearFreeObjects(void)
 		if(! sprite1.isRefCopy())
 		{
 		    total += sprite1.GetMemoryUsage();
-		    Surface::FreeSurface(sprite1);
+		    sprite1.Reset();
 		}
 		else
 		    used += sprite1.GetMemoryUsage();
@@ -351,7 +355,7 @@ u32 AGG::ClearFreeObjects(void)
 		if(! sprite2.isRefCopy())
 		{
 		    total += sprite2.GetMemoryUsage();
-		    Surface::FreeSurface(sprite2);
+		    sprite2.Reset();
 		}
 		else
 		    used += sprite2.GetMemoryUsage();
@@ -1494,18 +1498,18 @@ void AGG::PlayMusic(int mus, bool loop)
 void AGG::LoadTTFChar(u32 ch)
 {
     const Settings & conf = Settings::Get();
-    const RGBColor white = { 0xFF, 0xFF, 0xFF, 0x00 };
-    const RGBColor yellow= { 0xFF, 0xFF, 0x00, 0x00 };
+    const RGBA white(0xFF, 0xFF, 0xFF);
+    const RGBA yellow(0xFF, 0xFF, 0x00);
 	    
     // small
-    fonts[0].RenderUnicodeChar(fnt_cache[ch].sfs[0], ch, white, conf.FontSmallRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
-    fonts[0].RenderUnicodeChar(fnt_cache[ch].sfs[1], ch, yellow, conf.FontSmallRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
+    fnt_cache[ch].sfs[0] = Surface::RenderUnicodeChar(fonts[0], ch, white, ! conf.FontSmallRenderBlended());
+    fnt_cache[ch].sfs[1] = Surface::RenderUnicodeChar(fonts[0], ch, yellow, ! conf.FontSmallRenderBlended());
 
     // medium
     if(!(conf.QVGA() && !conf.Unicode()))
     {
-	fonts[1].RenderUnicodeChar(fnt_cache[ch].sfs[2], ch, white, conf.FontNormalRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
-	fonts[1].RenderUnicodeChar(fnt_cache[ch].sfs[3], ch, yellow, conf.FontNormalRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
+	fnt_cache[ch].sfs[2] = Surface::RenderUnicodeChar(fonts[1], ch, white, ! conf.FontNormalRenderBlended());
+	fnt_cache[ch].sfs[3] = Surface::RenderUnicodeChar(fonts[1], ch, yellow, ! conf.FontNormalRenderBlended());
     }
 
     DEBUG(DBG_ENGINE, DBG_TRACE, "0x" << std::hex << ch);
@@ -1608,7 +1612,7 @@ void AGG::ShowError(void)
         Display & display = Display::Get();
         LocalEvent & le = LocalEvent::Get();
 
-        display.Fill(zerr.MapRGB(0, 0, 0));
+        display.Fill(ColorBlack);
         zerr.Blit((display.w() - zerr.w()) / 2, (display.h() - zerr.h()) / 2, display);
         display.Flip();
 
@@ -1647,6 +1651,23 @@ bool AGG::Init(void)
 
     til_cache.resize(TIL::LASTTIL);
 
+    // load palette
+    u32 ncolors = ARRAY_COUNT(kb_pal) / 3;
+    pal_colors.reserve(ncolors);
+
+    for(u32 ii = 0; ii < ncolors; ++ii)
+    {
+        u32 index = ii * 3;
+        SDL_Color cols;
+
+        cols.r = kb_pal[index] << 2;
+        cols.g = kb_pal[index + 1] << 2;
+        cols.b = kb_pal[index + 2] << 2;
+
+        pal_colors.push_back(cols);
+    }
+    Surface::SetDefaultPalette(&pal_colors[0], pal_colors.size());
+
     // load font
     LoadFNT();
 
@@ -1682,4 +1703,10 @@ void AGG::Quit(void)
 #ifdef WITH_TTF
     delete [] fonts;
 #endif
+}
+
+RGBA AGG::GetPaletteColor(u32 index)
+{
+    return index < pal_colors.size() ?
+        RGBA(pal_colors[index].r, pal_colors[index].g, pal_colors[index].b) : RGBA(0,0,0);
 }

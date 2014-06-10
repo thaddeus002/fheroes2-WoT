@@ -76,7 +76,7 @@ void Battle::DialogBattleSettings(void)
 
     SpriteBack back(pos_rt);
 
-    display.FillRect(0x00, 0x00, 0x00, back.GetArea());
+    display.FillRect(back.GetArea(), ColorBlack);
     dialog.Blit(pos_rt.x, pos_rt.y);
 
     Button btn_ok(pos_rt.x + 113, pos_rt.y + 252, (conf.ExtGameEvilInterface() ? ICN::CSPANBTE : ICN::CSPANBTN), 0, 1);
@@ -451,7 +451,7 @@ int Battle::Arena::DialogBattleHero(const HeroBase & hero, bool buttons) const
     if(!conf.QVGA())
     {
 	Surface shadow(btnCast.w, btnCast.h);
-	shadow.Fill(0, 0, 0);
+	shadow.Fill(ColorBlack);
 	shadow.SetAlpha(80);
 	if(btnCast.isDisable()) shadow.Blit(btnCast, display);
 	if(btnRetreat.isDisable()) shadow.Blit(btnRetreat, display);

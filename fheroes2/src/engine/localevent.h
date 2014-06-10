@@ -262,11 +262,7 @@ private:
     void HandleMouseButtonEvent(const SDL_MouseButtonEvent &);
     void HandleKeyboardEvent(SDL_KeyboardEvent &);
 
-#if SDL_VERSION_ATLEAST(1, 3, 0)
-    static int GlobalFilterEvents(void*, SDL_Event*);
-#else
     static int GlobalFilterEvents(const SDL_Event*);
-#endif
 
     enum flag_t
     {

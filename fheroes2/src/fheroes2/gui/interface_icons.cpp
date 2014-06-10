@@ -38,7 +38,7 @@
 #define ICONS_HEIGHT            22
 #define ICONS_CURSOR_WIDTH      56
 #define ICONS_CURSOR_HEIGHT     32
-#define ICONS_CURSOR_COLOR      0x98
+#define ICONS_CURSOR_COLOR      RGBA(0xA0,0xE0,0xE0)
 
 bool Interface::IconsBar::IsVisible(void)
 {
@@ -331,7 +331,7 @@ void Interface::HeroesIcons::SetPos(s32 px, s32 py)
 Interface::IconsPanel::IconsPanel(Basic & basic) : BorderWindow(Rect(0, 0, 144, 128)),
     interface(basic), castleIcons(4, sfMarker), heroesIcons(4, sfMarker)
 {
-    sfMarker = Surface::RectBorder(ICONS_CURSOR_WIDTH, ICONS_CURSOR_HEIGHT, sfMarker.GetColorIndex(ICONS_CURSOR_COLOR), true);
+    sfMarker = Surface::RectBorder(Size(ICONS_CURSOR_WIDTH, ICONS_CURSOR_HEIGHT), ICONS_CURSOR_COLOR, true);
 }
 
 u32 Interface::IconsPanel::CountIcons(void) const

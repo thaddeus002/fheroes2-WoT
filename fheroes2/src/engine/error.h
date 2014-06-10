@@ -22,12 +22,11 @@
 #ifndef H2ERROR_H
 #define H2ERROR_H
 
-#include <string>
-
 struct Error
 {
     class Exception{};
     static void Except(const char* func, const char* message);
+    static void Message(const char* func, const char* message);
 };
 
 #endif

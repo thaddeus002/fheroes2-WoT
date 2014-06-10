@@ -107,7 +107,7 @@ int Game::LoadStandard(void)
     cursor.SetThemes(cursor.POINTER);
 
     Display & display = Display::Get();
-    display.Fill(0);
+    display.Fill(ColorBlack);
 
     // image background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);

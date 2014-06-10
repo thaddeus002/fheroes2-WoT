@@ -278,3 +278,27 @@ std::pair<Rect, Point> Rect::Fixed4Blit(const Rect & srcrt, const Rect & dstrt)
 
     return res;
 }
+
+SDL_Rect SDLRect(s32 x, s32 y, u32 w, u32 h)
+{
+    SDL_Rect res;
+
+    res.x = x;
+    res.y = y;
+    res.w = w;
+    res.h = h;
+
+    return res;
+}
+
+SDL_Rect SDLRect(const Rect & rt2)
+{
+    SDL_Rect res;
+
+    res.x = rt2.x;
+    res.y = rt2.y;
+    res.w = rt2.w;
+    res.h = rt2.h;
+
+    return res;
+}

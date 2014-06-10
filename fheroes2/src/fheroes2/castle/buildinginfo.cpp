@@ -379,7 +379,7 @@ void BuildingInfo::Redraw(void)
 	// build image
         if(BUILD_DISABLE == bcond && BUILD_TAVERN == building)
 	    // skip tavern necr
-	    Display::Get().FillRect(0, Rect(area.x + 1, area.y + 1, 135, 57));
+	    Display::Get().FillRect(Rect(area.x + 1, area.y + 1, 135, 57), ColorBlack);
 	else
 	    AGG::GetICN(ICN::Get4Building(castle.GetRace()), index).Blit(area.x + 1, area.y + 1);
 
@@ -682,18 +682,14 @@ DwellingItem::DwellingItem(Castle & castle, u32 dw)
     mons = Monster(castle.GetRace(), type);
 }
 
-DwellingsBar::DwellingsBar(Castle & cstl, s32 sw, s32 sh, int col) : castle(cstl)
+DwellingsBar::DwellingsBar(Castle & cstl, const Size & sz, const RGBA & fill) : castle(cstl)
 {
     for(u32 dw = DWELLING_MONSTER1; dw <= DWELLING_MONSTER6; dw <<= 1)
         content.push_back(DwellingItem(castle, dw));
 
     SetContent(content);
-
-    const u32 fill = backsf.GetColorIndex(col);
-    const u32 color = backsf.GetColorIndex(0x70);
-    backsf = Surface::RectBorder(sw, sh, fill, color, true);
-
-    SetItemSize(sw, sh);
+    backsf = Surface::RectBorder(sz, fill, RGBA(0xd0,0xc0,0x48), true);
+    SetItemSize(sz.w, sz.h);
 }
 
 void DwellingsBar::RedrawBackground(const Rect & pos, Surface & dstsf)

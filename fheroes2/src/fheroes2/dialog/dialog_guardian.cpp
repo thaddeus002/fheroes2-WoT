@@ -44,7 +44,7 @@ public:
 	back.Set(w, h);
 	backSprite.Blit(Rect(36, 267, w, h), 0, 0, back);
 
-	curs = Surface::RectBorder(w, h - 10, curs.GetColorIndex(0xD7), true);
+	curs = Surface::RectBorder(Size(w, h - 10), RGBA(0xc0,0x2c,0), true);
     }
 
     void Redraw(void)

@@ -263,7 +263,7 @@ void Display::SetCaption(const char* str)
 /* set icons window */
 void Display::SetIcons(Surface & icons)
 {
-    SDL_WM_SetIcon(icons.surface, NULL);
+    SDL_WM_SetIcon(icons(), NULL);
 }
 
 /* hide system cursor */
@@ -281,7 +281,7 @@ void Display::ShowCursor(void)
 void Display::Fade(void)
 {
     Surface temp(w(), h(), false);
-    temp.Fill(0, 0, 0);
+    temp.Fill(ColorBlack);
     int alpha = 0;
 
     while(alpha < 70)
@@ -296,7 +296,7 @@ void Display::Fade(void)
 void Display::Rise(void)
 {
     Surface temp(w(), h(), false);
-    temp.Fill(0, 0, 0);
+    temp.Fill(ColorBlack);
     int alpha = 71;
 
     while(alpha > 5)

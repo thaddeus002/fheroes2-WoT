@@ -48,7 +48,7 @@ u32 PocketPC::GetCursorAttackDialog(const Point & dst, int allow)
     const Sprite & sp_bright = AGG::GetICN(ICN::CMSECO, 9);
 
     Surface shadow(rt.w, rt.h);
-    shadow.Fill(0, 0, 0);
+    shadow.Fill(ColorBlack);
     shadow.SetAlpha(50);
 
     SpriteBack back(rt);
@@ -168,7 +168,7 @@ void PocketPC::KeyboardDialog(std::string & str)
 
     SpriteBack back(Rect((display.w() - width) / 2, 0, width, height));
     const Rect & top = back.GetArea();
-    display.FillRect(0, 0, 0, top);
+    display.FillRect(top, ColorBlack);
 
     const Surface sp = CreateTouchButton();
 
@@ -458,7 +458,7 @@ void PocketPC::KeyboardDialog(std::string & str)
 	    if(tx.w() < top.w) 
 	    {
 		cursor.Hide();
-		display.FillRect(0, 0, 0, Rect(top.x, top.y + top.h - 16, top.w, 16));
+		display.FillRect(Rect(top.x, top.y + top.h - 16, top.w, 16), ColorBlack);
 		tx.Blit(top.x + (top.w - tx.w()) / 2, top.y + top.h - 16 + 2);
 		cursor.Show();
 		display.Flip();

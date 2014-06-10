@@ -50,6 +50,8 @@ namespace AGG
     void	PlaySound(int m82);
     void	PlayMusic(int mus, bool loop = true);
     void	ResetMixer(void);
+
+    RGBA	GetPaletteColor(u32 index);
 }
 
 #endif

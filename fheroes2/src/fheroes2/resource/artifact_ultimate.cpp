@@ -66,7 +66,7 @@ bool UltimateArtifact::isPosition(s32 pos) const
 void UltimateArtifact::Reset(void)
 {
     Artifact::Reset();
-    Surface::FreeSurface(puzzlemap);
+    puzzlemap.Reset();
     index = -1;
     isfound = false;
 }
@@ -76,7 +76,7 @@ void UltimateArtifact::MakeSurface(void)
     if(Maps::isValidAbsIndex(index))
 	Interface::GameArea::GenerateUltimateArtifactAreaSurface(index, puzzlemap);
     else
-	Surface::FreeSurface(puzzlemap);
+	puzzlemap.Reset();
 }
 
 StreamBase & operator<< (StreamBase & msg, const UltimateArtifact & ultimate)

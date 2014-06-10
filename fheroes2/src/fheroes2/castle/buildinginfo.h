@@ -70,7 +70,7 @@ struct DwellingItem
 class DwellingsBar : public Interface::ItemsBar<DwellingItem>
 {
 public:
-    DwellingsBar(Castle &, s32, s32, int color);
+    DwellingsBar(Castle &, const Size &, const RGBA & fill);
 
     void        RedrawBackground(const Rect &, Surface &);
     void        RedrawItem(DwellingItem &, const Rect &, Surface &);

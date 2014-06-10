@@ -168,9 +168,9 @@ bool CursorAttack(u32 theme)
     return false;
 }
 
-void DrawHexagon(Surface & sf, int index_color)
+void DrawHexagon(Surface & sf, const RGBA & color)
 {
-    u32 r, l, w, h;
+    int r, l, w, h;
 
     if(Settings::Get().QVGA())
     {
@@ -180,16 +180,15 @@ void DrawHexagon(Surface & sf, int index_color)
 	h = CELLH2;
 
 	sf.Set(w, h);
-	u32 color = sf.GetColorIndex(index_color);
 
-	Surface::DrawLine(r, 0, 0, l, color, sf);
-	Surface::DrawLine(r, 0, w - 1, l, color, sf);
+	Surface::DrawLine(Point(r, 0), Point(0, l), color, sf);
+	Surface::DrawLine(Point(r, 0), Point(w - 1, l), color, sf);
 
-	Surface::DrawLine(0, l + 1, 0, h - l - 1, color, sf);
-	Surface::DrawLine(w - 1, l + 1, w - 1, h - l - 1, color, sf);
+	Surface::DrawLine(Point(0, l + 1), Point(0, h - l - 1), color, sf);
+	Surface::DrawLine(Point(w - 1, l + 1), Point(w - 1, h - l - 1), color, sf);
 
-	Surface::DrawLine(r, h - 1, 0, h - l - 1, color, sf);
-	Surface::DrawLine(r, h - 1, w - 1, h - l - 1, color, sf);
+	Surface::DrawLine(Point(r, h - 1), Point(0, h - l - 1), color, sf);
+	Surface::DrawLine(Point(r, h - 1), Point(w - 1, h - l - 1), color, sf);
     }
     else
     {
@@ -199,18 +198,16 @@ void DrawHexagon(Surface & sf, int index_color)
 	h = CELLH;
 
 	sf.Set(w, h);
-	u32 color = sf.GetColorIndex(index_color);
 
-	Surface::DrawLine(r, 0, 0, l, color, sf);
-	Surface::DrawLine(r, 0, w - 1, l, color, sf);
+	Surface::DrawLine(Point(r, 0), Point(0, l), color, sf);
+	Surface::DrawLine(Point(r, 0), Point(w - 1, l), color, sf);
 
-	Surface::DrawLine(0, l + 1, 0, h - l - 1, color, sf);
-	Surface::DrawLine(w - 1, l + 1, w - 1, h - l - 1, color, sf);
+	Surface::DrawLine(Point(0, l + 1), Point(0, h - l - 1), color, sf);
+	Surface::DrawLine(Point(w - 1, l + 1), Point(w - 1, h - l - 1), color, sf);
 
-	Surface::DrawLine(r, h - 1, 0, h - l - 1, color, sf);
-	Surface::DrawLine(r, h - 1, w - 1, h - l - 1, color, sf);
+	Surface::DrawLine(Point(r, h - 1), Point(0, h - l - 1), color, sf);
+	Surface::DrawLine(Point(r, h - 1), Point(w - 1, h - l - 1), color, sf);
     }
-
 }
 
 void DrawHexagonShadow(Surface & sf)
@@ -234,7 +231,7 @@ void DrawHexagonShadow(Surface & sf)
 
     sf.Set(w, h);
     Rect rt(0, l, w, 2 * l);
-    sf.FillRect(0x00, 0x00, 0x00, rt);
+    sf.FillRect(rt, ColorBlack);
 
     for(int i = 1; i < w / 2; i += 2)
     {
@@ -242,7 +239,7 @@ void DrawHexagonShadow(Surface & sf)
 	rt.h += 2;
 	rt.x += 2;
 	rt.w -= 4;
-	sf.FillRect(0x00, 0x00, 0x00, rt);
+	sf.FillRect(rt, ColorBlack);
     }
     sf.SetAlpha(0x30);
 }
@@ -587,13 +584,14 @@ const std::string & Battle::Status::GetMessage(void) const
 
 Battle::ArmiesOrder::ArmiesOrder() : orders(NULL), army_color2(0)
 {
-    const u32 yellow = sf_color[0].GetColorIndex(0xDA);
-    const u32 orange = sf_color[0].GetColorIndex(0xD6);
-    const u32 green = sf_color[0].GetColorIndex(0xDE);
+    const RGBA yellow = RGBA(0xe0, 0xe0, 0);
+    const RGBA orange = RGBA(0xe0, 0x48, 0);
+    const RGBA green = RGBA(0x90, 0xc0, 0);
+    const Size sz(ARMYORDERW, ARMYORDERW);
 
-    sf_color[0] = Surface::RectBorder(ARMYORDERW, ARMYORDERW, yellow, true);
-    sf_color[1] = Surface::RectBorder(ARMYORDERW, ARMYORDERW, orange, true);
-    sf_color[2] = Surface::RectBorder(ARMYORDERW, ARMYORDERW, green, true);
+    sf_color[0] = Surface::RectBorder(sz, yellow, true);
+    sf_color[1] = Surface::RectBorder(sz, orange, true);
+    sf_color[2] = Surface::RectBorder(sz, green, true);
 }
 
 void Battle::ArmiesOrder::Set(const Rect & rt, const Units* units, int color)
@@ -631,7 +629,7 @@ void Battle::ArmiesOrder::RedrawUnit(const Rect & pos, const Battle::Unit & unit
     const Sprite & mons32 = AGG::GetICN(ICN::MONS32, unit.GetSpriteIndex(), revert);
 
     // background
-    display.FillRect(0x33, 0x33, 0x33, pos);
+    display.FillRect(pos, RGBA(0x33, 0x33, 0x33));
     // mons32 sprite
     mons32.Blit(pos.x + (pos.w - mons32.w()) / 2, pos.y + pos.h - mons32.h() - (mons32.h() + 3 < pos.h ? 3 : 0), display);
 
@@ -718,8 +716,8 @@ Battle::Interface::Interface(Arena & a, s32 center) : arena(a), icn_cbkg(ICN::UN
     if(conf.QVGA() || conf.ExtPocketLowMemory()) icn_frng = ICN::UNKNOWN;
 
     // hexagon
-    DrawHexagon(sf_hexagon, (light ? 0xE0 : 0xE5));
-    DrawHexagon(sf_cursor, 0xD8);
+    DrawHexagon(sf_hexagon, (light ? RGBA(0x78, 0x94, 0) : RGBA(0x38,0x48,0)));
+    DrawHexagon(sf_cursor, RGBA(0xb0, 0x0c, 0));
     DrawHexagonShadow(sf_shadow);
 
     // buttons
@@ -1928,7 +1926,7 @@ void Battle::Interface::FadeArena(void)
     if(!conf.QVGA() && conf.ExtGameUseFade())
     {
 	Surface temp(640, 480, false);
-	temp.Fill(0, 0, 0);
+	temp.Fill(ColorBlack);
 	u32 alpha = 0;
 
 	while(alpha < 40)
@@ -3287,7 +3285,7 @@ void Battle::Interface::RedrawActionBloodLustSpell(Unit & target)
     Sprite sprite2(Surface(sprite1.w(), sprite1.h(), false), sprite1.x(), sprite1.y());
     sprite1.Blit(sprite2);
 
-    Surface sprite3 = Surface::Stencil(sprite1, sprite1.GetColorIndex(0xD8));
+    Surface sprite3 = Surface::Stencil(sprite1, RGBA(0xB0, 0x0C, 0));
 
     cursor.SetThemes(Cursor::WAR_NONE);
     cursor.Hide();
@@ -3635,7 +3633,7 @@ void Battle::Interface::RedrawActionArmageddonSpell(const TargetsInfo & targets)
     cursor.Hide();
 
     display.Blit(area, 0, 0, sprite1);
-    sprite2.Fill(sprite2.GetColorIndex(0xD8));
+    sprite2.Fill(RGBA(0xb0, 0x0c, 0));
 
     b_current = NULL;
     AGG::PlaySound(M82::ARMGEDN);
@@ -3935,9 +3933,7 @@ void Battle::Interface::RedrawTargetsWithFrameAnimation(const TargetsInfo & targ
 
 void RedrawSparksEffects(const Point & src, const Point & dst)
 {
-    Display & display = Display::Get();
-    u32 yellow = display.MapRGB(0xFF, 0xFF, 0);
-    Surface::DrawLine(src.x, src.y, dst.x, dst.y, yellow, display);
+    Surface::DrawLine(src, dst, RGBA(0xff, 0xff ,0), Display::Get());
 }
 
 void Battle::Interface::RedrawTroopWithFrameAnimation(Unit & b, int icn, int m82, bool pain)

@@ -313,7 +313,7 @@ void Game::ShowLoadMapsText(void)
     TextBox text(_("Maps Loading..."), Font::BIG, pos.w);
 
     // blit test
-    display.Fill(0, 0, 0);
+    display.Fill(ColorBlack);
     text.Blit(pos, display);
     display.Flip();
 }

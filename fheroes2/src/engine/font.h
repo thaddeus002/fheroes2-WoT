@@ -25,40 +25,36 @@
 
 #ifdef WITH_TTF
 #include <string>
-#include "types.h"
 #include "SDL_ttf.h"
-
-class Surface;
 
 namespace SDL
 {
     class Font
     {
     public:
-	enum render_t { SOLID, BLENDED };
-
 	Font();
 	~Font();
+
+	TTF_Font* operator() (void) const { return ptr; }
 
 	static void Init(void);
 	static void Quit(void);
 
-	bool Open(const std::string &, u8);
+	bool Open(const std::string &, int size);
 	bool isValid(void) const;
-	void SetStyle(u8);
+	void SetStyle(int);
 
 	int Height(void) const;
 	int Ascent(void) const;
 	int Descent(void) const;
 	int LineSkip(void) const;
 
-	void RenderText(Surface &, const std::string &, const RGBColor &, render_t = SOLID);
-	void RenderChar(Surface &, char, const RGBColor &, render_t = SOLID);
-	void RenderUnicodeText(Surface &, const u16 *, const RGBColor &, render_t = SOLID);
-	void RenderUnicodeChar(Surface &, u16, const RGBColor &, render_t = SOLID);
+    protected:
+	TTF_Font *ptr;
 
     private:
-	TTF_Font *fnt;
+    	Font(const Font &) {}
+	Font & operator= (const Font &) { return *this; }
     };
 }
 #endif

@@ -32,8 +32,6 @@ typedef Uint16		u16;
 typedef Sint32		s32;
 typedef Uint32		u32;
 
-typedef SDL_Color	RGBColor;
-
 #define MAXU16   		0xFFFF
 #define MAXU32   		0xFFFFFFFF
 

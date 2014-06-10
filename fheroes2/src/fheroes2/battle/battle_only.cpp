@@ -74,8 +74,9 @@ Battle::Only::Only() : hero1(NULL), hero2(NULL), player1(Color::BLUE), player2(C
     backSprite.Blit(rt1, 0, 0, sfb1);
     backSprite.Blit(rt2, 0, 0, sfb2);
 
-    sfc1 = Surface::RectBorder(rt1.w, rt1.h - 10, sfc1.GetIndexColor(0x10), true);
-    sfc2 = Surface::RectBorder(rt2.w, rt2.h, sfc2.GetIndexColor(0x10), true);
+    const RGBA gray = RGBA(0xb0, 0xb0, 0xb0);
+    sfc1 = Surface::RectBorder(Size(rt1.w, rt1.h - 10), gray, true);
+    sfc2 = Surface::RectBorder(rt2, gray, true);
 }
 
 StreamBase & operator<< (StreamBase & msg, const Battle::Only & b)
@@ -666,7 +667,7 @@ void Battle::Only::RedrawBaseInfo(const Point & top)
     }
     else
     {
-      display.FillRect(0, 0, 0, rtPortrait2);
+      display.FillRect(rtPortrait2, ColorBlack);
       text.Set("N/A", Font::BIG);
       text.Blit(rtPortrait2.x + (rtPortrait2.w - text.w()) / 2, rtPortrait2.y + rtPortrait2.h / 2 - 8);
     }

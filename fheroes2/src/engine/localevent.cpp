@@ -695,11 +695,7 @@ void LocalEvent::SetGlobalFilterKeysEvents(void (*pf)(int, int))
     keyboard_filter_func = pf;
 }
 
-#if SDL_VERSION_ATLEAST(1, 3, 0)
-int LocalEvent::GlobalFilterEvents(void *userdata, SDL_Event *event)
-#else
 int LocalEvent::GlobalFilterEvents(const SDL_Event *event)
-#endif
 {
     LocalEvent & le = LocalEvent::Get();
 
@@ -760,11 +756,7 @@ void LocalEvent::SetStateDefaults(void)
     SetState(SDL_VIDEORESIZE, false);
     SetState(SDL_VIDEOEXPOSE, false);
 
-#if SDL_VERSION_ATLEAST(1, 3, 0)
-    SDL_SetEventFilter(GlobalFilterEvents, NULL);
-#else
     SDL_SetEventFilter(GlobalFilterEvents);
-#endif
 }
 
 #ifdef WITHOUT_MOUSE

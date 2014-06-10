@@ -61,17 +61,19 @@ Surface PassableViewSurface(int passable)
 {
     const u32 w = 31;
     const u32 h = 31;
+    const RGBA colr2 = RGBA(0xC0,0x2C,0);
+    const RGBA colg2 = RGBA(0x90,0xC0,0);
     Surface sf;
 
     if(0 == passable || Direction::CENTER == passable)
-	sf = Surface::RectBorder(w, h, sf.GetColorIndex(0xD7), true);
+	sf = Surface::RectBorder(Size(w, h), colr2, true);
     else
     if(DIRECTION_ALL == passable)
-	sf = Surface::RectBorder(w, h, sf.GetColorIndex(0xDE), true);
+	sf = Surface::RectBorder(Size(w, h), colg2, true);
     else
     {
-	const u32 colr = sf.GetColorIndex(0xD7);
-	const u32 colg = sf.GetColorIndex(0xDE);
+	const u32 colr = sf.MapRGB(colr2);
+	const u32 colg = sf.MapRGB(colg2);
 
 	sf.Set(w, h, false);
 	sf.Lock();

@@ -29,6 +29,7 @@
 
 #include "engine.h"
 #include "system.h"
+#include "palette_h2.h"
 
 class icnheader
 {
@@ -58,6 +59,38 @@ class icnheader
 
 void SpriteDrawICNv1(Surface & sf, const u8* cur, const u32 size,  bool debug);
 void SpriteDrawICNv2(Surface & sf, const u8* cur, const u32 size,  bool debug);
+
+namespace H2Palette
+{
+    std::vector<SDL_Color> pal_colors;
+
+    void Init(void)
+    {
+	// load palette
+	u32 ncolors = ARRAY_COUNT(kb_pal) / 3;
+	pal_colors.reserve(ncolors);
+
+	for(u32 ii = 0; ii < ncolors; ++ii)
+	{
+    	    u32 index = ii * 3;
+    	    SDL_Color cols;
+
+    	    cols.r = kb_pal[index] << 2;
+    	    cols.g = kb_pal[index + 1] << 2;
+    	    cols.b = kb_pal[index + 2] << 2;
+
+    	    pal_colors.push_back(cols);
+	}
+
+	Surface::SetDefaultPalette(&pal_colors[0], pal_colors.size());
+    }
+
+    RGBA GetColor(u32 index)
+    {
+	return index < pal_colors.size() ?
+    	RGBA(pal_colors[index].r, pal_colors[index].g, pal_colors[index].b) : RGBA(0,0,0);
+    }
+};
 
 int main(int argc, char **argv)
 {
@@ -120,6 +153,7 @@ int main(int argc, char **argv)
     }
 
     SDL::Init();
+    H2Palette::Init();
 
     u16 count_sprite;
     u32 total_size;
@@ -148,12 +182,12 @@ int main(int argc, char **argv)
 
 	Surface sf(head.width, head.height, /*false*/true); // accepting transparency
 
-        const u32 clkey = sf.MapRGB(0xFF, 0, 0xFF);
+        const RGBA clkey = RGBA(0xFF, 0, 0xFF);
         sf.Fill(clkey);
 	sf.SetColorKey(clkey);
 
 	//sf.Fill(0xff, 0xff, 0xff);
-	sf.Fill(0); // filling with transparent color
+	sf.Fill(ColorBlack); // filling with transparent color
 
 	if(0x20 == head.type)
 	    SpriteDrawICNv2(sf, buf, data_size, debug);
@@ -195,8 +229,8 @@ void SpriteDrawICNv1(Surface & sf, const u8* cur, const u32 size,  bool debug)
     u16 x = 0;
     u16 y = 0;
 
-    u32 shadow = sf.MapRGB(0, 0, 0, 0x40);
-    u32 opaque = sf.MapRGB(0, 0, 0, 0xff); // non-transparent mask
+    u32 shadow = sf.MapRGB(RGBA(0, 0, 0, 0x40));
+    u32 opaque = sf.MapRGB(RGBA(0, 0, 0, 0xff)); // non-transparent mask
 
     // lock surface
     sf.Lock();
@@ -220,7 +254,7 @@ void SpriteDrawICNv1(Surface & sf, const u8* cur, const u32 size,  bool debug)
 	    ++cur;
 	    while(c-- && cur < max)
 	    {
-		sf.SetPixel(x, y, sf.GetColorIndex(*cur) | opaque);
+		sf.SetPixel(x, y, sf.MapRGB(H2Palette::GetColor(*cur)) | opaque);
 		++x;
 		++cur;
 	    }
@@ -259,14 +293,14 @@ void SpriteDrawICNv1(Surface & sf, const u8* cur, const u32 size,  bool debug)
 	    ++cur;
 	    c = *cur;
 	    ++cur;
-	    while(c--){ sf.SetPixel(x, y, sf.GetColorIndex(*cur) | opaque); ++x; }
+	    while(c--){ sf.SetPixel(x, y, sf.MapRGB(H2Palette::GetColor(*cur)) | opaque); ++x; }
 	    ++cur;
 	}
 	else
 	{
 	    c = *cur - 0xC0;
 	    ++cur;
-	    while(c--){ sf.SetPixel(x, y, sf.GetColorIndex(*cur) | opaque); ++x; }
+	    while(c--){ sf.SetPixel(x, y, sf.MapRGB(H2Palette::GetColor(*cur)) | opaque); ++x; }
 	    ++cur;
 	}
 
@@ -292,7 +326,8 @@ void SpriteDrawICNv2(Surface & sf, const u8* cur, const u32 size,  bool debug)
     u16 x = 0;
     u16 y = 0;
 
-    u32 opaque = sf.MapRGB(0, 0, 0, 0xff); // non-transparent mask
+    u32 opaque = sf.MapRGB(RGBA(0, 0, 0, 0xff)); // non-transparent mask
+    u32 shadow = sf.MapRGB(H2Palette::GetColor(1)) | opaque;
 
     // lock surface
     sf.Lock();
@@ -315,7 +350,7 @@ void SpriteDrawICNv2(Surface & sf, const u8* cur, const u32 size,  bool debug)
 	    c = *cur;
 	    while(c--)
 	    {
-		sf.SetPixel(x, y, sf.GetColorIndex(1) | opaque);
+		sf.SetPixel(x, y, shadow);
 		++x;
 	    }
 	    ++cur;

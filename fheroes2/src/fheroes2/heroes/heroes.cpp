@@ -1618,19 +1618,18 @@ void Heroes::PortraitRedraw(s32 px, s32 py, int type, Surface & dstsf) const
     	    const int iconsh = Interface::IconsBar::GetItemHeight();
     	    const int barw = 7;
 
-    	    dstsf.FillRect(0, 0, 0, Rect(px, py, iconsw, iconsh));
-
-    	    const u32 blue = dstsf.MapRGB(15, 30, 120);
+    	    dstsf.FillRect(Rect(px, py, iconsw, iconsh), ColorBlack);
+	    const RGBA blue = RGBA(15, 30, 120);
 
     	    // mobility
-    	    dstsf.FillRect(blue, Rect(px, py, barw, iconsh));
+    	    dstsf.FillRect(Rect(px, py, barw, iconsh), blue);
     	    mobility.Blit(px, py + mobility.y(), dstsf);
 
     	    // portrait
     	    port.Blit(px + barw + 1, py, dstsf);
 
     	    // mana
-    	    dstsf.FillRect(blue, Rect(px + barw + port.w() + 2, py, barw, iconsh));
+    	    dstsf.FillRect(Rect(px + barw + port.w() + 2, py, barw, iconsh), blue);
     	    mana.Blit(px + barw + port.w() + 2, py + mana.y(), dstsf);
 
 	    mp.x = 35;
@@ -1642,7 +1641,7 @@ void Heroes::PortraitRedraw(s32 px, s32 py, int type, Surface & dstsf) const
     {
         const Sprite & sprite = AGG::GetICN(ICN::BOAT12, 0);
 	const Rect pos(px + mp.x, py + mp.y - 1, sprite.w(), sprite.h());
-	dstsf.FillRect(0, 0, 0, pos);
+	dstsf.FillRect(pos, ColorBlack);
 	sprite.Blit(pos.x, pos.y, dstsf);
         mp.y = sprite.h();
     }
@@ -1651,7 +1650,7 @@ void Heroes::PortraitRedraw(s32 px, s32 py, int type, Surface & dstsf) const
     {
 	const Sprite & sprite = AGG::GetICN(ICN::MISC6, 11);
 	const Rect pos(px + mp.x + 3, py + mp.y, sprite.w(), sprite.h());
-	dstsf.FillRect(0, 0, 0, pos);
+	dstsf.FillRect(pos, ColorBlack);
 	sprite.Blit(pos.x, pos.y, dstsf);
         mp.y = sprite.h();
     }
@@ -1660,7 +1659,7 @@ void Heroes::PortraitRedraw(s32 px, s32 py, int type, Surface & dstsf) const
     {
         const Sprite & sprite = AGG::GetICN(ICN::MISC4, 14);
 	const Rect pos(px + mp.x + 3, py + mp.y - 1, sprite.w() - 4, sprite.h() - 4);
-	dstsf.FillRect(0, 0, 0, pos);
+	dstsf.FillRect(pos, ColorBlack);
 	sprite.Blit(pos.x - 2, pos.y - 2);
     }
 }

@@ -632,7 +632,7 @@ int Interface::Basic::StartGame(void)
     }
 
     if(res == Game::ENDTURN)
-	display.Fill(0, 0, 0);
+	display.Fill(ColorBlack);
     else
     if(conf.ExtGameUseFade())
 	display.Fade();

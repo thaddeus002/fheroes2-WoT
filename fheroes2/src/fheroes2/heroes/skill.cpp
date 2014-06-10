@@ -733,7 +733,7 @@ Surface GetBarBackgroundSprite(void)
 {
     Surface res;
     const Rect rt(26, 21, 32, 32);
-    res = Surface::RectBorder(rt.w + 2, rt.h + 2, res.GetColorIndex(0x70), true);
+    res = Surface::RectBorder(Size(rt.w + 2, rt.h + 2), RGBA(0xD0,0xC0,0x48), true);
     AGG::GetICN(ICN::HSICONS, 0).Blit(rt, 1, 1, res);
     return res;
 }

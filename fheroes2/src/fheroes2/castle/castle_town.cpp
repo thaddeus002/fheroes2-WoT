@@ -349,7 +349,7 @@ u32 Castle::OpenTown(void)
 	hero1->PortraitRedraw(dst_pt.x, dst_pt.y, PORT_BIG, display);
     }
     else
-	display.FillRect(0, 0, 0, rectHero1);
+	display.FillRect(rectHero1, ColorBlack);
     // indicator
     if(!allow_buy_hero1)
     {
@@ -367,7 +367,7 @@ u32 Castle::OpenTown(void)
 	hero2->PortraitRedraw(dst_pt.x, dst_pt.y, PORT_BIG, display);
     }
     else
-	display.FillRect(0, 0, 0, rectHero2);
+	display.FillRect(rectHero2, ColorBlack);
     // indicator
     if(!allow_buy_hero2)
     {

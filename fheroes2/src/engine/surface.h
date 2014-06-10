@@ -24,19 +24,37 @@
 
 #include <string>
 #include "rect.h"
+#include "font.h"
 #include "types.h"
 
 struct Point;
 struct Rect;
 struct SDL_Surface;
-class Display;
-class Sprite;
+
+class RGBA
+{
+public:
+    RGBA();
+    RGBA(int r, int g, int b, int a = 0);
+
+    SDL_Color operator() (void) const { return color; }
+
+    int		GetColor(void) const;
+    int         r(void) const;
+    int         g(void) const;
+    int         b(void) const;
+    int         a(void) const;
+
+protected:
+    SDL_Color   color;
+};
+
+#define ColorBlack RGBA(0,0,0)
 
 class Surface
 {
 public:
     Surface();
-    Surface(const void* pixels, u32 width, u32 height, u32 bytes_per_pixel, bool amask);
     Surface(u32 sw, u32 sh, bool amask = false);
     Surface(const std::string &);
 
@@ -44,20 +62,17 @@ public:
 
     Surface & operator= (const Surface &);
     bool operator== (const Surface &) const;
+    SDL_Surface* operator() (void) const { return surface; }
 
     virtual ~Surface();
     virtual bool isDisplay(void) const;
 
+    void Set(const void* pixels, u32 width, u32 height, u32 bytes_per_pixel /* 1, 2, 3, 4 */, bool amask);  /* agg: create raw tile */
     void Set(u32 sw, u32 sh, bool amask = false);
     void Set(SDL_Surface*);
-    void Set(u32 sw, u32 sh, u32 bpp /* 8, 16, 24, 32 */, bool amask); 
-    void Set(const void* pixels, u32 width, u32 height, u32 bytes_per_pixel /* 1, 2, 3, 4 */, bool amask); 
     void Reset(void);
 
-    bool Load(const char*);
     bool Load(const std::string &);
-
-    bool Save(const char*) const;
     bool Save(const std::string &) const;
 
     int w(void) const;
@@ -69,8 +84,12 @@ public:
     bool isRefCopy(void) const;
 
     bool isValid(void) const;
-    u32 MapRGB(int r, int g, int b, int a = 0) const;
-    void GetRGB(u32 pixel, u8 *r, u8 *g, u8 *b, u8 *a = NULL) const;
+
+    u32	 MapRGB(const RGBA &) const;
+    RGBA GetRGB(u32 pixel) const;
+
+    void SetColorKey(const RGBA &);
+    u32	 GetColorKey(void) const;
 
     void Blit(Surface &) const;
     void Blit(s32, s32, Surface &) const;
@@ -80,28 +99,17 @@ public:
     void Blit(u32 alpha, s32, s32, Surface &) const;
     void Blit(u32 alpha, const Rect & srt, const Point &, Surface &) const;
 
-    const SDL_Surface* SDLSurface(void) const{ return surface; };
-
-    void Fill(u32 color);
-    void Fill(int r, int g, int b);
-
-    void FillRect(u32 color, const Rect & src);
-    void FillRect(int r, int g, int b, const Rect & src);
+    void Fill(const RGBA &);
+    void FillRect(const Rect &, const RGBA &);
 
     void SetDisplayFormat(void);
-    void SetColorKey(u32 color);
     void SetAlpha(u32 level);
     void ResetAlpha(void);
-    void SetPixel(int x, int y, u32 color);
-    
-    u32 GetColorKey(void) const;
-    u32 GetColorIndex(u32) const;
-    s32 GetIndexColor(u32) const;
-    u32 GetPixel(int x, int y) const;
 
-    void ChangeColor(u32, u32);
-    void ChangeColorIndex(u32, u32);
-    
+    void SetPixel(int x, int y, u32 color);
+    void SetPixel(int x, int y, const RGBA &);
+    u32  GetPixel(int x, int y) const;
+
     void Lock(void) const;
     void Unlock(void) const;
 
@@ -110,40 +118,46 @@ public:
 
     static Surface Reflect(const Surface &, u32 shape /* 0: none, 1 : vert, 2: horz, 3: both */);
     static Surface Rotate(const Surface &, u32 parm /* 0: none, 1 : 90 CW, 2: 90 CCW, 3: 180 */);
-    static Surface Stencil(const Surface &, u32);
-    static Surface Contour(const Surface &, u32);
+    static Surface Stencil(const Surface &, const RGBA &);
+    static Surface Contour(const Surface &, const RGBA &);
     static Surface Scale(const Surface &, s32, s32);
     static Surface GrayScale(const Surface &);
     static Surface Sepia(const Surface &);
-    static Surface RectBorder(u32, u32, u32 fill, u32 color, bool solid);
-    static Surface RectBorder(u32, u32, u32 color, bool solid);
+    static Surface RectBorder(const Size &, const RGBA &, const RGBA &, bool solid);
+    static Surface RectBorder(const Size &, const RGBA &, bool solid);
 
-    static void DrawLine(const Point &, const Point &, u32, Surface &);
-    static void DrawLine(s32, s32, s32, s32, u32, Surface &);
+#ifdef WITH_TTF
+    static Surface RenderText(const SDL::Font &, const std::string &, const RGBA &, bool solid /* or blended */);
+    static Surface RenderChar(const SDL::Font &, char, const RGBA &, bool solid /* or blended */);
+    static Surface RenderUnicodeText(const SDL::Font &, const std::vector<u16> &, const RGBA &, bool solid /* or blended */);
+    static Surface RenderUnicodeChar(const SDL::Font &, u16, const RGBA &, bool solid /* or blended */);
+#endif
 
+    static void ChangeColor(const RGBA &, const RGBA &, Surface &);
+    static void DrawLine(const Point &, const Point &, const RGBA &, Surface &);
+
+    static void SetDefaultPalette(SDL_Color*, int);
     static void SetDefaultDepth(u32);
-    static u32  GetDefaultDepth(void);
-    static void SetDefaultColorKey(int r, int g, int b);
-    static u32  GetDefaultColorKey(void);
-    static u32  GetDefaultColorIndex(u32);
-    static void FreeSurface(Surface &);
+    static void SetDefaultColorKey(int, int, int);
     static void Swap(Surface &, Surface &);
     
 protected:
+    static void BlitSurface(const Surface &, SDL_Rect*, Surface &, SDL_Rect*);
+    static void FreeSurface(Surface &);
+
     void Set(const Surface &, bool refcopy);
+    void Set(u32 sw, u32 sh, u32 bpp /* bpp: 8, 16, 24, 32 */, bool amask);
+    void SetPalette(void);
+
     void SetPixel4(s32 x, s32 y, u32 color);
     void SetPixel3(s32 x, s32 y, u32 color);
     void SetPixel2(s32 x, s32 y, u32 color);
     void SetPixel1(s32 x, s32 y, u32 color);
+
     u32 GetPixel4(s32 x, s32 y) const;
     u32 GetPixel3(s32 x, s32 y) const;
     u32 GetPixel2(s32 x, s32 y) const;
     u32 GetPixel1(s32 x, s32 y) const;
-    void LoadPalette(void);
-    void CreateSurface(u32 sw, u32 sh, u32 bpp, bool amask);
-    static void BlitSurface(const Surface &, SDL_Rect*, Surface &, SDL_Rect*);
-
-    friend class Display;
 
     SDL_Surface* surface;
 };

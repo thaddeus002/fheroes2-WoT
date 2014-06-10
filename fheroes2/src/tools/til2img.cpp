@@ -83,7 +83,8 @@ int main(int argc, char **argv)
 
     for(u16 cur = 0; cur < count; ++cur)
     {
-	Surface sf(&body[width * height * cur], width, height, 1, false);
+	Surface sf;
+	sf.Set(&body[width * height * cur], width, height, 1, false);
 
 	std::ostringstream stream;
         stream << std::setw(3) << std::setfill('0') << cur;

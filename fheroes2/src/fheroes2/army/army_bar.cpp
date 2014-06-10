@@ -85,7 +85,7 @@ ArmyBar::ArmyBar(Army* ptr, bool mini, bool ro, bool change /* false */)
     : army(NULL), spcursor(AGG::GetICN(ICN::STRIP, 1)), use_mini_sprite(mini), read_only(ro), can_change(change)
 {
     if(use_mini_sprite)
-	SetBackground(43, 43, 0x67);
+	SetBackground(Size(43, 43), RGBA(0, 45, 0));
     else
     {
         const Sprite & sprite = AGG::GetICN(ICN::STRIP, 2);
@@ -115,17 +115,14 @@ bool ArmyBar::isValid(void) const
     return army != NULL;
 }
 
-void ArmyBar::SetBackground(u32 sw, u32 sh, u32 index)
+void ArmyBar::SetBackground(const Size & sz, const RGBA & fill)
 {
     if(use_mini_sprite)
     {
-        SetItemSize(sw, sh);
-	const u32 fill = backsf.GetColorIndex(index);
-	const u32 color1 = backsf.GetColorIndex(0x70);
-	const u32 color2 = spcursor.GetColorIndex(0xd7);
+        SetItemSize(sz.w, sz.h);
 
-	backsf = Surface::RectBorder(sw, sh, fill, color1, true);
-	spcursor = Surface::RectBorder(sw, sh, color2, true);
+	backsf = Surface::RectBorder(sz, fill, RGBA(0xd0,0xc0,0x48), true);
+	spcursor = Surface::RectBorder(sz, RGBA(0xc0,0x2c,0), true);
     }
 }
 
@@ -182,7 +179,7 @@ void ArmyBar::RedrawItem(ArmyTroop & troop, const Rect & pos, bool selected, Sur
 	if(! use_mini_sprite)
 	{
 	    Surface black(text.w() + 4, text.h());
-	    black.Fill(0, 0, 0);
+	    black.Fill(ColorBlack);
 	    const Point pt(pos.x + pos.w - black.w() - 1, pos.y + pos.h - black.h() - 1);
 	    black.Blit(pt.x, pt.y, dstsf);
 	    text.Blit(pt.x + 2, pt.y + 1, dstsf);

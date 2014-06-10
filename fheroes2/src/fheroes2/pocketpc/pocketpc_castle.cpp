@@ -173,7 +173,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     RedrawTownSprite(rectTown, castle);
 
     // dwelling bar
-    DwellingsBar dwellingsBar(castle, 43, 43, 0x67);
+    DwellingsBar dwellingsBar(castle, Size(43, 43), RGBA(0, 0x2c, 0));
     dwellingsBar.SetPos(dst_rt.x + 2, dst_rt.y + 34);
     dwellingsBar.SetColRows(6, 1);
     dwellingsBar.SetHSpace(2);

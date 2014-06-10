@@ -213,7 +213,7 @@ void Interface::GameArea::Redraw(Surface & dst, int flag, const Rect & rt) const
 	// redraw grid
 	if(flag & LEVEL_ALL)
 	{
-	    u32 col = dst.GetColorIndex(0x40);
+	    const u32 col = dst.MapRGB(RGBA(0x90, 0xA4, 0xE0));
 
 	    for(s32 oy = rt.y; oy < rt.y + rt.h; ++oy)
 		for(s32 ox = rt.x; ox < rt.x + rt.w; ++ox)

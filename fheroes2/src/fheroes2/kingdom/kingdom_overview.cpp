@@ -66,7 +66,7 @@ struct HeroRow
 	Clear();
 
 	armyBar = new ArmyBar(&hero->GetArmy(), true, false);
-	armyBar->SetBackground(41, 53, 0x82);
+	armyBar->SetBackground(Size(41, 53), RGBA(72, 28, 0));
 	armyBar->SetColRows(5, 1);
 	armyBar->SetHSpace(-1);
 
@@ -280,9 +280,10 @@ struct CstlRow
 	castle = ptr;
 
 	Clear();
+	const RGBA fill(40, 12, 0);
 
 	armyBarGuard = new ArmyBar(& castle->GetArmy(), true, false);
-	armyBarGuard->SetBackground(41, 41, 0x3C);
+	armyBarGuard->SetBackground(Size(41, 41), fill);
 	armyBarGuard->SetColRows(5, 1);
 	armyBarGuard->SetHSpace(-1);
 
@@ -291,12 +292,12 @@ struct CstlRow
         if(heroes.Guest())
 	{
 	    armyBarGuest = new ArmyBar(& heroes.Guest()->GetArmy(), true, false);
-	    armyBarGuest->SetBackground(41, 41, 0x3C);
+	    armyBarGuest->SetBackground(Size(41, 41), fill);
 	    armyBarGuest->SetColRows(5, 1);
 	    armyBarGuest->SetHSpace(-1);
 	}
 
-	dwellingsBar = new DwellingsBar(*castle, 39, 52, 0x3C);
+	dwellingsBar = new DwellingsBar(*castle, Size(39, 52), fill);
 	dwellingsBar->SetColRows(6, 1);
 	dwellingsBar->SetHSpace(2);
     }
@@ -633,6 +634,7 @@ void Kingdom::OverviewDialog(void)
     display.Flip();
 
     LocalEvent & le = LocalEvent::Get();
+    bool redraw = true;
 
     // dialog menu loop
     while(le.HandleEvents())
@@ -650,6 +652,7 @@ void Kingdom::OverviewDialog(void)
 	    buttonCastle.Draw();
 	    listStats = &listHeroes;
 	    ResetModes(OVERVIEWCSTL);
+	    redraw = true;
 	}
 	else
 	if(buttonCastle.isReleased() &&
@@ -662,6 +665,7 @@ void Kingdom::OverviewDialog(void)
 	    buttonCastle.Draw();
 	    listStats = &listCastles;
 	    SetModes(OVERVIEWCSTL);
+	    redraw = true;
 	}
 
 	// exit event
@@ -677,12 +681,13 @@ void Kingdom::OverviewDialog(void)
             Dialog::ResourceInfo("", "income:", GetIncome(INCOME_ALL), 0);
 
 	// redraw
-	if(! cursor.isVisible())
+	if(! cursor.isVisible() || redraw)
 	{
 	    listStats->Redraw();
 	    RedrawFundsInfo(cur_pt, *this);
 	    cursor.Show();
 	    display.Flip();
+	    redraw = false;
 	}
     }
 }

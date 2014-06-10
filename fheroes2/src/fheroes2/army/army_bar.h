@@ -37,7 +37,7 @@ public:
     void        RedrawBackground(const Rect &, Surface &);
     void        RedrawItem(ArmyTroop &, const Rect &, bool, Surface &);
 
-    void	SetBackground(u32, u32, u32);
+    void	SetBackground(const Size &, const RGBA &);
     void	SetArmy(Army*);
 
     bool	isValid(void) const;

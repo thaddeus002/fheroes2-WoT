@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include "settings.h"
+#include "agg.h"
 #include "icn.h"
 #include "cursor.h"
 #include "display.h"
@@ -83,7 +84,7 @@ void Sprite::DrawICN(int icn, const u8* cur, int size, bool reflect, Surface & s
 
     Surface sf_tmp;
     Surface* sf_cur = sf.amask() ? &sf : &sf_tmp;
-    u32 shadow = sf_cur->isValid() ? sf_cur->MapRGB(0, 0, 0, 0x40) : 0;
+    u32 shadow = sf_cur->isValid() ? sf_cur->MapRGB(RGBA(0, 0, 0, 0x40)) : 0;
 
     // lock surface
     sf.Lock();
@@ -105,7 +106,7 @@ void Sprite::DrawICN(int icn, const u8* cur, int size, bool reflect, Surface & s
 	    ++cur;
 	    while(c-- && cur < max)
 	    {
-		sf.SetPixel(x, y, sf.GetColorIndex(*cur));
+		sf.SetPixel(x, y, AGG::GetPaletteColor(*cur));
 		reflect ? x-- : x++;
 		++cur;
 	    }
@@ -139,7 +140,7 @@ void Sprite::DrawICN(int icn, const u8* cur, int size, bool reflect, Surface & s
 		if(! sf_cur->isValid())
 		{
 		    sf_cur->Set(sf.w(), sf.h(), true);
-		    shadow = sf_cur->MapRGB(0, 0, 0, 0x40);
+		    shadow = sf_cur->MapRGB(RGBA(0, 0, 0, 0x40));
 		}
 
 		while(c--){ sf_cur->SetPixel(x, y, shadow); reflect ? x-- : x++; }
@@ -154,14 +155,14 @@ void Sprite::DrawICN(int icn, const u8* cur, int size, bool reflect, Surface & s
 	    ++cur;
 	    c = *cur;
 	    ++cur;
-	    while(c--){ sf.SetPixel(x, y, sf.GetColorIndex(*cur)); reflect ? x-- : x++; }
+	    while(c--){ sf.SetPixel(x, y, AGG::GetPaletteColor(*cur)); reflect ? x-- : x++; }
 	    ++cur;
 	}
 	else
 	{
 	    c = *cur - 0xC0;
 	    ++cur;
-	    while(c--){ sf.SetPixel(x, y, sf.GetColorIndex(*cur)); reflect ? x-- : x++; }
+	    while(c--){ sf.SetPixel(x, y, AGG::GetPaletteColor(*cur)); reflect ? x-- : x++; }
 	    ++cur;
 	}
 
@@ -189,7 +190,7 @@ void Sprite::AddonExtensionModify(Sprite & sp, int icn, int index)
 	case ICN::AELEM:
 	    if(sp.w() > 3 && sp.h() > 3)
 	    {
-		Surface sf = Surface::Contour(sp, sp.GetColorIndex(0xEF));
+		Surface sf = Surface::Contour(sp, RGBA(0, 0x84, 0xe0));
 		sf.Blit(-1, -1, sp);
 	    }
 	    break;
@@ -237,4 +238,9 @@ Sprite Sprite::ScaleQVGASprite(const Sprite & sp)
     res.SetPos(Point(pt.x / 2, pt.y / 2));
 
     return res;
+}
+
+void Sprite::ChangeColorIndex(u32 fc, u32 tc)
+{
+    Surface::ChangeColor(AGG::GetPaletteColor(fc), AGG::GetPaletteColor(tc), *this);
 }

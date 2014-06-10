@@ -138,7 +138,7 @@ building_t GetCurrentFlash(const Castle & castle, CastleDialog::CacheBuildings &
 	if(! (*it).contour.isValid())
         {
             const Sprite & sprite = GetActualSpriteBuilding(castle, flash);
-    	    (*it).contour = Sprite(Surface::Contour(sprite, sprite.GetColorIndex(0xDA)), sprite.x() - 1, sprite.y() - 1);
+    	    (*it).contour = Sprite(Surface::Contour(sprite, RGBA(0xe0,0xe0,0)), sprite.x() - 1, sprite.y() - 1);
 	}
     }
 
@@ -213,7 +213,7 @@ Surface GetMeetingSprite(void)
 {
     const Sprite & sprite = AGG::GetICN(ICN::ADVMCO, 8);
     
-    Surface res = Surface::RectBorder(sprite.w() + 4, sprite.h() + 4, 0, sprite.GetColorIndex(0xDB), true);
+    Surface res = Surface::RectBorder(Size(sprite.w() + 4, sprite.h() + 4), ColorBlack, RGBA(0xe0, 0xb4, 0), true);
     sprite.Blit(2, 2, res);
 
     return res;
@@ -779,7 +779,7 @@ Rect Castle::RedrawResourcePanel(const Point & pt)
     Point dst_pt = pt;
 
     Rect src_rt(dst_pt.x + 552, dst_pt.y + 262, 82, 192);
-    display.FillRect(0, 0, 0, src_rt);
+    display.FillRect(src_rt, ColorBlack);
 
     Text text;
 

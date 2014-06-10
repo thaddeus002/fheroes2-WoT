@@ -221,16 +221,16 @@ int TestBlitSpeed(void)
     SDL::Time t;
 
     t.Start();
-    sf.Fill(0xFF, 0, 0);
+    sf.Fill(RGBA(0xFF, 0, 0));
     sf.Blit(srcrt, Point(0, 0), display);
     display.Flip();
-    sf.Fill(0, 0xFF, 0);
+    sf.Fill(RGBA(0, 0xFF, 0));
     sf.Blit(srcrt, Point(srcrt.w, 0), display);
     display.Flip();
-    sf.Fill(0, 0, 0xFF);
+    sf.Fill(RGBA(0, 0, 0xFF));
     sf.Blit(srcrt, Point(display.w() - srcrt.w, 0), display);
     display.Flip();
-    sf.Fill(0, 0, 0);
+    sf.Fill(RGBA(0, 0, 0));
     sf.Blit(display);
     display.Flip();
     t.Stop();
@@ -260,16 +260,14 @@ void LoadZLogo(void)
 		Surface::Swap(zlogo, small);
 	    }
 
-	    const u32 black = zlogo.MapRGB(0, 0, 0);
 	    const Point offset((display.w() - zlogo.w()) / 2, (display.h() - zlogo.h()) / 2);
-
 	    int ii = 0;
 
 	    while(ii < 250)
 	    {
 		zlogo.Blit(ii, offset.x, offset.y, display);
 		display.Flip();
-		display.Fill(black);
+		display.Fill(ColorBlack);
 		ii += 10;
 	    }
 
@@ -279,7 +277,7 @@ void LoadZLogo(void)
 	    {
 		zlogo.Blit(ii, offset.x, offset.y, display);
 		display.Flip();
-		display.Fill(black);
+		display.Fill(ColorBlack);
 		ii -= 10;
 	    }
 	}

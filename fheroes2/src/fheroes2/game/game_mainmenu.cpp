@@ -52,7 +52,7 @@ int Game::MainMenu(void)
     cursor.SetThemes(cursor.POINTER);
 
     Display & display = Display::Get();
-    display.Fill(0);
+    display.Fill(ColorBlack);
 
     // image background
     const Sprite &sprite = AGG::GetICN(ICN::HEROES, 0);

@@ -39,6 +39,7 @@ public:
     void Blit(const Point &, Surface & = Display::Get()) const;
     void Blit(const Rect & srt, int dstx, int dsty, Surface & = Display::Get()) const;
     void Blit(const Rect & srt, const Point &, Surface & = Display::Get()) const;
+
     void Blit(int alpha, int dstx, int dsty, Surface & = Display::Get()) const;
     void Blit(int alpha, const Rect & srt, const Point &, Surface & = Display::Get()) const;
 };

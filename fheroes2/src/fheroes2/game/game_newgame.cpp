@@ -150,7 +150,7 @@ int Game::NewGame(void)
     cursor.SetThemes(cursor.POINTER);
 
     Display & display = Display::Get();
-    display.Fill(0);
+    display.Fill(ColorBlack);
 
     // load game settings
     conf.BinaryLoad();

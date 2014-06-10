@@ -35,6 +35,8 @@ public:
     int x(void) const;
     int y(void) const;
 
+    void ChangeColorIndex(u32 index1, u32 index2);
+
     static void DrawICN(int icn, const u8* buf, int size, bool reflect, Surface &);
     static void AddonExtensionModify(Sprite & sp, int icn, int index);
     static Surface ScaleQVGASurface(const Surface &);

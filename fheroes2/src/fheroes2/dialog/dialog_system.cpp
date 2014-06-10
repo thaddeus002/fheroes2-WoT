@@ -180,7 +180,7 @@ void Dialog::DrawSystemInfo(const Rects & rects)
     Text text;
 
     Surface black(65, 65);
-    black.Fill(0, 0, 0);
+    black.Fill(ColorBlack);
 
     // sound
     const Sprite & sprite1 = AGG::GetICN(ICN::SPANEL, conf.Sound() ? 1 : 0);

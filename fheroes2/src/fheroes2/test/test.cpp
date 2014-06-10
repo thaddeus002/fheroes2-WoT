@@ -66,7 +66,7 @@ void RunTest2(void)
     Display & display = Display::Get();
     LocalEvent & le = LocalEvent::Get();
 
-    display.Fill(0x85, 0x85, 0x85);
+    display.Fill(RGBA(0x85, 0x85, 0x85));
     Point pt;
 
     // test alpha (without amask)
@@ -99,7 +99,7 @@ void RunTest2(void)
     pt.x += sf2.w() + 20;
 
     // stensil
-    Surface sf3 = Surface::Stencil(sprite2, sprite2.MapRGB(0x80, 0x50, 0x30));
+    Surface sf3 = Surface::Stencil(sprite2, RGBA(0x80, 0x50, 0x30));
     VERBOSE(sf3.Info());
     pt.x = 0;
     pt.y = 150;
@@ -107,7 +107,7 @@ void RunTest2(void)
     sf3.Blit(pt, display);
 
     // contour
-    Surface sf4 = Surface::Contour(sprite2, sprite2.MapRGB(0xFF, 0xFF, 0));
+    Surface sf4 = Surface::Contour(sprite2, RGBA(0xFF, 0xFF, 0));
     pt.x += sprite2.w() + 20;
 
     sf4.Blit(pt, display);

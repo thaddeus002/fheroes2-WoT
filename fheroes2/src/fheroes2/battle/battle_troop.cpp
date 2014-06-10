@@ -457,10 +457,10 @@ void Battle::Unit::InitContours(void)
     const Sprite & sprite2 = AGG::GetICN(msi.icn_file, msi.frm_idle.start, true);
 
     // main sprite
-    contours[0] = Surface::Contour(sprite1, sprite1.GetColorIndex(0xDA));
+    contours[0] = Surface::Contour(sprite1, RGBA(0xe0, 0xe0, 0));
 
     // revert sprite
-    contours[1] = Surface::Contour(sprite2, sprite2.GetColorIndex(0xDA));
+    contours[1] = Surface::Contour(sprite2, RGBA(0xe0, 0xe0, 0));
 
     // create white black sprite
     contours[2] = Surface::GrayScale(sprite1);
