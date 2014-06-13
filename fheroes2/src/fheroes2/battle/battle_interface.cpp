@@ -2094,6 +2094,7 @@ void Battle::Interface::MouseLeftClickBoardAction(u32 themes, const Cell & cell,
             themes = GetSwordCursorDirection(Board::GetDirection(index, b_current->GetHeadIndex()));
         // or show direction attack
         else
+	if(b)
 	{
 	    int res = PocketPC::GetCursorAttackDialog(cell.GetPos(), GetAllowSwordDirection(index));
 
