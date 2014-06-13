@@ -130,25 +130,29 @@ int PocketPC::SelectScenario(void)
 	listbox.QueueEventProcessing();
 	result = btnGroups.QueueEventProcessing();
 
-	if(((le.MouseClickLeft(buttonSelectSmall) || le.KeyPress(KEY_s)) && buttonSelectSmall.isEnable()) && buttonSelectSmall.isEnable())
+	if((le.MouseClickLeft(buttonSelectSmall) || le.KeyPress(KEY_s)) &&
+		buttonSelectSmall.isEnable() && buttonSelectSmall.isEnable())
 	{
 	    listbox.SetListContent(small);
 	    cursor.Hide();
 	}
 	else
-	if(((le.MouseClickLeft(buttonSelectMedium) || le.KeyPress(KEY_m)) && buttonSelectMedium.isEnable()) && buttonSelectMedium.isEnable())
+	if((le.MouseClickLeft(buttonSelectMedium) || le.KeyPress(KEY_m)) &&
+		buttonSelectMedium.isEnable() && buttonSelectMedium.isEnable())
 	{
 	    listbox.SetListContent(medium);
 	    cursor.Hide();
 	}
 	else
-	if(((le.MouseClickLeft(buttonSelectLarge) || le.KeyPress(KEY_l)) && buttonSelectLarge.isEnable()) && buttonSelectLarge.isEnable())
+	if((le.MouseClickLeft(buttonSelectLarge) || le.KeyPress(KEY_l)) &&
+		buttonSelectLarge.isEnable() && buttonSelectLarge.isEnable())
 	{
 	    listbox.SetListContent(large);
 	    cursor.Hide();
 	}
 	else
-	if(((le.MouseClickLeft(buttonSelectXLarge) || le.KeyPress(KEY_x)) && buttonSelectXLarge.isEnable()) && buttonSelectXLarge.isEnable())
+	if((le.MouseClickLeft(buttonSelectXLarge) || le.KeyPress(KEY_x)) &&
+		buttonSelectXLarge.isEnable() && buttonSelectXLarge.isEnable())
 	{
 	    listbox.SetListContent(xlarge);
 	    cursor.Hide();

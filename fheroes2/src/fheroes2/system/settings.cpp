@@ -873,14 +873,9 @@ int Settings::MapsDifficulty(void) const
     return current_maps_file.difficulty;
 }
 
-int Settings::MapsWidth(void) const
+Size Settings::MapsSize(void) const
 {
-    return current_maps_file.size_w;
-}
-
-int Settings::MapsHeight(void) const
-{
-    return current_maps_file.size_h;
+    return Size(current_maps_file.size_w, current_maps_file.size_h);
 }
 
 bool Settings::AllowChangeRace(int f) const

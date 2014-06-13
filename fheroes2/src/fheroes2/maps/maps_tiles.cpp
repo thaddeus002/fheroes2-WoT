@@ -1173,9 +1173,12 @@ bool Exclude4LongObject(const Maps::TilesAddon & ta)
 	    Maps::TilesAddon::isRoad(ta) || Maps::TilesAddon::isShadow(ta);
 }
 
-bool LongObjectUniq(const Maps::TilesAddon ta, u32 uid)
+bool HaveLongObjectUniq(const Maps::Addons & level, u32 uid)
 {
-    return !Exclude4LongObject(ta) && ta.isUniq(uid);
+    for(Maps::Addons::const_iterator
+	it = level.begin(); it != level.end(); ++it)
+	if(!Exclude4LongObject(*it) && (*it).isUniq(uid)) return true;
+    return false;
 }
 
 bool TopObjectDisable(const Maps::TilesAddon & ta)
@@ -1192,11 +1195,8 @@ bool Maps::Tiles::isLongObject(int direction)
 	for(Addons::const_iterator
 	    it = addons_level1.begin(); it != addons_level1.end(); ++it)
 	    if(! Exclude4LongObject(*it) &&
-		(tile.addons_level1.end() != std::find_if(tile.addons_level1.begin(), tile.addons_level1.end(),
-						    std::bind2nd(std::ptr_fun(&LongObjectUniq), (*it).uniq)) ||
-		(! Maps::TilesAddon::isTrees(*it) &&
-		 tile.addons_level2.end() != std::find_if(tile.addons_level2.begin(), tile.addons_level2.end(),
-						    std::bind2nd(std::ptr_fun(&LongObjectUniq), (*it).uniq)))))
+		(HaveLongObjectUniq(tile.addons_level1, (*it).uniq) ||
+		(! Maps::TilesAddon::isTrees(*it) && HaveLongObjectUniq(tile.addons_level2, (*it).uniq))))
 		return true;
     }
     return false;

@@ -102,7 +102,7 @@ bool Game::Save(const std::string &fn)
     if(fs.is_open())
     {
 	StreamBuf hinfo(1024);
-	StreamBuf gdata((Maps::MEDIUM < conf.MapsWidth() ? 1024 :512) * 1024);
+	StreamBuf gdata((Maps::MEDIUM < conf.MapsSize().w ? 1024 :512) * 1024);
 	if(! autosave) Game::SetLastSavename(fn);
 
 	hinfo.setbigendian(true);
@@ -156,7 +156,7 @@ bool Game::Load(const std::string & fn)
 	    std::string strver;
 	    u16 binver = 0;
 	    StreamBuf hinfo(1024);
-	    StreamBuf gdata((Maps::MEDIUM < conf.MapsWidth() ? 1024 : 512) * 1024);
+	    StreamBuf gdata((Maps::MEDIUM < conf.MapsSize().w ? 1024 : 512) * 1024);
 	    HeaderSAV header;
 
 	    hinfo.setbigendian(true);

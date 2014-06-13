@@ -280,7 +280,7 @@ void SpriteDrawICNv1(Surface & sf, const u8* cur, const u32 size,  bool debug)
 	if(0xC0 == *cur)
 	{
 	    ++cur;
-	    c = *cur % 4 ? *cur % 4 : *(++cur);
+	    c = (*cur % 4) ? *cur % 4 : *(++cur);
 
 	    while(c--){ sf.SetPixel(x, y, shadow); ++x; }
 

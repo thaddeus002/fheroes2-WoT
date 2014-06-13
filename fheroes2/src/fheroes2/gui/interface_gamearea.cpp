@@ -41,7 +41,8 @@ namespace Game
     void MouseCursorAreaPressRight(s32);
 }
 
-Interface::GameArea::GameArea(Basic & basic) : interface(basic), oldIndexPos(0), updateCursor(false)
+Interface::GameArea::GameArea(Basic & basic) : interface(basic), oldIndexPos(0), scrollDirection(0),
+				scrollStepX(32), scrollStepY(32), tailX(0), tailY(0), updateCursor(false)
 {
 }
 

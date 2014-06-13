@@ -38,7 +38,7 @@
 #define RESOURCE_WINDOW_EXPIRE 2500
 
 Interface::StatusWindow::StatusWindow(Basic & basic) : BorderWindow(Rect(0, 0, 144, 72)),
-	interface(basic), state(STATUS_UNKNOWN), oldState(STATUS_UNKNOWN)
+	interface(basic), state(STATUS_UNKNOWN), oldState(STATUS_UNKNOWN), lastResource(Resource::UNKNOWN)
 {
 }
 

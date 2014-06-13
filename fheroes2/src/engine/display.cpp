@@ -66,7 +66,7 @@ void UpdateRects::SetVideoMode(int dw, int dh)
     }
 
     len = (dw >> bf) * (dh >> bf);
-    len = (len % 8 ? (len >> 3) + 1 : len >> 3);
+    len = ((len % 8) ? (len >> 3) + 1 : len >> 3);
 
     if(bits) delete [] bits;
     bits = new u8 [len];

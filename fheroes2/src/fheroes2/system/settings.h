@@ -381,8 +381,7 @@ public:
     const std::string & MapsName(void) const;
     const std::string & MapsDescription(void) const;
     int			MapsDifficulty(void) const;
-    int			MapsWidth(void) const;
-    int			MapsHeight(void) const;
+    Size		MapsSize(void) const;
     bool		GameStartWithHeroes(void) const;
     int			ConditionWins(void) const;
     int			ConditionLoss(void) const;

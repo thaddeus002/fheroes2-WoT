@@ -95,7 +95,7 @@ int ObjectVisitedModifiersResult(int type, const u8* objs, u32 size, const Heroe
     return result;
 }
 
-Heroes::Heroes() : move_point_scale(-1), army(this), hid(UNKNOWN), portrait(UNKNOWN), race(UNKNOWN), path(*this),
+Heroes::Heroes() : move_point_scale(-1), army(this), hid(UNKNOWN), portrait(UNKNOWN), race(UNKNOWN), save_maps_object(0), path(*this),
     direction(Direction::RIGHT), sprite_index(18), patrol_square(0)
 {
 }

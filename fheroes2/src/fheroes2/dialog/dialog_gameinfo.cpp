@@ -80,7 +80,7 @@ void Dialog::GameInfo(void)
     text.Set(GetString(Game::GetRating()) + " %", Font::SMALL, 80);
     text.Blit(pt.x + 230, pt.y + 80);
 
-    text.Set(Maps::SizeString(conf.MapsWidth()), Font::SMALL, 80);
+    text.Set(Maps::SizeString(conf.MapsSize().w), Font::SMALL, 80);
     text.Blit(pt.x + 322, pt.y + 80);
 
     text.Set(conf.MapsDescription(), Font::SMALL, 350);

@@ -95,7 +95,7 @@ void HeroesIndicator::SetPos(const Point & pt, bool skip_back)
     if(! skip_back) back.Save(area);
 }
 
-LuckIndicator::LuckIndicator(const Heroes & h) : HeroesIndicator(h)
+LuckIndicator::LuckIndicator(const Heroes & h) : HeroesIndicator(h), luck(Luck::NORMAL)
 {
     area.w = 35;
     area.h = 26;

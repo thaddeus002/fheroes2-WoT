@@ -85,10 +85,10 @@ namespace Battle
 
 	if(result && orders_mode)
 	{
-	    if(result == *it1 && it1 != units1.end())
+	    if(it1 != units1.end() && result == *it1)
 		units1.erase(it1);
 	    else
-	    if(result == *it2 && it2 != units2.end())
+	    if(it2 != units2.end() && result == *it2)
 		units2.erase(it2);
 	}
 

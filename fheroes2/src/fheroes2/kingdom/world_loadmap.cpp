@@ -544,7 +544,7 @@ TiXmlElement & operator>> (TiXmlElement & doc, MapObjects & objects)
 	    objects.add(Maps::GetIndexFromAbsPoint(posx, posy), ptr);
 	}
 	else
-	if("event")
+	if(name == "event")
 	{
 	    MapEvent* ptr = new MapEvent();
 	    *xml_objects >> *ptr;

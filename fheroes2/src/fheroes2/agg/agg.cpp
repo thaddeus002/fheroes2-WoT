@@ -1554,7 +1554,7 @@ u32 AGG::GetFontHeight(bool small)
 /* return letter sprite */
 Surface AGG::GetUnicodeLetter(u32 ch, u32 ft)
 {
-    bool ttf_valid = fonts[0].isValid() && fonts[0].isValid();
+    bool ttf_valid = fonts[0].isValid() && fonts[1].isValid();
 
     if(! ttf_valid)
         return GetLetter(ch, ft);

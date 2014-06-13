@@ -1638,7 +1638,7 @@ void Battle::Interface::HumanBattleTurn(const Unit & b, Actions & a, std::string
 	    ProcessingHeroDialogResult(3, a);
 
 	// debug only
-#ifdef DEBUG
+#ifdef WITH_DEBUG
 	if(IS_DEVEL())
 	switch(le.KeyValue())
 	{
@@ -3487,7 +3487,7 @@ void Battle::Interface::RedrawActionDisruptingRaySpell(Unit & target)
 	if(Battle::AnimateInfrequentDelay(Game::BATTLE_DISRUPTING_DELAY))
     	{
 	    cursor.Hide();
-	    sprite2.SetPos(Point(sprite1.x() + (frame % 2 ? -1 : 1), sprite1.y()));
+	    sprite2.SetPos(Point(sprite1.x() + ((frame % 2) ? -1 : 1), sprite1.y()));
 	    Redraw();
 	    cursor.Show();
 	    display.Flip();
