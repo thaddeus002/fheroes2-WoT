@@ -29,7 +29,7 @@
 #include "surface.h"
 #include "types.h"
 
-struct RGBA;
+class RGBA;
 
 #ifdef WITH_TTF
 #include "SDL_ttf.h"
