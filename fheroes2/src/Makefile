@@ -3,8 +3,14 @@
 #
 
 TARGET := fheroes2
+
+ifdef WITH_SDL2
+SDL_LIBS := $(shell sdl2-config --libs)
+SDL_FLAGS := $(shell sdl2-config --cflags)
+else
 SDL_LIBS := $(shell sdl-config --libs)
 SDL_FLAGS := $(shell sdl-config --cflags)
+endif
 
 CFLAGS := $(CFLAGS) -Wall -fsigned-char
 LDFLAGS := $(LDFLAGS)

@@ -116,6 +116,8 @@ void Display::Flip(void)
 	    else
 		SDL_RenderPresent(renderer);
 	}
+
+	SDL_DestroyTexture(tx);
     }
     else
     	Error::Message(__FUNCTION__, SDL_GetError());
