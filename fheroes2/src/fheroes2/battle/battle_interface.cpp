@@ -187,7 +187,7 @@ Surface DrawHexagon(const RGBA & color)
 	h = CELLH;
     }
 
-    Surface sf(Size(w, h), true);
+    Surface sf(Size(w, h), false);
 
     sf.DrawLine(Point(r, 0), Point(0, l), color);
     sf.DrawLine(Point(r, 0), Point(w - 1, l), color);
@@ -220,9 +220,11 @@ Surface DrawHexagonShadow(void)
 	h = 52;
     }
 
-    Surface sf(Size(w, h), false);
+    Surface sf(Size(w, h), true);
+    RGBA shadow = RGBA(0, 0, 0, 0x30);
+
     Rect rt(0, l, w, 2 * l);
-    sf.FillRect(rt, ColorBlack);
+    sf.FillRect(rt, shadow);
 
     for(int i = 1; i < w / 2; i += 2)
     {
@@ -230,10 +232,9 @@ Surface DrawHexagonShadow(void)
 	rt.h += 2;
 	rt.x += 2;
 	rt.w -= 4;
-	sf.FillRect(rt, ColorBlack);
+	sf.FillRect(rt, shadow);
     }
 
-    sf.SetAlphaMod(0x30);
     return sf;
 }
 
