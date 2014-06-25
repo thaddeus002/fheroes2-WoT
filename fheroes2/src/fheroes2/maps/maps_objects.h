@@ -80,9 +80,11 @@ struct MapSign : public ObjectSimple, public MapPosition
 StreamBase & operator<< (StreamBase &, const MapSign &);
 StreamBase & operator>> (StreamBase &, MapSign &);
 
+/*
 struct MapArtifact : public ObjectSimple, public MapPosition
 {
     MapArtifact(){}
 };
+*/
 
 #endif

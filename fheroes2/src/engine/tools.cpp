@@ -35,6 +35,9 @@
 /* trim left right space */
 std::string StringTrim(std::string str)
 {
+    if(str.empty())
+	return str;
+
     std::string::iterator iter;
 
     // left

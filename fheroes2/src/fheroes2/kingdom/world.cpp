@@ -1078,6 +1078,18 @@ StreamBase & operator<< (StreamBase & msg, const MapObjects & objs)
 
         switch(obj.GetType())
         {
+	    case MP2::OBJ_EVENT:
+		msg << static_cast<const MapEvent &>(obj);
+		break;
+
+	    case MP2::OBJ_SPHINX:
+		msg << static_cast<const MapSphinx &>(obj);
+		break;
+
+	    case MP2::OBJ_SIGN:
+		msg << static_cast<const MapSign &>(obj);
+		break;
+
 	    case MP2::OBJ_RESOURCE:
 	    case MP2::OBJ_ARTIFACT:
 	    case MP2::OBJ_MONSTER:
@@ -1103,6 +1115,45 @@ StreamBase & operator>> (StreamBase & msg, MapObjects & objs)
 
         switch(type)
         {
+	    case MP2::OBJ_EVENT:
+	    {
+		MapEvent* ptr = new MapEvent();
+		if(FORMAT_VERSION_3220 > Game::GetLoadVersion())
+		{
+		    msg >> *static_cast<ObjectSimple*>(ptr);
+		    ptr->message = "brocken old save format, sorry...";
+		}
+		else
+		    msg >> *ptr;
+		objs[index] = ptr;
+	    } break;
+
+	    case MP2::OBJ_SPHINX:
+	    {
+		MapSphinx* ptr = new MapSphinx();
+		if(FORMAT_VERSION_3220 > Game::GetLoadVersion())
+		{
+		    msg >> *static_cast<ObjectSimple*>(ptr);
+		    ptr->message = "brocken old save format, sorry...";
+		}
+		else
+		    msg >> *ptr;
+		objs[index] = ptr;
+	    } break;
+
+	    case MP2::OBJ_SIGN:
+	    {
+		MapSign* ptr = new MapSign();
+		if(FORMAT_VERSION_3220 > Game::GetLoadVersion())
+		{
+		    msg >> *static_cast<ObjectSimple*>(ptr);
+		    ptr->message = "brocken old save format, sorry...";
+		}
+		else
+		    msg >> *ptr;
+		objs[index] = ptr;
+	    } break;
+
 //            case ACTION_DEFAULT:        { ActionDefault* ptr = new ActionDefault(); sb >> *ptr; st.push_back(ptr); } break;
             default: { ObjectSimple* ptr = new ObjectSimple(); msg >> *ptr; objs[index] = ptr; } break;
         }
