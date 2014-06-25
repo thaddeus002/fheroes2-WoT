@@ -258,12 +258,12 @@ void LoadZLogo(void)
 
 	    // scale logo
 	    if(Settings::Get().QVGA())
-		zlogo = Sprite::ScaleQVGASurface(zlogo);
+		static_cast<Surface &>(zlogo) = Sprite::ScaleQVGASurface(zlogo);
 
 	    const Point offset((display.w() - zlogo.w()) / 2, (display.h() - zlogo.h()) / 2);
 
-	    display.Fade(zlogo, black, offset, 250, 500);
-	    display.Rise(zlogo, black, offset, 10, 500
+	    display.Rise(zlogo, black, offset, 250, 500);
+	    display.Fade(zlogo, black, offset, 10, 500);
 	}
     }
 #endif
