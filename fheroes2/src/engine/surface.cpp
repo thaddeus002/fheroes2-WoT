@@ -690,7 +690,16 @@ void Surface::Blit(const Rect & srt, const Point & dpt, Surface & dst) const
 {
     SDL_Rect dstrect = SDLRect(dpt.x, dpt.y, srt.w, srt.h);
     SDL_Rect srcrect = SDLRect(srt);
-    SDL_BlitSurface(surface, & srcrect, dst.surface, & dstrect);
+
+    if(! dst.isDisplay() &&
+	amask()) && dst.amask())
+    {
+    	SDL_SetAlpha(surface, 0, 0);
+	SDL_BlitSurface(surface, & srcrect, dst.surface, & dstrect);
+	SDL_SetAlpha(surface, SDL_SRCALPHA, 255);
+    }
+    else
+	SDL_BlitSurface(surface, & srcrect, dst.surface, & dstrect);
 }
 
 void Surface::Blit(Surface & dst) const

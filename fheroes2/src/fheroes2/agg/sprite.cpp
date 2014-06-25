@@ -72,6 +72,7 @@ Sprite Sprite::CreateICN(int icn, const ICNHeader & header, const u8* cur, int s
     const u8* max = cur + size;
     u32 c = 0;
     Point pt(reflect ? sf.w() - 1 : 0, 0);
+
     RGBA shadow = RGBA(0, 0, 0, 0x40);
 
     while(1)
