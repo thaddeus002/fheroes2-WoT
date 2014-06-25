@@ -369,7 +369,7 @@ void BuildingInfo::Redraw(void)
 
 	if(BUILD_DISABLE == bcond)
 	{
-	    Surface::GrayScale(AGG::GetICN(ICN::BLDGXTRA, 0)).Blit(area.x, area.y, Display::Get());
+	    AGG::GetICN(ICN::BLDGXTRA, 0).RenderGrayScale().Blit(area.x, area.y, Display::Get());
 	}
 	else
 	{
@@ -395,7 +395,7 @@ void BuildingInfo::Redraw(void)
 	else
 	if(bcond == BUILD_DISABLE)
 	{
-	    Surface::GrayScale(sprite_deny).Blit(dst_pt, Display::Get());
+	    sprite_deny.RenderGrayScale().Blit(dst_pt, Display::Get());
 	}
 	else
 	if(bcond != ALLOW_BUILD)
@@ -688,7 +688,8 @@ DwellingsBar::DwellingsBar(Castle & cstl, const Size & sz, const RGBA & fill) : 
         content.push_back(DwellingItem(castle, dw));
 
     SetContent(content);
-    backsf = Surface::RectBorder(sz, fill, RGBA(0xd0,0xc0,0x48), true);
+    backsf.Set(sz.w, sz.h, false);
+    backsf.DrawBorder(RGBA(0xd0, 0xc0, 0x48));
     SetItemSize(sz.w, sz.h);
 }
 

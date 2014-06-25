@@ -37,7 +37,7 @@ Splitter::Splitter(const Surface & sf, const Rect & rt)
 
 void Splitter::SetSprite(const Surface & sf)
 {
-    Set(sf, true);
+    Surface::Set(sf, true);
 }
 
 void Splitter::SetArea(const Rect & rt)

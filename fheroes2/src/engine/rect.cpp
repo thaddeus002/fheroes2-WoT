@@ -44,7 +44,7 @@ bool Point::operator!= (const Point & pt) const
     return !(*this == pt);
 }
 
-Point & Point::operator+=(const Point & pt)
+Point & Point::operator+= (const Point & pt)
 {
     x += pt.x;
     y += pt.y;
@@ -52,7 +52,7 @@ Point & Point::operator+=(const Point & pt)
     return *this;
 }
 
-Point & Point::operator-=(const Point & pt)
+Point & Point::operator-= (const Point & pt)
 {
     x -= pt.x;
     y -= pt.y;
@@ -60,12 +60,12 @@ Point & Point::operator-=(const Point & pt)
     return *this;
 }
 
-Point Point::operator+(const Point & pt)
+Point Point::operator+ (const Point & pt) const
 {
     return Point(x + pt.x, y + pt.y);
 }
 
-Point Point::operator-(const Point & pt)
+Point Point::operator- (const Point & pt) const
 {
     return Point(x - pt.x, y - pt.y);
 }
@@ -99,6 +99,32 @@ bool Size::operator== (const Size & sz) const
 bool Size::operator!= (const Size & sz) const
 {
     return !(*this == sz);
+}
+
+Size & Size::operator+= (const Size & sz)
+{
+    w += sz.w;
+    h += sz.h;
+
+    return *this;
+}
+
+Size & Size::operator-= (const Size & sz)
+{
+    w -= sz.w;
+    h -= sz.h;
+
+    return *this;
+}
+
+Size Size::operator+ (const Size & sz) const
+{
+    return Size(w + sz.w, h + sz.h); 
+}
+
+Size Size::operator- (const Size & sz) const
+{
+    return Size(w - sz.w, h - sz.h); 
 }
 
 bool Size::isEmpty(void) const

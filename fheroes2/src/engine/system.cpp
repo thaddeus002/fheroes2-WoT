@@ -25,6 +25,7 @@
 #include <fstream>
 #include <cctype>
 #include <cstdlib>
+#include <clocale>
 
 #include "SDL.h"
 #include "system.h"
@@ -79,6 +80,21 @@ int System::MakeDirectory(const std::string & path)
 std::string System::ConcatePath(const std::string & str1, const std::string & str2)
 {
     return std::string(str1 + SEPARATOR + str2);
+}
+
+std::list<std::string> System::GetExtendedDirectories(void)
+{
+    std::list<std::string> res;
+#if defined(ANDROID)
+    res.push_back(SDL_AndroidGetInternalStoragePath());
+
+    if(SDL_ANDROID_EXTERNAL_STORAGE_READ & SDL_AndroidGetExternalStorageState())
+        res.push_back(SDL_AndroidGetExternalStoragePath());
+
+    res.push_back("/storage/sdcard0/fheroes2");
+    res.push_back("/storage/sdcard1/fheroes2");
+#endif
+    return res;
 }
 
 std::string System::GetDirname(const std::string & str)
@@ -232,7 +248,11 @@ bool System::IsDirectory(const std::string & name, bool writable)
     if(stat(name.c_str(), &fs) || !S_ISDIR(fs.st_mode))
         return false;
 
+#if defined (ANDROID)
+    return writable ? 0 == access(name.c_str(), W_OK) : true;
+#else
     return writable ? 0 == access(name.c_str(), W_OK) : S_IRUSR & fs.st_mode;
+#endif
 }
 
 int System::Unlink(const std::string & file)
@@ -369,4 +389,26 @@ bool System::isEmbededDevice(void)
     return true;
 #endif
     return false;
+}
+
+int System::GetRenderFlags(void)
+{
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+ #if defined(__MINGW32CE__) || defined(__SYMBIAN32__)
+    return SDL_RENDERER_SOFTWARE;
+ #endif
+ #if defined(__WIN32__) || defined(ANDROID)
+    return SDL_RENDERER_SOFTWARE;
+ #endif
+    return SDL_RENDERER_ACCELERATED;
+    //return SDL_RENDERER_SOFTWARE;
+#else
+ #if defined(__MINGW32CE__) || defined(__SYMBIAN32__)
+    return SDL_SWSURFACE;
+ #endif
+ #if defined(__WIN32__) || defined(ANDROID)
+    return SDL_HWSURFACE;
+ #endif
+    return SDL_SWSURFACE;
+#endif
 }

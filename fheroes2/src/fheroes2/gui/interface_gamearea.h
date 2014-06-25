@@ -84,7 +84,7 @@ namespace Interface
 	s32		GetIndexFromMousePoint(const Point &) const;
 	Rect		RectFixed(Point & dst, int rw, int rh) const;
 
-	static void	GenerateUltimateArtifactAreaSurface(s32, Surface &);
+	static Surface	GenerateUltimateArtifactAreaSurface(s32);
 
     private:
 	void SetAreaPosition(s32, s32, u32, u32);

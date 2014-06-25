@@ -47,22 +47,6 @@ namespace Skill
 			Secondary::LUCK, Secondary::BALLISTICS, Secondary::EAGLEEYE, Secondary::NECROMANCY, Secondary::ESTATES };
 }
 
-/*
-struct defaulthero_t
-{
-    const char*	name;
-    primary_t	primary;
-    secondary_t	sec;
-    // default army
-    // default art
-    // default spells
-    Surface	port30x22;
-    Surface	port50x46;
-    Surface	port101x93;
-
-};
-*/
-
 u32 Skill::Secondary::GetValues(void) const
 {
     const values_t* val = GameStatic::GetSkillValues(Skill());
@@ -731,9 +715,9 @@ StreamBase & Skill::operator>> (StreamBase & msg, Primary & skill)
 
 Surface GetBarBackgroundSprite(void)
 {
-    Surface res;
     const Rect rt(26, 21, 32, 32);
-    res = Surface::RectBorder(Size(rt.w + 2, rt.h + 2), RGBA(0xD0,0xC0,0x48), true);
+    Surface res(Size(rt.w, rt.h) + Size(2, 2), true);
+    res.DrawBorder(RGBA(0xD0, 0xC0, 0x48));
     AGG::GetICN(ICN::HSICONS, 0).Blit(rt, 1, 1, res);
     return res;
 }

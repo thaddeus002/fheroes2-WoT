@@ -71,9 +71,7 @@ int Dialog::SystemOptions(void)
     const Rect & rect8 = rects[7];
 //    const Rect & rect9 = rects[8];
 
-    Surface back2(area.w, area.h - 30);
-    display.Blit(area, 0, 0, back2);
-
+    Surface back2 = display.GetSurface(Rect(area.x, area.y, area.w, area.h - 30));
     DrawSystemInfo(rects);
 
     LocalEvent & le = LocalEvent::Get();
@@ -179,7 +177,7 @@ void Dialog::DrawSystemInfo(const Rects & rects)
     std::string str;
     Text text;
 
-    Surface black(65, 65);
+    Surface black(Size(65, 65), false);
     black.Fill(ColorBlack);
 
     // sound

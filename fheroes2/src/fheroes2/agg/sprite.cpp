@@ -52,14 +52,8 @@ Sprite::Sprite()
 {
 }
 
-Sprite::Sprite(const Texture & sf, s32 ox, s32 oy) : SpritePos(sf, Point(ox, oy))
+Sprite::Sprite(const Surface & sf, s32 ox, s32 oy) : SpritePos(sf, Point(ox, oy))
 {
-}
-
-Sprite & Sprite::operator= (const Texture & sf)
-{
-    Set(sf, true);
-    return *this;
 }
 
 int Sprite::x(void) const
@@ -72,115 +66,93 @@ int Sprite::y(void) const
     return pos.y;
 }
 
-void Sprite::DrawICN(int icn, const u8* cur, int size, bool reflect, Surface & sf)
+Sprite Sprite::CreateICN(int icn, const ICNHeader & header, const u8* cur, int size, bool reflect)
 {
-    if(NULL == cur || 0 == size) return;
-
+    Surface sf(Size(header.width, header.height), true);
     const u8* max = cur + size;
-
     u32 c = 0;
-    u32 x = reflect ? sf.w() - 1 : 0;
-    u32 y = 0;
-
-    Surface sf_tmp;
-    Surface* sf_cur = sf.amask() ? &sf : &sf_tmp;
-    u32 shadow = sf_cur->isValid() ? sf_cur->MapRGB(RGBA(0, 0, 0, 0x40)) : 0;
-
-    // lock surface
-    sf.Lock();
+    Point pt(reflect ? sf.w() - 1 : 0, 0);
+    RGBA shadow = RGBA(0, 0, 0, 0x40);
 
     while(1)
     {
-	// 0x00 - end line
-	if(0 == *cur)
-	{
-	    ++y;
-	    x = reflect ? sf.w() - 1 : 0;
-	    ++cur;
-	}
-	else
-	// 0x7F - count data
-	if(0x80 > *cur)
-	{
-	    c = *cur;
-	    ++cur;
-	    while(c-- && cur < max)
-	    {
-		sf.SetPixel(x, y, AGG::GetPaletteColor(*cur));
-		reflect ? x-- : x++;
-		++cur;
-	    }
-	}
-	else
-	// 0x80 - end data
-	if(0x80 == *cur)
-	{
-	    break;
-	}
-	else
-	// 0xBF - skip data
-	if(0xC0 > *cur)
-	{
-	    reflect ? x -= *cur - 0x80 : x += *cur - 0x80;
-	    ++cur;
-	}
-	else
-	// 0xC0 - shadow
-	if(0xC0 == *cur)
-	{
-	    ++cur;
-	    c = *cur % 4 ? *cur % 4 : *(++cur);
+        // 0x00 - end line
+        if(0 == *cur)
+        {
+            ++pt.y;
+            pt.x = reflect ? sf.w() - 1 : 0;
+            ++cur;
+        }
+        else
+        // 0x7F - count data
+        if(0x80 > *cur)
+        {
+            c = *cur;
+            ++cur;
+            while(c-- && cur < max)
+            {
+                sf.DrawPoint(pt, AGG::GetPaletteColor(*cur));
+                reflect ? pt.x-- : pt.x++;
+                ++cur;
+            }
+        }
+        else
+        // 0x80 - end data
+        if(0x80 == *cur)
+        {
+            break;
+        }
+        else
+        // 0xBF - skip data
+        if(0xC0 > *cur)
+        {
+            reflect ? pt.x -= *cur - 0x80 : pt.x += *cur - 0x80;
+            ++cur;
+        }
+        else
+        // 0xC0 - shadow
+        if(0xC0 == *cur)
+        {
+            ++cur;
+            c = *cur % 4 ? *cur % 4 : *(++cur);
 
-	    if(SkipLocalAlpha(icn) || 8 == sf.depth())
-	    {
-		while(c--){ reflect ? x-- : x++; }
-	    }
-	    else
-	    {
-		if(! sf_cur->isValid())
-		{
-		    sf_cur->Set(sf.w(), sf.h(), true);
-		    shadow = sf_cur->MapRGB(RGBA(0, 0, 0, 0x40));
-		}
+            if(SkipLocalAlpha(icn) || sf.depth() == 8)
+            {
+                while(c--){ reflect ? pt.x-- : pt.x++; }
+            }
+            else
+            {
+                while(c--){ sf.DrawPoint(pt, shadow); reflect ? pt.x-- : pt.x++; }
+            }
 
-		while(c--){ sf_cur->SetPixel(x, y, shadow); reflect ? x-- : x++; }
-	    }
+            ++cur;
+        }
+        else
+        // 0xC1
+        if(0xC1 == *cur)
+        {
+            ++cur;
+            c = *cur;
+            ++cur;
+            while(c--){ sf.DrawPoint(pt, AGG::GetPaletteColor(*cur)); reflect ? pt.x-- : pt.x++; }
+            ++cur;
+        }
+        else
+        {
+            c = *cur - 0xC0;
+            ++cur;
+            while(c--){ sf.DrawPoint(pt, AGG::GetPaletteColor(*cur)); reflect ? pt.x-- : pt.x++; }
+            ++cur;
+        }
 
-	    ++cur;
-	}
-	else
-	// 0xC1
-	if(0xC1 == *cur)
-	{
-	    ++cur;
-	    c = *cur;
-	    ++cur;
-	    while(c--){ sf.SetPixel(x, y, AGG::GetPaletteColor(*cur)); reflect ? x-- : x++; }
-	    ++cur;
-	}
-	else
-	{
-	    c = *cur - 0xC0;
-	    ++cur;
-	    while(c--){ sf.SetPixel(x, y, AGG::GetPaletteColor(*cur)); reflect ? x-- : x++; }
-	    ++cur;
-	}
-
-	if(cur >= max)
-	{
-	    DEBUG(DBG_ENGINE, DBG_WARN, "out of range: " << cur - max);
-	    break;
-	}
+        if(cur >= max)
+        {
+            DEBUG(DBG_ENGINE, DBG_WARN, "out of range: " << cur - max);
+            break;
+        }
     }
 
-    // unlock surface
-    sf.Unlock();
-
-    if(sf_tmp.isValid())
-    {
-	sf.Blit(sf_tmp);
-	Surface::Swap(sf_tmp, sf);
-    }
+    return Sprite(sf, header.offsetX, header.offsetY);
 }
 
 void Sprite::AddonExtensionModify(Sprite & sp, int icn, int index)
@@ -190,8 +162,7 @@ void Sprite::AddonExtensionModify(Sprite & sp, int icn, int index)
 	case ICN::AELEM:
 	    if(sp.w() > 3 && sp.h() > 3)
 	    {
-		Surface sf = Surface::Contour(sp, RGBA(0, 0x84, 0xe0));
-		sf.Blit(-1, -1, sp);
+		sp.RenderContour(RGBA(0, 0x84, 0xe0)).Blit(-1, -1, sp);
 	    }
 	    break;
 
@@ -203,7 +174,7 @@ Surface Sprite::ScaleQVGASurface(const Surface & src)
 {
     s32 w = src.w() / 2;
     s32 h = src.h() / 2;
-    return Surface::Scale(src, (w ? w : 1), (h ? h : 1));
+    return src.RenderScale(Size((w ? w : 1), (h ? h : 1)));
 }
 
 Sprite Sprite::ScaleQVGASprite(const Sprite & sp)
@@ -223,8 +194,7 @@ Sprite Sprite::ScaleQVGASprite(const Sprite & sp)
 	    display.Flip();
 	}
 
-	Surface mini = ScaleQVGASurface(sp);
-	Surface::Swap(mini, res);
+	res.SetSurface(ScaleQVGASurface(sp));
 
 	if(theme)
 	{
@@ -242,5 +212,30 @@ Sprite Sprite::ScaleQVGASprite(const Sprite & sp)
 
 void Sprite::ChangeColorIndex(u32 fc, u32 tc)
 {
-    Surface::ChangeColor(AGG::GetPaletteColor(fc), AGG::GetPaletteColor(tc), *this);
+    SetSurface(RenderChangeColor(AGG::GetPaletteColor(fc), AGG::GetPaletteColor(tc)));
+}
+
+void Sprite::Blit(void) const
+{
+    Blit(Display::Get());
+}
+
+void Sprite::Blit(s32 dx, s32 dy) const
+{
+    Blit(Point(dx, dy), Display::Get());
+}
+
+void Sprite::Blit(const Point & dpt) const
+{
+    Blit(Rect(Point(0, 0), GetSize()), dpt, Display::Get());
+}
+
+void Sprite::Blit(const Rect & srt, s32 dx, s32 dy) const
+{
+    Blit(srt, Point(dx, dy), Display::Get());
+}
+
+void Sprite::Blit(const Rect & srt, const Point & dpt) const
+{
+    Blit(srt, dpt, Display::Get());
 }

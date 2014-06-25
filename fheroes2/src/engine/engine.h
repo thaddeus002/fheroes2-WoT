@@ -30,12 +30,15 @@
 #include "rect.h"
 #include "surface.h"
 #include "rand.h"
+#include "font.h"
 #include "tools.h"
+#include "serialize.h"
+#include "system.h"
+
 #include "audio.h"
 #include "audio_mixer.h"
 #include "audio_music.h"
 #include "audio_cdrom.h"
-#include "serialize.h"
 
 #define INIT_VIDEO	SDL_INIT_VIDEO
 #define INIT_AUDIO	SDL_INIT_AUDIO

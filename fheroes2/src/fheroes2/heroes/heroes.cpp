@@ -1072,9 +1072,8 @@ bool Heroes::BuySpellBook(const Castle* castle, int shrine)
     if(isControlHuman())
     {
 	const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
-	Surface sprite(border.w(), border.h());
+	Surface sprite = border.GetSurface();
 
-	border.Blit(sprite);
 	AGG::GetICN(ICN::ARTIFACT, Artifact(Artifact::MAGIC_BOOK).IndexSprite64()).Blit(5, 5, sprite);
 
 	header.append(" ");

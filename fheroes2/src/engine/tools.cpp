@@ -27,6 +27,7 @@
 #include <iomanip>
 #include <cstring>
 #include <climits>
+#include <cctype>
 #include "error.h"
 #include "types.h"
 #include "tools.h"
@@ -517,6 +518,24 @@ std::vector<u8> LoadFileToMem(const std::string & file)
         fs.read(reinterpret_cast<char*>(&data[0]), data.size());
         fs.close();
     }
+    else
+    {
+#if defined(ANDROID)
+	SDL_RWops *rw = SDL_RWFromFile(file.c_str(),"r");
+
+	if(rw != NULL)
+	{
+	    if(SDL_RWseek(rw, 0, RW_SEEK_END) != -1)
+	    {
+		data.resize(SDL_RWtell(rw));
+		SDL_RWseek(rw, 0, RW_SEEK_SET);
+		SDL_RWread(rw, reinterpret_cast<char*>(&data[0]), data.size(), 1);
+		SDL_RWclose(rw);
+	    }
+	}
+#endif
+    }
+
     return data;
 }
 
@@ -781,4 +800,28 @@ std::vector<u8> decodeBase64(const std::string & src)
     }
 
     return res;
+}
+
+int CheckSum(const std::vector<u8> & v)
+{
+    u32 ret = 0;
+    std::vector<u8>::const_iterator it = v.begin();
+
+    do
+    {
+	u32 b1 = it < v.end() ? *it++ : 0;
+	u32 b2 = it < v.end() ? *it++ : 0;
+	u32 b3 = it < v.end() ? *it++ : 0;
+	u32 b4 = it < v.end() ? *it++ : 0;
+
+	ret += (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
+    }
+    while(it != v.end());
+
+    return ret;
+}
+
+int CheckSum(const std::string & str)
+{
+    return CheckSum(std::vector<u8>(str.begin(), str.end()));
 }

@@ -90,7 +90,7 @@ namespace H2Palette
 	return index < pal_colors.size() ?
     	RGBA(pal_colors[index].r, pal_colors[index].g, pal_colors[index].b) : RGBA(0,0,0);
     }
-};
+}
 
 int main(int argc, char **argv)
 {
@@ -180,7 +180,7 @@ int main(int argc, char **argv)
         std::memset(buf, 0x80, data_size + 100);
         fd_data.read((char*) buf, data_size);
 
-	Surface sf(head.width, head.height, /*false*/true); // accepting transparency
+	Surface sf(Size(head.width, head.height), /*false*/true); // accepting transparency
 
         const RGBA clkey = RGBA(0xFF, 0, 0xFF);
         sf.Fill(clkey);
@@ -229,11 +229,9 @@ void SpriteDrawICNv1(Surface & sf, const u8* cur, const u32 size,  bool debug)
     u16 x = 0;
     u16 y = 0;
 
-    u32 shadow = sf.MapRGB(RGBA(0, 0, 0, 0x40));
-    u32 opaque = sf.MapRGB(RGBA(0, 0, 0, 0xff)); // non-transparent mask
+    RGBA shadow = RGBA(0, 0, 0, 0x40);
 
     // lock surface
-    sf.Lock();
     while(1)
     {
 	if(debug)
@@ -254,7 +252,7 @@ void SpriteDrawICNv1(Surface & sf, const u8* cur, const u32 size,  bool debug)
 	    ++cur;
 	    while(c-- && cur < max)
 	    {
-		sf.SetPixel(x, y, sf.MapRGB(H2Palette::GetColor(*cur)) | opaque);
+		sf.DrawPoint(Point(x, y), H2Palette::GetColor(*cur));
 		++x;
 		++cur;
 	    }
@@ -282,7 +280,7 @@ void SpriteDrawICNv1(Surface & sf, const u8* cur, const u32 size,  bool debug)
 	    ++cur;
 	    c = (*cur % 4) ? *cur % 4 : *(++cur);
 
-	    while(c--){ sf.SetPixel(x, y, shadow); ++x; }
+	    while(c--){ sf.DrawPoint(Point(x, y), shadow); ++x; }
 
 	    ++cur;
 	}
@@ -293,14 +291,14 @@ void SpriteDrawICNv1(Surface & sf, const u8* cur, const u32 size,  bool debug)
 	    ++cur;
 	    c = *cur;
 	    ++cur;
-	    while(c--){ sf.SetPixel(x, y, sf.MapRGB(H2Palette::GetColor(*cur)) | opaque); ++x; }
+	    while(c--){ sf.DrawPoint(Point(x, y), H2Palette::GetColor(*cur)); ++x; }
 	    ++cur;
 	}
 	else
 	{
 	    c = *cur - 0xC0;
 	    ++cur;
-	    while(c--){ sf.SetPixel(x, y, sf.MapRGB(H2Palette::GetColor(*cur)) | opaque); ++x; }
+	    while(c--){ sf.DrawPoint(Point(x, y), H2Palette::GetColor(*cur)); ++x; }
 	    ++cur;
 	}
 
@@ -313,9 +311,6 @@ void SpriteDrawICNv1(Surface & sf, const u8* cur, const u32 size,  bool debug)
 	if(debug)
 	    std::cerr << std::endl;
     }
-
-    // unlock surface
-    sf.Unlock();
 }
 
 void SpriteDrawICNv2(Surface & sf, const u8* cur, const u32 size,  bool debug)
@@ -326,11 +321,9 @@ void SpriteDrawICNv2(Surface & sf, const u8* cur, const u32 size,  bool debug)
     u16 x = 0;
     u16 y = 0;
 
-    u32 opaque = sf.MapRGB(RGBA(0, 0, 0, 0xff)); // non-transparent mask
-    u32 shadow = sf.MapRGB(H2Palette::GetColor(1)) | opaque;
+    RGBA shadow = RGBA(0, 0, 0, 0xff);
 
     // lock surface
-    sf.Lock();
     while(1)
     {
 	if(debug)
@@ -350,7 +343,7 @@ void SpriteDrawICNv2(Surface & sf, const u8* cur, const u32 size,  bool debug)
 	    c = *cur;
 	    while(c--)
 	    {
-		sf.SetPixel(x, y, shadow);
+		sf.DrawPoint(Point(x, y), shadow);
 		++x;
 	    }
 	    ++cur;
@@ -380,7 +373,4 @@ void SpriteDrawICNv2(Surface & sf, const u8* cur, const u32 size,  bool debug)
 	if(debug)
 	    std::cerr << std::endl;
     }
-
-    // unlock surface
-    sf.Unlock();
 }

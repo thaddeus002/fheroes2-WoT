@@ -782,11 +782,13 @@ ArtifactsBar::ArtifactsBar(const Heroes* ptr, bool mini, bool ro, bool change /*
         const Sprite & sprite = AGG::GetICN(ICN::HSICONS, 0);
         const Rect rt(26, 21, 32, 32);
 
-	backsf = Surface::RectBorder(Size(rt.w + 2, rt.h + 2), RGBA(0xD0,0xC0,0x48), true);
+	backsf.Set(rt.w + 2, rt.h + 2, true);
+	backsf.DrawBorder(RGBA(0xD0, 0xC0, 0x48));
 	sprite.Blit(rt, 1, 1, backsf);
 
 	SetItemSize(backsf.w(), backsf.h());
-	spcursor = Surface::RectBorder(backsf.GetSize(), RGBA(0xb0,0xb0,0xb0), true);
+	spcursor.Set(backsf.w(), backsf.h(), true);
+	spcursor.DrawBorder(RGBA(0xb0, 0xb0, 0xb0));
     }
     else
     {

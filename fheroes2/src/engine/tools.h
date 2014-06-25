@@ -45,6 +45,8 @@ void			StringReplace(std::string &, const char*, const std::string &);
 void			StringReplace(std::string &, const char*, int);
 
 int			CountBits(u32);
+int			CheckSum(const std::vector<u8> &);
+int			CheckSum(const std::string &);
 
 std::string		EncodeString(const std::string &, const char* charset);
 std::vector<u16>	StringUTF8_to_UNICODE(const std::string &);

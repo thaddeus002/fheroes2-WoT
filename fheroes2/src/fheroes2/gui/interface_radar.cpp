@@ -32,46 +32,46 @@
 #include "cursor.h"
 #include "interface_radar.h"
 
-#define RADARCOLOR	RGBA(0x90,0xA4,0xE0)
-#define COLOR_DESERT	RGBA(0xd0,0xc0,0x48)
-#define COLOR_SNOW	RGBA(0xe0,0xe0,0xe0)
-#define COLOR_SWAMP	RGBA(0x58,0x94,0xa0)
-#define COLOR_WASTELAND	RGBA(0xe0,0x48,0)
-#define COLOR_BEACH	RGBA(0xe0,0xd0,0x80)
-#define COLOR_LAVA	RGBA(0x58,0x58,0x58)
-#define COLOR_DIRT	RGBA(0x80,0x58,0x28)
-#define COLOR_GRASS	RGBA(0x18,0x68,0x18)
-#define COLOR_WATER	RGBA(0,0x48,0xd0)
-#define COLOR_ROAD	RGBA(0x80,0x68,0x08)
+#define RADARCOLOR	0x40	// index palette
+#define COLOR_DESERT	0x70
+#define COLOR_SNOW	0x0A
+#define COLOR_SWAMP	0xA0
+#define COLOR_WASTELAND	0xD6
+#define COLOR_BEACH	0xC6
+#define COLOR_LAVA	0x19
+#define COLOR_DIRT	0x30
+#define COLOR_GRASS	0x60
+#define COLOR_WATER	0xF0
+#define COLOR_ROAD	0x7A
 
-#define COLOR_BLUE	RGBA(0x38,0x3c,0xa0)
-#define COLOR_GREEN	RGBA(0,0x80,0)
-#define COLOR_RED	RGBA(0x90,0x1c,0x18)
-#define COLOR_YELLOW	RGBA(0xd0,0xc0,0x48)
-#define COLOR_ORANGE	RGBA(0xd0,0x84,0x28)
-#define COLOR_PURPLE	RGBA(0xa0,0x78,0xc0)
-#define COLOR_GRAY	RGBA(0xb0,0xb0,0xb0)
+#define COLOR_BLUE	0x47
+#define COLOR_GREEN	0x67
+#define COLOR_RED	0xbd
+#define COLOR_YELLOW	0x70
+#define COLOR_ORANGE	0xcd
+#define COLOR_PURPLE	0x87
+#define COLOR_GRAY	0x10
 
-RGBA GetGroundColor(int ground)
+u32 GetPaletteIndexFromGround(int ground)
 {
     switch(ground)
     {
-	case Maps::Ground::DESERT:	return COLOR_DESERT;
-	case Maps::Ground::SNOW:	return COLOR_SNOW;
-	case Maps::Ground::SWAMP:	return COLOR_SWAMP;
-	case Maps::Ground::WASTELAND:	return COLOR_WASTELAND;
-	case Maps::Ground::BEACH:	return COLOR_BEACH;
-	case Maps::Ground::LAVA:	return COLOR_LAVA;
-	case Maps::Ground::DIRT:	return COLOR_DIRT;
-	case Maps::Ground::GRASS:	return COLOR_GRASS;
-	case Maps::Ground::WATER:	return COLOR_WATER;
+	case Maps::Ground::DESERT:	return (COLOR_DESERT);
+	case Maps::Ground::SNOW:	return (COLOR_SNOW);
+	case Maps::Ground::SWAMP:	return (COLOR_SWAMP);
+	case Maps::Ground::WASTELAND:	return (COLOR_WASTELAND);
+	case Maps::Ground::BEACH:	return (COLOR_BEACH);
+	case Maps::Ground::LAVA:	return (COLOR_LAVA);
+	case Maps::Ground::DIRT:	return (COLOR_DIRT);
+	case Maps::Ground::GRASS:	return (COLOR_GRASS);
+	case Maps::Ground::WATER:	return (COLOR_WATER);
 	default: break;
     }
 
-    return RGBA(0, 0, 0);
+    return 0;
 }
 
-RGBA GetObjectColor(int color)
+u32 GetPaletteIndexFromColor(int color)
 {
     switch(color)
     {
@@ -122,7 +122,7 @@ void Interface::Radar::Generate(void)
     const s32 world_w = world.w();
     const s32 world_h = world.h();
 
-    spriteArea.Set(world_w, world_h);
+    spriteArea.Set(world_w, world_h, false);
 
     for(s32 yy = 0; yy < world_h; ++yy)
     {
@@ -132,47 +132,48 @@ void Interface::Radar::Generate(void)
 	    RGBA color(0, 0, 0);
 
 	    if(tile.isRoad())
-		color = COLOR_ROAD;
+		color = AGG::GetPaletteColor(COLOR_ROAD);
 	    else
 	    {
-		color = GetGroundColor(tile.GetGround());
+		u32 index = GetPaletteIndexFromGround(tile.GetGround());
 
 		if(tile.GetObject() == MP2::OBJ_MOUNTS)
-		    color = RGBA(color.r() >> 1, color.g() >> 1, color.b() >> 1);
+		    index += 2;
+
+		color = AGG::GetPaletteColor(index);
 	    }
 
-	    if(color.GetColor())
-		spriteArea.SetPixel(xx, yy, color);
+            if(color.pack())
+                spriteArea.DrawPoint(Point(xx, yy), color);
 	}
     }
 
     if(spriteArea.GetSize() != area)
     {
-	s32 new_w, new_h;
+        Size new_sz;
 
-	if(world_w < world_h)
-	{
-	    new_w = (world_w * area.h) / world_h;
-	    new_h = area.h;
-	    offset.x = (area.w - new_w) / 2;
-	    offset.y = 0;
-	}
-	else
-	if(world_w > world_h)
-	{
-	    new_w = area.w;
-	    new_h = (world_h * area.w) / world_w;
-	    offset.x = 0;
-	    offset.y = (area.h - new_h) / 2;
-	}
-	else
-	{
-	    new_w = area.w;
-	    new_h = area.h;
-	}
+        if(world_w < world_h)
+        {
+            new_sz.w = (world_w * area.h) / world_h;
+            new_sz.h = area.h;
+            offset.x = (area.w - new_sz.w) / 2;
+            offset.y = 0;
+        }
+        else
+        if(world_w > world_h)
+        {
+            new_sz.w = area.w;
+            new_sz.h = (world_h * area.w) / world_w;
+            offset.x = 0;
+            offset.y = (area.h - new_sz.h) / 2;
+        }
+        else
+        {
+            new_sz.w = area.w;
+            new_sz.h = area.h;
+        }
 
-	Surface sf = Surface::Scale(spriteArea, new_w, new_h);
-	Surface::Swap(spriteArea, sf);
+        spriteArea = spriteArea.RenderScale(new_sz);
     }
 }
 
@@ -254,8 +255,7 @@ void Interface::Radar::RedrawObjects(int color)
     else
 	sw = GetChunkSize(areah, world_h);
 
-    Surface sf(sw, sw);
-    display.Lock();
+    Surface sf(Size(sw, sw), false);
 
     for(s32 yy = 0; yy < world_h; yy += stepy)
     {
@@ -276,7 +276,7 @@ void Interface::Radar::RedrawObjects(int color)
 		    case MP2::OBJ_HEROES:
 		    {
 			const Heroes* hero = world.GetHeroes(tile.GetCenter());
-			if(hero) color = GetObjectColor(hero->GetColor());
+			if(hero) color = AGG::GetPaletteColor(GetPaletteIndexFromColor(hero->GetColor()));
 		    }
 		    break;
 
@@ -284,7 +284,7 @@ void Interface::Radar::RedrawObjects(int color)
 		    case MP2::OBJN_CASTLE:
 		    {
 			const Castle* castle = world.GetCastle(tile.GetCenter());
-			if(castle) color = GetObjectColor(castle->GetColor());
+			if(castle) color = AGG::GetPaletteColor(GetPaletteIndexFromColor(castle->GetColor()));
 		    }
 		    break;
 
@@ -298,27 +298,26 @@ void Interface::Radar::RedrawObjects(int color)
 		    //case MP2::OBJN_MINES:
 		    case MP2::OBJ_SAWMILL:
 		    //case MP2::OBJN_SAWMILL:
-			color = GetObjectColor(tile.QuantityColor()); break;
+			color = AGG::GetPaletteColor(GetPaletteIndexFromColor(tile.QuantityColor())); break;
 
 		    default: continue;
 		}
 
 	    }
 
-	    const int dstx = area.x + offset.x + (xx * areaw) / world_w;
-	    const int dsty = area.y + offset.y + (yy * areah) / world_h;
+            const int dstx = area.x + offset.x + (xx * areaw) / world_w;
+            const int dsty = area.y + offset.y + (yy * areah) / world_h;
 
-	    if(sw > 1)
-	    {
-		sf.Fill(color);
-		sf.Blit(dstx, dsty, display);
-	    }
-	    else
-	    if(dstx < display.w() && dsty < display.h())
-		display.SetPixel(dstx, dsty, color);
+            if(sw > 1)
+            {
+                sf.Fill(color);
+                sf.Blit(dstx, dsty, display);
+            }
+            else
+            if(dstx < display.w() && dsty < display.h())
+                display.DrawPoint(Point(dstx, dsty), color);
 	}
     }
-    display.Unlock();
 }
 
 /* redraw radar cursor */
@@ -334,12 +333,15 @@ void Interface::Radar::RedrawCursor(void)
 	s32 areaw = (offset.x ? area.w - 2 * offset.x : area.w);
 	s32 areah = (offset.y ? area.h - 2 * offset.y : area.h);
 
-	const Size sz((rectMaps.w * areaw) / world.w(),
-			(rectMaps.h * areah) / world.h());
+        const Size sz((rectMaps.w * areaw) / world.w(),
+                        (rectMaps.h * areah) / world.h());
 
 	// check change game area
-	if(cursorArea.w() != sz.w && cursorArea.h() != sz.h)
-	    cursorArea = Surface::RectBorder(sz, RADARCOLOR, false);
+	if(cursorArea.GetSize() != sz)
+	{
+            cursorArea.Set(sz.w, sz.h, true);
+            cursorArea.DrawBorder(AGG::GetPaletteColor(RADARCOLOR), false);
+	}
 
         cursorArea.Move(area.x + offset.x + (rectMaps.x * areaw) / world.w(),
             		    area.y + offset.y + (rectMaps.y * areah) / world.h());

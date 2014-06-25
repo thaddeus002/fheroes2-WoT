@@ -209,7 +209,7 @@ bool Dialog::InputString(const std::string & header, std::string & res)
 
     TextBox textbox(header, Font::BIG, BOXAREA_WIDTH);
     Point dst_pt;
-    const Surface & sprite = AGG::GetICN((Settings::Get().ExtGameEvilInterface() ? ICN::BUYBUILD : ICN::BUYBUILE), 3);
+    const Sprite & sprite = AGG::GetICN((Settings::Get().ExtGameEvilInterface() ? ICN::BUYBUILD : ICN::BUYBUILE), 3);
 
     FrameBox box(10 + textbox.h() + 10 + sprite.h(), OK|CANCEL);
     const Rect & box_rt = box.GetArea();
@@ -362,7 +362,8 @@ int Dialog::ArmySplitTroop(int free_slots, u32 max, u32 & cur, bool savelast)
 	if(sp4.isValid()) sp4.Blit(rt4, display);
 	if(sp5.isValid()) sp5.Blit(rt5, display);
 
-	ssp = Surface::RectBorder(sp3.GetSize(), RGBA(0xC0, 0x2C, 0), true);
+	ssp.Set(sp3.w(), sp3.h(), true);
+	ssp.DrawBorder(RGBA(0xC0, 0x2C, 0));
     }
 
     ButtonGroups btnGroups(box.GetArea(), Dialog::OK | Dialog::CANCEL);

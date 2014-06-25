@@ -37,14 +37,13 @@ class ArmyCell : public Rect
 {
 public:
     ArmyCell(const Troop & t, const Point & pt, const bool & ro)
-	: Rect(pt.x, pt.y, 43, 53), select(false), troop(t), readonly(ro)
+	: Rect(pt.x, pt.y, 43, 53), troop(t), select(false), readonly(ro)
     {
 	const Sprite & backSprite = AGG::GetICN(ICN::SWAPWIN, 0);
-	
-	back.Set(w, h);
-	backSprite.Blit(Rect(36, 267, w, h), 0, 0, back);
+	back = backSprite.GetSurface(Rect(36, 267, w, h));
 
-	curs = Surface::RectBorder(Size(w, h - 10), RGBA(0xc0,0x2c,0), true);
+	curs.Set(w, h - 10, true);
+	curs.DrawBorder(RGBA(0xc0, 0x2c, 0));
     }
 
     void Redraw(void)
@@ -68,11 +67,11 @@ public:
 	    curs.Blit(*this, display);
     };
 
-    bool select;
     const Troop & troop;
+    bool select;
     Surface back;
     Surface curs;
-    const bool & readonly;
+    bool readonly;
 };
 
 class ArmySplit

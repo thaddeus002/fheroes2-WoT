@@ -394,7 +394,7 @@ bool Settings::Read(const std::string & filename)
 
     // playmus command
     sval = config.StrParams("playmus command");
-    if(! sval.empty()) playmus_command = sval;
+    if(! sval.empty()) Music::SetExtCommand(sval);
 
     // videodriver
     sval = config.StrParams("videodriver");
@@ -507,24 +507,7 @@ void Settings::PostLoad(void)
 
 void Settings::SetAutoVideoMode(void)
 {
-    Size size;
-
-    switch(Display::GetMaxMode(size, PocketPC()))
-    {
-	case 0:
-	    return;
-
-	case -1:
-	    video_mode.w = 1024;
-	    video_mode.h = 768;
-	    return;
-
-	default: break;
-    }
-
-    video_mode.w = size.w;
-    video_mode.h = size.h;
-
+    video_mode = Display::Get().GetMaxMode(PocketPC());
     PostLoad();
 }
 
@@ -576,10 +559,6 @@ std::string Settings::String(void) const
 	"unicode = " << (opt_global.Modes(GLOBAL_USEUNICODE) ? "on" : "off") << std::endl;
     if(force_lang.size())
     os << "lang = " << force_lang << std::endl;
-#endif
-
-#ifndef WITH_MIXER
-    os << "playmus command = " << playmus_command << std::endl;
 #endif
 
     if(video_driver.size())
@@ -651,6 +630,11 @@ ListDirs Settings::GetRootDirs(void)
     const Settings & conf = Settings::Get();
     ListDirs dirs;
 
+    std::list<std::string> exts = System::GetExtendedDirectories();
+    for(std::list<std::string>::const_iterator
+	it = exts.begin(); it != exts.end(); ++it)
+	dirs.push_back(*it);
+
     // from build
 #ifdef CONFIGURE_FHEROES2_DATA
     dirs.push_back(CONFIGURE_FHEROES2_DATA);
@@ -676,15 +660,20 @@ ListFiles Settings::GetListFiles(const std::string & prefix, const std::string &
     const ListDirs dirs = GetRootDirs();
     ListFiles res;
 
+    if(prefix.size() && System::IsDirectory(prefix))
+	res.ReadDir(prefix, filter, false);
+
     for(ListDirs::const_iterator
 	it = dirs.begin(); it != dirs.end(); ++it)
     {
-        std::string path = *it;
+        std::string path = prefix.size() ? System::ConcatePath(*it, prefix) : *it;
 
-	if(prefix.size())
-	    path = System::ConcatePath(*it, prefix);
-
-	res.ReadDir(path, filter, false);
+	if(System::IsDirectory(path))
+	    res.ReadDir(path, filter, false);
+	else
+	{
+	    DEBUG(DBG_ENGINE, DBG_WARN, "path not found: " << path);
+	}
     }
 
     return res;
@@ -736,9 +725,6 @@ std::string Settings::GetSaveDir(void)
 {
     return GetWriteableDir("save");
 }
-
-/* return path to locales directory */
-const std::string & Settings::PlayMusCommand(void) const { return playmus_command; }
 
 bool Settings::MusicExt(void) const { return opt_global.Modes(GLOBAL_MUSIC_EXT); }
 bool Settings::MusicMIDI(void) const { return opt_global.Modes(GLOBAL_MUSIC_MIDI); }
@@ -1483,17 +1469,10 @@ u32 Settings::MemoryLimit(void) const
     return memory_limit;
 }
 
-u32 Settings::DisplayFlags(void) const
+bool Settings::FullScreen(void) const
 {
-    u32 flags = opt_global.Modes(GLOBAL_USESWSURFACE) ? SDL_SWSURFACE : SDL_SWSURFACE | SDL_HWSURFACE;
-
-    if(System::isEmbededDevice())
-	flags = SDL_SWSURFACE | SDL_FULLSCREEN;
-
-    if(opt_global.Modes(GLOBAL_FULLSCREEN))
-	flags |= SDL_FULLSCREEN;
-
-    return flags;
+    return System::isEmbededDevice() ||
+	opt_global.Modes(GLOBAL_FULLSCREEN);
 }
 
 StreamBase & operator<< (StreamBase & msg, const Settings & conf)

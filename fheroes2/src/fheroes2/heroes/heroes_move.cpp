@@ -528,7 +528,8 @@ void Heroes::FadeOut(void) const
     s32 dx = gamearea.GetMapsPos().x + TILEWIDTH * (mp.x - gamearea.GetRectMaps().x);
     s32 dy = gamearea.GetMapsPos().y + TILEWIDTH * (mp.y - gamearea.GetRectMaps().y);
 
-    const Sprite & sprite1 = SpriteHero(*this, sprite_index, reflect, false);
+    Sprite sphero = SpriteHero(*this, sprite_index, reflect, false);
+    Sprite sprite1 = Sprite(sphero.GetSurface(), sphero.x(), sphero.y());
 
     Point dst_pt1(dx + (reflect ? TILEWIDTH - sprite1.x() - sprite1.w() : sprite1.x()), dy + sprite1.y() + TILEWIDTH);
     const Rect src_rt = gamearea.RectFixed(dst_pt1, sprite1.w(), sprite1.h());
@@ -553,7 +554,8 @@ void Heroes::FadeOut(void) const
         	tile.RedrawObjects(display);
     	    }
 
-    	    sprite1.Blit(alpha, src_rt, dst_pt1, display);
+    	    sprite1.SetAlphaMod(alpha);
+    	    sprite1.Blit(src_rt, dst_pt1, display);
 
 	    for(s32 y = mp.y - 1; y <= mp.y + 1; ++y)
 		for(s32 x = mp.x - 1; x <= mp.x + 1; ++x)
@@ -585,7 +587,8 @@ void Heroes::FadeIn(void) const
     s32 dx = gamearea.GetMapsPos().x + TILEWIDTH * (mp.x - gamearea.GetRectMaps().x);
     s32 dy = gamearea.GetMapsPos().y + TILEWIDTH * (mp.y - gamearea.GetRectMaps().y);
 
-    const Sprite & sprite1 = SpriteHero(*this, sprite_index, reflect, false);
+    Sprite sphero = SpriteHero(*this, sprite_index, reflect, false);
+    Sprite sprite1 = Sprite(sphero.GetSurface(), sphero.x(), sphero.y());
 
     Point dst_pt1(dx + (reflect ? TILEWIDTH - sprite1.x() - sprite1.w() : sprite1.x()), dy + sprite1.y() + TILEWIDTH);
     const Rect src_rt = gamearea.RectFixed(dst_pt1, sprite1.w(), sprite1.h());
@@ -610,7 +613,8 @@ void Heroes::FadeIn(void) const
         	tile.RedrawObjects(display);
     	    }
 
-    	    sprite1.Blit(alpha, src_rt, dst_pt1, display);
+    	    sprite1.SetAlphaMod(alpha);
+    	    sprite1.Blit(src_rt, dst_pt1, display);
 
 	    for(s32 y = mp.y - 1; y <= mp.y + 1; ++y)
 		for(s32 x = mp.x - 1; x <= mp.x + 1; ++x)

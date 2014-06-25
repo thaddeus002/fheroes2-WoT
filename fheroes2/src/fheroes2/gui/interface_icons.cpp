@@ -331,7 +331,8 @@ void Interface::HeroesIcons::SetPos(s32 px, s32 py)
 Interface::IconsPanel::IconsPanel(Basic & basic) : BorderWindow(Rect(0, 0, 144, 128)),
     interface(basic), castleIcons(4, sfMarker), heroesIcons(4, sfMarker)
 {
-    sfMarker = Surface::RectBorder(Size(ICONS_CURSOR_WIDTH, ICONS_CURSOR_HEIGHT), ICONS_CURSOR_COLOR, true);
+    sfMarker.Set(ICONS_CURSOR_WIDTH, ICONS_CURSOR_HEIGHT, true);
+    sfMarker.DrawBorder(ICONS_CURSOR_COLOR);
 }
 
 u32 Interface::IconsPanel::CountIcons(void) const

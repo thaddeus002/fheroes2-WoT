@@ -139,7 +139,7 @@ bool Game::ChangeMusicDisabled(void)
 
 void Game::DisableChangeMusic(bool f)
 {
-    disable_change_music = f;
+    //disable_change_music = f;
 }
 
 void Game::Init(void)
@@ -203,7 +203,7 @@ void Game::SetFixVideoMode(void)
     if(conf.VideoMode().w > max_x) fixsize.w = max_x;
     if(conf.VideoMode().h > max_y) fixsize.h = max_y;
 
-    Display::Get().SetVideoMode(fixsize.w, fixsize.h, conf.DisplayFlags());
+    Display::Get().SetVideoMode(fixsize.w, fixsize.h, conf.FullScreen());
 }
 
 /* play all sound from focus area game */

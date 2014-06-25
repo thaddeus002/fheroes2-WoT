@@ -229,8 +229,7 @@ public:
     void		SetPosIcons(const Point &);
     void		SetPosStatus(const Point &);
 
-    u32			DisplayFlags(void) const;
-
+    bool		FullScreen(void) const;
     bool		QVGA(void) const;
     bool		Sound(void) const;
     bool		Music(void) const;
@@ -457,7 +456,6 @@ private:
     int		game_type;
     int		preferably_count_players;
 
-    std::string playmus_command;
     std::string video_driver;
 
     int		port;

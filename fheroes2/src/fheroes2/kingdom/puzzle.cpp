@@ -228,21 +228,16 @@ void PuzzlesDraw(const Puzzle & pzl, const Surface & sf, s32 dstx, s32 dsty)
 	    sf.Blit(dstx, dsty, display);
 	    for(size_t ii = 0; ii < pzl.size(); ++ii)
 	    {
-    		const Sprite & piece = AGG::GetICN(ICN::PUZZLE, ii);
+		const Sprite & sprite = AGG::GetICN(ICN::PUZZLE, ii);
+		Sprite piece = Sprite(sprite.GetSurface(), sprite.x(), sprite.y());
+
 		if(pzl.test(ii))
-		{
-		    if(Settings::Get().QVGA())
-			piece.Blit(alpha, dstx + 8 + piece.x() - BORDERWIDTH, dsty + 8 + piece.y() - BORDERWIDTH);
-		    else
-			piece.Blit(alpha, dstx + piece.x() - BORDERWIDTH, dsty + piece.y() - BORDERWIDTH);
-		}
+		    piece.SetAlphaMod(alpha);
+
+		if(Settings::Get().QVGA())
+		    piece.Blit(dstx + 8 + piece.x() - BORDERWIDTH, dsty + 8 + piece.y() - BORDERWIDTH);
 		else
-		{
-		    if(Settings::Get().QVGA())
-			piece.Blit(dstx + 8 + piece.x() - BORDERWIDTH, dsty + 8 + piece.y() - BORDERWIDTH);
-		    else
-			piece.Blit(dstx + piece.x() - BORDERWIDTH, dsty + piece.y() - BORDERWIDTH);
-		}
+		    piece.Blit(dstx + piece.x() - BORDERWIDTH, dsty + piece.y() - BORDERWIDTH);
 	    }
 	    cursor.Show();
     	    display.Flip();

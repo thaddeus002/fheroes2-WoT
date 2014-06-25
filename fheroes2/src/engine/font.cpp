@@ -20,39 +20,37 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifdef WITH_TTF
-
-#include <iostream>
 #include "font.h"
 #include "engine.h"
 #include "surface.h"
-#include "SDL_ttf.h"
 
-SDL::Font::Font() : ptr(NULL)
+#ifdef WITH_TTF
+
+FontTTF::FontTTF() : ptr(NULL)
 {
 }
 
-SDL::Font::~Font()
+FontTTF::~FontTTF()
 {
     if(ptr) TTF_CloseFont(ptr);
 }
 
-void SDL::Font::Init(void)
+void FontTTF::Init(void)
 {
     if(0 != TTF_Init()) Error::Message(__FUNCTION__, SDL_GetError());
 }
 
-void SDL::Font::Quit(void)
+void FontTTF::Quit(void)
 {
     TTF_Quit();
 }
 
-bool SDL::Font::isValid(void) const
+bool FontTTF::isValid(void) const
 {
     return ptr;
 }
 
-bool SDL::Font::Open(const std::string & filename, int size)
+bool FontTTF::Open(const std::string & filename, int size)
 {
     if(ptr) TTF_CloseFont(ptr);
     ptr = TTF_OpenFont(filename.c_str(), size);
@@ -60,29 +58,100 @@ bool SDL::Font::Open(const std::string & filename, int size)
     return ptr;
 }
 
-void SDL::Font::SetStyle(int style)
+void FontTTF::SetStyle(int style)
 {
     TTF_SetFontStyle(ptr, style);
 }
 
-int SDL::Font::Height(void) const
+int FontTTF::Height(void) const
 {
     return TTF_FontHeight(ptr);
 }
 
-int SDL::Font::Ascent(void) const
+int FontTTF::Ascent(void) const
 {
     return TTF_FontAscent(ptr);
 }
 
-int SDL::Font::Descent(void) const
+int FontTTF::Descent(void) const
 {
     return TTF_FontDescent(ptr);
 }
 
-int SDL::Font::LineSkip(void) const
+int FontTTF::LineSkip(void) const
 {
     return TTF_FontLineSkip(ptr);
 }
 
+Surface FontTTF::RenderText(const std::string & msg, const RGBA & clr, bool solid)
+{
+    return Surface(solid ? TTF_RenderUTF8_Solid(ptr, msg.c_str(), clr()) :
+                        TTF_RenderUTF8_Blended(ptr, msg.c_str(), clr()));
+}
+    
+Surface FontTTF::RenderChar(char ch, const RGBA & clr, bool solid)
+{
+    char buf[2] = { '\0', '\0' };
+         buf[0] = ch;
+            
+    return Surface(solid ? TTF_RenderUTF8_Solid(ptr, buf, clr()) :
+                        TTF_RenderUTF8_Blended(ptr, buf, clr()));
+}
+
+Surface FontTTF::RenderUnicodeText(const std::vector<u16> & msg, const RGBA & clr, bool solid)
+{
+    return Surface(solid ? TTF_RenderUNICODE_Solid(ptr, &msg[0], clr()) :
+                        TTF_RenderUNICODE_Blended(ptr, &msg[0], clr()));
+}
+
+Surface FontTTF::RenderUnicodeChar(u16 ch, const RGBA & clr, bool solid)
+{
+    u16 buf[2] = { L'\0', L'\0' };
+        buf[0] = ch;
+
+    return Surface(solid ? TTF_RenderUNICODE_Solid(ptr, buf, clr()) :
+                        TTF_RenderUNICODE_Blended(ptr, buf, clr()));
+}
+
 #endif
+
+FontPSF::FontPSF(const std::string & fn, const Size & sz) : size(sz)
+{
+    buf = LoadFileToMem(fn);
+    if(buf.empty())
+	Error::Message(__FUNCTION__, "empty buffer");
+}
+
+Surface FontPSF::RenderText(const std::string & msg, const RGBA & color) const
+{
+    Surface res;
+
+    res.Set(msg.size() * size.w, size.h, false);
+    int posx = 0;
+
+    for(std::string::const_iterator
+	it = msg.begin(); it != msg.end(); ++it)
+    {
+	// render char
+	u32 offsetx = *it * size.w * size.h / 8; // bits -> byte
+
+	for(u32 yy = 0; yy < size.h; ++yy)
+	{
+	    u32 offsety = yy * size.w / 8; // bits -> byte
+
+	    if(offsetx + offsety < buf.size())
+	    {
+		int line = buf[offsetx + offsety];
+    		for(u32 xx = 0; xx < size.w; ++xx)
+    		{
+        	    if(0x80 & (line << xx))
+            		res.DrawPoint(Point(posx + xx, yy), color);
+    		}
+	    }
+	}
+
+	posx += size.w;
+    }
+
+    return res;
+}

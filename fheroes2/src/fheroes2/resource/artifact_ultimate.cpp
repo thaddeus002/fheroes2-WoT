@@ -74,7 +74,7 @@ void UltimateArtifact::Reset(void)
 void UltimateArtifact::MakeSurface(void)
 {
     if(Maps::isValidAbsIndex(index))
-	Interface::GameArea::GenerateUltimateArtifactAreaSurface(index, puzzlemap);
+	puzzlemap = Interface::GameArea::GenerateUltimateArtifactAreaSurface(index);
     else
 	puzzlemap.Reset();
 }

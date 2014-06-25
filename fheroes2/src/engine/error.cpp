@@ -23,9 +23,7 @@
 #include <stdexcept>
 #include <iostream>
 #include "error.h"
-#ifdef ANDROID
-#include <android/log.h>
-#endif
+#include "system.h"
 
 /* exception */
 void Error::Except(const char* func, const char* message)
@@ -38,11 +36,5 @@ void Error::Except(const char* func, const char* message)
 
 void Error::Message(const char* func, const char* message)
 {
-#ifndef ANDROID
-    std::cerr << func << ": " << message << std::endl;
-#else
- __android_log_print(ANDROID_LOG_FATAL, "fheroes2", "======");
- __android_log_print(ANDROID_LOG_FATAL, "fheroes2", "error: %s: %s", func, message);
- __android_log_print(ANDROID_LOG_FATAL, "fheroes2", "======");
-#endif
+    VERBOSE(func << ": " << message);
 }

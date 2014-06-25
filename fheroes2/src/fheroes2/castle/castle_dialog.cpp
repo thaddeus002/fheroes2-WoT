@@ -138,7 +138,7 @@ building_t GetCurrentFlash(const Castle & castle, CastleDialog::CacheBuildings &
 	if(! (*it).contour.isValid())
         {
             const Sprite & sprite = GetActualSpriteBuilding(castle, flash);
-    	    (*it).contour = Sprite(Surface::Contour(sprite, RGBA(0xe0,0xe0,0)), sprite.x() - 1, sprite.y() - 1);
+    	    (*it).contour = Sprite(sprite.RenderContour(RGBA(0xe0, 0xe0, 0)), sprite.x() - 1, sprite.y() - 1);
 	}
     }
 
@@ -213,7 +213,9 @@ Surface GetMeetingSprite(void)
 {
     const Sprite & sprite = AGG::GetICN(ICN::ADVMCO, 8);
     
-    Surface res = Surface::RectBorder(Size(sprite.w() + 4, sprite.h() + 4), ColorBlack, RGBA(0xe0, 0xb4, 0), true);
+    Surface res(sprite.GetSize() + Size(4, 4), false);
+    res.Fill(ColorBlack);
+    res.DrawBorder(RGBA(0xe0, 0xb4, 0));
     sprite.Blit(2, 2, res);
 
     return res;
@@ -230,8 +232,7 @@ MeetingButton::MeetingButton(s32 px, s32 py)
 
 SwapButton::SwapButton(s32 px, s32 py)
 {
-    Surface sf2 = GetMeetingSprite();
-    sf = Surface::Rotate(sf2, 1);
+    sf = GetMeetingSprite().RenderRotate(1);
 
     SetPos(px, py);
     SetSize(sf.w(), sf.h());
@@ -508,8 +509,14 @@ int Castle::OpenDialog(bool readonly, bool fade)
 	if(buttonNextCastle.isEnable() && le.MouseClickLeft(buttonNextCastle)){ result = Dialog::NEXT; break; }
 
 	// buildings event
+#if defined(ANDROID)
+	CastleDialog::CacheBuildings::const_reverse_iterator crend = cacheBuildings.rend();
+	for(CastleDialog::CacheBuildings::const_reverse_iterator
+    	    it = cacheBuildings.rbegin(); it != crend; ++it)
+#else
 	for(CastleDialog::CacheBuildings::const_reverse_iterator
     	    it = cacheBuildings.rbegin(); it != cacheBuildings.rend(); ++it)
+#endif
 	{
     	    if((*it).id == GetActualDwelling((*it).id) && isBuild((*it).id))
     	    {
@@ -653,7 +660,7 @@ int Castle::OpenDialog(bool readonly, bool fade)
 
 				// animate fade in for hero army bar
 				const Rect rt(0, 98, 552, 107);
-				Surface sf(rt.w, rt.h, false);
+				Surface sf(rt, false);
             			AGG::GetICN(ICN::STRIP, 0).Blit(rt, 0, 0, sf);
 				Surface port = Heroes::GetPortrait(heroes.Guest()->GetID(), PORT_BIG);
 				if(port.isValid()) port.Blit(6, 6, sf);
@@ -670,7 +677,8 @@ int Castle::OpenDialog(bool readonly, bool fade)
     				    if(Game::AnimateInfrequentDelay(Game::CASTLE_BUYHERO_DELAY))
     				    {
         				cursor.Hide();
-        				sf.Blit(alpha, cur_pt.x, cur_pt.y + 356, display);
+        				sf.SetAlphaMod(alpha);
+        				sf.Blit(cur_pt.x, cur_pt.y + 356, display);
         				cursor.Show();
         				display.Flip();
         				alpha += 10;

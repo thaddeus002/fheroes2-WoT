@@ -214,7 +214,7 @@ void Interface::GameArea::Redraw(Surface & dst, int flag, const Rect & rt) const
 	// redraw grid
 	if(flag & LEVEL_ALL)
 	{
-	    const u32 col = dst.MapRGB(RGBA(0x90, 0xA4, 0xE0));
+	    const RGBA col = RGBA(0x90, 0xA4, 0xE0);
 
 	    for(s32 oy = rt.y; oy < rt.y + rt.h; ++oy)
 		for(s32 ox = rt.x; ox < rt.x + rt.w; ++ox)
@@ -222,11 +222,7 @@ void Interface::GameArea::Redraw(Surface & dst, int flag, const Rect & rt) const
     		const Point dstpt(rectMapsPosition.x + TILEWIDTH * ox,
 				rectMapsPosition.y + TILEWIDTH * oy);
 		if(areaPosition & dstpt)
-    		{
-		    dst.Lock();
-    		    dst.SetPixel(dstpt.x, dstpt.y, col);
-    		    dst.Unlock();
-		}
+    		    dst.DrawPoint(dstpt, col);
 
 		world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawPassable(dst);
 	    }
@@ -406,11 +402,13 @@ void Interface::GameArea::SetCenter(s32 px, s32 py)
     if(scrollDirection) Scroll();
 }
 
-void Interface::GameArea::GenerateUltimateArtifactAreaSurface(s32 index, Surface & sf)
+Surface Interface::GameArea::GenerateUltimateArtifactAreaSurface(s32 index)
 {
+    Surface sf;
+
     if(Maps::isValidAbsIndex(index))
     {
-	sf.Set(448, 448);
+	sf.Set(448, 448, false);
 
 	GameArea & gamearea = Basic::Get().GetGameArea();
 	const Rect origPosition(gamearea.areaPosition);
@@ -439,18 +437,17 @@ void Interface::GameArea::GenerateUltimateArtifactAreaSurface(s32 index, Surface
 			    areaPosition.y + pt.y * TILEWIDTH - gamearea.scrollOffset.y);
 	marker.Blit(dst.x, dst.y + 8, sf);
 
-	sf = (Settings::Get().ExtGameEvilInterface() ? Surface::GrayScale(sf) : Surface::Sepia(sf));
+	sf = (Settings::Get().ExtGameEvilInterface() ? sf.RenderGrayScale() : sf.RenderSepia());
 
 	if(Settings::Get().QVGA())
-	{
-    	    Surface sf2 = Sprite::ScaleQVGASurface(sf);
-    	    Surface::Swap(sf2, sf);
-	}
+    	    sf = Sprite::ScaleQVGASurface(sf);
 
 	gamearea.SetAreaPosition(origPosition.x, origPosition.y, origPosition.w, origPosition.h);
     }
     else
     DEBUG(DBG_ENGINE, DBG_WARN, "artifact not found");
+
+    return sf;
 }
 
 bool Interface::GameArea::NeedScroll(void) const

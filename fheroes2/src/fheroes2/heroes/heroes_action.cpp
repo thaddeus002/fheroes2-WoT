@@ -106,7 +106,7 @@ u32 DialogCaptureResourceObject(const std::string & hdr, const std::string & str
     std::string msg = str;
 
     // sprite resource with x / day test
-    Surface sf(sprite.w() + 30, sprite.h() + 14);
+    Surface sf(sprite.GetSize() + Size(30, 14), false);
     sprite.Blit(15, 0, sf);
 
     std::string perday = _("%{count} / day");
@@ -147,7 +147,7 @@ u32 DialogGoldWithExp(const std::string & hdr, const std::string & msg, u32 coun
 {
     const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
     const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
-    Surface image(sprite.w() + gold.w() + 50, sprite.h() + 12);
+    Surface image(sprite.GetSize() + Size(gold.w() + 50, 12), false);
     gold.Blit(0, image.h() - gold.h() - 12, image);
     sprite.Blit(gold.w() + 50, 0, image);
     Text text(GetString(count));
@@ -163,7 +163,7 @@ u32 DialogArtifactWithExp(const std::string & hdr, const std::string & msg, cons
     const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
     const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
     const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, art.IndexSprite64());
-    Surface image(sprite.w() + border.w() + 50, border.h());
+    Surface image(border.GetSize() + Size(sprite.w() + 50, 0), false);
     border.Blit(image);
     artifact.Blit(5, 5, image);
     sprite.Blit(border.w() + 50, (border.h() - sprite.h()) / 2, image);
@@ -176,7 +176,7 @@ u32 DialogArtifactWithExp(const std::string & hdr, const std::string & msg, cons
 u32 DialogWithExp(const std::string & hdr, const std::string & msg, u32 exp, u32 buttons = Dialog::OK)
 {
     const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
-    Surface image(sprite.w(), sprite.h() + 12);
+    Surface image(sprite.GetSize() + Size(0, 12), false);
     sprite.Blit(image);
     Text text(GetString(exp), Font::SMALL);
     text.Blit((sprite.w() - text.w()) / 2, sprite.h(), image);
@@ -189,7 +189,7 @@ u32 DialogWithArtifactAndGold(const std::string & hdr, const std::string & msg, 
     const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
     const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
     const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, art.IndexSprite64());
-    Surface image(gold.w() + border.w() + 50, border.h());
+    Surface image(border.GetSize() + Size(gold.w() + 50, 0), false);
     border.Blit(image);
     artifact.Blit(5, 5, image);
     gold.Blit(border.w() + 50, (border.h() - gold.h()) / 2, image);
@@ -202,7 +202,7 @@ u32 DialogWithArtifactAndGold(const std::string & hdr, const std::string & msg, 
 u32 DialogWithGold(const std::string & hdr, const std::string & msg, u32 count, u32 buttons = Dialog::OK)
 {
     const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
-    Surface image(gold.w(), gold.h() + 12);
+    Surface image(gold.GetSize() + Size(0, 12), false);
     gold.Blit(image);
     Text text(GetString(count), Font::SMALL);
     text.Blit((gold.w() - text.w()) / 2, gold.h(), image);
@@ -216,7 +216,7 @@ u32 DialogMorale(const std::string & hdr, const std::string & msg, bool good, u3
     if(3 < count) count = 3;
     const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, (good ? 2 : 3));
     u32 offset = sprite.w() * 4 / 3;
-    Surface image(sprite.w() + offset * (count - 1), sprite.h());
+    Surface image(Size(sprite.w() + offset * (count - 1), sprite.h()), false);
     for(u32 ii = 0; ii < count; ++ii) sprite.Blit(offset * ii, 0, image);
 
     return Dialog::SpriteInfo(hdr, msg, image);
@@ -228,7 +228,7 @@ u32 DialogLuck(const std::string & hdr, const std::string & msg, bool good, u32 
     if(3 < count) count = 3;
     const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, (good ? 0 : 1));
     u32 offset = sprite.w() * 4 / 3;
-    Surface image(sprite.w() + offset * (count - 1), sprite.h());
+    Surface image(Size(sprite.w() + offset * (count - 1), sprite.h()), false);
     for(u32 ii = 0; ii < count; ++ii) sprite.Blit(offset * ii, 0, image);
 
     return Dialog::SpriteInfo(hdr, msg, image);
@@ -282,7 +282,7 @@ void AnimationRemoveObject(Maps::Tiles & tile)
 
     const MapsIndexes & heroes = Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_HEROES);
     const Surface & stile = tile.GetTileSurface();
-    Surface sobj(stile.w(), stile.h());
+    Surface sobj(stile.GetSize(), false);
 
     const Sprite & sprite = AGG::GetICN(MP2::GetICNObject(addon->object), addon->index);
     sprite.Blit(sprite.x(), sprite.y(), sobj);
@@ -304,7 +304,8 @@ void AnimationRemoveObject(Maps::Tiles & tile)
         {
 	    cursor.Hide();
 	    stile.Blit(dstx, dsty, display);
-	    sobj.Blit(alpha, dstx, dsty, display);
+	    sobj.SetAlphaMod(alpha);
+	    sobj.Blit(dstx, dsty, display);
 
 	    if(heroes.size())
 	    {
@@ -2534,7 +2535,7 @@ void ActionToUpgradeArmyObject(Heroes & hero, u32 obj, s32 dst_index)
 	// composite sprite
 	u32 ox = 0;
 	const Sprite & br = AGG::GetICN(ICN::STRIP, 12);
-	Surface sf(br.w() * mons.size() + (mons.size() - 1) * 4, br.h());
+	Surface sf(Size(br.w() * mons.size() + (mons.size() - 1) * 4, br.h()), false);
 
 	for(std::vector<Monster>::const_iterator
 	    it = mons.begin(); it != mons.end(); ++it)

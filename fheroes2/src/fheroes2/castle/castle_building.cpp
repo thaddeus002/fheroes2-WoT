@@ -261,19 +261,28 @@ void CastleRedrawBuilding(const Castle & castle, const Point & dst_pt, u32 build
     if(icn != ICN::UNKNOWN)
     {
 	// simple first sprite
-	const Sprite & sprite1 = AGG::GetICN(icn, index);
+	Sprite sprite1 = AGG::GetICN(icn, index);
 
 	if(alpha)
-	    sprite1.Blit(alpha, dst_pt.x + sprite1.x(), dst_pt.y + sprite1.y());
+	{
+	    sprite1.SetSurface(sprite1.GetSurface());
+	    sprite1.SetAlphaMod(alpha);
+	    sprite1.Blit(dst_pt.x + sprite1.x(), dst_pt.y + sprite1.y());
+	}
 	else
 	    CastleDialog::RedrawBuildingSpriteToArea(sprite1, dst_pt.x + sprite1.x(), dst_pt.y + sprite1.y(), max);
 
 	// second anime sprite
 	if(const u32 index2 = ICN::AnimationFrame(icn, index, frame))
 	{
-	    const Sprite & sprite2 = AGG::GetICN(icn, index2);
+	    Sprite sprite2 = AGG::GetICN(icn, index2);
+
 	    if(alpha)
-		sprite2.Blit(alpha, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
+	    {
+		sprite2.SetSurface(sprite2.GetSurface());
+		sprite2.SetAlphaMod(alpha);
+		sprite2.Blit(dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
+	    }
 	    else
 	        CastleDialog::RedrawBuildingSpriteToArea(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y(), max);
 	}

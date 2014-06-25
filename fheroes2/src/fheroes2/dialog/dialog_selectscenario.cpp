@@ -38,7 +38,7 @@ void VictoryConditionInfo(const Maps::FileInfo &);
 
 Surface GetNonStandardSizeIcon(void)
 {
-    Surface res(17, 17);
+    Surface res(Size(17, 17), false);
     res.Fill(ColorBlack);
     res.FillRect(Rect(1, 1, 15, 15), RGBA(0x8D, 0x73, 0xFF));
     Text text("N", Font::SMALL);

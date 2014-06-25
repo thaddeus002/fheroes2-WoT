@@ -203,7 +203,7 @@ s32  FindUncharteredTerritory(Heroes & hero, u32 scoute)
 	std::remove_if(v.begin(), v.end(), std::ptr_fun(&Maps::TileIsUnderProtection))));
 
 
-#if (__GNUC__ == 3 && __GNUC_MINOR__ == 4)
+#if defined(ANDROID)
     const MapsIndexes::const_reverse_iterator crend = v.rend();
 
     for(MapsIndexes::const_reverse_iterator
@@ -239,7 +239,7 @@ s32  GetRandomHeroesPosition(Heroes & hero, u32 scoute)
     v.resize(std::distance(v.begin(),
 	std::remove_if(v.begin(), v.end(), std::ptr_fun(&Maps::TileIsUnderProtection))));
 
-#if (__GNUC__ == 3 && __GNUC_MINOR__ == 4)
+#if defined(ANDROID)
     const MapsIndexes::const_reverse_iterator crend = v.rend();
 
     for(MapsIndexes::const_reverse_iterator

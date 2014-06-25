@@ -278,7 +278,7 @@ void Game::KeyboardGlobalFilter(int sym, int mod)
 
     // system hotkeys
     if(sym == key_events[EVENT_SYSTEM_FULLSCREEN])
-	display.FullScreen();
+	display.ToggleFullScreen();
     else
     if(sym == key_events[EVENT_SYSTEM_SCREENSHOT])
     {

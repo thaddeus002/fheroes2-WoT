@@ -57,11 +57,11 @@ void Interface::ControlPanel::ResetTheme(void)
 
     int alpha = 130;
 
-    btn_radr.SetAlpha(alpha);
-    btn_icon.SetAlpha(alpha);
-    btn_bttn.SetAlpha(alpha);
-    btn_stat.SetAlpha(alpha);
-    btn_quit.SetAlpha(alpha);
+    btn_radr.SetAlphaMod(alpha);
+    btn_icon.SetAlphaMod(alpha);
+    btn_bttn.SetAlphaMod(alpha);
+    btn_stat.SetAlphaMod(alpha);
+    btn_quit.SetAlphaMod(alpha);
 }
 
 const Rect & Interface::ControlPanel::GetArea(void)

@@ -89,7 +89,12 @@ bool ZSurface::Load(int w, int h, int bpp, int pitch, u32 rmask, u32 gmask, u32 
 
     if(! buf.empty())
     {
-	Set(SDL_CreateRGBSurfaceFrom(&buf[0], w, h, bpp, pitch, rmask, gmask, bmask, amask));
+        SDL_Surface* sf = SDL_CreateRGBSurfaceFrom(&buf[0], w, h, bpp, pitch, rmask, gmask, bmask, amask);
+
+        if(!sf)
+            Error::Except(__FUNCTION__, SDL_GetError());
+
+        Set(sf);
 	return true;
     }
 

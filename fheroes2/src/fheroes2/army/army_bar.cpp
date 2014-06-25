@@ -115,14 +115,18 @@ bool ArmyBar::isValid(void) const
     return army != NULL;
 }
 
-void ArmyBar::SetBackground(const Size & sz, const RGBA & fill)
+void ArmyBar::SetBackground(const Size & sz, const RGBA & fillColor)
 {
     if(use_mini_sprite)
     {
         SetItemSize(sz.w, sz.h);
 
-	backsf = Surface::RectBorder(sz, fill, RGBA(0xd0,0xc0,0x48), true);
-	spcursor = Surface::RectBorder(sz, RGBA(0xc0,0x2c,0), true);
+	backsf.Set(sz.w, sz.h, false);
+	backsf.Fill(fillColor);
+	backsf.DrawBorder(RGBA(0xd0, 0xc0, 0x48));
+
+	spcursor.Set(sz.w, sz.h, true /* transparent */);
+	spcursor.DrawBorder(RGBA(0xc0, 0x2c, 0));
     }
 }
 
@@ -178,7 +182,7 @@ void ArmyBar::RedrawItem(ArmyTroop & troop, const Rect & pos, bool selected, Sur
 
 	if(! use_mini_sprite)
 	{
-	    Surface black(text.w() + 4, text.h());
+	    Surface black(Size(text.w() + 4, text.h()), false);
 	    black.Fill(ColorBlack);
 	    const Point pt(pos.x + pos.w - black.w() - 1, pos.y + pos.h - black.h() - 1);
 	    black.Blit(pt.x, pt.y, dstsf);

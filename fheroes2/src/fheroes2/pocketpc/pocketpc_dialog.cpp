@@ -28,10 +28,6 @@
 #include "settings.h"
 #include "pocketpc.h"
 
-#ifdef ANDROID
-#include <SDL/SDL_screenkeyboard.h>
-#endif
-
 u32 PocketPC::GetCursorAttackDialog(const Point & dst, int allow)
 {
     Display & display = Display::Get();
@@ -47,9 +43,8 @@ u32 PocketPC::GetCursorAttackDialog(const Point & dst, int allow)
     const Sprite & sp_right = AGG::GetICN(ICN::CMSECO, 8);
     const Sprite & sp_bright = AGG::GetICN(ICN::CMSECO, 9);
 
-    Surface shadow(rt.w, rt.h);
+    Surface shadow(rt, false);
     shadow.Fill(ColorBlack);
-    shadow.SetAlpha(50);
 
     SpriteBack back(rt);
 
@@ -58,7 +53,8 @@ u32 PocketPC::GetCursorAttackDialog(const Point & dst, int allow)
     cursor.SetThemes(Cursor::POINTER);
 
     // blit alpha
-    shadow.Blit(120, rt.x, rt.y, display);
+    shadow.SetAlphaMod(120);
+    shadow.Blit(rt.x, rt.y, display);
 
     const Rect rt_info(rt.x + (rt.w - sp_info.w()) / 2, rt.y + (rt.h - sp_info.h()) / 2, sp_info.w(), sp_info.h());
     sp_info.Blit(rt_info.x, rt_info.y);
@@ -101,19 +97,9 @@ u32 PocketPC::GetCursorAttackDialog(const Point & dst, int allow)
     return Cursor::WAR_INFO;
 }
 
-#ifdef ANDROID
-void PocketPC::KeyboardDialog(std::string & str)
-{
-    char inputbuf[256];
-    strncpy(inputbuf, str.c_str(), sizeof(inputbuf));
-    inputbuf[sizeof(inputbuf) - 1] = 0;
-    SDL_ANDROID_GetScreenKeyboardTextInput(inputbuf, sizeof(inputbuf));
-    str = inputbuf;
-}
-#else
 Surface CreateTouchButton(void)
 {
-    Surface sf(24, 24);
+    Surface sf(Size(24, 24), false);
 
     const u32 ww = sf.w() / 2;
     const u32 hh = sf.h() / 2;
@@ -472,4 +458,3 @@ void PocketPC::KeyboardDialog(std::string & str)
     cursor.Show();
     display.Flip();
 }
-#endif

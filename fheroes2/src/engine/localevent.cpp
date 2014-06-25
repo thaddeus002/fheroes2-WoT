@@ -120,7 +120,11 @@ void LocalEvent::SetGlobalFilter(bool f)
 
 const char* KeySymGetName(KeySym sym)
 {
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+    return SDL_GetKeyName(static_cast<SDL_Keycode>(sym));
+#else
     return SDL_GetKeyName(static_cast<SDLKey>(sym));
+#endif
 }
 
 KeySym GetKeySym(int key)
@@ -186,7 +190,6 @@ KeySym GetKeySym(int key)
 	case SDLK_F10:		return KEY_F10;
 	case SDLK_F11:		return KEY_F11;
 	case SDLK_F12:		return KEY_F12;
-	case SDLK_PRINT:	return KEY_PRINT;
 	case SDLK_0:		return KEY_0;
 	case SDLK_1:		return KEY_1;
 	case SDLK_2:		return KEY_2;
@@ -224,6 +227,20 @@ KeySym GetKeySym(int key)
 	case SDLK_y:		return KEY_y;
 	case SDLK_z:		return KEY_z;
 
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+	case SDLK_PRINTSCREEN:	return KEY_PRINT;
+	case SDLK_KP_0:		return KEY_KP0;
+	case SDLK_KP_1:		return KEY_KP1;
+	case SDLK_KP_2:		return KEY_KP2;
+	case SDLK_KP_3:		return KEY_KP3;
+	case SDLK_KP_4:		return KEY_KP4;
+	case SDLK_KP_5:		return KEY_KP5;
+	case SDLK_KP_6:		return KEY_KP6;
+	case SDLK_KP_7:		return KEY_KP7;
+	case SDLK_KP_8:		return KEY_KP8;
+	case SDLK_KP_9:		return KEY_KP9;
+#else
+	case SDLK_PRINT:	return KEY_PRINT;
 	case SDLK_KP0:		return KEY_KP0;
 	case SDLK_KP1:		return KEY_KP1;
 	case SDLK_KP2:		return KEY_KP2;
@@ -234,6 +251,8 @@ KeySym GetKeySym(int key)
 	case SDLK_KP7:		return KEY_KP7;
 	case SDLK_KP8:		return KEY_KP8;
 	case SDLK_KP9:		return KEY_KP9;
+#endif
+
 	case SDLK_KP_PERIOD:	return KEY_KP_PERIOD;
 	case SDLK_KP_DIVIDE:	return KEY_KP_DIVIDE;
 	case SDLK_KP_MULTIPLY:	return KEY_KP_MULTIPLY;
@@ -282,26 +301,48 @@ bool LocalEvent::HandleEvents(bool delay)
     {
 	switch(event.type)
 	{
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+            case SDL_WINDOWEVENT:
+                if(Mixer::isValid())
+                {
+                    if(event.window.event == SDL_WINDOWEVENT_HIDDEN)
+                    {
+                        Mixer::Pause();
+                        Music::Pause();
+                        loop_delay = 100;
+                    }
+                    else
+                    if(event.window.event == SDL_WINDOWEVENT_SHOWN)
+                    {
+                        Mixer::Resume();
+                        Music::Resume();
+                        loop_delay = 1;
+                    }
+                }
+                break;
+#else
 	    case SDL_ACTIVEEVENT:
 		if(event.active.state & SDL_APPACTIVE)
 		{
-#ifdef WITH_MIXER
 		    if(Mixer::isValid())
 		    {
 			//iconify
 			if(0 == event.active.gain)
 			{
-			    Mixer::Reset();
+			    Mixer::Pause();
 			    Music::Pause();
 			    loop_delay = 100;
 			}
 			else
+			{
+			    Mixer::Resume();
+			    Music::Resume();
 			    loop_delay = 1;
+			}
 		    }
-#endif
 		}
 		break;
-
+#endif
 	    // keyboard
 	    case SDL_KEYDOWN:
 	    case SDL_KEYUP:
@@ -329,7 +370,11 @@ bool LocalEvent::HandleEvents(bool delay)
 	}
 
         // need for wheel up/down delay
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+        if(SDL_MOUSEWHEEL == event.type) break;
+#else
         if(SDL_BUTTON_WHEELDOWN == event.button.button || SDL_BUTTON_WHEELUP == event.button.button) break;
+#endif
     }
 
     // emulate press right
@@ -426,8 +471,13 @@ void LocalEvent::HandleMouseButtonEvent(const SDL_MouseButtonEvent & button)
     if(modes & MOUSE_PRESSED)
 	switch(button.button)
 	{
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+            case SDL_BUTTON_X1:
+            case SDL_BUTTON_X2:
+#else
 	    case SDL_BUTTON_WHEELDOWN:
 	    case SDL_BUTTON_WHEELUP:
+#endif
 		mouse_pm = mouse_cu;
 		break;
 
@@ -456,8 +506,13 @@ void LocalEvent::HandleMouseButtonEvent(const SDL_MouseButtonEvent & button)
     else
 	switch(button.button)
 	{
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+            case SDL_BUTTON_X1:
+            case SDL_BUTTON_X2:
+#else
 	    case SDL_BUTTON_WHEELDOWN:
 	    case SDL_BUTTON_WHEELUP:
+#endif
 		mouse_rm = mouse_cu;
 		break;
 
@@ -551,12 +606,20 @@ bool LocalEvent::MouseClickRight(const Rect &rt)
 
 bool LocalEvent::MouseWheelUp(void) const
 {
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+    return (modes & MOUSE_PRESSED) && SDL_BUTTON_X1 == mouse_button;
+#else
     return (modes & MOUSE_PRESSED) && SDL_BUTTON_WHEELUP == mouse_button;
+#endif
 }
 
 bool LocalEvent::MouseWheelDn(void) const
 {
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+    return (modes & MOUSE_PRESSED) && SDL_BUTTON_X2 == mouse_button;
+#else
     return (modes & MOUSE_PRESSED) && SDL_BUTTON_WHEELDOWN == mouse_button;
+#endif
 }
 
 bool LocalEvent::MousePressLeft(const Rect &rt) const
@@ -695,7 +758,11 @@ void LocalEvent::SetGlobalFilterKeysEvents(void (*pf)(int, int))
     keyboard_filter_func = pf;
 }
 
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+int LocalEvent::GlobalFilterEvents(void* userdata, SDL_Event* event)
+#else
 int LocalEvent::GlobalFilterEvents(const SDL_Event *event)
+#endif
 {
     LocalEvent & le = LocalEvent::Get();
 
@@ -736,8 +803,6 @@ int LocalEvent::GetState(u32 type)
          
 void LocalEvent::SetStateDefaults(void)
 {
-    // enable events
-    SetState(SDL_ACTIVEEVENT, true);
     SetState(SDL_USEREVENT, true);
     SetState(SDL_KEYDOWN, true);
     SetState(SDL_KEYUP, true);
@@ -746,17 +811,26 @@ void LocalEvent::SetStateDefaults(void)
     SetState(SDL_MOUSEBUTTONUP, true);
     SetState(SDL_QUIT, true);
 
-    // ignore events
     SetState(SDL_JOYAXISMOTION, false);
     SetState(SDL_JOYBALLMOTION, false);
     SetState(SDL_JOYHATMOTION, false);
     SetState(SDL_JOYBUTTONUP, false);
     SetState(SDL_JOYBUTTONDOWN, false);
     SetState(SDL_SYSWMEVENT, false);
+
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+    SetState(SDL_WINDOWEVENT, true);
+
+    SDL_SetEventFilter(GlobalFilterEvents, NULL);
+#else
+    SetState(SDL_ACTIVEEVENT, true);
+
+    SetState(SDL_SYSWMEVENT, false);
     SetState(SDL_VIDEORESIZE, false);
     SetState(SDL_VIDEOEXPOSE, false);
 
     SDL_SetEventFilter(GlobalFilterEvents);
+#endif
 }
 
 #ifdef WITHOUT_MOUSE

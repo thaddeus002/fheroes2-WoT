@@ -26,33 +26,15 @@
 #include "display.h"
 #include "surface.h"
 
-class Texture : public Surface /* SDL2 texture wrapper */
-{
-public:
-    Texture();
-    Texture(const Surface &);
-
-    Texture & operator= (const Surface &);
-
-    void Blit(Surface & = Display::Get()) const;
-    void Blit(int, int, Surface & = Display::Get()) const;
-    void Blit(const Point &, Surface & = Display::Get()) const;
-    void Blit(const Rect & srt, int dstx, int dsty, Surface & = Display::Get()) const;
-    void Blit(const Rect & srt, const Point &, Surface & = Display::Get()) const;
-
-    void Blit(int alpha, int dstx, int dsty, Surface & = Display::Get()) const;
-    void Blit(int alpha, const Rect & srt, const Point &, Surface & = Display::Get()) const;
-};
-
-class SpritePos : public Texture
+class SpritePos : public Surface
 {
 public:
     SpritePos();
-    SpritePos(const Texture &, const Point &);
+    SpritePos(const Surface &, const Point &);
 
-    SpritePos & operator= (const Texture &);
-
+    void SetSurface(const Surface &);
     void SetPos(const Point &);
+
     void Reset(void);
 
     const Point & GetPos(void) const;

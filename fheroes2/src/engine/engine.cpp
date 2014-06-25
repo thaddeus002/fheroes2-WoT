@@ -55,13 +55,16 @@ bool SDL::Init(const u32 system)
     if(SDL_INIT_CDROM & system) Cdrom::Open();
 #endif
 #ifdef WITH_TTF
-    SDL::Font::Init();
+    FontTTF::Init();
 #endif
 #ifdef WITH_NET
     Network::Init();
 #endif
 
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+#else
     SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+#endif
 
     System::CreateTrayIcon(true);
     System::PowerManagerOff(true);
@@ -79,7 +82,7 @@ void SDL::Quit(void)
     Network::Quit();
 #endif
 #ifdef WITH_TTF
-    SDL::Font::Quit();
+    FontTTF::Quit();
 #endif
 #ifdef WITH_AUDIOCD
     if(SubSystem(SDL_INIT_CDROM)) Cdrom::Close();

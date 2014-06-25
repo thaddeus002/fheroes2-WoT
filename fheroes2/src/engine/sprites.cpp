@@ -23,67 +23,12 @@
 #include "sprites.h"
 #include "display.h"
 
-Texture::Texture()
-{
-}
-
-Texture::Texture(const Surface & sf) : Surface(sf)
-{
-}
-
-Texture & Texture::operator= (const Surface & sf)
-{
-    Set(sf, true);
-    return *this;
-}
-
-void Texture::Blit(Surface & dst) const
-{
-    Surface::Blit(dst);
-}
-
-void Texture::Blit(int dstx, int dsty, Surface & dst) const
-{
-    Surface::Blit(dstx, dsty, dst);
-}
-
-void Texture::Blit(const Point & dpt, Surface & dst) const
-{
-    Surface::Blit(dpt, dst);
-}
-
-void Texture::Blit(const Rect & srt, int dstx, int dsty, Surface & dst) const
-{
-    Surface::Blit(srt, dstx, dsty, dst);
-}
-        
-void Texture::Blit(const Rect & srt, const Point & dpt, Surface & dst) const
-{
-    Surface::Blit(srt, dpt, dst);
-}
-
-void Texture::Blit(int alpha, int dstx, int dsty, Surface & dst) const
-{
-    Surface::Blit(alpha, dstx, dsty, dst);
-}
-
-void Texture::Blit(int alpha, const Rect & srt, const Point & dpt, Surface & dst) const
-{
-    Surface::Blit(alpha, srt, dpt, dst);
-}
-
 SpritePos::SpritePos()
 {
 }
 
-SpritePos::SpritePos(const Texture & sf, const Point & pt) : Texture(sf), pos(pt)
+SpritePos::SpritePos(const Surface & sf, const Point & pt) : Surface(sf), pos(pt)
 {
-}
-
-SpritePos & SpritePos::operator= (const Texture & sf)
-{
-    Set(sf, true);
-    return *this;
 }
 
 const Point & SpritePos::GetPos(void) const
@@ -94,6 +39,11 @@ const Point & SpritePos::GetPos(void) const
 Rect SpritePos::GetArea(void) const
 {
     return Rect(GetPos(), GetSize());
+}
+
+void SpritePos::SetSurface(const Surface & sf)
+{
+    Surface::Set(sf, true);
 }
 
 void SpritePos::SetPos(const Point & pt)
@@ -145,13 +95,7 @@ void SpriteBack::Save(const Rect & rt)
 
     if(rt.w && rt.h)
     {
-	if(! Surface::isValid())
-	{
-	    Set(rt.w, rt.h, false);
-	    SetDisplayFormat();
-	}
-
-	Display::Get().Blit(rt, 0, 0, *this);
+	Set(Display::Get().GetSurface(rt), true);
 
 	pos.w = rt.w;
 	pos.h = rt.h;

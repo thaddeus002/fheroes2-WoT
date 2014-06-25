@@ -85,9 +85,7 @@ void Game::DialogPlayers(int color, std::string str)
     StringReplace(str, "%{color}", (player ? player->GetName() : Color::String(color)));
 
     const Sprite & border = AGG::GetICN(ICN::BRCREST, 6);
-
-    Surface sign(border.w(), border.h());
-    border.Blit(sign);
+    Surface sign = border.GetSurface();
 
     switch(color)
     {
@@ -146,8 +144,6 @@ void Game::OpenCastleDialog(Castle & castle)
     {
 	(*it)->OpenDialog(true, need_fade);
     }
-
-    Music::Reset();
 
     if(it != myCastles.end())
     {

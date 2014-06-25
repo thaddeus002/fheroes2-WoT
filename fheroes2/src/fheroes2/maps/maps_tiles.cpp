@@ -61,40 +61,36 @@ Surface PassableViewSurface(int passable)
 {
     const u32 w = 31;
     const u32 h = 31;
-    const RGBA colr2 = RGBA(0xC0,0x2C,0);
-    const RGBA colg2 = RGBA(0x90,0xC0,0);
-    Surface sf;
+    const RGBA colr = RGBA(0xC0,0x2C,0);
+    const RGBA colg = RGBA(0x90,0xC0,0);
+    Surface sf(Size(w, h), true);
 
     if(0 == passable || Direction::CENTER == passable)
-	sf = Surface::RectBorder(Size(w, h), colr2, true);
+	sf.DrawBorder(colr);
     else
     if(DIRECTION_ALL == passable)
-	sf = Surface::RectBorder(Size(w, h), colg2, true);
+	sf.DrawBorder(colg);
     else
     {
-	const u32 colr = sf.MapRGB(colr2);
-	const u32 colg = sf.MapRGB(colg2);
-
 	sf.Set(w, h, false);
-	sf.Lock();
 
         for(u32 i = 0; i < w; ++i)
         {
 	    if(i < 10)
 	    {
-    		sf.SetPixel(i, 0, (passable & Direction::TOP_LEFT ? colg : colr));
-    		sf.SetPixel(i, h - 1, (passable & Direction::BOTTOM_LEFT ? colg : colr));
+    		sf.DrawPoint(Point(i, 0), (passable & Direction::TOP_LEFT ? colg : colr));
+    		sf.DrawPoint(Point(i, h - 1), (passable & Direction::BOTTOM_LEFT ? colg : colr));
 	    }
 	    else
 	    if(i < 21)
 	    {
-    		sf.SetPixel(i, 0, (passable & Direction::TOP ? colg : colr));
-    		sf.SetPixel(i, h - 1, (passable & Direction::BOTTOM ? colg : colr));
+    		sf.DrawPoint(Point(i, 0), (passable & Direction::TOP ? colg : colr));
+    		sf.DrawPoint(Point(i, h - 1), (passable & Direction::BOTTOM ? colg : colr));
     	    }
 	    else
 	    {
-		sf.SetPixel(i, 0, (passable & Direction::TOP_RIGHT ? colg : colr));
-    		sf.SetPixel(i, h - 1, (passable & Direction::BOTTOM_RIGHT ? colg : colr));
+		sf.DrawPoint(Point(i, 0), (passable & Direction::TOP_RIGHT ? colg : colr));
+    		sf.DrawPoint(Point(i, h - 1), (passable & Direction::BOTTOM_RIGHT ? colg : colr));
 	    }
 	}
 
@@ -102,23 +98,21 @@ Surface PassableViewSurface(int passable)
         {
 	    if(i < 10)
 	    {
-    		sf.SetPixel(0, i, (passable & Direction::TOP_LEFT ? colg : colr));
-    		sf.SetPixel(w - 1, i, (passable & Direction::TOP_RIGHT ? colg : colr));
+    		sf.DrawPoint(Point(0, i), (passable & Direction::TOP_LEFT ? colg : colr));
+    		sf.DrawPoint(Point(w - 1, i), (passable & Direction::TOP_RIGHT ? colg : colr));
 	    }
 	    else
 	    if(i < 21)
 	    {
-    		sf.SetPixel(0, i, (passable & Direction::LEFT ? colg : colr));
-    		sf.SetPixel(w - 1, i, (passable & Direction::RIGHT ? colg : colr));
+    		sf.DrawPoint(Point(0, i), (passable & Direction::LEFT ? colg : colr));
+    		sf.DrawPoint(Point(w - 1, i), (passable & Direction::RIGHT ? colg : colr));
     	    }
 	    else
 	    {
-		sf.SetPixel(0, i, (passable & Direction::BOTTOM_LEFT ? colg : colr));
-    		sf.SetPixel(w - 1, i, (passable & Direction::BOTTOM_RIGHT ? colg : colr));
+		sf.DrawPoint(Point(0, i), (passable & Direction::BOTTOM_LEFT ? colg : colr));
+    		sf.DrawPoint(Point(w - 1, i), (passable & Direction::BOTTOM_RIGHT ? colg : colr));
 	    }
 	}
-
-	sf.Unlock();
     }
 
     return sf;

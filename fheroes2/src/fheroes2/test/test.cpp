@@ -69,67 +69,55 @@ void RunTest2(void)
     display.Fill(RGBA(0x85, 0x85, 0x85));
     Point pt;
 
-    // test alpha (without amask)
-    const Sprite & sprite1 = AGG::GetICN(ICN::BTNSHNGL, 1);
+    // test alpha sprite
+    Sprite sp1 = AGG::GetICN(ICN::BTNSHNGL, 1);
 
-    sprite1.Blit(pt);
-    pt.x += sprite1.w() + 20;
+    sp1.Blit(pt);
+    pt.x += sp1.w() + 20;
 
-    Surface sf1;
-    sf1 = sprite1;
-    sf1.SetAlpha(50);
+    Surface sf1 = sp1.GetSurface();
+    sf1.SetAlphaMod(50);
 
     sf1.Blit(pt, display);
     pt.x += sf1.w() + 20;
 
-    // test alpha (with amask, shadow)
-    const Sprite & sprite2 = AGG::GetICN(ICN::DRAGBLAK, 1);
+    // test alpha sprite with shadow
+    Sprite sp2 = AGG::GetICN(ICN::DRAGBLAK, 1);
+    pt.y = 130;
+    pt.x = 0;
 
-    sprite2.Blit(pt, display);
-    pt.x += sprite2.w() + 20;
+    sp2.Blit(pt, display);
+    pt.x += sp2.w() + 20;
 
-    Surface sf2(sprite2.w(), sprite2.h(), false);
-    //sf2.Fill(0, 0, 0xFF);
-
-    //sprite2.SetColorKey(sprite2.MapRGB(0, 0, 0));
-    sprite2.Blit(sf2);
-    sf2.SetAlpha(50);
-
+    Surface sf2 = sp2.GetSurface();
     sf2.Blit(pt, display);
     pt.x += sf2.w() + 20;
 
-    // stensil
-    Surface sf3 = Surface::Stencil(sprite2, RGBA(0x80, 0x50, 0x30));
-    VERBOSE(sf3.Info());
+    VERBOSE(sp2.Info());
+    VERBOSE(sf2.Info());
+
+    sf2.SetAlphaMod(50);
+    sf2.Blit(pt, display);
+    pt.x += sf2.w() + 20;
+
+    // contour, stensil, change color
+    Surface sf3 = sp2.RenderContour(RGBA(0xFF, 0xFF, 0));
     pt.x = 0;
-    pt.y = 150;
+    pt.y = 260;
 
     sf3.Blit(pt, display);
+    pt.x += sf3.w() + 20;
 
-    // contour
-    Surface sf4 = Surface::Contour(sprite2, RGBA(0xFF, 0xFF, 0));
-    pt.x += sprite2.w() + 20;
-
+    RGBA color = RGBA(0x80, 0x50, 0x30);
+    Surface sf4 = sp2.RenderStencil(color);
     sf4.Blit(pt, display);
+    pt.x += sf4.w() + 20;
 
-    //sf2.Set(sprite2.w(), sprite2.h(), false);
-    //VERBOSE("sf2: " << sf2.Info());
-    //sf2.Blit(sprite2);
-    //sf2.SetAlpha(50);
+    Surface sf5 = sf4.RenderChangeColor(color, RGBA(0x30, 0x90, 0x30));
+    sf5.Blit(pt, display);
+    pt.x += sf5.w() + 20;
 
-    //sf2.Blit(pt);
-    //pt.x += sf2.w() + 20;
-
-    //Surface::MakeStencil(sf, sprite2, sprite.MapRGB(0xFF, 0xFF, 0));
-
-    //sf1.SetAlpha(100);
-
-    //VERBOSE("sprite1: " << sprite.Info());
-    //VERBOSE("sprite2: " << sprite.Info());
-    //VERBOSE("sf: " << sf.Info());
-
-
-
+    //
     display.Flip();
 
     while(le.HandleEvents())

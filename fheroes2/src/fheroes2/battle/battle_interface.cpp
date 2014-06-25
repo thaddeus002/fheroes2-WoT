@@ -168,7 +168,7 @@ bool CursorAttack(u32 theme)
     return false;
 }
 
-void DrawHexagon(Surface & sf, const RGBA & color)
+Surface DrawHexagon(const RGBA & color)
 {
     int r, l, w, h;
 
@@ -178,17 +178,6 @@ void DrawHexagon(Surface & sf, const RGBA & color)
 	l = 7;
 	w = CELLW2;
 	h = CELLH2;
-
-	sf.Set(w, h);
-
-	Surface::DrawLine(Point(r, 0), Point(0, l), color, sf);
-	Surface::DrawLine(Point(r, 0), Point(w - 1, l), color, sf);
-
-	Surface::DrawLine(Point(0, l + 1), Point(0, h - l - 1), color, sf);
-	Surface::DrawLine(Point(w - 1, l + 1), Point(w - 1, h - l - 1), color, sf);
-
-	Surface::DrawLine(Point(r, h - 1), Point(0, h - l - 1), color, sf);
-	Surface::DrawLine(Point(r, h - 1), Point(w - 1, h - l - 1), color, sf);
     }
     else
     {
@@ -196,21 +185,23 @@ void DrawHexagon(Surface & sf, const RGBA & color)
 	l = 13;
 	w = CELLW;
 	h = CELLH;
-
-	sf.Set(w, h);
-
-	Surface::DrawLine(Point(r, 0), Point(0, l), color, sf);
-	Surface::DrawLine(Point(r, 0), Point(w - 1, l), color, sf);
-
-	Surface::DrawLine(Point(0, l + 1), Point(0, h - l - 1), color, sf);
-	Surface::DrawLine(Point(w - 1, l + 1), Point(w - 1, h - l - 1), color, sf);
-
-	Surface::DrawLine(Point(r, h - 1), Point(0, h - l - 1), color, sf);
-	Surface::DrawLine(Point(r, h - 1), Point(w - 1, h - l - 1), color, sf);
     }
+
+    Surface sf(Size(w, h), true);
+
+    sf.DrawLine(Point(r, 0), Point(0, l), color);
+    sf.DrawLine(Point(r, 0), Point(w - 1, l), color);
+
+    sf.DrawLine(Point(0, l + 1), Point(0, h - l - 1), color);
+    sf.DrawLine(Point(w - 1, l + 1), Point(w - 1, h - l - 1), color);
+
+    sf.DrawLine(Point(r, h - 1), Point(0, h - l - 1), color);
+    sf.DrawLine(Point(r, h - 1), Point(w - 1, h - l - 1), color);
+
+    return sf;
 }
 
-void DrawHexagonShadow(Surface & sf)
+Surface DrawHexagonShadow(void)
 {
     int l, w, h;
 
@@ -229,7 +220,7 @@ void DrawHexagonShadow(Surface & sf)
 	h = 52;
     }
 
-    sf.Set(w, h);
+    Surface sf(Size(w, h), false);
     Rect rt(0, l, w, 2 * l);
     sf.FillRect(rt, ColorBlack);
 
@@ -241,7 +232,9 @@ void DrawHexagonShadow(Surface & sf)
 	rt.w -= 4;
 	sf.FillRect(rt, ColorBlack);
     }
-    sf.SetAlpha(0x30);
+
+    sf.SetAlphaMod(0x30);
+    return sf;
 }
 
 bool Battle::TargetInfo::isFinishAnimFrame(void) const
@@ -589,9 +582,14 @@ Battle::ArmiesOrder::ArmiesOrder() : orders(NULL), army_color2(0)
     const RGBA green = RGBA(0x90, 0xc0, 0);
     const Size sz(ARMYORDERW, ARMYORDERW);
 
-    sf_color[0] = Surface::RectBorder(sz, yellow, true);
-    sf_color[1] = Surface::RectBorder(sz, orange, true);
-    sf_color[2] = Surface::RectBorder(sz, green, true);
+    sf_color[0].Set(sz.w, sz.h, true);
+    sf_color[0].DrawBorder(yellow);
+
+    sf_color[1].Set(sz.w, sz.h, true);
+    sf_color[1].DrawBorder(orange);
+
+    sf_color[2].Set(sz.w, sz.h, true);
+    sf_color[2].DrawBorder(green);
 }
 
 void Battle::ArmiesOrder::Set(const Rect & rt, const Units* units, int color)
@@ -716,9 +714,9 @@ Battle::Interface::Interface(Arena & a, s32 center) : arena(a), icn_cbkg(ICN::UN
     if(conf.QVGA() || conf.ExtPocketLowMemory()) icn_frng = ICN::UNKNOWN;
 
     // hexagon
-    DrawHexagon(sf_hexagon, (light ? RGBA(0x78, 0x94, 0) : RGBA(0x38,0x48,0)));
-    DrawHexagon(sf_cursor, RGBA(0xb0, 0x0c, 0));
-    DrawHexagonShadow(sf_shadow);
+    sf_hexagon = DrawHexagon((light ? RGBA(0x78, 0x94, 0) : RGBA(0x38, 0x48, 0)));
+    sf_cursor = DrawHexagon(RGBA(0xb0, 0x0c, 0));
+    sf_shadow = DrawHexagonShadow();
 
     // buttons
     const Rect & area = border.GetArea();
@@ -955,7 +953,7 @@ void Battle::Interface::RedrawTroopSprite(const Unit & b) const
     if(b_current == &b)
     {
 	spmon1 = AGG::GetICN(msi.icn_file, msi.frm_idle.start, b.isReflect());
-	spmon2 = (b.isReflect() ? b.GetContour(CONTOUR_REFLECT) : b.GetContour(CONTOUR_MAIN));
+	spmon2 = Sprite(b.isReflect() ? b.GetContour(CONTOUR_REFLECT) : b.GetContour(CONTOUR_MAIN), 0, 0);
 
 	if(b_current_sprite)
 	{
@@ -967,7 +965,7 @@ void Battle::Interface::RedrawTroopSprite(const Unit & b) const
     if(b.Modes(SP_STONE))
     {
 	// black wite sprite
-	spmon1 = (b.isReflect() ? b.GetContour(CONTOUR_REFLECT|CONTOUR_BLACK) : b.GetContour(CONTOUR_BLACK));
+	spmon1 = Sprite(b.isReflect() ? b.GetContour(CONTOUR_REFLECT|CONTOUR_BLACK) : b.GetContour(CONTOUR_BLACK), 0, 0);
     }
     else
     {
@@ -1010,10 +1008,18 @@ void Battle::Interface::RedrawTroopSprite(const Unit & b) const
 	}
 
 	// sprite monster
-	if(255 > b_current_alpha && spmon1 == *b_current_sprite)
-	    spmon1.Blit(b_current_alpha, sp.x, sp.y);
+	if(b_current_sprite && spmon1 == *b_current_sprite)
+	{
+	    if(b_current_alpha < 255)
+	    {
+		spmon1 = Sprite(spmon1.GetSurface(), spmon1.x(), spmon1.y());
+		spmon1.SetAlphaMod(b_current_alpha);
+	    }
+	    spmon1.Blit(sp.x, sp.y);
+	}
 	else
 	    spmon1.Blit(sp);
+
 	// contour
 	if(spmon2.isValid()) spmon2.Blit(sp.x - 1, sp.y - 1);
     }
@@ -1055,7 +1061,7 @@ void Battle::Interface::RedrawCover(void)
 
     if(!sf_cover.isValid())
     {
-	sf_cover.Set(display.w(), display.h());
+	sf_cover.Set(display.w(), display.h(), false);
 	RedrawCoverStatic(sf_cover);
     }
 
@@ -1925,19 +1931,11 @@ void Battle::Interface::FadeArena(void)
 
     if(!conf.QVGA() && conf.ExtGameUseFade())
     {
-	Surface temp(640, 480, false);
-	temp.Fill(ColorBlack);
-	u32 alpha = 0;
-
-	while(alpha < 40)
-	{
-	    cursor.Hide();
-    	    temp.Blit(alpha, border.GetArea().x, border.GetArea().y, display);
-	    cursor.Show();
-    	    display.Flip();
-    	    alpha += 5;
-    	    DELAY(15);
-	}
+	Rect srt(border.GetArea().x, border.GetArea().y, 640, 480);
+	Surface top = display.GetSurface(srt);
+	Surface back(top.GetSize(), false);
+	back.Fill(ColorBlack);
+	display.Fade(top, back, srt, 50, 300);
     }
 }
 
@@ -3283,10 +3281,10 @@ void Battle::Interface::RedrawActionBloodLustSpell(Unit & target)
     const monstersprite_t & msi = target.GetMonsterSprite();
     const Sprite & sprite1 = AGG::GetICN(msi.icn_file, msi.frm_idle.start, target.isReflect());
 
-    Sprite sprite2(Surface(sprite1.w(), sprite1.h(), false), sprite1.x(), sprite1.y());
+    Sprite sprite2(Surface(sprite1.GetSize(), false), sprite1.x(), sprite1.y());
     sprite1.Blit(sprite2);
 
-    Surface sprite3 = Surface::Stencil(sprite1, RGBA(0xB0, 0x0C, 0));
+    Surface sprite3 = sprite1.RenderStencil(RGBA(0xB0, 0x0C, 0));
 
     cursor.SetThemes(Cursor::WAR_NONE);
     cursor.Hide();
@@ -3305,7 +3303,7 @@ void Battle::Interface::RedrawActionBloodLustSpell(Unit & target)
     	{
 	    cursor.Hide();
 	    sprite1.Blit(sprite2);
-	    sprite3.SetAlpha(alpha);
+	    sprite3.SetAlphaMod(alpha);
 	    sprite3.Blit(sprite2);
 	    Redraw();
 	    cursor.Show();
@@ -3625,10 +3623,8 @@ void Battle::Interface::RedrawActionArmageddonSpell(const TargetsInfo & targets)
 
     area.h -= Settings::Get().QVGA() ? 18 : 36;
 
-    Surface sprite1;
-    Surface sprite2;
-    sprite1.Set(area.w, area.h);
-    sprite2.Set(area.w, area.h);
+    Surface sprite1(area, false);
+    Surface sprite2(area, false);
 
     cursor.SetThemes(Cursor::WAR_NONE);
     cursor.Hide();
@@ -3648,7 +3644,7 @@ void Battle::Interface::RedrawActionArmageddonSpell(const TargetsInfo & targets)
     	{
 	    cursor.Hide();
 	    Redraw();
-	    sprite2.SetAlpha(alpha);
+	    sprite2.SetAlphaMod(alpha);
 	    sprite1.Blit(area.x, area.y, display);
 	    sprite2.Blit(area.x, area.y, display);
 	    RedrawInterface();
@@ -3712,13 +3708,10 @@ void Battle::Interface::RedrawActionEarthQuakeSpell(const std::vector<int> & tar
     u32 frame = 0;
     area.h -= Settings::Get().QVGA() ? 19 : 38;
 
-    Surface sprite;
-    sprite.Set(area.w, area.h);
-
     cursor.SetThemes(Cursor::WAR_NONE);
     cursor.Hide();
 
-    display.Blit(area, 0, 0, sprite);
+    Surface sprite = display.GetSurface(area);
 
     b_current = NULL;
     AGG::PlaySound(M82::ERTHQUAK);
@@ -3934,7 +3927,7 @@ void Battle::Interface::RedrawTargetsWithFrameAnimation(const TargetsInfo & targ
 
 void RedrawSparksEffects(const Point & src, const Point & dst)
 {
-    Surface::DrawLine(src, dst, RGBA(0xff, 0xff ,0), Display::Get());
+    Display::Get().DrawLine(src, dst, RGBA(0xff, 0xff, 0));
 }
 
 void Battle::Interface::RedrawTroopWithFrameAnimation(Unit & b, int icn, int m82, bool pain)

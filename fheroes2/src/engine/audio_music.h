@@ -27,11 +27,12 @@
 
 namespace Music
 {
-    void	Play(const u8* ptr, u32 size, bool loop);
-    void	Play(const char* file, bool loop);
+    void	Play(const std::vector<u8> &, bool loop);
+    void	Play(const std::string &, bool loop);
     u16		Volume(s16 vol);
-    void	SetFadeIn(u16);
-    void	SetFadeOut(u16);
+    void	SetFadeIn(int);
+    void	SetFadeOut(int);
+    void	SetExtCommand(const std::string &);
     void	Pause(void);
     void	Resume(void);
     void	Reset(void);

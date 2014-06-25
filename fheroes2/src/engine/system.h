@@ -26,6 +26,7 @@
 #include <sstream>
 #include <iostream>
 #include <string>
+#include <list>
 
 #if defined(__SYMBIAN32__)
 #define VERBOSE(x)
@@ -38,7 +39,7 @@ namespace std
     static const char* android_endl = "\n";
 }
 #define endl android_endl
-#define VERBOSE(x) if(true) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "FHeroes", "%s", osss.str().c_str()); }
+#define VERBOSE(x) if(true) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "SDLHeroes2", "%s", osss.str().c_str()); }
 #else
 #define VERBOSE(x) std::cout << x << std::endl
 #endif
@@ -50,6 +51,8 @@ namespace System
 
     int		MakeDirectory(const std::string &);
     std::string	ConcatePath(const std::string &, const std::string &);
+    std::list<std::string>
+		GetExtendedDirectories(void);
 
     std::string GetDirname(const std::string &);
     std::string GetBasename(const std::string &);
@@ -72,6 +75,7 @@ namespace System
     void	PowerManagerOff(bool);
 
     int		ShellCommand(const char*);
+    int         GetRenderFlags(void);
 }
 
 #endif

@@ -64,7 +64,7 @@ Battle::Only::Only() : hero1(NULL), hero2(NULL), player1(Color::BLUE), player2(C
 	luckIndicator1(NULL), luckIndicator2(NULL), primskill_bar1(NULL), primskill_bar2(NULL),
 	secskill_bar1(NULL), secskill_bar2(NULL), selectArmy1(NULL), selectArmy2(NULL),
 	selectArtifacts1(NULL), selectArtifacts2(NULL), cinfo2(NULL),
-	rt1(36, 267, 43, 53), sfb1(rt1.w, rt1.h), rt2(23, 347, 34, 34), sfb2(rt2.w, rt2.h)
+	rt1(36, 267, 43, 53), sfb1(rt1, false), rt2(23, 347, 34, 34), sfb2(rt2, false)
 {
     player1.SetControl(CONTROL_HUMAN);
     player2.SetControl(CONTROL_AI);
@@ -75,8 +75,12 @@ Battle::Only::Only() : hero1(NULL), hero2(NULL), player1(Color::BLUE), player2(C
     backSprite.Blit(rt2, 0, 0, sfb2);
 
     const RGBA gray = RGBA(0xb0, 0xb0, 0xb0);
-    sfc1 = Surface::RectBorder(Size(rt1.w, rt1.h - 10), gray, true);
-    sfc2 = Surface::RectBorder(rt2, gray, true);
+
+    sfc1.Set(rt1.w, rt1.h, true);
+    sfc1.DrawBorder(gray);
+
+    sfc2.Set(rt2.w, rt2.h, true);
+    sfc2.DrawBorder(gray);
 }
 
 StreamBase & operator<< (StreamBase & msg, const Battle::Only & b)

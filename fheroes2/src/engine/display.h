@@ -24,61 +24,90 @@
 
 #include <string>
 #include "surface.h"
-#include "rect.h"
-
-class UpdateRects
-{
-public:
-    UpdateRects();
-    ~UpdateRects();
-
-    void 	SetVideoMode(int, int);
-    void	PushRect(int, int, int, int);
-    void	Clear(void);
-    size_t	Size(void) const;
-    SDL_Rect*	Data(void);
-    bool	BitsToRects(void);
-
-protected:
-    void	SetBit(u32, bool);
-    bool	GetBit(u32) const;
-
-    std::vector<SDL_Rect>	rects;
-    u8*				bits;
-    int				len;
-    int				bf;
-    int				bw;
-};
+class Texture;
 
 class Display : public Surface
 {
 public:
     ~Display();
 
-    bool                isDisplay(void) const;
     static Display &    Get(void);
 
-    static void         SetVideoMode(int w, int h, u32 flags);
-    static int          GetMaxMode(Size &, bool enable_rotate);
-    static std::string  GetInfo(void);
+    Size        GetSize(void) const;
 
-    static void         HideCursor(void);
-    static void         ShowCursor(void);
+    std::string	GetInfo(void) const;
+    Size	GetMaxMode(bool enable_rotate) const;
 
-    static void         SetCaption(const char*);
-    static void         SetIcons(Surface &);
+    void	SetVideoMode(int w, int h, bool);
+    void	SetCaption(const char*);
+    void	SetIcons(Surface &);
 
-    void                AddUpdateRect(int, int, int, int);
-    void                Flip();
-    void                Fade(void);
-    void                Rise(void);
-    void                FullScreen(void);
+    void	Flip(void);
+    void	Present(void);
+    void        Clear(void);
+    void        ToggleFullScreen(void);
 
-private:
+    void	Fade(int delay = 500);
+    void	Fade(const Surface &, const Surface &, const Point &, int level, int delay);
+    void	Rise(int delay = 500);
+    void	Rise(const Surface &, const Surface &, const Point &, int level, int delay);
+
+    static void HideCursor(void);
+    static void ShowCursor(void);
+
+    Surface	GetSurface(void) const;
+    Surface	GetSurface(const Rect & rt) const;
+
+protected:
+    friend class Texture;
+
+    bool	isDisplay(void) const;
+
     Display();
 
-    UpdateRects update_rects;
-    bool        dirty;
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+    SDL_Window*         window;
+    SDL_Renderer*	renderer;
+#endif
 };
+
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+class TextureTarget
+{
+public:
+    TextureTarget();
+
+    void Fill(const RGBA &);
+    void FillRect(const Rect &, const RGBA &);
+};
+
+class Texture
+{
+public:
+    Texture();
+    Texture(const Surface &);
+    Texture(const Texture &);
+    ~Texture();
+
+    Texture &	operator= (const Texture &);
+    Size	GetSize(void) const;
+
+    void	Blit(Display &) const;
+    void        Blit(s32 dx, s32 dy, Display &) const;
+    void        Blit(const Point & dstpt, Display &) const;
+    void        Blit(const Rect & srcrt, s32 dx, s32 dy, Display &) const;
+    void        Blit(const Rect & srcrt, const Point & dstpt, Display &) const;
+
+protected:
+    SDL_Texture*        texture;
+    int*		counter;
+};
+#else
+class Texture : public Surface
+{
+public:
+    Texture(const Surface &);
+};
+#endif
 
 #endif

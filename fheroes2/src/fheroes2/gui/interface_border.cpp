@@ -241,7 +241,8 @@ bool Interface::BorderWindow::QueueEventProcessing(void)
         const Point & mp = le.GetMouseCursor();
 	const Rect & pos = GetRect();
 
-        SpriteMove moveIndicator = Surface::RectBorder(pos, RGBA(0xD0, 0xC0, 0x48), false);
+        SpriteMove moveIndicator(Surface(pos, false));
+        moveIndicator.DrawBorder(RGBA(0xD0, 0xC0, 0x48), false);
 
         const s32 ox = mp.x - pos.x;
         const s32 oy = mp.y - pos.y;

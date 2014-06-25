@@ -22,313 +22,189 @@
 
 #include <iostream>
 #include <sstream>
-#include <algorithm>
 #include <string>
-#include "rect.h"
+
+#include "tools.h"
 #include "types.h"
+#include "system.h"
 #include "error.h"
-#include "surface.h"
 #include "display.h"
 
-UpdateRects::UpdateRects() : bits(NULL), len(0), bf(0), bw(0)
-{
-}
-
-UpdateRects::~UpdateRects()
-{
-    delete [] bits;
-}
-
-void UpdateRects::SetVideoMode(int dw, int dh)
-{
-    if(dw < 640)
-    {
-	bw = 4;
-	bf = 2;
-    }
-    else
-    if(dw > 640)
-    {
-	bw = 16;
-	bf = 4;
-    }
-    else
-    {
-	bw = 8;
-	bf = 3;
-    }
-
-    // fix bw and bf
-    while(((dw % bw) || (dh % bw)) && 1 < bf)
-    {
-	bw >>= 1;
-	--bf;
-    }
-
-    len = (dw >> bf) * (dh >> bf);
-    len = ((len % 8) ? (len >> 3) + 1 : len >> 3);
-
-    if(bits) delete [] bits;
-    bits = new u8 [len];
-    std::fill(bits, bits + len, 0);
-
-    rects.reserve(len / 4);
-}
-
-size_t UpdateRects::Size(void) const
-{
-    return rects.size();
-}
-
-void UpdateRects::Clear(void)
-{
-    std::fill(bits, bits + len, 0);
-    rects.clear();
-}
-
-SDL_Rect* UpdateRects::Data(void)
-{
-    return rects.size() ? &rects[0] : NULL;
-}
-
-void UpdateRects::PushRect(int px, int py, int pw, int ph)
-{
-    Display & display = Display::Get();
-
-    if(0 != pw && 0 != ph &&
-	px + pw > 0 && py + ph > 0 &&
-	px < display.w() && py < display.h())
-    {
-	if(px < 0)
-	{
-	    pw += px;
-	    px = 0;
-	}
-
-	if(py < 0)
-	{
-	    ph += py;
-	    py = 0;
-	}
-
-	if(px + pw > display.w())
-	    pw = display.w() - px;
-
-	if(py + ph > display.h())
-	    ph = display.h() - py;
-
-	const int dw = display.w() >> bf;
-	int xx, yy;
-
-	for(yy = py; yy < py + ph; yy += bw)
-	    for(xx = px; xx < px + pw; xx += bw)
-		SetBit((yy >> bf) * dw + (xx >> bf), 1);
-
-	yy = py + ph - 1;
-	for(xx = px; xx < px + pw; xx += bw)
-	    SetBit((yy >> bf) * dw + (xx >> bf), 1);
-
-	xx = px + pw - 1;
-	for(yy = py; yy < py + ph; yy += bw)
-	    SetBit((yy >> bf) * dw + (xx >> bf), 1);
-
-	yy = py + ph - 1;
-	xx = px + pw - 1;
-	SetBit((yy >> bf) * dw + (xx >> bf), 1);
-    }
-}
-
-bool UpdateRects::BitsToRects(void)
-{
-    Display & display = Display::Get();
-
-    const int dbf = display.w() >> bf;
-    const size_t len2 = len << 3;
-    size_t index;
-    SDL_Rect rect;
-    SDL_Rect* prt = NULL;
-
-    for(index = 0; index < len2; ++index)
-    {
-	if(GetBit(index))
-	{
-    	    if(NULL != prt)
-	    {
-		if(static_cast<size_t>(rect.y) == (index / dbf) * bw)
-		    rect.w += bw;
-		else
-		{
-		    rects.push_back(*prt);
-		    prt = NULL;
-		}
-    	    }
-
-    	    if(NULL == prt)
-    	    {
-		rect.x = (index % dbf) * bw;
-		rect.y = (index / dbf) * bw;
-		rect.w = bw;
-		rect.h = bw;
-		prt = &rect;
-    	    }
-	}
-	else
-	{
-    	    if(prt)
-    	    {
-		rects.push_back(*prt);
-		prt = NULL;
-    	    }
-	}
-    }
-
-    if(prt)
-    {
-	rects.push_back(*prt);
-	prt = NULL;
-    }
-
-    return rects.size();
-}
-
-void UpdateRects::SetBit(u32 index, bool value)
-{
-    if(value != GetBit(index))
-	bits[index >> 3] ^= (1 << (index % 8));
-}
-
-bool UpdateRects::GetBit(u32 index) const
-{
-    return (bits[index >> 3] >> (index % 8));
-}
-
-Display::Display() : dirty(false)
-{
-}
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+Display::Display() : window(NULL), renderer(NULL) {}
+#else
+Display::Display() {}
+#endif
 
 Display::~Display()
 {
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+    if(renderer)
+	SDL_DestroyRenderer(renderer);
+
+    if(window)
+        SDL_DestroyWindow(window);
+
+    FreeSurface(*this);
+#else
+#endif
 }
 
-bool Display::isDisplay(void) const
+void Display::SetVideoMode(int w, int h, bool fullscreen)
 {
-    return true;
-}
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+    u32 flags = SDL_WINDOW_SHOWN;
+    if(fullscreen)
+        flags |= SDL_WINDOW_FULLSCREEN;
+        
+    if(renderer)
+	SDL_DestroyRenderer(renderer);
+        
+    if(window)
+        SDL_DestroyWindow(window);
 
-void Display::SetVideoMode(int w, int h, u32 flags)
-{
-    Display & display = Display::Get();
+    window = SDL_CreateWindow("", 0, 0, w, h, flags);
+    renderer = SDL_CreateRenderer(window, -1, System::GetRenderFlags());
 
-    if(display.isValid() && display.w() == w && display.h() == h) return;
+    if(! renderer)
+        Error::Except(__FUNCTION__, SDL_GetError());
 
-    if(display.surface && (display.surface->flags & SDL_FULLSCREEN)) flags |= SDL_FULLSCREEN;
-    display.surface = SDL_SetVideoMode(w, h, 0, flags);
+    Set(w, h, false);
+    Fill(RGBA(0, 0, 0));
+#else
+    u32 flags = System::GetRenderFlags();
 
-    if(!display.surface)
+    if(fullscreen)
+	flags |= SDL_FULLSCREEN;
+
+    surface = SDL_SetVideoMode(w, h, 0, flags);
+
+    if(! surface)
 	Error::Except(__FUNCTION__, SDL_GetError());
-
-    display.update_rects.SetVideoMode(display.w(), display.h());
+#endif
 }
 
-/* flip */
-void Display::Flip()
+Size Display::GetSize(void) const
 {
-    if(dirty)
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+    if(window)
     {
-	if(surface->flags & SDL_HWSURFACE)
-	    SDL_Flip(surface);
+        int dw, dh;
+        SDL_GetWindowSize(window, &dw, &dh);
+        return Size(dw, dh);
+    }
+
+    return Size(0, 0);
+#else
+    return Size(w(), h());
+#endif
+}
+
+void Display::Flip(void)
+{
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+    SDL_Texture* tx = SDL_CreateTextureFromSurface(renderer, surface);
+
+    if(tx)
+    {
+	if(0 != SDL_SetRenderTarget(renderer, NULL))
+    	    Error::Message(__FUNCTION__, SDL_GetError());
 	else
-	if(update_rects.BitsToRects())
 	{
-	    SDL_UpdateRects(surface, update_rects.Size(), update_rects.Data());
-	    update_rects.Clear();
+	    if(0 != SDL_RenderCopy(renderer, tx, NULL, NULL))
+    		Error::Message(__FUNCTION__, SDL_GetError());
+	    else
+		SDL_RenderPresent(renderer);
 	}
-
-	dirty = false;
-    }
-}
-
-/* full screen */
-void Display::FullScreen(void)
-{
-    SDL_WM_ToggleFullScreen(surface);
-}
-
-/* set caption main window */
-void Display::SetCaption(const char* str)
-{
-    SDL_WM_SetCaption(str, NULL);
-}
-
-/* set icons window */
-void Display::SetIcons(Surface & icons)
-{
-    SDL_WM_SetIcon(icons(), NULL);
-}
-
-/* hide system cursor */
-void Display::HideCursor(void)
-{
-    SDL_ShowCursor(SDL_DISABLE);
-}
-
-/* show system cursor */
-void Display::ShowCursor(void)
-{
-    SDL_ShowCursor(SDL_ENABLE);
-}
-
-void Display::Fade(void)
-{
-    Surface temp(w(), h(), false);
-    temp.Fill(ColorBlack);
-    int alpha = 0;
-
-    while(alpha < 70)
-    {
-	temp.Blit(alpha, 0, 0, *this);
-        Flip();
-	alpha += 5;
-	DELAY(10);
-    }
-}
-
-void Display::Rise(void)
-{
-    Surface temp(w(), h(), false);
-    temp.Fill(ColorBlack);
-    int alpha = 71;
-
-    while(alpha > 5)
-    {
-	temp.Blit(alpha, 0, 0, *this);
-	Flip();
-	alpha -= 5;
-	DELAY(10);
-    }
-}
-
-/* get video display */
-Display & Display::Get(void)
-{
-    static Display inside;
-    return inside;
-}
-
-int Display::GetMaxMode(Size & result, bool rotate)
-{
-    SDL_Rect** modes = SDL_ListModes(NULL, SDL_ANYFORMAT);
-
-    if(modes == (SDL_Rect **) 0)
-    {
-        std::cerr <<  "Display::" << "GetMaxMode: " << "no modes available" << std::endl;
-	return 0;
     }
     else
-    if(modes == (SDL_Rect **) -1)
+    	Error::Message(__FUNCTION__, SDL_GetError());
+#else
+    SDL_Flip(surface);
+#endif
+}
+
+void Display::Present(void)
+{
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+    SDL_RenderPresent(renderer);
+#else
+    SDL_Flip(surface);
+#endif
+}
+
+void Display::ToggleFullScreen(void)
+{
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+    if(window)
     {
-        //std::cout <<  "Display::" << "GetMaxMode: " << "all modes available" << std::endl;
-	return -1;
+        u32 flags = SDL_GetWindowFlags(window);
+
+        // toggle FullScreen
+        if(flags & SDL_WINDOW_FULLSCREEN)
+            flags &= ~SDL_WINDOW_FULLSCREEN;
+
+        SDL_SetWindowFullscreen(window, flags);
+    }
+#else
+    SDL_WM_ToggleFullScreen(surface);
+#endif
+}
+
+void Display::SetCaption(const char* str)
+{
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+    if(window)
+        SDL_SetWindowTitle(window, str);
+#else
+    SDL_WM_SetCaption(str, NULL);
+#endif
+}
+
+void Display::SetIcons(Surface & icons)
+{
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+    SDL_SetWindowIcon(window, icons());
+#else
+    SDL_WM_SetIcon(icons(), NULL);
+#endif
+}
+
+Size Display::GetMaxMode(bool rotate) const
+{
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+    int disp = 0;
+    int num = SDL_GetNumDisplayModes(disp);
+    SDL_DisplayMode mode;
+    int max = 0;
+    int cur = 0;
+
+    for(int ii = 0; ii < num; ++ii)
+    {
+        SDL_GetDisplayMode(disp, ii, &mode);
+
+        if(max < mode.w * mode.h)
+        {
+            max = mode.w * mode.h;
+            cur = ii;
+        }
+    }
+    
+    SDL_GetDisplayMode(disp, cur, &mode);
+    Size result = Size(mode.w, mode.h);
+
+    if(rotate && result.w < result.h)
+        std::swap(result.w, result.h);
+
+    return result;
+#else
+    Size result;
+    SDL_Rect** modes = SDL_ListModes(NULL, SDL_ANYFORMAT);
+
+    if(modes == (SDL_Rect **) 0 ||
+	modes == (SDL_Rect **) -1)
+    {
+        std::cerr <<  "Display::" << "GetMaxMode: " << "no modes available" << std::endl;
     }
     else
     {
@@ -348,32 +224,266 @@ int Display::GetMaxMode(Size & result, bool rotate)
 	result.h = modes[cur]->h;
 
 	if(rotate && result.w < result.h)
-	{
-	    cur = result.w;
-	    result.w = result.h;
-	    result.h = cur;
-	}
+	    std::swap(result.w, result.h);
     }
-    return 1;
+
+    return result;
+#endif
 }
 
-void Display::AddUpdateRect(int px, int py, int pw, int ph)
+std::string Display::GetInfo(void) const
 {
-    if(0 == (surface->flags & SDL_HWSURFACE))
-	update_rects.PushRect(px, py, pw, ph);
-    dirty = true;
-}
-
-std::string Display::GetInfo(void)
-{
-    Display & display = Display::Get();
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+    std::ostringstream os;
+    os << "Display::GetInfo: " <<
+            GetString(GetSize()) << ", " <<
+            "driver: " << SDL_GetCurrentVideoDriver();
+    return os.str();
+#else
     std::ostringstream os;
     char namebuf[12];
 
     os << "Display::" << "GetInfo: " <<
-	display.w() << "x" << display.h() << 
-	", bpp: " << static_cast<int>(display.depth()) <<
-	", driver: " << SDL_VideoDriverName(namebuf, 12);
+	GetString(GetSize()) << ", " <<
+	"driver: " << SDL_VideoDriverName(namebuf, 12);
 
     return os.str();
+#endif
 }
+
+Surface Display::GetSurface(const Rect & rt) const
+{
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+/*
+    SDL_Rect srcrect = SDLRect(rt);
+    SDL_Surface *sf = SDL_CreateRGBSurface(0, rt.w, rt.h, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+    Surface res;
+
+
+    if(! sf)
+        Error::Message(__FUNCTION__, SDL_GetError());
+    else
+    {
+        if(0 != SDL_RenderReadPixels(renderer, &srcrect, SDL_PIXELFORMAT_ARGB8888, sf->pixels, sf->pitch))
+            Error::Message(__FUNCTION__, SDL_GetError());
+
+        res.Set(sf);
+    }
+*/
+    return Surface::GetSurface(rt);
+#else
+    Surface res(rt, GetFormat());
+    Blit(rt, Point(0, 0), res);
+    return res; //Surface(SDL_DisplayFormat(res()));
+#endif
+}
+
+void Display::Clear(void)
+{
+    Fill(ColorBlack);
+}
+
+/* hide system cursor */
+void Display::HideCursor(void)
+{
+    SDL_ShowCursor(SDL_DISABLE);
+}
+
+/* show system cursor */
+void Display::ShowCursor(void)
+{
+    SDL_ShowCursor(SDL_ENABLE);
+}
+
+void Display::Fade(const Surface & top, const Surface & back, const Point & pt, int level, int delay)
+{
+    Surface shadow = top.GetSurface();
+    int alpha = 255;
+    const int step = 10;
+    const int min = step + 5;
+    const int delay2 = (delay * step) / (alpha - min);
+
+    while(alpha > min + level)
+    {
+	back.Blit(*this);
+	shadow.SetAlphaMod(alpha);
+	shadow.Blit(*this);
+	Flip();
+	alpha -= step;
+	DELAY(delay2);
+    }
+}
+
+void Display::Fade(int delay)
+{
+    Surface top = GetSurface();
+    Surface back(GetSize(), false);
+    back.Fill(ColorBlack);
+    Fade(top, back, Point(0, 0), 5, delay);
+    Blit(back);
+    Flip();
+}
+
+void Display::Rise(const Surface & top, const Surface & back, const Point & pt, int level, int delay)
+{
+    Surface shadow = top.GetSurface();
+    int alpha = 0;
+    const int step = 10;
+    const int max = level - step;
+    const int delay2 = (delay * step) / max;
+
+    while(alpha < max)
+    {
+	back.Blit(*this);
+	shadow.SetAlphaMod(alpha);
+	shadow.Blit(*this);
+        Flip();
+	alpha += step;
+	DELAY(delay2);
+    }
+}
+
+void Display::Rise(int delay)
+{
+    Surface top = GetSurface();
+    Surface back(GetSize(), false);
+    back.Fill(ColorBlack);
+    Rise(top, back, Point(0, 0), 250, delay);
+    Blit(top);
+    Flip();
+}
+
+/* get video display */
+Display & Display::Get(void)
+{
+    static Display inside;
+    return inside;
+}
+
+
+bool Display::isDisplay(void) const
+{
+    return true;
+}
+
+Surface Display::GetSurface(void) const
+{
+    return GetSurface(Rect(Point(0, 0), GetSize()));
+}
+
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+Texture::Texture() : texture(NULL), counter(NULL)
+{
+    counter = new int;
+    *counter = 0;
+}
+
+Texture::Texture(const Surface & sf) : texture(NULL), counter(NULL)
+{
+    Display & display = Display::Get();
+    texture = SDL_CreateTextureFromSurface(display.renderer, sf());
+
+    if(!texture)
+	Error::Message(__FUNCTION__, SDL_GetError());
+
+    counter = new int;
+    *counter = 1;
+}
+
+Texture::~Texture()
+{
+    if(1 < *counter)
+	*counter -= 1;
+    else
+    {
+	SDL_DestroyTexture(texture);
+	delete counter;
+    }
+}
+
+Texture::Texture(const Texture & tx) : texture(tx.texture), counter(tx.counter)
+{
+    if(texture)
+	*counter += 1;
+    else
+    {
+	counter = new int;
+	*counter = 0;
+    }
+}
+
+Texture & Texture::operator= (const Texture & tx)
+{
+    if(this == &tx)
+	return *this;
+
+    if(1 < *counter)
+	*counter -= 1;
+    else
+    {
+	SDL_DestroyTexture(texture);
+	delete counter;
+    }
+
+    texture = tx.texture;
+    counter = tx.counter;
+
+    if(texture)
+	*counter += 1;
+    else
+    {
+	counter = new int;
+	*counter = 0;
+    }
+
+    return *this;
+}
+
+Size Texture::GetSize(void) const
+{
+    int tw, th;
+    SDL_QueryTexture(texture, NULL, NULL, &tw, &th);
+    return Size(tw, th);
+}
+
+void Texture::Blit(Display & display) const
+{
+    Blit(Rect(Point(0, 0), GetSize()), Point(0, 0), display);
+}
+
+void Texture::Blit(s32 dx, s32 dy, Display & display) const
+{
+    Blit(Rect(Point(0, 0), GetSize()), Point(dx, dy), display);
+}
+
+void Texture::Blit(const Point & dstpt, Display & display) const
+{
+    Blit(Rect(Point(0, 0), GetSize()), dstpt, display);
+}
+
+void Texture::Blit(const Rect & srcrt, s32 dx, s32 dy, Display & display) const
+{
+    Blit(srcrt, Point(dx, dy), display);
+}
+
+void Texture::Blit(const Rect & srt, const Point & dpt, Display & display) const
+{
+    SDL_Rect srcrt = SDLRect(srt);
+    SDL_Rect dstrt = SDLRect(dpt.x, dpt.y, srt.w, srt.h);
+
+    if(0 != SDL_SetRenderTarget(display.renderer, NULL))
+    	Error::Message(__FUNCTION__, SDL_GetError());
+    else
+    {
+	if(0 != SDL_RenderCopy(display.renderer, texture, &srcrt, &dstrt))
+    	    Error::Message(__FUNCTION__, SDL_GetError());
+    }
+}
+
+#else
+Texture::Texture(const Surface & sf)
+{
+    Set(SDL_DisplayFormatAlpha(sf()));
+    //Set(SDL_DisplayFormat(sf()));
+}
+#endif

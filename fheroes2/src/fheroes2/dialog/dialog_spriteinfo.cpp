@@ -33,7 +33,7 @@ int Dialog::ArtifactInfo(const std::string & hdr, const std::string & msg, const
 {
     const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
     const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, art.IndexSprite64());
-    Surface image(border.w(), border.h());
+    Surface image = border.GetSurface();
     border.Blit(image);
     artifact.Blit(5, 5, image);
 

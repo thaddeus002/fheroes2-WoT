@@ -35,16 +35,16 @@ struct Point
     Point();
     Point(s16, s16);
 
-    bool operator== (const Point & pt) const;
-    bool operator!= (const Point & pt) const;
+    bool operator== (const Point &) const;
+    bool operator!= (const Point &) const;
 
     bool inABC(const Point &, const Point &, const Point &) const;
 
-    Point & operator+= (const Point & pt);
-    Point & operator-= (const Point & pt);
+    Point & operator+= (const Point &);
+    Point & operator-= (const Point &);
 
-    Point operator+ (const Point &);
-    Point operator- (const Point &);
+    Point operator+ (const Point &) const;
+    Point operator- (const Point &) const;
 };
 
 
@@ -58,8 +58,14 @@ struct Size
 
     bool isEmpty(void) const;
 
-    bool operator== (const Size & sz) const;
-    bool operator!= (const Size & sz) const;
+    bool operator== (const Size &) const;
+    bool operator!= (const Size &) const;
+
+    Size & operator+= (const Size &);
+    Size & operator-= (const Size &);
+
+    Size operator+ (const Size &) const;
+    Size operator- (const Size &) const;
 };
 
 struct Rect : Point, Size

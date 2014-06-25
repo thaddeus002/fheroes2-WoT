@@ -24,21 +24,39 @@
 
 #include "gamedefs.h"
 
+struct ICNHeader
+{
+    ICNHeader() : offsetX(0), offsetY(0), width(0), height(0), type(0), offsetData(0) {}
+
+    u16 offsetX;
+    u16 offsetY;
+    u16 width;
+    u16 height;
+    u8 type;
+    u32 offsetData;
+};
+
 class Sprite : public SpritePos
 {
 public:
     Sprite();
-    Sprite(const Texture &, s32, s32);
-
-    Sprite & operator= (const Texture &);
+    Sprite(const Surface &, s32, s32);
 
     int x(void) const;
     int y(void) const;
 
+    using Surface::Blit;
+
+    void Blit(void) const;
+    void Blit(s32, s32) const;
+    void Blit(const Point &) const;
+    void Blit(const Rect & srt, s32, s32) const;
+    void Blit(const Rect & srt, const Point &) const;
+
     void ChangeColorIndex(u32 index1, u32 index2);
 
-    static void DrawICN(int icn, const u8* buf, int size, bool reflect, Surface &);
-    static void AddonExtensionModify(Sprite & sp, int icn, int index);
+    static Sprite CreateICN(int icn, const ICNHeader &, const u8* buf, int size, bool reflect);
+    static void AddonExtensionModify(Sprite &, int icn, int index);
     static Surface ScaleQVGASurface(const Surface &);
     static Sprite ScaleQVGASprite(const Sprite &);
 };

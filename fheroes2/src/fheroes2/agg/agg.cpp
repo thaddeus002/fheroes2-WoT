@@ -128,7 +128,7 @@ namespace AGG
     std::vector<SDL_Color>			pal_colors;
 
 #ifdef WITH_TTF
-    SDL::Font*			fonts; /* small, medium */
+    FontTTF*			fonts; /* small, medium */
 
     void			LoadTTFChar(u32);
     Surface			GetFNT(u32, u32);
@@ -591,9 +591,7 @@ bool AGG::LoadExtICN(int icn, u32 index, bool reflect)
 		    // clean
 		    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(3, 8, 43, 14), 3, 1, sprite);
 		    // wait
-		    Surface src(28, 28);
-		    GetICN(ICN::ADVBTNS, 8 + index).Blit(Rect(5, 4, 28, 28), 0, 0, src);
-		    Surface dst = Sprite::ScaleQVGASurface(src);
+		    Surface dst = Sprite::ScaleQVGASurface(GetICN(ICN::ADVBTNS, 8 + index).GetSurface(Rect(5, 4, 28, 28)));
 		    dst.Blit((sprite.w() - dst.w()) / 2, 2, sprite);
 		}
 		break;
@@ -601,8 +599,7 @@ bool AGG::LoadExtICN(int icn, u32 index, bool reflect)
 	    case ICN::BOAT12:
 	    {
 		LoadOrgICN(sprite, ICN::ADVMCO, 28 + index, false);
-		Surface dst = Sprite::ScaleQVGASurface(sprite);
-		Surface::Swap(sprite, dst);
+		sprite.SetSurface(Sprite::ScaleQVGASurface(sprite));
 	    }
 		break;
 
@@ -761,7 +758,7 @@ bool AGG::LoadAltICN(int icn, u32 index, bool reflect)
 
 	    if(reflect && sp1.isValid() && ! sp2.isValid())
 	    {
-		sp2 = Sprite(Surface::Reflect(sp1, 2), ox, oy);
+		sp2 = Sprite(sp1.RenderReflect(2), ox, oy);
 		return sp2.isValid();
 	    }
 	}
@@ -865,18 +862,6 @@ const std::vector<u8> & AGG::ReadICNChunk(int icn, u32 index)
     return ReadChunk(ICN::GetString(icn));
 }
 
-struct ICNHeader
-{
-    ICNHeader() : offsetX(0), offsetY(0), width(0), height(0), type(0), offsetData(0) {}
-
-    u16 offsetX;
-    u16 offsetY;
-    u16 width;
-    u16 height;
-    u8 type;
-    u32 offsetData;
-};
-
 StreamBuf & operator>> (StreamBuf & st, ICNHeader & icn)
 {
     icn.offsetX =  st.getLE16();
@@ -918,8 +903,7 @@ bool AGG::LoadOrgICN(Sprite & sp, int icn, u32 index, bool reflect)
 	else
 	    sizeData = blockSize - header1.offsetData;
 
-	sp = Sprite(Surface(header1.width, header1.height, false), header1.offsetX, header1.offsetY);
-	Sprite::DrawICN(icn, &body[6 + header1.offsetData], sizeData, reflect, sp);
+	sp = Sprite::CreateICN(icn ,header1, &body[6 + header1.offsetData], sizeData, reflect);
 	Sprite::AddonExtensionModify(sp, icn, index);
 
 	return true;
@@ -1040,7 +1024,7 @@ int AGG::PutICN(const Sprite & sprite, bool init_reflect)
     if(init_reflect)
     {
 	v.reflect = new Sprite[1];
-        v.reflect[0] = Sprite(Surface::Reflect(sprite, 2), sprite.x(), sprite.y());
+        v.reflect[0] = Sprite(sprite.RenderReflect(2), sprite.x(), sprite.y());
     }
 
     icn_cache.push_back(v);
@@ -1122,7 +1106,7 @@ bool AGG::LoadOrgTIL(int til, u32 max)
 	if(body.size() == body_size && count <= max)
 	{
 	    for(u32 ii = 0; ii < count; ++ii)
-		v.sprites[ii].Set(&body[6 + ii * tile_size], width, height, 1, false);
+		v.sprites[ii] = Surface(&body[6 + ii * tile_size], width, height, 1, false);
 
 	    return true;
 	}
@@ -1203,7 +1187,7 @@ Surface AGG::GetTIL(int til, u32 index, u32 shape)
 	    const Surface & src = v.sprites[index];
 
 	    if(src.isValid())
-		surface = Surface::Reflect(src, shape);
+		surface = src.RenderReflect(shape);
 	    else
 		DEBUG(DBG_ENGINE, DBG_WARN, "is NULL");
 	}
@@ -1431,66 +1415,61 @@ void AGG::PlayMusic(int mus, bool loop)
 
     if(conf.MusicExt())
     {
-	const std::string musname = Settings::GetLastFile(prefix_music, MUS::GetString(mus));
+        std::string filename = Settings::GetLastFile(prefix_music, MUS::GetString(mus));
 
-#ifdef WITH_MIXER
-	std::string shortname = Settings::GetLastFile(prefix_music, MUS::GetString(mus, true));
-	const char* filename = NULL;
+        if(! System::IsFile(filename))
+            filename.clear();
 
-	if(System::IsFile(musname))   filename = musname.c_str();
-	else
-	if(System::IsFile(shortname)) filename = shortname.c_str();
-	else
-	{
-	    StringReplace(shortname, ".ogg", ".mp3");
-	    if(System::IsFile(shortname)) filename = shortname.c_str();
-	    else
-		DEBUG(DBG_ENGINE, DBG_WARN, "error read file: " << musname << ", skipping...");
-	}
+        if(filename.empty())
+        {
+            filename = Settings::GetLastFile(prefix_music, MUS::GetString(mus, true));
 
-	if(filename) Music::Play(filename, loop);
-#else
-	if(System::IsFile(musname) && conf.PlayMusCommand().size())
-	{
-	    const std::string run = conf.PlayMusCommand() + " " + musname;
-	    Music::Play(run.c_str(), loop);
-	}
-#endif
-	DEBUG(DBG_ENGINE, DBG_INFO, MUS::GetString(mus));
+            if(! System::IsFile(filename))
+            {
+                StringReplace(filename, ".ogg", ".mp3");
+
+                if(! System::IsFile(filename))
+                {
+                    DEBUG(DBG_ENGINE, DBG_WARN, "error read file: " << Settings::GetLastFile(prefix_music, MUS::GetString(mus)) << ", skipping...");
+                    filename.clear();
+                }
+            }
+        }
+
+        if(filename.size())
+            Music::Play(filename, loop);
+
+        DEBUG(DBG_ENGINE, DBG_INFO, MUS::GetString(mus));
     }
     else
 #ifdef WITH_AUDIOCD
     if(conf.MusicCD() && Cdrom::isValid())
     {
-	Cdrom::Play(mus, loop);
-	DEBUG(DBG_ENGINE, DBG_INFO, "cd track " << static_cast<int>(mus));
+        Cdrom::Play(mus, loop);
+        DEBUG(DBG_ENGINE, DBG_INFO, "cd track " << static_cast<int>(mus));
     }
     else
 #endif
     if(conf.MusicMIDI())
     {
-	int xmi = XMI::FromMUS(mus);
-	if(XMI::UNKNOWN != xmi)
-	{
+        int xmi = XMI::FromMUS(mus);
+        if(XMI::UNKNOWN != xmi)
+        {
 #ifdef WITH_MIXER
-	    const std::vector<u8> & v = GetMID(xmi);
-	    if(v.size()) Music::Play(&v[0], v.size(), loop);
+            const std::vector<u8> & v = GetMID(xmi);
+            if(v.size()) Music::Play(v, loop);
 #else
-	    if(conf.PlayMusCommand().size())
-	    {
-		const std::string file = Settings::GetLastFile(prefix_music, XMI::GetString(xmi));
+            std::string mid = XMI::GetString(xmi);
+            StringReplace(mid, ".XMI", ".MID");
+            const std::string file = System::ConcatePath(Settings::GetWriteableDir("music"), mid);
 
-		if(System::IsFile(file))
-		{
-		    const std::string run = conf.PlayMusCommand() + " " + file;
-		    Music::Play(run.c_str(), loop);
-		}
-		else
-		    SaveMemToFile(GetMID(xmi), file);
-	    }
+            if(! System::IsFile(file))
+                SaveMemToFile(GetMID(xmi), file);
+
+            Music::Play(file, loop);
 #endif
-	}
-	DEBUG(DBG_ENGINE, DBG_INFO, XMI::GetString(xmi));
+        }
+        DEBUG(DBG_ENGINE, DBG_INFO, XMI::GetString(xmi));
     }
 }
 
@@ -1502,14 +1481,14 @@ void AGG::LoadTTFChar(u32 ch)
     const RGBA yellow(0xFF, 0xFF, 0x00);
 	    
     // small
-    fnt_cache[ch].sfs[0] = Surface::RenderUnicodeChar(fonts[0], ch, white, ! conf.FontSmallRenderBlended());
-    fnt_cache[ch].sfs[1] = Surface::RenderUnicodeChar(fonts[0], ch, yellow, ! conf.FontSmallRenderBlended());
+    fnt_cache[ch].sfs[0] = fonts[0].RenderUnicodeChar(ch, white, ! conf.FontSmallRenderBlended());
+    fnt_cache[ch].sfs[1] = fonts[0].RenderUnicodeChar(ch, yellow, ! conf.FontSmallRenderBlended());
 
     // medium
     if(!(conf.QVGA() && !conf.Unicode()))
     {
-	fnt_cache[ch].sfs[2] = Surface::RenderUnicodeChar(fonts[1], ch, white, ! conf.FontNormalRenderBlended());
-	fnt_cache[ch].sfs[3] = Surface::RenderUnicodeChar(fonts[1], ch, yellow, ! conf.FontNormalRenderBlended());
+	fnt_cache[ch].sfs[2] = fonts[1].RenderUnicodeChar(ch, white, ! conf.FontNormalRenderBlended());
+	fnt_cache[ch].sfs[3] = fonts[1].RenderUnicodeChar(ch, yellow, ! conf.FontNormalRenderBlended());
     }
 
     DEBUG(DBG_ENGINE, DBG_TRACE, "0x" << std::hex << ch);
@@ -1637,7 +1616,7 @@ bool AGG::Init(void)
     const std::string font1 = Settings::GetLastFile(prefix_fonts, conf.FontsNormal());
     const std::string font2 = Settings::GetLastFile(prefix_fonts, conf.FontsSmall());
 
-    fonts = new SDL::Font[2];
+    fonts = new FontTTF[2];
 
     if(conf.Unicode())
     {

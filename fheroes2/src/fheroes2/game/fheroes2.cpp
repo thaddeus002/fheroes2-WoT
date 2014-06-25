@@ -137,10 +137,10 @@ int main(int argc, char **argv)
 	    if(0 == conf.VideoMode().w || 0 == conf.VideoMode().h)
 	    	conf.SetAutoVideoMode();
 
-            Display::SetVideoMode(conf.VideoMode().w, conf.VideoMode().h, conf.DisplayFlags());
-
-	    Display::HideCursor();
-	    Display::SetCaption(GetCaption().c_str());
+            Display & display = Display::Get();
+	    display.SetVideoMode(conf.VideoMode().w, conf.VideoMode().h, conf.FullScreen());
+	    display.HideCursor();
+	    display.SetCaption(GetCaption().c_str());
 
     	    //Ensure the mouse position is updated to prevent bad initial values.
     	    LocalEvent::Get().GetMouseCursor();
@@ -149,11 +149,11 @@ int main(int argc, char **argv)
     	    ZSurface zicons;
 	    if(zicons.Load(_ptr_08067830.width, _ptr_08067830.height, _ptr_08067830.bpp, _ptr_08067830.pitch,
     		_ptr_08067830.rmask, _ptr_08067830.gmask, _ptr_08067830.bmask, _ptr_08067830.amask, _ptr_08067830.zdata, sizeof(_ptr_08067830.zdata)))
-	    Display::SetIcons(zicons);
+	    display.SetIcons(zicons);
 #endif
 
             DEBUG(DBG_GAME, DBG_INFO, conf.String());
-            DEBUG(DBG_GAME|DBG_ENGINE, DBG_INFO, Display::GetInfo());
+            DEBUG(DBG_GAME|DBG_ENGINE, DBG_INFO, display.GetInfo());
 
 	    // read data dir
 	    if(! AGG::Init())
@@ -216,7 +216,7 @@ int main(int argc, char **argv)
 int TestBlitSpeed(void)
 {
     Display & display = Display::Get();
-    Surface sf(display.w(), display.h(), true);
+    Surface sf(display.GetSize(), true);
     Rect srcrt(0, 0, display.w() / 3, display.h());
     SDL::Time t;
 
@@ -253,33 +253,17 @@ void LoadZLogo(void)
 	if(zlogo.Load(_ptr_0806f690.width, _ptr_0806f690.height, _ptr_0806f690.bpp, _ptr_0806f690.pitch,
     		_ptr_0806f690.rmask, _ptr_0806f690.gmask, _ptr_0806f690.bmask, _ptr_0806f690.amask, _ptr_0806f690.zdata, sizeof(_ptr_0806f690.zdata)))
 	{
+	    Surface black(display.GetSize(), false);
+	    black.Fill(ColorBlack);
+
 	    // scale logo
 	    if(Settings::Get().QVGA())
-	    {
-		Surface small = Sprite::ScaleQVGASurface(zlogo);
-		Surface::Swap(zlogo, small);
-	    }
+		zlogo = Sprite::ScaleQVGASurface(zlogo);
 
 	    const Point offset((display.w() - zlogo.w()) / 2, (display.h() - zlogo.h()) / 2);
-	    int ii = 0;
 
-	    while(ii < 250)
-	    {
-		zlogo.Blit(ii, offset.x, offset.y, display);
-		display.Flip();
-		display.Fill(ColorBlack);
-		ii += 10;
-	    }
-
-	    DELAY(500);
-
-	    while(ii > 0)
-	    {
-		zlogo.Blit(ii, offset.x, offset.y, display);
-		display.Flip();
-		display.Fill(ColorBlack);
-		ii -= 10;
-	    }
+	    display.Fade(zlogo, black, offset, 250, 500);
+	    display.Rise(zlogo, black, offset, 10, 500
 	}
     }
 #endif

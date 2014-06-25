@@ -52,8 +52,7 @@ int DialogOneSecondary(const std::string & name, const std::string & primary, co
     StringReplace(message, "%{skill}", sec.GetName());
 
     const Sprite & sprite_frame = AGG::GetICN(ICN::SECSKILL, 15);
-    Surface sf(sprite_frame.w(), sprite_frame.h());
-    sprite_frame.Blit(sf);
+    Surface sf = sprite_frame.GetSurface();
 
     // sprite
     const Sprite & sprite_skill = AGG::GetICN(ICN::SECSKILL, sec.GetIndexSprite1());
