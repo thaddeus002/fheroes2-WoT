@@ -24,6 +24,8 @@
 #define H2AGG_H
 
 #include <vector>
+#include <utility>
+
 #include "gamedefs.h"
 #include "icn.h"
 #include "til.h"
@@ -31,6 +33,20 @@
 #include "mus.h"
 #include "xmi.h"
 #include "sprite.h"
+
+class ICNSprite : public std::pair<Surface, Surface> /* first: image with out alpha, second: shadow with alpha */
+{
+public:
+    ICNSprite() {}
+    ICNSprite(const Surface & sf1, const Surface & sf2) : std::pair<Surface, Surface>(sf1, sf2) {}
+
+    bool   isValid(void) const;
+    Sprite CreateSprite(bool reflect, bool shadow) const;
+    Surface First(void) { return first; }
+    Surface Second(void) { return second; }
+
+    Point      offset;
+};
 
 namespace AGG
 {	
@@ -52,6 +68,8 @@ namespace AGG
     void	ResetMixer(void);
 
     RGBA	GetPaletteColor(u32 index);
+    ICNSprite   RenderICNSprite(int, u32);
+    void        RenderICNSprite(int icn, u32 index, const Rect & srt, const Point & dpt, Surface & dst);
 }
 
 #endif

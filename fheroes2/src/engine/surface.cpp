@@ -1221,3 +1221,63 @@ void Surface::DrawBorder(const RGBA & color, bool solid)
         }
     }
 }
+
+Surface Surface::RenderSurface(const Size & sz) const
+{
+    return RenderSurface(Rect(Point(0,0), GetSize()), sz);
+}
+
+Surface Surface::RenderSurface(const Rect & srcrt, const Size & sz) const
+{
+    const Surface & srcsf = *this;
+    Surface dstsf(sz, false);
+    Rect dstrt = Rect(0, 0, sz.w, sz.h);
+    u32 mw = dstrt.w < srcrt.w ? dstrt.w : srcrt.w;
+    u32 mh = dstrt.h < srcrt.h ? dstrt.h : srcrt.h;
+
+    u32 cw = mw / 3;
+    u32 ch = mh / 3;
+    s32 cx = srcrt.x + (srcrt.w - cw) / 2;
+    s32 cy = srcrt.y + (srcrt.h - ch) / 2;
+    u32 bw = mw - 2 * cw;
+    u32 bh = mh - 2 * ch;
+
+    u32 ox = (dstrt.w - (dstrt.w / bw) * bw) / 2;
+    u32 oy = (dstrt.h - (dstrt.h / bh) * bh) / 2;
+
+    // body
+    if(bw < dstrt.w && bh < dstrt.h)
+        for(u32 yy = 0; yy < (dstrt.h / bh); ++yy)
+            for(u32 xx = 0; xx < (dstrt.w / bw); ++xx)
+                srcsf.Blit(Rect(cx, cy, bw, bh), dstrt.x + ox + xx * bw, dstrt.y + oy + yy * bh, dstsf);
+
+    // top, bottom bar
+    for(u32 xx = 0; xx < (dstrt.w / bw); ++xx)
+    {
+        s32 dstx = dstrt.x + ox + xx * bw;
+        srcsf.Blit(Rect(cx, srcrt.y, bw, ch), dstx, dstrt.y, dstsf);
+        srcsf.Blit(Rect(cx, srcrt.y + srcrt.h - ch, bw, ch), dstx, dstrt.y + dstrt.h - ch, dstsf);
+    }
+
+    // left, right bar
+    for(u32 yy = 0; yy < (dstrt.h / bh); ++yy)
+    {
+        s32 dsty = dstrt.y + oy + yy * bh;
+        srcsf.Blit(Rect(srcrt.x, cy, cw, bh), dstrt.x, dsty, dstsf);
+        srcsf.Blit(Rect(srcrt.x + srcrt.w - cw, cy, cw, bh), dstrt.x + dstrt.w - cw, dsty, dstsf);
+    }
+
+    // top left angle
+    srcsf.Blit(Rect(srcrt.x, srcrt.y, cw, ch), dstrt.x, dstrt.y, dstsf);
+
+    // top right angle
+    srcsf.Blit(Rect(srcrt.x + srcrt.w - cw, srcrt.y, cw, ch), dstrt.x + dstrt.w - cw, dstrt.y, dstsf);
+
+    // bottom left angle
+    srcsf.Blit(Rect(srcrt.x, srcrt.y + srcrt.h - ch, cw, ch), dstrt.x, dstrt.y + dstrt.h - ch, dstsf);
+
+    // bottom right angle
+    srcsf.Blit(Rect(srcrt.x + srcrt.w - cw, srcrt.y + srcrt.h - ch, cw, ch), dstrt.x + dstrt.w - cw, dstrt.y + dstrt.h - ch, dstsf);
+
+    return dstsf;
+}

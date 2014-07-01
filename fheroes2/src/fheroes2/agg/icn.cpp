@@ -2033,3 +2033,23 @@ int ICN::Get4Castle(int race)
 
     return UNKNOWN;
 }
+
+bool ICN::SkipLocalAlpha(int icn)
+{
+    switch(icn)
+    {
+        case SYSTEM:
+        case SYSTEME:
+        case BUYBUILD:
+        case BUYBUILE:
+        case BOOK:
+        case CSPANBKE:
+        case CPANBKGE:
+        case CAMPBKGE:
+            return true;
+
+        default: break;
+    }
+
+    return false;
+}

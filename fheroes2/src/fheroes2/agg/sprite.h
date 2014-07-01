@@ -24,18 +24,6 @@
 
 #include "gamedefs.h"
 
-struct ICNHeader
-{
-    ICNHeader() : offsetX(0), offsetY(0), width(0), height(0), type(0), offsetData(0) {}
-
-    u16 offsetX;
-    u16 offsetY;
-    u16 width;
-    u16 height;
-    u8 type;
-    u32 offsetData;
-};
-
 class Sprite : public SpritePos
 {
 public:
@@ -55,8 +43,6 @@ public:
 
     void ChangeColorIndex(u32 index1, u32 index2);
 
-    static Sprite CreateICN(int icn, const ICNHeader &, const u8* buf, int size, bool reflect);
-    static void AddonExtensionModify(Sprite &, int icn, int index);
     static Surface ScaleQVGASurface(const Surface &);
     static Sprite ScaleQVGASprite(const Sprite &);
 };

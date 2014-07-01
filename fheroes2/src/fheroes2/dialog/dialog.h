@@ -146,8 +146,8 @@ namespace Dialog
 	const Rect & GetArea(void) const;
 	const Rect & GetTop(void) const;
 
-	static void RedrawRegular(const Rect &);
-	static void Redraw(const Surface &, const Rect &, Surface &, const Rect &);
+	static void RenderRegular(const Rect &);
+	static void RenderOther(const Surface &, const Rect &);
 
     protected:
 	SpriteBack	background;

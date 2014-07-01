@@ -163,6 +163,22 @@ namespace AGG
 
 }
 
+Sprite ICNSprite::CreateSprite(bool reflect, bool shadow) const
+{
+    Surface res(first.GetSize(), true);
+    first.Blit(res);
+
+    if(shadow && second.isValid())
+	second.Blit(res);
+
+    return Sprite(reflect ? res.RenderReflect(2) : res, offset.x, offset.y);
+}
+
+bool ICNSprite::isValid(void) const
+{
+    return first.isValid();
+}
+
 /*AGG::File constructor */
 AGG::File::File(void) : count_items(0)
 {
@@ -862,6 +878,18 @@ const std::vector<u8> & AGG::ReadICNChunk(int icn, u32 index)
     return ReadChunk(ICN::GetString(icn));
 }
 
+struct ICNHeader
+{
+    ICNHeader() : offsetX(0), offsetY(0), width(0), height(0), type(0), offsetData(0) {}
+
+    u16 offsetX;
+    u16 offsetY;
+    u16 width;
+    u16 height;
+    u8 type;
+    u32 offsetData;
+};
+
 StreamBuf & operator>> (StreamBuf & st, ICNHeader & icn)
 {
     icn.offsetX =  st.getLE16();
@@ -874,6 +902,162 @@ StreamBuf & operator>> (StreamBuf & st, ICNHeader & icn)
     return st;
 }
 
+void AGG::RenderICNSprite(int icn, u32 index, const Rect & srt, const Point & dpt, Surface & sf)
+{
+    ICNSprite res = RenderICNSprite(icn, index);
+    res.first.Blit(srt, dpt, sf);
+}
+
+ICNSprite AGG::RenderICNSprite(int icn, u32 index)
+{
+    ICNSprite res;
+    const std::vector<u8> & body = ReadICNChunk(icn, index);
+
+    if(body.empty())
+    {
+        DEBUG(DBG_ENGINE, DBG_WARN, "error: " << ICN::GetString(icn));
+        return res;
+    }
+
+    // prepare icn data
+    DEBUG(DBG_ENGINE, DBG_TRACE, ICN::GetString(icn) << ", " << index);
+
+    StreamBuf st(body);
+
+    u32 count = st.getLE16();
+    u32 blockSize = st.getLE32();
+    u32 sizeData = 0;
+
+    if(index) st.skip(index * 13);
+
+    ICNHeader header1;
+    st >> header1;
+
+    if(index + 1 != count)
+    {
+        ICNHeader header2;
+        st >> header2;
+        sizeData = header2.offsetData - header1.offsetData;
+    }
+    else
+        sizeData = blockSize - header1.offsetData;
+
+    // start render
+    Size sz = Size(header1.width, header1.height);
+
+    const u8* buf = &body[6 + header1.offsetData];
+    const u8* max = buf + sizeData;
+
+    res.offset = Point(header1.offsetX, header1.offsetY);
+    Surface & sf1 = res.first;
+    Surface & sf2 = res.second;
+
+    sf1.Set(sz.w, sz.h, false);
+    RGBA shadow = RGBA(0, 0, 0, 0x40);
+
+    u32 c = 0;
+    Point pt(0, 0);
+
+    while(1)
+    {
+        // 0x00 - end line
+        if(0 == *buf)
+        {
+            ++pt.y;
+            pt.x = 0;
+            ++buf;
+        }
+        else
+        // 0x7F - count data
+        if(0x80 > *buf)
+        {
+            c = *buf;
+            ++buf;
+            while(c-- && buf < max)
+            {
+                sf1.DrawPoint(pt, GetPaletteColor(*buf));
+                ++pt.x;
+                ++buf;
+            }
+        }
+        else
+        // 0x80 - end data
+        if(0x80 == *buf)
+        {
+            break;
+        }
+        else
+        // 0xBF - skip data
+        if(0xC0 > *buf)
+        {
+            pt.x += *buf - 0x80;
+            ++buf;
+        }
+        else
+        // 0xC0 - shadow
+        if(0xC0 == *buf)
+        {
+            ++buf;
+            c = *buf % 4 ? *buf % 4 : *(++buf);
+            if(sf1.depth() == 8) // skip alpha
+            {
+                while(c--){ ++pt.x; }
+            }
+            else
+            {
+                if(! sf2.isValid()) sf2.Set(sz.w, sz.h, true);
+                while(c--){ sf2.DrawPoint(pt, shadow); ++pt.x; }
+            }
+            ++buf;
+        }
+        else
+        // 0xC1
+        if(0xC1 == *buf)
+        {
+            ++buf;
+            c = *buf;
+            ++buf;
+            while(c--){ sf1.DrawPoint(pt, GetPaletteColor(*buf)); ++pt.x; }
+            ++buf;
+        }
+        else
+        {
+            c = *buf - 0xC0;
+            ++buf;
+            while(c--){ sf1.DrawPoint(pt, GetPaletteColor(*buf)); ++pt.x; }
+            ++buf;
+        }
+        if(buf >= max)
+        {
+            DEBUG(DBG_ENGINE, DBG_WARN, "out of range: " << buf - max);
+            break;
+        }
+    }
+
+    // fix air elem sprite
+    if(icn == ICN::AELEM &&
+        res.first.w() > 3 && res.first.h() > 3)
+    {
+        res.first.RenderContour(RGBA(0, 0x84, 0xe0)).Blit(-1, -1, res.first);
+    }
+
+    return res;
+}
+
+bool AGG::LoadOrgICN(Sprite & sp, int icn, u32 index, bool reflect)
+{
+    ICNSprite icnSprite = AGG::RenderICNSprite(icn, index);
+
+    if(icnSprite.isValid())
+    {
+        sp = icnSprite.CreateSprite(reflect, ! ICN::SkipLocalAlpha(icn));
+        return true;
+    }
+
+    return false;
+}
+
+/*
 bool AGG::LoadOrgICN(Sprite & sp, int icn, u32 index, bool reflect)
 {
     const std::vector<u8> & body = ReadICNChunk(icn, index);
@@ -913,6 +1097,7 @@ bool AGG::LoadOrgICN(Sprite & sp, int icn, u32 index, bool reflect)
 
     return false;
 }
+*/
 
 bool AGG::LoadOrgICN(int icn, u32 index, bool reflect)
 {

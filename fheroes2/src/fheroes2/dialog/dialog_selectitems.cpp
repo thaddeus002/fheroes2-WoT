@@ -43,8 +43,7 @@ public:
     void RedrawBackground(const Point & dst)
     {
       const Sprite & sf = AGG::GetICN(ICN::CELLWIN, 1);
-      Dialog::FrameBorder::Redraw(sf, Rect(0, 0, sf.w(), sf.h()),
-				Display::Get(), Rect(dst.x, dst.y + 25, rtAreaItems.w + 5, rtAreaItems.h + 10));
+      Dialog::FrameBorder::RenderOther(sf, Rect(dst.x, dst.y + 25, rtAreaItems.w + 5, rtAreaItems.h + 10));
 
       // scroll
       AGG::GetICN(ICN::LISTBOX, 7).Blit(dst.x + area.w - 24, dst.y + 45);

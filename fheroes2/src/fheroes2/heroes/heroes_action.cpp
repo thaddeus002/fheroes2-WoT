@@ -292,7 +292,7 @@ void AnimationRemoveObject(Maps::Tiles & tile)
     if(0 != (index = ICN::AnimationFrame(MP2::GetICNObject(addon->object), addon->index, 0)))
     {
 	const Sprite & anim1 = AGG::GetICN(MP2::GetICNObject(addon->object), index);
-	anim1.Blit(sprite.x(), sprite.y(), sobj);
+	anim1.Blit(anim1.x(), anim1.y(), sobj);
     }
 
     LocalEvent & le = LocalEvent::Get();

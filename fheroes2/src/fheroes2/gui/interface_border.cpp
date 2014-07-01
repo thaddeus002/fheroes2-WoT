@@ -186,10 +186,10 @@ void Interface::BorderWindow::Redraw(void)
     if(Settings::Get().QVGA())
     {
 	const Surface & sf = AGG::GetICN(ICN::RESOURCE, 7);
-        Dialog::FrameBorder::Redraw(sf, Rect(0, 0, sf.w(), sf.h()), Display::Get(), border.GetRect());
+	Dialog::FrameBorder::RenderOther(sf, border.GetRect());
     }
     else
-	Dialog::FrameBorder::RedrawRegular(border.GetRect());
+	Dialog::FrameBorder::RenderRegular(border.GetRect());
 }
 
 void Interface::BorderWindow::SetPosition(s32 px, s32 py, u32 pw, u32 ph)

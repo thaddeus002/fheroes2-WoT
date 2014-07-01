@@ -116,7 +116,7 @@ namespace Battle
 	    const u32 ax = buttonPgUp.x;
 	    const u32 ah = buttonPgDn.y - (buttonPgUp.y + buttonPgUp.h);
 
-	    Dialog::FrameBorder::Redraw(sp4, Rect(0, 0, sp4.w(), sp4.h()), Display::Get(), border.GetRect());
+	    Dialog::FrameBorder::RenderOther(sp4, border.GetRect());
 
 	    for(u32 ii = 0; ii < (ah / sp3.h()); ++ii)
     		sp3.Blit(ax, buttonPgUp.y + buttonPgUp.h + (sp3.h() * ii));
@@ -1372,7 +1372,7 @@ void Battle::Interface::RedrawBorder(void)
     const Size displaySize = Display::Get().GetSize();
 
     if(displaySize != Size(320, 240) && displaySize != Size(640, 480))
-	Dialog::FrameBorder::RedrawRegular(border.GetRect());
+	Dialog::FrameBorder::RenderRegular(border.GetRect());
 }
 
 void Battle::Interface::RedrawPocketControls(void) const
@@ -4272,7 +4272,7 @@ void Battle::PopupDamageInfo::Redraw(int maxw, int maxh)
 	    SetPosition(tx, ty, tw, th);
 
 	const Sprite & sf = AGG::GetICN(ICN::CELLWIN, 1);
-	Dialog::FrameBorder::Redraw(sf, Rect(0, 0, sf.w(), sf.h()), Display::Get(), GetRect());
+	Dialog::FrameBorder::RenderOther(sf, GetRect());
 
 	text1.Blit(area.x, area.y);
 	text2.Blit(area.x, area.y + area.h/2);

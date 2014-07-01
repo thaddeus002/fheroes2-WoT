@@ -926,6 +926,7 @@ namespace ICN
     u32		GetMissIndex(int icn, s32, s32);
 
     bool	isBattleMonsterICN(int);
+    bool        SkipLocalAlpha(int);
 
     int		Get4Captain(int race);
     int		Get4Building(int race);

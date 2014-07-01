@@ -129,6 +129,8 @@ public:
     Surface RenderGrayScale(void) const;
     Surface RenderSepia(void) const;
     Surface RenderChangeColor(const RGBA &, const RGBA &) const;
+    Surface RenderSurface(const Rect & srt, const Size &) const;
+    Surface RenderSurface(const Size &) const;
 
     virtual Surface GetSurface(void) const;
     virtual Surface GetSurface(const Rect &) const;
