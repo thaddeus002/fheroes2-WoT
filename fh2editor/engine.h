@@ -431,6 +431,8 @@ namespace Editor
 {
     quint32 Rand(quint32 max);
     quint32 Rand(quint32 min, quint32 max);
+    float   RandF(float max);
+    float   RandF(float min, float max);
     QPixmap pixmapBorder(const QSize &, const QColor &, const QColor &);
     QPixmap pixmapBorderPassable(int passable);
 
@@ -589,6 +591,7 @@ public:
     int operator() (void) const;
     int groundsDirects(int) const;
     int directionsAroundGround(int) const;
+    int preferablyGround(void) const;
 };
 
 namespace EditorTheme
@@ -613,6 +616,7 @@ namespace EditorTheme
 
     int				ground(int);
     QPair<int, int>		groundBoundariesFix(const MapTile &, const MapTiles &);
+    int				groundOneTileFix(const MapTile &, const MapTiles &);
 
     QString			resourceFile(const QString & dir, const QString & file);
     QStringList			resourceFiles(const QString & dir, const QString & file);

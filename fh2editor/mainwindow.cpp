@@ -29,6 +29,7 @@
 #include <QMessageBox>
 #include <QMenuBar>
 #include <QToolBar>
+#include <QCheckBox>
 
 #include "dialogs.h"
 #include "mainwindow.h"
@@ -82,7 +83,7 @@ void MainWindow::newFile(void)
     if(QDialog::Accepted == form.exec())
     {
 	MapWindow* child = createMapWindow();
-	child->newFile(form.result, sequenceMapNumber++);
+	child->newFile(form.result, form.checkBoxGenerateMap->isChecked(), sequenceMapNumber++);
 	child->show();
     }
 }

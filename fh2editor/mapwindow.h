@@ -39,7 +39,7 @@ class MapWindow : public QGraphicsView
 public:
     MapWindow(MainWindow*);
 
-    void	newFile(const QSize &, int);
+    void	newFile(const QSize &, bool, int);
     bool	loadFile(const QString &);
     bool	save(void);
     bool	saveAs(void);

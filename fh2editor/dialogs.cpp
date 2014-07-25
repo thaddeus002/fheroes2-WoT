@@ -65,6 +65,7 @@ Form::SelectMapSize::SelectMapSize()
     vboxLayout->setSpacing(6);
     vboxLayout->setMargin(9);
 
+    // select size
     comboBoxSize = new QComboBox(this);
     comboBoxSize->addItem(QApplication::translate("SelectMapSize", "Small (36x36)", 0), 36);
     comboBoxSize->addItem(QApplication::translate("SelectMapSize", "Medium (72x72)", 0), 72);
@@ -73,11 +74,7 @@ Form::SelectMapSize::SelectMapSize()
     comboBoxSize->setCurrentIndex(1);
     vboxLayout->addWidget(comboBoxSize);
 
-    spacerItem = new QSpacerItem(20, 16, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    vboxLayout->addItem(spacerItem);
-
-    spacerItem1 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
+    // width
     spinBoxWidth = new QSpinBox(this);
     spinBoxWidth->setMaximum(1024);
     spinBoxWidth->setMinimum(36);
@@ -90,6 +87,7 @@ Form::SelectMapSize::SelectMapSize()
     labelWidth->setText(QApplication::translate("SelectMapSize", "width", 0));
     labelWidth->setBuddy(spinBoxWidth);
 
+    spacerItem1 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     spacerItem2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     hboxLayout = new QHBoxLayout();
@@ -101,8 +99,7 @@ Form::SelectMapSize::SelectMapSize()
     hboxLayout->addItem(spacerItem2);
     vboxLayout->addLayout(hboxLayout);
 
-    spacerItem3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
+    // height
     spinBoxHeight = new QSpinBox(this);
     spinBoxHeight->setMaximum(1024);
     spinBoxHeight->setMinimum(36);
@@ -114,6 +111,9 @@ Form::SelectMapSize::SelectMapSize()
     labelHeight->setVisible(false);
     labelHeight->setBuddy(spinBoxHeight);
 
+    spacerItem3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    spacerItem4 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
     hboxLayout1 = new QHBoxLayout();
     hboxLayout1->setSpacing(6);
     hboxLayout1->setMargin(0);
@@ -121,9 +121,13 @@ Form::SelectMapSize::SelectMapSize()
     hboxLayout1->addWidget(labelHeight);
     hboxLayout1->addWidget(spinBoxHeight);
 
-    spacerItem4 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     hboxLayout1->addItem(spacerItem4);
     vboxLayout->addLayout(hboxLayout1);
+
+    // generate map
+    checkBoxGenerateMap = new QCheckBox(this);
+    checkBoxGenerateMap->setText(QApplication::translate("SelectMapSize", "Generate map", 0));
+    vboxLayout->addWidget(checkBoxGenerateMap);
 
     spacerItem5 = new QSpacerItem(20, 16, QSizePolicy::Minimum, QSizePolicy::Expanding);
     vboxLayout->addItem(spacerItem5);

@@ -797,6 +797,17 @@ QPixmap AGG::Spool::getImage(const CompositeObject & obj, const QSize & tileSize
     return result;
 }
 
+float Editor::RandF(float min, float max)
+{
+    if(min > max) qSwap(min, max);
+    return min + Rand(max - min);
+}
+
+float Editor::RandF(float max)
+{
+    return static_cast<float>((max + 1) * (qrand() / (RAND_MAX + 1.0)));
+}
+
 quint32 Editor::Rand(quint32 min, quint32 max)
 {
     if(min > max) qSwap(min, max);
@@ -1782,6 +1793,35 @@ int AroundGrounds::directionsAroundGround(int ground) const
     return res;
 }
 
+struct GroundCount : QPair<int, int>
+{
+    GroundCount() : QPair<int, int>(Ground::Unknown, 0) {}
+    GroundCount(int ground, int count) : QPair<int, int>(ground, count) {}
+    //bool operator== (int ground) const { return first == ground; }
+};
+
+int AroundGrounds::preferablyGround(void) const
+{
+    QVector<GroundCount> res;
+    GroundCount pair;
+
+    res.push_back(GroundCount(Ground::Desert, std::count(begin(), end(), static_cast<int>(Ground::Desert))));
+    res.push_back(GroundCount(Ground::Snow, std::count(begin(), end(), static_cast<int>(Ground::Snow))));
+    res.push_back(GroundCount(Ground::Swamp, std::count(begin(), end(), static_cast<int>(Ground::Swamp))));
+    res.push_back(GroundCount(Ground::Wasteland, std::count(begin(), end(), static_cast<int>(Ground::Wasteland))));
+    res.push_back(GroundCount(Ground::Beach, std::count(begin(), end(), static_cast<int>(Ground::Beach))));
+    res.push_back(GroundCount(Ground::Lava, std::count(begin(), end(), static_cast<int>(Ground::Lava))));
+    res.push_back(GroundCount(Ground::Dirt, std::count(begin(), end(), static_cast<int>(Ground::Dirt))));
+    res.push_back(GroundCount(Ground::Grass, std::count(begin(), end(), static_cast<int>(Ground::Grass))));
+    res.push_back(GroundCount(Ground::Water, std::count(begin(), end(), static_cast<int>(Ground::Water))));
+
+    for(QVector<GroundCount>::const_iterator
+	it = res.begin(); it != res.end(); ++it)
+	    if((*it).second > pair.second) pair = *it;
+
+    return pair.first;
+}
+
 /* return pair, first: index tile, second: shape - 0: none, 1: vert, 2: horz, 3: both */
 QPair<int, int> EditorTheme::groundBoundariesFix(const MapTile & tile, const MapTiles & tiles)
 {
@@ -1817,6 +1857,27 @@ QPair<int, int> EditorTheme::groundBoundariesFix(const MapTile & tile, const Map
     }
 
     return groundBoundariesFixBase(around, ground, Ground::Water | Ground::Beach, groundAND, groundNOT);
+}
+
+int EditorTheme::groundOneTileFix(const MapTile & tile, const MapTiles & tiles)
+{
+    const int ground = tile.groundType();
+
+    AroundGrounds around(tiles, tile.mapPos());
+
+    const int groundAND = around.directionsAroundGround(ground);
+
+    if(!(IS_EQUAL_VALS(Direction::Top | Direction::Left | Direction::TopLeft, groundAND) ||
+	IS_EQUAL_VALS(Direction::Top | Direction::Right | Direction::TopRight, groundAND) ||
+	IS_EQUAL_VALS(Direction::Bottom | Direction::Left | Direction::BottomLeft, groundAND) ||
+	IS_EQUAL_VALS(Direction::Bottom | Direction::Right | Direction::BottomRight, groundAND)) &&
+       !(IS_EQUAL_VALS(Direction::Top | Direction::Left | Direction::Bottom, groundAND) ||
+	IS_EQUAL_VALS(Direction::Top | Direction::Right | Direction::Bottom, groundAND) ||
+	IS_EQUAL_VALS(Direction::Top | Direction::Left | Direction::Right, groundAND) ||
+	IS_EQUAL_VALS(Direction::Left | Direction::Right | Direction::Bottom, groundAND)))
+	return around.preferablyGround();
+
+    return Ground::Unknown;
 }
 
 QPair<int, int> EditorTheme::groundBoundariesFixBase(const AroundGrounds & around, int ground, int groundMarker, int groundAND, int groundNOT)

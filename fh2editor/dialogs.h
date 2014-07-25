@@ -77,7 +77,6 @@ namespace Form
 
 	QVBoxLayout*		vboxLayout;
 	QComboBox*		comboBoxSize;
-	QSpacerItem*		spacerItem;
 	QHBoxLayout*		hboxLayout;
 	QSpacerItem*		spacerItem1;
 	QLabel*			labelWidth;
@@ -95,6 +94,7 @@ namespace Form
 	QSpacerItem*		spacerItem7;
 	QPushButton*		pushButtonExpert;
 	QSpacerItem*		spacerItem8;
+	QCheckBox*		checkBoxGenerateMap;
 
 	QSize			result;
     };    

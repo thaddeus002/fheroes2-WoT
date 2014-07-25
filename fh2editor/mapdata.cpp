@@ -21,6 +21,8 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include <cmath>
+#include <cfloat>
 #include <QtGui>
 #include <QtWidgets>
 #include <QPainter>
@@ -848,6 +850,164 @@ QRect MapTiles::fixedRect(const QRect & srcrt, const QPoint & dstpt) const
 	res.setHeight(msize.height() - dstpt.y() + srcrt.height());
 
     return res;
+}
+
+int randomGround(void)
+{
+    switch(Editor::Rand(6))
+    {
+	case 0:	return Ground::Desert;
+	case 1: return Ground::Snow;
+	case 2: return Ground::Swamp;
+	case 3: return Ground::Wasteland;
+	case 4: return Ground::Lava;
+	case 5: return Ground::Dirt;
+	default: break;
+    }
+
+    return Ground::Grass;
+}
+
+void MapTiles::generateMap(void)
+{
+    // Smoothness controls how smooth the resultant terain is.  Higher = more smooth
+    float smoothness = 2.0f;
+
+    int width = msize.width();
+    int height = msize.height();
+
+    int step = 16;
+
+    // h determines the fineness of the scale it is working on.  After every step, h
+    // is decreased by a factor of "smoothness"
+    float h = 2;
+
+    //float[][] map = new float[width][height];
+    float map[width][height];
+
+    // Initialize the grid points
+    for(int yy = 0; yy < height; yy += 2 * step)
+        for(int xx = 0; xx < width; xx += 2 * step)
+	    map[xx][yy] = Editor::RandF(2 * h);
+
+    // do the rest of the magic
+    while(step > 0)
+    {   
+	// Diamond step
+	for(int xx = step; xx < width; xx += 2 * step)
+	{
+	    for(int yy = step; yy < height; yy += 2 * step)
+	    {
+		float sum = map[xx - step][yy - step] +	// down-left
+			map[xx - step][yy + step] +	// up-left
+			map[xx + step][yy - step] +	// down-right
+			map[xx + step][yy + step];	// up-right
+		map[xx][yy] = sum / 4 + Editor::RandF(-h, h);
+	    }
+	}
+
+	// Square step
+	for(int xx = 0; xx < width; xx += step)
+	{
+	    for(int yy = step * (1 - (xx / step) % 2); yy < height; yy += 2 * step)
+	    {
+		float sum = 0;
+		int count = 0;
+
+		if(xx - step >= 0)
+		{
+		    sum += map[xx - step][yy];
+		    count++;
+    		}
+
+		if(xx + step < width)
+		{
+		    sum += map[xx + step][yy];
+		    count++;
+		}
+
+		if(yy - step >= 0)
+		{
+		    sum += map[xx][yy - step];
+		    count++;
+		}
+
+		if(yy + step < height)
+		{
+		    sum += map[xx][yy + step];
+		    count++;
+    		}
+
+		map[xx][yy] = count > 0 ? sum / count + Editor::RandF(-h, h) : 0;
+	    }
+	}
+
+	h /= smoothness;
+	step /= 2;
+    }
+
+    QVector< QPair<QRect, int> > biome(9);
+    const int cw = width / 3;
+    const int ch = height / 3;
+
+    biome[0] = qMakePair(QRect(0, 0, cw, ch), randomGround());
+    biome[1] = qMakePair(QRect(cw, 0, cw, ch), randomGround());
+    biome[2] = qMakePair(QRect(2 * cw, 0, cw, ch), randomGround());
+    biome[3] = qMakePair(QRect(0, ch, cw, ch), randomGround());
+    biome[4] = qMakePair(QRect(cw, ch, cw, ch), randomGround());
+    biome[5] = qMakePair(QRect(2 * cw, ch, cw, ch), randomGround());
+    biome[6] = qMakePair(QRect(0, 2 * ch, cw, ch), randomGround());
+    biome[7] = qMakePair(QRect(cw, 2 * ch, cw, ch), randomGround());
+    biome[8] = qMakePair(QRect(2 * cw, 2 * ch, cw, ch), randomGround());
+
+    for(int xx = 0; xx < width; ++xx)
+    {
+        for(int yy = 0; yy < height; ++yy)
+	{
+	    MapTile* tile = this->tile(QPoint(xx, yy));
+
+	    if(tile)
+	    {
+		// set water
+		if(map[xx][yy] < 0.5f)
+            	    tile->setTileSprite(EditorTheme::startFilledTile(Ground::Water), 0);
+		else
+		if(map[xx][yy] < 0.8f)
+            	    tile->setTileSprite(EditorTheme::startFilledTile(Ground::Beach), 0);
+		else
+		// set ground from biome
+		{
+		    for(QVector< QPair<QRect, int> >::const_iterator
+			it = biome.begin(); it != biome.end(); ++it)
+		    if((*it).first.contains(xx, yy))
+		    {
+            		tile->setTileSprite(EditorTheme::startFilledTile((*it).second), 0);
+			break;
+		    }
+		}
+	    }
+	}
+    }
+
+    // fixed fill (one tile)
+    for(QVector<MapTile>::iterator
+	it = begin(); it != end(); ++it) 
+    {
+	int ground2 = EditorTheme::groundOneTileFix(*it, *this);
+
+        if(ground2 != Ground::Unknown)
+	    (*it).setTileSprite(EditorTheme::startFilledTile(ground2), 0);
+    }
+
+    // fixed border
+    for(QVector<MapTile>::iterator
+	it = begin(); it != end(); ++it) 
+    {
+        QPair<int, int> indexGroundRotate = EditorTheme::groundBoundariesFix(*it, *this);
+
+        if(0 <= indexGroundRotate.first)
+            (*it).setTileSprite(indexGroundRotate.first, indexGroundRotate.second);
+    }
 }
 
 void MapTiles::importTiles(const MapTiles & tiles, const QRect & srcrt, const QPoint & dstpt, QMap<quint32, quint32> & mapUIDs)
@@ -1780,6 +1940,17 @@ void MapData::fillGroundAction(QAction* act)
 		tile->setTileSprite(EditorTheme::startFilledTile(ground), 0);
 	}
 
+	// fixed fill (one tile)
+	for(QList<QGraphicsItem*>::iterator
+	    it = selected.begin(); it != selected.end(); ++it)
+	{
+	    MapTile* tile = qgraphicsitem_cast<MapTile*>(*it);
+
+	    int ground2 = EditorTheme::groundOneTileFix(*tile, mapTiles);
+	    if(ground2 != Ground::Unknown)
+		tile->setTileSprite(EditorTheme::startFilledTile(ground2), 0);
+	}
+
 	// fixed border
 	const QSize & tileSize = EditorTheme::tileSize();
         QRectF rectArea = selectionArea().boundingRect();
@@ -1897,12 +2068,15 @@ void MapData::removeCurrentObject(void)
     }
 }
 
-void MapData::newMap(const QSize & msz, const QString &, int seq)
+void MapData::newMap(const QSize & msz, bool generate, const QString &, int seq)
 {
     const QSize & tileSize = EditorTheme::tileSize();
 
     mapArea = MapArea(msz);
     mapHeader.mapName = QString("New Map").append(" ").append(QString::number(seq));
+
+    if(generate)
+	mapArea.tiles.generateMap();
 
     // insert tiles
     for(MapTiles::iterator
