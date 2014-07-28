@@ -129,6 +129,21 @@ Form::SelectMapSize::SelectMapSize()
     checkBoxGenerateMap->setText(QApplication::translate("SelectMapSize", "Generate map", 0));
     vboxLayout->addWidget(checkBoxGenerateMap);
 
+    labelArea = new QLabel(this);
+    labelArea->setText(QApplication::translate("SelectMapSize", "Area size", 0));
+    labelArea->setVisible(false);
+    vboxLayout->addWidget(labelArea);
+
+    sliderAreaSize = new QSlider(this);
+    sliderAreaSize->setMinimum(16);
+    sliderAreaSize->setMaximum(64);
+    sliderAreaSize->setSingleStep(16);
+    sliderAreaSize->setValue(32);
+    sliderAreaSize->setOrientation(Qt::Horizontal);
+    sliderAreaSize->setVisible(false);
+    vboxLayout->addWidget(sliderAreaSize);
+
+    //
     spacerItem5 = new QSpacerItem(20, 16, QSizePolicy::Minimum, QSizePolicy::Expanding);
     vboxLayout->addItem(spacerItem5);
 
@@ -161,6 +176,14 @@ Form::SelectMapSize::SelectMapSize()
 
     connect(pushButtonExpert, SIGNAL(clicked()), this, SLOT(clickExpert()));
     connect(pushButtonOk, SIGNAL(clicked()), this, SLOT(clickOk()));
+    connect(checkBoxGenerateMap, SIGNAL(clicked()), this, SLOT(generateWidgetVisible()));
+}
+
+void Form::SelectMapSize::generateWidgetVisible(void)
+{
+    labelArea->setVisible(checkBoxGenerateMap->isChecked());
+    sliderAreaSize->setVisible(checkBoxGenerateMap->isChecked());
+    resize(minimumSizeHint());
 }
 
 void Form::SelectMapSize::clickExpert(void)

@@ -83,7 +83,7 @@ void MainWindow::newFile(void)
     if(QDialog::Accepted == form.exec())
     {
 	MapWindow* child = createMapWindow();
-	child->newFile(form.result, form.checkBoxGenerateMap->isChecked(), sequenceMapNumber++);
+	child->newFile(form.result, form.checkBoxGenerateMap->isChecked() ? form.sliderAreaSize->value() : -1, sequenceMapNumber++);
 	child->show();
     }
 }

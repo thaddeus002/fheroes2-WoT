@@ -868,7 +868,7 @@ int randomGround(void)
     return Ground::Grass;
 }
 
-void MapTiles::generateMap(void)
+void MapTiles::generateMap(int step)
 {
     // Smoothness controls how smooth the resultant terain is.  Higher = more smooth
     float smoothness = 2.0f;
@@ -876,11 +876,11 @@ void MapTiles::generateMap(void)
     int width = msize.width();
     int height = msize.height();
 
-    int step = 16;
+    //int step = 64;
 
     // h determines the fineness of the scale it is working on.  After every step, h
     // is decreased by a factor of "smoothness"
-    float h = 2;
+    float h = 1;
 
     //float[][] map = new float[width][height];
     float map[width][height];
@@ -2068,15 +2068,15 @@ void MapData::removeCurrentObject(void)
     }
 }
 
-void MapData::newMap(const QSize & msz, bool generate, const QString &, int seq)
+void MapData::newMap(const QSize & msz, int generate, const QString &, int seq)
 {
     const QSize & tileSize = EditorTheme::tileSize();
 
     mapArea = MapArea(msz);
     mapHeader.mapName = QString("New Map").append(" ").append(QString::number(seq));
 
-    if(generate)
-	mapArea.tiles.generateMap();
+    if(0 < generate)
+	mapArea.tiles.generateMap(generate);
 
     // insert tiles
     for(MapTiles::iterator

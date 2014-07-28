@@ -43,6 +43,7 @@ class QPushButton;
 class QTabWidget;
 class QWidget;
 class QLineEdit;
+class QSlider;
 class QPlainTextEdit;
 class QGroupBox;
 class QSpacerItem;
@@ -71,6 +72,7 @@ namespace Form
     public slots:
 	void			clickExpert(void);
 	void			clickOk(void);
+	void			generateWidgetVisible(void);
 
     public:
 	SelectMapSize();
@@ -95,6 +97,8 @@ namespace Form
 	QPushButton*		pushButtonExpert;
 	QSpacerItem*		spacerItem8;
 	QCheckBox*		checkBoxGenerateMap;
+	QLabel*			labelArea;
+	QSlider*		sliderAreaSize;
 
 	QSize			result;
     };    

@@ -45,7 +45,7 @@ MapWindow::MapWindow(MainWindow* parent) : QGraphicsView(parent), mapData(this)
     connect(verticalScrollBar(), SIGNAL(rangeChanged(int, int)), this, SLOT(updateWindowPos(void)));
 }
 
-void MapWindow::newFile(const QSize & sz, bool generate, int sequenceNumber)
+void MapWindow::newFile(const QSize & sz, int generate, int sequenceNumber)
 {
     isUntitled = true;
 

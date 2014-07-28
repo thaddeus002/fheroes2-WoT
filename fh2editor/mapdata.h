@@ -240,7 +240,7 @@ public:
 
     bool		importTiles(const QSize &, const QVector<mp2til_t> &, const QVector<mp2ext_t> &);
     void		importTiles(const MapTiles &, const QRect &, const QPoint &, QMap<quint32, quint32> &);
-    void		generateMap(void);
+    void		generateMap(int);
 
     QRect		fixedRect(const QRect &, const QPoint &) const;
     const QSize &	mapSize(void) const { return msize; }
@@ -344,7 +344,7 @@ public:
     static QPair<int, int>
 			versions(void);
 
-    void		newMap(const QSize &, bool, const QString &, int);
+    void		newMap(const QSize &, int, const QString &, int);
     bool		loadMap(const QString &);
 
     bool		saveMapXML(const QString &) const;
