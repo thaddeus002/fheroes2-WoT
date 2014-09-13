@@ -23,7 +23,6 @@
 #include <cstring>
 #include <locale>
 #include <algorithm>
-#include <fstream>
 #include "difficulty.h"
 #include "color.h"
 #include "race.h"
@@ -340,9 +339,9 @@ bool Maps::FileInfo::ReadMAP(const std::string & filename)
 bool Maps::FileInfo::ReadMP2(const std::string & filename)
 {
     Reset();
-    std::ifstream fd(filename.c_str(), std::ios::binary);
+    StreamFile fs;
 
-    if(!fd.is_open())
+    if(! fs.open(filename, "rb"))
     {
 	DEBUG(DBG_GAME, DBG_WARN, "file not found " << filename);
 	return false;
@@ -356,15 +355,14 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
     localtime = 0;
 
     // magic byte
-    if(StreamBuf::getBE32(fd) != 0x5C000000)
+    if(fs.getBE32() != 0x5C000000)
     {
 	DEBUG(DBG_GAME, DBG_WARN, "incorrect maps file " << filename);
-	fd.close();
 	return false;
     }
 
     // level
-    switch(StreamBuf::getLE16(fd))
+    switch(fs.getLE16())
     {
 	case 0x00:	difficulty = Difficulty::EASY; break;
 	case 0x01:  	difficulty = Difficulty::NORMAL; break;
@@ -374,83 +372,81 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
     }
 
     // width
-    size_w = fd.get();
+    size_w = fs.get();
 
     // height
-    size_h = fd.get();
+    size_h = fs.get();
 
     Colors colors(Color::ALL);
 
     // kingdom color - blue, green, red, yellow, orange, purple
     for(Colors::const_iterator
 	it = colors.begin(); it != colors.end(); ++it)
-	if(fd.get()) kingdom_colors |= *it;
+	if(fs.get()) kingdom_colors |= *it;
 
     // allow human color - blue, green, red, yellow, orange, purple
     for(Colors::const_iterator
 	it = colors.begin(); it != colors.end(); ++it)
-	if(fd.get()) allow_human_colors |= *it;
+	if(fs.get()) allow_human_colors |= *it;
 
     // allow comp color - blue, green, red, yellow, orange, purple
     for(Colors::const_iterator
 	it = colors.begin(); it != colors.end(); ++it)
-	if(fd.get()) allow_comp_colors |= *it;
+	if(fs.get()) allow_comp_colors |= *it;
 
     // kingdom count
-    // fd.seekg(0x1A, std::ios_base::beg);
-    // fd.get();
+    // fs.seekg(0x1A, std::ios_base::beg);
+    // fs.get();
 
     // wins
-    fd.seekg(0x1D, std::ios_base::beg);
-    conditions_wins = fd.get();
+    fs.seek(0x1D);
+    conditions_wins = fs.get();
     // data wins
-    comp_also_wins = fd.get();
+    comp_also_wins = fs.get();
     // data wins
-    allow_normal_victory = fd.get();
+    allow_normal_victory = fs.get();
     // data wins
-    wins1 = StreamBuf::getLE16(fd);
+    wins1 = fs.getLE16();
     // data wins
-    fd.seekg(0x2c, std::ios_base::beg);
-    wins2 = StreamBuf::getLE16(fd);
+    fs.seek(0x2c);
+    wins2 = fs.getLE16();
 
     // loss
-    fd.seekg(0x22, std::ios_base::beg);
-    conditions_loss = fd.get();
+    fs.seek(0x22);
+    conditions_loss = fs.get();
     // data loss
-    loss1 = StreamBuf::getLE16(fd);
+    loss1 = fs.getLE16();
     // data loss
-    fd.seekg(0x2e, std::ios_base::beg);
-    loss2 = StreamBuf::getLE16(fd);
+    fs.seek(0x2e);
+    loss2 = fs.getLE16();
 
     // start with hero
-    fd.seekg(0x25, std::ios_base::beg);
-    with_heroes = 0 == fd.get();
+    fs.seek(0x25);
+    with_heroes = 0 == fs.get();
 
     // race color
     for(Colors::const_iterator
 	it = colors.begin(); it != colors.end(); ++it)
     {
-	int race = ByteToRace(fd.get());
+	int race = ByteToRace(fs.get());
 	races[Color::GetIndex(*it)] = race;
 	if(Race::RAND == race) rnd_races |= *it;
     }
 
     // name
     char bufname[LENGTHNAME];
-    fd.seekg(0x3A, std::ios_base::beg);
-    fd.read(bufname, LENGTHNAME);
+    fs.seek(0x3A);
+    fs.read(bufname, LENGTHNAME);
     bufname[LENGTHNAME - 1] = 0;
     name = Game::GetEncodeString(bufname);
 
     // description
     char bufdescription[LENGTHDESCRIPTION];
-    fd.seekg(0x76, std::ios_base::beg);
-    fd.read(bufdescription, LENGTHDESCRIPTION);
+    fs.seek(0x76);
+    fs.read(bufdescription, LENGTHDESCRIPTION);
     bufdescription[LENGTHDESCRIPTION - 1] = 0;
     description = Game::GetEncodeString(bufdescription);
 
-    fd.close();
-    
     //fill unions
     if(4 == conditions_wins)
 	FillUnions();

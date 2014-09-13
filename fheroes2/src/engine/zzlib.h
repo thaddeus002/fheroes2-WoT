@@ -42,27 +42,18 @@ private:
     std::vector<u8> buf;
 };
 
-class ZStreamBuf : protected StreamBuf
-{
-public:
-    ZStreamBuf();
-
-    ZStreamBuf & operator<< (StreamBuf &);
-    ZStreamBuf & operator>> (StreamBuf &);
-
-    bool        fail(void) const { return StreamBuf::fail(); }
-    void        setlimit(size_t v) { return StreamBuf::setlimit(v); }
-
-protected:
-    friend std::ostream & operator<< (std::ostream &, ZStreamBuf &);
-    friend std::istream & operator>> (std::istream &, ZStreamBuf &);
-};
-
-std::ostream & operator<< (std::ostream &, ZStreamBuf &);
-std::istream & operator>> (std::istream &, ZStreamBuf &);
-
 std::vector<u8> zlibCompress(const u8*, size_t srcsz);
 std::vector<u8> zlibDecompress(const u8*, size_t srcsz, size_t realsz = 0);
 
 #endif
+
+class ZStreamFile : public StreamBuf
+{
+public:
+    ZStreamFile() {}
+
+    bool	read(const std::string &, size_t offset = 0);
+    bool	write(const std::string &, bool append = false) const;
+};
+
 #endif

@@ -22,6 +22,9 @@
 #ifndef __IMG_SAVETOPNG_H__
 #define __IMG_SAVETOPNG_H__
 
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+    // SDL2 also supported png, skipped...
+#else
 /* #include <SDL/begin_code.h> */
 
 #ifdef __cplusplus
@@ -52,5 +55,5 @@ DECLSPEC int SDLCALL IMG_SavePNG_RW(SDL_RWops   *src,
 #ifdef __cplusplus
 }
 #endif
-
+#endif
 #endif/*__IMG_SAVETOPNG_H__*/

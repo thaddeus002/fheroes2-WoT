@@ -6,5 +6,5 @@ endif
 
 ifndef WITHOUT_UNICODE
 CFLAGS := $(CFLAGS) -DWITH_ICONV
-LIBS := $(LIBS) -lfreetype
+#LIBS := $(LIBS) -lfreetype
 endif

@@ -150,8 +150,8 @@ protected:
     void Lock(void) const;
     void Unlock(void) const;
 
-    void SetColorMod(const RGBA &);
-    void SetBlendMode(int);
+    //void SetColorMod(const RGBA &);
+    //void SetBlendMode(int);
 
     u32	 MapRGB(const RGBA &) const;
     RGBA GetRGB(u32 pixel) const;

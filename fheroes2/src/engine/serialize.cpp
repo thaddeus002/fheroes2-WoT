@@ -24,39 +24,128 @@
 #include <sstream>
 #include <iomanip>
 #include <iostream>
+
+#include "types.h"
 #include "rect.h"
+#include "error.h"
 #include "zzlib.h"
 #include "serialize.h"
 
-#define MINCAPACITY 12
+#define MINCAPACITY 1024
+/*
+#ifdef WITH_NET
+#include "sdlnet.h"
+
+Network::Socket & operator<< (Network::Socket & sc, StreamBuf & sb)
+{
+    const u32 count = sb.sizeg();
+
+    if(sc.Send(count) && sc.Send(sb.itget, count))
+	sb.itget += count;
+
+    return sc;
+}
+
+Network::Socket & operator>> (Network::Socket & sc, StreamBuf & sb)
+{
+    u32 count = 0;
+    const u32 limit = 5 * 1024 * 1024;
+
+    if(sc.Recv(count))
+    {
+	// limit network: 5Mb
+	if(count > limit)
+	{
+	    sb.setfail();
+	    return sc;
+	}
+
+	if(sb.sizep() < count)
+	    sb.realloc(count);
+
+	if(sc.Recv(sb.itput, count))
+	    sb.itput += count;
+	else
+	    sb.setfail();
+    }
+    else
+	sb.setfail();
+
+    return sc;
+}
+#endif                                                                                                           
+*/
+
+StreamBase::~StreamBase()
+{
+    if(rw) SDL_RWclose(rw);
+}
 
 bool StreamBase::bigendian(void) const
 {
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-    return true;
-#else
-    return false;
-#endif
+    return flags & 0x80000000;
+}
+
+void StreamBase::setbigendian(bool f)
+{
+    if(f)                                
+        flags |= 0x80000000;             
+    else
+        flags &= ~0x80000000;
+}
+
+bool StreamBase::fail(void) const
+{
+    return flags & 0x00000001;
+}   
+
+void StreamBase::setfail(void)
+{
+    flags |= 0x00000001;
+}
+
+long int StreamBase::tell(void) const
+{
+    return SDL_RWtell(rw);
+}
+
+bool StreamBase::seek(long int pos)
+{
+    if(0 > SDL_RWseek(rw, pos, RW_SEEK_SET)) setfail();
+    return ! fail();
+}
+
+int StreamBase::get8(void)
+{
+    u8 ch;
+    if(0 == SDL_RWread(rw, & ch, 1, 1)) setfail();
+    return ch;
+}
+
+void StreamBase::put8(u8 ch)
+{
+    resize(1);
+    if(1 != SDL_RWwrite(rw, & ch, 1, 1)) setfail();
 }
 
 int StreamBase::getBE16(void)
 {
-    return (get8() << 8) | get8();
+    return SDL_ReadBE16(rw);
 }
 
 int StreamBase::getLE16(void)
 {
-    return get8() | (get8() << 8);
+    return SDL_ReadLE16(rw);
 }
 
 int StreamBase::getBE32(void)
 {
-    return (get8() << 24) | (get8() << 16) | (get8() << 8) | get8();
+    return SDL_ReadBE32(rw);
 }
 
 int StreamBase::getLE32(void)
 {
-    return get8() | (get8() << 8) | (get8() << 16) | (get8() << 24);
+    return SDL_ReadLE32(rw);
 }
 
 int StreamBase::get16(void)
@@ -69,81 +158,57 @@ int StreamBase::get32(void)
     return bigendian() ? getBE32() : getLE32();
 }
 
-int StreamBase::getBE32(std::istream & is)
+void StreamBase::putBE32(u32 val)
 {
-    return (is.get() << 24) | (is.get() << 16) | (is.get() << 8) | is.get();
+    resize(4);
+    if(0 == SDL_WriteBE32(rw, val)) setfail();
 }
 
-int StreamBase::getLE32(std::istream & is)
+void StreamBase::putLE32(u32 val)
 {
-    return is.get() | (is.get() << 8) | (is.get() << 16) | (is.get() << 24);
+    resize(4);
+    if(0 == SDL_WriteLE32(rw, val)) setfail();
 }
 
-int StreamBase::getBE16(std::istream & is)
+void StreamBase::putBE16(u16 val)
 {
-    return (is.get() << 8) | is.get();
+    resize(2);
+    if(0 == SDL_WriteBE16(rw, val)) setfail();
 }
 
-int StreamBase::getLE16(std::istream & is)
+void StreamBase::putLE16(u16 val)
 {
-    return is.get() | (is.get() << 8);
+    resize(2);
+    if(0 == SDL_WriteLE16(rw, val)) setfail();
 }
 
-int StreamBase::getBE32(const u8* v)
+void StreamBase::put16(u16 v)
 {
-    u32 a = v[0];
-    u32 b = v[1];
-    u32 c = v[2];
-    u32 d = v[3];
-
-    return (a << 24) | (b << 16) | (c << 8) | d;
+    bigendian() ? putBE16(v) : putLE16(v);
 }
-
-int StreamBase::getLE32(const u8* v)
+ 
+void StreamBase::put32(u32 v)
 {
-    u32 a = v[0];
-    u32 b = v[1];
-    u32 c = v[2];
-    u32 d = v[3];
-
-    return a | (b << 8) | (c << 16) | (d << 24);
-}
-
-int StreamBase::getBE16(const u8* v)
-{
-    u32 a = v[0];
-    u32 b = v[1];
-
-    return (a << 16) | b;
-}
-
-int StreamBase::getLE16(const u8* v)
-{
-    u32 a = v[0];
-    u32 b = v[1];
-
-    return a | (b << 16);
+    bigendian() ? putBE32(v) : putLE32(v);
 }
 
 std::vector<u8> StreamBase::getRaw(size_t sz)
 {
-    std::vector<u8> v(sz ? sz : sizeg(), 0);
-
-    for(std::vector<u8>::iterator
-        it = v.begin(); it != v.end(); ++it) *this >> *it;
-
+    std::vector<u8> v(sz, 0);
+    if(0 == SDL_RWread(rw, & v[0], v.size(), 1)) setfail();
+ 
     return v;
 }
-
-void StreamBase::putRaw(const char* ptr, size_t sz)
+ 
+void StreamBase::putRaw(const void* ptr, size_t sz)
 {
-    for(size_t it = 0; it < sz; ++it)
-	*this << ptr[it];
+    resize(sz);
+    if(1 != SDL_RWwrite(rw, ptr, sz, 1)) setfail();
 }
 
 void StreamBase::skip(size_t sz)
 {
-    for(size_t it = 0; it < sz; ++it) get8();
+    if( 0 > SDL_RWseek(rw, sz, RW_SEEK_CUR)) setfail();
 }
 
 StreamBase & StreamBase::operator>> (bool & v)
@@ -232,72 +297,6 @@ StreamBase & StreamBase::operator>> (Size & v)
     return *this >> v.w >> v.h;
 }
 
-void StreamBase::put16(u16 v)
-{
-    bigendian() ? putBE16(v) : putLE16(v);
-}
-
-void StreamBase::putBE16(u16 v)
-{
-    put8(v >> 8);
-    put8(v);
-}
-
-void StreamBase::putLE16(u16 v)
-{
-    put8(v);
-    put8(v >> 8);
-}
-
-void StreamBase::put32(u32 v)
-{
-    bigendian() ? putBE32(v) : putLE32(v);
-}
-
-void StreamBase::putBE32(u32 v)
-{
-    put8(v >> 24);
-    put8(v >> 16);
-    put8(v >> 8);
-    put8(v);
-}
-
-void StreamBase::putLE32(u32 v)
-{
-    put8(v);
-    put8(v >> 8);
-    put8(v >> 16);
-    put8(v >> 24);
-}
-
-void StreamBase::putBE32(std::ostream & os, u32 v)
-{
-    os.put(v >> 24);
-    os.put(v >> 16);
-    os.put(v >> 8);
-    os.put(v);
-}
-
-void StreamBase::putLE32(std::ostream & os, u32 v)
-{
-    os.put(v);
-    os.put(v >> 8);
-    os.put(v >> 16);
-    os.put(v >> 24);
-}
-
-void StreamBase::putBE16(std::ostream & os, u16 v)
-{
-    os.put(v >> 8);
-    os.put(v);
-}
-
-void StreamBase::putLE16(std::ostream & os, u16 v)
-{
-    os.put(v);
-    os.put(v >> 8);
-}
-
 StreamBase & StreamBase::operator<< (const bool & v)
 {
     put8(v);
@@ -381,139 +380,133 @@ StreamBase & StreamBase::operator<< (const Size & v)
     return *this << v.w << v.h;
 }
 
-StreamBuf::StreamBuf(size_t sz) : itbeg(NULL), itget(NULL), itput(NULL), itend(NULL), flags(0)
+StreamFile::StreamFile(const std::string & fn, const char* mode)
 {
-    realloc(sz);
-    setbigendian(StreamBase::bigendian()); /* default: hardware endian */
+    open(fn, mode);
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    setbigendian(true);
+#else
+    setbigendian(false);
+#endif
+}
+
+bool StreamFile::open(const std::string & fn, const char* mode)
+{
+    rw = SDL_RWFromFile(fn.c_str(), mode);
+    if(! rw) Error::Message(__FUNCTION__, SDL_GetError());
+    return rw;
+}
+
+void StreamFile::close(void)
+{
+    if(rw) SDL_RWclose(rw);
+    rw = NULL;
+}
+
+long int StreamFile::size(void) const
+{
+    long int pos = SDL_RWtell(rw);
+    long int res = SDL_RWseek(rw, 0, SEEK_END);
+    SDL_RWseek(rw, pos, RW_SEEK_SET);
+    return res;
+}
+
+bool StreamFile::read(void* buf, size_t sz)
+{
+    if(0 == SDL_RWread(rw, buf, sz, 1)) setfail();
+    return ! fail();
+}
+
+StreamBuf::StreamBuf(const u8* ptr, size_t sz) : buf(NULL), len(0)
+{
+    buf = const_cast<u8*>(ptr);
+    len = sz;
+
+    rw = SDL_RWFromConstMem(buf, len);
+    if(! rw) Error::Message(__FUNCTION__, SDL_GetError());
+
+    setconstbuf(true);
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    setbigendian(true);
+#else
+    setbigendian(false);
+#endif
+}
+
+StreamBuf::StreamBuf(const std::vector<u8> & v) : buf(NULL), len(0)
+{
+    buf = const_cast<u8*>(& v[0]);
+    len = v.size();
+
+    rw = SDL_RWFromConstMem(buf, len);
+    if(! rw) Error::Message(__FUNCTION__, SDL_GetError());
+
+    setconstbuf(true);
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    setbigendian(true);
+#else
+    setbigendian(false);
+#endif
+}
+
+StreamBuf::StreamBuf(size_t sz) : buf(NULL), len(sz)
+{
+    if(len < MINCAPACITY) len = MINCAPACITY;
+    buf = new u8 [len];
+    rw = SDL_RWFromMem(buf, len);
+    if(! rw) Error::Message(__FUNCTION__, SDL_GetError());
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    setbigendian(true);
+#else
+    setbigendian(false);
+#endif
+}
+
+StreamBuf::StreamBuf(const StreamBuf & sb)
+{
+    len = sb.len;
+    buf = new u8 [len];
+    flags = sb.flags;
+
+    std::copy(sb.buf, sb.buf + len, buf);
+
+    rw = SDL_RWFromMem(buf, len);
+    SDL_RWseek(rw, SDL_RWtell(sb.rw), RW_SEEK_SET);
+}
+
+StreamBuf & StreamBuf::operator= (const StreamBuf & sb)
+{
+    SDL_RWclose(rw);
+    delete [] buf;
+
+    len = sb.len;
+    buf = new u8 [len];
+    flags = sb.flags;
+
+    std::copy(sb.buf, sb.buf + len, buf);
+
+    rw = SDL_RWFromMem(buf, len);
+    SDL_RWseek(rw, SDL_RWtell(sb.rw), RW_SEEK_SET);
+
+    return *this;
 }
 
 StreamBuf::~StreamBuf()
 {
-    if(itbeg && ! isconstbuf()) delete [] itbeg;
-}
-
-StreamBuf::StreamBuf(const StreamBuf & st) : itbeg(NULL), itget(NULL), itput(NULL), itend(NULL), flags(0)
-{
-    copy(st);
-}
-
-StreamBuf::StreamBuf(const std::vector<u8> & buf) : itbeg(NULL), itget(NULL), itput(NULL), itend(NULL), flags(0)
-{
-    itbeg = (u8*) & buf[0];
-    itend = itbeg + buf.size();
-    itget = itbeg;
-    itput = itend;
-    setbigendian(StreamBase::bigendian()); /* default: hardware endian */
-    setconstbuf(true);
-}
-
-StreamBuf::StreamBuf(const u8* buf, size_t bufsz) : itbeg(NULL), itget(NULL), itput(NULL), itend(NULL), flags(0)
-{
-    itbeg = const_cast<u8*>(buf);
-    itend = itbeg + bufsz;
-    itget = itbeg;
-    itput = itend;
-    setbigendian(StreamBase::bigendian()); /* default: hardware endian */
-    setconstbuf(true);
-}
-
-StreamBuf & StreamBuf::operator= (const StreamBuf & st)
-{
-    if(&st != this) copy(st);
-    return *this;
-}
-
-size_t StreamBuf::capacity(void) const
-{
-    return itend - itbeg;
-}
-
-u8* StreamBuf::data(void)
-{
-    return itget;
-}
-
-size_t StreamBuf::size(void) const
-{
-    return sizeg();
-}
-
-void StreamBuf::reset(void)
-{
-    itput = itbeg;
-    itget = itbeg;
-}
-
-std::string StreamBuf::dump(void) const
-{
-    std::ostringstream os;
-
-    for(const u8* it = itget; it != itput; ++it)
-	os << " 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(*it);
-
-    return os.str();
-}
-
-size_t StreamBuf::tellg(void) const
-{
-    return itget - itbeg;
-}
-
-size_t StreamBuf::tellp(void) const
-{
-    return itput - itbeg;
-}
-
-size_t StreamBuf::sizeg(void) const
-{
-    return itput - itget;
-}
-
-size_t StreamBuf::sizep(void) const
-{
-    return itend - itput;
-}
-
-void StreamBuf::realloc(size_t sz)
-{
-    setconstbuf(false);
-
-    if(! itbeg)
-    {
-	if(sz < MINCAPACITY) sz = MINCAPACITY;
-
-	itbeg = new u8 [sz];
-	itend = itbeg + sz;
-    	std::fill(itbeg, itend, 0);
-
-	reset();
-    }
-    else
-    if(sizep() < sz)
-    {
-	if(sz < MINCAPACITY) sz = MINCAPACITY;
-
-	u8* ptr = new u8 [sz];
-
-	std::fill(ptr, ptr + sz, 0);
-	std::copy(itbeg, itput, ptr);
-
-	itput = ptr + tellp();
-	itget = ptr + tellg();
-
-	delete [] itbeg;
-
-	itbeg = ptr;
-	itend = itbeg + sz;
-    }
+    if(buf && !isconstbuf())
+	    delete [] buf;
 }
 
 void StreamBuf::setconstbuf(bool f)
 {
     if(f)
-	flags |= 0x00001000;
+        flags |= 0x00001000;
     else
-	flags &= ~0x00001000;
+        flags &= ~0x00001000;
 }
 
 bool StreamBuf::isconstbuf(void) const
@@ -521,159 +514,24 @@ bool StreamBuf::isconstbuf(void) const
     return flags & 0x00001000;
 }
 
-bool StreamBuf::bigendian(void) const
+void StreamBuf::resize(size_t sz)
 {
-    return flags & 0x80000000;
-}
-
-void StreamBuf::setbigendian(bool f)
-{
-    if(f)
-	flags |= 0x80000000;
-    else
-	flags &= ~0x80000000;
-}
-
-bool StreamBuf::fail(void) const
-{
-    return flags & 0x00000001;
-}
-
-void StreamBuf::setfail(void)
-{
-    flags |= 0x00000001;
-}
-
-void StreamBuf::copy(const StreamBuf & sb)
-{
-    if(capacity() < sb.size())
-	realloc(sb.size());
-
-    std::copy(sb.itget, sb.itput, itbeg);
-
-    itput = itbeg + sb.tellp();
-    itget = itbeg + sb.tellg();
-    flags = 0;
-
-    setbigendian(sb.bigendian());
-}
-
-void StreamBuf::skip(size_t sz)
-{
-    itget += sz <= sizeg() ? sz : sizeg();
-}
-
-int StreamBuf::get(void)
-{
-    return get8();
-}
-
-void StreamBuf::put(int v)
-{
-    put8(v);
-}
-
-void StreamBuf::put8(int v)
-{
-    if(0 == sizep())
-	realloc(capacity() + capacity() / 2);
-
-    if(sizep())
-        *itput++ = 0x000000FF & v;
-}
-
-int StreamBuf::get8(void)
-{
-    int res = 0;
-
-    if(sizeg())
-	res = 0x000000FF & *itget++;
-
-    return res;
-}
-
-std::ostream & operator<< (std::ostream & os, StreamBuf & sb)
-{
-    const u32 count = sb.sizeg();
-
-    os.unsetf(std::ios::skipws);
-    sb.bigendian() ? StreamBase::putBE32(os, count) : StreamBase::putLE32(os, count);
-
-    if(os.write((char*) sb.itget, count))
-	sb.itget += count;
-
-    return os;
-}
-
-size_t available_count(std::istream & is)
-{
-    const size_t curpos = is.tellg();
-    is.seekg(0, std::ios_base::end);
-    const size_t sizeis = is.tellg();
-    is.seekg(curpos, std::ios_base::beg);
-    return sizeis  > curpos ? sizeis - curpos : 0;
-}
-
-std::istream & operator>> (std::istream & is, StreamBuf & sb)
-{
-    is.unsetf(std::ios::skipws);
-    const u32 count = sb.bigendian() ? StreamBase::getBE32(is) : StreamBase::getLE32(is);
-
-    if(count > available_count(is))
+    if(SDL_RWtell(rw) + sz > len)
     {
-	sb.setfail();
-	return is;
+	if(sz < MINCAPACITY) sz = MINCAPACITY;
+	u8* ptr = new u8 [len + sz];
+
+	std::fill(ptr, ptr + len + sz, 0);
+	std::copy(buf, buf + len, ptr);
+
+	long int pos = SDL_RWtell(rw);
+	SDL_RWclose(rw);
+	delete [] buf;
+
+	buf = ptr;
+	len += sz;
+
+	rw = SDL_RWFromMem(buf, len);
+	SDL_RWseek(rw, pos, RW_SEEK_SET);
     }
-
-    if(sb.sizep() < count)
-	sb.realloc(count);
-
-    if(is.read((char*) sb.itput, count))
-	sb.itput += count;
-    else
-	sb.setfail();
-
-    return is;
 }
-
-#ifdef WITH_NET
-#include "sdlnet.h"
-
-Network::Socket & operator<< (Network::Socket & sc, StreamBuf & sb)
-{
-    const u32 count = sb.sizeg();
-
-    if(sc.Send(count) && sc.Send(sb.itget, count))
-	sb.itget += count;
-
-    return sc;
-}
-
-Network::Socket & operator>> (Network::Socket & sc, StreamBuf & sb)
-{
-    u32 count = 0;
-    const u32 limit = 5 * 1024 * 1024;
-
-    if(sc.Recv(count))
-    {
-	// limit network: 5Mb
-	if(count > limit)
-	{
-	    sb.setfail();
-	    return sc;
-	}
-
-	if(sb.sizep() < count)
-	    sb.realloc(count);
-
-	if(sc.Recv(sb.itput, count))
-	    sb.itput += count;
-	else
-	    sb.setfail();
-    }
-    else
-	sb.setfail();
-
-    return sc;
-}
-#endif                                                                                                           

@@ -243,30 +243,28 @@ int TestBlitSpeed(void)
 void LoadZLogo(void)
 {
 #ifdef BUILD_RELEASE
-#ifdef WITH_ZLIB
+    std::string file = Settings::GetLastFile("image", "sdl_logo.png");
     // SDL logo
-    if(Settings::Get().ExtGameShowSDL())
+    if(Settings::Get().ExtGameShowSDL() && ! file.empty())
     {
 	Display & display = Display::Get();
-    	ZSurface zlogo;
+    	Surface sf;
 
-	if(zlogo.Load(_ptr_0806f690.width, _ptr_0806f690.height, _ptr_0806f690.bpp, _ptr_0806f690.pitch,
-    		_ptr_0806f690.rmask, _ptr_0806f690.gmask, _ptr_0806f690.bmask, _ptr_0806f690.amask, _ptr_0806f690.zdata, sizeof(_ptr_0806f690.zdata)))
+	if(sf.Load(file))
 	{
 	    Surface black(display.GetSize(), false);
 	    black.Fill(ColorBlack);
 
 	    // scale logo
 	    if(Settings::Get().QVGA())
-		static_cast<Surface &>(zlogo) = Sprite::ScaleQVGASurface(zlogo);
+		sf = Sprite::ScaleQVGASurface(sf);
 
-	    const Point offset((display.w() - zlogo.w()) / 2, (display.h() - zlogo.h()) / 2);
+	    const Point offset((display.w() - sf.w()) / 2, (display.h() - sf.h()) / 2);
 
-	    display.Rise(zlogo, black, offset, 250, 500);
-	    display.Fade(zlogo, black, offset, 10, 500);
+	    display.Rise(sf, black, offset, 250, 500);
+	    display.Fade(sf, black, offset, 10, 500);
 	}
     }
-#endif
 #endif
 }
 

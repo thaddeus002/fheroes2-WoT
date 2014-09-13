@@ -21,7 +21,6 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include <fstream>
 #include <sstream>
 #include <vector>
 #include <string>
@@ -82,85 +81,47 @@ class HGSData
 public:
     HGSData() {}
 
-    bool LoadOld(const char*);
-    bool Load(const char*);
-    bool Save(const char*);
+    bool Load(const std::string &);
+    bool Save(const std::string &);
     void ScoreRegistry(const std::string &, const std::string &, u32, u32);
     void RedrawList(s32, s32);
 private:
     std::vector<hgs_t> list;
 };
 
-bool HGSData::Load(const char* fn)
+bool HGSData::Load(const std::string & fn)
 {
-    std::ifstream fs(fn, std::ios::binary);
-    if(!fs.is_open()) return false;
+    ZStreamFile hdata;
+    if(! hdata.read(fn)) return false;
 
-    StreamBuf hdata(512);
     hdata.setbigendian(true);
-
-#ifdef WITH_ZLIB
-    ZStreamBuf zdata;
-    fs >> zdata;
-
-    if(zdata.fail())
-    {
-	DEBUG(DBG_GAME, DBG_INFO, ", zdata" << " read: error");
-    	return false;
-    }
-
-    zdata >> hdata;
-
-    if(hdata.fail())
-    {
-        DEBUG(DBG_GAME, DBG_INFO, ", uncompress: error");
-        return false;
-    }
-
-#else
-    fs >> hdata;
-
-    if(hdata.fail())
-    {
-	DEBUG(DBG_GAME, DBG_INFO, ", gdata" << " read: error");
-        return false;
-    }
-#endif
-
     u16 hgs_id = 0;
+
     hdata >> hgs_id;
+
+#ifdef FORMAT_VERSION_3225
+    // old stream ver. skip 4 byte
+    if(hgs_id != HGS_ID)
+	hdata >> hgs_id >> hgs_id;
+#endif
 
     if(hgs_id == HGS_ID)
     {
 	hdata >> list;
-	return true;
+	return ! hdata.fail();
     }
 
     return false;
 }
 
-bool HGSData::Save(const char* fn)
+bool HGSData::Save(const std::string & fn)
 {
-    std::ofstream fs(fn, std::ios::binary);
-    if(!fs.is_open()) return false;
-
-    StreamBuf hdata(512);
+    ZStreamFile hdata;
     hdata.setbigendian(true);
     hdata << static_cast<u16>(HGS_ID) << list;
+    if(hdata.fail() || ! hdata.write(fn)) return false;
 
-#ifdef WITH_ZLIB
-    ZStreamBuf zdata;
-    zdata << hdata;
-
-    if(! zdata.fail())
-        fs << zdata;
-    else
-	fs << hdata;
-#else
-    fs << hdata;
-#endif
-
-    return fs.good();
+    return true;
 }
 
 void HGSData::ScoreRegistry(const std::string & p, const std::string & m, u32 r, u32 s)

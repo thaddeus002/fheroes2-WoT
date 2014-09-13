@@ -85,14 +85,18 @@ std::string System::ConcatePath(const std::string & str1, const std::string & st
 std::list<std::string> System::GetExtendedDirectories(void)
 {
     std::list<std::string> res;
+    
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+    char* path = SDL_GetPrefPath("", "fheroes2");
+    res.push_back(path);
+    SDL_free(path);
+#endif
+
 #if defined(ANDROID)
     res.push_back(SDL_AndroidGetInternalStoragePath());
 
     if(SDL_ANDROID_EXTERNAL_STORAGE_READ & SDL_AndroidGetExternalStorageState())
         res.push_back(SDL_AndroidGetExternalStoragePath());
-
-    res.push_back("/storage/sdcard0/fheroes2");
-    res.push_back("/storage/sdcard1/fheroes2");
 #endif
     return res;
 }
@@ -400,8 +404,8 @@ int System::GetRenderFlags(void)
  #if defined(__WIN32__) || defined(ANDROID)
     return SDL_RENDERER_SOFTWARE;
  #endif
-    return SDL_RENDERER_ACCELERATED;
-    //return SDL_RENDERER_SOFTWARE;
+    //return SDL_RENDERER_ACCELERATED;
+    return SDL_RENDERER_SOFTWARE;
 #else
  #if defined(__MINGW32CE__) || defined(__SYMBIAN32__)
     return SDL_SWSURFACE;

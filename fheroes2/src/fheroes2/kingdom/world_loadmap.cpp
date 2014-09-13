@@ -20,7 +20,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <fstream>
 #include <functional>
 #include <algorithm>
 #include "agg.h" 
@@ -756,8 +755,8 @@ bool World::LoadMapMP2(const std::string & filename)
     Reset();
     Defaults();
 
-    std::ifstream fd(filename.c_str(), std::ios::binary);
-    if(!fd.is_open())
+    StreamFile fs;
+    if(!fs.open(filename, "rb"))
     {
 	 DEBUG(DBG_GAME|DBG_ENGINE, DBG_WARN, "file not found " << filename.c_str());
 	 Error::Except(__FUNCTION__, "load maps");
@@ -767,22 +766,21 @@ bool World::LoadMapMP2(const std::string & filename)
     vec_object.reserve(100);
 
     // check (mp2, mx2) ID
-    if(StreamBuf::getBE32(fd) != 0x5C000000)
+    if(fs.getBE32() != 0x5C000000)
 	return false;
 
     // endof
-    fd.seekg(0, std::ios_base::end);
-    const u32 endof_mp2 = fd.tellg();
-    fd.seekg(endof_mp2 - sizeof(u32), std::ios_base::beg);
+    const u32 endof_mp2 = fs.size();
+    fs.seek(endof_mp2 - 4);
 
     // read uniq
-    GameStatic::uniq = StreamBuf::getLE32(fd);
+    GameStatic::uniq = fs.getLE32();
 
     // offset data
-    fd.seekg(MP2OFFSETDATA - 2 * sizeof(u32), std::ios_base::beg);
+    fs.seek(MP2OFFSETDATA - 2 * 4);
 
     // width
-    switch(StreamBuf::getLE32(fd))
+    switch(fs.getLE32())
     {
         case Maps::SMALL:  Size::w = Maps::SMALL;  break;
         case Maps::MEDIUM: Size::w = Maps::MEDIUM; break;
@@ -792,7 +790,7 @@ bool World::LoadMapMP2(const std::string & filename)
     }
 
     // height
-    switch(StreamBuf::getLE32(fd))
+    switch(fs.getLE32())
     {
         case Maps::SMALL:  Size::h = Maps::SMALL;  break;
         case Maps::MEDIUM: Size::h = Maps::MEDIUM; break;
@@ -808,32 +806,32 @@ bool World::LoadMapMP2(const std::string & filename)
     }
 
     // seek to ADDONS block
-    fd.ignore(w() * h() * SIZEOFMP2TILE);
+    fs.skip(w() * h() * SIZEOFMP2TILE);
 
     // read all addons
-    std::vector<MP2::mp2addon_t> vec_mp2addons(StreamBuf::getLE32(fd) /* count mp2addon_t */);
+    std::vector<MP2::mp2addon_t> vec_mp2addons(fs.getLE32() /* count mp2addon_t */);
 
     for(std::vector<MP2::mp2addon_t>::iterator
 	it = vec_mp2addons.begin(); it != vec_mp2addons.end(); ++it)
     {
 	MP2::mp2addon_t & mp2addon = *it;
 
-	mp2addon.indexAddon = StreamBuf::getLE16(fd);
-	mp2addon.objectNameN1 = fd.get() * 2;
-	mp2addon.indexNameN1 = fd.get();
-	mp2addon.quantityN = fd.get();
-	mp2addon.objectNameN2 = fd.get();
-	mp2addon.indexNameN2 = fd.get();
+	mp2addon.indexAddon = fs.getLE16();
+	mp2addon.objectNameN1 = fs.get() * 2;
+	mp2addon.indexNameN1 = fs.get();
+	mp2addon.quantityN = fs.get();
+	mp2addon.objectNameN2 = fs.get();
+	mp2addon.indexNameN2 = fs.get();
 
-	mp2addon.uniqNumberN1 = StreamBuf::getLE32(fd);
-	mp2addon.uniqNumberN2 = StreamBuf::getLE32(fd);
+	mp2addon.uniqNumberN1 = fs.getLE32();
+	mp2addon.uniqNumberN2 = fs.getLE32();
     }
 
-    const u32 endof_addons = fd.tellg();
+    const u32 endof_addons = fs.tell();
     DEBUG(DBG_GAME, DBG_INFO, "read all tiles addons, tellg: " << endof_addons);
 
     // offset data
-    fd.seekg(MP2OFFSETDATA, std::ios_base::beg);
+    fs.seek(MP2OFFSETDATA);
 
     vec_tiles.resize(w() * h());
 
@@ -846,15 +844,15 @@ bool World::LoadMapMP2(const std::string & filename)
 
 	MP2::mp2tile_t mp2tile;
 
-	mp2tile.tileIndex = StreamBuf::getLE16(fd);
-	mp2tile.objectName1 = fd.get();
-	mp2tile.indexName1 = fd.get();
-	mp2tile.quantity1 = fd.get();
-	mp2tile.quantity2 = fd.get();
-	mp2tile.objectName2 = fd.get();
-	mp2tile.indexName2 = fd.get();
-	mp2tile.shape = fd.get();
-	mp2tile.generalObject = fd.get();
+	mp2tile.tileIndex = fs.getLE16();
+	mp2tile.objectName1 = fs.get();
+	mp2tile.indexName1 = fs.get();
+	mp2tile.quantity1 = fs.get();
+	mp2tile.quantity2 = fs.get();
+	mp2tile.objectName2 = fs.get();
+	mp2tile.indexName2 = fs.get();
+	mp2tile.shape = fs.get();
+	mp2tile.generalObject = fs.get();
 
 	switch(mp2tile.generalObject)
 	{
@@ -874,10 +872,10 @@ bool World::LoadMapMP2(const std::string & filename)
 	}
 
 	// offset first addon
-	size_t offsetAddonsBlock = StreamBuf::getLE16(fd);
+	size_t offsetAddonsBlock = fs.getLE16();
 
-	mp2tile.uniqNumber1 = StreamBuf::getLE32(fd);
-	mp2tile.uniqNumber2 = StreamBuf::getLE32(fd);
+	mp2tile.uniqNumber1 = fs.getLE32();
+	mp2tile.uniqNumber2 = fs.getLE32();
 
 	tile.Init(index, mp2tile);
 
@@ -893,18 +891,18 @@ bool World::LoadMapMP2(const std::string & filename)
 	tile.AddonsSort();
     }
 
-    DEBUG(DBG_GAME, DBG_INFO, "read all tiles, tellg: " << fd.tellg());
+    DEBUG(DBG_GAME, DBG_INFO, "read all tiles, tellg: " << fs.tell());
 
     // after addons
-    fd.seekg(endof_addons, std::ios_base::beg);
+    fs.seek(endof_addons);
 
     // cood castles
     // 72 x 3 byte (cx, cy, id)
     for(u32 ii = 0; ii < 72; ++ii)
     {
-	u32 cx = fd.get();
-	u32 cy = fd.get();
-	u32 id = fd.get();
+	u32 cx = fs.get();
+	u32 cy = fs.get();
+	u32 id = fs.get();
 
 	// empty block
 	if(0xFF == cx && 0xFF == cy) continue;
@@ -947,16 +945,16 @@ bool World::LoadMapMP2(const std::string & filename)
 	map_captureobj.Set(Maps::GetIndexFromAbsPoint(cx, cy), MP2::OBJ_CASTLE, Color::NONE);
     }
 
-    DEBUG(DBG_GAME, DBG_INFO, "read coord castles, tellg: " << fd.tellg());
-    fd.seekg(endof_addons + (72 * 3), std::ios_base::beg);
+    DEBUG(DBG_GAME, DBG_INFO, "read coord castles, tellg: " << fs.tell());
+    fs.seek(endof_addons + (72 * 3));
 
     // cood resource kingdoms
     // 144 x 3 byte (cx, cy, id)
     for(u32 ii = 0; ii < 144; ++ii)
     {
-	u32 cx = fd.get();
-	u32 cy = fd.get();
-	u32 id = fd.get();
+	u32 cx = fs.get();
+	u32 cy = fs.get();
+	u32 id = fs.get();
 
 	// empty block
 	if(0xFF == cx && 0xFF == cy) continue;
@@ -1001,18 +999,18 @@ bool World::LoadMapMP2(const std::string & filename)
 	}
     }
 
-    DEBUG(DBG_GAME, DBG_INFO, "read coord other resource, tellg: " << fd.tellg());
-    fd.seekg(endof_addons + (72 * 3) + (144 * 3), std::ios_base::beg);
+    DEBUG(DBG_GAME, DBG_INFO, "read coord other resource, tellg: " << fs.tell());
+    fs.seek(endof_addons + (72 * 3) + (144 * 3));
 
     // byte: num obelisks (01 default)
-    fd.ignore(1);
+    fs.skip(1);
 
     // count final mp2 blocks
     u32 countblock = 0;
     while(1)
     {
-	u32 l = fd.get();
-	u32 h = fd.get();
+	u32 l = fs.get();
+	u32 h = fs.get();
 
 	//VERBOSE("dump block: 0x" << std::setw(2) << std::setfill('0') << std::hex << l <<
 	//	std::setw(2) << std::setfill('0') << std::hex << h);
@@ -1030,9 +1028,9 @@ bool World::LoadMapMP2(const std::string & filename)
 	s32 findobject = -1;
 
 	// read block
-	size_t sizeblock = StreamBuf::getLE16(fd);
+	size_t sizeblock = fs.getLE16();
 	u8* pblock = new u8[sizeblock];
-	fd.read(reinterpret_cast<char*>(pblock), sizeblock);
+	fs.read(pblock, sizeblock);
 
 	for(MapsIndexes::const_iterator
 	    it_index = vec_object.begin(); it_index != vec_object.end() && findobject < 0; ++it_index)
@@ -1210,10 +1208,6 @@ bool World::LoadMapMP2(const std::string & filename)
 
 	delete [] pblock;
     }
-
-    // close mp2
-    fd.close();
-
 
     PostLoad();
 

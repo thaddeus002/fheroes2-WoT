@@ -21,7 +21,6 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include <fstream>
 
 #include "system.h"
 #include "text.h"
@@ -466,7 +465,6 @@ bool Settings::Read(const std::string & filename)
     // reset devel
     debug &= ~(DBG_DEVEL);
 #endif
-
     BinaryLoad();
 
     if(video_driver.size())
@@ -515,11 +513,9 @@ bool Settings::Save(const std::string & filename) const
 {
     if(filename.empty()) return false;
 
-    std::ofstream file(filename.c_str());
-    if(!file.is_open()) return false;
-
-    file << String();
-    file.close();
+    StreamFile fs;
+    if(! fs.open(filename, "wb")) return false;
+    fs << String();
 
     return true;
 }
@@ -1414,19 +1410,16 @@ void Settings::SetPosStatus(const Point & pt) { pos_stat = pt; }
 
 void Settings::BinarySave(void) const
 {
-    const std::string binary = System::ConcatePath(GetSaveDir(), "fheroes2.bin");
-    std::ofstream fs(binary.c_str(), std::ios::binary);
+    const std::string fname = System::ConcatePath(GetSaveDir(), "fheroes2.bin");
 
-    if(fs.is_open())
+    StreamFile fs;
+    fs.setbigendian(true);
+
+    if(fs.open(fname, "wb"))
     {
-	StreamBuf msg(64);
-	msg.setbigendian(true);
-
-	msg << static_cast<u16>(CURRENT_FORMAT_VERSION) <<
+	fs << static_cast<u16>(CURRENT_FORMAT_VERSION) <<
 	    opt_game << opt_world << opt_battle << opt_addons <<
 	    pos_radr << pos_bttn << pos_icon << pos_stat;
-
-	fs << msg;
     }
 }
 
@@ -1434,28 +1427,25 @@ void Settings::BinarySave(void) const
 
 void Settings::BinaryLoad(void)
 {
-    std::string binary = System::ConcatePath(GetSaveDir(), "fheroes2.bin");
+    std::string fname = System::ConcatePath(GetSaveDir(), "fheroes2.bin");
 
-    if(! System::IsFile(binary))
-	binary = GetLastFile("", "fheroes2.bin");
+    if(! System::IsFile(fname))
+	fname = GetLastFile("", "fheroes2.bin");
 
-    std::ifstream fs(binary.c_str(), std::ios::binary);
+    StreamFile fs;
+    fs.setbigendian(true);
 
-    if(fs.is_open())
+    if(fs.open(fname, "rb"))
     {
-	StreamBuf msg(64);
-	msg.setbigendian(true);
+	u16 version = 0;
 
-	fs >> msg;
-
-	if(! msg.fail())
-	{
-	    u16 version = 0;
-
-	    msg >> version >>
-		opt_game >> opt_world >> opt_battle >> opt_addons >>
-		pos_radr >> pos_bttn >> pos_icon >> pos_stat;
-	}
+#ifdef FORMAT_VERSION_3225
+	if(fs.size() == 38) // old stream ver.
+	    fs.skip(4);
+#endif
+	fs >> version >>
+	    opt_game >> opt_world >> opt_battle >> opt_addons >>
+	    pos_radr >> pos_bttn >> pos_icon >> pos_stat;
     }
 }
 

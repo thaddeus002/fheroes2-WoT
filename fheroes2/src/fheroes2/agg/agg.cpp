@@ -21,7 +21,6 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include <fstream>
 #include <iostream>
 #include <map>
 #include <vector>
@@ -75,7 +74,7 @@ namespace AGG
 	std::string			filename;
 	std::map<std::string, FAT>	fat;
 	u32				count_items;
-	std::ifstream			stream;
+	StreamFile			stream;
 	std::string			key;
 	std::vector<u8>			body;
     };
@@ -160,7 +159,6 @@ namespace AGG
     bool			ReadDataDir(void);
     const std::vector<u8> &	ReadICNChunk(int icn, u32);
     const std::vector<u8> &	ReadChunk(const std::string &);
-
 }
 
 Sprite ICNSprite::CreateSprite(bool reflect, bool shadow) const
@@ -187,57 +185,49 @@ AGG::File::File(void) : count_items(0)
 bool AGG::File::Open(const std::string & fname)
 {
     filename = fname;
-    stream.open(filename.c_str(), std::ios::binary);
-
-    if(! stream.is_open())
+    
+    if(! stream.open(filename, "rb"))
     {
 	DEBUG(DBG_ENGINE, DBG_WARN, "error read file: " << filename << ", skipping...");
 	return false;
     }
 
-    stream.seekg(0, std::ios_base::end);
-    const u32 size = stream.tellg();
-    stream.seekg(0, std::ios_base::beg);
+    const u32 size = stream.size();
 
-    count_items = StreamBase::getLE16(stream);
+    count_items = stream.getLE16();
     DEBUG(DBG_ENGINE, DBG_INFO, "load: " << filename << ", count items: " << count_items);
 
     char buf[FATSIZENAME + 1];
-    buf[FATSIZENAME] = 0;
+    std::fill(buf, buf + FATSIZENAME + 1, 0);
+
+    std::vector<u8> buf1 = stream.getRaw(count_items * 4 * 3 /* crc, offset, size */);
+    StreamBuf fats(buf1);
+
+    stream.seek(size - FATSIZENAME * count_items);
+
+    std::vector<u8> buf2 = stream.getRaw(FATSIZENAME * count_items);
+    StreamBuf names(buf2);
 
     for(u32 ii = 0; ii < count_items; ++ii)
     {
-	if(! stream.good())
-	{
-	    DEBUG(DBG_ENGINE, DBG_WARN, "stream error");
-	    return false;
-	}
+	std::vector<u8> name = names.getRaw(FATSIZENAME);
+        FAT & f = fat[reinterpret_cast<const char*>(& name[0])];
 
-        const u32 pos = stream.tellg();
-
-        stream.seekg(size - FATSIZENAME * (count_items - ii), std::ios_base::beg);
-        stream.read(buf, FATSIZENAME);
-
-        FAT & f = fat[std::string(buf)];
-
-        stream.seekg(pos, std::ios_base::beg);
-
-	f.crc = StreamBase::getLE32(stream);
-	f.offset = StreamBase::getLE32(stream);
-	f.size = StreamBase::getLE32(stream);
+	f.crc = fats.getLE32();
+	f.offset = fats.getLE32();
+	f.size = fats.getLE32();
     }
 
-    return true;
+    return ! stream.fail();
 }
 
 AGG::File::~File()
 {
-    stream.close();
 }
 
 bool AGG::File::isGood(void) const
 {
-    return stream.good() && count_items;
+    return !stream.fail() && count_items;
 }
 
 /* get AGG file name */
@@ -272,14 +262,13 @@ const std::vector<u8> & AGG::File::Read(const std::string & str)
 	{
 	    const FAT & f = (*it).second;
 	    key = str;
-	    body.resize(f.size);
 
 	    if(f.size)
 	    {
 		DEBUG(DBG_ENGINE, DBG_TRACE, key << ":\t" << f.Info());
 
-		stream.seekg(f.offset, std::ios_base::beg);
-		stream.read(reinterpret_cast<char*>(&body[0]), f.size);
+		stream.seek(f.offset);
+		body = stream.getRaw(f.size);
 	    }
 	}
 	else
@@ -420,6 +409,16 @@ bool AGG::CheckMemoryLimit(void)
 bool AGG::ReadDataDir(void)
 {
     Settings & conf = Settings::Get();
+
+#if defined(ANDROID)
+    // read from assets
+    heroes2_agg.Open("data/heroes2.agg");
+    heroes2x_agg.Open("data/heroes2x.agg");
+
+    if(heroes2x_agg.isGood()) conf.SetPriceLoyaltyVersion();
+    if(heroes2_agg.isGood()) return true;
+#endif
+
     ListFiles aggs = conf.GetListFiles("data", ".agg");
     const std::string & other_data = conf.GetDataParams();
 
@@ -1109,7 +1108,7 @@ bool AGG::LoadOrgICN(int icn, u32 index, bool reflect)
 
 	if(body.size())
 	{
-	    v.count = StreamBase::getLE16(& body[0]);
+	    v.count = StreamBuf(body).getLE16();
 	    v.sprites = new Sprite [v.count];
 	    v.reflect = new Sprite [v.count];
 	}
@@ -1863,6 +1862,14 @@ void AGG::Quit(void)
 	til_cache_t & tils = (*it);
 	if(tils.sprites) delete [] tils.sprites;
     }
+
+    icn_cache.clear();
+    til_cache.clear();
+    wav_cache.clear();
+    mid_cache.clear();
+    loop_sounds.clear();
+    fnt_cache.clear();
+    pal_colors.clear();
 
 #ifdef WITH_TTF
     delete [] fonts;

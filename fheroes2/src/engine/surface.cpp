@@ -281,14 +281,19 @@ Surface::Surface(const void* pixels, u32 width, u32 height, u32 bytes_per_pixel 
     SurfaceFormat fm = GetRGBAMask(8 * bytes_per_pixel);
 
     if(8 == fm.depth)
+    {
 #if SDL_VERSION_ATLEAST(2, 0, 0)
 	surface = SDL_CreateRGBSurface(0, width, height, fm.depth, fm.rmask, fm.gmask, fm.bmask, (amask ? fm.amask : 0));
 #else
 	surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, fm.depth, fm.rmask, fm.gmask, fm.bmask, (amask ? fm.amask : 0));
 #endif
+    }
     else
+    {
 	surface = SDL_CreateRGBSurfaceFrom(const_cast<void *>(pixels), width, height, fm.depth, width * bytes_per_pixel,
-		fm.rmask, fm.gmask, fm.bmask, (amask ? fm.amask : 0));
+		fm.rmask, fm.gmask, fm.bmask, amask ? fm.amask : 0);
+	SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
+    }
 
     if(!surface)
 	Error::Except(__FUNCTION__, SDL_GetError());
@@ -390,14 +395,35 @@ void Surface::Set(u32 sw, u32 sh, const SurfaceFormat & fm)
     else
     if(amask())
     {
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+	Fill(RGBA(0, 0, 0, 0)); // no color key only amask
+#else
 	Fill(RGBA(fm.ckey.r(), fm.ckey.g(), fm.ckey.b(), 0));
 	SetColorKey(fm.ckey);
+#endif
     }
     else
     if(fm.ckey.pack())
     {
 	Fill(fm.ckey);
 	SetColorKey(fm.ckey);
+    }
+
+    if(amask())
+    {
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+	SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_BLEND);
+#else
+	SDL_SetAlpha(surface, SDL_SRCALPHA, 255);
+#endif
+    }
+    else
+    {
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+	SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
+#else
+	SDL_SetAlpha(surface, 0, 0);
+#endif
     }
 }
 
@@ -457,6 +483,7 @@ bool Surface::Load(const std::string & fn)
 
 #ifdef WITH_IMAGE
     surface = IMG_Load(fn.c_str());
+    SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
 #else
     surface = SDL_LoadBMP(fn.c_str());
 #endif
@@ -472,7 +499,11 @@ bool Surface::Save(const std::string & fn) const
     int res = 0;
 
 #ifdef WITH_IMAGE
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+    res = IMG_SavePNG(surface, fn.c_str());
+#else
     res = IMG_SavePNG(fn.c_str(), surface, -1);
+#endif
 #else
     res = SDL_SaveBMP(surface, fn.c_str());
 #endif
@@ -543,7 +574,10 @@ u32 Surface::MapRGB(const RGBA & color) const
 
 RGBA Surface::GetRGB(u32 pixel) const
 {
-    u8 r, g, b, a;
+    u8 r = 0;
+    u8 g = 0;
+    u8 b = 0;
+    u8 a = 0;
 
     if(amask())
     {
@@ -572,7 +606,7 @@ void Surface::SetPalette(void)
 u32 Surface::GetColorKey(void) const
 {
 #if SDL_VERSION_ATLEAST(2, 0, 0)
-    if(isValid())
+    if(isValid() && ! amask())
     {
         u32 res = 0;
         SDL_GetColorKey(surface, &res);
@@ -637,7 +671,11 @@ void Surface::SetPixel(int x, int y, u32 pixel)
 	}
     }
     else
-	Error::Except(__FUNCTION__, "out of range");
+    {
+	std::ostringstream os;
+	os << "out of range: " << "x: " << x << ", " << "y: " << y << ", " << "width: " << w() << ", " << "height: " << h();
+	Error::Except(__FUNCTION__, os.str().c_str());
+    }
 }
 
 u32 Surface::GetPixel4(s32 x, s32 y) const
@@ -934,7 +972,8 @@ Surface Surface::RenderRotate(int parm /* 0: none, 1 : 90 CW, 2: 90 CCW, 3: 180 
 Surface Surface::RenderStencil(const RGBA & color) const
 {
     Surface res(GetSize(), GetFormat());
-    RGBA clkey = GetRGB(GetColorKey());
+    u32 clkey0 = GetColorKey();
+    RGBA clkey = GetRGB(clkey0);
     const u32 pixel = res.MapRGB(color);
 
     res.Lock();
@@ -942,7 +981,7 @@ Surface Surface::RenderStencil(const RGBA & color) const
         for(int x = 0; x < w(); ++x)
     {
         RGBA col = GetRGB(GetPixel(x, y));
-        if(clkey == col || col.a() < 200) continue;
+        if((clkey0 && clkey == col) || col.a() < 200) continue;
         res.SetPixel(x, y, pixel);
     }
     res.Unlock();
@@ -954,7 +993,8 @@ Surface Surface::RenderContour(const RGBA & color) const
     const RGBA fake = RGBA(0x00, 0xFF, 0xFF);
     Surface res(GetSize(), GetFormat());
     Surface trf = RenderStencil(fake);
-    RGBA clkey = trf.GetRGB(trf.GetColorKey());
+    u32 clkey0 = trf.GetColorKey();
+    RGBA clkey = trf.GetRGB(clkey0);
     const u32 pixel = res.MapRGB(color);
     const u32 fake2 = trf.MapRGB(fake);
 
@@ -970,23 +1010,23 @@ Surface Surface::RenderContour(const RGBA & color) const
             if(0 < x)
             {
                 RGBA col = trf.GetRGB(trf.GetPixel(x - 1, y));
-                if(col == clkey || col.a() < 200) res.SetPixel(x - 1, y, pixel);
+                if((clkey0 && col == clkey) || col.a() < 200) res.SetPixel(x - 1, y, pixel);
             }
             if(trf.w() - 1 > x)
             {
                 RGBA col = trf.GetRGB(trf.GetPixel(x + 1, y));
-                if(col == clkey || col.a() < 200) res.SetPixel(x + 1, y, pixel);
+                if((clkey0 && col == clkey) || col.a() < 200) res.SetPixel(x + 1, y, pixel);
             }
 
             if(0 < y)
             {
                 RGBA col = trf.GetRGB(trf.GetPixel(x, y - 1));
-                if(col == clkey || col.a() < 200) res.SetPixel(x, y - 1, pixel);
+                if((clkey0 && col == clkey) || col.a() < 200) res.SetPixel(x, y - 1, pixel);
             }
             if(trf.h() - 1 > y)
             {
                 RGBA col = trf.GetRGB(trf.GetPixel(x, y + 1));
-                if(col == clkey || col.a() < 200) res.SetPixel(x, y + 1, pixel);
+                if((clkey0 && col == clkey) || col.a() < 200) res.SetPixel(x, y + 1, pixel);
             }
         }
     }
@@ -1005,7 +1045,7 @@ Surface Surface::RenderGrayScale(void) const
         for(int x = 0; x < w(); ++x)
     {
         pixel = GetPixel(x, y);
-        if(pixel != colkey)
+        if(0 == colkey || pixel != colkey)
         {
             RGBA col = GetRGB(pixel);
             int z = col.r() * 0.299f + col.g() * 0.587f + col.b() * 0.114f;
@@ -1028,7 +1068,7 @@ Surface Surface::RenderSepia(void) const
         for(int y = 0; y < h(); y++)
     {
         pixel = GetPixel(x, y);
-        if(pixel != colkey)
+        if(colkey == 0 || pixel != colkey)
         {
 	    RGBA col = GetRGB(pixel);
             //Numbers derived from http://blogs.techrepublic.com.com/howdoi/?p=120

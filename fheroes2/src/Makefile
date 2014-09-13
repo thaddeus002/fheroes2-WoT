@@ -24,22 +24,38 @@ endif
 
 ifndef WITHOUT_MIXER
 CFLAGS := $(CFLAGS) -DWITH_MIXER
+ifdef WITH_SDL2
+SDL_LIBS := $(SDL_LIBS) -lSDL2_mixer
+else
 SDL_LIBS := $(SDL_LIBS) -lSDL_mixer
+endif
 endif
 
 ifndef WITHOUT_IMAGE
 CFLAGS := $(CFLAGS) -DWITH_IMAGE $(shell libpng-config --cflags) -DWITH_ZLIB
+ifdef WITH_SDL2
+SDL_LIBS := $(SDL_LIBS) -lSDL2_image $(shell libpng-config --libs) -lz
+else
 SDL_LIBS := $(SDL_LIBS) -lSDL_image $(shell libpng-config --libs) -lz
+endif
 endif
 
 ifndef WITHOUT_UNICODE
 CFLAGS := $(CFLAGS) -DWITH_TTF
+ifdef WITH_SDL2
+SDL_LIBS := $(SDL_LIBS) -lSDL2_ttf
+else
 SDL_LIBS := $(SDL_LIBS) -lSDL_ttf
+endif
 endif
 
 ifndef WITHOUT_NETWORK
 CFLAGS := $(CFLAGS) -DWITH_NET_DISABLE
+ifdef WITH_SDL2
+SDL_LIBS := $(SDL_LIBS) -lSDL2_net
+else
 SDL_LIBS := $(SDL_LIBS) -lSDL_net
+endif
 endif
 
 ifndef WITHOUT_XML

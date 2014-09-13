@@ -40,23 +40,23 @@ struct Size;
 
 class StreamBase
 {
+private:
+    StreamBase(const StreamBase &) {}
+    StreamBase &	operator= (const StreamBase &) { return *this; }
+
 protected:
-    virtual int		get8(void) = 0;
-    virtual void	put8(int) = 0;
+    int			get8(void);
+    void		put8(u8);
+    void		setfail(void);
+
+    SDL_RWops*		rw;
+    size_t		flags;
+
+    virtual void	resize(size_t) {}
 
 public:
-    enum { EndianBig = 0x80000000 };
-
-    StreamBase() {}
-    virtual ~StreamBase() {}
-
-    virtual size_t	sizeg(void) const = 0;
-    virtual size_t	sizep(void) const = 0;
-
-    virtual size_t	tellg(void) const = 0;
-    virtual size_t	tellp(void) const = 0;
-
-    virtual bool	bigendian(void) const;
+    StreamBase() : rw(NULL), flags(0) {}
+    ~StreamBase();
 
     int			getBE16(void);
     int			getLE16(void);
@@ -66,18 +66,29 @@ public:
     int			get16(void);
     int			get32(void);
 
-    std::vector<u8>	getRaw(size_t = 0 /* all data */);
-    void		putRaw(const char*, size_t);
+    void                putBE32(u32);
+    void                putLE32(u32);
+    void                putBE16(u16);
+    void                putLE16(u16);
 
     void		put16(u16);
     void		put32(u32);
 
-    void		putBE32(u32);
-    void		putLE32(u32);
-    void		putBE16(u16);
-    void		putLE16(u16);
+    int			get(void) { return get8(); } // get char
+    void		put(int ch) { put8(ch); }
 
-    virtual void	skip(size_t);
+    std::vector<u8>	getRaw(size_t = 0 /* all data */);
+    void		putRaw(const void*, size_t);
+
+    void		skip(size_t);
+
+    void		setbigendian(bool);
+    bool		bigendian(void) const;
+
+    bool		fail(void) const;
+
+    long int		tell(void) const;
+    bool		seek(long int);
 
     StreamBase &	operator>> (bool &);
     StreamBase &	operator>> (char &);
@@ -181,101 +192,42 @@ public:
 	    it = v.begin(); it != v.end(); ++it) *this << *it;
 	return *this;
     }
-
-    static void		putBE32(std::ostream &, u32);
-    static void		putLE32(std::ostream &, u32);
-
-    static void		putBE16(std::ostream &, u16);
-    static void		putLE16(std::ostream &, u16);
-
-    static int		getBE32(std::istream &);
-    static int		getLE32(std::istream &);
-
-    static int		getBE16(std::istream &);
-    static int		getLE16(std::istream &);
-
-    static int		getBE32(const u8*);
-    static int		getLE32(const u8*);
-
-    static int		getBE16(const u8*);
-    static int		getLE16(const u8*);
 };
 
-#ifdef WITH_ZLIB
-class ZStreamBuf;
-#endif
+class StreamFile : public StreamBase
+{
+public:
+    StreamFile() {}
+    StreamFile(const std::string &, const char* mode);
+
+    long int		size(void) const;
+    bool		read(void*, size_t);
+    bool		open(const std::string &, const char* mode);
+    void		close(void);
+};
 
 class StreamBuf : public StreamBase
 {
-public:
-    StreamBuf(size_t);
-    StreamBuf(const StreamBuf &);
-    StreamBuf(const std::vector<u8> &);
-    StreamBuf(const u8*, size_t);
-
-    ~StreamBuf();
-
-    StreamBuf &	operator= (const StreamBuf &);
-
-    size_t	capacity(void) const;
-    void	reset(void);
-    std::string	dump(void) const;
-
-    u8*		data(void);
-    size_t	size(void) const;
-    void	setlimit(size_t);
-
-    bool	fail(void) const;
-
-    void	setconstbuf(bool);
-    bool	isconstbuf(void) const;
-
-    void	setbigendian(bool);
-    bool	bigendian(void) const;
-
-    int		get(void); /* get char */
-    void	put(int);
-
-    void	skip(size_t);
-    size_t	tellg(void) const;
-    size_t	tellp(void) const;
-    size_t	sizeg(void) const;
-    size_t	sizep(void) const;
+    u8*			buf;
+    size_t		len;
 
 protected:
-    void	copy(const StreamBuf &);
-    void	realloc(size_t);
-    void	setfail(void);
+    void		setconstbuf(bool);
+    bool		isconstbuf(void) const;
+    void		resize(size_t);
 
-    int		get8(void);
-    void	put8(int);
+public:
+    StreamBuf(size_t = 0);
+    StreamBuf(const u8*, size_t);
+    StreamBuf(const std::vector<u8> &);
+    StreamBuf(const StreamBuf &);
+    ~StreamBuf();
 
+    StreamBuf &		operator= (const StreamBuf &);
 
-    friend std::ostream & operator<< (std::ostream &, StreamBuf &);
-    friend std::istream & operator>> (std::istream &, StreamBuf &);
-
-#ifdef WITH_NET
-    friend Network::Socket & operator<< (Network::Socket &, StreamBuf &);
-    friend Network::Socket & operator>> (Network::Socket &, StreamBuf &);
-#endif
-
-#ifdef WITH_ZLIB
-    friend class ZStreamBuf;
-#endif
-
-    u8*		itbeg;
-    u8*		itget;
-    u8*		itput;
-    u8*		itend;
-    size_t	flags;
+    const u8*		data(void) const { return buf; }
+    u8*			data(void) { return buf; }
+    size_t		size(void) const { return len; }
 };
-
-std::ostream & operator<< (std::ostream &, StreamBuf &);
-std::istream & operator>> (std::istream &, StreamBuf &);
-
-#ifdef WITH_NET
-Network::Socket & operator<< (Network::Socket &, StreamBuf &);
-Network::Socket & operator>> (Network::Socket &, StreamBuf &);
-#endif
 
 #endif

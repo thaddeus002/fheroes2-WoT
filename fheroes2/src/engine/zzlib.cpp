@@ -83,6 +83,7 @@ std::vector<u8> zlibCompress(const u8* src, size_t srcsz)
     return res;
 }
 
+#include "system.h"
 bool ZSurface::Load(int w, int h, int bpp, int pitch, u32 rmask, u32 gmask, u32 bmask, u32 amask, const u8* p, size_t s)
 {
     buf = zlibDecompress(p, s);
@@ -91,6 +92,9 @@ bool ZSurface::Load(int w, int h, int bpp, int pitch, u32 rmask, u32 gmask, u32 
     {
         SDL_Surface* sf = SDL_CreateRGBSurfaceFrom(&buf[0], w, h, bpp, pitch, rmask, gmask, bmask, amask);
 
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+	SDL_SetSurfaceBlendMode(sf, SDL_BLENDMODE_NONE);
+#endif
         if(!sf)
             Error::Except(__FUNCTION__, SDL_GetError());
 
@@ -101,71 +105,58 @@ bool ZSurface::Load(int w, int h, int bpp, int pitch, u32 rmask, u32 gmask, u32 
     return false;
 }
 
-ZStreamBuf::ZStreamBuf() : StreamBuf(0)
+bool ZStreamFile::read(const std::string & fn, size_t offset)
 {
-    setbigendian(true);
-}
+    StreamFile sf;
+    sf.setbigendian(true);
 
-std::ostream & operator<< (std::ostream & os, ZStreamBuf & zb)
-{
-    return os << static_cast<StreamBuf &>(zb);
-}
-
-std::istream & operator>> (std::istream & is, ZStreamBuf & zb)
-{
-    return is >> static_cast<StreamBuf &>(zb);
-}
-
-ZStreamBuf & ZStreamBuf::operator<< (StreamBuf & sb)
-{
-    const u32 size0 = sb.sizeg();
-    std::vector<u8> v = zlibCompress(sb.itget, size0);
-
-    if(! v.empty())
+    if(sf.open(fn, "rb"))
     {
-        const u32 size1 = v.size();
-        sb.itget += size0;
-
-        if(sizep() < size1 + 8)
-            realloc(size1 + 8);
-
-        put32(size0);
-        put32(size1);
-        std::copy(v.begin(), v.end(), itput);
-        itput += size1;
+	if(offset) sf.seek(offset);
+#ifdef WITH_ZLIB
+        const u32 size0 = sf.get32(); // raw size
+        const u32 size1 = sf.get32(); // zip size
+        sf.skip(4); // old stream format
+	std::vector<u8> zip = sf.getRaw(size1);
+        std::vector<u8> raw = zlibDecompress(& zip[0], zip.size(), size0);
+	putRaw(& raw[0], raw.size());
+	seek(0);
+#else
+        const u32 size0 = sf.get32(); // raw size
+	std::vector<u8> raw = sf.getRaw(size0);
+	putRaw(& raw[0], raw.size());
+	seek(0);
+#endif
+	return ! fail();
     }
-    else
-        setfail();
-
-    return *this;
+    return false;
 }
 
-ZStreamBuf & ZStreamBuf::operator>> (StreamBuf & sb)
+bool ZStreamFile::write(const std::string & fn, bool append) const
 {
-    if(sizeg() > 8)
+    StreamFile sf;
+    sf.setbigendian(true);
+
+    if(sf.open(fn, append ? "ab" : "wb"))
     {
-        const u32 size0 = get32();
-        const u32 size1 = get32();
-        std::vector<u8> v = zlibDecompress(itget, size1, size0);
+#ifdef WITH_ZLIB
+	std::vector<u8> zip = zlibCompress(data(), size());
 
-        if(size1 <= sizeg() &&
-            ! v.empty())
-        {
-            itget += size1;
-
-            if(sb.sizep() < v.size())
-                sb.realloc(v.size());
-
-            std::copy(v.begin(), v.end(), sb.itput);
-            sb.itput += v.size();
-        }
-        else
-            sb.setfail();
+	if(! zip.empty())
+	{
+    	    sf.put32(size());
+    	    sf.put32(zip.size());
+    	    sf.put32(0);	// unused, old format support
+	    sf.putRaw(& zip[0], zip.size());
+	    return ! sf.fail();
+	}
+#else
+    	sf.put32(size());
+	sf.putRaw(data(), size());
+	return ! sf.fail();
+#endif
     }
-    else
-        sb.setfail();
-
-    return *this;
+    return false;
 }
 
 #endif
