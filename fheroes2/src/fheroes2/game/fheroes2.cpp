@@ -46,11 +46,11 @@ int TestBlitSpeed(void);
 
 int PrintHelp(const char *basename)
 {
-    VERBOSE("Usage: " << basename << " [OPTIONS]");
+    COUT("Usage: " << basename << " [OPTIONS]");
 #ifndef BUILD_RELEASE
-    VERBOSE("  -d\tdebug mode");
+    COUT("  -d\tdebug mode");
 #endif
-    VERBOSE("  -h\tprint this help and exit");
+    COUT("  -h\tprint this help and exit");
 
     return EXIT_SUCCESS;
 }

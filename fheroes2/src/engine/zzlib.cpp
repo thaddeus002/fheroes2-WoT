@@ -24,7 +24,9 @@
 #ifdef WITH_ZLIB
 #include <sstream>
 #include <zlib.h>
+
 #include "error.h"
+#include "system.h"
 #include "zzlib.h"
 
 std::vector<u8> zlibDecompress(const u8* src, size_t srcsz, size_t realsz)
@@ -52,7 +54,7 @@ std::vector<u8> zlibDecompress(const u8* src, size_t srcsz, size_t realsz)
 	    res.clear();
 	    std::ostringstream os;
 	    os << "zlib error:" << ret;
-	    Error::Message(__FUNCTION__, os.str().c_str());
+	    ERROR(os.str().c_str());
 	}
     }
 
@@ -76,7 +78,7 @@ std::vector<u8> zlibCompress(const u8* src, size_t srcsz)
 	    res.clear();
 	    std::ostringstream os;
 	    os << "zlib error:" << ret;
-	    Error::Message(__FUNCTION__, os.str().c_str());
+	    ERROR(os.str().c_str());
 	}
     }
 

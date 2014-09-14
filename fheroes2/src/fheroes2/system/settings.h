@@ -95,7 +95,7 @@ enum
 };
 
 #ifdef WITH_DEBUG
-#define DEBUG(x, y, z) if(IS_DEBUG(x, y)) VERBOSE(System::GetTime() << ": [" << StringDebug(x) << "]\t" << __FUNCTION__ << ":  " << z)
+#define DEBUG(x, y, z) if(IS_DEBUG(x, y)) { COUT(System::GetTime() << ": [" << StringDebug(x) << "]\t" << __FUNCTION__ << ":  " << z); }
 #else
 #define DEBUG(x, y, z)
 #endif

@@ -21,7 +21,8 @@
  ***************************************************************************/
 
 #ifdef WITH_AUDIOCD
-#include <iostream>
+
+#include "system.h"
 #include "audio_mixer.h"
 #include "audio_cdrom.h"
 
@@ -68,7 +69,7 @@ void Cdrom::Open(void)
         cdLock = SDL_CreateMutex();
     }
 
-    std::cerr << "Cdrom::Open: "  << (cd ? "found CD audio device." : "no CDROM devices available.") << std::endl;
+    ERROR(cd ? "found CD audio device." : "no CDROM devices available.");
 }
 
 void Cdrom::Close(void)
@@ -110,7 +111,7 @@ void Cdrom::Play(const u8 track, bool loop, bool force)
         if(currentTrack != track || force)
         {
             if(SDL_CDPlayTracks(cd, track, 0, 1, 0) < 0)
-                std::cerr << "Cdrom::Play: Couldn't play track " << static_cast<int>(track) << std::endl;
+                ERROR("Couldn't play track " << static_cast<int>(track));
             
             currentTrack = track;
             if(loop)
@@ -121,7 +122,7 @@ void Cdrom::Play(const u8 track, bool loop, bool force)
             else startTime = 0;
 
             if(SDL_CDStatus(cd) != CD_PLAYING)
-                std::cerr << "Cdrom::Play: CD is not playing" << SDL_GetError() << std::endl;
+                ERROR("CD is not playing" << SDL_GetError());
         }
         
         SDL_UnlockMutex(cdLock);

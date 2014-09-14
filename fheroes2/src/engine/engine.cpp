@@ -46,7 +46,7 @@ bool SDL::Init(const u32 system)
 
     if(0 > SDL_Init(system))
     {
-	std::cerr << "SDL::Init: error: " << SDL_GetError() << std::endl;
+	ERROR(SDL_GetError());
 	return false;
     }
 

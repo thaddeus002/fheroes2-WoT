@@ -33,9 +33,8 @@ class TinyConfig : protected std::multimap<std::string, std::string>
 public:
     TinyConfig(char sep = '=', char com = ';');
 
-    bool	Load(const char*);
-    bool	Save(const char*) const;
-    void	Dump(std::ostream &) const;
+    bool	Load(const std::string &);
+    bool	Save(const std::string &) const;
     void	Clear(void);
 
     void	AddEntry(const std::string &, const std::string &, bool uniq = true);

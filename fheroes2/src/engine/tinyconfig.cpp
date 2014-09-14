@@ -20,14 +20,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <fstream>
 #include <iterator>
 #include <cctype>
 #include <iostream>
 #include <algorithm>
 
-#include "tinyconfig.h"
 #include "tools.h"
+#include "serialize.h"
+#include "tinyconfig.h"
 
 bool SpaceCompare(char a, char b)
 {
@@ -52,17 +52,17 @@ TinyConfig::TinyConfig(char sep, char com) : separator(sep), comment(com)
 {
 }
 
-bool TinyConfig::Load(const char* cfile)
+bool TinyConfig::Load(const std::string & cfile)
 {
-    if(!cfile) return false;
+    StreamFile sf;
+    if(! sf.open(cfile, "rb")) return false;
 
-    std::ifstream fs(cfile);
-    if(!fs.is_open()) return false;
+    std::list<std::string> rows = StringSplit(GetString(sf.getRaw(sf.size())), "\n");
 
-    std::string str;
-    while(std::getline(fs, str))
+    for(std::list<std::string>::const_iterator
+	it = rows.begin(); it != rows.end(); ++it)
     {
-	str = StringTrim(str);
+	std::string str = StringTrim(*it);
 	if(str.empty() || str[0] == comment) continue;
 
         size_t pos = str.find(separator);
@@ -78,29 +78,19 @@ bool TinyConfig::Load(const char* cfile)
         }
     }
 
-    fs.close();
-
     return true;
 }
 
-bool TinyConfig::Save(const char* cfile) const
+bool TinyConfig::Save(const std::string & cfile) const
 {
-    if(!cfile) return false;
+    StreamFile sf;
+    if(! sf.open(cfile, "wb")) return false;
 
-    std::ofstream fs(cfile);
-    if(!fs.is_open()) return false;
-
-    Dump(fs);
-    fs.close();
-
-    return true;
-}
-
-void TinyConfig::Dump(std::ostream & os) const
-{
     for(const_iterator
 	it = begin(); it != end(); ++it)
-	os << it->first << " " << separator << " " << it->second << std::endl;
+	sf << it->first << " " << separator << " " << it->second << '\n';
+
+    return true;
 }
 
 void TinyConfig::Clear(void)

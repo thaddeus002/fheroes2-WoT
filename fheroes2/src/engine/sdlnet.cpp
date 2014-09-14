@@ -67,7 +67,7 @@ u32 Network::Socket::Host(void) const
 {
     IPaddress* remoteIP = sd ? SDLNet_TCP_GetPeerAddress(sd) : NULL;
     if(remoteIP) return SDLNet_Read32(&remoteIP->host);
-    Error::Message(__FUNCTION__, SDLNet_GetError());
+    ERROR(SDLNet_GetError());
     return 0;
 }
 
@@ -75,7 +75,7 @@ u16 Network::Socket::Port(void) const
 {
     IPaddress* remoteIP = sd ? SDLNet_TCP_GetPeerAddress(sd) : NULL;
     if(remoteIP) return SDLNet_Read16(&remoteIP->port);
-    Error::Message(__FUNCTION__, SDLNet_GetError());
+    ERROR(SDLNet_GetError());
     return 0;
 }
 
@@ -152,7 +152,7 @@ bool Network::Socket::Open(IPaddress & ip)
     Assign(SDLNet_TCP_Open(&ip));
 
     if(! sd)
-	Error::Message(__FUNCTION__, SDLNet_GetError());
+	ERROR(SDLNet_GetError());
 
     return sd;
 }
@@ -190,7 +190,7 @@ bool Network::Init(void)
 {
     if(SDLNet_Init() < 0)
     {
-	Error::Message(__FUNCTION__, SDLNet_GetError());
+	ERROR(SDLNet_GetError());
         return false;
     }
     return true;
@@ -205,7 +205,7 @@ bool Network::ResolveHost(IPaddress & ip, const char* host, u16 port)
 {
     if(SDLNet_ResolveHost(&ip, host, port) < 0)
     {
-	Error::Message(__FUNCTION__, SDLNet_GetError());
+	ERROR(SDLNet_GetError());
 	return false;
     }
     return true;

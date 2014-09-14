@@ -22,12 +22,12 @@
 
 #include <utility>
 #include <iomanip>
-#include <iostream>
 #include <fstream>
 #include <list>
 #include <vector>
 
 #include "engine.h"
+#include "system.h"
 
 #define TAG_FORM	0x464F524D
 #define TAG_XDIR	0x58444952
@@ -90,7 +90,7 @@ pack_t unpackValue(const u8* ptr)
     {
         if(4 <= p - ptr)
         {
-            std::cerr << "unpack delta mistake" << std::endl;
+            ERROR("unpack delta mistake");
             break;
         }
 
@@ -221,7 +221,7 @@ struct XMIData
 				timb = sb.getRaw(iff.length);
 				if(timb.size() != iff.length)
 				{
-				    std::cerr << "parse error: " << "out of range";
+				    ERROR("parse error: " << "out of range");
 				    break;
 				}
 				sb >> iff;
@@ -237,7 +237,7 @@ struct XMIData
 			    // EVNT
 			    if(iff.ID != TAG_EVNT)
 			    {
-				std::cerr << "parse error: " << "evnt";
+				ERROR("parse error: " << "evnt");
 				break;
 			    }
 
@@ -245,22 +245,22 @@ struct XMIData
 
 			    if(evnt.size() != iff.length)
 			    {
-				std::cerr << "parse error: " << "out of range";
+				ERROR("parse error: " << "out of range");
 				break;
 			    }
 			}
 			else
-			    std::cerr << "unknown tag: " << group.ID << " (expected FORM), " << group.type << " (expected XMID)";
+			    ERROR("unknown tag: " << group.ID << " (expected FORM), " << group.type << " (expected XMID)");
 		    }
 		}
 		else
-		    std::cerr << "parse error: " << "cat xmid";
+		    ERROR("parse error: " << "cat xmid");
 	    }
 	    else
-		std::cerr << "parse error: " << "info";
+		ERROR("parse error: " << "info");
 	}
 	else
-	    std::cerr << "parse error: " << "form xdir";
+	    ERROR("parse error: " << "form xdir");
     }
 
     bool isvalid(void) const
@@ -436,8 +436,8 @@ struct MidEvents : std::list<MidEvent>
             	    // unused command
             	    default:
 			push_back(MidEvent(0, 0xFF, 0x2F, 0));
-                	std::cerr << "unknown st: 0x" << std::setw(2) << std::setfill('0') << std::hex <<
-			    static_cast<int>(*ptr) << ", ln: " << static_cast<int>(& t.evnt[0] + t.evnt.size() - ptr) << std::endl;
+                	ERROR("unknown st: 0x" << std::setw(2) << std::setfill('0') << std::hex <<
+			    static_cast<int>(*ptr) << ", ln: " << static_cast<int>(& t.evnt[0] + t.evnt.size() - ptr));
             	    break;
 		}
             }

@@ -26,7 +26,6 @@ struct Error
 {
     class Exception{};
     static void Except(const char* func, const char* message);
-    static void Message(const char* func, const char* message);
 };
 
 #endif

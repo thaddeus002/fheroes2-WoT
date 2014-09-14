@@ -37,7 +37,7 @@ FontTTF::~FontTTF()
 
 void FontTTF::Init(void)
 {
-    if(0 != TTF_Init()) Error::Message(__FUNCTION__, SDL_GetError());
+    if(0 != TTF_Init()) ERROR(SDL_GetError());
 }
 
 void FontTTF::Quit(void)
@@ -54,7 +54,7 @@ bool FontTTF::Open(const std::string & filename, int size)
 {
     if(ptr) TTF_CloseFont(ptr);
     ptr = TTF_OpenFont(filename.c_str(), size);
-    if(!ptr) Error::Message(__FUNCTION__, SDL_GetError());
+    if(!ptr) ERROR(SDL_GetError());
     return ptr;
 }
 
@@ -119,7 +119,7 @@ FontPSF::FontPSF(const std::string & fn, const Size & sz) : size(sz)
 {
     buf = LoadFileToMem(fn);
     if(buf.empty())
-	Error::Message(__FUNCTION__, "empty buffer");
+	ERROR("empty buffer");
 }
 
 Surface FontPSF::RenderText(const std::string & msg, const RGBA & color) const

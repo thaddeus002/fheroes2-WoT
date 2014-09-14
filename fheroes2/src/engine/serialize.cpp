@@ -25,10 +25,7 @@
 #include <iomanip>
 #include <iostream>
 
-#include "types.h"
-#include "rect.h"
-#include "error.h"
-#include "zzlib.h"
+#include "engine.h"
 #include "serialize.h"
 
 #define MINCAPACITY 1024
@@ -394,7 +391,7 @@ StreamFile::StreamFile(const std::string & fn, const char* mode)
 bool StreamFile::open(const std::string & fn, const char* mode)
 {
     rw = SDL_RWFromFile(fn.c_str(), mode);
-    if(! rw) Error::Message(__FUNCTION__, SDL_GetError());
+    if(! rw) ERROR(SDL_GetError());
     return rw;
 }
 
@@ -431,7 +428,7 @@ StreamBuf::StreamBuf(const u8* ptr, size_t sz) : buf(NULL), len(0)
     len = sz;
 
     rw = SDL_RWFromConstMem(buf, len);
-    if(! rw) Error::Message(__FUNCTION__, SDL_GetError());
+    if(! rw) ERROR(SDL_GetError());
 
     setconstbuf(true);
 
@@ -448,7 +445,7 @@ StreamBuf::StreamBuf(const std::vector<u8> & v) : buf(NULL), len(0)
     len = v.size();
 
     rw = SDL_RWFromConstMem(buf, len);
-    if(! rw) Error::Message(__FUNCTION__, SDL_GetError());
+    if(! rw) ERROR(SDL_GetError());
 
     setconstbuf(true);
 
@@ -464,7 +461,7 @@ StreamBuf::StreamBuf(size_t sz) : buf(NULL), len(sz)
     if(len < MINCAPACITY) len = MINCAPACITY;
     buf = new u8 [len];
     rw = SDL_RWFromMem(buf, len);
-    if(! rw) Error::Message(__FUNCTION__, SDL_GetError());
+    if(! rw) ERROR(SDL_GetError());
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
     setbigendian(true);

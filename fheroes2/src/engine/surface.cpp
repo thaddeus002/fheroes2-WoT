@@ -443,7 +443,7 @@ void Surface::SetDefaultDepth(u32 depth)
     switch(depth)
     {
 	case 24:
-	    Error::Message(__FUNCTION__, "switch to 32 bpp colors");
+	    ERROR("switch to 32 bpp colors");
 	    default_depth = 32;
 	    break;
 
@@ -451,7 +451,7 @@ void Surface::SetDefaultDepth(u32 depth)
 	case 15:
 	case 16:
 #if SDL_VERSION_ATLEAST(2, 0, 0)
-	    Error::Message(__FUNCTION__, "switch to 32 bpp colors");
+	    ERROR("switch to 32 bpp colors");
 	    default_depth = 32;
 #else
 	    default_depth = depth;
@@ -489,7 +489,7 @@ bool Surface::Load(const std::string & fn)
 #endif
 
     if(!surface)
-	Error::Message(__FUNCTION__, SDL_GetError());
+	ERROR(SDL_GetError());
 
     return surface;
 }
@@ -510,7 +510,7 @@ bool Surface::Save(const std::string & fn) const
 
     if(0 != res)
     {
-	Error::Message(__FUNCTION__, SDL_GetError());
+	ERROR(SDL_GetError());
 	return false;
     }
 

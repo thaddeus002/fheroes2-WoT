@@ -384,18 +384,18 @@ bool AGG::CheckMemoryLimit(void)
 
 	if(0 < usage && conf.MemoryLimit() < usage)
 	{
-    	    VERBOSE("MemoryLimit: " << "settings: " << conf.MemoryLimit() << ", game usage: " << usage);
+    	    VERBOSE("settings: " << conf.MemoryLimit() << ", game usage: " << usage);
     	    const u32 freemem = ClearFreeObjects();
-    	    VERBOSE("MemoryLimit: " << "free " << freemem);
+    	    VERBOSE("free " << freemem);
 
     	    usage = System::GetMemoryUsage();
 
     	    if(conf.MemoryLimit() < usage + (300 * 1024))
     	    {
-        	VERBOSE("MemoryLimit: " << "settings: " << conf.MemoryLimit() << ", too small");
+        	VERBOSE("settings: " << conf.MemoryLimit() << ", too small");
         	// increase + 300Kb
         	conf.SetMemoryLimit(usage + (300 * 1024));
-        	VERBOSE("MemoryLimit: " << "settings: " << "increase limit on 300kb, current value: " << conf.MemoryLimit());
+        	VERBOSE("settings: " << "increase limit on 300kb, current value: " << conf.MemoryLimit());
     	    }
 
 	    return true;
@@ -1795,6 +1795,7 @@ bool AGG::Init(void)
 
     if(conf.Unicode())
     {
+        DEBUG(DBG_ENGINE, DBG_INFO, "fonts: " << font1 << ", " << font2);
 	if(!fonts[1].Open(font1, conf.FontsNormalSize()) ||
 	   !fonts[0].Open(font2, conf.FontsSmallSize())) conf.SetUnicode(false);
     }

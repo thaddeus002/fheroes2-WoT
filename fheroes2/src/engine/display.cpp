@@ -20,7 +20,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -108,11 +107,15 @@ void Display::Flip(void)
     if(tx)
     {
 	if(0 != SDL_SetRenderTarget(renderer, NULL))
-    	    Error::Message(__FUNCTION__, SDL_GetError());
+	{
+    	    ERROR(SDL_GetError());
+	}
 	else
 	{
 	    if(0 != SDL_RenderCopy(renderer, tx, NULL, NULL))
-    		Error::Message(__FUNCTION__, SDL_GetError());
+	    {
+    		ERROR(SDL_GetError());
+	    }
 	    else
 		SDL_RenderPresent(renderer);
 	}
@@ -120,7 +123,7 @@ void Display::Flip(void)
 	SDL_DestroyTexture(tx);
     }
     else
-    	Error::Message(__FUNCTION__, SDL_GetError());
+    	ERROR(SDL_GetError());
 #else
     SDL_Flip(surface);
 #endif
@@ -206,7 +209,7 @@ Size Display::GetMaxMode(bool rotate) const
     if(modes == (SDL_Rect **) 0 ||
 	modes == (SDL_Rect **) -1)
     {
-        std::cerr <<  "Display::" << "GetMaxMode: " << "no modes available" << std::endl;
+        ERROR("GetMaxMode: " << "no modes available");
     }
     else
     {
@@ -263,11 +266,11 @@ Surface Display::GetSurface(const Rect & rt) const
 
 
     if(! sf)
-        Error::Message(__FUNCTION__, SDL_GetError());
+        ERROR(SDL_GetError());
     else
     {
         if(0 != SDL_RenderReadPixels(renderer, &srcrect, SDL_PIXELFORMAT_ARGB8888, sf->pixels, sf->pitch))
-            Error::Message(__FUNCTION__, SDL_GetError());
+            ERROR(SDL_GetError());
 
         res.Set(sf);
     }
@@ -386,7 +389,7 @@ Texture::Texture(const Surface & sf) : texture(NULL), counter(NULL)
     texture = SDL_CreateTextureFromSurface(display.renderer, sf());
 
     if(!texture)
-	Error::Message(__FUNCTION__, SDL_GetError());
+	ERROR(SDL_GetError());
 
     counter = new int;
     *counter = 1;
@@ -474,11 +477,13 @@ void Texture::Blit(const Rect & srt, const Point & dpt, Display & display) const
     SDL_Rect dstrt = SDLRect(dpt.x, dpt.y, srt.w, srt.h);
 
     if(0 != SDL_SetRenderTarget(display.renderer, NULL))
-    	Error::Message(__FUNCTION__, SDL_GetError());
+    {
+    	ERROR(SDL_GetError());
+    }
     else
     {
 	if(0 != SDL_RenderCopy(display.renderer, texture, &srcrt, &dstrt))
-    	    Error::Message(__FUNCTION__, SDL_GetError());
+    	    ERROR(SDL_GetError());
     }
 }
 

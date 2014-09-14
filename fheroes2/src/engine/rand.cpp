@@ -22,8 +22,9 @@
 
 #include <cstdlib>
 #include <ctime>
-#include <iostream>
 #include <iterator>
+
+#include "system.h"
 #include "rand.h"
 
 
@@ -90,6 +91,6 @@ s32 Rand::Queue::Get(void)
         if(rand <= amount) return (*it).first;
     }
 
-    std::cerr << "Rand::Queue::Get:" << " weight not found, return 0" << std::endl;
+    ERROR("weight not found, return 0");
     return 0;
 }

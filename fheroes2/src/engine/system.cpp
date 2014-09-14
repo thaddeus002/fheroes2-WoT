@@ -110,7 +110,7 @@ ListFiles System::GetListFiles(const std::string & prog, const std::string & pre
     ListFiles res;
 
 #if defined(ANDROID)
-    VERBOSE("get list: " << prefix << ", " << filter);
+    VERBOSE(prefix << ", " << filter);
 
     // check assets
     StreamFile sf;
@@ -285,28 +285,28 @@ std::string System::GetTime(void)
 
 bool System::IsFile(const std::string & name, bool writable)
 {
+#if defined(ANDROID)
+    return writable ? 0 == access(name.c_str(), W_OK) : true;
+#else
     struct stat fs;
 
     if(stat(name.c_str(), &fs) || !S_ISREG(fs.st_mode))
         return false;
 
-#if defined(ANDROID)
-    return writable ? 0 == access(name.c_str(), W_OK) : true;
-#else
     return writable ? 0 == access(name.c_str(), W_OK) : S_IRUSR & fs.st_mode;
 #endif
 }
 
 bool System::IsDirectory(const std::string & name, bool writable)
 {
+#if defined (ANDROID)
+    return writable ? 0 == access(name.c_str(), W_OK) : true;
+#else
     struct stat fs;
 
     if(stat(name.c_str(), &fs) || !S_ISDIR(fs.st_mode))
         return false;
 
-#if defined (ANDROID)
-    return writable ? 0 == access(name.c_str(), W_OK) : true;
-#else
     return writable ? 0 == access(name.c_str(), W_OK) : S_IRUSR & fs.st_mode;
 #endif
 }

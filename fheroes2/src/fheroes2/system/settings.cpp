@@ -37,7 +37,7 @@
 
 bool IS_DEBUG(int name, int level)
 {
-    const int debug = Settings::Get().Debug();
+    const int debug = 0xffff; //Settings::Get().Debug();
     return
         ((DBG_ENGINE & name) && ((DBG_ENGINE & debug) >> 2) >= level) ||
         ((DBG_GAME & name) && ((DBG_GAME & debug) >> 4) >= level) ||
@@ -225,7 +225,12 @@ Settings::Settings() : debug(DEFAULT_DEBUG), video_mode(0, 0), game_difficulty(D
     opt_global.SetModes(GLOBAL_SHOWBUTTONS);
     opt_global.SetModes(GLOBAL_SHOWSTATUS);
     if(System::isEmbededDevice())
+    {
 	opt_global.SetModes(GLOBAL_POCKETPC);
+	ExtSetModes(POCKETPC_HIDE_CURSOR);
+	ExtSetModes(POCKETPC_TAP_MODE);
+	ExtSetModes(POCKETPC_DRAG_DROP_SCROLL);
+    }
 }
 
 Settings::~Settings()
@@ -246,7 +251,7 @@ bool Settings::Read(const std::string & filename)
     std::string sval; int ival;
     LocalEvent & le = LocalEvent::Get();
 
-    if(! config.Load(filename.c_str())) return false;
+    if(! config.Load(filename)) return false;
 
     // debug
     ival = config.IntParams("debug");

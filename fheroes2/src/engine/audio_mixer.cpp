@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include <iostream>
+
 #include "engine.h"
 #include "audio.h"
 #include "audio_cdrom.h"
@@ -61,7 +61,7 @@ void Mixer::Init(void)
 
         if(0 != Mix_OpenAudio(hardware.freq, hardware.format, hardware.channels, hardware.samples))
         {
-            std::cerr << "Mixer: " << SDL_GetError() << std::endl;
+            ERROR(SDL_GetError());
             valid = false;
         }
         else
@@ -75,7 +75,7 @@ void Mixer::Init(void)
     }
     else
     {
-        std::cerr << "Mixer: audio subsystem not initialize" << std::endl;
+        ERROR("audio subsystem not initialize");
         valid = false;
     }
 }
@@ -105,21 +105,21 @@ void Mixer::FreeChunk(chunk_t* sample)
 Mixer::chunk_t* Mixer::LoadWAV(const char* file)
 {
     Mix_Chunk *sample = Mix_LoadWAV(file);
-    if(!sample) std::cerr << "Mixer::LoadWAV: " << Mix_GetError() << std::endl;
+    if(!sample) ERROR(SDL_GetError());
     return sample;
 }
 
 Mixer::chunk_t* Mixer::LoadWAV(const u8* ptr, u32 size)
 {
     Mix_Chunk *sample = Mix_LoadWAV_RW(SDL_RWFromConstMem(ptr, size), 1);
-    if(!sample) std::cerr << "Mixer::LoadWAV: "<< Mix_GetError() << std::endl;
+    if(!sample) ERROR(SDL_GetError());
     return sample;
 }
 
 int Mixer::Play(chunk_t* sample, int channel, bool loop)
 {
     int res = Mix_PlayChannel(channel, sample, loop ? -1 : 0);
-    if(res == -1) std::cerr << "Mixer::Play: " << Mix_GetError() << std::endl;;
+    if(res == -1) ERROR(SDL_GetError());
     return res;
 }
 
@@ -288,7 +288,7 @@ void Mixer::Init(void)
 
 	if(0 > SDL_OpenAudio(&spec, &Audio::GetHardwareSpec()))
         {
-            std::cerr << "Mixer::Init: " << SDL_GetError() << std::endl;
+            ERROR(SDL_GetError());
             valid = false;
         }
         else
@@ -300,7 +300,7 @@ void Mixer::Init(void)
     }
     else
     {
-        std::cerr << "Mixer::Init: audio subsystem not initialize" << std::endl;
+        ERROR("audio subsystem not initialize");
         valid = false;
     }
 }
@@ -377,7 +377,7 @@ int Mixer::Play(const u8* ptr, u32 size, int channel, bool loop)
 	        it = std::find_if(chunks.begin() + reserved_channels, chunks.end(), PredicateIsFreeSound);
 		if(it == chunks.end())
 		{
-		    std::cerr << "Mixer::PlayRAW: mixer is full" << std::endl;
+		    ERROR("mixer is full");
 		    return -1;
 		}
 	    }

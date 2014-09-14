@@ -30,8 +30,6 @@
 
 #if defined(__SYMBIAN32__)
 #define VERBOSE(x)
-#undef DEBUG
-#define DEBUG(x, y, z)
 #elif defined(ANDROID)
 #include <android/log.h>
 namespace std
@@ -39,10 +37,13 @@ namespace std
     static const char* android_endl = "\n";
 }
 #define endl android_endl
-#define VERBOSE(x) if(true) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "SDLHeroes2", "%s", osss.str().c_str()); }
+#define COUT(x) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "SDLHeroes2", "%s", osss.str().c_str()); }
 #else
-#define VERBOSE(x) std::cout << x << std::endl
+#define COUT(x) { std::cout << x << std::endl; }
 #endif
+
+#define VERBOSE(x) { COUT(System::GetTime() << ": [VERBOSE]\t" << __FUNCTION__ << ":  " << x); }
+#define ERROR(x) { COUT(System::GetTime() << ": [ERROR]\t" << __FUNCTION__ << ":  " << x); }
 
 #include "dir.h"
 

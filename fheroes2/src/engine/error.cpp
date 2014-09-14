@@ -28,13 +28,7 @@
 /* exception */
 void Error::Except(const char* func, const char* message)
 {
-    Error::Message(func, message);
 #ifndef ANDROID
     throw Exception();
 #endif
-}
-
-void Error::Message(const char* func, const char* message)
-{
-    VERBOSE(func << ": " << message);
 }

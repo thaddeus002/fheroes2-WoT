@@ -20,7 +20,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <iostream>
+#include "system.h"
 #include "thread.h"
 
 using namespace SDL;
@@ -159,5 +159,5 @@ u32 Time::Get(void) const
 
 void Time::Print(const char* header) const
 {
-    std::cerr << (header ? header : "time: ") << Get() << " ms" << std::endl;
+    ERROR((header ? header : "time: ") << Get() << " ms");
 }
