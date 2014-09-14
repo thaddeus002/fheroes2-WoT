@@ -485,7 +485,9 @@ bool Surface::Load(const std::string & fn)
 
 #ifdef WITH_IMAGE
     surface = IMG_Load(fn.c_str());
+#if SDL_VERSION_ATLEAST(2, 0, 0)
     SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
+#endif
 #else
     surface = SDL_LoadBMP(fn.c_str());
 #endif
