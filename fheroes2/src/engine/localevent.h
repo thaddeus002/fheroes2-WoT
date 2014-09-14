@@ -27,8 +27,6 @@
 #include "thread.h"
 #include "types.h"
 
-enum KeyMod { MOD_NONE = KMOD_NONE, MOD_CTRL = KMOD_CTRL, MOD_SHIFT = KMOD_SHIFT, MOD_ALT = KMOD_ALT, MOD_CAPS = KMOD_CAPS, MOD_NUM = KMOD_NUM };
-
 enum KeySym
 {
     KEY_NONE		= -1,

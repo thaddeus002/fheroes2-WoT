@@ -28,9 +28,13 @@
 #include <cstring>
 #include <climits>
 #include <cctype>
-#include "error.h"
+
 #include "types.h"
+#include "error.h"
 #include "tools.h"
+
+enum KeyMod { MOD_NONE = KMOD_NONE,
+    MOD_CTRL = KMOD_CTRL, MOD_SHIFT = KMOD_SHIFT, MOD_ALT = KMOD_ALT, MOD_CAPS = KMOD_CAPS, MOD_NUM = KMOD_NUM };
 
 /* trim left right space */
 std::string StringTrim(std::string str)

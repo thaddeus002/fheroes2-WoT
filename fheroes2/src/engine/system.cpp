@@ -25,7 +25,8 @@
 #include <fstream>
 #include <cctype>
 #include <cstdlib>
-#include <clocale>
+#include <locale>
+//#include <clocale>
 
 #include "SDL.h"
 #include "system.h"
@@ -221,8 +222,9 @@ void System::SetMessageLocale(const std::string & locale)
 
 std::string System::GetMessageLocale(int length /* 1, 2, 3 */)
 {
+    std::string locname;
 #if ! defined(__MINGW32CE__)
-    std::string locname = StringLower(setlocale(LC_MESSAGES, NULL));
+    locname = StringLower(setlocale(LC_MESSAGES, NULL));
     // 3: en_us.utf-8
     // 2: en_us
     // 1: en
@@ -231,8 +233,8 @@ std::string System::GetMessageLocale(int length /* 1, 2, 3 */)
 	std::list<std::string> list = StringSplit(locname, length < 2 ? "_" : ".");
 	return list.empty() ? locname : list.front();
     }
-    return locname;
 #endif
+    return locname;
 }
 
 int System::GetCommandOptions(int argc, char* const argv[], const char* optstring)
@@ -469,10 +471,9 @@ int System::GetRenderFlags(void)
  #endif
  #if defined(__WIN32__) || defined(ANDROID)
     return SDL_RENDERER_ACCELERATED;
-    //return SDL_RENDERER_SOFTWARE;
  #endif
-    return SDL_RENDERER_ACCELERATED;
-    //return SDL_RENDERER_SOFTWARE;
+    //return SDL_RENDERER_ACCELERATED;
+    return SDL_RENDERER_SOFTWARE;
 #else
  #if defined(__MINGW32CE__) || defined(__SYMBIAN32__)
     return SDL_SWSURFACE;

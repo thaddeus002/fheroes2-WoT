@@ -24,8 +24,10 @@
 
 #include <list>
 #include <string>
-#include "localevent.h"
+
 #include "types.h"
+#include "rect.h"
+#include "localevent.h"
 
 std::string		GetString(int);
 std::string		GetStringShort(int);

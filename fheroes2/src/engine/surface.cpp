@@ -292,7 +292,9 @@ Surface::Surface(const void* pixels, u32 width, u32 height, u32 bytes_per_pixel 
     {
 	surface = SDL_CreateRGBSurfaceFrom(const_cast<void *>(pixels), width, height, fm.depth, width * bytes_per_pixel,
 		fm.rmask, fm.gmask, fm.bmask, amask ? fm.amask : 0);
+#if SDL_VERSION_ATLEAST(2, 0, 0)
 	SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
+#endif
     }
 
     if(!surface)
