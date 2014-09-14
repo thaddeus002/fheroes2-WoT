@@ -66,6 +66,10 @@ extern HWND SDL_Window;
 #define SEPARATOR '/'
 #endif
 
+#include "serialize.h"
+#include "tools.h"
+#include "dir.h"
+
 int System::MakeDirectory(const std::string & path)
 {
 #if defined(__SYMBIAN32__)
@@ -82,21 +86,69 @@ std::string System::ConcatePath(const std::string & str1, const std::string & st
     return std::string(str1 + SEPARATOR + str2);
 }
 
-std::list<std::string> System::GetExtendedDirectories(void)
+std::string System::GetHomeDirectory(const std::string & prog)
 {
-    std::list<std::string> res;
-    
+    std::string res;
+
 #if SDL_VERSION_ATLEAST(2, 0, 0)
-    char* path = SDL_GetPrefPath("", "fheroes2");
-    res.push_back(path);
+    char* path = SDL_GetPrefPath("", prog.c_str());
+    res = path;
     SDL_free(path);
 #endif
+    
+    if(System::GetEnvironment("HOME"))
+        res = System::ConcatePath(System::GetEnvironment("HOME"), std::string(".").append(prog));
+    else
+    if(System::GetEnvironment("APPDATA"))
+        res = System::ConcatePath(System::GetEnvironment("APPDATA"), prog);
+
+    return res;
+}
+
+ListFiles System::GetListFiles(const std::string & prog, const std::string & prefix, const std::string & filter)
+{
+    ListFiles res;
 
 #if defined(ANDROID)
-    res.push_back(SDL_AndroidGetInternalStoragePath());
+    VERBOSE("get list: " << prefix << ", " << filter);
 
-    if(SDL_ANDROID_EXTERNAL_STORAGE_READ & SDL_AndroidGetExternalStorageState())
-        res.push_back(SDL_AndroidGetExternalStoragePath());
+    // check assets
+    StreamFile sf;
+    if(sf.open("assets.list", "rb"))
+    {
+	std::list<std::string> rows = StringSplit(GetString(sf.getRaw(sf.size())), "\n");
+	for(std::list<std::string>::const_iterator
+	    it = rows.begin(); it != rows.end(); ++it)
+	if(prefix.empty() ||
+	    ((prefix.size() <= (*it).size() &&
+		0 == prefix.compare((*it).substr(0, prefix.size())))))
+	{
+	    if(filter.empty() ||
+		(0 == filter.compare((*it).substr((*it).size() - filter.size(), filter.size()))))
+		res.push_back(*it);
+	}
+    }
+
+    ListDirs dirs;
+
+    const char* internal = SDL_AndroidGetInternalStoragePath();
+    if(internal) dirs.push_back(internal);
+
+    if(SDL_ANDROID_EXTERNAL_STORAGE_READ && SDL_AndroidGetExternalStorageState())
+    {
+	const char* external = SDL_AndroidGetExternalStoragePath();
+	if(external) dirs.push_back(external);
+    }
+
+    dirs.push_back("/storage/sdcard0");
+    dirs.push_back("/storage/sdcard1");
+
+    for(ListDirs::const_iterator
+	it = dirs.begin(); it != dirs.end(); ++it)
+    {
+        const std::string path = System::ConcatePath(*it, prog);
+        res.ReadDir(prefix.size() ? System::ConcatePath(path, prefix) : path, filter, false);
+    }
 #endif
     return res;
 }
@@ -402,10 +454,11 @@ int System::GetRenderFlags(void)
     return SDL_RENDERER_SOFTWARE;
  #endif
  #if defined(__WIN32__) || defined(ANDROID)
-    return SDL_RENDERER_SOFTWARE;
+    return SDL_RENDERER_ACCELERATED;
+    //return SDL_RENDERER_SOFTWARE;
  #endif
-    //return SDL_RENDERER_ACCELERATED;
-    return SDL_RENDERER_SOFTWARE;
+    return SDL_RENDERER_ACCELERATED;
+    //return SDL_RENDERER_SOFTWARE;
 #else
  #if defined(__MINGW32CE__) || defined(__SYMBIAN32__)
     return SDL_SWSURFACE;

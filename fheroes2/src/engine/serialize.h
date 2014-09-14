@@ -194,18 +194,6 @@ public:
     }
 };
 
-class StreamFile : public StreamBase
-{
-public:
-    StreamFile() {}
-    StreamFile(const std::string &, const char* mode);
-
-    long int		size(void) const;
-    bool		read(void*, size_t);
-    bool		open(const std::string &, const char* mode);
-    void		close(void);
-};
-
 class StreamBuf : public StreamBase
 {
     u8*			buf;
@@ -228,6 +216,20 @@ public:
     const u8*		data(void) const { return buf; }
     u8*			data(void) { return buf; }
     size_t		size(void) const { return len; }
+};
+
+class StreamFile : public StreamBase
+{
+public:
+    StreamFile() {}
+    StreamFile(const std::string &, const char* mode);
+
+    long int		size(void) const;
+    bool		read(void*, size_t);
+    bool		open(const std::string &, const char* mode);
+    void		close(void);
+
+    StreamBuf		toStreamBuf(void);
 };
 
 #endif

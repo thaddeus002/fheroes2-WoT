@@ -406,7 +406,6 @@ public:
     static std::string	GetWriteableDir(const char*);
     static std::string	GetSaveDir(void);
     static std::string	GetLangDir(void);
-    static std::string	GetHomeDir(void);
 
     // deprecated
     const std::string & GetDataParams(void) const { return data_params; }

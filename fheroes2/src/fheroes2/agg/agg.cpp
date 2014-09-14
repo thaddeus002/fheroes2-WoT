@@ -410,15 +410,6 @@ bool AGG::ReadDataDir(void)
 {
     Settings & conf = Settings::Get();
 
-#if defined(ANDROID)
-    // read from assets
-    heroes2_agg.Open("data/heroes2.agg");
-    heroes2x_agg.Open("data/heroes2x.agg");
-
-    if(heroes2x_agg.isGood()) conf.SetPriceLoyaltyVersion();
-    if(heroes2_agg.isGood()) return true;
-#endif
-
     ListFiles aggs = conf.GetListFiles("data", ".agg");
     const std::string & other_data = conf.GetDataParams();
 

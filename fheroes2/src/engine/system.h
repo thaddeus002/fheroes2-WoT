@@ -44,6 +44,8 @@ namespace std
 #define VERBOSE(x) std::cout << x << std::endl
 #endif
 
+#include "dir.h"
+
 namespace System
 {
     int		SetEnvironment(const char* name, const char* value);
@@ -51,8 +53,8 @@ namespace System
 
     int		MakeDirectory(const std::string &);
     std::string	ConcatePath(const std::string &, const std::string &);
-    std::list<std::string>
-		GetExtendedDirectories(void);
+    ListFiles	GetListFiles(const std::string &, const std::string &, const std::string &);
+    std::string GetHomeDirectory(const std::string &);
 
     std::string GetDirname(const std::string &);
     std::string GetBasename(const std::string &);

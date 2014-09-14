@@ -22,6 +22,7 @@
 #ifndef H2TOOLS_H
 #define H2TOOLS_H
 
+#include <list>
 #include <string>
 #include "localevent.h"
 #include "types.h"
@@ -40,6 +41,8 @@ int			Sign(int);
 std::string		StringTrim(std::string);
 std::string		StringLower(std::string);
 std::string		StringUpper(std::string);
+
+std::list<std::string>	StringSplit(const std::string &, const std::string &);
 
 void			StringReplace(std::string &, const char*, const std::string &);
 void			StringReplace(std::string &, const char*, int);

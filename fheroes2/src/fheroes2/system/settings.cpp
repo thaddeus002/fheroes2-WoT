@@ -608,28 +608,10 @@ void Settings::SetProgramPath(const char* argv0)
     if(argv0) path_program = argv0;
 }
 
-std::string Settings::GetHomeDir(void)
-{
-    std::string home;
-
-    if(System::GetEnvironment("HOME"))
-	home = System::ConcatePath(System::GetEnvironment("HOME"), ".fheroes2");
-    else
-    if(System::GetEnvironment("APPDATA"))
-	home = System::ConcatePath(System::GetEnvironment("APPDATA"), "fheroes2");
-
-    return home;
-}
-
 ListDirs Settings::GetRootDirs(void)
 {
     const Settings & conf = Settings::Get();
     ListDirs dirs;
-
-    std::list<std::string> exts = System::GetExtendedDirectories();
-    for(std::list<std::string>::const_iterator
-	it = exts.begin(); it != exts.end(); ++it)
-	dirs.push_back(*it);
 
     // from build
 #ifdef CONFIGURE_FHEROES2_DATA
@@ -644,7 +626,7 @@ ListDirs Settings::GetRootDirs(void)
     dirs.push_back(System::GetDirname(conf.path_program));
 
     // from HOME
-    const std::string & home = GetHomeDir();
+    const std::string & home = System::GetHomeDirectory("fheroes2");
     if(! home.empty()) dirs.push_back(home);
 
     return dirs;
@@ -671,6 +653,8 @@ ListFiles Settings::GetListFiles(const std::string & prefix, const std::string &
 	    DEBUG(DBG_ENGINE, DBG_WARN, "path not found: " << path);
 	}
     }
+
+    res.Append(System::GetListFiles("fheroes2", prefix, filter));
 
     return res;
 }

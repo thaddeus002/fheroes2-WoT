@@ -418,6 +418,13 @@ bool StreamFile::read(void* buf, size_t sz)
     return ! fail();
 }
 
+StreamBuf StreamFile::toStreamBuf(void)
+{
+    StreamBuf buf(size() - tell());
+    read(buf.data(), buf.size());
+    return buf;
+}
+
 StreamBuf::StreamBuf(const u8* ptr, size_t sz) : buf(NULL), len(0)
 {
     buf = const_cast<u8*>(ptr);

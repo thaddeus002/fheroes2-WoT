@@ -200,6 +200,21 @@ void StringReplace(std::string & dst, const char* pred, int value)
     StringReplace(dst, pred, GetString(value));
 }
 
+std::list<std::string> StringSplit(const std::string & str, const std::string & sep)
+{
+    std::list<std::string> list;
+    size_t pos1 = 0;
+    size_t pos2 = std::string::npos;
+    
+    while(std::string::npos != (pos2 = str.find(sep, pos1)))
+    {
+        list.push_back(str.substr(pos1, pos2 - pos1));
+        pos1 = pos2 + sep.size();
+    }
+
+    return list;
+}
+
 std::string InsertString(const std::string & src, size_t pos, const char* c)
 {
     std::string res = src;

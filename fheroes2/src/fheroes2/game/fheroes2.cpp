@@ -280,7 +280,7 @@ void ReadConfigs(void)
 
 void InitHomeDir(void)
 {
-    const std::string & home = Settings::GetHomeDir();
+    const std::string home = System::GetHomeDirectory("fheroes2");
 
     if(! home.empty())
     {

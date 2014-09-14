@@ -23,8 +23,7 @@
 #include <dirent.h>
 
 #include "system.h"
-#include "gamedefs.h"
-#include "settings.h"
+#include "tools.h"
 #include "dir.h"
 
 
@@ -37,7 +36,6 @@ void ListFiles::ReadDir(const std::string &path, const std::string &filter, bool
 {
     // read directory
     DIR *dp = opendir(path.c_str());
-    DEBUG(DBG_ENGINE, DBG_INFO, (filter.size() ? path + " (" + filter + ")" : path));
 
     if(dp)
     {
