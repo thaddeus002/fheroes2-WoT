@@ -37,7 +37,7 @@
 
 bool IS_DEBUG(int name, int level)
 {
-    const int debug = 0xffff; //Settings::Get().Debug();
+    const int debug = Settings::Get().Debug();
     return
         ((DBG_ENGINE & name) && ((DBG_ENGINE & debug) >> 2) >= level) ||
         ((DBG_GAME & name) && ((DBG_GAME & debug) >> 4) >= level) ||
@@ -213,7 +213,7 @@ std::string Settings::GetVersion(void)
 
 /* constructor */
 Settings::Settings() : debug(DEFAULT_DEBUG), video_mode(0, 0), game_difficulty(Difficulty::NORMAL),
-    font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), force_lang("en"), size_normal(15), size_small(10),
+    font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), heroes_speed(DEFAULT_SPEED_DELAY), ai_speed(DEFAULT_SPEED_DELAY), scroll_speed(SCROLL_NORMAL), battle_speed(DEFAULT_SPEED_DELAY),
     blit_speed(0), game_type(0), preferably_count_players(0), port(DEFAULT_PORT), memory_limit(0)
 {

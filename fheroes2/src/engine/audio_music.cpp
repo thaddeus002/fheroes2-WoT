@@ -47,7 +47,9 @@ void Music::Play(Mix_Music* mix, u32 id, bool loop)
 	Mix_FadeInMusic(mix, loop ? -1 : 0, fadein) : Mix_PlayMusic(mix, loop ? -1 : 0);
 
     if(res < 0)
-    	std::cerr << "Music::Play: " << Mix_GetError() << std::endl;
+    {
+    	ERROR(Mix_GetError());
+    }
     else
 	music = mix;
 /*
@@ -112,7 +114,9 @@ void Music::Play(const std::string & file, bool loop)
 	Mix_Music* mix = Mix_LoadMUS(file.c_str());
 
 	if(! mix)
-    	    std::cerr << "Music::Play: " << Mix_GetError() << std::endl;
+	{
+    	    ERROR(Mix_GetError());
+	}
 	else
 	    Music::Play(mix, id, loop);
     }

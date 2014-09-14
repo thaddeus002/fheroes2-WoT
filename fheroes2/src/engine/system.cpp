@@ -20,7 +20,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <locale>
+#include <ctime>
 #include <sstream>
 #include <fstream>
 #include <cctype>
@@ -212,12 +212,26 @@ int System::SetEnvironment(const char* name, const char* value)
 #endif
 }
 
-char* System::SetLocale(const char* locale)
+void System::SetMessageLocale(const std::string & locale)
 {
 #if ! defined(__MINGW32CE__)
-    return setlocale(LC_ALL, locale);
-#else
-    return NULL;
+    setlocale(LC_MESSAGES, locale.c_str());
+#endif
+}
+
+std::string System::GetMessageLocale(int length /* 1, 2, 3 */)
+{
+#if ! defined(__MINGW32CE__)
+    std::string locname = StringLower(setlocale(LC_MESSAGES, NULL));
+    // 3: en_us.utf-8
+    // 2: en_us
+    // 1: en
+    if(length < 3)
+    {
+	std::list<std::string> list = StringSplit(locname, length < 2 ? "_" : ".");
+	return list.empty() ? locname : list.front();
+    }
+    return locname;
 #endif
 }
 

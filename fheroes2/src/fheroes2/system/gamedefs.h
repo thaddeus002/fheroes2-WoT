@@ -39,15 +39,8 @@ const char* strip_context(const char* c);
 #define GCC_REFERENCE_FAIL
 #endif
 
-#ifdef WITH_TTF
-#include <libintl.h>
+#include "libintl.h"
 #define _(s) strip_context(gettext(s))
-#else
-#define _(s) strip_context(s)
-#define ngettext(s1, s2, c) (c == 1 ? s1 : s2)
-#endif
-
-#define GETTEXT_PACKAGE "fheroes2"
 
 // hardcore defines: kingdom
 #define KINGDOMMAX			6

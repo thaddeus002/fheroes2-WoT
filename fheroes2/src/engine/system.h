@@ -62,7 +62,8 @@ namespace System
 
     std::string GetTime(void);
 
-    char*	SetLocale(const char* locale);
+    void	SetMessageLocale(const std::string &);
+    std::string	GetMessageLocale(int /* 3: en_us.utf-8, 2: en_us, 1: en */);
     size_t	GetMemoryUsage(void);
 
     int		GetCommandOptions(int argc, char* const argv[], const char* optstring);

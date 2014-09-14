@@ -319,17 +319,22 @@ void SetTimidityEnvPath(const Settings & conf)
 void SetLangEnvPath(const Settings & conf)
 {
 #ifdef WITH_TTF
-    if(conf.ForceLang().size())
+    System::SetMessageLocale("");
+
+    std::string mofile = conf.ForceLang().empty() ?
+		System::GetMessageLocale(1).append(".mo") :
+		std::string(conf.ForceLang()).append(".mo");
+
+    ListFiles translations = Settings::GetListFiles(System::ConcatePath("files", "lang"), mofile);
+
+    if(translations.size())
     {
-	System::SetEnvironment("LANGUAGE", conf.ForceLang().c_str());
-	System::SetEnvironment("LANG", conf.ForceLang().c_str());
+	if(! loadMessageCatalog("fheroes2", translations.back().c_str()))
+	    ERROR("bindtextdomain false: " << translations.back());
     }
+    else
+	ERROR("translation not found: " << mofile);
 
-    const std::string & strtmp = conf.GetLangDir();
-
-    System::SetLocale("en_US.UTF8");
-    bindtextdomain(GETTEXT_PACKAGE, strtmp.c_str());
-    bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
-    textdomain(GETTEXT_PACKAGE);
+    textdomain("fheroes2");
 #endif
 }

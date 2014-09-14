@@ -20,8 +20,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <cstring>
+#if defined(ANDROID)
 #include <locale>
+#endif
+#include <cstring>
 #include <algorithm>
 #include "difficulty.h"
 #include "color.h"
@@ -41,8 +43,8 @@
 template <typename CharType>
 bool AlphabeticalCompare(const std::basic_string<CharType> & lhs, const std::basic_string<CharType> & rhs)
 {
-    return std::use_facet< std::collate< CharType > >( std::locale() ).compare( lhs.data(), lhs.data() + lhs.size(),
-		    rhs.data(), rhs.data() + rhs.size() ) == -1;
+    return std::use_facet< std::collate<CharType> >(std::locale()).compare(lhs.data(), lhs.data() + lhs.size(),
+		    rhs.data(), rhs.data() + rhs.size()) == -1;
 }
 
 namespace Editor
