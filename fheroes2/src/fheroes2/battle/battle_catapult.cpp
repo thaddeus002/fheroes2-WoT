@@ -145,31 +145,3 @@ int Battle::Catapult::GetTarget(const std::vector<u32> & values) const
 
     return 0;
 }
-
-Battle::Command Battle::Catapult::GetCommand(Arena & arena) const
-{
-    u32 shots = cat_shots;
-    std::vector<u32> values(CAT_MISS + 1, 0);
-
-    values[CAT_WALL1] = arena.GetCastleTargetValue(CAT_WALL1);
-    values[CAT_WALL2] = arena.GetCastleTargetValue(CAT_WALL2);
-    values[CAT_WALL3] = arena.GetCastleTargetValue(CAT_WALL3);
-    values[CAT_WALL4] = arena.GetCastleTargetValue(CAT_WALL4);
-    values[CAT_TOWER1] = arena.GetCastleTargetValue(CAT_TOWER1);
-    values[CAT_TOWER2] = arena.GetCastleTargetValue(CAT_TOWER2);
-    values[CAT_TOWER3] = arena.GetCastleTargetValue(CAT_TOWER3);
-    values[CAT_BRIDGE] = arena.GetCastleTargetValue(CAT_BRIDGE);
-
-    Command cmd(MSG_BATTLE_CATAPULT);
-    cmd.GetStream() << shots;
-
-    while(shots--)
-    {
-        int target = GetTarget(values);
-        u32 damage = GetDamage(target, arena.GetCastleTargetValue(target));
-        cmd.GetStream() << target << damage;
-        values[target] -= damage;
-    }
-
-    return cmd;
-}

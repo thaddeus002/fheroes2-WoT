@@ -355,7 +355,7 @@ void Battle::Arena::TurnTroop(Unit* current_troop)
 	while(actions.size())
 	{
 	    // apply action
-	    ApplyAction(actions.front().GetStream());
+	    ApplyAction(actions.front());
 	    actions.pop_front();
 
 	    // rescan orders
@@ -509,14 +509,40 @@ void Battle::Arena::TowerAction(const Tower & twr)
     const Unit* enemy = GetEnemyMaxQuality(twr.GetColor());
 
     if(enemy)
-	ApplyAction(twr.GetCommand(*enemy).GetStream());
+    {
+	Command cmd(MSG_BATTLE_TOWER, twr.GetType(), enemy->GetUID());
+	ApplyAction(cmd);
+    }
 }
 
 void Battle::Arena::CatapultAction(void)
 {
     if(catapult)
     {
-	ApplyAction(catapult->GetCommand(*this).GetStream());
+	u32 shots = catapult->GetShots();
+	std::vector<u32> values(CAT_MISS + 1, 0);
+    
+	values[CAT_WALL1] = GetCastleTargetValue(CAT_WALL1);
+	values[CAT_WALL2] = GetCastleTargetValue(CAT_WALL2);
+	values[CAT_WALL3] = GetCastleTargetValue(CAT_WALL3);
+	values[CAT_WALL4] = GetCastleTargetValue(CAT_WALL4);
+	values[CAT_TOWER1] = GetCastleTargetValue(CAT_TOWER1);
+	values[CAT_TOWER2] = GetCastleTargetValue(CAT_TOWER2);
+	values[CAT_TOWER3] = GetCastleTargetValue(CAT_TOWER3);
+	values[CAT_BRIDGE] = GetCastleTargetValue(CAT_BRIDGE);
+
+	Command cmd(MSG_BATTLE_CATAPULT);
+
+	while(shots--)
+	{
+    	    int target = catapult->GetTarget(values);
+    	    u32 damage = catapult->GetDamage(target, GetCastleTargetValue(target));
+    	    cmd << damage << target;
+    	    values[target] -= damage;
+	}
+    
+	cmd << catapult->GetShots();
+	ApplyAction(cmd);
     }
 }
 

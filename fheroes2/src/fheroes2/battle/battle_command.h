@@ -23,7 +23,6 @@
 #ifndef H2BATTLE_COMMAND_H
 #define H2BATTLE_COMMAND_H
 
-#include "serialize.h"
 #include "gamedefs.h"
 #include "battle_board.h"
 
@@ -54,24 +53,21 @@ namespace Battle
 	MSG_UNKNOWN
     };
 
-    class Command : protected StreamBuf
+    class Command : public std::vector<int>
     {
+	int			type;
+
     public:
-        Command(u32);
-        Command(const Command &);
-        explicit Command(const StreamBuf &);
+        Command(int);
+        Command(int cmd, int param1, int param2, const Indexes &);
+        Command(int cmd, int param1, int param2 = -1, int param3 = -1, int param4 = -1);
 
-        Command(u32 cmd, u32 param1, s32 param2, const Indexes &);
-        Command(u32 cmd, u32 param1, s32 param2 = -1, s32 param3 = -1, s32 param4 = -1);
+        int		GetType(void) const { return type; }
+	int		GetValue(void);
+        bool		isType(int msg) const { return type == msg; }
 
-        Command & 	operator= (const Command &);
-
-        u32		GetType(void) const { return type; }
-        bool		isType(u32 msg) const { return type == msg; }
-	StreamBuf &	GetStream(void) { return *this; }
-
-    protected:
-        u32     	type;
+	Command &	operator<< (const int &);
+	Command &	operator>> (int &);
     };
 }
 

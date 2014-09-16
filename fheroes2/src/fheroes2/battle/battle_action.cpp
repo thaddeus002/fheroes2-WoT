@@ -89,35 +89,32 @@ void Battle::Arena::BattleProcess(Unit & attacker, Unit & defender, s32 dst, int
     attacker.PostAttackAction(defender);
 }
 
-void Battle::Arena::ApplyAction(StreamBuf & sb)
+void Battle::Arena::ApplyAction(Command & cmd)
 {
-    Command cmd(sb);
-    StreamBuf & stream = cmd.GetStream();
-
     switch(cmd.GetType())
     {
-	case MSG_BATTLE_CAST:		ApplyActionSpellCast(stream); break;
-	case MSG_BATTLE_ATTACK:		ApplyActionAttack(stream); break;
+	case MSG_BATTLE_CAST:		ApplyActionSpellCast(cmd); break;
+	case MSG_BATTLE_ATTACK:		ApplyActionAttack(cmd); break;
 	case MSG_BATTLE_MOVE:		ApplyActionMove(cmd);   break;
-	case MSG_BATTLE_SKIP:		ApplyActionSkip(stream);   break;
-	case MSG_BATTLE_END_TURN:	ApplyActionEnd(stream); break;
-	case MSG_BATTLE_MORALE:		ApplyActionMorale(stream); break;
+	case MSG_BATTLE_SKIP:		ApplyActionSkip(cmd);   break;
+	case MSG_BATTLE_END_TURN:	ApplyActionEnd(cmd); break;
+	case MSG_BATTLE_MORALE:		ApplyActionMorale(cmd); break;
 
-	case MSG_BATTLE_TOWER:		ApplyActionTower(stream); break;
-	case MSG_BATTLE_CATAPULT:	ApplyActionCatapult(stream); break;
+	case MSG_BATTLE_TOWER:		ApplyActionTower(cmd); break;
+	case MSG_BATTLE_CATAPULT:	ApplyActionCatapult(cmd); break;
 
-	case MSG_BATTLE_RETREAT:	ApplyActionRetreat(stream); break;
-	case MSG_BATTLE_SURRENDER:	ApplyActionSurrender(stream); break;
+	case MSG_BATTLE_RETREAT:	ApplyActionRetreat(cmd); break;
+	case MSG_BATTLE_SURRENDER:	ApplyActionSurrender(cmd); break;
 
-	case MSG_BATTLE_AUTO:		ApplyActionAutoBattle(stream); break;
+	case MSG_BATTLE_AUTO:		ApplyActionAutoBattle(cmd); break;
 
 	default: break;
     }
 }
 
-void Battle::Arena::ApplyActionSpellCast(StreamBuf & stream)
+void Battle::Arena::ApplyActionSpellCast(Command & cmd)
 {
-    const Spell spell(stream.get32());
+    const Spell spell(cmd.GetValue());
     HeroBase* current_commander = GetCurrentForce().GetCommander();
 
     if(current_commander && current_commander->HaveSpellBook() &&
@@ -131,26 +128,26 @@ void Battle::Arena::ApplyActionSpellCast(StreamBuf & stream)
 	switch(spell())
 	{
 	    case Spell::TELEPORT:
-		ApplyActionSpellTeleport(stream);
+		ApplyActionSpellTeleport(cmd);
 		break;
 
 	    case Spell::EARTHQUAKE:
-		ApplyActionSpellEarthQuake(stream);
+		ApplyActionSpellEarthQuake(cmd);
 		break;
 
 	    case Spell::MIRRORIMAGE:
-		ApplyActionSpellMirrorImage(stream);
+		ApplyActionSpellMirrorImage(cmd);
 		break;
 
 	    case Spell::SUMMONEELEMENT:
 	    case Spell::SUMMONAELEMENT:
 	    case Spell::SUMMONFELEMENT:
 	    case Spell::SUMMONWELEMENT:
-		ApplyActionSpellSummonElemental(stream, spell);
+		ApplyActionSpellSummonElemental(cmd, spell);
 		break;
 
 	    default:
-		ApplyActionSpellDefaults(stream, spell);
+		ApplyActionSpellDefaults(cmd, spell);
 		break;
 	}
 
@@ -166,13 +163,12 @@ void Battle::Arena::ApplyActionSpellCast(StreamBuf & stream)
     }
 }
 
-void Battle::Arena::ApplyActionAttack(StreamBuf & stream)
+void Battle::Arena::ApplyActionAttack(Command & cmd)
 {
-    u32 uid1, uid2;
-    s32 dst;
-    int dir;
-
-    stream >> uid1 >> uid2 >> dst >> dir;
+    u32 uid1 = cmd.GetValue();
+    u32 uid2 = cmd.GetValue();
+    s32 dst = cmd.GetValue();
+    int dir = cmd.GetValue();
 
     Battle::Unit* b1 = GetTroopUID(uid1);
     Battle::Unit* b2 = GetTroopUID(uid2);
@@ -227,11 +223,9 @@ void Battle::Arena::ApplyActionAttack(StreamBuf & stream)
 
 void Battle::Arena::ApplyActionMove(Command & cmd)
 {
-    u32 uid = 0;
-    s32 dst = -1;
-    bool with_path = 0;
-
-    cmd.GetStream() >> uid >> dst >> with_path;
+    u32 uid = cmd.GetValue();
+    s32 dst = cmd.GetValue();
+    int path_size = cmd.GetValue();
 
     Battle::Unit* b = GetTroopUID(uid);
     Cell* cell = Board::GetCell(dst);
@@ -259,15 +253,14 @@ void Battle::Arena::ApplyActionMove(Command & cmd)
 	    Indexes path;
 
 	    // check path
-	    if(with_path)
-	    {
-		cmd.GetStream() >> path;
-	    }
-	    else
+	    if(0 == path_size)
 	    {
 		path = GetPath(*b, pos1);
 		cmd = Command(MSG_BATTLE_MOVE, b->GetUID(), dst, path);
 	    }
+	    else
+		for(int index = 0; index < path_size; ++index)
+		    path.push_back(cmd.GetValue());
 
 	    if(path.empty())
 	    {
@@ -306,10 +299,10 @@ void Battle::Arena::ApplyActionMove(Command & cmd)
     }
 }
 
-void Battle::Arena::ApplyActionSkip(StreamBuf & stream)
+void Battle::Arena::ApplyActionSkip(Command & cmd)
 {
-    u32 uid, hard;
-    stream >> uid >> hard;
+    u32 uid = cmd.GetValue();
+    int hard = cmd.GetValue();
 
     Battle::Unit* battle = GetTroopUID(uid);
     if(battle && battle->isValid())
@@ -339,10 +332,9 @@ void Battle::Arena::ApplyActionSkip(StreamBuf & stream)
 	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param" << ": " << "uid: " << uid);
 }
 
-void Battle::Arena::ApplyActionEnd(StreamBuf & stream)
+void Battle::Arena::ApplyActionEnd(Command & cmd)
 {
-    u32 uid;
-    stream >> uid;
+    u32 uid = cmd.GetValue();
 
     Battle::Unit* battle = GetTroopUID(uid);
 
@@ -366,10 +358,10 @@ void Battle::Arena::ApplyActionEnd(StreamBuf & stream)
 	    "0x" << std::setw(8) << std::setfill('0') << std::hex <<  uid);
 }
 
-void Battle::Arena::ApplyActionMorale(StreamBuf & stream)
+void Battle::Arena::ApplyActionMorale(Command & cmd)
 {
-    u32 uid, morale;
-    stream >> uid >> morale;
+    u32 uid = cmd.GetValue();
+    int morale = cmd.GetValue();
 
     Battle::Unit* b = GetTroopUID(uid);
 
@@ -400,7 +392,7 @@ void Battle::Arena::ApplyActionMorale(StreamBuf & stream)
 	    "0x" << std::setw(8) << std::setfill('0') << std::hex << uid);
 }
 
-void Battle::Arena::ApplyActionRetreat(StreamBuf & stream)
+void Battle::Arena::ApplyActionRetreat(Command & cmd)
 {
     if(CanRetreatOpponent(current_color))
     {
@@ -419,7 +411,7 @@ void Battle::Arena::ApplyActionRetreat(StreamBuf & stream)
 	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param");
 }
 
-void Battle::Arena::ApplyActionSurrender(StreamBuf & stream)
+void Battle::Arena::ApplyActionSurrender(Command & cmd)
 {
     if(CanSurrenderOpponent(current_color))
     {
@@ -698,10 +690,10 @@ Battle::TargetsInfo Battle::Arena::GetTargetsForSpells(const HeroBase* hero, con
     return targets;
 }
 
-void Battle::Arena::ApplyActionTower(StreamBuf & stream)
+void Battle::Arena::ApplyActionTower(Command & cmd)
 {
-    u32 type, uid;
-    stream >> type >> uid;
+    u32 type = cmd.GetValue();
+    u32 uid = cmd.GetValue();
 
     Tower* tower = GetTower(type);
     Battle::Unit* b2 = GetTroopUID(uid);
@@ -726,17 +718,16 @@ void Battle::Arena::ApplyActionTower(StreamBuf & stream)
 	    "0x" << std::setw(8) << std::setfill('0') << std::hex << uid);
 }
 
-void Battle::Arena::ApplyActionCatapult(StreamBuf & stream)
+void Battle::Arena::ApplyActionCatapult(Command & cmd)
 {
     if(catapult)
     {
-	u32 shots, target, damage;
-
-	stream >> shots;
+	u32 shots = cmd.GetValue();
 
 	while(shots--)
 	{
-	    stream >> target >> damage;
+	    u32 target = cmd.GetValue();
+	    u32 damage = cmd.GetValue();
 
 	    if(target)
 	    {
@@ -750,10 +741,9 @@ void Battle::Arena::ApplyActionCatapult(StreamBuf & stream)
 	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param");
 }
 
-void Battle::Arena::ApplyActionAutoBattle(StreamBuf & stream)
+void Battle::Arena::ApplyActionAutoBattle(Command & cmd)
 {
-    int color;
-    stream >> color;
+    int color = cmd.GetValue();
 
     if(current_color == color)
     {
@@ -772,19 +762,18 @@ void Battle::Arena::ApplyActionAutoBattle(StreamBuf & stream)
 	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param");
 }
 
-void Battle::Arena::ApplyActionSpellSummonElemental(StreamBuf & stream, const Spell & spell)
+void Battle::Arena::ApplyActionSpellSummonElemental(Command & cmd, const Spell & spell)
 {
     Unit* elem = CreateElemental(spell);
     if(interface) interface->RedrawActionSummonElementalSpell(*elem);
 }
 
-void Battle::Arena::ApplyActionSpellDefaults(StreamBuf & stream, const Spell & spell)
+void Battle::Arena::ApplyActionSpellDefaults(Command & cmd, const Spell & spell)
 {
     const HeroBase* current_commander = GetCurrentCommander();
     if(!current_commander) return;
 
-    s32 dst;
-    stream >> dst;
+    s32 dst = cmd.GetValue();
 
     TargetsInfo targets = GetTargetsForSpells(current_commander, spell, dst);
     if(interface) interface->RedrawActionSpellCastPart1(spell, dst, current_commander, current_commander->GetName(), targets);
@@ -793,11 +782,10 @@ void Battle::Arena::ApplyActionSpellDefaults(StreamBuf & stream, const Spell & s
     if(interface) interface->RedrawActionSpellCastPart2(spell, targets);
 }
 
-void Battle::Arena::ApplyActionSpellTeleport(StreamBuf & stream)
+void Battle::Arena::ApplyActionSpellTeleport(Command & cmd)
 {
-    s32 src, dst;
-
-    stream >> src >> dst;
+    s32 src = cmd.GetValue();
+    s32 dst = cmd.GetValue();
 
     Unit* b = GetTroopBoard(src);
     const Spell spell(Spell::TELEPORT);
@@ -820,7 +808,7 @@ void Battle::Arena::ApplyActionSpellTeleport(StreamBuf & stream)
     }
 }
 
-void Battle::Arena::ApplyActionSpellEarthQuake(StreamBuf & stream)
+void Battle::Arena::ApplyActionSpellEarthQuake(Command & cmd)
 {
     std::vector<int> targets = GetCastleTargets();
 
@@ -840,10 +828,9 @@ void Battle::Arena::ApplyActionSpellEarthQuake(StreamBuf & stream)
     DEBUG(DBG_BATTLE, DBG_TRACE, "spell: " << Spell(Spell::EARTHQUAKE).GetName() << ", targets: " << targets.size());
 }
 
-void Battle::Arena::ApplyActionSpellMirrorImage(StreamBuf & stream)
+void Battle::Arena::ApplyActionSpellMirrorImage(Command & cmd)
 {
-    s32 who;
-    stream >> who;
+    s32 who = cmd.GetValue();
     Unit* b = GetTroopBoard(who);
 
     if(b)

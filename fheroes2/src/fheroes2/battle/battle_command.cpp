@@ -31,58 +31,53 @@ bool Battle::Actions::HaveCommand(u32 cmd) const
     return end() != std::find_if(begin(), end(), std::bind2nd(std::mem_fun_ref(&Command::isType), cmd));
 }
 
-Battle::Command::Command(u32 msg) : StreamBuf(16), type(msg)
+Battle::Command::Command(int cmd) : type(cmd)
 {
-    setbigendian(true);
-    *this << type;
 }
 
-Battle::Command & Battle::Command::operator= (const Command & cmd)
+Battle::Command & Battle::Command::operator<< (const int & val)
 {
-    StreamBuf & stream = *this;
-    stream = cmd;
-    type = cmd.type;
-
+    push_back(val);
     return *this;
 }
 
-Battle::Command::Command(const Command & cmd) : StreamBuf(cmd), type(cmd.type)
+Battle::Command & Battle::Command::operator>> (int & val)
 {
-    setbigendian(true);
+    if(size())
+    {
+	val = back();
+	pop_back();
+    }
+    return *this;
 }
 
-Battle::Command::Command(const StreamBuf & sb) : StreamBuf(sb), type(0)
+int Battle::Command::GetValue(void)
 {
-    setbigendian(true);
-    *this >> type;
+    int val = 0; *this >> val;
+    return val;
 }
 
-Battle::Command::Command(u32 cmd, u32 param1, s32 param2, const Indexes & param3) : StreamBuf(16), type(cmd)
+Battle::Command::Command(int cmd, int param1, int param2, const Indexes & param3) : type(cmd)
 {
-    setbigendian(true);
-    StreamBase & base = *this;
-    *this << type;
-
     switch(type)
     {
         case MSG_BATTLE_MOVE:
-            base << param1 << param2 << static_cast<bool>(true) << param3; // uid, dst, path
+	    for(Indexes::const_reverse_iterator
+		it = param3.rbegin(); it != param3.rend(); ++it)
+		    *this << *it;
+            *this << param3.size() << param2 << param1;  // path, dst, uid
             break;
 
         default: break;
     }
 }
 
-Battle::Command::Command(u32 cmd, u32 param1, s32 param2, s32 param3, s32 param4) : StreamBuf(16), type(cmd)
+Battle::Command::Command(int cmd, int param1, int param2, int param3, int param4) : type(cmd)
 {
-    setbigendian(true);
-    StreamBase & base = *this;
-    *this << type;
-
     switch(type)
     {
         case MSG_BATTLE_AUTO:
-            base << param1; // color
+            *this << param1; // color
             break;
 
         case MSG_BATTLE_SURRENDER:
@@ -90,6 +85,9 @@ Battle::Command::Command(u32 cmd, u32 param1, s32 param2, s32 param3, s32 param4
             break;
 
         case MSG_BATTLE_TOWER:
+	    *this << param2 << param1; // enemy uid, type
+            break;
+
         case MSG_BATTLE_CATAPULT: // battle_arena.cpp
             break;
 
@@ -97,37 +95,37 @@ Battle::Command::Command(u32 cmd, u32 param1, s32 param2, s32 param3, s32 param4
             switch(param1)
             {
                 case Spell::MIRRORIMAGE:
-                    base << param1 << param2; // spell, who
+                    *this << param2 << param1; // who, spell
                     break;
 
                 case Spell::TELEPORT:
-                    base << param1 << param2 << param3; // spell, src, dst
+                    *this << param3 << param2 << param1; // dst, src, spell
                     break;
 
                 default:
-                    base << param1 << param2; // spell, dst
+                    *this << param2 << param1; // dst, spell
                     break;
             }
             break;
 
         case MSG_BATTLE_END_TURN:
-            base << param1; // uid
+            *this << param1; // uid
             break;
 
         case MSG_BATTLE_SKIP:
-            base << param1 << param2; // uid, hard_skip
+            *this << param2 << param1; // hard_skip, uid
             break;
 
         case MSG_BATTLE_MOVE:
-            base << param1 << param2 << static_cast<bool>(false); // uid, dst, path
+            *this << static_cast<int>(0) << param2 << param1; // path size, dst, uid 
             break;
 
         case MSG_BATTLE_ATTACK:
-            base << param1 << param2 << param3 << param4; // uid, uid, dst, direction
+            *this << param4 << param3 << param2 << param1; // direction, dst, uid, uid
             break;
 
         case MSG_BATTLE_MORALE:
-            base << param1 << param2; // uid, state
+            *this << param2 << param1; // state, uid
             break;
 
         default: break;

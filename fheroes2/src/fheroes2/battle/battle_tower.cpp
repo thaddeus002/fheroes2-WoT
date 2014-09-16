@@ -99,13 +99,6 @@ Point Battle::Tower::GetPortPosition(void) const
     return res;
 }
 
-Battle::Command Battle::Tower::GetCommand(const Unit & enemy) const
-{
-    Command cmd(MSG_BATTLE_TOWER);
-    cmd.GetStream() << GetType() << enemy.GetUID();
-    return cmd;
-}
-
 void Battle::Tower::SetDestroy(void)
 {
     switch(type)

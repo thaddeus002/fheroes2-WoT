@@ -48,7 +48,6 @@ namespace Battle
 
 	void	SetDestroy(void);
 	Point	GetPortPosition(void) const;
-	Command GetCommand(const Unit &) const;
 
 	static std::string GetInfo(const Castle &);
 

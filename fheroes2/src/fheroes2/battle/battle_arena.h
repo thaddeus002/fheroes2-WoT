@@ -99,7 +99,7 @@ namespace Battle
 	void		FadeArena(void) const;
 
 	Indexes		GetPath(const Unit &, const Position &);
-	void		ApplyAction(StreamBuf &);
+	void		ApplyAction(Command &);
 
 	TargetsInfo	GetTargetsForDamage(Unit &, Unit &, s32);
 	void		TargetsApplyDamage(Unit &, Unit &, TargetsInfo &);
@@ -115,11 +115,11 @@ namespace Battle
 	bool		CanSurrenderOpponent(int color) const;
 	bool		CanRetreatOpponent(int color) const;
 
-	void		ApplyActionSpellSummonElemental(StreamBuf &, const Spell &);
-	void		ApplyActionSpellMirrorImage(StreamBuf &);
-	void		ApplyActionSpellTeleport(StreamBuf &);
-	void		ApplyActionSpellEarthQuake(StreamBuf &);
-	void		ApplyActionSpellDefaults(StreamBuf &, const Spell &);
+	void		ApplyActionSpellSummonElemental(Command &, const Spell &);
+	void		ApplyActionSpellMirrorImage(Command &);
+	void		ApplyActionSpellTeleport(Command &);
+	void		ApplyActionSpellEarthQuake(Command &);
+	void		ApplyActionSpellDefaults(Command &, const Spell &);
 
 	u32		GetObstaclesPenalty(const Unit &, const Unit &) const;
 	int		GetICNCovr(void) const;
@@ -150,18 +150,18 @@ namespace Battle
 	std::vector<int>
 			GetCastleTargets(void) const;
 
-	void		ApplyActionRetreat(StreamBuf &);
-	void		ApplyActionSurrender(StreamBuf &);
-	void		ApplyActionAttack(StreamBuf &);
+	void		ApplyActionRetreat(Command &);
+	void		ApplyActionSurrender(Command &);
+	void		ApplyActionAttack(Command &);
 	void		ApplyActionMove(Command &);
-	void		ApplyActionEnd(StreamBuf &);
-	void		ApplyActionSkip(StreamBuf &);
-	void		ApplyActionMorale(StreamBuf &);
-	void		ApplyActionLuck(StreamBuf &);
-	void		ApplyActionSpellCast(StreamBuf &);
-	void		ApplyActionTower(StreamBuf &);
-	void		ApplyActionCatapult(StreamBuf &);
-	void		ApplyActionAutoBattle(StreamBuf &);
+	void		ApplyActionEnd(Command &);
+	void		ApplyActionSkip(Command &);
+	void		ApplyActionMorale(Command &);
+	void		ApplyActionLuck(Command &);
+	void		ApplyActionSpellCast(Command &);
+	void		ApplyActionTower(Command &);
+	void		ApplyActionCatapult(Command &);
+	void		ApplyActionAutoBattle(Command &);
 
 	void		BattleProcess(Unit &, Unit & b2, s32 = -1, int = 0);
 

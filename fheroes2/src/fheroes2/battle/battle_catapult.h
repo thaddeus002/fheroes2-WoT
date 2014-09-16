@@ -38,12 +38,12 @@ namespace Battle
 	Catapult(const HeroBase &, bool);
 
 	static Point	GetTargetPosition(int);
-	Command		GetCommand(Arena &) const;
 
-    private:
+	u32		GetShots(void) const { return cat_shots; }
 	int		GetTarget(const std::vector<u32> &) const;
 	u32		GetDamage(int, u32) const;
 
+    private:
 	u32	cat_shots;
 	u32	cat_first;
 	bool	cat_miss;
