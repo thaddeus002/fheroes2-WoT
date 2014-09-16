@@ -810,7 +810,10 @@ void Surface::FreeSurface(Surface & sf)
     if(sf.surface)
     {
 	if(sf.isRefCopy())
+	{
 	    --sf.surface->refcount;
+	    sf.surface = NULL;
+	}
 	else
 	{
     	    // clear static palette
