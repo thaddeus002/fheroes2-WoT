@@ -691,14 +691,30 @@ std::string Settings::GetLangDir(void)
 
 std::string Settings::GetWriteableDir(const char* subdir)
 {
-    std::string res;
-    const ListDirs dirs = GetRootDirs();
+    ListDirs dirs = GetRootDirs();
+    dirs.Append(System::GetDataDirectories("fheroes2"));
 
     for(ListDirs::const_iterator
 	it = dirs.begin(); it != dirs.end(); ++it)
     {
-	res = System::ConcatePath(System::ConcatePath(*it, "files"), subdir);
-        if(System::IsDirectory(res, true)) return res;
+	std::string dir_files = System::ConcatePath(*it, "files");
+
+	// create files
+	if(System::IsDirectory(*it, true) &&
+	    ! System::IsDirectory(dir_files, true))
+	    System::MakeDirectory(dir_files);
+
+	// create subdir
+        if(System::IsDirectory(dir_files, true))
+	{
+	    std::string dir_subdir = System::ConcatePath(dir_files, subdir);
+
+    	    if(! System::IsDirectory(dir_subdir, true))
+		System::MakeDirectory(dir_subdir);
+
+    	    if(System::IsDirectory(dir_subdir, true))
+		return dir_subdir;
+	}
     }
 
     DEBUG(DBG_GAME, DBG_WARN, "writable directory not found");

@@ -54,6 +54,7 @@ namespace System
 
     int		MakeDirectory(const std::string &);
     std::string	ConcatePath(const std::string &, const std::string &);
+    ListDirs	GetDataDirectories(const std::string &);
     ListFiles	GetListFiles(const std::string &, const std::string &, const std::string &);
     std::string GetHomeDirectory(const std::string &);
 

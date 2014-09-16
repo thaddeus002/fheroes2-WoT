@@ -109,6 +109,27 @@ std::string System::GetHomeDirectory(const std::string & prog)
     return res;
 }
 
+ListDirs System::GetDataDirectories(const std::string & prog)
+{
+    ListDirs dirs;
+
+#if defined(ANDROID)
+    const char* internal = SDL_AndroidGetInternalStoragePath();
+    if(internal) dirs.push_back(System::ConcatePath(internal, prog));
+
+    if(SDL_ANDROID_EXTERNAL_STORAGE_READ && SDL_AndroidGetExternalStorageState())
+    {
+	const char* external = SDL_AndroidGetExternalStoragePath();
+	if(external) dirs.push_back(System::ConcatePath(external, prog));
+    }
+
+    dirs.push_back(System::ConcatePath("/storage/sdcard0", prog));
+    dirs.push_back(System::ConcatePath("/storage/sdcard1", prog));
+#endif
+
+    return dirs;
+}
+
 ListFiles System::GetListFiles(const std::string & prog, const std::string & prefix, const std::string & filter)
 {
     ListFiles res;
@@ -133,25 +154,12 @@ ListFiles System::GetListFiles(const std::string & prog, const std::string & pre
 	}
     }
 
-    ListDirs dirs;
-
-    const char* internal = SDL_AndroidGetInternalStoragePath();
-    if(internal) dirs.push_back(internal);
-
-    if(SDL_ANDROID_EXTERNAL_STORAGE_READ && SDL_AndroidGetExternalStorageState())
-    {
-	const char* external = SDL_AndroidGetExternalStoragePath();
-	if(external) dirs.push_back(external);
-    }
-
-    dirs.push_back("/storage/sdcard0");
-    dirs.push_back("/storage/sdcard1");
+    ListDirs dirs = GetDataDirectories(prog);
 
     for(ListDirs::const_iterator
 	it = dirs.begin(); it != dirs.end(); ++it)
     {
-        const std::string path = System::ConcatePath(*it, prog);
-        res.ReadDir(prefix.size() ? System::ConcatePath(path, prefix) : path, filter, false);
+        res.ReadDir(prefix.size() ? System::ConcatePath(*it, prefix) : *it, filter, false);
     }
 #endif
     return res;
