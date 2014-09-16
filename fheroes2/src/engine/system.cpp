@@ -26,7 +26,10 @@
 #include <cctype>
 #include <cstdlib>
 #include <locale>
-//#include <clocale>
+
+#if defined(ANDROID)
+#include <clocale>
+#endif
 
 #include "SDL.h"
 #include "system.h"
