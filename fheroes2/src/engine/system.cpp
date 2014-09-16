@@ -227,14 +227,18 @@ std::string System::GetMessageLocale(int length /* 1, 2, 3 */)
 {
     std::string locname;
 #if ! defined(__MINGW32CE__)
-    locname = StringLower(setlocale(LC_MESSAGES, NULL));
-    // 3: en_us.utf-8
-    // 2: en_us
-    // 1: en
-    if(length < 3)
+    char* clocale = setlocale(LC_MESSAGES, NULL);
+    if(clocale)
     {
-	std::list<std::string> list = StringSplit(locname, length < 2 ? "_" : ".");
-	return list.empty() ? locname : list.front();
+	locname = StringLower(clocale);
+	// 3: en_us.utf-8
+	// 2: en_us
+	// 1: en
+	if(length < 3)
+	{
+	    std::list<std::string> list = StringSplit(locname, length < 2 ? "_" : ".");
+	    return list.empty() ? locname : list.front();
+	}
     }
 #endif
     return locname;

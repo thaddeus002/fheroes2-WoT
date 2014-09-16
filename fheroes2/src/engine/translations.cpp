@@ -136,7 +136,7 @@ struct mofile
 		}
 	    }
 	}
-	
+
 	// parse encoding and plural forms
 	if(count)
 	{
