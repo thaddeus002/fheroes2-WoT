@@ -56,7 +56,7 @@ protected:
 
 public:
     StreamBase() : rw(NULL), flags(0) {}
-    ~StreamBase();
+    ~StreamBase() {}
 
     int			getBE16(void);
     int			getLE16(void);
@@ -216,12 +216,14 @@ public:
     const u8*		data(void) const { return buf; }
     u8*			data(void) { return buf; }
     size_t		size(void) const { return len; }
+    void		clear(void);
 };
 
 class StreamFile : public StreamBase
 {
 public:
     StreamFile() {}
+    ~StreamFile();
     StreamFile(const std::string &, const char* mode);
 
     long int		size(void) const;

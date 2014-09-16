@@ -73,11 +73,6 @@ Network::Socket & operator>> (Network::Socket & sc, StreamBuf & sb)
 #endif                                                                                                           
 */
 
-StreamBase::~StreamBase()
-{
-    if(rw) SDL_RWclose(rw);
-}
-
 bool StreamBase::bigendian(void) const
 {
     return flags & 0x80000000;
@@ -388,6 +383,11 @@ StreamFile::StreamFile(const std::string & fn, const char* mode)
 #endif
 }
 
+StreamFile::~StreamFile()
+{
+    close();
+}
+
 bool StreamFile::open(const std::string & fn, const char* mode)
 {
     rw = SDL_RWFromFile(fn.c_str(), mode);
@@ -458,10 +458,13 @@ StreamBuf::StreamBuf(const std::vector<u8> & v) : buf(NULL), len(0)
 
 StreamBuf::StreamBuf(size_t sz) : buf(NULL), len(sz)
 {
-    if(len < MINCAPACITY) len = MINCAPACITY;
-    buf = new u8 [len];
-    rw = SDL_RWFromMem(buf, len);
-    if(! rw) ERROR(SDL_GetError());
+    if(len)
+    {
+	if(len < MINCAPACITY) len = MINCAPACITY;
+	buf = new u8 [len];
+	rw = SDL_RWFromMem(buf, len);
+	if(! rw) ERROR(SDL_GetError());
+    }
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
     setbigendian(true);
@@ -470,39 +473,57 @@ StreamBuf::StreamBuf(size_t sz) : buf(NULL), len(sz)
 #endif
 }
 
-StreamBuf::StreamBuf(const StreamBuf & sb)
+StreamBuf::StreamBuf(const StreamBuf & sb) : buf(NULL), len(0)
 {
-    len = sb.len;
-    buf = new u8 [len];
-    flags = sb.flags;
+    if(sb.len)
+    {
+	len = sb.len;
+	buf = new u8 [len];
+	flags = sb.flags;
 
-    std::copy(sb.buf, sb.buf + len, buf);
+	std::copy(sb.buf, sb.buf + len, buf);
 
-    rw = SDL_RWFromMem(buf, len);
-    SDL_RWseek(rw, SDL_RWtell(sb.rw), RW_SEEK_SET);
+        rw = SDL_RWFromMem(buf, len);
+	SDL_RWseek(rw, SDL_RWtell(sb.rw), RW_SEEK_SET);
+    }
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    setbigendian(true);
+#else
+    setbigendian(false);
+#endif
 }
 
 StreamBuf & StreamBuf::operator= (const StreamBuf & sb)
 {
-    SDL_RWclose(rw);
-    delete [] buf;
+    clear();
 
-    len = sb.len;
-    buf = new u8 [len];
-    flags = sb.flags;
+    if(sb.len)
+    {
+        len = sb.len;
+	buf = new u8 [len];
+	flags = sb.flags;
 
-    std::copy(sb.buf, sb.buf + len, buf);
+        std::copy(sb.buf, sb.buf + len, buf);
 
-    rw = SDL_RWFromMem(buf, len);
-    SDL_RWseek(rw, SDL_RWtell(sb.rw), RW_SEEK_SET);
+	rw = SDL_RWFromMem(buf, len);
+        SDL_RWseek(rw, SDL_RWtell(sb.rw), RW_SEEK_SET);
+    }
 
     return *this;
 }
 
 StreamBuf::~StreamBuf()
 {
+    clear();
+}
+
+void StreamBuf::clear(void)
+{
     if(buf && !isconstbuf())
-	    delete [] buf;
+	delete [] buf;
+    if(rw) SDL_RWclose(rw);
+    len = 0;
 }
 
 void StreamBuf::setconstbuf(bool f)
