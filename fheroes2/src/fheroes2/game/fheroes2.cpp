@@ -331,9 +331,10 @@ void SetLangEnvPath(const Settings & conf)
     {
         translation::bind_domain("fheroes2", translations.back().c_str());
         translation::set_domain("fheroes2");
-	translation::set_strip_context('|');
     }
     else
 	ERROR("translation not found: " << mofile);
+
+    translation::set_strip_context('|');
 #endif
 }

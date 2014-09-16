@@ -541,6 +541,14 @@ bool StreamBuf::isconstbuf(void) const
 
 void StreamBuf::resize(size_t sz)
 {
+    if(!rw)
+    {
+	len = sz < MINCAPACITY ? MINCAPACITY : sz;
+	buf = new u8 [len];
+	rw = SDL_RWFromMem(buf, len);
+	if(! rw) ERROR(SDL_GetError());
+    }
+    else
     if(SDL_RWtell(rw) + sz > len)
     {
 	if(sz < MINCAPACITY) sz = MINCAPACITY;
