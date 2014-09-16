@@ -1408,7 +1408,7 @@ int Battle::Interface::GetBattleCursor(std::string & status)
 		{
 		    status = _("Shoot %{monster}");
 		    status.append(" ");
-		    status.append(ngettext("(one shot left)", "(%{count} shots left)", b_current->GetShots()));
+		    status.append(_n("(one shot left)", "(%{count} shots left)", b_current->GetShots()));
 		    StringReplace(status, "%{monster}", b_enemy->GetMultiName());
  		    StringReplace(status, "%{count}", b_current->GetShots());
 
@@ -2360,7 +2360,7 @@ void Battle::Interface::RedrawActionAttackPart2(Unit & attacker, TargetsInfo & t
 	    if(killed)
 	    {
 	        msg.append(" ");
-		msg.append(ngettext("one creature perishes.", "%{count} creatures perish.", killed));
+		msg.append(_n("one creature perishes.", "%{count} creatures perish.", killed));
     		StringReplace(msg, "%{count}", killed);
 	    }
 	}
@@ -2372,7 +2372,7 @@ void Battle::Interface::RedrawActionAttackPart2(Unit & attacker, TargetsInfo & t
 	    if(target.killed)
 	    {
 		msg.append(" ");
-		msg.append(ngettext("one %{defender} perishes.", "%{count} %{defender} perish.", target.killed));
+		msg.append(_n("one %{defender} perishes.", "%{count} %{defender} perish.", target.killed));
     		StringReplace(msg, "%{count}", target.killed);
     		StringReplace(msg, "%{defender}", target.defender->GetPluralName(target.killed));
 	    }
@@ -2760,7 +2760,7 @@ void Battle::Interface::RedrawActionSpellCastPart2(const Spell & spell, TargetsI
 	    if(killed)
 	    {
 		status.SetMessage(msg, true);
-		msg = ngettext("one creature perishes.", "%{count} creatures perish.", killed);
+		msg = _n("one creature perishes.", "%{count} creatures perish.", killed);
     		StringReplace(msg, "%{count}", killed);
 	    }
 
@@ -2946,7 +2946,7 @@ void Battle::Interface::RedrawActionTowerPart2(Tower & tower, TargetInfo & targe
     if(target.killed)
     {
 	msg.append(" ");
-	msg.append(ngettext("one %{defender} perishes.", "%{count} %{defender} perish.", target.killed));
+	msg.append(_n("one %{defender} perishes.", "%{count} %{defender} perish.", target.killed));
     	StringReplace(msg, "%{count}", target.killed);
     	StringReplace(msg, "%{defender}", target.defender->GetName());
     }

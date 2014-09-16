@@ -468,7 +468,7 @@ bool ActionSpellVisions(Heroes & hero)
 			msg = _("All the creatures will join us...");
 		    else
 		    {
-			msg = ngettext("The creature will join us...", "%{count} of the creatures will join us...", join.second);
+			msg = _n("The creature will join us...", "%{count} of the creatures will join us...", join.second);
 			StringReplace(msg, "%{count}", join.second);
 		    }
 		    msg.append("\n");

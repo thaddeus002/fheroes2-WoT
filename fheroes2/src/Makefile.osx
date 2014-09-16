@@ -5,7 +5,7 @@ SIMPLE_LINK_FLAGS := -dynamic -undefined suppress -flat_namespace
 
 ifndef WITHOUT_UNICODE
 CFLAGS := $(CFLAGS) -DWITH_ICONV
-LIBS := $(LIBS) -lintl -liconv
+LIBS := $(LIBS) -liconv
 endif
 
 # the config scripts generate link flags like -Wl,-framework which screws up

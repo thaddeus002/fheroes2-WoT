@@ -88,7 +88,7 @@ void Troop::Reset(void)
 
 const char* Troop::GetName(void) const
 {
-    return 1 < count ? Monster::GetMultiName() : Monster::GetName();
+    return Monster::GetPluralName(count);
 }
 
 u32 Troop::GetCount(void) const

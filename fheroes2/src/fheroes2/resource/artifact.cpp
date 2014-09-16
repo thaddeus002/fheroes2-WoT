@@ -163,31 +163,31 @@ const char* GetPluralDescription(const Artifact & art, u32 count)
     switch(art())
     {
 	case Artifact::ENCHANTED_HOURGLASS:
-	    return ngettext("The %{name} extends the duration of all your spells by %{count} turn.",
+	    return _n("The %{name} extends the duration of all your spells by %{count} turn.",
 			    "The %{name} extends the duration of all your spells by %{count} turns.", count);
 	case Artifact::WIZARD_HAT:
-	    return ngettext("The %{name} increases the duration of your spells by %{count} turn.",
+	    return _n("The %{name} increases the duration of your spells by %{count} turn.",
 			    "The %{name} increases the duration of your spells by %{count} turns.", count);
 	case Artifact::POWER_RING:
-	    return ngettext("The %{name} returns %{count} extra power point/turn to your hero.",
+	    return _n("The %{name} returns %{count} extra power point/turn to your hero.",
 			    "The %{name} returns %{count} extra power points/turn to your hero.", count);
         case Artifact::ENDLESS_POUCH_SULFUR:
-	    return ngettext("The %{name} provides %{count} unit of sulfur per day.",
+	    return _n("The %{name} provides %{count} unit of sulfur per day.",
 			    "The %{name} provides %{count} units of sulfur per day.", count);
         case Artifact::ENDLESS_VIAL_MERCURY:
-	    return ngettext("The %{name} provides %{count} unit of mercury per day.",
+	    return _n("The %{name} provides %{count} unit of mercury per day.",
 			    "The %{name} provides %{count} units of mercury per day.", count);
         case Artifact::ENDLESS_POUCH_GEMS:
-	    return ngettext("The %{name} provides %{count} unit of gems per day.",
+	    return _n("The %{name} provides %{count} unit of gems per day.",
 			    "The %{name} provides %{count} units of gems per day.", count);
         case Artifact::ENDLESS_CORD_WOOD:
-	    return ngettext("The %{name} provides %{count} unit of wood per day.",
+	    return _n("The %{name} provides %{count} unit of wood per day.",
 			    "The %{name} provides %{count} units of wood per day.", count);
         case Artifact::ENDLESS_CART_ORE:
-	    return ngettext("The %{name} provides %{count} unit of ore per day.",
+	    return _n("The %{name} provides %{count} unit of ore per day.",
 			    "The %{name} provides %{count} units of ore per day.", count);
         case Artifact::ENDLESS_POUCH_CRYSTAL:
-	    return ngettext("The %{name} provides %{count} unit of crystal per day.",
+	    return _n("The %{name} provides %{count} unit of crystal per day.",
 			    "The %{name} provides %{count} units of crystal per day.", count);
 	default: break;
     }

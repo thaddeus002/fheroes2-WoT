@@ -2853,7 +2853,7 @@ void ActionToAlchemistsTower(Heroes & hero, u32 obj, s32 dst_index)
         {
 	    std::string msg = "As you enter the Alchemist's Tower, a hobbled, graying man in a brown cloak makes his way towards you.";
 	    msg.append("\n");
-	    msg.append(ngettext("He checks your pack, and sees that you have 1 cursed item.",
+	    msg.append(_n("He checks your pack, and sees that you have 1 cursed item.",
 				    "He checks your pack, and sees that you have %{count} cursed items.", cursed));
 	    StringReplace(msg, "%{count}", cursed);
 	    msg.append("\n");

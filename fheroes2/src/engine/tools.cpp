@@ -129,6 +129,13 @@ std::string GetString(const std::vector<u8> & v)
     return std::string(v.begin(), v.end());
 }
 
+std::string GetHexString(int value, int width)
+{
+    std::ostringstream stream;
+    stream << "0x" << std::setw(width) << std::setfill('0') << std::hex << value;
+    return stream.str();
+}
+
 int CountBits(u32 val)
 {
     int res = 0;

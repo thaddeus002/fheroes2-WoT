@@ -391,27 +391,27 @@ std::string Skill::Secondary::GetDescription(void) const
     switch(Skill())
     {
 	case PATHFINDING:
-	    str = ngettext("Reduces the movement penalty for rough terrain by %{count} percent.",
+	    str = _n("Reduces the movement penalty for rough terrain by %{count} percent.",
 			"Reduces the movement penalty for rough terrain by %{count} percent.", count); break;
         case ARCHERY:
-	    str = ngettext("Increases the damage done by range attacking creatures by %{count} percent.",
+	    str = _n("Increases the damage done by range attacking creatures by %{count} percent.",
 			"Increases the damage done by range attacking creatures by %{count} percent.", count); break;
         case LOGISTICS:
-	    str = ngettext("Increases your hero's movement points by %{count} percent.",
+	    str = _n("Increases your hero's movement points by %{count} percent.",
 			"Increases your hero's movement points by %{count} percent.", count); break;
         case SCOUTING:
-	    str = ngettext("Increases your hero's viewable area by %{count} square.",
+	    str = _n("Increases your hero's viewable area by %{count} square.",
 			"Increases your hero's viewable area by %{count} squares.", count); break;
         case DIPLOMACY:
 	    str = _("Allows you to negotiate with monsters who are weaker than your group.");
 	    str.append(" ");
-	    str.append(ngettext("Approximately %{count} percent of the creatures may offer to join you.",
+	    str.append(_n("Approximately %{count} percent of the creatures may offer to join you.",
 		    "Approximately %{count} percent of the creatures may offer to join you.", count)); break;
         case NAVIGATION:
-	    str = ngettext("Increases your hero's movement points over water by %{count} percent.",
+	    str = _n("Increases your hero's movement points over water by %{count} percent.",
 		    "Increases your hero's movement points over water by %{count} percent.", count); break;
         case LEADERSHIP:
-	    str = ngettext("Increases your hero's troops morale by %{count}.",
+	    str = _n("Increases your hero's troops morale by %{count}.",
 		    "Increases your hero's troops morale by %{count}.", count); break;
         case WISDOM:
 	{
@@ -428,10 +428,10 @@ std::string Skill::Secondary::GetDescription(void) const
 	    break;
 	}
         case MYSTICISM:
-	    str = ngettext("Regenerates %{count} of your hero's spell point per day.",
+	    str = _n("Regenerates %{count} of your hero's spell point per day.",
 		    "Regenerates %{count} of your hero's spell points per day.", count); break;
         case LUCK:
-	    str = ngettext("Increases your hero's luck by %{count}.",
+	    str = _n("Increases your hero's luck by %{count}.",
 		    "Increases your hero's luck by %{count}.", count); break;
         case BALLISTICS:
 	    switch(Level())
@@ -449,22 +449,22 @@ std::string Skill::Secondary::GetDescription(void) const
 	    switch(Level())
 	    {
 		case Level::BASIC:
-		    str = ngettext("Gives your hero a %{count} percent chance to learn any given 1st or 2nd level enemy spell used against him in a combat.",
+		    str = _n("Gives your hero a %{count} percent chance to learn any given 1st or 2nd level enemy spell used against him in a combat.",
 		    "Gives your hero a %{count} percent chance to learn any given 1st or 2nd level enemy spell used against him in a combat.", count); break;
 		case Level::ADVANCED:
-		    str = ngettext("Gives your hero a %{count} percent chance to learn any given 3rd level spell (or below) used against him in combat.",
+		    str = _n("Gives your hero a %{count} percent chance to learn any given 3rd level spell (or below) used against him in combat.",
 		    "Gives your hero a %{count} percent chance to learn any given 3rd level spell (or below) used against him in combat.", count); break;
 		case Level::EXPERT:
-		    str = ngettext("Gives your hero a %{count} percent chance to learn any given 4th level spell (or below) used against him in combat.",
+		    str = _n("Gives your hero a %{count} percent chance to learn any given 4th level spell (or below) used against him in combat.",
 		    "Gives your hero a %{count} percent chance to learn any given 4th level spell (or below) used against him in combat.", count); break;
 		default: break;
 	    }
 	    break;
         case NECROMANCY:
-	    str = ngettext("Allows %{count} percent of the creatures killed in combat to be brought back from the dead as Skeletons.",
+	    str = _n("Allows %{count} percent of the creatures killed in combat to be brought back from the dead as Skeletons.",
 		    "Allows %{count} percent of the creatures killed in combat to be brought back from the dead as Skeletons.", count); break;
 	case ESTATES:
-	    str = ngettext("Your hero produce %{count} gold pieces per turn as tax revenue from estates.",
+	    str = _n("Your hero produce %{count} gold pieces per turn as tax revenue from estates.",
 		    "Your hero produces %{count} gold pieces per turn as tax revenue from estates.", count); break;
 	default: break;
     }

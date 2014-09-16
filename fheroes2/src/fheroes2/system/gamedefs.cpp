@@ -25,15 +25,6 @@
 #include "players.h"
 #include "serialize.h"
 
-const char* strip_context(const char* c)
-{
-    const char* p = c;
-
-    while(p && *p && *p++ != '|');
-
-    return p && *p ? p : c;
-}
-
 StreamBase & operator<< (StreamBase & msg, const BitModes & b)
 {
     return msg << b.modes;

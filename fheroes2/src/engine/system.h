@@ -39,7 +39,7 @@ namespace std
 #define endl android_endl
 #define COUT(x) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "SDLHeroes2", "%s", osss.str().c_str()); }
 #else
-#define COUT(x) { std::cout << x << std::endl; }
+#define COUT(x) { std::cerr << x << std::endl; }
 #endif
 
 #define VERBOSE(x) { COUT(System::GetTime() << ": [VERBOSE]\t" << __FUNCTION__ << ":  " << x); }

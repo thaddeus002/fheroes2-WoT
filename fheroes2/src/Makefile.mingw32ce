@@ -3,7 +3,7 @@ LIBS := $(LIBS) -lSDL -lmad -lvorbisfile -lvorbis -logg
 endif
 
 ifndef WITHOUT_UNICODE
-LIBS := $(LIBS) -lintl -lfreetype
+LIBS := $(LIBS) -lfreetype
 endif
 
 ifdef WITH_ICONS
