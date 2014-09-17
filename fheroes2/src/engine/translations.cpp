@@ -181,7 +181,10 @@ struct mofile
 
 namespace translation
 {
-    enum { LOCALE_EN, LOCALE_CS, LOCALE_ES, LOCALE_FR, LOCALE_HU, LOCALE_NL, LOCALE_PL, LOCALE_PT, LOCALE_RU, LOCALE_SV, LOCALE_TR };
+    enum { LOCALE_EN, LOCALE_AF, LOCALE_AR, LOCALE_BG, LOCALE_CA, LOCALE_CS, LOCALE_DA, LOCALE_DE, LOCALE_EL, LOCALE_ES,
+	    LOCALE_ET, LOCALE_EU, LOCALE_FI, LOCALE_FR, LOCALE_GL, LOCALE_HE, LOCALE_HR, LOCALE_HU, LOCALE_ID, LOCALE_IT,
+	    LOCALE_LA, LOCALE_LT, LOCALE_LV, LOCALE_MK, LOCALE_NL, LOCALE_PL, LOCALE_PT, LOCALE_RU, LOCALE_SK, LOCALE_SL,
+	    LOCALE_SR, LOCALE_SV, LOCALE_TL, LOCALE_TR };
 
     mofile*				current = NULL;
     std::map<std::string, mofile>	domains;
@@ -210,13 +213,49 @@ namespace translation
 	System::SetMessageLocale("");
 	std::string str = System::GetMessageLocale(1);
 
-	if(str == "cs")	locale = LOCALE_CS;
+	if(str == "af")	locale = LOCALE_AF;
+	else
+	if(str == "ar")	locale = LOCALE_AR;
+	else
+	if(str == "bg")	locale = LOCALE_BG;
+	else
+	if(str == "ca")	locale = LOCALE_CA;
+	else
+	if(str == "da")	locale = LOCALE_DA;
+	else
+	if(str == "de")	locale = LOCALE_DE;
+	else
+	if(str == "el")	locale = LOCALE_EL;
 	else
 	if(str == "es")	locale = LOCALE_ES;
 	else
+	if(str == "et")	locale = LOCALE_ET;
+	else
+	if(str == "eu")	locale = LOCALE_EU;
+	else
+	if(str == "fi")	locale = LOCALE_FI;
+	else
 	if(str == "fr")	locale = LOCALE_FR;
 	else
+	if(str == "gl")	locale = LOCALE_GL;
+	else
+	if(str == "he")	locale = LOCALE_HE;
+	else
+	if(str == "hr")	locale = LOCALE_HR;
+	else
 	if(str == "hu")	locale = LOCALE_HU;
+	else
+	if(str == "id")	locale = LOCALE_ID;
+	else
+	if(str == "it")	locale = LOCALE_IT;
+	else
+	if(str == "la")	locale = LOCALE_LA;
+	else
+	if(str == "lt")	locale = LOCALE_LT;
+	else
+	if(str == "lv")	locale = LOCALE_LV;
+	else
+	if(str == "mk")	locale = LOCALE_MK;
 	else
 	if(str == "nl")	locale = LOCALE_NL;
 	else
@@ -226,7 +265,15 @@ namespace translation
 	else
 	if(str == "ru")	locale = LOCALE_RU;
 	else
+	if(str == "sk")	locale = LOCALE_SK;
+	else
+	if(str == "sl")	locale = LOCALE_SL;
+	else
+	if(str == "sr")	locale = LOCALE_SR;
+	else
 	if(str == "sv")	locale = LOCALE_SV;
+	else
+	if(str == "tl")	locale = LOCALE_TL;
 	else
 	if(str == "tr")	locale = LOCALE_TR;
 
@@ -259,27 +306,48 @@ namespace translation
 	if(current)
 	    switch(locale)
 	{
-	    case LOCALE_CS:
-		return strip_context(current->ngettext(str, ((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2)));
-	    case LOCALE_ES:
-		return strip_context(current->ngettext(str, (n != 1)));
-	    case LOCALE_FR:
-		return strip_context(current->ngettext(str, (n > 1)));
-	    case LOCALE_HU:
-		return strip_context(current->ngettext(str, (n != 1)));
-	    case LOCALE_NL:
-		return strip_context(current->ngettext(str, (n != 1)));
-	    case LOCALE_PL:
-		return strip_context(current->ngettext(str, (n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)));
-	    case LOCALE_PT:
-		return strip_context(current->ngettext(str, (n > 1)));
-	    case LOCALE_RU:
-		return strip_context(current->ngettext(str, (n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)));
-		break;
-	    case LOCALE_SV:
-		return strip_context(current->ngettext(str, (n != 1)));
+	    case LOCALE_AF:
+	    case LOCALE_EU:
+	    case LOCALE_ID:
+	    case LOCALE_LA:
+	    case LOCALE_TL:
 	    case LOCALE_TR:
 		return strip_context(current->ngettext(str, 0));
+	    case LOCALE_AR:
+		return strip_context(current->ngettext(str, (n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5)));
+	    case LOCALE_BG:
+	    case LOCALE_DA:
+	    case LOCALE_DE:
+	    case LOCALE_ES:
+	    case LOCALE_ET:
+	    case LOCALE_FI:
+	    case LOCALE_GL:
+	    case LOCALE_HE:
+	    case LOCALE_IT:
+	    case LOCALE_NL:
+	    case LOCALE_SV:
+		return strip_context(current->ngettext(str, (n != 1)));
+	    case LOCALE_SK:
+		return strip_context(current->ngettext(str, ((n==1) ? 1 : (n>=2 && n<=4) ? 2 : 0)));
+	    case LOCALE_SL:
+		return strip_context(current->ngettext(str, (n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3)));
+	    case LOCALE_SR:
+		return strip_context(current->ngettext(str, (n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)));
+	    case LOCALE_CS:
+		return strip_context(current->ngettext(str, ((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2)));
+	    case LOCALE_EL:
+	    case LOCALE_FR:
+	    case LOCALE_PT:
+		return strip_context(current->ngettext(str, (n > 1)));
+	    case LOCALE_HR:
+	    case LOCALE_RU:
+	    case LOCALE_LT:
+	    case LOCALE_LV:
+		return strip_context(current->ngettext(str, (n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)));
+	    case LOCALE_MK:
+		return strip_context(current->ngettext(str, (n==1 || n%10==1 ? 0 : 1)));
+	    case LOCALE_PL:
+		return strip_context(current->ngettext(str, (n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)));
 	    default: break;
 	}
 

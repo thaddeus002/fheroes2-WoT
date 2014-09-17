@@ -49,14 +49,14 @@ SDL_LIBS := $(SDL_LIBS) -lSDL_ttf
 endif
 endif
 
-ifndef WITHOUT_NETWORK
-CFLAGS := $(CFLAGS) -DWITH_NET_DISABLE
-ifdef WITH_SDL2
-SDL_LIBS := $(SDL_LIBS) -lSDL2_net
-else
-SDL_LIBS := $(SDL_LIBS) -lSDL_net
-endif
-endif
+#ifndef WITHOUT_NETWORK
+#CFLAGS := $(CFLAGS) -DWITH_NET_DISABLE
+#ifdef WITH_SDL2
+#SDL_LIBS := $(SDL_LIBS) -lSDL2_net
+#else
+#SDL_LIBS := $(SDL_LIBS) -lSDL_net
+#endif
+#endif
 
 ifndef WITHOUT_XML
 CFLAGS := $(CFLAGS) -DWITH_XML

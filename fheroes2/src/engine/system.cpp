@@ -487,8 +487,8 @@ int System::GetRenderFlags(void)
  #if defined(__WIN32__) || defined(ANDROID)
     return SDL_RENDERER_ACCELERATED;
  #endif
-    //return SDL_RENDERER_ACCELERATED;
-    return SDL_RENDERER_SOFTWARE;
+    return SDL_RENDERER_ACCELERATED;
+    //return SDL_RENDERER_SOFTWARE;
 #else
  #if defined(__MINGW32CE__) || defined(__SYMBIAN32__)
     return SDL_SWSURFACE;
