@@ -68,6 +68,7 @@ public:
     };
 
     Kingdom();
+    virtual ~Kingdom() {}
 
     void	Init(int color);
     void	clear(void);

@@ -248,6 +248,7 @@ void GameOver::DialogLoss(int cond)
 	    body = _("The enemy has captured %{name}!\nThey are triumphant.");
 	    const Castle* town = world.GetCastle(conf.WinsMapsPositionObject());
 	    if(town) StringReplace(body, "%{name}", town->GetName());
+	    break;
 	}
 
 	case LOSS_STARTHERO:

@@ -391,6 +391,7 @@ bool Maps::TilesAddon::isRoad(int direct) const
 	    if(19 == index) return direct & (Direction::TOP_LEFT | Direction::BOTTOM_RIGHT);
 	    else
 	    if(20 == index) return direct & (Direction::TOP_RIGHT | Direction::BOTTOM_LEFT);
+	    else break;
 
 	// castle and tower (gate)
 	case ICN::OBJNTOWN:
@@ -406,7 +407,9 @@ bool Maps::TilesAddon::isRoad(int direct) const
 	    	157 == index ||
 	    	173 == index ||
 	    	189 == index) return direct & (Direction::TOP | Direction::BOTTOM);
+	    else break;
 
+		break;
 	// castle lands (gate)
         case ICN::OBJNTWBA:
 	    if(7 == index ||
@@ -417,6 +420,7 @@ bool Maps::TilesAddon::isRoad(int direct) const
 		57 == index ||
 		67 == index ||
 		77 == index) return direct & (Direction::TOP | Direction::BOTTOM);
+	    else break;
 
 	default:
 	    break;
@@ -1574,7 +1578,9 @@ void Maps::Tiles::RedrawMonster(Surface & dst) const
 	{
 	    case Direction::TOP_LEFT:
 	    case Direction::LEFT:
-	    case Direction::BOTTOM_LEFT:	revert = true;
+	    case Direction::BOTTOM_LEFT:
+	    	revert = true;
+	    	break;
 	    default: break;
 	}
 
@@ -2607,23 +2613,23 @@ void Maps::Tiles::RedrawFogs(Surface & dst, int color) const
 	{ index = 10; revert = false; }
 	else
 	// see ICN::CLOP32: sprite 6, 7, 8
-	if(around & (Direction::CENTER | Direction::TOP) && !(around & (Direction::BOTTOM | Direction::LEFT | Direction::RIGHT)))
+	if((around & (Direction::CENTER | Direction::TOP)) && !(around & (Direction::BOTTOM | Direction::LEFT | Direction::RIGHT)))
 	{ index = 6; revert = false; }
 	else
-	if(around & (Direction::CENTER | Direction::RIGHT) && !(around & (Direction::TOP | Direction::BOTTOM | Direction::LEFT)))
+	if((around & (Direction::CENTER | Direction::RIGHT)) && !(around & (Direction::TOP | Direction::BOTTOM | Direction::LEFT)))
 	{ index = 7; revert = false; }
 	else
-	if(around & (Direction::CENTER | Direction::LEFT) && !(around & (Direction::TOP | Direction::BOTTOM | Direction::RIGHT)))
+	if((around & (Direction::CENTER | Direction::LEFT)) && !(around & (Direction::TOP | Direction::BOTTOM | Direction::RIGHT)))
 	{ index = 7; revert = true; }
 	else
-	if(around & (Direction::CENTER | Direction::BOTTOM) && !(around & (Direction::TOP | Direction::LEFT | Direction::RIGHT)))
+	if((around & (Direction::CENTER | Direction::BOTTOM)) && !(around & (Direction::TOP | Direction::LEFT | Direction::RIGHT)))
 	{ index = 8; revert = false; }
 	else
 	// see ICN::CLOP32: sprite 9, 29
-	if(around & (DIRECTION_CENTER_COL) && !(around & (Direction::LEFT | Direction::RIGHT)))
+	if((around & (DIRECTION_CENTER_COL)) && !(around & (Direction::LEFT | Direction::RIGHT)))
 	{ index = 9; revert = false; }
 	else
-	if(around & (DIRECTION_CENTER_ROW) && !(around & (Direction::TOP | Direction::BOTTOM)))
+	if((around & (DIRECTION_CENTER_ROW)) && !(around & (Direction::TOP | Direction::BOTTOM)))
 	{ index = 29; revert = false; }
 	else
 	// see ICN::CLOP32: sprite 15, 22
@@ -2672,124 +2678,124 @@ void Maps::Tiles::RedrawFogs(Surface & dst, int color) const
 	{ index = 14; revert = true; }
 	else
 	// see ICN::CLOP32: sprite 11, 12
-	if(around & (Direction::CENTER | Direction::LEFT | Direction::BOTTOM_LEFT | Direction::BOTTOM) &&
+	if((around & (Direction::CENTER | Direction::LEFT | Direction::BOTTOM_LEFT | Direction::BOTTOM)) &&
 	 !(around & (Direction::TOP | Direction::TOP_RIGHT | Direction::RIGHT)))
 	{ index = 11; revert = false; }
 	else
-	if(around & (Direction::CENTER | Direction::RIGHT | Direction::BOTTOM_RIGHT | Direction::BOTTOM) &&
+	if((around & (Direction::CENTER | Direction::RIGHT | Direction::BOTTOM_RIGHT | Direction::BOTTOM)) &&
 	 !(around & (Direction::TOP | Direction::TOP_LEFT | Direction::LEFT)))
 	{ index = 11; revert = true; }
 	else
-	if(around & (Direction::CENTER | Direction::LEFT | Direction::TOP_LEFT | Direction::TOP) &&
+	if((around & (Direction::CENTER | Direction::LEFT | Direction::TOP_LEFT | Direction::TOP)) &&
 	 !(around & (Direction::BOTTOM | Direction::BOTTOM_RIGHT | Direction::RIGHT)))
 	{ index = 12; revert = false; }
 	else
-	if(around & (Direction::CENTER | Direction::RIGHT | Direction::TOP_RIGHT | Direction::TOP) &&
+	if((around & (Direction::CENTER | Direction::RIGHT | Direction::TOP_RIGHT | Direction::TOP)) &&
 	 !(around & (Direction::BOTTOM | Direction::BOTTOM_LEFT | Direction::LEFT)))
 	{ index = 12; revert = true; }
 	else
 	// see ICN::CLOP32: sprite 19, 20, 22
-	if(around & (DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::TOP | Direction::TOP_LEFT) &&
+	if((around & (DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::TOP | Direction::TOP_LEFT)) &&
 	 !(around & (Direction::BOTTOM_LEFT | Direction::BOTTOM_RIGHT | Direction::TOP_RIGHT)))
 	{ index = 19; revert = false; }
 	else
-	if(around & (DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::TOP | Direction::TOP_RIGHT) &&
+	if((around & (DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::TOP | Direction::TOP_RIGHT)) &&
 	 !(around & (Direction::BOTTOM_LEFT | Direction::BOTTOM_RIGHT | Direction::TOP_LEFT)))
 	{ index = 19; revert = true; }
 	else
-	if(around & (DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::TOP | Direction::BOTTOM_LEFT) &&
+	if((around & (DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::TOP | Direction::BOTTOM_LEFT)) &&
 	 !(around & (Direction::TOP_RIGHT | Direction::BOTTOM_RIGHT | Direction::TOP_LEFT)))
 	{ index = 20; revert = false; }
 	else
-	if(around & (DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::TOP | Direction::BOTTOM_RIGHT) &&
+	if((around & (DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::TOP | Direction::BOTTOM_RIGHT)) &&
 	 !(around & (Direction::TOP_RIGHT | Direction::BOTTOM_LEFT | Direction::TOP_LEFT)))
 	{ index = 20; revert = true; }
 	else
-	if(around & (DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::TOP) &&
+	if((around & (DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::TOP)) &&
 	 !(around & (Direction::TOP_RIGHT | Direction::BOTTOM_RIGHT | Direction::BOTTOM_LEFT | Direction::TOP_LEFT)))
 	{ index = 22; revert = false; }
 	else
 	// see ICN::CLOP32: sprite 24, 25, 26, 30
-	if(around & (DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::BOTTOM_LEFT) &&
+	if((around & (DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::BOTTOM_LEFT)) &&
 	 !(around & (Direction::TOP | Direction::BOTTOM_RIGHT)))
 	{ index = 24; revert = false; }
 	else
-	if(around & (DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::BOTTOM_RIGHT) &&
+	if((around & (DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::BOTTOM_RIGHT)) &&
 	 !(around & (Direction::TOP | Direction::BOTTOM_LEFT)))
 	{ index = 24; revert = true; }
 	else
-	if(around & (DIRECTION_CENTER_COL | Direction::LEFT | Direction::TOP_LEFT) &&
+	if((around & (DIRECTION_CENTER_COL | Direction::LEFT | Direction::TOP_LEFT)) &&
 	 !(around & (Direction::RIGHT | Direction::BOTTOM_LEFT)))
 	{ index = 25; revert = false; }
 	else
-	if(around & (DIRECTION_CENTER_COL | Direction::RIGHT | Direction::TOP_RIGHT) &&
+	if((around & (DIRECTION_CENTER_COL | Direction::RIGHT | Direction::TOP_RIGHT)) &&
 	 !(around & (Direction::LEFT | Direction::BOTTOM_RIGHT)))
 	{ index = 25; revert = true; }
 	else
-	if(around & (DIRECTION_CENTER_COL | Direction::BOTTOM_LEFT | Direction::LEFT) &&
+	if((around & (DIRECTION_CENTER_COL | Direction::BOTTOM_LEFT | Direction::LEFT)) &&
 	 !(around & (Direction::RIGHT | Direction::TOP_LEFT)))
 	{ index = 26; revert = false; }
 	else
-	if(around & (DIRECTION_CENTER_COL | Direction::BOTTOM_RIGHT | Direction::RIGHT) &&
+	if((around & (DIRECTION_CENTER_COL | Direction::BOTTOM_RIGHT | Direction::RIGHT)) &&
 	 !(around & (Direction::LEFT | Direction::TOP_RIGHT)))
 	{ index = 26; revert = true; }
 	else
-	if(around & (DIRECTION_CENTER_ROW | Direction::TOP_LEFT | Direction::TOP) &&
+	if((around & (DIRECTION_CENTER_ROW | Direction::TOP_LEFT | Direction::TOP)) &&
 	 !(around & (Direction::BOTTOM | Direction::TOP_RIGHT)))
 	{ index = 30; revert = false; }
 	else
-	if(around & (DIRECTION_CENTER_ROW | Direction::TOP_RIGHT | Direction::TOP) &&
+	if((around & (DIRECTION_CENTER_ROW | Direction::TOP_RIGHT | Direction::TOP)) &&
 	 !(around & (Direction::BOTTOM | Direction::TOP_LEFT)))
 	{ index = 30; revert = true; }
 	else
 	// see ICN::CLOP32: sprite 27, 28
-	if(around & (Direction::CENTER | Direction::BOTTOM | Direction::LEFT) &&
+	if((around & (Direction::CENTER | Direction::BOTTOM | Direction::LEFT)) &&
 	 !(around & (Direction::TOP | Direction::TOP_RIGHT | Direction::RIGHT | Direction::BOTTOM_LEFT)))
 	{ index = 27; revert = false; }
 	else
-	if(around & (Direction::CENTER | Direction::BOTTOM | Direction::RIGHT) &&
+	if((around & (Direction::CENTER | Direction::BOTTOM | Direction::RIGHT)) &&
 	 !(around & (Direction::TOP | Direction::TOP_LEFT | Direction::LEFT | Direction::BOTTOM_RIGHT)))
 	{ index = 27; revert = true; }
 	else
-	if(around & (Direction::CENTER | Direction::LEFT | Direction::TOP) &&
+	if((around & (Direction::CENTER | Direction::LEFT | Direction::TOP)) &&
 	 !(around & (Direction::TOP_LEFT | Direction::RIGHT | Direction::BOTTOM | Direction::BOTTOM_RIGHT)))
 	{ index = 28; revert = false; }
 	else
-	if(around & (Direction::CENTER | Direction::RIGHT | Direction::TOP) &&
+	if((around & (Direction::CENTER | Direction::RIGHT | Direction::TOP)) &&
 	 !(around & (Direction::TOP_RIGHT | Direction::LEFT | Direction::BOTTOM | Direction::BOTTOM_LEFT)))
 	{ index = 28; revert = true; }
 	else
 	// see ICN::CLOP32: sprite 31, 32, 33
-	if(around & (DIRECTION_CENTER_ROW | Direction::TOP) &&
+	if((around & (DIRECTION_CENTER_ROW | Direction::TOP)) &&
 	 !(around & (Direction::BOTTOM | Direction::TOP_LEFT | Direction::TOP_RIGHT)))
 	{ index = 31; revert = false; }
 	else
-	if(around & (DIRECTION_CENTER_COL | Direction::RIGHT) &&
+	if((around & (DIRECTION_CENTER_COL | Direction::RIGHT)) &&
 	 !(around & (Direction::LEFT | Direction::TOP_RIGHT | Direction::BOTTOM_RIGHT)))
 	{ index = 32; revert = false; }
 	else
-	if(around & (DIRECTION_CENTER_COL | Direction::LEFT) &&
+	if((around & (DIRECTION_CENTER_COL | Direction::LEFT)) &&
 	 !(around & (Direction::RIGHT | Direction::TOP_LEFT | Direction::BOTTOM_LEFT)))
 	{ index = 32; revert = true; }
 	else
-	if(around & (DIRECTION_CENTER_ROW | Direction::BOTTOM) &&
+	if((around & (DIRECTION_CENTER_ROW | Direction::BOTTOM)) &&
 	 !(around & (Direction::TOP | Direction::BOTTOM_LEFT | Direction::BOTTOM_RIGHT)))
 	{ index = 33; revert = false; }
 	else
 	// see ICN::CLOP32: sprite 0, 1, 2, 3, 4, 5
-	if(around & (DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW) &&
+	if((around & (DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW)) &&
 	 !(around & (Direction::TOP)))
 	{ index = (GetIndex() % 2) ? 0 : 1; revert = false; }
 	else
-	if(around & (DIRECTION_CENTER_ROW | DIRECTION_TOP_ROW) &&
+	if((around & (DIRECTION_CENTER_ROW | DIRECTION_TOP_ROW)) &&
 	 !(around & (Direction::BOTTOM)))
 	{ index = (GetIndex() % 2) ? 4 : 5; revert = false; }
 	else
-	if(around & (DIRECTION_CENTER_COL | DIRECTION_LEFT_COL) &&
+	if((around & (DIRECTION_CENTER_COL | DIRECTION_LEFT_COL)) &&
 	 !(around & (Direction::RIGHT)))
 	{ index = (GetIndex() % 2) ? 2 : 3; revert = false; }
 	else
-	if(around & (DIRECTION_CENTER_COL | DIRECTION_RIGHT_COL) &&
+	if((around & (DIRECTION_CENTER_COL | DIRECTION_RIGHT_COL)) &&
 	 !(around & (Direction::LEFT)))
 	{ index = (GetIndex() % 2) ? 2 : 3; revert = true; }
 	// unknown

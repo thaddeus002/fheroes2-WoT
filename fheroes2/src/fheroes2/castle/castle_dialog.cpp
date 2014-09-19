@@ -567,7 +567,7 @@ int Castle::OpenDialog(bool readonly, bool fade)
     		    if(selectArmy1.isSelected()) selectArmy1.ResetSelected();
     		    if(selectArmy2.isValid() && selectArmy2.isSelected()) selectArmy2.ResetSelected();
 
-            	    if(readonly && (*it).id & (BUILD_SHIPYARD | BUILD_MARKETPLACE | BUILD_WELL | BUILD_TENT | BUILD_CASTLE))
+            	    if(readonly && ((*it).id & (BUILD_SHIPYARD | BUILD_MARKETPLACE | BUILD_WELL | BUILD_TENT | BUILD_CASTLE)))
                 	Dialog::Message(GetStringBuilding((*it).id), GetDescriptionBuilding((*it).id), Font::BIG, Dialog::OK);
             	    else
             	    switch((*it).id)

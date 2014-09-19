@@ -399,7 +399,7 @@ void Heroes::PostLoad(void)
 	LevelUp(Modes(CUSTOMSKILLS), true);
     }
 
-    if(race & (Race::SORC | Race::WRLK | Race::WZRD | Race::NECR) &&
+    if((race & (Race::SORC | Race::WRLK | Race::WZRD | Race::NECR)) &&
 	! HaveSpellBook())
     {
 	Spell spell = Skill::Primary::GetInitialSpell(race);
