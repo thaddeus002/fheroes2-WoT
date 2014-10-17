@@ -898,11 +898,31 @@ void MapTiles::generateMap(int step)
 	{
 	    for(int yy = step; yy < height; yy += 2 * step)
 	    {
-		float sum = map[xx - step][yy - step] +	// down-left
-			map[xx - step][yy + step] +	// up-left
-			map[xx + step][yy - step] +	// down-right
-			map[xx + step][yy + step];	// up-right
-		map[xx][yy] = sum / 4 + Editor::RandF(-h, h);
+                float sum = 0;
+                int count = 0;
+
+                if(xx - step >= 0 && yy - step >= 0)
+                {
+                    sum += map[xx - step][yy - step];
+                    count++;
+                }
+                if(xx - step >= 0 && yy + step < height)
+                {
+                    sum += map[xx - step][yy + step];
+                    count++;
+                }
+                if(xx + step < width && yy - step >= 0)
+                {
+                    sum += map[xx + step][yy - step];
+                    count++;
+                }
+                if(xx + step < width && yy + step < height)
+                {
+                    sum += map[xx + step][yy + step];
+                    count++;
+                }
+
+		map[xx][yy] = sum / count + Editor::RandF(-h, h);
 	    }
 	}
 

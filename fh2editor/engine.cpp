@@ -800,12 +800,12 @@ QPixmap AGG::Spool::getImage(const CompositeObject & obj, const QSize & tileSize
 float Editor::RandF(float min, float max)
 {
     if(min > max) qSwap(min, max);
-    return min + Rand(max - min);
+    return min + RandF(max - min);
 }
 
 float Editor::RandF(float max)
 {
-    return static_cast<float>((max + 1) * (qrand() / (RAND_MAX + 1.0)));
+    return qrand() * (max) / static_cast<float>(RAND_MAX);
 }
 
 quint32 Editor::Rand(quint32 min, quint32 max)
