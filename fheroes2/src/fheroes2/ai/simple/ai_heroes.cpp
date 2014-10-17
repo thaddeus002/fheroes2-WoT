@@ -324,7 +324,8 @@ void AIHeroesAddedTask(Heroes & hero)
 
 	if(hero.isShipMaster())
 	{
-	    if(! tile.isWater()) continue;
+	    if(MP2::OBJ_COAST != tile.GetObject() &&
+		! tile.isWater()) continue;
 
 	    // check previous positions
 	    if(MP2::OBJ_COAST == (*it).second &&
