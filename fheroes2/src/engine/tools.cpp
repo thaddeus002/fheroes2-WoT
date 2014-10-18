@@ -31,6 +31,7 @@
 
 #include "types.h"
 #include "error.h"
+#include "system.h"
 #include "tools.h"
 
 enum KeyMod { MOD_NONE = KMOD_NONE,
@@ -523,46 +524,34 @@ KeySym KeySymFromChar(char c)
 
 bool SaveMemToFile(const std::vector<u8> & data, const std::string & file)
 {
-    std::ofstream fs(file.c_str(), std::ios::binary);
+    SDL_RWops *rw = SDL_RWFromFile(file.c_str(),"wb");
 
-    if(fs.is_open() && data.size())
+    if(rw && 1 == SDL_RWwrite(rw, & data[0], data.size(), 1))
+	SDL_RWclose(rw);
+    else
     {
-        fs.write(reinterpret_cast<const char*>(&data[0]), data.size());
-        fs.close();
-        return true;
+	ERROR(SDL_GetError());
+        return false;
     }
-    return false;
+
+    return true;
 }
 
 std::vector<u8> LoadFileToMem(const std::string & file)
 {
-    std::ifstream fs(file.c_str(), std::ios::binary);
     std::vector<u8> data;
+    SDL_RWops *rw = SDL_RWFromFile(file.c_str(),"rb");
 
-    if(fs.is_open())
+    if(rw && SDL_RWseek(rw, 0, RW_SEEK_END) != -1)
     {
-        fs.seekg(0, std::ios_base::end);
-        data.resize(fs.tellg());
-        fs.seekg(0, std::ios_base::beg);
-        fs.read(reinterpret_cast<char*>(&data[0]), data.size());
-        fs.close();
+	data.resize(SDL_RWtell(rw));
+	SDL_RWseek(rw, 0, RW_SEEK_SET);
+	SDL_RWread(rw, & data[0], data.size(), 1);
+	SDL_RWclose(rw);
     }
     else
     {
-#if defined(ANDROID)
-	SDL_RWops *rw = SDL_RWFromFile(file.c_str(),"r");
-
-	if(rw != NULL)
-	{
-	    if(SDL_RWseek(rw, 0, RW_SEEK_END) != -1)
-	    {
-		data.resize(SDL_RWtell(rw));
-		SDL_RWseek(rw, 0, RW_SEEK_SET);
-		SDL_RWread(rw, reinterpret_cast<char*>(&data[0]), data.size(), 1);
-		SDL_RWclose(rw);
-	    }
-	}
-#endif
+	ERROR(SDL_GetError());
     }
 
     return data;

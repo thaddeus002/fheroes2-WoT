@@ -28,7 +28,6 @@
 #include "engine.h"
 #include "serialize.h"
 
-#define MINCAPACITY 1024
 /*
 #ifdef WITH_NET
 #include "sdlnet.h"
@@ -116,7 +115,7 @@ int StreamBase::get8(void)
 
 void StreamBase::put8(u8 ch)
 {
-    resize(1);
+    resize(sizep() + 1);
     if(1 != SDL_RWwrite(rw, & ch, 1, 1)) setfail();
 }
 
@@ -152,25 +151,25 @@ int StreamBase::get32(void)
 
 void StreamBase::putBE32(u32 val)
 {
-    resize(4);
+    resize(sizep() + 4);
     if(0 == SDL_WriteBE32(rw, val)) setfail();
 }
 
 void StreamBase::putLE32(u32 val)
 {
-    resize(4);
+    resize(sizep() + 4);
     if(0 == SDL_WriteLE32(rw, val)) setfail();
 }
 
 void StreamBase::putBE16(u16 val)
 {
-    resize(2);
+    resize(sizep() + 2);
     if(0 == SDL_WriteBE16(rw, val)) setfail();
 }
 
 void StreamBase::putLE16(u16 val)
 {
-    resize(2);
+    resize(sizep() + 2);
     if(0 == SDL_WriteLE16(rw, val)) setfail();
 }
 
@@ -194,7 +193,7 @@ std::vector<u8> StreamBase::getRaw(size_t sz)
  
 void StreamBase::putRaw(const void* ptr, size_t sz)
 {
-    resize(sz);
+    resize(sizep() + sz);
     if(1 != SDL_RWwrite(rw, ptr, sz, 1)) setfail();
 }
 
@@ -422,12 +421,31 @@ StreamBuf StreamFile::toStreamBuf(void)
     return buf;
 }
 
-StreamBuf::StreamBuf(const u8* ptr, size_t sz) : buf(NULL), len(0)
+StreamBuf::StreamBuf(const u8* ptr, size_t sz) : itb(NULL), itp(NULL), ite(NULL)
 {
-    buf = const_cast<u8*>(ptr);
-    len = sz;
+    itb = const_cast<u8*>(ptr);
+    ite = itb + sz;
+    itp = ite;
 
-    rw = SDL_RWFromConstMem(buf, len);
+    rw = SDL_RWFromConstMem(data(), size());
+    if(! rw) ERROR(SDL_GetError());
+        
+    setconstbuf(true);
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    setbigendian(true);
+#else
+    setbigendian(false);
+#endif
+}
+
+StreamBuf::StreamBuf(const std::vector<u8> & v) : itb(NULL), itp(NULL), ite(NULL)
+{
+    itb = const_cast<u8*>(& v[0]);
+    ite = itb + v.size();
+    itp = ite;
+
+    rw = SDL_RWFromConstMem(data(), size());
     if(! rw) ERROR(SDL_GetError());
 
     setconstbuf(true);
@@ -439,15 +457,11 @@ StreamBuf::StreamBuf(const u8* ptr, size_t sz) : buf(NULL), len(0)
 #endif
 }
 
-StreamBuf::StreamBuf(const std::vector<u8> & v) : buf(NULL), len(0)
+#define MIN_BUF_SIZE	1024
+
+StreamBuf::StreamBuf(size_t sz) : itb(NULL), itp(NULL), ite(NULL)
 {
-    buf = const_cast<u8*>(& v[0]);
-    len = v.size();
-
-    rw = SDL_RWFromConstMem(buf, len);
-    if(! rw) ERROR(SDL_GetError());
-
-    setconstbuf(true);
+    resize(sz);
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
     setbigendian(true);
@@ -456,60 +470,16 @@ StreamBuf::StreamBuf(const std::vector<u8> & v) : buf(NULL), len(0)
 #endif
 }
 
-StreamBuf::StreamBuf(size_t sz) : buf(NULL), len(sz)
+StreamBuf::StreamBuf(const StreamBuf & sb) : itb(NULL), itp(NULL), ite(NULL)
 {
-    if(len)
-    {
-	if(len < MINCAPACITY) len = MINCAPACITY;
-	buf = new u8 [len];
-	rw = SDL_RWFromMem(buf, len);
-	if(! rw) ERROR(SDL_GetError());
-    }
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-    setbigendian(true);
-#else
-    setbigendian(false);
-#endif
-}
-
-StreamBuf::StreamBuf(const StreamBuf & sb) : buf(NULL), len(0)
-{
-    if(sb.len)
-    {
-	len = sb.len;
-	buf = new u8 [len];
-	flags = sb.flags;
-
-	std::copy(sb.buf, sb.buf + len, buf);
-
-        rw = SDL_RWFromMem(buf, len);
-	SDL_RWseek(rw, SDL_RWtell(sb.rw), RW_SEEK_SET);
-    }
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-    setbigendian(true);
-#else
-    setbigendian(false);
-#endif
+    set(sb);
 }
 
 StreamBuf & StreamBuf::operator= (const StreamBuf & sb)
 {
     clear();
-
-    if(sb.len)
-    {
-        len = sb.len;
-	buf = new u8 [len];
-	flags = sb.flags;
-
-        std::copy(sb.buf, sb.buf + len, buf);
-
-	rw = SDL_RWFromMem(buf, len);
-        SDL_RWseek(rw, SDL_RWtell(sb.rw), RW_SEEK_SET);
-    }
-
+    set(sb);
+        
     return *this;
 }
 
@@ -518,12 +488,32 @@ StreamBuf::~StreamBuf()
     clear();
 }
 
+void StreamBuf::set(const StreamBuf & sb)
+{
+    if(sb.size())
+    {
+	int len = sb.ite - sb.itb;
+        itb = new u8 [len];
+        ite = itb + len;
+        itp = itb + sb.size();
+        std::fill(itb, ite, 0);
+        flags = sb.flags;
+
+        std::copy(sb.itb, sb.ite, itb);
+
+        rw = SDL_RWFromMem(data(), size());
+        SDL_RWseek(rw, SDL_RWtell(sb.rw), RW_SEEK_SET);
+    }
+}
+
 void StreamBuf::clear(void)
 {
-    if(buf && !isconstbuf())
-	delete [] buf;
+    if(itb && !isconstbuf())
+	delete [] itb;
     if(rw) SDL_RWclose(rw);
-    len = 0;
+    itb = NULL;
+    itp = NULL;
+    ite = NULL;
 }
 
 void StreamBuf::setconstbuf(bool f)
@@ -539,32 +529,58 @@ bool StreamBuf::isconstbuf(void) const
     return flags & 0x00001000;
 }
 
+size_t StreamBuf::tellp(void) const
+{
+    return rw ? SDL_RWtell(rw) : 0;
+}
+
+size_t StreamBuf::tellg(void) const
+{
+    return rw ? SDL_RWtell(rw) : 0;
+}
+
+size_t StreamBuf::sizep(void) const
+{
+    return size() - tellp();
+}
+
+size_t StreamBuf::sizeg(void) const
+{
+    return size() - tellg();
+}
+
 void StreamBuf::resize(size_t sz)
 {
-    if(!rw)
+    if(!rw && 0 < sz)
     {
-	len = sz < MINCAPACITY ? MINCAPACITY : sz;
-	buf = new u8 [len];
-	rw = SDL_RWFromMem(buf, len);
-	if(! rw) ERROR(SDL_GetError());
+	int len = MIN_BUF_SIZE > sz ? MIN_BUF_SIZE : sz;
+        itb = new u8 [len];
+        itp = itb + sz;
+        ite = itb + len;
+        std::fill(itb, ite, 0);
+        rw = SDL_RWFromMem(data(), size());
+        if(! rw) ERROR(SDL_GetError());
     }
     else
-    if(SDL_RWtell(rw) + sz > len)
+    if(sz > static_cast<size_t>(ite - itb))
     {
-	if(sz < MINCAPACITY) sz = MINCAPACITY;
-	u8* ptr = new u8 [len + sz];
+	int len2 = sz + MIN_BUF_SIZE;
+        u8* itb2 = new u8 [len2];
+        u8* ite2 = itb2 + len2;
+        u8* itp2 = itb2 + sz;
 
-	std::fill(ptr, ptr + len + sz, 0);
-	std::copy(buf, buf + len, ptr);
+        std::fill(itb2, ite2, 0);
+        std::copy(itb, ite, itb2);
 
-	long int pos = SDL_RWtell(rw);
-	SDL_RWclose(rw);
-	delete [] buf;
+        long int pos = SDL_RWtell(rw);
+        SDL_RWclose(rw);
+        delete [] itb;
 
-	buf = ptr;
-	len += sz;
+        itb = itb2;
+        itp = itp2;
+        ite = ite2;
 
-	rw = SDL_RWFromMem(buf, len);
-	SDL_RWseek(rw, pos, RW_SEEK_SET);
+        rw = SDL_RWFromMem(itb, size());
+        SDL_RWseek(rw, pos, RW_SEEK_SET);
     }
 }

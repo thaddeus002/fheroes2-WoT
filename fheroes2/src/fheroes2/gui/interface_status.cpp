@@ -71,7 +71,7 @@ u32 Interface::StatusWindow::ResetResourceStatus(u32 tick, void *ptr)
 	    status->timerShowLastResource.Remove();
     }
 
-    return tick;
+    return 0;
 }
 
 void Interface::StatusWindow::SavePosition(void)

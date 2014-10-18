@@ -52,7 +52,9 @@ protected:
     SDL_RWops*		rw;
     size_t		flags;
 
-    virtual void	resize(size_t) {}
+    virtual size_t      sizep(void) const { return 0; }
+    virtual size_t      sizeg(void) const { return 0; }
+    virtual void        resize(size_t) {}
 
 public:
     StreamBase() : rw(NULL), flags(0) {}
@@ -196,13 +198,20 @@ public:
 
 class StreamBuf : public StreamBase
 {
-    u8*			buf;
-    size_t		len;
+    u8*                 itb;
+    u8*                 itp;
+    u8*                 ite;
 
 protected:
     void		setconstbuf(bool);
     bool		isconstbuf(void) const;
-    void		resize(size_t);
+
+    size_t              tellp(void) const;
+    size_t              tellg(void) const;
+    size_t              sizep(void) const;
+    size_t              sizeg(void) const;
+    void                resize(size_t);
+    void		set(const StreamBuf &);
 
 public:
     StreamBuf(size_t = 0);
@@ -213,9 +222,9 @@ public:
 
     StreamBuf &		operator= (const StreamBuf &);
 
-    const u8*		data(void) const { return buf; }
-    u8*			data(void) { return buf; }
-    size_t		size(void) const { return len; }
+    const u8*		data(void) const { return itb; }
+    u8*			data(void) { return itb; }
+    size_t		size(void) const { return itp - itb; }
     void		clear(void);
 };
 

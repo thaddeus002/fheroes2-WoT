@@ -20,6 +20,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifndef _H2TRANSLATION_
+#define _H2TRANSLATION_
+
 namespace translation
 {
     bool bind_domain(const char* domain, const char* file);
@@ -31,3 +34,5 @@ namespace translation
     const char* ngettext(const char* str, const char* plural, size_t num);
     const char* dngettext(const char* domain, const char* str, const char* plural, size_t num);
 }
+
+#endif

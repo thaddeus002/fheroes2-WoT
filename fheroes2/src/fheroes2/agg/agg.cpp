@@ -1134,6 +1134,8 @@ void AGG::LoadICN(int icn, u32 index, bool reflect)
 		if(! LoadOrgICN(icn, index, reflect))
 		    Error::Except(__FUNCTION__, "load icn");
 	    }
+
+	    if(Settings::Get().UseAltResource()) SaveICN(icn);
 	}
 
 	// pocketpc: scale sprites
@@ -1837,12 +1839,7 @@ void AGG::Quit(void)
 	icn_cache_t & icns = (*it);
 
 	if(icns.sprites)
-	{
-	    int icn_num = std::distance(icn_cache.begin(), it);
-	    if(icn_num < ICN::LASTICN &&
-		Settings::Get().UseAltResource()) SaveICN(icn_num);
 		delete [] icns.sprites;
-	}
 	icns.sprites = NULL;
 	if(icns.reflect) delete [] icns.reflect;
 	icns.reflect = NULL;
