@@ -127,7 +127,8 @@ std::string GetString(const Rect & rt)
 
 std::string GetString(const std::vector<u8> & v)
 {
-    return std::string(v.begin(), v.end());
+    std::vector<u8>::const_iterator itend = std::find(v.begin(), v.end(), 0);
+    return std::string(v.begin(), itend != v.end() ? itend : v.end());
 }
 
 std::string GetHexString(int value, int width)

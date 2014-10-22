@@ -121,7 +121,7 @@ bool ZStreamFile::read(const std::string & fn, size_t offset)
         sf.skip(4); // old stream format
 	std::vector<u8> zip = sf.getRaw(size1);
         std::vector<u8> raw = zlibDecompress(& zip[0], zip.size(), size0);
-	putRaw(& raw[0], raw.size());
+	putRaw(reinterpret_cast<char*>(& raw[0]), raw.size());
 	seek(0);
 #else
         const u32 size0 = sf.get32(); // raw size
@@ -149,7 +149,7 @@ bool ZStreamFile::write(const std::string & fn, bool append) const
     	    sf.put32(size());
     	    sf.put32(zip.size());
     	    sf.put32(0);	// unused, old format support
-	    sf.putRaw(& zip[0], zip.size());
+	    sf.putRaw(reinterpret_cast<char*>(& zip[0]), zip.size());
 	    return ! sf.fail();
 	}
 #else

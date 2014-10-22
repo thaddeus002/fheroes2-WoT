@@ -30,67 +30,59 @@
 
 #include "types.h"
 
-#ifdef WITH_NET
-namespace Network { class Socket; }
-#endif
-
 struct Point;
 struct Rect;
 struct Size;
 
 class StreamBase
 {
-private:
-    StreamBase(const StreamBase &) {}
-    StreamBase &	operator= (const StreamBase &) { return *this; }
-
 protected:
-    int			get8(void);
-    void		put8(u8);
-    void		setfail(void);
-
-    SDL_RWops*		rw;
     size_t		flags;
 
-    virtual size_t      sizep(void) const { return 0; }
-    virtual size_t      sizeg(void) const { return 0; }
-    virtual void        resize(size_t) {}
+    virtual int		get8(void) = 0;
+    virtual void	put8(char) = 0;
+
+    virtual size_t	sizeg(void) const = 0;
+    virtual size_t	sizep(void) const = 0;
+    virtual size_t	tellg(void) const = 0;
+    virtual size_t	tellp(void) const = 0;
 
 public:
-    StreamBase() : rw(NULL), flags(0) {}
-    ~StreamBase() {}
+    StreamBase() : flags(0) {}
+    virtual ~StreamBase() {}
 
-    int			getBE16(void);
-    int			getLE16(void);
-    int			getBE32(void);
-    int			getLE32(void);
+    bool		fail(void) const;
 
-    int			get16(void);
-    int			get32(void);
-
-    void                putBE32(u32);
-    void                putLE32(u32);
-    void                putBE16(u16);
-    void                putLE16(u16);
-
-    void		put16(u16);
-    void		put32(u32);
-
-    int			get(void) { return get8(); } // get char
-    void		put(int ch) { put8(ch); }
-
-    std::vector<u8>	getRaw(size_t = 0 /* all data */);
-    void		putRaw(const void*, size_t);
-
-    void		skip(size_t);
+    void		setconstbuf(bool);
+    bool		isconstbuf(void) const;
 
     void		setbigendian(bool);
     bool		bigendian(void) const;
 
-    bool		fail(void) const;
+    virtual int		getBE16(void);
+    virtual int		getLE16(void);
+    virtual int		getBE32(void);
+    virtual int		getLE32(void);
 
-    long int		tell(void) const;
-    bool		seek(long int);
+    virtual void	putBE32(u32);
+    virtual void	putLE32(u32);
+    virtual void	putBE16(u16);
+    virtual void	putLE16(u16);
+
+    virtual std::vector<u8>	getRaw(size_t = 0 /* all data */);
+    virtual void		putRaw(const char*, size_t);
+
+    int			get16(void);
+    int			get32(void);
+
+    void		put16(u16);
+    void		put32(u32);
+
+
+    int                 get(void) { return get8(); } // get char
+    void                put(int ch) { put8(ch); }
+
+    virtual void	skip(size_t);
 
     StreamBase &	operator>> (bool &);
     StreamBase &	operator>> (char &);
@@ -196,51 +188,97 @@ public:
     }
 };
 
+#ifdef WITH_ZLIB
+class ZStreamBuf;
+#endif
+
 class StreamBuf : public StreamBase
 {
-    u8*                 itb;
-    u8*                 itp;
-    u8*                 ite;
-
-protected:
-    void		setconstbuf(bool);
-    bool		isconstbuf(void) const;
-
-    size_t              tellp(void) const;
-    size_t              tellg(void) const;
-    size_t              sizep(void) const;
-    size_t              sizeg(void) const;
-    void                resize(size_t);
-    void		set(const StreamBuf &);
-
 public:
     StreamBuf(size_t = 0);
-    StreamBuf(const u8*, size_t);
-    StreamBuf(const std::vector<u8> &);
     StreamBuf(const StreamBuf &);
+    StreamBuf(const std::vector<u8> &);
+    StreamBuf(const u8*, size_t);
+
     ~StreamBuf();
 
     StreamBuf &		operator= (const StreamBuf &);
 
-    const u8*		data(void) const { return itb; }
-    u8*			data(void) { return itb; }
-    size_t		size(void) const { return itp - itb; }
-    void		clear(void);
+    size_t		capacity(void) const;
+    void		reset(void);
+    std::string		dump(void) const;
+
+    const u8*		data(void) const;
+    u8*			data(void);
+    size_t		size(void) const;
+
+    void		skip(size_t);
+    void		seek(size_t);
+
+protected:
+    size_t		tellg(void) const;
+    size_t		tellp(void) const;
+    size_t		sizeg(void) const;
+    size_t		sizep(void) const;
+
+    void		copy(const StreamBuf &);
+    void		realloc(size_t);
+    void		setfail(void);
+
+    int			get8(void);
+    void		put8(char);
+
+#ifdef WITH_ZLIB
+    friend class ZStreamBuf;
+#endif
+
+    u8*			itbeg;
+    u8*			itget;
+    u8*			itput;
+    u8*			itend;
 };
 
 class StreamFile : public StreamBase
 {
+    SDL_RWops*		rw;
+
 public:
     StreamFile() {}
-    ~StreamFile();
     StreamFile(const std::string &, const char* mode);
+    ~StreamFile();
 
-    long int		size(void) const;
-    bool		read(void*, size_t);
+    size_t		size(void) const;
+    size_t		tell(void) const;
+    void		seek(size_t);
+    //bool		read(void*, size_t);
     bool		open(const std::string &, const char* mode);
     void		close(void);
 
-    StreamBuf		toStreamBuf(void);
+    StreamBuf		toStreamBuf(size_t = 0 /* all data */);
+
+    void		skip(size_t);
+
+    int			getBE16(void);
+    int			getLE16(void);
+    int			getBE32(void);
+    int			getLE32(void);
+
+    void		putBE32(u32);
+    void		putLE32(u32);
+    void		putBE16(u16);
+    void		putLE16(u16);
+
+    std::vector<u8>	getRaw(size_t = 0 /* all data */);
+    void		putRaw(const char*, size_t);
+
+protected:
+    size_t		sizeg(void) const;
+    size_t		sizep(void) const;
+    size_t		tellg(void) const;
+    size_t		tellp(void) const;
+
+    int			get8(void);
+    void		put8(char);
 };
 
 #endif

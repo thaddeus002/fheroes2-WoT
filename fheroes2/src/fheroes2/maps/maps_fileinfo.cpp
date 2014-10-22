@@ -436,18 +436,12 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
     }
 
     // name
-    char bufname[LENGTHNAME];
     fs.seek(0x3A);
-    fs.read(bufname, LENGTHNAME);
-    bufname[LENGTHNAME - 1] = 0;
-    name = Game::GetEncodeString(bufname);
+    name = Game::GetEncodeString(GetString(fs.getRaw(LENGTHNAME)));
 
     // description
-    char bufdescription[LENGTHDESCRIPTION];
     fs.seek(0x76);
-    fs.read(bufdescription, LENGTHDESCRIPTION);
-    bufdescription[LENGTHDESCRIPTION - 1] = 0;
-    description = Game::GetEncodeString(bufdescription);
+    description = Game::GetEncodeString(GetString(fs.getRaw(LENGTHDESCRIPTION)));
 
     //fill unions
     if(4 == conditions_wins)

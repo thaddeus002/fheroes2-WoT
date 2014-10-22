@@ -1029,8 +1029,8 @@ bool World::LoadMapMP2(const std::string & filename)
 
 	// read block
 	size_t sizeblock = fs.getLE16();
-	u8* pblock = new u8[sizeblock];
-	fs.read(pblock, sizeblock);
+	std::vector<u8> buf = fs.getRaw(sizeblock);
+	const u8* pblock = & buf[0];
 
 	for(MapsIndexes::const_iterator
 	    it_index = vec_object.begin(); it_index != vec_object.end() && findobject < 0; ++it_index)
@@ -1195,7 +1195,7 @@ bool World::LoadMapMP2(const std::string & filename)
 	    {
 		if(pblock[8])
 		{
-		    vec_rumors.push_back(Game::GetEncodeString(reinterpret_cast<char*>(&pblock[8])));
+		    vec_rumors.push_back(Game::GetEncodeString(reinterpret_cast<const char*>(&pblock[8])));
 		    DEBUG(DBG_GAME, DBG_INFO, "add rumors: " << vec_rumors.back());
 		}
 	    }
@@ -1205,8 +1205,6 @@ bool World::LoadMapMP2(const std::string & filename)
 	{
 	    DEBUG(DBG_GAME, DBG_WARN, "read maps: unknown block addons, size: " << sizeblock);
 	}
-
-	delete [] pblock;
     }
 
     PostLoad();

@@ -128,10 +128,9 @@ struct mofile
 		{
 		    sf >> count >> offset_strings1 >> offset_strings2 >> hash_size >> hash_offset;
 
-		    buf = StreamBuf(size);
 
 		    sf.seek(0);
-		    sf.read(buf.data(), buf.size());
+		    buf = sf.toStreamBuf(size);
 		    sf.close();
 		}
 	    }
