@@ -1261,10 +1261,8 @@ void World::PostFixLoad(void)
     }
 }
 
-EventDate::EventDate(const u8* ptr, size_t sz)
+void EventDate::LoadFromMP2(StreamBuf st)
 {
-    StreamBuf st(ptr, sz);
-
     // id
     if(0 == st.get())
     {
@@ -1305,8 +1303,8 @@ EventDate::EventDate(const u8* ptr, size_t sz)
 	if(st.get()) colors |= Color::PURPLE;
 
 	// message
-	message = Game::GetEncodeString(GetString(st.getRaw()));
-	DEBUG(DBG_GAME, DBG_INFO, "add: " << message);
+	message = Game::GetEncodeString(st.toString());
+	DEBUG(DBG_GAME , DBG_INFO, "event" << ": " << message);
     }
     else
 	DEBUG(DBG_GAME , DBG_WARN, "unknown id");

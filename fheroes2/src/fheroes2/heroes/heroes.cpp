@@ -264,15 +264,13 @@ Heroes::Heroes(int heroid, int rc) : HeroBase(HeroBase::HEROES, rc), ColorBase(C
     move_point = GetMaxMovePoints();
 }
 
-void Heroes::LoadFromMP2(s32 map_index, int cl, int rc, const u8* ptr, size_t sz)
+void Heroes::LoadFromMP2(s32 map_index, int cl, int rc, StreamBuf st)
 {
     // reset modes
     modes = 0;
 
     SetIndex(map_index);
     SetColor(cl);
-
-    StreamBuf st(ptr ,sz);
 
     // unknown
     st.skip(1);
@@ -360,7 +358,7 @@ void Heroes::LoadFromMP2(s32 map_index, int cl, int rc, const u8* ptr, size_t sz
     if(st.get())
     {
 	SetModes(NOTDEFAULTS);
-        name = Game::GetEncodeString(GetString(st.getRaw(13)));
+        name = Game::GetEncodeString(st.toString(13));
     }
     else
 	st.skip(13);

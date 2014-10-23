@@ -1,12 +1,12 @@
 /***************************************************************************
- *   Copyright (C) 2012 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *   Copyright (C) 2014 by CataclysmNA team <cataclysm.newage@gmail.com>   *
  *                                                                         *
- *   Part of the Free Heroes2 Engine:                                      *
- *   http://sourceforge.net/projects/fheroes2                              *
+ *   Part of the Cataclysm: NewAge engine:                                 *
+ *   https://launchpad.net/cataclysm.newage                                *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -24,6 +24,7 @@
 #include <sstream>
 #include <iomanip>
 #include <iostream>
+#include <algorithm>
 
 #include "rect.h"
 #include "system.h"
@@ -57,29 +58,17 @@ void StreamBase::setbigendian(bool f)
 	flags &= ~0x80000000;
 }
 
+void StreamBase::setfail(bool f)
+{
+    if(f)
+	flags |= 0x00000001;
+    else
+	flags &= ~0x00000001;
+}
+
 bool StreamBase::fail(void) const
 {
     return flags & 0x00000001;
-}
-
-int StreamBase::getBE16(void)
-{
-    return (get8() << 8) | get8();
-}
-
-int StreamBase::getLE16(void)
-{
-    return get8() | (get8() << 8);
-}
-
-int StreamBase::getBE32(void)
-{
-    return (get8() << 24) | (get8() << 16) | (get8() << 8) | get8();
-}
-
-int StreamBase::getLE32(void)
-{
-    return get8() | (get8() << 8) | (get8() << 16) | (get8() << 24);
 }
 
 int StreamBase::get16(void)
@@ -92,26 +81,6 @@ int StreamBase::get32(void)
     return bigendian() ? getBE32() : getLE32();
 }
 
-std::vector<u8> StreamBase::getRaw(size_t sz)
-{
-    std::vector<u8> v(sz ? sz : sizeg(), 0);
-
-    for(std::vector<u8>::iterator
-        it = v.begin(); it != v.end(); ++it) *this >> *it;
-
-    return v;
-}
-
-void StreamBase::putRaw(const char* ptr, size_t sz)
-{
-    for(size_t it = 0; it < sz; ++it)
-	*this << ptr[it];
-}
-
-void StreamBase::skip(size_t sz)
-{
-    for(size_t it = 0; it < sz; ++it) get8();
-}
 
 StreamBase & StreamBase::operator>> (bool & v)
 {
@@ -204,37 +173,9 @@ void StreamBase::put16(u16 v)
     bigendian() ? putBE16(v) : putLE16(v);
 }
 
-void StreamBase::putBE16(u16 v)
-{
-    put8(v >> 8);
-    put8(v);
-}
-
-void StreamBase::putLE16(u16 v)
-{
-    put8(v);
-    put8(v >> 8);
-}
-
 void StreamBase::put32(u32 v)
 {
     bigendian() ? putBE32(v) : putLE32(v);
-}
-
-void StreamBase::putBE32(u32 v)
-{
-    put8(v >> 24);
-    put8(v >> 16);
-    put8(v >> 8);
-    put8(v);
-}
-
-void StreamBase::putLE32(u32 v)
-{
-    put8(v);
-    put8(v >> 8);
-    put8(v >> 16);
-    put8(v >> 24);
 }
 
 StreamBase & StreamBase::operator<< (const bool & v)
@@ -320,6 +261,13 @@ StreamBase & StreamBase::operator<< (const Size & v)
     return *this << v.w << v.h;
 }
 
+std::string StreamBase::toString(size_t sz)
+{
+    const std::vector<u8> buf = getRaw(sz);
+    std::vector<u8>::const_iterator itend = std::find(buf.begin(), buf.end(), 0);
+    return std::string(buf.begin(), itend != buf.end() ? itend : buf.end());
+}
+
 StreamBuf::StreamBuf(size_t sz) : itbeg(NULL), itget(NULL), itput(NULL), itend(NULL)
 {
     if(sz) realloc(sz);
@@ -400,16 +348,6 @@ void StreamBuf::reset(void)
     itget = itbeg;
 }
 
-std::string StreamBuf::dump(void) const
-{
-    std::ostringstream os;
-
-    for(const u8* it = itget; it != itput; ++it)
-	os << " 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(*it);
-
-    return os.str();
-}
-
 size_t StreamBuf::tellg(void) const
 {
     return itget - itbeg;
@@ -483,15 +421,6 @@ void StreamBuf::copy(const StreamBuf & sb)
     setbigendian(sb.bigendian());
 }
 
-void StreamBuf::skip(size_t sz)
-{
-    itget += sz <= sizeg() ? sz : sizeg();
-}
-
-void StreamBuf::seek(size_t sz)
-{
-    itget = itbeg + sz;
-}
 
 void StreamBuf::put8(char v)
 {
@@ -511,6 +440,81 @@ int StreamBuf::get8(void)
 
     return res;
 }
+
+int StreamBuf::getBE16(void)
+{
+    return (get8() << 8) | get8();
+}
+
+int StreamBuf::getLE16(void)
+{
+    return get8() | (get8() << 8);
+}
+
+int StreamBuf::getBE32(void)
+{
+    return (get8() << 24) | (get8() << 16) | (get8() << 8) | get8();
+}
+
+int StreamBuf::getLE32(void)
+{
+    return get8() | (get8() << 8) | (get8() << 16) | (get8() << 24);
+}
+
+void StreamBuf::putBE16(u16 v)
+{
+    put8(v >> 8);
+    put8(v);
+}
+
+void StreamBuf::putLE16(u16 v)
+{
+    put8(v);
+    put8(v >> 8);
+}
+
+void StreamBuf::putBE32(u32 v)
+{
+    put8(v >> 24);
+    put8(v >> 16);
+    put8(v >> 8);
+    put8(v);
+}
+
+void StreamBuf::putLE32(u32 v)
+{
+    put8(v);
+    put8(v >> 8);
+    put8(v >> 16);
+    put8(v >> 24);
+}
+
+std::vector<u8> StreamBuf::getRaw(size_t sz)
+{
+    std::vector<u8> v(sz ? sz : sizeg(), 0);
+
+    for(std::vector<u8>::iterator
+        it = v.begin(); it != v.end(); ++it) *this >> *it;
+
+    return v;
+}
+
+void StreamBuf::putRaw(const char* ptr, size_t sz)
+{
+    for(size_t it = 0; it < sz; ++it)
+	*this << ptr[it];
+}
+
+void StreamBuf::skip(size_t sz)
+{
+    itget += sz <= sizeg() ? sz : sizeg();
+}
+
+void StreamBuf::seek(size_t sz)
+{
+    itget = itbeg + sz;
+}
+
 /*
 std::ostream & operator<< (std::ostream & os, StreamBuf & sb)
 {
@@ -557,8 +561,6 @@ std::istream & operator>> (std::istream & is, StreamBuf & sb)
 }
 */
 
-
-
 StreamFile::StreamFile(const std::string & fn, const char* mode)
 {
     open(fn, mode);
@@ -604,13 +606,7 @@ size_t StreamFile::tell(void) const
 {
     return tellg();
 }
-/*
-bool StreamFile::read(void* buf, size_t sz)
-{
-    if(rw) SDL_RWread(rw, buf, sz, 1);
-    return true;
-}
-*/
+
 void StreamFile::seek(size_t pos)
 {
     if(rw) SDL_RWseek(rw, pos, RW_SEEK_SET);

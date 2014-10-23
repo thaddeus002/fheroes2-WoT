@@ -20,13 +20,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2IO_H
-#define H2IO_H
+#ifndef H2SERIALIZE_H
+#define H2SERIALIZE_H
 
-#include <list>
-#include <vector>
 #include <map>
+#include <list>
 #include <string>
+#include <vector>
 
 #include "types.h"
 
@@ -47,30 +47,35 @@ protected:
     virtual size_t	tellg(void) const = 0;
     virtual size_t	tellp(void) const = 0;
 
+    void		setconstbuf(bool);
+    void		setfail(bool);
+
 public:
     StreamBase() : flags(0) {}
     virtual ~StreamBase() {}
 
-    bool		fail(void) const;
-
-    void		setconstbuf(bool);
-    bool		isconstbuf(void) const;
-
     void		setbigendian(bool);
+
+    bool		isconstbuf(void) const;
+    bool		fail(void) const;
     bool		bigendian(void) const;
 
-    virtual int		getBE16(void);
-    virtual int		getLE16(void);
-    virtual int		getBE32(void);
-    virtual int		getLE32(void);
+    virtual void	skip(size_t) = 0;
 
-    virtual void	putBE32(u32);
-    virtual void	putLE32(u32);
-    virtual void	putBE16(u16);
-    virtual void	putLE16(u16);
+    virtual int		getBE16(void) = 0;
+    virtual int		getLE16(void) = 0;
+    virtual int		getBE32(void) = 0;
+    virtual int		getLE32(void) = 0;
 
-    virtual std::vector<u8>	getRaw(size_t = 0 /* all data */);
-    virtual void		putRaw(const char*, size_t);
+    virtual void	putBE32(u32) = 0;
+    virtual void	putLE32(u32) = 0;
+    virtual void	putBE16(u16) = 0;
+    virtual void	putLE16(u16) = 0;
+
+    virtual std::vector<u8>
+			getRaw(size_t = 0 /* all data */) = 0;
+    virtual void	putRaw(const char*, size_t) = 0;
+    std::string		toString(size_t = 0 /* all data */);
 
     int			get16(void);
     int			get32(void);
@@ -78,11 +83,8 @@ public:
     void		put16(u16);
     void		put32(u32);
 
-
     int                 get(void) { return get8(); } // get char
     void                put(int ch) { put8(ch); }
-
-    virtual void	skip(size_t);
 
     StreamBase &	operator>> (bool &);
     StreamBase &	operator>> (char &);
@@ -204,18 +206,30 @@ public:
 
     StreamBuf &		operator= (const StreamBuf &);
 
-    size_t		capacity(void) const;
-    void		reset(void);
-    std::string		dump(void) const;
-
     const u8*		data(void) const;
     u8*			data(void);
     size_t		size(void) const;
+    size_t		capacity(void) const;
 
-    void		skip(size_t);
     void		seek(size_t);
+    void		skip(size_t);
+
+    int			getBE16(void);
+    int			getLE16(void);
+    int			getBE32(void);
+    int			getLE32(void);
+
+    void		putBE32(u32);
+    void		putLE32(u32);
+    void		putBE16(u16);
+    void		putLE16(u16);
+
+    std::vector<u8>	getRaw(size_t = 0 /* all data */);
+    void		putRaw(const char*, size_t);
 
 protected:
+    void		reset(void);
+
     size_t		tellg(void) const;
     size_t		tellp(void) const;
     size_t		sizeg(void) const;
@@ -249,13 +263,13 @@ public:
 
     size_t		size(void) const;
     size_t		tell(void) const;
-    void		seek(size_t);
-    //bool		read(void*, size_t);
+
     bool		open(const std::string &, const char* mode);
     void		close(void);
 
     StreamBuf		toStreamBuf(size_t = 0 /* all data */);
 
+    void		seek(size_t);
     void		skip(size_t);
 
     int			getBE16(void);
@@ -272,6 +286,8 @@ public:
     void		putRaw(const char*, size_t);
 
 protected:
+    StreamFile &	operator= (const StreamFile &) { return *this; }
+
     size_t		sizeg(void) const;
     size_t		sizep(void) const;
     size_t		tellg(void) const;

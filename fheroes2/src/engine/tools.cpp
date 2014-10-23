@@ -125,12 +125,6 @@ std::string GetString(const Rect & rt)
     return os.str();
 }
 
-std::string GetString(const std::vector<u8> & v)
-{
-    std::vector<u8>::const_iterator itend = std::find(v.begin(), v.end(), 0);
-    return std::string(v.begin(), itend != v.end() ? itend : v.end());
-}
-
 std::string GetHexString(int value, int width)
 {
     std::ostringstream stream;

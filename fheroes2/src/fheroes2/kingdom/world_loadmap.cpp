@@ -1029,8 +1029,7 @@ bool World::LoadMapMP2(const std::string & filename)
 
 	// read block
 	size_t sizeblock = fs.getLE16();
-	std::vector<u8> buf = fs.getRaw(sizeblock);
-	const u8* pblock = & buf[0];
+	std::vector<u8> pblock = fs.getRaw(sizeblock);
 
 	for(MapsIndexes::const_iterator
 	    it_index = vec_object.begin(); it_index != vec_object.end() && findobject < 0; ++it_index)
@@ -1055,16 +1054,16 @@ bool World::LoadMapMP2(const std::string & filename)
 	    {
 		case MP2::OBJ_CASTLE:
 		    // add castle
-		    if(SIZEOFMP2CASTLE != sizeblock)
+		    if(SIZEOFMP2CASTLE != pblock.size())
 		    {
-			DEBUG(DBG_GAME, DBG_WARN, "read castle: " << "incorrect size block: " << sizeblock);
+			DEBUG(DBG_GAME, DBG_WARN, "read castle: " << "incorrect size block: " << pblock.size());
 		    }
 		    else
 		    {
 			Castle* castle = GetCastle(Maps::GetPoint(findobject));
 			if(castle)
 			{
-			    castle->LoadFromMP2(pblock, sizeblock);
+			    castle->LoadFromMP2(StreamBuf(pblock));
 			    Maps::MinimizeAreaForCastle(castle->GetCenter());
 			    map_captureobj.SetColor(tile.GetIndex(), castle->GetColor());
 			}
@@ -1077,16 +1076,16 @@ bool World::LoadMapMP2(const std::string & filename)
 		case MP2::OBJ_RNDTOWN:
 		case MP2::OBJ_RNDCASTLE:
 		    // add rnd castle
-		    if(SIZEOFMP2CASTLE != sizeblock)
+		    if(SIZEOFMP2CASTLE != pblock.size())
 		    {
-			DEBUG(DBG_GAME , DBG_WARN, "read castle: " << "incorrect size block: " << sizeblock);
+			DEBUG(DBG_GAME , DBG_WARN, "read castle: " << "incorrect size block: " << pblock.size());
 		    }
 		    else
 		    {
 			Castle* castle = GetCastle(Maps::GetPoint(findobject));
 			if(castle)
 			{
-			    castle->LoadFromMP2(pblock, sizeblock);
+			    castle->LoadFromMP2(StreamBuf(pblock));
 			    Maps::UpdateRNDSpriteForCastle(castle->GetCenter(), castle->GetRace(), castle->isCastle());
 			    Maps::MinimizeAreaForCastle(castle->GetCenter());
 			    map_captureobj.SetColor(tile.GetIndex(), castle->GetColor());
@@ -1099,9 +1098,9 @@ bool World::LoadMapMP2(const std::string & filename)
 		    break;
 		case MP2::OBJ_JAIL:
 		    // add jail
-		    if(SIZEOFMP2HEROES != sizeblock)
+		    if(SIZEOFMP2HEROES != pblock.size())
 		    {
-			DEBUG(DBG_GAME , DBG_WARN, "read heroes: " << "incorrect size block: " << sizeblock);
+			DEBUG(DBG_GAME , DBG_WARN, "read heroes: " << "incorrect size block: " << pblock.size());
 		    }
 		    else
 		    {
@@ -1120,16 +1119,16 @@ bool World::LoadMapMP2(const std::string & filename)
 
 			if(hero)
 			{
-			    hero->LoadFromMP2(findobject, Color::NONE, hero->GetRace(), pblock, sizeblock);
+			    hero->LoadFromMP2(findobject, Color::NONE, hero->GetRace(), StreamBuf(pblock));
 			    hero->SetModes(Heroes::JAIL);
 			}
 		    }
 		    break;
 		case MP2::OBJ_HEROES:
 		    // add heroes
-		    if(SIZEOFMP2HEROES != sizeblock)
+		    if(SIZEOFMP2HEROES != pblock.size())
 		    {
-			DEBUG(DBG_GAME, DBG_WARN, "read heroes: " << "incorrect size block: " << sizeblock);
+			DEBUG(DBG_GAME, DBG_WARN, "read heroes: " << "incorrect size block: " << pblock.size());
 		    }
 		    else
 		    if(NULL != (addon = tile.FindObjectConst(MP2::OBJ_HEROES)))
@@ -1154,7 +1153,7 @@ bool World::LoadMapMP2(const std::string & filename)
 				hero = vec_heroes.GetFreeman(colorRace.second);
 
 			    if(hero)
-				hero->LoadFromMP2(findobject, colorRace.first, colorRace.second, pblock, sizeblock);
+				hero->LoadFromMP2(findobject, colorRace.first, colorRace.second, StreamBuf(pblock));
 			}
 			else
 			{
@@ -1165,18 +1164,30 @@ bool World::LoadMapMP2(const std::string & filename)
 		case MP2::OBJ_SIGN:
 		case MP2::OBJ_BOTTLE:
 		    // add sign or buttle
-		    if(SIZEOFMP2SIGN - 1 < sizeblock && 0x01 == pblock[0])
-			map_objects.add(findobject, new MapSign(findobject, pblock, sizeblock));
+		    if(SIZEOFMP2SIGN - 1 < pblock.size() && 0x01 == pblock[0])
+		    {
+			MapSign* obj = new MapSign();
+			obj->LoadFromMP2(findobject, StreamBuf(pblock));
+			map_objects.add(findobject, obj);
+		    }
 		    break;
 		case MP2::OBJ_EVENT:
 		    // add event maps
-		    if(SIZEOFMP2EVENT - 1 < sizeblock && 0x01 == pblock[0])
-			map_objects.add(findobject, new MapEvent(findobject, pblock, sizeblock));
+		    if(SIZEOFMP2EVENT - 1 < pblock.size() && 0x01 == pblock[0])
+		    {
+			MapEvent* obj = new MapEvent();
+			obj->LoadFromMP2(findobject, StreamBuf(pblock));
+			map_objects.add(findobject, obj);
+		    }
 		    break;
 		case MP2::OBJ_SPHINX:
 		    // add riddle sphinx
-		    if(SIZEOFMP2RIDDLE - 1 < sizeblock && 0x00 == pblock[0])
-			map_objects.add(findobject, new MapSphinx(findobject, pblock, sizeblock));
+		    if(SIZEOFMP2RIDDLE - 1 < pblock.size() && 0x00 == pblock[0])
+		    {
+			MapSphinx* obj = new MapSphinx();
+			obj->LoadFromMP2(findobject, StreamBuf(pblock));
+			map_objects.add(findobject, obj);
+		    }
 		    break;
 		default:
 		    break;
@@ -1187,15 +1198,18 @@ bool World::LoadMapMP2(const std::string & filename)
 	if(0x00 == pblock[0])
 	{
 	    // add event day
-	    if(SIZEOFMP2EVENT - 1 < sizeblock && 1 == pblock[42])
-		vec_eventsday.push_back(EventDate(pblock, sizeblock));
+	    if(SIZEOFMP2EVENT - 1 < pblock.size() && 1 == pblock[42])
+	    {
+		vec_eventsday.push_back(EventDate());
+		vec_eventsday.back().LoadFromMP2(StreamBuf(pblock));
+	    }
 	    // add rumors
 	    else
-	    if(SIZEOFMP2RUMOR - 1 < sizeblock)
+	    if(SIZEOFMP2RUMOR - 1 < pblock.size())
 	    {
 		if(pblock[8])
 		{
-		    vec_rumors.push_back(Game::GetEncodeString(reinterpret_cast<const char*>(&pblock[8])));
+		    vec_rumors.push_back(Game::GetEncodeString(StreamBuf(&pblock[8], pblock.size() - 8).toString()));
 		    DEBUG(DBG_GAME, DBG_INFO, "add rumors: " << vec_rumors.back());
 		}
 	    }
@@ -1203,7 +1217,7 @@ bool World::LoadMapMP2(const std::string & filename)
 	// debug
 	else
 	{
-	    DEBUG(DBG_GAME, DBG_WARN, "read maps: unknown block addons, size: " << sizeblock);
+	    DEBUG(DBG_GAME, DBG_WARN, "read maps: unknown block addons, size: " << pblock.size());
 	}
     }
 

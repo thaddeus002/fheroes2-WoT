@@ -55,10 +55,8 @@ Castle::Castle(s32 cx, s32 cy, int rc) : MapPosition(Point(cx, cy)), race(rc), b
     army.SetCommander(&captain);
 }
 
-void Castle::LoadFromMP2(const u8* ptr, size_t sz)
+void Castle::LoadFromMP2(StreamBuf st)
 {
-    StreamBuf st(ptr, sz);
-
     switch(st.get())
     {
 	case 0: SetColor(Color::BLUE);   break;
@@ -152,7 +150,7 @@ void Castle::LoadFromMP2(const u8* ptr, size_t sz)
 
     // custom name
     st.skip(1);
-    name = Game::GetEncodeString(GetString(st.getRaw(13)));
+    name = Game::GetEncodeString(st.toString(13));
 
     // race
     u32 kingdom_race = Players::GetPlayerRace(GetColor());

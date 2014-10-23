@@ -98,7 +98,7 @@ public:
     const Castle*	inCastle(void) const;
     Castle*		inCastle(void);
 
-    void		LoadFromMP2(s32 map_index, int cl, int rc, const u8*, size_t);
+    void		LoadFromMP2(s32 map_index, int cl, int rc, StreamBuf);
     void		PostLoad(void);
 
     int			GetRace(void) const;

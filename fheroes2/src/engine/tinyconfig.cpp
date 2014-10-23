@@ -57,7 +57,7 @@ bool TinyConfig::Load(const std::string & cfile)
     StreamFile sf;
     if(! sf.open(cfile, "rb")) return false;
 
-    std::list<std::string> rows = StringSplit(GetString(sf.getRaw(sf.size())), "\n");
+    std::list<std::string> rows = StringSplit(sf.toString(), "\n");
 
     for(std::list<std::string>::const_iterator
 	it = rows.begin(); it != rows.end(); ++it)

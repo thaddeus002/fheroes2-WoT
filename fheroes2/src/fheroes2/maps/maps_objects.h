@@ -32,7 +32,8 @@
 struct MapEvent : public ObjectSimple, public MapPosition
 {
     MapEvent();
-    MapEvent(s32 index, const u8*, size_t);
+
+    void	LoadFromMP2(s32 index, StreamBuf);
 
     bool	isAllow(int color) const;
     void	SetVisited(int color);
@@ -53,7 +54,8 @@ typedef std::list<std::string>    RiddleAnswers;
 struct MapSphinx : public ObjectSimple, public MapPosition
 {
     MapSphinx();
-    MapSphinx(s32 index, const u8*, size_t);
+
+    void	LoadFromMP2(s32 index, StreamBuf);
 
     bool	AnswerCorrect(const std::string & answer);
     void	SetQuiet(void);
@@ -71,8 +73,9 @@ StreamBase & operator>> (StreamBase &, MapSphinx &);
 struct MapSign : public ObjectSimple, public MapPosition
 {
     MapSign();
-    MapSign(s32 index, const char*);
-    MapSign(s32 index, const u8*, size_t);
+    MapSign(s32 index, const std::string &);
+
+    void	LoadFromMP2(s32 index, StreamBuf);
 
     std::string		message;
 };

@@ -437,11 +437,11 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
 
     // name
     fs.seek(0x3A);
-    name = Game::GetEncodeString(GetString(fs.getRaw(LENGTHNAME)));
+    name = Game::GetEncodeString(fs.toString(LENGTHNAME));
 
     // description
     fs.seek(0x76);
-    description = Game::GetEncodeString(GetString(fs.getRaw(LENGTHDESCRIPTION)));
+    description = Game::GetEncodeString(fs.toString(LENGTHDESCRIPTION));
 
     //fill unions
     if(4 == conditions_wins)

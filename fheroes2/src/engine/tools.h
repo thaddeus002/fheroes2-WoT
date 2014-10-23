@@ -35,7 +35,6 @@ std::string		GetString(const Point &);
 std::string		GetString(const Size &);
 std::string		GetString(const Rect &);
 std::string		GetString(double, u8);
-std::string		GetString(const std::vector<u8> &);
 std::string		GetHexString(int value, int width = 8);
 
 int			GetInt(const std::string &);

@@ -34,10 +34,8 @@ MapEvent::MapEvent() : ObjectSimple(MP2::OBJ_EVENT), computer(false), cancel(tru
 {
 }
 
-MapEvent::MapEvent(s32 index, const u8* ptr, const size_t sz) : ObjectSimple(MP2::OBJ_EVENT)
+void MapEvent::LoadFromMP2(s32 index, StreamBuf st)
 {
-    StreamBuf st(ptr, sz);
-
     // id
     if(1 == st.get())
     {
@@ -78,8 +76,8 @@ MapEvent::MapEvent(s32 index, const u8* ptr, const size_t sz) : ObjectSimple(MP2
 	if(st.get()) colors |= Color::PURPLE;
 
 	// message
-        message = Game::GetEncodeString(GetString(st.getRaw()));
-        DEBUG(DBG_GAME , DBG_INFO, "add: " << message);
+        message = Game::GetEncodeString(st.toString());
+	DEBUG(DBG_GAME , DBG_INFO, "event" << ": " << message);
     }
     else
 	DEBUG(DBG_GAME, DBG_WARN, "unknown id");
@@ -102,10 +100,8 @@ MapSphinx::MapSphinx() : ObjectSimple(MP2::OBJ_SPHINX), valid(false)
 {
 }
 
-MapSphinx::MapSphinx(s32 index, const u8* ptr, size_t sz) : ObjectSimple(MP2::OBJ_SPHINX), valid(false)
+void MapSphinx::LoadFromMP2(s32 index, StreamBuf st)
 {
-    StreamBuf st(ptr, sz);
-
     // id
     if(0 == st.get())
     {
@@ -129,17 +125,17 @@ MapSphinx::MapSphinx(s32 index, const u8* ptr, size_t sz) : ObjectSimple(MP2::OB
 	// answers
 	for(u32 i = 0; i < 8; ++i)
 	{
-	    std::string answer = Game::GetEncodeString(GetString(st.getRaw(13)));
+	    std::string answer = Game::GetEncodeString(st.toString(13));
 
 	    if(count-- && answer.size())
 		answers.push_back(StringLower(answer));
 	}
 
 	// message
-	message = Game::GetEncodeString(GetString(st.getRaw()));
+	message = Game::GetEncodeString(st.toString());
 
 	valid = true;
-	DEBUG(DBG_GAME, DBG_INFO, "add: " << message);
+	DEBUG(DBG_GAME , DBG_INFO, "sphinx" << ": " << message);
     }
     else
 	DEBUG(DBG_GAME , DBG_WARN, "unknown id");
@@ -225,21 +221,20 @@ MapSign::MapSign() : ObjectSimple(MP2::OBJ_SIGN)
 {
 }
 
-MapSign::MapSign(s32 index, const char* msg) : ObjectSimple(MP2::OBJ_SIGN)
+MapSign::MapSign(s32 index, const std::string & msg) : ObjectSimple(MP2::OBJ_SIGN)
 {
     SetIndex(index);
-    if(msg) message = msg;
+    message = msg;
 }
 
-MapSign::MapSign(s32 index, const u8* ptr, size_t sz) : ObjectSimple(MP2::OBJ_SIGN)
+void MapSign::LoadFromMP2(s32 index, StreamBuf st)
 {
-    StreamBuf st(ptr, sz);
-
     st.skip(9);
-    message = GetString(st.getRaw());
+    message = st.toString();
 
     SetIndex(index);
     message = Game::GetEncodeString(message);
+    DEBUG(DBG_GAME , DBG_INFO, "sign" << ": " << message);
 }
 
 StreamBase & operator<< (StreamBase & msg, const MapSign & obj)

@@ -97,7 +97,8 @@ struct CapturedObjects : std::map<s32, CapturedObject>
 struct EventDate
 {
     EventDate() : computer(false), first(0), subsequent(0), colors(0) {}
-    EventDate(const u8*, size_t);
+
+    void	LoadFromMP2(StreamBuf);
 
     bool        isAllow(int color, u32 date) const;
     bool        isDeprecated(u32 date) const;
