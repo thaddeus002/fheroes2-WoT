@@ -194,20 +194,12 @@ bool AGG::File::Open(const std::string & fname)
     }
 
     const u32 size = stream.size();
-
     count_items = stream.getLE16();
     DEBUG(DBG_ENGINE, DBG_INFO, "load: " << filename << ", count items: " << count_items);
 
-    char buf[FATSIZENAME + 1];
-    std::fill(buf, buf + FATSIZENAME + 1, 0);
-
-    std::vector<u8> buf1 = stream.getRaw(count_items * 4 * 3 /* crc, offset, size */);
-    StreamBuf fats(buf1);
-
+    StreamBuf fats = stream.toStreamBuf(count_items * 4 * 3 /* crc, offset, size */);
     stream.seek(size - FATSIZENAME * count_items);
-
-    std::vector<u8> buf2 = stream.getRaw(FATSIZENAME * count_items);
-    StreamBuf names(buf2);
+    StreamBuf names = stream.toStreamBuf(FATSIZENAME * count_items);
 
     for(u32 ii = 0; ii < count_items; ++ii)
     {
