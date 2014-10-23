@@ -75,7 +75,6 @@ public:
     virtual std::vector<u8>
 			getRaw(size_t = 0 /* all data */) = 0;
     virtual void	putRaw(const char*, size_t) = 0;
-    std::string		toString(size_t = 0 /* all data */);
 
     int			get16(void);
     int			get32(void);
@@ -207,7 +206,6 @@ public:
     StreamBuf &		operator= (const StreamBuf &);
 
     const u8*		data(void) const;
-    u8*			data(void);
     size_t		size(void) const;
     size_t		capacity(void) const;
 
@@ -226,6 +224,8 @@ public:
 
     std::vector<u8>	getRaw(size_t = 0 /* all data */);
     void		putRaw(const char*, size_t);
+
+    std::string		toString(size_t = 0 /* all data */);
 
 protected:
     void		reset(void);
@@ -284,6 +284,8 @@ public:
 
     std::vector<u8>	getRaw(size_t = 0 /* all data */);
     void		putRaw(const char*, size_t);
+
+    std::string		toString(size_t = 0 /* all data */);
 
 protected:
     StreamFile &	operator= (const StreamFile &) { return *this; }

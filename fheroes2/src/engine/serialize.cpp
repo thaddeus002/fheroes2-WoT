@@ -261,13 +261,6 @@ StreamBase & StreamBase::operator<< (const Size & v)
     return *this << v.w << v.h;
 }
 
-std::string StreamBase::toString(size_t sz)
-{
-    const std::vector<u8> buf = getRaw(sz);
-    std::vector<u8>::const_iterator itend = std::find(buf.begin(), buf.end(), 0);
-    return std::string(buf.begin(), itend != buf.end() ? itend : buf.end());
-}
-
 StreamBuf::StreamBuf(size_t sz) : itbeg(NULL), itget(NULL), itput(NULL), itend(NULL)
 {
     if(sz) realloc(sz);
@@ -328,11 +321,6 @@ size_t StreamBuf::capacity(void) const
 }
 
 const u8* StreamBuf::data(void) const
-{
-    return itget;
-}
-
-u8* StreamBuf::data(void)
 {
     return itget;
 }
@@ -505,6 +493,15 @@ void StreamBuf::putRaw(const char* ptr, size_t sz)
 	*this << ptr[it];
 }
 
+std::string StreamBuf::toString(size_t sz)
+{
+    u8* it1 = itget;
+    u8* it2 = itget + (sz ? sz : sizeg());
+    it2 = std::find(it1, it2, 0);
+    itget = it2;
+    return std::string(it1, it2);
+}
+
 void StreamBuf::skip(size_t sz)
 {
     itget += sz <= sizeg() ? sz : sizeg();
@@ -512,7 +509,7 @@ void StreamBuf::skip(size_t sz)
 
 void StreamBuf::seek(size_t sz)
 {
-    itget = itbeg + sz;
+    itget = itbeg + sz < itend ? itbeg + sz : itend;
 }
 
 /*
@@ -714,4 +711,11 @@ StreamBuf StreamFile::toStreamBuf(size_t sz)
     std::vector<u8> buf = getRaw(sz);
     sb.putRaw(reinterpret_cast<const char*>(& buf[0]), buf.size());
     return sb;
+}
+
+std::string StreamFile::toString(size_t sz)
+{
+    const std::vector<u8> buf = getRaw(sz);
+    std::vector<u8>::const_iterator itend = std::find(buf.begin(), buf.end(), 0);
+    return std::string(buf.begin(), itend != buf.end() ? itend : buf.end());
 }

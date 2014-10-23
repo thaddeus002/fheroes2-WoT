@@ -73,7 +73,8 @@ struct mofile
 	if(it == hash_offsets.end())
 	    return str;
 
-	const u8* ptr = buf.data() + (*it).second.offset;
+	buf.seek((*it).second.offset);
+	const u8* ptr = buf.data();
 
 	while(plural > 0)
 	{
@@ -81,6 +82,7 @@ struct mofile
 	    plural--;
 	    ptr++;
 	}
+
 	return reinterpret_cast<const char*>(ptr);
     }
 
@@ -148,8 +150,9 @@ struct mofile
 	    const std::string tag2("Plural-Forms");
 	    const std::string sep2(": ");
 
-	    std::list<std::string> tags = StringSplit(std::string(reinterpret_cast<const char*>(buf.data() + offset2),
-								reinterpret_cast<const char*>(buf.data() + offset2 + length2)), "\n");
+	    buf.seek(offset2);
+	    std::list<std::string> tags = StringSplit(buf.toString(length2), "\n");
+
 	    for(std::list<std::string>::const_iterator
 		it = tags.begin(); it != tags.end(); ++it)
 	    {
@@ -164,13 +167,22 @@ struct mofile
 	// generate hash table
 	for(u32 index = 0; index < count; ++index)
 	{
-	    buf.seek(offset_strings1 + index * 8 /* length, offset */ + 4 /* length unused */);
+	    buf.seek(offset_strings1 + index * 8 /* length, offset */);
+	    u32 length1 = buf.get32();
 	    u32 offset1 = buf.get32();
-	    u32 crc = crc32b(reinterpret_cast<const char*>(buf.data() + offset1));
+	    buf.seek(offset1);
+	    const std::string msg1 = buf.toString(length1);
+	    u32 crc = crc32b(msg1.c_str());
 	    buf.seek(offset_strings2 + index * 8 /* length, offset */);
 	    u32 length2 = buf.get32();
 	    u32 offset2 = buf.get32();
-	    hash_offsets[crc] = chunk(offset2, length2);
+	    std::map<u32, chunk>::const_iterator it = hash_offsets.find(crc);
+	    if(it == hash_offsets.end())
+		hash_offsets[crc] = chunk(offset2, length2);
+	    else
+	    {
+		ERROR("incorrect hash for: " << msg1);
+	    }
 	}
 
         return true;
