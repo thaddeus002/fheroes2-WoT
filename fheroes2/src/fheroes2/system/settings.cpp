@@ -653,10 +653,6 @@ ListFiles Settings::GetListFiles(const std::string & prefix, const std::string &
 
 	if(System::IsDirectory(path))
 	    res.ReadDir(path, filter, false);
-	else
-	{
-	    DEBUG(DBG_ENGINE, DBG_WARN, "path not found: " << path);
-	}
     }
 
     res.Append(System::GetListFiles("fheroes2", prefix, filter));

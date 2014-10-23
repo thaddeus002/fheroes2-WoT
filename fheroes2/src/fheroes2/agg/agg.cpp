@@ -149,6 +149,7 @@ namespace AGG
     bool			LoadAltTIL(int til, u32 max);
     bool			LoadOrgTIL(int til, u32 max);
     void			LoadTIL(int til);
+    void			SaveTIL(int til);
 
     void			LoadFNT(void);
     void			ShowError(void);
@@ -210,8 +211,7 @@ bool AGG::File::Open(const std::string & fname)
 
     for(u32 ii = 0; ii < count_items; ++ii)
     {
-	std::vector<u8> name = names.getRaw(FATSIZENAME);
-        FAT & f = fat[reinterpret_cast<const char*>(& name[0])];
+        FAT & f = fat[names.toString(FATSIZENAME)];
 
 	f.crc = fats.getLE32();
 	f.offset = fats.getLE32();
@@ -443,7 +443,6 @@ const std::vector<u8> & AGG::ReadChunk(const std::string & key)
 
     return heroes2_agg.Read(key);
 }
-
 
 /* load manual ICN object */
 bool AGG::LoadExtICN(int icn, u32 index, bool reflect)
@@ -742,8 +741,11 @@ bool AGG::LoadAltICN(int icn, u32 index, bool reflect)
 	int index1 = index;
 	int index2 = 0;
 
-	for(; xml_sprite && index2 != index1; xml_sprite = xml_sprite->NextSiblingElement("sprite"))
+	for(; xml_sprite; xml_sprite = xml_sprite->NextSiblingElement("sprite"))
+	{
 	    xml_sprite->Attribute("index", &index2);
+	    if(index1 == index2) break;
+	}
 
 	if(xml_sprite && index2 == index1)
 	{
@@ -754,6 +756,7 @@ bool AGG::LoadAltICN(int icn, u32 index, bool reflect)
 
 	    Sprite & sp1 = v.sprites[index];
 	    Sprite & sp2 = v.reflect[index];
+
 
 	    if(! sp1.isValid() && System::IsFile(name) && sp1.Load(name.c_str()))
 	    {
@@ -794,7 +797,7 @@ void AGG::SaveICN(int icn)
 
 	if(System::IsDirectory(icn_dir, true))
 	{
-	    const std::string stats_file = System::ConcatePath(icn_dir, "stats.xml");
+	    const std::string stats_file = System::ConcatePath(icn_dir, "spec.xml");
 	    bool need_save = false;
 	    TiXmlDocument doc;
 	    TiXmlElement* icn_element = NULL;
@@ -1134,8 +1137,9 @@ void AGG::LoadICN(int icn, u32 index, bool reflect)
 		if(! LoadOrgICN(icn, index, reflect))
 		    Error::Except(__FUNCTION__, "load icn");
 	    }
-
+#ifdef DEBUG
 	    if(Settings::Get().UseAltResource()) SaveICN(icn);
+#endif
 	}
 
 	// pocketpc: scale sprites
@@ -1262,6 +1266,82 @@ bool AGG::LoadAltTIL(int til, u32 max)
     return false;
 }
 
+void AGG::SaveTIL(int til)
+{
+#ifdef WITH_XML
+#ifdef WITH_DEBUG
+    const std::string images_dir = Settings::GetWriteableDir("images");
+
+    if(images_dir.size())
+    {
+	til_cache_t & v = til_cache[til];
+
+        const std::string til_lower = StringLower(ICN::GetString(til));
+	const std::string til_dir = System::ConcatePath(images_dir, til_lower);
+
+	if(! System::IsDirectory(til_dir))
+		System::MakeDirectory(til_dir);
+
+	if(System::IsDirectory(til_dir, true))
+	{
+	    const std::string stats_file = System::ConcatePath(til_dir, "spec.xml");
+	    bool need_save = false;
+	    TiXmlDocument doc;
+	    TiXmlElement* til_element = NULL;
+
+	    if(doc.LoadFile(stats_file.c_str()))
+		til_element = doc.FirstChildElement("til");
+
+	    if(! til_element)
+	    {
+		TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );
+		doc.LinkEndChild(decl);
+    
+		til_element = new TiXmlElement("til");
+		til_element->SetAttribute("name", til_lower.c_str());
+		til_element->SetAttribute("count", v.count);
+
+		doc.LinkEndChild(til_element);
+		need_save = true;
+	    }
+
+	    for(u32 index = 0; index < v.count; ++index)
+	    {
+		const Surface & sf = v.sprites[index];
+
+		if(sf.isValid())
+		{
+		    std::ostringstream sf_name;
+		    sf_name << std::setw(3) << std::setfill('0') << index;
+#ifndef WITH_IMAGE
+    		    sf_name << ".bmp";
+#else
+    		    sf_name << ".png";
+#endif
+		    const std::string image_full = System::ConcatePath(til_dir, sf_name.str());
+
+		    if(! System::IsFile(image_full))
+		    {
+			sf.Save(image_full);
+
+			TiXmlElement* sprite_element = new TiXmlElement("sprite");
+			sprite_element->SetAttribute("index", index);
+			sprite_element->SetAttribute("name", sf_name.str().c_str());
+
+			til_element->LinkEndChild(sprite_element);
+			need_save = true;
+		    }
+		}
+	    }
+
+	    if(need_save)
+		doc.SaveFile(stats_file.c_str());
+	}
+    }
+#endif
+#endif
+}
+
 bool AGG::LoadOrgTIL(int til, u32 max)
 {
     const std::vector<u8> & body = ReadChunk(TIL::GetString(til));
@@ -1324,6 +1404,10 @@ void AGG::LoadTIL(int til)
 	{
 	    if(! LoadOrgTIL(til, max))
 		Error::Except(__FUNCTION__, "load til");
+
+#ifdef DEBUG
+	    if(conf.UseAltResource()) SaveTIL(til);
+#endif
 	}
     }
 }
@@ -1783,8 +1867,8 @@ bool AGG::Init(void)
     if(! ReadDataDir())
     {
         DEBUG(DBG_ENGINE, DBG_WARN, "data files not found");
-        ShowError();
-        return false;
+        //ShowError();
+        //return false;
     }
 
 #ifdef WITH_TTF
