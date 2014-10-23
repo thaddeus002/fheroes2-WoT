@@ -498,7 +498,7 @@ std::string StreamBuf::toString(size_t sz)
     u8* it1 = itget;
     u8* it2 = itget + (sz ? sz : sizeg());
     it2 = std::find(it1, it2, 0);
-    itget = it2;
+    itget = it1 + (sz ? sz : sizeg());
     return std::string(it1, it2);
 }
 
