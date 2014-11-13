@@ -115,7 +115,7 @@ int main(int argc, char **argv)
 	{
 	    std::atexit(SDL::Quit);
 
-	    if(conf.Unicode()) SetLangEnvPath(conf);
+	    SetLangEnvPath(conf);
 
 	    if(Mixer::isValid())
 	    {
@@ -319,22 +319,24 @@ void SetTimidityEnvPath(const Settings & conf)
 void SetLangEnvPath(const Settings & conf)
 {
 #ifdef WITH_TTF
-    System::SetMessageLocale("");
+    if(conf.Unicode())
+    {
+	System::SetMessageLocale("");
 
-    std::string mofile = conf.ForceLang().empty() ?
+	std::string mofile = conf.ForceLang().empty() ?
 		System::GetMessageLocale(1).append(".mo") :
 		std::string(conf.ForceLang()).append(".mo");
 
-    ListFiles translations = Settings::GetListFiles(System::ConcatePath("files", "lang"), mofile);
+	ListFiles translations = Settings::GetListFiles(System::ConcatePath("files", "lang"), mofile);
 
-    if(translations.size())
-    {
-        if(translation::bind_domain("fheroes2", translations.back().c_str()))
-    	    translation::set_domain("fheroes2");
+	if(translations.size())
+	{
+    	    if(translation::bind_domain("fheroes2", translations.back().c_str()))
+    		translation::set_domain("fheroes2");
+	}
+	else
+	    ERROR("translation not found: " << mofile);
     }
-    else
-	ERROR("translation not found: " << mofile);
-
-    translation::set_strip_context('|');
 #endif
+    translation::set_strip_context('|');
 }
