@@ -80,7 +80,7 @@ struct HeroRow
 	secskillsBar->SetColRows(4, 2);
         secskillsBar->SetHSpace(-1);
         secskillsBar->SetVSpace(8);
-        secskillsBar->SetContent(hero->GetSecondarySkills());
+        secskillsBar->SetContent(hero->GetSecondarySkills().ToVector());
 
 	primskillsBar = new PrimarySkillsBar(ptr, true);
 	primskillsBar->SetColRows(4, 1);

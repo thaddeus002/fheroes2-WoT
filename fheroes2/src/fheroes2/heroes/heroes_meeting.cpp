@@ -122,14 +122,14 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     SecondarySkillsBar secskill_bar1;
     secskill_bar1.SetColRows(8, 1);
     secskill_bar1.SetHSpace(-1);
-    secskill_bar1.SetContent(secondary_skills);
+    secskill_bar1.SetContent(secondary_skills.ToVector());
     secskill_bar1.SetPos(cur_pt.x + 22, cur_pt.y + 199);
     secskill_bar1.Redraw();
 
     SecondarySkillsBar secskill_bar2;
     secskill_bar2.SetColRows(8, 1);
     secskill_bar2.SetHSpace(-1);
-    secskill_bar2.SetContent(heroes2.GetSecondarySkills());
+    secskill_bar2.SetContent(heroes2.GetSecondarySkills().ToVector());
     secskill_bar2.SetPos(cur_pt.x + 353, cur_pt.y + 199);
     secskill_bar2.Redraw();
 

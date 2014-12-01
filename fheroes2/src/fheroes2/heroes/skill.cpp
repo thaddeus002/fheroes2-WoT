@@ -489,20 +489,20 @@ Skill::SecSkills::SecSkills(int race)
 
 	if(ptr)
 	{
-	    if(ptr->initial_secondary.archery)		push_back(Secondary(Secondary::ARCHERY, ptr->initial_secondary.archery));
-	    if(ptr->initial_secondary.ballistics)	push_back(Secondary(Secondary::BALLISTICS, ptr->initial_secondary.ballistics));
-	    if(ptr->initial_secondary.diplomacy)	push_back(Secondary(Secondary::DIPLOMACY, ptr->initial_secondary.diplomacy));
-	    if(ptr->initial_secondary.eagleeye)		push_back(Secondary(Secondary::EAGLEEYE, ptr->initial_secondary.eagleeye));
-	    if(ptr->initial_secondary.estates)		push_back(Secondary(Secondary::ESTATES, ptr->initial_secondary.estates));
-	    if(ptr->initial_secondary.leadership)	push_back(Secondary(Secondary::LEADERSHIP, ptr->initial_secondary.leadership));
-	    if(ptr->initial_secondary.logistics)	push_back(Secondary(Secondary::LOGISTICS, ptr->initial_secondary.logistics));
-	    if(ptr->initial_secondary.luck)		push_back(Secondary(Secondary::LUCK, ptr->initial_secondary.luck));
-	    if(ptr->initial_secondary.mysticism)	push_back(Secondary(Secondary::MYSTICISM, ptr->initial_secondary.mysticism));
-	    if(ptr->initial_secondary.navigation)	push_back(Secondary(Secondary::NAVIGATION, ptr->initial_secondary.navigation));
-	    if(ptr->initial_secondary.necromancy)	push_back(Secondary(Secondary::NECROMANCY, ptr->initial_secondary.necromancy));
-	    if(ptr->initial_secondary.pathfinding)	push_back(Secondary(Secondary::PATHFINDING, ptr->initial_secondary.pathfinding));
-	    if(ptr->initial_secondary.scouting)		push_back(Secondary(Secondary::SCOUTING, ptr->initial_secondary.scouting));
-	    if(ptr->initial_secondary.wisdom)		push_back(Secondary(Secondary::WISDOM, ptr->initial_secondary.wisdom));
+	    if(ptr->initial_secondary.archery)		AddSkill(Secondary(Secondary::ARCHERY, ptr->initial_secondary.archery));
+	    if(ptr->initial_secondary.ballistics)	AddSkill(Secondary(Secondary::BALLISTICS, ptr->initial_secondary.ballistics));
+	    if(ptr->initial_secondary.diplomacy)	AddSkill(Secondary(Secondary::DIPLOMACY, ptr->initial_secondary.diplomacy));
+	    if(ptr->initial_secondary.eagleeye)		AddSkill(Secondary(Secondary::EAGLEEYE, ptr->initial_secondary.eagleeye));
+	    if(ptr->initial_secondary.estates)		AddSkill(Secondary(Secondary::ESTATES, ptr->initial_secondary.estates));
+	    if(ptr->initial_secondary.leadership)	AddSkill(Secondary(Secondary::LEADERSHIP, ptr->initial_secondary.leadership));
+	    if(ptr->initial_secondary.logistics)	AddSkill(Secondary(Secondary::LOGISTICS, ptr->initial_secondary.logistics));
+	    if(ptr->initial_secondary.luck)		AddSkill(Secondary(Secondary::LUCK, ptr->initial_secondary.luck));
+	    if(ptr->initial_secondary.mysticism)	AddSkill(Secondary(Secondary::MYSTICISM, ptr->initial_secondary.mysticism));
+	    if(ptr->initial_secondary.navigation)	AddSkill(Secondary(Secondary::NAVIGATION, ptr->initial_secondary.navigation));
+	    if(ptr->initial_secondary.necromancy)	AddSkill(Secondary(Secondary::NECROMANCY, ptr->initial_secondary.necromancy));
+	    if(ptr->initial_secondary.pathfinding)	AddSkill(Secondary(Secondary::PATHFINDING, ptr->initial_secondary.pathfinding));
+	    if(ptr->initial_secondary.scouting)		AddSkill(Secondary(Secondary::SCOUTING, ptr->initial_secondary.scouting));
+	    if(ptr->initial_secondary.wisdom)		AddSkill(Secondary(Secondary::WISDOM, ptr->initial_secondary.wisdom));
 	}
     }
 }
@@ -523,6 +523,11 @@ u32 Skill::SecSkills::GetValues(int skill) const
     return it == end() ? 0 : (*it).GetValues();
 }
 
+int Skill::SecSkills::Count(void) const
+{
+    return std::count_if(begin(), end(), std::mem_fun_ref(&Secondary::isValid));
+}
+
 void Skill::SecSkills::AddSkill(const Skill::Secondary & skill)
 {
     if(skill.isValid())
@@ -538,9 +543,23 @@ void Skill::SecSkills::AddSkill(const Skill::Secondary & skill)
 	    if(it != end())
     		(*it).Set(skill);
     	    else
+	    if(size() < HEROESMAXSKILL)
 	        push_back(skill);
 	}
     }
+}
+
+Skill::Secondary* Skill::SecSkills::FindSkill(int skill)
+{
+    iterator it = std::find_if(begin(), end(),
+        std::bind2nd(std::mem_fun_ref(&Secondary::isSkill), skill));
+    return it != end() ? & (*it) : NULL;
+}
+
+std::vector<Skill::Secondary> & Skill::SecSkills::ToVector(void)
+{
+    std::vector<Secondary> & v = *this;
+    return v;
 }
 
 std::string Skill::SecSkills::String(void) const
@@ -627,20 +646,19 @@ void Skill::SecSkills::FindSkillsForLevelUp(int race, Secondary & sec1, Secondar
     exclude_skills.reserve(MAXSECONDARYSKILL + HEROESMAXSKILL);
 
     // exclude for expert
-    {
-	for(const_iterator
-	    it = begin(); it != end(); ++it)
-	    if((*it).Level() == Level::EXPERT) exclude_skills.push_back((*it).Skill());
-    }
+    for(const_iterator
+	it = begin(); it != end(); ++it)
+	if((*it).Level() == Level::EXPERT) exclude_skills.push_back((*it).Skill());
 
     // exclude is full, add other.
-    if(HEROESMAXSKILL <= exclude_skills.size())
+    if(HEROESMAXSKILL <= Count())
     {
 	for(u32 ii = 0; ii < ARRAY_COUNT(secskills); ++ii)
 	    if(Level::NONE == GetLevel(secskills[ii])) exclude_skills.push_back(secskills[ii]);
     }
 
     sec1.SetSkill(SecondaryPriorityFromRace(race, exclude_skills));
+
     if(Secondary::UNKNOWN != sec1.Skill())
     {
 	exclude_skills.push_back(sec1.Skill());
@@ -974,4 +992,23 @@ bool SecondarySkillsBar::QueueEventProcessing(std::string* str)
 StreamBase & Skill::operator>> (StreamBase & sb, Secondary & st)
 {
     return sb >> st.first >> st.second;
+}
+
+StreamBase & Skill::operator<< (StreamBase & sb, const SecSkills & ss)
+{
+    const std::vector<Secondary> & v = ss;
+    return sb << v;
+}
+
+StreamBase & Skill::operator>> (StreamBase & sb, SecSkills & ss)
+{
+    std::vector<Secondary> & v = ss;
+    sb >> v;
+
+    if(FORMAT_VERSION_3255 > Game::GetLoadVersion())
+    {
+	if(v.size() > HEROESMAXSKILL)
+	    v.resize(HEROESMAXSKILL);
+    }
+    return sb;
 }

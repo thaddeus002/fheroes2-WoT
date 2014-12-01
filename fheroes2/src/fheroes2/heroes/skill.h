@@ -102,8 +102,9 @@ namespace Skill
 
     StreamBase & operator>> (StreamBase &, Secondary &);
 
-    struct SecSkills : std::vector<Secondary>
+    class SecSkills : protected std::vector<Secondary>
     {
+	public:
 	SecSkills();
 	SecSkills(int race);
 
@@ -112,8 +113,19 @@ namespace Skill
 	void		AddSkill(const Skill::Secondary &);
 	void		FindSkillsForLevelUp(int race, Secondary &, Secondary &) const;
 	void		FillMax(const Skill::Secondary &);
+	Secondary*	FindSkill(int);
 	std::string	String(void) const;
+	int		Count(void) const;
+	std::vector<Secondary> &
+			ToVector(void);
+
+    protected:
+	friend StreamBase & operator<< (StreamBase &, const SecSkills &);
+	friend StreamBase & operator>> (StreamBase &, SecSkills &);
     };
+
+    StreamBase & operator<< (StreamBase &, const SecSkills &);
+    StreamBase & operator>> (StreamBase &, SecSkills &);
 
     class Primary
     {

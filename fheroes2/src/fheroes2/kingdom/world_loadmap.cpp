@@ -289,7 +289,7 @@ TiXmlElement & operator>> (TiXmlElement & doc, Heroes & hero)
     if(xml_skills)
 	*xml_skills >> skills;
 
-    if(skills.size())
+    if(skills.Count())
     {
 	hero.SetModes(Heroes::CUSTOMSKILLS);
 	hero.secondary_skills = skills;

@@ -93,7 +93,7 @@ int PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
     SecondarySkillsBar secskill_bar;
     secskill_bar.SetColRows(8, 1);
     secskill_bar.SetHSpace(-1);
-    secskill_bar.SetContent(hero.GetSecondarySkills());
+    secskill_bar.SetContent(hero.GetSecondarySkills().ToVector());
     secskill_bar.SetPos(dst_rt.x + 8, dst_rt.y + 58);
     secskill_bar.Redraw();
 

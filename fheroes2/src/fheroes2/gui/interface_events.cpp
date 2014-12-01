@@ -583,8 +583,21 @@ void Interface::Basic::EventKeyArrowPress(int dir)
 
 void Interface::Basic::EventDebug1(void)
 {
+    VERBOSE("");
+/*
+    Heroes* hero = GetFocusHeroes();
+
+    if(hero)
+    {
+	int level = hero->GetLevelFromExperience(hero->GetExperience());
+	u32 exp = hero->GetExperienceFromLevel(level + 1);
+
+	hero->IncreaseExperience(exp - hero->GetExperience() + 100);
+    }
+*/
 }
 
 void Interface::Basic::EventDebug2(void)
 {
+    VERBOSE("");
 }
