@@ -747,13 +747,21 @@ void Maps::Tiles::QuantityUpdate(void)
 	break;
 
         case MP2::OBJ_BARRIER:
-	    if(addons_level1.size())
-        	QuantitySetColor(TilesAddon::ColorFromBarrierSprite(addons_level1.front()));
+	    {
+		Addons::const_reverse_iterator it = std::find_if(addons_level1.rbegin(), addons_level1.rend(),
+						std::ptr_fun(&TilesAddon::ColorFromBarrierSprite));
+		if(it != addons_level1.rend())
+        	    QuantitySetColor(TilesAddon::ColorFromBarrierSprite(*it));
+	    }
 	    break;
 
         case MP2::OBJ_TRAVELLERTENT:
-	    if(addons_level1.size())
-        	QuantitySetColor(TilesAddon::ColorFromTravellerTentSprite(addons_level1.front()));
+	    {
+		Addons::const_reverse_iterator it = std::find_if(addons_level1.rbegin(), addons_level1.rend(),
+						std::ptr_fun(&TilesAddon::ColorFromTravellerTentSprite));
+		if(it != addons_level1.rend())
+        	    QuantitySetColor(TilesAddon::ColorFromTravellerTentSprite(*it));
+	    }
     	    break;
 
         case MP2::OBJ_ALCHEMYLAB:
