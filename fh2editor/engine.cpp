@@ -2298,6 +2298,9 @@ MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2, int spri
 	if(Portrait::Random <= portrait) portrait = Portrait::Unknown;
     }
 
+    if(mp2.customName)
+	nameHero = mp2.name;
+
     if(nameHero.isEmpty())
 	nameHero = race == Race::Random ? "Random" : Portrait::transcribe(portrait);
 

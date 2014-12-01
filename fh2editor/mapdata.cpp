@@ -2313,9 +2313,10 @@ bool MapData::loadMapXML(const QString & mapFile)
 
     QDomElement edata = emap.firstChildElement("data");
     quint16 compress = edata.attribute("compress").toInt();
-    QByteArray bdata;
 
+    if(compress)
     {
+	QByteArray bdata;
 	QByteArray cdata = QByteArray::fromBase64(edata.text().toLatin1());
 
         if(compress != qChecksum(cdata.data(), cdata.size()))
@@ -2339,31 +2340,35 @@ bool MapData::loadMapXML(const QString & mapFile)
 	int dataSize; ds >> dataSize;
 	int offset = sizeof(_mapVersion) + sizeof(dataSize);
 	bdata = qUncompress(reinterpret_cast<const uchar*>(cdata.data()) + offset, cdata.size() - offset);
-    }
 
-    if(0 == bdata.size())
-    {
-	QApplication::restoreOverrideCursor();
-	QMessageBox::warning(NULL, "Map Editor", "Incorrect data.");
-	return false;
-    }
+	if(0 == bdata.size())
+	{
+	    QApplication::restoreOverrideCursor();
+	    QMessageBox::warning(NULL, "Map Editor", "Incorrect data.");
+	    return false;
+	}
 
-    if(dom.setContent(bdata))
-    {
-	edata = dom.firstChildElement("data");
-	edata >> *this;
+	if(dom.setContent(bdata))
+	{
+	    edata = dom.firstChildElement("data");
+	    edata >> *this;
+	}
+	else
+	{
+	    QApplication::restoreOverrideCursor();
+	    QMessageBox::warning(NULL, "Map Editor", "Unknown error.");
+	    return false;
+	}
     }
     else
     {
-	QApplication::restoreOverrideCursor();
-	QMessageBox::warning(NULL, "Map Editor", "Unknown error.");
-	return false;
+	edata >> *this;
     }
 
     return true;
 }
 
-bool MapData::saveMapXML(const QString & mapFile) const
+bool MapData::saveMapXML(const QString & mapFile, bool compress) const
 {
     QFile file(mapFile);
 
@@ -2380,10 +2385,11 @@ bool MapData::saveMapXML(const QString & mapFile) const
     emap.appendChild(eheader);
     eheader << mapHeader;
 
-    QByteArray cdata;
-    quint16 checksum = 0;
-
+    if(compress)
     {
+	QByteArray cdata;
+	quint16 checksum = 0;
+
 	QByteArray bdata;
 	bdata.reserve(size().width() * size().height() * 1024);
 	QTextStream ts(&bdata);
@@ -2391,29 +2397,24 @@ bool MapData::saveMapXML(const QString & mapFile) const
         edata0 << *this;
         edata0.save(ts, 4);
 
-	// Dump uncomressed data block
-	if(0)
-	{
-	    QFile file("data.xml");
-	    if(file.open(QFile::WriteOnly | QFile::Truncate))
-	    {
-		QTextStream qt(&file);
-    		edata0.save(qt, 4);
-	    }
-	}
-
 	QDataStream ds(&cdata, QIODevice::WriteOnly);
 	ds.setByteOrder(QDataStream::LittleEndian);
 	ds << static_cast<int>(FH2ENGINE_CURRENT_VERSION) << bdata.size();
 
 	cdata.append(qCompress(bdata, 7));
 	checksum = qChecksum(cdata.data(), cdata.size());
-    }
 
-    QDomElement edata = doc.createElement("data");
-    edata.setAttribute("compress", checksum);
-    emap.appendChild(edata);
-    edata.appendChild(doc.createTextNode(cdata.toBase64()));
+	QDomElement edata = doc.createElement("data");
+	edata.setAttribute("compress", checksum);
+	emap.appendChild(edata);
+	edata.appendChild(doc.createTextNode(cdata.toBase64()));
+    }
+    else
+    {
+	QDomElement edata = doc.createElement("data");
+        edata << *this;
+	emap.appendChild(edata);
+    }
 
     doc.insertBefore(doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\""), doc.firstChild());
 

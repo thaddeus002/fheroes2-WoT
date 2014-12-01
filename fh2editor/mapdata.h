@@ -347,7 +347,7 @@ public:
     void		newMap(const QSize &, int, const QString &, int);
     bool		loadMap(const QString &);
 
-    bool		saveMapXML(const QString &) const;
+    bool		saveMapXML(const QString &, bool) const;
     bool		isValidBuffer(void) const;
     bool		showPassableMode(void) const { return showPassable; }
 
