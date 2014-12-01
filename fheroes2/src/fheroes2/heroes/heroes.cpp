@@ -1589,7 +1589,7 @@ Surface Heroes::GetPortrait(int id, int type)
 
 void Heroes::PortraitRedraw(s32 px, s32 py, int type, Surface & dstsf) const
 {
-    Surface port = GetPortrait(hid, type);
+    Surface port = GetPortrait(portrait, type);
     Point mp;
 
     if(port.isValid())

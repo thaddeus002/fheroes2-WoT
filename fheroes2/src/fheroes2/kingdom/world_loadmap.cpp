@@ -126,14 +126,17 @@ TiXmlElement & operator>> (TiXmlElement & doc, MapsTiles & tiles)
 
 TiXmlElement & operator>> (TiXmlElement & doc, Army & army)
 {
+    army.Clean();
+    int position = 0;
+
     TiXmlElement* xml_troop = doc.FirstChildElement("troop");
     for(; xml_troop; xml_troop = xml_troop->NextSiblingElement("troop"))
     {
 	int type, count;
 	xml_troop->Attribute("type", & type);
 	xml_troop->Attribute("count", & count);
-
-	army.JoinTroop(type, count);
+	Troop* troop = army.GetTroop(position++);
+	if(troop) troop->Set(type, count);
     }
 
     return doc;
@@ -255,7 +258,7 @@ TiXmlElement & operator>> (TiXmlElement & doc, BagArtifacts & bag)
 
 TiXmlElement & operator>> (TiXmlElement & doc, Heroes & hero)
 {
-    int posx, posy, color, portrait, exp, patrol, square;
+    int posx, posy, color, portrait, exp, patrol, square, attack, defense, power, knowledge, race;
 
     doc.Attribute("posx", & posx);
     doc.Attribute("posy", & posy);
@@ -264,8 +267,23 @@ TiXmlElement & operator>> (TiXmlElement & doc, Heroes & hero)
     doc.Attribute("color", & color);
     hero.SetColor(color);
 
+    doc.Attribute("attack", & attack);
+    hero.attack = attack;
+
+    doc.Attribute("defense", & defense);
+    hero.defense = defense;
+
+    doc.Attribute("power", & power);
+    hero.power = power;
+
+    doc.Attribute("knowledge", & knowledge);
+    hero.knowledge = knowledge;
+
     doc.Attribute("portrait", & portrait);
-    hero.portrait = portrait;
+    hero.portrait = portrait - 1;
+
+    doc.Attribute("race", & race);
+    hero.race = race;
 
     doc.Attribute("experience", & exp);
     hero.experience = exp;
@@ -724,6 +742,12 @@ bool World::LoadMapMAP(const std::string & filename)
         NULL != (xml_map = doc.FirstChildElement("map")))
     {
         TiXmlElement* xml_data = xml_map->FirstChildElement("data");
+	if(! xml_data->Attribute("compress"))
+	{
+	    *xml_data >> *this;
+	    return true;
+	}
+	else
 	if(xml_data->GetText())
 	{
 	    std::vector<u8> raw_data = DecodeBase64AndUncomress(xml_data->GetText());
