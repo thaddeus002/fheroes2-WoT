@@ -2802,7 +2802,7 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
     horizontalLayoutColor->addWidget(comboBoxColor);
 
     labelRace = new QLabel(tabInfo);
-    labelRace->setText(QApplication::translate("MapHeroDialog", "Race", 0));
+    labelRace->setText(QApplication::translate("MapHeroDialog", "Type", 0));
 
     comboBoxRace = new QComboBox(tabInfo);
     comboBoxRace->addItem(Race::transcribe(Race::Knight), Race::Knight);

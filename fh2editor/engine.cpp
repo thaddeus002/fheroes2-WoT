@@ -2268,13 +2268,13 @@ QDomElement & operator>> (QDomElement & el, MapTown & town)
 
 MapHero::MapHero(const QPoint & pos, quint32 id)
     : MapObject(pos, id, MapObj::Heroes), col(Color::None), race(Race::Unknown),
-    portrait(Portrait::Unknown), experience(0), patrolMode(false), patrolSquare(0)
+    portrait(Portrait::Unknown), experience(0), patrolMode(false), patrolSquare(0), jailMode(false)
 {
     nameHero = Portrait::transcribe(portrait);
 }
 
-MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2, int spriteIndex)
-    : MapObject(pos, id, MapObj::Heroes), col(Color::None), race(Race::Unknown), portrait(Portrait::Unknown), nameHero(mp2.name)
+MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2, int spriteIndex, bool jail)
+    : MapObject(pos, id, MapObj::Heroes), col(Color::None), race(Race::Unknown), portrait(Portrait::Unknown), jailMode(jail), nameHero(mp2.name)
 {
     updateInfo(spriteIndex);
 
@@ -2393,6 +2393,7 @@ QDomElement & operator<< (QDomElement & el, const MapHero & hero)
     el.setAttribute("experience", hero.experience);
     el.setAttribute("patrolMode", hero.patrolMode);
     el.setAttribute("patrolSquare", hero.patrolSquare);
+    el.setAttribute("jailMode", hero.jailMode);
 
     QDomDocument doc = el.ownerDocument();
 
@@ -2456,6 +2457,7 @@ QDomElement & operator>> (QDomElement & el, MapHero & hero)
     hero.experience = el.hasAttribute("experience") ? el.attribute("experience").toInt() : 0;
     hero.patrolMode = el.hasAttribute("patrolMode") ? el.attribute("patrolMode").toInt() : false;
     hero.patrolSquare = el.hasAttribute("patrolSquare") ? el.attribute("patrolSquare").toInt() : 0;
+    hero.jailMode = el.hasAttribute("jailMode") ? el.attribute("jailMode").toInt() : false;
 
     hero.artifacts.clear();
     QDomNodeList artList = el.firstChildElement("artifacts").elementsByTagName("artifact");

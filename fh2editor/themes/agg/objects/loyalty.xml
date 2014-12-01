@@ -114,11 +114,11 @@
         <sprite px="2" py="1" index="4" level="action" passable="0x01F8" />
     </object>
     <object icn="x_loc2" name="Jail" width="3" height="2" cid="0x7b" >
-        <sprite px="1" py="0" index="0" level="top" />
-        <sprite px="2" py="0" index="1" level="top" />
-        <sprite px="0" py="1" index="2" level="top" />
-        <sprite px="1" py="1" index="3" level="bottom" passable="0x01F8" />
-        <sprite px="2" py="1" index="4" level="action" passable="0x01F8" />
+        <sprite px="1" py="0" index="5" level="top" />
+        <sprite px="2" py="0" index="6" level="top" />
+        <sprite px="0" py="1" index="7" level="top" />
+        <sprite px="1" py="1" index="8" level="bottom" passable="0x01F8" />
+        <sprite px="2" py="1" index="9" level="action" passable="0x01F8" />
     </object>
     <object icn="x_loc2" name="Mermaid" width="3" height="2" cid="0x32" >
         <sprite px="0" py="0" index="10" level="top" animation="8" />

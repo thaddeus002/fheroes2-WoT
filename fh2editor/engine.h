@@ -770,9 +770,10 @@ struct MapHero : public MapObject
     quint32	experience;
     bool	patrolMode;
     int		patrolSquare;
+    bool	jailMode;
     QString     nameHero;
 
-    MapHero(const QPoint &, quint32, const mp2hero_t &, int);
+    MapHero(const QPoint &, quint32, const mp2hero_t &, int, bool);
     MapHero(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1);
 
     QString	name(void) const { return nameHero; }

@@ -258,7 +258,7 @@ TiXmlElement & operator>> (TiXmlElement & doc, BagArtifacts & bag)
 
 TiXmlElement & operator>> (TiXmlElement & doc, Heroes & hero)
 {
-    int posx, posy, color, portrait, exp, patrol, square, attack, defense, power, knowledge, race;
+    int posx, posy, color, portrait, exp, patrol, square, attack, defense, power, knowledge, race, jail;
 
     doc.Attribute("posx", & posx);
     doc.Attribute("posy", & posy);
@@ -296,6 +296,10 @@ TiXmlElement & operator>> (TiXmlElement & doc, Heroes & hero)
 	hero.patrol_center = Point(posx, posy);
 	hero.patrol_square = square;
     }
+
+    doc.Attribute("jailMode", & jail);
+    if(jail)
+	hero.SetModes(Heroes::JAIL);
 
     hero.name = doc.Attribute("name");
     if(hero.name == "Random" || hero.name == "Unknown")

@@ -652,6 +652,7 @@ bool MapTile::isObjectEdit(void) const
     switch(object())
     {
 	case MapObj::Heroes:
+    	case MapObj::Jail:
 	    return true;
 
 	case MapObj::RndCastle:
@@ -1215,11 +1216,16 @@ void MapArea::importMP2Heroes(const QVector<H2::HeroPos> & heroes)
 	it = heroes.begin(); it != heroes.end(); ++it) if(tiles.isValidPoint((*it).pos()))
     {
 	const MapTileExt* ext = tiles.tileConst((*it).pos())->levels1Const().findConst(MapTileExt::isMiniHero);
+	bool jail = false;
 
 	if(!ext)
+	{
 	    ext = tiles.tileConst((*it).pos())->levels1Const().findConst(MapTileExt::isJail);
+	    jail = true;
+	}
 
-	if(ext) objects.push_back(new MapHero((*it).pos(), ext->uid(), (*it).hero(), ext->index()));
+	if(ext)
+	    objects.push_back(new MapHero((*it).pos(), ext->uid(), (*it).hero(), ext->index(), jail));
     }
 }
 
