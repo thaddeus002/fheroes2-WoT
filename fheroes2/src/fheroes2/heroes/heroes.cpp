@@ -344,6 +344,8 @@ void Heroes::LoadFromMP2(s32 map_index, int cl, int rc, StreamBuf st)
 	    it = secs.begin(); it != secs.end(); ++it)
 	    (*it).SetLevel(st.get());
 
+        secondary_skills = Skill::SecSkills();
+
 	for(std::vector<Skill::Secondary>::const_iterator
 	    it = secs.begin(); it != secs.end(); ++it)
 	    if((*it).isValid()) secondary_skills.AddSkill(*it);
