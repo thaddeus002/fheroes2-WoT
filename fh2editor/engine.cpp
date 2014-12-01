@@ -2766,8 +2766,18 @@ void MapObjects::remove(int uid)
     erase(std::remove(begin(), end(), uid), end());
 }
 
-SharedMapObject MapObjects::find(const QPoint & pos) const
+SharedMapObject MapObjects::find(const QPoint & pos, bool last) const
 {
+    if(last)
+    {
+	SharedMapObject res = NULL;
+
+	for(const_iterator it = begin(); it != end(); ++it)
+	    if(*it == pos) res = *it;
+
+	return res;
+    }
+
     const_iterator it = std::find(begin(), end(), pos);
     return it != end() ? *it : NULL;
 }

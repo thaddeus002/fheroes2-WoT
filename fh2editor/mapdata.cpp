@@ -651,14 +651,16 @@ bool MapTile::isObjectEdit(void) const
 {
     switch(object())
     {
+	case MapObj::Heroes:
+	    return true;
+
+	case MapObj::RndCastle:
+	case MapObj::RndTown:
+	case MapObj::Castle:
 	case MapObj::Bottle:
 	case MapObj::Sign:
 	case MapObj::Event:
     	case MapObj::Sphinx:
-	case MapObj::Heroes:
-	case MapObj::RndCastle:
-	case MapObj::RndTown:
-	case MapObj::Castle:
 	case MapObj::RndArtifact:
 	case MapObj::RndArtifact1:
 	case MapObj::RndArtifact2:
@@ -681,6 +683,14 @@ bool MapTile::isObjectEdit(void) const
 
 bool MapTile::isObjectAction(void) const
 {
+    switch(object())
+    {
+	case MapObj::Heroes:
+	    return false;
+
+	default: break;
+    }
+
     return objectID & MapObj::IsAction;
 }
 
@@ -2932,7 +2942,7 @@ void MapData::editArtifactDialog(const MapTile & tile)
 
 void MapData::editOtherMapEventsDialog(const MapTile & tile)
 {
-    MapActions* actions = dynamic_cast<MapActions*>(mapObjects.find(tile.mapPos()).data());
+    MapActions* actions = dynamic_cast<MapActions*>(mapObjects.find(tile.mapPos(), true).data());
 
     Form::ObjectEventsDialog form(actions);
 

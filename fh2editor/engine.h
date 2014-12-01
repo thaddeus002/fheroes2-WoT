@@ -993,7 +993,7 @@ class MapObjects : public QList<SharedMapObject>
 public:
     MapObjects();
 
-    SharedMapObject		find(const QPoint &) const;
+    SharedMapObject		find(const QPoint &, bool last = false) const;
     QList<SharedMapObject>	list(int types) const;
     QMap<quint32, quint32>	importObjects(const MapObjects &, const QRect &, const QPoint &, quint32);
 

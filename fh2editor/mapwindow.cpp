@@ -107,7 +107,7 @@ bool MapWindow::saveAs(void)
 
 bool MapWindow::saveFile(const QString & fileName)
 {
-    if(! mapData.saveMapXML(fileName, true))
+    if(! mapData.saveMapXML(fileName, true /* compress */))
     {
         QMessageBox::warning(this, tr("Map Editor"), tr("Cannot write file %1.").arg(fileName));
         return saveAs();
