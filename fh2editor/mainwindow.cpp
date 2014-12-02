@@ -128,6 +128,12 @@ void MainWindow::saveAs(void)
         statusBar()->showMessage(tr("File saved"), 2000);
 }
 
+void MainWindow::saveRaw(void)
+{
+    if(activeMapWindow() && activeMapWindow()->saveRaw())
+        statusBar()->showMessage(tr("File saved"), 2000);
+}
+
 void MainWindow::about(void)
 {
    QMessageBox::about(this, tr("Map Editor"), tr("<b>version 20130825</b>"));
@@ -217,6 +223,7 @@ void MainWindow::updateMenus(void)
 
     fileSaveAct->setEnabled(hasMapWindow);
     fileSaveAsAct->setEnabled(hasMapWindow);
+    fileSaveRawAct->setEnabled(hasMapWindow);
     closeAct->setEnabled(hasMapWindow);
     closeAllAct->setEnabled(hasMapWindow);
     tileAct->setEnabled(hasMapWindow);
@@ -296,6 +303,10 @@ void MainWindow::createActions(void)
     fileSaveAsAct->setStatusTip(tr("Save the map under a new name"));
     connect(fileSaveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
 
+    fileSaveRawAct = new QAction(QIcon(":/images/menu_save.png"), tr("&Save raw"), this);
+    fileSaveRawAct->setStatusTip(tr("Save the uncompressed map to disk"));
+    connect(fileSaveRawAct, SIGNAL(triggered()), this, SLOT(saveRaw()));
+
     mapOptionsAct = new QAction(QIcon(":/images/map_options.png"), tr("&Options"), this);
     mapOptionsAct->setStatusTip(tr("Show map options"));
 
@@ -350,6 +361,8 @@ void MainWindow::createMenus(void)
     fileMenu->addAction(fileOpenAct);
     fileMenu->addAction(fileSaveAct);
     fileMenu->addAction(fileSaveAsAct);
+    fileMenu->addSeparator();
+    fileMenu->addAction(fileSaveRawAct);
     fileMenu->addSeparator();
 
     fileMenu->addAction(fileExitAct);

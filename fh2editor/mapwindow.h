@@ -43,7 +43,8 @@ public:
     bool	loadFile(const QString &);
     bool	save(void);
     bool	saveAs(void);
-    bool	saveFile(const QString &);
+    bool	saveRaw(void);
+    bool	saveFile(const QString &, bool);
     QString	userFriendlyCurrentFile(void);
     QString	currentFile(void);
 

@@ -571,6 +571,7 @@ u32 Heroes::GetMaxMovePoints(void) const
     {
 	Troop* troop = const_cast<Army &>(army).GetSlowestTroop();
 
+	if(troop)
     	switch(troop->GetSpeed())
 	{
 	    default: break;

@@ -96,18 +96,24 @@ bool MapWindow::loadFile(const QString & fileName)
 
 bool MapWindow::save(void)
 {
-    return isUntitled ? saveAs() : saveFile(curFile);
+    return isUntitled ? saveAs() : saveFile(curFile, true);
 }
 
 bool MapWindow::saveAs(void)
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), curFile);
-    return fileName.isEmpty() ? false : saveFile(fileName);
+    return fileName.isEmpty() ? false : saveFile(fileName, true);
 }
 
-bool MapWindow::saveFile(const QString & fileName)
+bool MapWindow::saveRaw(void)
 {
-    if(! mapData.saveMapXML(fileName, true /* compress */))
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Raw As"), curFile);
+    return fileName.isEmpty() ? false : saveFile(fileName, false);
+}
+
+bool MapWindow::saveFile(const QString & fileName, bool compress)
+{
+    if(! mapData.saveMapXML(fileName, compress))
     {
         QMessageBox::warning(this, tr("Map Editor"), tr("Cannot write file %1.").arg(fileName));
         return saveAs();

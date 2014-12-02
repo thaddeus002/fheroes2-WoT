@@ -55,6 +55,7 @@ private slots:
     void		newFile(void);
     void		open(void);
     void		save(void);
+    void		saveRaw(void);
     void		saveAs(void);
     void		about(void);
     void		updateWindowMenu(void);
@@ -90,6 +91,7 @@ private:
     QAction*		fileOpenAct;
     QAction*		fileSaveAct;
     QAction*		fileSaveAsAct;
+    QAction*		fileSaveRawAct;
     QAction*		fileExitAct;
     QAction*		editCopyAct;
     QAction*		editPasteAct;
