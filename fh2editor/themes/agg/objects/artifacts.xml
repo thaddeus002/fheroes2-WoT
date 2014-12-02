@@ -84,7 +84,6 @@
     <template section="resource" name="White Pearl" index="158" />
     <template section="resource" name="Black Pearl" index="160" />
     <template section="resource" name="Random Artifact" index="162" cid="0x2D" />
-    <template section="resource" name="Ultimate Artifact" index="164" cid="0x2C" />
     <template section="resource" name="Random Artifact 1" index="166" cid="0x74" />
     <template section="resource" name="Random Artifact 2" index="168" cid="0x75" />
     <template section="resource" name="Random Artifact 3" index="170" cid="0x76" />
@@ -105,4 +104,8 @@
     <template section="resource" name="Sword Breaker" index="200" />
     <template section="resource" name="Sword of Anduran" index="202" />
     <template section="resource" name="Spade of Necromancy" index="204" />
+
+    <object name="Ultimate Artifact" width="1" height="1" icn="objnarti" cid="0x29" >
+	<sprite px="0" py="0" index="164" level="action" cid="0x2C" />
+    </object>
 </objects>
