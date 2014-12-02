@@ -659,7 +659,7 @@ void Dialog::QuickInfo(const Castle & castle)
 	text.Blit(dst_pt);
 
 	// mini port heroes
-	Surface port = Heroes::GetPortrait(guardian->GetID(), PORT_SMALL);
+	Surface port = guardian->GetPortrait(PORT_SMALL);
 	if(port.isValid())
 	{
 	    dst_pt.x = cur_rt.x + (cur_rt.w - port.w()) / 2;
@@ -765,7 +765,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     text.Blit(dst_pt);
 
     // mini port heroes
-    Surface port = Heroes::GetPortrait(hero.GetID(), PORT_SMALL);
+    Surface port = hero.GetPortrait(PORT_SMALL);
     if(port.isValid())
     {
 	dst_pt.x = cur_rt.x + (cur_rt.w - port.w()) / 2;

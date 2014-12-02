@@ -225,6 +225,7 @@ public:
     bool		AllowBattle(bool attacker) const;
 
     std::string		String(void) const;
+    Surface             GetPortrait(int type) const;
 
     static int		GetLevelFromExperience(u32);
     static u32		GetExperienceFromLevel(int);

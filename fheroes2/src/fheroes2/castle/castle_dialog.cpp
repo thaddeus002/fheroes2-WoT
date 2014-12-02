@@ -160,7 +160,7 @@ void RedrawIcons(const Castle & castle, const CastleHeroes & heroes, const Point
 	Surface icon1, icon2;
 
 	if(hero1)
-    	    icon1 = Heroes::GetPortrait(hero1->GetID(), PORT_MEDIUM);
+    	    icon1 = hero1->GetPortrait(PORT_MEDIUM);
 	else
 	if(castle.isBuild(BUILD_CAPTAIN))
     	    icon1 = castle.GetCaptain().GetPortrait(PORT_MEDIUM);
@@ -168,7 +168,7 @@ void RedrawIcons(const Castle & castle, const CastleHeroes & heroes, const Point
     	    icon1 = AGG::GetICN(ICN::BRCREST, Color::GetIndex(castle.GetColor()));
 
         if(hero2)
-    	    icon2 = Heroes::GetPortrait(hero2->GetID(), PORT_MEDIUM);
+    	    icon2 = hero2->GetPortrait(PORT_MEDIUM);
 	else
 	    icon2 = AGG::GetICN(ICN::BRCREST, Color::GetIndex(castle.GetColor()));
 
@@ -187,7 +187,7 @@ void RedrawIcons(const Castle & castle, const CastleHeroes & heroes, const Point
 	Surface icon1, icon2;
 
 	if(hero1)
-	    icon1 = Heroes::GetPortrait(hero1->GetID(), PORT_BIG);
+	    icon1 = hero1->GetPortrait(PORT_BIG);
 	else
 	if(castle.isBuild(BUILD_CAPTAIN))
 	    icon1 = castle.GetCaptain().GetPortrait(PORT_BIG);
@@ -195,7 +195,7 @@ void RedrawIcons(const Castle & castle, const CastleHeroes & heroes, const Point
 	    icon1 = AGG::GetICN(ICN::CREST, Color::GetIndex(castle.GetColor()));
 
 	if(hero2)
-	    icon2 = Heroes::GetPortrait(hero2->GetID(), PORT_BIG);
+	    icon2 = hero2->GetPortrait(PORT_BIG);
 	else
 	    icon2 = AGG::GetICN(ICN::STRIP, 3);
 
@@ -662,7 +662,7 @@ int Castle::OpenDialog(bool readonly, bool fade)
 				const Rect rt(0, 98, 552, 107);
 				Surface sf(rt, false);
             			AGG::GetICN(ICN::STRIP, 0).Blit(rt, 0, 0, sf);
-				Surface port = Heroes::GetPortrait(heroes.Guest()->GetID(), PORT_BIG);
+				Surface port = heroes.Guest()->GetPortrait(PORT_BIG);
 				if(port.isValid()) port.Blit(6, 6, sf);
 				const Point savept = selectArmy2.GetPos();
 				selectArmy2.SetPos(112, 5);

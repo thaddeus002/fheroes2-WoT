@@ -1587,6 +1587,11 @@ Surface Heroes::GetPortrait(int id, int type)
     return Surface();
 }
 
+Surface Heroes::GetPortrait(int type) const
+{
+    return Heroes::GetPortrait(portrait, type);
+}
+
 void Heroes::PortraitRedraw(s32 px, s32 py, int type, Surface & dstsf) const
 {
     Surface port = GetPortrait(portrait, type);

@@ -234,7 +234,7 @@ void DrawHeroIcons(const std::vector<ValueColors> & v, const Point & pos, u32 wi
 
 	for(u32 ii = 0; ii < v.size(); ++ii)
 	{
-	    Surface icons = Heroes::GetPortrait(v[ii].first, PORT_SMALL);
+	    Surface icons = world.GetHeroes(v[ii].first)->GetPortrait(PORT_SMALL);
 	    if(icons.isValid())
 	    {
 		s32 px = pos.x + chunk / 2 + ii * chunk;

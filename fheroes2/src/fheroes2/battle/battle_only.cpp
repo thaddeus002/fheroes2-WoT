@@ -661,12 +661,12 @@ void Battle::Only::RedrawBaseInfo(const Point & top)
     text.Blit(top.x + 320 - text.w() / 2, top.y + 26);
 
     // portrait
-    Surface port1 = Heroes::GetPortrait(hero1->GetID(), PORT_BIG);
+    Surface port1 = hero1->GetPortrait(PORT_BIG);
     if(port1.isValid()) port1.Blit(rtPortrait1.x, rtPortrait1.y, display);
 
     if(hero2)
     {
-	Surface port2 = Heroes::GetPortrait(hero2->GetID(), PORT_BIG);
+	Surface port2 = hero2->GetPortrait(PORT_BIG);
 	if(port2.isValid()) port2.Blit(rtPortrait2.x, rtPortrait2.y, display);
     }
     else

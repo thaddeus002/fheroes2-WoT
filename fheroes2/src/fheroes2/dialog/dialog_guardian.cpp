@@ -163,7 +163,7 @@ bool Dialog::SetGuardian(Heroes & hero, Troop & troop, CapturedObject & co, bool
     dst_pt.y = area.y + 5;
     window.Blit(dst_pt);
 
-    Surface port = Heroes::GetPortrait(hero.GetID(), PORT_MEDIUM);
+    Surface port = hero.GetPortrait(PORT_MEDIUM);
     if(port.isValid()) port.Blit(dst_pt.x + 4, dst_pt.y + 4, display);
 
     // indicators
