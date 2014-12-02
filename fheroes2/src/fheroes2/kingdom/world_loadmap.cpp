@@ -280,10 +280,10 @@ TiXmlElement & operator>> (TiXmlElement & doc, Heroes & hero)
     hero.knowledge = knowledge;
 
     doc.Attribute("portrait", & portrait);
-    hero.portrait = portrait - 1;
+    if(portrait) hero.portrait = portrait - 1;
 
     doc.Attribute("race", & race);
-    hero.race = race;
+    if(race & Race::ALL) hero.race = race;
 
     doc.Attribute("experience", & exp);
     hero.experience = exp;
@@ -299,7 +299,10 @@ TiXmlElement & operator>> (TiXmlElement & doc, Heroes & hero)
 
     doc.Attribute("jailMode", & jail);
     if(jail)
-	hero.SetModes(Heroes::JAIL);
+    {
+    	hero.SetModes(Heroes::JAIL);
+	hero.SetColor(Color::NONE);
+    }
 
     hero.name = doc.Attribute("name");
     if(hero.name == "Random" || hero.name == "Unknown")
@@ -322,7 +325,6 @@ TiXmlElement & operator>> (TiXmlElement & doc, Heroes & hero)
 	*xml_artifacts >> hero.bag_artifacts;
 
     TiXmlElement* xml_troops = doc.FirstChildElement("troops");
-
     if(xml_troops)
 	*xml_troops >> hero.army;
 

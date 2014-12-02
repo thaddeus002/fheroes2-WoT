@@ -776,7 +776,7 @@ struct MapHero : public MapObject
     MapHero(const QPoint &, quint32, const mp2hero_t &, int, bool);
     MapHero(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1);
 
-    QString	name(void) const { return nameHero; }
+    QString	name(void) const;
     QString	object(void) const { return "hero"; }
 
     int		color(void) const { return col; }

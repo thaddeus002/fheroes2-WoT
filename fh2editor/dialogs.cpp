@@ -2791,11 +2791,19 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
     comboBoxColor = new QComboBox(tabInfo);
 
     QVector<int> colors = Color::colors(Color::All);
-    for(QVector<int>::const_iterator
-        it = colors.begin(); it != colors.end(); ++it)
-        comboBoxColor->addItem(Editor::pixmapBorder(QSize(24, 24), Color::convert(*it), QColor(0, 0, 0)), Color::transcribe(*it), *it);
-
-    comboBoxColor->setCurrentIndex(Color::index(hero.color()) - 1);
+    if(hero.jailMode)
+    {
+	comboBoxColor->setDisabled(true);
+	comboBoxColor->addItem(Editor::pixmapBorder(QSize(24, 24), Color::convert(Color::None), QColor(0, 0, 0)), "Jail", Color::None);
+	comboBoxColor->setCurrentIndex(0);
+    }
+    else
+    {
+	for(QVector<int>::const_iterator
+    	    it = colors.begin(); it != colors.end(); ++it)
+    	    comboBoxColor->addItem(Editor::pixmapBorder(QSize(24, 24), Color::convert(*it), QColor(0, 0, 0)), Color::transcribe(*it), *it);
+	comboBoxColor->setCurrentIndex(Color::index(hero.color()) - 1);
+    }
 
     horizontalLayoutColor = new QHBoxLayout();
     horizontalLayoutColor->addWidget(labelColor);

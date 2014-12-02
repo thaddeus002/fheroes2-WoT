@@ -687,6 +687,9 @@ bool BagArtifacts::PushArtifact(const Artifact & art)
 {
     if(art.isValid())
     {
+	if(art() == Artifact::MAGIC_BOOK && isPresentArtifact(art))
+	    return false;
+
 	iterator it = std::find(begin(), end(), Artifact(Artifact::UNKNOWN));
 	if(it == end()) return false;
 

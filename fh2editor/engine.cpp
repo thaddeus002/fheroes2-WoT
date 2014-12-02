@@ -2310,6 +2310,17 @@ MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2, int spri
 	    if(mp2.skillId[ii] && mp2.skillLevel[ii])
 		skills.push_back(Skill(mp2.skillId[ii], mp2.skillLevel[ii]));
     }
+
+    if(jail)
+	col = Color::None;
+}
+
+QString MapHero::name(void) const
+{
+    if(jailMode)
+	return QString(nameHero).append(" (Jail)");
+
+    return nameHero;
 }
 
 bool MapHero::haveMagicBook(void) const
