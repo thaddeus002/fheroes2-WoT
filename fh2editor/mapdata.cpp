@@ -3158,6 +3158,7 @@ void MapData::addMapObject(const QPoint & pos, const CompositeObject & obj, quin
     		case MapObj::Sphinx:	objPtr = new MapSphinx(tile->mapPos(), uid); break;
 
 		case MapObj::Resource:
+		case MapObj::RndResource:
 		{
 		    const MapTileExt* ext = tile->levels1Const().findConst(MapTileExt::isResource);
 		    if(ext)
@@ -3166,6 +3167,11 @@ void MapData::addMapObject(const QPoint & pos, const CompositeObject & obj, quin
 		break;
 
 		case MapObj::Monster:
+		case MapObj::RndMonster:
+		case MapObj::RndMonster1:
+		case MapObj::RndMonster2:
+		case MapObj::RndMonster3:
+		case MapObj::RndMonster4:
 		{
 		    const MapTileExt* ext = tile->levels1Const().findConst(MapTileExt::isMonster);
 		    if(ext)
@@ -3174,6 +3180,11 @@ void MapData::addMapObject(const QPoint & pos, const CompositeObject & obj, quin
 		break;
 
 		case MapObj::Artifact:
+		case MapObj::RndArtifact:
+		case MapObj::RndArtifact1:
+		case MapObj::RndArtifact2:
+		case MapObj::RndArtifact3:
+		case MapObj::RndUltimateArtifact:
 		{
 		    const MapTileExt* ext = tile->levels1Const().findConst(MapTileExt::isArtifact);
 		    if(ext)

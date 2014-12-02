@@ -573,6 +573,14 @@ TiXmlElement & operator>> (TiXmlElement & doc, MapObjects & objects)
 	    *xml_objects >> *ptr;
 	    objects.add(Maps::GetIndexFromAbsPoint(posx, posy), ptr);
 	}
+	else
+	if(name == "monster")
+	{
+	    // int mons;
+	    // xml_objects->Attribute("monster", & mons);
+	    // monster="66" count="0" uid="1838" condition="-1" posx="0" posy="0"
+	    // VERBOSE("monster: " << mons);
+	}
     }
 
     return doc;

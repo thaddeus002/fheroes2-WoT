@@ -66,9 +66,9 @@
     <template section="monster" name="Air Elementals" index="63" />
     <template section="monster" name="Fire Elementals" index="64" />
     <template section="monster" name="Water Elementals" index="65" />
-    <template section="monster" name="Random Monsters" index="66" />
-    <template section="monster" name="Random Monsters 3" index="67" />
-    <template section="monster" name="Random Monsters 2" index="68" />
-    <template section="monster" name="Random Monsters 3" index="69" />
-    <template section="monster" name="Random Monsters 4" index="70" />
+    <template section="monster" name="Random Monsters" index="66" cid="0x2f" />
+    <template section="monster" name="Random Monsters 1" index="67" cid="0x33" />
+    <template section="monster" name="Random Monsters 2" index="68" cid="0x34" />
+    <template section="monster" name="Random Monsters 3" index="69" cid="0x35" />
+    <template section="monster" name="Random Monsters 4" index="70" cid="0x36" />
 </objects>
