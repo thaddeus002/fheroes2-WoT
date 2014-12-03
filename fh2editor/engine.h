@@ -123,11 +123,11 @@ namespace Artifact
 	    ThunderMace, ArmoredGauntlets, DefenderHelm, GiantFlail, Ballista, StealthShield, DragonSword, PowerAxe, DivineBreastplate,
 	    MinorScroll, MajorScroll, SuperiorScroll, ForemostScroll, EndlessSackGold, EndlessBagGold, EndlessPurseGold, NomadBootsMobility,
 	    TravelerBootsMobility, RabbitFoot, GoldenHorseShoe, GamblerLuckyCoin, FourLeafClover, TrueCompassMobility, SailorsAstrolabeMobility,
-	    EvilEye, Wnchanted_Hourglass, GoldWatch, SkullCap, IceCloak, FireCloak, LightningHelm, EvercoldIcicle, EverhotLavaRock, LightningRod,
+	    EvilEye, EnchantedHourglass, GoldWatch, SkullCap, IceCloak, FireCloak, LightningHelm, EvercoldIcicle, EverhotLavaRock, LightningRod,
 	    SnakeRing, Ankh, BookElements, ElementalRing, HolyPendant, PendantFreeWill, PendantLife, SerenityPendant, SeeingEyePendant, KineticPendant,
 	    PendantDeath, WandNegation, GoldenBow, Telescope, StatesmanQuill, WizardHat, PowerRing, AmmoCart, TaxLien, HideousMask, EndlessPouchSulfur,
 	    EndlessVialMercury, EndlessPouchGems, EndlessCordWood, EndlessCartOre, EndlessPouchCrystal, SpikedHelm, SpikedShield, WhitePearl, BlackPearl,
-	    MagicBook, Dummy1, Dummy2, Dummy3, Dummy4, SpellScroll, ArmMartyr, BreastplateAnduran, BroachShielding, BattleGarb, CrystalBall, HeartFire,
+	    Random, UltimateRandom, Random1, Random2, Random3, SpellScroll, ArmMartyr, BreastplateAnduran, BroachShielding, BattleGarb, CrystalBall, HeartFire,
 	    HeartIce, HelmetAnduran, HolyHammer, LegendaryScepter, Masthead, SphereNegation, StaffWizardry, SwordBreaker, SwordAnduran, SpadeNecromancy,
 	    Unknown };
 
@@ -771,6 +771,7 @@ struct MapHero : public MapObject
     bool	patrolMode;
     int		patrolSquare;
     bool	jailMode;
+    bool	magicBook;
     QString     nameHero;
 
     MapHero(const QPoint &, quint32, const mp2hero_t &, int, bool);

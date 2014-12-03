@@ -218,6 +218,7 @@ public:
     bool MakeBattleGarb(void);
     bool ContainUltimateArtifact(void) const;
 
+    void  RemoveArtifact(const Artifact &);
     void  RemoveScroll(const Artifact &);
 
     u32   CountArtifacts(void) const;

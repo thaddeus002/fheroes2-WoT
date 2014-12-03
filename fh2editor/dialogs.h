@@ -845,6 +845,7 @@ namespace Form
 	SkillsList* 		listWidgetSkills;
 	QSpacerItem* 		verticalSpacerSkills;
         QWidget* 		tabSpells;
+	QCheckBox*		checkBoxHaveMagicBook;
         int 			tabSpellsIndex;
 	QVBoxLayout* 		verticalLayoutSpells;
 	SpellsList* 		listWidgetSpells;
@@ -865,13 +866,14 @@ namespace Form
 	QVector<int>		artifacts(void) const;
 	QVector<int>		spells(void) const;
 	Skills			skills(void) const;
+	bool			book(void) const;
 
     protected slots:
 	void			setEnableOKButton(void);
 	void			setPortrait(int);
 	void			setDefaultTroops(bool);
 	void			widgetSkillsVisible(bool);
-	void			artifactsChanged(void);
+	void			widgetSpellsVisible(bool);
     };
 
     class ListDialog : public QDialog

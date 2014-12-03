@@ -133,8 +133,9 @@ H2::File::File(const QString & fn) : QFile(fn)
 quint32 H2::File::readLE16(void)
 {
     quint16 res = 0;
+    long long int ps = pos() + sizeof(res);
 
-    if(pos() + sizeof(res) <= size())
+    if(ps <= size())
     {
 	read((char*) &res, sizeof(res));
 	res = qFromLittleEndian(res);
@@ -148,8 +149,9 @@ quint32 H2::File::readLE16(void)
 quint32 H2::File::readLE32(void)
 {
     quint32 res = 0;
+    long long int ps = pos() + sizeof(res);
 
-    if(pos() + sizeof(res) <= size())
+    if(ps <= size())
     {
 	read((char*) &res, sizeof(res));
 	res = qFromLittleEndian(res);
@@ -163,8 +165,9 @@ quint32 H2::File::readLE32(void)
 quint32 H2::File::readByte(void)
 {
     quint8 res = 0;
+    long long int ps = pos() + sizeof(res);
 
-    if(pos() + sizeof(res) <= size())
+    if(ps <= size())
     {
 	read((char*) &res, 1);
     }
@@ -184,7 +187,8 @@ QByteArray H2::File::readBlock(size_t sz, int ps)
     if(0 <= ps)
 	seek(ps);
 
-    if(pos() + sz <= size())
+    long long int pps = pos() + sizeof(sz);
+    if(pps <= size())
 	return read(sz);
     else
 	qWarning() << "H2::File::readBlock:" << "out of range";
@@ -2268,13 +2272,13 @@ QDomElement & operator>> (QDomElement & el, MapTown & town)
 
 MapHero::MapHero(const QPoint & pos, quint32 id)
     : MapObject(pos, id, MapObj::Heroes), col(Color::None), race(Race::Unknown),
-    portrait(Portrait::Unknown), experience(0), patrolMode(false), patrolSquare(0), jailMode(false)
+    portrait(Portrait::Unknown), experience(0), patrolMode(false), patrolSquare(0), jailMode(false), magicBook(false)
 {
     nameHero = Portrait::transcribe(portrait);
 }
 
 MapHero::MapHero(const QPoint & pos, quint32 id, const mp2hero_t & mp2, int spriteIndex, bool jail)
-    : MapObject(pos, id, MapObj::Heroes), col(Color::None), race(Race::Unknown), portrait(Portrait::Unknown), jailMode(jail), nameHero(mp2.name)
+    : MapObject(pos, id, MapObj::Heroes), col(Color::None), race(Race::Unknown), portrait(Portrait::Unknown), jailMode(jail), magicBook(false), nameHero(mp2.name)
 {
     updateInfo(spriteIndex);
 
@@ -2325,7 +2329,7 @@ QString MapHero::name(void) const
 
 bool MapHero::haveMagicBook(void) const
 {
-    return artifacts.end() != std::find(artifacts.begin(), artifacts.end(), static_cast<int>(Artifact::MagicBook));
+    return magicBook;
 }
 
 void MapHero::updateInfo(int spriteIndex)
@@ -2370,10 +2374,10 @@ void MapHero::updateInfo(int spriteIndex)
 
     switch(race)
     {
-	case Race::Sorceress: artifacts.push_back(Artifact::MagicBook);  spells.push_back(Spell::Bless); break;
-	case Race::Warlock: artifacts.push_back(Artifact::MagicBook);  spells.push_back(Spell::Curse); break;
-	case Race::Wizard: artifacts.push_back(Artifact::MagicBook);  spells.push_back(Spell::StoneSkin); break;
-	case Race::Necromancer: artifacts.push_back(Artifact::MagicBook); spells.push_back(Spell::Haste); break;
+	case Race::Sorceress: magicBook = true;  spells.push_back(Spell::Bless); break;
+	case Race::Warlock: magicBook = true;  spells.push_back(Spell::Curse); break;
+	case Race::Wizard: magicBook = true;  spells.push_back(Spell::StoneSkin); break;
+	case Race::Necromancer: magicBook = true; spells.push_back(Spell::Haste); break;
 	default: break;
     }
 
@@ -2405,6 +2409,7 @@ QDomElement & operator<< (QDomElement & el, const MapHero & hero)
     el.setAttribute("patrolMode", hero.patrolMode);
     el.setAttribute("patrolSquare", hero.patrolSquare);
     el.setAttribute("jailMode", hero.jailMode);
+    el.setAttribute("haveBook", hero.magicBook);
 
     QDomDocument doc = el.ownerDocument();
 
@@ -2469,6 +2474,7 @@ QDomElement & operator>> (QDomElement & el, MapHero & hero)
     hero.patrolMode = el.hasAttribute("patrolMode") ? el.attribute("patrolMode").toInt() : false;
     hero.patrolSquare = el.hasAttribute("patrolSquare") ? el.attribute("patrolSquare").toInt() : 0;
     hero.jailMode = el.hasAttribute("jailMode") ? el.attribute("jailMode").toInt() : false;
+    hero.magicBook = el.hasAttribute("haveBook") ? el.attribute("haveBook").toInt() : false;
 
     hero.artifacts.clear();
     QDomNodeList artList = el.firstChildElement("artifacts").elementsByTagName("artifact");
@@ -3293,8 +3299,9 @@ QString Artifact::transcribe(int index)
 	"Everhot Lava Rock", "Lightning Rod", "Snake-Ring", "Ankh", "Book of Elements", "Elemental Ring", "Holy Pendant", "Pendant of Free Will", "Pendant of Life",
 	"Serenity Pendant", "Seeing-eye Pendant", "Kinetic Pendant", "Pendant of Death", "Wand of Negation", "Golden Bow", "Telescope", "Statesman's Quill",
 	"Wizard's Hat", "Power Ring", "Ammo Cart", "Tax Lien", "Hideous Mask", "Endless Pouch of Sulfur", "Endless Vial of Mercury", "Endless Pouch of Gems",
-	"Endless Cord of Wood", "Endless Cart of Ore", "Endless Pouch of Crystal", "Spiked Helm", "Spiked Shield", "White Pearl", "Black Pearl", "Magic Book",
-	"Dummy 1", "Dummy 2", "Dummy 3", "Dummy 4", "Spell Scroll", "Arm of the Martyr", "Breastplate of Anduran", "Broach of Shielding", "Battle Garb of Anduran",
+	"Endless Cord of Wood", "Endless Cart of Ore", "Endless Pouch of Crystal", "Spiked Helm", "Spiked Shield", "White Pearl", "Black Pearl",
+	"Random", "Ultimate Random", "Random 1", "Random 2", "Random 3",
+	"Spell Scroll", "Arm of the Martyr", "Breastplate of Anduran", "Broach of Shielding", "Battle Garb of Anduran",
 	"Crystal Ball", "Heart of Fire", "Heart of Ice", "Helmet of Anduran", "Holy Hammer", "Legendary Scepter", "Masthead", "Sphere of Negation", "Staff of Wizardry",
 	"Sword Breaker", "Sword of Anduran", "Spade of Necromancy", "Unknown" };
 

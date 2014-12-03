@@ -256,9 +256,25 @@ TiXmlElement & operator>> (TiXmlElement & doc, BagArtifacts & bag)
     return doc;
 }
 
+TiXmlElement & operator>> (TiXmlElement & doc, SpellBook & book)
+{
+    book.clear();
+
+    TiXmlElement* xml_spell = doc.FirstChildElement("spell");
+    for(; xml_spell; xml_spell = xml_spell->NextSiblingElement("spell"))
+    {
+	int spell = 0;
+	xml_spell->Attribute("id", & spell);
+
+	if(spell)
+	    book.Append(Spell(spell));
+    }
+    return doc;
+}
+
 TiXmlElement & operator>> (TiXmlElement & doc, Heroes & hero)
 {
-    int posx, posy, color, portrait, exp, patrol, square, attack, defense, power, knowledge, race, jail;
+    int posx, posy, color, portrait, exp, patrol, square, attack, defense, power, knowledge, race, jail, book;
 
     doc.Attribute("posx", & posx);
     doc.Attribute("posy", & posy);
@@ -288,6 +304,7 @@ TiXmlElement & operator>> (TiXmlElement & doc, Heroes & hero)
     doc.Attribute("experience", & exp);
     hero.experience = exp;
 
+
     doc.Attribute("patrolMode", & patrol);
     if(patrol)
     {
@@ -308,6 +325,7 @@ TiXmlElement & operator>> (TiXmlElement & doc, Heroes & hero)
     if(hero.name == "Random" || hero.name == "Unknown")
 	hero.name = Heroes::GetName(hero.GetID());
 
+    // skills
     Skill::SecSkills skills;
 
     TiXmlElement* xml_skills = doc.FirstChildElement("skills");
@@ -320,13 +338,29 @@ TiXmlElement & operator>> (TiXmlElement & doc, Heroes & hero)
 	hero.secondary_skills = skills;
     }
 
+    // artifacts
+    doc.Attribute("haveBook", & book);
+    if(book)
+	hero.bag_artifacts.PushArtifact(Artifact::MAGIC_BOOK);
+    else
+	hero.bag_artifacts.RemoveArtifact(Artifact::MAGIC_BOOK);
+
     TiXmlElement* xml_artifacts = doc.FirstChildElement("artifacts");
     if(xml_artifacts)
 	*xml_artifacts >> hero.bag_artifacts;
 
+    // troops
     TiXmlElement* xml_troops = doc.FirstChildElement("troops");
     if(xml_troops)
 	*xml_troops >> hero.army;
+
+    // spells
+    if(book)
+    {
+	TiXmlElement* xml_spells = doc.FirstChildElement("spells");
+	if(xml_spells)
+	    *xml_spells >> hero.spell_book;
+    }
 
     hero.PostLoad();
 

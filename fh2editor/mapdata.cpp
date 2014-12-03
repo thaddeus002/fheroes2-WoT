@@ -1645,7 +1645,7 @@ ListStringPos MapData::conditionArtifactList(void) const
 
     res << QPair<QString, QPoint>("Ultimate Artifact", QPoint(-1, -1));
 
-    for(int art = Artifact::UltimateBook; art < Artifact::MagicBook; ++art)
+    for(int art = Artifact::UltimateBook; art < Artifact::Random; ++art)
 	res << QPair<QString, QPoint>(Artifact::transcribe(art), QPoint(art, -1));
 
     for(int art = Artifact::SpellScroll; art < Artifact::Unknown; ++art)
@@ -3079,6 +3079,7 @@ void MapData::editHeroDialog(const MapTile & tile)
 	    hero->patrolMode = form.checkBoxEnablePatrol->isChecked();
 	    hero->patrolSquare = qvariant_cast<int>(comboBoxCurrentData(form.comboBoxPatrol));
 	    hero->skills = form.skills();
+	    hero->magicBook = form.book();
 	    hero->spells = form.spells();
 	    hero->col = qvariant_cast<int>(comboBoxCurrentData(form.comboBoxColor));
 	    hero->race = qvariant_cast<int>(comboBoxCurrentData(form.comboBoxRace));

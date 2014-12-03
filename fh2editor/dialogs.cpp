@@ -1409,7 +1409,7 @@ void Form::ArtifactGroup::setFormChanged(void)
 
 void Form::ArtifactGroup::setValue(int art)
 {
-    if(art >= Artifact::MagicBook && art <= Artifact::Dummy4)
+    if(art >= Artifact::Random && art <= Artifact::Random3)
 	art = Artifact::None;
 
     comboBoxArtifact->setCurrentIndex(art >= Artifact::None && art < Artifact::Unknown ? art : Artifact::None);
@@ -3130,10 +3130,16 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
     // tab: spells
     tabSpells = new QWidget();
 
+    checkBoxHaveMagicBook = new QCheckBox(tabSpells);
+    checkBoxHaveMagicBook->setChecked(hero.haveMagicBook());
+    checkBoxHaveMagicBook->setText(QApplication::translate("MapHeroDialog", "Have magic book", 0));
+
     listWidgetSpells = new SpellsList(tabSpells);
+    listWidgetSpells->setEnabled(hero.haveMagicBook());
     verticalSpacerSpells = new QSpacerItem(20, 6, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
     verticalLayoutSpells = new QVBoxLayout(tabSpells);
+    verticalLayoutSpells->addWidget(checkBoxHaveMagicBook);
     verticalLayoutSpells->addWidget(listWidgetSpells);
     verticalLayoutSpells->addItem(verticalSpacerSpells);
 
@@ -3212,9 +3218,6 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
 
     tabSpellsIndex = 5;
 
-    if(! hero.haveMagicBook())
-	tabWidget->removeTab(tabSpellsIndex);
-
     verticalLayoutWidget = new QVBoxLayout(this);
     verticalLayoutWidget->addWidget(tabWidget);
     verticalLayoutWidget->addLayout(horizontalLayoutButtons);
@@ -3251,7 +3254,9 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
     connect(spinBoxCount5, SIGNAL(valueChanged(int)), this, SLOT(setEnableOKButton()));
 
     connect(checkBoxDefaultSkills, SIGNAL(toggled(bool)), this, SLOT(widgetSkillsVisible(bool)));
-    connect(listWidgetArtifacts, SIGNAL(listChanged()), this, SLOT(artifactsChanged()));
+    connect(listWidgetArtifacts, SIGNAL(listChanged()), this, SLOT(setEnableOKButton()));
+
+    connect(checkBoxHaveMagicBook, SIGNAL(toggled(bool)), this, SLOT(widgetSpellsVisible(bool)));
     connect(listWidgetSpells, SIGNAL(listChanged()), this, SLOT(setEnableOKButton()));
 
     connect(checkBoxEnablePatrol, SIGNAL(toggled(bool)), comboBoxPatrol, SLOT(setEnabled(bool)));
@@ -3259,26 +3264,17 @@ Form::MapHeroDialog::MapHeroDialog(const MapHero & hero)
     connect(comboBoxPatrol, SIGNAL(currentIndexChanged(int)), this, SLOT(setEnableOKButton()));
 }
 
+void Form::MapHeroDialog::widgetSpellsVisible(bool f)
+{
+    listWidgetSpells->setEnabled(f);
+    setEnableOKButton();
+}
+
 void Form::MapHeroDialog::widgetSkillsVisible(bool f)
 {
     if(f) listWidgetSkills->clear();
     listWidgetSkills->setVisible(! f);
     setEnableOKButton();
-}
-
-void Form::MapHeroDialog::artifactsChanged(void)
-{
-    setEnableOKButton();
-
-    QVector<int> arts = artifacts();
-
-    if(arts.end() == std::find(arts.begin(), arts.end(), static_cast<int>(Artifact::MagicBook)))
-    {
-	listWidgetSpells->clear();
-	tabWidget->removeTab(tabSpellsIndex);
-    }
-    else
-	tabWidget->insertTab(tabSpellsIndex, tabSpells, "Spells");
 }
 
 void Form::MapHeroDialog::setPortrait(int val)
@@ -3365,10 +3361,16 @@ QVector<int> Form::MapHeroDialog::artifacts(void) const
     return res;
 }
 
+bool Form::MapHeroDialog::book(void) const
+{
+    return checkBoxHaveMagicBook->isChecked();
+}
+
 QVector<int> Form::MapHeroDialog::spells(void) const
 {
     QVector<int> res;
 
+    if(checkBoxHaveMagicBook->isChecked())
     for(int index = 0; index < listWidgetSpells->count(); ++index)
 	res.push_back(listWidgetSpells->item(index)->data(Qt::UserRole).toInt());
 
@@ -3535,7 +3537,17 @@ Form::SelectArtifactDialog::SelectArtifactDialog(int current)
 {
     setWindowTitle(QApplication::translate("SelectArtifactDialog", "Select artifact", 0));
 
-    for(int index = Artifact::None + 1; index < Artifact::Unknown; ++index)
+    for(int index = Artifact::None + 1; index < Artifact::Random; ++index)
+    {
+	QListWidgetItem* item = new QListWidgetItem(EditorTheme::getImageICN("ARTIFACT.ICN", index).first, Artifact::transcribe(index));
+	item->setData(Qt::UserRole, index);
+#ifndef QT_NO_TOOLTIP
+	item->setToolTip(Artifact::description(index));
+#endif
+	listWidget->addItem(item);
+    }
+
+    for(int index = Artifact::Random3 + 1; index < Artifact::Unknown; ++index)
     {
 	QListWidgetItem* item = new QListWidgetItem(EditorTheme::getImageICN("ARTIFACT.ICN", index).first, Artifact::transcribe(index));
 	item->setData(Qt::UserRole, index);
