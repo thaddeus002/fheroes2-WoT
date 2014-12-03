@@ -70,20 +70,3 @@ bool MapPosition::isPosition(const Point & pt) const
 {
     return pt == center;
 }
-
-StreamBase & operator<< (StreamBase & sb, const ObjectSimple & st)
-{
-    return sb << st.type << st.uid;
-}
-
-StreamBase & operator>> (StreamBase & sb, ObjectSimple & st)
-{
-    if(FORMAT_VERSION_3186 > Game::GetLoadVersion())
-    {
-        int old;
-        sb >> old;
-    }
-    else
-	sb >> st.type >> st.uid;
-    return sb;
-}

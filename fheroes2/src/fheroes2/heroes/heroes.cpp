@@ -1470,7 +1470,7 @@ void Heroes::ActionNewPosition(void)
     if(! isFreeman() &&
 	GetMapsObject() == MP2::OBJ_EVENT)
     {
-	const MapEvent* event = world.GetMapEvent(GetIndex());
+	const MapEvent* event = world.GetMapEvent(GetCenter());
 
 	if(event && event->isAllow(GetColor()))
 	{

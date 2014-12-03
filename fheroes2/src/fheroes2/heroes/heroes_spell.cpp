@@ -442,12 +442,11 @@ bool ActionSpellVisions(Heroes & hero)
 	    it = monsters.begin(); it != monsters.end(); ++it)
 	{
 	    const Maps::Tiles & tile = world.GetTiles(*it);
-	    const Troop & troop = tile.QuantityTroop();
+	    MapMonster* map_troop = static_cast<MapMonster*>(world.GetMapObject(tile.GetObjectUID(MP2::OBJ_MONSTER)));
+	    Troop troop = map_troop ? map_troop->QuantityTroop() : tile.QuantityTroop();
+	    JoinCount join = Army::GetJoinSolution(hero, tile, troop);
 
-    	    //u32 join = troop.GetCount();
     	    Funds cost;
-
-	    JoinCount join = Army::GetJoinSolution(hero, tile);
 	    std::string hdr, msg;
 
 	    hdr = std::string("%{count} ") + StringLower(troop.GetPluralName(join.second));

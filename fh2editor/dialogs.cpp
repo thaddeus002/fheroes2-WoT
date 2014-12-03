@@ -4640,7 +4640,7 @@ Form::MapArtifactDialog::MapArtifactDialog(const MapArtifact & obj)
 
     labelSpell = new QLabel("spell:", this);
     spellGroup = new SpellGroup(this, Spell::Random);
-    if(obj.artifact == Artifact::SpellScroll)
+    if(obj.artifact() == Artifact::SpellScroll)
     {
 	labelSpell->setVisible(true);
 	spellGroup->setVisible(true);
@@ -4722,9 +4722,10 @@ Form::MapMonsterDialog::MapMonsterDialog(const MapMonster & obj)
 
     joinDefault = new QCheckBox("Default", this);
 
-    joinCondition.push_back(new QRadioButton("join: fight only", this));
-    joinCondition.push_back(new QRadioButton("join: all joined", this));
-    joinCondition.push_back(new QRadioButton("join: just for the money", this));
+    joinCondition.push_back(new QRadioButton("they do not join, fight only", this));
+    joinCondition.push_back(new QRadioButton("may join only part of the army and only for money", this));
+    joinCondition.push_back(new QRadioButton("they join, if the enemy's army will be stronger", this));
+    joinCondition.push_back(new QRadioButton("they all joined, without conditions", this));
 
     if(obj.condition < 0)
     {

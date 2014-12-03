@@ -795,7 +795,10 @@ Army::Army(const Maps::Tiles & t) : commander(NULL), combat_format(true), color(
 	    }
 	    else
 	    {
-		at(0)->Set(t.QuantityTroop());
+		MapMonster* map_troop = static_cast<MapMonster*>(world.GetMapObject(t.GetObjectUID(MP2::OBJ_MONSTER)));
+		Troop troop = map_troop ? map_troop->QuantityTroop() : t.QuantityTroop();
+
+		at(0)->Set(troop);
 		ArrangeForBattle(! Settings::Get().ExtWorldSaveMonsterBattle());
 	    }
 	    break;
@@ -1164,20 +1167,22 @@ void Army::DrawMons32LineShort(const Troops & troops, s32 cx, s32 cy, u32 width,
     troops.DrawMons32LineWithScoute(cx, cy, width, first, count, Skill::Level::EXPERT, true);
 }
 
-JoinCount Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile)
+JoinCount Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, const Troop & troop)
 {
-    const Troop & troop = tile.QuantityTroop();
+    MapMonster* map_troop = static_cast<MapMonster*>(world.GetMapObject(tile.GetObjectUID(MP2::OBJ_MONSTER)));
     const u32  ratios = troop.isValid() ? hero.GetArmy().GetHitPoints() / troop.GetHitPoints() : 0;
     const bool check_free_stack = true; // (hero.GetArmy().GetCount() < hero.GetArmy().size() || hero.GetArmy().HasMonster(troop)); // set force, see Dialog::ArmyJoinWithCost, http://sourceforge.net/tracker/?func=detail&aid=3567985&group_id=96859&atid=616183
     const bool check_extra_condition = (!hero.HasArtifact(Artifact::HIDEOUS_MASK) && Morale::NORMAL <= hero.GetMorale());
 
+    const bool join_skip = map_troop ? map_troop->JoinConditionSkip() : tile.MonsterJoinConditionSkip();
+    const bool join_free = map_troop ? map_troop->JoinConditionFree() : tile.MonsterJoinConditionFree();
     // force join for campain and others...
-    const bool force_join = tile.MonsterJoinConditionForce();
+    const bool join_force = map_troop ? map_troop->JoinConditionForce() : tile.MonsterJoinConditionForce();
 
-    if(!tile.MonsterJoinConditionSkip() &&
-        check_free_stack && ((check_extra_condition && ratios >= 2) || force_join))
+    if(!join_skip &&
+        check_free_stack && ((check_extra_condition && ratios >= 2) || join_force))
     {
-        if(tile.MonsterJoinConditionFree() || force_join)
+        if(join_free || join_force)
             return JoinCount(JOIN_FREE, troop.GetCount());
         else
         if(hero.HasSecondarySkill(Skill::Secondary::DIPLOMACY))

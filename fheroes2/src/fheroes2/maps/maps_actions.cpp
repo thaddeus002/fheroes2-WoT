@@ -26,56 +26,75 @@
 #include "dialog.h"
 #include "heroes.h"
 #include "kingdom.h"
+#include "settings.h"
+#include "game.h"
 #include "maps_actions.h"
+
+StreamBase & operator<< (StreamBase & sb, const ActionSimple & st)
+{
+    return sb << st.type << st.uid;
+}
+
+StreamBase & operator>> (StreamBase & sb, ActionSimple & st)
+{
+    if(FORMAT_VERSION_3186 > Game::GetLoadVersion())
+    {
+        int old;
+        sb >> old;
+    }
+    else
+        sb >> st.type >> st.uid;
+    return sb;
+}
 
 StreamBase & operator<< (StreamBase & sb, const ActionResources & st)
 {
-    return sb << static_cast<const ObjectSimple &>(st) << st.resources << st.message;
+    return sb << static_cast<const ActionSimple &>(st) << st.resources << st.message;
 }
 
 StreamBase & operator>> (StreamBase & sb, ActionResources & st)
 {
-    return sb >> static_cast<ObjectSimple &>(st) >> st.resources >> st.message;
+    return sb >> static_cast<ActionSimple &>(st) >> st.resources >> st.message;
 }
 
 StreamBase & operator<< (StreamBase & sb, const ActionArtifact & st)
 {
-    return sb << static_cast<const ObjectSimple &>(st) << st.artifact << st.message;
+    return sb << static_cast<const ActionSimple &>(st) << st.artifact << st.message;
 }
 
 StreamBase & operator>> (StreamBase & sb, ActionArtifact & st)
 {
-    return sb >> static_cast<ObjectSimple &>(st) >> st.artifact >> st.message;
+    return sb >> static_cast<ActionSimple &>(st) >> st.artifact >> st.message;
 }
 
 StreamBase & operator<< (StreamBase & sb, const ActionAccess & st)
 {
-    return sb << static_cast<const ObjectSimple &>(st) << st.allowPlayers << st.allowComputer << st.cancelAfterFirstVisit << st.message;
+    return sb << static_cast<const ActionSimple &>(st) << st.allowPlayers << st.allowComputer << st.cancelAfterFirstVisit << st.message;
 }
 
 StreamBase & operator>> (StreamBase & sb, ActionAccess & st)
 {
-    return sb >> static_cast<ObjectSimple &>(st) >> st.allowPlayers >> st.allowComputer >> st.cancelAfterFirstVisit >> st.message;
+    return sb >> static_cast<ActionSimple &>(st) >> st.allowPlayers >> st.allowComputer >> st.cancelAfterFirstVisit >> st.message;
 }
 
 StreamBase & operator<< (StreamBase & sb, const ActionDefault & st)
 {
-    return sb << static_cast<const ObjectSimple &>(st) << st.enabled << st.message;
+    return sb << static_cast<const ActionSimple &>(st) << st.enabled << st.message;
 }
 
 StreamBase & operator>> (StreamBase & sb, ActionDefault & st)
 {
-    return sb >> static_cast<ObjectSimple &>(st) >> st.enabled >> st.message;
+    return sb >> static_cast<ActionSimple &>(st) >> st.enabled >> st.message;
 }
 
 StreamBase & operator<< (StreamBase & sb, const ActionMessage & st)
 {
-    return sb << static_cast<const ObjectSimple &>(st) << st.message;
+    return sb << static_cast<const ActionSimple &>(st) << st.message;
 }
 
 StreamBase & operator>> (StreamBase & sb, ActionMessage & st)
 {
-    return sb >> static_cast<ObjectSimple &>(st) >> st.message;
+    return sb >> static_cast<ActionSimple &>(st) >> st.message;
 }
 
 StreamBase & operator<< (StreamBase & sb, const ListActions & st)
@@ -119,7 +138,7 @@ StreamBase & operator>> (StreamBase & sb, ListActions & st)
             case ACTION_RESOURCES:      { ActionResources* ptr = new ActionResources(); sb >> *ptr; st.push_back(ptr); } break;
             case ACTION_ARTIFACT:       { ActionArtifact* ptr = new ActionArtifact(); sb >> *ptr; st.push_back(ptr); } break;
 
-            default: { ObjectSimple* ptr = new ObjectSimple(); sb >> *ptr; st.push_back(ptr); } break;
+            default: { ActionSimple* ptr = new ActionSimple(); sb >> *ptr; st.push_back(ptr); } break;
         }
     }
 

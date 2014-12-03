@@ -50,25 +50,4 @@ protected:
 StreamBase & operator<< (StreamBase &, const MapPosition &);
 StreamBase & operator>> (StreamBase &, MapPosition &);
 
-class ObjectSimple
-{
-public:
-    ObjectSimple(int v = 0) : uid(0), type(v) {}
-    virtual ~ObjectSimple() {}
-
-    int		GetType(void) const { return type; }
-    u32		GetUID(void) const { return uid; }
-    void	SetUID(u32 v) { uid = v; }
-
-protected:
-    friend StreamBase & operator<< (StreamBase &, const ObjectSimple &);
-    friend StreamBase & operator>> (StreamBase &, ObjectSimple &);
-
-    u32         uid;
-    int         type;
-};
-
-StreamBase & operator<< (StreamBase &, const ObjectSimple &);
-StreamBase & operator>> (StreamBase &, ObjectSimple &);
-
 #endif

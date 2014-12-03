@@ -54,7 +54,7 @@ void ActionToBoat(Heroes & hero, u32 obj, s32 dst_index);
 void ActionToCoast(Heroes & hero, u32 obj, s32 dst_index);
 void ActionToWagon(Heroes & hero, u32 obj, s32 dst_index);
 void ActionToSkeleton(Heroes & hero, u32 obj, s32 dst_index);
-void ActionToResource(Heroes & hero, u32 obj, s32 dst_index);
+void ActionToObjectResource(Heroes & hero, u32 obj, s32 dst_index);
 void ActionToPickupResource(Heroes & hero, u32 obj, s32 dst_index);
 void ActionToFlotSam(Heroes & hero, u32 obj, s32 dst_index);
 void ActionToArtifact(Heroes & hero, u32 obj, s32 dst_index);
@@ -432,19 +432,19 @@ void Heroes::Action(s32 dst_index)
     else
     switch(object)
     {
-	case MP2::OBJ_MONSTER:	ActionToMonster(*this, object, dst_index); break;
+	case MP2::OBJ_MONSTER:		ActionToMonster(*this, object, dst_index); break;
 
-        case MP2::OBJ_CASTLE:	ActionToCastle(*this, object, dst_index); break;
-        case MP2::OBJ_HEROES:	ActionToHeroes(*this, object, dst_index); break;
+        case MP2::OBJ_CASTLE:		ActionToCastle(*this, object, dst_index); break;
+        case MP2::OBJ_HEROES:		ActionToHeroes(*this, object, dst_index); break;
 
-        case MP2::OBJ_BOAT:	ActionToBoat(*this, object, dst_index); break;
-	case MP2::OBJ_COAST:	ActionToCoast(*this, object, dst_index); break;
+        case MP2::OBJ_BOAT:		ActionToBoat(*this, object, dst_index); break;
+	case MP2::OBJ_COAST:		ActionToCoast(*this, object, dst_index); break;
 
         // resource object
 	case MP2::OBJ_WINDMILL:
 	case MP2::OBJ_WATERWHEEL:
         case MP2::OBJ_MAGICGARDEN:
-        case MP2::OBJ_LEANTO:	ActionToResource(*this, object, dst_index); break;
+        case MP2::OBJ_LEANTO:		ActionToObjectResource(*this, object, dst_index); break;
 
         case MP2::OBJ_WAGON:		ActionToWagon(*this, object, dst_index); break;
         case MP2::OBJ_SKELETON:		ActionToSkeleton(*this, object, dst_index); break;
@@ -584,10 +584,11 @@ void ActionToMonster(Heroes & hero, u32 obj, s32 dst_index)
 {
     bool destroy = false;
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const Troop & troop = tile.QuantityTroop();
+    MapMonster* map_troop = static_cast<MapMonster*>(world.GetMapObject(tile.GetObjectUID(obj)));
+    Troop troop = map_troop ? map_troop->QuantityTroop() : tile.QuantityTroop();
     //const Settings & conf = Settings::Get();
 
-    JoinCount join = Army::GetJoinSolution(hero, tile);
+    JoinCount join = Army::GetJoinSolution(hero, tile, troop);
 
     Interface::StatusWindow & statusWindow = Interface::Basic::Get().GetStatusWindow();
 
@@ -650,9 +651,7 @@ void ActionToMonster(Heroes & hero, u32 obj, s32 dst_index)
     if(JOIN_NONE == join.first)
     {
 	DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " attack monster " << troop.GetName());
-
 	Army army(tile);
-
 	Battle::Result res = Battle::Loader(hero.GetArmy(), army, dst_index);
 
 	if(res.AttackerWins())
@@ -669,6 +668,12 @@ void ActionToMonster(Heroes & hero, u32 obj, s32 dst_index)
         	tile.MonsterSetCount(army.GetCountMonsters(troop()));
         	// reset "can join"
 		if(tile.MonsterJoinConditionFree()) tile.MonsterSetJoinCondition(Monster::JOIN_CONDITION_MONEY);
+
+                if(map_troop)
+                {
+                    map_troop->count = army.GetCountMonsters(troop());
+                    if(map_troop->JoinConditionFree()) map_troop->condition = Monster::JOIN_CONDITION_MONEY;
+                }
     	    }
 	}
     }
@@ -692,6 +697,8 @@ void ActionToMonster(Heroes & hero, u32 obj, s32 dst_index)
             if(Maps::isValidDirection(dst_index, Direction::LEFT))
                 world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
 	}
+
+        if(map_troop) world.RemoveMapObject(map_troop);
 
 	// auto move hero
 	// disable: https://sourceforge.net/tracker/index.php?func=detail&aid=3155230&group_id=96859&atid=616180
@@ -911,6 +918,7 @@ void ActionToCoast(Heroes & hero, u32 obj, s32 dst_index)
 void ActionToPickupResource(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
+    MapResource* map_resource = static_cast<MapResource*>(world.GetMapObject(tile.GetObjectUID(obj)));
 
     Game::PlayPickupSound();
     AnimationRemoveObject(tile);
@@ -918,12 +926,12 @@ void ActionToPickupResource(Heroes & hero, u32 obj, s32 dst_index)
 
     if(obj == MP2::OBJ_BOTTLE)
     {
-	const MapSign* sign = world.GetMapSign(dst_index);
+	MapSign* sign = static_cast<MapSign*>(world.GetMapObject(tile.GetObjectUID(obj)));
         Dialog::Message(MP2::StringObject(obj), (sign ? sign->message : ""), Font::BIG, Dialog::OK);
     }
     else
     {
-	const Funds & funds = tile.QuantityFunds();
+	Funds funds = map_resource ? Funds(map_resource->resource) : tile.QuantityFunds();
 
 	if(obj == MP2::OBJ_CAMPFIRE)
 	{
@@ -935,7 +943,9 @@ void ActionToPickupResource(Heroes & hero, u32 obj, s32 dst_index)
 	}
 	else
         {
-	    const ResourceCount & rc = tile.QuantityResourceCount();
+	    ResourceCount rc = tile.QuantityResourceCount();
+	    if(map_resource) rc = map_resource->resource;
+
             Interface::Basic & I = Interface::Basic::Get();
             I.GetStatusWindow().SetResource(rc.first, rc.second);
             I.SetRedraw(REDRAW_STATUS);
@@ -945,14 +955,15 @@ void ActionToPickupResource(Heroes & hero, u32 obj, s32 dst_index)
     }
 
     tile.QuantityReset();
+    if(map_resource) world.RemoveMapObject(map_resource);
 
     DEBUG(DBG_GAME, DBG_INFO, hero.GetName());
 }
 
-void ActionToResource(Heroes & hero, u32 obj, s32 dst_index)
+void ActionToObjectResource(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const ResourceCount & rc = tile.QuantityResourceCount();
+    ResourceCount rc = tile.QuantityResourceCount();
     bool cancapture = Settings::Get().ExtWorldExtObjectsCaptured();
     bool showinvalid = cancapture && hero.GetColor() == tile.QuantityColor() ? false : true;
 
@@ -1011,7 +1022,6 @@ void ActionToResource(Heroes & hero, u32 obj, s32 dst_index)
     }
 
     tile.QuantityReset();
-
     hero.SetVisited(dst_index, Visit::GLOBAL);
 
     DEBUG(DBG_GAME, DBG_INFO, hero.GetName());
@@ -1370,7 +1380,8 @@ void ActionToPoorLuckObject(Heroes & hero, u32 obj, s32 dst_index)
 void ActionToSign(Heroes & hero, u32 obj, s32 dst_index)
 {
     PlaySoundWarning;
-    const MapSign* sign = world.GetMapSign(dst_index);
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    MapSign* sign = static_cast<MapSign*>(world.GetMapObject(tile.GetObjectUID(obj)));
     Dialog::Message(_("Sign"), (sign ? sign->message : ""), Font::BIG, Dialog::OK);
     DEBUG(DBG_GAME, DBG_INFO, hero.GetName());
 }
@@ -1683,13 +1694,20 @@ void ActionToShipwreckSurvivor(Heroes & hero, u32 obj, s32 dst_index)
 void ActionToArtifact(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
+    MapArtifact* map_artifact = static_cast<MapArtifact*>(world.GetMapObject(tile.GetObjectUID(obj)));
 
     if(hero.IsFullBagArtifacts())
 	Dialog::Message("", _("You have no room to carry another artifact!"), Font::BIG, Dialog::OK);
     else
     {
-        const u32 cond = tile.QuantityVariant();
-        const Artifact & art = tile.QuantityArtifact();
+        u32 cond = tile.QuantityVariant();
+        Artifact art = tile.QuantityArtifact();
+
+        if(map_artifact)
+        {
+            cond = map_artifact->condition;
+            art = map_artifact->artifact;
+        }
 
 	bool result = false;
 	std::string msg;
@@ -1697,7 +1715,7 @@ void ActionToArtifact(Heroes & hero, u32 obj, s32 dst_index)
         // 1,2,3 - gold, gold + res
 	if(0 < cond && cond < 4)
 	{
-	    const Funds & payment = tile.QuantityFunds();
+	    Funds payment = map_artifact ? map_artifact->QuantityFunds() : tile.QuantityFunds();
 
 	    if(1 == cond)
 	    {
@@ -1709,7 +1727,7 @@ void ActionToArtifact(Heroes & hero, u32 obj, s32 dst_index)
 		msg = _("A leprechaun offers you the %{art} for the small price of %{gold} Gold and %{count} %{res}.");
 
 		StringReplace(msg, "%{gold}", payment.Get(Resource::GOLD));
-		const ResourceCount & rc = tile.QuantityResourceCount();
+		ResourceCount rc = map_artifact ? map_artifact->QuantityResourceCount() : tile.QuantityResourceCount();
 		StringReplace(msg, "%{count}", rc.second);
 		StringReplace(msg, "%{res}", Resource::String(rc.first));
 	    }
@@ -2604,26 +2622,23 @@ void ActionToMagellanMaps(Heroes & hero, u32 obj, s32 dst_index)
 void ActionToEvent(Heroes & hero, u32 obj, s32 dst_index)
 {
     // check event maps
-    MapEvent* event_ptr = world.GetMapEvent(dst_index);
+    MapEvent* event_maps = world.GetMapEvent(Maps::GetPoint(dst_index));
 
-
-    if(event_ptr && event_ptr->isAllow(hero.GetColor()))
+    if(event_maps && event_maps->isAllow(hero.GetColor()))
     {
-	MapEvent & event_maps = *event_ptr;
-
 	hero.SetMove(false);
 
-	if(event_maps.resource.GetValidItemsCount())
+	if(event_maps->resources.GetValidItemsCount())
 	{
-    	    hero.GetKingdom().AddFundsResource(event_maps.resource);
+    	    hero.GetKingdom().AddFundsResource(event_maps->resources);
 	    PlaySoundSuccess;
-    	    Dialog::ResourceInfo("", event_maps.message, event_maps.resource);
+    	    Dialog::ResourceInfo("", event_maps->message, event_maps->resources);
 	}
 	else
-	if(event_maps.message.size())
-	    Dialog::Message("", event_maps.message, Font::BIG, Dialog::OK);
+	if(event_maps->message.size())
+	    Dialog::Message("", event_maps->message, Font::BIG, Dialog::OK);
 
-	const Artifact & art = event_maps.artifact;
+	const Artifact & art = event_maps->artifact;
 	if(art.isValid())
 	{
 	    if(hero.PickupArtifact(art))
@@ -2635,10 +2650,13 @@ void ActionToEvent(Heroes & hero, u32 obj, s32 dst_index)
 	    }
 	}
 
-	event_maps.SetVisited(hero.GetColor());
+	event_maps->SetVisited(hero.GetColor());
 
-	if(event_maps.cancel)
+	if(event_maps->cancel)
+	{
 	    hero.SetMapsObject(MP2::OBJ_ZERO);
+	    world.RemoveMapObject(event_maps);
+	}
     }
 
     DEBUG(DBG_GAME, DBG_INFO, hero.GetName());
@@ -3008,7 +3026,8 @@ void ActionToEyeMagi(Heroes & hero, u32 obj, s32 dst_index)
 
 void ActionToSphinx(Heroes & hero, u32 obj, s32 dst_index)
 {
-    MapSphinx* riddle = world.GetMapSphinx(dst_index);
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    MapSphinx* riddle = static_cast<MapSphinx*>(world.GetMapObject(tile.GetObjectUID(obj)));
 
     if(riddle && riddle->valid)
     {
@@ -3020,7 +3039,7 @@ void ActionToSphinx(Heroes & hero, u32 obj, s32 dst_index)
 	    Dialog::InputString(header, answer);
 	    if(riddle->AnswerCorrect(answer))
 	    {
-		const Funds & res = riddle->resource;
+		const Funds & res = riddle->resources;
 		const Artifact art = riddle->artifact;
 		const std::string say = _("Looking somewhat disappointed, the Sphinx sighs. You've answered my riddle so here's your reward. Now begone.");
 		const u32 count = res.GetValidItemsCount();

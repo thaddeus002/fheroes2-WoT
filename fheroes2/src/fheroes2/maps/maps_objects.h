@@ -25,11 +25,34 @@
 #include <vector>
 #include <string>
 #include "resource.h"
+#include "monster.h"
 #include "artifact.h"
 #include "position.h"
+#include "pairs.h"
 #include "gamedefs.h"
 
-struct MapEvent : public ObjectSimple, public MapPosition
+class MapObjectSimple : public MapPosition
+{
+public:
+    MapObjectSimple(int v = 0) : uid(0), type(v) {}
+    virtual ~MapObjectSimple() {}
+
+    int         GetType(void) const { return type; }
+    u32         GetUID(void) const { return uid; }
+    void        SetUID(u32 v) { uid = v; }
+
+protected:
+    friend StreamBase & operator<< (StreamBase &, const MapObjectSimple &);
+    friend StreamBase & operator>> (StreamBase &, MapObjectSimple &);
+
+    u32         uid;
+    int         type;
+};
+
+StreamBase & operator<< (StreamBase &, const MapObjectSimple &);
+StreamBase & operator>> (StreamBase &, MapObjectSimple &);
+
+struct MapEvent : public MapObjectSimple
 {
     MapEvent();
 
@@ -38,7 +61,7 @@ struct MapEvent : public ObjectSimple, public MapPosition
     bool	isAllow(int color) const;
     void	SetVisited(int color);
 
-    Funds	resource;
+    Funds	resources;
     Artifact	artifact;
     bool	computer;
     bool	cancel;
@@ -51,7 +74,7 @@ StreamBase & operator>> (StreamBase &, MapEvent &);
 
 typedef std::list<std::string>    RiddleAnswers;
 
-struct MapSphinx : public ObjectSimple, public MapPosition
+struct MapSphinx : public MapObjectSimple
 {
     MapSphinx();
 
@@ -60,7 +83,7 @@ struct MapSphinx : public ObjectSimple, public MapPosition
     bool	AnswerCorrect(const std::string & answer);
     void	SetQuiet(void);
 
-    Funds		resource;
+    Funds		resources;
     Artifact		artifact;
     RiddleAnswers	answers;
     std::string		message;
@@ -70,7 +93,7 @@ struct MapSphinx : public ObjectSimple, public MapPosition
 StreamBase & operator<< (StreamBase &, const MapSphinx &);
 StreamBase & operator>> (StreamBase &, MapSphinx &);
 
-struct MapSign : public ObjectSimple, public MapPosition
+struct MapSign : public MapObjectSimple
 {
     MapSign();
     MapSign(s32 index, const std::string &);
@@ -83,11 +106,48 @@ struct MapSign : public ObjectSimple, public MapPosition
 StreamBase & operator<< (StreamBase &, const MapSign &);
 StreamBase & operator>> (StreamBase &, MapSign &);
 
-/*
-struct MapArtifact : public ObjectSimple, public MapPosition
+struct MapResource : public MapObjectSimple
 {
-    MapArtifact(){}
+    MapResource();
+
+    ResourceCount	resource;
 };
-*/
+
+StreamBase & operator<< (StreamBase &, const MapResource &);
+StreamBase & operator>> (StreamBase &, MapResource &);
+
+struct MapArtifact : public MapObjectSimple
+{
+    MapArtifact();
+
+    Artifact		artifact;
+    int			condition;
+    int			extended;
+
+    Funds		QuantityFunds(void) const;
+    ResourceCount	QuantityResourceCount(void) const;
+};
+
+StreamBase & operator<< (StreamBase &, const MapArtifact &);
+StreamBase & operator>> (StreamBase &, MapArtifact &);
+
+struct MapMonster : public MapObjectSimple
+{
+    MapMonster();
+
+    Monster		monster;
+
+    int			condition;
+    int			count;
+
+    Troop		QuantityTroop(void) const;
+    bool		JoinConditionSkip(void) const;
+    bool		JoinConditionMoney(void) const;
+    bool		JoinConditionFree(void) const;
+    bool		JoinConditionForce(void) const;
+};
+
+StreamBase & operator<< (StreamBase &, const MapMonster &);
+StreamBase & operator>> (StreamBase &, MapMonster &);
 
 #endif

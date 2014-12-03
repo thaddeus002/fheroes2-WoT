@@ -1360,6 +1360,12 @@ void Maps::Tiles::UpdatePassable(void)
     }
 }
 
+u32 Maps::Tiles::GetObjectUID(int obj) const
+{
+    const Maps::TilesAddon* addon = FindObjectConst(obj);
+    return addon ? addon->uniq : 0;
+}
+
 int Maps::Tiles::GetPassable(void) const
 {
     return tile_passable;
@@ -2038,7 +2044,7 @@ Maps::TilesAddon* Maps::Tiles::FindObject(int objs)
 
 const Maps::TilesAddon* Maps::Tiles::FindObjectConst(int objs) const
 {
-    Addons::const_iterator it = addons_level1.end();
+    Addons::const_iterator it = addons_level1.size() ? addons_level1.begin() : addons_level1.end();
 
     switch(objs)
     {
@@ -2165,7 +2171,7 @@ const Maps::TilesAddon* Maps::Tiles::FindObjectConst(int objs) const
 	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isSkeleton);
 	    break;
 
-	default: break;
+	default: if(addons_level1.size() > 1) DEBUG(DBG_GAME, DBG_WARN, "FIXME for: " << MP2::StringObject(objs)); break;
     }
 
     return addons_level1.end() != it ? &(*it) : NULL;

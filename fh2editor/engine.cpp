@@ -3603,47 +3603,20 @@ QDataStream & operator<< (QDataStream & ds, const GameCondition & cond)
 
 QDataStream & operator>> (QDataStream & ds, GameCondition & cond)
 {
-    int vers = MapData::versions().first;
+    int buf[4];
 
-    if(vers > FH2ENGINE_VERSION_3140)
-    {
-	int buf[4];
+    for(int it = 0; it < 4; ++it)
+	ds >> buf[it];
 
-	for(int it = 0; it < 4; ++it)
-	    ds >> buf[it];
+    cond.first = buf[0];
 
-	cond.first = buf[0];
-
-	if(buf[1] == 1)
-	    cond.second = QPoint(buf[2], buf[3]);
-	else
-	if(buf[1] == 2)
-	    cond.second = buf[2];
-	else
-	    cond.second = QVariant();
-
-    }
+    if(buf[1] == 1)
+	cond.second = QPoint(buf[2], buf[3]);
     else
-    {
-	int variant;
-	ds >> cond.first >> variant;
-
-	if(variant == 1)
-	{
-	    int tempx, tempy;
-	    ds >> tempx >>tempy;
-	    cond.second = QPoint(tempx, tempy);
-	}
-	else
-	if(variant == 2)
-	{
-	    int temp;
-	    ds >> temp;
-	    cond.second = temp;
-	}
-	else
-	    cond.second = QVariant();
-    }
+    if(buf[1] == 2)
+	cond.second = buf[2];
+    else
+	cond.second = QVariant();
 
     return ds;
 }
@@ -4000,23 +3973,23 @@ QString Spell::tips(int spell)
 
 void MapArtifact::updateInfo(const mp2til_t & til)
 {
-    if(artifact == Artifact::SpellScroll)
+    if(type == Artifact::SpellScroll)
 	spell = til.quantity1;
 }
 
 QDomElement & operator<< (QDomElement & el, const MapArtifact & obj)
 {
     el << static_cast<const MapObject &>(obj);
-    el.setAttribute("artifact", obj.artifact);
+    el.setAttribute("type", obj.type);
     el.setAttribute("condition", obj.condition);
-    if(obj.artifact == Artifact::SpellScroll) el.setAttribute("spell", obj.spell);
+    if(obj.type == Artifact::SpellScroll) el.setAttribute("spell", obj.spell);
     return el;
 }
 
 QDomElement & operator>> (QDomElement & el, MapArtifact & obj)
 {
     el >> static_cast<MapObject &>(obj);
-    obj.artifact = el.hasAttribute("artifact") ? el.attribute("artifact").toInt() : 0;
+    obj.type = el.hasAttribute("type") ? el.attribute("type").toInt() : 0;
     obj.condition = el.hasAttribute("condition") ? el.attribute("condition").toInt() : 0;
     obj.spell = el.hasAttribute("spell") ? el.attribute("spell").toInt() : 0;
     return el;
@@ -4025,7 +3998,7 @@ QDomElement & operator>> (QDomElement & el, MapArtifact & obj)
 QDomElement & operator<< (QDomElement & el, const MapResource & obj)
 {
     el << static_cast<const MapObject &>(obj);
-    el.setAttribute("resource", obj.resource);
+    el.setAttribute("type", obj.type);
     el.setAttribute("count", obj.count);
     return el;
 }
@@ -4033,7 +4006,7 @@ QDomElement & operator<< (QDomElement & el, const MapResource & obj)
 QDomElement & operator>> (QDomElement & el, MapResource & obj)
 {
     el >> static_cast<MapObject &>(obj);
-    obj.resource = el.hasAttribute("resource") ? el.attribute("resource").toInt() : 0;
+    obj.type = el.hasAttribute("type") ? el.attribute("type").toInt() : 0;
     obj.count = el.hasAttribute("count") ? el.attribute("count").toInt() : 0;
     return el;
 }
@@ -4046,7 +4019,7 @@ void MapMonster::updateInfo(const mp2til_t & til)
 QDomElement & operator<< (QDomElement & el, const MapMonster & obj)
 {
     el << static_cast<const MapObject &>(obj);
-    el.setAttribute("monster", obj.monster);
+    el.setAttribute("type", obj.type);
     el.setAttribute("condition", obj.condition);
     el.setAttribute("count", obj.count);
     return el;
@@ -4055,7 +4028,7 @@ QDomElement & operator<< (QDomElement & el, const MapMonster & obj)
 QDomElement & operator>> (QDomElement & el, MapMonster & obj)
 {
     el >> static_cast<MapObject &>(obj);
-    obj.monster = el.hasAttribute("monster") ? el.attribute("monster").toInt() : 0;
+    obj.type = el.hasAttribute("type") ? el.attribute("type").toInt() : 0;
     obj.condition = el.hasAttribute("condition") ? el.attribute("condition").toInt() : 0;
     obj.count = el.hasAttribute("count") ? el.attribute("count").toInt() : 0;
     return el;

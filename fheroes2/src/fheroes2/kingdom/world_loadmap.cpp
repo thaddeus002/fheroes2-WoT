@@ -478,7 +478,7 @@ TiXmlElement & operator>> (TiXmlElement & doc, MapSphinx & riddle)
 
     TiXmlElement* xml_resources = doc.FirstChildElement("resources");
     if(xml_resources)
-	*xml_resources >> riddle.resource;
+	*xml_resources >> riddle.resources;
 
     TiXmlElement* xml_msg = doc.FirstChildElement("msg");
     if(xml_msg && xml_msg->GetText())
@@ -508,7 +508,7 @@ TiXmlElement & operator>> (TiXmlElement & doc, MapEvent & event)
 
     TiXmlElement* xml_resources = doc.FirstChildElement("resources");
     if(xml_resources)
-	*xml_resources >> event.resource;
+	*xml_resources >> event.resources;
 
     TiXmlElement* xml_msg = doc.FirstChildElement("msg");
     if(xml_msg && xml_msg->GetText())
@@ -563,16 +563,127 @@ TiXmlElement & operator>> (TiXmlElement & doc, Rumors & rumors)
     return doc;
 }
 
-TiXmlElement & operator>> (TiXmlElement & doc, MapSign & sign)
+TiXmlElement & operator>> (TiXmlElement & doc, MapSign & obj)
 {
     int posx, posy, uid;
     doc.Attribute("posx", & posx);
     doc.Attribute("posy", & posy);
     doc.Attribute("uid", & uid);
 
-    sign.SetCenter(Point(posx, posy));
-    sign.SetUID(uid);
-    if(doc.GetText()) sign.message = doc.GetText();
+    obj.SetCenter(Point(posx, posy));
+    obj.SetUID(uid);
+    if(doc.GetText()) obj.message = doc.GetText();
+
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, MapResource & obj)
+{
+    int posx, posy, uid, type, count;
+    doc.Attribute("posx", & posx);
+    doc.Attribute("posy", & posy);
+    doc.Attribute("uid", & uid);
+    doc.Attribute("type", & type);
+    doc.Attribute("count", & count);
+
+    obj.SetCenter(Point(posx, posy));
+    obj.SetUID(uid);
+    obj.resource = ResourceCount(type, count);
+
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, MapMonster & obj)
+{
+    int posx, posy, uid, type, cond, count;
+    doc.Attribute("posx", & posx);
+    doc.Attribute("posy", & posy);
+    doc.Attribute("uid", & uid);
+    doc.Attribute("type", & type);
+    doc.Attribute("condition", & cond);
+    doc.Attribute("count", & count);
+
+    obj.SetCenter(Point(posx, posy));
+    obj.SetUID(uid);
+    obj.monster = Monster(type);
+
+    /* join condition: random: -1, fight: 0, all join: 1, for money: 2 */
+    if(cond < 0)
+    {
+	cond = 0;
+
+        // 20% chance for join
+        if(3 > Rand::Get(1, 10))
+        {
+	    cond = 4 > Rand::Get(1, 10) ? 1 : 2;
+	}
+    }
+
+    if(obj.monster() == Monster::GHOST || obj.monster.isElemental())
+    	cond = 0;
+
+    if(count == 0)
+    {
+        int mul = 4;
+
+        // set random count
+        switch(Settings::Get().GameDifficulty())
+        {
+            case Difficulty::EASY:      mul = 3; break;
+            case Difficulty::NORMAL:    mul = 4; break;
+            case Difficulty::HARD:      mul = 4; break;
+            case Difficulty::EXPERT:    mul = 5; break;
+            case Difficulty::IMPOSSIBLE:mul = 6; break;
+            default: break;
+        }
+
+        count = mul * obj.monster.GetRNDSize(true);
+    }
+
+    obj.condition = cond;
+    obj.count = count;
+
+    return doc;
+}
+
+TiXmlElement & operator>> (TiXmlElement & doc, MapArtifact & obj)
+{
+    int posx, posy, uid, type, cond;
+    doc.Attribute("posx", & posx);
+    doc.Attribute("posy", & posy);
+    doc.Attribute("uid", & uid);
+    doc.Attribute("type", & type);
+    doc.Attribute("condition", & cond);
+
+    obj.SetCenter(Point(posx, posy));
+    obj.SetUID(uid);
+    obj.artifact = Artifact(type);
+
+    if(0 > cond)
+    {
+        // 0: 70% none
+        // 1,2,3 - 2000g, 2500g+3res, 3000g+5res,
+        // 4,5 - need have skill wisard or leadership,
+        // 6 - 50 rogues, 7 - 1 gin, 8,9,10,11,12,13 - 1 monster level4,
+        // 15 - spell
+	cond = Rand::Get(1, 10) < 4 ? Rand::Get(1, 13) : 0;
+
+        // always available
+        if(Settings::Get().ExtWorldNoRequirementsForArtifacts())
+            cond = 0;
+    }
+
+    obj.condition = cond;
+
+    if(cond == 2 || cond == 3)
+	obj.extended = Resource::Rand();
+
+    if(type == Artifact::SPELL_SCROLL)
+    {
+	int spell;
+	doc.Attribute("spell", & spell);
+	obj.artifact.SetSpell(spell);
+    }
 
     return doc;
 }
@@ -591,29 +702,42 @@ TiXmlElement & operator>> (TiXmlElement & doc, MapObjects & objects)
 	{
 	    MapSign* ptr = new MapSign();
 	    *xml_objects >> *ptr;
-	    objects.add(Maps::GetIndexFromAbsPoint(posx, posy), ptr);
+	    objects.add(ptr);
 	}
 	else
 	if(name == "sphinx")
 	{
 	    MapSphinx* ptr = new MapSphinx();
 	    *xml_objects >> *ptr;
-	    objects.add(Maps::GetIndexFromAbsPoint(posx, posy), ptr);
+	    objects.add(ptr);
 	}
 	else
 	if(name == "event")
 	{
 	    MapEvent* ptr = new MapEvent();
 	    *xml_objects >> *ptr;
-	    objects.add(Maps::GetIndexFromAbsPoint(posx, posy), ptr);
+	    objects.add(ptr);
 	}
 	else
 	if(name == "monster")
 	{
-	    // int mons;
-	    // xml_objects->Attribute("monster", & mons);
-	    // monster="66" count="0" uid="1838" condition="-1" posx="0" posy="0"
-	    // VERBOSE("monster: " << mons);
+	    MapMonster* ptr = new MapMonster();
+	    *xml_objects >> *ptr;
+	    objects.add(ptr);
+	}
+	else
+	if(name == "artifact")
+	{
+	    MapArtifact* ptr = new MapArtifact();
+	    *xml_objects >> *ptr;
+	    objects.add(ptr);
+	}
+	else
+	if(name == "resource")
+	{
+	    MapResource* ptr = new MapResource();
+	    *xml_objects >> *ptr;
+	    objects.add(ptr);
 	}
     }
 
@@ -1240,7 +1364,7 @@ bool World::LoadMapMP2(const std::string & filename)
 		    {
 			MapSign* obj = new MapSign();
 			obj->LoadFromMP2(findobject, StreamBuf(pblock));
-			map_objects.add(findobject, obj);
+			map_objects.add(obj);
 		    }
 		    break;
 		case MP2::OBJ_EVENT:
@@ -1249,7 +1373,7 @@ bool World::LoadMapMP2(const std::string & filename)
 		    {
 			MapEvent* obj = new MapEvent();
 			obj->LoadFromMP2(findobject, StreamBuf(pblock));
-			map_objects.add(findobject, obj);
+			map_objects.add(obj);
 		    }
 		    break;
 		case MP2::OBJ_SPHINX:
@@ -1258,7 +1382,7 @@ bool World::LoadMapMP2(const std::string & filename)
 		    {
 			MapSphinx* obj = new MapSphinx();
 			obj->LoadFromMP2(findobject, StreamBuf(pblock));
-			map_objects.add(findobject, obj);
+			map_objects.add(obj);
 		    }
 		    break;
 		default:

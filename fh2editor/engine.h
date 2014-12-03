@@ -831,11 +831,11 @@ struct MapSphinx : public MapObject
 
 struct MapResource : public MapObject
 {
-    int		resource;
+    int		type;
     int		count;
 
     MapResource(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1, int res = Resource::Unknown) :
-	MapObject(pos, uid, MapObj::Resource), resource(res), count(0) {}
+	MapObject(pos, uid, MapObj::Resource), type(res), count(0) {}
 
     QString	object(void) const { return "resource"; }
     MapObject*	copy(void) const { return new MapResource(*this); }
@@ -843,30 +843,32 @@ struct MapResource : public MapObject
 
 struct MapMonster : public MapObject
 {
-    int		monster;
+    int		type;
     int		count;
     int		condition;
 
     MapMonster(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1, int mons = Monster::None) :
-	MapObject(pos, uid, MapObj::Monster), monster(mons), count(0), condition(-1) {}
+	MapObject(pos, uid, MapObj::Monster), type(mons), count(0), condition(-1) {}
 
     QString	object(void) const { return "monster"; }
     MapObject*	copy(void) const { return new MapMonster(*this); }
     void	updateInfo(const mp2til_t &);
+    int		monster(void) const { return type; }
 };
 
 struct MapArtifact : public MapObject
 {
-    int		artifact;
+    int		type;
     int		spell;
     int		condition;
 
     MapArtifact(const QPoint & pos = QPoint(-1, -1), quint32 uid = -1, int art = Artifact::None) :
-	MapObject(pos, uid, MapObj::Artifact), artifact(art), spell(Spell::None), condition(-1) {}
+	MapObject(pos, uid, MapObj::Artifact), type(art), spell(Spell::None), condition(-1) {}
 
     QString	object(void) const { return "artifact"; }
     MapObject*	copy(void) const { return new MapArtifact(*this); }
     void	updateInfo(const mp2til_t &);
+    int		artifact(void) const { return type; }
 };
 
 struct ActionSimple;

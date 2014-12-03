@@ -1279,3 +1279,13 @@ MonsterStaticData & MonsterStaticData::Get(void)
     static MonsterStaticData mgds;
     return mgds;
 }
+
+StreamBase & operator<< (StreamBase & msg, const Monster & obj)
+{
+    return msg;
+}
+
+StreamBase & operator>> (StreamBase & msg, Monster & obj)
+{
+    return msg;
+}

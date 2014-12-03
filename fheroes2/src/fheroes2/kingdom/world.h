@@ -40,21 +40,25 @@ class Castle;
 class Kingdom;
 class Recruits;
 class Radar;
-class ObjectSimple;
+class MapObjectSimple;
+class ActionSimple;
 
-struct ListActions : public std::list<ObjectSimple*>
+struct ListActions : public std::list<ActionSimple*>
 {
     ~ListActions();
     void clear(void);
 };
 
-struct MapObjects : public std::map<s32, ObjectSimple*>
+struct MapObjects : public std::map<u32, MapObjectSimple*>
 {
     ~MapObjects();
     void		clear(void);
-    void		add(s32, ObjectSimple*);
-    ObjectSimple*	get(s32);
-    const ObjectSimple*	get(s32) const;
+    void		add(MapObjectSimple*);
+    std::list<MapObjectSimple*>
+			get(const Point &);
+    MapObjectSimple*	get(u32 uid);
+    void		remove(const Point &);
+    void		remove(u32 uid);
 };
 
 typedef std::map<s32, ListActions>	MapActions;
@@ -212,9 +216,9 @@ public:
     void		AddEventDate(const EventDate &);
     EventsDate		GetEventsDate(int color) const;
 
-    MapEvent*		GetMapEvent(s32);
-    MapSphinx*		GetMapSphinx(s32);
-    const MapSign*	GetMapSign(s32) const;
+    MapEvent*		GetMapEvent(const Point &);
+    MapObjectSimple*	GetMapObject(u32 uid);
+    void		RemoveMapObject(const MapObjectSimple*);
 
     static u32		GetUniq(void);
 

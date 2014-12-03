@@ -56,7 +56,7 @@ void ListActions::clear(void)
 {
     for(iterator it = begin(); it != end(); ++it)
 	delete *it;
-    std::list<ObjectSimple*>::clear();
+    std::list<ActionSimple*>::clear();
 }
 
 MapObjects::~MapObjects()
@@ -68,28 +68,52 @@ void MapObjects::clear(void)
 {
     for(iterator it = begin(); it != end(); ++it)
 	delete (*it).second;
-    std::map<s32, ObjectSimple*>::clear();
+    std::map<u32, MapObjectSimple*>::clear();
 }
 
-const ObjectSimple* MapObjects::get(s32 index) const
+void MapObjects::add(MapObjectSimple* obj)
 {
-    const std::map<s32, ObjectSimple*> & obj = *this;
-    const_iterator it = obj.find(index);
+    if(obj)
+    {
+        std::map<u32, MapObjectSimple*> & map = *this;
+	if(map[obj->GetUID()]) delete map[obj->GetUID()];
+        map[obj->GetUID()] = obj;
+    }
+}
+
+MapObjectSimple* MapObjects::get(u32 uid)
+{
+    iterator it = find(uid);
     return it != end() ? (*it).second : NULL;
 }
 
-void MapObjects::add(s32 index, ObjectSimple* ptr)
+std::list<MapObjectSimple*> MapObjects::get(const Point & pos)
 {
-    std::map<s32, ObjectSimple*> & obj = *this;
-    if(obj[index]) delete obj[index];
-    obj[index] = ptr;
+    std::list<MapObjectSimple*> res;
+    for(iterator it = begin(); it != end(); ++it)
+	if((*it).second && (*it).second->isPosition(pos))
+	    res.push_back((*it).second);
+    return res;
 }
 
-ObjectSimple* MapObjects::get(s32 index)
+void MapObjects::remove(const Point & pos)
 {
-    std::map<s32, ObjectSimple*> & obj = *this;
-    iterator it = obj.find(index);
-    return it != end() ? (*it).second : NULL;
+    std::vector<u32> uids;
+
+    for(iterator it = begin(); it != end(); ++it)
+	if((*it).second && (*it).second->isPosition(pos))
+	    uids.push_back((*it).second->GetUID());
+
+    for(std::vector<u32>::const_iterator
+	it = uids.begin(); it != uids.end(); ++it)
+	remove(*it);
+}
+
+void MapObjects::remove(u32 uid)
+{
+    iterator it = find(uid);
+    if(it != end()) delete (*it).second;
+    erase(it);
 }
 
 CapturedObject & CapturedObjects::Get(s32 index)
@@ -882,19 +906,20 @@ void World::ActionToEyeMagi(int color) const
     }
 }
 
-MapSphinx* World::GetMapSphinx(s32 index)
+MapEvent* World::GetMapEvent(const Point & pos)
 {
-    return static_cast<MapSphinx*>(map_objects.get(index));
+    std::list<MapObjectSimple*> res = map_objects.get(pos);
+    return res.size() ? static_cast<MapEvent*>(res.front()) : NULL;
 }
 
-const MapSign* World::GetMapSign(s32 index) const
+MapObjectSimple* World::GetMapObject(u32 uid)
 {
-    return static_cast<const MapSign*>(map_objects.get(index));
+    return uid ? map_objects.get(uid) : NULL;
 }
 
-MapEvent* World::GetMapEvent(s32 index)
+void World::RemoveMapObject(const MapObjectSimple* obj)
 {
-    return static_cast<MapEvent*>(map_objects.get(index));
+    if(obj) map_objects.remove(obj->GetUID());
 }
 
 void World::UpdateRecruits(Recruits & recruits) const
@@ -1072,7 +1097,7 @@ StreamBase & operator<< (StreamBase & msg, const MapObjects & objs)
     for(MapObjects::const_iterator it = objs.begin(); it != objs.end(); ++it)
     if((*it).second)
     {
-	const ObjectSimple & obj = *(*it).second;
+	const MapObjectSimple & obj = *(*it).second;
         msg << (*it).first << obj.GetType();
 
         switch(obj.GetType())
@@ -1090,9 +1115,17 @@ StreamBase & operator<< (StreamBase & msg, const MapObjects & objs)
 		break;
 
 	    case MP2::OBJ_RESOURCE:
+		msg << static_cast<const MapResource &>(obj);
+		break;
+
 	    case MP2::OBJ_ARTIFACT:
+		msg << static_cast<const MapArtifact &>(obj);
+		break;
+
 	    case MP2::OBJ_MONSTER:
-//            case ACTION_DEFAULT:        { const ActionDefault* ptr = static_cast<const ActionDefault*>(*it); if(ptr) sb << *ptr; } break;
+		msg << static_cast<const MapMonster &>(obj);
+		break;
+
             default: msg << obj; break;
         }
     }
@@ -1119,7 +1152,7 @@ StreamBase & operator>> (StreamBase & msg, MapObjects & objs)
 		MapEvent* ptr = new MapEvent();
 		if(FORMAT_VERSION_3220 > Game::GetLoadVersion())
 		{
-		    msg >> *static_cast<ObjectSimple*>(ptr);
+		    msg >> *static_cast<MapObjectSimple*>(ptr);
 		    ptr->message = "brocken old save format, sorry...";
 		}
 		else
@@ -1132,7 +1165,7 @@ StreamBase & operator>> (StreamBase & msg, MapObjects & objs)
 		MapSphinx* ptr = new MapSphinx();
 		if(FORMAT_VERSION_3220 > Game::GetLoadVersion())
 		{
-		    msg >> *static_cast<ObjectSimple*>(ptr);
+		    msg >> *static_cast<MapObjectSimple*>(ptr);
 		    ptr->message = "brocken old save format, sorry...";
 		}
 		else
@@ -1145,7 +1178,7 @@ StreamBase & operator>> (StreamBase & msg, MapObjects & objs)
 		MapSign* ptr = new MapSign();
 		if(FORMAT_VERSION_3220 > Game::GetLoadVersion())
 		{
-		    msg >> *static_cast<ObjectSimple*>(ptr);
+		    msg >> *static_cast<MapObjectSimple*>(ptr);
 		    ptr->message = "brocken old save format, sorry...";
 		}
 		else
@@ -1153,8 +1186,37 @@ StreamBase & operator>> (StreamBase & msg, MapObjects & objs)
 		objs[index] = ptr;
 	    } break;
 
-//            case ACTION_DEFAULT:        { ActionDefault* ptr = new ActionDefault(); sb >> *ptr; st.push_back(ptr); } break;
-            default: { ObjectSimple* ptr = new ObjectSimple(); msg >> *ptr; objs[index] = ptr; } break;
+	    case MP2::OBJ_RESOURCE:
+	    {
+		MapResource* ptr = new MapResource();
+		if(FORMAT_VERSION_3269 > Game::GetLoadVersion())
+		    msg >> *static_cast<MapObjectSimple*>(ptr);
+		else
+		    msg >> *ptr;
+		objs[index] = ptr;
+	    } break;
+
+	    case MP2::OBJ_ARTIFACT:
+	    {
+		MapArtifact* ptr = new MapArtifact();
+		if(FORMAT_VERSION_3269 > Game::GetLoadVersion())
+		    msg >> *static_cast<MapObjectSimple*>(ptr);
+		else
+		    msg >> *ptr;
+		objs[index] = ptr;
+	    } break;
+
+	    case MP2::OBJ_MONSTER:
+	    {
+		MapMonster* ptr = new MapMonster();
+		if(FORMAT_VERSION_3269 > Game::GetLoadVersion())
+		    msg >> *static_cast<MapObjectSimple*>(ptr);
+		else
+		    msg >> *ptr;
+		objs[index] = ptr;
+	    } break;
+
+            default: { MapObjectSimple* ptr = new MapObjectSimple(); msg >> *ptr; objs[index] = ptr; } break;
         }
     }
 
@@ -1204,21 +1266,21 @@ StreamBase & operator>> (StreamBase & msg, World & w)
 
 	for(std::list<MapEvent>::const_iterator
 	    it = vec_eventsmap.begin(); it != vec_eventsmap.end(); ++it)
-	    w.map_objects.add((*it).GetIndex(), new MapEvent(*it));
+	    w.map_objects.add(new MapEvent(*it));
 
 	std::list<MapSphinx> vec_riddles;
 	msg >> vec_riddles;
 
 	for(std::list<MapSphinx>::const_iterator
 	    it = vec_riddles.begin(); it != vec_riddles.end(); ++it)
-	    w.map_objects.add((*it).GetIndex(), new MapSphinx(*it));
+	    w.map_objects.add(new MapSphinx(*it));
 
 	std::map<s32, std::string> map_sign;
 	msg >> map_sign;
 
 	for(std::map<s32, std::string>::const_iterator
 	    it = map_sign.begin(); it != map_sign.end(); ++it)
-	    w.map_objects.add((*it).first, new MapSign((*it).first, (*it).second.c_str()));
+	    w.map_objects.add(new MapSign((*it).first, (*it).second.c_str()));
     }
 
     msg >>

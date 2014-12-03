@@ -47,7 +47,7 @@ void AIToMonster(Heroes & hero, u32 obj, s32 dst_index);
 void AIToPickupResource(Heroes & hero, u32 obj, s32 dst_index);
 void AIToTreasureChest(Heroes & hero, u32 obj, s32 dst_index);
 void AIToArtifact(Heroes & hero, u32 obj, s32 dst_index);
-void AIToResource(Heroes & hero, u32 obj, s32 dst_index);
+void AIToObjectResource(Heroes & hero, u32 obj, s32 dst_index);
 void AIToWagon(Heroes & hero, u32 obj, s32 dst_index);
 void AIToSkeleton(Heroes & hero, u32 obj, s32 dst_index);
 void AIToCaptureObject(Heroes & hero, u32 obj, s32 dst_index);
@@ -195,7 +195,7 @@ void AI::HeroesAction(Heroes & hero, s32 dst_index)
         case MP2::OBJ_MAGICGARDEN:
         case MP2::OBJ_LEANTO:
         case MP2::OBJ_WINDMILL:
-        case MP2::OBJ_WATERWHEEL:	AIToResource(hero, object, dst_index); break;
+        case MP2::OBJ_WATERWHEEL:	AIToObjectResource(hero, object, dst_index); break;
 
         case MP2::OBJ_WAGON:		AIToWagon(hero, object, dst_index); break;
         case MP2::OBJ_SKELETON:		AIToSkeleton(hero, object, dst_index); break;
@@ -491,10 +491,11 @@ void AIToMonster(Heroes & hero, u32 obj, s32 dst_index)
 {
     bool destroy = false;
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const Troop & troop = tile.QuantityTroop();
+    MapMonster* map_troop = static_cast<MapMonster*>(world.GetMapObject(tile.GetObjectUID(obj)));
+    Troop troop = map_troop ? map_troop->QuantityTroop() : tile.QuantityTroop();
     //const Settings & conf = Settings::Get();
 
-    JoinCount join = Army::GetJoinSolution(hero, tile);
+    JoinCount join = Army::GetJoinSolution(hero, tile, troop);
 
     // free join
     if(JOIN_FREE == join.first)
@@ -532,9 +533,7 @@ void AIToMonster(Heroes & hero, u32 obj, s32 dst_index)
     if(JOIN_NONE == join.first)
     {
 	DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " attack monster " << troop.GetName());
-
 	Army army(tile);
-
     	Battle::Result res = Battle::Loader(hero.GetArmy(), army, dst_index);
 
     	if(res.AttackerWins())
@@ -550,6 +549,12 @@ void AIToMonster(Heroes & hero, u32 obj, s32 dst_index)
     	    {
             	tile.MonsterSetCount(army.GetCountMonsters(troop()));
             	if(tile.MonsterJoinConditionFree()) tile.MonsterSetJoinCondition(Monster::JOIN_CONDITION_MONEY);
+
+		if(map_troop)
+		{
+		    map_troop->count = army.GetCountMonsters(troop());
+            	    if(map_troop->JoinConditionFree()) map_troop->condition = Monster::JOIN_CONDITION_MONEY;
+		}
     	    }
     	}
     }
@@ -573,6 +578,8 @@ void AIToMonster(Heroes & hero, u32 obj, s32 dst_index)
                 world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
         }
 
+	if(map_troop) world.RemoveMapObject(map_troop);
+
         // auto move hero
 	// disable: https://sourceforge.net/tracker/index.php?func=detail&aid=3155230&group_id=96859&atid=616180
 	/*
@@ -587,14 +594,14 @@ void AIToMonster(Heroes & hero, u32 obj, s32 dst_index)
 void AIToPickupResource(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
+    MapResource* map_resource = static_cast<MapResource*>(world.GetMapObject(tile.GetObjectUID(obj)));
 
     if(obj != MP2::OBJ_BOTTLE)
-    {
-	hero.GetKingdom().AddFundsResource(tile.QuantityFunds());
-    }
+	hero.GetKingdom().AddFundsResource(map_resource ? Funds(map_resource->resource) : tile.QuantityFunds());
 
     tile.RemoveObjectSprite();
     tile.QuantityReset();
+    if(map_resource) world.RemoveMapObject(map_resource);
     hero.GetPath().Reset();
 
     DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " pickup small resource");
@@ -643,7 +650,7 @@ void AIToTreasureChest(Heroes & hero, u32 obj, s32 dst_index)
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
-void AIToResource(Heroes & hero, u32 obj, s32 dst_index)
+void AIToObjectResource(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const ResourceCount & rc = tile.QuantityResourceCount();
@@ -1050,18 +1057,21 @@ void AIToXanadu(Heroes & hero, u32 obj, s32 dst_index)
 void AIToEvent(Heroes & hero, u32 obj, s32 dst_index)
 {
     // check event maps
-    MapEvent* event_maps = world.GetMapEvent(dst_index);
+    MapEvent* event_maps = world.GetMapEvent(Maps::GetPoint(dst_index));
 
     if(event_maps && event_maps->isAllow(hero.GetColor()) && event_maps->computer)
     {
-        if(event_maps->resource.GetValidItemsCount())
-    	    hero.GetKingdom().AddFundsResource(event_maps->resource);
+        if(event_maps->resources.GetValidItemsCount())
+    	    hero.GetKingdom().AddFundsResource(event_maps->resources);
 	if(event_maps->artifact.isValid())
 	    hero.PickupArtifact(event_maps->artifact);
 	event_maps->SetVisited(hero.GetColor());
 
 	if(event_maps->cancel)
+	{
 	    hero.SetMapsObject(MP2::OBJ_ZERO);
+	    world.RemoveMapObject(event_maps);
+	}
     }
 
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
@@ -1335,18 +1345,25 @@ void AIToShipwreckSurvivor(Heroes & hero, u32 obj, s32 dst_index)
 void AIToArtifact(Heroes & hero, u32 obj, s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
+    MapArtifact* map_artifact = static_cast<MapArtifact*>(world.GetMapObject(tile.GetObjectUID(obj)));
 
     if(! hero.IsFullBagArtifacts())
     {
-	const u32 cond = tile.QuantityVariant();
-	const Artifact & art = tile.QuantityArtifact();
+	u32 cond = tile.QuantityVariant();
+	Artifact art = tile.QuantityArtifact();
+
+	if(map_artifact)
+	{
+	    cond = map_artifact->condition;
+	    art = map_artifact->artifact;
+	}
 
         bool result = false;
 
 	// 1,2,3 - gold, gold + res
 	if(0 < cond && cond < 4)
         {
-    	    const Funds & payment = tile.QuantityFunds();
+    	    Funds payment = map_artifact ? map_artifact->QuantityFunds() : tile.QuantityFunds();
 
     	    if(hero.GetKingdom().AllowPayment(payment))
             {
@@ -1388,6 +1405,7 @@ void AIToArtifact(Heroes & hero, u32 obj, s32 dst_index)
         {
 	    tile.RemoveObjectSprite();
             tile.QuantityReset();
+	    if(map_artifact) world.RemoveMapObject(map_artifact);
         }
     }
 
