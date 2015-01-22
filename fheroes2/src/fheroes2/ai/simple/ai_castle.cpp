@@ -75,7 +75,7 @@ void AICastleDevelopment(Castle & c)
 	    if(!c.isBuild(BUILD_SPEC) && Race::WRLK == c.GetRace())
 		c.BuyBuilding(BUILD_SPEC);
 
-	    if(!c.isBuild(BUILD_TAVERN) && Race::KNGT == c.GetRace())
+	    if(!c.isBuild(BUILD_TAVERN) && (Race::KNGT == c.GetRace() || Race::SORC == c.GetRace()))
 		c.BuyBuilding(BUILD_TAVERN);
 
 	    if(!c.isBuild(BUILD_MAGEGUILD1) && ((Race::SORC | Race::WZRD | Race::WRLK | Race::NECR) & c.GetRace()))
@@ -131,6 +131,8 @@ void AICastleDevelopment(Castle & c)
 	    if(!c.isBuild(BUILD_CAPTAIN))
 		c.BuyBuilding(BUILD_CAPTAIN);
 
+	    if(!c.isBuild(BUILD_TAVERN))
+		c.BuyBuilding(BUILD_TAVERN);
 
 	    if(!c.isBuild(BUILD_MAGEGUILD2))
 		c.BuyBuilding(BUILD_MAGEGUILD2);
