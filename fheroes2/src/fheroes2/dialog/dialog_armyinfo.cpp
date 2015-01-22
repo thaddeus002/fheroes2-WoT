@@ -362,6 +362,83 @@ void DrawBattleStats(const Point & dst, const Troop & b)
 	}
 }
 
+int Dialog::ArmyJoinFree(const Troop & troop, Heroes & hero)
+{
+    Display & display = Display::Get();
+    const Settings & conf = Settings::Get();
+
+    // cursor
+    Cursor & cursor = Cursor::Get();
+    int oldthemes = cursor.Themes();
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
+
+    std::string message = _("A group of %{monster} with a desire for greater glory wish to join you.\nDo you accept?");
+    StringReplace(message, "%{monster}", StringLower(troop.GetMultiName()));
+
+    TextBox textbox(message, Font::BIG, BOXAREA_WIDTH);
+    const int buttons = Dialog::YES | Dialog::NO;
+    int posy = 0;
+
+    FrameBox box(10 + textbox.h() + 10, buttons);
+    const Rect & pos = box.GetArea();
+
+    posy = pos.y + 10;
+    textbox.Blit(pos.x, posy);
+
+    ButtonGroups btnGroups(pos, buttons);
+    Button btnHeroes(pos.x + pos.w / 2 - 20, pos.y + pos.h - 35, (conf.ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS), 0, 1);
+
+    if(hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(troop))
+	btnHeroes.SetDisable(true);
+    else
+    {
+	//TextBox textbox2(_("Not room in\nthe garrison"), Font::SMALL, 100);
+	//textbox2.Blit(btnHeroes.x - 35, btnHeroes.y - 30);
+	btnHeroes.Draw();
+	btnGroups.DisableButton1(true);
+    }
+
+    btnGroups.Draw();
+    cursor.Show();
+    display.Flip();
+
+    LocalEvent & le = LocalEvent::Get();
+
+    // message loop
+    int result = Dialog::ZERO;
+
+    while(result == Dialog::ZERO && le.HandleEvents())
+    {
+	if(btnHeroes.isEnable())
+    	    le.MousePressLeft(btnHeroes) ? btnHeroes.PressDraw() : btnHeroes.ReleaseDraw();
+
+        if(!buttons && !le.MousePressRight()) break;
+
+        result = btnGroups.QueueEventProcessing();
+
+	if(btnHeroes.isEnable() && le.MouseClickLeft(btnHeroes))
+	{
+	    hero.OpenDialog(false, false);
+
+	    if(hero.GetArmy().GetCount() < hero.GetArmy().Size())
+	    {
+    		btnGroups.DisableButton1(false);
+		btnGroups.Draw();
+	    }
+
+	    cursor.Show();
+	    display.Flip();
+	}
+    }
+
+    cursor.Hide();
+    cursor.SetThemes(oldthemes);
+    cursor.Show();
+
+    return result;
+}
+
 int Dialog::ArmyJoinWithCost(const Troop & troop, u32 join, u32 gold, Heroes & hero)
 {
     Display & display = Display::Get();

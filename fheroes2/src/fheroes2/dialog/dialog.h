@@ -105,6 +105,7 @@ namespace Dialog
     void	DwellingInfo(const Monster &, u32 available);
     bool	SetGuardian(Heroes &, Troop &, CapturedObject &, bool readonly);
     int		ArmyInfo(const Troop & troop, int flags);
+    int		ArmyJoinFree(const Troop &, Heroes &);
     int		ArmyJoinWithCost(const Troop &, u32 join, u32 gold, Heroes &);
     int		ArmySplitTroop(int free_slots, u32 max, u32 &, bool);
     void	Marketplace(bool fromTradingPost = false);

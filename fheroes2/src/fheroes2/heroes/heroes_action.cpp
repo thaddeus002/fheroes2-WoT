@@ -597,11 +597,8 @@ void ActionToMonster(Heroes & hero, u32 obj, s32 dst_index)
     {
 	DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " join monster " << troop.GetName());
 
-        std::string message = _("A group of %{monster} with a desire for greater glory wish to join you.\nDo you accept?");
-        StringReplace(message, "%{monster}", StringLower(troop.GetMultiName()));
-
-        if(Dialog::Message("Followers", message, Font::BIG, Dialog::YES | Dialog::NO) == Dialog::YES)
-	{
+        if(Dialog::YES == Dialog::ArmyJoinFree(troop, hero))
+        {
     	    hero.GetArmy().JoinTroop(troop);
 	    statusWindow.SetRedraw();
 	}
