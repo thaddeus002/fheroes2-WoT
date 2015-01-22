@@ -234,9 +234,10 @@ void DrawHeroIcons(const std::vector<ValueColors> & v, const Point & pos, u32 wi
 
 	for(u32 ii = 0; ii < v.size(); ++ii)
 	{
-	    Surface icons = world.GetHeroes(v[ii].first)->GetPortrait(PORT_SMALL);
-	    if(icons.isValid())
+	    const Heroes* hero = world.GetHeroes(v[ii].first);
+	    if(hero)
 	    {
+		Surface icons = hero->GetPortrait(PORT_SMALL);
 		s32 px = pos.x + chunk / 2 + ii * chunk;
 		const Sprite & window = AGG::GetICN(ICN::LOCATORS, 22);
 		window.Blit(px - window.w() / 2, pos.y - 4, display);

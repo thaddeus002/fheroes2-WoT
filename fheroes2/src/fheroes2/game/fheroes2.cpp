@@ -75,7 +75,7 @@ int main(int argc, char **argv)
 	// getopt
 	{
 	    int opt;
-	    while((opt = System::GetCommandOptions(argc, argv, "hest:d:")) != -1)
+	    while((opt = System::GetCommandOptions(argc, argv, "ht:d:")) != -1)
     		switch(opt)
                 {
 #ifndef BUILD_RELEASE
