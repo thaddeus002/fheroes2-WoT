@@ -29,15 +29,14 @@
 #include "engine.h"
 #include "system.h"
 
-#define AGGSIZENAME	15
+#define FATSIZENAME     15
 
-typedef struct
+struct aggfat_t
 {
-    std::string name;
+    u32  crc;
     u32  offset;
     u32  size;
-
-} aggfat_t;
+};
             
 int main(int argc, char **argv)
 {
@@ -48,65 +47,54 @@ int main(int argc, char **argv)
 	return EXIT_SUCCESS;
     }
 
-    std::fstream fd_data(argv[1], std::ios::in | std::ios::binary);
+    StreamFile sf1, sf2;
 
-    if(fd_data.fail())
+    if(! sf1.open(argv[1], "rb"))
     {
 	std::cout << "error open file: " << argv[1] << std::endl;
-
 	return EXIT_SUCCESS;
     }
 
     System::MakeDirectory(argv[2]);
 
-    u16 count = StreamBase::getLE16(fd_data);
-    u16 total = 0;
+    const u32 size = sf1.size();
+    int total = 0;
+    int count_items = sf1.getLE16();
 
-    char buf[AGGSIZENAME];
-    std::vector<aggfat_t> vector(count);
+    StreamBuf fats = sf1.toStreamBuf(count_items * 4 * 3 /* crc, offset, size */);
+    sf1.seek(size - FATSIZENAME * count_items);
+    StreamBuf names = sf1.toStreamBuf(FATSIZENAME * count_items);
 
-    for(u16 cur = 0; cur < count; ++cur)
+    std::map<std::string, aggfat_t> maps;
+
+    for(int ii = 0; ii < count_items; ++ii)
     {
-	aggfat_t & fat = vector[cur];
+        aggfat_t & f = maps[StringLower(names.toString(FATSIZENAME))];
 
-	fd_data.seekg(-AGGSIZENAME * (count - cur), std::ios_base::end);
-        fd_data.read(buf, AGGSIZENAME);
-
-        for(u8 ii = 0; ii < AGGSIZENAME; ++ii) buf[ii] = tolower(buf[ii]);
-
-        fat.name = buf;
-
-	fd_data.seekg(sizeof(u16) + cur * (3 * sizeof(u32)), std::ios_base::beg);
-	fd_data.seekg(sizeof(u32), std::ios_base::cur);
-
-	fat.offset = StreamBase::getLE32(fd_data);
-	fat.size = StreamBase::getLE32(fd_data);
-
-	fd_data.seekg(fat.offset, std::ios_base::beg);
-
-	char *body = new char[fat.size];
-        fd_data.read(body, fat.size);
-
-	const std::string full_name = System::ConcatePath(argv[2], fat.name);
-
-	std::fstream fd_body(full_name.c_str(), std::ios::out | std::ios::binary);
-
-	if(! fd_body.fail())
-	{
-    	    fd_body.write(body, fat.size);
-	    fd_body.close();
-	    
-	    ++total;
-
-	    std::cout << "extract: " << full_name << std::endl;
-	}
-
-	delete [] body;
+        f.crc = fats.getLE32();
+        f.offset = fats.getLE32();
+        f.size = fats.getLE32();
     }
 
-    fd_data.close();
+    for(std::map<std::string, aggfat_t>::const_iterator
+	it = maps.begin(); it != maps.end(); ++it)
+    {
+	const aggfat_t & fat = (*it).second;
+	const std::string & fn = System::ConcatePath(argv[2], (*it).first);
+	sf1.seek(fat.offset);
+	std::vector<u8> buf = sf1.getRaw(fat.size);
 
+	if(buf.size() && sf2.open(fn, "wb"))
+	{
+    	    sf2.putRaw(reinterpret_cast<char*>(& buf[0]), buf.size());
+	    sf2.close();
+
+	    ++total;
+	    std::cout << "extract: " << fn << std::endl;
+	}
+    }
+
+    sf1.close();
     std::cout << "total: " << total << std::endl;
-
     return EXIT_SUCCESS;
 }

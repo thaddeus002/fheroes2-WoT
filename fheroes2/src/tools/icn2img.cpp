@@ -31,34 +31,25 @@
 #include "system.h"
 #include "palette_h2.h"
 
-class icnheader
+struct icnheader
 {
-    public:
-    icnheader(){};
-
-    void read(std::fstream & fd)
-    {
-        if(! fd.fail())
-	{
-	    offsetX = StreamBase::getLE16(fd);
-    	    offsetY = StreamBase::getLE16(fd);
-    	    width = StreamBase::getLE16(fd);
-    	    height = StreamBase::getLE16(fd);
-    	    type = fd.get();
-    	    offsetData = StreamBase::getLE32(fd);
-	}
-    };
-
     s16	offsetX;
     s16 offsetY;
     u16 width;
     u16 height;
-    u8 type; // type of sprite : 0 = Normal, 32 = Monochromatic shape
+    u8  type; // type of sprite : 0 = Normal, 32 = Monochromatic shape
     u32 offsetData;
+
+    icnheader() : offsetX(0), offsetY(0), width(0), height(0), type(0), offsetData(0) {}
 };
 
-void SpriteDrawICNv1(Surface & sf, const u8* cur, const u32 size,  bool debug);
-void SpriteDrawICNv2(Surface & sf, const u8* cur, const u32 size,  bool debug);
+StreamBase & operator>>(StreamBase & sb, icnheader & st)
+{
+    return sb >> st.offsetX >> st.offsetY >> st.width >> st.height >> st.type >> st.offsetData;
+}
+
+void SpriteDrawICNv1(Surface & sf, const std::vector<u8> &, bool debug);
+void SpriteDrawICNv2(Surface & sf, const std::vector<u8> &, bool debug);
 
 namespace H2Palette
 {
@@ -97,7 +88,6 @@ int main(int argc, char **argv)
     if(argc < 3)
     {
 	std::cout << argv[0] << " [-s (skip shadow)] [-d (debug on)] infile.icn extract_to_dir" << std::endl;
-
 	return EXIT_SUCCESS;
     }
 
@@ -124,16 +114,18 @@ int main(int argc, char **argv)
     ++ptr;
     std::string prefix(*ptr);
 
-    std::fstream fd_data(shortname.c_str(), std::ios::in | std::ios::binary);
+    StreamFile sf;
 
-    if(fd_data.fail())
+    if(! sf.open(shortname, "rb"))
     {
 	std::cout << "error open file: " << shortname << std::endl;
 	return EXIT_SUCCESS;
     }
+
+    int count_sprite = sf.getLE16();
+    int total_size = sf.getLE32();
     
     shortname.replace(shortname.find(".icn"), 4, "");
-    
     prefix = System::ConcatePath(prefix, shortname);
 
     if(0 != System::MakeDirectory(prefix))
@@ -144,85 +136,81 @@ int main(int argc, char **argv)
 
     // write file "spec.xml"
     std::string name_spec_file = System::ConcatePath(prefix, "spec.xml");
-    
-    std::fstream fd_spec(name_spec_file.c_str(), std::ios::out);
-    if(fd_spec.fail())
+    std::fstream fs(name_spec_file.c_str(), std::ios::out);
+    if(fs.fail())
     {
-	std::cout << "error write file: " << shortname << std::endl;
+	std::cout << "error write file: " << name_spec_file << std::endl;
 	return EXIT_SUCCESS;
     }
 
     SDL::Init();
     H2Palette::Init();
 
-    u16 count_sprite;
-    u32 total_size;
+    fs << "<?xml version=\"1.0\" ?>" << std::endl <<
+	"<icn name=\"" << shortname << ".icn\" count=\"" << count_sprite << "\">" << std::endl;
 
-    count_sprite = StreamBase::getLE16(fd_data);
-    total_size = StreamBase::getLE32(fd_data);
-
-    fd_spec << "<?xml version=\"1.0\" ?>" << std::endl <<
-		"<icn name=\"" << shortname << ".icn\" count=\"" << count_sprite << "\">" << std::endl;
-
-    u32 save_pos = fd_data.tellg();
+    u32 save_pos = sf.tell();
 
     std::vector<icnheader> headers(count_sprite);
-    for(int ii = 0; ii < count_sprite; ++ii) headers[ii].read(fd_data);
+    for(int ii = 0; ii < count_sprite; ++ii)
+	sf >> headers[ii];
 
     for(int ii = 0; ii < count_sprite; ++ii)
     {
 	const icnheader & head = headers[ii];
 
 	u32 data_size = (ii + 1 != count_sprite ? headers[ii + 1].offsetData - head.offsetData : total_size - head.offsetData);
-	fd_data.seekg(save_pos + head.offsetData, std::ios_base::beg);
-    
-        u8* buf = new u8[data_size + 100];
-        std::memset(buf, 0x80, data_size + 100);
-        fd_data.read((char*) buf, data_size);
+	sf.seek(save_pos + head.offsetData);
+	std::cerr << data_size << std::endl;
+        std::vector<u8> buf = sf.getRaw(data_size);
 
-	Surface sf(Size(head.width, head.height), /*false*/true); // accepting transparency
+	if(buf.size())
+	{
+	    Surface surf(Size(head.width, head.height), /*false*/true); // accepting transparency
 
-        const RGBA clkey = RGBA(0xFF, 0, 0xFF);
-        sf.Fill(clkey);
-	sf.SetColorKey(clkey);
+	    const RGBA clkey = RGBA(0xFF, 0, 0xFF);
+    	    surf.Fill(clkey);
+	    surf.SetColorKey(clkey);
 
-	//sf.Fill(0xff, 0xff, 0xff);
-	sf.Fill(ColorBlack); // filling with transparent color
+	    //surf.Fill(0xff, 0xff, 0xff);
+	    surf.Fill(ColorBlack); // filling with transparent color
 
-	if(0x20 == head.type)
-	    SpriteDrawICNv2(sf, buf, data_size, debug);
-	else
-	    SpriteDrawICNv1(sf, buf, data_size, debug);
-        delete [] buf;
+	    if(0x20 == head.type)
+		SpriteDrawICNv2(surf, buf, debug);
+	    else
+		SpriteDrawICNv1(surf, buf, debug);
 
-	std::ostringstream stream;
-        stream << std::setw(3) << std::setfill('0') << ii;
+	    std::ostringstream os;
+	    os << std::setw(3) << std::setfill('0') << ii;
 
-	std::string dstfile = System::ConcatePath(prefix, stream.str());
-	std::string shortdstfile(stream.str()); // the name of destfile without the path
+	    std::string dstfile = System::ConcatePath(prefix, os.str());
+	    std::string shortdstfile(os.str()); // the name of destfile without the path
 
 #ifndef WITH_IMAGE
-	dstfile += ".bmp";
-	shortdstfile += ".bmp";
+	    dstfile += ".bmp";
+	    shortdstfile += ".bmp";
 #else
-	dstfile += ".png";
-	shortdstfile += ".png";
+	    dstfile += ".png";
+	    shortdstfile += ".png";
 #endif
-	sf.Save(dstfile.c_str());
-	fd_spec << " <sprite index=\"" << ii+1 << "\" name=\"" << shortdstfile.c_str() << "\" ox=\"" << head.offsetX << "\" oy=\"" << head.offsetY << "\"/>" << std::endl; 
+	    surf.Save(dstfile.c_str());
+	    fs << " <sprite index=\"" << ii+1 << "\" name=\"" << shortdstfile.c_str() << "\" ox=\"" << head.offsetX << "\" oy=\"" << head.offsetY << "\"/>" << std::endl; 
+	}
     }
 
-    fd_data.close();
-    fd_spec << "</icn>" << std::endl;
-    fd_spec.close();
+    sf.close();
+    fs << "</icn>" << std::endl;
+    fs.close();
     std::cout << "expand to: " << prefix << std::endl;
 
     SDL::Quit();
     return EXIT_SUCCESS;
 }
 
-void SpriteDrawICNv1(Surface & sf, const u8* cur, const u32 size,  bool debug)
+void SpriteDrawICNv1(Surface & sf, const std::vector<u8> & buf, bool debug)
 {
+    const u8* cur = & buf[0];
+    const u32 size = buf.size();
     const u8 *max = cur + size;
 
     u8  c = 0;
@@ -313,8 +301,10 @@ void SpriteDrawICNv1(Surface & sf, const u8* cur, const u32 size,  bool debug)
     }
 }
 
-void SpriteDrawICNv2(Surface & sf, const u8* cur, const u32 size,  bool debug)
+void SpriteDrawICNv2(Surface & sf, const std::vector<u8> & buf, bool debug)
 {
+    const u8* cur = & buf[0];
+    const u32 size = buf.size();
     const u8 *max = cur + size;
 
     u8  c = 0;
