@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2014 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
@@ -20,16 +20,17 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _H2TRANSLATION_
-#define _H2TRANSLATION_
+#ifndef H2TRANSLATIONS_H
+#define H2TRANSLATIONS_H
 
-namespace translation
+namespace Translation
 {
-    bool bind_domain(const char* domain, const char* file);
-    bool set_domain(const char* domain);
-    void set_strip_context(char strip);
+    bool bindDomain(const char* domain, const char* file);
+    bool setDomain(const char* domain);
+    void setStripContext(char strip);
 
     const char* gettext(const char* str);
+    const char* gettext(const std::string & str);
     const char* dgettext(const char* domain, const char* str);
     const char* ngettext(const char* str, const char* plural, size_t num);
     const char* dngettext(const char* domain, const char* str, const char* plural, size_t num);

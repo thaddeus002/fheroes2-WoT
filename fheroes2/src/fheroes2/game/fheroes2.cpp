@@ -321,7 +321,8 @@ void SetLangEnvPath(const Settings & conf)
 #ifdef WITH_TTF
     if(conf.Unicode())
     {
-	System::SetMessageLocale("");
+        System::SetLocale(LC_ALL, "");
+        System::SetLocale(LC_NUMERIC, "C");
 
 	std::string mofile = conf.ForceLang().empty() ?
 		System::GetMessageLocale(1).append(".mo") :
@@ -331,12 +332,12 @@ void SetLangEnvPath(const Settings & conf)
 
 	if(translations.size())
 	{
-    	    if(translation::bind_domain("fheroes2", translations.back().c_str()))
-    		translation::set_domain("fheroes2");
+    	    if(Translation::bindDomain("fheroes2", translations.back().c_str()))
+    		Translation::setDomain("fheroes2");
 	}
 	else
 	    ERROR("translation not found: " << mofile);
     }
 #endif
-    translation::set_strip_context('|');
+    Translation::setStripContext('|');
 }

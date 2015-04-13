@@ -38,8 +38,8 @@
 #endif
 
 #include "translations.h"
-#define _(s)		translation::gettext(s)
-#define _n(a,b,c)	translation::ngettext(a,b,c)
+#define _(s)		Translation::gettext(s)
+#define _n(a,b,c)	Translation::ngettext(a,b,c)
 
 // hardcore defines: kingdom
 #define KINGDOMMAX			6

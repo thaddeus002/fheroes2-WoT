@@ -63,7 +63,7 @@ namespace System
 
     std::string GetTime(void);
 
-    void	SetMessageLocale(const std::string &);
+    void	SetLocale(int, const char*);
     std::string	GetMessageLocale(int /* 3: en_us.utf-8, 2: en_us, 1: en */);
     size_t	GetMemoryUsage(void);
 

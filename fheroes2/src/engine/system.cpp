@@ -224,18 +224,26 @@ int System::SetEnvironment(const char* name, const char* value)
 #endif
 }
 
-void System::SetMessageLocale(const std::string & locale)
+void System::SetLocale(int category, const char* locale)
 {
-#if ! defined(__MINGW32CE__)
-    setlocale(LC_MESSAGES, locale.c_str());
+#if defined(ANDROID)
+    setlocale(category, locale);
+#else
+    std::setlocale(category, locale);
 #endif
 }
 
 std::string System::GetMessageLocale(int length /* 1, 2, 3 */)
 {
     std::string locname;
-#if ! defined(__MINGW32CE__)
+#if defined(__MINGW32CE__) || defined(__MINGW32__)
+    char* clocale = std::setlocale(LC_MONETARY, NULL);
+#elif defined(ANDROID)
     char* clocale = setlocale(LC_MESSAGES, NULL);
+#else
+    char* clocale = std::setlocale(LC_MESSAGES, NULL);
+#endif
+
     if(clocale)
     {
 	locname = StringLower(clocale);
@@ -248,7 +256,7 @@ std::string System::GetMessageLocale(int length /* 1, 2, 3 */)
 	    return list.empty() ? locname : list.front();
 	}
     }
-#endif
+
     return locname;
 }
 

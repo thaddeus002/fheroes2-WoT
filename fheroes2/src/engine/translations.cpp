@@ -26,27 +26,6 @@
 
 #include "engine.h"
 
-u32 crc32b(const char* msg)
-{
-    u32 crc = 0xFFFFFFFF;
-    u32 index = 0;
-
-    while(msg[index])
-    {
-	crc ^= static_cast<u32>(msg[index]);
-
-	for(int bit = 0; bit < 8; ++bit)
-	{
-	    size_t mask = -(crc & 1);
-	    crc = (crc >> 1) ^ (0xEDB88320 & mask);
-        }
-
-	++index;
-    }
-
-   return ~crc;
-}
-
 struct chunk
 {
     u32		offset;
@@ -55,6 +34,27 @@ struct chunk
     chunk() : offset(0), length(0) {}
     chunk(u32 off, u32 len) : offset(off), length(len) {}
 };
+
+u32 crc32b(const char* msg)
+{
+    u32 crc = 0xFFFFFFFF;
+    u32 index = 0;
+
+    while(msg[index])
+    {
+       crc ^= static_cast<u32>(msg[index]);
+
+       for(int bit = 0; bit < 8; ++bit)
+       {
+           size_t mask = -(crc & 1);
+           crc = (crc >> 1) ^ (0xEDB88320 & mask);
+        }
+
+       ++index;
+    }
+
+   return ~crc;
+}
 
 struct mofile
 {
@@ -190,24 +190,24 @@ struct mofile
 
 };
 
-namespace translation
+namespace Translation
 {
     enum { LOCALE_EN, LOCALE_AF, LOCALE_AR, LOCALE_BG, LOCALE_CA, LOCALE_CS, LOCALE_DA, LOCALE_DE, LOCALE_EL, LOCALE_ES,
 	    LOCALE_ET, LOCALE_EU, LOCALE_FI, LOCALE_FR, LOCALE_GL, LOCALE_HE, LOCALE_HR, LOCALE_HU, LOCALE_ID, LOCALE_IT,
 	    LOCALE_LA, LOCALE_LT, LOCALE_LV, LOCALE_MK, LOCALE_NL, LOCALE_PL, LOCALE_PT, LOCALE_RU, LOCALE_SK, LOCALE_SL,
-	    LOCALE_SR, LOCALE_SV, LOCALE_TL, LOCALE_TR };
+	    LOCALE_SR, LOCALE_SV, LOCALE_TR };
 
     mofile*				current = NULL;
     std::map<std::string, mofile>	domains;
     int					locale = LOCALE_EN;
     char				context = 0;
 
-    void set_strip_context(char strip)
+    void setStripContext(char strip)
     {
 	context = strip;
     }
 
-    const char* strip_context(const char* str)
+    const char* stripContext(const char* str)
     {
 	if(! context) return str;
 	const char* pos = str;
@@ -215,83 +215,80 @@ namespace translation
 	return *pos ? pos : str;
     }
 
-    bool bind_domain(const char* domain, const char* file)
+    bool bindDomain(const char* domain, const char* file)
     {
 	std::map<std::string, mofile>::const_iterator it = domains.find(domain);
 	if(it != domains.end())
 	    return true;
 
-	System::SetMessageLocale("");
 	std::string str = System::GetMessageLocale(1);
 
-	if(str == "af")	locale = LOCALE_AF;
+	if(str == "af" || str == "afrikaans")	locale = LOCALE_AF;
 	else
-	if(str == "ar")	locale = LOCALE_AR;
+	if(str == "ar" || str == "arabic")	locale = LOCALE_AR;
 	else
-	if(str == "bg")	locale = LOCALE_BG;
+	if(str == "bg" || str == "bulgarian")	locale = LOCALE_BG;
 	else
-	if(str == "ca")	locale = LOCALE_CA;
+	if(str == "ca" || str == "catalan")	locale = LOCALE_CA;
 	else
-	if(str == "da")	locale = LOCALE_DA;
+	if(str == "da" || str == "danish")	locale = LOCALE_DA;
 	else
-	if(str == "de")	locale = LOCALE_DE;
+	if(str == "de" || str == "german")	locale = LOCALE_DE;
 	else
-	if(str == "el")	locale = LOCALE_EL;
+	if(str == "el" || str == "greek")	locale = LOCALE_EL;
 	else
-	if(str == "es")	locale = LOCALE_ES;
+	if(str == "es" || str == "spanish")	locale = LOCALE_ES;
 	else
-	if(str == "et")	locale = LOCALE_ET;
+	if(str == "et" || str == "estonian")	locale = LOCALE_ET;
 	else
-	if(str == "eu")	locale = LOCALE_EU;
+	if(str == "eu" || str == "basque")	locale = LOCALE_EU;
 	else
-	if(str == "fi")	locale = LOCALE_FI;
+	if(str == "fi" || str == "finnish")	locale = LOCALE_FI;
 	else
-	if(str == "fr")	locale = LOCALE_FR;
+	if(str == "fr" || str == "french")	locale = LOCALE_FR;
 	else
-	if(str == "gl")	locale = LOCALE_GL;
+	if(str == "gl" || str == "galician")	locale = LOCALE_GL;
 	else
-	if(str == "he")	locale = LOCALE_HE;
+	if(str == "he" || str == "hebrew")	locale = LOCALE_HE;
 	else
-	if(str == "hr")	locale = LOCALE_HR;
+	if(str == "hr" || str == "croatian")	locale = LOCALE_HR;
 	else
-	if(str == "hu")	locale = LOCALE_HU;
+	if(str == "hu" || str == "hungarian")	locale = LOCALE_HU;
 	else
-	if(str == "id")	locale = LOCALE_ID;
+	if(str == "id" || str == "indonesian")	locale = LOCALE_ID;
 	else
-	if(str == "it")	locale = LOCALE_IT;
+	if(str == "it" || str == "italian")	locale = LOCALE_IT;
 	else
-	if(str == "la")	locale = LOCALE_LA;
+	if(str == "la" || str == "latin")	locale = LOCALE_LA;
 	else
-	if(str == "lt")	locale = LOCALE_LT;
+	if(str == "lt" || str == "lithuanian")	locale = LOCALE_LT;
 	else
-	if(str == "lv")	locale = LOCALE_LV;
+	if(str == "lv" || str == "latvian")	locale = LOCALE_LV;
 	else
-	if(str == "mk")	locale = LOCALE_MK;
+	if(str == "mk" || str == "macedonia")	locale = LOCALE_MK;
 	else
-	if(str == "nl")	locale = LOCALE_NL;
+	if(str == "nl" || str == "dutch")	locale = LOCALE_NL;
 	else
-	if(str == "pl")	locale = LOCALE_PL;
+	if(str == "pl" || str == "polish")	locale = LOCALE_PL;
 	else
-	if(str == "pt")	locale = LOCALE_PT;
+	if(str == "pt" || str == "portuguese")	locale = LOCALE_PT;
 	else
-	if(str == "ru")	locale = LOCALE_RU;
+	if(str == "ru" || str == "russian")	locale = LOCALE_RU;
 	else
-	if(str == "sk")	locale = LOCALE_SK;
+	if(str == "sk" || str == "slovak")	locale = LOCALE_SK;
 	else
-	if(str == "sl")	locale = LOCALE_SL;
+	if(str == "sl" || str == "slovenian")	locale = LOCALE_SL;
 	else
-	if(str == "sr")	locale = LOCALE_SR;
+	if(str == "sr" || str == "serbian")	locale = LOCALE_SR;
 	else
-	if(str == "sv")	locale = LOCALE_SV;
+	if(str == "sv" || str == "swedish")	locale = LOCALE_SV;
 	else
-	if(str == "tl")	locale = LOCALE_TL;
-	else
-	if(str == "tr")	locale = LOCALE_TR;
+	if(str == "tr" || str == "turkish")	locale = LOCALE_TR;
 
 	return domains[domain].open(file);
     }
 
-    bool set_domain(const char* domain)
+    bool setDomain(const char* domain)
     {
 	std::map<std::string, mofile>::iterator it = domains.find(domain);
 	if(it == domains.end())
@@ -301,14 +298,19 @@ namespace translation
 	return true;
     }
 
+    const char* gettext(const std::string & str)
+    {
+	return gettext(str.c_str());
+    }
+
     const char* gettext(const char* str)
     {
-	return strip_context(current ? current->ngettext(str, 0) : str);
+	return stripContext(current ? current->ngettext(str, 0) : str);
     }
 
     const char* dgettext(const char* domain, const char* str)
     {
-	set_domain(domain);
+	setDomain(domain);
 	return gettext(str);
     }
 
@@ -321,11 +323,10 @@ namespace translation
 	    case LOCALE_EU:
 	    case LOCALE_ID:
 	    case LOCALE_LA:
-	    case LOCALE_TL:
 	    case LOCALE_TR:
-		return strip_context(current->ngettext(str, 0));
+		return stripContext(current->ngettext(str, 0));
 	    case LOCALE_AR:
-		return strip_context(current->ngettext(str, (n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5)));
+		return stripContext(current->ngettext(str, (n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5)));
 	    case LOCALE_BG:
 	    case LOCALE_DA:
 	    case LOCALE_DE:
@@ -337,37 +338,37 @@ namespace translation
 	    case LOCALE_IT:
 	    case LOCALE_NL:
 	    case LOCALE_SV:
-		return strip_context(current->ngettext(str, (n != 1)));
+		return stripContext(current->ngettext(str, (n != 1)));
 	    case LOCALE_SK:
-		return strip_context(current->ngettext(str, ((n==1) ? 1 : (n>=2 && n<=4) ? 2 : 0)));
+		return stripContext(current->ngettext(str, ((n==1) ? 1 : (n>=2 && n<=4) ? 2 : 0)));
 	    case LOCALE_SL:
-		return strip_context(current->ngettext(str, (n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3)));
+		return stripContext(current->ngettext(str, (n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3)));
 	    case LOCALE_SR:
-		return strip_context(current->ngettext(str, (n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)));
+		return stripContext(current->ngettext(str, (n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)));
 	    case LOCALE_CS:
-		return strip_context(current->ngettext(str, ((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2)));
+		return stripContext(current->ngettext(str, ((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2)));
 	    case LOCALE_EL:
 	    case LOCALE_FR:
 	    case LOCALE_PT:
-		return strip_context(current->ngettext(str, (n > 1)));
+		return stripContext(current->ngettext(str, (n > 1)));
 	    case LOCALE_HR:
 	    case LOCALE_RU:
 	    case LOCALE_LT:
 	    case LOCALE_LV:
-		return strip_context(current->ngettext(str, (n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)));
+		return stripContext(current->ngettext(str, (n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)));
 	    case LOCALE_MK:
-		return strip_context(current->ngettext(str, (n==1 || n%10==1 ? 0 : 1)));
+		return stripContext(current->ngettext(str, (n==1 || n%10==1 ? 0 : 1)));
 	    case LOCALE_PL:
-		return strip_context(current->ngettext(str, (n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)));
+		return stripContext(current->ngettext(str, (n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)));
 	    default: break;
 	}
 
-	return strip_context(n == 1 ? str : plural);
+	return stripContext(n == 1 ? str : plural);
     }
 
     const char* dngettext(const char* domain, const char* str, const char* plural, size_t num)
     {
-	set_domain(domain);
+	setDomain(domain);
 	return ngettext(str, plural, num);
     }
 }
