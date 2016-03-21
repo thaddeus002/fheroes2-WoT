@@ -2168,13 +2168,7 @@ StreamBase & operator>> (StreamBase & msg, Castle & castle)
 	castle.name >>
 	castle.mageguild;
 
-    if(FORMAT_VERSION_3182 > Game::GetLoadVersion())
-    {
-	u8 count; msg >> count; dwellingcount = count;
-    }
-    else
-	msg >> dwellingcount;
-
+    msg >> dwellingcount;
     for(u32 ii = 0; ii < dwellingcount; ++ii)
 	msg >> castle.dwelling[ii];
 

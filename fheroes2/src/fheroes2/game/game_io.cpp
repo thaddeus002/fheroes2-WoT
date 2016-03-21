@@ -155,15 +155,6 @@ bool Game::Load(const std::string & fn)
     u16 binver = 0;
     HeaderSAV header;
 
-#ifdef FORMAT_VERSION_3225
-    if(savid == SAV2ID2)
-    {
-	// skip 4 byte
-	u32 unused;
-	fs >> unused;
-    }
-#endif
-
     // read raw info
     fs >> strver >> binver >> header;
     size_t offset = fs.tell();
@@ -253,14 +244,6 @@ bool Game::LoadSAV2FileInfo(const std::string & fn,  Maps::FileInfo & finfo)
     u16 binver = 0;
     HeaderSAV header;
 
-#ifdef FORMAT_VERSION_3225
-    if(savid == SAV2ID2)
-    {
-	// skip 4 byte
-	u32 unused;
-	fs >> unused;
-    }
-#endif
     // read raw info
     fs >> strver >> binver >> header;
 

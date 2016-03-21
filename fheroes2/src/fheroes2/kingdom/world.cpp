@@ -1150,39 +1150,21 @@ StreamBase & operator>> (StreamBase & msg, MapObjects & objs)
 	    case MP2::OBJ_EVENT:
 	    {
 		MapEvent* ptr = new MapEvent();
-		if(FORMAT_VERSION_3220 > Game::GetLoadVersion())
-		{
-		    msg >> *static_cast<MapObjectSimple*>(ptr);
-		    ptr->message = "brocken old save format, sorry...";
-		}
-		else
-		    msg >> *ptr;
+		msg >> *ptr;
 		objs[index] = ptr;
 	    } break;
 
 	    case MP2::OBJ_SPHINX:
 	    {
 		MapSphinx* ptr = new MapSphinx();
-		if(FORMAT_VERSION_3220 > Game::GetLoadVersion())
-		{
-		    msg >> *static_cast<MapObjectSimple*>(ptr);
-		    ptr->message = "brocken old save format, sorry...";
-		}
-		else
-		    msg >> *ptr;
+		msg >> *ptr;
 		objs[index] = ptr;
 	    } break;
 
 	    case MP2::OBJ_SIGN:
 	    {
 		MapSign* ptr = new MapSign();
-		if(FORMAT_VERSION_3220 > Game::GetLoadVersion())
-		{
-		    msg >> *static_cast<MapObjectSimple*>(ptr);
-		    ptr->message = "brocken old save format, sorry...";
-		}
-		else
-		    msg >> *ptr;
+		msg >> *ptr;
 		objs[index] = ptr;
 	    } break;
 
@@ -1257,33 +1239,7 @@ StreamBase & operator>> (StreamBase & msg, World & w)
 	w.vec_castles >>
 	w.vec_kingdoms >>
 	w.vec_rumors >>
-	w.vec_eventsday;
-
-    if(FORMAT_VERSION_3186 > Game::GetLoadVersion())
-    {
-	std::list<MapEvent> vec_eventsmap;
-	msg >> vec_eventsmap;
-
-	for(std::list<MapEvent>::const_iterator
-	    it = vec_eventsmap.begin(); it != vec_eventsmap.end(); ++it)
-	    w.map_objects.add(new MapEvent(*it));
-
-	std::list<MapSphinx> vec_riddles;
-	msg >> vec_riddles;
-
-	for(std::list<MapSphinx>::const_iterator
-	    it = vec_riddles.begin(); it != vec_riddles.end(); ++it)
-	    w.map_objects.add(new MapSphinx(*it));
-
-	std::map<s32, std::string> map_sign;
-	msg >> map_sign;
-
-	for(std::map<s32, std::string>::const_iterator
-	    it = map_sign.begin(); it != map_sign.end(); ++it)
-	    w.map_objects.add(new MapSign((*it).first, (*it).second.c_str()));
-    }
-
-    msg >>
+	w.vec_eventsday >>
 	w.map_captureobj >>
 	w.ultimate_artifact >>
 	w.day >> w.week >> w.month >>
@@ -1291,10 +1247,8 @@ StreamBase & operator>> (StreamBase & msg, World & w)
 	w.week_next >>
         w.heroes_cond_wins >>
         w.heroes_cond_loss >>
-	w.map_actions;
-
-    if(FORMAT_VERSION_3186 <= Game::GetLoadVersion())
-	msg >> w.map_objects;
+	w.map_actions >>
+	w.map_objects;
 
     // update tile passable
     std::for_each(w.vec_tiles.begin(), w.vec_tiles.end(),
@@ -1309,18 +1263,6 @@ StreamBase & operator>> (StreamBase & msg, World & w)
 
 void World::PostFixLoad(void)
 {
-    if(FORMAT_VERSION_3205 > Game::GetLoadVersion())
-    {
-	for(AllCastles::iterator
-	    it = vec_castles.begin(); it != vec_castles.end(); ++it)
-	if(*it && ! (*it)->isControlHuman())
-	{
-    	    CastleHeroes castleHeroes = (*it)->GetHeroes();
-
-            if(!castleHeroes.Guest() && castleHeroes.Guard())
-                (*it)->SwapCastleHeroes(castleHeroes);
-	}
-    }
 }
 
 void EventDate::LoadFromMP2(StreamBuf st)

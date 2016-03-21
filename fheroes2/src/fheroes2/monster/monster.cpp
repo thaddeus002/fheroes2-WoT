@@ -171,12 +171,7 @@ StreamBase & operator<< (StreamBase & msg, const MonsterStaticData & obj)
 StreamBase & operator>> (StreamBase & msg, MonsterStaticData & obj)
 {
     u32 monsters_size;
-    if(FORMAT_VERSION_3182 > Game::GetLoadVersion())
-    {
-	u16 size; msg >> size; monsters_size = size;
-    }
-    else
-	msg >> monsters_size;
+    msg >> monsters_size;
 
     for(u32 ii = 0; ii < monsters_size; ++ii)
 	msg >> monsters[ii];

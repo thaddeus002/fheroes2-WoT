@@ -39,14 +39,7 @@ StreamBase & operator<< (StreamBase & msg, const MapObjectSimple & obj)
 
 StreamBase & operator>> (StreamBase & msg, MapObjectSimple & obj)
 {
-    if(FORMAT_VERSION_3186 > Game::GetLoadVersion())
-    {
-        int old;
-        msg >> old;
-    }
-    else
-        msg >> obj.type >> obj.uid >> static_cast<MapPosition &>(obj);
-    return msg;
+    return msg >> obj.type >> obj.uid >> static_cast<MapPosition &>(obj);
 }
 
 MapEvent::MapEvent() : MapObjectSimple(MP2::OBJ_EVENT), computer(false), cancel(true), colors(0)
@@ -186,15 +179,8 @@ StreamBase & operator<< (StreamBase & msg, const MapEvent & obj)
 
 StreamBase & operator>> (StreamBase & msg, MapEvent & obj)
 {
-    if(FORMAT_VERSION_3186 > Game::GetLoadVersion())
-    {
-	static_cast<MapObjectSimple &>(obj) = MapObjectSimple(MP2::OBJ_EVENT);
-    }
-    else
-	msg >>
-	    static_cast<MapObjectSimple &>(obj);
-
     return msg >>
+	static_cast<MapObjectSimple &>(obj) >>
 	obj.resources >>
 	obj.artifact >>
 	obj.computer >>
@@ -216,15 +202,8 @@ StreamBase & operator<< (StreamBase & msg, const MapSphinx & obj)
 
 StreamBase & operator>> (StreamBase & msg, MapSphinx & obj)
 {
-    if(FORMAT_VERSION_3186 > Game::GetLoadVersion())
-    {
-	static_cast<MapObjectSimple &>(obj) = MapObjectSimple(MP2::OBJ_SPHINX);
-    }
-    else
-	msg >>
-	    static_cast<MapObjectSimple &>(obj);
-
-    return msg >>
+    return msg >> 
+        static_cast<MapObjectSimple &>(obj) >>
 	obj.resources >>
 	obj.artifact >>
 	obj.answers >>

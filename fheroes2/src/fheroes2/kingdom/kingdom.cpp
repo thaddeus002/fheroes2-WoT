@@ -812,13 +812,7 @@ StreamBase & operator<< (StreamBase & msg, const Kingdoms & obj)
 StreamBase & operator>> (StreamBase & msg, Kingdoms & obj)
 {
     u32 kingdomscount;
-
-    if(FORMAT_VERSION_3182 > Game::GetLoadVersion())
-    {
-	u8 count; msg >> count; kingdomscount = count;
-    }
-    else
-        msg >> kingdomscount; // FIXME: check kingdomscount
+    msg >> kingdomscount; // FIXME: check kingdomscount
 
     for(u32 ii = 0; ii < kingdomscount; ++ii)
 	msg >> obj.kingdoms[ii];

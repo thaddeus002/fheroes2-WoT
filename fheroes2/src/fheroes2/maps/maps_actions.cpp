@@ -37,14 +37,7 @@ StreamBase & operator<< (StreamBase & sb, const ActionSimple & st)
 
 StreamBase & operator>> (StreamBase & sb, ActionSimple & st)
 {
-    if(FORMAT_VERSION_3186 > Game::GetLoadVersion())
-    {
-        int old;
-        sb >> old;
-    }
-    else
-        sb >> st.type >> st.uid;
-    return sb;
+    return sb >> st.type >> st.uid;
 }
 
 StreamBase & operator<< (StreamBase & sb, const ActionResources & st)

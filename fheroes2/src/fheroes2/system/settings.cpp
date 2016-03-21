@@ -1440,10 +1440,6 @@ void Settings::BinaryLoad(void)
     {
 	u16 version = 0;
 
-#ifdef FORMAT_VERSION_3225
-	if(fs.size() == 38) // old stream ver.
-	    fs.skip(4);
-#endif
 	fs >> version >>
 	    opt_game >> opt_world >> opt_battle >> opt_addons >>
 	    pos_radr >> pos_bttn >> pos_icon >> pos_stat;

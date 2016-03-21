@@ -2026,13 +2026,6 @@ StreamBase & operator>> (StreamBase & msg, Heroes & hero)
 	hero.visit_object;
 
     hero.army.SetCommander(&hero);
-    
-    if(! hero.army.isValid() && FORMAT_VERSION_3186 > Game::GetLoadVersion())
-    {
-	VERBOSE("invalid army: " << hero.GetName() << ", pos: " << GetString(hero.GetCenter()));
-	hero.army.Reset();
-    }
-
     return msg;
 }
 

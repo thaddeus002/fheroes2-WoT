@@ -99,12 +99,6 @@ bool HGSData::Load(const std::string & fn)
 
     hdata >> hgs_id;
 
-#ifdef FORMAT_VERSION_3225
-    // old stream ver. skip 4 byte
-    if(hgs_id != HGS_ID)
-	hdata >> hgs_id >> hgs_id;
-#endif
-
     if(hgs_id == HGS_ID)
     {
 	hdata >> list;
