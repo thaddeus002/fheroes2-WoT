@@ -1,0 +1,8 @@
+immobile 1 à 8
+marche 9 à 16
+?? 19 à 24
+attaque haut 26 à 30 -> 18 à 26
+attaque 31 à 36 -> 27 à 33
+attaque bas 38 à 44 -> 34 à 40
+encaisse?? 45 à 50 -> 41 à 44
+meurt 51 à 57 -> 45 à 51

@@ -1,0 +1,13 @@
+centaure attal -> centaure H2
+attaque rapprochée 1 à 8 -> 34 à 37
+attaque rapprochée haut 9 à 12 -> 38 à 41 et 55 à 57
+attaque rapprochée bas 13 à 15 -> 42 à 45
+attaque 16 à 23 -> 18 à 26
+attaque haut 24 à 28 -> 27 à 29
+attaque bas 29 à 32 -> 30 à 32
+meurt 33 à 38 -> 46 à 54
+victoire 39 à 42
+attend 43 à 49 -> 9 à 17 et 64 à 70 et 73 à 76
+marche 50 à 62 -> 1 à 8 et 71 à 72
+encaisse 63 à 69 -> 58 à 63
+?? 71 à 72

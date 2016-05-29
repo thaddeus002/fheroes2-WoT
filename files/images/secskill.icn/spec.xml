@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<icn name="secskill.icn" count="16">
+ <sprite index="1" name="000.png" ox="0" oy="0"/>
+ <sprite index="2" name="001.png" ox="0" oy="0"/>
+ <sprite index="3" name="archery.png" ox="0" oy="0"/>
+ <sprite index="4" name="003.png" ox="0" oy="0"/>
+ <sprite index="5" name="004.png" ox="0" oy="0"/>
+ <sprite index="6" name="005.png" ox="0" oy="0"/>
+ <sprite index="7" name="006.png" ox="0" oy="0"/>
+ <sprite index="8" name="007.png" ox="0" oy="0"/>
+ <sprite index="9" name="008.png" ox="0" oy="0"/>
+ <sprite index="10" name="009.png" ox="0" oy="0"/>
+ <sprite index="11" name="010.png" ox="0" oy="0"/>
+ <sprite index="12" name="011.png" ox="0" oy="0"/>
+ <sprite index="13" name="012.png" ox="0" oy="0"/>
+ <sprite index="14" name="013.png" ox="0" oy="0"/>
+ <sprite index="15" name="014.png" ox="0" oy="0"/>
+ <sprite index="16" name="015.png" ox="0" oy="0"/>
+</icn>
