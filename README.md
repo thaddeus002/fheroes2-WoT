@@ -27,3 +27,5 @@ I have collect some resources from the free game `Attal : lords of doom` which i
 But the artwork remain under GPL license.
 
 Some resources were taken from [Wesnoth](http://wesnoth.org), or from [OpenGameArt](http://opengameart.org).
+
+For more informations read AUTHOR files.
