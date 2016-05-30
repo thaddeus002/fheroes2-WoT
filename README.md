@@ -28,4 +28,4 @@ But the artwork remain under GPL license.
 
 Some resources were taken from [Wesnoth](http://wesnoth.org), or from [OpenGameArt](http://opengameart.org).
 
-For more informations read AUTHOR files.
+For more informations read file/images/AUTHORS files.
