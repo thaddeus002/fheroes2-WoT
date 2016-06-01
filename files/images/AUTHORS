@@ -1,8 +1,14 @@
-File                              Author              License
-*/human-highwayman_*.png          Jason Lutes         GPL v2
-*/human_peasant_*.png             Jason Lutes         GPL v2
-*/lisar_*.png                     Wesnoth team        GPL v2
-*/female_avatar_*.png             NatashaHaggard      CC-BY-SA 3.0 (http://opengameart.org/content/female-avatar)
-centaur.icn/*.png                 Attal               GPL v2
-sprite.icn/*.png                  Attal               GPL v2
-unicorn.icn/*.png                 Attal               GPL v2
+File                              Author                      License                                                  URL
+*/human-highwayman_*.png          Jason Lutes                 GPL v2
+*/human_peasant_*.png             Jason Lutes                 GPL v2
+*/lisar_*.png                     Wesnoth team                GPL v2
+*/female_avatar_*.png             NatashaHaggard              CC-BY-SA 3.0                                             http://opengameart.org/content/female-avatar
+centaur.icn/*.png                 Attal                       GPL v2
+sprite.icn/*.png                  Attal                       GPL v2
+unicorn.icn/*.png                 Attal                       GPL v2
+*crest.icn/yellow.png             N3MO (nach Kurt Weideman)   Public Domain                                            https://commons.wikimedia.org/wiki/File:Wappen_L%C3%BCbeck.svg
+*crest.icn/red.png                Spedona                     Creative Commons Attribution-Share Alike 3.0 Unported    https://commons.wikimedia.org/wiki/File:Blason_ville_fr_Balaruc-le-Vieux_%28H%C3%A9rault%29.svg
+*crest.icn/orange.png             Spedona, modified by Y.G.   Creative Commons Attribution-Share Alike 3.0 Unported    https://commons.wikimedia.org/wiki/File:Blason_ville_fr_Beaulieu_(Hérault).svg
+*crest.icn/purple.png             Spedona, modified by Y.G.   Creative Commons Attribution-Share Alike 3.0 Unported    https://commons.wikimedia.org/wiki/File:Blason_ville_fr_Loupian_%28H%C3%A9rault%29.svg
+*crest.icn/blue.png               Spedona                     Creative Commons Attribution-Share Alike 3.0 Unported    https://commons.wikimedia.org/wiki/File:Blason_ville_fr_M%C3%A8ze_%28H%C3%A9rault%29.svg
+*crest.icn/green.png              Spedona                     Creative Commons Attribution-Share Alike 3.0 Unported    https://commons.wikimedia.org/wiki/File:Blason_ville_fr_Le_Souli%C3%A9_%28H%C3%A9rault%29.svg
