@@ -24,8 +24,13 @@ Most of the original resources are still used because there are few libre artwor
 ## Where the alternative artwork comes from?
 
 I have collect some resources from the free game `Attal : lords of doom` which is now unmaintained. The web site of this game is not still alive.
+
 But the artwork remain under GPL license.
 
 Some resources were taken from [Wesnoth](http://wesnoth.org), or from [OpenGameArt](http://opengameart.org).
 
-For more informations read file/images/AUTHORS files.
+For more informations read [files/images/AUTHORS](files/images/AUTHORS) file.
+
+## Website
+
+To learn more on this project read [the official website](http://thaddeus.dupont.free.fr/fheroes2-WoT/index.html)
