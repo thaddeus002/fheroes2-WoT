@@ -30,6 +30,61 @@
 #define MEDIPORTSPEC MEDIPORTDIR"/spec.xml"
 
 
+
+
+/**
+ * @param table
+ * @param spec
+ * @param col the index of the column of the table where put the portraits
+ * @param directory
+ */
+static void add_portraits(htmlTable *table, xmlNode *spec, int col, char *directory) {
+
+    xmlNode *spriteNode;
+
+    spriteNode = spec->children;
+
+    while(spriteNode!=NULL) {
+
+        xmlNode *item;
+        char heroeName[50];
+        char *index = xml_get_attribute(spriteNode, "index");
+        // index values begin at 1 in spec.xml files, but we want begin at 0
+        int line = atoi(index) - 1;
+        // sprite filename
+        char *name = xml_get_attribute(spriteNode, "name");
+        char *completeFileName;
+
+        completeFileName = malloc(sizeof(char) * (strlen(directory) + strlen(name) + 2));
+
+        sprintf(heroeName, "Heroe %s", index);
+        free(index);
+
+        if(col==2) {
+            // the medium portraits have at first index aleatory (unknown) heroe
+            line--;
+        }
+
+        if(completeFileName != NULL && line >= 0) {
+
+            sprintf(completeFileName, "%s/%s", directory, name);
+
+            html_add_image_in_table(table, completeFileName, col, line);
+
+            free(completeFileName);
+        }
+
+        free(name);
+        spriteNode = spriteNode->next;
+    }
+}
+
+
+
+
+
+
+
 int main(int argc, char **argv) {
 
     // the spec files
@@ -40,9 +95,8 @@ int main(int argc, char **argv) {
 
     htmlTable *table;
 
-    xmlNode *spriteNode;
-
     char **headers = malloc(4*sizeof(char *));
+    int i;
 
     // returned error code
     int err;
@@ -55,47 +109,34 @@ int main(int argc, char **argv) {
     table = create_html_table(4, 60, headers);
     html_add_table(page, table);
 
+    for (i=0; i<60; i++) {
+        char number[3];
+        sprintf(number, "%d", i+1);
+        html_set_text_in_table(table, number, 0, i);
+    }
+
 
 
     specMini = read_xml_file(MINIPORTSPEC);
 
     if(specMini == NULL) {
         fprintf(stderr, "Spec file not read : exit\n");
-        exit(1);
-    }
-
-    spriteNode = specMini->children;
-
-    while(spriteNode!=NULL) {
-
-        xmlNode *item;
-        char heroeName[50];
-        char *index = xml_get_attribute(spriteNode, "index");
-        int line = atoi(index);
-        // sprite filename
-        char *name = xml_get_attribute(spriteNode, "name");
-        char *completeFileName;
-
-        completeFileName = malloc(sizeof(char) * (strlen(MINIPORTDIR) + strlen(name) + 2));
-
-        sprintf(heroeName, "Heroe %s", index);
-        free(index);
-
-        if(completeFileName != NULL && line <= 60) {
-
-            sprintf(completeFileName, "%s/%s", MINIPORTDIR, name);
-
-            html_add_image_in_table(table, completeFileName, 1, line);
-
-            free(completeFileName);
-        }
-
-        free(name);
-        spriteNode = spriteNode->next;
+    } else {
+        add_portraits(table, specMini, 1, MINIPORTDIR);
+        destroy_xmlNode(specMini);
     }
 
 
-    destroy_xmlNode(specMini);
+    specMedi = read_xml_file(MEDIPORTSPEC);
+
+    if(specMedi == NULL) {
+        fprintf(stderr, "Spec file not read : exit\n");
+    } else {
+        add_portraits(table, specMedi, 2, MEDIPORTDIR);
+        destroy_xmlNode(specMedi);
+    }
+
+
 
 
     err = html_write_to_file(page, "portraits_view.html");
@@ -105,3 +146,5 @@ int main(int argc, char **argv) {
     return err;
 
 }
+
+
