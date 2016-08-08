@@ -139,12 +139,43 @@ int main(int argc, char **argv) {
 
 
 
+    for (i=0; i<60; i++) {
+        char icndir[500];
+        char specfile[500];
+        xmlNode *specPort;
+        xmlNode *spriteNode;
+        // sprite filename
+        char *name;
+        char *completeFileName;
+
+
+        sprintf(icndir, "%s/files/images/port00%02d.icn", WOTDIR, i);
+        sprintf(specfile, "%s/spec.xml", icndir);
+
+        specPort = read_xml_file(specfile);
+        if(specPort != NULL) {
+            spriteNode = specPort->children;
+            name = xml_get_attribute(spriteNode, "name");
+            destroy_xmlNode(specPort);
+
+            completeFileName = malloc(sizeof(char) * (strlen(icndir) + strlen(name) + 2));
+            sprintf(completeFileName, "%s/%s", icndir, name);
+            free(name);
+
+            html_add_image_in_table(table, completeFileName, 3, i);
+
+            free(completeFileName);
+        }
+    }
+
+
+
+
+
     err = html_write_to_file(page, "portraits_view.html");
 
     destroy_html_document(page);
 
     return err;
-
 }
-
 
