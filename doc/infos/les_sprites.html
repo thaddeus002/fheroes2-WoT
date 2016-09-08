@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Informations sur les données de fheroes2</title>
+    <link rel="stylesheet" type="text/css" media="screen" href="../style.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../favicon.png" />
+</head>   
+
+<!-- Heroes table 
+<h2>Heros</h2>
+<table>
+	<tr>
+		<td>Alignement</td>
+		<td>Nb de héros</td>
+		<td>Dont héroïnes</td>
+	</tr>
+	<tr>
+		<td>Chevaliers</td>
+		<td>9</td>
+		<td>2</td>
+	</tr>
+	<tr>
+		<td>Barbares</td>
+		<td>9</td>
+		<td>2</td>
+	</tr>
+	<tr>
+		<td>Sorcières</td>
+		<td>9</td>
+		<td>9</td>
+	</tr>
+	<tr>
+		<td>Mages</td>
+		<td>9</td>
+		<td>0</td>
+	</tr>
+		<tr>
+		<td>Magiciens</td>
+		<td>9</td>
+		<td>4</td>
+	</tr>
+	<tr>
+		<td>Nécromanciens</td>
+		<td>9</td>
+		<td>5</td>
+	</tr>
+	<tr>
+		<td>Autres</td>
+		<td>6</td>
+		<td>1</td>
+	</tr>
+	<tr>
+		<td>Extensions</td>
+		<td>11</td>
+		<td>2</td>
+	</tr>	
+	</tr>
+		<tr>
+		<td>Total</td>
+		<td>60 + 11 extensions</td>
+		<td>23 + 2 extensions</td>
+	</tr>
+</table>
+-->
+
+
+
+<h2>Les fichiers de données</h2>
+
+<h3>Les sprites (extensions .icn)</h3>
+
+<h4>Contenu des fichiers</h4>
+<p>Les fichiers icn se décomposent en répertoires contenant des fichiers images (png car la transparence du fond est souvent requise) et un fichier spec.xml contenant le nb de fichiers, puis pour chaque fichier (numéroté de 1 à n) le nom du fichier image à utiliser et des offsets de placement en nb de pixels.</p>
+
+<h4>Liste des principaux fichiers</h4>
+<p>La modification du theme passe par le remplacement des fichiers suivants :</p>
+<ul>
+	<li><b>cbkg*.icn</b>
+	<p>13 fichiers représentant les types de terrain utilisés pour les combats. Il n'y a qu'une image par fichier représentant un paysage plat et de taille 640x443. les 99 pixels du haut de l'image représentent l'horizon qui est inaccessible aux combattants. Le reste de l'image représente le champ de bataille sur lequel seront placés des obstacles aléatoirement avant le début de chaque combat.</p>
+	<p></p>
+	</li>
+
+	<li><b>minimon.icn</b>
+	<p>594 images utilisées comme animations de créatures sur la carte d'aventure. Certaines de ces animations correspond au mouvement effectué par les créatures pour attaquer les héros.</p>
+	<p>Il est envisageable d'utiliser les images du fichier <i>mons32.icn</i> mais dans ce cas on se prive des animations des monstres sur la carte d'aventure.</p>
+	<p></p>
+	</li>
+
+	<li><b>miniport.icn</b>
+	<p>Les 60 portraits miniatures des héros en taille 30x22.</p>
+	<p>Ils sont utilisés dans la partie droite de l'interface et dans les pop-up.</p>
+	<p></p>
+	</li>
+
+	<li><b>mons32.icn</b>
+	<p>Contient des miniatures de tous les monstres semblables à celle qui aparaissent sur la carte d'aventure. La différence étant que les miniatures de la carte sont animées. Ces miniatures aparaissent dans les pop-up pour donner l'ordre d'attaque durant les combats mais surtout dans la partie droite de l'interface. Elles sont utilisées également dans l'éditeur de cartes. leur taille varie mais ne dépassent pas 41x39 (pour les dragons). Malgré ces variations de taille, les offsets sont quasiment toujours nuls, à part quelques valeurs à 1 pixel.</p>
+	<p>020.png correspond aux fées</p>
+	<p>027.png correspond aux licornes (32x37 de taille originale)</p>
+	<p>029.png correspond aux centaures (33x29 de taille originale)</p>
+	<p></p>
+	</li>
+
+	<li><b>&lt;monstres&gt;.icn</b>
+	<p>Un fichier/répertoire par créature (soit 66 fichiers). Contient les animations des différents monstres sur le champ de bataille.</p>
+	<p>On retouve les animations suivante : attente, avance, attaque vers le haut, attaque au centre, attaque vers le bas, réception d'un coup, mort.</p>
+	<p>Pour les créatures attaquant à distance, il faut ajouter les trois animations suivantes : tir vers le haut, tir au centre, tir vers le bas.</p>
+	<p></p>
+	</li>
+
+	<li><b>port00*.icn</b>
+	<p>101x93</p>
+	<p></p>
+	</li>
+
+	<li><b>portmedi.icn</b>
+	<p>51x47</p>
+	<p></p>
+	</li>
+
+	<li><b>townbkg[0-5].icn</b>
+	<p>640x256</p>
+	<p>Les images de fond des chateaux. Respectivement : chevalier, barbare, sorciere, warlord, magicien, et nécromancien.</p>
+	</li>
+
+
+
+</ul>
+</html>

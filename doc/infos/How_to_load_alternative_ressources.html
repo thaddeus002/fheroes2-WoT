@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset=""utf-8"/"></meta>
+        <title>Loading alternative ressources in fheroes2</title>
+        <link href="../style.css" rel="stylesheet" type="text/css" /="text/css"></link>
+        <link rel="shortcut icon" type="image/x-icon" href="../favicon.png" /="../favicon.png"></link>
+    </head>
+    <body>
+        <h1>How to load alternative resources in fheroes2</h1>
+            This informations are from fheroes2 official website, but the page was removed from the site.
+            <p>Here you can learn how to use your own images into Free Heroes 2.</p>
+            <p>
+                <i>Note: the term icon (icn) is used for all groups of image sprites, but it can be a background, a monster attacking, or really an icon.</i>
+            </p>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            <h2>Contents</h2>
+                            <ul>
+                                <li class="toclevel-1">
+                                    <a href="#Explanation">
+                                        <span class="tocnumber">1</span>
+                                        <span class="toctext">Explanation</span>
+                                    </a>
+                                    <ul>
+                                        <li class="toclevel-2">
+                                            <a href="#spec.xml_template">
+                                                <span class="tocnumber">1.1</span>
+                                                <span class="toctext">spec.xml template</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="toclevel-1">
+                                    <a href="#Example_with_the_main_menu_background">
+                                        <span class="tocnumber">2</span>
+                                        <span class="toctext">Example with the main menu background</span>
+                                    </a>
+                                </li>
+                                <li class="toclevel-1">
+                                    <a href="#Battle_animations">
+                                        <span class="tocnumber">3</span>
+                                        <span class="toctext">Battle animations</span>
+                                    </a>
+                                </li>
+                                <li class="toclevel-1">
+                                    <a href="#Sounds">
+                                        <span class="tocnumber">4</span>
+                                        <span class="toctext">Sounds</span>
+                                    </a>
+                                </li>
+                                <li class="toclevel-1">
+                                    <a href="#Music">
+                                        <span class="tocnumber">5</span>
+                                        <span class="toctext">Music</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <a name="Explanation" id="Explanation"></a>
+            <h2>Explanation</h2>
+            <p>You can use your own sprites (images groups) to customize the appearance of the game. For this you need do some steps:</p>
+            <ol>
+                <li>
+                    You need to know the name of the sprite to replace. You can see a list in the
+                    <a href="ICN_Reference.html" title="ICN Reference">icn reference</a>
+                    page.
+                </li>
+                <li>
+                    Next you need to extract it, to know how many images have it or use that images as templates.
+                    <ul>
+                        <li>
+                            First unpack the resources, in the file heroes2.agg. For this purpose use
+                            <code>tools/extractor.exe path_to/heroes2.agg agg_unpack_dir</code>
+                            .
+                        </li>
+                        <li>
+                            All sprites are in files ICN. To unpack them it is possible by means of the utility:
+                            <code>tools/icn2img.exe icn_file unpack_dir</code>
+                        </li>
+                    </ul>
+                </li>
+                <li>The next step is make the folder that contain the change images. It's name should be the same as the icn (ending with the .icn) and with the letters in lowercase. And one more thing, it should be in the files/images/ folder of fheroes 2.</li>
+                <li>Add the images to that folder. If you extracted it, it name may be something as 000.png, 001.png, ... .</li>
+                <li>Now make a text file named spec.xml on the icon folder.</li>
+                <li>Add template code to it (see bellow), adding one sprite line for each image that have the icon (as you can see when extracted it).</li>
+                <li>Complete the template using the name of the images that you have, their location, the name of the icon, and the number of sprites (images) that it have. And save it, of course.</li>
+                <li>
+                    Edit the fheroes2.cfg file and change/add the option "<code>alt resource = on</code>".
+                </li>
+                <li>Now you can play with your changes images (support png and jpg format).</li>
+            </ol>
+            <a name="spec.xml_template" id="spec.xml_template"></a>
+            <h3>
+                spec.xml template
+            </h3>
+            <pre>&lt;?xml version="1.0"&nbsp;?&gt;
+&lt;icn name="test.icn" count="3"&gt;
+	&lt;sprite name="0.png" ox="ORIX" oy="ORIY"/&gt;
+	&lt;sprite name="1.png" ox="ORIX" oy="ORIY"/&gt;
+	&lt;sprite name="2.png" ox="ORIX" oy="ORIY"/&gt;
+&lt;/icn&gt;</pre>
+            <p>Where:</p>
+            <ul>
+                <li>test.icn is the name of the ICN.</li>
+                <li>count="3" is the number of sprites of the icon (in the template are 3 sprites).</li>
+                <li>0.png, 1.png, 2.png are the name of the images files of each sprite.</li>
+                <li>ORIX are the x origin coordinate, for example 20, -1, or 0 for
+ the left side. Each sprite can (and normally) have different values.</li>
+                <li>ORIY are the y origin coordinate, for example 20, -1, or 0 for
+ the upper side. Each sprite can (and normally) have different values.</li>
+            </ul>
+            <a name="Example_with_the_main_menu_background" id="Example_with_the_main_menu_background"></a>
+            <h2>
+                Example with the main menu background
+            </h2>
+            <ul>
+                <li>
+                    For loading alternative sprites, it is necessary to learn name ICN of a file and an index sprite:
+                    <ul>
+                        <li>
+                            It is necessary to unpack a file heroes2.agg. For this purpose use:
+                            <ul>
+                                <li>tools/extractor.exe path_to/heroes2.agg agg_unpack_dir</li>
+                            </ul>
+                        </li>
+                        <li>
+                            All sprites are in files ICN. To unpack them it is possible by means of the utility:
+                            <ul>
+                                <li>tools/icn2img.exe icn_file unpack_dir</li>
+                            </ul>
+                        </li>
+                        <li>Unpack all sprites. For example: HEROES.ICN is an image of the start menu, 1 sprite.</li>
+                    </ul>
+                </li>
+                <li>
+                    We load an alternative picture into the starting menu:
+                    <ul>
+                        <li>create folder files/images/heroes.icn (case sensitive!)</li>
+                        <li>create xml file files/images/heroes.icn/spec.xml</li>
+                    </ul>
+                </li>
+            </ul>
+            <pre>&lt;?xml version="1.0"&nbsp;?&gt;
+&lt;icn name="heroes.icn" count="1"&gt;
+	&lt;sprite name="000.png" ox="0" oy="0"/&gt;
+&lt;/icn&gt;</pre>
+            <ul>
+                <li>Copy your variant of a picture files/images/heroes.icn/000.png. They should be the same size as well as the original.</li>
+                <li>Set options: "alt resource = on"</li>
+                <li>Start game.</li>
+            </ul>
+            <a name="Battle_animations" id="Battle_animations"></a>
+            <h2>
+                Battle animations
+            </h2>
+            <ul>
+                <li>prepare alternative sprites (above)</li>
+                <li>edit files/images/battle.xml</li>
+            </ul>
+            <pre>&lt;?xml version="1.0"&nbsp;?&gt;
+&lt;battle&gt;
+  &lt;!--
+ &lt;icn name="unknown.icn"&gt;
+  &lt;animation state="idle" start="0" count="0"/&gt;  // idle frame
+  &lt;animation state="move" start="0" count="0"/&gt;  // move frame
+  &lt;animation state="fly1" start="0" count="0"/&gt;  // jump up frame
+  &lt;animation state="fly2" start="0" count="0"/&gt;  // fly frame
+  &lt;animation state="fly3" start="0" count="0"/&gt;  // jump down frame
+  &lt;animation state="shot0" start="0" count="0"/&gt; // prepare shot frame
+  &lt;animation state="shot1" start="0" count="0"/&gt; // shot up frame
+  &lt;animation state="shot2" start="0" count="0"/&gt; // shot frame
+  &lt;animation state="shot3" start="0" count="0"/&gt; // shot down frame
+  &lt;animation state="attk0" start="0" count="0"/&gt; // prepare attack frame
+  &lt;animation state="attk1" start="0" count="0"/&gt; // attack up frame
+  &lt;animation state="attk2" start="0" count="0"/&gt; // attack frame
+  &lt;animation state="attk3" start="0" count="0"/&gt; // attack down frame
+  &lt;animation state="wcne" start="0" count="0"/&gt;  // wcne frame
+  &lt;animation state="kill" start="0" count="0"/&gt;  // kill frame
+ &lt;/icn&gt; --&gt;
+
+ &lt;!-- example: original frame for peasant.icn --&gt;
+ &lt;icn name="peasant.icn"&gt;
+  &lt;animation state="idle" start="1" count="4"/&gt;
+  &lt;animation state="move" start="5" count="8"/&gt;
+  &lt;animation state="attk1" start="16" count="6"/&gt;
+  &lt;animation state="attk2" start="22" count="6"/&gt;
+  &lt;animation state="attk3" start="28" count="6"/&gt;
+  &lt;animation state="wcne" start="13" count="3"/&gt;
+  &lt;animation state="kill" start="34" count="4"/&gt;
+ &lt;/icn&gt;
+
+ &lt;!-- example: original frame for archer.icn --&gt;
+ &lt;icn name="archer.icn"&gt;
+  &lt;animation state="idle" start="1" count="4"/&gt;
+  &lt;animation state="move" start="5" count="8"/&gt;
+  &lt;animation state="shot0" start="16" count="4"/&gt;
+  &lt;animation state="shot1" start="20" count="4"/&gt;
+  &lt;animation state="shot2" start="24" count="4"/&gt;
+  &lt;animation state="shot3" start="28" count="4"/&gt;
+  &lt;animation state="attk0" start="32" count="4"/&gt;
+  &lt;animation state="attk1" start="36" count="3"/&gt;
+  &lt;animation state="attk2" start="39" count="3"/&gt;
+  &lt;animation state="attk3" start="42" count="3"/&gt;
+  &lt;animation state="wcne" start="13" count="3"/&gt;
+  &lt;animation state="kill" start="45" count="6"/&gt;
+ &lt;/icn&gt;
+
+ &lt;!-- more other --&gt;
+
+&lt;/battle&gt;</pre>
+            <a name="Sounds" id="Sounds"></a>
+            <h2>
+                <span class="mw-headline">Sounds</span>
+            </h2>
+            <ul>
+                <li>support mp3 and ogg format</li>
+                <li>see files/sounds/sound.txt list files</li>
+            </ul>
+            <a name="Music" id="Music"></a>
+            <h2>Music</h2>
+            <ul>
+                <li>support mp3 and ogg format</li>
+                <li>set option: music = ext</li>
+                <li>
+                    list of required track names for full music support
+                    <ul>
+                        <li>02.ogg - Random for Battle</li>
+                        <li>03.ogg - Random for Battle</li>
+                        <li>04.ogg - Random for Battle</li>
+                        <li>05.ogg - Barbarian Castle</li>
+                        <li>06.ogg - Sorceress Castle</li>
+                        <li>07.ogg - Warlock Castle</li>
+                        <li>08.ogg - Wizard Castle</li>
+                        <li>09.ogg - Necromancer Castle</li>
+                        <li>10.ogg - Knight Castle</li>
+                        <li>11.ogg - Lava Theme</li>
+                        <li>12.ogg - Wasteland Theme</li>
+                        <li>13.ogg - Desert Theme</li>
+                        <li>14.ogg - Snow Theme</li>
+                        <li>15.ogg - Swamp Theme</li>
+                        <li>16.ogg - Beach Theme</li>
+                        <li>17.ogg - Dirt Theme</li>
+                        <li>18.ogg - Grass Theme</li>
+                        <li>23.ogg - Map Puzzle</li>
+                        <li>28.ogg - AI Turns</li>
+                        <li>29.ogg - Battle Wins</li>
+                        <li>30.ogg - Battle Loss</li>
+                        <li>42.ogg - Main Menu</li>
+                    </ul>
+                </li>
+            </ul>
+    </body>
+</html>

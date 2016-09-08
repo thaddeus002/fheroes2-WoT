@@ -1,0 +1,79 @@
+
+body
+{
+    background-color: #f0f0a0;
+    color: #101010;
+    font-size: 20px;
+    margin-bottom: 30px;
+}
+
+h2
+{
+    color: #c04040;
+}
+
+#info_maj
+{
+    text-align: right;
+    font-size: 60%;
+    margin:0px;
+}
+
+/*#bienvenue
+{
+    text-align: center;
+    font-size: 34px;
+    color: #e04040;
+    margin: 50px;
+}*/
+
+h1
+{
+    text-align: center;
+    font-size: 34px;
+    font-weight: normal;
+    color: #e04040;
+    margin-top: 50px;
+    margin-bottom: 70px;
+}
+
+
+.aff_image
+{
+    text-align: center;
+}
+
+.image
+{
+    /*display: block;*/
+    height: 600px;
+    /*margin: 10px;*/
+    /*align: center;*/
+}
+
+/*.aff_image:after
+{
+    clear: both;
+    content: <p><a href="index.html">Retour</a></p>;
+}*/
+
+.code {
+    /*background-color: light-gray; */
+    font-family: Monospace, sans-serif;
+    font-size: 100%;
+    padding: 5px;
+    margin-left: 50px;
+    margin-right: 50px;
+ }
+
+
+#heroes_table {
+    padding: 15px;
+    text-align: left;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #444;
+}

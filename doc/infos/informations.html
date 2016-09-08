@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>AGG format in game "HOMM2"</title>
+    <link href="../style.css" rel="stylesheet" type="text/css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../favicon.png" />
+</head>
+
+<body>
+
+<h1>Informations on Heroes of Might and Magic 2 AGG format</h1>
+
+<p>This is what I could learn about the format of the data, present in the file Heroes2.agg. Most of the information on this page was retrieve from internet.</p>
+
+<h2>main aggregate file</h2>
+
+<p>The following is the description of James Koppel:</p>
+
+<quote><p>Aggregate files consist of the binary contents of various files concatenated
+together uncompressed, with a small amount of metadata.</p>
+
+<ul><p>Format for AGG files:</p>
+
+<li><p>First two bytes: Little endian 16-bit integer describing number of files
+contained (henceforth, "n")</p>
+
+<li><p>Next 12n bytes: A 12-byte FileInfo structure for every file consisting of
+three little-endian 32-bit integers: a file ID (see below), an offset o, and
+a size s. Bytes in the range [o,o+s-1] will contain the binary contents of
+the corresponding file.</p>
+<p>Note : in Heroes of Might and Magic 1, this section is diffrent. There are 14n bytes FileInfo structure for every file consisting of : a file ID (32 bits), a 16-bits number, and two times the same 32-bits integer representing the size of the file.</p>
+
+<li><p>Next arbitrary number of bytes: A concatenation of the binary contents of
+all files in the AGG.</p>
+
+<li><p>Final 15n bytes: For every file, a 13-character (including trailing null) DOS-compatible filename, followed by two padding characters. The ith file here gives the filename of the ith file in the array of FileInfo's included at the beginning.</p>
+</ul>
+
+<p>A file's ID is a 32-bit hash of its filename computed by the following C function or equivalent: </p>
+
+    <div class=code>
+    int hash(char* filename) {<br>
+	unsigned int a = 0;<br>
+	int b = 0;<br>
+	for(int i = strlen(filename)-1; i>=0; i--){<br>
+	    char c = toupper(filename[i]);<br>
+	    a=(a<<5)+(a>>25);<br>
+	    b+=c;<br>
+	    a+=b+c;<br>
+      }<br>
+      return a;<br>
+    }<br>
+    </div>
+
+</quote>
+
+<p>James also release a <a href="data/AGGUtils.zip">program</a> in java to extends and create AGG files.</p>
+
+<h2>files in the aggregate</h2>
+
+<p>The files includes in the aggregate file are the <a href="les_sprites.html">data</a> of the games.</p>
+<p>They are of type :
+
+<ul>
+<li><b>82M</b>: <p>This is used for the game's sounds.
+
+<li><b>FNT</b>: <p>TODO 
+
+<li><b>XMI</b>: <p>TODO
+
+<li><b>PAL</b>: <p>There is only one file of this type in the archive : the file "kb.pal". This file is the palette. It contains the colors to use to interpret the images in ICN files. It is a 3*256 bytes file. All group of 3 bytes represent a RGB color. You may notice that this palette is very dark (each byte is letter or equal than 0x3F). You must multiplicate all the bytes by 4 to obtain the real game's colors.</p>
+<p>Note for Heroes I : there are two pal files in HEROES.AGG archive but they are identical. Caution, in this version the palette must be translate to retrieve the good colors.</p>
+
+<p>Some palette ranges are for color animation (cycling colors) for phoenix, fire elementaries, lava, water : 
+<ul>
+<li>214-217 (red)
+<li>218-221 (yellow)
+<li>231-237 (ocean/river/lake colors)
+<li>238-241 (blue)
+</ul>
+The color cycling is an in-game feature. Simply put, if you place color 214, it will be put in a cycle automatically: 214-215-216-217-214-... etc. If you start from color 215, it will go in the game like 215-216-217-214-215-... etc.
+
+
+<li><b>TIL</b>: <p>TODO 
+
+<li><b>BMP</b>: <p>Three colors bitmap images. These files have a 6 bytes header compose of three times two bytes :
+	<ul>
+		<li>a magic number whose is always : 0x21 0x00</li>
+		<li>width of the bitmap in little endian format</li>
+		<li>height of the bitmap in little endian format</li>
+	</ul>
+	<p>Then there are width*height bytes of data (one by pixel) whose values are 0, 1, or 2.</p>
+
+
+<li><b>ICN</b>: <p>These files are like the .def files from HOMM3. Each ICN file contains one or more images (for animations), plus offsets for relative position of frames. They contain the most part of the graphical artwork of the game, and the widgets of the game's interface.
+
+</ul>
+
+
+<p>Most of the informations bellow on the formats of these files were extract for the study of the code of <a href=http://www.sourceforge.net/apps/mediawiki/fheroes2/index.php?title=Main_Page>fheroes2</a>.
+
+<h2>icn format for sprites</h2>
+
+<p>The icn file contains a number n of images, we will name sprites. this is the structure of the file :
+<ul>
+<li>2 bytes : the number of sprites</li>
+<li>4 bytes, the total size of the file (excluding the 6 first bytes)</li>
+<li>13n bytes, representing n sprites headers (see below)</li>
+<li>total_size-(count_sprite*13) bytes : concatenation of the data of the sprites.</li>
+</ul>
+
+<h3>icn sprite header</h3>
+<ul>
+  <li>s16 offsetX;
+	<li>s16 offsetY;
+	<li>u16 width;
+	<li>u16 height;
+	<li>u8 type; // type of sprite : 0 = Normal, 32 = Monochromatic shape
+	<li>u32 offsetData;
+</ul>
+<h3>icn sprite data</h3>
+
+TODO
+
+
+</body>
+</html>
