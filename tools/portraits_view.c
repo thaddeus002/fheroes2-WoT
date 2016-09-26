@@ -32,6 +32,28 @@
 
 
 
+const char* names[] = {
+    // knight
+    "Lord Kilburn", "Sir Gallanth", "Ector", "Gwenneth", "Tyro", "Ambrose", "Ruby", "Maximus", "Dimitry",
+    // barbarian
+    "Thundax", "Fineous", "Jojosh", "Crag Hack", "Jezebel", "Jaclyn", "Ergon", "Tsabu", "Atlas",
+    // sorceress
+    "Astra", "Natasha", "Troyan", "Vatawna", "Rebecca", "Gem", "Ariel", "Carlawn", "Luna",
+    // warlock
+    "Arie", "Alamar", "Vesper", "Crodo", "Barok", "Kastore", "Agar", "Falagar", "Wrathmont",
+    // wizard
+    "Myra", "Flint", "Dawn", "Halon", "Myrini", "Wilfrey", "Sarakin", "Kalindra", "Mandigal",
+    // necromant
+    "Zom", "Darlana", "Zam", "Ranloo", "Charity", "Rialdo", "Roxana", "Sandro", "Celia",
+    // campains
+    "Roland", "Lord Corlagon", "Sister Eliza", "Archibald", "Lord Halton", "Brother Bax",
+    // loyalty version
+    "Solmyr", "Dainwin", "Mog", "Uncle Ivan", "Joseph", "Gallavant", "Elderian", "Ceallach", "Drakonia", "Martine", "Jarkonas"
+};
+
+
+
+
 /**
  * @param table
  * @param spec
@@ -91,7 +113,7 @@ int main(int argc, char **argv) {
     xmlNode *specMini, *specMedi;
 
     // the html output
-    htmlDocument *page = create_html_document("Portraits view");
+    htmlDocument *page = html_create_document("Portraits view");
 
     htmlTable *table;
 
@@ -106,7 +128,7 @@ int main(int argc, char **argv) {
     headers[2]="medi";
     headers[3]="port";
 
-    table = create_html_table(4, 60, headers);
+    table = html_create_table(4, 60, headers);
     html_add_table(page, table);
 
     for (i=0; i<60; i++) {
@@ -117,23 +139,23 @@ int main(int argc, char **argv) {
 
 
 
-    specMini = read_xml_file(MINIPORTSPEC);
+    specMini = xml_read_file(MINIPORTSPEC);
 
     if(specMini == NULL) {
         fprintf(stderr, "Spec file not read : exit\n");
     } else {
         add_portraits(table, specMini, 1, MINIPORTDIR);
-        destroy_xmlNode(specMini);
+        xml_destroy_node(specMini);
     }
 
 
-    specMedi = read_xml_file(MEDIPORTSPEC);
+    specMedi = xml_read_file(MEDIPORTSPEC);
 
     if(specMedi == NULL) {
         fprintf(stderr, "Spec file not read : exit\n");
     } else {
         add_portraits(table, specMedi, 2, MEDIPORTDIR);
-        destroy_xmlNode(specMedi);
+        xml_destroy_node(specMedi);
     }
 
 
@@ -152,11 +174,11 @@ int main(int argc, char **argv) {
         sprintf(icndir, "%s/files/images/port00%02d.icn", WOTDIR, i);
         sprintf(specfile, "%s/spec.xml", icndir);
 
-        specPort = read_xml_file(specfile);
+        specPort = xml_read_file(specfile);
         if(specPort != NULL) {
             spriteNode = specPort->children;
             name = xml_get_attribute(spriteNode, "name");
-            destroy_xmlNode(specPort);
+            xml_destroy_node(specPort);
 
             completeFileName = malloc(sizeof(char) * (strlen(icndir) + strlen(name) + 2));
             sprintf(completeFileName, "%s/%s", icndir, name);
@@ -174,7 +196,7 @@ int main(int argc, char **argv) {
 
     err = html_write_to_file(page, "portraits_view.html");
 
-    destroy_html_document(page);
+    html_destroy_document(page);
 
     return err;
 }
