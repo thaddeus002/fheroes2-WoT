@@ -134,7 +134,7 @@ int main(int argc, char **argv) {
     for (i=0; i<60; i++) {
         char number[3];
         sprintf(number, "%d", i+1);
-        html_set_text_in_table(table, number, 0, i);
+        html_set_text_in_table(table, names[i], 0, i);
     }
 
 
@@ -157,8 +157,6 @@ int main(int argc, char **argv) {
         add_portraits(table, specMedi, 2, MEDIPORTDIR);
         xml_destroy_node(specMedi);
     }
-
-
 
 
     for (i=0; i<60; i++) {
@@ -189,9 +187,6 @@ int main(int argc, char **argv) {
             free(completeFileName);
         }
     }
-
-
-
 
 
     err = html_write_to_file(page, "portraits_view.html");
