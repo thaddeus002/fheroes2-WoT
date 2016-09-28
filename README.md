@@ -2,6 +2,9 @@
 
 This project aim is to provide "libre" artwork for the game engine [fheroes2](https://sourceforge.net/projects/fheroes2).
 
+Main screen of fheroes2-WoT :
+![screeshot](assets/screenshot_main_screen.png)
+
 fheroes2 with the original artwork :
 ![screenshot](assets/screenshot_battle.png)
 
