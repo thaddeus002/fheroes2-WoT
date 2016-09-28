@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<icn name="btnshngl.icn" count="20">
+ <sprite index="1" name="b000.png" ox="110" oy="130"/>
+ <sprite index="2" name="b001.png" ox="110" oy="130"/>
+ <sprite index="3" name="b002.png" ox="110" oy="130"/>
+ <sprite index="4" name="b003.png" ox="110" oy="130"/>
+ <sprite index="5" name="b004.png" ox="110" oy="185"/>
+ <sprite index="6" name="b005.png" ox="110" oy="185"/>
+ <sprite index="7" name="b006.png" ox="110" oy="185"/>
+ <sprite index="8" name="b007.png" ox="110" oy="185"/>
+ <sprite index="9" name="b008.png" ox="110" oy="240"/>
+ <sprite index="10" name="b009.png" ox="110" oy="240"/>
+ <sprite index="11" name="b010.png" ox="110" oy="240"/>
+ <sprite index="12" name="b011.png" ox="110" oy="240"/>
+ <sprite index="13" name="b012.png" ox="110" oy="295"/>
+ <sprite index="14" name="b013.png" ox="110" oy="295"/>
+ <sprite index="15" name="b014.png" ox="110" oy="295"/>
+ <sprite index="16" name="b015.png" ox="110" oy="295"/>
+ <sprite index="17" name="b016.png" ox="110" oy="425"/>
+ <sprite index="18" name="b017.png" ox="110" oy="425"/>
+ <sprite index="19" name="b018.png" ox="110" oy="425"/>
+ <sprite index="20" name="b019.png" ox="110" oy="425"/>
+</icn>

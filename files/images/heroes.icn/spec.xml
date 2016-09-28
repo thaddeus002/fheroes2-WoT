@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<icn name="heroes.icn" count="1">
+ <sprite index="1" name="landscape.png" ox="-80" oy="-10"/>
+</icn>
