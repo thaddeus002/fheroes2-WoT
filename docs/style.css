@@ -77,3 +77,9 @@ th, td {
     text-align: center;
     border-bottom: 1px solid #444;
 }
+
+/* for td with no bottom line */
+.no_bottom {
+    text-align: left;
+    border-bottom: 0px;
+}
