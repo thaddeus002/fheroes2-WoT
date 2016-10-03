@@ -31,11 +31,11 @@ The web site of this game is not still alive. But the artwork remain under GPL l
 
 Some resources were taken from [Wesnoth](http://wesnoth.org), or from [OpenGameArt](http://opengameart.org).
 
-For more informations read [files/images/AUTHORS](files/images/AUTHORS) file.
+For more informations read `[files/images/AUTHORS](files/images/AUTHORS)` file.
 
 ### Licence
 
-File's licences are detailled in file "AUTHORS".
+File's licences are detailled in file `[AUTHORS](files/images/AUTHORS)`.
 
 If a file is not listed, it is my own work, with licence CC0 (Public Domain).
 
