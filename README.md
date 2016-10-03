@@ -26,13 +26,20 @@ Most of the original resources are still used because there are few libre artwor
 
 ## Where the alternative artwork comes from?
 
-I have collect some resources from the free game `Attal : lords of doom` which is now unmaintained. The web site of this game is not still alive.
-
-But the artwork remain under GPL license.
+I have collect some resources from the free game `Attal : lords of doom` which is now unmaintained.
+The web site of this game is not still alive. But the artwork remain under GPL license.
 
 Some resources were taken from [Wesnoth](http://wesnoth.org), or from [OpenGameArt](http://opengameart.org).
 
 For more informations read [files/images/AUTHORS](files/images/AUTHORS) file.
+
+### Licence
+
+File's licences are detailled in file "AUTHORS".
+
+If a file is not listed, it is my own work, with licence CC0 (Public Domain).
+
+If you want to contribute with artwork you have done, Let me know what Licence you want (must be open) for your file, or add a modification of file AUTHOR in your pull request.
 
 ## Website
 
