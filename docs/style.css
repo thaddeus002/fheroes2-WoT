@@ -83,3 +83,15 @@ th, td {
     text-align: left;
     border-bottom: 0px;
 }
+
+
+.one_line {
+    border-bottom: 0px;
+}
+
+/* for page's title */
+#main_title {
+    border: 2px solid #888;
+    text-align: center;
+    padding: 0px;
+}
