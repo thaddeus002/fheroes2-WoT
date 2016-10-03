@@ -36,4 +36,4 @@ For more informations read [files/images/AUTHORS](files/images/AUTHORS) file.
 
 ## Website
 
-To learn more on this project read [the official website](http://thaddeus.dupont.free.fr/fheroes2-WoT/index.html)
+To learn more on this project read [the official website](http://thaddeus002.github.io/fheroes2-WoT/index.html)
