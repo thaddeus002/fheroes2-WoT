@@ -39,19 +39,19 @@ all files in the AGG.</p>
 
 <p>A file's ID is a 32-bit hash of its filename computed by the following C function or equivalent: </p>
 
-    <div class=code>
-    int hash(char* filename) {<br>
-	unsigned int a = 0;<br>
-	int b = 0;<br>
-	for(int i = strlen(filename)-1; i>=0; i--){<br>
-	    char c = toupper(filename[i]);<br>
-	    a=(a<<5)+(a>>25);<br>
-	    b+=c;<br>
-	    a+=b+c;<br>
-      }<br>
-      return a;<br>
-    }<br>
-    </div>
+    <div class=code><pre>
+int hash(char* filename) {
+    unsigned int a = 0;
+    int b = 0;
+    for(int i = strlen(filename)-1; i>=0; i--){
+        char c = toupper(filename[i]);
+        a=(a<<5)+(a>>25);
+        b+=c;
+        a+=b+c;
+    }
+    return a;
+}
+    </pre></div>
 
 </quote>
 
@@ -65,14 +65,14 @@ all files in the AGG.</p>
 <ul>
 <li><b>82M</b>: <p>This is used for the game's sounds.
 
-<li><b>FNT</b>: <p>TODO 
+<li><b>FNT</b>: <p>TODO
 
 <li><b>XMI</b>: <p>TODO
 
 <li><b>PAL</b>: <p>There is only one file of this type in the archive : the file "kb.pal". This file is the palette. It contains the colors to use to interpret the images in ICN files. It is a 3*256 bytes file. All group of 3 bytes represent a RGB color. You may notice that this palette is very dark (each byte is letter or equal than 0x3F). You must multiplicate all the bytes by 4 to obtain the real game's colors.</p>
 <p>Note for Heroes I : there are two pal files in HEROES.AGG archive but they are identical. Caution, in this version the palette must be translate to retrieve the good colors.</p>
 
-<p>Some palette ranges are for color animation (cycling colors) for phoenix, fire elementaries, lava, water : 
+<p>Some palette ranges are for color animation (cycling colors) for phoenix, fire elementaries, lava, water :
 <ul>
 <li>214-217 (red)
 <li>218-221 (yellow)
@@ -82,15 +82,15 @@ all files in the AGG.</p>
 The color cycling is an in-game feature. Simply put, if you place color 214, it will be put in a cycle automatically: 214-215-216-217-214-... etc. If you start from color 215, it will go in the game like 215-216-217-214-215-... etc.
 
 
-<li><b>TIL</b>: <p>TODO 
+<li><b>TIL</b>: <p>TODO
 
 <li><b>BMP</b>: <p>Three colors bitmap images. These files have a 6 bytes header compose of three times two bytes :
-	<ul>
-		<li>a magic number whose is always : 0x21 0x00</li>
-		<li>width of the bitmap in little endian format</li>
-		<li>height of the bitmap in little endian format</li>
-	</ul>
-	<p>Then there are width*height bytes of data (one by pixel) whose values are 0, 1, or 2.</p>
+    <ul>
+        <li>a magic number whose is always : 0x21 0x00</li>
+        <li>width of the bitmap in little endian format</li>
+        <li>height of the bitmap in little endian format</li>
+    </ul>
+    <p>Then there are width*height bytes of data (one by pixel) whose values are 0, 1, or 2.</p>
 
 
 <li><b>ICN</b>: <p>These files are like the .def files from HOMM3. Each ICN file contains one or more images (for animations), plus offsets for relative position of frames. They contain the most part of the graphical artwork of the game, and the widgets of the game's interface.
@@ -115,11 +115,11 @@ The color cycling is an in-game feature. Simply put, if you place color 214, it 
 <h3>icn sprite header</h3>
 <ul>
   <li>s16 offsetX;
-	<li>s16 offsetY;
-	<li>u16 width;
-	<li>u16 height;
-	<li>u8 type; // type of sprite : 0 = Normal, 32 = Monochromatic shape
-	<li>u32 offsetData;
+    <li>s16 offsetY;
+    <li>u16 width;
+    <li>u16 height;
+    <li>u8 type; // type of sprite : 0 = Normal, 32 = Monochromatic shape
+    <li>u32 offsetData;
 </ul>
 <h3>icn sprite data</h3>
 

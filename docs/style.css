@@ -10,6 +10,7 @@ body
 h2
 {
     color: #c04040;
+    border-bottom: 1px solid #444;
 }
 
 #info_maj
@@ -62,8 +63,9 @@ h1
     font-family: Monospace, sans-serif;
     font-size: 100%;
     padding: 5px;
-    margin-left: 50px;
-    margin-right: 50px;
+    margin-left: 20px;
+    margin-right: 20px;
+    white-space: pre-wrap;
  }
 
 
@@ -75,8 +77,8 @@ h1
 th, td {
     padding: 10px;
     text-align: center;
-    border-bottom: 1px solid #444;
 }
+
 
 /* for td with no bottom line */
 .no_bottom {
@@ -94,4 +96,123 @@ th, td {
     border: 2px solid #888;
     text-align: center;
     padding: 0px;
+}
+
+
+
+
+/* tabs configuration */
+
+.tabs {
+  position: relative;
+  /* set height to be even for all tab groups */
+  min-height: 240px;
+  display: block;
+  margin: 1em auto 0;
+  width: 95%;
+}
+
+.tab {
+  float: left;
+}
+
+.tab label {
+  cursor: pointer;
+  background: #c69;
+  font-size: 1.2em;
+  border-radius: 5px 5px 0 0;
+  padding: .5em 1em;
+}
+
+.tab [type=radio] {
+  position: absolute;
+  height: 0;
+  width: 0;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+
+  /*&:focus + label {
+    outline: 2px dotted #000;
+  }*/
+}
+
+.content {
+  background: wheat;
+  border: 1px solid #c69;
+  border-radius: 0 5px 5px;
+  padding: .5em 2em;
+  max-width: 95%;
+  position: absolute;
+  top: 2em; left: 0; right: 0; bottom: 0;
+  opacity: 0;
+}
+
+[type=radio]:checked ~ label {
+  z-index: 2;
+  background: #c99;
+}
+
+[type=radio]:checked ~ label ~ .content {
+  z-index: 1;
+  opacity: 1;
+}
+
+/* For the search engine */
+
+div#warning {
+  display: block;
+  background:#e0e020;
+  border: 1px solid #802020;
+  text-align:center;
+  color:red;
+  margin:20px;
+}
+
+div#speudoRequest {
+  max-height:50px;
+}
+
+#speudoValid {
+  display: block;
+  background-color:#d0d0d0;
+  padding:5px;
+  max-width:80px;
+  text-align:left;
+}
+
+.panel {
+  display: block;
+  background-color:#e8e8e8;
+  width:95%;
+}
+
+#avatar{
+  float:right;
+  padding:5px;
+}
+
+.hidenavatar{
+  width:1px;
+}
+
+.imgavatar {
+  width:100px;
+}
+
+
+#result {
+  padding:5px;
+  min-height:200px;
+  width:95%;
+  white-space: pre-wrap;
+}
+
+.pretable {
+  text-align:left;
+  /*border:1px;*/
+  padding:0px;
+  border-width:1px;
+  border-style:solid;
+  border-color:black;
+  border-collapse: collapse;
 }
