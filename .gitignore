@@ -6,3 +6,4 @@ www
 tools/portraits_view
 tools/portraits_view.html
 *.thaddeus
+*.o

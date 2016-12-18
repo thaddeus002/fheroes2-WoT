@@ -32,7 +32,6 @@
 #include <unistd.h>
 
 #include "aggregation.h"
-#include "aggregation_lod.h"
 
 // Default Version of the AGG file (1 for HOMM1, 2 for HOMM2, 3 for HOMM3)
 #ifndef AGGVERSION

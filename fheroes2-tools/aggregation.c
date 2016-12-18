@@ -192,7 +192,6 @@ void destroy_aggtable(aggtable_t *table) {
  */
 aggtable_t *read_aggtable(FILE *fd_data, int agg_version) {
 
-    uint16_t count; /* 16 bits read in data file : number of elements in aggregate */
     char buf[AGGSIZENAME]; /* name of a element */
     uint32_t offset; /* for version 1 only */
     int i;
@@ -207,27 +206,27 @@ aggtable_t *read_aggtable(FILE *fd_data, int agg_version) {
     }
 
     /* read 16 bits */
-    fread(&count, sizeof(uint16_t), 1, fd_data);
-    count = le16toh(count);
+    fread(&table->count, sizeof(uint16_t), 1, fd_data);
+    table->count = le16toh(table->count);
 
     /* reading of $count elements in data file */
-    fprintf(stdout, "Extracting %d elements\n", count);
-    table->files = malloc(sizeof(aggfile_t) * count);
+    fprintf(stdout, "Extracting %d elements\n", table->count);
+    table->files = malloc(sizeof(aggfile_t) * table->count);
     if(table->files == NULL) {
         fprintf(stderr, "Failed allocating memory\n");
         destroy_aggtable(table);
         return NULL;
     }
 
-    offset = 2 + (count*14); // first file 's offset
+    offset = 2 + (table->count*14); // first file 's offset
 
-    for(i = 0; i < count; i++)
+    for(i = 0; i < table->count; i++)
     {
         uint32_t id;
         uint8_t j; /* counter */
 
         aggfile_t *fat  = table->files + i;
-        fseek(fd_data, -AGGSIZENAME * (count - i), SEEK_END);
+        fseek(fd_data, -AGGSIZENAME * (table->count - i), SEEK_END);
         fread(buf, AGGSIZENAME, 1, fd_data);
 
         for(j = 0; j < AGGSIZENAME; j++) {
@@ -272,7 +271,6 @@ aggtable_t *read_aggtable(FILE *fd_data, int agg_version) {
 
 aggtable_t *read_lodtable(FILE *fd_data) {
 
-    int count = 0;
     aggtable_t *table;
     char archiveType[4]; /* First four bytes of file, must be LOD\0 */
     int i;
@@ -294,10 +292,10 @@ aggtable_t *read_lodtable(FILE *fd_data) {
     fseek(fd_data, 4, SEEK_CUR);
 
     /* read 32 bits */
-    fread(&count, sizeof(uint32_t), 1, fd_data);
-    count = le32toh(count);
+    fread(&table->count, sizeof(uint32_t), 1, fd_data);
+    table->count = le32toh(table->count);
 
-    table->files = malloc(sizeof(aggfile_t)*count);
+    table->files = malloc(sizeof(aggfile_t)*table->count);
 
     if(table->files==NULL) {
         fprintf(stderr, "Failed allocating memory\n");
@@ -309,10 +307,10 @@ aggtable_t *read_lodtable(FILE *fd_data) {
     fseek(fd_data, 80, SEEK_CUR);
 
     /* reading of $count elements in data file */
-    fprintf(stdout, "Reading %d elements\n", count);
+    fprintf(stdout, "Reading %d elements\n", table->count);
 
 
-    for(i = 0; i < count; i++){
+    for(i = 0; i < table->count; i++){
 
         aggfile_t *current = table->files + i;
         int j;
@@ -367,7 +365,7 @@ int extract_files(FILE *fd_data, char *output_dir, aggtable_t *table){
     }
 
     /* reading and creating files for $count elements in data file */
-    fprintf(stdout, "Extracting %d elements\n", table->count);
+    fprintf(stdout, "Writing %d files\n", table->count);
 
     for(i = 0; i < table->count; i++)
     {
