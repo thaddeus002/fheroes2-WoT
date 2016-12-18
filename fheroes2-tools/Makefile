@@ -67,21 +67,14 @@ LIBS := $(SDL_LIBS) $(LIBS)
 
 
 all: $(TARGETS)
-#all: extractor_lod
 
 $(GENERAL_TARGETS): $(addsuffix .c, $(GENERAL_TARGETS)) aggregation.o
 	$(CC) -c $@.c -Wall -O2
 	$(CC) -o $@ $@.o aggregation.o -lz
 
-#extractor_lod: extractor_lod.cpp aggregation_lod.o
-#	$(CXX) -c $@.c -Wall -fsigned-char -O2  -I../libzpipe
-#	$(CXX) -o $@ $@.o aggregation_lod.o -L../libzpipe  -lzpipe -lz
 
 aggregation.o : aggregation.c
 	$(CC) -c aggregation.c -Wall -O2
-
-aggregation_lod.o : aggregation_lod.c
-	$(CC) -c aggregation_lod.c -Wall -O2
 
 YG_CFLAGS=$(shell libpng-config --cflags)
 YG_LDFLAGS=$(shell libpng-config --ldflags)
