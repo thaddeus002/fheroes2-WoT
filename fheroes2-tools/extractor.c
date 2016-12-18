@@ -64,15 +64,25 @@ void usage(char *progName) {
  * Extract the data from an aggregate stream in the directory indicated.
  * \param fd_data data stream from input file
  * \param output_dir the name of the directory where to create the files
- * \param agg_version the version of HOMM from whom the data file is (may be 1 or 2)
+ * \param agg_version the version of HOMM from whom the data file is (may be 1, 2 or 3)
  * \return the number of files extracted
  */
 int extract(FILE *fd_data, char *output_dir, int agg_version){
 
-     aggtable_t *table;
+    aggtable_t *table = NULL;
     int total = 0;
 
-    table = read_aggtable(fd_data, agg_version);
+    switch(agg_version) {
+    case 1:
+    case 2:
+        table = read_aggtable(fd_data, agg_version);
+        break;
+    case 3:
+        table = read_lodtable(fd_data);
+        break;
+    default:
+        fprintf(stderr, "Bad agg version : %d\n", agg_version);
+    }
 
     if(table != NULL) {
         total = extract_files(fd_data, output_dir, table);
@@ -81,15 +91,6 @@ int extract(FILE *fd_data, char *output_dir, int agg_version){
 
     return total;
 }
-
-
-
-
-
-
-
-
-
 
 
 
@@ -110,6 +111,8 @@ int main(int argc, char **argv)
     int opt;
 
     FILE *fd_data;
+
+    int total;
 
     while ((opt = getopt(argc, argv, "v:")) != -1) {
         switch (opt) {
@@ -139,13 +142,8 @@ int main(int argc, char **argv)
     }
 
     fprintf(stdout, "Reading file %s as Homm v%d datafile\n", aggregate, agg_version);
-    int total = 0;
 
-    if((agg_version==1)||(agg_version==2)) {
-        total = extract(fd_data, output_dir, agg_version);
-    } else if (agg_version==3) {
-        total = extract_lod(fd_data, output_dir);
-    }
+    total = extract(fd_data, output_dir, agg_version);
 
     /* close data file */
     fclose(fd_data);

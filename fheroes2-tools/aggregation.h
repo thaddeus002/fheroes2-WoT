@@ -1,29 +1,39 @@
 /**
  * \file aggregation.h
- * \brief AGG format handler.
+ * \brief AGG/LOD format handler.
  *
  * A AGG (or aggregate) file is a uniq file that contains all the data (artwork)
  * for the games HOMM1 (version 1) or HOMM2 (version 2). The second version of
  * AGG can also be used with fheroes2 since fheroes2 uses HOMM2 data.
+ *
+ * LOD files are for HOMM3. In these files data can be compressed.
  */
 
 
 #ifndef AGGREGATOR_H
 #define AGGREGATOR_H
 
+#ifndef WITH_ZLIB
+    #define WITH_ZLIB
+    #include "zlib.h"
+#endif
+
 
 
 /** filenames' length in aggregate */
 #define AGGSIZENAME 15
+#define LODSIZENAME 16
+
 
 /**
  * This define a file, with its name and the informations
  * we need to recover its data in the aggregate.
  */
 typedef struct {
-    char name[AGGSIZENAME+1]; /**< filename */
+    char name[LODSIZENAME+1]; /**< filename */
     uint32_t  offset; /**< offset of the data */
-    uint32_t  size; /**< data's length */
+    uint32_t  size; /**< size of file before compression */
+    uint32_t  length; /**< compressed size if file is compressed. 0 otherwise => use "size" */
 } aggfile_t;
 
 
@@ -46,6 +56,11 @@ void destroy_aggtable(aggtable_t *table);
  * \return a new table or NULL
  */
 aggtable_t *read_aggtable(FILE *fd_data, int agg_version) ;
+
+/**
+ * read a LOD file.
+ */
+aggtable_t *read_lodtable(FILE *fd_data);
 
 
 /**

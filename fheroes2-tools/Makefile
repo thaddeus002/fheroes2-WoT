@@ -69,9 +69,9 @@ LIBS := $(SDL_LIBS) $(LIBS)
 all: $(TARGETS)
 #all: extractor_lod
 
-$(GENERAL_TARGETS): $(addsuffix .c, $(GENERAL_TARGETS)) aggregation.o aggregation_lod.o
+$(GENERAL_TARGETS): $(addsuffix .c, $(GENERAL_TARGETS)) aggregation.o
 	$(CC) -c $@.c -Wall -O2
-	$(CC) -o $@ $@.o aggregation.o aggregation_lod.o -lz
+	$(CC) -o $@ $@.o aggregation.o -lz
 
 #extractor_lod: extractor_lod.cpp aggregation_lod.o
 #	$(CXX) -c $@.c -Wall -fsigned-char -O2  -I../libzpipe
