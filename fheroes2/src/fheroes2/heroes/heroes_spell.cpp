@@ -521,8 +521,8 @@ bool ActionSpellSetGuardian(Heroes & hero, const Spell & spell, int mons)
 	    tile.SetObject(MP2::OBJ_ABANDONEDMINE);
 	}
 
-	Troop troop = world.GetCapturedObject(tile.GetIndex()).GetTroop();
-	troop.Set(Monster(spell), count);
+	world.GetCapturedObject(tile.GetIndex()).GetTroop().Set(Monster(spell), count);
+	return true;
     }
 
     return false;
