@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <ctype.h> // tolower()
 #include <sys/types.h>
+#include <dirent.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <errno.h>
@@ -377,6 +378,93 @@ int extract_files(FILE *fd_data, char *output_dir, aggtable_t *table){
    }
 
     return total;
+}
+
+
+/**
+ * Make an aggragate with the content of a directory.
+ * Filenames will be shorten to 8 characters plus 3 for the extension.
+ * Subdirectories will be ignored.
+ * Aggregate name will be dirname plus extension .agg
+ * Agg version will be 2.
+ * \return a negative error code or zero in case of success
+ */
+int aggregate(char *directory) {
+
+    DIR *fd_dir;
+    struct dirent *file;
+    aggtable_t *table = NULL;
+    int nb; // files number
+
+    fd_dir = opendir(directory);
+
+    if(fd_dir == NULL) {
+        fprintf(stderr, "Could'nt open directory %s.\n", directory);
+        return -1;
+    }
+
+    table = malloc(sizeof(aggtable_t));
+    if(table==NULL) {
+        fprintf(stderr, "Failed allocating memory\n");
+        closedir(fd_dir);
+        return -2;
+    }
+    table->files = NULL;
+
+    file = readdir(fd_dir);
+    nb = 0;
+
+    while(file != NULL) {
+
+        aggfile_t *tmp;
+        struct stat buf;
+        char *fullfilename;
+        int err;
+
+        fullfilename=malloc(sizeof(char) * (strlen(directory) + strlen(file->d_name) + 2));
+        if(fullfilename==NULL) {
+            fprintf(stderr, "Failed allocate memory\n");
+            break;
+        }
+
+        err = stat(fullfilename, &buf);
+        free(fullfilename);
+        if(err<0) {
+            file = readdir(fd_dir);
+            continue;
+        }
+
+        if(S_ISREG(buf.st_mode)) {
+
+            aggfile_t *aggfile;
+
+            tmp = realloc(table->files, sizeof(aggfile_t)*(nb+1));
+            if(tmp==NULL) {
+                // realloc() failed
+                fprintf(stderr, "Failed allocate memory\n");
+                break;
+            }
+            table->files = tmp;
+
+            aggfile = table->files + nb;
+            aggfile->length = 0;
+            aggfile->size = buf.st_size;
+            strncpy(aggfile->name, file->d_name, AGGSIZENAME+1);
+            aggfile->name[AGGSIZENAME]='\0';
+
+            nb++;
+        }
+
+        file = readdir(fd_dir);
+    }
+
+    table->count = nb;
+
+    // TODO create aggregate
+
+    destroy_aggtable(table);
+    closedir(fd_dir);
+    return 0;
 }
 
 
