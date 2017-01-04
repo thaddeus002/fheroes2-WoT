@@ -1,11 +1,4 @@
 /***************************************************************************
- *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
- *                                                                         *
- *   Part of the Free Heroes2 Engine:                                      *
- *   http://sourceforge.net/projects/fheroes2                              *
- *                                                                         *
- *   Copyrigth (C) 2015 by Yannick Garcia                                  *
- *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
  *   the Free Software Foundation; either version 2 of the License, or     *
@@ -21,6 +14,12 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
+/************************************************************************//**
+ * \file extractor.c                                                        *
+ * \brief Program to extract files from a aggregate (.agg or .lod file).    *
+ ****************************************************************************/
+
 
 // for mkdir()
 #include <sys/stat.h>
@@ -50,11 +49,6 @@ void usage(char *progName) {
     fprintf(stdout, "        -v agg_version : indicate the version of source file. Can be 1, 2, or 3 (default = %d)\n", AGGVERSION);
     exit(EXIT_FAILURE);
 }
-
-
-
-
-
 
 
 
@@ -152,5 +146,4 @@ int main(int argc, char **argv)
 
     return EXIT_SUCCESS;
 }
-
 

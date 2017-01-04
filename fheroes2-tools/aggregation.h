@@ -47,12 +47,15 @@ typedef struct {
 
 
 
-
-
+/**
+ * \brief Free memory used by a aggtable_t struct.
+ */
 void destroy_aggtable(aggtable_t *table);
 
 
 /**
+ * \param fd_data file descriptor of the aggregate
+ * \param agg_version must be 1 or 2
  * \return a new table or NULL
  */
 aggtable_t *read_aggtable(FILE *fd_data, int agg_version) ;
@@ -68,6 +71,10 @@ aggtable_t *read_lodtable(FILE *fd_data);
  * \return the number of extracted files
  */
 int extract_files(FILE *fd_data, char *output_dir, aggtable_t *table);
+
+
+
+
 
 
 
