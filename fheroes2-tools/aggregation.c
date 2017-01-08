@@ -381,33 +381,31 @@ int extract_files(FILE *fd_data, char *output_dir, aggtable_t *table){
 }
 
 
-/**
- * Make an aggragate with the content of a directory.
- * Filenames will be shorten to 8 characters plus 3 for the extension.
- * Subdirectories will be ignored.
- * Aggregate name will be dirname plus extension .agg
- * Agg version will be 2.
- * \return a negative error code or zero in case of success
- */
-int aggregate(char *directory) {
+
+
+
+static aggtable_t *aggregate(char *directory, int *err) {
 
     DIR *fd_dir;
     struct dirent *file;
     aggtable_t *table = NULL;
     int nb; // files number
 
+    *err = 0;
     fd_dir = opendir(directory);
 
     if(fd_dir == NULL) {
         fprintf(stderr, "Could'nt open directory %s.\n", directory);
-        return -1;
+        *err = -1;
+        return NULL;
     }
 
     table = malloc(sizeof(aggtable_t));
     if(table==NULL) {
         fprintf(stderr, "Failed allocating memory\n");
         closedir(fd_dir);
-        return -2;
+        *err = -2;
+        return NULL;
     }
     table->files = NULL;
 
@@ -419,7 +417,7 @@ int aggregate(char *directory) {
         aggfile_t *tmp;
         struct stat buf;
         char *fullfilename;
-        int err;
+        int errl;
 
         fullfilename=malloc(sizeof(char) * (strlen(directory) + strlen(file->d_name) + 2));
         if(fullfilename==NULL) {
@@ -427,9 +425,9 @@ int aggregate(char *directory) {
             break;
         }
 
-        err = stat(fullfilename, &buf);
+        errl = stat(fullfilename, &buf);
         free(fullfilename);
-        if(err<0) {
+        if(errl<0) {
             file = readdir(fd_dir);
             continue;
         }
@@ -460,11 +458,36 @@ int aggregate(char *directory) {
 
     table->count = nb;
 
-    // TODO create aggregate
-
-    destroy_aggtable(table);
     closedir(fd_dir);
-    return 0;
+    return table;
 }
 
 
+
+/**
+ * Make an aggragate with the content of a directory.
+ * Filenames will be shorten to 8 characters plus 3 for the extension.
+ * Subdirectories will be ignored.
+ * Aggregate name will be dirname plus extension .agg
+ * Agg version will be 2.
+ * \return a negative error code or zero in case of success
+ */
+int create_aggregate(directory) {
+
+
+    aggtable_t *table;
+    int err;
+
+
+    table = aggregate(directory, &err);
+
+    if(table== NULL) {
+        return err;
+    }
+
+    // TODO create aggregate
+
+    destroy_aggtable(table);
+
+    return 0;
+}
