@@ -123,7 +123,7 @@ static int write_file(FILE *fd_agg, aggfile_t *file, const char *output_dir) {
     body = malloc(sizeof(unsigned char) * longueur);
     if(body == NULL) {
         fprintf(stderr, "Failed allocate memory. File %s not created.\n", file->name);
-        return 1;
+        return AGG_ALLOC_ERROR;
     }
 
     fread(body, longueur, 1, fd_agg);
@@ -398,7 +398,7 @@ static aggtable_t *aggregate(char *directory, int *err) {
 
     if(fd_dir == NULL) {
         fprintf(stderr, "Could'nt open directory %s.\n", directory);
-        *err = -1;
+        *err = AGG_OPENDIR_ERROR;
         return NULL;
     }
 
@@ -406,7 +406,7 @@ static aggtable_t *aggregate(char *directory, int *err) {
     if(table==NULL) {
         fprintf(stderr, "Failed allocating memory\n");
         closedir(fd_dir);
-        *err = -2;
+        *err = AGG_ALLOC_ERROR;
         return NULL;
     }
     table->files = NULL;
@@ -472,7 +472,34 @@ static aggtable_t *aggregate(char *directory, int *err) {
 
 
 static int write_aggregate(char *directory, aggtable_t *table) {
-    // TODO
+
+    char *filename;
+    FILE *fd;
+    char buf[256];
+    uint16_t twobytes;
+
+
+    filename = malloc(sizeof(char) * (strlen(directory) + 5));
+
+    if(filename == NULL) { return AGG_ALLOC_ERROR; }
+
+    sprintf(filename, "%s.agg", directory);
+
+    fd=fopen(filename, "w");
+    free(filename);
+
+    if(fd == NULL) {
+        return AGG_CREATE_FILE_ERROR;
+    }
+
+    twobytes = htole16(table->count);
+
+    fwrite(&twobytes, 2, 1, fd);
+
+
+
+
+    fclose(fd);
 }
 
 
@@ -495,9 +522,9 @@ int create_aggregate(directory) {
         return err;
     }
 
-    write_aggregate(directory, table);
+    err = write_aggregate(directory, table);
 
     destroy_aggtable(table);
 
-    return 0;
+    return err;
 }

@@ -25,6 +25,12 @@
 #define LODSIZENAME 16
 
 
+/** error codes */
+#define AGG_ALLOC_ERROR -1
+#define AGG_OPENDIR_ERROR -2
+#define AGG_CREATE_FILE_ERROR -3
+
+
 /**
  * This define a file, with its name and the informations
  * we need to recover its data in the aggregate.
