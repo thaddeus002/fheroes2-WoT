@@ -500,6 +500,7 @@ static int write_aggregate(char *directory, aggtable_t *table) {
 
 
     fclose(fd);
+    return 0;
 }
 
 
@@ -511,7 +512,7 @@ static int write_aggregate(char *directory, aggtable_t *table) {
  * Agg version will be 2.
  * \return a negative error code or zero in case of success
  */
-int create_aggregate(directory) {
+int create_aggregate(char *directory) {
 
     aggtable_t *table;
     int err;
