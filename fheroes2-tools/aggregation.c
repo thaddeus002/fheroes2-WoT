@@ -390,6 +390,8 @@ static aggtable_t *aggregate(char *directory, int *err) {
     struct dirent *file;
     aggtable_t *table = NULL;
     int nb; // files number
+    int offset = 2;
+    int i;
 
     *err = 0;
     fd_dir = opendir(directory);
@@ -449,7 +451,9 @@ static aggtable_t *aggregate(char *directory, int *err) {
             aggfile->size = buf.st_size;
             strncpy(aggfile->name, file->d_name, AGGSIZENAME+1);
             aggfile->name[AGGSIZENAME]='\0';
+            aggfile->offset = offset;
 
+            offset += buf.st_size;
             nb++;
         }
 
@@ -457,11 +461,19 @@ static aggtable_t *aggregate(char *directory, int *err) {
     }
 
     table->count = nb;
+    // add 12n to all offset (valid for aggversion == 2 only)
+    for(i=0; i<nb; i++) {
+        table->files[i].offset += 12 * nb;
+    }
 
     closedir(fd_dir);
     return table;
 }
 
+
+static int write_aggregate(char *directory, aggtable_t *table) {
+    // TODO
+}
 
 
 /**
@@ -474,10 +486,8 @@ static aggtable_t *aggregate(char *directory, int *err) {
  */
 int create_aggregate(directory) {
 
-
     aggtable_t *table;
     int err;
-
 
     table = aggregate(directory, &err);
 
@@ -485,7 +495,7 @@ int create_aggregate(directory) {
         return err;
     }
 
-    // TODO create aggregate
+    write_aggregate(directory, table);
 
     destroy_aggtable(table);
 
