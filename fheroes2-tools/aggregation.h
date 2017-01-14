@@ -9,6 +9,7 @@
  * LOD files are for HOMM3. In these files data can be compressed.
  */
 
+#include <stdint.h>
 
 #ifndef AGGREGATOR_H
 #define AGGREGATOR_H

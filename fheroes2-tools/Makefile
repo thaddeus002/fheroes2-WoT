@@ -12,7 +12,7 @@ endif
 
 IMAGE_TARGETS := bmp2img til2img
 AUDIO_TARGETS := 82m2wav xmi2mid
-GENERAL_TARGETS := extractor
+GENERAL_TARGETS := extractor aggregator
 # extractor_lod
 PROGS_YANN := bmp2img extractor_lod
 TARGETS := $(GENERAL_TARGETS) $(LOD_TARGETS) $(IMAGE_TARGETS) $(AUDIO_TARGETS)
@@ -68,7 +68,11 @@ LIBS := $(SDL_LIBS) $(LIBS)
 
 all: $(TARGETS)
 
-$(GENERAL_TARGETS): $(addsuffix .c, $(GENERAL_TARGETS)) aggregation.o
+extractor: extractor.c aggregation.o
+	$(CC) -c $@.c -Wall -O2
+	$(CC) -o $@ $@.o aggregation.o -lz
+
+aggregator: aggregator.c aggregation.o
 	$(CC) -c $@.c -Wall -O2
 	$(CC) -o $@ $@.o aggregation.o -lz
 
