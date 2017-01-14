@@ -47,7 +47,7 @@ int main(int argc, char **argv)
     char *directory = NULL;
     int err;
 
-    if(argc < 1) {
+    if(argc < 2) {
         usage(argv[0]);
     }
 

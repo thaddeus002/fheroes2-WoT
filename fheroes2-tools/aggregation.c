@@ -428,6 +428,8 @@ static aggtable_t *aggregate(char *directory, int *err) {
             break;
         }
 
+        sprintf(fullfilename, "%s/%s", directory, file->d_name);
+
         errl = stat(fullfilename, &buf);
         free(fullfilename);
         if(errl<0) {
@@ -462,6 +464,7 @@ static aggtable_t *aggregate(char *directory, int *err) {
     }
 
     table->count = nb;
+
     // add 12n to all offset (valid for aggversion == 2 only)
     for(i=0; i<nb; i++) {
         table->files[i].offset += 12 * nb;
@@ -522,6 +525,7 @@ static int write_aggregate(char *directory, aggtable_t *table) {
 
         if(datafilefullname == NULL) continue;
 
+        sprintf(datafilefullname, "%s/%s", directory, datafile);
         fdData = fopen(datafilefullname, "r");
         free(datafilefullname);
 
