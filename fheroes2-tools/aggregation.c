@@ -531,7 +531,6 @@ static int write_aggregate(char *directory, aggtable_t *table) {
 
         if(fdData == NULL) continue;
 
-        // TODO
         nb=fread(data, 1, 1024, fdData);
         while(nb != 0) {
             fwrite(data, 1, nb, fd);

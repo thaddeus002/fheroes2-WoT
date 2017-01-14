@@ -13,9 +13,9 @@ endif
 IMAGE_TARGETS := bmp2img til2img
 AUDIO_TARGETS := 82m2wav xmi2mid
 GENERAL_TARGETS := extractor aggregator
-# extractor_lod
-PROGS_YANN := bmp2img extractor_lod
-TARGETS := $(GENERAL_TARGETS) $(LOD_TARGETS) $(IMAGE_TARGETS) $(AUDIO_TARGETS)
+TARGETS := $(GENERAL_TARGETS) $(IMAGE_TARGETS) $(AUDIO_TARGETS)
+# What is ready
+TARGETS := $(GENERAL_TARGETS)
 
 
 CFLAGS := $(CFLAGS) -O2
@@ -67,6 +67,7 @@ LIBS := $(SDL_LIBS) $(LIBS)
 
 
 all: $(TARGETS)
+	@echo "Done"
 
 extractor: extractor.c aggregation.o
 	$(CC) -c $@.c -Wall -O2
@@ -133,4 +134,4 @@ yImage.o: yImage.c yImage.h
 .PHONY: clean
 
 clean:
-	rm -f *.o *.exe $(TARGETS)
+	rm -f *.o $(TARGETS)
