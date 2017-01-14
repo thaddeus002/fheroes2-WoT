@@ -383,7 +383,9 @@ int extract_files(FILE *fd_data, char *output_dir, aggtable_t *table){
 
 
 
-
+/**
+ * Make the table of the content of a directory
+ */
 static aggtable_t *aggregate(char *directory, int *err) {
 
     DIR *fd_dir;
@@ -471,13 +473,16 @@ static aggtable_t *aggregate(char *directory, int *err) {
 }
 
 
+/**
+ * Create a AGG version 2 file.
+ */
 static int write_aggregate(char *directory, aggtable_t *table) {
 
     char *filename;
     FILE *fd;
-    char buf[256];
     uint16_t twobytes;
-
+    uint32_t fourbytes;
+    int i;
 
     filename = malloc(sizeof(char) * (strlen(directory) + 5));
 
@@ -493,11 +498,49 @@ static int write_aggregate(char *directory, aggtable_t *table) {
     }
 
     twobytes = htole16(table->count);
-
     fwrite(&twobytes, 2, 1, fd);
 
+    for(i = 0; i < table->count; i++) {
 
+        fourbytes = htole32(i);
+        fwrite(&fourbytes, 4, 1, fd);
 
+        fourbytes = htole32(table->files[i].offset);
+        fwrite(&fourbytes, 4, 1, fd);
+
+        fourbytes = htole32(table->files[i].size);
+        fwrite(&fourbytes, 4, 1, fd);
+    }
+
+    for(i = 0; i < table->count; i++) {
+        char *datafile = table->files[i].name;
+        char *datafilefullname;
+        FILE *fdData;
+        unsigned char data[1024];
+        int nb;
+
+        datafilefullname = malloc(sizeof(char) * (strlen(datafile)+strlen(directory)+2));
+
+        if(datafilefullname == NULL) continue;
+
+        fdData = fopen(datafilefullname, "r");
+        free(datafilefullname);
+
+        if(fdData == NULL) continue;
+
+        // TODO
+        nb=fread(data, 1, 1024, fdData);
+        while(nb != 0) {
+            fwrite(data, 1, nb, fd);
+            nb=fread(data, 1024, 1, fdData);
+        }
+
+        fclose(fdData);
+    }
+
+    for(i = 0; i < table->count; i++) {
+        fwrite(table->files[i].name, 15, 1, fd);
+    }
 
     fclose(fd);
     return 0;
