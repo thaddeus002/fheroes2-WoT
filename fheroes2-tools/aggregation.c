@@ -535,14 +535,14 @@ static int write_aggregate(char *directory, aggtable_t *table) {
         nb=fread(data, 1, 1024, fdData);
         while(nb != 0) {
             fwrite(data, 1, nb, fd);
-            nb=fread(data, 1024, 1, fdData);
+            nb=fread(data, 1, 1024, fdData);
         }
 
         fclose(fdData);
     }
 
     for(i = 0; i < table->count; i++) {
-        fwrite(table->files[i].name, 15, 1, fd);
+        fwrite(table->files[i].name, 1, 15, fd);
     }
 
     fclose(fd);
