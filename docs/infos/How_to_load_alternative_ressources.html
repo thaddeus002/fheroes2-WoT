@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset=""utf-8"/"></meta>
+        <meta charset="utf-8" />
         <title>Loading alternative ressources in fheroes2</title>
-        <link href="../style.css" rel="stylesheet" type="text/css" /="text/css"></link>
-        <link rel="shortcut icon" type="image/x-icon" href="../favicon.png" /="../favicon.png"></link>
+        <link href="../style.css" rel="stylesheet" type="text/css" />
+        <link rel="shortcut icon" type="image/x-icon" href="../favicon.png" />
     </head>
     <body>
         <h1>How to load alternative resources in fheroes2</h1>
@@ -13,55 +13,7 @@
             <p>
                 <i>Note: the term icon (icn) is used for all groups of image sprites, but it can be a background, a monster attacking, or really an icon.</i>
             </p>
-            <table>
-                <tbody>
-                    <tr>
-                        <td>
-                            <h2>Contents</h2>
-                            <ul>
-                                <li class="toclevel-1">
-                                    <a href="#Explanation">
-                                        <span class="tocnumber">1</span>
-                                        <span class="toctext">Explanation</span>
-                                    </a>
-                                    <ul>
-                                        <li class="toclevel-2">
-                                            <a href="#spec.xml_template">
-                                                <span class="tocnumber">1.1</span>
-                                                <span class="toctext">spec.xml template</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li class="toclevel-1">
-                                    <a href="#Example_with_the_main_menu_background">
-                                        <span class="tocnumber">2</span>
-                                        <span class="toctext">Example with the main menu background</span>
-                                    </a>
-                                </li>
-                                <li class="toclevel-1">
-                                    <a href="#Battle_animations">
-                                        <span class="tocnumber">3</span>
-                                        <span class="toctext">Battle animations</span>
-                                    </a>
-                                </li>
-                                <li class="toclevel-1">
-                                    <a href="#Sounds">
-                                        <span class="tocnumber">4</span>
-                                        <span class="toctext">Sounds</span>
-                                    </a>
-                                </li>
-                                <li class="toclevel-1">
-                                    <a href="#Music">
-                                        <span class="tocnumber">5</span>
-                                        <span class="toctext">Music</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+
             <a name="Explanation" id="Explanation"></a>
             <h2>Explanation</h2>
             <p>You can use your own sprites (images groups) to customize the appearance of the game. For this you need do some steps:</p>
@@ -101,9 +53,9 @@
             </h3>
             <pre>&lt;?xml version="1.0"&nbsp;?&gt;
 &lt;icn name="test.icn" count="3"&gt;
-	&lt;sprite name="0.png" ox="ORIX" oy="ORIY"/&gt;
-	&lt;sprite name="1.png" ox="ORIX" oy="ORIY"/&gt;
-	&lt;sprite name="2.png" ox="ORIX" oy="ORIY"/&gt;
+    &lt;sprite name="0.png" ox="ORIX" oy="ORIY"/&gt;
+    &lt;sprite name="1.png" ox="ORIX" oy="ORIY"/&gt;
+    &lt;sprite name="2.png" ox="ORIX" oy="ORIY"/&gt;
 &lt;/icn&gt;</pre>
             <p>Where:</p>
             <ul>
@@ -148,7 +100,7 @@
             </ul>
             <pre>&lt;?xml version="1.0"&nbsp;?&gt;
 &lt;icn name="heroes.icn" count="1"&gt;
-	&lt;sprite name="000.png" ox="0" oy="0"/&gt;
+    &lt;sprite name="000.png" ox="0" oy="0"/&gt;
 &lt;/icn&gt;</pre>
             <ul>
                 <li>Copy your variant of a picture files/images/heroes.icn/000.png. They should be the same size as well as the original.</li>
