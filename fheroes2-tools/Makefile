@@ -10,7 +10,7 @@ ifndef CC
 CC := gcc
 endif
 
-IMAGE_TARGETS := bmp2img til2img
+IMAGE_TARGETS := icn2img bmp2img til2img
 AUDIO_TARGETS := 82m2wav xmi2mid
 GENERAL_TARGETS := extractor aggregator
 TARGETS := $(GENERAL_TARGETS) $(IMAGE_TARGETS) $(AUDIO_TARGETS)
@@ -39,25 +39,6 @@ ifndef WITHOUT_IMAGE
 CFLAGS := $(CFLAGS) -DWITH_IMAGE $(shell libpng-config --cflags) -DWITH_ZLIB
 SDL_LIBS := $(SDL_LIBS) -lSDL_image $(shell libpng-config --libs) -lz
 endif
-
-#ifndef WITHOUT_UNICODE
-#CFLAGS := $(CFLAGS) -DWITH_TTF
-#SDL_LIBS := $(SDL_LIBS) -lSDL_ttf
-#endif
-
-#ifndef WITHOUT_NETWORK
-#CFLAGS := $(CFLAGS) -DWITH_NET_DISABLE
-#SDL_LIBS := $(SDL_LIBS) -lSDL_net
-#endif
-
-#ifndef WITHOUT_XML
-#CFLAGS := $(CFLAGS) -DWITH_XML
-#endif
-
-#ifndef WITHOUT_ZLIB
-#CFLAGS := $(CFLAGS) -DWITH_ZLIB
-#LIBS := $(LIBS) -lz
-#endif
 
 
 
@@ -94,8 +75,7 @@ $(AUDIO_TARGETS): $(addsuffix .cpp, $(AUDIO_TARGETS))
 
 $(IMAGE_TARGETS): $(addsuffix .cpp, $(IMAGE_TARGETS)) yImage.o
 	$(CXX) -c $@.cpp $(YG_CFLAGS) $(SDL_FLAGS) -DHAVE_LIBPNG -DWITH_IMAGE
-	#$(CXX) -o $@ $@.o yImage.o $(YG_LDFLAGS) $(SDL_LIBS)
-	$(CXX) -o $@ $@.o yImage.o -L../engine -lengine -L/usr/lib -lpng
+	$(CXX) -o $@ $@.o yImage.o palette.o $(YG_LDFLAGS) $(SDL_LIBS)
 
 
 til2img: til2img.cpp palette.o yImage.o
@@ -111,10 +91,8 @@ icn2img.o : icn2img.cpp icn2img.h
 	$(CXX) -c icn2img.cpp -DHAVE_LIBPNG $(shell libpng-config --cflags)
 
 
-
 palette.o : palette.c palette.h
 	$(CXX) -c palette.c
-
 
 
 #bmp2img: bmp2img.cpp yImage.o
