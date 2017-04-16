@@ -104,27 +104,57 @@ The color cycling is an in-game feature. Simply put, if you place color 214, it 
 
 <h2>icn format for sprites</h2>
 
-<p>The icn file contains a number n of images, we will name sprites. this is the structure of the file :
+<p>All the numbers are encoded in little-endians.</p>
+
+<p>The icn file contains a number n of images, we will name sprites. This is the structure of the file :
 <ul>
 <li>2 bytes : the number of sprites</li>
-<li>4 bytes, the total size of the file (excluding the 6 first bytes)</li>
-<li>13n bytes, representing n sprites headers (see below)</li>
-<li>total_size-(count_sprite*13) bytes : concatenation of the data of the sprites.</li>
+<li>4 bytes : the total size of the file (excluding the 6 first bytes)</li>
+<li>13n bytes : representing n sprites headers (see below)</li>
+<li>total_size - (count_sprite*13) bytes : concatenation of the data of the sprites.</li>
 </ul>
 
 <h3>icn sprite header</h3>
 <ul>
-  <li>s16 offsetX;
-    <li>s16 offsetY;
-    <li>u16 width;
-    <li>u16 height;
+    <li>s16 offsetX;  // positionning offset of the sprite on X axis
+    <li>s16 offsetY;  // positionning offset of the sprite on Y axis
+    <li>u16 width;  // sprite's width
+    <li>u16 height;  // sprite's height
     <li>u8 type; // type of sprite : 0 = Normal, 32 = Monochromatic shape
-    <li>u32 offsetData;
+    <li>u32 offsetData; // beginning of the data
 </ul>
+
 <h3>icn sprite data</h3>
 
-TODO
+<p>Each sprite's pixel has a color taken from a "palette". The palette is an array of 256 colors defined in the file "kb.pal". The format of this file is describe above. The pixel can also be a shadow pixel. The shadow color will be represented by a black pixel with an alpha channel of 64 (0 represents a fully transparent color, and 255 represents a fully opaque color).</p>
 
+<p>The following sheme is repeated many times, describing how to fill pixels. By default a pixel will be transparent.</p>
+
+<h4>Scheme for normal sprite</h4>
+
+<p>There is one byte for command followed by 0 or more bytes of data. The command byte can be :</p>
+<ul>
+    <li>0x00 - end of line reached, go to the first pixel of next line.</li>
+    <li>0x01 to 0x7F - number n of data. The next n bytes are the colors of the next n pixels.</li>
+    <li>0x80 - end of data. The sprite is yet totaly describe.</li>
+    <li>0x81 to 0xBF - number of pixels to skip + 0x80. The (n - 128) pixels are transparents.</li>
+    <li>0xC0 - put here n pixels of shadow. If the next byte module 4 is not null, n equals the next pixel modulo 4, otherwise n equals the second next byte.</li>
+    <li>0xC1 - next byte is the number of next pixels of same color. The second next byte is the color of these pixels.</li>
+    <li>0xC2 to 0xFF - number of pixels of same color plus 0xC0. Next byte is the color of these pixels.</li>
+</ul>
+
+<h4>Scheme for monochromatic shape</h4>
+
+<p>The pixels can only be in two states (transparent or black). So the rules are simplified.</p>
+
+<p>Command bytes are : </p>
+
+<ul>
+    <li>0x00 - end of line reached, go to the first pixel of next line.</li>
+    <li>0x01 to 0x7F - number of black pixels</li>
+    <li>0x80 - end of data. The sprite is yet totaly describe.</li>
+    <li>0x81 to 0xFF - number of pixels to skip + 0x80. The (n - 128) pixels are transparents.</li>
+</ul>
 
 </body>
 </html>
