@@ -1,6 +1,6 @@
 # fheroes2 : War of Thrones
 
-This project aim is to provide "libre" artwork for the game engine [fheroes2](https://sourceforge.net/projects/fheroes2).
+This project is a mod for [fheroes2](https://sourceforge.net/projects/fheroes2). fheroes2 is a turn by turn strategy game, maintly develop by Andrey Afletdinov, as a clone of HOMM2 (Heroes of Might and Magic II) and release under free license. But the graphics used by this game are those of HOMM2 and are not free for use. The aim of this project is to provide open artwork for fheroes2.
 
 Main screen of fheroes2-WoT :
 ![screenshot](assets/screenshot_main_screen.png)
