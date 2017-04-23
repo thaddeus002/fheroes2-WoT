@@ -1,0 +1,5 @@
+*.o
+*.d
+fheroes2
+*.a
+*.pot
