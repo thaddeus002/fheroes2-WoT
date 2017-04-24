@@ -44,7 +44,9 @@
 #define FATSIZENAME	15
 
 namespace AGG
-{	
+{
+    /** \brief location of a file in the agg stream.
+     */
     class FAT
     {
     public:
@@ -57,13 +59,20 @@ namespace AGG
 	std::string	Info(void) const;
     };
 
+    /** \brief the AGG file description
+     */
     class File
     {
     public:
 	File();
 	~File();
 
-	bool			Open(const std::string &);
+	/**
+	 * Init this object with the content of a file.
+	 * \param fname the AGG file's name
+	 * \return true if the file is successfully opened
+	 */
+	bool			Open(const std::string & fname);
 	bool			isGood(void) const;
 	const std::string &	Name(void) const;
 	const FAT &		Fat(const std::string & key);
@@ -98,7 +107,7 @@ namespace AGG
 
     struct fnt_cache_t
     {
-	Surface		sfs[4]; /* small_white, small_yellow, medium_white, medium_yellow */
+	Surface		sfs[4]; /**< small_white, small_yellow, medium_white, medium_yellow */
     };
 
     struct loop_sound_t
@@ -186,7 +195,7 @@ AGG::File::File(void) : count_items(0)
 bool AGG::File::Open(const std::string & fname)
 {
     filename = fname;
-    
+
     if(! stream.open(filename, "rb"))
     {
 	DEBUG(DBG_ENGINE, DBG_WARN, "error read file: " << filename << ", skipping...");
@@ -222,19 +231,19 @@ bool AGG::File::isGood(void) const
     return !stream.fail() && count_items;
 }
 
-/* get AGG file name */
+/** get AGG file name */
 const std::string & AGG::File::Name(void) const
 {
     return filename;
 }
 
-/* get FAT element */
+/** get FAT element */
 const AGG::FAT & AGG::File::Fat(const std::string & key)
 {
     return fat[key];
 }
 
-/* dump FAT */
+/** dump FAT */
 std::string AGG::FAT::Info(void) const
 {
     std::ostringstream os;
@@ -243,7 +252,7 @@ std::string AGG::FAT::Info(void) const
     return os.str();
 }
 
-/* read element to body */
+/** read element to body */
 const std::vector<u8> & AGG::File::Read(const std::string & str)
 {
     if(key != str)
@@ -397,7 +406,7 @@ bool AGG::CheckMemoryLimit(void)
     return false;
 }
 
-/* read data directory */
+/** read data directory */
 bool AGG::ReadDataDir(void)
 {
     Settings & conf = Settings::Get();
@@ -801,7 +810,7 @@ void AGG::SaveICN(int icn)
 	    {
 		TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );
 		doc.LinkEndChild(decl);
-    
+
 		icn_element = new TiXmlElement("icn");
 		icn_element->SetAttribute("name", icn_lower.c_str());
 		icn_element->SetAttribute("count", v.count);
@@ -1288,7 +1297,7 @@ void AGG::SaveTIL(int til)
 	    {
 		TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );
 		doc.LinkEndChild(decl);
-    
+
 		til_element = new TiXmlElement("til");
 		til_element->SetAttribute("name", til_lower.c_str());
 		til_element->SetAttribute("count", v.count);
@@ -1732,7 +1741,7 @@ void AGG::LoadTTFChar(u32 ch)
     const Settings & conf = Settings::Get();
     const RGBA white(0xFF, 0xFF, 0xFF);
     const RGBA yellow(0xFF, 0xFF, 0x00);
-	    
+
     // small
     fnt_cache[ch].sfs[0] = fonts[0].RenderUnicodeChar(ch, white, ! conf.FontSmallRenderBlended());
     fnt_cache[ch].sfs[1] = fonts[0].RenderUnicodeChar(ch, yellow, ! conf.FontSmallRenderBlended());
@@ -1772,7 +1781,7 @@ void AGG::LoadFNT(void)
 	else
 	{
     	    DEBUG(DBG_ENGINE, DBG_INFO, "normal fonts " << conf.FontsNormal());
-    	    DEBUG(DBG_ENGINE, DBG_INFO, "small fonts " << conf.FontsSmall());	
+    	    DEBUG(DBG_ENGINE, DBG_INFO, "small fonts " << conf.FontsSmall());
 	    DEBUG(DBG_ENGINE, DBG_INFO, "preload english charsets");
 	}
     }

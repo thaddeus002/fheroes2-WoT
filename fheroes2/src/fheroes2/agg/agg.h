@@ -34,7 +34,11 @@
 #include "xmi.h"
 #include "sprite.h"
 
-class ICNSprite : public std::pair<Surface, Surface> /* first: image with out alpha, second: shadow with alpha */
+/**
+ * A ICNSprite is a pair of Surface.
+ * first: image without alpha, second: shadow with alpha
+ */
+class ICNSprite : public std::pair<Surface, Surface>
 {
 public:
     ICNSprite() {}
@@ -49,7 +53,7 @@ public:
 };
 
 namespace AGG
-{	
+{
     bool	Init(void);
     void	Quit(void);
 
