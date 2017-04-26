@@ -92,9 +92,9 @@ namespace AGG
     {
 	icn_cache_t() : sprites(NULL), reflect(NULL), count(0) {}
 
-	Sprite*		sprites;
-	Sprite*		reflect;
-	u32		count;
+	Sprite*		sprites; /**< Sprites table */
+	Sprite*		reflect; /**< Reflect Sprites table*/
+	u32		count; /**< number of sprites in tables */
     };
 
     struct til_cache_t
@@ -123,6 +123,7 @@ namespace AGG
     File					heroes2_agg;
     File					heroes2x_agg;
 
+    /** all ICN data */
     std::vector<icn_cache_t>			icn_cache;
     std::vector<til_cache_t>			til_cache;
 
@@ -148,11 +149,23 @@ namespace AGG
     void			LoadWAV(int m82, std::vector<u8> &);
     void			LoadMID(int xmi, std::vector<u8> &);
 
+    /** \brief Load modified? resource */
     bool			LoadExtICN(int icn, u32, bool);
+    /** \brief Load alternative resource */
     bool			LoadAltICN(int icn, u32, bool);
     bool			LoadOrgICN(Sprite &, int icn, u32, bool);
-    bool			LoadOrgICN(int icn, u32, bool);
-    void			LoadICN(int icn, u32, bool reflect = false);
+
+    /**
+     * \brief Load a sprite from origin AGG file and place it in the vector icn_cache
+     *
+     * \param icn ICN index
+     * \param index the sprite's index in ICN data
+     * \param reflect true for reflect sprite
+     * \return true in case of success
+     *
+     */
+    bool			LoadOrgICN(int icn, u32 index, bool reflect);
+    void			LoadICN(int icn, u32 index, bool reflect = false);
     void			SaveICN(int icn);
 
     bool			LoadAltTIL(int til, u32 max);
@@ -187,7 +200,7 @@ bool ICNSprite::isValid(void) const
     return first.isValid();
 }
 
-/*AGG::File constructor */
+/** AGG::File constructor */
 AGG::File::File(void) : count_items(0)
 {
 }
@@ -356,15 +369,15 @@ u32 AGG::ClearFreeObjects(void)
 
 	    if(icns.reflect)
 	    {
-		Sprite & sprite2 = icns.reflect[jj];
+            Sprite & sprite2 = icns.reflect[jj];
 
-		if(! sprite2.isRefCopy())
-		{
-		    total += sprite2.GetMemoryUsage();
-		    sprite2.Reset();
-		}
-		else
-		    used += sprite2.GetMemoryUsage();
+            if(! sprite2.isRefCopy())
+            {
+                total += sprite2.GetMemoryUsage();
+                sprite2.Reset();
+            }
+            else
+                used += sprite2.GetMemoryUsage();
 	    }
 	}
     }
@@ -385,19 +398,19 @@ bool AGG::CheckMemoryLimit(void)
 
 	if(0 < usage && conf.MemoryLimit() < usage)
 	{
-    	    VERBOSE("settings: " << conf.MemoryLimit() << ", game usage: " << usage);
-    	    const u32 freemem = ClearFreeObjects();
-    	    VERBOSE("free " << freemem);
+    	VERBOSE("settings: " << conf.MemoryLimit() << ", game usage: " << usage);
+    	const u32 freemem = ClearFreeObjects();
+    	VERBOSE("free " << freemem);
 
-    	    usage = System::GetMemoryUsage();
+    	usage = System::GetMemoryUsage();
 
-    	    if(conf.MemoryLimit() < usage + (300 * 1024))
-    	    {
+    	if(conf.MemoryLimit() < usage + (300 * 1024))
+    	{
         	VERBOSE("settings: " << conf.MemoryLimit() << ", too small");
         	// increase + 300Kb
         	conf.SetMemoryLimit(usage + (300 * 1024));
         	VERBOSE("settings: " << "increase limit on 300kb, current value: " << conf.MemoryLimit());
-    	    }
+    	}
 
 	    return true;
 	}
@@ -406,7 +419,9 @@ bool AGG::CheckMemoryLimit(void)
     return false;
 }
 
-/** read data directory */
+/** \brief read data directory I.e open agg file
+ * \return true if success
+ */
 bool AGG::ReadDataDir(void)
 {
     Settings & conf = Settings::Get();
@@ -415,7 +430,7 @@ bool AGG::ReadDataDir(void)
     const std::string & other_data = conf.GetDataParams();
 
     if(other_data.size() && other_data != "data")
-	aggs.Append(conf.GetListFiles(other_data, ".agg"));
+        aggs.Append(conf.GetListFiles(other_data, ".agg"));
 
     // not found agg, exit
     if(0 == aggs.size()) return false;
@@ -424,9 +439,9 @@ bool AGG::ReadDataDir(void)
     for(ListFiles::const_iterator
 	it = aggs.begin(); it != aggs.end(); ++it)
     {
-	std::string lower = StringLower(*it);
-	if(std::string::npos != lower.find("heroes2.agg") && !heroes2_agg.isGood()) heroes2_agg.Open(*it);
-	if(std::string::npos != lower.find("heroes2x.agg") && !heroes2x_agg.isGood()) heroes2x_agg.Open(*it);
+        std::string lower = StringLower(*it);
+        if(std::string::npos != lower.find("heroes2.agg") && !heroes2_agg.isGood()) heroes2_agg.Open(*it);
+        if(std::string::npos != lower.find("heroes2x.agg") && !heroes2x_agg.isGood()) heroes2x_agg.Open(*it);
     }
 
     if(heroes2x_agg.isGood()) conf.SetPriceLoyaltyVersion();
@@ -438,8 +453,8 @@ const std::vector<u8> & AGG::ReadChunk(const std::string & key)
 {
     if(heroes2x_agg.isGood())
     {
-	const std::vector<u8> & buf = heroes2x_agg.Read(key);
-	if(buf.size()) return buf;
+        const std::vector<u8> & buf = heroes2x_agg.Read(key);
+        if(buf.size()) return buf;
     }
 
     return heroes2_agg.Read(key);
@@ -485,9 +500,9 @@ bool AGG::LoadExtICN(int icn, u32 index, bool reflect)
 
     if(NULL == v.sprites)
     {
-	v.sprites = new Sprite [count];
-	v.reflect = new Sprite [count];
-	v.count = count;
+        v.sprites = new Sprite [count];
+        v.reflect = new Sprite [count];
+        v.count = count;
     }
 
     // simple modify
@@ -1051,47 +1066,6 @@ bool AGG::LoadOrgICN(Sprite & sp, int icn, u32 index, bool reflect)
     return false;
 }
 
-/*
-bool AGG::LoadOrgICN(Sprite & sp, int icn, u32 index, bool reflect)
-{
-    const std::vector<u8> & body = ReadICNChunk(icn, index);
-
-    if(body.size())
-    {
-	// loading original
-	DEBUG(DBG_ENGINE, DBG_TRACE, ICN::GetString(icn) << ", " << index);
-
-	StreamBuf st(body);
-
-	u32 count = st.getLE16();
-	u32 blockSize = st.getLE32();
-	u32 sizeData = 0;
-
-	if(index) st.skip(index * 13);
-
-	ICNHeader header1;
-	st >> header1;
-
-	if(index + 1 != count)
-	{
-	    ICNHeader header2;
-	    st >> header2;
-	    sizeData = header2.offsetData - header1.offsetData;
-	}
-	else
-	    sizeData = blockSize - header1.offsetData;
-
-	sp = Sprite::CreateICN(icn ,header1, &body[6 + header1.offsetData], sizeData, reflect);
-	Sprite::AddonExtensionModify(sp, icn, index);
-
-	return true;
-    }
-
-    DEBUG(DBG_ENGINE, DBG_WARN, "error: " << ICN::GetString(icn));
-
-    return false;
-}
-*/
 
 bool AGG::LoadOrgICN(int icn, u32 index, bool reflect)
 {
@@ -1116,7 +1090,7 @@ bool AGG::LoadOrgICN(int icn, u32 index, bool reflect)
     return LoadOrgICN(sp, icn, index, reflect);
 }
 
-/* load ICN object */
+/** load ICN object */
 void AGG::LoadICN(int icn, u32 index, bool reflect)
 {
     icn_cache_t & v = icn_cache[icn];
@@ -1134,9 +1108,9 @@ void AGG::LoadICN(int icn, u32 index, bool reflect)
 	    // load modify sprite
 	    if(! LoadExtICN(icn, index, reflect))
 	    {
-		//load origin sprite
-		if(! LoadOrgICN(icn, index, reflect))
-		    Error::Except(__FUNCTION__, "load icn");
+            //load origin sprite
+            if(! LoadOrgICN(icn, index, reflect))
+                Error::Except(__FUNCTION__, "load icn");
 	    }
 #ifdef DEBUG
 	    if(Settings::Get().UseAltResource()) SaveICN(icn);

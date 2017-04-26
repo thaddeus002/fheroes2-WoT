@@ -72,7 +72,17 @@ namespace AGG
     void	ResetMixer(void);
 
     RGBA	GetPaletteColor(u32 index);
+
     ICNSprite   RenderICNSprite(int, u32);
+
+    /** \brief Draw a sprite on a Surface.
+     *
+     * \param icn identify the ICN data
+     * \param index index of sprite in ICN
+     * \param srt const Rect&
+     * \param dpt const Point&
+     * \param dst Surface& where to draw the sprite
+     */
     void        RenderICNSprite(int icn, u32 index, const Rect & srt, const Point & dpt, Surface & dst);
 }
 
