@@ -757,11 +757,8 @@ bool AGG::LoadAltICN(int icn, u32 index, bool reflect)
 	int index1 = index;
 	int index2 = 0;
 
-	for(; xml_sprite; xml_sprite = xml_sprite->NextSiblingElement("sprite"))
-	{
+	for(; xml_sprite && index2 != index1; xml_sprite = xml_sprite->NextSiblingElement("sprite"))
 	    xml_sprite->Attribute("index", &index2);
-	    if(index1 == index2) break;
-	}
 
 	if(xml_sprite && index2 == index1)
 	{
