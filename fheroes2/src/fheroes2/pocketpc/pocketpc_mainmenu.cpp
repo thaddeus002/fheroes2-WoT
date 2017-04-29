@@ -102,23 +102,23 @@ int PocketPC::MainMenu(void)
     // mainmenu loop
     while(le.HandleEvents())
     {
-	if(Game::HotKeyPressEvent(Game::EVENT_BUTTON_NEWGAME) ||
-		le.MouseClickLeft(rectNewGame)) return Game::NEWSTANDARD; //NEWGAME;
-	else
-	if(Game::HotKeyPressEvent(Game::EVENT_BUTTON_LOADGAME) ||
-		le.MouseClickLeft(rectLoadGame)) return Game::LOADGAME;
-	else
-	if(Game::HotKeyPressEvent(Game::EVENT_BUTTON_SETTINGS) ||
-		le.MouseClickLeft(rectSettings)){ Dialog::ExtSettings(false); cursor.Show(); display.Flip(); }
-	else
-	if(Game::HotKeyPressEvent(Game::EVENT_BUTTON_CREDITS) ||
-		le.MouseClickLeft(rectCredits)) return Game::CREDITS;
-	else
-	if(Game::HotKeyPressEvent(Game::EVENT_BUTTON_HIGHSCORES) ||
-		le.MouseClickLeft(rectHighScores)) return Game::HIGHSCORES;
-	else
-	if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT) ||
-		le.MouseClickLeft(rectQuitGame)) return Game::QUITGAME;
+        if(Game::HotKeyPressEvent(Game::EVENT_BUTTON_NEWGAME) ||
+                le.MouseClickLeft(rectNewGame)) return Game::NEWSTANDARD; //NEWGAME;
+        else
+        if(Game::HotKeyPressEvent(Game::EVENT_BUTTON_LOADGAME) ||
+                le.MouseClickLeft(rectLoadGame)) return Game::LOADGAME;
+        else
+        if(Game::HotKeyPressEvent(Game::EVENT_BUTTON_SETTINGS) ||
+                le.MouseClickLeft(rectSettings)){ Dialog::ExtSettings(false); cursor.Show(); display.Flip(); }
+        else
+        if(Game::HotKeyPressEvent(Game::EVENT_BUTTON_CREDITS) ||
+                le.MouseClickLeft(rectCredits)) return Game::CREDITS;
+        else
+        if(Game::HotKeyPressEvent(Game::EVENT_BUTTON_HIGHSCORES) ||
+                le.MouseClickLeft(rectHighScores)) return Game::HIGHSCORES;
+        else
+        if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT) ||
+                le.MouseClickLeft(rectQuitGame)) return Game::QUITGAME;
     }
 
     return Game::QUITGAME;
@@ -173,17 +173,17 @@ int PocketPC::NewGame(void)
     // mainmenu loop
     while(le.HandleEvents())
     {
-	if(Game::HotKeyPressEvent(Game::EVENT_BUTTON_STANDARD) ||
-		le.MouseClickLeft(rectStandardGame)) return Game::NEWSTANDARD;
-	else
-	if(Game::HotKeyPressEvent(Game::EVENT_BUTTON_CAMPAIN) ||
-		le.MouseClickLeft(rectCampaignGame)) return Game::MAINMENU;
-	else
-	if(Game::HotKeyPressEvent(Game::EVENT_BUTTON_MULTI) ||
-		le.MouseClickLeft(rectMultiGame)) return Game::NEWMULTI;
-	else
-	if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT) ||
-		le.MouseClickLeft(rectCancel)) return Game::MAINMENU;
+        if(Game::HotKeyPressEvent(Game::EVENT_BUTTON_STANDARD) ||
+                le.MouseClickLeft(rectStandardGame)) return Game::NEWSTANDARD;
+        else
+        if(Game::HotKeyPressEvent(Game::EVENT_BUTTON_CAMPAIN) ||
+                le.MouseClickLeft(rectCampaignGame)) return Game::MAINMENU;
+        else
+        if(Game::HotKeyPressEvent(Game::EVENT_BUTTON_MULTI) ||
+                le.MouseClickLeft(rectMultiGame)) return Game::NEWMULTI;
+        else
+        if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT) ||
+                le.MouseClickLeft(rectCancel)) return Game::MAINMENU;
     }
 
     return Game::QUITGAME;
@@ -234,18 +234,18 @@ int PocketPC::NewMulti(void)
     // mainmenu loop
     while(le.HandleEvents())
     {
-	if(Game::HotKeyPressEvent(Game::EVENT_BUTTON_HOTSEAT) ||
-		le.MouseClickLeft(rectHotSeat)) return Game::NEWHOTSEAT;
-	else
-	if(Game::HotKeyPressEvent(Game::EVENT_BUTTON_NETWORK) ||
-		le.MouseClickLeft(rectNetwork))
-	{
-	    Dialog::Message(_("Error"), _("This release is compiled without network support."), Font::BIG, Dialog::OK);
-	    return Game::MAINMENU;
-	}
-	else
-	if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT) ||
-	    le.MouseClickLeft(rectCancel)) return Game::MAINMENU;
+        if(Game::HotKeyPressEvent(Game::EVENT_BUTTON_HOTSEAT) ||
+                le.MouseClickLeft(rectHotSeat)) return Game::NEWHOTSEAT;
+        else
+        if(Game::HotKeyPressEvent(Game::EVENT_BUTTON_NETWORK) ||
+                le.MouseClickLeft(rectNetwork))
+        {
+            Dialog::Message(_("Error"), _("This release is compiled without network support."), Font::BIG, Dialog::OK);
+            return Game::MAINMENU;
+        }
+        else
+        if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT) ||
+            le.MouseClickLeft(rectCancel)) return Game::MAINMENU;
     }
 
     return Game::QUITGAME;

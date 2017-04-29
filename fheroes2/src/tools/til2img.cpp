@@ -33,16 +33,16 @@ int main(int argc, char **argv)
 {
     if(argc != 3)
     {
-	std::cout << argv[0] << " [-d] infile.til extract_to_dir" << std::endl;
-	return EXIT_SUCCESS;
+        std::cout << argv[0] << " [-d] infile.til extract_to_dir" << std::endl;
+        return EXIT_SUCCESS;
     }
 
     StreamFile sf;
 
     if(! sf.open(argv[1], "rb"))
     {
-	std::cout << "error open file: " << argv[1] << std::endl;
-	return EXIT_SUCCESS;
+        std::cout << "error open file: " << argv[1] << std::endl;
+        return EXIT_SUCCESS;
     }
 
     std::string prefix(argv[2]);
@@ -57,8 +57,8 @@ int main(int argc, char **argv)
 
     if(0 != System::MakeDirectory(prefix))
     {
-	std::cout << "error mkdir: " << prefix << std::endl;
-	return EXIT_SUCCESS;
+        std::cout << "error mkdir: " << prefix << std::endl;
+        return EXIT_SUCCESS;
     }
 
     int size = sf.size();
@@ -71,22 +71,22 @@ int main(int argc, char **argv)
 
     for(int cur = 0; cur < count; ++cur)
     {
-	u32 offset = width * height * cur;
-	if(offset < buf.size())
-	{
-	    Surface sf(& buf[offset], width, height, 1, false);
+        u32 offset = width * height * cur;
+        if(offset < buf.size())
+        {
+            Surface sf(& buf[offset], width, height, 1, false);
 
-	    std::ostringstream stream;
-    	    stream << std::setw(3) << std::setfill('0') << cur;
-	    std::string dstfile = System::ConcatePath(prefix, stream.str());
+            std::ostringstream stream;
+                stream << std::setw(3) << std::setfill('0') << cur;
+            std::string dstfile = System::ConcatePath(prefix, stream.str());
 
 #ifndef WITH_IMAGE
-    	    dstfile += ".bmp";
+                dstfile += ".bmp";
 #else
-    	    dstfile += ".png";
+                dstfile += ".png";
 #endif
-    	    sf.Save(dstfile.c_str());
-	}
+                sf.Save(dstfile.c_str());
+        }
     }
 
     sf.close();

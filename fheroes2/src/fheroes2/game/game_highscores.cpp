@@ -40,8 +40,8 @@
 #include "game.h"
 #include "game_over.h"
 
-#define HGS_ID	0xF1F3
-#define HGS_MAX	10
+#define HGS_ID        0xF1F3
+#define HGS_MAX        10
 
 struct hgs_t
 {
@@ -49,11 +49,11 @@ struct hgs_t
 
     bool operator== (const hgs_t &) const;
 
-    std::string	player;
-    std::string	land;
-    u32		localtime;
-    u32		days;
-    u32		rating;
+    std::string        player;
+    std::string        land;
+    u32                localtime;
+    u32                days;
+    u32                rating;
 };
 
 StreamBase & operator<< (StreamBase & msg, const hgs_t & hgs)
@@ -101,8 +101,8 @@ bool HGSData::Load(const std::string & fn)
 
     if(hgs_id == HGS_ID)
     {
-	hdata >> list;
-	return ! hdata.fail();
+        hdata >> list;
+        return ! hdata.fail();
     }
 
     return false;
@@ -130,9 +130,9 @@ void HGSData::ScoreRegistry(const std::string & p, const std::string & m, u32 r,
 
     if(list.end() == std::find(list.begin(), list.end(), h))
     {
-	list.push_back(h);
-	std::sort(list.begin(), list.end(), RatingSort);
-	if(list.size() > HGS_MAX) list.resize(HGS_MAX);
+        list.push_back(h);
+        std::sort(list.begin(), list.end(), RatingSort);
+        if(list.size() > HGS_MAX) list.resize(HGS_MAX);
     }
 }
 
@@ -146,9 +146,9 @@ void HGSData::RedrawList(s32 ox, s32 oy)
 
     const Sprite &head = AGG::GetICN(ICN::HISCORE, 6);
     if(conf.QVGA())
-	head.Blit(ox + 25, oy + 15);
+        head.Blit(ox + 25, oy + 15);
     else
-	head.Blit(ox + 50, oy + 31);
+        head.Blit(ox + 50, oy + 31);
 
     std::sort(list.begin(), list.end(), RatingSort);
 
@@ -160,21 +160,21 @@ void HGSData::RedrawList(s32 ox, s32 oy)
 
     for(; it1 != it2 && (it1 - list.begin() < HGS_MAX); ++it1)
     {
-	const hgs_t & hgs = *it1;
+        const hgs_t & hgs = *it1;
 
-	text.Set(hgs.player);
-	text.Blit(ox + (conf.QVGA() ? 45 : 88), oy + (conf.QVGA() ? 33 : 70));
+        text.Set(hgs.player);
+        text.Blit(ox + (conf.QVGA() ? 45 : 88), oy + (conf.QVGA() ? 33 : 70));
 
-	text.Set(hgs.land);
-	text.Blit(ox + (conf.QVGA() ? 170 : 260), oy + (conf.QVGA() ? 33 : 70));
+        text.Set(hgs.land);
+        text.Blit(ox + (conf.QVGA() ? 170 : 260), oy + (conf.QVGA() ? 33 : 70));
 
-	text.Set(GetString(hgs.days));
-	text.Blit(ox + (conf.QVGA() ? 250 : 420), oy + (conf.QVGA() ? 33 : 70));
+        text.Set(GetString(hgs.days));
+        text.Blit(ox + (conf.QVGA() ? 250 : 420), oy + (conf.QVGA() ? 33 : 70));
 
-	text.Set(GetString(hgs.rating));
-	text.Blit(ox + (conf.QVGA() ? 270 : 480), oy + (conf.QVGA() ? 33 : 70));
+        text.Set(GetString(hgs.rating));
+        text.Blit(ox + (conf.QVGA() ? 270 : 480), oy + (conf.QVGA() ? 33 : 70));
 
-	oy += conf.QVGA() ? 20 : 40;
+        oy += conf.QVGA() ? 20 : 40;
     }
 }
 
@@ -190,9 +190,9 @@ int Game::HighScores(bool fill)
 #ifdef WITH_DEBUG
     if(IS_DEVEL() && world.CountDay())
     {
-	std::string msg = std::string("Devepoper mode, not save! \n \n Your result: ") + GetString(GetGameOverScores());
-	Dialog::Message("High Scores", msg, Font::BIG, Dialog::OK);
-	return MAINMENU;
+        std::string msg = std::string("Devepoper mode, not save! \n \n Your result: ") + GetString(GetGameOverScores());
+        Dialog::Message("High Scores", msg, Font::BIG, Dialog::OK);
+        return MAINMENU;
     }
 #endif
 
@@ -230,30 +230,30 @@ int Game::HighScores(bool fill)
 
     if(rating && (gameResult.GetResult() & GameOver::WINS))
     {
-	std::string player(_("Unknown Hero"));
-	Dialog::InputString(_("Your Name"), player);
-	cursor.Hide();
-	if(player.empty()) player = _("Unknown Hero");
-	hgs.ScoreRegistry(player, Settings::Get().CurrentFileInfo().name, days, rating);
-	hgs.Save(stream.str().c_str());
-	hgs.RedrawList(top.x, top.y);
-	buttonCampain.Draw();
-	buttonExit.Draw();
-	cursor.Show();
-	display.Flip();
-	gameResult.Reset();
+        std::string player(_("Unknown Hero"));
+        Dialog::InputString(_("Your Name"), player);
+        cursor.Hide();
+        if(player.empty()) player = _("Unknown Hero");
+        hgs.ScoreRegistry(player, Settings::Get().CurrentFileInfo().name, days, rating);
+        hgs.Save(stream.str().c_str());
+        hgs.RedrawList(top.x, top.y);
+        buttonCampain.Draw();
+        buttonExit.Draw();
+        cursor.Show();
+        display.Flip();
+        gameResult.Reset();
     }
 
     // highscores loop
     while(le.HandleEvents())
     {
-	// key code info
+        // key code info
         if(Settings::Get().Debug() == 0x12 && le.KeyPress())
             Dialog::Message("Key Press:", GetString(le.KeyValue()), Font::SMALL, Dialog::OK);
-	le.MousePressLeft(buttonCampain) ? buttonCampain.PressDraw() : buttonCampain.ReleaseDraw();
-	le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
+        le.MousePressLeft(buttonCampain) ? buttonCampain.PressDraw() : buttonCampain.ReleaseDraw();
+        le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
-	if(le.MouseClickLeft(buttonExit) || HotKeyCloseWindow) return MAINMENU;
+        if(le.MouseClickLeft(buttonExit) || HotKeyCloseWindow) return MAINMENU;
     }
 
     return QUITGAME;

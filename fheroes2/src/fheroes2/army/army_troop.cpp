@@ -116,19 +116,19 @@ u32 Troop::GetStrength(void) const
     float res = (GetDamageMin() + GetDamageMax()) >> 1;
 
     // increase strength
-    if(isFly())		res += res * 0.5;
-    if(isArchers())	res += res * 0.5;
-    if(isTwiceAttack())	res += res * 0.5;
-    if(isHideAttack())	res += res * 0.5;
+    if(isFly())                res += res * 0.5;
+    if(isArchers())        res += res * 0.5;
+    if(isTwiceAttack())        res += res * 0.5;
+    if(isHideAttack())        res += res * 0.5;
 
     // slowly: decrease strength
     if((!isFly() && !isArchers()) && Speed::AVERAGE > GetSpeed()) res -= res * 0.5;
 
     switch(GetID())
     {
-	case Monster::GHOST: res *= 2; break;
+        case Monster::GHOST: res *= 2; break;
 
-	default: break;
+        default: break;
     }
 
     return static_cast<u32>(res);
@@ -247,7 +247,7 @@ const Army* ArmyTroop::GetArmy(void) const
 std::string ArmyTroop::GetAttackString(void) const
 {
     if(Troop::GetAttack() == GetAttack())
-	return GetString(Troop::GetAttack());
+        return GetString(Troop::GetAttack());
 
     std::ostringstream os;
     os << Troop::GetAttack() << " (" << GetAttack() << ")";
@@ -257,7 +257,7 @@ std::string ArmyTroop::GetAttackString(void) const
 std::string ArmyTroop::GetDefenseString(void) const
 {
     if(Troop::GetDefense() == GetDefense())
-	return GetString(Troop::GetDefense());
+        return GetString(Troop::GetDefense());
 
     std::ostringstream os;
     os << Troop::GetDefense() << " (" << GetDefense() << ")";

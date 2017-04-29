@@ -58,11 +58,11 @@ void MageGuild::Builds(int race, bool libraryCap)
 
     if(libraryCap)
     {
-	library.Append(GetUniqueCombatSpellCompatibility(general, race, 1));
-	library.Append(GetUniqueCombatSpellCompatibility(general, race, 2));
-	library.Append(GetUniqueCombatSpellCompatibility(general, race, 3));
-	library.Append(GetUniqueCombatSpellCompatibility(general, race, 4));
-	library.Append(GetUniqueCombatSpellCompatibility(general, race, 5));
+        library.Append(GetUniqueCombatSpellCompatibility(general, race, 1));
+        library.Append(GetUniqueCombatSpellCompatibility(general, race, 2));
+        library.Append(GetUniqueCombatSpellCompatibility(general, race, 3));
+        library.Append(GetUniqueCombatSpellCompatibility(general, race, 4));
+        library.Append(GetUniqueCombatSpellCompatibility(general, race, 5));
     }
 }
 
@@ -72,8 +72,8 @@ SpellStorage MageGuild::GetSpells(int lvlmage, bool islibrary, int level) const
 
     if(lvlmage >= level)
     {
-	result = general.GetSpells(level);
-	if(islibrary) result.Append(library.GetSpells(level));
+        result = general.GetSpells(level);
+        if(islibrary) result.Append(library.GetSpells(level));
     }
 
     return result;
@@ -83,15 +83,15 @@ void MageGuild::EducateHero(HeroBase & hero, int lvlmage, bool isLibraryBuild) c
 {
     if(hero.HaveSpellBook() && lvlmage)
     {
-	SpellStorage spells;
+        SpellStorage spells;
 
-	for(s32 level = 1; level <= 5; ++level) if(level <= lvlmage)
-	{
-	    spells.Append(general.GetSpells(level));
-	    if(isLibraryBuild) spells.Append(library.GetSpells(level));
-	}
+        for(s32 level = 1; level <= 5; ++level) if(level <= lvlmage)
+        {
+            spells.Append(general.GetSpells(level));
+            if(isLibraryBuild) spells.Append(library.GetSpells(level));
+        }
 
-	hero.AppendSpellsToBook(spells);
+        hero.AppendSpellsToBook(spells);
     }
 }
 

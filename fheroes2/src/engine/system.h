@@ -49,13 +49,13 @@ namespace std
 
 namespace System
 {
-    int		SetEnvironment(const char* name, const char* value);
-    const char*	GetEnvironment(const char* name);
+    int                SetEnvironment(const char* name, const char* value);
+    const char*        GetEnvironment(const char* name);
 
-    int		MakeDirectory(const std::string &);
-    std::string	ConcatePath(const std::string &, const std::string &);
-    ListDirs	GetDataDirectories(const std::string &);
-    ListFiles	GetListFiles(const std::string &, const std::string &, const std::string &);
+    int                MakeDirectory(const std::string &);
+    std::string        ConcatePath(const std::string &, const std::string &);
+    ListDirs        GetDataDirectories(const std::string &);
+    ListFiles        GetListFiles(const std::string &, const std::string &, const std::string &);
     std::string GetHomeDirectory(const std::string &);
 
     std::string GetDirname(const std::string &);
@@ -63,23 +63,23 @@ namespace System
 
     std::string GetTime(void);
 
-    void	SetLocale(int, const char*);
-    std::string	GetMessageLocale(int /* 3: en_us.utf-8, 2: en_us, 1: en */);
-    size_t	GetMemoryUsage(void);
+    void        SetLocale(int, const char*);
+    std::string        GetMessageLocale(int /* 3: en_us.utf-8, 2: en_us, 1: en */);
+    size_t        GetMemoryUsage(void);
 
-    int		GetCommandOptions(int argc, char* const argv[], const char* optstring);
-    char*	GetOptionsArgument(void);
+    int                GetCommandOptions(int argc, char* const argv[], const char* optstring);
+    char*        GetOptionsArgument(void);
 
-    bool	IsFile(const std::string & name, bool writable = false);
-    bool	IsDirectory(const std::string & name, bool writable = false);
-    int		Unlink(const std::string &);
+    bool        IsFile(const std::string & name, bool writable = false);
+    bool        IsDirectory(const std::string & name, bool writable = false);
+    int                Unlink(const std::string &);
 
-    bool	isEmbededDevice(void);
-    bool	isRunning(void);
-    int		CreateTrayIcon(bool);
-    void	PowerManagerOff(bool);
+    bool        isEmbededDevice(void);
+    bool        isRunning(void);
+    int                CreateTrayIcon(bool);
+    void        PowerManagerOff(bool);
 
-    int		ShellCommand(const char*);
+    int                ShellCommand(const char*);
     int         GetRenderFlags(void);
 }
 

@@ -39,7 +39,7 @@ Display::~Display()
 {
 #if SDL_VERSION_ATLEAST(2, 0, 0)
     if(renderer)
-	SDL_DestroyRenderer(renderer);
+        SDL_DestroyRenderer(renderer);
 
     if(window)
         SDL_DestroyWindow(window);
@@ -57,7 +57,7 @@ void Display::SetVideoMode(int w, int h, bool fullscreen)
         flags |= SDL_WINDOW_FULLSCREEN;
         
     if(renderer)
-	SDL_DestroyRenderer(renderer);
+        SDL_DestroyRenderer(renderer);
         
     if(window)
         SDL_DestroyWindow(window);
@@ -74,12 +74,12 @@ void Display::SetVideoMode(int w, int h, bool fullscreen)
     u32 flags = System::GetRenderFlags();
 
     if(fullscreen)
-	flags |= SDL_FULLSCREEN;
+        flags |= SDL_FULLSCREEN;
 
     surface = SDL_SetVideoMode(w, h, 0, flags);
 
     if(! surface)
-	Error::Except(__FUNCTION__, SDL_GetError());
+        Error::Except(__FUNCTION__, SDL_GetError());
 #endif
 }
 
@@ -106,24 +106,24 @@ void Display::Flip(void)
 
     if(tx)
     {
-	if(0 != SDL_SetRenderTarget(renderer, NULL))
-	{
-    	    ERROR(SDL_GetError());
-	}
-	else
-	{
-	    if(0 != SDL_RenderCopy(renderer, tx, NULL, NULL))
-	    {
-    		ERROR(SDL_GetError());
-	    }
-	    else
-		SDL_RenderPresent(renderer);
-	}
+        if(0 != SDL_SetRenderTarget(renderer, NULL))
+        {
+                ERROR(SDL_GetError());
+        }
+        else
+        {
+            if(0 != SDL_RenderCopy(renderer, tx, NULL, NULL))
+            {
+                    ERROR(SDL_GetError());
+            }
+            else
+                SDL_RenderPresent(renderer);
+        }
 
-	SDL_DestroyTexture(tx);
+        SDL_DestroyTexture(tx);
     }
     else
-    	ERROR(SDL_GetError());
+            ERROR(SDL_GetError());
 #else
     SDL_Flip(surface);
 #endif
@@ -207,29 +207,29 @@ Size Display::GetMaxMode(bool rotate) const
     SDL_Rect** modes = SDL_ListModes(NULL, SDL_ANYFORMAT);
 
     if(modes == (SDL_Rect **) 0 ||
-	modes == (SDL_Rect **) -1)
+        modes == (SDL_Rect **) -1)
     {
         ERROR("GetMaxMode: " << "no modes available");
     }
     else
     {
-	int max = 0;
-	int cur = 0;
+        int max = 0;
+        int cur = 0;
 
-	for(int ii = 0; modes[ii]; ++ii)
-	{
-	    if(max < modes[ii]->w * modes[ii]->h)
-	    {
-		max = modes[ii]->w * modes[ii]->h;
-		cur = ii;
-	    }
-	}
+        for(int ii = 0; modes[ii]; ++ii)
+        {
+            if(max < modes[ii]->w * modes[ii]->h)
+            {
+                max = modes[ii]->w * modes[ii]->h;
+                cur = ii;
+            }
+        }
 
-	result.w = modes[cur]->w;
-	result.h = modes[cur]->h;
+        result.w = modes[cur]->w;
+        result.h = modes[cur]->h;
 
-	if(rotate && result.w < result.h)
-	    std::swap(result.w, result.h);
+        if(rotate && result.w < result.h)
+            std::swap(result.w, result.h);
     }
 
     return result;
@@ -249,8 +249,8 @@ std::string Display::GetInfo(void) const
     char namebuf[12];
 
     os << "Display::" << "GetInfo: " <<
-	GetString(GetSize()) << ", " <<
-	"driver: " << SDL_VideoDriverName(namebuf, 12);
+        GetString(GetSize()) << ", " <<
+        "driver: " << SDL_VideoDriverName(namebuf, 12);
 
     return os.str();
 #endif
@@ -310,12 +310,12 @@ void Display::Fade(const Surface & top, const Surface & back, const Point & pt, 
 
     while(alpha > min + level)
     {
-	back.Blit(*this);
-	shadow.SetAlphaMod(alpha);
-	shadow.Blit(*this);
-	Flip();
-	alpha -= step;
-	DELAY(delay2);
+        back.Blit(*this);
+        shadow.SetAlphaMod(alpha);
+        shadow.Blit(*this);
+        Flip();
+        alpha -= step;
+        DELAY(delay2);
     }
 }
 
@@ -339,12 +339,12 @@ void Display::Rise(const Surface & top, const Surface & back, const Point & pt, 
 
     while(alpha < max)
     {
-	back.Blit(*this);
-	shadow.SetAlphaMod(alpha);
-	shadow.Blit(*this);
+        back.Blit(*this);
+        shadow.SetAlphaMod(alpha);
+        shadow.Blit(*this);
         Flip();
-	alpha += step;
-	DELAY(delay2);
+        alpha += step;
+        DELAY(delay2);
     }
 }
 
@@ -389,7 +389,7 @@ Texture::Texture(const Surface & sf) : texture(NULL), counter(NULL)
     texture = SDL_CreateTextureFromSurface(display.renderer, sf());
 
     if(!texture)
-	ERROR(SDL_GetError());
+        ERROR(SDL_GetError());
 
     counter = new int;
     *counter = 1;
@@ -398,47 +398,47 @@ Texture::Texture(const Surface & sf) : texture(NULL), counter(NULL)
 Texture::~Texture()
 {
     if(1 < *counter)
-	*counter -= 1;
+        *counter -= 1;
     else
     {
-	SDL_DestroyTexture(texture);
-	delete counter;
+        SDL_DestroyTexture(texture);
+        delete counter;
     }
 }
 
 Texture::Texture(const Texture & tx) : texture(tx.texture), counter(tx.counter)
 {
     if(texture)
-	*counter += 1;
+        *counter += 1;
     else
     {
-	counter = new int;
-	*counter = 0;
+        counter = new int;
+        *counter = 0;
     }
 }
 
 Texture & Texture::operator= (const Texture & tx)
 {
     if(this == &tx)
-	return *this;
+        return *this;
 
     if(1 < *counter)
-	*counter -= 1;
+        *counter -= 1;
     else
     {
-	SDL_DestroyTexture(texture);
-	delete counter;
+        SDL_DestroyTexture(texture);
+        delete counter;
     }
 
     texture = tx.texture;
     counter = tx.counter;
 
     if(texture)
-	*counter += 1;
+        *counter += 1;
     else
     {
-	counter = new int;
-	*counter = 0;
+        counter = new int;
+        *counter = 0;
     }
 
     return *this;
@@ -478,12 +478,12 @@ void Texture::Blit(const Rect & srt, const Point & dpt, Display & display) const
 
     if(0 != SDL_SetRenderTarget(display.renderer, NULL))
     {
-    	ERROR(SDL_GetError());
+            ERROR(SDL_GetError());
     }
     else
     {
-	if(0 != SDL_RenderCopy(display.renderer, texture, &srcrt, &dstrt))
-    	    ERROR(SDL_GetError());
+        if(0 != SDL_RenderCopy(display.renderer, texture, &srcrt, &dstrt))
+                ERROR(SDL_GetError());
     }
 }
 

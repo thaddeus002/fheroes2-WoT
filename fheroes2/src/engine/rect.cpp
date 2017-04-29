@@ -170,21 +170,21 @@ Rect Rect::Get(const Rect & rt1, const Rect & rt2, bool intersect)
 
     if(intersect)
     {
-	if(rt1 & rt2)
-	{
-    	    rt3.x = std::max(rt1.x, rt2.x);
-    	    rt3.y = std::max(rt1.y, rt2.y);
-    	    rt3.w = std::min(rt1.x + rt1.w, rt2.x + rt2.w) - rt3.x;
-    	    rt3.h = std::min(rt1.y + rt1.h, rt2.y + rt2.h) - rt3.y;
-	}
+        if(rt1 & rt2)
+        {
+                rt3.x = std::max(rt1.x, rt2.x);
+                rt3.y = std::max(rt1.y, rt2.y);
+                rt3.w = std::min(rt1.x + rt1.w, rt2.x + rt2.w) - rt3.x;
+                rt3.h = std::min(rt1.y + rt1.h, rt2.y + rt2.h) - rt3.y;
+        }
     }
     else
     // max
     {
-	rt3.x = rt1.x < rt2.x ? rt1.x : rt2.x;
-	rt3.y = rt1.y < rt2.y ? rt1.y : rt2.y;
-	rt3.w = rt1.x + rt1.w > rt2.x + rt2.w ? rt1.x + rt1.w - rt3.x : rt2.x + rt2.w - rt3.x;
-	rt3.h = rt1.y + rt1.h > rt2.y + rt2.h ? rt1.y + rt1.h - rt3.y : rt2.y + rt2.h - rt3.y;
+        rt3.x = rt1.x < rt2.x ? rt1.x : rt2.x;
+        rt3.y = rt1.y < rt2.y ? rt1.y : rt2.y;
+        rt3.w = rt1.x + rt1.w > rt2.x + rt2.w ? rt1.x + rt1.w - rt3.x : rt2.x + rt2.w - rt3.x;
+        rt3.h = rt1.y + rt1.h > rt2.y + rt2.h ? rt1.y + rt1.h - rt3.y : rt2.y + rt2.h - rt3.y;
     }
 
     return rt3;
@@ -224,19 +224,19 @@ Rect Points::GetRect(void) const
 
     if(1 < size())
     {
-	res = Rect::Get(at(0), at(1));
+        res = Rect::Get(at(0), at(1));
 
-	for(const_iterator
-	    it = begin() + 2; it != end(); ++it)
-	{
-	    if((*it).x < res.x) res.x = (*it).x;
-	    else
-	    if((*it).x > res.x + res.w) res.w = (*it).x - res.x + 1;
+        for(const_iterator
+            it = begin() + 2; it != end(); ++it)
+        {
+            if((*it).x < res.x) res.x = (*it).x;
+            else
+            if((*it).x > res.x + res.w) res.w = (*it).x - res.x + 1;
 
-	    if((*it).y < res.y) res.y = (*it).y;
-	    else
-	    if((*it).y > res.y + res.h) res.h = (*it).y - res.y + 1;
-	}
+            if((*it).y < res.y) res.y = (*it).y;
+            else
+            if((*it).y > res.y + res.h) res.h = (*it).y - res.y + 1;
+        }
     }
 
     return res;
@@ -248,13 +248,13 @@ Rect Rects::GetRect(void) const
 
     if(size())
     {
-	const_iterator it = begin();
-	res = *it;
+        const_iterator it = begin();
+        res = *it;
 
-	++it;
+        ++it;
 
-	for(; it != end(); ++it)
-	    res = Rect::Get(*it, res, false);
+        for(; it != end(); ++it)
+            res = Rect::Get(*it, res, false);
     }
 
     return res;
@@ -263,8 +263,8 @@ Rect Rects::GetRect(void) const
 s32 Rects::GetIndex(const Point & pt) const
 {
     for(const_iterator
-	it = begin(); it != end(); ++it)
-	if(*it & pt) return std::distance(begin(), it);
+        it = begin(); it != end(); ++it)
+        if(*it & pt) return std::distance(begin(), it);
     return -1;
 }
 
@@ -280,8 +280,8 @@ std::pair<Rect, Point> Rect::Fixed4Blit(const Rect & srcrt, const Rect & dstrt)
     {
         srcrtfix.w = srcrt.w;
         srcrtfix.h = srcrt.h;
-	dstptfix.x = srcrt.x;
-	dstptfix.y = srcrt.y;
+        dstptfix.x = srcrt.x;
+        dstptfix.y = srcrt.y;
 
         if(srcrt.x < dstrt.x)
         {

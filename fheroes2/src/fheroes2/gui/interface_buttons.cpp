@@ -78,28 +78,28 @@ void Interface::ButtonsArea::Redraw(void)
 
     if(!conf.ExtGameHideInterface() || conf.ShowButtons())
     {
-	const int icnbtn = Settings::Get().ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
+        const int icnbtn = Settings::Get().ExtGameEvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
 
-	if(conf.ExtGameHideInterface())
-	    BorderWindow::Redraw();
+        if(conf.ExtGameHideInterface())
+            BorderWindow::Redraw();
 
-	buttonNextHero.SetSprite(icnbtn, 0, 1);
-	buttonMovement.SetSprite(icnbtn, 2, 3);
-	buttonKingdom.SetSprite(icnbtn, 4, 5);
-	buttonSpell.SetSprite(icnbtn, 6, 7);
-	buttonEndTur.SetSprite(icnbtn, 8, 9);
-	buttonAdventure.SetSprite(icnbtn, 10, 11);
-	buttonFile.SetSprite(icnbtn, 12, 13);
-	buttonSystem.SetSprite(icnbtn, 14, 15);
+        buttonNextHero.SetSprite(icnbtn, 0, 1);
+        buttonMovement.SetSprite(icnbtn, 2, 3);
+        buttonKingdom.SetSprite(icnbtn, 4, 5);
+        buttonSpell.SetSprite(icnbtn, 6, 7);
+        buttonEndTur.SetSprite(icnbtn, 8, 9);
+        buttonAdventure.SetSprite(icnbtn, 10, 11);
+        buttonFile.SetSprite(icnbtn, 12, 13);
+        buttonSystem.SetSprite(icnbtn, 14, 15);
 
-	buttonNextHero.Draw();
-	buttonMovement.Draw();
-	buttonKingdom.Draw();
-	buttonSpell.Draw();
-	buttonEndTur.Draw();
-	buttonAdventure.Draw();
-	buttonFile.Draw();
-	buttonSystem.Draw();
+        buttonNextHero.Draw();
+        buttonMovement.Draw();
+        buttonKingdom.Draw();
+        buttonSpell.Draw();
+        buttonEndTur.Draw();
+        buttonAdventure.Draw();
+        buttonFile.Draw();
+        buttonSystem.Draw();
     }
 }
 
@@ -119,8 +119,8 @@ int Interface::ButtonsArea::QueueEventProcessing(void)
     le.MousePressLeft(buttonSystem) ? buttonSystem.PressDraw() : buttonSystem.ReleaseDraw();
 
     if(conf.ShowButtons() &&
-	// move border window
-	BorderWindow::QueueEventProcessing())
+        // move border window
+        BorderWindow::QueueEventProcessing())
     {
     }
     else
@@ -128,56 +128,56 @@ int Interface::ButtonsArea::QueueEventProcessing(void)
     {
         // for QVGA: auto hide buttons after click
         if(conf.QVGA()) conf.SetShowButtons(false);
-	interface.EventNextHero();
+        interface.EventNextHero();
     }
     else
     if(le.MouseClickLeft(buttonMovement))
     {
         // for QVGA: auto hide buttons after click
         if(conf.QVGA()) conf.SetShowButtons(false);
-	interface.EventContinueMovement();
+        interface.EventContinueMovement();
     }
     else
     if(le.MouseClickLeft(buttonKingdom))
     {
         // for QVGA: auto hide buttons after click
         if(conf.QVGA()) conf.SetShowButtons(false);
-	interface.EventKingdomInfo();
+        interface.EventKingdomInfo();
     }
     else
     if(le.MouseClickLeft(buttonSpell))
     {
         // for QVGA: auto hide buttons after click
         if(conf.QVGA()) conf.SetShowButtons(false);
-	interface.EventCastSpell();
+        interface.EventCastSpell();
     }
     else
     if(le.MouseClickLeft(buttonEndTur))
     {
         // for QVGA: auto hide buttons after click
         if(conf.QVGA()) conf.SetShowButtons(false);
-	res = interface.EventEndTurn();
+        res = interface.EventEndTurn();
     }
     else
     if(le.MouseClickLeft(buttonAdventure))
     {
         // for QVGA: auto hide buttons after click
         if(conf.QVGA()) conf.SetShowButtons(false);
-	res = interface.EventAdventureDialog();
+        res = interface.EventAdventureDialog();
     }
     else
     if(le.MouseClickLeft(buttonFile))
     {
         // for QVGA: auto hide buttons after click
         if(conf.QVGA()) conf.SetShowButtons(false);
-	res = interface.EventFileDialog();
+        res = interface.EventFileDialog();
     }
     else
     if(le.MouseClickLeft(buttonSystem))
     {
         // for QVGA: auto hide buttons after click
         if(conf.QVGA()) conf.SetShowButtons(false);
-	interface.EventSystemDialog();
+        interface.EventSystemDialog();
     }
 
     if(le.MousePressRight(buttonNextHero)) Dialog::Message(_("Next Hero"), _("Select the next Hero."), Font::BIG);

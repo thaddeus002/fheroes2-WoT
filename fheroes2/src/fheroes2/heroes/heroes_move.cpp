@@ -46,17 +46,17 @@ void PlayWalkSound(int ground)
     // play sound
     switch(ground)
     {
-    	case Maps::Ground::WATER:       wav = (1 == speed ? M82::WSND00 : (2 == speed ? M82::WSND10 : M82::WSND20)); break;
-    	case Maps::Ground::GRASS:       wav = (1 == speed ? M82::WSND01 : (2 == speed ? M82::WSND11 : M82::WSND21)); break;
-    	case Maps::Ground::WASTELAND:   wav = (1 == speed ? M82::WSND02 : (2 == speed ? M82::WSND12 : M82::WSND22)); break;
-    	case Maps::Ground::SWAMP:
-    	case Maps::Ground::BEACH:       wav = (1 == speed ? M82::WSND03 : (2 == speed ? M82::WSND13 : M82::WSND23)); break;
-    	case Maps::Ground::LAVA:        wav = (1 == speed ? M82::WSND04 : (2 == speed ? M82::WSND14 : M82::WSND24)); break;
-    	case Maps::Ground::DESERT:
-    	case Maps::Ground::SNOW:        wav = (1 == speed ? M82::WSND05 : (2 == speed ? M82::WSND15 : M82::WSND25)); break;
-    	case Maps::Ground::DIRT:        wav = (1 == speed ? M82::WSND06 : (2 == speed ? M82::WSND16 : M82::WSND26)); break;
+            case Maps::Ground::WATER:       wav = (1 == speed ? M82::WSND00 : (2 == speed ? M82::WSND10 : M82::WSND20)); break;
+            case Maps::Ground::GRASS:       wav = (1 == speed ? M82::WSND01 : (2 == speed ? M82::WSND11 : M82::WSND21)); break;
+            case Maps::Ground::WASTELAND:   wav = (1 == speed ? M82::WSND02 : (2 == speed ? M82::WSND12 : M82::WSND22)); break;
+            case Maps::Ground::SWAMP:
+            case Maps::Ground::BEACH:       wav = (1 == speed ? M82::WSND03 : (2 == speed ? M82::WSND13 : M82::WSND23)); break;
+            case Maps::Ground::LAVA:        wav = (1 == speed ? M82::WSND04 : (2 == speed ? M82::WSND14 : M82::WSND24)); break;
+            case Maps::Ground::DESERT:
+            case Maps::Ground::SNOW:        wav = (1 == speed ? M82::WSND05 : (2 == speed ? M82::WSND15 : M82::WSND25)); break;
+            case Maps::Ground::DIRT:        wav = (1 == speed ? M82::WSND06 : (2 == speed ? M82::WSND16 : M82::WSND26)); break;
 
-    	default: break;
+            default: break;
     }
 
     if(wav != M82::UNKNOWN) AGG::PlaySound(wav);
@@ -68,7 +68,7 @@ bool ReflectSprite(int from)
     {
         case Direction::BOTTOM_LEFT:
         case Direction::LEFT:
-        case Direction::TOP_LEFT:		return true;
+        case Direction::TOP_LEFT:                return true;
 
         default: break;
     }
@@ -95,7 +95,7 @@ Sprite SpriteHero(const Heroes & hero, int index, bool reflect, bool rotate)
         default: DEBUG(DBG_GAME, DBG_WARN, "unknown race"); break;
     }
 
-    if(rotate)				index_sprite = 45;
+    if(rotate)                                index_sprite = 45;
     else
     switch(hero.GetDirection())
     {
@@ -131,7 +131,7 @@ Sprite SpriteFlag(const Heroes & hero, int index, bool reflect, bool rotate)
         default: DEBUG(DBG_GAME, DBG_WARN, "unknown color"); break;
     }
 
-    if(rotate)				index_sprite = 45;
+    if(rotate)                                index_sprite = 45;
     else
     switch(hero.GetDirection())
     {
@@ -197,16 +197,16 @@ bool isNeedStayFrontObject(const Heroes & hero, const Maps::Tiles & next)
 {
     if(next.GetObject() == MP2::OBJ_CASTLE)
     {
-	const Castle* castle = world.GetCastle(next.GetCenter());
+        const Castle* castle = world.GetCastle(next.GetCenter());
 
-	return (castle &&
-		! hero.isFriends(castle->GetColor()));
+        return (castle &&
+                ! hero.isFriends(castle->GetColor()));
     }
     else
     // to coast action
     if(hero.isShipMaster() &&
-	next.GetObject() == MP2::OBJ_COAST)
-	return true;
+        next.GetObject() == MP2::OBJ_COAST)
+        return true;
 
     return MP2::isNeedStayFront(next.GetObject());
 }
@@ -242,46 +242,46 @@ void Heroes::Redraw(Surface & dst, s32 dx, s32 dy, bool with_shadow) const
     // apply offset
     if(sprite_index < 45)
     {
-	s32 ox = 0;
-	s32 oy = 0;
-	int frame = (sprite_index % 9);
+        s32 ox = 0;
+        s32 oy = 0;
+        int frame = (sprite_index % 9);
 
-	switch(direction)
-	{
-    	    case Direction::TOP:            oy = -4 * frame; break;
-    	    case Direction::TOP_RIGHT:      ox = 4 * frame; oy = -4 * frame; break;
-    	    case Direction::TOP_LEFT:       ox = -4 * frame; oy = -4 * frame; break;
-    	    case Direction::BOTTOM_RIGHT:   ox = 4 * frame; oy = 4 * frame; break;
-    	    case Direction::BOTTOM:         oy = 4 * frame; break;
-    	    case Direction::BOTTOM_LEFT:    ox = -4 * frame; oy = 4 * frame; break;
-    	    case Direction::RIGHT:          ox = 4 * frame; break;
-    	    case Direction::LEFT:           ox = -4 * frame; break;
-    	    default: break;
-	}
+        switch(direction)
+        {
+                case Direction::TOP:            oy = -4 * frame; break;
+                case Direction::TOP_RIGHT:      ox = 4 * frame; oy = -4 * frame; break;
+                case Direction::TOP_LEFT:       ox = -4 * frame; oy = -4 * frame; break;
+                case Direction::BOTTOM_RIGHT:   ox = 4 * frame; oy = 4 * frame; break;
+                case Direction::BOTTOM:         oy = 4 * frame; break;
+                case Direction::BOTTOM_LEFT:    ox = -4 * frame; oy = 4 * frame; break;
+                case Direction::RIGHT:          ox = 4 * frame; break;
+                case Direction::LEFT:           ox = -4 * frame; break;
+                default: break;
+        }
 
-	dst_pt1.x += ox;
-	dst_pt1.y += oy;
-	dst_pt2.x += ox;
-	dst_pt2.y += oy;
-	dst_pt3.x += ox;
-	dst_pt3.y += oy;
-	dst_pt4.x += ox;
-	dst_pt4.y += oy;
+        dst_pt1.x += ox;
+        dst_pt1.y += oy;
+        dst_pt2.x += ox;
+        dst_pt2.y += oy;
+        dst_pt3.x += ox;
+        dst_pt3.y += oy;
+        dst_pt4.x += ox;
+        dst_pt4.y += oy;
     }
 
     if(isShipMaster())
     {
-	dst_pt1.y -= 15;
-	dst_pt2.y -= 15;
-	dst_pt3.y -= 15;
-	dst_pt4.y -= 15;
+        dst_pt1.y -= 15;
+        dst_pt2.y -= 15;
+        dst_pt3.y -= 15;
+        dst_pt4.y -= 15;
 
-	sprite4.Blit(gamearea.RectFixed(dst_pt4, sprite4.w(), sprite4.h()), dst_pt4, dst);
+        sprite4.Blit(gamearea.RectFixed(dst_pt4, sprite4.w(), sprite4.h()), dst_pt4, dst);
     }
 
     // redraw sprites for shadow
     if(with_shadow)
-	sprite3.Blit(gamearea.RectFixed(dst_pt3, sprite3.w(), sprite3.h()), dst_pt3, dst);
+        sprite3.Blit(gamearea.RectFixed(dst_pt3, sprite3.w(), sprite3.h()), dst_pt3, dst);
 
     // redraw sprites hero and flag
     sprite1.Blit(gamearea.RectFixed(dst_pt1, sprite1.w(), sprite1.h()), dst_pt1, dst);
@@ -295,49 +295,49 @@ void Heroes::Redraw(Surface & dst, s32 dx, s32 dy, bool with_shadow) const
     tile.RedrawTop(dst);
 
     if(Maps::isValidDirection(centerIndex, Direction::TOP))
-	world.GetTiles(Maps::GetDirectionIndex(centerIndex, Direction::TOP)).RedrawTop4Hero(dst, skip_ground);
+        world.GetTiles(Maps::GetDirectionIndex(centerIndex, Direction::TOP)).RedrawTop4Hero(dst, skip_ground);
 
     if(Maps::isValidDirection(centerIndex, Direction::BOTTOM))
     {
-	Maps::Tiles & tile_bottom = world.GetTiles(Maps::GetDirectionIndex(centerIndex, Direction::BOTTOM));
-	tile_bottom.RedrawBottom4Hero(dst);
-	tile_bottom.RedrawTop(dst);
+        Maps::Tiles & tile_bottom = world.GetTiles(Maps::GetDirectionIndex(centerIndex, Direction::BOTTOM));
+        tile_bottom.RedrawBottom4Hero(dst);
+        tile_bottom.RedrawTop(dst);
     }
 
     if(45 > GetSpriteIndex())
     {
-	if(Direction::BOTTOM != direction &&
-	    Direction::TOP != direction &&
-	    Maps::isValidDirection(centerIndex, direction))
-	{
-	    if(Maps::isValidDirection(Maps::GetDirectionIndex(centerIndex, direction), Direction::BOTTOM))
-	    {
-		Maps::Tiles & tile_dir_bottom = world.GetTiles(Maps::GetDirectionIndex(Maps::GetDirectionIndex(centerIndex, direction), Direction::BOTTOM));
-    		tile_dir_bottom.RedrawBottom4Hero(dst);
-		tile_dir_bottom.RedrawTop(dst);
-	    }
-	    if(Maps::isValidDirection(Maps::GetDirectionIndex(centerIndex, direction), Direction::TOP))
-	    {
-		Maps::Tiles & tile_dir_top = world.GetTiles(Maps::GetDirectionIndex(Maps::GetDirectionIndex(centerIndex, direction), Direction::TOP));
-		tile_dir_top.RedrawTop4Hero(dst, skip_ground);
-	    }
-	}
+        if(Direction::BOTTOM != direction &&
+            Direction::TOP != direction &&
+            Maps::isValidDirection(centerIndex, direction))
+        {
+            if(Maps::isValidDirection(Maps::GetDirectionIndex(centerIndex, direction), Direction::BOTTOM))
+            {
+                Maps::Tiles & tile_dir_bottom = world.GetTiles(Maps::GetDirectionIndex(Maps::GetDirectionIndex(centerIndex, direction), Direction::BOTTOM));
+                    tile_dir_bottom.RedrawBottom4Hero(dst);
+                tile_dir_bottom.RedrawTop(dst);
+            }
+            if(Maps::isValidDirection(Maps::GetDirectionIndex(centerIndex, direction), Direction::TOP))
+            {
+                Maps::Tiles & tile_dir_top = world.GetTiles(Maps::GetDirectionIndex(Maps::GetDirectionIndex(centerIndex, direction), Direction::TOP));
+                tile_dir_top.RedrawTop4Hero(dst, skip_ground);
+            }
+        }
 
-	if(Maps::isValidDirection(centerIndex, Direction::BOTTOM))
-	{
-	    Maps::Tiles & tile_bottom = world.GetTiles(Maps::GetDirectionIndex(centerIndex, Direction::BOTTOM));
+        if(Maps::isValidDirection(centerIndex, Direction::BOTTOM))
+        {
+            Maps::Tiles & tile_bottom = world.GetTiles(Maps::GetDirectionIndex(centerIndex, Direction::BOTTOM));
 
-	    if(tile_bottom.GetObject() == MP2::OBJ_BOAT)
-    		tile_bottom.RedrawObjects(dst);
-	}
+            if(tile_bottom.GetObject() == MP2::OBJ_BOAT)
+                    tile_bottom.RedrawObjects(dst);
+        }
     }
 
     if(Maps::isValidDirection(centerIndex, direction))
     {
-	if(Direction::TOP == direction)
-	    world.GetTiles(Maps::GetDirectionIndex(centerIndex, direction)).RedrawTop4Hero(dst, skip_ground);
-	else
-	    world.GetTiles(Maps::GetDirectionIndex(centerIndex, direction)).RedrawTop(dst);
+        if(Direction::TOP == direction)
+            world.GetTiles(Maps::GetDirectionIndex(centerIndex, direction)).RedrawTop4Hero(dst, skip_ground);
+        else
+            world.GetTiles(Maps::GetDirectionIndex(centerIndex, direction)).RedrawTop(dst);
     }
 }
 
@@ -345,24 +345,24 @@ void Heroes::MoveStep(Heroes & hero, s32 index_from, s32 index_to, bool newpos)
 {
     if(newpos)
     {
-	hero.Move2Dest(index_to);
-	hero.GetPath().PopFront();
+        hero.Move2Dest(index_to);
+        hero.GetPath().PopFront();
 
-	// possible hero is die
-	if(!hero.isFreeman() &&
-	    index_to == hero.GetPath().GetDestinationIndex())
-	{
-	    hero.GetPath().Reset();
-	    hero.Action(index_to);
-	    hero.SetMove(false);
-	}
+        // possible hero is die
+        if(!hero.isFreeman() &&
+            index_to == hero.GetPath().GetDestinationIndex())
+        {
+            hero.GetPath().Reset();
+            hero.Action(index_to);
+            hero.SetMove(false);
+        }
     }
     else
     {
-	hero.ApplyPenaltyMovement();
-	hero.GetPath().Reset();
-	hero.Action(index_to);
-	hero.SetMove(false);
+        hero.ApplyPenaltyMovement();
+        hero.GetPath().Reset();
+        hero.Action(index_to);
+        hero.SetMove(false);
     }
 }
 
@@ -375,36 +375,36 @@ bool Heroes::MoveStep(bool fast)
 
     if(fast)
     {
-	if(index_to == index_dst && isNeedStayFrontObject(*this, world.GetTiles(index_to)))
-	    MoveStep(*this, index_from, index_to, false);
-	else
-	    MoveStep(*this, index_from, index_to, true);
+        if(index_to == index_dst && isNeedStayFrontObject(*this, world.GetTiles(index_to)))
+            MoveStep(*this, index_from, index_to, false);
+        else
+            MoveStep(*this, index_from, index_to, true);
 
-	return true;
+        return true;
     }
     else
     if(0 == sprite_index % 9)
     {
-	if(index_to == index_dst && isNeedStayFrontObject(*this, world.GetTiles(index_to)))
-	{
-	    MoveStep(*this, index_from, index_to, false);
+        if(index_to == index_dst && isNeedStayFrontObject(*this, world.GetTiles(index_to)))
+        {
+            MoveStep(*this, index_from, index_to, false);
 
-	    return true;
-	}
-	else
-	{
-	    // play sound
-	    if(GetKingdom().isControlHuman())
-		PlayWalkSound(world.GetTiles(mp.x, mp.y).GetGround());
-	}
+            return true;
+        }
+        else
+        {
+            // play sound
+            if(GetKingdom().isControlHuman())
+                PlayWalkSound(world.GetTiles(mp.x, mp.y).GetGround());
+        }
     }
     else
     if(8 == sprite_index % 9)
     {
-	sprite_index -= 8;
-	MoveStep(*this, index_from, index_to, true);
+        sprite_index -= 8;
+        MoveStep(*this, index_from, index_to, true);
 
-	return true;
+        return true;
     }
 
     ++sprite_index;
@@ -420,97 +420,97 @@ void Heroes::AngleStep(int to_direct)
     // start index
     if(45 > sprite_index && 0 == sprite_index % 9)
     {
-	switch(direction)
-	{
-    	    case Direction::TOP:		sprite_index = 45; break;
-    	    case Direction::TOP_RIGHT:		sprite_index = clockwise ? 47 : 46; break;
-    	    case Direction::TOP_LEFT:		sprite_index = clockwise ? 46 : 47; break;
-    	    case Direction::RIGHT:		sprite_index = clockwise ? 49 : 48; break;
-    	    case Direction::LEFT:		sprite_index = clockwise ? 48 : 49; break;
-    	    case Direction::BOTTOM_RIGHT:	sprite_index = clockwise ? 51 : 50; break;
-    	    case Direction::BOTTOM_LEFT:	sprite_index = clockwise ? 50 : 51; break;
-    	    case Direction::BOTTOM:		sprite_index = clockwise ? 52 : 53; break;
+        switch(direction)
+        {
+                case Direction::TOP:                sprite_index = 45; break;
+                case Direction::TOP_RIGHT:                sprite_index = clockwise ? 47 : 46; break;
+                case Direction::TOP_LEFT:                sprite_index = clockwise ? 46 : 47; break;
+                case Direction::RIGHT:                sprite_index = clockwise ? 49 : 48; break;
+                case Direction::LEFT:                sprite_index = clockwise ? 48 : 49; break;
+                case Direction::BOTTOM_RIGHT:        sprite_index = clockwise ? 51 : 50; break;
+                case Direction::BOTTOM_LEFT:        sprite_index = clockwise ? 50 : 51; break;
+                case Direction::BOTTOM:                sprite_index = clockwise ? 52 : 53; break;
 
-	    default: break;
-	}
+            default: break;
+        }
     }
     // animation process
     else
     {
-	switch(direction)
-	{
-    	    case Direction::TOP_RIGHT:
-    	    case Direction::RIGHT:
-    	    case Direction::BOTTOM_RIGHT:
-		clockwise ? ++sprite_index : --sprite_index;
-		break;
+        switch(direction)
+        {
+                case Direction::TOP_RIGHT:
+                case Direction::RIGHT:
+                case Direction::BOTTOM_RIGHT:
+                clockwise ? ++sprite_index : --sprite_index;
+                break;
 
-    	    case Direction::TOP:
-		++sprite_index;
-		break;
+                case Direction::TOP:
+                ++sprite_index;
+                break;
 
-    	    case Direction::TOP_LEFT:
-    	    case Direction::LEFT:
-    	    case Direction::BOTTOM_LEFT:
-		clockwise ? --sprite_index : ++sprite_index;
-		break;
+                case Direction::TOP_LEFT:
+                case Direction::LEFT:
+                case Direction::BOTTOM_LEFT:
+                clockwise ? --sprite_index : ++sprite_index;
+                break;
 
-    	    case Direction::BOTTOM:
-		--sprite_index;
-		break;
+                case Direction::BOTTOM:
+                --sprite_index;
+                break;
 
-	    default: break;
-	}
+            default: break;
+        }
 
-	bool end = false;
-	int next = Direction::UNKNOWN;
+        bool end = false;
+        int next = Direction::UNKNOWN;
 
-	switch(direction)
-	{
-    	    case Direction::TOP:		next = clockwise ? Direction::TOP_RIGHT : Direction::TOP_LEFT; break;
-    	    case Direction::TOP_RIGHT:		next = clockwise ? Direction::RIGHT : Direction::TOP; break;
-    	    case Direction::TOP_LEFT:		next = clockwise ? Direction::TOP : Direction::LEFT; break;
-    	    case Direction::RIGHT:		next = clockwise ? Direction::BOTTOM_RIGHT : Direction::TOP_RIGHT; break;
-    	    case Direction::LEFT:		next = clockwise ? Direction::TOP_LEFT : Direction::BOTTOM_LEFT; break;
-    	    case Direction::BOTTOM_RIGHT:	next = clockwise ? Direction::BOTTOM : Direction::RIGHT; break;
-    	    case Direction::BOTTOM_LEFT:	next = clockwise ? Direction::LEFT : Direction::BOTTOM; break;
-    	    case Direction::BOTTOM:		next = clockwise ? Direction::BOTTOM_LEFT : Direction::BOTTOM_RIGHT; break;
+        switch(direction)
+        {
+                case Direction::TOP:                next = clockwise ? Direction::TOP_RIGHT : Direction::TOP_LEFT; break;
+                case Direction::TOP_RIGHT:                next = clockwise ? Direction::RIGHT : Direction::TOP; break;
+                case Direction::TOP_LEFT:                next = clockwise ? Direction::TOP : Direction::LEFT; break;
+                case Direction::RIGHT:                next = clockwise ? Direction::BOTTOM_RIGHT : Direction::TOP_RIGHT; break;
+                case Direction::LEFT:                next = clockwise ? Direction::TOP_LEFT : Direction::BOTTOM_LEFT; break;
+                case Direction::BOTTOM_RIGHT:        next = clockwise ? Direction::BOTTOM : Direction::RIGHT; break;
+                case Direction::BOTTOM_LEFT:        next = clockwise ? Direction::LEFT : Direction::BOTTOM; break;
+                case Direction::BOTTOM:                next = clockwise ? Direction::BOTTOM_LEFT : Direction::BOTTOM_RIGHT; break;
 
-	    default: break;
-	}
+            default: break;
+        }
 
-	switch(next)
-	{
-    	    case Direction::TOP:		end = (sprite_index == 44); break;
-    	    case Direction::TOP_RIGHT:		end = (sprite_index == (clockwise ? 47 : 46)); break;
-    	    case Direction::TOP_LEFT:		end = (sprite_index == (clockwise ? 46 : 47)); break;
-    	    case Direction::RIGHT:		end = (sprite_index == (clockwise ? 49 : 48)); break;
-    	    case Direction::LEFT:		end = (sprite_index == (clockwise ? 48 : 49)); break;
-    	    case Direction::BOTTOM_RIGHT:	end = (sprite_index == (clockwise ? 51 : 50)); break;
-    	    case Direction::BOTTOM_LEFT:	end = (sprite_index == (clockwise ? 50 : 51)); break;
-    	    case Direction::BOTTOM:		end = (sprite_index == 53); break;
+        switch(next)
+        {
+                case Direction::TOP:                end = (sprite_index == 44); break;
+                case Direction::TOP_RIGHT:                end = (sprite_index == (clockwise ? 47 : 46)); break;
+                case Direction::TOP_LEFT:                end = (sprite_index == (clockwise ? 46 : 47)); break;
+                case Direction::RIGHT:                end = (sprite_index == (clockwise ? 49 : 48)); break;
+                case Direction::LEFT:                end = (sprite_index == (clockwise ? 48 : 49)); break;
+                case Direction::BOTTOM_RIGHT:        end = (sprite_index == (clockwise ? 51 : 50)); break;
+                case Direction::BOTTOM_LEFT:        end = (sprite_index == (clockwise ? 50 : 51)); break;
+                case Direction::BOTTOM:                end = (sprite_index == 53); break;
 
-	    default: break;
-	}
+            default: break;
+        }
 
-	if(end)
-	{
-	    switch(next)
-	    {
-    		case Direction::TOP:            sprite_index = 0; break;
-    		case Direction::BOTTOM:         sprite_index = 36; break;
-    		case Direction::TOP_RIGHT:
-    		case Direction::TOP_LEFT:       sprite_index = 9; break;
-    		case Direction::BOTTOM_RIGHT:
-    		case Direction::BOTTOM_LEFT:    sprite_index = 27; break;
-    		case Direction::RIGHT:
-    		case Direction::LEFT:           sprite_index = 18; break;
+        if(end)
+        {
+            switch(next)
+            {
+                    case Direction::TOP:            sprite_index = 0; break;
+                    case Direction::BOTTOM:         sprite_index = 36; break;
+                    case Direction::TOP_RIGHT:
+                    case Direction::TOP_LEFT:       sprite_index = 9; break;
+                    case Direction::BOTTOM_RIGHT:
+                    case Direction::BOTTOM_LEFT:    sprite_index = 27; break;
+                    case Direction::RIGHT:
+                    case Direction::LEFT:           sprite_index = 18; break;
 
-		default: break;
-	    }
+                default: break;
+            }
 
-	    direction = next;
-	}
+            direction = next;
+        }
     }
 }
 
@@ -543,31 +543,31 @@ void Heroes::FadeOut(void) const
         {
             Cursor::Get().Hide();
 
-	    for(s32 y = mp.y - 1; y <= mp.y + 1; ++y)
-		for(s32 x = mp.x - 1; x <= mp.x + 1; ++x)
-    		    if(Maps::isValidAbsPoint(x, y))
-	    {
-        	const Maps::Tiles & tile = world.GetTiles(Maps::GetIndexFromAbsPoint(x, y));
+            for(s32 y = mp.y - 1; y <= mp.y + 1; ++y)
+                for(s32 x = mp.x - 1; x <= mp.x + 1; ++x)
+                        if(Maps::isValidAbsPoint(x, y))
+            {
+                const Maps::Tiles & tile = world.GetTiles(Maps::GetIndexFromAbsPoint(x, y));
 
-        	tile.RedrawTile(display);
-        	tile.RedrawBottom(display);
-        	tile.RedrawObjects(display);
-    	    }
+                tile.RedrawTile(display);
+                tile.RedrawBottom(display);
+                tile.RedrawObjects(display);
+                }
 
-    	    sprite1.SetAlphaMod(alpha);
-    	    sprite1.Blit(src_rt, dst_pt1, display);
+                sprite1.SetAlphaMod(alpha);
+                sprite1.Blit(src_rt, dst_pt1, display);
 
-	    for(s32 y = mp.y - 1; y <= mp.y + 1; ++y)
-		for(s32 x = mp.x - 1; x <= mp.x + 1; ++x)
-    		    if(Maps::isValidAbsPoint(x, y))
-	    {
-        	const Maps::Tiles & tile = world.GetTiles(Maps::GetIndexFromAbsPoint(x, y));
+            for(s32 y = mp.y - 1; y <= mp.y + 1; ++y)
+                for(s32 x = mp.x - 1; x <= mp.x + 1; ++x)
+                        if(Maps::isValidAbsPoint(x, y))
+            {
+                const Maps::Tiles & tile = world.GetTiles(Maps::GetIndexFromAbsPoint(x, y));
 
-        	tile.RedrawTop(display);
-    	    }
+                tile.RedrawTop(display);
+                }
 
-	    Cursor::Get().Show();
-	    display.Flip();
+            Cursor::Get().Show();
+            display.Flip();
             alpha -= 10;
         }
     }
@@ -602,31 +602,31 @@ void Heroes::FadeIn(void) const
         {
             Cursor::Get().Hide();
 
-	    for(s32 y = mp.y - 1; y <= mp.y + 1; ++y)
-		for(s32 x = mp.x - 1; x <= mp.x + 1; ++x)
-    		    if(Maps::isValidAbsPoint(x, y))
-	    {
-        	const Maps::Tiles & tile = world.GetTiles(Maps::GetIndexFromAbsPoint(x, y));
+            for(s32 y = mp.y - 1; y <= mp.y + 1; ++y)
+                for(s32 x = mp.x - 1; x <= mp.x + 1; ++x)
+                        if(Maps::isValidAbsPoint(x, y))
+            {
+                const Maps::Tiles & tile = world.GetTiles(Maps::GetIndexFromAbsPoint(x, y));
 
-        	tile.RedrawTile(display);
-        	tile.RedrawBottom(display);
-        	tile.RedrawObjects(display);
-    	    }
+                tile.RedrawTile(display);
+                tile.RedrawBottom(display);
+                tile.RedrawObjects(display);
+                }
 
-    	    sprite1.SetAlphaMod(alpha);
-    	    sprite1.Blit(src_rt, dst_pt1, display);
+                sprite1.SetAlphaMod(alpha);
+                sprite1.Blit(src_rt, dst_pt1, display);
 
-	    for(s32 y = mp.y - 1; y <= mp.y + 1; ++y)
-		for(s32 x = mp.x - 1; x <= mp.x + 1; ++x)
-    		    if(Maps::isValidAbsPoint(x, y))
-	    {
-        	const Maps::Tiles & tile = world.GetTiles(Maps::GetIndexFromAbsPoint(x, y));
+            for(s32 y = mp.y - 1; y <= mp.y + 1; ++y)
+                for(s32 x = mp.x - 1; x <= mp.x + 1; ++x)
+                        if(Maps::isValidAbsPoint(x, y))
+            {
+                const Maps::Tiles & tile = world.GetTiles(Maps::GetIndexFromAbsPoint(x, y));
 
-        	tile.RedrawTop(display);
-    	    }
+                tile.RedrawTop(display);
+                }
 
-	    Cursor::Get().Show();
-	    display.Flip();
+            Cursor::Get().Show();
+            display.Flip();
             alpha += 10;
         }
     }
@@ -640,34 +640,34 @@ bool Heroes::Move(bool fast)
     if(path.isValid() &&
            (isEnableMove() || (GetSpriteIndex() < 45 && GetSpriteIndex() % 9) || GetSpriteIndex() >= 45))
     {
-	// fast move for hide AI
-	if(fast)
-	{
-	    direction = path.GetFrontDirection();
-    	    MoveStep(true);
+        // fast move for hide AI
+        if(fast)
+        {
+            direction = path.GetFrontDirection();
+                MoveStep(true);
 
-	    return true;
-	}
-	else
-	{
-    	    // if need change through the circle
-	    if(GetDirection() != path.GetFrontDirection())
-    	    {
+            return true;
+        }
+        else
+        {
+                // if need change through the circle
+            if(GetDirection() != path.GetFrontDirection())
+                {
                 AngleStep(path.GetFrontDirection());
             }
             else
             // move
-    	    if(MoveStep())
-    	    {
-    		if(isFreeman()) return false;
+                if(MoveStep())
+                {
+                    if(isFreeman()) return false;
 
-		return true;
-    	    }
-	}
+                return true;
+                }
+        }
     }
     else
     {
-	SetMove(false);
+        SetMove(false);
     }
 
     return false;

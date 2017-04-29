@@ -33,7 +33,7 @@
 #include "dialog.h"
 
 void RedrawCurrentInfo(const Point & pos, u32 available, u32 result,
-	    const payment_t & paymentMonster, const payment_t & paymentCosts, const Funds & funds, const std::string & label)
+            const payment_t & paymentMonster, const payment_t & paymentCosts, const Funds & funds, const std::string & label)
 {
     Text text;
 
@@ -48,16 +48,16 @@ void RedrawCurrentInfo(const Point & pos, u32 available, u32 result,
 
     if(rsext)
     {
-	text.Set(sgold, Font::SMALL);
-	text.Blit(pos.x + 133 - text.w() / 2, pos.y + 228);
+        text.Set(sgold, Font::SMALL);
+        text.Blit(pos.x + 133 - text.w() / 2, pos.y + 228);
 
-	text.Set(GetString(paymentCosts.Get(rsext)) + " " + "(" + GetString(funds.Get(rsext) - paymentCosts.Get(rsext)) + ")", Font::SMALL);
-	text.Blit(pos.x + 195 - text.w() / 2, pos.y + 228);
+        text.Set(GetString(paymentCosts.Get(rsext)) + " " + "(" + GetString(funds.Get(rsext) - paymentCosts.Get(rsext)) + ")", Font::SMALL);
+        text.Blit(pos.x + 195 - text.w() / 2, pos.y + 228);
     }
     else
     {
-	text.Set(sgold, Font::SMALL);
-	text.Blit(pos.x + 160 - text.w() / 2, pos.y + 228);
+        text.Set(sgold, Font::SMALL);
+        text.Blit(pos.x + 160 - text.w() / 2, pos.y + 228);
     }
 
     text.Set(label, Font::SMALL);
@@ -65,7 +65,7 @@ void RedrawCurrentInfo(const Point & pos, u32 available, u32 result,
 }
 
 void RedrawResourceInfo(const Surface & sres, const Point & pos, s32 value,
-	s32 px1, s32 py1, s32 px2, s32 py2)
+        s32 px1, s32 py1, s32 px2, s32 py2)
 {
     Display & display = Display::Get();
     Point dst_pt;
@@ -120,8 +120,8 @@ void RedrawStaticInfo(const Rect & pos, const Monster & monster, bool label)
     // change label
     if(label)
     {
-	text.Set("( change )", Font::YELLOW_SMALL);
-	text.Blit(pos.x + 68 - text.w() / 2, pos.y + 80);
+        text.Set("( change )", Font::YELLOW_SMALL);
+        text.Blit(pos.x + 68 - text.w() / 2, pos.y + 80);
     }
 
     // info resource
@@ -144,66 +144,66 @@ void RedrawStaticInfo(const Rect & pos, const Monster & monster, bool label)
     if(paymentMonster.crystal)
     {
         const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 4);
-	RedrawResourceInfo(sres, pos, paymentMonster.crystal,
-				225, 75, 240, 103);
-	dst_pt.x = pos.x + 180;
-	dst_pt.y = pos.y + 200;
-	sres.Blit(dst_pt);
+        RedrawResourceInfo(sres, pos, paymentMonster.crystal,
+                                225, 75, 240, 103);
+        dst_pt.x = pos.x + 180;
+        dst_pt.y = pos.y + 200;
+        sres.Blit(dst_pt);
     }
     else
     // mercury
     if(paymentMonster.mercury)
     {
         const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 1);
-	RedrawResourceInfo(sres, pos, paymentMonster.mercury,
-				225, 72, 240, 103);
-	dst_pt.x = pos.x + 180;
-	dst_pt.y = pos.y + 197;
-	sres.Blit(dst_pt);
+        RedrawResourceInfo(sres, pos, paymentMonster.mercury,
+                                225, 72, 240, 103);
+        dst_pt.x = pos.x + 180;
+        dst_pt.y = pos.y + 197;
+        sres.Blit(dst_pt);
     }
     else
     // wood
     if(paymentMonster.wood)
     {
         const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 0);
-	RedrawResourceInfo(sres, pos, paymentMonster.wood,
-				225, 72, 240, 103);
-	dst_pt.x = pos.x + 180;
-	dst_pt.y = pos.y + 197;
-	sres.Blit(dst_pt);
+        RedrawResourceInfo(sres, pos, paymentMonster.wood,
+                                225, 72, 240, 103);
+        dst_pt.x = pos.x + 180;
+        dst_pt.y = pos.y + 197;
+        sres.Blit(dst_pt);
     }
     else
     // ore
     if(paymentMonster.ore)
     {
         const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 2);
-	RedrawResourceInfo(sres, pos, paymentMonster.ore,
-				225, 72, 240, 103);
-	dst_pt.x = pos.x + 180;
-	dst_pt.y = pos.y + 197;
-	sres.Blit(dst_pt);
+        RedrawResourceInfo(sres, pos, paymentMonster.ore,
+                                225, 72, 240, 103);
+        dst_pt.x = pos.x + 180;
+        dst_pt.y = pos.y + 197;
+        sres.Blit(dst_pt);
     }
     else
     // sulfur
     if(paymentMonster.sulfur)
     {
         const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 3);
-	RedrawResourceInfo(sres, pos, paymentMonster.sulfur,
-				225, 75, 240, 103);
-	dst_pt.x = pos.x + 180;
-	dst_pt.y = pos.y + 200;
-	sres.Blit(dst_pt);
+        RedrawResourceInfo(sres, pos, paymentMonster.sulfur,
+                                225, 75, 240, 103);
+        dst_pt.x = pos.x + 180;
+        dst_pt.y = pos.y + 200;
+        sres.Blit(dst_pt);
     }
     else
     // gems
     if(paymentMonster.gems)
     {
         const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 5);
-	RedrawResourceInfo(sres, pos, paymentMonster.gems,
-				225, 75, 240, 103);
-	dst_pt.x = pos.x + 180;
-	dst_pt.y = pos.y + 200;
-	sres.Blit(dst_pt);
+        RedrawResourceInfo(sres, pos, paymentMonster.gems,
+                                225, 75, 240, 103);
+        dst_pt.x = pos.x + 180;
+        dst_pt.y = pos.y + 200;
+        sres.Blit(dst_pt);
     }
 
     // text number buy
@@ -218,18 +218,18 @@ const char* SwitchMaxMinButtons(Button & btnMax, Button & btnMin, bool max)
 {
     if(btnMax.isEnable() || btnMin.isEnable())
     {
-	if(max)
-	{
-	    btnMax.SetDisable(true);
-	    btnMin.SetDisable(false);
-	}
-	else
-	{
-	    btnMin.SetDisable(true);
-	    btnMax.SetDisable(false);
-	}
+        if(max)
+        {
+            btnMax.SetDisable(true);
+            btnMin.SetDisable(false);
+        }
+        else
+        {
+            btnMin.SetDisable(true);
+            btnMax.SetDisable(false);
+        }
 
-	return max ? "max" : "min";
+        return max ? "max" : "min";
     }
 
     return "";
@@ -300,13 +300,13 @@ Troop Dialog::RecruitMonster(const Monster & monster0, u32 available, bool ext)
 
     if(0 == result)
     {
-	buttonOk.Press();
-	buttonOk.SetDisable(true);
-	buttonMax.Press();
-	buttonMin.Press();
-	buttonMax.SetDisable(true);
-	buttonMin.SetDisable(true);
-	buttonMax.Draw();
+        buttonOk.Press();
+        buttonOk.SetDisable(true);
+        buttonMax.Press();
+        buttonMin.Press();
+        buttonMax.SetDisable(true);
+        buttonMin.SetDisable(true);
+        buttonMax.Draw();
     }
 
     const Funds & funds = kingdom.GetFunds();
@@ -328,143 +328,143 @@ Troop Dialog::RecruitMonster(const Monster & monster0, u32 available, bool ext)
     // str loop
     while(le.HandleEvents())
     {
-	if(buttonOk.isEnable())
-	    le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
-	le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
-	le.MousePressLeft(buttonUp) ? buttonUp.PressDraw() : buttonUp.ReleaseDraw();
-	le.MousePressLeft(buttonDn) ? buttonDn.PressDraw() : buttonDn.ReleaseDraw();
+        if(buttonOk.isEnable())
+            le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
+        le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
+        le.MousePressLeft(buttonUp) ? buttonUp.PressDraw() : buttonUp.ReleaseDraw();
+        le.MousePressLeft(buttonDn) ? buttonDn.PressDraw() : buttonDn.ReleaseDraw();
 
-	if(buttonMax.isEnable())
-	    le.MousePressLeft(buttonMax) ? buttonMax.PressDraw() : buttonMax.ReleaseDraw();
-	if(buttonMin.isEnable())
-	    le.MousePressLeft(buttonMin) ? buttonMin.PressDraw() : buttonMin.ReleaseDraw();
+        if(buttonMax.isEnable())
+            le.MousePressLeft(buttonMax) ? buttonMax.PressDraw() : buttonMax.ReleaseDraw();
+        if(buttonMin.isEnable())
+            le.MousePressLeft(buttonMin) ? buttonMin.PressDraw() : buttonMin.ReleaseDraw();
 
-	if(ext && le.MouseClickLeft(rtChange))
-	{
-	    if(monster != monster.GetDowngrade())
-	    {
-		monster = monster.GetDowngrade();
-		max = CalculateMax(monster, kingdom, available);
-		result = max;
-		paymentMonster = monster.GetCost();
-		paymentCosts = paymentMonster * result;
-		redraw = true;
-	    }
-	    else
-	    if(monster != monster0)
-	    {
-		monster = monster0;
-		max = CalculateMax(monster, kingdom, available);
-		result = max;
-		paymentMonster = monster.GetCost();
-		paymentCosts = paymentMonster * result;
-		redraw = true;
-	    }
+        if(ext && le.MouseClickLeft(rtChange))
+        {
+            if(monster != monster.GetDowngrade())
+            {
+                monster = monster.GetDowngrade();
+                max = CalculateMax(monster, kingdom, available);
+                result = max;
+                paymentMonster = monster.GetCost();
+                paymentCosts = paymentMonster * result;
+                redraw = true;
+            }
+            else
+            if(monster != monster0)
+            {
+                monster = monster0;
+                max = CalculateMax(monster, kingdom, available);
+                result = max;
+                paymentMonster = monster.GetCost();
+                paymentCosts = paymentMonster * result;
+                redraw = true;
+            }
 
-	    if(result == max)
-	    {
-		maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, true);
-	    }
-	}
+            if(result == max)
+            {
+                maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, true);
+            }
+        }
 
-	if(PressIntKey(0, max, result))
-	{
-	    paymentCosts = paymentMonster * result;
-	    redraw = true;
-	    maxmin.clear();
+        if(PressIntKey(0, max, result))
+        {
+            paymentCosts = paymentMonster * result;
+            redraw = true;
+            maxmin.clear();
 
-	    if(result == max)
-	    {
-		maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, true);
-	    }
-	    else
-	    if(result == 1)
-	    {
-		maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, false);
-	    }
-	}
+            if(result == max)
+            {
+                maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, true);
+            }
+            else
+            if(result == 1)
+            {
+                maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, false);
+            }
+        }
 
-	if((le.MouseWheelUp(rtWheel) || le.MouseClickLeft(buttonUp)) && result < max)
-	{
-	    ++result;
-	    paymentCosts += paymentMonster;
-	    redraw = true;
-	    maxmin.clear();
+        if((le.MouseWheelUp(rtWheel) || le.MouseClickLeft(buttonUp)) && result < max)
+        {
+            ++result;
+            paymentCosts += paymentMonster;
+            redraw = true;
+            maxmin.clear();
 
-	    if(result == max)
-	    {
-		maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, true);
-	    }
-	    else
-	    if(result == 1)
-	    {
-		maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, false);
-	    }
-	}
-	else
-	if((le.MouseWheelDn(rtWheel) || le.MouseClickLeft(buttonDn)) && result)
-	{
-	    --result;
-	    paymentCosts -= paymentMonster;
-	    redraw = true;
-	    maxmin.clear();
+            if(result == max)
+            {
+                maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, true);
+            }
+            else
+            if(result == 1)
+            {
+                maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, false);
+            }
+        }
+        else
+        if((le.MouseWheelDn(rtWheel) || le.MouseClickLeft(buttonDn)) && result)
+        {
+            --result;
+            paymentCosts -= paymentMonster;
+            redraw = true;
+            maxmin.clear();
 
-	    if(result == max)
-	    {
-		maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, true);
-	    }
-	    else
-	    if(result == 1)
-	    {
-		maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, false);
-	    }
-	}
-	else
-	if(buttonMax.isEnable() && le.MouseClickLeft(buttonMax) && result != max)
-	{
-	    maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, true);
-	    result = max;
-	    paymentCosts = paymentMonster * max;
-	    redraw = true;
-	}
-	else
-	if(buttonMin.isEnable() && le.MouseClickLeft(buttonMin) && result != 1)
-	{
-	    maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, false);
-	    result = 1;
-	    paymentCosts = paymentMonster;
-	    redraw = true;
-	}
+            if(result == max)
+            {
+                maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, true);
+            }
+            else
+            if(result == 1)
+            {
+                maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, false);
+            }
+        }
+        else
+        if(buttonMax.isEnable() && le.MouseClickLeft(buttonMax) && result != max)
+        {
+            maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, true);
+            result = max;
+            paymentCosts = paymentMonster * max;
+            redraw = true;
+        }
+        else
+        if(buttonMin.isEnable() && le.MouseClickLeft(buttonMin) && result != 1)
+        {
+            maxmin = SwitchMaxMinButtons(buttonMax, buttonMin, false);
+            result = 1;
+            paymentCosts = paymentMonster;
+            redraw = true;
+        }
 
-	if(redraw)
-	{
-	    cursor.Hide();
-	    RedrawStaticInfo(pos, monster, ext && monster0.GetDowngrade() != monster0);
-	    RedrawCurrentInfo(pos, available, result, paymentMonster, paymentCosts, funds, maxmin);
+        if(redraw)
+        {
+            cursor.Hide();
+            RedrawStaticInfo(pos, monster, ext && monster0.GetDowngrade() != monster0);
+            RedrawCurrentInfo(pos, available, result, paymentMonster, paymentCosts, funds, maxmin);
 
-	    if(0 == result)
-	    {
-		buttonOk.Press();
-		buttonOk.SetDisable(true);
-		buttonOk.Draw();
-	    }
-	    else
-	    {
-		buttonOk.Release();
-		buttonOk.SetDisable(false);
-		buttonOk.Draw();
-	    }
+            if(0 == result)
+            {
+                buttonOk.Press();
+                buttonOk.SetDisable(true);
+                buttonOk.Draw();
+            }
+            else
+            {
+                buttonOk.Release();
+                buttonOk.SetDisable(false);
+                buttonOk.Draw();
+            }
 
-	    if(buttonMax.isEnable()) buttonMax.Draw();
-	    if(buttonMin.isEnable()) buttonMin.Draw();
-	    cursor.Show();
-	    display.Flip();
-	    redraw = false;
-	}
+            if(buttonMax.isEnable()) buttonMax.Draw();
+            if(buttonMin.isEnable()) buttonMin.Draw();
+            cursor.Show();
+            display.Flip();
+            redraw = false;
+        }
 
-	if(le.MouseClickLeft(buttonOk) || Game::HotKeyPressEvent(Game::EVENT_DEFAULT_READY)) break;
+        if(le.MouseClickLeft(buttonOk) || Game::HotKeyPressEvent(Game::EVENT_DEFAULT_READY)) break;
 
-	if(le.MouseClickLeft(buttonCancel) || Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)){ result = 0; break; }
+        if(le.MouseClickLeft(buttonCancel) || Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)){ result = 0; break; }
     }
 
     cursor.Hide();
@@ -530,49 +530,49 @@ void Dialog::DwellingInfo(const Monster & monster, u32 available)
     // crystal
     if(paymentMonster.crystal)
     {
-	const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 4);
-	RedrawResourceInfo(sres, pos, paymentMonster.crystal,
-				225, 75, 240, 103);
+        const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 4);
+        RedrawResourceInfo(sres, pos, paymentMonster.crystal,
+                                225, 75, 240, 103);
     }
     else
     // mercury
     if(paymentMonster.mercury)
     {
-	const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 1);
-	RedrawResourceInfo(sres, pos, paymentMonster.mercury,
-				225, 72, 240, 103);
+        const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 1);
+        RedrawResourceInfo(sres, pos, paymentMonster.mercury,
+                                225, 72, 240, 103);
     }
     else
     // wood
     if(paymentMonster.wood)
     {
-	const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 0);
-	RedrawResourceInfo(sres, pos, paymentMonster.wood,
-				225, 72, 240, 103);
+        const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 0);
+        RedrawResourceInfo(sres, pos, paymentMonster.wood,
+                                225, 72, 240, 103);
     }
     else
     // ore
     if(paymentMonster.ore)
     {
-	const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 2);
-	RedrawResourceInfo(sres, pos, paymentMonster.ore,
-				225, 72, 240, 103);
+        const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 2);
+        RedrawResourceInfo(sres, pos, paymentMonster.ore,
+                                225, 72, 240, 103);
     }
     else
     // sulfur
     if(paymentMonster.sulfur)
     {
-	const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 3);
-	RedrawResourceInfo(sres, pos, paymentMonster.sulfur,
-				225, 75, 240, 103);
+        const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 3);
+        RedrawResourceInfo(sres, pos, paymentMonster.sulfur,
+                                225, 75, 240, 103);
     }
     else
     // gems
     if(paymentMonster.gems)
     {
-	const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 5);
-	RedrawResourceInfo(sres, pos, paymentMonster.gems,
-				225, 75, 240, 103);
+        const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 5);
+        RedrawResourceInfo(sres, pos, paymentMonster.gems,
+                                225, 75, 240, 103);
     }
 
     // text available

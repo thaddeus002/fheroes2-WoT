@@ -40,22 +40,22 @@ namespace Maps
 {
     enum mapsize_t
     {
-	ZERO	= 0,
-        SMALL	= 36,
-        MEDIUM	= 72,
-        LARGE	= 108,
-        XLARGE	= 144
+        ZERO        = 0,
+        SMALL        = 36,
+        MEDIUM        = 72,
+        LARGE        = 108,
+        XLARGE        = 144
     };
 
     typedef MapsIndexes Indexes;
 
     class IndexesDistance : public std::vector<IndexDistance>
     {
-	void Assign(s32, const Indexes &, int sort /* 0: none, 1: short first, 2: long first */);
+        void Assign(s32, const Indexes &, int sort /* 0: none, 1: short first, 2: long first */);
 
     public:
-	IndexesDistance(s32, const Indexes &, int sort = 0);
-	IndexesDistance(s32, s32, u32 dist, int sort = 0);
+        IndexesDistance(s32, const Indexes &, int sort = 0);
+        IndexesDistance(s32, s32, u32 dist, int sort = 0);
     };
 
     const char* SizeString(int size);
@@ -83,9 +83,9 @@ namespace Maps
     Indexes ScanAroundObject(s32, u32 dist, int obj);
     Indexes ScanAroundObjects(s32, u32 dist, const u8* objs);
 
-    Indexes	GetTilesUnderProtection(s32);
-    bool	TileIsUnderProtection(s32);
-    bool	IsNearTiles(s32, s32);
+    Indexes        GetTilesUnderProtection(s32);
+    bool        TileIsUnderProtection(s32);
+    bool        IsNearTiles(s32, s32);
 
     Indexes GetObjectPositions(int obj, bool check_hero);
     Indexes GetObjectPositions(s32, int obj, bool check_hero);

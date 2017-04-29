@@ -103,50 +103,50 @@ void Battle::DialogBattleSettings(void)
 
     while(le.HandleEvents())
     {
-	le.MousePressLeft(btn_ok) ? btn_ok.PressDraw() : btn_ok.ReleaseDraw();
+        le.MousePressLeft(btn_ok) ? btn_ok.PressDraw() : btn_ok.ReleaseDraw();
 
-	if(le.MouseClickLeft(opt_speed))
-	{
-	    conf.SetBattleSpeed((conf.BattleSpeed() + 1) % 11);
-	    Game::UpdateBattleSpeed();
-	    cursor.Hide();
-	    SpeedRedraw(opt_speed);
-	    cursor.Show();
-	    display.Flip();
-	}
+        if(le.MouseClickLeft(opt_speed))
+        {
+            conf.SetBattleSpeed((conf.BattleSpeed() + 1) % 11);
+            Game::UpdateBattleSpeed();
+            cursor.Hide();
+            SpeedRedraw(opt_speed);
+            cursor.Show();
+            display.Flip();
+        }
 
-	if(le.MouseClickLeft(opt_grid))
-	{
-	    conf.SetBattleGrid(!conf.ExtBattleShowGrid());
-	    cursor.Hide();
-	    opt_grid.isPressed() ? opt_grid.Release() : opt_grid.Press();
-	    opt_grid.Draw();
-	    cursor.Show();
-	    display.Flip();
-	}
+        if(le.MouseClickLeft(opt_grid))
+        {
+            conf.SetBattleGrid(!conf.ExtBattleShowGrid());
+            cursor.Hide();
+            opt_grid.isPressed() ? opt_grid.Release() : opt_grid.Press();
+            opt_grid.Draw();
+            cursor.Show();
+            display.Flip();
+        }
 
-	if(le.MouseClickLeft(opt_shadow_movement))
-	{
-	    conf.SetBattleMovementShaded(!conf.ExtBattleShowMoveShadow());
-	    cursor.Hide();
-	    opt_shadow_movement.isPressed() ? opt_shadow_movement.Release() : opt_shadow_movement.Press();
-	    opt_shadow_movement.Draw();
-	    cursor.Show();
-	    display.Flip();
-	}
+        if(le.MouseClickLeft(opt_shadow_movement))
+        {
+            conf.SetBattleMovementShaded(!conf.ExtBattleShowMoveShadow());
+            cursor.Hide();
+            opt_shadow_movement.isPressed() ? opt_shadow_movement.Release() : opt_shadow_movement.Press();
+            opt_shadow_movement.Draw();
+            cursor.Show();
+            display.Flip();
+        }
 
-	if(le.MouseClickLeft(opt_shadow_cursor))
-	{
-	    conf.SetBattleMouseShaded(!conf.ExtBattleShowMouseShadow());
-	    cursor.Hide();
-	    opt_shadow_cursor.isPressed() ? opt_shadow_cursor.Release() : opt_shadow_cursor.Press();
-	    opt_shadow_cursor.Draw();
-	    cursor.Show();
-	    display.Flip();
-	}
+        if(le.MouseClickLeft(opt_shadow_cursor))
+        {
+            conf.SetBattleMouseShaded(!conf.ExtBattleShowMouseShadow());
+            cursor.Hide();
+            opt_shadow_cursor.isPressed() ? opt_shadow_cursor.Release() : opt_shadow_cursor.Press();
+            opt_shadow_cursor.Draw();
+            cursor.Show();
+            display.Flip();
+        }
 
         // exit
-	if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(btn_ok)) break;
+        if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(btn_ok)) break;
     }
 
     // restore background
@@ -160,42 +160,42 @@ void Battle::GetSummaryParams(int res1, int res2, const HeroBase & hero, u32 exp
 {
     if(res1 & RESULT_WINS)
     {
-	icn_anim = ICN::WINCMBT;
-	if(res2 & RESULT_SURRENDER)
-    	    msg.append(_("The enemy has surrendered!"));
-    	else
-	if(res2 & RESULT_RETREAT)
-    	    msg.append(_("The enemy has fled!"));
-	else
-	    msg.append(_("A glorious victory!"));
+        icn_anim = ICN::WINCMBT;
+        if(res2 & RESULT_SURRENDER)
+                msg.append(_("The enemy has surrendered!"));
+            else
+        if(res2 & RESULT_RETREAT)
+                msg.append(_("The enemy has fled!"));
+        else
+            msg.append(_("A glorious victory!"));
 
-	if(hero.isHeroes())
-	{
-    	    msg.append("\n");
-    	    msg.append(_("For valor in combat, %{name} receives %{exp} experience"));
-    	    StringReplace(msg, "%{name}", hero.GetName());
-    	    StringReplace(msg, "%{exp}", exp);
-    	}
+        if(hero.isHeroes())
+        {
+                msg.append("\n");
+                msg.append(_("For valor in combat, %{name} receives %{exp} experience"));
+                StringReplace(msg, "%{name}", hero.GetName());
+                StringReplace(msg, "%{exp}", exp);
+            }
     }
     else
     if(res1 & RESULT_RETREAT)
     {
-	icn_anim = ICN::CMBTFLE3;
-	msg.append(_("The cowardly %{name} flees from battle."));
-    	StringReplace(msg, "%{name}", hero.GetName());
+        icn_anim = ICN::CMBTFLE3;
+        msg.append(_("The cowardly %{name} flees from battle."));
+            StringReplace(msg, "%{name}", hero.GetName());
     }
     else
     if(res1 & RESULT_SURRENDER)
     {
-	icn_anim = ICN::CMBTSURR;
-	msg.append(_("%{name} surrenders to the enemy, and departs in shame."));
-    	StringReplace(msg, "%{name}", hero.GetName());
+        icn_anim = ICN::CMBTSURR;
+        msg.append(_("%{name} surrenders to the enemy, and departs in shame."));
+            StringReplace(msg, "%{name}", hero.GetName());
     }
     else
     {
-	icn_anim = ICN::CMBTLOS3;
-	msg.append(_("Your force suffer a bitter defeat, and %{name} abandons your cause."));
-    	StringReplace(msg, "%{name}", hero.GetName());
+        icn_anim = ICN::CMBTLOS3;
+        msg.append(_("Your force suffer a bitter defeat, and %{name} abandons your cause."));
+            StringReplace(msg, "%{name}", hero.GetName());
     }
 }
 
@@ -217,44 +217,44 @@ void Battle::Arena::DialogBattleSummary(const Result & res) const
 
     if((res.army1 & RESULT_WINS) && army1->GetCommander() && army1->GetCommander()->isControlHuman())
     {
-    	GetSummaryParams(res.army1, res.army2, *army1->GetCommander(), res.exp1, icn_anim, msg);
-	if(conf.Music()) AGG::PlayMusic(MUS::BATTLEWIN, false);
+            GetSummaryParams(res.army1, res.army2, *army1->GetCommander(), res.exp1, icn_anim, msg);
+        if(conf.Music()) AGG::PlayMusic(MUS::BATTLEWIN, false);
     }
     else
     if((res.army2 & RESULT_WINS) && army2->GetCommander() && army2->GetCommander()->isControlHuman())
     {
-    	GetSummaryParams(res.army2, res.army1, *army2->GetCommander(), res.exp2, icn_anim, msg);
-	if(conf.Music()) AGG::PlayMusic(MUS::BATTLEWIN, false);
+            GetSummaryParams(res.army2, res.army1, *army2->GetCommander(), res.exp2, icn_anim, msg);
+        if(conf.Music()) AGG::PlayMusic(MUS::BATTLEWIN, false);
     }
     else
     if(army1->GetCommander() && army1->GetCommander()->isControlHuman())
     {
-    	GetSummaryParams(res.army1, res.army2, *army1->GetCommander(), res.exp1, icn_anim, msg);
-	if(conf.Music()) AGG::PlayMusic(MUS::BATTLELOSE, false);
+            GetSummaryParams(res.army1, res.army2, *army1->GetCommander(), res.exp1, icn_anim, msg);
+        if(conf.Music()) AGG::PlayMusic(MUS::BATTLELOSE, false);
     }
     else
     if(army2->GetCommander() && army2->GetCommander()->isControlHuman())
     {
-    	GetSummaryParams(res.army2, res.army1, *army2->GetCommander(), res.exp2, icn_anim, msg);
-	if(conf.Music()) AGG::PlayMusic(MUS::BATTLELOSE, false);
+            GetSummaryParams(res.army2, res.army1, *army2->GetCommander(), res.exp2, icn_anim, msg);
+        if(conf.Music()) AGG::PlayMusic(MUS::BATTLELOSE, false);
     }
     else
     // AI move
     if(army1->GetCommander() && army1->GetCommander()->isControlAI())
     {
-	// AI wins
-	if(res.army1 & RESULT_WINS)
-	{
-	    icn_anim = ICN::CMBTLOS3;
-	    msg.append(_("Your force suffer a bitter defeat."));
-	}
-	else
-	// Human wins
-	if(res.army2 & RESULT_WINS)
-	{
-	    icn_anim = ICN::WINCMBT;
-	    msg.append(_("A glorious victory!"));
-	}
+        // AI wins
+        if(res.army1 & RESULT_WINS)
+        {
+            icn_anim = ICN::CMBTLOS3;
+            msg.append(_("Your force suffer a bitter defeat."));
+        }
+        else
+        // Human wins
+        if(res.army2 & RESULT_WINS)
+        {
+            icn_anim = ICN::WINCMBT;
+            msg.append(_("A glorious victory!"));
+        }
     }
 
     const Sprite & dialog = AGG::GetICN((conf.ExtGameEvilInterface() ? ICN::WINLOSEE : ICN::WINLOSE), 0);
@@ -269,22 +269,22 @@ void Battle::Arena::DialogBattleSummary(const Result & res) const
 
     if(conf.QVGA())
     {
-	dialog.Blit(Rect(0, 232, pos_rt.w, 224), pos_rt.x, pos_rt.y);
-	dialog.Blit(Rect(0, 0, pos_rt.w, 30), pos_rt.x, pos_rt.y);
+        dialog.Blit(Rect(0, 232, pos_rt.w, 224), pos_rt.x, pos_rt.y);
+        dialog.Blit(Rect(0, 0, pos_rt.w, 30), pos_rt.x, pos_rt.y);
     }
     else
-	dialog.Blit(pos_rt.x, pos_rt.y);
+        dialog.Blit(pos_rt.x, pos_rt.y);
 
     const int anime_ox = 47;
     const int anime_oy = 36;
 
     if(!conf.QVGA())
     {
-	const Sprite & sprite1 = AGG::GetICN(icn_anim, 0);
-	const Sprite & sprite2 = AGG::GetICN(icn_anim, 1);
+        const Sprite & sprite1 = AGG::GetICN(icn_anim, 0);
+        const Sprite & sprite2 = AGG::GetICN(icn_anim, 1);
 
-	sprite1.Blit(pos_rt.x + anime_ox + sprite1.x(), pos_rt.y + anime_oy + sprite1.y());
-	sprite2.Blit(pos_rt.x + anime_ox + sprite2.x(), pos_rt.y + anime_oy + sprite2.y());
+        sprite1.Blit(pos_rt.x + anime_ox + sprite1.x(), pos_rt.y + anime_oy + sprite1.y());
+        sprite2.Blit(pos_rt.x + anime_ox + sprite2.x(), pos_rt.y + anime_oy + sprite2.y());
     }
 
     Button btn_ok(pos_rt.x + 121, pos_rt.y + (conf.QVGA() ? 176 : 410), (conf.ExtGameEvilInterface() ? ICN::WINCMBBE : ICN::WINCMBTB), 0, 1);
@@ -301,11 +301,11 @@ void Battle::Arena::DialogBattleSummary(const Result & res) const
     text.Blit(pos_rt.x + (pos_rt.w - text.w()) / 2, pos_rt.y + (conf.QVGA() ? 70 : 285));
 
     if(killed1.isValid())
-	Army::DrawMons32Line(killed1, pos_rt.x + 25, pos_rt.y + (conf.QVGA() ? 83 : 303), 270);
+        Army::DrawMons32Line(killed1, pos_rt.x + 25, pos_rt.y + (conf.QVGA() ? 83 : 303), 270);
     else
     {
-	text.Set("None", Font::SMALL);
-	text.Blit(pos_rt.x + (pos_rt.w - text.w()) / 2, pos_rt.y + (conf.QVGA() ? 80 : 300));
+        text.Set("None", Font::SMALL);
+        text.Blit(pos_rt.x + (pos_rt.w - text.w()) / 2, pos_rt.y + (conf.QVGA() ? 80 : 300));
     }
 
     // defender
@@ -313,11 +313,11 @@ void Battle::Arena::DialogBattleSummary(const Result & res) const
     text.Blit(pos_rt.x + (pos_rt.w - text.w()) / 2, pos_rt.y + (conf.QVGA() ? 120 : 345));
 
     if(killed2.isValid())
-	Army::DrawMons32Line(killed2, pos_rt.x + 25, pos_rt.y + (conf.QVGA() ? 138 : 363), 270);
+        Army::DrawMons32Line(killed2, pos_rt.x + 25, pos_rt.y + (conf.QVGA() ? 138 : 363), 270);
     else
     {
-	text.Set("None", Font::SMALL);
-	text.Blit(pos_rt.x + (pos_rt.w - text.w()) / 2, pos_rt.y + (conf.QVGA() ? 135 : 360));
+        text.Set("None", Font::SMALL);
+        text.Blit(pos_rt.x + (pos_rt.w - text.w()) / 2, pos_rt.y + (conf.QVGA() ? 135 : 360));
     }
 
     btn_ok.Draw();
@@ -329,27 +329,27 @@ void Battle::Arena::DialogBattleSummary(const Result & res) const
 
     while(le.HandleEvents())
     {
-	le.MousePressLeft(btn_ok) ? btn_ok.PressDraw() : btn_ok.ReleaseDraw();
+        le.MousePressLeft(btn_ok) ? btn_ok.PressDraw() : btn_ok.ReleaseDraw();
 
         // exit
-	if(HotKeyCloseWindow || le.MouseClickLeft(btn_ok)) break;
+        if(HotKeyCloseWindow || le.MouseClickLeft(btn_ok)) break;
 
         // animation
-	if(!conf.QVGA() && Game::AnimateInfrequentDelay(Game::BATTLE_DIALOG_DELAY))
+        if(!conf.QVGA() && Game::AnimateInfrequentDelay(Game::BATTLE_DIALOG_DELAY))
         {
-	    if(0 == frame || 1 != ICN::AnimationFrame(icn_anim, 1, frame))
-	    {
-		const Sprite & sprite1 = AGG::GetICN(icn_anim, 0);
-		const Sprite & sprite2 = AGG::GetICN(icn_anim, ICN::AnimationFrame(icn_anim, 1, frame));
+            if(0 == frame || 1 != ICN::AnimationFrame(icn_anim, 1, frame))
+            {
+                const Sprite & sprite1 = AGG::GetICN(icn_anim, 0);
+                const Sprite & sprite2 = AGG::GetICN(icn_anim, ICN::AnimationFrame(icn_anim, 1, frame));
 
-		cursor.Hide();
-		sprite1.Blit(pos_rt.x + anime_ox + sprite1.x(), pos_rt.y + anime_oy + sprite1.y());
-		sprite2.Blit(pos_rt.x + anime_ox + sprite2.x(), pos_rt.y + anime_oy + sprite2.y());
-		cursor.Show();
-		display.Flip();
-		++frame;
-	    }
-	}
+                cursor.Hide();
+                sprite1.Blit(pos_rt.x + anime_ox + sprite1.x(), pos_rt.y + anime_oy + sprite1.y());
+                sprite2.Blit(pos_rt.x + anime_ox + sprite2.x(), pos_rt.y + anime_oy + sprite2.y());
+                cursor.Show();
+                display.Flip();
+                ++frame;
+            }
+        }
     }
 
     // restore background
@@ -450,12 +450,12 @@ int Battle::Arena::DialogBattleHero(const HeroBase & hero, bool buttons) const
 
     if(!conf.QVGA())
     {
-	Surface shadow(btnCast, false);
-	shadow.Fill(ColorBlack);
-	shadow.SetAlphaMod(80);
-	if(btnCast.isDisable()) shadow.Blit(btnCast, display);
-	if(btnRetreat.isDisable()) shadow.Blit(btnRetreat, display);
-	if(btnSurrender.isDisable()) shadow.Blit(btnSurrender, display);
+        Surface shadow(btnCast, false);
+        shadow.Fill(ColorBlack);
+        shadow.SetAlphaMod(80);
+        if(btnCast.isDisable()) shadow.Blit(btnCast, display);
+        if(btnRetreat.isDisable()) shadow.Blit(btnRetreat, display);
+        if(btnSurrender.isDisable()) shadow.Blit(btnSurrender, display);
     }
 
     int result = 0;
@@ -465,36 +465,36 @@ int Battle::Arena::DialogBattleHero(const HeroBase & hero, bool buttons) const
 
     while(le.HandleEvents() && !result)
     {
-	btnCast.isEnable() && le.MousePressLeft(btnCast) ? btnCast.PressDraw() : btnCast.ReleaseDraw();
-	btnRetreat.isEnable() && le.MousePressLeft(btnRetreat) ? btnRetreat.PressDraw() : btnRetreat.ReleaseDraw();
-	btnSurrender.isEnable() && le.MousePressLeft(btnSurrender) ? btnSurrender.PressDraw() : btnSurrender.ReleaseDraw();
-	le.MousePressLeft(btnClose) ? btnClose.PressDraw() : btnClose.ReleaseDraw();
+        btnCast.isEnable() && le.MousePressLeft(btnCast) ? btnCast.PressDraw() : btnCast.ReleaseDraw();
+        btnRetreat.isEnable() && le.MousePressLeft(btnRetreat) ? btnRetreat.PressDraw() : btnRetreat.ReleaseDraw();
+        btnSurrender.isEnable() && le.MousePressLeft(btnSurrender) ? btnSurrender.PressDraw() : btnSurrender.ReleaseDraw();
+        le.MousePressLeft(btnClose) ? btnClose.PressDraw() : btnClose.ReleaseDraw();
 
-	if(!buttons && !le.MousePressRight()) break;
+        if(!buttons && !le.MousePressRight()) break;
 
-	if(Game::HotKeyPressEvent(Game::EVENT_BATTLE_CASTSPELL) ||
-		(btnCast.isEnable() && le.MouseClickLeft(btnCast))) result = 1;
+        if(Game::HotKeyPressEvent(Game::EVENT_BATTLE_CASTSPELL) ||
+                (btnCast.isEnable() && le.MouseClickLeft(btnCast))) result = 1;
 
-	if(Game::HotKeyPressEvent(Game::EVENT_BATTLE_RETREAT) ||
-		(btnRetreat.isEnable() && le.MouseClickLeft(btnRetreat))) result = 2;
+        if(Game::HotKeyPressEvent(Game::EVENT_BATTLE_RETREAT) ||
+                (btnRetreat.isEnable() && le.MouseClickLeft(btnRetreat))) result = 2;
 
-	if(Game::HotKeyPressEvent(Game::EVENT_BATTLE_SURRENDER) ||
-		(btnSurrender.isEnable() && le.MouseClickLeft(btnSurrender))) result = 3;
+        if(Game::HotKeyPressEvent(Game::EVENT_BATTLE_SURRENDER) ||
+                (btnSurrender.isEnable() && le.MouseClickLeft(btnSurrender))) result = 3;
 
-	if(le.MousePressRight(btnCast))
-	    Dialog::Message(_("Cast Spell"), _("Cast a magical spell. You may only cast one spell per combat round. The round is reset when every creature has had a turn"), Font::BIG);
-	else
-	if(le.MousePressRight(btnRetreat))
-	    Dialog::Message(_("Retreat"), _("Retreat your hero, abandoning your creatures. Your hero will be available for you to recruit again, however, the hero will have only a novice hero's forces."), Font::BIG);
-	else
-	if(le.MousePressRight(btnSurrender))
-	    Dialog::Message(_("Surrender"), _("Surrendering costs gold. However if you pay the ransom, the hero and all of his or her surviving creatures will be available to recruit again."), Font::BIG);
-	else
-	if(le.MousePressRight(btnClose))
-	    Dialog::Message(_("Cancel"), _("Return to the battle."), Font::BIG);
+        if(le.MousePressRight(btnCast))
+            Dialog::Message(_("Cast Spell"), _("Cast a magical spell. You may only cast one spell per combat round. The round is reset when every creature has had a turn"), Font::BIG);
+        else
+        if(le.MousePressRight(btnRetreat))
+            Dialog::Message(_("Retreat"), _("Retreat your hero, abandoning your creatures. Your hero will be available for you to recruit again, however, the hero will have only a novice hero's forces."), Font::BIG);
+        else
+        if(le.MousePressRight(btnSurrender))
+            Dialog::Message(_("Surrender"), _("Surrendering costs gold. However if you pay the ransom, the hero and all of his or her surviving creatures will be available to recruit again."), Font::BIG);
+        else
+        if(le.MousePressRight(btnClose))
+            Dialog::Message(_("Cancel"), _("Return to the battle."), Font::BIG);
 
         // exit
-	if(HotKeyCloseWindow || le.MouseClickLeft(btnClose)) break;
+        if(HotKeyCloseWindow || le.MouseClickLeft(btnClose)) break;
     }
 
     cursor.Hide();
@@ -536,22 +536,22 @@ bool Battle::DialogBattleSurrender(const HeroBase & hero, u32 cost)
 
     if(! kingdom.AllowPayment(payment_t(Resource::GOLD, cost)))
     {
-	btnAccept.Press();
-    	btnAccept.SetDisable(true);
+        btnAccept.Press();
+            btnAccept.SetDisable(true);
     }
 
     if(kingdom.GetCountMarketplace())
     {
-	if(kingdom.AllowPayment(payment_t(Resource::GOLD, cost)))
-    	    btnMarket.SetDisable(true);
-	else
-	{
-    	    std::string msg = _("Not enough gold (%{gold})");
-    	    StringReplace(msg, "%{gold}", cost - kingdom.GetFunds().Get(Resource::GOLD));
-	    Text text(msg, Font::SMALL);
-	    text.Blit(btnMarket.x + (btnMarket.w - text.w()) / 2, btnMarket.y - 15);
-    	    btnMarket.Draw();
-	}
+        if(kingdom.AllowPayment(payment_t(Resource::GOLD, cost)))
+                btnMarket.SetDisable(true);
+        else
+        {
+                std::string msg = _("Not enough gold (%{gold})");
+                StringReplace(msg, "%{gold}", cost - kingdom.GetFunds().Get(Resource::GOLD));
+            Text text(msg, Font::SMALL);
+            text.Blit(btnMarket.x + (btnMarket.w - text.w()) / 2, btnMarket.y - 15);
+                btnMarket.Draw();
+        }
     }
 
     btnAccept.Draw();
@@ -578,28 +578,28 @@ bool Battle::DialogBattleSurrender(const HeroBase & hero, u32 cost)
 
     while(le.HandleEvents() && !result)
     {
-	if(btnAccept.isEnable())
-	le.MousePressLeft(btnAccept) ? btnAccept.PressDraw() : btnAccept.ReleaseDraw();
-	le.MousePressLeft(btnDecline) ? btnDecline.PressDraw() : btnDecline.ReleaseDraw();
+        if(btnAccept.isEnable())
+        le.MousePressLeft(btnAccept) ? btnAccept.PressDraw() : btnAccept.ReleaseDraw();
+        le.MousePressLeft(btnDecline) ? btnDecline.PressDraw() : btnDecline.ReleaseDraw();
 
-	if(btnMarket.isEnable())
-	le.MousePressLeft(btnMarket) ? btnMarket.PressDraw() : btnMarket.ReleaseDraw();
+        if(btnMarket.isEnable())
+        le.MousePressLeft(btnMarket) ? btnMarket.PressDraw() : btnMarket.ReleaseDraw();
 
-	if(btnAccept.isEnable() && le.MouseClickLeft(btnAccept)) result = true;
+        if(btnAccept.isEnable() && le.MouseClickLeft(btnAccept)) result = true;
 
         if(btnMarket.isEnable() && le.MouseClickLeft(btnMarket))
         {
             Dialog::Marketplace(false);
 
             if(kingdom.AllowPayment(payment_t(Resource::GOLD, cost)))
-	    {
-		btnAccept.Release();
-    		btnAccept.SetDisable(false);
-	    }
+            {
+                btnAccept.Release();
+                    btnAccept.SetDisable(false);
+            }
         }
 
         // exit
-	if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(btnDecline)) break;
+        if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(btnDecline)) break;
     }
 
     cursor.Hide();

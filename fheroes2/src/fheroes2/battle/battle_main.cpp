@@ -50,25 +50,25 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
     // pre battle army1
     if(army1.GetCommander())
     {
-	if(army1.GetCommander()->isCaptain())
-	    army1.GetCommander()->ActionPreBattle();
-	else
-	if(army1.isControlAI())
-    	    AI::HeroesPreBattle(*army1.GetCommander());
+        if(army1.GetCommander()->isCaptain())
+            army1.GetCommander()->ActionPreBattle();
         else
-	    army1.GetCommander()->ActionPreBattle();
+        if(army1.isControlAI())
+                AI::HeroesPreBattle(*army1.GetCommander());
+        else
+            army1.GetCommander()->ActionPreBattle();
     }
 
     // pre battle army2
     if(army2.GetCommander())
     {
-	if(army2.GetCommander()->isCaptain())
-	    army2.GetCommander()->ActionPreBattle();
-	else
-	if(army2.isControlAI())
-    	    AI::HeroesPreBattle(*army2.GetCommander());
+        if(army2.GetCommander()->isCaptain())
+            army2.GetCommander()->ActionPreBattle();
         else
-	    army2.GetCommander()->ActionPreBattle();
+        if(army2.isControlAI())
+                AI::HeroesPreBattle(*army2.GetCommander());
+        else
+            army2.GetCommander()->ActionPreBattle();
     }
 
     AGG::ResetMixer();
@@ -84,7 +84,7 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
     DEBUG(DBG_BATTLE, DBG_INFO, "army2 " << army2.String());
 
     while(arena.BattleValid())
-	arena.Turns();
+        arena.Turns();
 
     const Result & result = arena.GetResult();
     AGG::ResetMixer();
@@ -95,11 +95,11 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
 
     if(local)
     {
-	// fade arena
-	arena.FadeArena();
+        // fade arena
+        arena.FadeArena();
 
-	// dialog summary
-	arena.DialogBattleSummary(result);
+        // dialog summary
+        arena.DialogBattleSummary(result);
     }
 
     // save count troop
@@ -109,38 +109,38 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
     // after battle army1
     if(army1.GetCommander())
     {
-	if(army1.isControlAI())
-    	    AI::HeroesAfterBattle(*army1.GetCommander());
+        if(army1.isControlAI())
+                AI::HeroesAfterBattle(*army1.GetCommander());
         else
-	    army1.GetCommander()->ActionAfterBattle();
+            army1.GetCommander()->ActionAfterBattle();
     }
 
     // after battle army2
     if(army2.GetCommander())
     {
-	if(army2.isControlAI())
-    	    AI::HeroesAfterBattle(*army2.GetCommander());
+        if(army2.isControlAI())
+                AI::HeroesAfterBattle(*army2.GetCommander());
         else
-	    army2.GetCommander()->ActionAfterBattle();
+            army2.GetCommander()->ActionAfterBattle();
     }
 
     // pickup artifact
     if(hero_wins && hero_loss &&
-	!((RESULT_RETREAT | RESULT_SURRENDER) & loss_result) &&
-	hero_wins->isHeroes() &&
-	hero_loss->isHeroes())
-	PickupArtifactsAction(*hero_wins, *hero_loss, hero_wins->isControlHuman());
+        !((RESULT_RETREAT | RESULT_SURRENDER) & loss_result) &&
+        hero_wins->isHeroes() &&
+        hero_loss->isHeroes())
+        PickupArtifactsAction(*hero_wins, *hero_loss, hero_wins->isControlHuman());
 
     // eagle eye capability
     if(hero_wins && hero_loss &&
-	hero_wins->GetLevelSkill(Skill::Secondary::EAGLEEYE) &&
-	hero_loss->isHeroes())
-	    EagleEyeSkillAction(*hero_wins, arena.GetUsageSpells(), hero_wins->isControlHuman());
+        hero_wins->GetLevelSkill(Skill::Secondary::EAGLEEYE) &&
+        hero_loss->isHeroes())
+            EagleEyeSkillAction(*hero_wins, arena.GetUsageSpells(), hero_wins->isControlHuman());
 
     // necromancy capability
     if(hero_wins &&
-	hero_wins->GetLevelSkill(Skill::Secondary::NECROMANCY))
-	    NecromancySkillAction(*hero_wins, result.killed, hero_wins->isControlHuman());
+        hero_wins->GetLevelSkill(Skill::Secondary::NECROMANCY))
+            NecromancySkillAction(*hero_wins, result.killed, hero_wins->isControlHuman());
 
     DEBUG(DBG_BATTLE, DBG_INFO, "army1 " << army1.String());
     DEBUG(DBG_BATTLE, DBG_INFO, "army2 " << army1.String());
@@ -148,14 +148,14 @@ Battle::Result Battle::Loader(Army & army1, Army & army2, s32 mapsindex)
     // update army
     if(army1.GetCommander() && army1.GetCommander()->isHeroes())
     {
-	// hard reset army
-	if(!army1.isValid() || (result.army1 & RESULT_RETREAT)) army1.Reset(false);
+        // hard reset army
+        if(!army1.isValid() || (result.army1 & RESULT_RETREAT)) army1.Reset(false);
     }
 
     // update army
     if(army2.GetCommander() && army2.GetCommander()->isHeroes())
     {
-	// hard reset army
+        // hard reset army
         if(!army2.isValid() || (result.army2 & RESULT_RETREAT)) army2.Reset(false);
     }
 
@@ -171,34 +171,34 @@ void Battle::PickupArtifactsAction(HeroBase & hero1, HeroBase & hero2, bool loca
 
     for(u32 ii = 0; ii < bag2.size(); ++ii)
     {
-	Artifact & art = bag2[ii];
+        Artifact & art = bag2[ii];
 
-	if(art.isUltimate())
-	{
-	    art = Artifact::UNKNOWN;
-	}
-	else
-	if(art() != Artifact::UNKNOWN && art() != Artifact::MAGIC_BOOK)
+        if(art.isUltimate())
+        {
+            art = Artifact::UNKNOWN;
+        }
+        else
+        if(art() != Artifact::UNKNOWN && art() != Artifact::MAGIC_BOOK)
         {
             BagArtifacts::iterator it = std::find(bag1.begin(), bag1.end(), Artifact((Artifact::UNKNOWN)));
             if(bag1.end() != it)
             {
-        	*it = art;
-        	if(local)
-		{
-		    Game::PlayPickupSound();
-		    Dialog::ArtifactInfo(_("You have captured an enemy artifact!"), "", art);
-		}
-    	    }
-    	    art = Artifact::UNKNOWN;
-	}
+                *it = art;
+                if(local)
+                {
+                    Game::PlayPickupSound();
+                    Dialog::ArtifactInfo(_("You have captured an enemy artifact!"), "", art);
+                }
+                }
+                art = Artifact::UNKNOWN;
+        }
     }
 }
 
 void Battle::EagleEyeSkillAction(HeroBase & hero, const SpellStorage & spells, bool local)
 {
     if(spells.empty() ||
-	!hero.HaveSpellBook()) return;
+        !hero.HaveSpellBook()) return;
 
     SpellStorage new_spells;
     new_spells.reserve(10);
@@ -207,43 +207,43 @@ void Battle::EagleEyeSkillAction(HeroBase & hero, const SpellStorage & spells, b
 
     // filter spells
     for(SpellStorage::const_iterator
-	it = spells.begin(); it != spells.end(); ++it)
+        it = spells.begin(); it != spells.end(); ++it)
     {
-	const Spell & sp = *it;
-    	if(!hero.HaveSpell(sp))
-	{
-	    switch(eagleeye.Level())
-	    {
-		case Skill::Level::BASIC:
-		    // 20%
-		    if(3 > sp.Level() && eagleeye.GetValues() >= Rand::Get(1, 100)) new_spells.push_back(sp);
-		    break;
-		case Skill::Level::ADVANCED:
-		    // 30%
-		    if(4 > sp.Level() && eagleeye.GetValues() >= Rand::Get(1, 100)) new_spells.push_back(sp);
-		    break;
-		case Skill::Level::EXPERT:
-		    // 40%
-		    if(5 > sp.Level() && eagleeye.GetValues() >= Rand::Get(1, 100)) new_spells.push_back(sp);
-		    break;
-		default: break;
-    	    }
-	}
+        const Spell & sp = *it;
+            if(!hero.HaveSpell(sp))
+        {
+            switch(eagleeye.Level())
+            {
+                case Skill::Level::BASIC:
+                    // 20%
+                    if(3 > sp.Level() && eagleeye.GetValues() >= Rand::Get(1, 100)) new_spells.push_back(sp);
+                    break;
+                case Skill::Level::ADVANCED:
+                    // 30%
+                    if(4 > sp.Level() && eagleeye.GetValues() >= Rand::Get(1, 100)) new_spells.push_back(sp);
+                    break;
+                case Skill::Level::EXPERT:
+                    // 40%
+                    if(5 > sp.Level() && eagleeye.GetValues() >= Rand::Get(1, 100)) new_spells.push_back(sp);
+                    break;
+                default: break;
+                }
+        }
     }
 
     // add new spell
     for(SpellStorage::const_iterator
-	it = new_spells.begin(); it != new_spells.end(); ++it)
+        it = new_spells.begin(); it != new_spells.end(); ++it)
     {
-	const Spell & sp = *it;
-	if(local)
-	{
-	    std::string msg = _("Through eagle-eyed observation, %{name} is able to learn the magic spell %{spell}.");
-	    StringReplace(msg, "%{name}", hero.GetName());
-	    StringReplace(msg, "%{spell}", sp.GetName());
-	    Game::PlayPickupSound();
-	    Dialog::SpellInfo("", msg, sp);
-	}
+        const Spell & sp = *it;
+        if(local)
+        {
+            std::string msg = _("Through eagle-eyed observation, %{name} is able to learn the magic spell %{spell}.");
+            StringReplace(msg, "%{name}", hero.GetName());
+            StringReplace(msg, "%{spell}", sp.GetName());
+            Game::PlayPickupSound();
+            Dialog::SpellInfo("", msg, sp);
+        }
     }
 
     hero.AppendSpellsToBook(new_spells, true);
@@ -254,7 +254,7 @@ void Battle::NecromancySkillAction(HeroBase & hero, u32 killed, bool local)
     Army & army = hero.GetArmy();
 
     if(0 == killed ||
-	(army.isFullHouse() && !army.HasMonster(Monster::SKELETON))) return;
+        (army.isFullHouse() && !army.HasMonster(Monster::SKELETON))) return;
 
     // check necromancy shrine build
     u32 percent = 10 * world.GetKingdom(army.GetColor()).GetCountNecromancyShrineBuild();
@@ -277,17 +277,17 @@ void Battle::NecromancySkillAction(HeroBase & hero, u32 killed, bool local)
 
     if(local)
     {
-	std::string msg = _("Practicing the dark arts of necromancy, you are able to raise %{count} of the enemy's dead to return under your service as %{monster}");
-	StringReplace(msg, "%{count}", count);
-	StringReplace(msg, "%{monster}", mons.GetPluralName(count));
-	Surface sf1(Size(40, 45), false);
-	const Sprite & sf2 = AGG::GetICN(ICN::MONS32, mons.GetSpriteIndex());
-	sf2.Blit((sf1.w() - sf2.w()) / 2, 0, sf1);
-	Text text(GetString(count), Font::SMALL);
-	text.Blit((sf1.w() - text.w()) / 2, sf2.h() + 3, sf1);
-	Game::PlayPickupSound();
+        std::string msg = _("Practicing the dark arts of necromancy, you are able to raise %{count} of the enemy's dead to return under your service as %{monster}");
+        StringReplace(msg, "%{count}", count);
+        StringReplace(msg, "%{monster}", mons.GetPluralName(count));
+        Surface sf1(Size(40, 45), false);
+        const Sprite & sf2 = AGG::GetICN(ICN::MONS32, mons.GetSpriteIndex());
+        sf2.Blit((sf1.w() - sf2.w()) / 2, 0, sf1);
+        Text text(GetString(count), Font::SMALL);
+        text.Blit((sf1.w() - text.w()) / 2, sf2.h() + 3, sf1);
+        Game::PlayPickupSound();
 
-	Dialog::SpriteInfo("", msg, sf1);
+        Dialog::SpriteInfo("", msg, sf1);
     }
 
     DEBUG(DBG_BATTLE, DBG_TRACE, "raise: " << count << mons.GetMultiName());

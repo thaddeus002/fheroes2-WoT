@@ -42,20 +42,20 @@ struct Focus : std::pair<int, void*>
 {
     Focus() : std::pair<int, void*>(FOCUS_UNSEL, NULL) {}
 
-    bool	isValid(void) const { return first != FOCUS_UNSEL && second; }
+    bool        isValid(void) const { return first != FOCUS_UNSEL && second; }
 
-    void	Reset(void) { first = FOCUS_UNSEL; second = NULL; }
-    void	Set(Castle* ptr) { first = FOCUS_CASTLE; second = ptr; }
-    void	Set(Heroes* ptr) { first = FOCUS_HEROES; second = ptr; }
+    void        Reset(void) { first = FOCUS_UNSEL; second = NULL; }
+    void        Set(Castle* ptr) { first = FOCUS_CASTLE; second = ptr; }
+    void        Set(Heroes* ptr) { first = FOCUS_HEROES; second = ptr; }
 
-    Castle*	GetCastle(void) { return first == FOCUS_CASTLE && second ? reinterpret_cast<Castle*>(second) : NULL; }
-    Heroes*	GetHeroes(void) { return first == FOCUS_HEROES && second ? reinterpret_cast<Heroes*>(second) : NULL; }
+    Castle*        GetCastle(void) { return first == FOCUS_CASTLE && second ? reinterpret_cast<Castle*>(second) : NULL; }
+    Heroes*        GetHeroes(void) { return first == FOCUS_HEROES && second ? reinterpret_cast<Heroes*>(second) : NULL; }
 };
 
 struct Control
 {
     virtual int         GetControl(void) const = 0;
-    virtual 			~Control() {}
+    virtual                         ~Control() {}
     bool                isControlAI(void) const;
     bool                isControlHuman(void) const;
     bool                isControlRemote(void) const;
@@ -94,13 +94,13 @@ protected:
     friend StreamBase & operator<< (StreamBase &, const Player &);
     friend StreamBase & operator>> (StreamBase &, Player &);
 
-    int		control;
-    int		color;
-    int		race;
-    int		friends;
-    std::string	name;
-    u32		id;
-    Focus	focus;
+    int                control;
+    int                color;
+    int                race;
+    int                friends;
+    std::string        name;
+    u32                id;
+    Focus        focus;
 };
 
 StreamBase & operator<< (StreamBase &, const Player &);
@@ -116,27 +116,27 @@ public:
     void Init(const Maps::FileInfo &);
     void clear(void);
 
-    void	SetStartGame(void);
-    int	 	GetColors(int control = 0xFF, bool strong = false) const;
-    int		GetActualColors(void) const;
-    std::string	String(void) const;
+    void        SetStartGame(void);
+    int                 GetColors(int control = 0xFF, bool strong = false) const;
+    int                GetActualColors(void) const;
+    std::string        String(void) const;
 
-    Player*		GetCurrent(void);
-    const Player*	GetCurrent(void) const;
+    Player*                GetCurrent(void);
+    const Player*        GetCurrent(void) const;
 
-    static Player*	Get(int color);
-    static int		GetPlayerControl(int color);
-    static int		GetPlayerRace(int color);
-    static int		GetPlayerFriends(int color);
-    static bool		GetPlayerInGame(int color);
-    static bool		isFriends(int player, int colors);
-    static void		SetPlayerRace(int color, int race);
-    static void		SetPlayerControl(int color, int ctrl);
-    static void		SetPlayerInGame(int color, bool);
-    static int		HumanColors(void);
-    static int		FriendColors(void);
+    static Player*        Get(int color);
+    static int                GetPlayerControl(int color);
+    static int                GetPlayerRace(int color);
+    static int                GetPlayerFriends(int color);
+    static bool                GetPlayerInGame(int color);
+    static bool                isFriends(int player, int colors);
+    static void                SetPlayerRace(int color, int race);
+    static void                SetPlayerControl(int color, int ctrl);
+    static void                SetPlayerInGame(int color, bool);
+    static int                HumanColors(void);
+    static int                FriendColors(void);
 
-    int		current_color;
+    int                current_color;
 };
 
 StreamBase & operator<< (StreamBase &, const Players &);
@@ -146,33 +146,33 @@ namespace Interface
 {
     struct PlayerInfo
     {
-	PlayerInfo() : player(NULL) {}
+        PlayerInfo() : player(NULL) {}
 
-	bool operator== (const Player*) const;
+        bool operator== (const Player*) const;
 
-	Player*     player;
-	Rect        rect1; // opponent
-	Rect        rect2; // class
-	Rect        rect3; // change
+        Player*     player;
+        Rect        rect1; // opponent
+        Rect        rect2; // class
+        Rect        rect3; // change
     };
 
     struct PlayersInfo : std::vector<PlayerInfo>
     {
-	PlayersInfo(bool /* show name */, bool /* show race */, bool /* show swap button */);
+        PlayersInfo(bool /* show name */, bool /* show race */, bool /* show swap button */);
 
-	void UpdateInfo(Players &, const Point & opponents, const Point & classes);
+        void UpdateInfo(Players &, const Point & opponents, const Point & classes);
 
-	Player* GetFromOpponentClick(const Point & pt);
-	Player* GetFromOpponentNameClick(const Point & pt);
-	Player* GetFromOpponentChangeClick(const Point & pt);
-	Player* GetFromClassClick(const Point & pt);
+        Player* GetFromOpponentClick(const Point & pt);
+        Player* GetFromOpponentNameClick(const Point & pt);
+        Player* GetFromOpponentChangeClick(const Point & pt);
+        Player* GetFromClassClick(const Point & pt);
 
-	void RedrawInfo(bool show_play_info = false) const;
-	bool QueueEventProcessing(void);
+        void RedrawInfo(bool show_play_info = false) const;
+        bool QueueEventProcessing(void);
 
-	bool show_name;
-	bool show_race;
-	bool show_swap;
+        bool show_name;
+        bool show_race;
+        bool show_swap;
     };
 }
 

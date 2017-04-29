@@ -39,43 +39,43 @@ namespace Interface
     class StatusWindow : public BorderWindow
     {
     public:
-	StatusWindow(Basic &);
+        StatusWindow(Basic &);
 
-	void		SetPos(s32, s32);
-	void		SavePosition(void);
-	void		SetRedraw(void) const;
+        void                SetPos(s32, s32);
+        void                SavePosition(void);
+        void                SetRedraw(void) const;
 
-	void		Reset(void);
-	    
-	void		Redraw(void);
-	void		NextState(void);
-	int		GetState(void) const;
-	void		SetState(int);
-	void		SetResource(int, u32);
-	void		RedrawTurnProgress(u32);
-	void		QueueEventProcessing(void);
+        void                Reset(void);
+            
+        void                Redraw(void);
+        void                NextState(void);
+        int                GetState(void) const;
+        void                SetState(int);
+        void                SetResource(int, u32);
+        void                RedrawTurnProgress(u32);
+        void                QueueEventProcessing(void);
 
-	static void	ResetTimer(void);
+        static void        ResetTimer(void);
 
     private:
-	void		DrawKingdomInfo(int oh = 0) const;
-	void		DrawDayInfo(int oh = 0) const;
-	void		DrawArmyInfo(int oh = 0) const;
-	void		DrawResourceInfo(int oh = 0) const;
-	void		DrawBackground(void) const;
-	void		DrawAITurns(void) const;
-	static u32	ResetResourceStatus(u32, void *);
-	static u32	RedrawAIStatus(u32, void *);
+        void                DrawKingdomInfo(int oh = 0) const;
+        void                DrawDayInfo(int oh = 0) const;
+        void                DrawArmyInfo(int oh = 0) const;
+        void                DrawResourceInfo(int oh = 0) const;
+        void                DrawBackground(void) const;
+        void                DrawAITurns(void) const;
+        static u32        ResetResourceStatus(u32, void *);
+        static u32        RedrawAIStatus(u32, void *);
 
-	Basic &		interface;
+        Basic &                interface;
 
-	int		state;
-	int		oldState;
-	int		lastResource;
-	u32		countLastResource;
-	SDL::Timer	timerShowLastResource;
-	SDL::Timer	timerRedrawAIStatus;
-	u32		turn_progress;
+        int                state;
+        int                oldState;
+        int                lastResource;
+        u32                countLastResource;
+        SDL::Timer        timerShowLastResource;
+        SDL::Timer        timerRedrawAIStatus;
+        u32                turn_progress;
     };
 }
 

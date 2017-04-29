@@ -44,72 +44,72 @@ namespace Battle
 
     struct Result
     {
-	u32	army1;
-	u32	army2;
-	u32	exp1;
-	u32	exp2;
-	u32	killed;
+        u32        army1;
+        u32        army2;
+        u32        exp1;
+        u32        exp2;
+        u32        killed;
 
-	Result() : army1(0), army2(0), exp1(0), exp2(0), killed(0) {}
+        Result() : army1(0), army2(0), exp1(0), exp2(0), killed(0) {}
 
-	bool	AttackerWins(void) const;
-	bool	DefenderWins(void) const;
-	u32	AttackerResult(void) const;
-	u32	DefenderResult(void) const;
-	u32	GetExperienceAttacker(void) const;
-	u32	GetExperienceDefender(void) const;
+        bool        AttackerWins(void) const;
+        bool        DefenderWins(void) const;
+        u32        AttackerResult(void) const;
+        u32        DefenderResult(void) const;
+        u32        GetExperienceAttacker(void) const;
+        u32        GetExperienceDefender(void) const;
     };
 
     StreamBase & operator<< (StreamBase &, const Result &);
     StreamBase & operator>> (StreamBase &, Result &);
 
-    Result	Loader(Army &, Army &, s32);
-    void	UpdateMonsterSpriteAnimation(const std::string &);
-    void	UpdateMonsterAttributes(const std::string &);
+    Result        Loader(Army &, Army &, s32);
+    void        UpdateMonsterSpriteAnimation(const std::string &);
+    void        UpdateMonsterAttributes(const std::string &);
 
     enum { AS_NONE, AS_IDLE, AS_MOVE, AS_FLY1, AS_FLY2, AS_FLY3, AS_SHOT0, AS_SHOT1, AS_SHOT2, AS_SHOT3, AS_ATTK0, AS_ATTK1, AS_ATTK2, AS_ATTK3, AS_WNCE, AS_KILL };
 
     struct animframe_t
     {
-        int		start;
-        int		count;
+        int                start;
+        int                count;
     };
 
     struct monstersprite_t
     {
-        int		icn_file;
-        animframe_t	frm_idle;
-        animframe_t	frm_move;
-        animframe_t	frm_fly1;
-        animframe_t	frm_fly2;
-        animframe_t	frm_fly3;
-        animframe_t	frm_shot0;
-        animframe_t	frm_shot1;
-        animframe_t	frm_shot2;
-        animframe_t	frm_shot3;
-        animframe_t	frm_attk0;
-        animframe_t	frm_attk1;
-        animframe_t	frm_attk2;
-        animframe_t	frm_attk3;
-        animframe_t	frm_wnce;
-        animframe_t	frm_kill;
-        int		m82_attk;
-        int		m82_kill;
-        int		m82_move;
-        int		m82_wnce;
+        int                icn_file;
+        animframe_t        frm_idle;
+        animframe_t        frm_move;
+        animframe_t        frm_fly1;
+        animframe_t        frm_fly2;
+        animframe_t        frm_fly3;
+        animframe_t        frm_shot0;
+        animframe_t        frm_shot1;
+        animframe_t        frm_shot2;
+        animframe_t        frm_shot3;
+        animframe_t        frm_attk0;
+        animframe_t        frm_attk1;
+        animframe_t        frm_attk2;
+        animframe_t        frm_attk3;
+        animframe_t        frm_wnce;
+        animframe_t        frm_kill;
+        int                m82_attk;
+        int                m82_kill;
+        int                m82_move;
+        int                m82_wnce;
     };
 
     struct TargetInfo
     {
-        Unit*	defender;
-	u32	damage;
-	u32	killed;
-	bool	resist;
+        Unit*        defender;
+        u32        damage;
+        u32        killed;
+        bool        resist;
 
-	TargetInfo() : defender(NULL), damage(0), killed(0), resist(false) {}
+        TargetInfo() : defender(NULL), damage(0), killed(0), resist(false) {}
 
-	bool	operator==(const TargetInfo &) const;
-        bool	isFinishAnimFrame(void) const;
+        bool        operator==(const TargetInfo &) const;
+        bool        isFinishAnimFrame(void) const;
     };
 
     StreamBase & operator<< (StreamBase &, const TargetInfo &);
@@ -117,7 +117,7 @@ namespace Battle
 
     struct TargetsInfo : public std::vector<TargetInfo>
     {
-	TargetsInfo() {}
+        TargetsInfo() {}
     };
 
     StreamBase & operator<< (StreamBase &, const TargetsInfo &);

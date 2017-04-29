@@ -44,7 +44,7 @@ const char* MoraleString(int morale)
         case Morale::GOOD:
         case Morale::GREAT:
         case Morale::BLOOD:
-    	    return _("Good Morale");
+                return _("Good Morale");
 
         default: break;
     }
@@ -120,9 +120,9 @@ void LuckIndicator::Redraw(void)
     s32 cy = area.y + (area.h - sprite.h()) / 2;
 
     if(modificators.size())
-	descriptions.append(modificators);
+        descriptions.append(modificators);
     else
-	descriptions.append(_("None"));
+        descriptions.append(_("None"));
 
     back.Restore();
     while(count--)
@@ -166,9 +166,9 @@ void MoraleIndicator::Redraw(void)
     s32 cy = area.y + (area.h - sprite.h()) / 2;
 
     if(modificators.size())
-	descriptions.append(modificators);
+        descriptions.append(modificators);
     else
-	descriptions.append(_("None"));
+        descriptions.append(_("None"));
 
     back.Restore();
     while(count--)
@@ -212,9 +212,9 @@ void ExperienceIndicator::QueueEventProcessing(void)
 
     if(le.MouseClickLeft(area) || le.MousePressRight(area))
     {
-	std::string message = _("Level %{level}");
-	StringReplace(message, "%{level}", hero.GetLevel());
-	Dialog::Message(message, descriptions, Font::BIG, (le.MousePressRight() ? 0 : Dialog::OK));
+        std::string message = _("Level %{level}");
+        StringReplace(message, "%{level}", hero.GetLevel());
+        Dialog::Message(message, descriptions, Font::BIG, (le.MousePressRight() ? 0 : Dialog::OK));
     }
 }
 
@@ -244,6 +244,6 @@ void SpellPointsIndicator::QueueEventProcessing(void)
 
     if(le.MouseClickLeft(area) || le.MousePressRight(area))
     {
-	Dialog::Message(_("Spell Points"), descriptions, Font::BIG, (le.MousePressRight() ? 0 : Dialog::OK));
+        Dialog::Message(_("Spell Points"), descriptions, Font::BIG, (le.MousePressRight() ? 0 : Dialog::OK));
     }
 }

@@ -99,30 +99,30 @@ void Button::SetSprite(const Surface & s1, const Surface & s2)
 void Button::SetDisable(bool f)
 {
     if(f)
-	flags |= (BTN_DISABLE | BTN_PRESSED);
+        flags |= (BTN_DISABLE | BTN_PRESSED);
     else
-	flags &= ~(BTN_DISABLE | BTN_PRESSED);
+        flags &= ~(BTN_DISABLE | BTN_PRESSED);
 }
 
 void Button::Press(void)
 {
     if(isEnable() && isReleased())
-	flags |= BTN_PRESSED;
+        flags |= BTN_PRESSED;
 }
 
 void Button::Release(void)
 {
     if(isEnable() && isPressed())
-	flags &= ~BTN_PRESSED;
+        flags &= ~BTN_PRESSED;
 }
 
 void Button::PressDraw(void)
 {
     if(isEnable() && isReleased())
     {
-	Press();
-	Draw();
-	Display::Get().Flip();
+        Press();
+        Draw();
+        Display::Get().Flip();
     }
 }
 
@@ -130,9 +130,9 @@ void Button::ReleaseDraw(void)
 {
     if(isEnable() && isPressed())
     {
-	Release();
-	Draw();
-	Display::Get().Flip();
+        Release();
+        Draw();
+        Display::Get().Flip();
     }
 }
 
@@ -143,14 +143,14 @@ void Button::Draw(void)
 
     if((*this & cursor.GetArea()) && cursor.isVisible())
     {
-	cursor.Hide();
-	localcursor = true;
+        cursor.Hide();
+        localcursor = true;
     }
 
     if(isPressed())
-	sf2.Blit(x, y, Display::Get());
+        sf2.Blit(x, y, Display::Get());
     else
-	sf1.Blit(x, y, Display::Get());
+        sf1.Blit(x, y, Display::Get());
 
     if(localcursor) cursor.Show();
 }
@@ -162,44 +162,44 @@ ButtonGroups::ButtonGroups(const Rect & pos, u32 btns) : button1(NULL), button2(
 
     switch(buttons)
     {
-	case Dialog::YES|Dialog::NO:
+        case Dialog::YES|Dialog::NO:
             pt.x = pos.x;
             pt.y = pos.y + pos.h - AGG::GetICN(system, 5).h();
-	    button1 = new Button(pt.x, pt.y, system, 5, 6);
-	    result1 = Dialog::YES;
+            button1 = new Button(pt.x, pt.y, system, 5, 6);
+            result1 = Dialog::YES;
             pt.x = pos.x + pos.w - AGG::GetICN(system, 7).w();
             pt.y = pos.y + pos.h - AGG::GetICN(system, 7).h();
-	    button2 = new Button(pt.x, pt.y, system, 7, 8);
-	    result2 = Dialog::NO;
-	    break;
+            button2 = new Button(pt.x, pt.y, system, 7, 8);
+            result2 = Dialog::NO;
+            break;
 
-	case Dialog::OK|Dialog::CANCEL:
+        case Dialog::OK|Dialog::CANCEL:
             pt.x = pos.x;
             pt.y = pos.y + pos.h - AGG::GetICN(system, 1).h();
-	    button1 = new Button(pt.x, pt.y, system, 1, 2);
-	    result1 = Dialog::OK;
+            button1 = new Button(pt.x, pt.y, system, 1, 2);
+            result1 = Dialog::OK;
             pt.x = pos.x + pos.w - AGG::GetICN(system, 3).w();
             pt.y = pos.y + pos.h - AGG::GetICN(system, 3).h();
-	    button2 = new Button(pt.x, pt.y, system, 3, 4);
-	    result2 = Dialog::CANCEL;
-	    break;
+            button2 = new Button(pt.x, pt.y, system, 3, 4);
+            result2 = Dialog::CANCEL;
+            break;
 
-	case Dialog::OK:
+        case Dialog::OK:
             pt.x = pos.x + (pos.w - AGG::GetICN(system, 1).w()) / 2;
             pt.y = pos.y + pos.h - AGG::GetICN(system, 1).h();
-	    button1 = new Button(pt.x, pt.y, system, 1, 2);
-	    result1 = Dialog::OK;
-	    break;
+            button1 = new Button(pt.x, pt.y, system, 1, 2);
+            result1 = Dialog::OK;
+            break;
 
-	case Dialog::CANCEL:
+        case Dialog::CANCEL:
             pt.x = pos.x + (pos.w - AGG::GetICN(system, 3).w()) / 2;
             pt.y = pos.y + pos.h - AGG::GetICN(system, 3).h();
-	    button2 = new Button(pt.x, pt.y, system, 3, 4);
-	    result2 = Dialog::CANCEL;
-	    break;
+            button2 = new Button(pt.x, pt.y, system, 3, 4);
+            result2 = Dialog::CANCEL;
+            break;
 
-	default:
-	    break;
+        default:
+            break;
     }
 }
 
@@ -227,21 +227,21 @@ int ButtonGroups::QueueEventProcessing(void)
 
     if(button1 && button2)
     {
-	if(buttons == (Dialog::YES|Dialog::NO) ||
-	    buttons == (Dialog::OK|Dialog::CANCEL))
-	{
-	    if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_READY)) return result1;
-    	    if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)) return result2;
-	}
+        if(buttons == (Dialog::YES|Dialog::NO) ||
+            buttons == (Dialog::OK|Dialog::CANCEL))
+        {
+            if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_READY)) return result1;
+                if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)) return result2;
+        }
 
-	if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_LEFT)) return result1;
-	else
-	if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_RIGHT)) return result2;
+        if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_LEFT)) return result1;
+        else
+        if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_RIGHT)) return result2;
     }
     else
     // one button
     {
-	if(HotKeyCloseWindow) return buttons;
+        if(HotKeyCloseWindow) return buttons;
     }
 
     return Dialog::ZERO;
@@ -251,16 +251,16 @@ void ButtonGroups::DisableButton1(bool f)
 {
     if(button1)
     {
-	if(f)
-	{
-	    button1->Press();
-	    button1->SetDisable(true);
-	}
-	else
-	{
-	    button1->Release();
-	    button1->SetDisable(false);
-	}
+        if(f)
+        {
+            button1->Press();
+            button1->SetDisable(true);
+        }
+        else
+        {
+            button1->Release();
+            button1->SetDisable(false);
+        }
     }
 }
 
@@ -268,15 +268,15 @@ void ButtonGroups::DisableButton2(bool f)
 {
     if(button2)
     {
-	if(f)
-	{
-	    button2->Press();
-	    button2->SetDisable(true);
-	}
-	else
-	{
-	    button2->Release();
-	    button2->SetDisable(false);
-	}
+        if(f)
+        {
+            button2->Press();
+            button2->SetDisable(true);
+        }
+        else
+        {
+            button2->Release();
+            button2->SetDisable(false);
+        }
     }
 }

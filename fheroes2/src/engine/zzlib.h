@@ -52,8 +52,8 @@ class ZStreamFile : public StreamBuf
 public:
     ZStreamFile() {}
 
-    bool	read(const std::string &, size_t offset = 0);
-    bool	write(const std::string &, bool append = false) const;
+    bool        read(const std::string &, size_t offset = 0);
+    bool        write(const std::string &, bool append = false) const;
 };
 
 #endif

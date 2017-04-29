@@ -44,26 +44,26 @@ class TradeWindowGUI
 {
 public:
     TradeWindowGUI(const Rect & rt) :
-	pos_rt(rt),
-	tradpost(Settings::Get().ExtGameEvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST)
+        pos_rt(rt),
+        tradpost(Settings::Get().ExtGameEvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST)
     {
-	back.Save(Rect(rt.x - 5, rt.y + 15, rt.w + 10, 160));
+        back.Save(Rect(rt.x - 5, rt.y + 15, rt.w + 10, 160));
 
         buttonGift.SetPos(pos_rt.x + (pos_rt.w - AGG::GetICN(tradpost, 17).w()) / 2, pos_rt.y + 120);
         buttonTrade.SetPos(pos_rt.x + (pos_rt.w - AGG::GetICN(tradpost, 17).w()) / 2, pos_rt.y + 150);
-	buttonLeft.SetPos(pos_rt.x + 11, pos_rt.y + 129);
-	buttonRight.SetPos(pos_rt.x + 220, pos_rt.y + 129);
+        buttonLeft.SetPos(pos_rt.x + 11, pos_rt.y + 129);
+        buttonRight.SetPos(pos_rt.x + 220, pos_rt.y + 129);
 
-	buttonGift.SetSprite(ICN::BTNGIFT, 0, 1);
-	buttonTrade.SetSprite(tradpost, 15, 16);
-	buttonLeft.SetSprite(tradpost, 3, 4);
-	buttonRight.SetSprite(tradpost, 5, 6);
+        buttonGift.SetSprite(ICN::BTNGIFT, 0, 1);
+        buttonTrade.SetSprite(tradpost, 15, 16);
+        buttonLeft.SetSprite(tradpost, 3, 4);
+        buttonRight.SetSprite(tradpost, 5, 6);
 
         splitter.SetSprite(AGG::GetICN(tradpost, 2));
         splitter.SetArea(Rect(pos_rt.x + (pos_rt.w - AGG::GetICN(tradpost, 1).w()) / 2 + 21, pos_rt.y + 131, 189, 11));
         splitter.HideCursor();
 
-	TextBox(_("Please inspect our fine wares. If you feel like offering a trade, click on the items you wish to trade with and for."), Font::BIG, Rect(pos_rt.x, pos_rt.y + 30, pos_rt.w, 100));
+        TextBox(_("Please inspect our fine wares. If you feel like offering a trade, click on the items you wish to trade with and for."), Font::BIG, Rect(pos_rt.x, pos_rt.y + 30, pos_rt.w, 100));
 
         textSell.SetFont(Font::SMALL);
         textBuy.SetFont(Font::SMALL);
@@ -98,17 +98,17 @@ void TradeWindowGUI::ShowTradeArea(int resourceFrom, int resourceTo, u32 max_buy
     if(disable || resourceFrom == resourceTo || (Resource::GOLD != resourceTo && 0 == max_buy))
     {
         cursor.Hide();
-	splitter.HideCursor();
+        splitter.HideCursor();
         back.Restore();
         Rect dst_rt(pos_rt.x, pos_rt.y + 30, pos_rt.w, 100);
         TextBox(_("You have received quite a bargain. I expect to make no profit on the deal. Can I interest you in any of my other wares?"), Font::BIG, dst_rt);
         buttonGift.SetDisable(false);
-	buttonTrade.SetDisable(true);
+        buttonTrade.SetDisable(true);
         buttonLeft.SetDisable(true);
         buttonRight.SetDisable(true);
         buttonGift.Draw();
-	buttonMax = Rect();
-	buttonMin = Rect();
+        buttonMax = Rect();
+        buttonMin = Rect();
         cursor.Show();
         display.Flip();
     }
@@ -124,7 +124,7 @@ void TradeWindowGUI::ShowTradeArea(int resourceFrom, int resourceTo, u32 max_buy
         bar.Blit(dst_pt);
         splitter.SetRange(0, (Resource::GOLD == resourceTo ? max_sell : max_buy));
         u32 exchange_rate = GetTradeCosts(resourceFrom, resourceTo, fromTradingPost);
-	std::string message;
+        std::string message;
         if(Resource::GOLD == resourceTo)
         {
             message = _("I can offer you %{count} for 1 unit of %{resfrom}.");
@@ -154,14 +154,14 @@ void TradeWindowGUI::ShowTradeArea(int resourceFrom, int resourceTo, u32 max_buy
         Text text("max", Font::YELLOW_SMALL);
         dst_pt.x = pos_rt.x + (pos_rt.w - text.w()) / 2 - 5;
         dst_pt.y = pos_rt.y + 80;
-	buttonMax = Rect(dst_pt.x, dst_pt.y, text.w(), text.h());
+        buttonMax = Rect(dst_pt.x, dst_pt.y, text.w(), text.h());
         text.Blit(dst_pt);
-	text.Set("min", Font::YELLOW_SMALL);
+        text.Set("min", Font::YELLOW_SMALL);
         dst_pt.x = pos_rt.x + (pos_rt.w - text.w()) / 2 - 5;
         dst_pt.y = pos_rt.y + 103;
-	buttonMin = Rect(dst_pt.x, dst_pt.y, text.w(), text.h());
+        buttonMin = Rect(dst_pt.x, dst_pt.y, text.w(), text.h());
         text.Blit(dst_pt);
-	text.Set(_("Qty to trade"), Font::SMALL);
+        text.Set(_("Qty to trade"), Font::SMALL);
         dst_pt.x = pos_rt.x + (pos_rt.w - text.w()) / 2;
         dst_pt.y = pos_rt.y + 115;
         text.Blit(dst_pt);
@@ -176,7 +176,7 @@ void TradeWindowGUI::ShowTradeArea(int resourceFrom, int resourceTo, u32 max_buy
         buttonRight.Draw();
 
         RedrawInfoBuySell(count_sell, count_buy, max_sell, world.GetKingdom(Settings::Get().CurrentColor()).GetFunds().Get(resourceTo));
-	splitter.ShowCursor();
+        splitter.ShowCursor();
         cursor.Show();
         display.Flip();
     }
@@ -239,13 +239,13 @@ void Dialog::Marketplace(bool fromTradingPost)
     const Point pt1(pos_rt.x, pos_rt.y + 190);
     Rects rectsFrom;
     rectsFrom.reserve(7);
-    rectsFrom.push_back(Rect(pt1.x, pt1.y, 34, 34));		// wood
-    rectsFrom.push_back(Rect(pt1.x + 37, pt1.y, 34, 34));	// mercury
-    rectsFrom.push_back(Rect(pt1.x + 74, pt1.y, 34, 34));	// ore
-    rectsFrom.push_back(Rect(pt1.x, pt1.y + 37, 34, 34));	// sulfur
-    rectsFrom.push_back(Rect(pt1.x + 37, pt1.y + 37, 34, 34));	// crystal
-    rectsFrom.push_back(Rect(pt1.x + 74, pt1.y + 37, 34, 34));	// gems
-    rectsFrom.push_back(Rect(pt1.x + 37, pt1.y + 74, 34, 34));	// gold
+    rectsFrom.push_back(Rect(pt1.x, pt1.y, 34, 34));                // wood
+    rectsFrom.push_back(Rect(pt1.x + 37, pt1.y, 34, 34));        // mercury
+    rectsFrom.push_back(Rect(pt1.x + 74, pt1.y, 34, 34));        // ore
+    rectsFrom.push_back(Rect(pt1.x, pt1.y + 37, 34, 34));        // sulfur
+    rectsFrom.push_back(Rect(pt1.x + 37, pt1.y + 37, 34, 34));        // crystal
+    rectsFrom.push_back(Rect(pt1.x + 74, pt1.y + 37, 34, 34));        // gems
+    rectsFrom.push_back(Rect(pt1.x + 37, pt1.y + 74, 34, 34));        // gold
 
     SpriteMove cursorFrom(AGG::GetICN(tradpost, 14));
     text.Set(header_from, Font::SMALL);
@@ -261,13 +261,13 @@ void Dialog::Marketplace(bool fromTradingPost)
     const Point pt2(138 + pos_rt.x, pos_rt.y + 190);
     Rects rectsTo;
     rectsTo.reserve(7);
-    rectsTo.push_back(Rect(pt2.x, pt2.y, 34, 34));		// wood
-    rectsTo.push_back(Rect(pt2.x + 37, pt2.y, 34, 34));		// mercury
-    rectsTo.push_back(Rect(pt2.x + 74, pt2.y, 34, 34));		// ore
-    rectsTo.push_back(Rect(pt2.x, pt2.y + 37, 34, 34));		// sulfur
-    rectsTo.push_back(Rect(pt2.x + 37, pt2.y + 37, 34, 34));	// crystal
-    rectsTo.push_back(Rect(pt2.x + 74, pt2.y + 37, 34, 34));	// gems
-    rectsTo.push_back(Rect(pt2.x + 37, pt2.y + 74, 34, 34));	// gold
+    rectsTo.push_back(Rect(pt2.x, pt2.y, 34, 34));                // wood
+    rectsTo.push_back(Rect(pt2.x + 37, pt2.y, 34, 34));                // mercury
+    rectsTo.push_back(Rect(pt2.x + 74, pt2.y, 34, 34));                // ore
+    rectsTo.push_back(Rect(pt2.x, pt2.y + 37, 34, 34));                // sulfur
+    rectsTo.push_back(Rect(pt2.x + 37, pt2.y + 37, 34, 34));        // crystal
+    rectsTo.push_back(Rect(pt2.x + 74, pt2.y + 37, 34, 34));        // gems
+    rectsTo.push_back(Rect(pt2.x + 37, pt2.y + 74, 34, 34));        // gold
 
     SpriteMove cursorTo(AGG::GetICN(tradpost, 14));
     text.Set(header_to, Font::SMALL);
@@ -315,16 +315,16 @@ void Dialog::Marketplace(bool fromTradingPost)
 
         if(le.MouseClickLeft(buttonExit) || HotKeyCloseWindow) break;
 
-	if(buttonGift.isEnable() &&
-	    le.MouseClickLeft(buttonGift))
-	{
+        if(buttonGift.isEnable() &&
+            le.MouseClickLeft(buttonGift))
+        {
             cursor.Hide();
-	    Dialog::MakeGiftResource();
-	    fundsFrom = kingdom.GetFunds();
-	    RedrawFromResource(pt1, fundsFrom);
+            Dialog::MakeGiftResource();
+            fundsFrom = kingdom.GetFunds();
+            RedrawFromResource(pt1, fundsFrom);
             cursor.Show();
             display.Flip();
-	}
+        }
 
         // click from
         for(u32 ii = 0; ii < rectsFrom.size(); ++ii)
@@ -333,7 +333,7 @@ void Dialog::Marketplace(bool fromTradingPost)
 
             if(le.MouseClickLeft(rect_from))
             {
-		resourceFrom = Resource::FromIndexSprite2(ii);
+                resourceFrom = Resource::FromIndexSprite2(ii);
                 max_sell = fundsFrom.Get(resourceFrom);
 
                 if(GetTradeCosts(resourceFrom, resourceTo, fromTradingPost))
@@ -357,9 +357,9 @@ void Dialog::Marketplace(bool fromTradingPost)
                 cursor.Show();
                 display.Flip();
             }
-    	    else
-	    if(le.MousePressRight(rect_from))
-        	Dialog::ResourceInfo("", "income:", kingdom.GetIncome(INCOME_ALL), 0);
+                else
+            if(le.MousePressRight(rect_from))
+                Dialog::ResourceInfo("", "income:", kingdom.GetIncome(INCOME_ALL), 0);
         }
 
         // click to
@@ -369,7 +369,7 @@ void Dialog::Marketplace(bool fromTradingPost)
 
             if(le.MouseClickLeft(rect_to))
             {
-		resourceTo = Resource::FromIndexSprite2(ii);
+                resourceTo = Resource::FromIndexSprite2(ii);
 
                 if(GetTradeCosts(resourceFrom, resourceTo, fromTradingPost))
                 {
@@ -399,7 +399,7 @@ void Dialog::Marketplace(bool fromTradingPost)
         // move splitter
         if(buttonLeft.isEnable() && buttonRight.isEnable() && max_buy && le.MousePressLeft(splitter.GetRect()))
         {
-    	    s32 seek = (le.GetMouseCursor().x - splitter.GetRect().x) * 100 / splitter.GetStep();
+                s32 seek = (le.GetMouseCursor().x - splitter.GetRect().x) * 100 / splitter.GetStep();
 
             if(seek < splitter.Min()) seek = splitter.Min();
             else
@@ -415,10 +415,10 @@ void Dialog::Marketplace(bool fromTradingPost)
             display.Flip();
         }
         else
-	// click max
-	if(buttonMax.w && max_buy && le.MouseClickLeft(buttonMax))
-	{
-	    const u32 & max = splitter.Max();
+        // click max
+        if(buttonMax.w && max_buy && le.MouseClickLeft(buttonMax))
+        {
+            const u32 & max = splitter.Max();
 
             count_buy  = max * (Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) : 1);
             count_sell = max * (Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo, fromTradingPost));
@@ -428,11 +428,11 @@ void Dialog::Marketplace(bool fromTradingPost)
             gui.RedrawInfoBuySell(count_sell, count_buy, max_sell, fundsFrom.Get(resourceTo));
             cursor.Show();
             display.Flip();
-	}
-	// click min
-	if(buttonMin.w && max_buy && le.MouseClickLeft(buttonMin))
-	{
-	    const u32 min = 1;
+        }
+        // click min
+        if(buttonMin.w && max_buy && le.MouseClickLeft(buttonMin))
+        {
+            const u32 min = 1;
 
             count_buy  = min * (Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) : 1);
             count_sell = min * (Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo, fromTradingPost));
@@ -442,7 +442,7 @@ void Dialog::Marketplace(bool fromTradingPost)
             gui.RedrawInfoBuySell(count_sell, count_buy, max_sell, fundsFrom.Get(resourceTo));
             cursor.Show();
             display.Flip();
-	}
+        }
 
         // trade
         if(buttonTrade.isEnable() && le.MouseClickLeft(buttonTrade) && count_sell && count_buy)
@@ -537,10 +537,10 @@ void RedrawResourceSprite2(const Surface & sf, s32 px, s32 py, bool show, int fr
 
     if(show)
     {
-	Text text(GetStringTradeCosts(from, res, trading), Font::SMALL);
-	dst_pt.x += (34 - text.w()) / 2;
-	dst_pt.y += 21;
-	text.Blit(dst_pt);
+        Text text(GetStringTradeCosts(from, res, trading), Font::SMALL);
+        dst_pt.x += (34 - text.w()) / 2;
+        dst_pt.y += 21;
+        text.Blit(dst_pt);
     }
 }
 
@@ -570,13 +570,13 @@ std::string GetStringTradeCosts(int rs_from, int rs_to, bool tradingPost)
 
     if(rs_from == rs_to)
     {
-	res = _("n/a");
+        res = _("n/a");
     }
     else
     {
-	if(Resource::GOLD != rs_from && Resource::GOLD != rs_to)
-	    res = "1/";
-	res.append(GetString(GetTradeCosts(rs_from, rs_to, tradingPost)));
+        if(Resource::GOLD != rs_from && Resource::GOLD != rs_to)
+            res = "1/";
+        res.append(GetString(GetTradeCosts(rs_from, rs_to, tradingPost)));
     }
 
     return res;
@@ -590,215 +590,215 @@ u32 GetTradeCosts(int rs_from, int rs_to, bool tradingPost)
 
     switch(rs_from)
     {
-	// uncostly
-	case Resource::WOOD:
-	case Resource::ORE:
+        // uncostly
+        case Resource::WOOD:
+        case Resource::ORE:
 
-    	    switch(rs_to)
-    	    {
-    		// sale uncostly
-    		case Resource::GOLD:
-    		    if(1 == markets) return SALE_UNCOSTLY1;
-        	    else
-        	    if(2 == markets) return SALE_UNCOSTLY2;
-        	    else
-        	    if(3 == markets) return SALE_UNCOSTLY3;
-        	    else
-        	    if(4 == markets) return SALE_UNCOSTLY4;
-        	    else
-        	    if(5 == markets) return SALE_UNCOSTLY5;
-        	    else
-        	    if(6 == markets) return SALE_UNCOSTLY6;
-        	    else
-        	    if(7 == markets) return SALE_UNCOSTLY7;
-        	    else
-        	    if(8 == markets) return SALE_UNCOSTLY8;
-        	    else
-        	    if(8 <  markets) return SALE_UNCOSTLY9;
-    		    break;
+                switch(rs_to)
+                {
+                    // sale uncostly
+                    case Resource::GOLD:
+                        if(1 == markets) return SALE_UNCOSTLY1;
+                    else
+                    if(2 == markets) return SALE_UNCOSTLY2;
+                    else
+                    if(3 == markets) return SALE_UNCOSTLY3;
+                    else
+                    if(4 == markets) return SALE_UNCOSTLY4;
+                    else
+                    if(5 == markets) return SALE_UNCOSTLY5;
+                    else
+                    if(6 == markets) return SALE_UNCOSTLY6;
+                    else
+                    if(7 == markets) return SALE_UNCOSTLY7;
+                    else
+                    if(8 == markets) return SALE_UNCOSTLY8;
+                    else
+                    if(8 <  markets) return SALE_UNCOSTLY9;
+                        break;
 
-		// change uncostly to costly
-		case Resource::MERCURY:
-		case Resource::SULFUR:
-		case Resource::CRYSTAL:
-		case Resource::GEMS:
-    		    if(1 == markets) return UNCOSTLY_COSTLY1;
-        	    else
-        	    if(2 == markets) return UNCOSTLY_COSTLY2;
-        	    else
-        	    if(3 == markets) return UNCOSTLY_COSTLY3;
-        	    else
-        	    if(4 == markets) return UNCOSTLY_COSTLY4;
-        	    else
-        	    if(5 == markets) return UNCOSTLY_COSTLY5;
-        	    else
-        	    if(6 == markets) return UNCOSTLY_COSTLY6;
-        	    else
-        	    if(7 == markets) return UNCOSTLY_COSTLY7;
-        	    else
-        	    if(8 == markets) return UNCOSTLY_COSTLY8;
-        	    else
-        	    if(8 <  markets) return UNCOSTLY_COSTLY9;
-    		    break;
+                // change uncostly to costly
+                case Resource::MERCURY:
+                case Resource::SULFUR:
+                case Resource::CRYSTAL:
+                case Resource::GEMS:
+                        if(1 == markets) return UNCOSTLY_COSTLY1;
+                    else
+                    if(2 == markets) return UNCOSTLY_COSTLY2;
+                    else
+                    if(3 == markets) return UNCOSTLY_COSTLY3;
+                    else
+                    if(4 == markets) return UNCOSTLY_COSTLY4;
+                    else
+                    if(5 == markets) return UNCOSTLY_COSTLY5;
+                    else
+                    if(6 == markets) return UNCOSTLY_COSTLY6;
+                    else
+                    if(7 == markets) return UNCOSTLY_COSTLY7;
+                    else
+                    if(8 == markets) return UNCOSTLY_COSTLY8;
+                    else
+                    if(8 <  markets) return UNCOSTLY_COSTLY9;
+                        break;
 
-		// change uncostly to uncostly
-		case Resource::WOOD:
-		case Resource::ORE:
-    		    if(1 == markets) return COSTLY_COSTLY1;
-        	    else
-        	    if(2 == markets) return COSTLY_COSTLY2;
-        	    else
-        	    if(3 == markets) return COSTLY_COSTLY3;
-        	    else
-        	    if(4 == markets) return COSTLY_COSTLY4;
-        	    else
-        	    if(5 == markets) return COSTLY_COSTLY5;
-        	    else
-        	    if(6 == markets) return COSTLY_COSTLY6;
-        	    else
-        	    if(7 == markets) return COSTLY_COSTLY7;
-        	    else
-        	    if(8 == markets) return COSTLY_COSTLY8;
-        	    else
-        	    if(8 <  markets) return COSTLY_COSTLY9;
-        	    break;
-    	    }
-	    break;
+                // change uncostly to uncostly
+                case Resource::WOOD:
+                case Resource::ORE:
+                        if(1 == markets) return COSTLY_COSTLY1;
+                    else
+                    if(2 == markets) return COSTLY_COSTLY2;
+                    else
+                    if(3 == markets) return COSTLY_COSTLY3;
+                    else
+                    if(4 == markets) return COSTLY_COSTLY4;
+                    else
+                    if(5 == markets) return COSTLY_COSTLY5;
+                    else
+                    if(6 == markets) return COSTLY_COSTLY6;
+                    else
+                    if(7 == markets) return COSTLY_COSTLY7;
+                    else
+                    if(8 == markets) return COSTLY_COSTLY8;
+                    else
+                    if(8 <  markets) return COSTLY_COSTLY9;
+                    break;
+                }
+            break;
 
-	// costly
-	case Resource::MERCURY:
-	case Resource::SULFUR:
-	case Resource::CRYSTAL:
-	case Resource::GEMS:
+        // costly
+        case Resource::MERCURY:
+        case Resource::SULFUR:
+        case Resource::CRYSTAL:
+        case Resource::GEMS:
 
-    	    switch(rs_to)
-    	    {
-    		// sale costly
-    		case Resource::GOLD:
-    		    if(1 == markets) return SALE_COSTLY1;
-        	    else
-        	    if(2 == markets) return SALE_COSTLY2;
-        	    else
-        	    if(3 == markets) return SALE_COSTLY3;
-        	    else
-        	    if(4 == markets) return SALE_COSTLY4;
-        	    else
-        	    if(5 == markets) return SALE_COSTLY5;
-        	    else
-        	    if(6 == markets) return SALE_COSTLY6;
-        	    else
-        	    if(7 == markets) return SALE_COSTLY7;
-        	    else
-        	    if(8 == markets) return SALE_COSTLY8;
-        	    else
-        	    if(8 <  markets) return SALE_COSTLY9;
-        	    break;
+                switch(rs_to)
+                {
+                    // sale costly
+                    case Resource::GOLD:
+                        if(1 == markets) return SALE_COSTLY1;
+                    else
+                    if(2 == markets) return SALE_COSTLY2;
+                    else
+                    if(3 == markets) return SALE_COSTLY3;
+                    else
+                    if(4 == markets) return SALE_COSTLY4;
+                    else
+                    if(5 == markets) return SALE_COSTLY5;
+                    else
+                    if(6 == markets) return SALE_COSTLY6;
+                    else
+                    if(7 == markets) return SALE_COSTLY7;
+                    else
+                    if(8 == markets) return SALE_COSTLY8;
+                    else
+                    if(8 <  markets) return SALE_COSTLY9;
+                    break;
 
-		// change costly to costly
-		case Resource::MERCURY:
-		case Resource::SULFUR:
-		case Resource::CRYSTAL:
-		case Resource::GEMS:
-    		    if(1 == markets) return COSTLY_COSTLY1;
-        	    else
-        	    if(2 == markets) return COSTLY_COSTLY2;
-        	    else
-        	    if(3 == markets) return COSTLY_COSTLY3;
-        	    else
-        	    if(4 == markets) return COSTLY_COSTLY4;
-        	    else
-        	    if(5 == markets) return COSTLY_COSTLY5;
-        	    else
-        	    if(6 == markets) return COSTLY_COSTLY6;
-        	    else
-        	    if(7 == markets) return COSTLY_COSTLY7;
-        	    else
-        	    if(8 == markets) return COSTLY_COSTLY8;
-        	    else
-        	    if(8 <  markets) return COSTLY_COSTLY9;
-        	    break;
+                // change costly to costly
+                case Resource::MERCURY:
+                case Resource::SULFUR:
+                case Resource::CRYSTAL:
+                case Resource::GEMS:
+                        if(1 == markets) return COSTLY_COSTLY1;
+                    else
+                    if(2 == markets) return COSTLY_COSTLY2;
+                    else
+                    if(3 == markets) return COSTLY_COSTLY3;
+                    else
+                    if(4 == markets) return COSTLY_COSTLY4;
+                    else
+                    if(5 == markets) return COSTLY_COSTLY5;
+                    else
+                    if(6 == markets) return COSTLY_COSTLY6;
+                    else
+                    if(7 == markets) return COSTLY_COSTLY7;
+                    else
+                    if(8 == markets) return COSTLY_COSTLY8;
+                    else
+                    if(8 <  markets) return COSTLY_COSTLY9;
+                    break;
 
-		// change costly to uncostly
-		case Resource::WOOD:
-		case Resource::ORE:
-    		    if(1 == markets) return COSTLY_UNCOSTLY1;
-        	    else
-        	    if(2 == markets) return COSTLY_UNCOSTLY2;
-        	    else
-        	    if(3 == markets) return COSTLY_UNCOSTLY3;
-        	    else
-        	    if(4 == markets) return COSTLY_UNCOSTLY4;
-        	    else
-        	    if(5 == markets) return COSTLY_UNCOSTLY5;
-        	    else
-        	    if(6 == markets) return COSTLY_UNCOSTLY6;
-        	    else
-        	    if(7 == markets) return COSTLY_UNCOSTLY7;
-        	    else
-        	    if(8 == markets) return COSTLY_UNCOSTLY8;
-        	    else
-        	    if(8 <  markets) return COSTLY_UNCOSTLY9;
-        	    break;
-    	    }
-	    break;
+                // change costly to uncostly
+                case Resource::WOOD:
+                case Resource::ORE:
+                        if(1 == markets) return COSTLY_UNCOSTLY1;
+                    else
+                    if(2 == markets) return COSTLY_UNCOSTLY2;
+                    else
+                    if(3 == markets) return COSTLY_UNCOSTLY3;
+                    else
+                    if(4 == markets) return COSTLY_UNCOSTLY4;
+                    else
+                    if(5 == markets) return COSTLY_UNCOSTLY5;
+                    else
+                    if(6 == markets) return COSTLY_UNCOSTLY6;
+                    else
+                    if(7 == markets) return COSTLY_UNCOSTLY7;
+                    else
+                    if(8 == markets) return COSTLY_UNCOSTLY8;
+                    else
+                    if(8 <  markets) return COSTLY_UNCOSTLY9;
+                    break;
+                }
+            break;
 
-	// gold
-	case Resource::GOLD:
+        // gold
+        case Resource::GOLD:
 
-    	    switch(rs_to)
-    	    {
-    		default: break;
+                switch(rs_to)
+                {
+                    default: break;
 
-		// buy costly
-		case Resource::MERCURY:
-		case Resource::SULFUR:
-		case Resource::CRYSTAL:
-		case Resource::GEMS:
-    		    if(1 == markets) return BUY_COSTLY1;
-        	    else
-        	    if(2 == markets) return BUY_COSTLY2;
-        	    else
-        	    if(3 == markets) return BUY_COSTLY3;
-        	    else
-        	    if(4 == markets) return BUY_COSTLY4;
-        	    else
-        	    if(5 == markets) return BUY_COSTLY5;
-        	    else
-        	    if(6 == markets) return BUY_COSTLY6;
-        	    else
-        	    if(7 == markets) return BUY_COSTLY7;
-        	    else
-        	    if(8 == markets) return BUY_COSTLY8;
-        	    else
-        	    if(8 <  markets) return BUY_COSTLY9;
-        	    break;
+                // buy costly
+                case Resource::MERCURY:
+                case Resource::SULFUR:
+                case Resource::CRYSTAL:
+                case Resource::GEMS:
+                        if(1 == markets) return BUY_COSTLY1;
+                    else
+                    if(2 == markets) return BUY_COSTLY2;
+                    else
+                    if(3 == markets) return BUY_COSTLY3;
+                    else
+                    if(4 == markets) return BUY_COSTLY4;
+                    else
+                    if(5 == markets) return BUY_COSTLY5;
+                    else
+                    if(6 == markets) return BUY_COSTLY6;
+                    else
+                    if(7 == markets) return BUY_COSTLY7;
+                    else
+                    if(8 == markets) return BUY_COSTLY8;
+                    else
+                    if(8 <  markets) return BUY_COSTLY9;
+                    break;
 
-		// buy uncostly
-		case Resource::WOOD:
-		case Resource::ORE:
-    		    if(1 == markets) return BUY_UNCOSTLY1;
-        	    else
-        	    if(2 == markets) return BUY_UNCOSTLY2;
-        	    else
-        	    if(3 == markets) return BUY_UNCOSTLY3;
-        	    else
-        	    if(4 == markets) return BUY_UNCOSTLY4;
-        	    else
-        	    if(5 == markets) return BUY_UNCOSTLY5;
-        	    else
-        	    if(6 == markets) return BUY_UNCOSTLY6;
-        	    else
-        	    if(7 == markets) return BUY_UNCOSTLY7;
-        	    else
-        	    if(8 == markets) return BUY_UNCOSTLY8;
-        	    else
-        	    if(8 <  markets) return BUY_UNCOSTLY9;
-        	    break;
-    	    }
-	    break;
+                // buy uncostly
+                case Resource::WOOD:
+                case Resource::ORE:
+                        if(1 == markets) return BUY_UNCOSTLY1;
+                    else
+                    if(2 == markets) return BUY_UNCOSTLY2;
+                    else
+                    if(3 == markets) return BUY_UNCOSTLY3;
+                    else
+                    if(4 == markets) return BUY_UNCOSTLY4;
+                    else
+                    if(5 == markets) return BUY_UNCOSTLY5;
+                    else
+                    if(6 == markets) return BUY_UNCOSTLY6;
+                    else
+                    if(7 == markets) return BUY_UNCOSTLY7;
+                    else
+                    if(8 == markets) return BUY_UNCOSTLY8;
+                    else
+                    if(8 <  markets) return BUY_UNCOSTLY9;
+                    break;
+                }
+            break;
 
-	// not select
-	default:  break;
+        // not select
+        default:  break;
     }
 
     return 0;

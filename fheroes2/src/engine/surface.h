@@ -45,7 +45,7 @@ public:
     int         b(void) const;
     int         a(void) const;
 
-    int		pack(void) const;
+    int                pack(void) const;
     static RGBA unpack(int);
 
 protected:
@@ -56,12 +56,12 @@ protected:
 
 struct SurfaceFormat
 {
-    u32		depth;
-    u32	 	rmask;
-    u32		gmask;
-    u32 	bmask;
-    u32		amask;
-    RGBA	ckey;
+    u32                depth;
+    u32                 rmask;
+    u32                gmask;
+    u32         bmask;
+    u32                amask;
+    RGBA        ckey;
 
     SurfaceFormat() : depth(0), rmask(0), gmask(0), bmask(0), amask(0) {}
 };
@@ -103,7 +103,7 @@ public:
     bool isValid(void) const;
 
     void SetColorKey(const RGBA &);
-    u32	 GetColorKey(void) const;
+    u32         GetColorKey(void) const;
 
     void Blit(Surface &) const;
     void Blit(s32, s32, Surface &) const;
@@ -153,7 +153,7 @@ protected:
     //void SetColorMod(const RGBA &);
     //void SetBlendMode(int);
 
-    u32	 MapRGB(const RGBA &) const;
+    u32         MapRGB(const RGBA &) const;
     RGBA GetRGB(u32 pixel) const;
 
     void Set(const Surface &, bool refcopy);

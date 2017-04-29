@@ -62,8 +62,8 @@ int ObjXlc2::GetPassable(u32 index)
         return DIRECTION_ALL;
     else
     if(isAction(index) ||
-	(110 < index && index < 136))
-	return 0;
+        (110 < index && index < 136))
+        return 0;
 
     return ARRAY_COUNT_END(restricted) != std::find(restricted, ARRAY_COUNT_END(restricted), index) ?
             DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
@@ -106,7 +106,7 @@ bool ObjXlc3::isAction(u32 index)
 bool ObjXlc3::isShadow(u32 index)
 {
     const u8 shadows [] = { 0, 9, 20, 29, 41, 59, 65, 71, 77, 83, 89, 95, 101,
-	108, 109, 112, 113, 116, 117, 120, 121, 124, 125, 128, 129, 132, 133, 136, 137 };
+        108, 109, 112, 113, 116, 117, 120, 121, 124, 125, 128, 129, 132, 133, 136, 137 };
 
     return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
 }
@@ -115,13 +115,13 @@ int ObjXlc1::GetActionObject(u32 index)
 {
     switch(index)
     {
-        case 3:		return MP2::OBJ_ALCHEMYTOWER;
-        case 70:	return MP2::OBJ_ARENA;
-        case 77:	return MP2::OBJ_BARROWMOUNDS;
-        case 94:	return MP2::OBJ_EARTHALTAR;
-        case 118:	return MP2::OBJ_AIRALTAR;
-        case 127:	return MP2::OBJ_FIREALTAR;
-        case 135:	return MP2::OBJ_WATERALTAR;
+        case 3:                return MP2::OBJ_ALCHEMYTOWER;
+        case 70:        return MP2::OBJ_ARENA;
+        case 77:        return MP2::OBJ_BARROWMOUNDS;
+        case 94:        return MP2::OBJ_EARTHALTAR;
+        case 118:        return MP2::OBJ_AIRALTAR;
+        case 127:        return MP2::OBJ_FIREALTAR;
+        case 135:        return MP2::OBJ_WATERALTAR;
         default: break;
     }
 
@@ -132,10 +132,10 @@ int ObjXlc2::GetActionObject(u32 index)
 {
     switch(index)
     {
-        case 4:		return MP2::OBJ_STABLES;
-        case 9:		return MP2::OBJ_JAIL;
-        case 37:	return MP2::OBJ_MERMAID;
-        case 101:	return MP2::OBJ_SIRENS;
+        case 4:                return MP2::OBJ_STABLES;
+        case 9:                return MP2::OBJ_JAIL;
+        case 37:        return MP2::OBJ_MERMAID;
+        case 101:        return MP2::OBJ_SIRENS;
         default: break;
     }
 
@@ -146,24 +146,24 @@ int ObjXlc3::GetActionObject(u32 index)
 {
     switch(index)
     {
-        case 30:	return MP2::OBJ_HUTMAGI;
-        case 50:	return MP2::OBJ_EYEMAGI;
-	case 60:
-	case 66:
-	case 72:
-	case 78:
-	case 84:
-	case 90:
-	case 96:
-        case 102:	return MP2::OBJ_BARRIER;
-	case 110:
-	case 114:
-	case 118:
-	case 122:
-	case 126:
-	case 130:
-	case 134:
-        case 138:	return MP2::OBJ_TRAVELLERTENT;
+        case 30:        return MP2::OBJ_HUTMAGI;
+        case 50:        return MP2::OBJ_EYEMAGI;
+        case 60:
+        case 66:
+        case 72:
+        case 78:
+        case 84:
+        case 90:
+        case 96:
+        case 102:        return MP2::OBJ_BARRIER;
+        case 110:
+        case 114:
+        case 118:
+        case 122:
+        case 126:
+        case 130:
+        case 134:
+        case 138:        return MP2::OBJ_TRAVELLERTENT;
         default: break;
     }
 

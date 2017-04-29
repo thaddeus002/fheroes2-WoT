@@ -41,7 +41,7 @@ enum KeyMod { MOD_NONE = KMOD_NONE,
 std::string StringTrim(std::string str)
 {
     if(str.empty())
-	return str;
+        return str;
 
     std::string::iterator iter;
 
@@ -84,14 +84,14 @@ std::string GetStringShort(int value)
 {
     if(std::abs(value) > 1000)
     {
-	std::ostringstream stream;
+        std::ostringstream stream;
 
-	if(std::abs(value) > 1000000)
-	    stream << value / 1000000 << "M";
-	else
-	    stream << value / 1000 << "K";
+        if(std::abs(value) > 1000000)
+            stream << value / 1000000 << "M";
+        else
+            stream << value / 1000 << "K";
 
-	return stream.str();
+        return stream.str();
     }
 
     return GetString(value);
@@ -214,7 +214,7 @@ std::list<std::string> StringSplit(const std::string & str, const std::string & 
     size_t pos2 = std::string::npos;
     
     while(pos1 < str.size() &&
-	std::string::npos != (pos2 = str.find(sep, pos1)))
+        std::string::npos != (pos2 = str.find(sep, pos1)))
     {
         list.push_back(str.substr(pos1, pos2 - pos1));
         pos1 = pos2 + sep.size();
@@ -232,9 +232,9 @@ std::string InsertString(const std::string & src, size_t pos, const char* c)
     std::string res = src;
 
     if(pos >= src.size())
-	res.append(c);
+        res.append(c);
     else
-	res.insert(pos, c);
+        res.insert(pos, c);
 
     return res;
 }
@@ -246,41 +246,41 @@ std::vector<u16> StringUTF8_to_UNICODE(const std::string & utf8)
     unicode.reserve(utf8.size());
 
     for(std::string::const_iterator
-	it = utf8.begin(); it < utf8.end(); ++it)
+        it = utf8.begin(); it < utf8.end(); ++it)
     {
-	u16 ch = static_cast<u8>(*it);
+        u16 ch = static_cast<u8>(*it);
 
         if(ch >= 0xF0)
-	{
-	    if(utf8.end() - it > 3)
-    	    {
-	        ch  =  static_cast<u16>(*it++ & 0x07) << 18;
-        	ch |=  static_cast<u16>(*it++ & 0x3F) << 12;
-        	ch |=  static_cast<u16>(*it++ & 0x3F) << 6;
-        	ch |=  static_cast<u16>(*it & 0x3F);
-	    }
-	    else break;
+        {
+            if(utf8.end() - it > 3)
+                {
+                ch  =  static_cast<u16>(*it++ & 0x07) << 18;
+                ch |=  static_cast<u16>(*it++ & 0x3F) << 12;
+                ch |=  static_cast<u16>(*it++ & 0x3F) << 6;
+                ch |=  static_cast<u16>(*it & 0x3F);
+            }
+            else break;
         }
-	else
+        else
         if(ch >= 0xE0)
-	{
-	    if(utf8.end() - it > 2)
+        {
+            if(utf8.end() - it > 2)
             {
-		ch  =  static_cast<u16>(*it++ & 0x0F) << 12;
-        	ch |=  static_cast<u16>(*it++ & 0x3F) << 6;
-        	ch |=  static_cast<u16>(*it & 0x3F);
-	    }
-	    else break;
+                ch  =  static_cast<u16>(*it++ & 0x0F) << 12;
+                ch |=  static_cast<u16>(*it++ & 0x3F) << 6;
+                ch |=  static_cast<u16>(*it & 0x3F);
+            }
+            else break;
         }
-	else
+        else
         if(ch >= 0xC0)
-	{
-	    if(utf8.end() - it > 1)
+        {
+            if(utf8.end() - it > 1)
             {
-        	ch  =  static_cast<u16>(*it++ & 0x1F) << 6;
-        	ch |=  static_cast<u16>(*it & 0x3F);
-	    }
-	    else break;
+                ch  =  static_cast<u16>(*it++ & 0x1F) << 6;
+                ch |=  static_cast<u16>(*it & 0x3F);
+            }
+            else break;
         }
 
         unicode.push_back(ch);
@@ -295,21 +295,21 @@ std::string StringUNICODE_to_UTF8(const std::vector<u16> & unicode)
     utf8.reserve(2 * unicode.size());
 
     for(std::vector<u16>::const_iterator
-	it = unicode.begin(); it != unicode.end(); ++it)
+        it = unicode.begin(); it != unicode.end(); ++it)
     {
-	if(*it < 128)
-	{
+        if(*it < 128)
+        {
             utf8.append(1, static_cast<char>(*it));
-	}
-	else
-	if(*it < 2048)
-	{
-    	    utf8.append(1, static_cast<char>(192 + ((*it - (*it % 64)) / 64)));
+        }
+        else
+        if(*it < 2048)
+        {
+                utf8.append(1, static_cast<char>(192 + ((*it - (*it % 64)) / 64)));
             utf8.append(1, static_cast<char>(128 + (*it % 64)));
         }
         else
         {
-    	    utf8.append(1, static_cast<char>(224 + ((*it - (*it % 4096)) / 4096)));
+                utf8.append(1, static_cast<char>(224 + ((*it - (*it % 4096)) / 4096)));
             utf8.append(1, static_cast<char>(128 + (((*it % 4096) - (*it % 64)) / 64)));
             utf8.append(1, static_cast<char>(128 + (*it % 64)));
         }
@@ -333,22 +333,22 @@ char CharFromKeySym(KeySym sym, u16 mod)
         case KEY_9:     return (MOD_SHIFT & mod ? '(' : '9');
         case KEY_0:     return (MOD_SHIFT & mod ? ')' : '0');
 
-	case KEY_KP0:	if(MOD_NUM & mod) return '0'; break;
-	case KEY_KP1:	if(MOD_NUM & mod) return '1'; break;
-	case KEY_KP2:	if(MOD_NUM & mod) return '2'; break;
-	case KEY_KP3:	if(MOD_NUM & mod) return '3'; break;
-	case KEY_KP4:	if(MOD_NUM & mod) return '4'; break;
-	case KEY_KP5:	if(MOD_NUM & mod) return '5'; break;
-	case KEY_KP6:	if(MOD_NUM & mod) return '6'; break;
-	case KEY_KP7:	if(MOD_NUM & mod) return '7'; break;
-	case KEY_KP8:	if(MOD_NUM & mod) return '8'; break;
-	case KEY_KP9:	if(MOD_NUM & mod) return '9'; break;
+        case KEY_KP0:        if(MOD_NUM & mod) return '0'; break;
+        case KEY_KP1:        if(MOD_NUM & mod) return '1'; break;
+        case KEY_KP2:        if(MOD_NUM & mod) return '2'; break;
+        case KEY_KP3:        if(MOD_NUM & mod) return '3'; break;
+        case KEY_KP4:        if(MOD_NUM & mod) return '4'; break;
+        case KEY_KP5:        if(MOD_NUM & mod) return '5'; break;
+        case KEY_KP6:        if(MOD_NUM & mod) return '6'; break;
+        case KEY_KP7:        if(MOD_NUM & mod) return '7'; break;
+        case KEY_KP8:        if(MOD_NUM & mod) return '8'; break;
+        case KEY_KP9:        if(MOD_NUM & mod) return '9'; break;
 
         case KEY_MINUS:         return (MOD_SHIFT & mod ? '_' : '-');
         case KEY_EQUALS:        return (MOD_SHIFT & mod ? '+' : '=');
-	case KEY_BACKSLASH:     return (MOD_SHIFT & mod ? '|' : '\\');
-	case KEY_LEFTBRACKET:   return (MOD_SHIFT & mod ? '{' : '[');
-	case KEY_RIGHTBRACKET:  return (MOD_SHIFT & mod ? '}' : ']');
+        case KEY_BACKSLASH:     return (MOD_SHIFT & mod ? '|' : '\\');
+        case KEY_LEFTBRACKET:   return (MOD_SHIFT & mod ? '{' : '[');
+        case KEY_RIGHTBRACKET:  return (MOD_SHIFT & mod ? '}' : ']');
         case KEY_SEMICOLON:     return (MOD_SHIFT & mod ? ':' : ';');
         case KEY_QUOTE:         return (MOD_SHIFT & mod ? '"' : '\'');
         case KEY_COMMA:         return (MOD_SHIFT & mod ? '<' : ',');
@@ -356,7 +356,7 @@ char CharFromKeySym(KeySym sym, u16 mod)
         case KEY_SLASH:         return (MOD_SHIFT & mod ? '?' : '/');
 
         case KEY_EXCLAIM:       return '!';
-	case KEY_AT:            return '@';
+        case KEY_AT:            return '@';
         case KEY_HASH:          return '#';
         case KEY_DOLLAR:        return '$';
         case KEY_AMPERSAND:     return '&';
@@ -366,13 +366,13 @@ char CharFromKeySym(KeySym sym, u16 mod)
         case KEY_QUOTEDBL:      return '"';
         case KEY_PLUS:          return '+';
         case KEY_COLON:         return ':';
-	case KEY_LESS:          return '<';
-	case KEY_GREATER:       return '>';
-	case KEY_QUESTION:      return '?';
-	case KEY_CARET:         return '^';
-	case KEY_UNDERSCORE:    return '_';
+        case KEY_LESS:          return '<';
+        case KEY_GREATER:       return '>';
+        case KEY_QUESTION:      return '?';
+        case KEY_CARET:         return '^';
+        case KEY_UNDERSCORE:    return '_';
 
-        case KEY_SPACE:		return ' ';
+        case KEY_SPACE:                return ' ';
 
         case KEY_a:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'A' : 'a');
         case KEY_b:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'B' : 'b');
@@ -411,32 +411,32 @@ size_t InsertKeySym(std::string & res, size_t pos, KeySym sym, u16 mod)
 {
     switch(sym)
     {
-	case KEY_BACKSPACE:
-	{
-	    if(res.size() && pos)
-	    {
-		if(pos >= res.size())
-		    res.resize(res.size() - 1);
-		else
-		    res.erase(pos - 1, 1);
-		--pos;
-	    }
-	}
-	break;
+        case KEY_BACKSPACE:
+        {
+            if(res.size() && pos)
+            {
+                if(pos >= res.size())
+                    res.resize(res.size() - 1);
+                else
+                    res.erase(pos - 1, 1);
+                --pos;
+            }
+        }
+        break;
 
-	case KEY_LEFT:	if(pos) --pos; break;
-	case KEY_RIGHT: if(pos < res.size()) ++pos; break;
+        case KEY_LEFT:        if(pos) --pos; break;
+        case KEY_RIGHT: if(pos < res.size()) ++pos; break;
 
-	default:
-	{
-	    char c = CharFromKeySym(sym, mod);
+        default:
+        {
+            char c = CharFromKeySym(sym, mod);
 
-	    if(c)
-	    {
-		res.insert(pos, 1, c);
-		++pos;
-	    }
-	}
+            if(c)
+            {
+                res.insert(pos, 1, c);
+                ++pos;
+            }
+        }
     }
 
     return pos;
@@ -467,16 +467,16 @@ KeySym KeySymFromChar(char c)
         case '/': return KEY_SLASH;
         case ':': return KEY_COLON;
         case ';': return KEY_SEMICOLON;
-	case '<': return KEY_LESS;
+        case '<': return KEY_LESS;
         case '=': return KEY_EQUALS;
-	case '>': return KEY_GREATER;
-	case '?': return KEY_QUESTION;
-	case '@': return KEY_AT;
-	case '[': return KEY_LEFTBRACKET;
-	case '\\': return KEY_BACKSLASH;
-	case ']': return KEY_RIGHTBRACKET;
-	case '^': return KEY_CARET;
-	case '_': return KEY_UNDERSCORE;
+        case '>': return KEY_GREATER;
+        case '?': return KEY_QUESTION;
+        case '@': return KEY_AT;
+        case '[': return KEY_LEFTBRACKET;
+        case '\\': return KEY_BACKSLASH;
+        case ']': return KEY_RIGHTBRACKET;
+        case '^': return KEY_CARET;
+        case '_': return KEY_UNDERSCORE;
         case ' ': return KEY_SPACE;
 
         case 'a': return KEY_a;
@@ -527,10 +527,10 @@ bool SaveMemToFile(const std::vector<u8> & data, const std::string & file)
     SDL_RWops *rw = SDL_RWFromFile(file.c_str(),"wb");
 
     if(rw && 1 == SDL_RWwrite(rw, & data[0], data.size(), 1))
-	SDL_RWclose(rw);
+        SDL_RWclose(rw);
     else
     {
-	ERROR(SDL_GetError());
+        ERROR(SDL_GetError());
         return false;
     }
 
@@ -544,14 +544,14 @@ std::vector<u8> LoadFileToMem(const std::string & file)
 
     if(rw && SDL_RWseek(rw, 0, RW_SEEK_END) != -1)
     {
-	data.resize(SDL_RWtell(rw));
-	SDL_RWseek(rw, 0, RW_SEEK_SET);
-	SDL_RWread(rw, & data[0], data.size(), 1);
-	SDL_RWclose(rw);
+        data.resize(SDL_RWtell(rw));
+        SDL_RWseek(rw, 0, RW_SEEK_SET);
+        SDL_RWread(rw, & data[0], data.size(), 1);
+        SDL_RWclose(rw);
     }
     else
     {
-	ERROR(SDL_GetError());
+        ERROR(SDL_GetError());
     }
 
     return data;
@@ -573,7 +573,7 @@ bool PressIntKey(u32 min, u32 max, u32 & result)
     else
     if(le.KeyPress() && KEY_0 <= le.KeyValue() && KEY_9 >= le.KeyValue())
     {
-	if(max > result)
+        if(max > result)
         {
             result *= 10;
             switch(le.KeyValue())
@@ -588,20 +588,20 @@ bool PressIntKey(u32 min, u32 max, u32 & result)
                     case KEY_8: result += 8; break;
                     case KEY_9: result += 9; break;
 
-		    case KEY_KP1: result += 1; break;
-		    case KEY_KP2: result += 2; break;
-		    case KEY_KP3: result += 3; break;
-		    case KEY_KP4: result += 4; break;
-		    case KEY_KP5: result += 5; break;
-		    case KEY_KP6: result += 6; break;
-		    case KEY_KP7: result += 7; break;
-		    case KEY_KP8: result += 8; break;
-		    case KEY_KP9: result += 9; break;
+                    case KEY_KP1: result += 1; break;
+                    case KEY_KP2: result += 2; break;
+                    case KEY_KP3: result += 3; break;
+                    case KEY_KP4: result += 4; break;
+                    case KEY_KP5: result += 5; break;
+                    case KEY_KP6: result += 6; break;
+                    case KEY_KP7: result += 7; break;
+                    case KEY_KP8: result += 8; break;
+                    case KEY_KP9: result += 9; break;
 
                     default: break;
             }
             if(result > max) result = max;
-	}
+        }
         return true;
     }
     return false;
@@ -614,7 +614,7 @@ std::string EncodeString(const std::string & str, const char* charset)
     iconv_t cd;
 
     if(! charset || (iconv_t)(-1) == (cd = iconv_open("utf-8", charset)))
-	return str;
+        return str;
 
     std::string res(str);
     size_t inbytesleft = str.size();
@@ -631,7 +631,7 @@ std::string EncodeString(const std::string & str, const char* charset)
     iconv_close(cd);
 
     if(reslen != (size_t)(-1))
-	res = std::string(outbuf2, outbuf1 - outbuf2);
+        res = std::string(outbuf2, outbuf1 - outbuf2);
 
     delete [] outbuf2;
 
@@ -663,22 +663,22 @@ std::string cp1251_to_utf8(const std::string & in)
     res.reserve(in.size() * 2 + 1);
 
     for(std::string::const_iterator
-	it = in.begin(); it != in.end(); ++it)
+        it = in.begin(); it != in.end(); ++it)
     {
-	if(*it & 0x80)
-	{
-	    const size_t index = *it & 0x7f;
+        if(*it & 0x80)
+        {
+            const size_t index = *it & 0x7f;
 
-	    if(index < ARRAY_COUNT(table_1251))
-	    {
-		const u32 & v = table_1251[index];
-		res.append(1, v);
-		res.append(1, v >> 8);
-		if(v & 0xFFFF0000) res.append(1, v >> 16);
-	    }
-	}
-	else
-	    res.append(1, *it);
+            if(index < ARRAY_COUNT(table_1251))
+            {
+                const u32 & v = table_1251[index];
+                res.append(1, v);
+                res.append(1, v >> 8);
+                if(v & 0xFFFF0000) res.append(1, v >> 16);
+            }
+        }
+        else
+            res.append(1, *it);
     }
 
     return res;
@@ -688,8 +688,8 @@ std::string EncodeString(const std::string & str, const char* charset)
 {
     if(charset)
     {
-	if(0 == std::strcmp(charset, "cp1251"))
-	    return cp1251_to_utf8(str);
+        if(0 == std::strcmp(charset, "cp1251"))
+            return cp1251_to_utf8(str);
     }
 
     return str;
@@ -771,19 +771,19 @@ Points GetArcPoints(const Point & from, const Point & to, const Point & max, u16
 u32 decodeChar(int v)
 {
     if('A' <= v && v <= 'Z')
-	return v - 'A';
+        return v - 'A';
 
     if('a' <= v && v <= 'z')
-	return v - 'a' + 26;
+        return v - 'a' + 26;
 
     if('0' <= v && v <= '9')
-	return v - '0' + 52;
+        return v - '0' + 52;
 
     if(v == '+')
-	return 62;
+        return 62;
 
     if(v == '/')
-	return 63;
+        return 63;
 
     return 0;
 }
@@ -794,27 +794,27 @@ std::vector<u8> decodeBase64(const std::string & src)
 
     if(src.size() % 4 == 0)
     {
-	u32 size = 3 * src.size() / 4;
+        u32 size = 3 * src.size() / 4;
 
-	if(src[src.size() - 1] == '=') size--;
-	if(src[src.size() - 2] == '=') size--;
+        if(src[src.size() - 1] == '=') size--;
+        if(src[src.size() - 2] == '=') size--;
 
-	res.reserve(size);
+        res.reserve(size);
 
-	for(u32 ii = 0; ii < src.size(); ii += 4)
-	{
-    	    u32 sextet_a = decodeChar(src[ii]);
-    	    u32 sextet_b = decodeChar(src[ii + 1]);
-    	    u32 sextet_c = decodeChar(src[ii + 2]);
-    	    u32 sextet_d = decodeChar(src[ii + 3]);
+        for(u32 ii = 0; ii < src.size(); ii += 4)
+        {
+                u32 sextet_a = decodeChar(src[ii]);
+                u32 sextet_b = decodeChar(src[ii + 1]);
+                u32 sextet_c = decodeChar(src[ii + 2]);
+                u32 sextet_d = decodeChar(src[ii + 3]);
 
-    	    u32 triple = (sextet_a << 18) + (sextet_b << 12) +
-				(sextet_c << 6) + sextet_d;
+                u32 triple = (sextet_a << 18) + (sextet_b << 12) +
+                                (sextet_c << 6) + sextet_d;
 
-    	    if(res.size() < size) res.push_back((triple >> 16) & 0xFF);
-	    if(res.size() < size) res.push_back((triple >> 8) & 0xFF);
-    	    if(res.size() < size) res.push_back(triple & 0xFF);
-	}
+                if(res.size() < size) res.push_back((triple >> 16) & 0xFF);
+            if(res.size() < size) res.push_back((triple >> 8) & 0xFF);
+                if(res.size() < size) res.push_back(triple & 0xFF);
+        }
     }
 
     return res;
@@ -827,12 +827,12 @@ int CheckSum(const std::vector<u8> & v)
 
     do
     {
-	u32 b1 = it < v.end() ? *it++ : 0;
-	u32 b2 = it < v.end() ? *it++ : 0;
-	u32 b3 = it < v.end() ? *it++ : 0;
-	u32 b4 = it < v.end() ? *it++ : 0;
+        u32 b1 = it < v.end() ? *it++ : 0;
+        u32 b2 = it < v.end() ? *it++ : 0;
+        u32 b3 = it < v.end() ? *it++ : 0;
+        u32 b4 = it < v.end() ? *it++ : 0;
 
-	ret += (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
+        ret += (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
     }
     while(it != v.end());
 

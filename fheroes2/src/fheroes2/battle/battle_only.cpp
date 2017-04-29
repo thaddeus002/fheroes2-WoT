@@ -39,7 +39,7 @@
 #include "army_bar.h"
 #include "battle_only.h"
 
-#define PRIMARY_MAX_VALUE	20
+#define PRIMARY_MAX_VALUE        20
 
 void RedrawPrimarySkillInfo(const Point &, PrimarySkillsBar*, PrimarySkillsBar*); /* heroes_meeting.cpp */
 
@@ -60,11 +60,11 @@ void Battle::ControlInfo::Redraw(void)
 }
 
 Battle::Only::Only() : hero1(NULL), hero2(NULL), player1(Color::BLUE), player2(Color::NONE),
-	army1(NULL), army2(NULL), moraleIndicator1(NULL), moraleIndicator2(NULL),
-	luckIndicator1(NULL), luckIndicator2(NULL), primskill_bar1(NULL), primskill_bar2(NULL),
-	secskill_bar1(NULL), secskill_bar2(NULL), selectArmy1(NULL), selectArmy2(NULL),
-	selectArtifacts1(NULL), selectArtifacts2(NULL), cinfo2(NULL),
-	rt1(36, 267, 43, 53), sfb1(rt1, false), rt2(23, 347, 34, 34), sfb2(rt2, false)
+        army1(NULL), army2(NULL), moraleIndicator1(NULL), moraleIndicator2(NULL),
+        luckIndicator1(NULL), luckIndicator2(NULL), primskill_bar1(NULL), primskill_bar2(NULL),
+        secskill_bar1(NULL), secskill_bar2(NULL), selectArmy1(NULL), selectArmy2(NULL),
+        selectArtifacts1(NULL), selectArtifacts2(NULL), cinfo2(NULL),
+        rt1(36, 267, 43, 53), sfb1(rt1, false), rt2(23, 347, 34, 34), sfb2(rt2, false)
 {
     player1.SetControl(CONTROL_HUMAN);
     player2.SetControl(CONTROL_AI);
@@ -86,9 +86,9 @@ Battle::Only::Only() : hero1(NULL), hero2(NULL), player1(Color::BLUE), player2(C
 StreamBase & operator<< (StreamBase & msg, const Battle::Only & b)
 {
     return msg <<
-	b.hero1->GetID() << *b.hero1 <<
-	b.hero2->GetID() << *b.hero2 <<
-	b.player1 << b.player2;
+        b.hero1->GetID() << *b.hero1 <<
+        b.hero2->GetID() << *b.hero2 <<
+        b.player1 << b.player2;
 }
 
 StreamBase & operator>> (StreamBase & msg, Battle::Only & b)
@@ -98,19 +98,19 @@ StreamBase & operator>> (StreamBase & msg, Battle::Only & b)
     msg >> id;
     b.hero1 = world.GetHeroes(id);
     if(b.hero1)
-	msg >> *b.hero1;
+        msg >> *b.hero1;
     else
        DEBUG(DBG_NETWORK, DBG_WARN, "unknown id");
 
     msg >> id;
     b.hero2 = world.GetHeroes(id);
     if(b.hero2)
-	msg >> *b.hero2;
+        msg >> *b.hero2;
     else
-	DEBUG(DBG_NETWORK, DBG_WARN, "unknown id");
+        DEBUG(DBG_NETWORK, DBG_WARN, "unknown id");
 
     msg >>
-	b.player1 >> b.player2;
+        b.player1 >> b.player2;
 
     return msg;
 }
@@ -156,12 +156,12 @@ bool Battle::Only::ChangeSettings(void)
 
     if(conf.GameType(Game::TYPE_NETWORK))
     {
-	player2.SetColor(Color::RED);
+        player2.SetColor(Color::RED);
 
-	player1.SetControl(CONTROL_REMOTE);
-	player2.SetControl(CONTROL_REMOTE);
+        player1.SetControl(CONTROL_REMOTE);
+        player2.SetControl(CONTROL_REMOTE);
 
-	hero2 = world.GetHeroes(Heroes::ZOM);
+        hero2 = world.GetHeroes(Heroes::ZOM);
     }
 
     hero1 = world.GetHeroes(Heroes::LORDKILBURN);
@@ -186,14 +186,14 @@ bool Battle::Only::ChangeSettings(void)
 
     if(hero2)
     {
-	hero2->GetSecondarySkills().FillMax(Skill::Secondary());
-	UpdateHero2(cur_pt);
+        hero2->GetSecondarySkills().FillMax(Skill::Secondary());
+        UpdateHero2(cur_pt);
 
-	moraleIndicator2->Redraw();
-	luckIndicator2->Redraw();
-	secskill_bar2->Redraw();
-	selectArtifacts2->Redraw();
-	selectArmy2->Redraw();
+        moraleIndicator2->Redraw();
+        luckIndicator2->Redraw();
+        secskill_bar2->Redraw();
+        selectArtifacts2->Redraw();
+        selectArmy2->Redraw();
     }
 
     monsters.GetTroop(0)->Set(Monster::PEASANT, 100);
@@ -221,251 +221,251 @@ bool Battle::Only::ChangeSettings(void)
     while(!exit && le.HandleEvents())
     {
         buttonStart.isEnable() &&
-	    le.MousePressLeft(buttonStart) ? buttonStart.PressDraw() : buttonStart.ReleaseDraw();
+            le.MousePressLeft(buttonStart) ? buttonStart.PressDraw() : buttonStart.ReleaseDraw();
 
-	if((buttonStart.isEnable() && le.MouseClickLeft(buttonStart)) ||
-	    Game::HotKeyPressEvent(Game::EVENT_DEFAULT_READY))
-	{
-	    result = true;
-	    exit = true;
-	}
+        if((buttonStart.isEnable() && le.MouseClickLeft(buttonStart)) ||
+            Game::HotKeyPressEvent(Game::EVENT_DEFAULT_READY))
+        {
+            result = true;
+            exit = true;
+        }
         else
-	if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)) exit = true;
+        if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)) exit = true;
 
-	if(allow1 && le.MouseClickLeft(rtPortrait1))
-	{
-	    int hid = Dialog::SelectHeroes(hero1->GetID());
-	    if(hero2 && hid == hero2->GetID())
-	    {
-		Dialog::Message("Error", "Please, select other hero.", Font::BIG, Dialog::OK);
-	    }
-	    else
-	    if(Heroes::UNKNOWN != hid)
-	    {
-		hero1 = world.GetHeroes(hid);
-		if(hero1) hero1->GetSecondarySkills().FillMax(Skill::Secondary());
-		UpdateHero1(cur_pt);
-		redraw = true;
-	    }
-	}
-	else
-	if(allow2 && le.MouseClickLeft(rtPortrait2))
-	{
-	    int hid = Dialog::SelectHeroes(hero2 ? hero2->GetID() : Heroes::UNKNOWN);
-	    if(hid == hero1->GetID())
-	    {
-		Dialog::Message("Error", "Please, select other hero.", Font::BIG, Dialog::OK);
-	    }
-	    else
-	    if(Heroes::UNKNOWN != hid)
-	    {
-		hero2 = world.GetHeroes(hid);
-		if(hero2) hero2->GetSecondarySkills().FillMax(Skill::Secondary());
-		UpdateHero2(cur_pt);
-		if(player2.isControlLocal() && NULL == cinfo2)
-		    cinfo2 = new ControlInfo(Point(cur_pt.x + 500, cur_pt.y + 425), player2.GetControl());
-		redraw = true;
-	    }
-	}
+        if(allow1 && le.MouseClickLeft(rtPortrait1))
+        {
+            int hid = Dialog::SelectHeroes(hero1->GetID());
+            if(hero2 && hid == hero2->GetID())
+            {
+                Dialog::Message("Error", "Please, select other hero.", Font::BIG, Dialog::OK);
+            }
+            else
+            if(Heroes::UNKNOWN != hid)
+            {
+                hero1 = world.GetHeroes(hid);
+                if(hero1) hero1->GetSecondarySkills().FillMax(Skill::Secondary());
+                UpdateHero1(cur_pt);
+                redraw = true;
+            }
+        }
+        else
+        if(allow2 && le.MouseClickLeft(rtPortrait2))
+        {
+            int hid = Dialog::SelectHeroes(hero2 ? hero2->GetID() : Heroes::UNKNOWN);
+            if(hid == hero1->GetID())
+            {
+                Dialog::Message("Error", "Please, select other hero.", Font::BIG, Dialog::OK);
+            }
+            else
+            if(Heroes::UNKNOWN != hid)
+            {
+                hero2 = world.GetHeroes(hid);
+                if(hero2) hero2->GetSecondarySkills().FillMax(Skill::Secondary());
+                UpdateHero2(cur_pt);
+                if(player2.isControlLocal() && NULL == cinfo2)
+                    cinfo2 = new ControlInfo(Point(cur_pt.x + 500, cur_pt.y + 425), player2.GetControl());
+                redraw = true;
+            }
+        }
 
-	if(hero1 && allow1)
-	{
-	    if(le.MouseClickLeft(rtAttack1))
-	    {
-		u32 value = hero1->attack;
-		if(Dialog::SelectCount("Set Attack Skill", 0, PRIMARY_MAX_VALUE, value))
-		{
-		    hero1->attack = value;
-		    redraw = true;
-		}
-	    }
-	    else
-	    if(le.MouseClickLeft(rtDefense1))
-	    {
-		u32 value = hero1->defense;
-		if(Dialog::SelectCount("Set Defense Skill", 0, PRIMARY_MAX_VALUE, value))
-		{
-		    hero1->defense = value;
-		    redraw = true;
-		}
-	    }
-	    else
-	    if(le.MouseClickLeft(rtPower1))
-	    {
-		u32 value = hero1->power;
-		if(Dialog::SelectCount("Set Power Skill", 0, PRIMARY_MAX_VALUE, value))
-		{
-		    hero1->power = value;
-		    redraw = true;
-		}
-	    }
-	    else
-	    if(le.MouseClickLeft(rtKnowledge1))
-	    {
-		u32 value = hero1->knowledge;
-		if(Dialog::SelectCount("Set Knowledge Skill", 0, PRIMARY_MAX_VALUE, value))
-		{
-		    hero1->knowledge = value;
-		    redraw = true;
-		}
-	    }
-	}
+        if(hero1 && allow1)
+        {
+            if(le.MouseClickLeft(rtAttack1))
+            {
+                u32 value = hero1->attack;
+                if(Dialog::SelectCount("Set Attack Skill", 0, PRIMARY_MAX_VALUE, value))
+                {
+                    hero1->attack = value;
+                    redraw = true;
+                }
+            }
+            else
+            if(le.MouseClickLeft(rtDefense1))
+            {
+                u32 value = hero1->defense;
+                if(Dialog::SelectCount("Set Defense Skill", 0, PRIMARY_MAX_VALUE, value))
+                {
+                    hero1->defense = value;
+                    redraw = true;
+                }
+            }
+            else
+            if(le.MouseClickLeft(rtPower1))
+            {
+                u32 value = hero1->power;
+                if(Dialog::SelectCount("Set Power Skill", 0, PRIMARY_MAX_VALUE, value))
+                {
+                    hero1->power = value;
+                    redraw = true;
+                }
+            }
+            else
+            if(le.MouseClickLeft(rtKnowledge1))
+            {
+                u32 value = hero1->knowledge;
+                if(Dialog::SelectCount("Set Knowledge Skill", 0, PRIMARY_MAX_VALUE, value))
+                {
+                    hero1->knowledge = value;
+                    redraw = true;
+                }
+            }
+        }
 
-	if(hero2 && allow2)
-	{
-	    if(le.MouseClickLeft(rtAttack2))
-	    {
-		u32 value = hero2->attack;
-		if(Dialog::SelectCount("Set Attack Skill", 0, PRIMARY_MAX_VALUE, value))
-		{
-		    hero2->attack = value;
-		    redraw = true;
-		}
-	    }
-	    else
-	    if(le.MouseClickLeft(rtDefense2))
-	    {
-		u32 value = hero2->defense;
-		if(Dialog::SelectCount("Set Defense Skill", 0, PRIMARY_MAX_VALUE, value))
-		{
-		    hero2->defense = value;
-		    redraw = true;
-		}
-	    }
-	    else
-	    if(le.MouseClickLeft(rtPower2))
-	    {
-		u32 value = hero2->power;
-		if(Dialog::SelectCount("Set Power Skill", 0, PRIMARY_MAX_VALUE, value))
-		{
-		    hero2->power = value;
-		    redraw = true;
-		}
-	    }
-	    else
-	    if(le.MouseClickLeft(rtKnowledge2))
-	    {
-		u32 value = hero2->knowledge;
-		if(Dialog::SelectCount("Set Knowledge Skill", 0, PRIMARY_MAX_VALUE, value))
-		{
-		    hero2->knowledge = value;
-		    redraw = true;
-		}
-	    }
-	}
+        if(hero2 && allow2)
+        {
+            if(le.MouseClickLeft(rtAttack2))
+            {
+                u32 value = hero2->attack;
+                if(Dialog::SelectCount("Set Attack Skill", 0, PRIMARY_MAX_VALUE, value))
+                {
+                    hero2->attack = value;
+                    redraw = true;
+                }
+            }
+            else
+            if(le.MouseClickLeft(rtDefense2))
+            {
+                u32 value = hero2->defense;
+                if(Dialog::SelectCount("Set Defense Skill", 0, PRIMARY_MAX_VALUE, value))
+                {
+                    hero2->defense = value;
+                    redraw = true;
+                }
+            }
+            else
+            if(le.MouseClickLeft(rtPower2))
+            {
+                u32 value = hero2->power;
+                if(Dialog::SelectCount("Set Power Skill", 0, PRIMARY_MAX_VALUE, value))
+                {
+                    hero2->power = value;
+                    redraw = true;
+                }
+            }
+            else
+            if(le.MouseClickLeft(rtKnowledge2))
+            {
+                u32 value = hero2->knowledge;
+                if(Dialog::SelectCount("Set Knowledge Skill", 0, PRIMARY_MAX_VALUE, value))
+                {
+                    hero2->knowledge = value;
+                    redraw = true;
+                }
+            }
+        }
 
-	if(allow1 && le.MouseCursor(selectArmy1->GetArea()) &&
-	    selectArmy1->QueueEventProcessing())
-	{
-	    if(selectArtifacts1->isSelected()) selectArtifacts1->ResetSelected();
-	    else
-	    if(selectArtifacts2 && selectArtifacts2->isSelected()) selectArtifacts2->ResetSelected();
+        if(allow1 && le.MouseCursor(selectArmy1->GetArea()) &&
+            selectArmy1->QueueEventProcessing())
+        {
+            if(selectArtifacts1->isSelected()) selectArtifacts1->ResetSelected();
+            else
+            if(selectArtifacts2 && selectArtifacts2->isSelected()) selectArtifacts2->ResetSelected();
 
-	    if(selectArmy2->isSelected()) selectArmy2->ResetSelected();
+            if(selectArmy2->isSelected()) selectArmy2->ResetSelected();
 
-	    redraw = true;
-	}
+            redraw = true;
+        }
 
-	if(allow2 && le.MouseCursor(selectArmy2->GetArea()) &&
-	    selectArmy2->QueueEventProcessing())
-	{
-	    if(selectArtifacts1->isSelected()) selectArtifacts1->ResetSelected();
-	    else
-	    if(selectArtifacts2 && selectArtifacts2->isSelected()) selectArtifacts2->ResetSelected();
+        if(allow2 && le.MouseCursor(selectArmy2->GetArea()) &&
+            selectArmy2->QueueEventProcessing())
+        {
+            if(selectArtifacts1->isSelected()) selectArtifacts1->ResetSelected();
+            else
+            if(selectArtifacts2 && selectArtifacts2->isSelected()) selectArtifacts2->ResetSelected();
 
-	    if(selectArmy1->isSelected()) selectArmy1->ResetSelected();
+            if(selectArmy1->isSelected()) selectArmy1->ResetSelected();
 
-	    redraw = true;
-	}
+            redraw = true;
+        }
 
-	if(allow1 && le.MouseCursor(selectArtifacts1->GetArea()) &&
-	    selectArtifacts1->QueueEventProcessing())
-	{
-	    if(selectArmy1->isSelected()) selectArmy1->ResetSelected();
-	    else
-	    if(selectArmy2->isSelected()) selectArmy2->ResetSelected();
+        if(allow1 && le.MouseCursor(selectArtifacts1->GetArea()) &&
+            selectArtifacts1->QueueEventProcessing())
+        {
+            if(selectArmy1->isSelected()) selectArmy1->ResetSelected();
+            else
+            if(selectArmy2->isSelected()) selectArmy2->ResetSelected();
 
-	    if(selectArtifacts2 && selectArtifacts2->isSelected()) selectArtifacts2->ResetSelected();
+            if(selectArtifacts2 && selectArtifacts2->isSelected()) selectArtifacts2->ResetSelected();
 
-	    redraw = true;
-	}
+            redraw = true;
+        }
 
-	if(allow2 && selectArtifacts2 && le.MouseCursor(selectArtifacts2->GetArea()) &&
-	    selectArtifacts2->QueueEventProcessing())
-	{
-	    if(selectArmy1->isSelected()) selectArmy1->ResetSelected();
-	    else
-	    if(selectArmy2->isSelected()) selectArmy2->ResetSelected();
+        if(allow2 && selectArtifacts2 && le.MouseCursor(selectArtifacts2->GetArea()) &&
+            selectArtifacts2->QueueEventProcessing())
+        {
+            if(selectArmy1->isSelected()) selectArmy1->ResetSelected();
+            else
+            if(selectArmy2->isSelected()) selectArmy2->ResetSelected();
 
-	    if(selectArtifacts1->isSelected()) selectArtifacts1->ResetSelected();
+            if(selectArtifacts1->isSelected()) selectArtifacts1->ResetSelected();
 
-	    redraw = true;
-	}
+            redraw = true;
+        }
 
-	if(hero1 && allow1)
-	{
+        if(hero1 && allow1)
+        {
           if(le.MouseCursor(moraleIndicator1->GetArea())) MoraleIndicator::QueueEventProcessing(*moraleIndicator1);
           else
-	  if(le.MouseCursor(luckIndicator1->GetArea())) LuckIndicator::QueueEventProcessing(*luckIndicator1);
+          if(le.MouseCursor(luckIndicator1->GetArea())) LuckIndicator::QueueEventProcessing(*luckIndicator1);
           else
-	  if(le.MouseCursor(primskill_bar1->GetArea()) && primskill_bar1->QueueEventProcessing())
-	      redraw = true;
+          if(le.MouseCursor(primskill_bar1->GetArea()) && primskill_bar1->QueueEventProcessing())
+              redraw = true;
           else
-	  if(le.MouseCursor(secskill_bar1->GetArea()) && secskill_bar1->QueueEventProcessing())
-	      redraw = true;
-	}
+          if(le.MouseCursor(secskill_bar1->GetArea()) && secskill_bar1->QueueEventProcessing())
+              redraw = true;
+        }
 
-	if(hero2 && allow2)
-	{
-	  if(le.MouseCursor(moraleIndicator2->GetArea())) MoraleIndicator::QueueEventProcessing(*moraleIndicator2);
-	  else
-	  if(le.MouseCursor(luckIndicator2->GetArea())) LuckIndicator::QueueEventProcessing(*luckIndicator2);
-	  else
-	  if(le.MouseCursor(primskill_bar2->GetArea()) && primskill_bar2->QueueEventProcessing())
-	      redraw = true;
-	  else
-	  if(le.MouseCursor(secskill_bar2->GetArea()) && secskill_bar2->QueueEventProcessing())
-	      redraw = true;
-	}
+        if(hero2 && allow2)
+        {
+          if(le.MouseCursor(moraleIndicator2->GetArea())) MoraleIndicator::QueueEventProcessing(*moraleIndicator2);
+          else
+          if(le.MouseCursor(luckIndicator2->GetArea())) LuckIndicator::QueueEventProcessing(*luckIndicator2);
+          else
+          if(le.MouseCursor(primskill_bar2->GetArea()) && primskill_bar2->QueueEventProcessing())
+              redraw = true;
+          else
+          if(le.MouseCursor(secskill_bar2->GetArea()) && secskill_bar2->QueueEventProcessing())
+              redraw = true;
+        }
 
-	if(cinfo2 && allow1)
-	{
-	    if(hero2 && le.MouseClickLeft(cinfo2->rtLocal) && player2.isControlAI())
-	    {
-		player2.SetControl(CONTROL_HUMAN);
-		redraw = true;
-	    }
-	    else
-	    if(le.MouseClickLeft(cinfo2->rtAI) && player2.isControlHuman())
-	    {
-		player2.SetControl(CONTROL_AI);
-		redraw = true;
-	    }
-	}
+        if(cinfo2 && allow1)
+        {
+            if(hero2 && le.MouseClickLeft(cinfo2->rtLocal) && player2.isControlAI())
+            {
+                player2.SetControl(CONTROL_HUMAN);
+                redraw = true;
+            }
+            else
+            if(le.MouseClickLeft(cinfo2->rtAI) && player2.isControlHuman())
+            {
+                player2.SetControl(CONTROL_AI);
+                redraw = true;
+            }
+        }
 
-	if(redraw || !cursor.isVisible())
-	{
-	  cursor.Hide();
-	  RedrawBaseInfo(cur_pt);
-	  moraleIndicator1->Redraw();
-	  luckIndicator1->Redraw();
-	  secskill_bar1->Redraw();
-	  selectArtifacts1->Redraw();
-	  selectArmy1->Redraw();
-	  if(hero2)
-	  {
-	    moraleIndicator2->Redraw();
-	    luckIndicator2->Redraw();
-	    secskill_bar2->Redraw();
-	    selectArtifacts2->Redraw();
-	  }
-	  selectArmy2->Redraw();
-	  if(cinfo2) cinfo2->Redraw();
-	  buttonStart.Draw();
-	  cursor.Show();
-	  display.Flip();
-	  redraw = false;
-	}
+        if(redraw || !cursor.isVisible())
+        {
+          cursor.Hide();
+          RedrawBaseInfo(cur_pt);
+          moraleIndicator1->Redraw();
+          luckIndicator1->Redraw();
+          secskill_bar1->Redraw();
+          selectArtifacts1->Redraw();
+          selectArmy1->Redraw();
+          if(hero2)
+          {
+            moraleIndicator2->Redraw();
+            luckIndicator2->Redraw();
+            secskill_bar2->Redraw();
+            selectArtifacts2->Redraw();
+          }
+          selectArmy2->Redraw();
+          if(cinfo2) cinfo2->Redraw();
+          buttonStart.Draw();
+          cursor.Show();
+          display.Flip();
+          redraw = false;
+        }
     }
 
     delete moraleIndicator1;
@@ -655,7 +655,7 @@ void Battle::Only::RedrawBaseInfo(const Point & top)
 
     StringReplace(message, "%{name1}", std::string(Race::String(hero1->GetRace())) + " " + hero1->GetName());
     if(hero2)
-	StringReplace(message, "%{name2}", (hero2 ? std::string(Race::String(hero2->GetRace())) + " " + hero2->GetName() : "Monsters"));
+        StringReplace(message, "%{name2}", (hero2 ? std::string(Race::String(hero2->GetRace())) + " " + hero2->GetName() : "Monsters"));
 
     Text text(message, Font::BIG);
     text.Blit(top.x + 320 - text.w() / 2, top.y + 26);
@@ -666,8 +666,8 @@ void Battle::Only::RedrawBaseInfo(const Point & top)
 
     if(hero2)
     {
-	Surface port2 = hero2->GetPortrait(PORT_BIG);
-	if(port2.isValid()) port2.Blit(rtPortrait2.x, rtPortrait2.y, display);
+        Surface port2 = hero2->GetPortrait(PORT_BIG);
+        if(port2.isValid()) port2.Blit(rtPortrait2.x, rtPortrait2.y, display);
     }
     else
     {
@@ -698,15 +698,15 @@ void Battle::Only::StartBattle(void)
 
     if(hero1)
     {
-	hero1->SetSpellPoints(hero1->GetMaxSpellPoints());
-	hero1->Recruit(player1.GetColor(), Point(5, 5));
+        hero1->SetSpellPoints(hero1->GetMaxSpellPoints());
+        hero1->Recruit(player1.GetColor(), Point(5, 5));
 
-	if(hero2)
-	{
-    	    hero2->SetSpellPoints(hero2->GetMaxSpellPoints());
-    	    hero2->Recruit(player2.GetColor(), Point(5, 6));
-	}
+        if(hero2)
+        {
+                hero2->SetSpellPoints(hero2->GetMaxSpellPoints());
+                hero2->Recruit(player2.GetColor(), Point(5, 6));
+        }
 
-	Battle::Loader(hero1->GetArmy(), (hero2 ? hero2->GetArmy() : monsters), hero1->GetIndex() + 1);
+        Battle::Loader(hero1->GetArmy(), (hero2 ? hero2->GetArmy() : monsters), hero1->GetIndex() + 1);
     }
 }

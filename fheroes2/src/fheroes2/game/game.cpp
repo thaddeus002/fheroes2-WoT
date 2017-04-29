@@ -52,23 +52,23 @@
 
 namespace Game
 {
-    u32		GetMixerChannelFromObject(const Maps::Tiles &);
-    void	AnimateDelaysInitialize(void);
-    void	KeyboardGlobalFilter(int, int);
-    void	UpdateGlobalDefines(const std::string &);
-    void	LoadExternalResource(const Settings &);
+    u32                GetMixerChannelFromObject(const Maps::Tiles &);
+    void        AnimateDelaysInitialize(void);
+    void        KeyboardGlobalFilter(int, int);
+    void        UpdateGlobalDefines(const std::string &);
+    void        LoadExternalResource(const Settings &);
 
-    void	HotKeysDefaults(void);
-    void	HotKeysLoad(const std::string &);
+    void        HotKeysDefaults(void);
+    void        HotKeysLoad(const std::string &);
 
-    bool	disable_change_music = false;
-    int		current_music = MUS::UNKNOWN;
-    u32		castle_animation_frame = 0;
-    u32		maps_animation_frame = 0;
+    bool        disable_change_music = false;
+    int                current_music = MUS::UNKNOWN;
+    u32                castle_animation_frame = 0;
+    u32                maps_animation_frame = 0;
     std::string last_name;
-    int		save_version = CURRENT_FORMAT_VERSION;
+    int                save_version = CURRENT_FORMAT_VERSION;
     std::vector<int>
-		reserved_vols(LOOPXX_COUNT, 0);
+                reserved_vols(LOOPXX_COUNT, 0);
 }
 
 void Game::SetLoadVersion(int ver)
@@ -196,9 +196,9 @@ void Game::SetFixVideoMode(void)
     Size mapSize = conf.MapsSize();
 
     u32 max_x = Settings::Get().ExtGameHideInterface() ? mapSize.w * TILEWIDTH :
-			    (6 + mapSize.w) * TILEWIDTH; // RADARWIDTH + 3 * BORDERWIDTH
+                            (6 + mapSize.w) * TILEWIDTH; // RADARWIDTH + 3 * BORDERWIDTH
     u32 max_y = Settings::Get().ExtGameHideInterface() ? mapSize.h * TILEWIDTH :
-			    (1 + mapSize.h) * TILEWIDTH; // 2 * BORDERWIDTH
+                            (1 + mapSize.h) * TILEWIDTH; // 2 * BORDERWIDTH
 
     if(conf.VideoMode().w > max_x) fixsize.w = max_x;
     if(conf.VideoMode().h > max_y) fixsize.h = max_y;
@@ -214,29 +214,29 @@ void Game::EnvironmentSoundMixer(void)
 
     if(conf.Sound())
     {
-	std::fill(reserved_vols.begin(), reserved_vols.end(), 0);
+        std::fill(reserved_vols.begin(), reserved_vols.end(), 0);
 
         // scan 4x4 square from focus
         for(s32 yy = abs_pt.y - 3; yy <= abs_pt.y + 3; ++yy)
-    	{
-    	    for(s32 xx = abs_pt.x - 3; xx <= abs_pt.x + 3; ++xx)
-	    {
-		if(Maps::isValidAbsPoint(xx, yy))
-		{
-		    const u32 channel = GetMixerChannelFromObject(world.GetTiles(xx, yy));
-    		    if(channel < reserved_vols.size())
-		    {
-			// calculation volume
-    			const int length = std::max(std::abs(xx - abs_pt.x), std::abs(yy - abs_pt.y));
-			const int volume = (2 < length ? 4 : (1 < length ? 8 : (0 < length ? 12 : 16))) * Mixer::MaxVolume() / 16;
+            {
+                for(s32 xx = abs_pt.x - 3; xx <= abs_pt.x + 3; ++xx)
+            {
+                if(Maps::isValidAbsPoint(xx, yy))
+                {
+                    const u32 channel = GetMixerChannelFromObject(world.GetTiles(xx, yy));
+                        if(channel < reserved_vols.size())
+                    {
+                        // calculation volume
+                            const int length = std::max(std::abs(xx - abs_pt.x), std::abs(yy - abs_pt.y));
+                        const int volume = (2 < length ? 4 : (1 < length ? 8 : (0 < length ? 12 : 16))) * Mixer::MaxVolume() / 16;
 
-			if(volume > reserved_vols[channel]) reserved_vols[channel] = volume;
-		    }
-		}
-	    }
-	}
+                        if(volume > reserved_vols[channel]) reserved_vols[channel] = volume;
+                    }
+                }
+            }
+        }
 
-	AGG::LoadLOOPXXSounds(reserved_vols);
+        AGG::LoadLOOPXXSounds(reserved_vols);
     }
 }
 
@@ -258,17 +258,17 @@ u32 Game::GetRating(void)
         case Difficulty::NORMAL:     rating += 20; break;
         case Difficulty::HARD:       rating += 40; break;
         case Difficulty::EXPERT:
-        case Difficulty::IMPOSSIBLE:	rating += 80; break;
-	default: break;
+        case Difficulty::IMPOSSIBLE:        rating += 80; break;
+        default: break;
     }
 
     switch(conf.GameDifficulty())
     {
         case Difficulty::NORMAL:     rating += 30; break;
         case Difficulty::HARD:       rating += 50; break;
-        case Difficulty::EXPERT:	rating += 70; break;
-        case Difficulty::IMPOSSIBLE:	rating += 90; break;
-	default: break;
+        case Difficulty::EXPERT:        rating += 70; break;
+        case Difficulty::IMPOSSIBLE:        rating += 90; break;
+        default: break;
     }
 
     return rating;
@@ -282,11 +282,11 @@ u32 Game::GetGameOverScores(void)
 
     switch(conf.MapsSize().w)
     {
-	case Maps::SMALL:	k_size = 140; break;
-	case Maps::MEDIUM:	k_size = 100; break;
-	case Maps::LARGE:	k_size =  80; break;
-	case Maps::XLARGE:	k_size =  60; break;
-	default: break;
+        case Maps::SMALL:        k_size = 140; break;
+        case Maps::MEDIUM:        k_size = 100; break;
+        case Maps::LARGE:        k_size =  80; break;
+        case Maps::XLARGE:        k_size =  60; break;
+        default: break;
     }
 
     u32 flag = 0;
@@ -295,13 +295,13 @@ u32 Game::GetGameOverScores(void)
 
     for(u32 ii = 1; ii <= end_days; ++ii)
     {
-	nk = ii * k_size / 100;
+        nk = ii * k_size / 100;
 
-	if(0 == flag && nk > 60){ end_days = ii + (world.CountDay() - ii) / 2; flag = 1; }
-	else
-	if(1 == flag && nk > 120) end_days = ii + (world.CountDay() - ii) / 2;
-	else
-	if(nk > 180) break;
+        if(0 == flag && nk > 60){ end_days = ii + (world.CountDay() - ii) / 2; flag = 1; }
+        else
+        if(1 == flag && nk > 120) end_days = ii + (world.CountDay() - ii) / 2;
+        else
+        if(nk > 180) break;
     }
 
     return GetRating() * (200 - nk) / 100;
@@ -337,24 +337,24 @@ void Game::UpdateGlobalDefines(const std::string & spec)
     const TiXmlElement* xml_globals = NULL;
 
     if(doc.LoadFile(spec.c_str()) &&
-	NULL != (xml_globals = doc.FirstChildElement("globals")))
+        NULL != (xml_globals = doc.FirstChildElement("globals")))
     {
-	// starting_resource
-	KingdomUpdateStartingResource(xml_globals->FirstChildElement("starting_resource"));
-	// view_distance
-	OverViewUpdateStatic(xml_globals->FirstChildElement("view_distance"));
-	// kingdom
-	KingdomUpdateStatic(xml_globals->FirstChildElement("kingdom"));
-	// game_over
-	GameOverUpdateStatic(xml_globals->FirstChildElement("game_over"));
-	// whirlpool
-	WhirlpoolUpdateStatic(xml_globals->FirstChildElement("whirlpool"));
-	// heroes
-	HeroesUpdateStatic(xml_globals->FirstChildElement("heroes"));
-	// castle_extra_growth
-	CastleUpdateGrowth(xml_globals->FirstChildElement("castle_extra_growth"));
-	// monster upgrade ratio
-	MonsterUpdateStatic(xml_globals->FirstChildElement("monster_upgrade"));
+        // starting_resource
+        KingdomUpdateStartingResource(xml_globals->FirstChildElement("starting_resource"));
+        // view_distance
+        OverViewUpdateStatic(xml_globals->FirstChildElement("view_distance"));
+        // kingdom
+        KingdomUpdateStatic(xml_globals->FirstChildElement("kingdom"));
+        // game_over
+        GameOverUpdateStatic(xml_globals->FirstChildElement("game_over"));
+        // whirlpool
+        WhirlpoolUpdateStatic(xml_globals->FirstChildElement("whirlpool"));
+        // heroes
+        HeroesUpdateStatic(xml_globals->FirstChildElement("heroes"));
+        // castle_extra_growth
+        CastleUpdateGrowth(xml_globals->FirstChildElement("castle_extra_growth"));
+        // monster upgrade ratio
+        MonsterUpdateStatic(xml_globals->FirstChildElement("monster_upgrade"));
     }
     else
     VERBOSE(spec << ": " << doc.ErrorDesc());
@@ -375,61 +375,61 @@ void Game::LoadExternalResource(const Settings & conf)
     spec = Settings::GetLastFile(prefix_stats, "globals.xml");
 
     if(System::IsFile(spec))
-	Game::UpdateGlobalDefines(spec);
+        Game::UpdateGlobalDefines(spec);
 
     // animations.xml
     spec = Settings::GetLastFile(prefix_stats, "animations.xml");
 
     if(System::IsFile(spec))
-	Battle::UpdateMonsterSpriteAnimation(spec);
+        Battle::UpdateMonsterSpriteAnimation(spec);
 
     // battle.xml
     spec = Settings::GetLastFile(prefix_stats, "battle.xml");
 
     if(System::IsFile(spec))
-	Battle::UpdateMonsterAttributes(spec);
+        Battle::UpdateMonsterAttributes(spec);
 
     // monsters.xml
     spec = Settings::GetLastFile(prefix_stats, "monsters.xml");
 
     if(System::IsFile(spec))
-	Monster::UpdateStats(spec);
+        Monster::UpdateStats(spec);
 
     // spells.xml
     spec = Settings::GetLastFile(prefix_stats, "spells.xml");
 
     if(System::IsFile(spec))
-	Spell::UpdateStats(spec);
+        Spell::UpdateStats(spec);
 
     // artifacts.xml
     spec = Settings::GetLastFile(prefix_stats, "artifacts.xml");
 
     if(System::IsFile(spec))
-	Artifact::UpdateStats(spec);
+        Artifact::UpdateStats(spec);
 
     // buildings.xml
     spec = Settings::GetLastFile(prefix_stats, "buildings.xml");
 
     if(System::IsFile(spec))
-	BuildingInfo::UpdateCosts(spec);
+        BuildingInfo::UpdateCosts(spec);
 
     // payments.xml
     spec = Settings::GetLastFile(prefix_stats, "payments.xml");
 
     if(System::IsFile(spec))
-	PaymentConditions::UpdateCosts(spec);
+        PaymentConditions::UpdateCosts(spec);
 
     // profits.xml
     spec = Settings::GetLastFile(prefix_stats, "profits.xml");
 
     if(System::IsFile(spec))
-	ProfitConditions::UpdateCosts(spec);
+        ProfitConditions::UpdateCosts(spec);
 
     // skills.xml
     spec = Settings::GetLastFile(prefix_stats, "skills.xml");
 
     if(System::IsFile(spec))
-	Skill::UpdateStats(spec);
+        Skill::UpdateStats(spec);
 }
 
 std::string Game::GetEncodeString(const std::string & str1)
@@ -438,7 +438,7 @@ std::string Game::GetEncodeString(const std::string & str1)
 
     // encode name
     if(conf.Unicode() && conf.MapsCharset().size())
-	return EncodeString(str1.c_str(), conf.MapsCharset().c_str());
+        return EncodeString(str1.c_str(), conf.MapsCharset().c_str());
 
     return str1;
 }
@@ -480,7 +480,7 @@ std::string Game::CountScoute(u32 count, int scoute, bool shorts)
     if(res.empty())
     {
         u32 min = Rand::Get(static_cast<u32>(std::floor(count - infelicity + 0.5)),
-			    static_cast<u32>(std::floor(count + infelicity + 0.5)));
+                            static_cast<u32>(std::floor(count + infelicity + 0.5)));
         u32 max = 0;
 
         if(min > count)

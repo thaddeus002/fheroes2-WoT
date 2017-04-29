@@ -99,8 +99,8 @@ int GetCovr(int ground)
 StreamBase & Battle::operator<< (StreamBase & msg, const TargetInfo & t)
 {
     return msg <<
-	(t.defender ? t.defender->GetUID() : static_cast<u32>(0)) <<
-	t.damage << t.killed << t.resist;
+        (t.defender ? t.defender->GetUID() : static_cast<u32>(0)) <<
+        t.damage << t.killed << t.resist;
 }
 
 StreamBase & Battle::operator>> (StreamBase & msg, TargetInfo & t)
@@ -108,7 +108,7 @@ StreamBase & Battle::operator>> (StreamBase & msg, TargetInfo & t)
     u32 uid = 0;
 
     msg >> uid >>
-	t.damage >> t.killed >> t.resist;
+        t.damage >> t.killed >> t.resist;
 
     t.defender = uid ? GetArena()->GetTroopUID(uid) : NULL;
 
@@ -120,8 +120,8 @@ StreamBase & Battle::operator<< (StreamBase & msg, const TargetsInfo & ts)
     msg << static_cast<u32>(ts.size());
 
     for(TargetsInfo::const_iterator
-	it = ts.begin(); it != ts.end(); ++it)
-	msg << *it;
+        it = ts.begin(); it != ts.end(); ++it)
+        msg << *it;
 
     return msg;
 }
@@ -134,8 +134,8 @@ StreamBase & Battle::operator>> (StreamBase & msg, TargetsInfo & ts)
     ts.resize(size);
 
     for(TargetsInfo::iterator
-	it = ts.begin(); it != ts.end(); ++it)
-	msg >> *it;
+        it = ts.begin(); it != ts.end(); ++it)
+        msg >> *it;
 
     return msg;
 }
@@ -188,8 +188,8 @@ Battle::Tower* Battle::Arena::GetTower(int type)
 }
 
 Battle::Arena::Arena(Army & a1, Army & a2, s32 index, bool local) :
-	army1(NULL), army2(NULL), armies_order(NULL), castle(NULL), current_color(0), catapult(NULL),
-	bridge(NULL), interface(NULL), icn_covr(ICN::UNKNOWN), current_turn(0), auto_battle(0), end_turn(false)
+        army1(NULL), army2(NULL), armies_order(NULL), castle(NULL), current_color(0), catapult(NULL),
+        bridge(NULL), interface(NULL), icn_covr(ICN::UNKNOWN), current_turn(0), auto_battle(0), end_turn(false)
 {
     const Settings & conf = Settings::Get();
     usage_spells.reserve(20);
@@ -203,30 +203,30 @@ Battle::Arena::Arena(Army & a1, Army & a2, s32 index, bool local) :
 
     if(castle)
     {
-	CastleHeroes heroes = world.GetHeroes(*castle);
+        CastleHeroes heroes = world.GetHeroes(*castle);
 
-	// skip if present guard and guest
-	if(heroes.FullHouse()) castle = NULL;
+        // skip if present guard and guest
+        if(heroes.FullHouse()) castle = NULL;
 
-	// skip for town
-	if(castle && !castle->isCastle()) castle = NULL;
+        // skip for town
+        if(castle && !castle->isCastle()) castle = NULL;
     }
 
     // init interface
     if(local)
     {
-	interface = new Interface(*this, index);
-	board.SetArea(interface->GetArea());
+        interface = new Interface(*this, index);
+        board.SetArea(interface->GetArea());
 
-	std::for_each(army1->begin(), army1->end(), std::mem_fun(&Unit::InitContours));
-	std::for_each(army2->begin(), army2->end(), std::mem_fun(&Unit::InitContours));
+        std::for_each(army1->begin(), army1->end(), std::mem_fun(&Unit::InitContours));
+        std::for_each(army2->begin(), army2->end(), std::mem_fun(&Unit::InitContours));
 
-	if(conf.Sound())
-	    AGG::PlaySound(M82::PREBATTL);
+        if(conf.Sound())
+            AGG::PlaySound(M82::PREBATTL);
 
-	armies_order = new Units();
-	armies_order->reserve(25);
-	interface->SetArmiesOrder(armies_order);
+        armies_order = new Units();
+        armies_order->reserve(25);
+        interface->SetArmiesOrder(armies_order);
     }
 
 
@@ -236,71 +236,71 @@ Battle::Arena::Arena(Army & a1, Army & a2, s32 index, bool local) :
 
     if(castle)
     {
-	// init
-	towers[0] = castle->isBuild(BUILD_LEFTTURRET) ? new Tower(*castle, TWR_LEFT) : NULL;
-	towers[1] = new Tower(*castle, TWR_CENTER);
-	towers[2] = castle->isBuild(BUILD_RIGHTTURRET) ? new Tower(*castle, TWR_RIGHT) : NULL;
-	bool fortification = (Race::KNGT == castle->GetRace()) && castle->isBuild(BUILD_SPEC);
-	catapult = army1->GetCommander() ? new Catapult(*army1->GetCommander(), fortification) : NULL;
-	bridge = new Bridge();
+        // init
+        towers[0] = castle->isBuild(BUILD_LEFTTURRET) ? new Tower(*castle, TWR_LEFT) : NULL;
+        towers[1] = new Tower(*castle, TWR_CENTER);
+        towers[2] = castle->isBuild(BUILD_RIGHTTURRET) ? new Tower(*castle, TWR_RIGHT) : NULL;
+        bool fortification = (Race::KNGT == castle->GetRace()) && castle->isBuild(BUILD_SPEC);
+        catapult = army1->GetCommander() ? new Catapult(*army1->GetCommander(), fortification) : NULL;
+        bridge = new Bridge();
 
-	// catapult cell
-	board[77].SetObject(1);
+        // catapult cell
+        board[77].SetObject(1);
 
-	// wall (3,2,1,0)
-	board[8].SetObject(fortification ? 3 : 2);
-	board[29].SetObject(fortification ? 3 : 2);
-	board[73].SetObject(fortification ? 3 : 2);
-	board[96].SetObject(fortification ? 3 : 2);
+        // wall (3,2,1,0)
+        board[8].SetObject(fortification ? 3 : 2);
+        board[29].SetObject(fortification ? 3 : 2);
+        board[73].SetObject(fortification ? 3 : 2);
+        board[96].SetObject(fortification ? 3 : 2);
 
-	// tower
-	board[40].SetObject(2);
-	board[62].SetObject(2);
+        // tower
+        board[40].SetObject(2);
+        board[62].SetObject(2);
 
-	// archers tower
-	board[19].SetObject(2);
+        // archers tower
+        board[19].SetObject(2);
         board[85].SetObject(2);
 
-	// bridge
-	board[49].SetObject(1);
-	board[50].SetObject(1);
+        // bridge
+        board[49].SetObject(1);
+        board[50].SetObject(1);
     }
     else
     // set obstacles
     {
-	icn_covr = Maps::ScanAroundObject(index, MP2::OBJ_CRATER).size() ?
-			GetCovr(world.GetTiles(index).GetGround()) : ICN::UNKNOWN;
+        icn_covr = Maps::ScanAroundObject(index, MP2::OBJ_CRATER).size() ?
+                        GetCovr(world.GetTiles(index).GetGround()) : ICN::UNKNOWN;
 
-	if(icn_covr != ICN::UNKNOWN)
-	    board.SetCovrObjects(icn_covr);
-	else
-	    board.SetCobjObjects(world.GetTiles(index));
+        if(icn_covr != ICN::UNKNOWN)
+            board.SetCovrObjects(icn_covr);
+        else
+            board.SetCobjObjects(world.GetTiles(index));
     }
 
     // set guardian objects mode (+2 defense)
     if(conf.ExtWorldGuardianObjectsTwoDefense() &&
-	!castle &&
+        !castle &&
         MP2::isCaptureObject(world.GetTiles(index).GetObject(false)))
         army2->SetModes(ARMY_GUARDIANS_OBJECT);
 
     //
     if(interface)
     {
-	Cursor & cursor = Cursor::Get();
-	Display & display = Display::Get();
+        Cursor & cursor = Cursor::Get();
+        Display & display = Display::Get();
 
-	cursor.Hide();
-	cursor.SetThemes(Cursor::WAR_NONE);
+        cursor.Hide();
+        cursor.SetThemes(Cursor::WAR_NONE);
 
-	if(conf.ExtGameUseFade()) display.Fade();
+        if(conf.ExtGameUseFade()) display.Fade();
 
-	interface->Redraw();
-	cursor.Show();
-	display.Flip();
+        interface->Redraw();
+        cursor.Show();
+        display.Flip();
 
-	// pause for play M82::PREBATTL
-	if(conf.Sound())
-	    while(LocalEvent::Get().HandleEvents() && Mixer::isPlaying(-1));
+        // pause for play M82::PREBATTL
+        if(conf.Sound())
+            while(LocalEvent::Get().HandleEvents() && Mixer::isPlaying(-1));
     }
 }
 
@@ -327,70 +327,70 @@ void Battle::Arena::TurnTroop(Unit* current_troop)
 
     while(! end_turn)
     {
-	// bad morale
-	if(current_troop->Modes(MORALE_BAD))
-	{
-    	    actions.push_back(Command(MSG_BATTLE_MORALE, current_troop->GetUID(), false));
-	    end_turn = true;
-	}
-	else
-	{
-	    // turn opponents
-	    if(current_troop->isControlRemote())
-		RemoteTurn(*current_troop, actions);
-	    else
-	    {
-		if(current_troop->isControlAI() ||
-		    (current_color & auto_battle))
-		    {
-			AI::BattleTurn(*this, *current_troop, actions);
-		    }
-    		else
-		if(current_troop->isControlHuman())
-		    HumanTurn(*current_troop, actions);
-	    }
-	}
+        // bad morale
+        if(current_troop->Modes(MORALE_BAD))
+        {
+                actions.push_back(Command(MSG_BATTLE_MORALE, current_troop->GetUID(), false));
+            end_turn = true;
+        }
+        else
+        {
+            // turn opponents
+            if(current_troop->isControlRemote())
+                RemoteTurn(*current_troop, actions);
+            else
+            {
+                if(current_troop->isControlAI() ||
+                    (current_color & auto_battle))
+                    {
+                        AI::BattleTurn(*this, *current_troop, actions);
+                    }
+                    else
+                if(current_troop->isControlHuman())
+                    HumanTurn(*current_troop, actions);
+            }
+        }
 
-	// apply task
-	while(actions.size())
-	{
-	    // apply action
-	    ApplyAction(actions.front());
-	    actions.pop_front();
+        // apply task
+        while(actions.size())
+        {
+            // apply action
+            ApplyAction(actions.front());
+            actions.pop_front();
 
-	    // rescan orders
-	    if(armies_order)
-		Force::UpdateOrderUnits(*army1, *army2, *armies_order);
+            // rescan orders
+            if(armies_order)
+                Force::UpdateOrderUnits(*army1, *army2, *armies_order);
 
-    	    // check end battle
-    	    if(! BattleValid())
-		end_turn = true;
+                // check end battle
+                if(! BattleValid())
+                end_turn = true;
 
-	    // good morale
-	    if(!end_turn &&
-		    !current_troop->Modes(TR_SKIPMOVE) &&
-		    current_troop->Modes(TR_MOVED) &&
-		    current_troop->Modes(MORALE_GOOD) &&
-		    BattleValid())
-	    {
-		actions.push_back(Command(MSG_BATTLE_MORALE, current_troop->GetUID(), true));
-		end_turn = false;
-	    }
-	}
+            // good morale
+            if(!end_turn &&
+                    !current_troop->Modes(TR_SKIPMOVE) &&
+                    current_troop->Modes(TR_MOVED) &&
+                    current_troop->Modes(MORALE_GOOD) &&
+                    BattleValid())
+            {
+                actions.push_back(Command(MSG_BATTLE_MORALE, current_troop->GetUID(), true));
+                end_turn = false;
+            }
+        }
 
-	if(current_troop->Modes(TR_SKIPMOVE | TR_MOVED))
-	    end_turn = true;
+        if(current_troop->Modes(TR_SKIPMOVE | TR_MOVED))
+            end_turn = true;
 
-	board.Reset();
+        board.Reset();
 
-	DELAY(10);
+        DELAY(10);
     }
 }
 
 bool Battle::Arena::BattleValid(void) const
 {
     return army1->isValid() && army2->isValid() &&
-	0 == result_game.army1 && 0 == result_game.army2;
+        0 == result_game.army1 && 0 == result_game.army2;
 }
 
 void Battle::Arena::Turns(void)
@@ -415,36 +415,36 @@ void Battle::Arena::Turns(void)
     if(armies_order) Force::UpdateOrderUnits(*army1, *army2, *armies_order);
 
     while(BattleValid() &&
-	NULL != (current_troop = Force::GetCurrentUnit(*army1, *army2, current_troop, true)))
+        NULL != (current_troop = Force::GetCurrentUnit(*army1, *army2, current_troop, true)))
     {
-	current_color = current_troop->GetArmyColor();
+        current_color = current_troop->GetArmyColor();
 
-	// first turn: castle and catapult action
-	if(castle)
-	{
-	    if(!catapult_moved && current_troop->GetColor() == army1->GetColor())
-	    {
-		CatapultAction();
-		catapult_moved = true;
-	    }
+        // first turn: castle and catapult action
+        if(castle)
+        {
+            if(!catapult_moved && current_troop->GetColor() == army1->GetColor())
+            {
+                CatapultAction();
+                catapult_moved = true;
+            }
 
-	    if(!tower_moved && current_troop->GetColor() == army2->GetColor())
-	    {
-		if(towers[0] && towers[0]->isValid()) TowerAction(*towers[0]);
-		if(towers[1] && towers[1]->isValid()) TowerAction(*towers[1]);
-		if(towers[2] && towers[2]->isValid()) TowerAction(*towers[2]);
-		tower_moved = true;
+            if(!tower_moved && current_troop->GetColor() == army2->GetColor())
+            {
+                if(towers[0] && towers[0]->isValid()) TowerAction(*towers[0]);
+                if(towers[1] && towers[1]->isValid()) TowerAction(*towers[1]);
+                if(towers[2] && towers[2]->isValid()) TowerAction(*towers[2]);
+                tower_moved = true;
 
-    		// check dead last army from towers
-    		if(! BattleValid()) break;
-	    }
-	}
+                    // check dead last army from towers
+                    if(! BattleValid()) break;
+            }
+        }
 
-	// set bridge passable
-	if(bridge && bridge->isValid() && !bridge->isDown()) bridge->SetPassable(*current_troop);
+        // set bridge passable
+        if(bridge && bridge->isValid() && !bridge->isDown()) bridge->SetPassable(*current_troop);
 
-	// turn troop
-	TurnTroop(current_troop);
+        // turn troop
+        TurnTroop(current_troop);
     }
 
     current_troop = NULL;
@@ -452,28 +452,28 @@ void Battle::Arena::Turns(void)
     // can skip move ?
     if(Settings::Get().ExtBattleSoftWait())
     while(BattleValid() &&
-	NULL != (current_troop = Force::GetCurrentUnit(*army1, *army2, current_troop, false)))
+        NULL != (current_troop = Force::GetCurrentUnit(*army1, *army2, current_troop, false)))
     {
-	current_color = current_troop->GetArmyColor();
+        current_color = current_troop->GetArmyColor();
 
-	// set bridge passable
-	if(bridge && bridge->isValid() && !bridge->isDown()) bridge->SetPassable(*current_troop);
+        // set bridge passable
+        if(bridge && bridge->isValid() && !bridge->isDown()) bridge->SetPassable(*current_troop);
 
-	// turn troop
-	TurnTroop(current_troop);
+        // turn troop
+        TurnTroop(current_troop);
     }
 
     // end turn: fix result
     if(!army1->isValid() || (result_game.army1 & (RESULT_RETREAT | RESULT_SURRENDER)))
     {
-	result_game.army1 |= RESULT_LOSS;
-	if(army2->isValid()) result_game.army2 = RESULT_WINS;
+        result_game.army1 |= RESULT_LOSS;
+        if(army2->isValid()) result_game.army2 = RESULT_WINS;
     }
 
     if(!army2->isValid() || (result_game.army2 & (RESULT_RETREAT | RESULT_SURRENDER)))
     {
-	result_game.army2 |= RESULT_LOSS;
-	if(army1->isValid()) result_game.army1 = RESULT_WINS;
+        result_game.army2 |= RESULT_LOSS;
+        if(army1->isValid()) result_game.army1 = RESULT_WINS;
     }
 
     // fix experience and killed
@@ -485,8 +485,8 @@ void Battle::Arena::Turns(void)
         if(army1->GetCommander()) result_game.exp2 += 500;
         if(army2->GetCommander()) result_game.exp1 += 500;
 
-	Force *army_loss = (result_game.army1 & RESULT_LOSS ? army1 : (result_game.army2 & RESULT_LOSS ? army2 : NULL));
-	result_game.killed = army_loss ? army_loss->GetDeadCounts() : 0;
+        Force *army_loss = (result_game.army1 & RESULT_LOSS ? army1 : (result_game.army2 & RESULT_LOSS ? army2 : NULL));
+        result_game.killed = army_loss ? army_loss->GetDeadCounts() : 0;
     }
 }
 
@@ -510,8 +510,8 @@ void Battle::Arena::TowerAction(const Tower & twr)
 
     if(enemy)
     {
-	Command cmd(MSG_BATTLE_TOWER, twr.GetType(), enemy->GetUID());
-	ApplyAction(cmd);
+        Command cmd(MSG_BATTLE_TOWER, twr.GetType(), enemy->GetUID());
+        ApplyAction(cmd);
     }
 }
 
@@ -519,30 +519,30 @@ void Battle::Arena::CatapultAction(void)
 {
     if(catapult)
     {
-	u32 shots = catapult->GetShots();
-	std::vector<u32> values(CAT_MISS + 1, 0);
+        u32 shots = catapult->GetShots();
+        std::vector<u32> values(CAT_MISS + 1, 0);
     
-	values[CAT_WALL1] = GetCastleTargetValue(CAT_WALL1);
-	values[CAT_WALL2] = GetCastleTargetValue(CAT_WALL2);
-	values[CAT_WALL3] = GetCastleTargetValue(CAT_WALL3);
-	values[CAT_WALL4] = GetCastleTargetValue(CAT_WALL4);
-	values[CAT_TOWER1] = GetCastleTargetValue(CAT_TOWER1);
-	values[CAT_TOWER2] = GetCastleTargetValue(CAT_TOWER2);
-	values[CAT_TOWER3] = GetCastleTargetValue(CAT_TOWER3);
-	values[CAT_BRIDGE] = GetCastleTargetValue(CAT_BRIDGE);
+        values[CAT_WALL1] = GetCastleTargetValue(CAT_WALL1);
+        values[CAT_WALL2] = GetCastleTargetValue(CAT_WALL2);
+        values[CAT_WALL3] = GetCastleTargetValue(CAT_WALL3);
+        values[CAT_WALL4] = GetCastleTargetValue(CAT_WALL4);
+        values[CAT_TOWER1] = GetCastleTargetValue(CAT_TOWER1);
+        values[CAT_TOWER2] = GetCastleTargetValue(CAT_TOWER2);
+        values[CAT_TOWER3] = GetCastleTargetValue(CAT_TOWER3);
+        values[CAT_BRIDGE] = GetCastleTargetValue(CAT_BRIDGE);
 
-	Command cmd(MSG_BATTLE_CATAPULT);
+        Command cmd(MSG_BATTLE_CATAPULT);
 
-	while(shots--)
-	{
-    	    int target = catapult->GetTarget(values);
-    	    u32 damage = catapult->GetDamage(target, GetCastleTargetValue(target));
-    	    cmd << damage << target;
-    	    values[target] -= damage;
-	}
+        while(shots--)
+        {
+                int target = catapult->GetTarget(values);
+                u32 damage = catapult->GetDamage(target, GetCastleTargetValue(target));
+                cmd << damage << target;
+                values[target] -= damage;
+        }
     
-	cmd << catapult->GetShots();
-	ApplyAction(cmd);
+        cmd << catapult->GetShots();
+        ApplyAction(cmd);
     }
 }
 
@@ -552,12 +552,12 @@ Battle::Indexes Battle::Arena::GetPath(const Unit & b, const Position & dst)
 
     if(result.size())
     {
-	if(IS_DEBUG(DBG_BATTLE, DBG_TRACE))
-	{
-    	    std::stringstream ss;
-	    for(u32 ii = 0; ii < result.size(); ++ii) ss << result[ii] << ", ";
-	    DEBUG(DBG_BATTLE, DBG_TRACE, ss.str());
-	}
+        if(IS_DEBUG(DBG_BATTLE, DBG_TRACE))
+        {
+                std::stringstream ss;
+            for(u32 ii = 0; ii < result.size(); ++ii) ss << result[ii] << ", ";
+            DEBUG(DBG_BATTLE, DBG_TRACE, ss.str());
+        }
     }
 
     return result;
@@ -606,12 +606,12 @@ int Battle::Arena::GetOppositeColor(int col) const
 Battle::Unit* Battle::Arena::GetTroopUID(u32 uid)
 {
     Units::iterator it = std::find_if(army1->begin(), army1->end(),
-			std::bind2nd(std::mem_fun(&Unit::isUID), uid));
+                        std::bind2nd(std::mem_fun(&Unit::isUID), uid));
 
     if(it != army1->end()) return *it;
 
     it = std::find_if(army2->begin(), army2->end(),
-			std::bind2nd(std::mem_fun(&Unit::isUID), uid));
+                        std::bind2nd(std::mem_fun(&Unit::isUID), uid));
 
     return it != army2->end() ? *it : NULL;
 }
@@ -619,12 +619,12 @@ Battle::Unit* Battle::Arena::GetTroopUID(u32 uid)
 const Battle::Unit* Battle::Arena::GetTroopUID(u32 uid) const
 {
     Units::const_iterator it = std::find_if(army1->begin(), army1->end(),
-			std::bind2nd(std::mem_fun(&Unit::isUID), uid));
+                        std::bind2nd(std::mem_fun(&Unit::isUID), uid));
 
     if(it != army1->end()) return *it;
 
     it = std::find_if(army2->begin(), army2->end(),
-			std::bind2nd(std::mem_fun(&Unit::isUID), uid));
+                        std::bind2nd(std::mem_fun(&Unit::isUID), uid));
 
     return it != army2->end() ? *it : NULL;
 }
@@ -635,13 +635,13 @@ const Battle::Unit* Battle::Arena::GetEnemyMaxQuality(int my_color) const
     s32 quality = 0;
 
     for(Board::const_iterator
-	it = board.begin(); it != board.end(); ++it)
+        it = board.begin(); it != board.end(); ++it)
     {
-	const Unit* enemy = (*it).GetUnit();
+        const Unit* enemy = (*it).GetUnit();
 
-	if(enemy && enemy->GetColor() != my_color &&
-	    (!enemy->isWide() || enemy->GetTailIndex() != (*it).GetIndex()) &&
-	    quality < (*it).GetQuality())
+        if(enemy && enemy->GetColor() != my_color &&
+            (!enemy->isWide() || enemy->GetTailIndex() != (*it).GetIndex()) &&
+            quality < (*it).GetQuality())
         {
             res = enemy;
             quality = (*it).GetQuality();
@@ -672,7 +672,7 @@ s32 Battle::Arena::GetFreePositionNearHero(int color) const
     if(army2->GetColor() == color) cells = cells2;
 
     if(cells) for(u32 ii = 0; ii < 3; ++ii)
-	if(board[cells[ii]].isPassable1(true) && NULL == board[cells[ii]].GetUnit()) return cells[ii];
+        if(board[cells[ii]].isPassable1(true) && NULL == board[cells[ii]].GetUnit()) return cells[ii];
 
     return -1;
 }
@@ -682,14 +682,14 @@ bool Battle::Arena::CanSurrenderOpponent(int color) const
     const HeroBase* hero1 = GetCommander(color, false); // enemy
     const HeroBase* hero2 = GetCommander(color, true);
     return hero1 && hero1->isHeroes() && hero2 &&
-	world.GetKingdom(hero2->GetColor()).GetCastles().size();
+        world.GetKingdom(hero2->GetColor()).GetCastles().size();
 }
 
 bool Battle::Arena::CanRetreatOpponent(int color) const
 {
     const HeroBase* hero = army1->GetColor() == color ? army1->GetCommander() : army2->GetCommander();
     return hero && hero->isHeroes() && NULL == hero->inCastle() &&
-	world.GetKingdom(hero->GetColor()).GetCastles().size();
+        world.GetKingdom(hero->GetColor()).GetCastles().size();
 }
 
 bool Battle::Arena::isDisableCastSpell(const Spell & spell, std::string* msg)
@@ -709,65 +709,65 @@ bool Battle::Arena::isDisableCastSpell(const Spell & spell, std::string* msg)
     // check casted
     if(current_commander)
     {
-	if(current_commander->Modes(Heroes::SPELLCASTED))
-	{
-	    if(msg) *msg = _("You have already cast a spell this round.");
-	    return true;
-	}
+        if(current_commander->Modes(Heroes::SPELLCASTED))
+        {
+            if(msg) *msg = _("You have already cast a spell this round.");
+            return true;
+        }
 
-	if(spell == Spell::EARTHQUAKE && !castle)
-	{
-	    *msg = _("That spell will affect no one!");
-	    return true;
-	}
-	else
-	if(spell.isSummon())
-	{
-	    const Unit* elem = GetCurrentForce().FindMode(CAP_SUMMONELEM);
-	    bool affect = true;
+        if(spell == Spell::EARTHQUAKE && !castle)
+        {
+            *msg = _("That spell will affect no one!");
+            return true;
+        }
+        else
+        if(spell.isSummon())
+        {
+            const Unit* elem = GetCurrentForce().FindMode(CAP_SUMMONELEM);
+            bool affect = true;
 
-	    if(elem) switch(spell())
-	    {
-		case Spell::SUMMONEELEMENT: if(elem->GetID() != Monster::EARTH_ELEMENT) affect = false; break;
-		case Spell::SUMMONAELEMENT: if(elem->GetID() != Monster::AIR_ELEMENT) affect = false; break;
-		case Spell::SUMMONFELEMENT: if(elem->GetID() != Monster::FIRE_ELEMENT) affect = false; break;
-		case Spell::SUMMONWELEMENT: if(elem->GetID() != Monster::WATER_ELEMENT) affect = false; break;
-		default: break;
-	    }
-	    if(!affect)
-	    {
-		*msg = _("You may only summon one type of elemental per combat.");
-		return true;
-	    }
+            if(elem) switch(spell())
+            {
+                case Spell::SUMMONEELEMENT: if(elem->GetID() != Monster::EARTH_ELEMENT) affect = false; break;
+                case Spell::SUMMONAELEMENT: if(elem->GetID() != Monster::AIR_ELEMENT) affect = false; break;
+                case Spell::SUMMONFELEMENT: if(elem->GetID() != Monster::FIRE_ELEMENT) affect = false; break;
+                case Spell::SUMMONWELEMENT: if(elem->GetID() != Monster::WATER_ELEMENT) affect = false; break;
+                default: break;
+            }
+            if(!affect)
+            {
+                *msg = _("You may only summon one type of elemental per combat.");
+                return true;
+            }
 
-	    if(0 > GetFreePositionNearHero(current_color))
-	    {
-		*msg = _("There is no open space adjacent to your hero to summon an Elemental to.");
-		return true;
-	    }
-	}
-	else
-	if(spell.isValid())
-	{
-	    // check army
-	    for(Board::const_iterator
-		it = board.begin(); it != board.end(); ++it)
-	    {
-		const Battle::Unit* b = (*it).GetUnit();
+            if(0 > GetFreePositionNearHero(current_color))
+            {
+                *msg = _("There is no open space adjacent to your hero to summon an Elemental to.");
+                return true;
+            }
+        }
+        else
+        if(spell.isValid())
+        {
+            // check army
+            for(Board::const_iterator
+                it = board.begin(); it != board.end(); ++it)
+            {
+                const Battle::Unit* b = (*it).GetUnit();
 
-		if(b)
-		{
-		    if(b->AllowApplySpell(spell, current_commander, NULL))
-			return false;
-		}
-		else
-		// check graveyard
-		if(GraveyardAllowResurrect((*it).GetIndex(), spell))
-			return false;
-	    }
-	    *msg = _("That spell will affect no one!");
-	    return true;
-	}
+                if(b)
+                {
+                    if(b->AllowApplySpell(spell, current_commander, NULL))
+                        return false;
+                }
+                else
+                // check graveyard
+                if(GraveyardAllowResurrect((*it).GetIndex(), spell))
+                        return false;
+            }
+            *msg = _("That spell will affect no one!");
+            return true;
+        }
     }
 
     // may be check other..
@@ -782,10 +782,10 @@ bool Battle::Arena::GraveyardAllowResurrect(s32 index, const Spell & spell) cons
     const HeroBase* hero = GetCurrentCommander();
     const Unit* killed = GetTroopUID(graveyard.GetLastTroopUID(index));
     const Unit* tail = killed && killed->isWide() ?
-	    GetTroopUID(graveyard.GetLastTroopUID(killed->GetTailIndex())) : NULL;
+            GetTroopUID(graveyard.GetLastTroopUID(killed->GetTailIndex())) : NULL;
 
     return killed && (! killed->isWide() || killed == tail) &&
-	hero && spell.isResurrect() && killed->AllowApplySpell(spell, hero, NULL);
+        hero && spell.isResurrect() && killed->AllowApplySpell(spell, hero, NULL);
 }
 
 const Battle::Unit* Battle::Arena::GraveyardLastTroop(s32 index) const
@@ -812,13 +812,13 @@ void Battle::Arena::SetCastleTargetValue(int target, u32 value)
         case CAT_TOWER3:if(towers[1] && towers[1]->isValid()) towers[1]->SetDestroy(); break;
 
         case CAT_BRIDGE:
-	    if(bridge->isValid())
-	    {
+            if(bridge->isValid())
+            {
                 if(interface) interface->RedrawBridgeAnimation(true);
-		bridge->SetDown(true);
-		bridge->SetDestroy();
-	    }
-	    break;
+                bridge->SetDown(true);
+                bridge->SetDestroy();
+            }
+            break;
 
         default: break;
     }
@@ -865,21 +865,21 @@ std::vector<int> Battle::Arena::GetCastleTargets(void) const
 StreamBase & Battle::operator<< (StreamBase & msg, const Arena & a)
 {
     msg <<
-	a.current_turn << a.board <<
-	*a.army1 << *a.army2;
+        a.current_turn << a.board <<
+        *a.army1 << *a.army2;
 
     const HeroBase* hero1 = a.army1->GetCommander();
     const HeroBase* hero2 = a.army2->GetCommander();
 
     if(hero1)
-	msg << hero1->GetType() << *hero1;
+        msg << hero1->GetType() << *hero1;
     else
-	msg << static_cast<int>(HeroBase::UNDEFINED);
+        msg << static_cast<int>(HeroBase::UNDEFINED);
 
     if(hero2)
-	msg << hero2->GetType() << *hero2;
+        msg << hero2->GetType() << *hero2;
     else
-	msg << static_cast<int>(HeroBase::UNDEFINED);
+        msg << static_cast<int>(HeroBase::UNDEFINED);
 
     return msg;
 }
@@ -887,7 +887,7 @@ StreamBase & Battle::operator<< (StreamBase & msg, const Arena & a)
 StreamBase & Battle::operator>> (StreamBase & msg, Arena & a)
 {
     msg >> a.current_turn >> a.board >>
-	*a.army1 >> *a.army2;
+        *a.army1 >> *a.army2;
 
     int type;
     HeroBase* hero1 = a.army1->GetCommander();
@@ -908,11 +908,11 @@ const HeroBase* Battle::Arena::GetCommander(int color, bool invert) const
 
     if(army1->GetColor() == color)
     {
-	commander = invert ? army2->GetCommander() : army1->GetCommander();
+        commander = invert ? army2->GetCommander() : army1->GetCommander();
     }
     else
     {
-	commander = invert ? army1->GetCommander() : army2->GetCommander();
+        commander = invert ? army1->GetCommander() : army2->GetCommander();
     }
 
     return commander;
@@ -935,8 +935,8 @@ Battle::Unit* Battle::Arena::CreateElemental(const Spell & spell)
 
     if(0 > pos || !hero)
     {
-	DEBUG(DBG_BATTLE, DBG_WARN, "internal error");
-	return NULL;
+        DEBUG(DBG_BATTLE, DBG_WARN, "internal error");
+        return NULL;
     }
 
     Force & army = GetCurrentForce();
@@ -954,16 +954,16 @@ Battle::Unit* Battle::Arena::CreateElemental(const Spell & spell)
 
     if(!affect)
     {
-	DEBUG(DBG_BATTLE, DBG_WARN, "other elemental summon");
-	return NULL;
+        DEBUG(DBG_BATTLE, DBG_WARN, "other elemental summon");
+        return NULL;
     }
 
     Monster mons(spell);
 
     if(! mons.isValid())
     {
-	DEBUG(DBG_BATTLE, DBG_WARN, "unknown id");
-	return NULL;
+        DEBUG(DBG_BATTLE, DBG_WARN, "unknown id");
+        return NULL;
     }
 
     DEBUG(DBG_BATTLE, DBG_TRACE, mons.GetName() << ", position: " << pos);
@@ -976,13 +976,13 @@ Battle::Unit* Battle::Arena::CreateElemental(const Spell & spell)
     if(elem)
     {
         elem->SetModes(CAP_SUMMONELEM);
-	elem->SetArmy(hero->GetArmy());
-	if(interface) elem->InitContours();
-	army.push_back(elem);
+        elem->SetArmy(hero->GetArmy());
+        if(interface) elem->InitContours();
+        army.push_back(elem);
     }
     else
     {
-	DEBUG(DBG_BATTLE, DBG_WARN, "is NULL");
+        DEBUG(DBG_BATTLE, DBG_WARN, "is NULL");
     }
 
     return elem;
@@ -994,18 +994,18 @@ Battle::Unit* Battle::Arena::CreateMirrorImage(Unit & b, s32 pos)
 
     if(image)
     {
-	b.SetMirror(image);
-	image->SetArmy(*b.GetArmy());
-	image->SetMirror(&b);
-	image->SetModes(CAP_MIRRORIMAGE);
-	if(interface) image->InitContours();
-	b.SetModes(CAP_MIRROROWNER);
+        b.SetMirror(image);
+        image->SetArmy(*b.GetArmy());
+        image->SetMirror(&b);
+        image->SetModes(CAP_MIRRORIMAGE);
+        if(interface) image->InitContours();
+        b.SetModes(CAP_MIRROROWNER);
 
-	GetCurrentForce().push_back(image);
+        GetCurrentForce().push_back(image);
     }
     else
     {
-	DEBUG(DBG_BATTLE, DBG_WARN, "internal error");
+        DEBUG(DBG_BATTLE, DBG_WARN, "internal error");
     }
 
     return image;
@@ -1024,91 +1024,91 @@ u32 Battle::Arena::GetObstaclesPenalty(const Unit & attacker, const Unit & defen
 
     if(castle)
     {
-	// archery skill
-	if(enemy && Skill::Level::NONE != enemy->GetLevelSkill(Skill::Secondary::ARCHERY)) return 0;
+        // archery skill
+        if(enemy && Skill::Level::NONE != enemy->GetLevelSkill(Skill::Secondary::ARCHERY)) return 0;
 
-	// attacker is castle owner
-	if(attacker.GetColor() == castle->GetColor() &&
-	    !attacker.OutOfWalls()) return 0;
+        // attacker is castle owner
+        if(attacker.GetColor() == castle->GetColor() &&
+            !attacker.OutOfWalls()) return 0;
 
-	if(defender.GetColor() == castle->GetColor() &&
-	    defender.OutOfWalls()) return 0;
+        if(defender.GetColor() == castle->GetColor() &&
+            defender.OutOfWalls()) return 0;
 
-	// check castle walls defensed
-	const Points points = GetLinePoints(attacker.GetBackPoint(), defender.GetBackPoint(), step);
+        // check castle walls defensed
+        const Points points = GetLinePoints(attacker.GetBackPoint(), defender.GetBackPoint(), step);
 
-	for(Points::const_iterator
-	    it = points.begin(); it != points.end(); ++it)
-	{
-	    if(0 == board[8].GetObject() && (board[8].GetPos() & *it)) return 0;
-	    else
-	    if(0 == board[29].GetObject() && (board[29].GetPos() & *it)) return 0;
-	    else
-	    if(0 == board[73].GetObject() && (board[73].GetPos() & *it)) return 0;
-	    else
-	    if(0 == board[96].GetObject() && (board[96].GetPos() & *it)) return 0;
-	}
+        for(Points::const_iterator
+            it = points.begin(); it != points.end(); ++it)
+        {
+            if(0 == board[8].GetObject() && (board[8].GetPos() & *it)) return 0;
+            else
+            if(0 == board[29].GetObject() && (board[29].GetPos() & *it)) return 0;
+            else
+            if(0 == board[73].GetObject() && (board[73].GetPos() & *it)) return 0;
+            else
+            if(0 == board[96].GetObject() && (board[96].GetPos() & *it)) return 0;
+        }
 
-	result = 1;
+        result = 1;
     }
     else
     if(Settings::Get().ExtBattleObjectsArchersPenalty())
     {
-	const Points points = GetLinePoints(attacker.GetBackPoint(), defender.GetBackPoint(), step);
-	Indexes indexes;
-	indexes.reserve(points.size());
+        const Points points = GetLinePoints(attacker.GetBackPoint(), defender.GetBackPoint(), step);
+        Indexes indexes;
+        indexes.reserve(points.size());
 
-	for(Points::const_iterator
-	    it = points.begin(); it != points.end(); ++it)
-	{
-	    const s32 index = board.GetIndexAbsPosition(*it);
-	    if(Board::isValidIndex(index)) indexes.push_back(index);
-	}
+        for(Points::const_iterator
+            it = points.begin(); it != points.end(); ++it)
+        {
+            const s32 index = board.GetIndexAbsPosition(*it);
+            if(Board::isValidIndex(index)) indexes.push_back(index);
+        }
 
-	if(indexes.size())
-	{
-	    std::sort(indexes.begin(), indexes.end());
-	    indexes.resize(std::distance(indexes.begin(), std::unique(indexes.begin(), indexes.end())));
-	}
+        if(indexes.size())
+        {
+            std::sort(indexes.begin(), indexes.end());
+            indexes.resize(std::distance(indexes.begin(), std::unique(indexes.begin(), indexes.end())));
+        }
 
-	for(Indexes::const_iterator
-	    it = indexes.begin(); it != indexes.end(); ++it)
-	{
-	    // obstacles
-	    switch(board[*it].GetObject())
-	    {
-		    // tree
-		    case 0x82:
-		    // trock
-		    case 0x85:
-		    // tree
-		    case 0x89:
-		    // tree
-		    case 0x8D:
-		    // rock
-		    case 0x95:
-		    case 0x96:
-		    // stub
-		    case 0x9A:
-		    // dead tree
-		    case 0x9B:
-		    // tree
-		    case 0x9C: ++result; break;
+        for(Indexes::const_iterator
+            it = indexes.begin(); it != indexes.end(); ++it)
+        {
+            // obstacles
+            switch(board[*it].GetObject())
+            {
+                    // tree
+                    case 0x82:
+                    // trock
+                    case 0x85:
+                    // tree
+                    case 0x89:
+                    // tree
+                    case 0x8D:
+                    // rock
+                    case 0x95:
+                    case 0x96:
+                    // stub
+                    case 0x9A:
+                    // dead tree
+                    case 0x9B:
+                    // tree
+                    case 0x9C: ++result; break;
 
-		    default: break;
-	    }
-	}
+                    default: break;
+            }
+        }
 
-	if(enemy)
-	{
-	    switch(enemy->GetLevelSkill(Skill::Secondary::ARCHERY))
-	    {
-		case Skill::Level::BASIC:	if(result < 2) return 0; break;
-		case Skill::Level::ADVANCED:	if(result < 3) return 0; break;
-		case Skill::Level::EXPERT:	return 0;
-		default: break;
-	    }
-	}
+        if(enemy)
+        {
+            switch(enemy->GetLevelSkill(Skill::Secondary::ARCHERY))
+            {
+                case Skill::Level::BASIC:        if(result < 2) return 0; break;
+                case Skill::Level::ADVANCED:        if(result < 3) return 0; break;
+                case Skill::Level::EXPERT:        return 0;
+                default: break;
+            }
+        }
     }
 
     return result;
@@ -1155,7 +1155,7 @@ Battle::Result & Battle::Arena::GetResult(void)
 bool Battle::Arena::CanBreakAutoBattle(void) const
 {
     return (auto_battle & current_color) && GetCurrentCommander() &&
-	! GetCurrentCommander()->isControlAI();
+        ! GetCurrentCommander()->isControlAI();
 }
 
 void Battle::Arena::BreakAutoBattle(void)

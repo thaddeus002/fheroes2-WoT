@@ -49,7 +49,7 @@ void StatusBar::ShowMessage(const std::string & msg)
         Show();
         Cursor::Get().Show();
         Display::Get().Flip();
-	prev = msg;
+        prev = msg;
     }
 }
 

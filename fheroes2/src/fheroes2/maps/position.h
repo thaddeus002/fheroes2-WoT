@@ -32,19 +32,19 @@ public:
 
     bool operator== (s32) const;
 
-    const Point &	GetCenter(void) const;
-    s32			GetIndex(void) const;
+    const Point &        GetCenter(void) const;
+    s32                        GetIndex(void) const;
 
-    void		SetCenter(const Point &);
-    void		SetIndex(s32);
+    void                SetCenter(const Point &);
+    void                SetIndex(s32);
 
-    bool		isPosition(const Point &) const;
+    bool                isPosition(const Point &) const;
 
 protected:
     friend StreamBase & operator<< (StreamBase &, const MapPosition &);
     friend StreamBase & operator>> (StreamBase &, MapPosition &);
 
-    Point	center;
+    Point        center;
 };
 
 StreamBase & operator<< (StreamBase &, const MapPosition &);

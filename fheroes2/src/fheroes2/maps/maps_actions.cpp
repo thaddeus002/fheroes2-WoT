@@ -142,21 +142,21 @@ bool ActionAccess::Action(ActionAccess* act, s32 index, Heroes & hero)
 {
     if(act)
     {
-	if(act->cancelAfterFirstVisit &&
-	    hero.isVisited(world.GetTiles(index), Visit::GLOBAL))
-	    return false;
+        if(act->cancelAfterFirstVisit &&
+            hero.isVisited(world.GetTiles(index), Visit::GLOBAL))
+            return false;
 
-	if(! act->message.empty())
-	    Dialog::Message("", act->message, Font::BIG, Dialog::OK);
+        if(! act->message.empty())
+            Dialog::Message("", act->message, Font::BIG, Dialog::OK);
 
-	if(hero.isControlAI() && ! act->allowComputer)
-	    return false;
+        if(hero.isControlAI() && ! act->allowComputer)
+            return false;
 
-	if(act->cancelAfterFirstVisit)
-	    hero.SetVisited(index, Visit::GLOBAL);
+        if(act->cancelAfterFirstVisit)
+            hero.SetVisited(index, Visit::GLOBAL);
 
-	if(hero.GetColor() & act->allowPlayers)
-	    return true;
+        if(hero.GetColor() & act->allowPlayers)
+            return true;
     }
 
     return false;
@@ -166,9 +166,9 @@ bool ActionDefault::Action(ActionDefault* act, s32 index, Heroes & hero)
 {
     if(act)
     {
-	if(! act->message.empty())
-	    Dialog::Message("", act->message, Font::BIG, Dialog::OK);
-	return act->enabled;
+        if(! act->message.empty())
+            Dialog::Message("", act->message, Font::BIG, Dialog::OK);
+        return act->enabled;
     }
 
     return false;
@@ -178,11 +178,11 @@ bool ActionArtifact::Action(ActionArtifact* act, s32 index, Heroes & hero)
 {
     if(act && act->artifact != Artifact::UNKNOWN)
     {
-	if(! act->message.empty())
-    	    Dialog::ArtifactInfo("", act->message, act->artifact);
-	hero.PickupArtifact(act->artifact);
-	act->artifact = Artifact::UNKNOWN;
-	return true;
+        if(! act->message.empty())
+                Dialog::ArtifactInfo("", act->message, act->artifact);
+        hero.PickupArtifact(act->artifact);
+        act->artifact = Artifact::UNKNOWN;
+        return true;
     }
 
     return false;
@@ -193,9 +193,9 @@ bool ActionResources::Action(ActionResources* act, s32 index, Heroes & hero)
     if(act && 0 < act->resources.GetValidItems())
     {
         Dialog::ResourceInfo("", act->message, act->resources);
-	hero.GetKingdom().AddFundsResource(act->resources);
-	act->resources.Reset();
-	return true;
+        hero.GetKingdom().AddFundsResource(act->resources);
+        act->resources.Reset();
+        return true;
     }
 
     return false;
@@ -205,9 +205,9 @@ bool ActionMessage::Action(ActionMessage* act, s32 index, Heroes & hero)
 {
     if(act)
     {
-	if(! act->message.empty())
-	    Dialog::Message("", act->message, Font::BIG, Dialog::OK);
-	return true;
+        if(! act->message.empty())
+            Dialog::Message("", act->message, Font::BIG, Dialog::OK);
+        return true;
     }
 
     return false;

@@ -81,23 +81,23 @@ Sprite Sprite::ScaleQVGASprite(const Sprite & sp)
 
     if(sp.w() > 3 && sp.h() > 3)
     {
-	int theme = 0;
-	if(cursor.isVisible() && Cursor::WAIT != cursor.Themes())
-	{
-	    theme = cursor.Themes();
-	    cursor.SetThemes(Cursor::WAIT);
-	    cursor.Show();
-	    display.Flip();
-	}
+        int theme = 0;
+        if(cursor.isVisible() && Cursor::WAIT != cursor.Themes())
+        {
+            theme = cursor.Themes();
+            cursor.SetThemes(Cursor::WAIT);
+            cursor.Show();
+            display.Flip();
+        }
 
-	res.SetSurface(ScaleQVGASurface(sp));
+        res.SetSurface(ScaleQVGASurface(sp));
 
-	if(theme)
-	{
-	    cursor.SetThemes(theme);
-	    cursor.Show();
-	    display.Flip();
-	}
+        if(theme)
+        {
+            cursor.SetThemes(theme);
+            cursor.Show();
+            display.Flip();
+        }
     }
 
     const Point pt = sp.GetPos();

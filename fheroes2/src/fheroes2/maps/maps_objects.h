@@ -56,16 +56,16 @@ struct MapEvent : public MapObjectSimple
 {
     MapEvent();
 
-    void	LoadFromMP2(s32 index, StreamBuf);
+    void        LoadFromMP2(s32 index, StreamBuf);
 
-    bool	isAllow(int color) const;
-    void	SetVisited(int color);
+    bool        isAllow(int color) const;
+    void        SetVisited(int color);
 
-    Funds	resources;
-    Artifact	artifact;
-    bool	computer;
-    bool	cancel;
-    int		colors;
+    Funds        resources;
+    Artifact        artifact;
+    bool        computer;
+    bool        cancel;
+    int                colors;
     std::string message;
 };
 
@@ -78,16 +78,16 @@ struct MapSphinx : public MapObjectSimple
 {
     MapSphinx();
 
-    void	LoadFromMP2(s32 index, StreamBuf);
+    void        LoadFromMP2(s32 index, StreamBuf);
 
-    bool	AnswerCorrect(const std::string & answer);
-    void	SetQuiet(void);
+    bool        AnswerCorrect(const std::string & answer);
+    void        SetQuiet(void);
 
-    Funds		resources;
-    Artifact		artifact;
-    RiddleAnswers	answers;
-    std::string		message;
-    bool		valid;
+    Funds                resources;
+    Artifact                artifact;
+    RiddleAnswers        answers;
+    std::string                message;
+    bool                valid;
 };
 
 StreamBase & operator<< (StreamBase &, const MapSphinx &);
@@ -98,9 +98,9 @@ struct MapSign : public MapObjectSimple
     MapSign();
     MapSign(s32 index, const std::string &);
 
-    void	LoadFromMP2(s32 index, StreamBuf);
+    void        LoadFromMP2(s32 index, StreamBuf);
 
-    std::string		message;
+    std::string                message;
 };
 
 StreamBase & operator<< (StreamBase &, const MapSign &);
@@ -110,7 +110,7 @@ struct MapResource : public MapObjectSimple
 {
     MapResource();
 
-    ResourceCount	resource;
+    ResourceCount        resource;
 };
 
 StreamBase & operator<< (StreamBase &, const MapResource &);
@@ -120,12 +120,12 @@ struct MapArtifact : public MapObjectSimple
 {
     MapArtifact();
 
-    Artifact		artifact;
-    int			condition;
-    int			extended;
+    Artifact                artifact;
+    int                        condition;
+    int                        extended;
 
-    Funds		QuantityFunds(void) const;
-    ResourceCount	QuantityResourceCount(void) const;
+    Funds                QuantityFunds(void) const;
+    ResourceCount        QuantityResourceCount(void) const;
 };
 
 StreamBase & operator<< (StreamBase &, const MapArtifact &);
@@ -135,16 +135,16 @@ struct MapMonster : public MapObjectSimple
 {
     MapMonster();
 
-    Monster		monster;
+    Monster                monster;
 
-    int			condition;
-    int			count;
+    int                        condition;
+    int                        count;
 
-    Troop		QuantityTroop(void) const;
-    bool		JoinConditionSkip(void) const;
-    bool		JoinConditionMoney(void) const;
-    bool		JoinConditionFree(void) const;
-    bool		JoinConditionForce(void) const;
+    Troop                QuantityTroop(void) const;
+    bool                JoinConditionSkip(void) const;
+    bool                JoinConditionMoney(void) const;
+    bool                JoinConditionFree(void) const;
+    bool                JoinConditionForce(void) const;
 };
 
 StreamBase & operator<< (StreamBase &, const MapMonster &);

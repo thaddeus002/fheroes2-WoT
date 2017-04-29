@@ -73,14 +73,14 @@ void ProfitConditions::UpdateCosts(const std::string & spec)
     if(doc.LoadFile(spec.c_str()) &&
         NULL != (xml_profits = doc.FirstChildElement("profits")))
     {
-	profitstats_t* ptr = &_profits[0];
+        profitstats_t* ptr = &_profits[0];
 
         while(ptr->id)
         {
             const TiXmlElement* xml_profit = xml_profits->FirstChildElement(ptr->id);
 
             if(xml_profit)
-        	LoadCostFromXMLElement(ptr->cost, *xml_profit);
+                LoadCostFromXMLElement(ptr->cost, *xml_profit);
 
             ++ptr;
         }
@@ -97,18 +97,18 @@ payment_t ProfitConditions::FromBuilding(u32 building, int race)
 
     switch(building)
     {
-	case BUILD_CASTLE: id = "castle"; break;
-	case BUILD_TENT:  id = "town"; break;
-	case BUILD_STATUE: id = "statue"; break;
-	case BUILD_SPEC: if(race == Race::WRLK) id = "dungeon"; break;
-	default: break;
+        case BUILD_CASTLE: id = "castle"; break;
+        case BUILD_TENT:  id = "town"; break;
+        case BUILD_STATUE: id = "statue"; break;
+        case BUILD_SPEC: if(race == Race::WRLK) id = "dungeon"; break;
+        default: break;
     }
 
     if(id)
     {
-	profitstats_t* ptr = &_profits[0];
-	while(ptr->id && std::strcmp(id, ptr->id)) ++ptr;
-	if(ptr->id) result = ptr->cost;
+        profitstats_t* ptr = &_profits[0];
+        while(ptr->id && std::strcmp(id, ptr->id)) ++ptr;
+        if(ptr->id) result = ptr->cost;
     }
 
     return result;
@@ -121,25 +121,25 @@ payment_t ProfitConditions::FromArtifact(int artifact)
 
     switch(artifact)
     {
-	case Artifact::TAX_LIEN: id = "tax_lien"; break;
-	case Artifact::GOLDEN_GOOSE: id = "ultimate_golden_goose"; break;
-	case Artifact::ENDLESS_SACK_GOLD: id = "endless_sack_gold"; break;
-	case Artifact::ENDLESS_BAG_GOLD: id = "endless_bag_gold"; break;
-	case Artifact::ENDLESS_PURSE_GOLD: id = "endless_purse_gold"; break;
-	case Artifact::ENDLESS_POUCH_SULFUR: id = "endless_pouch_sulfur"; break;
-	case Artifact::ENDLESS_VIAL_MERCURY: id = "endless_vial_mercury"; break;
-	case Artifact::ENDLESS_POUCH_GEMS: id = "endless_pouch_gems"; break;
-	case Artifact::ENDLESS_CORD_WOOD: id = "endless_cord_wood"; break;
-	case Artifact::ENDLESS_CART_ORE: id = "endless_cart_ore"; break;
-	case Artifact::ENDLESS_POUCH_CRYSTAL: id = "endless_pouch_crystal"; break;
-	default: break;
+        case Artifact::TAX_LIEN: id = "tax_lien"; break;
+        case Artifact::GOLDEN_GOOSE: id = "ultimate_golden_goose"; break;
+        case Artifact::ENDLESS_SACK_GOLD: id = "endless_sack_gold"; break;
+        case Artifact::ENDLESS_BAG_GOLD: id = "endless_bag_gold"; break;
+        case Artifact::ENDLESS_PURSE_GOLD: id = "endless_purse_gold"; break;
+        case Artifact::ENDLESS_POUCH_SULFUR: id = "endless_pouch_sulfur"; break;
+        case Artifact::ENDLESS_VIAL_MERCURY: id = "endless_vial_mercury"; break;
+        case Artifact::ENDLESS_POUCH_GEMS: id = "endless_pouch_gems"; break;
+        case Artifact::ENDLESS_CORD_WOOD: id = "endless_cord_wood"; break;
+        case Artifact::ENDLESS_CART_ORE: id = "endless_cart_ore"; break;
+        case Artifact::ENDLESS_POUCH_CRYSTAL: id = "endless_pouch_crystal"; break;
+        default: break;
     }
 
     if(id)
     {
-	profitstats_t* ptr = &_profits[0];
-	while(ptr->id && std::strcmp(id, ptr->id)) ++ptr;
-	if(ptr->id) result = ptr->cost;
+        profitstats_t* ptr = &_profits[0];
+        while(ptr->id && std::strcmp(id, ptr->id)) ++ptr;
+        if(ptr->id) result = ptr->cost;
     }
 
     return result;
@@ -152,21 +152,21 @@ payment_t ProfitConditions::FromMine(int type)
 
     switch(type)
     {
-	case Resource::ORE: id = "mine_ore"; break;
-	case Resource::WOOD: id = "sawmill"; break;
-	case Resource::MERCURY: id = "alchemylab"; break;
-	case Resource::SULFUR: id = "mine_sulfur"; break;
-	case Resource::CRYSTAL: id = "mine_crystal"; break;
-	case Resource::GEMS: id = "mine_gems"; break;
-	case Resource::GOLD: id = "mine_gold"; break;
-	default: break;
+        case Resource::ORE: id = "mine_ore"; break;
+        case Resource::WOOD: id = "sawmill"; break;
+        case Resource::MERCURY: id = "alchemylab"; break;
+        case Resource::SULFUR: id = "mine_sulfur"; break;
+        case Resource::CRYSTAL: id = "mine_crystal"; break;
+        case Resource::GEMS: id = "mine_gems"; break;
+        case Resource::GOLD: id = "mine_gold"; break;
+        default: break;
     }
 
     if(id)
     {
-	profitstats_t* ptr = &_profits[0];
-	while(ptr->id && std::strcmp(id, ptr->id)) ++ptr;
-	if(ptr->id) result = ptr->cost;
+        profitstats_t* ptr = &_profits[0];
+        while(ptr->id && std::strcmp(id, ptr->id)) ++ptr;
+        if(ptr->id) result = ptr->cost;
     }
 
     return result;

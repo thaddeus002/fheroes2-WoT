@@ -29,15 +29,15 @@ namespace Audio
 {
     struct Spec : public SDL_AudioSpec
     {
-	Spec();
+        Spec();
     };
 
     struct CVT : public SDL_AudioCVT
     {
-	CVT();
+        CVT();
 
-	bool Build(const Spec & src, const Spec & dst);
-	bool Convert(void);
+        bool Build(const Spec & src, const Spec & dst);
+        bool Convert(void);
     };
 
     Spec & GetHardwareSpec(void);

@@ -85,7 +85,7 @@ int Dialog::AdventureOptions(bool enabledig)
         if(le.MouseClickLeft(buttonDig) && buttonDig.isEnable()){ result = Dialog::DIG; break; }
         if(le.MouseClickLeft(buttonCancel) || Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)){ result = Dialog::CANCEL; break; }
 
-	// right info
+        // right info
         if(le.MousePressRight(buttonWorld)) Dialog::Message("", _("View the entire world."), Font::BIG);
         if(le.MousePressRight(buttonPuzzle)) Dialog::Message("", _("View the obelisk puzzle."), Font::BIG);
         if(le.MousePressRight(buttonInfo)) Dialog::Message("", _("View information on the scenario you are currently playing."), Font::BIG);

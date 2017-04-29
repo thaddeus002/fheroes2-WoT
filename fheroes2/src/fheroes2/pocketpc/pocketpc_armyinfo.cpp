@@ -75,16 +75,16 @@ int PocketPC::DialogArmyInfo(const Troop & troop, u32 flags)
 
     if(! troop.isBattle() && troop.isAllowUpgrade())
     {
-	if(Dialog::UPGRADE & flags)
+        if(Dialog::UPGRADE & flags)
         {
-	    if(Dialog::UPGRADE_DISABLE & flags)
-	    {
-        	buttonUpgrade.Press();
-        	buttonUpgrade.SetDisable(true);
-    	    }
-    	    else
-        	buttonUpgrade.SetDisable(false);
-    	    buttonUpgrade.Draw();
+            if(Dialog::UPGRADE_DISABLE & flags)
+            {
+                buttonUpgrade.Press();
+                buttonUpgrade.SetDisable(true);
+                }
+                else
+                buttonUpgrade.SetDisable(false);
+                buttonUpgrade.Draw();
         }
         else buttonUpgrade.SetDisable(true);
     }

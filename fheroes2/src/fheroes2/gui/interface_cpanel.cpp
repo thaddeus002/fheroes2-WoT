@@ -101,15 +101,15 @@ int Interface::ControlPanel::QueueEventProcessing(void)
 {
     LocalEvent & le = LocalEvent::Get();
 
-    if(le.MouseClickLeft(rt_radr))	interface.EventSwitchShowRadar();
+    if(le.MouseClickLeft(rt_radr))        interface.EventSwitchShowRadar();
     else
-    if(le.MouseClickLeft(rt_icon))	interface.EventSwitchShowIcons();
+    if(le.MouseClickLeft(rt_icon))        interface.EventSwitchShowIcons();
     else
-    if(le.MouseClickLeft(rt_bttn))	interface.EventSwitchShowButtons();
+    if(le.MouseClickLeft(rt_bttn))        interface.EventSwitchShowButtons();
     else
-    if(le.MouseClickLeft(rt_stat))	interface.EventSwitchShowStatus();
+    if(le.MouseClickLeft(rt_stat))        interface.EventSwitchShowStatus();
     else
-    if(le.MouseClickLeft(rt_quit))	return interface.EventEndTurn();
+    if(le.MouseClickLeft(rt_quit))        return interface.EventEndTurn();
 
     return Game::CANCEL;
 }

@@ -91,14 +91,14 @@ void SpriteBack::Save(const Rect & rt)
 {
     // resize SpriteBack
     if(Surface::isValid() &&
-	GetSize() != rt) FreeSurface(*this);
+        GetSize() != rt) FreeSurface(*this);
 
     if(rt.w && rt.h)
     {
-	Set(Display::Get().GetSurface(rt), true);
+        Set(Display::Get().GetSurface(rt), true);
 
-	pos.w = rt.w;
-	pos.h = rt.h;
+        pos.w = rt.w;
+        pos.h = rt.h;
     }
 
     pos.x = rt.x;
@@ -113,7 +113,7 @@ void SpriteBack::Save(const Point & pt)
 void SpriteBack::Restore(void)
 {
     if(Surface::isValid())
-	Blit(GetPos(), Display::Get());
+        Blit(GetPos(), Display::Get());
 }
 
 void SpriteBack::Destroy(void)
@@ -167,7 +167,7 @@ void SpriteMove::Hide(void)
     if(isVisible())
     {
         background.Restore();
-	mode &= ~(_VISIBLE);
+        mode &= ~(_VISIBLE);
     }
 }
 
@@ -177,7 +177,7 @@ void SpriteMove::Show(const Point & pos)
     {
         background.Save(Rect(pos, GetSize()));
         Surface::Blit(GetPos(), Display::Get());
-	mode |= _VISIBLE;
+        mode |= _VISIBLE;
     }
 }
 
@@ -210,5 +210,5 @@ const Rect & SpriteMove::GetArea(void) const
 u32 SpriteMove::GetMemoryUsage(void) const
 {
     return Surface::GetMemoryUsage() +
-	background.GetMemoryUsage() + sizeof(mode);
+        background.GetMemoryUsage() + sizeof(mode);
 }

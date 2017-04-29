@@ -37,10 +37,10 @@ public:
     void        RedrawBackground(const Rect &, Surface &);
     void        RedrawItem(ArmyTroop &, const Rect &, bool, Surface &);
 
-    void	SetBackground(const Size &, const RGBA &);
-    void	SetArmy(Army*);
+    void        SetBackground(const Size &, const RGBA &);
+    void        SetArmy(Army*);
 
-    bool	isValid(void) const;
+    bool        isValid(void) const;
 
     void        ResetSelected(void);
     void        Redraw(Surface & dstsf = Display::Get());
@@ -51,20 +51,20 @@ public:
     bool        ActionBarPressRight(const Point &, ArmyTroop &, const Rect &);
     bool        ActionBarPressRight(const Point &, ArmyTroop &, const Rect &, ArmyTroop &, const Rect &);
 
-    bool	ActionBarCursor(const Point &, ArmyTroop &, const Rect &);
-    bool	ActionBarCursor(const Point &, ArmyTroop &, const Rect &, ArmyTroop &, const Rect &);
+    bool        ActionBarCursor(const Point &, ArmyTroop &, const Rect &);
+    bool        ActionBarCursor(const Point &, ArmyTroop &, const Rect &, ArmyTroop &, const Rect &);
 
-    bool	QueueEventProcessing(std::string* = NULL);
-    bool	QueueEventProcessing(ArmyBar &, std::string* = NULL);
+    bool        QueueEventProcessing(std::string* = NULL);
+    bool        QueueEventProcessing(ArmyBar &, std::string* = NULL);
 
 protected:
-    Army*		army;
+    Army*                army;
     Surface             backsf;
     SpriteMove          spcursor;
     bool                use_mini_sprite;
     bool                read_only;
     bool                can_change;
-    std::string		msg;
+    std::string                msg;
 };
 
 #endif

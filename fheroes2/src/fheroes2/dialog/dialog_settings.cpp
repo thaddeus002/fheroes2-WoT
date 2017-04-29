@@ -60,9 +60,9 @@ void SettingsListBox::RedrawItem(const u32 & item, s32 ox, s32 oy, bool current)
     msg.SetAlign(ALIGN_LEFT);
 
     if(1 < msg.row())
-	msg.Blit(ox + cell.w() + 5, oy - 1);
+        msg.Blit(ox + cell.w() + 5, oy - 1);
     else
-	msg.Blit(ox + cell.w() + 5, oy + 4);
+        msg.Blit(ox + cell.w() + 5, oy + 4);
 }
 
 void SettingsListBox::RedrawBackground(const Point & top)
@@ -75,7 +75,7 @@ void SettingsListBox::RedrawBackground(const Point & top)
     AGG::GetICN(ICN::STONEBAK, 0).Blit(Rect(15, 25, 280, ah), top.x + 15, top.y + 25);
 
     for(int ii = 1; ii < (window_h / 25); ++ii)
-	AGG::GetICN(ICN::DROPLISL, 11).Blit(top.x + 295, top.y + 35 + (19 * ii));
+        AGG::GetICN(ICN::DROPLISL, 11).Blit(top.x + 295, top.y + 35 + (19 * ii));
 
     AGG::GetICN(ICN::DROPLISL, 10).Blit(top.x + 295, top.y + 46);
     AGG::GetICN(ICN::DROPLISL, 12).Blit(top.x + 295, top.y + ah - 14);
@@ -92,42 +92,42 @@ void SettingsListBox::ActionListSingleClick(u32 & item)
 
     if(!readonly || conf.CanChangeInGame(item))
     {
-	conf.ExtModes(item) ? conf.ExtResetModes(item) : conf.ExtSetModes(item);
+        conf.ExtModes(item) ? conf.ExtResetModes(item) : conf.ExtSetModes(item);
 
-	// depends
-	switch(item)
-	{
-	    case Settings::WORLD_1HERO_HIRED_EVERY_WEEK:
-		conf.ExtResetModes(Settings::CASTLE_1HERO_HIRED_EVERY_WEEK);
-		break;
+        // depends
+        switch(item)
+        {
+            case Settings::WORLD_1HERO_HIRED_EVERY_WEEK:
+                conf.ExtResetModes(Settings::CASTLE_1HERO_HIRED_EVERY_WEEK);
+                break;
 
-	    case Settings::CASTLE_1HERO_HIRED_EVERY_WEEK:
-		conf.ExtResetModes(Settings::WORLD_1HERO_HIRED_EVERY_WEEK);
-		break;
+            case Settings::CASTLE_1HERO_HIRED_EVERY_WEEK:
+                conf.ExtResetModes(Settings::WORLD_1HERO_HIRED_EVERY_WEEK);
+                break;
 
-	    case Settings::GAME_AUTOSAVE_BEGIN_DAY:
-		if(conf.ExtModes(Settings::GAME_AUTOSAVE_BEGIN_DAY))
-		    conf.ExtSetModes(Settings::GAME_AUTOSAVE_ON);
-		else
-		    conf.ExtResetModes(Settings::GAME_AUTOSAVE_ON);
-		break;
+            case Settings::GAME_AUTOSAVE_BEGIN_DAY:
+                if(conf.ExtModes(Settings::GAME_AUTOSAVE_BEGIN_DAY))
+                    conf.ExtSetModes(Settings::GAME_AUTOSAVE_ON);
+                else
+                    conf.ExtResetModes(Settings::GAME_AUTOSAVE_ON);
+                break;
 
-	    case Settings::WORLD_GUARDIAN_TWO_DEFENSE:
-		if(conf.ExtModes(Settings::WORLD_GUARDIAN_TWO_DEFENSE))
-		    conf.ExtSetModes(Settings::WORLD_ALLOW_SET_GUARDIAN);
-		else
-		    conf.ExtResetModes(Settings::WORLD_ALLOW_SET_GUARDIAN);
-		break;
+            case Settings::WORLD_GUARDIAN_TWO_DEFENSE:
+                if(conf.ExtModes(Settings::WORLD_GUARDIAN_TWO_DEFENSE))
+                    conf.ExtSetModes(Settings::WORLD_ALLOW_SET_GUARDIAN);
+                else
+                    conf.ExtResetModes(Settings::WORLD_ALLOW_SET_GUARDIAN);
+                break;
 
-	    case Settings::WORLD_NEW_VERSION_WEEKOF:
-		if(conf.ExtModes(Settings::WORLD_NEW_VERSION_WEEKOF))
-		    conf.ExtSetModes(Settings::WORLD_BAN_WEEKOF);
-		else
-		    conf.ExtResetModes(Settings::WORLD_BAN_WEEKOF);
-		break;
+            case Settings::WORLD_NEW_VERSION_WEEKOF:
+                if(conf.ExtModes(Settings::WORLD_NEW_VERSION_WEEKOF))
+                    conf.ExtSetModes(Settings::WORLD_BAN_WEEKOF);
+                else
+                    conf.ExtResetModes(Settings::WORLD_BAN_WEEKOF);
+                break;
 
-	    default: break;
-	}
+            default: break;
+        }
     }
 }
 
@@ -163,18 +163,18 @@ void Dialog::ExtSettings(bool readonly)
 
     if(! conf.QVGA())
     {
-	states.push_back(Settings::GAME_CASTLE_FLASH_BUILDING);
-	states.push_back(Settings::GAME_HIDE_INTERFACE);
+        states.push_back(Settings::GAME_CASTLE_FLASH_BUILDING);
+        states.push_back(Settings::GAME_HIDE_INTERFACE);
     }
 
     if(!conf.PocketPC())
-	states.push_back(Settings::GAME_DYNAMIC_INTERFACE);
+        states.push_back(Settings::GAME_DYNAMIC_INTERFACE);
 
     states.push_back(Settings::GAME_AUTOSAVE_ON);
     states.push_back(Settings::GAME_AUTOSAVE_BEGIN_DAY);
 
     if(conf.VideoMode().w == 640 && conf.VideoMode().h == 480)
-	states.push_back(Settings::GAME_USE_FADE);
+        states.push_back(Settings::GAME_USE_FADE);
 
 #ifdef BUILD_RELEASE
     states.push_back(Settings::GAME_SHOW_SDL_LOGO);
@@ -218,7 +218,7 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::HEROES_ARENA_ANY_SKILLS);
 
     if(! conf.QVGA())
-	states.push_back(Settings::CASTLE_ALLOW_BUY_FROM_WELL);
+        states.push_back(Settings::CASTLE_ALLOW_BUY_FROM_WELL);
 
     states.push_back(Settings::CASTLE_ALLOW_GUARDIANS);
     states.push_back(Settings::CASTLE_MAGEGUILD_POINTS_TURN);
@@ -237,10 +237,10 @@ void Dialog::ExtSettings(bool readonly)
 
     if(conf.PocketPC())
     {
-	states.push_back(Settings::POCKETPC_HIDE_CURSOR);
-	states.push_back(Settings::POCKETPC_TAP_MODE);
-	states.push_back(Settings::POCKETPC_LOW_MEMORY);
-	states.push_back(Settings::POCKETPC_DRAG_DROP_SCROLL);
+        states.push_back(Settings::POCKETPC_HIDE_CURSOR);
+        states.push_back(Settings::POCKETPC_TAP_MODE);
+        states.push_back(Settings::POCKETPC_LOW_MEMORY);
+        states.push_back(Settings::POCKETPC_DRAG_DROP_SCROLL);
     }
 
     SettingsListBox listbox(area, readonly);
@@ -268,22 +268,22 @@ void Dialog::ExtSettings(bool readonly)
     int result = Dialog::ZERO;
     while(result == Dialog::ZERO && le.HandleEvents())
     {
-	result = btnGroups.QueueEventProcessing();
+        result = btnGroups.QueueEventProcessing();
 
-	listbox.QueueEventProcessing();
+        listbox.QueueEventProcessing();
 
-	if(!cursor.isVisible())
-	{
-	    listbox.Redraw();
-	    cursor.Show();
-	    display.Flip();
-	}
+        if(!cursor.isVisible())
+        {
+            listbox.Redraw();
+            cursor.Show();
+            display.Flip();
+        }
     }
 
     // store
     if(result == Dialog::OK)
     {
-	le.SetTapMode(conf.ExtPocketTapMode());
-	Settings::Get().BinarySave();
+        le.SetTapMode(conf.ExtPocketTapMode());
+        Settings::Get().BinarySave();
     }
 }

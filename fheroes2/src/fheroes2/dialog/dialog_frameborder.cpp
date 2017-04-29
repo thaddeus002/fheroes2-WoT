@@ -76,23 +76,23 @@ bool Dialog::FrameBorder::isValid(void) const
 void Dialog::FrameBorder::SetPosition(s32 posx, s32 posy, u32 encw, u32 ench)
 {
     if(background.isValid())
-	background.Restore();
+        background.Restore();
 
     rect.x = posx;
     rect.y = posy;
 
     if(encw && ench)
     {
-	rect.w = encw + 2 * border;
-	rect.h = ench + 2 * border;
+        rect.w = encw + 2 * border;
+        rect.h = ench + 2 * border;
 
-    	background.Save(rect);
+            background.Save(rect);
 
-	area.w = encw;
-	area.h = ench;
+        area.w = encw;
+        area.h = ench;
     }
     else
-    	background.Save(Point(posx, posy));
+            background.Save(Point(posx, posy));
 
     area.x = posx + border;
     area.y = posy + border;

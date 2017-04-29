@@ -91,20 +91,20 @@ void PocketPC::ThievesGuild(bool oracle)
     u32 ii = 0;
     for(ii = 0; ii < colors.size(); ++ii)
     {
-	switch(ii+1)
-	{
-	    case 1: text.Set(_("1st")); break;
-	    case 2: text.Set(_("2nd")); break;
-	    case 3: text.Set(_("3rd")); break;
-	    case 4: text.Set(_("4th")); break;
-	    case 5: text.Set(_("5th")); break;
-	    case 6: text.Set(_("6th")); break;
-	    default: break;
-	}
+        switch(ii+1)
+        {
+            case 1: text.Set(_("1st")); break;
+            case 2: text.Set(_("2nd")); break;
+            case 3: text.Set(_("3rd")); break;
+            case 4: text.Set(_("4th")); break;
+            case 5: text.Set(_("5th")); break;
+            case 6: text.Set(_("6th")); break;
+            default: break;
+        }
 
-	dst_pt.x = cur_pt.x + startx + maxw / (colors.size() * 2) + ii * maxw / colors.size() - text.w() / 2;
-	dst_pt.y = cur_pt.y + 25;
-	text.Blit(dst_pt);
+        dst_pt.x = cur_pt.x + startx + maxw / (colors.size() * 2) + ii * maxw / colors.size() - text.w() / 2;
+        dst_pt.y = cur_pt.y + 25;
+        text.Blit(dst_pt);
     }
 
     // button exit
@@ -199,13 +199,13 @@ void PocketPC::ThievesGuild(bool oracle)
     // head 2
     ii = 0;
     for(Colors::const_iterator
-	color = colors.begin(); color != colors.end(); ++color)
+        color = colors.begin(); color != colors.end(); ++color)
     {
-	text.Set(Color::String(*color), Font::SMALL);
-	dst_pt.x = cur_pt.x + startx + maxw / (colors.size() * 2) + ii * maxw / colors.size() - text.w() / 2;
-	dst_pt.y = cur_pt.y + 145;
-	text.Blit(dst_pt);
-	++ii;
+        text.Set(Color::String(*color), Font::SMALL);
+        dst_pt.x = cur_pt.x + startx + maxw / (colors.size() * 2) + ii * maxw / colors.size() - text.w() / 2;
+        dst_pt.y = cur_pt.y + 145;
+        text.Blit(dst_pt);
+        ++ii;
     }
 
     text.Set(_("Best Hero:"));

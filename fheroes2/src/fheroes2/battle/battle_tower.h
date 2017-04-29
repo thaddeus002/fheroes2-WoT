@@ -36,26 +36,26 @@ namespace Battle
     class Tower : public Unit
     {
     public:
-	Tower(const Castle &, int);
+        Tower(const Castle &, int);
 
-	bool	isValid(void) const;
-	int	GetColor(void) const;
-	u32	GetType(void) const;
-	u32	GetBonus(void) const;
-	u32	GetAttack(void) const;
+        bool        isValid(void) const;
+        int        GetColor(void) const;
+        u32        GetType(void) const;
+        u32        GetBonus(void) const;
+        u32        GetAttack(void) const;
 
-	const char* GetName(void) const;
+        const char* GetName(void) const;
 
-	void	SetDestroy(void);
-	Point	GetPortPosition(void) const;
+        void        SetDestroy(void);
+        Point        GetPortPosition(void) const;
 
-	static std::string GetInfo(const Castle &);
+        static std::string GetInfo(const Castle &);
 
     private:
-	int	type;
-	int	color;
-	u32	bonus;
-	bool	valid;
+        int        type;
+        int        color;
+        u32        bonus;
+        bool        valid;
     };
 }
 

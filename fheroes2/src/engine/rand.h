@@ -36,16 +36,16 @@ namespace Rand
     template<typename T>
     const T* Get(const std::vector<T> & vec)
     {
-	typename std::vector<T>::const_iterator it = vec.begin();
-	std::advance(it, Rand::Get(vec.size() - 1));
+        typename std::vector<T>::const_iterator it = vec.begin();
+        std::advance(it, Rand::Get(vec.size() - 1));
         return it == vec.end() ? NULL: &(*it);
     }
     
     template<typename T>
     const T* Get(const std::list<T> & list)
     {
-	typename std::list<T>::const_iterator it = list.begin();
-	std::advance(it, Rand::Get(list.size() - 1));
+        typename std::list<T>::const_iterator it = list.begin();
+        std::advance(it, Rand::Get(list.size() - 1));
         return it == list.end() ? NULL: &(*it);
     }
 
@@ -54,12 +54,12 @@ namespace Rand
     class Queue : private std::vector<ValuePercent>
     {
     public:
-	Queue(u32 size = 0);
+        Queue(u32 size = 0);
 
-	void Reset(void);
-	void Push(s32, u32);
-	size_t Size(void) const;
-	s32 Get(void);
+        void Reset(void);
+        void Push(s32, u32);
+        size_t Size(void) const;
+        s32 Get(void);
     };
 }
    

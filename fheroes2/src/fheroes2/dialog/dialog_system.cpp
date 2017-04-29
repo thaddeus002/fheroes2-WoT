@@ -46,7 +46,7 @@ int Dialog::SystemOptions(void)
     cursor.SetThemes(cursor.POINTER);
 
     Dialog::FrameBorder frameborder((display.w() - 300 - BORDERWIDTH * 2) / 2,
-	(display.h() - 320 - BORDERWIDTH * 2) / 2 - (conf.QVGA() ? 25 : 0), 300, 315);
+        (display.h() - 320 - BORDERWIDTH * 2) / 2 - (conf.QVGA() ? 25 : 0), 300, 315);
     const Rect & area = frameborder.GetArea();
 
     Rects rects;
@@ -89,75 +89,75 @@ int Dialog::SystemOptions(void)
     // dialog menu loop
     while(btnres == Dialog::ZERO && le.HandleEvents())
     {
-	btnres = btnGroups.QueueEventProcessing();
+        btnres = btnGroups.QueueEventProcessing();
 
         // set sound volume
         if(conf.Sound() && le.MouseClickLeft(rect1))
         {
-    	    conf.SetSoundVolume(10 > conf.SoundVolume() ? conf.SoundVolume() + 1 : 0);
-	    redraw = true;
-    	    Game::EnvironmentSoundMixer();
-    	}
+                conf.SetSoundVolume(10 > conf.SoundVolume() ? conf.SoundVolume() + 1 : 0);
+            redraw = true;
+                Game::EnvironmentSoundMixer();
+            }
 
         // set music volume
         if(conf.Music() && le.MouseClickLeft(rect2))
         {
-    	    conf.SetMusicVolume(10 > conf.MusicVolume() ? conf.MusicVolume() + 1 : 0);
-	    redraw = true;
-    	    Music::Volume(Mixer::MaxVolume() * conf.MusicVolume() / 10);
-    	}
+                conf.SetMusicVolume(10 > conf.MusicVolume() ? conf.MusicVolume() + 1 : 0);
+            redraw = true;
+                Music::Volume(Mixer::MaxVolume() * conf.MusicVolume() / 10);
+            }
 
         // set hero speed
         if(le.MouseClickLeft(rect4))
         {
-    	    conf.SetHeroesMoveSpeed(10 > conf.HeroesMoveSpeed() ? conf.HeroesMoveSpeed() + 1 : 0);
-    	    result |= 0x01;
-	    redraw = true;
-	    Game::UpdateHeroesMoveSpeed();
-    	}
+                conf.SetHeroesMoveSpeed(10 > conf.HeroesMoveSpeed() ? conf.HeroesMoveSpeed() + 1 : 0);
+                result |= 0x01;
+            redraw = true;
+            Game::UpdateHeroesMoveSpeed();
+            }
 
         // set ai speed
         if(le.MouseClickLeft(rect5))
         {
-    	    conf.SetAIMoveSpeed(10 > conf.AIMoveSpeed() ? conf.AIMoveSpeed() + 1 : 0);
-    	    result |= 0x01;
-	    redraw = true;
-	    Game::UpdateHeroesMoveSpeed();
-    	}
+                conf.SetAIMoveSpeed(10 > conf.AIMoveSpeed() ? conf.AIMoveSpeed() + 1 : 0);
+                result |= 0x01;
+            redraw = true;
+            Game::UpdateHeroesMoveSpeed();
+            }
 
         // set scroll speed
         if(le.MouseClickLeft(rect6))
         {
-    	    conf.SetScrollSpeed(SCROLL_FAST2 > conf.ScrollSpeed() ? conf.ScrollSpeed() << 1 : SCROLL_SLOW);
-    	    result |= 0x10;
-	    redraw = true;
-    	}
+                conf.SetScrollSpeed(SCROLL_FAST2 > conf.ScrollSpeed() ? conf.ScrollSpeed() << 1 : SCROLL_SLOW);
+                result |= 0x10;
+            redraw = true;
+            }
 
         // set interface theme
         if(le.MouseClickLeft(rect7))
         {
-    	    conf.SetEvilInterface(!conf.ExtGameEvilInterface());
-    	    result |= 0x08;
-	    redraw = true;
-    	}
+                conf.SetEvilInterface(!conf.ExtGameEvilInterface());
+                result |= 0x08;
+            redraw = true;
+            }
 
         // set interface hide/show
         if(le.MouseClickLeft(rect8) && !conf.QVGA())
         {
-    	    conf.SetHideInterface(!conf.ExtGameHideInterface());
-    	    result |= 0x04;
-	    redraw = true;
-    	}
+                conf.SetHideInterface(!conf.ExtGameHideInterface());
+                result |= 0x04;
+            redraw = true;
+            }
 
-	if(redraw)
-	{
-    	    cursor.Hide();
-    	    back2.Blit(area, display);
-	    DrawSystemInfo(rects);
-    	    cursor.Show();
-    	    display.Flip();
-	    redraw = false;
-	}
+        if(redraw)
+        {
+                cursor.Hide();
+                back2.Blit(area, display);
+            DrawSystemInfo(rects);
+                cursor.Show();
+                display.Flip();
+            redraw = false;
+        }
     }
 
     // restore background
@@ -187,9 +187,9 @@ void Dialog::DrawSystemInfo(const Rects & rects)
     str = _("sound");
     str.append(" ");
     if(conf.Sound() && conf.SoundVolume())
-	str.append(GetString(conf.SoundVolume()));
+        str.append(GetString(conf.SoundVolume()));
     else
-	str.append(_("off"));
+        str.append(_("off"));
     text.Set(str, Font::SMALL);
     text.Blit(rect1.x + (rect1.w - text.w()) / 2, rect1.y + rect1.h + 5);
 
@@ -200,9 +200,9 @@ void Dialog::DrawSystemInfo(const Rects & rects)
     str = _("music");
     str.append(" ");
     if(conf.Music() && conf.MusicVolume())
-	str.append(GetString(conf.MusicVolume()));
+        str.append(GetString(conf.MusicVolume()));
     else
-	str.append(_("off"));
+        str.append(_("off"));
     text.Set(str);
     text.Blit(rect2.x + (rect2.w - text.w()) / 2, rect2.y + rect2.h + 5);
 
@@ -223,9 +223,9 @@ void Dialog::DrawSystemInfo(const Rects & rects)
     str = _("hero speed");
     str.append(" ");
     if(conf.HeroesMoveSpeed())
-	str.append(GetString(conf.HeroesMoveSpeed()));
+        str.append(GetString(conf.HeroesMoveSpeed()));
     else
-	str.append(_("off"));
+        str.append(_("off"));
     text.Set(str);
     text.Blit(rect4.x + (rect4.w - text.w()) / 2, rect4.y + rect4.h + 5);
 
@@ -237,9 +237,9 @@ void Dialog::DrawSystemInfo(const Rects & rects)
     str = _("ai speed");
     str.append(" ");
     if(conf.AIMoveSpeed())
-	str.append(GetString(conf.AIMoveSpeed()));
+        str.append(GetString(conf.AIMoveSpeed()));
     else
-	str.append(_("off"));
+        str.append(_("off"));
     text.Set(str);
     text.Blit(rect5.x + (rect5.w - text.w()) / 2, rect5.y + rect5.h + 5);
 
@@ -262,9 +262,9 @@ void Dialog::DrawSystemInfo(const Rects & rects)
     str = _("Interface");
     str += ": ";
     if(conf.ExtGameEvilInterface())
-	str += _("Evil");
+        str += _("Evil");
     else
-	str += _("Good");
+        str += _("Good");
     text.Set(str);
     text.Blit(rect7.x + (rect7.w - text.w()) / 2, rect7.y + rect7.h + 5);
 
@@ -277,14 +277,14 @@ void Dialog::DrawSystemInfo(const Rects & rects)
     str += ": ";
     if(conf.ExtGameHideInterface())
     {
-	sprite81.Blit(rect8, display);
-	str += _("Hide");
+        sprite81.Blit(rect8, display);
+        str += _("Hide");
     }
     else
     {
-	sprite8.Blit(rect8, display);
-	sprite81.Blit(Rect(13, 13, 38, 38), rect8.x + 13, rect8.y + 13);
-	str += _("Show");
+        sprite8.Blit(rect8, display);
+        sprite81.Blit(Rect(13, 13, 38, 38), rect8.x + 13, rect8.y + 13);
+        str += _("Show");
     }
     text.Set(str);
     text.Blit(rect8.x + (rect8.w - text.w()) / 2, rect8.y + rect8.h + 5);

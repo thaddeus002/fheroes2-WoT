@@ -33,15 +33,15 @@ class HeroesIndicator
 public:
     HeroesIndicator(const Heroes &);
 
-    const Rect &	GetArea(void) const;
-    const std::string &	GetDescriptions(void) const;
-    void		SetPos(const Point &, bool skip_back = false);
+    const Rect &        GetArea(void) const;
+    const std::string &        GetDescriptions(void) const;
+    void                SetPos(const Point &, bool skip_back = false);
 
 protected:
-    const Heroes & 	hero;
-    Rect		area;
-    SpriteBack		back;
-    std::string		descriptions;
+    const Heroes &         hero;
+    Rect                area;
+    SpriteBack                back;
+    std::string                descriptions;
 };
 
 class LuckIndicator : public HeroesIndicator
@@ -49,11 +49,11 @@ class LuckIndicator : public HeroesIndicator
 public:
     LuckIndicator(const Heroes &);
 
-    void	Redraw(void);
-    static void	QueueEventProcessing(LuckIndicator &);
+    void        Redraw(void);
+    static void        QueueEventProcessing(LuckIndicator &);
 
 private:
-    int		luck;
+    int                luck;
 };
 
 class MoraleIndicator : public HeroesIndicator
@@ -61,11 +61,11 @@ class MoraleIndicator : public HeroesIndicator
 public:
     MoraleIndicator(const Heroes &);
 
-    void	Redraw(void);
-    static void	QueueEventProcessing(MoraleIndicator &);
+    void        Redraw(void);
+    static void        QueueEventProcessing(MoraleIndicator &);
 
 private:
-    int		morale;
+    int                morale;
 };
 
 class ExperienceIndicator : public HeroesIndicator
@@ -73,8 +73,8 @@ class ExperienceIndicator : public HeroesIndicator
 public:
     ExperienceIndicator(const Heroes &);
 
-    void	Redraw(void);
-    void	QueueEventProcessing(void);
+    void        Redraw(void);
+    void        QueueEventProcessing(void);
 };
 
 class SpellPointsIndicator : public HeroesIndicator
@@ -82,8 +82,8 @@ class SpellPointsIndicator : public HeroesIndicator
 public:
     SpellPointsIndicator(const Heroes &);
 
-    void	Redraw(void);
-    void	QueueEventProcessing(void);
+    void        Redraw(void);
+    void        QueueEventProcessing(void);
 };
 
 #endif

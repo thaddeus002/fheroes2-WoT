@@ -26,8 +26,8 @@ namespace Morale
 {
     enum
     {
-	UNKNOWN  = -4,
-	TREASON  = -3,
+        UNKNOWN  = -4,
+        TREASON  = -3,
         AWFUL    = -2,
         POOR     = -1,
         NORMAL   = 0,

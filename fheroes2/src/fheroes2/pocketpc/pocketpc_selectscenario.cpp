@@ -67,14 +67,14 @@ int PocketPC::SelectScenario(void)
 
     for(MapsFileInfoList::iterator cur = all.begin(); cur != all.end(); ++ cur)
     {
-	switch((*cur).size_w)
-	{
-    	    case Maps::SMALL:	small.push_back(*cur); break;
-    	    case Maps::MEDIUM:	medium.push_back(*cur); break;
-    	    case Maps::LARGE:	large.push_back(*cur); break;
-    	    case Maps::XLARGE:	xlarge.push_back(*cur); break;
-	    default: continue;
-	}
+        switch((*cur).size_w)
+        {
+                case Maps::SMALL:        small.push_back(*cur); break;
+                case Maps::MEDIUM:        medium.push_back(*cur); break;
+                case Maps::LARGE:        large.push_back(*cur); break;
+                case Maps::XLARGE:        xlarge.push_back(*cur); break;
+            default: continue;
+        }
     }
 
     Dialog::FrameBorder frameborder(Size(320, 224));
@@ -121,63 +121,63 @@ int PocketPC::SelectScenario(void)
 
     while(result == Dialog::ZERO && le.HandleEvents())
     {
-	le.MousePressLeft(buttonSelectSmall) && buttonSelectSmall.isEnable() ? buttonSelectSmall.PressDraw() : buttonSelectSmall.ReleaseDraw();
-	le.MousePressLeft(buttonSelectMedium) && buttonSelectMedium.isEnable() ? buttonSelectMedium.PressDraw() : buttonSelectMedium.ReleaseDraw();
-	le.MousePressLeft(buttonSelectLarge) && buttonSelectLarge.isEnable() ? buttonSelectLarge.PressDraw() : buttonSelectLarge.ReleaseDraw();
-	le.MousePressLeft(buttonSelectXLarge) && buttonSelectXLarge.isEnable() ? buttonSelectXLarge.PressDraw() : buttonSelectXLarge.ReleaseDraw();
-	le.MousePressLeft(buttonSelectAll) ? buttonSelectAll.PressDraw() : buttonSelectAll.ReleaseDraw();
+        le.MousePressLeft(buttonSelectSmall) && buttonSelectSmall.isEnable() ? buttonSelectSmall.PressDraw() : buttonSelectSmall.ReleaseDraw();
+        le.MousePressLeft(buttonSelectMedium) && buttonSelectMedium.isEnable() ? buttonSelectMedium.PressDraw() : buttonSelectMedium.ReleaseDraw();
+        le.MousePressLeft(buttonSelectLarge) && buttonSelectLarge.isEnable() ? buttonSelectLarge.PressDraw() : buttonSelectLarge.ReleaseDraw();
+        le.MousePressLeft(buttonSelectXLarge) && buttonSelectXLarge.isEnable() ? buttonSelectXLarge.PressDraw() : buttonSelectXLarge.ReleaseDraw();
+        le.MousePressLeft(buttonSelectAll) ? buttonSelectAll.PressDraw() : buttonSelectAll.ReleaseDraw();
 
-	listbox.QueueEventProcessing();
-	result = btnGroups.QueueEventProcessing();
+        listbox.QueueEventProcessing();
+        result = btnGroups.QueueEventProcessing();
 
-	if((le.MouseClickLeft(buttonSelectSmall) || le.KeyPress(KEY_s)) &&
-		buttonSelectSmall.isEnable() && buttonSelectSmall.isEnable())
-	{
-	    listbox.SetListContent(small);
-	    cursor.Hide();
-	}
-	else
-	if((le.MouseClickLeft(buttonSelectMedium) || le.KeyPress(KEY_m)) &&
-		buttonSelectMedium.isEnable() && buttonSelectMedium.isEnable())
-	{
-	    listbox.SetListContent(medium);
-	    cursor.Hide();
-	}
-	else
-	if((le.MouseClickLeft(buttonSelectLarge) || le.KeyPress(KEY_l)) &&
-		buttonSelectLarge.isEnable() && buttonSelectLarge.isEnable())
-	{
-	    listbox.SetListContent(large);
-	    cursor.Hide();
-	}
-	else
-	if((le.MouseClickLeft(buttonSelectXLarge) || le.KeyPress(KEY_x)) &&
-		buttonSelectXLarge.isEnable() && buttonSelectXLarge.isEnable())
-	{
-	    listbox.SetListContent(xlarge);
-	    cursor.Hide();
-	}
-	else
-	if(le.MouseClickLeft(buttonSelectAll) || le.KeyPress(KEY_a))
-	{
-	    listbox.SetListContent(all);
-	    cursor.Hide();
-	}
+        if((le.MouseClickLeft(buttonSelectSmall) || le.KeyPress(KEY_s)) &&
+                buttonSelectSmall.isEnable() && buttonSelectSmall.isEnable())
+        {
+            listbox.SetListContent(small);
+            cursor.Hide();
+        }
+        else
+        if((le.MouseClickLeft(buttonSelectMedium) || le.KeyPress(KEY_m)) &&
+                buttonSelectMedium.isEnable() && buttonSelectMedium.isEnable())
+        {
+            listbox.SetListContent(medium);
+            cursor.Hide();
+        }
+        else
+        if((le.MouseClickLeft(buttonSelectLarge) || le.KeyPress(KEY_l)) &&
+                buttonSelectLarge.isEnable() && buttonSelectLarge.isEnable())
+        {
+            listbox.SetListContent(large);
+            cursor.Hide();
+        }
+        else
+        if((le.MouseClickLeft(buttonSelectXLarge) || le.KeyPress(KEY_x)) &&
+                buttonSelectXLarge.isEnable() && buttonSelectXLarge.isEnable())
+        {
+            listbox.SetListContent(xlarge);
+            cursor.Hide();
+        }
+        else
+        if(le.MouseClickLeft(buttonSelectAll) || le.KeyPress(KEY_a))
+        {
+            listbox.SetListContent(all);
+            cursor.Hide();
+        }
 
-	if(!cursor.isVisible())
-	{
-	    listbox.Redraw();
-	    cursor.Show();
-	    display.Flip();
-	}
+        if(!cursor.isVisible())
+        {
+            listbox.Redraw();
+            cursor.Show();
+            display.Flip();
+        }
     }
 
     if(Dialog::OK == result)
     {
-	conf.SetCurrentFileInfo(listbox.GetCurrent());
-    	conf.SetGameDifficulty(Difficulty::NORMAL);
+        conf.SetCurrentFileInfo(listbox.GetCurrent());
+            conf.SetGameDifficulty(Difficulty::NORMAL);
 
-	return Game::SCENARIOINFO;
+        return Game::SCENARIOINFO;
     }
 
     return Game::MAINMENU;

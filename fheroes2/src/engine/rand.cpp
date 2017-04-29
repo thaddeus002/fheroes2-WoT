@@ -34,9 +34,9 @@ u32 Rand::Get(u32 min, u32 max)
 {
     if(max)
     {
-	if(min > max) std::swap(min, max);
+        if(min > max) std::swap(min, max);
 
-	return min + Get(max - min);
+        return min + Get(max - min);
     }
 
     return static_cast<u32>((min + 1) * (std::rand() / (RAND_MAX + 1.0)));
@@ -55,7 +55,7 @@ void Rand::Queue::Reset(void)
 void Rand::Queue::Push(s32 value, u32 percent)
 {
     if(percent)
-	push_back(std::make_pair(value, percent));
+        push_back(std::make_pair(value, percent));
 }
 
 size_t Rand::Queue::Size(void) const

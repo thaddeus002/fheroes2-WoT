@@ -70,8 +70,8 @@ void Castle::OpenTavern(void)
 
     if(const u32 index = ICN::AnimationFrame(tavwin, 0, 0))
     {
-	const Sprite & s21 = AGG::GetICN(tavwin, index);
-	s21.Blit(dst_pt.x + s21.x(), dst_pt.y + s21.y());
+        const Sprite & s21 = AGG::GetICN(tavwin, index);
+        s21.Blit(dst_pt.x + s21.x(), dst_pt.y + s21.y());
     }
 
     box1.Blit(pos.x, dst_pt.y + s1.h() + 10);
@@ -96,19 +96,19 @@ void Castle::OpenTavern(void)
         if(le.MouseClickLeft(buttonYes) || HotKeyCloseWindow) break;
 
         // animation
-	if(Game::AnimateInfrequentDelay(Game::CASTLE_TAVERN_DELAY))
-	{
-	    cursor.Hide();
-	    s20.Blit(dst_pt);
+        if(Game::AnimateInfrequentDelay(Game::CASTLE_TAVERN_DELAY))
+        {
+            cursor.Hide();
+            s20.Blit(dst_pt);
 
-	    if(const u32 index = ICN::AnimationFrame(tavwin, 0, frame++))
-	    {
-		const Sprite & s22 = AGG::GetICN(tavwin, index);
-		s22.Blit(dst_pt.x + s22.x(), dst_pt.y + s22.y());
-	    }
+            if(const u32 index = ICN::AnimationFrame(tavwin, 0, frame++))
+            {
+                const Sprite & s22 = AGG::GetICN(tavwin, index);
+                s22.Blit(dst_pt.x + s22.x(), dst_pt.y + s22.y());
+            }
 
-	    cursor.Show();
-	    display.Flip();
-	}
+            cursor.Show();
+            display.Flip();
+        }
     }
 }

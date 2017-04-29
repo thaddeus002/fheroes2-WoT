@@ -41,10 +41,10 @@ bool Maps::Tiles::QuantityIsValid(void) const
         case MP2::OBJ_TREASURECHEST:
         case MP2::OBJ_WATERCHEST:
         case MP2::OBJ_ABANDONEDMINE:
-	    return true;
+            return true;
 
         case MP2::OBJ_PYRAMID:
-	    return QuantitySpell().isValid();
+            return QuantitySpell().isValid();
 
         case MP2::OBJ_SHIPWRECK:
         case MP2::OBJ_GRAVEYARD:
@@ -53,16 +53,16 @@ bool Maps::Tiles::QuantityIsValid(void) const
         case MP2::OBJ_WINDMILL:
         case MP2::OBJ_LEANTO:
         case MP2::OBJ_MAGICGARDEN:
-	    return quantity2;
+            return quantity2;
 
         case MP2::OBJ_SKELETON:
-	    return QuantityArtifact() != Artifact::UNKNOWN;
+            return QuantityArtifact() != Artifact::UNKNOWN;
 
         case MP2::OBJ_WAGON:
-	    return QuantityArtifact() != Artifact::UNKNOWN || quantity2;
+            return QuantityArtifact() != Artifact::UNKNOWN || quantity2;
 
         case MP2::OBJ_DAEMONCAVE:
-	    return QuantityVariant();
+            return QuantityVariant();
 
         default: break;
     }
@@ -100,15 +100,15 @@ Skill::Secondary Maps::Tiles::QuantitySkill(void) const
             switch(QuantityVariant())
             {
                 case 4:
-		    return Skill::Secondary(Skill::Secondary::LEADERSHIP, Skill::Level::BASIC);
+                    return Skill::Secondary(Skill::Secondary::LEADERSHIP, Skill::Level::BASIC);
                 case 5:
-		    return Skill::Secondary(Skill::Secondary::WISDOM, Skill::Level::BASIC);
+                    return Skill::Secondary(Skill::Secondary::WISDOM, Skill::Level::BASIC);
                 default: break;
             }
             break;
 
         case MP2::OBJ_WITCHSHUT:
-	    return Skill::Secondary(quantity1, Skill::Level::BASIC);
+            return Skill::Secondary(quantity1, Skill::Level::BASIC);
 
         default: break;
     }
@@ -139,7 +139,7 @@ Spell Maps::Tiles::QuantitySpell(void) const
         case MP2::OBJ_SHRINE2:
         case MP2::OBJ_SHRINE3:
         case MP2::OBJ_PYRAMID:
-	    return Spell(quantity1);
+            return Spell(quantity1);
 
         default: break;
     }
@@ -156,8 +156,8 @@ void Maps::Tiles::QuantitySetSpell(int spell)
         case MP2::OBJ_SHRINE2:
         case MP2::OBJ_SHRINE3:
         case MP2::OBJ_PYRAMID:
-	    quantity1 = spell;
-	    break;
+            quantity1 = spell;
+            break;
 
         default: break;
     }
@@ -176,17 +176,17 @@ Artifact Maps::Tiles::QuantityArtifact(void) const
         case MP2::OBJ_SHIPWRECKSURVIROR:
         case MP2::OBJ_SHIPWRECK:
         case MP2::OBJ_GRAVEYARD:
-	    return Artifact(quantity1);
+            return Artifact(quantity1);
 
         case MP2::OBJ_ARTIFACT:
-	    if(QuantityVariant() == 15)
-	    {
-        	Artifact art(Artifact::SPELL_SCROLL);
-        	art.SetSpell(QuantitySpell().GetID());
-		return art;
-	    }
-	    else
-		return Artifact(quantity1);
+            if(QuantityVariant() == 15)
+            {
+                Artifact art(Artifact::SPELL_SCROLL);
+                art.SetSpell(QuantitySpell().GetID());
+                return art;
+            }
+            else
+                return Artifact(quantity1);
 
         default: break;
     }
@@ -211,7 +211,7 @@ u32 Maps::Tiles::QuantityGold(void) const
     switch(GetObject(false))
     {
         case MP2::OBJ_ARTIFACT:
-	{
+        {
             switch(QuantityVariant())
             {
                 case 1: return 2000;
@@ -220,13 +220,13 @@ u32 Maps::Tiles::QuantityGold(void) const
                 default: break;
             }
             break;
-	}
-	break;
+        }
+        break;
 
         case MP2::OBJ_RESOURCE:
         case MP2::OBJ_MAGICGARDEN:
         case MP2::OBJ_WATERWHEEL:
-	case MP2::OBJ_TREEKNOWLEDGE:
+        case MP2::OBJ_TREEKNOWLEDGE:
             return quantity1 == Resource::GOLD ? 100 * quantity2 : 0;
 
         case MP2::OBJ_FLOTSAM:
@@ -240,8 +240,8 @@ u32 Maps::Tiles::QuantityGold(void) const
         case MP2::OBJ_DAEMONCAVE:
             switch(QuantityVariant())
             {
-        	case 2:
-		case 4: return 2500;
+                case 2:
+                case 4: return 2500;
                 default: break;
             }
             break;
@@ -274,11 +274,11 @@ ResourceCount Maps::Tiles::QuantityResourceCount(void) const
                 case 3: return ResourceCount(Resource::FromIndexSprite2(QuantityExt() - 1), 5);
                 default: break;
             }
-	    break;
+            break;
 
         case MP2::OBJ_WATERCHEST:
-	case MP2::OBJ_TREASURECHEST:
-    	    return ResourceCount(Resource::GOLD, QuantityGold());
+        case MP2::OBJ_TREASURECHEST:
+                return ResourceCount(Resource::GOLD, QuantityGold());
 
         case MP2::OBJ_FLOTSAM:
             return ResourceCount(Resource::WOOD, quantity1);
@@ -303,7 +303,7 @@ Funds Maps::Tiles::QuantityFunds(void) const
                 case 3: return Funds(Resource::GOLD, QuantityGold()) + Funds(rc);
                 default: break;
             }
-    	    break;
+                break;
 
         case MP2::OBJ_CAMPFIRE:
             return Funds(Resource::GOLD, QuantityGold()) + Funds(rc);
@@ -331,12 +331,12 @@ void Maps::Tiles::QuantitySetColor(int col)
     {
         case MP2::OBJ_BARRIER:
         case MP2::OBJ_TRAVELLERTENT:
-	    quantity1 = col;
-	    break;
+            quantity1 = col;
+            break;
 
-	default:
-	    world.CaptureObject(GetIndex(), col);
-	    break;
+        default:
+            world.CaptureObject(GetIndex(), col);
+            break;
     }
 }
 
@@ -346,10 +346,10 @@ int Maps::Tiles::QuantityColor(void) const
     {
         case MP2::OBJ_BARRIER:
         case MP2::OBJ_TRAVELLERTENT:
-	    return quantity1;
+            return quantity1;
 
-	default:
-	    return world.ColorCapturedObject(GetIndex());
+        default:
+            return world.ColorCapturedObject(GetIndex());
     }
 
     return Color::NONE;
@@ -398,19 +398,19 @@ Monster Maps::Tiles::QuantityMonster(void) const
         case MP2::OBJ_EARTHALTAR:       return Monster(Monster::EARTH_ELEMENT);
         case MP2::OBJ_BARROWMOUNDS:     return Monster(Monster::GHOST);
 
-	case MP2::OBJ_MONSTER:		return Monster(GetQuantity3());
+        case MP2::OBJ_MONSTER:                return Monster(GetQuantity3());
 
         default: break;
     }
 
     return MP2::isCaptureObject(GetObject(false)) ?
-	world.GetCapturedObject(GetIndex()).GetTroop() : Monster(Monster::UNKNOWN);
+        world.GetCapturedObject(GetIndex()).GetTroop() : Monster(Monster::UNKNOWN);
 }
 
 Troop Maps::Tiles::QuantityTroop(void) const
 {
     return MP2::isCaptureObject(GetObject(false)) ?
-	world.GetCapturedObject(GetIndex()).GetTroop() : Troop(QuantityMonster(), MonsterCount());
+        world.GetCapturedObject(GetIndex()).GetTroop() : Troop(QuantityMonster(), MonsterCount());
 }
 
 void Maps::Tiles::QuantityReset(void)
@@ -429,10 +429,10 @@ void Maps::Tiles::QuantityReset(void)
         case MP2::OBJ_SHIPWRECK:
         case MP2::OBJ_GRAVEYARD:
         case MP2::OBJ_DAEMONCAVE:
-	    QuantitySetArtifact(Artifact::UNKNOWN);
-	    break;
+            QuantitySetArtifact(Artifact::UNKNOWN);
+            break;
 
-	default: break;
+        default: break;
     }
 
     if(MP2::isPickupObject(mp2_object))
@@ -469,12 +469,12 @@ void Maps::Tiles::QuantityUpdate(void)
 
             if(percents.Get())
                 QuantitySetArtifact(Artifact::Rand(Artifact::ART_LEVEL123));
-	    else
-		QuantityReset();
+            else
+                QuantityReset();
         }
         break;
 
-	case MP2::OBJ_WAGON:
+        case MP2::OBJ_WAGON:
         {
             quantity2 = 0;
 
@@ -496,8 +496,8 @@ void Maps::Tiles::QuantityUpdate(void)
         break;
 
         case MP2::OBJ_ARTIFACT:
-	{
-	    TilesAddon* addon = FindObject(MP2::OBJ_ARTIFACT);
+        {
+            TilesAddon* addon = FindObject(MP2::OBJ_ARTIFACT);
             if(addon)
             {
                 int art = Artifact::FromMP2IndexSprite(addon->index).GetID();
@@ -506,9 +506,9 @@ void Maps::Tiles::QuantityUpdate(void)
                 {
                     if(art == Artifact::SPELL_SCROLL)
                     {
-            		QuantitySetVariant(15);
+                            QuantitySetVariant(15);
                         // spell from origin mp2
-    			QuantitySetSpell(1 + (quantity2 * 256 + quantity1) / 8);
+                            QuantitySetSpell(1 + (quantity2 * 256 + quantity1) / 8);
                     }
                     else
                     {
@@ -521,22 +521,22 @@ void Maps::Tiles::QuantityUpdate(void)
 
                         // always available
                         if(Settings::Get().ExtWorldNoRequirementsForArtifacts())
-                    	    cond = 0;
+                                cond = 0;
 
-            		QuantitySetVariant(cond);
-    			QuantitySetArtifact(art);
+                            QuantitySetVariant(cond);
+                            QuantitySetArtifact(art);
 
                         if(cond == 2 || cond == 3)
-			    QuantitySetExt(Resource::GetIndexSprite2(Resource::Rand()) + 1);
+                            QuantitySetExt(Resource::GetIndexSprite2(Resource::Rand()) + 1);
                     }
                 }
-	    }
-	}
+            }
+        }
         break;
 
         case MP2::OBJ_RESOURCE:
-	{
-	    TilesAddon* addon = FindObject(MP2::OBJ_RESOURCE);
+        {
+            TilesAddon* addon = FindObject(MP2::OBJ_RESOURCE);
             if(addon)
             {
                 int res = Resource::FromIndexSprite(addon->index);
@@ -552,7 +552,7 @@ void Maps::Tiles::QuantityUpdate(void)
 
                 QuantitySetResource(res, count);
             }
-	}
+        }
         break;
 
         case MP2::OBJ_CAMPFIRE:
@@ -627,7 +627,7 @@ void Maps::Tiles::QuantityUpdate(void)
         }
         break;
 
-	case MP2::OBJ_WATERCHEST:
+        case MP2::OBJ_WATERCHEST:
         {
             Rand::Queue percents(3);
             // 20% - empty
@@ -653,15 +653,15 @@ void Maps::Tiles::QuantityUpdate(void)
         }
         break;
 
-	case MP2::OBJ_TREASURECHEST:
-	if(isWater())
-	{
-    	    SetObject(MP2::OBJ_WATERCHEST);
-	    QuantityUpdate();
-	}
-	else
+        case MP2::OBJ_TREASURECHEST:
+        if(isWater())
         {
-    	    UpdateTreasureChestSprite(*this);
+                SetObject(MP2::OBJ_WATERCHEST);
+            QuantityUpdate();
+        }
+        else
+        {
+                UpdateTreasureChestSprite(*this);
 
             Rand::Queue percents(4);
             // 31% - 2000 gold or 1500 exp
@@ -708,8 +708,8 @@ void Maps::Tiles::QuantityUpdate(void)
 
             int cond = percents.Get();
 
-	    QuantitySetVariant(cond);
-	    QuantitySetArtifact(cond == 4 ? Artifact::Rand(Artifact::ART_LEVEL123) : Artifact::UNKNOWN);
+            QuantitySetVariant(cond);
+            QuantitySetArtifact(cond == 4 ? Artifact::Rand(Artifact::ART_LEVEL123) : Artifact::UNKNOWN);
         }
         break;
 
@@ -728,15 +728,15 @@ void Maps::Tiles::QuantityUpdate(void)
         break;
 
         case MP2::OBJ_DAEMONCAVE:
-	{
+        {
             // 1000 exp or 1000 exp + 2500 gold or 1000 exp + art or (-2500 or remove hero)
             int cond = Rand::Get(1, 4);
             QuantitySetVariant(cond);
             QuantitySetArtifact(cond == 3 ? Artifact::Rand(Artifact::ART_LEVEL123) : Artifact::UNKNOWN);
-	}
+        }
         break;
 
-	case MP2::OBJ_TREEKNOWLEDGE:
+        case MP2::OBJ_TREEKNOWLEDGE:
             // variant: 10 gems, 2000 gold or free
             switch(Rand::Get(1, 3))
             {
@@ -744,58 +744,58 @@ void Maps::Tiles::QuantityUpdate(void)
                 case 2: QuantitySetResource(Resource::GOLD, 2000); break;
                 default: break;
             }
-	break;
+        break;
 
         case MP2::OBJ_BARRIER:
-	    {
-		Addons::const_reverse_iterator it = std::find_if(addons_level1.rbegin(), addons_level1.rend(),
-						std::ptr_fun(&TilesAddon::ColorFromBarrierSprite));
-		if(it != addons_level1.rend())
-        	    QuantitySetColor(TilesAddon::ColorFromBarrierSprite(*it));
-	    }
-	    break;
+            {
+                Addons::const_reverse_iterator it = std::find_if(addons_level1.rbegin(), addons_level1.rend(),
+                                                std::ptr_fun(&TilesAddon::ColorFromBarrierSprite));
+                if(it != addons_level1.rend())
+                    QuantitySetColor(TilesAddon::ColorFromBarrierSprite(*it));
+            }
+            break;
 
         case MP2::OBJ_TRAVELLERTENT:
-	    {
-		Addons::const_reverse_iterator it = std::find_if(addons_level1.rbegin(), addons_level1.rend(),
-						std::ptr_fun(&TilesAddon::ColorFromTravellerTentSprite));
-		if(it != addons_level1.rend())
-        	    QuantitySetColor(TilesAddon::ColorFromTravellerTentSprite(*it));
-	    }
-    	    break;
+            {
+                Addons::const_reverse_iterator it = std::find_if(addons_level1.rbegin(), addons_level1.rend(),
+                                                std::ptr_fun(&TilesAddon::ColorFromTravellerTentSprite));
+                if(it != addons_level1.rend())
+                    QuantitySetColor(TilesAddon::ColorFromTravellerTentSprite(*it));
+            }
+                break;
 
         case MP2::OBJ_ALCHEMYLAB:
-	    QuantitySetResource(Resource::MERCURY, 1);
-	break;
+            QuantitySetResource(Resource::MERCURY, 1);
+        break;
 
         case MP2::OBJ_SAWMILL:
-	    QuantitySetResource(Resource::WOOD, 2);
-	break;
+            QuantitySetResource(Resource::WOOD, 2);
+        break;
 
         case MP2::OBJ_MINES:
-	{
-	    TilesAddon* addon = FindObject(MP2::OBJ_MINES);
-	    if(addon) switch(addon->index)
-	    {
-    		case 0: QuantitySetResource(Resource::ORE, 2); break;
-    		case 1: QuantitySetResource(Resource::SULFUR, 1); break;
-    		case 2: QuantitySetResource(Resource::CRYSTAL, 1); break;
-    		case 3: QuantitySetResource(Resource::GEMS, 1); break;
-    		case 4: QuantitySetResource(Resource::GOLD, 1000); break;
-    		default: break;
-	    }
-	}
-	break;
+        {
+            TilesAddon* addon = FindObject(MP2::OBJ_MINES);
+            if(addon) switch(addon->index)
+            {
+                    case 0: QuantitySetResource(Resource::ORE, 2); break;
+                    case 1: QuantitySetResource(Resource::SULFUR, 1); break;
+                    case 2: QuantitySetResource(Resource::CRYSTAL, 1); break;
+                    case 3: QuantitySetResource(Resource::GEMS, 1); break;
+                    case 4: QuantitySetResource(Resource::GOLD, 1000); break;
+                    default: break;
+            }
+        }
+        break;
 
         case MP2::OBJ_ABANDONEDMINE:
-	{
+        {
             Troop & troop = world.GetCapturedObject(GetIndex()).GetTroop();
 
             // I checked in Heroes II: min 3 x 13, and max 3 x 15
-	    troop.Set(Monster::GHOST, 3 * Rand::Get(13, 15));
+            troop.Set(Monster::GHOST, 3 * Rand::Get(13, 15));
 
             if(! Settings::Get().ExtWorldAbandonedMineRandom())
-		QuantitySetResource(Resource::GOLD, 1000);
+                QuantitySetResource(Resource::GOLD, 1000);
             else
             switch(Rand::Get(1, 5))
             {
@@ -806,10 +806,10 @@ void Maps::Tiles::QuantityUpdate(void)
                 default: QuantitySetResource(Resource::GOLD, 1000); break;
             }
         }
-	break;
+        break;
 
         case MP2::OBJ_STONELIGHTS:
-    	    UpdateStoneLightsSprite(*this);
+                UpdateStoneLightsSprite(*this);
         break;
 
         case MP2::OBJ_FOUNTAIN:
@@ -818,16 +818,16 @@ void Maps::Tiles::QuantityUpdate(void)
 
         case MP2::OBJ_EVENT:
         {
-	    TilesAddon* addon = FindObject(MP2::OBJ_EVENT);
- 	    // remove event sprite
+            TilesAddon* addon = FindObject(MP2::OBJ_EVENT);
+             // remove event sprite
             if(addon) Remove(addon->uniq);
-	}
+        }
         break;
 
-	case MP2::OBJ_BOAT:
+        case MP2::OBJ_BOAT:
         {
-	    TilesAddon* addon = FindObject(MP2::OBJ_BOAT);
-	    // remove small sprite boat
+            TilesAddon* addon = FindObject(MP2::OBJ_BOAT);
+            // remove small sprite boat
             if(addon) Remove(addon->uniq);
         }
         break;
@@ -848,10 +848,10 @@ void Maps::Tiles::QuantityUpdate(void)
         break;
 
         case MP2::OBJ_MONSTER:
-	    if(world.CountWeek() > 1)
-		UpdateMonsterPopulation(*this);
-	    else
-        	UpdateMonsterInfo(*this);
+            if(world.CountWeek() > 1)
+                UpdateMonsterPopulation(*this);
+            else
+                UpdateMonsterInfo(*this);
         break;
 
         case MP2::OBJ_RNDMONSTER:
@@ -863,7 +863,7 @@ void Maps::Tiles::QuantityUpdate(void)
             UpdateMonsterInfo(*this);
         break;
 
-	// join dwelling
+        // join dwelling
         case MP2::OBJ_ANCIENTLAMP:
             MonsterSetCount(QuantityMonster().GetRNDSize(true));
         break;
@@ -890,12 +890,12 @@ void Maps::Tiles::QuantityUpdate(void)
         case MP2::OBJ_AIRALTAR:
         case MP2::OBJ_FIREALTAR:
         case MP2::OBJ_EARTHALTAR:
-	    UpdateDwellingPopulation(*this);
-	break;
+            UpdateDwellingPopulation(*this);
+        break;
 
         case MP2::OBJ_BARROWMOUNDS:
-	    if(! Settings::Get().ExtWorldDisableBarrowMounds())
-		UpdateDwellingPopulation(*this);
+            if(! Settings::Get().ExtWorldDisableBarrowMounds())
+                UpdateDwellingPopulation(*this);
         break;
 
         default: break;
@@ -913,8 +913,8 @@ void Maps::Tiles::MonsterSetJoinCondition(int cond)
     Maps::TilesAddon *addon = FindObject(MP2::OBJ_MONSTER);
     if(addon)
     {
-	addon->tmp &= 0xFC;
-	addon->tmp |= (cond & 0x03);
+        addon->tmp &= 0xFC;
+        addon->tmp |= (cond & 0x03);
     }
 }
 
@@ -970,24 +970,24 @@ void Maps::Tiles::PlaceMonsterOnTile(Tiles & tile, const Monster & mons, u32 cou
     if(count)
     {
         tile.MonsterSetFixedCount();
-	tile.MonsterSetCount(count);
+        tile.MonsterSetCount(count);
     }
     else
     {
-	int mul = 4;
+        int mul = 4;
 
-	// set random count
-	switch(Settings::Get().GameDifficulty())
-	{
-    	    case Difficulty::EASY:	mul = 3; break;
-    	    case Difficulty::NORMAL:	mul = 4; break;
-    	    case Difficulty::HARD:	mul = 4; break;
-    	    case Difficulty::EXPERT:	mul = 5; break;
-    	    case Difficulty::IMPOSSIBLE:mul = 6; break;
-	    default: break;
-	}
+        // set random count
+        switch(Settings::Get().GameDifficulty())
+        {
+                case Difficulty::EASY:        mul = 3; break;
+                case Difficulty::NORMAL:        mul = 4; break;
+                case Difficulty::HARD:        mul = 4; break;
+                case Difficulty::EXPERT:        mul = 5; break;
+                case Difficulty::IMPOSSIBLE:mul = 6; break;
+            default: break;
+        }
 
-	tile.MonsterSetCount(mul * mons.GetRNDSize(true));
+        tile.MonsterSetCount(mul * mons.GetRNDSize(true));
     }
 
     // skip join
@@ -1014,14 +1014,14 @@ void Maps::Tiles::PlaceMonsterOnTile(Tiles & tile, const Monster & mons, u32 cou
 
     if(! addon)
     {
-	// add new sprite
+        // add new sprite
         tile.AddonsPushLevel1(TilesAddon(TilesAddon::UPPER, World::GetUniq(), 0x33, mons.GetSpriteIndex()));
     }
     else
     if(addon->index != mons() - 1)
     {
-	// fixed sprite
-	addon->index = mons() - 1; // ICN::MONS32 start from PEASANT
+        // fixed sprite
+        addon->index = mons() - 1; // ICN::MONS32 start from PEASANT
     }
 }
 
@@ -1031,30 +1031,30 @@ void Maps::Tiles::UpdateMonsterInfo(Tiles & tile)
 
     if(MP2::OBJ_MONSTER == tile.GetObject())
     {
-	const Maps::TilesAddon *addon = tile.FindObject(MP2::OBJ_MONSTER);
+        const Maps::TilesAddon *addon = tile.FindObject(MP2::OBJ_MONSTER);
 
-	if(addon)
-	    mons = Monster(addon->index + 1); // ICN::MONS32 start from PEASANT
+        if(addon)
+            mons = Monster(addon->index + 1); // ICN::MONS32 start from PEASANT
     }
     else
     {
-	Maps::TilesAddon *addon = tile.FindObject(MP2::OBJ_RNDMONSTER);
+        Maps::TilesAddon *addon = tile.FindObject(MP2::OBJ_RNDMONSTER);
 
-	switch(tile.GetObject())
-	{
-    	    case MP2::OBJ_RNDMONSTER:	mons = Monster::Rand().GetID(); break;
-    	    case MP2::OBJ_RNDMONSTER1:  mons = Monster::Rand(Monster::LEVEL1).GetID(); break;
-    	    case MP2::OBJ_RNDMONSTER2:  mons = Monster::Rand(Monster::LEVEL2).GetID(); break;
-    	    case MP2::OBJ_RNDMONSTER3:  mons = Monster::Rand(Monster::LEVEL3).GetID(); break;
-    	    case MP2::OBJ_RNDMONSTER4:  mons = Monster::Rand(Monster::LEVEL4).GetID(); break;
-    	    default: break;
-	}
+        switch(tile.GetObject())
+        {
+                case MP2::OBJ_RNDMONSTER:        mons = Monster::Rand().GetID(); break;
+                case MP2::OBJ_RNDMONSTER1:  mons = Monster::Rand(Monster::LEVEL1).GetID(); break;
+                case MP2::OBJ_RNDMONSTER2:  mons = Monster::Rand(Monster::LEVEL2).GetID(); break;
+                case MP2::OBJ_RNDMONSTER3:  mons = Monster::Rand(Monster::LEVEL3).GetID(); break;
+                case MP2::OBJ_RNDMONSTER4:  mons = Monster::Rand(Monster::LEVEL4).GetID(); break;
+                default: break;
+        }
 
-	// fixed random sprite
-	tile.SetObject(MP2::OBJ_MONSTER);
+        // fixed random sprite
+        tile.SetObject(MP2::OBJ_MONSTER);
 
-	if(addon)
-	    addon->index = mons() - 1; // ICN::MONS32 start from PEASANT
+        if(addon)
+            addon->index = mons() - 1; // ICN::MONS32 start from PEASANT
     }
 
     u32 count = 0;
@@ -1079,7 +1079,7 @@ void Maps::Tiles::UpdateDwellingPopulation(Tiles & tile)
 
     switch(obj)
     {
-    	// join monsters
+            // join monsters
         case MP2::OBJ_HALFLINGHOLE:
         case MP2::OBJ_PEASANTHUT:
         case MP2::OBJ_THATCHEDHUT:
@@ -1087,51 +1087,51 @@ void Maps::Tiles::UpdateDwellingPopulation(Tiles & tile)
         case MP2::OBJ_CAVE:
         case MP2::OBJ_TREEHOUSE:
         case MP2::OBJ_GOBLINHUT:
-	    count = troop().GetRNDSize(true) * 3 / 2;
-	    break;
+            count = troop().GetRNDSize(true) * 3 / 2;
+            break;
 
         case MP2::OBJ_TREECITY:
-	    count = troop().GetRNDSize(true) * 2;
-	    break;
-	    
-    	case MP2::OBJ_WATCHTOWER:
+            count = troop().GetRNDSize(true) * 2;
+            break;
+            
+            case MP2::OBJ_WATCHTOWER:
         case MP2::OBJ_ARCHERHOUSE:
         case MP2::OBJ_DWARFCOTT:
-	//
-	case MP2::OBJ_RUINS:
+        //
+        case MP2::OBJ_RUINS:
         case MP2::OBJ_WAGONCAMP:
         case MP2::OBJ_DESERTTENT:
         case MP2::OBJ_WATERALTAR:
         case MP2::OBJ_AIRALTAR:
         case MP2::OBJ_FIREALTAR:
         case MP2::OBJ_EARTHALTAR:
-	case MP2::OBJ_BARROWMOUNDS:
-	    count = troop().GetRNDSize(true);
-	    // increase small if dwelling not open
-	    if(! Settings::Get().ExtWorldDwellingsAccumulateUnits() && count <= troop.GetCount())
-	    	count = troop.GetCount() + Rand::Get(1, 3);
-	    break;
+        case MP2::OBJ_BARROWMOUNDS:
+            count = troop().GetRNDSize(true);
+            // increase small if dwelling not open
+            if(! Settings::Get().ExtWorldDwellingsAccumulateUnits() && count <= troop.GetCount())
+                    count = troop.GetCount() + Rand::Get(1, 3);
+            break;
 
         case MP2::OBJ_TROLLBRIDGE:
         case MP2::OBJ_CITYDEAD:
-	    count = 1 < world.CountWeek() &&
-		    Color::NONE == tile.QuantityColor() ? 0 : troop().GetRNDSize(true);
-	    break;
+            count = 1 < world.CountWeek() &&
+                    Color::NONE == tile.QuantityColor() ? 0 : troop().GetRNDSize(true);
+            break;
 
         case MP2::OBJ_DRAGONCITY:
-	    count = 1 < world.CountWeek() &&
-		    Color::NONE == tile.QuantityColor() ? 0 : 1;
-    	    break;
+            count = 1 < world.CountWeek() &&
+                    Color::NONE == tile.QuantityColor() ? 0 : 1;
+                break;
 
-	default: break;
+        default: break;
     }
 
     if(count)
     {
-	if(Settings::Get().ExtWorldDwellingsAccumulateUnits())
-    	    tile.MonsterSetCount(troop.GetCount() + count);
-	else
-	    tile.MonsterSetCount(count);
+        if(Settings::Get().ExtWorldDwellingsAccumulateUnits())
+                tile.MonsterSetCount(troop.GetCount() + count);
+        else
+            tile.MonsterSetCount(count);
     }
 }
 

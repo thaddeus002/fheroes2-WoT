@@ -26,7 +26,7 @@ namespace Luck
 {
     enum
     {
-	UNKNOWN    = -4,
+        UNKNOWN    = -4,
         CURSED     = -3,
         AWFUL      = -2,
         BAD        = -1,

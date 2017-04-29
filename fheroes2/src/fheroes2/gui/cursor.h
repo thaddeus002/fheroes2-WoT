@@ -30,37 +30,37 @@ public:
 
     enum
     {
-	NONE               = 0x0000,
-	// ADVMCO.ICN
-	POINTER            = 0x1000,
-	WAIT               = 0x1001,
+        NONE               = 0x0000,
+        // ADVMCO.ICN
+        POINTER            = 0x1000,
+        WAIT               = 0x1001,
         HEROES             = 0x1002,
-	CASTLE             = 0x1003,
+        CASTLE             = 0x1003,
         MOVE               = 0x1004,
-	FIGHT              = 0x1005,
+        FIGHT              = 0x1005,
         BOAT               = 0x1006,
-	ANCHOR             = 0x1007,
+        ANCHOR             = 0x1007,
         CHANGE             = 0x1008,
-	ACTION             = 0x1009,
+        ACTION             = 0x1009,
         MOVE2              = 0x100A,
-	FIGHT2             = 0x100B,
+        FIGHT2             = 0x100B,
         BOAT2              = 0x100C,
-	ANCHOR2            = 0x100D,
+        ANCHOR2            = 0x100D,
         CHANGE2            = 0x100E,
         ACTION2            = 0x100F,
-	MOVE3              = 0x1010,
+        MOVE3              = 0x1010,
         FIGHT3             = 0x1011,
-	BOAT3              = 0x1012,
+        BOAT3              = 0x1012,
         ANCHOR3            = 0x1013,
-	CHANGE3            = 0x1014,
+        CHANGE3            = 0x1014,
         ACTION3            = 0x1015,
-	MOVE4              = 0x1016,
+        MOVE4              = 0x1016,
         FIGHT4             = 0x1017,
-	BOAT4              = 0x1018,
+        BOAT4              = 0x1018,
         ANCHOR4            = 0x1019,
-	CHANGE4            = 0x101A,
+        CHANGE4            = 0x101A,
         ACTION4            = 0x101B,
-	REDBOAT            = 0x101C,
+        REDBOAT            = 0x101C,
         REDBOAT2           = 0x101D,
         REDBOAT3           = 0x101E,
         REDBOAT4           = 0x101F,
@@ -72,10 +72,10 @@ public:
         SCROLL_BOTTOMLEFT  = 0x1025,
         SCROLL_LEFT        = 0x1026,
         SCROLL_TOPLEFT     = 0x1027,
-	POINTER2           = 0x1028,
-	// CMSECO.ICN
+        POINTER2           = 0x1028,
+        // CMSECO.ICN
         WAR_NONE           = 0x2000,
-	WAR_MOVE           = 0x2001,
+        WAR_MOVE           = 0x2001,
         WAR_FLY            = 0x2002,
         WAR_ARROW          = 0x2003,
         WAR_HERO           = 0x2004,
@@ -132,24 +132,24 @@ public:
         SP_ARROW              = 0x3026
     };
 
-	static Cursor &	Get(void);
+        static Cursor &        Get(void);
 
-	static void	Redraw(s32, s32);
-	static int	DistanceThemes(int, u32);
-	static int	WithoutDistanceThemes(int);
+        static void        Redraw(s32, s32);
+        static int        DistanceThemes(int, u32);
+        static int        WithoutDistanceThemes(int);
 
-	int		Themes(void);
-	bool		SetThemes(int, bool force = false);
-	void		Show(void);
+        int                Themes(void);
+        bool                SetThemes(int, bool force = false);
+        void                Show(void);
 
 private:
-	Cursor();
-	void		SetOffset(int);
-	void		Move(s32, s32);
+        Cursor();
+        void                SetOffset(int);
+        void                Move(s32, s32);
 
-	int		theme;
-        s32		offset_x;
-        s32		offset_y;
+        int                theme;
+        s32                offset_x;
+        s32                offset_y;
 };
 
 #endif

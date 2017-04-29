@@ -34,29 +34,29 @@ class BuildingInfo
 public:
     BuildingInfo(const Castle &, building_t);
 
-    u32			operator() (void) const;
-    void		SetPos(s32, s32);
-    const Rect &	GetArea(void) const;
-    const char*		GetName(void) const;
+    u32                        operator() (void) const;
+    void                SetPos(s32, s32);
+    const Rect &        GetArea(void) const;
+    const char*                GetName(void) const;
     const std::string & GetDescription(void) const;
-    void		SetStatusMessage(StatusBar &) const;
-    bool		IsDwelling(void) const;
-    void		Redraw(void);
-    bool		QueueEventProcessing(void);
-    bool		DialogBuyBuilding(bool buttons) const;
+    void                SetStatusMessage(StatusBar &) const;
+    bool                IsDwelling(void) const;
+    void                Redraw(void);
+    bool                QueueEventProcessing(void);
+    bool                DialogBuyBuilding(bool buttons) const;
 
-    static void		UpdateCosts(const std::string &);
-    static payment_t	GetCost(u32, int);
+    static void                UpdateCosts(const std::string &);
+    static payment_t        GetCost(u32, int);
 
 private:
-    void		RedrawCaptain(void);
-    std::string		GetConditionDescription(void) const;
+    void                RedrawCaptain(void);
+    std::string                GetConditionDescription(void) const;
 
-    const Castle &	castle;
-    u32			building;
-    std::string		description;
-    Rect		area;
-    int			bcond;
+    const Castle &        castle;
+    u32                        building;
+    std::string                description;
+    Rect                area;
+    int                        bcond;
 };
 
 struct DwellingItem

@@ -82,17 +82,17 @@ u32 PocketPC::GetCursorAttackDialog(const Point & dst, int allow)
 
     while(le.HandleEvents() && !le.MouseClickLeft());
 
-    if((allow & Battle::BOTTOM_LEFT) && (rt_tright & le.GetMouseCursor()))	return Cursor::SWORD_TOPRIGHT;
+    if((allow & Battle::BOTTOM_LEFT) && (rt_tright & le.GetMouseCursor()))        return Cursor::SWORD_TOPRIGHT;
     else
-    if((allow & Battle::LEFT) && (rt_right & le.GetMouseCursor()))		return Cursor::SWORD_RIGHT;
+    if((allow & Battle::LEFT) && (rt_right & le.GetMouseCursor()))                return Cursor::SWORD_RIGHT;
     else
-    if((allow & Battle::TOP_LEFT) && (rt_bright & le.GetMouseCursor()))	return Cursor::SWORD_BOTTOMRIGHT;
+    if((allow & Battle::TOP_LEFT) && (rt_bright & le.GetMouseCursor()))        return Cursor::SWORD_BOTTOMRIGHT;
     else
-    if((allow & Battle::BOTTOM_RIGHT) && (rt_tleft & le.GetMouseCursor()))	return Cursor::SWORD_TOPLEFT;
+    if((allow & Battle::BOTTOM_RIGHT) && (rt_tleft & le.GetMouseCursor()))        return Cursor::SWORD_TOPLEFT;
     else
-    if((allow & Battle::RIGHT) && (rt_left & le.GetMouseCursor()))		return Cursor::SWORD_LEFT;
+    if((allow & Battle::RIGHT) && (rt_left & le.GetMouseCursor()))                return Cursor::SWORD_LEFT;
     else
-    if((allow & Battle::TOP_RIGHT) && (rt_bleft & le.GetMouseCursor()))	return Cursor::SWORD_BOTTOMLEFT;
+    if((allow & Battle::TOP_RIGHT) && (rt_bleft & le.GetMouseCursor()))        return Cursor::SWORD_BOTTOMLEFT;
 
     return Cursor::WAR_INFO;
 }
@@ -120,25 +120,25 @@ void RedrawTouchButton(const Surface & sf, const Rect & rt, const char* lb)
 
     if(sf.w() != rt.w)
     {
-	const u32 ww = 4;
-	sf.Blit(Rect(0, 0, ww, sf.h()), rt.x, rt.y, display);
+        const u32 ww = 4;
+        sf.Blit(Rect(0, 0, ww, sf.h()), rt.x, rt.y, display);
 
-	if(rt.w > 8)
-	{
-	    const u32 count = (rt.w - ww) / ww;
-	    for(u32 ii = 0; ii < count; ++ii)
-		sf.Blit(Rect(ww, 0, ww, sf.h()), rt.x + ww * (ii + 1), rt.y, display);
-	}
+        if(rt.w > 8)
+        {
+            const u32 count = (rt.w - ww) / ww;
+            for(u32 ii = 0; ii < count; ++ii)
+                sf.Blit(Rect(ww, 0, ww, sf.h()), rt.x + ww * (ii + 1), rt.y, display);
+        }
 
-	sf.Blit(Rect(sf.w() - ww, 0, ww, sf.h()), rt.x + rt.w - ww, rt.y, display);
+        sf.Blit(Rect(sf.w() - ww, 0, ww, sf.h()), rt.x + rt.w - ww, rt.y, display);
     }
     else
-	sf.Blit(rt.x, rt.y, display);
+        sf.Blit(rt.x, rt.y, display);
 
     if(lb)
     {
-	Text tx(lb, Font::BIG);
-	tx.Blit(rt.x + (rt.w - tx.w()) / 2, rt.y + (rt.h - tx.h()) / 2);
+        Text tx(lb, Font::BIG);
+        tx.Blit(rt.x + (rt.w - tx.w()) / 2, rt.y + (rt.h - tx.h()) / 2);
     }
 }
 
@@ -324,133 +324,133 @@ void PocketPC::KeyboardDialog(std::string & str)
     while(le.HandleEvents())
     {
         if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT))
-	{
-	    str.clear();
-	    break;
-	}
+        {
+            str.clear();
+            break;
+        }
 
-	char ch = 0;
+        char ch = 0;
 
-        if(le.MouseClickLeft(rt_0))	ch = '0';
-	else
-        if(le.MouseClickLeft(rt_1))	ch = '1';
-	else
-        if(le.MouseClickLeft(rt_2))	ch = '2';
-	else
-        if(le.MouseClickLeft(rt_3))	ch = '3';
-	else
-        if(le.MouseClickLeft(rt_4))	ch = '4';
-	else
-        if(le.MouseClickLeft(rt_5))	ch = '5';
-	else
-        if(le.MouseClickLeft(rt_6))	ch = '6';
-	else
-        if(le.MouseClickLeft(rt_7))	ch = '7';
-	else
-        if(le.MouseClickLeft(rt_8))	ch = '8';
-	else
-        if(le.MouseClickLeft(rt_9))	ch = '9';
-	else
-        if(le.MouseClickLeft(rt_A))	ch = 'a';
-	else
-        if(le.MouseClickLeft(rt_B))	ch = 'b';
-	else
-        if(le.MouseClickLeft(rt_C))	ch = 'c';
-	else
-        if(le.MouseClickLeft(rt_D))	ch = 'd';
-	else
-        if(le.MouseClickLeft(rt_E))	ch = 'e';
-	else
-        if(le.MouseClickLeft(rt_F))	ch = 'f';
-	else
-        if(le.MouseClickLeft(rt_G))	ch = 'g';
-	else
-        if(le.MouseClickLeft(rt_H))	ch = 'h';
-	else
-        if(le.MouseClickLeft(rt_I))	ch = 'i';
-	else
-        if(le.MouseClickLeft(rt_J))	ch = 'j';
-	else
-        if(le.MouseClickLeft(rt_K))	ch = 'k';
-	else
-        if(le.MouseClickLeft(rt_L))	ch = 'l';
-	else
-        if(le.MouseClickLeft(rt_M))	ch = 'm';
-	else
-        if(le.MouseClickLeft(rt_N))	ch = 'n';
-	else
-        if(le.MouseClickLeft(rt_O))	ch = 'o';
-	else
-        if(le.MouseClickLeft(rt_P))	ch = 'p';
-	else
-        if(le.MouseClickLeft(rt_Q))	ch = 'q';
-	else
-        if(le.MouseClickLeft(rt_R))	ch = 'r';
-	else
-        if(le.MouseClickLeft(rt_S))	ch = 's';
-	else
-        if(le.MouseClickLeft(rt_T))	ch = 't';
-	else
-        if(le.MouseClickLeft(rt_U))	ch = 'u';
-	else
-        if(le.MouseClickLeft(rt_V))	ch = 'v';
-	else
-        if(le.MouseClickLeft(rt_W))	ch = 'w';
-	else
-        if(le.MouseClickLeft(rt_X))	ch = 'x';
-	else
-        if(le.MouseClickLeft(rt_Y))	ch = 'y';
-	else
-        if(le.MouseClickLeft(rt_Z))	ch = 'z';
-	else
-	if(le.MouseClickLeft(rt_EQUAL))	ch = '=';
-	else
-	if(le.MouseClickLeft(rt_MINUS))	ch = '-';
-	else
-	if(le.MouseClickLeft(rt_LB))	ch = '[';
-	else
-	if(le.MouseClickLeft(rt_RB))	ch = ']';
+        if(le.MouseClickLeft(rt_0))        ch = '0';
         else
-	if(le.MouseClickLeft(rt_SP))	ch = ';';
-	else
-	if(le.MouseClickLeft(rt_CM))	ch = '\'';
-	else
-        if(le.MouseClickLeft(rt_CS))	ch = ',';
-	else
-        if(le.MouseClickLeft(rt_DT))	ch = '.';
-	else
-	if(le.MouseClickLeft(rt_SL))	ch = '/';
-	else
-	if(le.MouseClickLeft(rt_SPACE))	ch = 0x20;
+        if(le.MouseClickLeft(rt_1))        ch = '1';
+        else
+        if(le.MouseClickLeft(rt_2))        ch = '2';
+        else
+        if(le.MouseClickLeft(rt_3))        ch = '3';
+        else
+        if(le.MouseClickLeft(rt_4))        ch = '4';
+        else
+        if(le.MouseClickLeft(rt_5))        ch = '5';
+        else
+        if(le.MouseClickLeft(rt_6))        ch = '6';
+        else
+        if(le.MouseClickLeft(rt_7))        ch = '7';
+        else
+        if(le.MouseClickLeft(rt_8))        ch = '8';
+        else
+        if(le.MouseClickLeft(rt_9))        ch = '9';
+        else
+        if(le.MouseClickLeft(rt_A))        ch = 'a';
+        else
+        if(le.MouseClickLeft(rt_B))        ch = 'b';
+        else
+        if(le.MouseClickLeft(rt_C))        ch = 'c';
+        else
+        if(le.MouseClickLeft(rt_D))        ch = 'd';
+        else
+        if(le.MouseClickLeft(rt_E))        ch = 'e';
+        else
+        if(le.MouseClickLeft(rt_F))        ch = 'f';
+        else
+        if(le.MouseClickLeft(rt_G))        ch = 'g';
+        else
+        if(le.MouseClickLeft(rt_H))        ch = 'h';
+        else
+        if(le.MouseClickLeft(rt_I))        ch = 'i';
+        else
+        if(le.MouseClickLeft(rt_J))        ch = 'j';
+        else
+        if(le.MouseClickLeft(rt_K))        ch = 'k';
+        else
+        if(le.MouseClickLeft(rt_L))        ch = 'l';
+        else
+        if(le.MouseClickLeft(rt_M))        ch = 'm';
+        else
+        if(le.MouseClickLeft(rt_N))        ch = 'n';
+        else
+        if(le.MouseClickLeft(rt_O))        ch = 'o';
+        else
+        if(le.MouseClickLeft(rt_P))        ch = 'p';
+        else
+        if(le.MouseClickLeft(rt_Q))        ch = 'q';
+        else
+        if(le.MouseClickLeft(rt_R))        ch = 'r';
+        else
+        if(le.MouseClickLeft(rt_S))        ch = 's';
+        else
+        if(le.MouseClickLeft(rt_T))        ch = 't';
+        else
+        if(le.MouseClickLeft(rt_U))        ch = 'u';
+        else
+        if(le.MouseClickLeft(rt_V))        ch = 'v';
+        else
+        if(le.MouseClickLeft(rt_W))        ch = 'w';
+        else
+        if(le.MouseClickLeft(rt_X))        ch = 'x';
+        else
+        if(le.MouseClickLeft(rt_Y))        ch = 'y';
+        else
+        if(le.MouseClickLeft(rt_Z))        ch = 'z';
+        else
+        if(le.MouseClickLeft(rt_EQUAL))        ch = '=';
+        else
+        if(le.MouseClickLeft(rt_MINUS))        ch = '-';
+        else
+        if(le.MouseClickLeft(rt_LB))        ch = '[';
+        else
+        if(le.MouseClickLeft(rt_RB))        ch = ']';
+        else
+        if(le.MouseClickLeft(rt_SP))        ch = ';';
+        else
+        if(le.MouseClickLeft(rt_CM))        ch = '\'';
+        else
+        if(le.MouseClickLeft(rt_CS))        ch = ',';
+        else
+        if(le.MouseClickLeft(rt_DT))        ch = '.';
+        else
+        if(le.MouseClickLeft(rt_SL))        ch = '/';
+        else
+        if(le.MouseClickLeft(rt_SPACE))        ch = 0x20;
 
-	if(le.MouseClickLeft(rt_BACKSPACE) && str.size())
-	{
-	    str.resize(str.size() - 1);
-	    redraw = true;
-	}
-	else
-	if(le.MouseClickLeft(rt_RETURN))
-	    break;
-	else
-	if(ch)
-	{
-	    str += ch;
-	    redraw = true;
-	}
+        if(le.MouseClickLeft(rt_BACKSPACE) && str.size())
+        {
+            str.resize(str.size() - 1);
+            redraw = true;
+        }
+        else
+        if(le.MouseClickLeft(rt_RETURN))
+            break;
+        else
+        if(ch)
+        {
+            str += ch;
+            redraw = true;
+        }
 
-	if(redraw)
-	{
-	    Text tx(str, Font::SMALL);
-	    if(tx.w() < top.w) 
-	    {
-		cursor.Hide();
-		display.FillRect(Rect(top.x, top.y + top.h - 16, top.w, 16), ColorBlack);
-		tx.Blit(top.x + (top.w - tx.w()) / 2, top.y + top.h - 16 + 2);
-		cursor.Show();
-		display.Flip();
-	    }
-	    redraw = false;
-	}
+        if(redraw)
+        {
+            Text tx(str, Font::SMALL);
+            if(tx.w() < top.w) 
+            {
+                cursor.Hide();
+                display.FillRect(Rect(top.x, top.y + top.h - 16, top.w, 16), ColorBlack);
+                tx.Blit(top.x + (top.w - tx.w()) / 2, top.y + top.h - 16 + 2);
+                cursor.Show();
+                display.Flip();
+            }
+            redraw = false;
+        }
     }
 
     cursor.Hide();

@@ -53,7 +53,7 @@ void MapPosition::SetCenter(const Point & pt)
 void MapPosition::SetIndex(s32 index)
 {
     center = Maps::isValidAbsIndex(index) ?
-		Maps::GetPoint(index) : Point(-1, -1);
+                Maps::GetPoint(index) : Point(-1, -1);
 }
 
 StreamBase & operator<< (StreamBase & sb, const MapPosition & st)

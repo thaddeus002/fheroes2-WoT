@@ -44,10 +44,10 @@ const char* Battle::Tower::GetName(void) const
 {
     switch(type)
     {
-	case TWR_LEFT:	return _("Left Turret");
-	case TWR_RIGHT:	return _("Right Turret");
+        case TWR_LEFT:        return _("Left Turret");
+        case TWR_RIGHT:        return _("Right Turret");
 
-	default: break;
+        default: break;
     }
 
     return _("Ballista");
@@ -84,16 +84,16 @@ Point Battle::Tower::GetPortPosition(void) const
 
     switch(type)
     {
-	case TWR_LEFT:	res = Point(410, 70); break;
-	case TWR_RIGHT:	res = Point(410, 320); break;
-	case TWR_CENTER:res = Point(560, 170); break;
-	default: break;
+        case TWR_LEFT:        res = Point(410, 70); break;
+        case TWR_RIGHT:        res = Point(410, 320); break;
+        case TWR_CENTER:res = Point(560, 170); break;
+        default: break;
     }
 
     if(Settings::Get().QVGA())
     {
-	res.x /= 2;
-	res.y /= 2;
+        res.x /= 2;
+        res.y /= 2;
     }
 
     return res;
@@ -103,9 +103,9 @@ void Battle::Tower::SetDestroy(void)
 {
     switch(type)
     {
-	case TWR_LEFT:	Board::GetCell(19)->SetObject(1); break;
-	case TWR_RIGHT:	Board::GetCell(85)->SetObject(1); break;
-	default: break;
+        case TWR_LEFT:        Board::GetCell(19)->SetObject(1); break;
+        case TWR_RIGHT:        Board::GetCell(85)->SetObject(1); break;
+        default: break;
     }
     valid = false;
 }
@@ -120,32 +120,32 @@ std::string Battle::Tower::GetInfo(const Castle & cstl)
 
     if(cstl.isBuild(BUILD_CASTLE))
     {
-	towers.push_back(TWR_CENTER);
+        towers.push_back(TWR_CENTER);
 
-	if(cstl.isBuild(BUILD_LEFTTURRET)) towers.push_back(TWR_LEFT);
-	if(cstl.isBuild(BUILD_RIGHTTURRET)) towers.push_back(TWR_RIGHT);
+        if(cstl.isBuild(BUILD_LEFTTURRET)) towers.push_back(TWR_LEFT);
+        if(cstl.isBuild(BUILD_RIGHTTURRET)) towers.push_back(TWR_RIGHT);
 
-	for(std::vector<int>::const_iterator
-	    it = towers.begin(); it != towers.end(); ++it)
-	{
-    	    Tower twr = Tower(cstl, *it);
+        for(std::vector<int>::const_iterator
+            it = towers.begin(); it != towers.end(); ++it)
+        {
+                Tower twr = Tower(cstl, *it);
 
-    	    msg.append(tmpl);
-    	    StringReplace(msg, "%{name}", twr.GetName());
-    	    StringReplace(msg, "%{count}", twr.GetCount());
+                msg.append(tmpl);
+                StringReplace(msg, "%{name}", twr.GetName());
+                StringReplace(msg, "%{count}", twr.GetCount());
 
-	    if(twr.GetBonus())
-	    {
-		msg.append(", ");
-		msg.append(addn);
-    		StringReplace(msg, "%{attack}", twr.GetBonus());
-	    }
-	    else
-		msg.append(".");
+            if(twr.GetBonus())
+            {
+                msg.append(", ");
+                msg.append(addn);
+                    StringReplace(msg, "%{attack}", twr.GetBonus());
+            }
+            else
+                msg.append(".");
 
-	    if((it + 1) != towers.end())
-    		msg.append("\n \n");
-	}
+            if((it + 1) != towers.end())
+                    msg.append("\n \n");
+        }
     }
 
     return msg;

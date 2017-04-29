@@ -126,18 +126,18 @@ void Dialog::GameInfo(void)
     // message loop
     while(le.HandleEvents())
     {
-	le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
-	le.MousePressLeft(buttonCfg) ? buttonCfg.PressDraw() : buttonCfg.ReleaseDraw();
+        le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
+        le.MousePressLeft(buttonCfg) ? buttonCfg.PressDraw() : buttonCfg.ReleaseDraw();
 
         if(le.MouseClickLeft(buttonCfg))
-	{
-	    Dialog::ExtSettings(true);
-	    Cursor::Get().Show();
-	    Display::Get().Flip();
-	}
+        {
+            Dialog::ExtSettings(true);
+            Cursor::Get().Show();
+            Display::Get().Flip();
+        }
 
         if(le.MouseClickLeft(buttonOk) ||
-	   HotKeyCloseWindow) break;
+           HotKeyCloseWindow) break;
     }
 
     cursor.Hide();

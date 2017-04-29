@@ -100,7 +100,7 @@ void PocketPC::HeroesMeeting(Heroes & hero1, Heroes & hero2)
         {
             cursor.Hide();
 
-    	    if(selectArtifacts1.isSelected()) selectArtifacts1.ResetSelected();
+                if(selectArtifacts1.isSelected()) selectArtifacts1.ResetSelected();
             else
             if(selectArtifacts2.isSelected()) selectArtifacts2.ResetSelected();
 
@@ -109,7 +109,7 @@ void PocketPC::HeroesMeeting(Heroes & hero1, Heroes & hero2)
 
             cursor.Show();
             display.Flip();
-	}
+        }
 
         if((le.MouseCursor(selectArtifacts1.GetArea()) &&
             selectArtifacts1.QueueEventProcessing(selectArtifacts2)) ||
@@ -118,7 +118,7 @@ void PocketPC::HeroesMeeting(Heroes & hero1, Heroes & hero2)
         {
             cursor.Hide();
 
-    	    if(selectArmy1.isSelected()) selectArmy1.ResetSelected();
+                if(selectArmy1.isSelected()) selectArmy1.ResetSelected();
             else
             if(selectArmy2.isSelected()) selectArmy2.ResetSelected();
 
@@ -127,6 +127,6 @@ void PocketPC::HeroesMeeting(Heroes & hero1, Heroes & hero2)
 
             cursor.Show();
             display.Flip();
-    	}
+            }
     }
 }

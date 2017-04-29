@@ -97,7 +97,7 @@ SurfaceFormat GetRGBAMask(u32 bpp)
  #endif
             break;
 #else
-	case 32:
+        case 32:
  #if SDL_BYTEORDER == SDL_BIG_ENDIAN
             fm.rmask = 0xff000000;
             fm.gmask = 0x00ff0000;
@@ -109,9 +109,9 @@ SurfaceFormat GetRGBAMask(u32 bpp)
             fm.bmask = 0x00ff0000;
             fm.amask = 0xff000000;
  #endif
-	    break;
+            break;
 
-	case 24:
+        case 24:
  #if SDL_BYTEORDER == SDL_BIG_ENDIAN
             fm.rmask = 0x00fc0000;
             fm.gmask = 0x0003f000;
@@ -123,9 +123,9 @@ SurfaceFormat GetRGBAMask(u32 bpp)
             fm.bmask = 0x0003f000;
             fm.amask = 0x00fc0000;
  #endif
-	    break;
+            break;
 
-	case 16:
+        case 16:
  #if SDL_BYTEORDER == SDL_BIG_ENDIAN
             fm.rmask = 0x0000f000;
             fm.gmask = 0x00000f00;
@@ -137,15 +137,15 @@ SurfaceFormat GetRGBAMask(u32 bpp)
             fm.bmask = 0x00000f00;
             fm.amask = 0x0000f000;
  #endif
-	    break;
+            break;
 #endif
 
-	default:
-	    fm.rmask = 0;
-	    fm.gmask = 0;
-	    fm.bmask = 0;
-	    fm.amask = 0;
-	    break;
+        default:
+            fm.rmask = 0;
+            fm.gmask = 0;
+            fm.bmask = 0;
+            fm.amask = 0;
+            break;
     }
     return fm;
 }
@@ -233,9 +233,9 @@ int RGBA::a(void) const
 int RGBA::pack(void) const
 {
     return (((r() << 24) & 0xFF000000) |
-	    ((g() << 16) & 0x00FF0000) |
-	    ((b() << 8) & 0x0000FF00) |
-	    (a() & 0x000000FF));
+            ((g() << 16) & 0x00FF0000) |
+            ((b() << 8) & 0x0000FF00) |
+            (a() & 0x000000FF));
 }
 
 RGBA RGBA::unpack(int v)
@@ -283,29 +283,29 @@ Surface::Surface(const void* pixels, u32 width, u32 height, u32 bytes_per_pixel 
     if(8 == fm.depth)
     {
 #if SDL_VERSION_ATLEAST(2, 0, 0)
-	surface = SDL_CreateRGBSurface(0, width, height, fm.depth, fm.rmask, fm.gmask, fm.bmask, (amask ? fm.amask : 0));
+        surface = SDL_CreateRGBSurface(0, width, height, fm.depth, fm.rmask, fm.gmask, fm.bmask, (amask ? fm.amask : 0));
 #else
-	surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, fm.depth, fm.rmask, fm.gmask, fm.bmask, (amask ? fm.amask : 0));
+        surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, fm.depth, fm.rmask, fm.gmask, fm.bmask, (amask ? fm.amask : 0));
 #endif
     }
     else
     {
-	surface = SDL_CreateRGBSurfaceFrom(const_cast<void *>(pixels), width, height, fm.depth, width * bytes_per_pixel,
-		fm.rmask, fm.gmask, fm.bmask, amask ? fm.amask : 0);
+        surface = SDL_CreateRGBSurfaceFrom(const_cast<void *>(pixels), width, height, fm.depth, width * bytes_per_pixel,
+                fm.rmask, fm.gmask, fm.bmask, amask ? fm.amask : 0);
 #if SDL_VERSION_ATLEAST(2, 0, 0)
-	SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
+        SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
 #endif
     }
 
     if(!surface)
-	Error::Except(__FUNCTION__, SDL_GetError());
+        Error::Except(__FUNCTION__, SDL_GetError());
 
     if(8 == fm.depth)
     {
-	SetPalette();
-	Lock();
-	std::memcpy(surface->pixels, pixels, width * height);
-	Unlock();
+        SetPalette();
+        Lock();
+        std::memcpy(surface->pixels, pixels, width * height);
+        Unlock();
     }
 }
 
@@ -344,18 +344,18 @@ void Surface::Set(const Surface & bs, bool refcopy)
 
     if(bs.isValid())
     {
-	if(refcopy)
-	{
-	    surface = bs.surface;
-	    if(surface) surface->refcount += 1;
-	}
-	else
-	{
-	    surface = SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags);
+        if(refcopy)
+        {
+            surface = bs.surface;
+            if(surface) surface->refcount += 1;
+        }
+        else
+        {
+            surface = SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags);
 
-	    if(!surface)
-		Error::Except(__FUNCTION__, SDL_GetError());
-	}
+            if(!surface)
+                Error::Except(__FUNCTION__, SDL_GetError());
+        }
     }
 }
 
@@ -367,7 +367,7 @@ void Surface::Set(u32 sw, u32 sh, bool amask)
 void Surface::Set(u32 sw, u32 sh, u32 bpp /* bpp: 8, 16, 24, 32 */, bool amask)
 {
     if(bpp == 8)
-	bpp = 32;
+        bpp = 32;
 
     SurfaceFormat fm = GetRGBAMask(bpp);
 
@@ -386,45 +386,45 @@ void Surface::Set(u32 sw, u32 sh, const SurfaceFormat & fm)
 #endif
 
     if(!surface)
-	Error::Except(__FUNCTION__, SDL_GetError());
+        Error::Except(__FUNCTION__, SDL_GetError());
 
     if(8 == depth())
     {
-	SetPalette();
-	Fill(fm.ckey);
-	SetColorKey(fm.ckey);
+        SetPalette();
+        Fill(fm.ckey);
+        SetColorKey(fm.ckey);
     }
     else
     if(amask())
     {
 #if SDL_VERSION_ATLEAST(2, 0, 0)
-	Fill(RGBA(0, 0, 0, 0)); // no color key only amask
+        Fill(RGBA(0, 0, 0, 0)); // no color key only amask
 #else
-	Fill(RGBA(fm.ckey.r(), fm.ckey.g(), fm.ckey.b(), 0));
-	SetColorKey(fm.ckey);
+        Fill(RGBA(fm.ckey.r(), fm.ckey.g(), fm.ckey.b(), 0));
+        SetColorKey(fm.ckey);
 #endif
     }
     else
     if(fm.ckey.pack())
     {
-	Fill(fm.ckey);
-	SetColorKey(fm.ckey);
+        Fill(fm.ckey);
+        SetColorKey(fm.ckey);
     }
 
     if(amask())
     {
 #if SDL_VERSION_ATLEAST(2, 0, 0)
-	SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_BLEND);
+        SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_BLEND);
 #else
-	SDL_SetAlpha(surface, SDL_SRCALPHA, 255);
+        SDL_SetAlpha(surface, SDL_SRCALPHA, 255);
 #endif
     }
     else
     {
 #if SDL_VERSION_ATLEAST(2, 0, 0)
-	SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
+        SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
 #else
-	SDL_SetAlpha(surface, 0, 0);
+        SDL_SetAlpha(surface, 0, 0);
 #endif
     }
 }
@@ -444,28 +444,28 @@ void Surface::SetDefaultDepth(u32 depth)
 {
     switch(depth)
     {
-	case 24:
-	    ERROR("switch to 32 bpp colors");
-	    default_depth = 32;
-	    break;
+        case 24:
+            ERROR("switch to 32 bpp colors");
+            default_depth = 32;
+            break;
 
-	case 8:
-	case 15:
-	case 16:
+        case 8:
+        case 15:
+        case 16:
 #if SDL_VERSION_ATLEAST(2, 0, 0)
-	    ERROR("switch to 32 bpp colors");
-	    default_depth = 32;
+            ERROR("switch to 32 bpp colors");
+            default_depth = 32;
 #else
-	    default_depth = depth;
+            default_depth = depth;
 #endif
-	    break;
+            break;
 
-	case 32:
-	    default_depth = depth;
-	    break;
+        case 32:
+            default_depth = depth;
+            break;
 
-	default:
-	    break;
+        default:
+            break;
     }
 }
 
@@ -493,7 +493,7 @@ bool Surface::Load(const std::string & fn)
 #endif
 
     if(!surface)
-	ERROR(SDL_GetError());
+        ERROR(SDL_GetError());
 
     return surface;
 }
@@ -514,8 +514,8 @@ bool Surface::Save(const std::string & fn) const
 
     if(0 != res)
     {
-	ERROR(SDL_GetError());
-	return false;
+        ERROR(SDL_GetError());
+        return false;
     }
 
     return true;
@@ -561,12 +561,12 @@ SurfaceFormat Surface::GetFormat(void) const
     SurfaceFormat res;
     if(surface->format)
     {
-	res.depth = surface->format->BitsPerPixel;
-	res.rmask = surface->format->Rmask;
-	res.gmask = surface->format->Gmask;
-	res.bmask = surface->format->Bmask;
-	res.amask = surface->format->Amask;
-	res.ckey = default_color_key;
+        res.depth = surface->format->BitsPerPixel;
+        res.rmask = surface->format->Rmask;
+        res.gmask = surface->format->Gmask;
+        res.bmask = surface->format->Bmask;
+        res.amask = surface->format->Amask;
+        res.ckey = default_color_key;
     }
     return res;
 }
@@ -585,8 +585,8 @@ RGBA Surface::GetRGB(u32 pixel) const
 
     if(amask())
     {
-	SDL_GetRGBA(pixel, surface->format, &r, &g, &b, &a);
-	return RGBA(r, g, b, a);
+        SDL_GetRGBA(pixel, surface->format, &r, &g, &b, &a);
+        return RGBA(r, g, b, a);
     }
 
     SDL_GetRGB(pixel, surface->format, &r, &g, &b);
@@ -597,10 +597,10 @@ RGBA Surface::GetRGB(u32 pixel) const
 void Surface::SetPalette(void)
 {
     if(isValid() &&
-	pal_colors && pal_nums && surface->format->palette)
+        pal_colors && pal_nums && surface->format->palette)
     {
-	if(surface->format->palette->colors &&
-	    pal_colors != surface->format->palette->colors) SDL_free(surface->format->palette->colors);
+        if(surface->format->palette->colors &&
+            pal_colors != surface->format->palette->colors) SDL_free(surface->format->palette->colors);
 
         surface->format->palette->colors = pal_colors;
         surface->format->palette->ncolors = pal_nums;
@@ -664,21 +664,21 @@ void Surface::SetPixel(int x, int y, u32 pixel)
 {
     if(x < w() && y < h())
     {
-	switch(depth())
-	{
-	    case 8:  SetPixel1(x, y, pixel); break;
-	    case 15:
-	    case 16: SetPixel2(x, y, pixel); break;
-	    case 24: SetPixel3(x, y, pixel); break;
-	    case 32: SetPixel4(x, y, pixel); break;
-	    default: break;
-	}
+        switch(depth())
+        {
+            case 8:  SetPixel1(x, y, pixel); break;
+            case 15:
+            case 16: SetPixel2(x, y, pixel); break;
+            case 24: SetPixel3(x, y, pixel); break;
+            case 32: SetPixel4(x, y, pixel); break;
+            default: break;
+        }
     }
     else
     {
-	std::ostringstream os;
-	os << "out of range: " << "x: " << x << ", " << "y: " << y << ", " << "width: " << w() << ", " << "height: " << h();
-	Error::Except(__FUNCTION__, os.str().c_str());
+        std::ostringstream os;
+        os << "out of range: " << "x: " << x << ", " << "y: " << y << ", " << "width: " << w() << ", " << "height: " << h();
+        Error::Except(__FUNCTION__, os.str().c_str());
     }
 }
 
@@ -712,18 +712,18 @@ u32 Surface::GetPixel(int x, int y) const
 
     if(x < w() && y < h())
     {
-	switch(depth())
-	{
-	    case 8:  pixel = GetPixel1(x, y); break;
-	    case 15:
-	    case 16: pixel = GetPixel2(x, y); break;
-	    case 24: pixel = GetPixel3(x, y); break;
-	    case 32: pixel = GetPixel4(x, y); break;
-	    default: break;
-	}
+        switch(depth())
+        {
+            case 8:  pixel = GetPixel1(x, y); break;
+            case 15:
+            case 16: pixel = GetPixel2(x, y); break;
+            case 24: pixel = GetPixel3(x, y); break;
+            case 32: pixel = GetPixel4(x, y); break;
+            default: break;
+        }
     }
     else
-	Error::Except(__FUNCTION__, "out of range");
+        Error::Except(__FUNCTION__, "out of range");
     
     return pixel;
 }
@@ -737,14 +737,14 @@ void Surface::Blit(const Rect & srt, const Point & dpt, Surface & dst) const
     SDL_BlitSurface(surface, & srcrect, dst.surface, & dstrect);
 #else
     if(! dst.isDisplay() &&
-	amask() && dst.amask())
+        amask() && dst.amask())
     {
-    	SDL_SetAlpha(surface, 0, 0);
-	SDL_BlitSurface(surface, & srcrect, dst.surface, & dstrect);
-	SDL_SetAlpha(surface, SDL_SRCALPHA, 255);
+            SDL_SetAlpha(surface, 0, 0);
+        SDL_BlitSurface(surface, & srcrect, dst.surface, & dstrect);
+        SDL_SetAlpha(surface, SDL_SRCALPHA, 255);
     }
     else
-	SDL_BlitSurface(surface, & srcrect, dst.surface, & dstrect);
+        SDL_BlitSurface(surface, & srcrect, dst.surface, & dstrect);
 #endif
 }
 
@@ -776,16 +776,16 @@ void Surface::SetAlphaMod(int level)
 #else
     if(isValid())
     {
-	if(amask())
-	{
-	    Surface res(GetSize(), false);
-    	    SDL_SetAlpha(surface, 0, 0);
-    	    Blit(res);
-    	    SDL_SetAlpha(surface, SDL_SRCALPHA, 255);
-	    Set(res, true);
-	}
+        if(amask())
+        {
+            Surface res(GetSize(), false);
+                SDL_SetAlpha(surface, 0, 0);
+                Blit(res);
+                SDL_SetAlpha(surface, SDL_SRCALPHA, 255);
+            Set(res, true);
+        }
 
-	SDL_SetAlpha(surface, SDL_SRCALPHA, level);
+        SDL_SetAlpha(surface, SDL_SRCALPHA, level);
     }
 #endif
 }
@@ -809,24 +809,24 @@ void Surface::FreeSurface(Surface & sf)
 {
     if(sf.surface)
     {
-	if(sf.isRefCopy())
-	{
-	    --sf.surface->refcount;
-	    sf.surface = NULL;
-	}
-	else
-	{
-    	    // clear static palette
-    	    if(sf.surface->format && 8 == sf.surface->format->BitsPerPixel && pal_colors && pal_nums &&
-        	sf.surface->format->palette && pal_colors == sf.surface->format->palette->colors)
-    	    {
-        	sf.surface->format->palette->colors = NULL;
-        	sf.surface->format->palette->ncolors = 0;
-    	    }
+        if(sf.isRefCopy())
+        {
+            --sf.surface->refcount;
+            sf.surface = NULL;
+        }
+        else
+        {
+                // clear static palette
+                if(sf.surface->format && 8 == sf.surface->format->BitsPerPixel && pal_colors && pal_nums &&
+                sf.surface->format->palette && pal_colors == sf.surface->format->palette->colors)
+                {
+                sf.surface->format->palette->colors = NULL;
+                sf.surface->format->palette->ncolors = 0;
+                }
 
-	    SDL_FreeSurface(sf.surface);
-	    sf.surface = NULL;
-	}
+            SDL_FreeSurface(sf.surface);
+            sf.surface = NULL;
+        }
     }
 }
 
@@ -836,11 +836,11 @@ u32 Surface::GetMemoryUsage(void) const
 
     if(surface)
     {
-	res += sizeof(SDL_Surface) + sizeof(SDL_PixelFormat) + surface->pitch * surface->h;
+        res += sizeof(SDL_Surface) + sizeof(SDL_PixelFormat) + surface->pitch * surface->h;
 
-	if(surface->format && surface->format->palette &&
-	    (! pal_colors || pal_colors != surface->format->palette->colors))
-	    res += sizeof(SDL_Palette) + surface->format->palette->ncolors * sizeof(SDL_Color);
+        if(surface->format && surface->format->palette &&
+            (! pal_colors || pal_colors != surface->format->palette->colors))
+            res += sizeof(SDL_Palette) + surface->format->palette->ncolors * sizeof(SDL_Color);
     }
 
     return res;
@@ -852,25 +852,25 @@ std::string Surface::Info(void) const
 
     if(isValid())
     {
-	os << 
+        os << 
 #if SDL_VERSION_ATLEAST(2, 0, 0)
-	    "flags" << "(" << surface->flags << "), " <<
+            "flags" << "(" << surface->flags << "), " <<
 #else
-	    "flags" << "(" << surface->flags << ", " << (surface->flags & SDL_SRCALPHA ? "SRCALPHA" : "") << (surface->flags & SDL_SRCCOLORKEY ? "SRCCOLORKEY" : "") << "), " <<
+            "flags" << "(" << surface->flags << ", " << (surface->flags & SDL_SRCALPHA ? "SRCALPHA" : "") << (surface->flags & SDL_SRCCOLORKEY ? "SRCCOLORKEY" : "") << "), " <<
 #endif
-	    "w"<< "(" << surface->w << "), " <<
-	    "h"<< "(" << surface->h << "), " <<
-	    "size" << "(" << GetMemoryUsage() << "), " <<
-	    "bpp" << "(" << depth() << "), " <<
+            "w"<< "(" << surface->w << "), " <<
+            "h"<< "(" << surface->h << "), " <<
+            "size" << "(" << GetMemoryUsage() << "), " <<
+            "bpp" << "(" << depth() << "), " <<
 #if SDL_VERSION_ATLEAST(2, 0, 0)
 #else
-	    "Amask" << "(" << "0x" << std::setw(8) << std::setfill('0') << std::hex << surface->format->Amask << "), " <<
-	    "colorkey" << "(" << "0x" << std::setw(8) << std::setfill('0') << surface->format->colorkey << "), " << std::dec <<
+            "Amask" << "(" << "0x" << std::setw(8) << std::setfill('0') << std::hex << surface->format->Amask << "), " <<
+            "colorkey" << "(" << "0x" << std::setw(8) << std::setfill('0') << surface->format->colorkey << "), " << std::dec <<
 #endif
-	    "alpha" << "(" << alpha() << "), ";
+            "alpha" << "(" << alpha() << "), ";
     }
     else
-	os << "invalid surface";
+        os << "invalid surface";
 
     return os.str();
 }
@@ -917,7 +917,7 @@ Surface Surface::RenderReflect(int shape /* 0: none, 1 : vert, 2: horz, 3: both 
     {
         // normal
         default:
-	    Blit(res);
+            Blit(res);
             break;
 
             // vertical reflect
@@ -1077,7 +1077,7 @@ Surface Surface::RenderSepia(void) const
         pixel = GetPixel(x, y);
         if(colkey == 0 || pixel != colkey)
         {
-	    RGBA col = GetRGB(pixel);
+            RGBA col = GetRGB(pixel);
             //Numbers derived from http://blogs.techrepublic.com.com/howdoi/?p=120
             #define CLAMP255(val) std::min<u16>((val), 255)
             int outR = CLAMP255(static_cast<u16>(col.r() * 0.693f + col.g() * 0.769f + col.b() * 0.189f));
@@ -1124,29 +1124,29 @@ Surface Surface::GetSurface(const Rect & rt) const
 
     if(isDisplay())
     {
-	Surface res(rt, fm);
-	Blit(rt, Point(0, 0), res);
-	return res;
+        Surface res(rt, fm);
+        Blit(rt, Point(0, 0), res);
+        return res;
     }
 
     Surface res(rt, fm);
 
 #if SDL_VERSION_ATLEAST(2, 0, 0)
     if(amask())
-	SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
+        SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
 #else
     if(amask())
-	SDL_SetAlpha(surface, 0, 0);
+        SDL_SetAlpha(surface, 0, 0);
 #endif
 
     Blit(rt, Point(0, 0), res);
 
 #if SDL_VERSION_ATLEAST(2, 0, 0)
     if(amask())
-	SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_BLEND);
+        SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_BLEND);
 #else
     if(amask())
-	SDL_SetAlpha(surface, SDL_SRCALPHA, 255);
+        SDL_SetAlpha(surface, SDL_SRCALPHA, 255);
 #endif
 
     return res;
@@ -1237,10 +1237,10 @@ void Surface::DrawRect(const Rect & rt, const RGBA & color)
 void Surface::DrawBorder(const RGBA & color, bool solid)
 {
     if(solid)
-	DrawRect(Rect(Point(0, 0), GetSize()), color);
+        DrawRect(Rect(Point(0, 0), GetSize()), color);
     else
     {
-	const u32 pixel = MapRGB(color);
+        const u32 pixel = MapRGB(color);
 
         for(int i = 0; i < w(); ++i)
         {

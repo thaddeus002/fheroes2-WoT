@@ -105,15 +105,15 @@ int ObjWatr::GetActionObject(u32 index)
 {
     switch(index)
     {
-        case 62:	return MP2::OBJ_MAGELLANMAPS;
-        case 195:	return MP2::OBJ_BUOY;
+        case 62:        return MP2::OBJ_MAGELLANMAPS;
+        case 195:        return MP2::OBJ_BUOY;
         case 202:
         case 206:
         case 210:
         case 214:
         case 218:
-        case 222:	return MP2::OBJ_WHIRLPOOL;
-        case 241:	return MP2::OBJ_SHIPWRECK;
+        case 222:        return MP2::OBJ_WHIRLPOOL;
+        case 241:        return MP2::OBJ_SHIPWRECK;
         default: break;
     }
 
@@ -124,7 +124,7 @@ int ObjWat2::GetActionObject(u32 index)
 {
     switch(index)
     {
-        case 21:	return MP2::OBJ_DERELICTSHIP;
+        case 21:        return MP2::OBJ_DERELICTSHIP;
         default: break;
     }
 

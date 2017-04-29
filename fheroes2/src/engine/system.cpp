@@ -119,8 +119,8 @@ ListDirs System::GetDataDirectories(const std::string & prog)
 
     if(SDL_ANDROID_EXTERNAL_STORAGE_READ && SDL_AndroidGetExternalStorageState())
     {
-	const char* external = SDL_AndroidGetExternalStoragePath();
-	if(external) dirs.push_back(System::ConcatePath(external, prog));
+        const char* external = SDL_AndroidGetExternalStoragePath();
+        if(external) dirs.push_back(System::ConcatePath(external, prog));
     }
 
     dirs.push_back(System::ConcatePath("/storage/sdcard0", prog));
@@ -141,23 +141,23 @@ ListFiles System::GetListFiles(const std::string & prog, const std::string & pre
     StreamFile sf;
     if(sf.open("assets.list", "rb"))
     {
-	std::list<std::string> rows = StringSplit(GetString(sf.getRaw(sf.size())), "\n");
-	for(std::list<std::string>::const_iterator
-	    it = rows.begin(); it != rows.end(); ++it)
-	if(prefix.empty() ||
-	    ((prefix.size() <= (*it).size() &&
-		0 == prefix.compare((*it).substr(0, prefix.size())))))
-	{
-	    if(filter.empty() ||
-		(0 == filter.compare((*it).substr((*it).size() - filter.size(), filter.size()))))
-		res.push_back(*it);
-	}
+        std::list<std::string> rows = StringSplit(GetString(sf.getRaw(sf.size())), "\n");
+        for(std::list<std::string>::const_iterator
+            it = rows.begin(); it != rows.end(); ++it)
+        if(prefix.empty() ||
+            ((prefix.size() <= (*it).size() &&
+                0 == prefix.compare((*it).substr(0, prefix.size())))))
+        {
+            if(filter.empty() ||
+                (0 == filter.compare((*it).substr((*it).size() - filter.size(), filter.size()))))
+                res.push_back(*it);
+        }
     }
 
     ListDirs dirs = GetDataDirectories(prog);
 
     for(ListDirs::const_iterator
-	it = dirs.begin(); it != dirs.end(); ++it)
+        it = dirs.begin(); it != dirs.end(); ++it)
     {
         res.ReadDir(prefix.size() ? System::ConcatePath(*it, prefix) : *it, filter, false);
     }
@@ -246,15 +246,15 @@ std::string System::GetMessageLocale(int length /* 1, 2, 3 */)
 
     if(clocale)
     {
-	locname = StringLower(clocale);
-	// 3: en_us.utf-8
-	// 2: en_us
-	// 1: en
-	if(length < 3)
-	{
-	    std::list<std::string> list = StringSplit(locname, length < 2 ? "_" : ".");
-	    return list.empty() ? locname : list.front();
-	}
+        locname = StringLower(clocale);
+        // 3: en_us.utf-8
+        // 2: en_us
+        // 1: en
+        if(length < 3)
+        {
+            std::list<std::string> list = StringSplit(locname, length < 2 ? "_" : ".");
+            return list.empty() ? locname : list.front();
+        }
     }
 
     return locname;
@@ -365,10 +365,10 @@ int System::CreateTrayIcon(bool fl)
 
     if(fl)
     {
-	nid.uFlags = NIF_ICON | NIF_MESSAGE;
-	nid.uCallbackMessage = WM_USER;
-	nid.hIcon = ::LoadIcon(SDL_Instance, MAKEINTRESOURCE(ID_ICON));
-	return Shell_NotifyIcon(NIM_ADD, &nid);
+        nid.uFlags = NIF_ICON | NIF_MESSAGE;
+        nid.uCallbackMessage = WM_USER;
+        nid.hIcon = ::LoadIcon(SDL_Instance, MAKEINTRESOURCE(ID_ICON));
+        return Shell_NotifyIcon(NIM_ADD, &nid);
     }
 
     return Shell_NotifyIcon(NIM_DELETE, &nid);
@@ -389,19 +389,19 @@ void System::PowerManagerOff(bool fl)
     if(ERROR_SUCCESS == RegOpenKeyEx(HKEY_LOCAL_MACHINE, lpGlobalSubKeyPM, 0, KEY_ALL_ACCESS, &hKey))
     {
         DWORD dwType = REG_DWORD;
-	DWORD value = 0;
+        DWORD value = 0;
 
-	// save orig value
-	if(fl)
-	{
-    	    DWORD valueLen = sizeof(origValuePM);
+        // save orig value
+        if(fl)
+        {
+                DWORD valueLen = sizeof(origValuePM);
 
-    	    if(ERROR_SUCCESS == RegQueryValueEx(hKey, lpNamePM, 0, &dwType, (LPBYTE) &origValuePM, &valueLen))
-		RegSetValueEx(hKey, lpNamePM, 0, dwType, (const BYTE*) &value, sizeof(value));
-	}
-	else
-	if(origValuePM)
-	    RegSetValueEx(hKey, lpNamePM, 0, dwType, (const BYTE*) &origValuePM, sizeof(origValuePM));
+                if(ERROR_SUCCESS == RegQueryValueEx(hKey, lpNamePM, 0, &dwType, (LPBYTE) &origValuePM, &valueLen))
+                RegSetValueEx(hKey, lpNamePM, 0, dwType, (const BYTE*) &value, sizeof(value));
+        }
+        else
+        if(origValuePM)
+            RegSetValueEx(hKey, lpNamePM, 0, dwType, (const BYTE*) &origValuePM, sizeof(origValuePM));
 
         RegCloseKey(hKey);
     }
@@ -422,19 +422,19 @@ void System::PowerManagerOff(bool fl)
     if(ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, lpGlobalSubKeyBL, 0, KEY_ALL_ACCESS, &hKey))
     {
         DWORD dwType = REG_DWORD;
-	DWORD value = 0;
+        DWORD value = 0;
 
-	// save orig value
-	if(fl)
-	{
-    	    DWORD valueLen = sizeof(origValueBL);
+        // save orig value
+        if(fl)
+        {
+                DWORD valueLen = sizeof(origValueBL);
 
-    	    if(ERROR_SUCCESS == RegQueryValueEx(hKey, lpNameBL, 0, &dwType, (LPBYTE) &origValueBL, &valueLen))
-		RegSetValueEx(hKey, lpNameBL, 0, dwType, (const BYTE*) &value, sizeof(value));
-	}
-	else
-	if(origValueBL)
-	    RegSetValueEx(hKey, lpNameBL, 0, dwType, (const BYTE*) &origValueBL, sizeof(origValueBL));
+                if(ERROR_SUCCESS == RegQueryValueEx(hKey, lpNameBL, 0, &dwType, (LPBYTE) &origValueBL, &valueLen))
+                RegSetValueEx(hKey, lpNameBL, 0, dwType, (const BYTE*) &value, sizeof(value));
+        }
+        else
+        if(origValueBL)
+            RegSetValueEx(hKey, lpNameBL, 0, dwType, (const BYTE*) &origValueBL, sizeof(origValueBL));
 
         RegCloseKey(hKey);
     }

@@ -106,22 +106,22 @@ public:
 
     void RedrawItem(const int & index, s32 dstx, s32 dsty, bool current)
     {
-	Display & display = Display::Get();
-	Surface port = Heroes::GetPortrait(index, PORT_SMALL);
+        Display & display = Display::Get();
+        Surface port = Heroes::GetPortrait(index, PORT_SMALL);
 
-	if(port.isValid())
-	    port.Blit(dstx + 5, dsty + 3, display);
+        if(port.isValid())
+            port.Blit(dstx + 5, dsty + 3, display);
 
-	Text text(Heroes::GetName(index), (current ? Font::YELLOW_BIG : Font::BIG));
-	text.Blit(dstx + 50, dsty + 5);
+        Text text(Heroes::GetName(index), (current ? Font::YELLOW_BIG : Font::BIG));
+        text.Blit(dstx + 50, dsty + 5);
     };
 
     void RedrawBackground(const Point & dst)
     {
-	Text text("Select Hero:", Font::YELLOW_BIG);
-	text.Blit(dst.x + (area.w - text.w()) / 2, dst.y);
+        Text text("Select Hero:", Font::YELLOW_BIG);
+        text.Blit(dst.x + (area.w - text.w()) / 2, dst.y);
 
-	SelectEnum::RedrawBackground(dst);
+        SelectEnum::RedrawBackground(dst);
     };
 };
 
@@ -240,8 +240,8 @@ Skill::Secondary Dialog::SelectSecondarySkill(void)
 
     if(result == Dialog::OK || listbox.ok)
     {
-	skill.SetSkill(1 + (listbox.GetCurrent() / 3));
-	skill.SetLevel(1 + (listbox.GetCurrent() % 3));
+        skill.SetSkill(1 + (listbox.GetCurrent() / 3));
+        skill.SetLevel(1 + (listbox.GetCurrent() % 3));
     }
 
     return skill;
@@ -267,7 +267,7 @@ Spell Dialog::SelectSpell(int cur)
 
     listbox.SetListContent(spells);
     if(cur != Spell::NONE)
-	listbox.SetCurrent(static_cast<int>(cur));
+        listbox.SetCurrent(static_cast<int>(cur));
     listbox.Redraw();
 
     ButtonGroups btnGroups(area, Dialog::OK|Dialog::CANCEL);
@@ -291,7 +291,7 @@ Spell Dialog::SelectSpell(int cur)
     }
 
     return result == Dialog::OK || listbox.ok ?
-	Spell(listbox.GetCurrent()) : Spell(Spell::NONE);
+        Spell(listbox.GetCurrent()) : Spell(Spell::NONE);
 }
 
 
@@ -316,7 +316,7 @@ Artifact Dialog::SelectArtifact(int cur)
 
     listbox.SetListContent(artifacts);
     if(cur != Artifact::UNKNOWN)
-	listbox.SetCurrent(static_cast<int>(cur));
+        listbox.SetCurrent(static_cast<int>(cur));
     listbox.Redraw();
 
     ButtonGroups btnGroups(area, Dialog::OK|Dialog::CANCEL);
@@ -340,7 +340,7 @@ Artifact Dialog::SelectArtifact(int cur)
     }
 
     return result == Dialog::OK || listbox.ok ?
-	Artifact(listbox.GetCurrent()) : Artifact(Artifact::UNKNOWN);
+        Artifact(listbox.GetCurrent()) : Artifact(Artifact::UNKNOWN);
 }
 
 Monster Dialog::SelectMonster(int id)
@@ -364,7 +364,7 @@ Monster Dialog::SelectMonster(int id)
 
     listbox.SetListContent(monsters);
     if(id != Monster::UNKNOWN)
-	listbox.SetCurrent(static_cast<int>(id));
+        listbox.SetCurrent(static_cast<int>(id));
     listbox.Redraw();
 
     ButtonGroups btnGroups(area, Dialog::OK|Dialog::CANCEL);
@@ -388,7 +388,7 @@ Monster Dialog::SelectMonster(int id)
     }
 
     return result == Dialog::OK || listbox.ok ?
-	Monster(listbox.GetCurrent()) : Monster(Monster::UNKNOWN);
+        Monster(listbox.GetCurrent()) : Monster(Monster::UNKNOWN);
 }
 
 int Dialog::SelectHeroes(int cur)
@@ -412,7 +412,7 @@ int Dialog::SelectHeroes(int cur)
 
     listbox.SetListContent(heroes);
     if(cur != Heroes::UNKNOWN)
-	listbox.SetCurrent(cur);
+        listbox.SetCurrent(cur);
     listbox.Redraw();
 
     ButtonGroups btnGroups(area, Dialog::OK|Dialog::CANCEL);
@@ -436,5 +436,5 @@ int Dialog::SelectHeroes(int cur)
     }
 
     return result == Dialog::OK || listbox.ok ?
-	listbox.GetCurrent() : Heroes::UNKNOWN;
+        listbox.GetCurrent() : Heroes::UNKNOWN;
 }

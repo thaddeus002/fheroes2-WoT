@@ -37,8 +37,8 @@
 
 struct buildstats_t
 {
-    u32		id2;
-    u8		race;
+    u32                id2;
+    u8                race;
     cost_t      cost;
 };
 
@@ -154,13 +154,13 @@ void BuildingInfo::UpdateCosts(const std::string & spec)
     if(doc.LoadFile(spec.c_str()) &&
         NULL != (xml_buildings = doc.FirstChildElement("buildings")))
     {
-	size_t index = 0;
+        size_t index = 0;
 
         for(const TiXmlElement* xml_building = xml_buildings->FirstChildElement("building");
-    		xml_building && BUILD_NOTHING != _builds[index].id2; xml_building = xml_building->NextSiblingElement("building"), ++index)
+                    xml_building && BUILD_NOTHING != _builds[index].id2; xml_building = xml_building->NextSiblingElement("building"), ++index)
         {
-    	    cost_t & cost = _builds[index].cost;
-	    int value;
+                cost_t & cost = _builds[index].cost;
+            int value;
 
             xml_building->Attribute("gold", &value); cost.gold = value;
             xml_building->Attribute("wood", &value); cost.wood = value;
@@ -169,7 +169,7 @@ void BuildingInfo::UpdateCosts(const std::string & spec)
             xml_building->Attribute("sulfur", &value); cost.sulfur = value;
             xml_building->Attribute("crystal", &value); cost.crystal = value;
             xml_building->Attribute("gems", &value); cost.gems = value;
-	}
+        }
     }
     else
     VERBOSE(spec << ": " << doc.ErrorDesc());
@@ -185,13 +185,13 @@ payment_t BuildingInfo::GetCost(u32 build, int race)
 
     if(BUILD_NOTHING != ptr->id2)
     {
-	payment.gold = ptr->cost.gold;
-	payment.wood = ptr->cost.wood;
-	payment.mercury = ptr->cost.mercury;
-	payment.ore = ptr->cost.ore;
-	payment.sulfur = ptr->cost.sulfur;
-	payment.crystal = ptr->cost.crystal;
-	payment.gems = ptr->cost.gems;
+        payment.gold = ptr->cost.gold;
+        payment.wood = ptr->cost.wood;
+        payment.mercury = ptr->cost.mercury;
+        payment.ore = ptr->cost.ore;
+        payment.sulfur = ptr->cost.sulfur;
+        payment.crystal = ptr->cost.crystal;
+        payment.gems = ptr->cost.gems;
     }
 
     return payment;
@@ -201,38 +201,38 @@ int GetIndexBuildingSprite(u32 build)
 {
     switch(build)
     {
-	case DWELLING_MONSTER1:	return 19;
-	case DWELLING_MONSTER2: return 20;
-	case DWELLING_MONSTER3: return 21;
-	case DWELLING_MONSTER4: return 22;
-	case DWELLING_MONSTER5: return 23;
-	case DWELLING_MONSTER6: return 24;
-	case DWELLING_UPGRADE2: return 25;
-	case DWELLING_UPGRADE3: return 26;
-	case DWELLING_UPGRADE4: return 27;
-	case DWELLING_UPGRADE5: return 28;
-	case DWELLING_UPGRADE6: return 29;
-	case DWELLING_UPGRADE7: return 30;
-	case BUILD_MAGEGUILD1:
-	case BUILD_MAGEGUILD2:
-	case BUILD_MAGEGUILD3:
-	case BUILD_MAGEGUILD4:
-	case BUILD_MAGEGUILD5:	return 0;
-	case BUILD_THIEVESGUILD:return 1;
-	case BUILD_SHRINE:
-	case BUILD_TAVERN:	return 2;
-	case BUILD_SHIPYARD:	return 3;
-	case BUILD_WELL:	return 4;
-	case BUILD_CASTLE:	return 6;
-	case BUILD_STATUE:	return 7;
-	case BUILD_LEFTTURRET:	return 8;
-	case BUILD_RIGHTTURRET:	return 9;
-	case BUILD_MARKETPLACE:	return 10;
-	case BUILD_WEL2:	return 11;
-	case BUILD_MOAT:	return 12;
-	case BUILD_SPEC:	return 13;
-	case BUILD_CAPTAIN:	return 15;
-	default: break;
+        case DWELLING_MONSTER1:        return 19;
+        case DWELLING_MONSTER2: return 20;
+        case DWELLING_MONSTER3: return 21;
+        case DWELLING_MONSTER4: return 22;
+        case DWELLING_MONSTER5: return 23;
+        case DWELLING_MONSTER6: return 24;
+        case DWELLING_UPGRADE2: return 25;
+        case DWELLING_UPGRADE3: return 26;
+        case DWELLING_UPGRADE4: return 27;
+        case DWELLING_UPGRADE5: return 28;
+        case DWELLING_UPGRADE6: return 29;
+        case DWELLING_UPGRADE7: return 30;
+        case BUILD_MAGEGUILD1:
+        case BUILD_MAGEGUILD2:
+        case BUILD_MAGEGUILD3:
+        case BUILD_MAGEGUILD4:
+        case BUILD_MAGEGUILD5:        return 0;
+        case BUILD_THIEVESGUILD:return 1;
+        case BUILD_SHRINE:
+        case BUILD_TAVERN:        return 2;
+        case BUILD_SHIPYARD:        return 3;
+        case BUILD_WELL:        return 4;
+        case BUILD_CASTLE:        return 6;
+        case BUILD_STATUE:        return 7;
+        case BUILD_LEFTTURRET:        return 8;
+        case BUILD_RIGHTTURRET:        return 9;
+        case BUILD_MARKETPLACE:        return 10;
+        case BUILD_WEL2:        return 11;
+        case BUILD_MOAT:        return 12;
+        case BUILD_SPEC:        return 13;
+        case BUILD_CAPTAIN:        return 15;
+        default: break;
     }
 
     return 0;
@@ -245,52 +245,52 @@ BuildingInfo::BuildingInfo(const Castle & c, building_t b) : castle(c), building
     building = castle.isBuild(b) ? castle.GetUpgradeBuilding(b) : b;
 
     if(BUILD_TAVERN == building && Race::NECR == castle.GetRace())
-	building = Settings::Get().PriceLoyaltyVersion() ? BUILD_SHRINE : BUILD_TAVERN;
+        building = Settings::Get().PriceLoyaltyVersion() ? BUILD_SHRINE : BUILD_TAVERN;
 
     bcond = castle.CheckBuyBuilding(building);
 
     // generate description
     if(BUILD_DISABLE == bcond)
-	description = GetConditionDescription();
+        description = GetConditionDescription();
     else
     if(IsDwelling())
     {
-	description = _("The %{building} produces %{monster}.");
+        description = _("The %{building} produces %{monster}.");
         StringReplace(description, "%{building}", Castle::GetStringBuilding(building, castle.GetRace()));
         StringReplace(description, "%{monster}", StringLower(Monster(castle.GetRace(), building).GetMultiName()));
     }
     else
-    	description = Castle::GetDescriptionBuilding(building, castle.GetRace());
+            description = Castle::GetDescriptionBuilding(building, castle.GetRace());
 
     switch(building)
     {
-	case BUILD_WELL:
-    	    StringReplace(description, "%{count}", Castle::GetGrownWell());
-	    break;
+        case BUILD_WELL:
+                StringReplace(description, "%{count}", Castle::GetGrownWell());
+            break;
 
-	case BUILD_WEL2:
-    	    StringReplace(description, "%{count}", Castle::GetGrownWel2());
-	    break;
+        case BUILD_WEL2:
+                StringReplace(description, "%{count}", Castle::GetGrownWel2());
+            break;
 
-	case BUILD_CASTLE:
-	case BUILD_STATUE:
-	case BUILD_SPEC:
-	{
-	    const payment_t profit = ProfitConditions::FromBuilding(building, castle.GetRace());
-	    StringReplace(description, "%{count}", profit.gold);
-	    break;
-	}
+        case BUILD_CASTLE:
+        case BUILD_STATUE:
+        case BUILD_SPEC:
+        {
+            const payment_t profit = ProfitConditions::FromBuilding(building, castle.GetRace());
+            StringReplace(description, "%{count}", profit.gold);
+            break;
+        }
 
-	default: break;
+        default: break;
     }
 
     // fix area for capratin
     if(b == BUILD_CAPTAIN)
     {
-	const Sprite & sprite = AGG::GetICN(ICN::Get4Captain(castle.GetRace()),
-						(building & BUILD_CAPTAIN ? 1 : 0));
-	area.w = sprite.w();
-	area.h = sprite.h();
+        const Sprite & sprite = AGG::GetICN(ICN::Get4Captain(castle.GetRace()),
+                                                (building & BUILD_CAPTAIN ? 1 : 0));
+        area.w = sprite.w();
+        area.h = sprite.h();
     }
 }
 
@@ -314,20 +314,20 @@ bool BuildingInfo::IsDwelling(void) const
 {
     switch(building)
     {
-	case DWELLING_MONSTER1:
-	case DWELLING_MONSTER2:
-	case DWELLING_MONSTER3:
-	case DWELLING_MONSTER4:
-	case DWELLING_MONSTER5:
-	case DWELLING_MONSTER6:
-	case DWELLING_UPGRADE2:
-	case DWELLING_UPGRADE3:
-	case DWELLING_UPGRADE4:
-	case DWELLING_UPGRADE5:
-	case DWELLING_UPGRADE6:
-	case DWELLING_UPGRADE7:
-	    return true;
-	default: break;
+        case DWELLING_MONSTER1:
+        case DWELLING_MONSTER2:
+        case DWELLING_MONSTER3:
+        case DWELLING_MONSTER4:
+        case DWELLING_MONSTER5:
+        case DWELLING_MONSTER6:
+        case DWELLING_UPGRADE2:
+        case DWELLING_UPGRADE3:
+        case DWELLING_UPGRADE4:
+        case DWELLING_UPGRADE5:
+        case DWELLING_UPGRADE6:
+        case DWELLING_UPGRADE7:
+            return true;
+        default: break;
     }
     return false;
 }
@@ -335,7 +335,7 @@ bool BuildingInfo::IsDwelling(void) const
 void BuildingInfo::RedrawCaptain(void)
 {
     AGG::GetICN(ICN::Get4Captain(castle.GetRace()),
-				(building & BUILD_CAPTAIN ? 1 : 0)).Blit(area.x, area.y);
+                                (building & BUILD_CAPTAIN ? 1 : 0)).Blit(area.x, area.y);
 
     const Sprite & sprite_allow = AGG::GetICN(ICN::TOWNWIND, 11);
     const Sprite & sprite_deny  = AGG::GetICN(ICN::TOWNWIND, 12);
@@ -350,10 +350,10 @@ void BuildingInfo::RedrawCaptain(void)
     else
     if(! allow_buy)
     {
-	if(LACK_RESOURCES == bcond)
-	    sprite_money.Blit(dst_pt);
-	else
-	    sprite_deny.Blit(dst_pt);
+        if(LACK_RESOURCES == bcond)
+            sprite_money.Blit(dst_pt);
+        else
+            sprite_deny.Blit(dst_pt);
     }
 }
 
@@ -361,64 +361,64 @@ void BuildingInfo::Redraw(void)
 {
     if(BUILD_CAPTAIN == building)
     {
-	RedrawCaptain();
+        RedrawCaptain();
     }
     else
     {
-	int index = GetIndexBuildingSprite(building);
+        int index = GetIndexBuildingSprite(building);
 
-	if(BUILD_DISABLE == bcond)
-	{
-	    AGG::GetICN(ICN::BLDGXTRA, 0).RenderGrayScale().Blit(area.x, area.y, Display::Get());
-	}
-	else
-	{
-	    AGG::GetICN(ICN::BLDGXTRA, 0).Blit(area.x, area.y);
-	}
-
-	// build image
-        if(BUILD_DISABLE == bcond && BUILD_TAVERN == building)
-	    // skip tavern necr
-	    Display::Get().FillRect(Rect(area.x + 1, area.y + 1, 135, 57), ColorBlack);
-	else
-	    AGG::GetICN(ICN::Get4Building(castle.GetRace()), index).Blit(area.x + 1, area.y + 1);
-
-	const Sprite & sprite_allow = AGG::GetICN(ICN::TOWNWIND, 11);
-	const Sprite & sprite_deny  = AGG::GetICN(ICN::TOWNWIND, 12);
-	const Sprite & sprite_money = AGG::GetICN(ICN::TOWNWIND, 13);
-
-	Point dst_pt(area.x + 115, area.y + 40);
-
-	// indicator
-	if(bcond == ALREADY_BUILT)
-	    sprite_allow.Blit(dst_pt);
-	else
-	if(bcond == BUILD_DISABLE)
-	{
-	    sprite_deny.RenderGrayScale().Blit(dst_pt, Display::Get());
-	}
-	else
-	if(bcond != ALLOW_BUILD)
+        if(BUILD_DISABLE == bcond)
         {
-	    if(LACK_RESOURCES == bcond)
-		sprite_money.Blit(dst_pt);
-	    else
-		sprite_deny.Blit(dst_pt);
-	}
+            AGG::GetICN(ICN::BLDGXTRA, 0).RenderGrayScale().Blit(area.x, area.y, Display::Get());
+        }
+        else
+        {
+            AGG::GetICN(ICN::BLDGXTRA, 0).Blit(area.x, area.y);
+        }
 
-	// status bar
-	if(bcond != BUILD_DISABLE && bcond != ALREADY_BUILT)
-	{
-	    dst_pt.x = area.x;
-	    dst_pt.y = area.y + 58;
-	    AGG::GetICN(ICN::CASLXTRA, bcond == ALLOW_BUILD ? 1 : 2).Blit(dst_pt);
-	}
+        // build image
+        if(BUILD_DISABLE == bcond && BUILD_TAVERN == building)
+            // skip tavern necr
+            Display::Get().FillRect(Rect(area.x + 1, area.y + 1, 135, 57), ColorBlack);
+        else
+            AGG::GetICN(ICN::Get4Building(castle.GetRace()), index).Blit(area.x + 1, area.y + 1);
 
-	// name
-	Text text(Castle::GetStringBuilding(building, castle.GetRace()), Font::SMALL);
-	dst_pt.x = area.x + 68 - text.w() / 2;
+        const Sprite & sprite_allow = AGG::GetICN(ICN::TOWNWIND, 11);
+        const Sprite & sprite_deny  = AGG::GetICN(ICN::TOWNWIND, 12);
+        const Sprite & sprite_money = AGG::GetICN(ICN::TOWNWIND, 13);
+
+        Point dst_pt(area.x + 115, area.y + 40);
+
+        // indicator
+        if(bcond == ALREADY_BUILT)
+            sprite_allow.Blit(dst_pt);
+        else
+        if(bcond == BUILD_DISABLE)
+        {
+            sprite_deny.RenderGrayScale().Blit(dst_pt, Display::Get());
+        }
+        else
+        if(bcond != ALLOW_BUILD)
+        {
+            if(LACK_RESOURCES == bcond)
+                sprite_money.Blit(dst_pt);
+            else
+                sprite_deny.Blit(dst_pt);
+        }
+
+        // status bar
+        if(bcond != BUILD_DISABLE && bcond != ALREADY_BUILT)
+        {
+            dst_pt.x = area.x;
+            dst_pt.y = area.y + 58;
+            AGG::GetICN(ICN::CASLXTRA, bcond == ALLOW_BUILD ? 1 : 2).Blit(dst_pt);
+        }
+
+        // name
+        Text text(Castle::GetStringBuilding(building, castle.GetRace()), Font::SMALL);
+        dst_pt.x = area.x + 68 - text.w() / 2;
         dst_pt.y = area.y + 59;
-	text.Blit(dst_pt);
+        text.Blit(dst_pt);
     }
 }
 
@@ -439,24 +439,24 @@ bool BuildingInfo::QueueEventProcessing(void)
 
     if(le.MouseClickLeft(area))
     {
-	if(bcond == ALREADY_BUILT)
-	    Dialog::Message(GetName(), GetDescription(), Font::BIG, Dialog::OK);
-	else
-	if(bcond == ALLOW_BUILD || bcond == REQUIRES_BUILD || bcond == LACK_RESOURCES)
-	    return DialogBuyBuilding(true);
-	else
-	    Dialog::Message("", GetConditionDescription(), Font::BIG, Dialog::OK);
+        if(bcond == ALREADY_BUILT)
+            Dialog::Message(GetName(), GetDescription(), Font::BIG, Dialog::OK);
+        else
+        if(bcond == ALLOW_BUILD || bcond == REQUIRES_BUILD || bcond == LACK_RESOURCES)
+            return DialogBuyBuilding(true);
+        else
+            Dialog::Message("", GetConditionDescription(), Font::BIG, Dialog::OK);
     }
     else
     if(le.MousePressRight(area))
     {
-	if(bcond == ALREADY_BUILT)
-	    Dialog::Message(GetName(), GetDescription(), Font::BIG);
-	else
-	if(bcond == ALLOW_BUILD || bcond == REQUIRES_BUILD || bcond == LACK_RESOURCES)
-	    DialogBuyBuilding(false);
-	else
-	    Dialog::Message("", GetConditionDescription(), Font::BIG);
+        if(bcond == ALREADY_BUILT)
+            Dialog::Message(GetName(), GetDescription(), Font::BIG);
+        else
+        if(bcond == ALLOW_BUILD || bcond == REQUIRES_BUILD || bcond == LACK_RESOURCES)
+            DialogBuyBuilding(false);
+        else
+            Dialog::Message("", GetConditionDescription(), Font::BIG);
     }
     return false;
 }
@@ -474,13 +474,13 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
 
     if(ALLOW_BUILD != bcond)
     {
-	const std::string & ext = GetConditionDescription();
+        const std::string & ext = GetConditionDescription();
 
-	if(! ext.empty())
-	{
-	    box1str.append("\n \n");
-	    box1str.append(ext);
-	}
+        if(! ext.empty())
+        {
+            box1str.append("\n \n");
+            box1str.append(ext);
+        }
     }
 
     TextBox box1(box1str, Font::BIG, BOXAREA_WIDTH);
@@ -493,13 +493,13 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
     for(u32 itr = 0x00000001; itr; itr <<= 1)
         if((requires & itr) && ! castle.isBuild(itr))
     {
-	str.append(Castle::GetStringBuilding(itr, castle.GetRace()));
-	str.append(sep);
+        str.append(Castle::GetStringBuilding(itr, castle.GetRace()));
+        str.append(sep);
     }
 
     // replace end sep
     if(str.size())
-	str.replace(str.size() - strlen(sep), strlen(sep), ".");
+        str.replace(str.size() - strlen(sep), strlen(sep), ".");
 
     bool requires_true = str.size();
     Text requires_text(_("Requires:"), Font::BIG);
@@ -528,7 +528,7 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
     window_icons.Blit(dst_pt);
 
     const Sprite & building_icons = AGG::GetICN(ICN::Get4Building(castle.GetRace()),
-					    GetIndexBuildingSprite(building));
+                                            GetIndexBuildingSprite(building));
     dst_pt.x = box_rt.x + (box_rt.w - building_icons.w()) / 2;
     dst_pt.y += 1;
     building_icons.Blit(dst_pt);
@@ -545,14 +545,14 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
     dst_pt.y += box1.h() + space;
     if(requires_true)
     {
-	dst_pt.x = box_rt.x + (box_rt.w - requires_text.w()) / 2;
-	requires_text.Blit(dst_pt);
+        dst_pt.x = box_rt.x + (box_rt.w - requires_text.w()) / 2;
+        requires_text.Blit(dst_pt);
 
-	dst_pt.x = box_rt.x;
-	dst_pt.y += requires_text.h();
-	box2.Blit(dst_pt);
+        dst_pt.x = box_rt.x;
+        dst_pt.y += requires_text.h();
+        box2.Blit(dst_pt);
 
-	dst_pt.y += box2.h() + space;
+        dst_pt.y += box2.h() + space;
     }
 
     rbs.SetPos(dst_pt.x, dst_pt.y);
@@ -560,11 +560,11 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
 
     if(buttons)
     {
-	if(ALLOW_BUILD != castle.CheckBuyBuilding(building))
-	    button1.SetDisable(true);
+        if(ALLOW_BUILD != castle.CheckBuyBuilding(building))
+            button1.SetDisable(true);
 
-	button1.Draw();
-	button2.Draw();
+        button1.Draw();
+        button2.Draw();
     }
 
     cursor.Show();
@@ -579,11 +579,11 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
         le.MousePressLeft(button2) ? button2.PressDraw() : button2.ReleaseDraw();
 
         if(button1.isEnable() &&
-	    (Game::HotKeyPressEvent(Game::EVENT_DEFAULT_READY) ||
-    	    le.MouseClickLeft(button1))) return true;
+            (Game::HotKeyPressEvent(Game::EVENT_DEFAULT_READY) ||
+                le.MouseClickLeft(button1))) return true;
 
         if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT) ||
-    	    le.MouseClickLeft(button2)) break;
+                le.MouseClickLeft(button2)) break;
     }
 
     return false;
@@ -593,14 +593,14 @@ const char* GetBuildConditionDescription(int bcond)
 {
     switch(bcond)
     {
-	case NOT_TODAY:
-	    return _("Cannot build. Already built here this turn.");
-	    break;
+        case NOT_TODAY:
+            return _("Cannot build. Already built here this turn.");
+            break;
 
-	case NEED_CASTLE:
-	    return _("For this action it is necessary first to build a castle.");
+        case NEED_CASTLE:
+            return _("For this action it is necessary first to build a castle.");
 
-	default: break;
+        default: break;
     }
 
     return NULL;
@@ -612,42 +612,42 @@ std::string BuildingInfo::GetConditionDescription(void) const
 
     switch(bcond)
     {
-	case NOT_TODAY:
-	case NEED_CASTLE:
-	    res = GetBuildConditionDescription(bcond);
-	    break;
+        case NOT_TODAY:
+        case NEED_CASTLE:
+            res = GetBuildConditionDescription(bcond);
+            break;
 
-	case BUILD_DISABLE:
-	    if(building == BUILD_SHIPYARD)
-	    {
-		res = _("Cannot build %{name} because castle is too far from water.");
-		StringReplace(res, "%{name}", Castle::GetStringBuilding(BUILD_SHIPYARD, castle.GetRace()));
-	    }
-	    else
-		res = "disable build.";
-	    break;
+        case BUILD_DISABLE:
+            if(building == BUILD_SHIPYARD)
+            {
+                res = _("Cannot build %{name} because castle is too far from water.");
+                StringReplace(res, "%{name}", Castle::GetStringBuilding(BUILD_SHIPYARD, castle.GetRace()));
+            }
+            else
+                res = "disable build.";
+            break;
 
-	case LACK_RESOURCES:
-	    res = _("Cannot afford %{name}");
-    	    StringReplace(res, "%{name}", GetName());
-	    break;
+        case LACK_RESOURCES:
+            res = _("Cannot afford %{name}");
+                StringReplace(res, "%{name}", GetName());
+            break;
 
-	case ALREADY_BUILT:
-	    res = _("%{name} is already built");
-	    StringReplace(res, "%{name}", GetName());
-	    break;
+        case ALREADY_BUILT:
+            res = _("%{name} is already built");
+            StringReplace(res, "%{name}", GetName());
+            break;
 
-	case REQUIRES_BUILD:
-    	    res = _("Cannot build %{name}");
-    	    StringReplace(res, "%{name}", GetName());
-	    break;
+        case REQUIRES_BUILD:
+                res = _("Cannot build %{name}");
+                StringReplace(res, "%{name}", GetName());
+            break;
 
-	case ALLOW_BUILD:
-    	    res = _("Build %{name}");
-    	    StringReplace(res, "%{name}", GetName());
-	    break;
+        case ALLOW_BUILD:
+                res = _("Build %{name}");
+                StringReplace(res, "%{name}", GetName());
+            break;
 
-	default: break;
+        default: break;
     }
 
     return res;
@@ -659,18 +659,18 @@ void BuildingInfo::SetStatusMessage(StatusBar & bar) const
 
     switch(bcond)
     {
-	case NOT_TODAY:
-	case ALREADY_BUILT:
-	case NEED_CASTLE:
-	case BUILD_DISABLE:
-	case LACK_RESOURCES:
-	case REQUIRES_BUILD:
-	case ALLOW_BUILD:
-	    str = GetConditionDescription();
-	    break;
+        case NOT_TODAY:
+        case ALREADY_BUILT:
+        case NEED_CASTLE:
+        case BUILD_DISABLE:
+        case LACK_RESOURCES:
+        case REQUIRES_BUILD:
+        case ALLOW_BUILD:
+            str = GetConditionDescription();
+            break;
 
-	default:
-	    break;
+        default:
+            break;
     }
 
     bar.ShowMessage(str);

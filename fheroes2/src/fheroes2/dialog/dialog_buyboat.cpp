@@ -79,8 +79,8 @@ int Dialog::BuyBoat(bool enable)
 
     if(!enable)
     {
-	button1.Press();
-	button1.SetDisable(true);
+        button1.Press();
+        button1.SetDisable(true);
     }
 
     button1.Draw();
@@ -98,10 +98,10 @@ int Dialog::BuyBoat(bool enable)
         le.MousePressLeft(button2) ? button2.PressDraw() : button2.ReleaseDraw();
 
         if(button1.isEnable() &&
-	    (Game::HotKeyPressEvent(Game::EVENT_DEFAULT_READY) ||le.MouseClickLeft(button1))) return Dialog::OK;
+            (Game::HotKeyPressEvent(Game::EVENT_DEFAULT_READY) ||le.MouseClickLeft(button1))) return Dialog::OK;
 
         if(Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT) ||
-    	    le.MouseClickLeft(button2)) return Dialog::CANCEL;
+                le.MouseClickLeft(button2)) return Dialog::CANCEL;
     }
 
     return Dialog::ZERO;

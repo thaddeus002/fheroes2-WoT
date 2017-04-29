@@ -60,7 +60,7 @@ void Interface::GameBorderRedraw(void)
     for(u32 ii = 0; ii < count_w + 1; ++ii)
     {
         icnadv.Blit(srcrt, dstpt);
-	dstpt.x += TILEWIDTH;
+        dstpt.x += TILEWIDTH;
     }
     srcrt.x += TILEWIDTH;
     srcrt.w = icnadv.w() - srcrt.x;
@@ -82,7 +82,7 @@ void Interface::GameBorderRedraw(void)
     for(u32 ii = 0; ii < count_h + 1; ++ii)
     {
         icnadv.Blit(srcrt, dstpt);
-	dstpt.y += TILEWIDTH;
+        dstpt.y += TILEWIDTH;
     }
     srcrt.y += TILEWIDTH;
     srcrt.h = icnadv.h() - srcrt.y;
@@ -145,7 +145,7 @@ void Interface::GameBorderRedraw(void)
     for(u32 ii = 0; ii < count_w + 1; ++ii)
     {
         icnadv.Blit(srcrt, dstpt);
-	dstpt.x += TILEWIDTH;
+        dstpt.x += TILEWIDTH;
     }
     srcrt.x += TILEWIDTH;
     srcrt.w = icnadv.w() - srcrt.x;
@@ -173,7 +173,7 @@ Interface::BorderWindow::BorderWindow(const Rect & rt) : area(rt)
 const Rect & Interface::BorderWindow::GetRect(void) const
 {
     return Settings::Get().ExtGameHideInterface() && border.isValid() ?
-	border.GetRect() : GetArea();
+        border.GetRect() : GetArea();
 }
 
 const Rect & Interface::BorderWindow::GetArea(void) const
@@ -185,11 +185,11 @@ void Interface::BorderWindow::Redraw(void)
 {
     if(Settings::Get().QVGA())
     {
-	const Surface & sf = AGG::GetICN(ICN::RESOURCE, 7);
-	Dialog::FrameBorder::RenderOther(sf, border.GetRect());
+        const Surface & sf = AGG::GetICN(ICN::RESOURCE, 7);
+        Dialog::FrameBorder::RenderOther(sf, border.GetRect());
     }
     else
-	Dialog::FrameBorder::RenderRegular(border.GetRect());
+        Dialog::FrameBorder::RenderRegular(border.GetRect());
 }
 
 void Interface::BorderWindow::SetPosition(s32 px, s32 py, u32 pw, u32 ph)
@@ -204,21 +204,21 @@ void Interface::BorderWindow::SetPosition(s32 px, s32 py)
 {
     if(Settings::Get().ExtGameHideInterface())
     {
-	Display & display = Display::Get();
+        Display & display = Display::Get();
 
-	if(px + area.w < 0) px = 0;
-	else
-	if(px > display.w() - area.w + border.BorderWidth()) px = display.w() - area.w;
+        if(px + area.w < 0) px = 0;
+        else
+        if(px > display.w() - area.w + border.BorderWidth()) px = display.w() - area.w;
 
-	if(py + area.h < 0) py = 0;
-	else
-	if(py > display.h() - area.h + border.BorderHeight()) py = display.h() - area.h;
+        if(py + area.h < 0) py = 0;
+        else
+        if(py > display.h() - area.h + border.BorderHeight()) py = display.h() - area.h;
 
         area.x = px + border.BorderWidth();
         area.y = py + border.BorderHeight();
 
         border.SetPosition(px, py, area.w, area.h);
-	SavePosition();
+        SavePosition();
     }
     else
     {
@@ -233,13 +233,13 @@ bool Interface::BorderWindow::QueueEventProcessing(void)
     LocalEvent & le = LocalEvent::Get();
 
     if(conf.ExtGameHideInterface() &&
-	le.MousePressLeft(border.GetTop()))
+        le.MousePressLeft(border.GetTop()))
     {
-	Display & display = Display::Get();
-	Cursor & cursor = Cursor::Get();
+        Display & display = Display::Get();
+        Cursor & cursor = Cursor::Get();
 
         const Point & mp = le.GetMouseCursor();
-	const Rect & pos = GetRect();
+        const Rect & pos = GetRect();
 
         SpriteMove moveIndicator(Surface(pos, false));
         moveIndicator.DrawBorder(RGBA(0xD0, 0xC0, 0x48), false);
@@ -248,27 +248,27 @@ bool Interface::BorderWindow::QueueEventProcessing(void)
         const s32 oy = mp.y - pos.y;
 
         cursor.Hide();
-	moveIndicator.Move(pos.x, pos.y);
-	moveIndicator.Redraw();
+        moveIndicator.Move(pos.x, pos.y);
+        moveIndicator.Redraw();
         cursor.Show();
         display.Flip();
 
         while(le.HandleEvents() && le.MousePressLeft())
-	{
-    	    if(le.MouseMotion())
-    	    {
-        	    cursor.Hide();
-		    moveIndicator.Move(mp.x - ox, mp.y - oy);
-        	    cursor.Show();
-        	    display.Flip();
-    	    }
+        {
+                if(le.MouseMotion())
+                {
+                    cursor.Hide();
+                    moveIndicator.Move(mp.x - ox, mp.y - oy);
+                    cursor.Show();
+                    display.Flip();
+                }
         }
 
         cursor.Hide();
         SetPos(mp.x - ox, mp.y - oy);
         Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
 
-	return true;
+        return true;
     }
 
     return false;

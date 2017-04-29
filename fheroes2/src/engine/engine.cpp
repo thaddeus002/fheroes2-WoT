@@ -46,8 +46,8 @@ bool SDL::Init(const u32 system)
 
     if(0 > SDL_Init(system))
     {
-	ERROR(SDL_GetError());
-	return false;
+        ERROR(SDL_GetError());
+        return false;
     }
 
     if(SDL_INIT_AUDIO & system) Mixer::Init();

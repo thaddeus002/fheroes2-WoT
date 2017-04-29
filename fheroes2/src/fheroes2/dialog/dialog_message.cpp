@@ -60,7 +60,7 @@ int Dialog::Message(const std::string &header, const std::string &message, int f
     while(result == Dialog::ZERO && le.HandleEvents())
     {
         if(!buttons && !le.MousePressRight()) break;
-	result = btnGroups.QueueEventProcessing();
+        result = btnGroups.QueueEventProcessing();
     }
 
     cursor.Hide();

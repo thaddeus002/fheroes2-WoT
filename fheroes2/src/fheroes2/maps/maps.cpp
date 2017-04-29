@@ -78,8 +78,8 @@ bool TileIsObjects(s32 index, const u8* objs)
 {
     while(objs && *objs)
     {
-	if(*objs == world.GetTiles(index).GetObject()) return true;
-	++objs;
+        if(*objs == world.GetTiles(index).GetObject()) return true;
+        ++objs;
     }
     return false;
 }
@@ -87,7 +87,7 @@ bool TileIsObjects(s32 index, const u8* objs)
 Maps::Indexes & MapsIndexesFilteredObjects(Maps::Indexes & indexes, const u8* objs)
 {
     indexes.resize(std::distance(indexes.begin(),
-	    std::remove_if(indexes.begin(), indexes.end(), std::not1(std::bind2nd(std::ptr_fun(&TileIsObjects), objs)))));
+            std::remove_if(indexes.begin(), indexes.end(), std::not1(std::bind2nd(std::ptr_fun(&TileIsObjects), objs)))));
 
     return indexes;
 }
@@ -95,7 +95,7 @@ Maps::Indexes & MapsIndexesFilteredObjects(Maps::Indexes & indexes, const u8* ob
 Maps::Indexes & MapsIndexesFilteredObject(Maps::Indexes & indexes, int obj)
 {
     indexes.resize(std::distance(indexes.begin(),
-	    std::remove_if(indexes.begin(), indexes.end(), std::not1(std::bind2nd(std::ptr_fun(&TileIsObject), obj)))));
+            std::remove_if(indexes.begin(), indexes.end(), std::not1(std::bind2nd(std::ptr_fun(&TileIsObject), obj)))));
     return indexes;
 }
 
@@ -105,10 +105,10 @@ const char* Maps::SizeString(int s)
 
     switch(s)
     {
-	case SMALL:	return mapsize[1];
-	case MEDIUM:	return mapsize[2];
-	case LARGE:	return mapsize[3];
-	case XLARGE:	return mapsize[4];
+        case SMALL:        return mapsize[1];
+        case MEDIUM:        return mapsize[2];
+        case LARGE:        return mapsize[3];
+        case XLARGE:        return mapsize[4];
         default: break;
     }
 
@@ -119,12 +119,12 @@ const char* Maps::GetMinesName(int type)
 {
     switch(type)
     {
-	case Resource::ORE:	return _("Ore Mine");
-        case Resource::SULFUR:	return _("Sulfur Mine");
-        case Resource::CRYSTAL:	return _("Crystal Mine");
-        case Resource::GEMS:	return _("Gems Mine");
-        case Resource::GOLD:	return _("Gold Mine");
-	default: break;
+        case Resource::ORE:        return _("Ore Mine");
+        case Resource::SULFUR:        return _("Sulfur Mine");
+        case Resource::CRYSTAL:        return _("Crystal Mine");
+        case Resource::GEMS:        return _("Gems Mine");
+        case Resource::GOLD:        return _("Gold Mine");
+        default: break;
     }
 
     return _("Mine");
@@ -134,15 +134,15 @@ s32 Maps::GetDirectionIndex(s32 from, int vector)
 {
     switch(vector)
     {
-	case Direction::TOP:		return from - world.w();
-	case Direction::TOP_RIGHT:	return from - world.w() + 1;
-	case Direction::RIGHT:		return from + 1;
-	case Direction::BOTTOM_RIGHT:	return from + world.w() + 1;
-	case Direction::BOTTOM:		return from + world.w();
-	case Direction::BOTTOM_LEFT:	return from + world.w() - 1;
-	case Direction::LEFT:		return from - 1;
-	case Direction::TOP_LEFT:	return from - world.w() - 1;
-	default: break;
+        case Direction::TOP:                return from - world.w();
+        case Direction::TOP_RIGHT:        return from - world.w() + 1;
+        case Direction::RIGHT:                return from + 1;
+        case Direction::BOTTOM_RIGHT:        return from + world.w() + 1;
+        case Direction::BOTTOM:                return from + world.w();
+        case Direction::BOTTOM_LEFT:        return from + world.w() - 1;
+        case Direction::LEFT:                return from - 1;
+        case Direction::TOP_LEFT:        return from - world.w() - 1;
+        default: break;
     }
 
     return -1;
@@ -153,24 +153,24 @@ bool Maps::isValidDirection(s32 from, int vector)
 {
     switch(vector)
     {
-	case Direction::TOP:            return (from >= world.w());
-	case Direction::RIGHT:          return ((from % world.w()) < (world.w() - 1));
-	case Direction::BOTTOM:         return (from < world.w() * (world.h() - 1));
-	case Direction::LEFT:           return (from % world.w());
+        case Direction::TOP:            return (from >= world.w());
+        case Direction::RIGHT:          return ((from % world.w()) < (world.w() - 1));
+        case Direction::BOTTOM:         return (from < world.w() * (world.h() - 1));
+        case Direction::LEFT:           return (from % world.w());
 
-	case Direction::TOP_RIGHT:
-	    return isValidDirection(from, Direction::TOP) && isValidDirection(from, Direction::RIGHT);
+        case Direction::TOP_RIGHT:
+            return isValidDirection(from, Direction::TOP) && isValidDirection(from, Direction::RIGHT);
 
-	case Direction::BOTTOM_RIGHT:
-	    return isValidDirection(from, Direction::BOTTOM) && isValidDirection(from, Direction::RIGHT);
+        case Direction::BOTTOM_RIGHT:
+            return isValidDirection(from, Direction::BOTTOM) && isValidDirection(from, Direction::RIGHT);
 
-	case Direction::BOTTOM_LEFT:
-	    return isValidDirection(from, Direction::BOTTOM) && isValidDirection(from, Direction::LEFT);
+        case Direction::BOTTOM_LEFT:
+            return isValidDirection(from, Direction::BOTTOM) && isValidDirection(from, Direction::LEFT);
 
-	case Direction::TOP_LEFT:
-	    return isValidDirection(from, Direction::TOP) && isValidDirection(from, Direction::LEFT);
+        case Direction::TOP_LEFT:
+            return isValidDirection(from, Direction::TOP) && isValidDirection(from, Direction::LEFT);
 
-	default: break;
+        default: break;
     }
 
     return false;
@@ -208,8 +208,8 @@ s32 Maps::GetIndexFromAbsPoint(s32 px, s32 py)
 
     if(px < 0 || py < 0)
     {
-	VERBOSE("Maps::GetIndexFromAbsPoint: error coods, " << "x: " << px << ", y: " << py);
-	return -1;
+        VERBOSE("Maps::GetIndexFromAbsPoint: error coods, " << "x: " << px << ", y: " << py);
+        return -1;
     }
 
     return res;
@@ -221,8 +221,8 @@ Maps::Indexes Maps::GetAllIndexes(void)
     result.assign(world.w() * world.h(), 0);
 
     for(Indexes::iterator
-	it = result.begin(); it != result.end(); ++it)
-	*it = std::distance(result.begin(), it);
+        it = result.begin(); it != result.end(); ++it)
+        *it = std::distance(result.begin(), it);
     return result;
 }
 
@@ -233,12 +233,12 @@ Maps::Indexes Maps::GetAroundIndexes(s32 center)
 
     if(isValidAbsIndex(center))
     {
-	const Directions directions = Direction::All();
+        const Directions directions = Direction::All();
 
         for(Directions::const_iterator
             it = directions.begin(); it != directions.end(); ++it)
-	    if(isValidDirection(center, *it))
-		result.push_back(GetDirectionIndex(center, *it));
+            if(isValidDirection(center, *it))
+                result.push_back(GetDirectionIndex(center, *it));
     }
 
     return result;
@@ -252,14 +252,14 @@ Maps::Indexes Maps::GetAroundIndexes(s32 center, int dist, bool sort)
     const Point cp = GetPoint(center);
 
     for(s32 xx = cp.x - dist; xx <= cp.x + dist; ++xx)
-	for(s32 yy = cp.y - dist; yy <= cp.y + dist; ++yy)
+        for(s32 yy = cp.y - dist; yy <= cp.y + dist; ++yy)
     {
-	if(isValidAbsPoint(xx, yy) && (xx != cp.x || yy != cp.y))
-	    results.push_back(GetIndexFromAbsPoint(xx, yy));
+        if(isValidAbsPoint(xx, yy) && (xx != cp.x || yy != cp.y))
+            results.push_back(GetIndexFromAbsPoint(xx, yy));
     }
 
     if(sort)
-	std::sort(results.begin(), results.end(), ComparsionDistance(center));
+        std::sort(results.begin(), results.end(), ComparsionDistance(center));
 
     return results;
 }
@@ -294,29 +294,29 @@ void Maps::ClearFog(s32 index, int scoute, int color)
 {
     if(0 != scoute && isValidAbsIndex(index))
     {
-	const Point center = GetPoint(index);
-	const Settings & conf = Settings::Get();
+        const Point center = GetPoint(index);
+        const Settings & conf = Settings::Get();
 
-	// AI advantage
-	if(world.GetKingdom(color).isControlAI())
-	{
-	    switch(conf.GameDifficulty())
-	    {
-    		case Difficulty::NORMAL:	scoute += 2; break;
-    		case Difficulty::HARD:		scoute += 3; break;
-    		case Difficulty::EXPERT:	scoute += 4; break;
-    		case Difficulty::IMPOSSIBLE:	scoute += 6; break;
-		default: break;
-	    }
-	}
+        // AI advantage
+        if(world.GetKingdom(color).isControlAI())
+        {
+            switch(conf.GameDifficulty())
+            {
+                    case Difficulty::NORMAL:        scoute += 2; break;
+                    case Difficulty::HARD:                scoute += 3; break;
+                    case Difficulty::EXPERT:        scoute += 4; break;
+                    case Difficulty::IMPOSSIBLE:        scoute += 6; break;
+                default: break;
+            }
+        }
 
-	int colors = conf.ExtUnionsAllowViewMaps() ? Players::GetPlayerFriends(color) : color;
+        int colors = conf.ExtUnionsAllowViewMaps() ? Players::GetPlayerFriends(color) : color;
 
-	for(s32 y = center.y - scoute; y <= center.y + scoute; ++y)
-    	    for(s32 x = center.x - scoute; x <= center.x + scoute; ++x)
-        	if(isValidAbsPoint(x, y) &&
-		    (scoute + scoute / 2) >= std::abs(x - center.x) + std::abs(y - center.y))
-            	    world.GetTiles(GetIndexFromAbsPoint(x, y)).ClearFog(colors);
+        for(s32 y = center.y - scoute; y <= center.y + scoute; ++y)
+                for(s32 x = center.x - scoute; x <= center.x + scoute; ++x)
+                if(isValidAbsPoint(x, y) &&
+                    (scoute + scoute / 2) >= std::abs(x - center.x) + std::abs(y - center.y))
+                        world.GetTiles(GetIndexFromAbsPoint(x, y)).ClearFog(colors);
     }
 }
 
@@ -351,14 +351,14 @@ Maps::Indexes Maps::GetObjectPositions(int obj, bool check_hero)
 
     if(check_hero && obj != MP2::OBJ_HEROES)
     {
-	const Indexes & v = GetObjectPositions(MP2::OBJ_HEROES, false);
-	for(Indexes::const_iterator
-	    it = v.begin(); it != v.end(); ++it)
-	{
-	    const Heroes* hero = world.GetHeroes(GetPoint(*it));
-	    if(hero && obj == hero->GetMapsObject())
-		results.push_back(*it);
-	}
+        const Indexes & v = GetObjectPositions(MP2::OBJ_HEROES, false);
+        for(Indexes::const_iterator
+            it = v.begin(); it != v.end(); ++it)
+        {
+            const Heroes* hero = world.GetHeroes(GetPoint(*it));
+            if(hero && obj == hero->GetMapsObject())
+                results.push_back(*it);
+        }
     }
 
     return results;
@@ -385,22 +385,22 @@ bool MapsTileIsUnderProtection(s32 from, s32 index) /* from: center, index: mons
 
     if(tile1.isWater() == tile2.isWater())
     {
-	/* if monster can attack to */
-	result = (tile2.GetPassable() & Direction::Get(index, from)) &&
-		(tile1.GetPassable() & Direction::Get(from, index));
+        /* if monster can attack to */
+        result = (tile2.GetPassable() & Direction::Get(index, from)) &&
+                (tile1.GetPassable() & Direction::Get(from, index));
 
-	if(! result)
-	{
-	    /* h2 specific monster attack: BOTTOM_LEFT impassable! */
-	    if(Direction::BOTTOM_LEFT == Direction::Get(index, from) &&
-		(Direction::LEFT & tile2.GetPassable()) && (Direction::TOP & tile1.GetPassable()))
-		result = true;
-	    else
-	    /* h2 specific monster attack: BOTTOM_RIGHT impassable! */
-	    if(Direction::BOTTOM_RIGHT == Direction::Get(index, from) &&
-		(Direction::RIGHT & tile2.GetPassable()) && (Direction::TOP & tile1.GetPassable()))
-		result = true;
-	}
+        if(! result)
+        {
+            /* h2 specific monster attack: BOTTOM_LEFT impassable! */
+            if(Direction::BOTTOM_LEFT == Direction::Get(index, from) &&
+                (Direction::LEFT & tile2.GetPassable()) && (Direction::TOP & tile1.GetPassable()))
+                result = true;
+            else
+            /* h2 specific monster attack: BOTTOM_RIGHT impassable! */
+            if(Direction::BOTTOM_RIGHT == Direction::Get(index, from) &&
+                (Direction::RIGHT & tile2.GetPassable()) && (Direction::TOP & tile1.GetPassable()))
+                result = true;
+        }
     }
 
     return result;
@@ -414,7 +414,7 @@ bool Maps::IsNearTiles(s32 index1, s32 index2)
 bool Maps::TileIsUnderProtection(s32 center)
 {
     return MP2::OBJ_MONSTER == world.GetTiles(center).GetObject() ? true :
-	    GetTilesUnderProtection(center).size();
+            GetTilesUnderProtection(center).size();
 }
 
 Maps::Indexes Maps::GetTilesUnderProtection(s32 center)
@@ -422,11 +422,11 @@ Maps::Indexes Maps::GetTilesUnderProtection(s32 center)
     Indexes indexes = Maps::ScanAroundObject(center, MP2::OBJ_MONSTER);
 
     indexes.resize(std::distance(indexes.begin(),
-	    std::remove_if(indexes.begin(), indexes.end(),
-		std::not1(std::bind1st(std::ptr_fun(&MapsTileIsUnderProtection), center)))));
+            std::remove_if(indexes.begin(), indexes.end(),
+                std::not1(std::bind1st(std::ptr_fun(&MapsTileIsUnderProtection), center)))));
 
     if(MP2::OBJ_MONSTER == world.GetTiles(center).GetObject())
-	indexes.push_back(center);
+        indexes.push_back(center);
 
     return indexes;
 }
@@ -456,8 +456,8 @@ void Maps::MinimizeAreaForCastle(const Point & center)
     {
         Maps::Tiles & tile = world.GetTiles(center.x + xx, center.y + yy);
 
-	// skip angle
-	if(yy == -1 && (xx == -2 || xx == 2)) continue;
+        // skip angle
+        if(yy == -1 && (xx == -2 || xx == 2)) continue;
 
         tile.SetObject(MP2::OBJN_CASTLE);
     }
@@ -513,36 +513,36 @@ castle size: T and B - sprite, S - shadow, XX - center
     // correct only RND town and castle
     switch(tile_center.GetObject())
     {
-	case MP2::OBJ_RNDTOWN:
-	case MP2::OBJ_RNDCASTLE:
-	    break;
-	
-	default:
-	    DEBUG(DBG_GAME, DBG_WARN, "incorrect object" << ", index: " << GetIndexFromAbsPoint(center.x, center.y));
-	    return;
+        case MP2::OBJ_RNDTOWN:
+        case MP2::OBJ_RNDCASTLE:
+            break;
+        
+        default:
+            DEBUG(DBG_GAME, DBG_WARN, "incorrect object" << ", index: " << GetIndexFromAbsPoint(center.x, center.y));
+            return;
     }
 
     // modify all rnd sprites
     for(Indexes::const_iterator
-	it = coords.begin(); it != coords.end(); ++it)
+        it = coords.begin(); it != coords.end(); ++it)
     if(isValidAbsIndex(*it))
     {
-	Maps::TilesAddon *addon = world.GetTiles(*it).FindObject(MP2::OBJ_RNDCASTLE);
-	if(addon)
-	{
-    	    addon->object -= 12;
+        Maps::TilesAddon *addon = world.GetTiles(*it).FindObject(MP2::OBJ_RNDCASTLE);
+        if(addon)
+        {
+                addon->object -= 12;
 
-    	    switch(race)
-    	    {
-    		case Race::KNGT: break;
-        	case Race::BARB: addon->index += 32; break;
-        	case Race::SORC: addon->index += 64; break;
-        	case Race::WRLK: addon->index += 96; break;
-        	case Race::WZRD: addon->index += 128; break;
-        	case Race::NECR: addon->index += 160; break;
-        	default: break;
-	    }
-	}
+                switch(race)
+                {
+                    case Race::KNGT: break;
+                case Race::BARB: addon->index += 32; break;
+                case Race::SORC: addon->index += 64; break;
+                case Race::WRLK: addon->index += 96; break;
+                case Race::WZRD: addon->index += 128; break;
+                case Race::NECR: addon->index += 160; break;
+                default: break;
+            }
+        }
     }
 }
 
@@ -573,19 +573,19 @@ void Maps::UpdateSpritesFromTownToCastle(const Point & center)
 
     // modify all town sprites
     for(Indexes::const_iterator
-	it = coords.begin(); it != coords.end(); ++it)
+        it = coords.begin(); it != coords.end(); ++it)
     if(isValidAbsIndex(*it))
     {
-	TilesAddon *addon = world.GetTiles(*it).FindObject(MP2::OBJ_CASTLE);
-	if(addon) addon->index -= 16;
+        TilesAddon *addon = world.GetTiles(*it).FindObject(MP2::OBJ_CASTLE);
+        if(addon) addon->index -= 16;
     }
 
     // T0
     if(isValidAbsIndex(GetIndexFromAbsPoint(center.x, center.y - 3) && isValidAbsIndex(GetIndexFromAbsPoint(center.x, center.y - 2))))
     {
-	TilesAddon *addon = world.GetTiles(GetIndexFromAbsPoint(center.x, center.y - 2)).FindObject(MP2::OBJ_CASTLE);
-	if(addon)
-	    world.GetTiles(GetIndexFromAbsPoint(center.x, center.y - 3)).AddonsPushLevel2(TilesAddon(addon->level, addon->uniq, addon->object, addon->index - 3));
+        TilesAddon *addon = world.GetTiles(GetIndexFromAbsPoint(center.x, center.y - 2)).FindObject(MP2::OBJ_CASTLE);
+        if(addon)
+            world.GetTiles(GetIndexFromAbsPoint(center.x, center.y - 3)).AddonsPushLevel2(TilesAddon(addon->level, addon->uniq, addon->object, addon->index - 3));
     }
 }
 
@@ -595,8 +595,8 @@ int Maps::TileIsCoast(s32 center, int filter)
     const Directions directions = Direction::All();
 
     for(Directions::const_iterator
-	it = directions.begin(); it != directions.end(); ++it)
-	if((*it & filter) && isValidDirection(center, *it) &&
+        it = directions.begin(); it != directions.end(); ++it)
+        if((*it & filter) && isValidDirection(center, *it) &&
         world.GetTiles(GetDirectionIndex(center, *it)).isWater()) result |= *it;
 
     return result;

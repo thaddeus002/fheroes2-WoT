@@ -71,14 +71,14 @@ void PaymentConditions::UpdateCosts(const std::string & spec)
     if(doc.LoadFile(spec.c_str()) &&
         NULL != (xml_payments = doc.FirstChildElement("payments")))
     {
-	paymentstats_t* ptr = &_payments[0];
+        paymentstats_t* ptr = &_payments[0];
 
         while(ptr->id)
         {
             const TiXmlElement* xml_payment = xml_payments->FirstChildElement(ptr->id);
 
             if(xml_payment)
-        	LoadCostFromXMLElement(ptr->cost, *xml_payment);
+                LoadCostFromXMLElement(ptr->cost, *xml_payment);
 
             ++ptr;
         }
@@ -112,10 +112,10 @@ payment_t PaymentConditions::BuySpellBook(int shrine)
 
     switch(shrine)
     {
-	case 1:  skey = "buy_spell_book_from_shrine1"; break;
-	case 2:  skey = "buy_spell_book_from_shrine2"; break;
-	case 3:  skey = "buy_spell_book_from_shrine3"; break;
-	default: skey = "buy_spell_book"; break;
+        case 1:  skey = "buy_spell_book_from_shrine1"; break;
+        case 2:  skey = "buy_spell_book_from_shrine2"; break;
+        case 3:  skey = "buy_spell_book_from_shrine3"; break;
+        default: skey = "buy_spell_book"; break;
     }
 
     while(ptr->id && std::strcmp(skey, ptr->id)) ++ptr;
@@ -134,18 +134,18 @@ payment_t PaymentConditions::RecruitHero(int level)
     // level price
     if(Settings::Get().ExtHeroRecruitCostDependedFromLevel())
     {
-	ptr = &_payments[0];
-	while(ptr->id && std::strcmp("recruit_level", ptr->id)) ++ptr;
-	if(ptr && 1 < level)
-	{
-	    if(ptr->cost.gold) result.gold += (level - 1) * ptr->cost.gold;
-	    if(ptr->cost.wood) result.wood += (level - 1) * ptr->cost.wood;
-	    if(ptr->cost.mercury) result.mercury += (level - 1) * ptr->cost.mercury;
-	    if(ptr->cost.ore) result.ore += (level - 1) * ptr->cost.ore;
-	    if(ptr->cost.sulfur) result.sulfur += (level - 1) * ptr->cost.sulfur;
-	    if(ptr->cost.crystal) result.crystal += (level - 1) * ptr->cost.crystal;
-	    if(ptr->cost.gems) result.gems += (level - 1) * ptr->cost.gems;
-	}
+        ptr = &_payments[0];
+        while(ptr->id && std::strcmp("recruit_level", ptr->id)) ++ptr;
+        if(ptr && 1 < level)
+        {
+            if(ptr->cost.gold) result.gold += (level - 1) * ptr->cost.gold;
+            if(ptr->cost.wood) result.wood += (level - 1) * ptr->cost.wood;
+            if(ptr->cost.mercury) result.mercury += (level - 1) * ptr->cost.mercury;
+            if(ptr->cost.ore) result.ore += (level - 1) * ptr->cost.ore;
+            if(ptr->cost.sulfur) result.sulfur += (level - 1) * ptr->cost.sulfur;
+            if(ptr->cost.crystal) result.crystal += (level - 1) * ptr->cost.crystal;
+            if(ptr->cost.gems) result.gems += (level - 1) * ptr->cost.gems;
+        }
     }
 
     return result;

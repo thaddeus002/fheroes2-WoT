@@ -77,18 +77,18 @@ void Interface::RedrawCastleIcon(const Castle & castle, s32 sx, s32 sy)
     // castle build marker
     switch(Castle::GetAllBuildingStatus(castle))
     {
-	// white marker
-	case UNKNOWN_COND:
-	case NOT_TODAY:		AGG::GetICN(ICN::CSLMARKER, 0).Blit(sx + 39, sy + 1); break;
+        // white marker
+        case UNKNOWN_COND:
+        case NOT_TODAY:                AGG::GetICN(ICN::CSLMARKER, 0).Blit(sx + 39, sy + 1); break;
 
-	// green marker
-	case LACK_RESOURCES:	AGG::GetICN(ICN::CSLMARKER, 2).Blit(sx + 39, sy + 1); break;
+        // green marker
+        case LACK_RESOURCES:        AGG::GetICN(ICN::CSLMARKER, 2).Blit(sx + 39, sy + 1); break;
 
-	// red marker
-	case NEED_CASTLE:
-	case REQUIRES_BUILD:	AGG::GetICN(ICN::CSLMARKER, 1).Blit(sx + 39, sy + 1); break;
+        // red marker
+        case NEED_CASTLE:
+        case REQUIRES_BUILD:        AGG::GetICN(ICN::CSLMARKER, 1).Blit(sx + 39, sy + 1); break;
 
-	default: break;
+        default: break;
     }
 //
 //    if(! castle.AllowBuild())
@@ -121,18 +121,18 @@ void Interface::IconsBar::RedrawBackground(const Point & pos)
     srcrt.h = 32;
 
     if(2 < iconsCount)
-	for(u32 ii = 0; ii < iconsCount - 2; ++ii)
-	{
-	    icnadv.Blit(srcrt, dstpt);
-	    dstpt.y += srcrt.h;
-	}
+        for(u32 ii = 0; ii < iconsCount - 2; ++ii)
+        {
+            icnadv.Blit(srcrt, dstpt);
+            dstpt.y += srcrt.h;
+        }
 
     srcrt.y = srcrt.y + 64;
     srcrt.h = 32;
     icnadv.Blit(srcrt, dstpt);
 
     for(u32 ii = 0; ii < iconsCount; ++ii)
-	back.Blit(pos.x + 5, pos.y + 5 + ii * (IconsBar::GetItemHeight() + 10));
+        back.Blit(pos.x + 5, pos.y + 5 + ii * (IconsBar::GetItemHeight() + 10));
 }
 
 /* Interface::CastleIcons */
@@ -140,10 +140,10 @@ void Interface::CastleIcons::RedrawItem(const CASTLE & item, s32 ox, s32 oy, boo
 {
     if(item && show)
     {
-	RedrawCastleIcon(*item, ox, oy);
+        RedrawCastleIcon(*item, ox, oy);
 
-	if(current)
-	    marker.Blit(ox - 5, oy - 5, Display::Get());
+        if(current)
+            marker.Blit(ox - 5, oy - 5, Display::Get());
     }
 }
 
@@ -168,8 +168,8 @@ void Interface::CastleIcons::ActionListDoubleClick(CASTLE & item)
     {
         Game::OpenCastleDialog(*item);
 
-	// for QVGA: auto hide icons after click
-	if(Settings::Get().QVGA()) Settings::Get().SetShowIcons(false);
+        // for QVGA: auto hide icons after click
+        if(Settings::Get().QVGA()) Settings::Get().SetShowIcons(false);
     }
 }
 
@@ -177,13 +177,13 @@ void Interface::CastleIcons::ActionListSingleClick(CASTLE & item)
 {
     if(item)
     {
-	Interface::Basic & I = Interface::Basic::Get();
+        Interface::Basic & I = Interface::Basic::Get();
 
-	I.SetFocus(item);
-	I.RedrawFocus();
+        I.SetFocus(item);
+        I.RedrawFocus();
 
-	// for QVGA: auto hide icons after click
-	if(Settings::Get().QVGA()) Settings::Get().SetShowIcons(false);
+        // for QVGA: auto hide icons after click
+        if(Settings::Get().QVGA()) Settings::Get().SetShowIcons(false);
     }
 }
 
@@ -191,8 +191,8 @@ void Interface::CastleIcons::ActionListPressRight(CASTLE & item)
 {
     if(item)
     {
-	Cursor::Get().Hide();
-	Dialog::QuickInfo(*item);
+        Cursor::Get().Hide();
+        Dialog::QuickInfo(*item);
     }
 }
 
@@ -202,10 +202,10 @@ void Interface::CastleIcons::SetShow(bool f)
 
     if(IconsBar::IsVisible())
     {
-	if(f)
-	    GetSplitter().ShowCursor();
-	else
-	    GetSplitter().HideCursor();
+        if(f)
+            GetSplitter().ShowCursor();
+        else
+            GetSplitter().HideCursor();
     }
 }
 
@@ -215,11 +215,11 @@ void Interface::CastleIcons::SetPos(s32 px, s32 py)
 
     SetTopLeft(Point(px, py));
     SetScrollSplitter(AGG::GetICN(icnscroll, 4),
-			Rect(px + ICONS_CURSOR_WIDTH + 3, py + 19, 10, ICONS_CURSOR_HEIGHT * iconsCount - 37));
+                        Rect(px + ICONS_CURSOR_WIDTH + 3, py + 19, 10, ICONS_CURSOR_HEIGHT * iconsCount - 37));
     SetScrollButtonUp(icnscroll, 0, 1,
-			Point(px + ICONS_CURSOR_WIDTH + 1, py + 1));
+                        Point(px + ICONS_CURSOR_WIDTH + 1, py + 1));
     SetScrollButtonDn(icnscroll, 2, 3,
-			Point(px + ICONS_CURSOR_WIDTH + 1, py + iconsCount * ICONS_CURSOR_HEIGHT - 15));
+                        Point(px + ICONS_CURSOR_WIDTH + 1, py + iconsCount * ICONS_CURSOR_HEIGHT - 15));
     SetAreaMaxItems(iconsCount);
     SetAreaItems(Rect(px + 5, py + 5, ICONS_CURSOR_WIDTH, iconsCount * ICONS_CURSOR_HEIGHT));
     DisableHotkeys(true);
@@ -233,10 +233,10 @@ void Interface::HeroesIcons::RedrawItem(const HEROES & item, s32 ox, s32 oy, boo
 {
     if(item && show)
     {
-	RedrawHeroesIcon(*item, ox, oy);
+        RedrawHeroesIcon(*item, ox, oy);
 
-	if(current)
-	    marker.Blit(ox - 5, oy - 5, Display::Get());
+        if(current)
+            marker.Blit(ox - 5, oy - 5, Display::Get());
     }
 }
 
@@ -259,16 +259,16 @@ void Interface::HeroesIcons::ActionListDoubleClick(HEROES & item)
 {
     if(item)
     {
-	if(item->Modes(Heroes::GUARDIAN))
-	{
-	    Castle* castle = world.GetCastle(item->GetCenter());
-	    if(castle) Game::OpenCastleDialog(*castle);
-	}
-	else
-	    Game::OpenHeroesDialog(*item);
+        if(item->Modes(Heroes::GUARDIAN))
+        {
+            Castle* castle = world.GetCastle(item->GetCenter());
+            if(castle) Game::OpenCastleDialog(*castle);
+        }
+        else
+            Game::OpenHeroesDialog(*item);
 
-	// for QVGA: auto hide icons after click
-	if(Settings::Get().QVGA()) Settings::Get().SetShowIcons(false);
+        // for QVGA: auto hide icons after click
+        if(Settings::Get().QVGA()) Settings::Get().SetShowIcons(false);
     }
 }
 
@@ -276,13 +276,13 @@ void Interface::HeroesIcons::ActionListSingleClick(HEROES & item)
 {
     if(item)
     {
-	Interface::Basic & I = Interface::Basic::Get();
+        Interface::Basic & I = Interface::Basic::Get();
 
-	I.SetFocus(item);
-	I.RedrawFocus();
+        I.SetFocus(item);
+        I.RedrawFocus();
 
-	// for QVGA: auto hide icons after click
-	if(Settings::Get().QVGA()) Settings::Get().SetShowIcons(false);
+        // for QVGA: auto hide icons after click
+        if(Settings::Get().QVGA()) Settings::Get().SetShowIcons(false);
     }
 }
 
@@ -290,8 +290,8 @@ void Interface::HeroesIcons::ActionListPressRight(HEROES & item)
 {
     if(item)
     {
-	Cursor::Get().Hide();
-	Dialog::QuickInfo(*item);
+        Cursor::Get().Hide();
+        Dialog::QuickInfo(*item);
     }
 }
 
@@ -301,10 +301,10 @@ void Interface::HeroesIcons::SetShow(bool f)
 
     if(IconsBar::IsVisible())
     {
-	if(f)
-	    GetSplitter().ShowCursor();
-	else
-	    GetSplitter().HideCursor();
+        if(f)
+            GetSplitter().ShowCursor();
+        else
+            GetSplitter().HideCursor();
     }
 }
 
@@ -314,11 +314,11 @@ void Interface::HeroesIcons::SetPos(s32 px, s32 py)
 
     SetTopLeft(Point(px, py));
     SetScrollSplitter(AGG::GetICN(icnscroll, 4),
-			Rect(px + ICONS_CURSOR_WIDTH + 3, py + 19, 10, ICONS_CURSOR_HEIGHT * iconsCount - 37));
+                        Rect(px + ICONS_CURSOR_WIDTH + 3, py + 19, 10, ICONS_CURSOR_HEIGHT * iconsCount - 37));
     SetScrollButtonUp(icnscroll, 0, 1,
-			Point(px + ICONS_CURSOR_WIDTH + 1, py + 1));
+                        Point(px + ICONS_CURSOR_WIDTH + 1, py + 1));
     SetScrollButtonDn(icnscroll, 2, 3,
-			Point(px + ICONS_CURSOR_WIDTH + 1, py + iconsCount * ICONS_CURSOR_HEIGHT - 15));
+                        Point(px + ICONS_CURSOR_WIDTH + 1, py + iconsCount * ICONS_CURSOR_HEIGHT - 15));
     SetAreaMaxItems(iconsCount);
     SetAreaItems(Rect(px + 5, py + 5, ICONS_CURSOR_WIDTH, iconsCount * ICONS_CURSOR_HEIGHT));
     DisableHotkeys(true);
@@ -350,14 +350,14 @@ void Interface::IconsPanel::SetRedraw(icons_t type) const
     // is visible
     if(IconsBar::IsVisible())
     {
-	switch(type)
-	{
-	    case ICON_HEROES:	interface.SetRedraw(REDRAW_HEROES); break;
-	    case ICON_CASTLES:	interface.SetRedraw(REDRAW_CASTLES); break;
-	    default: break;
-	}
+        switch(type)
+        {
+            case ICON_HEROES:        interface.SetRedraw(REDRAW_HEROES); break;
+            case ICON_CASTLES:        interface.SetRedraw(REDRAW_CASTLES); break;
+            default: break;
+        }
 
-	interface.SetRedraw(REDRAW_ICONS);
+        interface.SetRedraw(REDRAW_ICONS);
     }
 }
 
@@ -372,12 +372,12 @@ void Interface::IconsPanel::SetPos(s32 ox, s32 oy)
 
     if(Settings::Get().ExtGameHideInterface())
     {
-	iconsCount = 2;
+        iconsCount = 2;
     }
     else
     {
-	const u32 count_h = (Display::Get().h() - 480) / TILEWIDTH;
-	iconsCount = count_h > 3 ? 8 : ( count_h < 3 ? 4 : 7);
+        const u32 count_h = (Display::Get().h() - 480) / TILEWIDTH;
+        iconsCount = count_h > 3 ? 8 : ( count_h < 3 ? 4 : 7);
     }
 
     BorderWindow::SetPosition(ox, oy, 144, iconsCount * ICONS_CURSOR_HEIGHT);
@@ -396,39 +396,39 @@ void Interface::IconsPanel::Redraw(void)
     // is visible
     if(IconsBar::IsVisible())
     {
-	// redraw border
-	if(Settings::Get().ExtGameHideInterface())
-	    BorderWindow::Redraw();
+        // redraw border
+        if(Settings::Get().ExtGameHideInterface())
+            BorderWindow::Redraw();
 
-	heroesIcons.Redraw();
-	castleIcons.Redraw();
+        heroesIcons.Redraw();
+        castleIcons.Redraw();
     }
 }
 
 void Interface::IconsPanel::QueueEventProcessing(void)
 {
     if(Settings::Get().ShowIcons() &&
-	// move border window
-	BorderWindow::QueueEventProcessing())
+        // move border window
+        BorderWindow::QueueEventProcessing())
     {
-	interface.RedrawFocus();
-	SetRedraw();
+        interface.RedrawFocus();
+        SetRedraw();
     }
     else
     if(heroesIcons.QueueEventProcessing())
     {
-	if(heroesIcons.isSelected())
-	    castleIcons.Unselect();
+        if(heroesIcons.isSelected())
+            castleIcons.Unselect();
 
-	SetRedraw();
+        SetRedraw();
     }
     else
     if(castleIcons.QueueEventProcessing())
     {
-	if(castleIcons.isSelected())
-	    heroesIcons.Unselect();
+        if(castleIcons.isSelected())
+            heroesIcons.Unselect();
 
-	SetRedraw();
+        SetRedraw();
     }
 }
 
@@ -450,17 +450,17 @@ void Interface::IconsPanel::ResetIcons(icons_t type)
 
     if(! kingdom.isControlAI())
     {
-	if(type & ICON_HEROES)
-	{
-	    heroesIcons.SetListContent(kingdom.GetHeroes());
-	    heroesIcons.Reset();
-	}
+        if(type & ICON_HEROES)
+        {
+            heroesIcons.SetListContent(kingdom.GetHeroes());
+            heroesIcons.Reset();
+        }
 
-	if(type & ICON_CASTLES)
-	{
-	    castleIcons.SetListContent(kingdom.GetCastles());
-	    castleIcons.Reset();
-	}
+        if(type & ICON_CASTLES)
+        {
+            castleIcons.SetListContent(kingdom.GetCastles());
+            castleIcons.Reset();
+        }
     }
 }
 
@@ -480,14 +480,14 @@ void Interface::IconsPanel::SetCurrentVisible(void)
 {
     if(heroesIcons.isSelected())
     {
-	heroesIcons.SetCurrentVisible();
-	heroesIcons.Redraw();
+        heroesIcons.SetCurrentVisible();
+        heroesIcons.Redraw();
     }
     else
     if(castleIcons.isSelected())
     {
-	castleIcons.SetCurrentVisible();
-	castleIcons.Redraw();
+        castleIcons.SetCurrentVisible();
+        castleIcons.Redraw();
     }
 }
 

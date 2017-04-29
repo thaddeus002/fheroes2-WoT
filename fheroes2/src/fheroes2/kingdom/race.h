@@ -35,12 +35,12 @@ namespace Race
         NECR    = 0x20,
         MULT    = 0x40,
         RAND    = 0x80,
-	ALL	= KNGT | BARB | SORC | WRLK | WZRD | NECR
+        ALL        = KNGT | BARB | SORC | WRLK | WZRD | NECR
     };
 
     const char* String(int);
-    int		Rand(void);
-    int		FromInt(int);
+    int                Rand(void);
+    int                FromInt(int);
 }
 
 #endif

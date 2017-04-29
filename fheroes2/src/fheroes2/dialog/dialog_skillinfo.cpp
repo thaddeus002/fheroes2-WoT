@@ -87,7 +87,7 @@ void Dialog::SecondarySkillInfo(const std::string & header, const std::string & 
     {
         pt.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 1).w()) / 2;
         pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 1).h();
-	button = new Button(pt.x, pt.y, system, 1, 2);
+        button = new Button(pt.x, pt.y, system, 1, 2);
     }
 
     if(button) (*button).Draw();
@@ -100,11 +100,11 @@ void Dialog::SecondarySkillInfo(const std::string & header, const std::string & 
     {
         if(!ok_button && !le.MousePressRight()) break;
 
-	if(button) le.MousePressLeft(*button) ? button->PressDraw() : button->ReleaseDraw();
+        if(button) le.MousePressLeft(*button) ? button->PressDraw() : button->ReleaseDraw();
 
         if(button && le.MouseClickLeft(*button)){ break; }
 
-	if(HotKeyCloseWindow){ break; }
+        if(HotKeyCloseWindow){ break; }
     }
 
     cursor.Hide();
@@ -127,27 +127,27 @@ void Dialog::PrimarySkillInfo(const std::string &header, const std::string &mess
 
     switch(skill)
     {
-	case Skill::Primary::ATTACK:
-	    index = 0;
-	    skill_name = _("Attack Skill");
-	    break;
+        case Skill::Primary::ATTACK:
+            index = 0;
+            skill_name = _("Attack Skill");
+            break;
 
-	case Skill::Primary::DEFENSE:
-	    index = 1;
-	    skill_name = _("Defense Skill");
-	    break;
+        case Skill::Primary::DEFENSE:
+            index = 1;
+            skill_name = _("Defense Skill");
+            break;
 
-	case Skill::Primary::POWER:
-	    index = 2;
-	    skill_name = _("Spell Power");
-	    break;
+        case Skill::Primary::POWER:
+            index = 2;
+            skill_name = _("Spell Power");
+            break;
 
-	case Skill::Primary::KNOWLEDGE:
-	    index = 3;
-	    skill_name = _("Knowledge");
-	    break;
+        case Skill::Primary::KNOWLEDGE:
+            index = 3;
+            skill_name = _("Knowledge");
+            break;
 
-	default: break;
+        default: break;
     }
 
     TextBox box1(header, Font::BIG, BOXAREA_WIDTH);
@@ -197,11 +197,11 @@ void Dialog::PrimarySkillInfo(const std::string &header, const std::string &mess
     // message loop
     while(le.HandleEvents())
     {
-	le.MousePressLeft(button) ? button.PressDraw() : button.ReleaseDraw();
+        le.MousePressLeft(button) ? button.PressDraw() : button.ReleaseDraw();
 
         if(le.MouseClickLeft(button)){ break; }
 
-	if(HotKeyCloseWindow){ break; }
+        if(HotKeyCloseWindow){ break; }
     }
 
     cursor.Hide();

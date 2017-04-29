@@ -60,14 +60,14 @@ void Splitter::SetRange(int smin, int smax)
     if(min < max)
     {
         step = 100 * (isVertical() ? (area.h - SpriteMove::h()) : (area.w - SpriteMove::w())) / (max - min);
-	cur = min;
-	move = GetPositionCursor();
+        cur = min;
+        move = GetPositionCursor();
     }
     else
     {
-	step = 0;
-	move = Point(area.x + (area.w - SpriteMove::w()) / 2,
-			    area.y + (area.h - SpriteMove::h()) / 2);
+        step = 0;
+        move = Point(area.x + (area.w - SpriteMove::w()) / 2,
+                            area.y + (area.h - SpriteMove::h()) / 2);
     }
 
     SpriteMove::background.SetPos(move);
@@ -79,13 +79,13 @@ Point Splitter::GetPositionCursor(void)
 
     if(isVertical())
     {
-	res.x = area.x + (area.w - SpriteMove::w()) / 2;
-    	res.y = area.y + cur * step / 100;
+        res.x = area.x + (area.w - SpriteMove::w()) / 2;
+            res.y = area.y + cur * step / 100;
     }
     else
     {
-	res.x = area.x + cur * step / 100;
-	res.y = area.y + (area.h - SpriteMove::h()) / 2;
+        res.x = area.x + cur * step / 100;
+        res.y = area.y + (area.h - SpriteMove::h()) / 2;
     }
 
     return res;
@@ -109,7 +109,7 @@ void Splitter::ShowCursor(void)
 void Splitter::MoveCenter(void)
 {
     Move(area.x + (area.w - SpriteMove::w()) / 2,
-		    area.y + (area.h - SpriteMove::h()) / 2);
+                    area.y + (area.h - SpriteMove::h()) / 2);
 }
 
 /* move splitter to pos */
@@ -117,12 +117,12 @@ void Splitter::MoveIndex(int num)
 {
     if(num > max || num < min)
     {
-	DEBUG(DBG_ENGINE, DBG_WARN, "out of range" << ": " << num << ", min: " << min << ", max: " << max << ", cur: " << cur << ", step: " << step);
+        DEBUG(DBG_ENGINE, DBG_WARN, "out of range" << ": " << num << ", min: " << min << ", max: " << max << ", cur: " << cur << ", step: " << step);
     }
     else
     {
-	cur = num;
-	Move(GetPositionCursor());
+        cur = num;
+        Move(GetPositionCursor());
     }
 }
 
@@ -131,8 +131,8 @@ void Splitter::Forward(void)
 {
     if(cur != max)
     {
-	++cur;
-	Move(GetPositionCursor());
+        ++cur;
+        Move(GetPositionCursor());
     }
 }
 
@@ -141,7 +141,7 @@ void Splitter::Backward(void)
 {
     if(cur)
     {
-	--cur;
-	Move(GetPositionCursor());
+        --cur;
+        Move(GetPositionCursor());
     }
 }

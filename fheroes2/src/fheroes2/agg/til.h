@@ -31,11 +31,11 @@ namespace TIL
 {
     enum
     {
-	UNKNOWN,
-	CLOF32,
-	GROUND32,
-	STON,
-	LASTTIL
+        UNKNOWN,
+        CLOF32,
+        GROUND32,
+        STON,
+        LASTTIL
     };
 
     const char* GetString(int);

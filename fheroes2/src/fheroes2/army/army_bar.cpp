@@ -46,8 +46,8 @@ void RedistributeArmy(ArmyTroop & troop1 /* from */, ArmyTroop & troop2 /* to */
     }
     else
     {
-	const u32 free_slots = (army1 == army2 ? 1 : 0) + army2->Size() - army2->GetCount();
-	const u32 max_count = save_last_troop ? troop1.GetCount() - 1 : troop1.GetCount();
+        const u32 free_slots = (army1 == army2 ? 1 : 0) + army2->Size() - army2->GetCount();
+        const u32 max_count = save_last_troop ? troop1.GetCount() - 1 : troop1.GetCount();
         u32 redistr_count = troop1.GetCount() / 2;
         const u32 slots = Dialog::ArmySplitTroop((free_slots > max_count ? max_count : free_slots), max_count, redistr_count, save_last_troop);
 
@@ -85,7 +85,7 @@ ArmyBar::ArmyBar(Army* ptr, bool mini, bool ro, bool change /* false */)
     : army(NULL), spcursor(AGG::GetICN(ICN::STRIP, 1)), use_mini_sprite(mini), read_only(ro), can_change(change)
 {
     if(use_mini_sprite)
-	SetBackground(Size(43, 43), RGBA(0, 45, 0));
+        SetBackground(Size(43, 43), RGBA(0, 45, 0));
     else
     {
         const Sprite & sprite = AGG::GetICN(ICN::STRIP, 2);
@@ -98,14 +98,14 @@ ArmyBar::ArmyBar(Army* ptr, bool mini, bool ro, bool change /* false */)
 void ArmyBar::SetArmy(Army* ptr)
 {
     if(army && isSelected())
-	ResetSelected();
+        ResetSelected();
 
     army = ptr;
     items.clear();
 
     if(ptr)
-	for(u32 ii = 0; ii < ptr->Size(); ++ii)
-	    items.push_back(reinterpret_cast<ArmyTroop*>(ptr->GetTroop(ii)));
+        for(u32 ii = 0; ii < ptr->Size(); ++ii)
+            items.push_back(reinterpret_cast<ArmyTroop*>(ptr->GetTroop(ii)));
     
     SetContentItems();
 }
@@ -121,12 +121,12 @@ void ArmyBar::SetBackground(const Size & sz, const RGBA & fillColor)
     {
         SetItemSize(sz.w, sz.h);
 
-	backsf.Set(sz.w, sz.h, false);
-	backsf.Fill(fillColor);
-	backsf.DrawBorder(RGBA(0xd0, 0xc0, 0x48));
+        backsf.Set(sz.w, sz.h, false);
+        backsf.Fill(fillColor);
+        backsf.DrawBorder(RGBA(0xd0, 0xc0, 0x48));
 
-	spcursor.Set(sz.w, sz.h, true /* transparent */);
-	spcursor.DrawBorder(RGBA(0xc0, 0x2c, 0));
+        spcursor.Set(sz.w, sz.h, true /* transparent */);
+        spcursor.DrawBorder(RGBA(0xc0, 0x2c, 0));
     }
 }
 
@@ -135,7 +135,7 @@ void ArmyBar::RedrawBackground(const Rect & pos, Surface & dstsf)
     if(use_mini_sprite)
         backsf.Blit(pos, dstsf);
     else
-	AGG::GetICN(ICN::STRIP, 2).Blit(pos, dstsf);
+        AGG::GetICN(ICN::STRIP, 2).Blit(pos, dstsf);
 }
 
 void ArmyBar::RedrawItem(ArmyTroop & troop, const Rect & pos, bool selected, Surface & dstsf)
@@ -144,29 +144,29 @@ void ArmyBar::RedrawItem(ArmyTroop & troop, const Rect & pos, bool selected, Sur
     {
         Text text(GetString(troop.GetCount()),(use_mini_sprite ? Font::SMALL : Font::BIG));
 
-	if(use_mini_sprite)
-	{
-	    const Sprite & mons32 = AGG::GetICN(ICN::MONS32, troop.GetSpriteIndex());
-	    Rect srcrt(0, 0, mons32.w(), mons32.h());
+        if(use_mini_sprite)
+        {
+            const Sprite & mons32 = AGG::GetICN(ICN::MONS32, troop.GetSpriteIndex());
+            Rect srcrt(0, 0, mons32.w(), mons32.h());
 
             if(mons32.w() > pos.w)
             {
                 srcrt.x = (mons32.w() - pos.w) / 2;
                 srcrt.w = pos.w;
-    	    }
+                }
 
-    	    if(mons32.h() > pos.h)
+                if(mons32.h() > pos.h)
             {
                 srcrt.y = (mons32.h() - pos.h) / 2;
-        	srcrt.h = pos.h;
+                srcrt.h = pos.h;
             }
 
-	    mons32.Blit(srcrt, pos.x + (pos.w - mons32.w()) / 2, pos.y + pos.h - mons32.h() - 1, dstsf);
-	}
-	else
-	{
-	    switch(troop.GetRace())
-	    {
+            mons32.Blit(srcrt, pos.x + (pos.w - mons32.w()) / 2, pos.y + pos.h - mons32.h() - 1, dstsf);
+        }
+        else
+        {
+            switch(troop.GetRace())
+            {
                 case Race::KNGT: AGG::GetICN(ICN::STRIP, 4).Blit(pos, dstsf);  break;
                 case Race::BARB: AGG::GetICN(ICN::STRIP, 5).Blit(pos, dstsf);  break;
                 case Race::SORC: AGG::GetICN(ICN::STRIP, 6).Blit(pos, dstsf);  break;
@@ -174,24 +174,24 @@ void ArmyBar::RedrawItem(ArmyTroop & troop, const Rect & pos, bool selected, Sur
                 case Race::WZRD: AGG::GetICN(ICN::STRIP, 8).Blit(pos, dstsf);  break;
                 case Race::NECR: AGG::GetICN(ICN::STRIP, 9).Blit(pos, dstsf);  break;
                 default: AGG::GetICN(ICN::STRIP, 10).Blit(pos, dstsf); break;
-	    }
+            }
 
-	    const Sprite & spmonh = AGG::GetICN(troop.ICNMonh(), 0);
-	    spmonh.Blit(pos.x + spmonh.x(), pos.y + spmonh.y(), dstsf);
-	}
+            const Sprite & spmonh = AGG::GetICN(troop.ICNMonh(), 0);
+            spmonh.Blit(pos.x + spmonh.x(), pos.y + spmonh.y(), dstsf);
+        }
 
-	if(! use_mini_sprite)
-	{
-	    Surface black(Size(text.w() + 4, text.h()), false);
-	    black.Fill(ColorBlack);
-	    const Point pt(pos.x + pos.w - black.w() - 1, pos.y + pos.h - black.h() - 1);
-	    black.Blit(pt.x, pt.y, dstsf);
-	    text.Blit(pt.x + 2, pt.y + 1, dstsf);
-	}
-	else
-	    text.Blit(pos.x + pos.w - text.w() - 3, pos.y + pos.h - text.h() - 1, dstsf);
+        if(! use_mini_sprite)
+        {
+            Surface black(Size(text.w() + 4, text.h()), false);
+            black.Fill(ColorBlack);
+            const Point pt(pos.x + pos.w - black.w() - 1, pos.y + pos.h - black.h() - 1);
+            black.Blit(pt.x, pt.y, dstsf);
+            text.Blit(pt.x + 2, pt.y + 1, dstsf);
+        }
+        else
+            text.Blit(pos.x + pos.w - text.w() - 3, pos.y + pos.h - text.h() - 1, dstsf);
 
-	if(selected)
+        if(selected)
             spcursor.Move(pos.x, pos.y);
     }
 }
@@ -214,31 +214,31 @@ bool ArmyBar::ActionBarCursor(const Point & cursor, ArmyTroop & troop, const Rec
 {
     if(isSelected())
     {
-	ArmyTroop* troop2 = GetSelectedItem();
+        ArmyTroop* troop2 = GetSelectedItem();
 
-	if(&troop == troop2)
-	{
-	    msg = _("View %{name}");
-	    StringReplace(msg, "%{name}", troop.GetName());
-	}
-	else
-	if(! troop.isValid())
-	{
-    	    msg = _("Move or right click Redistribute %{name}");
-    	    StringReplace(msg, "%{name}", troop2->GetName());
-	}
-	else
-	if(troop.GetID() == troop2->GetID())
-	{
-	    msg = _("Combine %{name} armies");
-	    StringReplace(msg, "%{name}", troop.GetName());
-	}
-	else
-	{
-	    msg = _("Exchange %{name2} with %{name}");
-	    StringReplace(msg, "%{name}", troop.GetName());
-	    StringReplace(msg, "%{name2}", troop2->GetName());
-	}
+        if(&troop == troop2)
+        {
+            msg = _("View %{name}");
+            StringReplace(msg, "%{name}", troop.GetName());
+        }
+        else
+        if(! troop.isValid())
+        {
+                msg = _("Move or right click Redistribute %{name}");
+                StringReplace(msg, "%{name}", troop2->GetName());
+        }
+        else
+        if(troop.GetID() == troop2->GetID())
+        {
+            msg = _("Combine %{name} armies");
+            StringReplace(msg, "%{name}", troop.GetName());
+        }
+        else
+        {
+            msg = _("Exchange %{name2} with %{name}");
+            StringReplace(msg, "%{name}", troop.GetName());
+            StringReplace(msg, "%{name2}", troop2->GetName());
+        }
     }
     else
     if(troop.isValid())
@@ -254,28 +254,28 @@ bool ArmyBar::ActionBarCursor(const Point & cursor, ArmyTroop & troop, const Rec
     if(!troop.isValid() && troop_p && troop_p->isValid())
     {
 /*
-	const Rect* pos_p = GetItemPos(le.GetMousePressLeft());
-	const Point offset(Point(le.GetMousePressLeft()) - *pos_p);
-	Surface sf(pos.w, pos.h);
-	RedrawItem(*troop_p, Rect(0, 0, pos.w, pos.h), false, sf);
-	sf.GrayScale();
-	SpriteCursor sp;
-	sp.SetSprite(sf);
-	while(le.HandleEvents() && le.MousePressLeft()){ Cursor::Get().Hide(); sp.Move(Point(le.GetMouseCursor()) - offset); Cursor::Get().Show(); Display::Get().Flip(); DELAY(1); };
-	Cursor::Get().Hide();
-	sp.Hide();
+        const Rect* pos_p = GetItemPos(le.GetMousePressLeft());
+        const Point offset(Point(le.GetMousePressLeft()) - *pos_p);
+        Surface sf(pos.w, pos.h);
+        RedrawItem(*troop_p, Rect(0, 0, pos.w, pos.h), false, sf);
+        sf.GrayScale();
+        SpriteCursor sp;
+        sp.SetSprite(sf);
+        while(le.HandleEvents() && le.MousePressLeft()){ Cursor::Get().Hide(); sp.Move(Point(le.GetMouseCursor()) - offset); Cursor::Get().Show(); Display::Get().Flip(); DELAY(1); };
+        Cursor::Get().Hide();
+        sp.Hide();
 */
-	while(le.HandleEvents() && le.MousePressLeft()){ Cursor::Get().Show(); Display::Get().Flip(); DELAY(1); };
-	ArmyTroop* troop_r = GetItem(le.GetMouseReleaseLeft());
+        while(le.HandleEvents() && le.MousePressLeft()){ Cursor::Get().Show(); Display::Get().Flip(); DELAY(1); };
+        ArmyTroop* troop_r = GetItem(le.GetMouseReleaseLeft());
 
-	if(troop_r && !troop_r->isValid())
-	{
-	    RedistributeArmy(*troop_p, *troop_r);
-	    if(isSelected()) ResetSelected();
-	    le.ResetPressLeft();
-	    return true;
-	}
-	le.ResetPressLeft();
+        if(troop_r && !troop_r->isValid())
+        {
+            RedistributeArmy(*troop_p, *troop_r);
+            if(isSelected()) ResetSelected();
+            le.ResetPressLeft();
+            return true;
+        }
+        le.ResetPressLeft();
     }
 
     return false;
@@ -287,28 +287,28 @@ bool ArmyBar::ActionBarCursor(const Point & cursor, ArmyTroop & troop1, const Re
 
     if(troop1.isValid())
     {
-	if(troop1.GetID() != troop2.GetID())
-	{
-	    msg = _("Exchange %{name2} with %{name}");
-	    StringReplace(msg, "%{name}", troop1.GetName());
-	    StringReplace(msg, "%{name2}", troop2.GetName());
-	}
-	else
-	if(save_last_troop)
-	    msg = _("Cannot move last troop");
-	else
-	{
-	    msg = _("Combine %{name} armies");
-	    StringReplace(msg, "%{name}", troop1.GetName());
-	}
+        if(troop1.GetID() != troop2.GetID())
+        {
+            msg = _("Exchange %{name2} with %{name}");
+            StringReplace(msg, "%{name}", troop1.GetName());
+            StringReplace(msg, "%{name2}", troop2.GetName());
+        }
+        else
+        if(save_last_troop)
+            msg = _("Cannot move last troop");
+        else
+        {
+            msg = _("Combine %{name} armies");
+            StringReplace(msg, "%{name}", troop1.GetName());
+        }
     }
     else
     if(save_last_troop)
         msg = _("Cannot move last troop");
     else
     {
-    	msg = _("Move or right click Redistribute %{name}");
-    	StringReplace(msg, "%{name}", troop2.GetName());
+            msg = _("Move or right click Redistribute %{name}");
+            StringReplace(msg, "%{name}", troop2.GetName());
     }
 
     return false;
@@ -318,17 +318,17 @@ bool ArmyBar::ActionBarSingleClick(const Point & cursor, ArmyTroop & troop, cons
 {
     if(isSelected())
     {
-	ArmyTroop* troop2 = GetSelectedItem();
+        ArmyTroop* troop2 = GetSelectedItem();
 
-	// combine
+        // combine
         if(troop.GetID() == troop2->GetID())
         {
-	    troop.SetCount(troop.GetCount() + troop2->GetCount());
-	    troop2->Reset();
+            troop.SetCount(troop.GetCount() + troop2->GetCount());
+            troop2->Reset();
         }
         // exchange
         else
-	    Army::SwapTroops(troop, *troop2);
+            Army::SwapTroops(troop, *troop2);
 
         return false; // reset cursor
     }
@@ -343,33 +343,33 @@ bool ArmyBar::ActionBarSingleClick(const Point & cursor, ArmyTroop & troop, cons
     }
     else
     {
-	
+        
         if(can_change) // add troop
-	{
-	    int cur = Monster::UNKNOWN;
+        {
+            int cur = Monster::UNKNOWN;
 
-	    if(army->GetCommander())
-		switch(army->GetCommander()->GetRace())
-    	    {
-		case Race::KNGT: cur = Monster::PEASANT; break;
-		case Race::BARB: cur = Monster::GOBLIN; break;
-		case Race::SORC: cur = Monster::SPRITE; break;
-		case Race::WRLK: cur = Monster::CENTAUR; break;
-		case Race::WZRD: cur = Monster::HALFLING; break;
-		case Race::NECR: cur = Monster::SKELETON; break;
-		default: break;
-    	    }
+            if(army->GetCommander())
+                switch(army->GetCommander()->GetRace())
+                {
+                case Race::KNGT: cur = Monster::PEASANT; break;
+                case Race::BARB: cur = Monster::GOBLIN; break;
+                case Race::SORC: cur = Monster::SPRITE; break;
+                case Race::WRLK: cur = Monster::CENTAUR; break;
+                case Race::WZRD: cur = Monster::HALFLING; break;
+                case Race::NECR: cur = Monster::SKELETON; break;
+                default: break;
+                }
 
-	    const Monster mons = Dialog::SelectMonster(cur);
+            const Monster mons = Dialog::SelectMonster(cur);
 
-	    if(mons.isValid())
-	    {
-		u32 count = 1;
+            if(mons.isValid())
+            {
+                u32 count = 1;
 
-		if(Dialog::SelectCount("Set Count", 1, 500000, count))
-		    troop.Set(mons, count);
-    	    }
-	}
+                if(Dialog::SelectCount("Set Count", 1, 500000, count))
+                    troop.Set(mons, count);
+                }
+        }
 
         return false;
     }
@@ -381,21 +381,21 @@ bool ArmyBar::ActionBarSingleClick(const Point & cursor, ArmyTroop & troop1, con
 {
     if(troop2.GetArmy()->SaveLastTroop())
     {
-	if(troop1.isValid())
-	    Army::SwapTroops(troop1, troop2);
+        if(troop1.isValid())
+            Army::SwapTroops(troop1, troop2);
     }
     else
     {
-	if(! troop1.isValid())
-	    Army::SwapTroops(troop1, troop2);
-	else
-	if(troop1.isValid() && troop1.GetID() == troop2.GetID())
-	{
-	    troop1.SetCount(troop1.GetCount() + troop2.GetCount());
-	    troop2.Reset();
-	}
-	else
-	    Army::SwapTroops(troop1, troop2);
+        if(! troop1.isValid())
+            Army::SwapTroops(troop1, troop2);
+        else
+        if(troop1.isValid() && troop1.GetID() == troop2.GetID())
+        {
+            troop1.SetCount(troop1.GetCount() + troop2.GetCount());
+            troop2.Reset();
+        }
+        else
+            Army::SwapTroops(troop1, troop2);
     }
 
     return false; // reset cursor
@@ -407,32 +407,32 @@ bool ArmyBar::ActionBarDoubleClick(const Point & cursor, ArmyTroop & troop, cons
 
     if(&troop == troop2)
     {
-	int flags = (read_only || army->SaveLastTroop() ? Dialog::READONLY | Dialog::BUTTONS : Dialog::BUTTONS);
-	const Castle* castle = army->inCastle();
+        int flags = (read_only || army->SaveLastTroop() ? Dialog::READONLY | Dialog::BUTTONS : Dialog::BUTTONS);
+        const Castle* castle = army->inCastle();
 
-	if(troop.isAllowUpgrade() &&
-	    // allow upgrade
-	    castle && castle->GetRace() == troop.GetRace() && castle->isBuild(troop.GetUpgrade().GetDwelling()))
-	{
-	    flags |= Dialog::UPGRADE;
+        if(troop.isAllowUpgrade() &&
+            // allow upgrade
+            castle && castle->GetRace() == troop.GetRace() && castle->isBuild(troop.GetUpgrade().GetDwelling()))
+        {
+            flags |= Dialog::UPGRADE;
 
-	    if(! world.GetKingdom(army->GetColor()).AllowPayment(troop.GetUpgradeCost()))
-		flags |= Dialog::UPGRADE_DISABLE;
-	}
+            if(! world.GetKingdom(army->GetColor()).AllowPayment(troop.GetUpgradeCost()))
+                flags |= Dialog::UPGRADE_DISABLE;
+        }
 
-	switch(Dialog::ArmyInfo(troop, flags))
-	{
-    	    case Dialog::UPGRADE:
-    		world.GetKingdom(army->GetColor()).OddFundsResource(troop.GetUpgradeCost());
-		troop.Upgrade();
-		break;
+        switch(Dialog::ArmyInfo(troop, flags))
+        {
+                case Dialog::UPGRADE:
+                    world.GetKingdom(army->GetColor()).OddFundsResource(troop.GetUpgradeCost());
+                troop.Upgrade();
+                break;
 
-	    case Dialog::DISMISS:
-            	troop.Reset();
-		break;
+            case Dialog::DISMISS:
+                    troop.Reset();
+                break;
 
-	    default: break;
-	}
+            default: break;
+        }
     }
 
     ResetSelected();
@@ -444,18 +444,18 @@ bool ArmyBar::ActionBarPressRight(const Point & cursor, ArmyTroop & troop, const
 {
     if(troop.isValid())
     {
-	ResetSelected();
+        ResetSelected();
 
         if(can_change && ! army->SaveLastTroop())
             troop.Reset();
         else
-	    Dialog::ArmyInfo(troop, 0);
+            Dialog::ArmyInfo(troop, 0);
     }
     // empty troops - redistribute troops
     if(isSelected())
     {
-	ArmyTroop & troop2 = *GetSelectedItem();
-	ResetSelected();
+        ArmyTroop & troop2 = *GetSelectedItem();
+        ResetSelected();
 
         RedistributeArmy(troop2, troop);
     }
@@ -468,7 +468,7 @@ bool ArmyBar::ActionBarPressRight(const Point & cursor, ArmyTroop & troop1, cons
     ResetSelected();
 
     if(troop1.isValid())
-	Dialog::ArmyInfo(troop1, 0);
+        Dialog::ArmyInfo(troop1, 0);
     else
         RedistributeArmy(troop2, troop1);
 

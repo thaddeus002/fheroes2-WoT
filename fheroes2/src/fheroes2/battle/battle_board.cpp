@@ -37,16 +37,16 @@ namespace Battle
 {
     int GetObstaclePosition(void)
     {
-	return Rand::Get(3, 6) + (11 * Rand::Get(1, 7));
+        return Rand::Get(3, 6) + (11 * Rand::Get(1, 7));
     }
 
     bool WideDifficultDirection(int where, int whereto)
     {
-	return
-	((TOP_LEFT == where) && (whereto & (LEFT | TOP_RIGHT))) ||
-	((TOP_RIGHT == where) && (whereto & (RIGHT | TOP_LEFT))) ||
-	((BOTTOM_LEFT == where) && (whereto & (LEFT | BOTTOM_RIGHT))) ||
-	((BOTTOM_RIGHT == where) && (whereto & (RIGHT | BOTTOM_LEFT)));
+        return
+        ((TOP_LEFT == where) && (whereto & (LEFT | TOP_RIGHT))) ||
+        ((TOP_RIGHT == where) && (whereto & (RIGHT | TOP_LEFT))) ||
+        ((BOTTOM_LEFT == where) && (whereto & (LEFT | BOTTOM_RIGHT))) ||
+        ((BOTTOM_RIGHT == where) && (whereto & (RIGHT | BOTTOM_LEFT)));
     }
 }
 
@@ -59,7 +59,7 @@ Battle::Board::Board()
 void Battle::Board::SetArea(const Rect & area)
 {
     for(iterator it = begin(); it != end(); ++it)
-	(*it).SetArea(area);
+        (*it).SetArea(area);
 }
 
 Rect Battle::Board::GetArea(void) const
@@ -68,7 +68,7 @@ Rect Battle::Board::GetArea(void) const
     rects.reserve(size());
 
     for(const_iterator it = begin(); it != end(); ++it)
-	rects.push_back((*it).GetPos());
+        rects.push_back((*it).GetPos());
 
     return rects.GetRect();
 }
@@ -85,23 +85,23 @@ void Battle::Board::SetPositionQuality(const Unit & b)
     Units enemies(arena->GetForce(b.GetColor(), true), true);
 
     for(Units::const_iterator
-	it1 = enemies.begin(); it1 != enemies.end(); ++it1)
+        it1 = enemies.begin(); it1 != enemies.end(); ++it1)
     {
-	const Unit* unit = *it1;
+        const Unit* unit = *it1;
 
-	if(unit && unit->isValid())
-	{
-	    const Cell* cell1 = GetCell(unit->GetHeadIndex());
-	    const Indexes around = GetAroundIndexes(*unit);
+        if(unit && unit->isValid())
+        {
+            const Cell* cell1 = GetCell(unit->GetHeadIndex());
+            const Indexes around = GetAroundIndexes(*unit);
 
-	    for(Indexes::const_iterator
-		it2 = around.begin(); it2 != around.end(); ++it2)
-	    {
-		Cell* cell2 = GetCell(*it2);
-		if(cell2 && cell2->isPassable3(b, false))
-		    cell2->SetQuality(cell2->GetQuality() + cell1->GetQuality());
-	    }
-	}
+            for(Indexes::const_iterator
+                it2 = around.begin(); it2 != around.end(); ++it2)
+            {
+                Cell* cell2 = GetCell(*it2);
+                if(cell2 && cell2->isPassable3(b, false))
+                    cell2->SetQuality(cell2->GetQuality() + cell1->GetQuality());
+            }
+        }
     }
 }
 
@@ -113,20 +113,20 @@ void Battle::Board::SetEnemyQuality(const Unit & b)
     for(Units::const_iterator
         it = enemies.begin(); it != enemies.end(); ++it)
     {
-	Unit* unit = *it;
+        Unit* unit = *it;
 
-	if(unit && unit->isValid())
-	{
-	    const s32 & score = b.GetScoreQuality(*unit);
-	    Cell* cell = GetCell(unit->GetHeadIndex());
+        if(unit && unit->isValid())
+        {
+            const s32 & score = b.GetScoreQuality(*unit);
+            Cell* cell = GetCell(unit->GetHeadIndex());
 
-	    cell->SetQuality(score);
+            cell->SetQuality(score);
 
-	    if(unit->isWide())
-        	GetCell(unit->GetTailIndex())->SetQuality(score);
+            if(unit->isWide())
+                GetCell(unit->GetTailIndex())->SetQuality(score);
 
-	    DEBUG(DBG_BATTLE, DBG_TRACE, score << " for " << unit->String());
-	}
+            DEBUG(DBG_BATTLE, DBG_TRACE, score << " for " << unit->String());
+        }
     }
 }
 
@@ -134,10 +134,10 @@ s32 Battle::Board::GetDistance(s32 index1, s32 index2)
 {
     if(isValidIndex(index1) && isValidIndex(index2))
     {
-	const s32 dx = (index1 % ARENAW) - (index2 % ARENAW);
-	const s32 dy = (index1 / ARENAW) - (index2 / ARENAW);
+        const s32 dx = (index1 % ARENAW) - (index2 % ARENAW);
+        const s32 dy = (index1 / ARENAW) - (index2 / ARENAW);
 
-	return Sign(dx) == Sign(dy) ? std::max(std::abs(dx), std::abs(dy)) : std::abs(dx) + std::abs(dy);
+        return Sign(dx) == Sign(dy) ? std::max(std::abs(dx), std::abs(dy)) : std::abs(dx) + std::abs(dy);
     }
 
     return 0;
@@ -152,26 +152,26 @@ void Battle::Board::SetScanPassability(const Unit & b)
     if(b.isFly())
     {
         for(iterator it = begin(); it != end(); ++it)
-	    if((*it).isPassable3(b, false)) (*it).SetDirection(CENTER);
+            if((*it).isPassable3(b, false)) (*it).SetDirection(CENTER);
     }
     else
     {
-	Indexes indexes = GetDistanceIndexes(b.GetHeadIndex(), b.GetSpeed());
-	indexes.resize(std::distance(indexes.begin(),
-		std::remove_if(indexes.begin(), indexes.end(), isImpassableIndex)));
+        Indexes indexes = GetDistanceIndexes(b.GetHeadIndex(), b.GetSpeed());
+        indexes.resize(std::distance(indexes.begin(),
+                std::remove_if(indexes.begin(), indexes.end(), isImpassableIndex)));
 
-	// set pasable
-	for(Indexes::const_iterator
-	    it = indexes.begin(); it != indexes.end(); ++it)
-	    GetAStarPath(b, Position::GetCorrect(b, *it), false);
+        // set pasable
+        for(Indexes::const_iterator
+            it = indexes.begin(); it != indexes.end(); ++it)
+            GetAStarPath(b, Position::GetCorrect(b, *it), false);
     }
 }
 
 struct bcell_t
 {
-    s32		cost;
-    s32		prnt;
-    bool	open;
+    s32                cost;
+    s32                prnt;
+    bool        open;
 
     bcell_t() : cost(MAXU16), prnt(-1), open(true) {}
 };
@@ -190,53 +190,53 @@ Battle::Indexes Battle::Board::GetAStarPath(const Unit & b, const Position & dst
 
     while(cur != dst.GetHead()->GetIndex())
     {
-	const Cell & center = at(cur);
-	Indexes around = b.isWide() ?
-	    GetMoveWideIndexes(cur, (0 > list[cur].prnt ? b.isReflect() : (RIGHT_SIDE & GetDirection(cur, list[cur].prnt)))) :
-	    GetAroundIndexes(cur);
+        const Cell & center = at(cur);
+        Indexes around = b.isWide() ?
+            GetMoveWideIndexes(cur, (0 > list[cur].prnt ? b.isReflect() : (RIGHT_SIDE & GetDirection(cur, list[cur].prnt)))) :
+            GetAroundIndexes(cur);
 
         for(Indexes::const_iterator
-	    it = around.begin(); it != around.end(); ++it)
+            it = around.begin(); it != around.end(); ++it)
         {
-    	    Cell & cell = at(*it);
+                Cell & cell = at(*it);
 
-	    if(list[*it].open && cell.isPassable4(b, center) &&
-		// check bridge
-	        (!bridge || !Board::isBridgeIndex(*it) || bridge->isPassable(b.GetColor())))
-	    {
-		const s32 cost = 100 * Board::GetDistance(*it, dst.GetHead()->GetIndex()) +
-		    (b.isWide() && WideDifficultDirection(center.GetDirection(), GetDirection(*it, cur)) ? 100 : 0) +
-		    (castle && castle->isBuild(BUILD_MOAT) && Board::isMoatIndex(*it) ? 100 : 0);
+            if(list[*it].open && cell.isPassable4(b, center) &&
+                // check bridge
+                (!bridge || !Board::isBridgeIndex(*it) || bridge->isPassable(b.GetColor())))
+            {
+                const s32 cost = 100 * Board::GetDistance(*it, dst.GetHead()->GetIndex()) +
+                    (b.isWide() && WideDifficultDirection(center.GetDirection(), GetDirection(*it, cur)) ? 100 : 0) +
+                    (castle && castle->isBuild(BUILD_MOAT) && Board::isMoatIndex(*it) ? 100 : 0);
 
-		// new cell
-		if(0 > list[*it].prnt)
-		{
-		    list[*it].prnt = cur;
-		    list[*it].cost = cost + list[cur].cost;
-		}
-		else
-		// change parent
-		if(list[*it].cost > cost + list[cur].cost)
-		{
-		    list[*it].prnt = cur;
-		    list[*it].cost = cost + list[cur].cost;
-		}
-	    }
-	}
+                // new cell
+                if(0 > list[*it].prnt)
+                {
+                    list[*it].prnt = cur;
+                    list[*it].cost = cost + list[cur].cost;
+                }
+                else
+                // change parent
+                if(list[*it].cost > cost + list[cur].cost)
+                {
+                    list[*it].prnt = cur;
+                    list[*it].cost = cost + list[cur].cost;
+                }
+            }
+        }
 
-	list[cur].open = false;
-	s32 cost = MAXU16;
+        list[cur].open = false;
+        s32 cost = MAXU16;
 
-	// find min cost opens
-	for(std::map<s32, bcell_t>::const_iterator
-	    it = list.begin(); it != list.end(); ++it)
-	if((*it).second.open && cost > (*it).second.cost)
-	{
-	    cur = (*it).first;
-	    cost = (*it).second.cost;
-	}
+        // find min cost opens
+        for(std::map<s32, bcell_t>::const_iterator
+            it = list.begin(); it != list.end(); ++it)
+        if((*it).second.open && cost > (*it).second.cost)
+        {
+            cur = (*it).first;
+            cost = (*it).second.cost;
+        }
 
-	if(MAXU16 == cost) break;
+        if(MAXU16 == cost) break;
     }
 
     Indexes result;
@@ -246,73 +246,73 @@ Battle::Indexes Battle::Board::GetAStarPath(const Unit & b, const Position & dst
     if(cur == dst.GetHead()->GetIndex())
     {
         while(cur != b.GetHeadIndex() &&
-	    isValidIndex(cur))
+            isValidIndex(cur))
         {
             result.push_back(cur);
             cur = list[cur].prnt;
         }
 
-	std::reverse(result.begin(), result.end());
+        std::reverse(result.begin(), result.end());
 
-	// correct wide position
-	if(b.isWide() && result.size())
-	{
-	    const s32 head = dst.GetHead()->GetIndex();
-	    const s32 tail = dst.GetTail()->GetIndex();
-	    const s32 prev = 1 < result.size() ? result[result.size() - 2] : b.GetHeadIndex();
+        // correct wide position
+        if(b.isWide() && result.size())
+        {
+            const s32 head = dst.GetHead()->GetIndex();
+            const s32 tail = dst.GetTail()->GetIndex();
+            const s32 prev = 1 < result.size() ? result[result.size() - 2] : b.GetHeadIndex();
 
-	    if(result.back() == head)
-	    {
-		int side = RIGHT == GetDirection(head, tail) ? RIGHT_SIDE : LEFT_SIDE;
+            if(result.back() == head)
+            {
+                int side = RIGHT == GetDirection(head, tail) ? RIGHT_SIDE : LEFT_SIDE;
 
-		if(! (side & GetDirection(head, prev)))
-		    result.push_back(tail);
-	    }
-	    else
-	    if(result.back() == tail)
-	    {
-		int side = RIGHT == GetDirection(head, tail) ? LEFT_SIDE : RIGHT_SIDE;
+                if(! (side & GetDirection(head, prev)))
+                    result.push_back(tail);
+            }
+            else
+            if(result.back() == tail)
+            {
+                int side = RIGHT == GetDirection(head, tail) ? LEFT_SIDE : RIGHT_SIDE;
 
-		if(! (side & GetDirection(tail, prev)))
-		    result.push_back(head);
-	    }
-	}
+                if(! (side & GetDirection(tail, prev)))
+                    result.push_back(head);
+            }
+        }
 
-	if(result.size() > b.GetSpeed())
-	    result.resize(b.GetSpeed());
+        if(result.size() > b.GetSpeed())
+            result.resize(b.GetSpeed());
 
-	// skip moat position
-	if(castle && castle->isBuild(BUILD_MOAT) && ! Board::isMoatIndex(b.GetHeadIndex()))
-	{
-	    Indexes::iterator moat = std::find_if(result.begin(), result.end(), Board::isMoatIndex);
-	    if(moat != result.end())
-		result.resize(std::distance(result.begin(), ++moat));
-	}
+        // skip moat position
+        if(castle && castle->isBuild(BUILD_MOAT) && ! Board::isMoatIndex(b.GetHeadIndex()))
+        {
+            Indexes::iterator moat = std::find_if(result.begin(), result.end(), Board::isMoatIndex);
+            if(moat != result.end())
+                result.resize(std::distance(result.begin(), ++moat));
+        }
 
-	// set passable info
-	for(Indexes::iterator
-	    it = result.begin(); it != result.end(); ++it)
-	{
-	    Cell* cell = GetCell(*it);
-	    cell->SetDirection(cell->GetDirection() |
-		GetDirection(*it, it == result.begin() ? b.GetHeadIndex() : *(it - 1)));
+        // set passable info
+        for(Indexes::iterator
+            it = result.begin(); it != result.end(); ++it)
+        {
+            Cell* cell = GetCell(*it);
+            cell->SetDirection(cell->GetDirection() |
+                GetDirection(*it, it == result.begin() ? b.GetHeadIndex() : *(it - 1)));
 
-	    if(b.isWide())
-	    {
-		const s32 head = *it;
-		const s32 prev = it != result.begin() ? *(it - 1) : b.GetHeadIndex();
-		Cell* tail = GetCell(head, LEFT_SIDE & GetDirection(head, prev) ? LEFT : RIGHT);
+            if(b.isWide())
+            {
+                const s32 head = *it;
+                const s32 prev = it != result.begin() ? *(it - 1) : b.GetHeadIndex();
+                Cell* tail = GetCell(head, LEFT_SIDE & GetDirection(head, prev) ? LEFT : RIGHT);
 
-		if(tail && UNKNOWN == tail->GetDirection())
-		    tail->SetDirection(GetDirection(tail->GetIndex(), head));
-	    }
-	}
+                if(tail && UNKNOWN == tail->GetDirection())
+                    tail->SetDirection(GetDirection(tail->GetIndex(), head));
+            }
+        }
     }
 
     if(debug && result.empty())
     {
-	DEBUG(DBG_BATTLE, DBG_WARN, "path not found: " << b.String() << ", dst: " <<
-	    "(head: " << dst.GetHead()->GetIndex() << ", tail: " << (dst.GetTail() ? dst.GetTail()->GetIndex() : -1) << ")");
+        DEBUG(DBG_BATTLE, DBG_WARN, "path not found: " << b.String() << ", dst: " <<
+            "(head: " << dst.GetHead()->GetIndex() << ", tail: " << (dst.GetTail() ? dst.GetTail()->GetIndex() : -1) << ")");
     }
 
     return result;
@@ -323,10 +323,10 @@ std::string Battle::Board::AllUnitsInfo(void) const
     std::ostringstream os;
 
     for(const_iterator
-	it = begin(); it != end(); ++it)
+        it = begin(); it != end(); ++it)
     {
-	const Unit* b = (*it).GetUnit();
-	if(b) os << "\t" << b->String(true) << std::endl;
+        const Unit* b = (*it).GetUnit();
+        if(b) os << "\t" << b->String(true) << std::endl;
     }
 
     return os.str();
@@ -374,7 +374,7 @@ Battle::Indexes Battle::Board::GetNearestTroopIndexes(s32 pos, const Indexes* bl
             if(black && black->end() != std::find(black->begin(), black->end(), b->GetHeadIndex())) continue;
             // added
             if(pos != b->GetHeadIndex())
-		dists.push_back(IndexDistance(b->GetHeadIndex(), GetDistance(pos, b->GetHeadIndex())));
+                dists.push_back(IndexDistance(b->GetHeadIndex(), GetDistance(pos, b->GetHeadIndex())));
         }
     }
 
@@ -382,15 +382,15 @@ Battle::Indexes Battle::Board::GetNearestTroopIndexes(s32 pos, const Indexes* bl
     {
         std::sort(dists.begin(), dists.end(), IndexDistance::Shortest);
         dists.resize(std::count_if(dists.begin(), dists.end(),
-		std::bind2nd(IndexDistanceEqualDistance(), dists.front().second)));
+                std::bind2nd(IndexDistanceEqualDistance(), dists.front().second)));
     }
 
     if(dists.size())
     {
         result.reserve(dists.size());
         for(std::vector<IndexDistance>::const_iterator
-	    it = dists.begin(); it != dists.end(); ++it)
-    	    result.push_back((*it).first);
+            it = dists.begin(); it != dists.end(); ++it)
+                result.push_back((*it).first);
     }
 
     return result;
@@ -400,11 +400,11 @@ int Battle::Board::GetDirection(s32 index1, s32 index2)
 {
     if(isValidIndex(index1) && isValidIndex(index2))
     {
-	if(index1 == index2) return CENTER;
-	else
-	for(direction_t dir = TOP_LEFT; dir < CENTER; ++dir)
-	    if(isValidDirection(index1, dir) &&
-		index2 == GetIndexDirection(index1, dir)) return dir;
+        if(index1 == index2) return CENTER;
+        else
+        for(direction_t dir = TOP_LEFT; dir < CENTER; ++dir)
+            if(isValidDirection(index1, dir) &&
+                index2 == GetIndexDirection(index1, dir)) return dir;
     }
 
     return UNKNOWN;
@@ -413,20 +413,20 @@ int Battle::Board::GetDirection(s32 index1, s32 index2)
 bool Battle::Board::isNearIndexes(s32 index1, s32 index2)
 {
     return index1 != index2 &&
-	UNKNOWN != GetDirection(index1, index2);
+        UNKNOWN != GetDirection(index1, index2);
 }
 
 int Battle::Board::GetReflectDirection(int d)
 {
     switch(d)
     {
-        case TOP_LEFT:		return BOTTOM_RIGHT;
-        case TOP_RIGHT:		return BOTTOM_LEFT;
-        case LEFT:		return RIGHT;
-        case RIGHT:		return LEFT;
-        case BOTTOM_LEFT:	return TOP_RIGHT;
-        case BOTTOM_RIGHT:	return TOP_LEFT;
-	default:		break;
+        case TOP_LEFT:                return BOTTOM_RIGHT;
+        case TOP_RIGHT:                return BOTTOM_LEFT;
+        case LEFT:                return RIGHT;
+        case RIGHT:                return LEFT;
+        case BOTTOM_LEFT:        return TOP_RIGHT;
+        case BOTTOM_RIGHT:        return TOP_LEFT;
+        default:                break;
     }
 
     return UNKNOWN;
@@ -438,8 +438,8 @@ bool Battle::Board::isReflectDirection(int d)
     {
         case TOP_LEFT:
         case LEFT:
-        case BOTTOM_LEFT:	return true;
-	default:		break;
+        case BOTTOM_LEFT:        return true;
+        default:                break;
     }
 
     return false;
@@ -495,7 +495,7 @@ s32 Battle::Board::GetIndexAbsPosition(const Point & pt) const
     const_iterator it = begin();
 
     for(; it != end(); ++it)
-	if((*it).isPositionIncludePoint(pt)) break;
+        if((*it).isPositionIncludePoint(pt)) break;
 
     return it != end() ? (*it).GetIndex() : -1;
 }
@@ -554,17 +554,17 @@ bool Battle::Board::isMoatIndex(s32 index)
 {
     switch(index)
     {
-	case 7:
-	case 18:
-	case 28:
-	case 39:
-	case 61:
-	case 72:
-	case 84:
-	case 95:
-	    return true;
+        case 7:
+        case 18:
+        case 28:
+        case 39:
+        case 61:
+        case 72:
+        case 84:
+        case 95:
+            return true;
 
-	default: break;
+        default: break;
     }
 
     return false;
@@ -579,84 +579,84 @@ void Battle::Board::SetCobjObjects(const Maps::Tiles & tile)
 
     if(grave)
     {
-	objs.push_back(ICN::COBJ0000);
-	objs.push_back(ICN::COBJ0001);
+        objs.push_back(ICN::COBJ0000);
+        objs.push_back(ICN::COBJ0001);
     }
     else
     switch(ground)
     {
-	case Maps::Ground::DESERT:
-	    objs.push_back(ICN::COBJ0009);
-	    objs.push_back(ICN::COBJ0012);
-	    objs.push_back(ICN::COBJ0017);
-	    objs.push_back(ICN::COBJ0024);
-	    break;
+        case Maps::Ground::DESERT:
+            objs.push_back(ICN::COBJ0009);
+            objs.push_back(ICN::COBJ0012);
+            objs.push_back(ICN::COBJ0017);
+            objs.push_back(ICN::COBJ0024);
+            break;
 
         case Maps::Ground::SNOW:
-	    objs.push_back(ICN::COBJ0022);
-	    objs.push_back(ICN::COBJ0026);
-	    break;
+            objs.push_back(ICN::COBJ0022);
+            objs.push_back(ICN::COBJ0026);
+            break;
 
         case Maps::Ground::SWAMP:
-	    objs.push_back(ICN::COBJ0006);
-	    objs.push_back(ICN::COBJ0015);
-	    objs.push_back(ICN::COBJ0016);
-	    objs.push_back(ICN::COBJ0019);
-	    objs.push_back(ICN::COBJ0025);
-	    objs.push_back(ICN::COBJ0027);
-	    break;
+            objs.push_back(ICN::COBJ0006);
+            objs.push_back(ICN::COBJ0015);
+            objs.push_back(ICN::COBJ0016);
+            objs.push_back(ICN::COBJ0019);
+            objs.push_back(ICN::COBJ0025);
+            objs.push_back(ICN::COBJ0027);
+            break;
 
         case Maps::Ground::BEACH:
-	    objs.push_back(ICN::COBJ0017);
-	    break;
+            objs.push_back(ICN::COBJ0017);
+            break;
 
         case Maps::Ground::DIRT:
-	    objs.push_back(ICN::COBJ0011);
+            objs.push_back(ICN::COBJ0011);
         case Maps::Ground::GRASS:
-	    objs.push_back(ICN::COBJ0002);
-	    objs.push_back(ICN::COBJ0004);
-	    objs.push_back(ICN::COBJ0005);
-	    objs.push_back(ICN::COBJ0008);
-	    objs.push_back(ICN::COBJ0012);
-	    objs.push_back(ICN::COBJ0028);
-	    break;
+            objs.push_back(ICN::COBJ0002);
+            objs.push_back(ICN::COBJ0004);
+            objs.push_back(ICN::COBJ0005);
+            objs.push_back(ICN::COBJ0008);
+            objs.push_back(ICN::COBJ0012);
+            objs.push_back(ICN::COBJ0028);
+            break;
 
         case Maps::Ground::WASTELAND:
-	    objs.push_back(ICN::COBJ0013);
-	    objs.push_back(ICN::COBJ0018);
-	    objs.push_back(ICN::COBJ0020);
-	    objs.push_back(ICN::COBJ0021);
-	    break;
+            objs.push_back(ICN::COBJ0013);
+            objs.push_back(ICN::COBJ0018);
+            objs.push_back(ICN::COBJ0020);
+            objs.push_back(ICN::COBJ0021);
+            break;
 
         case Maps::Ground::LAVA:
-	    objs.push_back(ICN::COBJ0007);
-	    objs.push_back(ICN::COBJ0029);
-	    objs.push_back(ICN::COBJ0030);
-	    objs.push_back(ICN::COBJ0031);
-	    break;
+            objs.push_back(ICN::COBJ0007);
+            objs.push_back(ICN::COBJ0029);
+            objs.push_back(ICN::COBJ0030);
+            objs.push_back(ICN::COBJ0031);
+            break;
 
         case Maps::Ground::WATER:
-	    objs.push_back(ICN::COBJ0003);
-	    objs.push_back(ICN::COBJ0010);
-	    objs.push_back(ICN::COBJ0023);
-	    break;
+            objs.push_back(ICN::COBJ0003);
+            objs.push_back(ICN::COBJ0010);
+            objs.push_back(ICN::COBJ0023);
+            break;
 
-	default: break;
+        default: break;
     }
 
     if(objs.size() && 2 < Rand::Get(1, 10))
     {
-	// 80% 1 obj
-	s32 dst = GetObstaclePosition();
-	SetCobjObject(*Rand::Get(objs), dst);
+        // 80% 1 obj
+        s32 dst = GetObstaclePosition();
+        SetCobjObject(*Rand::Get(objs), dst);
 
-	// 50% 2 obj
-	while(at(dst).GetObject()) dst = GetObstaclePosition();
-	if(objs.size() > 1 && 5 < Rand::Get(1, 10)) SetCobjObject(*Rand::Get(objs), dst);
-
-	// 30% 3 obj
+        // 50% 2 obj
         while(at(dst).GetObject()) dst = GetObstaclePosition();
-	if(objs.size() > 1 && 7 < Rand::Get(1, 10)) SetCobjObject(*Rand::Get(objs), dst);
+        if(objs.size() > 1 && 5 < Rand::Get(1, 10)) SetCobjObject(*Rand::Get(objs), dst);
+
+        // 30% 3 obj
+        while(at(dst).GetObject()) dst = GetObstaclePosition();
+        if(objs.size() > 1 && 7 < Rand::Get(1, 10)) SetCobjObject(*Rand::Get(objs), dst);
     }
 }
 
@@ -664,61 +664,61 @@ void Battle::Board::SetCobjObject(int icn, s32 dst)
 {
     switch(icn)
     {
-	case ICN::COBJ0000:	at(dst).SetObject(0x80); break;
-	case ICN::COBJ0001:	at(dst).SetObject(0x81); break;
-	case ICN::COBJ0002:	at(dst).SetObject(0x82); break;
-	case ICN::COBJ0003:	at(dst).SetObject(0x83); break;
-	case ICN::COBJ0004:	at(dst).SetObject(0x84); break;
-	case ICN::COBJ0005:	at(dst).SetObject(0x85); break;
-	case ICN::COBJ0006:	at(dst).SetObject(0x86); break;
-	case ICN::COBJ0007:	at(dst).SetObject(0x87); break;
-	case ICN::COBJ0008:	at(dst).SetObject(0x88); break;
-	case ICN::COBJ0009:	at(dst).SetObject(0x89); break;
-	case ICN::COBJ0010:	at(dst).SetObject(0x8A); break;
-	case ICN::COBJ0011:	at(dst).SetObject(0x8B); break;
-	case ICN::COBJ0012:	at(dst).SetObject(0x8C); break;
-	case ICN::COBJ0013:	at(dst).SetObject(0x8D); break;
-	case ICN::COBJ0014:	at(dst).SetObject(0x8E); break;
-	case ICN::COBJ0015:	at(dst).SetObject(0x8F); break;
-	case ICN::COBJ0016:	at(dst).SetObject(0x90); break;
-	case ICN::COBJ0017:	at(dst).SetObject(0x91); break;
-	case ICN::COBJ0018:	at(dst).SetObject(0x92); break;
-	case ICN::COBJ0019:	at(dst).SetObject(0x93); break;
-	case ICN::COBJ0020:	at(dst).SetObject(0x94); break;
-	case ICN::COBJ0021:	at(dst).SetObject(0x95); break;
-	case ICN::COBJ0022:	at(dst).SetObject(0x96); break;
-	case ICN::COBJ0023:	at(dst).SetObject(0x97); break;
-	case ICN::COBJ0024:	at(dst).SetObject(0x98); break;
-	case ICN::COBJ0025:	at(dst).SetObject(0x99); break;
-	case ICN::COBJ0026:	at(dst).SetObject(0x9A); break;
-	case ICN::COBJ0027:	at(dst).SetObject(0x9B); break;
-	case ICN::COBJ0028:	at(dst).SetObject(0x9C); break;
-	case ICN::COBJ0029:	at(dst).SetObject(0x9D); break;
-	case ICN::COBJ0030:	at(dst).SetObject(0x9E); break;
-	case ICN::COBJ0031:	at(dst).SetObject(0x9F); break;
+        case ICN::COBJ0000:        at(dst).SetObject(0x80); break;
+        case ICN::COBJ0001:        at(dst).SetObject(0x81); break;
+        case ICN::COBJ0002:        at(dst).SetObject(0x82); break;
+        case ICN::COBJ0003:        at(dst).SetObject(0x83); break;
+        case ICN::COBJ0004:        at(dst).SetObject(0x84); break;
+        case ICN::COBJ0005:        at(dst).SetObject(0x85); break;
+        case ICN::COBJ0006:        at(dst).SetObject(0x86); break;
+        case ICN::COBJ0007:        at(dst).SetObject(0x87); break;
+        case ICN::COBJ0008:        at(dst).SetObject(0x88); break;
+        case ICN::COBJ0009:        at(dst).SetObject(0x89); break;
+        case ICN::COBJ0010:        at(dst).SetObject(0x8A); break;
+        case ICN::COBJ0011:        at(dst).SetObject(0x8B); break;
+        case ICN::COBJ0012:        at(dst).SetObject(0x8C); break;
+        case ICN::COBJ0013:        at(dst).SetObject(0x8D); break;
+        case ICN::COBJ0014:        at(dst).SetObject(0x8E); break;
+        case ICN::COBJ0015:        at(dst).SetObject(0x8F); break;
+        case ICN::COBJ0016:        at(dst).SetObject(0x90); break;
+        case ICN::COBJ0017:        at(dst).SetObject(0x91); break;
+        case ICN::COBJ0018:        at(dst).SetObject(0x92); break;
+        case ICN::COBJ0019:        at(dst).SetObject(0x93); break;
+        case ICN::COBJ0020:        at(dst).SetObject(0x94); break;
+        case ICN::COBJ0021:        at(dst).SetObject(0x95); break;
+        case ICN::COBJ0022:        at(dst).SetObject(0x96); break;
+        case ICN::COBJ0023:        at(dst).SetObject(0x97); break;
+        case ICN::COBJ0024:        at(dst).SetObject(0x98); break;
+        case ICN::COBJ0025:        at(dst).SetObject(0x99); break;
+        case ICN::COBJ0026:        at(dst).SetObject(0x9A); break;
+        case ICN::COBJ0027:        at(dst).SetObject(0x9B); break;
+        case ICN::COBJ0028:        at(dst).SetObject(0x9C); break;
+        case ICN::COBJ0029:        at(dst).SetObject(0x9D); break;
+        case ICN::COBJ0030:        at(dst).SetObject(0x9E); break;
+        case ICN::COBJ0031:        at(dst).SetObject(0x9F); break;
 
-	default: break;
+        default: break;
     }
 
     switch(icn)
     {
-	case ICN::COBJ0004:
-	case ICN::COBJ0005:
-	case ICN::COBJ0007:
-	case ICN::COBJ0011:
-	case ICN::COBJ0014:
-	case ICN::COBJ0015:
-	case ICN::COBJ0017:
-	case ICN::COBJ0018:
-	case ICN::COBJ0019:
-	case ICN::COBJ0020:
-	case ICN::COBJ0022:
-	case ICN::COBJ0030:
-	case ICN::COBJ0031:
-	    at(dst + 1).SetObject(0x40);
-	    break;
+        case ICN::COBJ0004:
+        case ICN::COBJ0005:
+        case ICN::COBJ0007:
+        case ICN::COBJ0011:
+        case ICN::COBJ0014:
+        case ICN::COBJ0015:
+        case ICN::COBJ0017:
+        case ICN::COBJ0018:
+        case ICN::COBJ0019:
+        case ICN::COBJ0020:
+        case ICN::COBJ0022:
+        case ICN::COBJ0030:
+        case ICN::COBJ0031:
+            at(dst + 1).SetObject(0x40);
+            break;
 
-	default: break;
+        default: break;
     }
 }
 
@@ -730,113 +730,113 @@ void Battle::Board::SetCovrObjects(int icn)
         case ICN::COVR0007:
         case ICN::COVR0013:
         case ICN::COVR0019:
-	    at(15).SetObject(0x40);
-	    at(16).SetObject(0x40);
-	    at(17).SetObject(0x40);
-	    at(25).SetObject(0x40);
-	    at(26).SetObject(0x40);
-	    at(27).SetObject(0x40);
-	    at(28).SetObject(0x40);
-	    at(40).SetObject(0x40);
-	    at(51).SetObject(0x40);
-	    break;
+            at(15).SetObject(0x40);
+            at(16).SetObject(0x40);
+            at(17).SetObject(0x40);
+            at(25).SetObject(0x40);
+            at(26).SetObject(0x40);
+            at(27).SetObject(0x40);
+            at(28).SetObject(0x40);
+            at(40).SetObject(0x40);
+            at(51).SetObject(0x40);
+            break;
 
         case ICN::COVR0002:
         case ICN::COVR0008:
         case ICN::COVR0014:
         case ICN::COVR0020:
-	    at(47).SetObject(0x40);
-	    at(48).SetObject(0x40);
-	    at(49).SetObject(0x40);
-	    at(50).SetObject(0x40);
-	    at(51).SetObject(0x40);
-	    break;
+            at(47).SetObject(0x40);
+            at(48).SetObject(0x40);
+            at(49).SetObject(0x40);
+            at(50).SetObject(0x40);
+            at(51).SetObject(0x40);
+            break;
 
         case ICN::COVR0003:
         case ICN::COVR0009:
         case ICN::COVR0015:
         case ICN::COVR0021:
-	    at(35).SetObject(0x40);
-	    at(41).SetObject(0x40);
-	    at(46).SetObject(0x40);
-	    at(47).SetObject(0x40);
-	    at(48).SetObject(0x40);
-	    at(49).SetObject(0x40);
-	    at(50).SetObject(0x40);
-	    at(51).SetObject(0x40);
-	    break;
+            at(35).SetObject(0x40);
+            at(41).SetObject(0x40);
+            at(46).SetObject(0x40);
+            at(47).SetObject(0x40);
+            at(48).SetObject(0x40);
+            at(49).SetObject(0x40);
+            at(50).SetObject(0x40);
+            at(51).SetObject(0x40);
+            break;
 
         case ICN::COVR0004:
         case ICN::COVR0010:
         case ICN::COVR0016:
         case ICN::COVR0022:
-	    at(41).SetObject(0x40);
-	    at(51).SetObject(0x40);
-	    at(58).SetObject(0x40);
-	    at(59).SetObject(0x40);
-	    at(60).SetObject(0x40);
-	    at(61).SetObject(0x40);
-	    at(62).SetObject(0x40);
-	    break;
+            at(41).SetObject(0x40);
+            at(51).SetObject(0x40);
+            at(58).SetObject(0x40);
+            at(59).SetObject(0x40);
+            at(60).SetObject(0x40);
+            at(61).SetObject(0x40);
+            at(62).SetObject(0x40);
+            break;
 
         case ICN::COVR0005:
         case ICN::COVR0017:
-	    at(24).SetObject(0x40);
-	    at(25).SetObject(0x40);
-	    at(26).SetObject(0x40);
-	    at(27).SetObject(0x40);
-	    at(28).SetObject(0x40);
-	    at(29).SetObject(0x40);
-	    at(30).SetObject(0x40);
-	    at(58).SetObject(0x40);
-	    at(59).SetObject(0x40);
-	    at(60).SetObject(0x40);
-	    at(61).SetObject(0x40);
-	    at(62).SetObject(0x40);
-	    at(63).SetObject(0x40);
-	    at(68).SetObject(0x40);
-	    at(74).SetObject(0x40);
-	    break;
+            at(24).SetObject(0x40);
+            at(25).SetObject(0x40);
+            at(26).SetObject(0x40);
+            at(27).SetObject(0x40);
+            at(28).SetObject(0x40);
+            at(29).SetObject(0x40);
+            at(30).SetObject(0x40);
+            at(58).SetObject(0x40);
+            at(59).SetObject(0x40);
+            at(60).SetObject(0x40);
+            at(61).SetObject(0x40);
+            at(62).SetObject(0x40);
+            at(63).SetObject(0x40);
+            at(68).SetObject(0x40);
+            at(74).SetObject(0x40);
+            break;
 
         case ICN::COVR0006:
         case ICN::COVR0018:
-	    at(14).SetObject(0x40);
-	    at(15).SetObject(0x40);
-	    at(16).SetObject(0x40);
-	    at(17).SetObject(0x40);
-	    at(18).SetObject(0x40);
-	    at(24).SetObject(0x40);
-	    at(68).SetObject(0x40);
-	    at(80).SetObject(0x40);
-	    at(81).SetObject(0x40);
-	    at(82).SetObject(0x40);
-	    at(83).SetObject(0x40);
-	    at(84).SetObject(0x40);
-	    break;
+            at(14).SetObject(0x40);
+            at(15).SetObject(0x40);
+            at(16).SetObject(0x40);
+            at(17).SetObject(0x40);
+            at(18).SetObject(0x40);
+            at(24).SetObject(0x40);
+            at(68).SetObject(0x40);
+            at(80).SetObject(0x40);
+            at(81).SetObject(0x40);
+            at(82).SetObject(0x40);
+            at(83).SetObject(0x40);
+            at(84).SetObject(0x40);
+            break;
 
         case ICN::COVR0011:
         case ICN::COVR0023:
-	    at(15).SetObject(0x40);
-	    at(25).SetObject(0x40);
-	    at(36).SetObject(0x40);
-	    at(51).SetObject(0x40);
-	    at(62).SetObject(0x40);
-	    at(71).SetObject(0x40);
-	    at(72).SetObject(0x40);
-	    break;
+            at(15).SetObject(0x40);
+            at(25).SetObject(0x40);
+            at(36).SetObject(0x40);
+            at(51).SetObject(0x40);
+            at(62).SetObject(0x40);
+            at(71).SetObject(0x40);
+            at(72).SetObject(0x40);
+            break;
 
         case ICN::COVR0012:
         case ICN::COVR0024:
-	    at(18).SetObject(0x40);
-	    at(29).SetObject(0x40);
-	    at(41).SetObject(0x40);
-	    at(59).SetObject(0x40);
-	    at(70).SetObject(0x40);
-	    at(82).SetObject(0x40);
-	    at(83).SetObject(0x40);
-	    break;
+            at(18).SetObject(0x40);
+            at(29).SetObject(0x40);
+            at(41).SetObject(0x40);
+            at(59).SetObject(0x40);
+            at(70).SetObject(0x40);
+            at(82).SetObject(0x40);
+            at(83).SetObject(0x40);
+            break;
 
-	default: break;
+        default: break;
     }
 }
 
@@ -863,20 +863,20 @@ Battle::Indexes Battle::Board::GetMoveWideIndexes(s32 center, bool reflect)
 
     if(isValidIndex(center))
     {
-	if(reflect)
-	{
+        if(reflect)
+        {
             if(isValidDirection(center, LEFT)) result.push_back(GetIndexDirection(center, LEFT));
             if(isValidDirection(center, RIGHT)) result.push_back(GetIndexDirection(center, RIGHT));
             if(isValidDirection(center, TOP_LEFT)) result.push_back(GetIndexDirection(center, TOP_LEFT));
             if(isValidDirection(center, BOTTOM_LEFT)) result.push_back(GetIndexDirection(center, BOTTOM_LEFT));
-	}
-	else
-	{
+        }
+        else
+        {
             if(isValidDirection(center, LEFT)) result.push_back(GetIndexDirection(center, LEFT));
             if(isValidDirection(center, RIGHT)) result.push_back(GetIndexDirection(center, RIGHT));
             if(isValidDirection(center, TOP_RIGHT)) result.push_back(GetIndexDirection(center, TOP_RIGHT));
             if(isValidDirection(center, BOTTOM_RIGHT)) result.push_back(GetIndexDirection(center, BOTTOM_RIGHT));
-	}
+        }
     }
     return result;
 }
@@ -888,7 +888,7 @@ Battle::Indexes Battle::Board::GetAroundIndexes(s32 center)
 
     if(isValidIndex(center))
     {
-	for(direction_t dir = TOP_LEFT; dir < CENTER; ++dir)
+        for(direction_t dir = TOP_LEFT; dir < CENTER; ++dir)
             if(isValidDirection(center, dir)) result.push_back(GetIndexDirection(center, dir));
     }
 
@@ -899,16 +899,16 @@ Battle::Indexes Battle::Board::GetAroundIndexes(const Unit & b)
 {
     if(b.isWide())
     {
-	Indexes around = GetAroundIndexes(b.GetHeadIndex());
-	const Indexes & tail = GetAroundIndexes(b.GetTailIndex());
-	around.insert(around.end(), tail.begin(), tail.end());
+        Indexes around = GetAroundIndexes(b.GetHeadIndex());
+        const Indexes & tail = GetAroundIndexes(b.GetTailIndex());
+        around.insert(around.end(), tail.begin(), tail.end());
 
-	Indexes::iterator it_end = around.end();
-	it_end = std::remove(around.begin(), it_end, b.GetHeadIndex());
-	it_end = std::remove(around.begin(), it_end, b.GetTailIndex());
-	around.resize(std::distance(around.begin(), it_end));
+        Indexes::iterator it_end = around.end();
+        it_end = std::remove(around.begin(), it_end, b.GetHeadIndex());
+        it_end = std::remove(around.begin(), it_end, b.GetTailIndex());
+        around.resize(std::distance(around.begin(), it_end));
 
-	return around;
+        return around;
     }
 
     return GetAroundIndexes(b.GetHeadIndex());
@@ -933,7 +933,7 @@ Battle::Indexes Battle::Board::GetDistanceIndexes(s32 center, u32 radius)
             for(Indexes::const_iterator
                 it = abroad.begin(); it != abroad.end(); ++it)
             {
-		const Indexes around = GetAroundIndexes(*it);
+                const Indexes around = GetAroundIndexes(*it);
                 tm.insert(around.begin(), around.end());
             }
 
@@ -959,8 +959,8 @@ Battle::Indexes Battle::Board::GetDistanceIndexes(s32 center, u32 radius)
 bool Battle::Board::isValidMirrorImageIndex(s32 index, const Unit* b)
 {
     return b && GetCell(index) &&
-	index != b->GetHeadIndex() && (!b->isWide() || index != b->GetTailIndex()) &&
-	GetCell(index)->isPassable3(*b, true);
+        index != b->GetHeadIndex() && (!b->isWide() || index != b->GetTailIndex()) &&
+        GetCell(index)->isPassable3(*b, true);
 }
 
 std::string Battle::Board::GetMoatInfo(void)

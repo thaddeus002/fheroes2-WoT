@@ -34,7 +34,7 @@
 #include "game_interface.h"
 
 Interface::Basic::Basic() : gameArea(*this), radar(*this),
-	iconsPanel(*this), buttonsArea(*this), statusWindow(*this), controlPanel(*this), redraw(0)
+        iconsPanel(*this), buttonsArea(*this), statusWindow(*this), controlPanel(*this), redraw(0)
 {
     Settings & conf = Settings::Get().Get();
     const Display & display = Display::Get();
@@ -91,35 +91,35 @@ void Interface::Basic::SetHideInterface(bool f)
 
     if(f)
     {
-	conf.SetShowPanel(true);
+        conf.SetShowPanel(true);
 
-	Point pos_radr = conf.PosRadar();
-	Point pos_bttn = conf.PosButtons();
-	Point pos_icon = conf.PosIcons();
-	Point pos_stat = conf.PosStatus();
+        Point pos_radr = conf.PosRadar();
+        Point pos_bttn = conf.PosButtons();
+        Point pos_icon = conf.PosIcons();
+        Point pos_stat = conf.PosStatus();
 
-	if(0 == pos_radr.x && 0 == pos_radr.y)
-	    pos_radr = Point(BORDERWIDTH, conf.QVGA() ? TILEWIDTH : BORDERWIDTH);
-	if(0 == pos_icon.x && 0 == pos_icon.y)
-	    pos_icon = Point(conf.QVGA() ? BORDERWIDTH : px - BORDERWIDTH, conf.QVGA() ? TILEWIDTH : radar.GetArea().y + radar.GetArea().h);
-	if(0 == pos_bttn.x && 0 == pos_bttn.y)
-	    pos_bttn = Point(conf.QVGA() ? BORDERWIDTH : px - BORDERWIDTH, conf.QVGA() ? TILEWIDTH : iconsPanel.GetArea().y + iconsPanel.GetArea().h);
-	if(0 == pos_stat.x && 0 == pos_stat.y)
-	    pos_stat = Point(conf.QVGA() ? BORDERWIDTH : px - BORDERWIDTH, conf.QVGA() ? TILEWIDTH : buttonsArea.GetArea().y + buttonsArea.GetArea().h);
+        if(0 == pos_radr.x && 0 == pos_radr.y)
+            pos_radr = Point(BORDERWIDTH, conf.QVGA() ? TILEWIDTH : BORDERWIDTH);
+        if(0 == pos_icon.x && 0 == pos_icon.y)
+            pos_icon = Point(conf.QVGA() ? BORDERWIDTH : px - BORDERWIDTH, conf.QVGA() ? TILEWIDTH : radar.GetArea().y + radar.GetArea().h);
+        if(0 == pos_bttn.x && 0 == pos_bttn.y)
+            pos_bttn = Point(conf.QVGA() ? BORDERWIDTH : px - BORDERWIDTH, conf.QVGA() ? TILEWIDTH : iconsPanel.GetArea().y + iconsPanel.GetArea().h);
+        if(0 == pos_stat.x && 0 == pos_stat.y)
+            pos_stat = Point(conf.QVGA() ? BORDERWIDTH : px - BORDERWIDTH, conf.QVGA() ? TILEWIDTH : buttonsArea.GetArea().y + buttonsArea.GetArea().h);
 
-	controlPanel.SetPos(display.w() - controlPanel.GetArea().w - scroll_width, 0);
-	radar.SetPos(pos_radr.x, pos_radr.y);
-	iconsPanel.SetPos(pos_icon.x, pos_icon.y);
-	buttonsArea.SetPos(pos_bttn.x, pos_bttn.y);
-	statusWindow.SetPos(pos_stat.x, pos_stat.y);
+        controlPanel.SetPos(display.w() - controlPanel.GetArea().w - scroll_width, 0);
+        radar.SetPos(pos_radr.x, pos_radr.y);
+        iconsPanel.SetPos(pos_icon.x, pos_icon.y);
+        buttonsArea.SetPos(pos_bttn.x, pos_bttn.y);
+        statusWindow.SetPos(pos_stat.x, pos_stat.y);
     }
     else
     {
-	radar.SetPos(px, BORDERWIDTH);
-	iconsPanel.SetPos(px, radar.GetArea().y + radar.GetArea().h + BORDERWIDTH);
+        radar.SetPos(px, BORDERWIDTH);
+        iconsPanel.SetPos(px, radar.GetArea().y + radar.GetArea().h + BORDERWIDTH);
 
-	buttonsArea.SetPos(px, iconsPanel.GetArea().y + iconsPanel.GetArea().h + BORDERWIDTH);
-	statusWindow.SetPos(px, buttonsArea.GetArea().y + buttonsArea.GetArea().h);
+        buttonsArea.SetPos(px, iconsPanel.GetArea().y + iconsPanel.GetArea().h + BORDERWIDTH);
+        statusWindow.SetPos(px, buttonsArea.GetArea().y + buttonsArea.GetArea().h);
     }
     
     gameArea.Build();
@@ -184,10 +184,10 @@ void Interface::Basic::Redraw(int force)
 
     // show system info
     if(conf.ExtGameShowSystemInfo())
-	RedrawSystemInfo((conf.ExtGameHideInterface() ? 10 : 26), Display::Get().h() - (conf.ExtGameHideInterface() ? 14 : 30), System::GetMemoryUsage());
+        RedrawSystemInfo((conf.ExtGameHideInterface() ? 10 : 26), Display::Get().h() - (conf.ExtGameHideInterface() ? 14 : 30), System::GetMemoryUsage());
 
     if((redraw | force) & REDRAW_BORDER)
-	    GameBorderRedraw();
+            GameBorderRedraw();
 
     redraw = 0;
 }
@@ -220,31 +220,31 @@ s32 Interface::Basic::GetDimensionDoorDestination(s32 from, u32 distance, bool w
 
     while(le.HandleEvents())
     {
-	const Point & mp = le.GetMouseCursor();
-	dst = gameArea.GetIndexFromMousePoint(mp);
-	if(0 > dst) break;
+        const Point & mp = le.GetMouseCursor();
+        dst = gameArea.GetIndexFromMousePoint(mp);
+        if(0 > dst) break;
 
-	const Maps::Tiles & tile = world.GetTiles(dst);
+        const Maps::Tiles & tile = world.GetTiles(dst);
 
-	const bool valid = ((gameArea.GetArea() & mp) &&
-			dst >= 0 &&
-			(! tile.isFog(conf.CurrentColor())) &&
-			MP2::isClearGroundObject(tile.GetObject()) &&
-			water == world.GetTiles(dst).isWater() &&
-			distance >= Maps::GetApproximateDistance(from, dst));
+        const bool valid = ((gameArea.GetArea() & mp) &&
+                        dst >= 0 &&
+                        (! tile.isFog(conf.CurrentColor())) &&
+                        MP2::isClearGroundObject(tile.GetObject()) &&
+                        water == world.GetTiles(dst).isWater() &&
+                        distance >= Maps::GetApproximateDistance(from, dst));
 
-	cursor.SetThemes(valid ? (water ? Cursor::BOAT : Cursor::MOVE) : Cursor::WAR_NONE);
+        cursor.SetThemes(valid ? (water ? Cursor::BOAT : Cursor::MOVE) : Cursor::WAR_NONE);
 
-	// exit
-	if(le.MousePressRight()) break;
-	else
-	if(le.MouseClickLeft() && valid) return dst;
+        // exit
+        if(le.MousePressRight()) break;
+        else
+        if(le.MouseClickLeft() && valid) return dst;
 
-	// redraw cursor
+        // redraw cursor
         if(!cursor.isVisible())
-	{
-    	    cursor.Show();
-	    display.Flip();
+        {
+                cursor.Show();
+            display.Flip();
         }
     }
 

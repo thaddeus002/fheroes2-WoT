@@ -128,8 +128,8 @@ void Timer::Remove(void)
 {
     if(id)
     {
-	SDL_RemoveTimer(id);
-	id = 0;
+        SDL_RemoveTimer(id);
+        id = 0;
     }
 }
 

@@ -133,7 +133,7 @@ void AI::HeroesTurn(Heroes & hero)
 
     while(AI::HeroesCanMove(hero))
     {
-	// turn indicator
+        // turn indicator
         status.RedrawTurnProgress(3);
         status.RedrawTurnProgress(4);
 
@@ -146,7 +146,7 @@ void AI::HeroesTurn(Heroes & hero)
 
         // heroes AI turn
         AI::HeroesMove(hero);
-	hero.SetModes(HEROES_MOVED);
+        hero.SetModes(HEROES_MOVED);
 
         // turn indicator
         status.RedrawTurnProgress(7);
@@ -180,15 +180,15 @@ void AI::KingdomTurn(Kingdom & kingdom)
 
     // castles AI turn
     for(KingdomCastles::iterator
-	it = castles.begin(); it != castles.end(); ++it)
-	if(*it) CastleTurn(**it);
+        it = castles.begin(); it != castles.end(); ++it)
+        if(*it) CastleTurn(**it);
 
     status.RedrawTurnProgress(3);
 
     // heroes turns
     for(KingdomHeroes::iterator
-	it = heroes.begin(); it != heroes.end(); ++it)
-	if(*it) HeroesTurn(**it);
+        it = heroes.begin(); it != heroes.end(); ++it)
+        if(*it) HeroesTurn(**it);
 
     status.RedrawTurnProgress(6);
     status.RedrawTurnProgress(7);

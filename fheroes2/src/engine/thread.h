@@ -39,13 +39,13 @@ public:
 
     Thread & operator= (const Thread &);
 
-    void	Create(int (*)(void *), void *param = NULL);
-    int		Wait(void);
-    void	Kill(void);
+    void        Create(int (*)(void *), void *param = NULL);
+    int                Wait(void);
+    void        Kill(void);
 
-    bool	IsRun(void) const;
+    bool        IsRun(void) const;
 
-    u32		GetID(void) const;
+    u32                GetID(void) const;
 
 private:
     SDL_Thread *thread;

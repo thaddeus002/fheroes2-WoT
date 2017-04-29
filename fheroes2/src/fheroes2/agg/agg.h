@@ -54,24 +54,24 @@ public:
 
 namespace AGG
 {
-    bool	Init(void);
-    void	Quit(void);
+    bool        Init(void);
+    void        Quit(void);
 
-    int		PutICN(const Sprite &, bool init_reflect = false);
-    Sprite	GetICN(int icn, u32 index, bool reflect = false);
-    u32		GetICNCount(int icn);
-    Surface	GetTIL(int til, u32 index, u32 shape);
-    Surface	GetLetter(u32 ch, u32 ft);
+    int                PutICN(const Sprite &, bool init_reflect = false);
+    Sprite        GetICN(int icn, u32 index, bool reflect = false);
+    u32                GetICNCount(int icn);
+    Surface        GetTIL(int til, u32 index, u32 shape);
+    Surface        GetLetter(u32 ch, u32 ft);
 #ifdef WITH_TTF
-    Surface	GetUnicodeLetter(u32 ch, u32 ft);
-    u32		GetFontHeight(bool small);
+    Surface        GetUnicodeLetter(u32 ch, u32 ft);
+    u32                GetFontHeight(bool small);
 #endif
-    void	LoadLOOPXXSounds(const std::vector<int> &);
-    void	PlaySound(int m82);
-    void	PlayMusic(int mus, bool loop = true);
-    void	ResetMixer(void);
+    void        LoadLOOPXXSounds(const std::vector<int> &);
+    void        PlaySound(int m82);
+    void        PlayMusic(int mus, bool loop = true);
+    void        ResetMixer(void);
 
-    RGBA	GetPaletteColor(u32 index);
+    RGBA        GetPaletteColor(u32 index);
 
     ICNSprite   RenderICNSprite(int, u32);
 

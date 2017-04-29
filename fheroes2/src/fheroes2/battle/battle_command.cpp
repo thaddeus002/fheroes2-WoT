@@ -45,8 +45,8 @@ Battle::Command & Battle::Command::operator>> (int & val)
 {
     if(size())
     {
-	val = back();
-	pop_back();
+        val = back();
+        pop_back();
     }
     return *this;
 }
@@ -62,9 +62,9 @@ Battle::Command::Command(int cmd, int param1, int param2, const Indexes & param3
     switch(type)
     {
         case MSG_BATTLE_MOVE:
-	    for(Indexes::const_reverse_iterator
-		it = param3.rbegin(); it != param3.rend(); ++it)
-		    *this << *it;
+            for(Indexes::const_reverse_iterator
+                it = param3.rbegin(); it != param3.rend(); ++it)
+                    *this << *it;
             *this << param3.size() << param2 << param1;  // path, dst, uid
             break;
 
@@ -85,7 +85,7 @@ Battle::Command::Command(int cmd, int param1, int param2, int param3, int param4
             break;
 
         case MSG_BATTLE_TOWER:
-	    *this << param2 << param1; // enemy uid, type
+            *this << param2 << param1; // enemy uid, type
             break;
 
         case MSG_BATTLE_CATAPULT: // battle_arena.cpp

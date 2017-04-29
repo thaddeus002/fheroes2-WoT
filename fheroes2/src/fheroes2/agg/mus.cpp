@@ -33,8 +33,8 @@ namespace MUS
 {
     const struct
     {
-	int type;
-	const char* string;
+        int type;
+        const char* string;
     } musmap[] = {
         { UNUSED,       ""                    },
         { DATATRACK,    ""                    },
@@ -91,7 +91,7 @@ namespace MUS
       sstream << ".ogg";
       else
       sstream << " " <<
-	(UNUSED <= mus && UNKNOWN > mus ? musmap[mus].string : musmap[UNKNOWN].string) << ".ogg";
+        (UNUSED <= mus && UNKNOWN > mus ? musmap[mus].string : musmap[UNKNOWN].string) << ".ogg";
       return sstream.str();
     }
 }
@@ -100,15 +100,15 @@ int MUS::FromGround(int ground)
 {
     switch(ground)
     {
-        case Maps::Ground::DESERT:	return DESERT;
-        case Maps::Ground::SNOW:	return SNOW;
-        case Maps::Ground::SWAMP:	return SWAMP;
-        case Maps::Ground::WASTELAND:	return WASTELAND;
-        case Maps::Ground::BEACH:	return BEACH;
-        case Maps::Ground::LAVA:	return LAVA;
-        case Maps::Ground::DIRT:	return DIRT;
-        case Maps::Ground::GRASS:	return GRASS;
-        case Maps::Ground::WATER:	return BEACH;
+        case Maps::Ground::DESERT:        return DESERT;
+        case Maps::Ground::SNOW:        return SNOW;
+        case Maps::Ground::SWAMP:        return SWAMP;
+        case Maps::Ground::WASTELAND:        return WASTELAND;
+        case Maps::Ground::BEACH:        return BEACH;
+        case Maps::Ground::LAVA:        return LAVA;
+        case Maps::Ground::DIRT:        return DIRT;
+        case Maps::Ground::GRASS:        return GRASS;
+        case Maps::Ground::WATER:        return BEACH;
         default: break;
     }
 
@@ -119,12 +119,12 @@ int MUS::FromRace(int race)
 {
     switch(race)
     {
-        case Race::KNGT:	return KNIGHT;
-        case Race::BARB:	return BARBARIAN;
-        case Race::SORC:	return SORCERESS;
-        case Race::WRLK:	return WARLOCK;
-        case Race::WZRD:	return WIZARD;
-        case Race::NECR:	return NECROMANCER;
+        case Race::KNGT:        return KNIGHT;
+        case Race::BARB:        return BARBARIAN;
+        case Race::SORC:        return SORCERESS;
+        case Race::WRLK:        return WARLOCK;
+        case Race::WZRD:        return WIZARD;
+        case Race::NECR:        return NECROMANCER;
         default: break;
     }
 
@@ -180,10 +180,10 @@ int MUS::GetBattleRandom(void)
 {
     switch(Rand::Get(1, 3))
     {
-	case 1:	return BATTLE1;
-	case 2:	return BATTLE2;
-	case 3:	return BATTLE3;
-	default: break;
+        case 1:        return BATTLE1;
+        case 2:        return BATTLE2;
+        case 3:        return BATTLE3;
+        default: break;
     }
     return UNKNOWN;
 }

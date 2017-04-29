@@ -32,18 +32,18 @@ class HeroBase;
 class MageGuild
 {
     public:
-	MageGuild() {};
+        MageGuild() {};
 
-	void		Builds(int race, bool libraryCap);
-	void		EducateHero(HeroBase &, int lvlmage, bool isLibraryBuild) const;
-	SpellStorage	GetSpells(int lvlmage, bool islibrary, int) const;
+        void                Builds(int race, bool libraryCap);
+        void                EducateHero(HeroBase &, int lvlmage, bool isLibraryBuild) const;
+        SpellStorage        GetSpells(int lvlmage, bool islibrary, int) const;
 
     private:
         friend StreamBase & operator<< (StreamBase &, const MageGuild &);
         friend StreamBase & operator>> (StreamBase &, MageGuild &);
 
-	SpellStorage	general;
-	SpellStorage	library;
+        SpellStorage        general;
+        SpellStorage        library;
 };
 
 StreamBase & operator<< (StreamBase &, const MageGuild &);
@@ -53,12 +53,12 @@ class RowSpells
 {
 public:
     RowSpells(const Point &, const Castle &, int);
-    void		Redraw(void);
-    bool		QueueEventProcessing(void);
+    void                Redraw(void);
+    bool                QueueEventProcessing(void);
 
 private:
-    Rects		coords;
-    SpellStorage	spells;
+    Rects                coords;
+    SpellStorage        spells;
 };
 
 #endif

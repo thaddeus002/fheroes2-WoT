@@ -46,23 +46,23 @@ RowSpells::RowSpells(const Point & pos, const Castle & castle, int lvl)
 
     switch(lvl)
     {
-	case 1:
-	case 2: count = 3; break;
-	case 3:
-	case 4: count = 2; break;
-	case 5: count = 1; break;
-	default: break;
+        case 1:
+        case 2: count = 3; break;
+        case 3:
+        case 4: count = 2; break;
+        case 5: count = 1; break;
+        default: break;
     }
 
     for(u32 ii = 0; ii < count; ++ii)
-	coords.push_back(Rect(pos.x + coords.size() * (Settings::Get().QVGA() ? 72 : 110) - roll.w() / 2, pos.y, roll.w(), roll.h()));
+        coords.push_back(Rect(pos.x + coords.size() * (Settings::Get().QVGA() ? 72 : 110) - roll.w() / 2, pos.y, roll.w(), roll.h()));
 
     if(castle.HaveLibraryCapability())
     {
-	if(! hide && castle.isLibraryBuild())
-	    coords.push_back(Rect(pos.x + coords.size() * (Settings::Get().QVGA() ? 72 : 110) - roll_show.w() / 2, pos.y, roll_show.w(), roll_show.h()));
-	else
-	    coords.push_back(Rect(pos.x + coords.size() * (Settings::Get().QVGA() ? 72 : 110) - roll_hide.w() / 2, pos.y, roll_hide.w(), roll_hide.h()));
+        if(! hide && castle.isLibraryBuild())
+            coords.push_back(Rect(pos.x + coords.size() * (Settings::Get().QVGA() ? 72 : 110) - roll_show.w() / 2, pos.y, roll_show.w(), roll_show.h()));
+        else
+            coords.push_back(Rect(pos.x + coords.size() * (Settings::Get().QVGA() ? 72 : 110) - roll_hide.w() / 2, pos.y, roll_hide.w(), roll_hide.h()));
     }
 
     spells.reserve(6);
@@ -76,35 +76,35 @@ void RowSpells::Redraw(void)
     const Sprite & roll_hide = AGG::GetICN(ICN::TOWNWIND, 1);
 
     for(Rects::iterator
-	it = coords.begin(); it != coords.end(); ++it)
+        it = coords.begin(); it != coords.end(); ++it)
     {
-	const Rect & dst = (*it);
-	const Spell & spell = spells[std::distance(coords.begin(), it)];
+        const Rect & dst = (*it);
+        const Spell & spell = spells[std::distance(coords.begin(), it)];
 
-	// roll hide
-	if(dst.w < roll_show.w() || spell == Spell::NONE)
-	{
-	    roll_hide.Blit(dst);
-	}
-	// roll show
-	else
-	{
-	    roll_show.Blit(dst);
+        // roll hide
+        if(dst.w < roll_show.w() || spell == Spell::NONE)
+        {
+            roll_hide.Blit(dst);
+        }
+        // roll show
+        else
+        {
+            roll_show.Blit(dst);
 
-	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, spell.IndexSprite());
+            const Sprite & icon = AGG::GetICN(ICN::SPELLS, spell.IndexSprite());
 
-	    if(Settings::Get().QVGA())
-	    {
-		icon.Blit(dst.x + 2 + (dst.w - icon.w()) / 2, dst.y + 20 - icon.h() / 2);
-	    }
-	    else
-	    {
-		icon.Blit(dst.x + 5 + (dst.w - icon.w()) / 2, dst.y + 40 - icon.h() / 2);
+            if(Settings::Get().QVGA())
+            {
+                icon.Blit(dst.x + 2 + (dst.w - icon.w()) / 2, dst.y + 20 - icon.h() / 2);
+            }
+            else
+            {
+                icon.Blit(dst.x + 5 + (dst.w - icon.w()) / 2, dst.y + 40 - icon.h() / 2);
 
-		TextBox text(std::string(spell.GetName()) + " [" + GetString(spell.SpellPoint(NULL)) + "]", Font::SMALL, 78);
-		text.Blit(dst.x + 18, dst.y + 62);
-	    }
-	}
+                TextBox text(std::string(spell.GetName()) + " [" + GetString(spell.SpellPoint(NULL)) + "]", Font::SMALL, 78);
+                text.Blit(dst.x + 18, dst.y + 62);
+            }
+        }
     }
 }
 
@@ -119,15 +119,15 @@ bool RowSpells::QueueEventProcessing(void)
     if(0 <= index &&
        (le.MouseClickLeft() || le.MousePressRight()))
     {
-	const Spell & spell = spells[index];
+        const Spell & spell = spells[index];
 
-	if(spell != Spell::NONE)
-	{
-    	    cursor.Hide();
-    	    Dialog::SpellInfo(spell, !le.MousePressRight());
-    	    cursor.Show();
-    	    display.Flip();
-	}
+        if(spell != Spell::NONE)
+        {
+                cursor.Hide();
+                Dialog::SpellInfo(spell, !le.MousePressRight());
+                cursor.Show();
+                display.Flip();
+        }
     }
 
     return 0 <= index;
@@ -161,7 +161,7 @@ void Castle::OpenMageGuild(void)
         case Race::WRLK: icn = ICN::MAGEGLDW; break;
         case Race::WZRD: icn = ICN::MAGEGLDZ; break;
         case Race::NECR: icn = ICN::MAGEGLDN; break;
-	default: break;
+        default: break;
     }
     const Sprite & sprite = AGG::GetICN(icn, level - 1);
     sprite.Blit(cur_pt.x + 90 - sprite.w() / 2, cur_pt.y + 290 - sprite.h());
@@ -195,9 +195,9 @@ void Castle::OpenMageGuild(void)
         if(le.MouseClickLeft(buttonExit) || HotKeyCloseWindow) break;
 
         if(spells1.QueueEventProcessing() ||
-    	    spells2.QueueEventProcessing() ||
-    	    spells3.QueueEventProcessing() ||
-    	    spells4.QueueEventProcessing() ||
-    	    spells5.QueueEventProcessing()){}
+                spells2.QueueEventProcessing() ||
+                spells3.QueueEventProcessing() ||
+                spells4.QueueEventProcessing() ||
+                spells5.QueueEventProcessing()){}
     }
 }

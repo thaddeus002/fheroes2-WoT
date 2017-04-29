@@ -28,7 +28,7 @@ namespace Difficulty
 {
     enum
     {
-	EASY,
+        EASY,
         NORMAL,
         HARD,
         EXPERT,

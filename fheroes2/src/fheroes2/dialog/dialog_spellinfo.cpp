@@ -36,12 +36,12 @@ void Dialog::SpellInfo(const Spell & spell, bool ok_button)
 
     switch(spell())
     {
-	case Spell::HASTE:
-	case Spell::MASSHASTE:
-	    if(0 == extra) extra = 2;
-	    break;
+        case Spell::HASTE:
+        case Spell::MASSHASTE:
+            if(0 == extra) extra = 2;
+            break;
 
-	default: break;
+        default: break;
     }
 
     if(1 == extra)
@@ -50,7 +50,7 @@ void Dialog::SpellInfo(const Spell & spell, bool ok_button)
     if(2 == extra)
         StringReplace(msg, "%{count}", _("two"));
     else
-	StringReplace(msg, "%{count}", extra);
+        StringReplace(msg, "%{count}", extra);
 
     Dialog::SpellInfo(spell.GetName(), msg, spell, ok_button);
 }
@@ -100,7 +100,7 @@ void Dialog::SpellInfo(const std::string &header, const std::string &message, co
     {
         pt.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 1).w()) / 2;
         pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 1).h();
-	button = new Button(pt.x, pt.y, system, 1, 2);
+        button = new Button(pt.x, pt.y, system, 1, 2);
     }
 
     if(button) (*button).Draw();
@@ -112,9 +112,9 @@ void Dialog::SpellInfo(const std::string &header, const std::string &message, co
     while(le.HandleEvents())
     {
         if(!ok_button && !le.MousePressRight()) break;
-	if(button) le.MousePressLeft(*button) ? button->PressDraw() : button->ReleaseDraw();
+        if(button) le.MousePressLeft(*button) ? button->PressDraw() : button->ReleaseDraw();
         if(button && le.MouseClickLeft(*button)){ break; }
-	if(HotKeyCloseWindow){ break; }
+        if(HotKeyCloseWindow){ break; }
     }
 
     cursor.Hide();

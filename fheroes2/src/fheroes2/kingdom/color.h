@@ -35,22 +35,22 @@ namespace Color
 {
     enum
     {
-	NONE	= 0x00,
+        NONE        = 0x00,
         BLUE    = 0x01,
         GREEN   = 0x02,
         RED     = 0x04,
         YELLOW  = 0x08,
         ORANGE  = 0x10,
         PURPLE  = 0x20,
-	UNUSED	= 0x80,
-	ALL	= BLUE | GREEN | RED | YELLOW | ORANGE | PURPLE
+        UNUSED        = 0x80,
+        ALL        = BLUE | GREEN | RED | YELLOW | ORANGE | PURPLE
     };
 
     const char* String(int);
-    int		Count(int);
-    int		GetIndex(int);
-    int		GetFirst(int);
-    int		FromInt(int);
+    int                Count(int);
+    int                GetIndex(int);
+    int                GetFirst(int);
+    int                FromInt(int);
 }
 
 class Colors : public std::vector<int>
@@ -73,11 +73,11 @@ class ColorBase
 public:
     ColorBase(int col = Color::NONE): color(col){}
 
-    bool	operator== (int) const;
-    bool	isFriends(int) const;
-    void	SetColor(int);
+    bool        operator== (int) const;
+    bool        isFriends(int) const;
+    void        SetColor(int);
 
-    Kingdom &	GetKingdom(void) const;
+    Kingdom &        GetKingdom(void) const;
 
     int GetColor(void) const { return color; }
 };

@@ -78,13 +78,13 @@ bool ObjLav3::isShadow(u32 index)
 int ObjLava::GetPassable(u32 index)
 {
     const u8 disabled[] = { 2, 3, 4, 5, 12, 13, 14, 15, 18, 27, 28, 29, 30, 31, 32, 39, 40,
-		    41, 46, 47, 48, 53, 54, 57, 60, 61, 64, 65, 69, 70, 120, 121 };
+                    41, 46, 47, 48, 53, 54, 57, 60, 61, 64, 65, 69, 70, 120, 121 };
 
     const u8 restricted[] = { 6, 7, 8, 9, 16, 17, 19, 20, 33, 34, 35, 36, 37, 38, 42, 43, 44,
-		    50, 51, 52, 55, 56, 58, 59, 62, 66, 67, 68, 72, 73, 76, 77, 88, 98, 114, 122, 123, 125 };
+                    50, 51, 52, 55, 56, 58, 59, 62, 66, 67, 68, 72, 73, 76, 77, 88, 98, 114, 122, 123, 125 };
 
     if(isAction(index) ||
-	ARRAY_COUNT_END(disabled) != std::find(disabled, ARRAY_COUNT_END(disabled), index))
+        ARRAY_COUNT_END(disabled) != std::find(disabled, ARRAY_COUNT_END(disabled), index))
         return 0;
 
     return ARRAY_COUNT_END(restricted) != std::find(restricted, ARRAY_COUNT_END(restricted), index) ?
@@ -121,10 +121,10 @@ int ObjLava::GetActionObject(u32 index)
 {
     switch(index)
     {
-	case 110:	return MP2::OBJ_OBELISK;
-	case 115:	return MP2::OBJ_DAEMONCAVE;
-	case 117:	return MP2::OBJ_SIGN;
-	case 124:	return MP2::OBJ_SAWMILL;
+        case 110:        return MP2::OBJ_OBELISK;
+        case 115:        return MP2::OBJ_DAEMONCAVE;
+        case 117:        return MP2::OBJ_SIGN;
+        case 124:        return MP2::OBJ_SAWMILL;
         default: break;
     }
 

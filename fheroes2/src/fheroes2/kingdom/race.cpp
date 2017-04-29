@@ -27,7 +27,7 @@
 const char* Race::String(int race)
 {
     const char* str_race[] = { _("Knight"), _("Barbarian"), _("Sorceress"),
-	_("Warlock"), _("Wizard"), _("Necromancer"), _("Multi"), "Random", "Neutral" };
+        _("Warlock"), _("Wizard"), _("Necromancer"), _("Multi"), "Random", "Neutral" };
 
     switch(race)
     {
@@ -39,7 +39,7 @@ const char* Race::String(int race)
         case Race::NECR: return str_race[5];
         case Race::MULT: return str_race[6];
         case Race::RAND: return str_race[7];
-	case Race::NONE: return str_race[8];
+        case Race::NONE: return str_race[8];
         default: break;
     }
 
@@ -55,7 +55,7 @@ int Race::Rand(void)
         case 3: return Race::SORC;
         case 4: return Race::WRLK;
         case 5: return Race::WZRD;
-	default: break;
+        default: break;
     }
 
     return Race::NECR;
@@ -65,15 +65,15 @@ int Race::FromInt(int race)
 {
     switch(race)
     {
-	case KNGT:
-	case BARB:
-	case SORC:
-	case WRLK:
-	case WZRD:
-	case NECR:
-	case MULT:
-	case RAND:	return race;
-	default: break;
+        case KNGT:
+        case BARB:
+        case SORC:
+        case WRLK:
+        case WZRD:
+        case NECR:
+        case MULT:
+        case RAND:        return race;
+        default: break;
     }
 
     return Race::NONE;

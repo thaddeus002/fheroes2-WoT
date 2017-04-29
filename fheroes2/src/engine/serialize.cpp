@@ -35,9 +35,9 @@
 void StreamBase::setconstbuf(bool f)
 {
     if(f)
-	flags |= 0x00001000;
+        flags |= 0x00001000;
     else
-	flags &= ~0x00001000;
+        flags &= ~0x00001000;
 }
 
 bool StreamBase::isconstbuf(void) const
@@ -53,17 +53,17 @@ bool StreamBase::bigendian(void) const
 void StreamBase::setbigendian(bool f)
 {
     if(f)
-	flags |= 0x80000000;
+        flags |= 0x80000000;
     else
-	flags &= ~0x80000000;
+        flags &= ~0x80000000;
 }
 
 void StreamBase::setfail(bool f)
 {
     if(f)
-	flags |= 0x00000001;
+        flags |= 0x00000001;
     else
-	flags &= ~0x00000001;
+        flags &= ~0x00000001;
 }
 
 bool StreamBase::fail(void) const
@@ -362,31 +362,31 @@ void StreamBuf::realloc(size_t sz)
 
     if(! itbeg)
     {
-	if(sz < MINCAPACITY) sz = MINCAPACITY;
+        if(sz < MINCAPACITY) sz = MINCAPACITY;
 
-	itbeg = new u8 [sz];
-	itend = itbeg + sz;
-    	std::fill(itbeg, itend, 0);
+        itbeg = new u8 [sz];
+        itend = itbeg + sz;
+            std::fill(itbeg, itend, 0);
 
-	reset();
+        reset();
     }
     else
     if(sizep() < sz)
     {
-	if(sz < MINCAPACITY) sz = MINCAPACITY;
+        if(sz < MINCAPACITY) sz = MINCAPACITY;
 
-	u8* ptr = new u8 [sz];
+        u8* ptr = new u8 [sz];
 
-	std::fill(ptr, ptr + sz, 0);
-	std::copy(itbeg, itput, ptr);
+        std::fill(ptr, ptr + sz, 0);
+        std::copy(itbeg, itput, ptr);
 
-	itput = ptr + tellp();
-	itget = ptr + tellg();
+        itput = ptr + tellp();
+        itget = ptr + tellg();
 
-	delete [] itbeg;
+        delete [] itbeg;
 
-	itbeg = ptr;
-	itend = itbeg + sz;
+        itbeg = ptr;
+        itend = itbeg + sz;
     }
 }
 
@@ -398,7 +398,7 @@ void StreamBuf::setfail(void)
 void StreamBuf::copy(const StreamBuf & sb)
 {
     if(capacity() < sb.size())
-	realloc(sb.size());
+        realloc(sb.size());
 
     std::copy(sb.itget, sb.itput, itbeg);
 
@@ -413,7 +413,7 @@ void StreamBuf::copy(const StreamBuf & sb)
 void StreamBuf::put8(char v)
 {
     if(0 == sizep())
-	realloc(capacity() + capacity() / 2);
+        realloc(capacity() + capacity() / 2);
 
     if(sizep())
         *itput++ = v;
@@ -424,7 +424,7 @@ int StreamBuf::get8(void)
     int res = 0;
 
     if(sizeg())
-	res = 0x000000FF & *itget++;
+        res = 0x000000FF & *itget++;
 
     return res;
 }
@@ -490,7 +490,7 @@ std::vector<u8> StreamBuf::getRaw(size_t sz)
 void StreamBuf::putRaw(const char* ptr, size_t sz)
 {
     for(size_t it = 0; it < sz; ++it)
-	*this << ptr[it];
+        *this << ptr[it];
 }
 
 std::string StreamBuf::toString(size_t sz)
@@ -521,7 +521,7 @@ std::ostream & operator<< (std::ostream & os, StreamBuf & sb)
     sb.bigendian() ? StreamBase::putBE32(os, count) : StreamBase::putLE32(os, count);
 
     if(os.write((char*) sb.itget, count))
-	sb.itget += count;
+        sb.itget += count;
 
     return os;
 }
@@ -542,17 +542,17 @@ std::istream & operator>> (std::istream & is, StreamBuf & sb)
 
     if(count > available_count(is))
     {
-	sb.setfail();
-	return is;
+        sb.setfail();
+        return is;
     }
 
     if(sb.sizep() < count)
-	sb.realloc(count);
+        sb.realloc(count);
 
     if(is.read((char*) sb.itput, count))
-	sb.itput += count;
+        sb.itput += count;
     else
-	sb.setfail();
+        sb.setfail();
 
     return is;
 }
@@ -590,11 +590,11 @@ size_t StreamFile::size(void) const
 {
     if(rw)
     {
-	size_t pos = SDL_RWtell(rw);
-	SDL_RWseek(rw, 0, RW_SEEK_END);
-	size_t len = SDL_RWseek(rw, 0, SEEK_END);
-	SDL_RWseek(rw, pos, RW_SEEK_SET);
-	return len;
+        size_t pos = SDL_RWtell(rw);
+        SDL_RWseek(rw, 0, RW_SEEK_END);
+        size_t len = SDL_RWseek(rw, 0, SEEK_END);
+        SDL_RWseek(rw, pos, RW_SEEK_SET);
+        return len;
     }
     return 0;
 }
@@ -613,10 +613,10 @@ size_t StreamFile::sizeg(void) const
 {
     if(rw)
     {
-	size_t pos = SDL_RWtell(rw);
-	size_t len = SDL_RWseek(rw, 0, RW_SEEK_END);
-	SDL_RWseek(rw, pos, RW_SEEK_SET);
-	return len - pos;
+        size_t pos = SDL_RWtell(rw);
+        size_t len = SDL_RWseek(rw, 0, RW_SEEK_END);
+        SDL_RWseek(rw, pos, RW_SEEK_SET);
+        return len - pos;
     }
     return 0;
 }

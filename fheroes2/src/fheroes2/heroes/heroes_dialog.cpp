@@ -201,8 +201,8 @@ int Heroes::OpenDialog(bool readonly, bool fade)
 
     if(inCastle() || readonly || Modes(NOTDISMISS))
     {
-	buttonDismiss.Press();
-	buttonDismiss.SetDisable(true);
+        buttonDismiss.Press();
+        buttonDismiss.SetDisable(true);
     }
 
     if(readonly || 2 > GetKingdom().GetHeroes().size())
@@ -228,160 +228,160 @@ int Heroes::OpenDialog(bool readonly, bool fade)
     // dialog menu loop
     while(le.HandleEvents())
     {
-	if(redrawMorale)
-	{
-	    cursor.Hide();
-	    moraleIndicator.Redraw();
-	    cursor.Show();
-	    display.Flip();
-	    redrawMorale = false;
-	}
+        if(redrawMorale)
+        {
+            cursor.Hide();
+            moraleIndicator.Redraw();
+            cursor.Show();
+            display.Flip();
+            redrawMorale = false;
+        }
 
-	if(redrawLuck)
-	{
-	    cursor.Hide();
-	    luckIndicator.Redraw();
-	    cursor.Show();
-	    display.Flip();
-	    redrawLuck = false;
-	}
+        if(redrawLuck)
+        {
+            cursor.Hide();
+            luckIndicator.Redraw();
+            cursor.Show();
+            display.Flip();
+            redrawLuck = false;
+        }
 
         // exit
-	if(le.MouseClickLeft(buttonExit) || Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)) return Dialog::CANCEL;
+        if(le.MouseClickLeft(buttonExit) || Game::HotKeyPressEvent(Game::EVENT_DEFAULT_EXIT)) return Dialog::CANCEL;
 
         // heroes troops
         if(le.MouseCursor(selectArmy.GetArea()) &&
-	    selectArmy.QueueEventProcessing(&message))
-	{
-	    cursor.Hide();
-	    if(selectArtifacts.isSelected()) selectArtifacts.ResetSelected();
-	    selectArmy.Redraw();
-	    redrawMorale = true;
-	    redrawLuck = true;
-	}
+            selectArmy.QueueEventProcessing(&message))
+        {
+            cursor.Hide();
+            if(selectArtifacts.isSelected()) selectArtifacts.ResetSelected();
+            selectArmy.Redraw();
+            redrawMorale = true;
+            redrawLuck = true;
+        }
 
         if(le.MouseCursor(selectArtifacts.GetArea()) &&
-	    selectArtifacts.QueueEventProcessing(&message))
+            selectArtifacts.QueueEventProcessing(&message))
         {
-	    cursor.Hide();
-	    if(selectArmy.isSelected()) selectArmy.ResetSelected();
-	    selectArtifacts.Redraw();
-    	    redrawMorale = true;
-	    redrawLuck = true;
-	}
+            cursor.Hide();
+            if(selectArmy.isSelected()) selectArmy.ResetSelected();
+            selectArtifacts.Redraw();
+                redrawMorale = true;
+            redrawLuck = true;
+        }
 
         // button click
-	le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
-	if(buttonDismiss.isEnable()) le.MousePressLeft(buttonDismiss) ? buttonDismiss.PressDraw() : buttonDismiss.ReleaseDraw();
-    	if(buttonPrevHero.isEnable()) le.MousePressLeft(buttonPrevHero) ? buttonPrevHero.PressDraw() : buttonPrevHero.ReleaseDraw();
-    	if(buttonNextHero.isEnable()) le.MousePressLeft(buttonNextHero) ? buttonNextHero.PressDraw() : buttonNextHero.ReleaseDraw();
+        le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
+        if(buttonDismiss.isEnable()) le.MousePressLeft(buttonDismiss) ? buttonDismiss.PressDraw() : buttonDismiss.ReleaseDraw();
+            if(buttonPrevHero.isEnable()) le.MousePressLeft(buttonPrevHero) ? buttonPrevHero.PressDraw() : buttonPrevHero.ReleaseDraw();
+            if(buttonNextHero.isEnable()) le.MousePressLeft(buttonNextHero) ? buttonNextHero.PressDraw() : buttonNextHero.ReleaseDraw();
 
-    	// prev hero
-	if(buttonPrevHero.isEnable() && le.MouseClickLeft(buttonPrevHero)){ return Dialog::PREV; }
+            // prev hero
+        if(buttonPrevHero.isEnable() && le.MouseClickLeft(buttonPrevHero)){ return Dialog::PREV; }
 
-    	// next hero
-    	if(buttonNextHero.isEnable() && le.MouseClickLeft(buttonNextHero)){ return Dialog::NEXT; }
+            // next hero
+            if(buttonNextHero.isEnable() && le.MouseClickLeft(buttonNextHero)){ return Dialog::NEXT; }
 
-    	// dismiss
-    	if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss) &&
-    	      Dialog::YES == Dialog::Message(GetName(), _("Are you sure you want to dismiss this Hero?"), Font::BIG, Dialog::YES | Dialog::NO))
-    	    { return Dialog::DISMISS; }
+            // dismiss
+            if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss) &&
+                  Dialog::YES == Dialog::Message(GetName(), _("Are you sure you want to dismiss this Hero?"), Font::BIG, Dialog::YES | Dialog::NO))
+                { return Dialog::DISMISS; }
 
         if(le.MouseCursor(moraleIndicator.GetArea())) MoraleIndicator::QueueEventProcessing(moraleIndicator);
         else
         if(le.MouseCursor(luckIndicator.GetArea())) LuckIndicator::QueueEventProcessing(luckIndicator);
-	else
-	if(le.MouseCursor(experienceInfo.GetArea())) experienceInfo.QueueEventProcessing();
-	else
-	if(le.MouseCursor(spellPointsInfo.GetArea())) spellPointsInfo.QueueEventProcessing();
+        else
+        if(le.MouseCursor(experienceInfo.GetArea())) experienceInfo.QueueEventProcessing();
+        else
+        if(le.MouseCursor(spellPointsInfo.GetArea())) spellPointsInfo.QueueEventProcessing();
 
-	// left click info
+        // left click info
         if(!readonly && le.MouseClickLeft(rectSpreadArmyFormat) && !army.isSpreadFormat())
         {
-	    cursor.Hide();
-	    cursorFormat.Move(army1_pt);
-	    cursor.Show();
-	    display.Flip();
-    	    army.SetSpreadFormat(true);
+            cursor.Hide();
+            cursorFormat.Move(army1_pt);
+            cursor.Show();
+            display.Flip();
+                army.SetSpreadFormat(true);
         }
-	else
+        else
         if(!readonly && le.MouseClickLeft(rectGroupedArmyFormat) && army.isSpreadFormat())
         {
-	    cursor.Hide();
-	    cursorFormat.Move(army2_pt);
-	    cursor.Show();
-	    display.Flip();
-    	    army.SetSpreadFormat(false);
+            cursor.Hide();
+            cursorFormat.Move(army2_pt);
+            cursor.Show();
+            display.Flip();
+                army.SetSpreadFormat(false);
         }
-	else
-	if(le.MouseCursor(secskill_bar.GetArea()) && secskill_bar.QueueEventProcessing(&message))
-	{
-	    cursor.Show();
-	    display.Flip();
-	}
-	else
-	if(le.MouseCursor(primskill_bar.GetArea()) && primskill_bar.QueueEventProcessing(&message))
-	{
-	    cursor.Show();
-	    display.Flip();
-	}
+        else
+        if(le.MouseCursor(secskill_bar.GetArea()) && secskill_bar.QueueEventProcessing(&message))
+        {
+            cursor.Show();
+            display.Flip();
+        }
+        else
+        if(le.MouseCursor(primskill_bar.GetArea()) && primskill_bar.QueueEventProcessing(&message))
+        {
+            cursor.Show();
+            display.Flip();
+        }
 
-	// right info
-	if(le.MousePressRight(portPos))
-	    Dialog::QuickInfo(*this);
-	else
+        // right info
+        if(le.MousePressRight(portPos))
+            Dialog::QuickInfo(*this);
+        else
         if(le.MousePressRight(rectSpreadArmyFormat))
-	    Dialog::Message(_("Spread Formation"), descriptionSpreadArmyFormat, Font::BIG);
+            Dialog::Message(_("Spread Formation"), descriptionSpreadArmyFormat, Font::BIG);
         else
         if(le.MousePressRight(rectGroupedArmyFormat))
-	    Dialog::Message(_("Grouped Formation"), descriptionGroupedArmyFormat, Font::BIG);
+            Dialog::Message(_("Grouped Formation"), descriptionGroupedArmyFormat, Font::BIG);
 
         // status message
-	if(le.MouseCursor(portPos))
-	    message = _("View Stats");
-	else
-	if(le.MouseCursor(moraleIndicator.GetArea()))
-	    message = _("View Morale Info");
-	else
-	if(le.MouseCursor(luckIndicator.GetArea()))
-	    message = _("View Luck Info");
-	else
-	if(le.MouseCursor(experienceInfo.GetArea()))
-	    message = _("View Experience Info");
-	else
-	if(le.MouseCursor(spellPointsInfo.GetArea()))
-	    message = _("View Spell Points Info");
-	else
-	if(le.MouseCursor(rectSpreadArmyFormat))
-	    message = _("Set army combat formation to 'Spread'");
-	else
-	if(le.MouseCursor(rectGroupedArmyFormat))
-	    message = _("Set army combat formation to 'Grouped'");
-	else
+        if(le.MouseCursor(portPos))
+            message = _("View Stats");
+        else
+        if(le.MouseCursor(moraleIndicator.GetArea()))
+            message = _("View Morale Info");
+        else
+        if(le.MouseCursor(luckIndicator.GetArea()))
+            message = _("View Luck Info");
+        else
+        if(le.MouseCursor(experienceInfo.GetArea()))
+            message = _("View Experience Info");
+        else
+        if(le.MouseCursor(spellPointsInfo.GetArea()))
+            message = _("View Spell Points Info");
+        else
+        if(le.MouseCursor(rectSpreadArmyFormat))
+            message = _("Set army combat formation to 'Spread'");
+        else
+        if(le.MouseCursor(rectGroupedArmyFormat))
+            message = _("Set army combat formation to 'Grouped'");
+        else
         if(le.MouseCursor(buttonExit))
-	    message = _("Exit hero");
+            message = _("Exit hero");
         else
         if(le.MouseCursor(buttonDismiss))
-	{
-	    if(Modes(NOTDISMISS))
-	        message = "Dismiss disabled, see game info";
-	    else
-	        message = _("Dismiss hero");
+        {
+            if(Modes(NOTDISMISS))
+                message = "Dismiss disabled, see game info";
+            else
+                message = _("Dismiss hero");
         }
-	else
+        else
         if(le.MouseCursor(buttonPrevHero))
-	    message = _("Show prev heroes");
+            message = _("Show prev heroes");
         else
         if(le.MouseCursor(buttonNextHero))
-	    message = _("Show next heroes");
+            message = _("Show next heroes");
 
-	if(message.empty())
-    	    statusBar.ShowMessage(_("Hero Screen"));
-	else
-	{
-	    statusBar.ShowMessage(message);
-	    message.clear();
-	}
+        if(message.empty())
+                statusBar.ShowMessage(_("Hero Screen"));
+        else
+        {
+            statusBar.ShowMessage(message);
+            message.clear();
+        }
     }
 
     return Dialog::ZERO;
