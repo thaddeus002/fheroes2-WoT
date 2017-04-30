@@ -73,7 +73,7 @@ $(AUDIO_TARGETS): $(addsuffix .cpp, $(AUDIO_TARGETS))
 	$(CXX) -o $@ $@.o -L../engine -lengine
 
 
-$(IMAGE_TARGETS): $(addsuffix .cpp, $(IMAGE_TARGETS)) yImage.o
+$(IMAGE_TARGETS): $(addsuffix .cpp, $(IMAGE_TARGETS)) yImage.o palette.o
 	$(CXX) -c $@.cpp $(YG_CFLAGS) $(SDL_FLAGS) -DHAVE_LIBPNG -DWITH_IMAGE
 	$(CXX) -o $@ $@.o yImage.o palette.o $(YG_LDFLAGS) $(SDL_LIBS)
 
