@@ -10,7 +10,7 @@ ifndef CC
 CC := gcc
 endif
 
-IMAGE_TARGETS := icn2img bmp2img til2img
+IMAGE_TARGETS := icn2img til2img
 AUDIO_TARGETS := 82m2wav xmi2mid
 GENERAL_TARGETS := extractor aggregator
 TARGETS := $(GENERAL_TARGETS) $(IMAGE_TARGETS) $(AUDIO_TARGETS)
@@ -95,10 +95,9 @@ palette.o : palette.c palette.h
 	$(CXX) -c palette.c
 
 
-#bmp2img: bmp2img.cpp yImage.o
-#	$(CXX) -c $@.cpp $(YG_CFLAGS) $(SDL_FLAGS)
-#	#$(CXX) -o $@ $@.o yImage.o $(YG_LDFLAGS) $(SDL_LIBS)
-#	$(CXX) -o $@ $@.o yImage.o -L../engine -lengine -L/usr/lib -lpng15
+bmp2img: bmp2img.cpp yImage.o h2bmp.o
+	$(CXX) -c $< $(YG_CFLAGS)
+	$(CXX) -o $@ $@.o yImage.o h2bmp.o $(YG_LDFLAGS)
 
 #icn2img: icn2img.cpp yImage.o
 #	$(CXX) -c $@.cpp -DWITH_IMAGE $(YG_CFLAGS) $(SDL_FLAGS)
@@ -108,6 +107,8 @@ palette.o : palette.c palette.h
 yImage.o: yImage.c yImage.h
 	$(CXX) -c yImage.c -DHAVE_LIBPNG
 
+h2bmp.o: h2bmp.cpp h2bmp.h
+	$(CXX) -c $<
 
 .PHONY: clean
 
