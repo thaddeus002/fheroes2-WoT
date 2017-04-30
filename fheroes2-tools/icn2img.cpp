@@ -112,8 +112,10 @@ icnsprite::~icnsprite(){
 }
 
 
-/* convert the data in a image */
-/* The decoding of the data is here */
+/**
+ * Convert the data in a image
+ * The decoding of the data is here
+ */
 yImage *icnsprite::converti_en_yImage(){
 
     yImage *im;
@@ -373,12 +375,19 @@ icnheader icnfile::get_icnheader(int numOfSprite){
 
 
 
-/* Créée les fichiers (images + spec.xml) dans le répertoire spécifié */
+/**
+ * \brief Create the files (images + spec.xml) in the specified directory.
+ */
 int icnfile::create_files(std::string dir){
 
     int i; /* counter */
     std::string name_spec_file = dir+'/'+"spec.xml";
 
+    if((mkdir(dir.c_str(), 0777)!=0)&&(errno != EEXIST))
+    {
+        std::cout << "error mkdir: " << dir << std::endl;
+        return EXIT_FAILURE;
+    }
 
     /* create spec file */
     std::fstream fd_spec(name_spec_file.c_str(), std::ios::out);
@@ -429,23 +438,36 @@ int icnfile::create_files(std::string dir){
     return(0);
 }
 
+
+void usage(char *prog) {
+
+    std::cout << "Extract sprites from icn file" << std::endl;
+    std::cout << "Usage : " << prog << " <file.icn>" << std::endl;
+    exit(1);
+}
+
+
+
 /**
- *
+ * Main program.
  */
 int main(int argc, char **argv) {
 
     char *filename = NULL;
 
-    if(argc >= 1) {
+    if(argc >= 2) {
         filename = argv[1];
     } else {
-        return 1;
+        usage(argv[0]);
     }
 
-    icnfile *inc = new icnfile(filename, 2);
+    icnfile *icn = new icnfile(filename, 2);
 
+    std::string dirname(filename);
 
-    delete inc;
+    icn->create_files(dirname + ".extract");
+
+    delete icn;
 
     return 0;
 }
