@@ -39,7 +39,6 @@
 
 /* CLASS ICNHEADER */
 
-// read ICN Header from stream
 void icnheader::read(std::fstream & fd)
 {
         if(fd.fail()) return;
@@ -64,7 +63,6 @@ void icnheader::read(std::fstream & fd)
         offsetData=le32toh(offsetData);
 }
 
-// write the content of the header on standart output
 void icnheader::present(int number)
 {
         std::cout << std::endl;
@@ -84,14 +82,9 @@ void icnheader::present(int number)
 }
 
 
-
 /* CLASS ICNSPRITE */
 
-
-/* create the sprite by assemble all the data */
 icnsprite::icnsprite(icnheader header, int dataSize, unsigned char *dataContent){
-
-    //std::cout << "Init sprite (" << header.width << "," << header.height << ") of " << dataSize << " octets" << std::endl;
 
     data=(unsigned char *) malloc(dataSize);
     if(data==NULL) return;
@@ -112,17 +105,13 @@ icnsprite::~icnsprite(){
 }
 
 
-/**
- * Convert the data in a image
- * The decoding of the data is here
- */
 yImage *icnsprite::converti_en_yImage(){
 
     yImage *im;
     int err;
 
     bool debug=true;
-    std::cout << "Décodage de l'image (" << data_size << " octets)" << std::endl;
+    std::cout << "Decoding image (" << data_size << " bytes)" << std::endl;
 
     if(data == NULL || data_size == 0) return NULL;
 
@@ -178,7 +167,6 @@ yImage *icnsprite::converti_en_yImage(){
                         std::cout << "  c(" << x << "," << y << ") = " << (int) *cur;
                     }
 
-                    //y_get_color_index(&color, palette, *cur);
                     color = getColor(*cur);
                     yImage_set_pixel(im, &color, x, y);
 
@@ -193,7 +181,6 @@ yImage *icnsprite::converti_en_yImage(){
                 c = *cur;
                 while(c--)
                 {
-                    //y_get_color_index(&color, palette, 1);
                     color = getColor(1);
                     yImage_set_pixel(im, &color, x, y);
                     ++x;
@@ -235,7 +222,6 @@ yImage *icnsprite::converti_en_yImage(){
                 ++x;
             }
 
-
             ++cur;
         }
 
@@ -246,7 +232,7 @@ yImage *icnsprite::converti_en_yImage(){
             ++cur;
             c = *cur;
             ++cur;
-            //y_get_color_index(&color, palette, *cur);
+
             color = getColor(*cur);
             if(debug) std::cout << "writing " << (int) c << " pixels of color " << *cur << std::endl;
             while(c--){
@@ -264,7 +250,6 @@ yImage *icnsprite::converti_en_yImage(){
                 if(debug) std::cout << "found " << (int) *cur << " : reading " << (int) c << " pixels" << std::endl;
                 ++cur;
                 while(c--){
-                    //y_get_color_index(&color, palette, *cur);
                     color = getColor(*cur);
                     yImage_set_pixel(im, &color, x, y);
                     ++x;
@@ -320,8 +305,7 @@ void icnfile::read_icnfile(std::string file){
     fd.read(reinterpret_cast<char *>(& total_size), sizeof(uint32_t));
     total_size=le32toh(total_size);
 
-    std::cout << count_sprite << " sprite(s) sur " << total_size << " octets" << std::endl;
-    //begin_pos = fd.tellg();
+    std::cout << count_sprite << " sprite(s) on " << total_size << " bytes" << std::endl;
 
     headers = new icnheader[count_sprite];
 
@@ -359,7 +343,6 @@ unsigned char *icnfile::sprite_data(int numOfSprite){
         header_size=12;
     }
 
-
     size=sprite_size(numOfSprite);
 
     if(!size) return(NULL);
@@ -375,9 +358,6 @@ icnheader icnfile::get_icnheader(int numOfSprite){
 
 
 
-/**
- * \brief Create the files (images + spec.xml) in the specified directory.
- */
 int icnfile::create_files(std::string dir){
 
     int i; /* counter */

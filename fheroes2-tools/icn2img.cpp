@@ -20,21 +20,22 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <sys/stat.h>
+/*#include <sys/stat.h>
 #include <sys/types.h>
 
-#include <iostream>
 #include <iomanip>
 #include <fstream>
 #include <sstream>
 #include <cstring>
 
-#include "yImage.h"
 #include "palette.h"
 #include <vector>
+*/
+
+#include <iostream>
 
 #include "h2icn.h"
-#include <endian.h>
+//#include <endian.h>
 
 
 

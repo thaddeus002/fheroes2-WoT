@@ -23,12 +23,7 @@
 #ifndef ICN2IMG_H
 #define ICN2IMG_H
 
-
-#include <iostream>
-
-#include <fstream>
-
-#include <stdlib.h> //free()
+#include "yImage.h"
 
 
 /* CLASS ICNHEADER */
@@ -41,9 +36,9 @@ class icnheader
     int16_t offsetX, offsetY;
     /* dimension of the image */
     uint16_t width, height;
-    /* type of sprite : 0 = Normal, 32 = Monochromatic shape */
-    uint8_t type; // type of sprite : 0 = Normal, 32 = Monochromatic shape
-    /* beginning of data in the global file */
+    /** type of sprite : 0 = Normal, 32 = Monochromatic shape */
+    uint8_t type;
+    /** beginning of data in the global file */
     uint32_t offsetData;
     /** version of heroes from which the file is */
     int version;
@@ -67,15 +62,13 @@ class icnsprite : public icnheader {
         unsigned char *data;
 
     public:
-        //icnsprite(const icnfile *file, int number);
+        /** create the sprite by assemble all the data */
         icnsprite(icnheader header, int dataSize, unsigned char *dataContent);
         ~icnsprite();
 
         /** convert the data in a image */
         yImage *converti_en_yImage();
 };
-
-
 
 
 /* CLASS ICNFILE */
@@ -89,7 +82,6 @@ class icnfile {
         /* General file header */
         uint16_t count_sprite; /* number of sprites */
         uint32_t total_size; /* size of icnfile without the general header */
-        //u32 begin_pos; /* position of beginning of headers data */
 
         icnheader *headers; /* array of "count_sprite" icnheader */
 
@@ -105,8 +97,6 @@ class icnfile {
         unsigned char *sprite_data(int numOfSprite);
         icnheader get_icnheader(int numOfSprite);
 
-
-
     public:
 
         icnfile(std::string filename, int version);
@@ -119,8 +109,9 @@ class icnfile {
             }
         }
 
-
-        /* create all the files of the sprite */
+        /**
+         * \brief Create the files (images + spec.xml) in the specified directory.
+         */
         int create_files(std::string dir);
 };
 
