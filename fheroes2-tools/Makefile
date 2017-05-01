@@ -10,7 +10,7 @@ ifndef CC
 CC := gcc
 endif
 
-IMAGE_TARGETS := icn2img til2img
+IMAGE_TARGETS := til2img
 AUDIO_TARGETS := 82m2wav xmi2mid
 GENERAL_TARGETS := extractor aggregator
 TARGETS := $(GENERAL_TARGETS) $(IMAGE_TARGETS) $(AUDIO_TARGETS)
@@ -86,28 +86,25 @@ convert: convert.cpp icn2img.o yImage.o palette.o
 	$(CXX) -c $@.cpp
 	$(CXX) -o $@ $@.o icn2img.o yImage.o palette.o $(shell libpng-config --ldflags)
 
-icn2img.o : icn2img.cpp icn2img.h
-	#$(CXX) -c icn2img.cpp -DHAVE_LIBPNG -I/usr/local/include/libpng15 -D_GNU_SOURCE=1 -D_REENTRANT
-	$(CXX) -c icn2img.cpp -DHAVE_LIBPNG $(shell libpng-config --cflags)
-
 
 palette.o : palette.c palette.h
 	$(CXX) -c palette.c
-
 
 bmp2img: bmp2img.cpp yImage.o h2bmp.o
 	$(CXX) -c $< $(YG_CFLAGS)
 	$(CXX) -o $@ $@.o yImage.o h2bmp.o $(YG_LDFLAGS)
 
-#icn2img: icn2img.cpp yImage.o
-#	$(CXX) -c $@.cpp -DWITH_IMAGE $(YG_CFLAGS) $(SDL_FLAGS)
-#	#$(CXX) -o $@ $@.o yImage.o $(YG_LDFLAGS) $(SDL_LIBS)
-#	$(CXX) -o $@ $@.o yImage.o -L../engine -lengine -L/usr/lib -lpng15
+icn2img: icn2img.cpp yImage.o palette.o h2icn.o
+	$(CXX) -c $< -DHAVE_LIBPNG $(shell libpng-config --cflags)
+	$(CXX) -o $@ $@.o yImage.o palette.o h2icn.o $(YG_LDFLAGS)
 
 yImage.o: yImage.c yImage.h
 	$(CXX) -c yImage.c -DHAVE_LIBPNG
 
 h2bmp.o: h2bmp.cpp h2bmp.h
+	$(CXX) -c $<
+
+h2icn.o: h2icn.cpp h2icn.h
 	$(CXX) -c $<
 
 .PHONY: clean
