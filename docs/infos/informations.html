@@ -81,8 +81,8 @@ int hash(char* filename) {
 </ul>
 <p>The color cycling is an in-game feature. Simply put, if you place color 214, it will be put in a cycle automatically: 214-215-216-217-214-... etc. If you start from color 215, it will go in the game like 215-216-217-214-215-... etc.</p>
 
-<li><b>TIL</b>: <p>The three files : clof32.til, ground32.til and ston.til, contains tiles for the maps.</p>
-    <p>In these files, the first three groups of 2 bytes are :
+<li><b>TIL</b>:
+    <p>TIL files contains tiles for the maps. In these files, the first three groups of 2 bytes are :
     <ul>
         <li>the number of tiles (n)</li>
 	<li>tiles' width</li>
@@ -90,6 +90,13 @@ int hash(char* filename) {
     </ul>
     </p>
     <p>Then there are n times, width * height bytes, that are the colors' index in the palette of the tiles' pixels.</p>
+    <p>The data contains three TIL files :
+    <ul>
+        <li>clof32.til : four dark tiles (nigth sky?)
+        <li>ground32.til : tiles for all terrain's type in the main map.
+        <li>ston.til : stone ground tiles.
+    </ul>
+    </p>
 
 <li><b>BMP</b>: <p>Three colors bitmap images. These files have a 6 bytes header compose of three times two bytes :
     <ul>
