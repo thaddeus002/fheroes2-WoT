@@ -10,7 +10,7 @@ ifndef CC
 CC := gcc
 endif
 
-IMAGE_TARGETS := til2img
+IMAGE_TARGETS :=
 AUDIO_TARGETS := 82m2wav xmi2mid
 GENERAL_TARGETS := extractor aggregator
 TARGETS := $(GENERAL_TARGETS) $(IMAGE_TARGETS) $(AUDIO_TARGETS)
@@ -73,14 +73,6 @@ $(AUDIO_TARGETS): $(addsuffix .cpp, $(AUDIO_TARGETS))
 	$(CXX) -o $@ $@.o -L../engine -lengine
 
 
-$(IMAGE_TARGETS): $(addsuffix .cpp, $(IMAGE_TARGETS)) yImage.o palette.o
-	$(CXX) -c $@.cpp $(YG_CFLAGS) $(SDL_FLAGS) -DHAVE_LIBPNG -DWITH_IMAGE
-	$(CXX) -o $@ $@.o yImage.o palette.o $(YG_LDFLAGS) $(SDL_LIBS)
-
-
-til2img: til2img.cpp palette.o yImage.o
-	$(CXX) -c $@.cpp $(YG_CFLAGS) -DHAVE_LIBPNG -DWITH_IMAGE
-	$(CXX) -o $@ $@.o yImage.o palette.o -L/usr/lib -lpng
 
 convert: convert.cpp icn2img.o yImage.o palette.o
 	$(CXX) -c $@.cpp
@@ -89,6 +81,14 @@ convert: convert.cpp icn2img.o yImage.o palette.o
 
 palette.o : palette.c palette.h
 	$(CXX) -c palette.c
+
+$(IMAGE_TARGETS): $(addsuffix .cpp, $(IMAGE_TARGETS)) yImage.o palette.o
+	$(CXX) -c $@.cpp $(YG_CFLAGS) $(SDL_FLAGS) -DHAVE_LIBPNG -DWITH_IMAGE
+	$(CXX) -o $@ $@.o yImage.o palette.o $(YG_LDFLAGS) $(SDL_LIBS)
+
+til2img: til2img.cpp palette.o yImage.o
+	$(CXX) -c $@.cpp $(YG_CFLAGS) -DHAVE_LIBPNG -DWITH_IMAGE
+	$(CXX) -o $@ $@.o yImage.o palette.o -L/usr/lib -lpng
 
 bmp2img: bmp2img.cpp yImage.o h2bmp.o
 	$(CXX) -c $< $(YG_CFLAGS)
