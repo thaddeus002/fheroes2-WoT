@@ -26,6 +26,7 @@
 #include <cstring>
 #include <iostream>
 #include "h2bmp.h"
+#include "ySaveImage.h"
 #include "yImage.h"
 
 

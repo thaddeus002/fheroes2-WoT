@@ -33,6 +33,7 @@
 #include <string.h> // strlen()
 
 #include "yImage.h"
+#include "ySaveImage.h"
 #include "palette.h"
 
 int main(int argc, char **argv)

@@ -1,157 +1,138 @@
-/* yImage : sauvegarder des images dans différents formats */
-/* fonctions inspirées de la bibliothèque Imlib */
-/* => yImage est sous licence GPL (GNU GENERAL PUBLIC LICENSE) */
+/**
+ * \file yImage.h
+ * \brief images representation and basic operations. Plus load or save actions.
+ *
+ * Can save images in various formats with functions which are inspired by the
+ * imlib library.
+ *
+ * This file is under GPL license (GNU GENERAL PUBLIC LICENSE).
+ */
 
-#include "stdint.h"
+#include <stdint.h>
 #include <stdio.h>
-
-#ifndef YIMAGE_H_
-#define YIMAGE_H_
-
-/* qualité par défaut de la compression JPEG = 80% (208/255) */
-#define DEFAULT_JPEG_QUALITY 208
+#include "yColor.h"
 
 
-/* taille de la page postscript à créer*/
-#define PAGE_SIZE_EXECUTIVE    0
-#define PAGE_SIZE_LETTER       1
-#define PAGE_SIZE_LEGAL        2
-#define PAGE_SIZE_A4           3
-#define PAGE_SIZE_A3           4
-#define PAGE_SIZE_A5           5
-#define PAGE_SIZE_FOLIO        6
+#ifndef __Y_IMAGE_H_
+#define __Y_IMAGE_H_
 
-/* error code */
-#define ERR_NULL_PALETTE -1
-#define ERR_NULL_COLOR -2
-#define ERR_BAD_INDEX -3
-#define ERR_ALLOCATE_FAIL -4
+
+/**
+ * \brief A point define a pixel position in the image
+ */
+typedef struct {
+    int x;
+    int y;
+} yPoint;
 
 
 
-
-/* pour représenter une couleur */
-typedef struct _yColor {
-    unsigned char r, g, b; /* Rouge, Vert et Bleu entre 0 et 255 */
-    unsigned char alpha; /* 0 => transparence ; 255 => opacité */
-} yColor;
-
-
-
-/* for 8 bits color images */
-/* palette de couleurs */
-typedef uint8_t yColorPalette_t[256*3];
-
-
-
-/* une image raster */
+/** \brief A raster image */
 typedef struct {
     unsigned char *rgbData; /* tableau RVBRVGRVB... */
     unsigned char *alphaChanel; /* array of alpha (8bits) values */
     int rgbWidth, rgbHeight; /* largeur et hauteur */
     int presShapeColor; /* indicate if shape_color is use or not */
-    /* available if alpha_chanel == NULL and pres_shape_color != 0 */
+    /* available if alpha_chanel == NULL and presShapeColor != 0 */
     yColor shapeColor; /* couleur correspondant à un pixel transparent */
 } yImage;
 
 
-/* Image raster avec canal alpha */
-/* alpha == 0 => transparence totale */
-/* alpha == 255 => opacité */
-//typedef struct {
-//  unsigned char *rgba_data; /* tableau RVBARVBA... */
-//  int rgba_width, rgba_height; /* dimensions de l'image */
-//} yAlphaImage;
-
 
 /************************************************************/
-/*               CREATION / DESTRUCTION DES IMAGES          */
+/*                    CREATE / DESTROY IMAGES               */
 /************************************************************/
 
-/** Cette fonction spécifique aux tools fheroes2 est-elle utile ?? */
-void init_palette(yColorPalette_t palette, const uint8_t *pal);
-
-/* create an yImage without transparency */
-/* im must be allocated */
-//int create_yImage(yImage *im, const unsigned char *rgb_data, int width, int height);
-/* Create an yImage */
+/**
+ * Create an yImage without transparency.
+ * \param rbg_data the background image. Background will be black if NULL
+ */
 yImage *create_yImage(int *err, const unsigned char *rgb_data, int width, int height);
 
 
+/**
+ * create an yImage with an uniform background color
+ */
+yImage *create_uniform_yImage(int *err, yColor *background, int width, int height);
 
-/* libération de la memoire */
+
+/**
+ * free memory
+ */
 void destroy_yImage(yImage *im);
 
 /************************************************************/
-/*               MANIPULATION DES IMAGES                    */
+/*                   HANDLING IMAGES                        */
 /************************************************************/
 
-/* recupere une couleur sur la palette */
-int y_get_color_index(yColor *color, yColorPalette_t palette, int index);
 
-/* create a color */
-void y_set_color(yColor *color, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
-void y_init_color(yColor *color, unsigned int rgba);
+/**
+ * \brief retrive the color of a pixel in the image
+ * \param im the image
+ * \param x x coordinate of the pixel
+ * \param y y coordinate of the pixel
+ * \return a newly allocated yColor or NULL in case of fail
+ */
+yColor *y_get_color(yImage *im, int x, int y);
 
-/* rend l'image transparente */
+
+/**
+ * \brief set the max transparency to the image
+ * \return 0 in case of success, or a negative error code
+ */
 int transp(yImage *im);
 
 
+/**
+ * \brief superimpose two images.
+ */
+void superpose_images(yImage *back, yImage *fore, int x, int y);
+
+
+/**
+ * \brief Each pixel of the image will become white with alpha=max(r,g,b).
+ *
+ * So, black will become full transparency, white will remain white.
+ */
+void y_grey_level_to_alpha(yImage *im);
+
+
+
+/************************************************************/
+/*                   DRAWING FUNCTIONS                      */
+/************************************************************/
+
+/**
+ * \brief Set a color on a pixel of the image.
+ * \param im the image to modify
+ * \param color the color for the pixel
+ * \param x x coordinate of pixel : 0 is left border
+ * \param y y coordinate of pixel : 0 is top border
+ */
 void yImage_set_pixel(yImage *im, yColor *color, int x, int y);
 
 
+/**
+ * \brief Draw a line between two pixels on the image.
+ * \param im the image where to draw
+ * \param color the color for the line
+ * \param x1 x coordinate of first pixel : 0 is left border
+ * \param y1 y coordinate of first pixel : 0 is top border
+ * \param x2 x coordinate of second pixel
+ * \param y2 y coordinate of second pixel
+ */
+void y_draw_line(yImage *im, yColor *color, int x1, int y1, int x2, int y2);
 
 
-#ifdef HAVE_LIBPNG
-yImage *LoadPNG(FILE * f);
-#endif
+/**
+ * \brief draw some lines by linking points.
+ * \param im the image where to draw
+ * \param color the color for the lines
+ * \param points a points table
+ * \param nbPoints size of the points table
+ */
+void y_draw_lines(yImage *im, yColor *color, yPoint *points, int nbPoints);
 
 
-/************************************************************/
-/*               SAUVEGARDE DES IMAGES                      */
-/************************************************************/
-
-
-/* sauvegarde "im" dans "file" au format ppm ou pnm */
-/* retourne 1 en cas de succes */
-int sauve_ppm(yImage *im, const char *file);
-
-
-/* sauvegarde "im" dans "file" au format pgm */
-/* retourne 1 en cas de succes */
-int sauve_pgm(yImage *im, const char *file);
-
-
-/* sauvegarde "im" dans "file" au format ps */
-/* retourne 1 en cas de succes */
-/* valeurs conseillées :
-   scaling = 1024;
-   xjustification = 512;
-   yjustification = 512;
-   color = 1; */
-int sauve_ps(yImage *im, const char *file, int page_size, int scaling, int xjustification, int yjustification, char color);
-
-
-/* sauvegarde "im" dans "file" au format JPEG */
-/* retourne 1 en cas de succes */
-/* nécessite la bibliothèque libjpeg */
-int sauve_jpeg(yImage *im, const char *file);
-
-
-/* sauvegarde "im" dans "file" au format PNG */
-/* retourne 1 en cas de succes */
-/* nécessite la bibliothèque libpng */
-int sauve_png(yImage *im, const char *file);
-
-/* sauvegarde "im" dans "file" au format PNG */
-/* retourne 1 en cas de succes */
-/* nécessite la bibliothèque libpng */
-//int sauve_alphaImage_png(yAlphaImage *im, const char *file);
-
-
-/* sauvegarde "im" dans "file" au format TIFF */
-/* retourne 1 en cas de succes */
-/* nécessite la bibliothèque libtiff */
-int sauve_tiff(yImage *im, const char *file);
 
 #endif

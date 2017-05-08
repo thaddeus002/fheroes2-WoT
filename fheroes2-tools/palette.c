@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <stdlib.h> //malloc()
+#include "ySaveImage.h"
 #include "palette.h"
 
 

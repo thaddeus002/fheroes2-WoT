@@ -10,7 +10,7 @@ ifndef CC
 CC := gcc
 endif
 
-IMAGE_TARGETS :=
+YIMAGE_TARGETS := yImage.o yColor.o ySaveImage.o
 AUDIO_TARGETS := 82m2wav xmi2mid
 GENERAL_TARGETS := extractor aggregator
 TARGETS := $(GENERAL_TARGETS) $(IMAGE_TARGETS) $(AUDIO_TARGETS)
@@ -82,24 +82,22 @@ convert: convert.cpp icn2img.o yImage.o palette.o
 palette.o : palette.c palette.h
 	$(CXX) -c palette.c
 
-$(IMAGE_TARGETS): $(addsuffix .cpp, $(IMAGE_TARGETS)) yImage.o palette.o
-	$(CXX) -c $@.cpp $(YG_CFLAGS) $(SDL_FLAGS) -DHAVE_LIBPNG -DWITH_IMAGE
-	$(CXX) -o $@ $@.o yImage.o palette.o $(YG_LDFLAGS) $(SDL_LIBS)
 
-til2img: til2img.cpp palette.o yImage.o
+til2img: til2img.cpp palette.o yImage.o yColor.o ySaveImage.o
 	$(CXX) -c $@.cpp $(YG_CFLAGS) -DHAVE_LIBPNG -DWITH_IMAGE
-	$(CXX) -o $@ $@.o yImage.o palette.o -L/usr/lib -lpng
+	$(CXX) -o $@ $@.o yImage.o yColor.o ySaveImage.o palette.o -L/usr/lib -lpng
 
-bmp2img: bmp2img.cpp yImage.o h2bmp.o
+bmp2img: bmp2img.cpp yImage.o yColor.o ySaveImage.o h2bmp.o
 	$(CXX) -c $< $(YG_CFLAGS)
-	$(CXX) -o $@ $@.o yImage.o h2bmp.o $(YG_LDFLAGS)
+	$(CXX) -o $@ $@.o yImage.o yColor.o ySaveImage.o h2bmp.o $(YG_LDFLAGS)
 
-icn2img: icn2img.cpp yImage.o palette.o h2icn.o
+icn2img: icn2img.cpp yImage.o yColor.o ySaveImage.o palette.o h2icn.o
 	$(CXX) -c $< -DHAVE_LIBPNG $(shell libpng-config --cflags)
-	$(CXX) -o $@ $@.o yImage.o palette.o h2icn.o $(YG_LDFLAGS)
+	$(CXX) -o $@ $@.o yImage.o yColor.o ySaveImage.o palette.o h2icn.o $(YG_LDFLAGS)
 
-yImage.o: yImage.c yImage.h
-	$(CXX) -c yImage.c -DHAVE_LIBPNG
+
+$(YIMAGE_TARGETS): $(subst .o,.c,$@)
+	$(CXX) -c $(subst .o,.c,$@) -DHAVE_LIBPNG
 
 h2bmp.o: h2bmp.cpp h2bmp.h
 	$(CXX) -c $<

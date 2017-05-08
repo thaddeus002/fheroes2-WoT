@@ -30,6 +30,7 @@
 #include <cstring>
 
 #include "yImage.h"
+#include "ySaveImage.h"
 #include "palette.h"
 #include <vector>
 
