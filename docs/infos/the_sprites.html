@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>fheroes2's data</title>
+    <link rel="stylesheet" type="text/css" media="screen" href="../style.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../favicon.png" />
+</head>
+
+
+<h2>The data files</h2>
+
+<h3>The sprites (files with .icn extension)</h3>
+
+<h4>files content</h4>
+<p>For each icn file, the extraction program will create a directory containing one or more images. As these images often require transparency, they will be saved as png files. A file named spec.xml will also be generated, containing the number of images, and for each of them (numbered from 1 to n), the corresponding filename and the offsets in pixels to draw the image. To precisions on how these informations are store in icn files, see <a href="informations.html#icn_format">the icn format description</a>.</p>
+
+<h4>Main files list</h4>
+<p>To making a mod needs the modification of the following files :</p>
+<p></p>
+<ul>
+  <li><b>cbkg*.icn</b>
+  <p>13 files for the differents battlefield background. There is only one image by icn file, which is a landscape image of size 640x443. The 99 first lines of pixels are for the horizon (sky, far mountain) and are not part of the battlefield. Some obstacle will be randomly placed on the rest of the image before each battle begin.</p>
+  <p></p>
+  </li>
+
+  <li><b>minimon.icn</b>
+  <p>594 images used for animate the monsters on the adventure map. Some of these animations are the movement made
+  by the monster to attack a heroe's army.</p>
+  <p>The data of file <a href="#mons32.icn"><i>mons32.icn</i></a> can be used instead of the one of <i>minimon.icn</i> but there will not be monster animations on the aventure map.</p>
+  <p></p>
+  </li>
+
+  <li><b>miniport.icn</b>
+  <p>The 60 mini portraits of the heroes of size 30x22.</p>
+  <p>They are used in the rigth part of the interface and in the pop-up.</p>
+  <p></p>
+  </li>
+
+  <li id="mons32.icn"><b>mons32.icn</b>
+  <p>The mini representations of all the monsters, like those on the adventure map, but without the animations. They appear on the pop-up windows, on top of the screen during the battle to give the turns order, and also on the rigth part of the interface. They are also used in the maps editor. Images' size varies but never exceeds 41x39, which is the dragons' miniatures sizes. In spite of the size variations, the offsets are almost always zero, except when their value is 1.</p>
+  <p>020.png are for sprites (fairies)</p>
+  <p>027.png are for licorns (original size of 32x37)</p>
+  <p>029.png are for centaurs (original size of 33x29)</p>
+  <p></p>
+  </li>
+
+  <li><b>&lt;monster&gt;.icn</b>
+  <p>One icn file (or directory) by monster (66 files). This file contains the animations of the monsters in the
+  battlefield.</p>
+  <p>The animations are : waiting, move forward, attack to the top, attack on front, attack to the bottom, receive an attack, die.</p>
+  <p>For the monsters with remote attack, to the contact attack we have to add the three animations to the remote attacks : to the top, to the middle, and to the bottom.</p>
+  <p></p>
+  </li>
+
+  <li><b>port00*.icn</b>
+  <p>One file by heroe, for the maximun size portrait (101x93). This portrait appears in the heroe's view window.</p>
+  <p></p>
+  </li>
+
+  <li><b>portmedi.icn</b>
+  <p>Medium size portraits of the heroes, with size 51x47.</p>
+  <p></p>
+  </li>
+
+  <li><b>townbkg[0-5].icn</b>
+  <p>Six images of size 640x256. They are the background images of the castles. Respectively : knight, barbarian, witch, warlord, wizard, and necromancer.</p>
+  </li>
+
+</ul>
+</html>

@@ -59,13 +59,13 @@ int hash(char* filename) {
 
 <h2>files in the aggregate</h2>
 
-<p>The files includes in the aggregate file are the <a href="les_sprites.html">data</a> of the games.</p>
+<p>The files includes in the aggregate file are the <a href="the_sprites.html">data</a> of the games.</p>
 <p>They are of type :
 
 <ul>
 <li><b>82M</b>: <p>This is used for the game's sounds.
 
-<li><b>FNT</b>: <p>TODO
+<li><b>FNT</b>: <p>Two files (bigfont.fnt and smalfont.fnt) with the fonts for showing text.</p>
 
 <li><b>XMI</b>: <p>TODO
 
@@ -85,7 +85,7 @@ int hash(char* filename) {
     <p>TIL files contains tiles for the maps. In these files, the first three groups of 2 bytes are :
     <ul>
         <li>the number of tiles (n)</li>
-	<li>tiles' width</li>
+  <li>tiles' width</li>
         <li>tiles' height</li>
     </ul>
     </p>
@@ -116,7 +116,7 @@ int hash(char* filename) {
 
 <p>Most of the informations bellow on the formats of these files were extract for the study of the code of <a href=http://www.sourceforge.net/apps/mediawiki/fheroes2/index.php?title=Main_Page>fheroes2</a>.
 
-<h2>icn format for sprites</h2>
+<h2 id="icn_format">icn format for sprites</h2>
 
 <p>All the numbers are encoded in little-endians.</p>
 
