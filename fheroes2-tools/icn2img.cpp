@@ -29,7 +29,6 @@
 
 
 void usage(char *prog) {
-
     std::cout << "Extract sprites from icn file" << std::endl;
     std::cout << "Usage : " << prog << " <file.icn>" << std::endl;
     exit(1);

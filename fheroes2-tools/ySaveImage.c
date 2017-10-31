@@ -11,7 +11,6 @@
 #include <ctype.h>
 #include <string.h> //memset()
 
-#define HAVE_LIBPNG
 
 #ifdef HAVE_LIBPNG
 #include "png.h"

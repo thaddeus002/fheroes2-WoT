@@ -103,7 +103,7 @@ h2bmp.o: h2bmp.cpp h2bmp.h
 	$(CXX) -c $<
 
 h2icn.o: h2icn.cpp h2icn.h
-	$(CXX) -c $<
+	$(CXX) -c -DHAVE_LIBPNG $<
 
 .PHONY: clean
 

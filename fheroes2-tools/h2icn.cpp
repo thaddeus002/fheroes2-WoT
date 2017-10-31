@@ -111,8 +111,8 @@ yImage *icnsprite::converti_en_yImage(){
     yImage *im;
     int err;
 
-    bool debug=true;
-    std::cout << "Decoding image (" << data_size << " bytes)" << std::endl;
+    bool debug=false;
+    if(debug) std::cout << "Decoding image (" << data_size << " bytes)" << std::endl;
 
     if(data == NULL || data_size == 0) return NULL;
 
