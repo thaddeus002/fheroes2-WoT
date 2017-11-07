@@ -65,7 +65,8 @@ int hash(char* filename) {
 <ul>
 <li><b>82M</b>: <p>This is used for the game's sounds.
 
-<li><b>FNT</b>: <p>Two files (bigfont.fnt and smalfont.fnt) with the fonts for showing text.</p>
+<li><b>FNT</b>: <p>Two 17 bytes files (bigfont.fnt and smalfont.fnt). The 13 last bytes of these files are null-terminated string with the name of a icn file.<p>
+<p>They respectively refer to font.icn and smalfont.icn, that contain each 96 characters images.</p>
 
 <li><b>XMI</b>: <p>TODO
 
@@ -148,11 +149,11 @@ int hash(char* filename) {
 
 <p>There is one byte for command followed by 0 or more bytes of data. The command byte can be :</p>
 <ul>
-    <li>0x00 - end of line reached, go to the first pixel of next line.</li>
+    <li>0x00 - end of line reached, go to the first pixel of next line. All of remaining pixels of current line are transparent.</li>
     <li>0x01 to 0x7F - number n of data. The next n bytes are the colors of the next n pixels.</li>
     <li>0x80 - end of data. The sprite is yet totaly describe.</li>
     <li>0x81 to 0xBF - number of pixels to skip + 0x80. The (n - 128) pixels are transparents.</li>
-    <li>0xC0 - put here n pixels of shadow. If the next byte module 4 is not null, n equals the next pixel modulo 4, otherwise n equals the second next byte.</li>
+    <li>0xC0 - put here n pixels of shadow. If the next byte modulo 4 is not null, n equals the next byte modulo 4, otherwise n equals the second next byte.</li>
     <li>0xC1 - next byte is the number of next pixels of same color. The second next byte is the color of these pixels.</li>
     <li>0xC2 to 0xFF - number of pixels of same color plus 0xC0. Next byte is the color of these pixels.</li>
 </ul>
