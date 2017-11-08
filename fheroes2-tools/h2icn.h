@@ -27,7 +27,9 @@
 
 
 /* CLASS ICNHEADER */
-/** the description of an image */
+/**
+ * \brief The description of an image.
+ */
 class icnheader
 {
     public:
@@ -54,7 +56,11 @@ class icnheader
 
 
 /* CLASS ICNSPRITE */
-/** this is one image of the sprite */
+/**
+ * \brief This is one image of the sprite.
+ *
+ * A sprite is a header plus the image's data.
+ */
 class icnsprite : public icnheader {
 
     private:
@@ -113,6 +119,11 @@ class icnfile {
          * \brief Create the files (images + spec.xml) in the specified directory.
          */
         int create_files(std::string dir);
+
+        /**
+         * \brief Show infos about the content of this icnfile.
+         */
+        void show_infos();
 };
 
 

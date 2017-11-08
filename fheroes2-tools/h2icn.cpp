@@ -418,3 +418,37 @@ int icnfile::create_files(std::string dir){
 
     return(0);
 }
+
+
+void icnfile::show_infos() {
+
+    int maxwidth = 0;
+    int maxheight = 0;
+    int i = 0; // counter
+    int monoSprites = 0;
+
+    for(i=0; i<count_sprite; i++) {
+        icnheader *current = headers+i;
+
+        if(current->width > maxwidth) {
+            maxwidth = current->width;
+        }
+
+        if(current->height > maxheight) {
+            maxheight = current->height;
+        }
+
+        if(current->type == 32) {
+            monoSprites++;
+        }
+    }
+
+    std::cout << "icn file v" << version << " " << name << std::endl << std::endl;
+    std::cout << "number of sprites : " << count_sprite;
+    if(monoSprites > 0) {
+        std::cout << monoSprites << " of them are monochromatic";
+    }
+    std::cout << std::endl;
+    std::cout << "maximun width     : " << maxwidth << std::endl;
+    std::cout << "maximun height    : " << maxheight << std::endl;
+}

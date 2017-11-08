@@ -55,6 +55,8 @@ int main(int argc, char **argv) {
 
     icn->create_files(dirname + ".extract");
 
+    icn->show_infos();
+
     delete icn;
 
     return 0;
