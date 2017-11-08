@@ -37,6 +37,8 @@
 #include "h2icn.h"
 #include <endian.h>
 
+// change to 1 to show debug messages
+#define DEBUG 0
 
 /* CLASS ICNHEADER */
 
@@ -111,8 +113,7 @@ yImage *icnsprite::converti_en_yImage(){
     yImage *im;
     int err;
 
-    bool debug=false;
-    if(debug) std::cout << "Decoding image (" << data_size << " bytes)" << std::endl;
+    if(DEBUG) std::cout << "Decoding image (" << data_size << " bytes)" << std::endl;
 
     if(data == NULL || data_size == 0) return NULL;
 
@@ -146,7 +147,7 @@ yImage *icnsprite::converti_en_yImage(){
         // 0x00 - end line
         if(0 == *cur)
         {
-            if(debug) std::cout << "Found : end of line" << std::endl;
+            if(DEBUG) std::cout << "Found : end of line" << std::endl;
             ++y;
             x = 0;
             ++cur;
@@ -159,11 +160,11 @@ yImage *icnsprite::converti_en_yImage(){
             if(!type)
             {
                 c = *cur;
-                if(debug) std::cout << "Reading " << (int) c << " pixels" << std::endl;
+                if(DEBUG) std::cout << "Reading " << (int) c << " pixels" << std::endl;
                 ++cur;
                 while(c-- && cur < max)
                 {
-                    if(debug)
+                    if(DEBUG)
                     {
                         std::cout << "  c(" << x << "," << y << ") = " << (int) *cur;
                     }
@@ -174,11 +175,11 @@ yImage *icnsprite::converti_en_yImage(){
                     ++x;
                     ++cur;
                 }
-                if(debug) std::cout << std::endl;
+                if(DEBUG) std::cout << std::endl;
             }
             else
             {
-                if(debug) std::cout << "writing " << (int) *cur << " pixels" << std::endl;
+                if(DEBUG) std::cout << "writing " << (int) *cur << " pixels" << std::endl;
                 c = *cur;
                 while(c--)
                 {
@@ -195,7 +196,7 @@ yImage *icnsprite::converti_en_yImage(){
         // 0x80 - end data
         if(0x80 == *cur)
         {
-            if(debug) std::cout << "end of sprite" << std::endl;
+            if(DEBUG) std::cout << "end of sprite" << std::endl;
             break;
         }
 
@@ -203,7 +204,7 @@ yImage *icnsprite::converti_en_yImage(){
         // 0xBF - skip data
         if(0xC0 > *cur)
         {
-            if(debug) std::cout << (int) *cur << " : skipping " <<  (int) (*cur - 0x80) << " pixels" << std::endl;
+            if(DEBUG) std::cout << (int) *cur << " : skipping " <<  (int) (*cur - 0x80) << " pixels" << std::endl;
             x += *cur - 0x80;
             ++cur;
         }
@@ -215,7 +216,7 @@ yImage *icnsprite::converti_en_yImage(){
             ++cur;
             c = *cur % 4 ? *cur % 4 : *(++cur);
 
-            if(debug) std::cout << (int) c << " pixels of shadow" << std::endl;
+            if(DEBUG) std::cout << (int) c << " pixels of shadow" << std::endl;
 
             while(c--){
                 yImage_set_pixel(im, &shadow, x, y);
@@ -235,7 +236,7 @@ yImage *icnsprite::converti_en_yImage(){
             ++cur;
 
             color = getColor(*cur);
-            if(debug) std::cout << "writing " << (int) c << " pixels of color " << *cur << std::endl;
+            if(DEBUG) std::cout << "writing " << (int) c << " pixels of color " << *cur << std::endl;
             while(c--){
                 yImage_set_pixel(im, &color, x, y);
                 ++x;
@@ -248,7 +249,7 @@ yImage *icnsprite::converti_en_yImage(){
             if(!type)
             {
                 c = *cur - 0xC0;
-                if(debug) std::cout << "found " << (int) *cur << " : reading " << (int) c << " pixels" << std::endl;
+                if(DEBUG) std::cout << "found " << (int) *cur << " : reading " << (int) c << " pixels" << std::endl;
                 ++cur;
                 while(c--){
                     color = getColor(*cur);
@@ -258,7 +259,7 @@ yImage *icnsprite::converti_en_yImage(){
             }
             else // for type 32 - skipping data
             {
-                if(debug) std::cout << (int) *cur << " : skipping " <<  (int) (*cur - 0x80) << " pixels" << std::endl;
+                if(DEBUG) std::cout << (int) *cur << " : skipping " <<  (int) (*cur - 0x80) << " pixels" << std::endl;
                 x += *cur - 0x80;
             }
             ++cur;
@@ -319,7 +320,7 @@ void icnfile::read_icnfile(std::string file){
     for(i=0; i<count_sprite; i++){
         headers[i].version = version;
         headers[i].read(fd);
-        headers[i].present();
+        if(DEBUG) headers[i].present();
     }
 
     fd.read(reinterpret_cast<char *>(icndata), total_size-(count_sprite*header_size));
