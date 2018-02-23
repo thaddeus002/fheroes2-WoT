@@ -41,6 +41,16 @@ If a file is not listed, it is my own work, with licence CC0 (Public Domain).
 
 If you want to contribute with artwork you have done, Let me know what Licence you want (must be open) for your file, or add a modification of file AUTHOR in your pull request.
 
+### progress state
+
+Sprites items replacement :
+
+![](assets/sprites_replacement_progress.png)
+
+Global items replacement :
+
+![](assets/global_progress.png)
+
 ## Website
 
 To learn more on this project read [the official website](http://thaddeus002.github.io/fheroes2-WoT/index.html)
