@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<icn name="scroll.icn" count="5">
+ <sprite index="1" name="000.png" ox="0" oy="0"/>
+ <sprite index="2" name="001.png" ox="0" oy="0"/>
+ <sprite index="3" name="002.png" ox="0" oy="0"/>
+ <sprite index="4" name="003.png" ox="0" oy="0"/>
+ <sprite index="5" name="004.png" ox="0" oy="0"/>
+</icn>
