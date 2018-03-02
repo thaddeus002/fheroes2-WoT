@@ -81,12 +81,12 @@ int extract_files(FILE *fd_data, char *output_dir, aggtable_t *table);
 
 
 /**
- * Make an aggragate with the content of a directory.
+ * Make an aggregate with the content of a directory.
  * Filenames will be shorten to 8 characters plus 3 for the extension.
  * Subdirectories will be ignored.
  * Aggregate name will be dirname plus extension .agg
  * Agg version will be 2.
- * \return a negative error code or zero in case of success
+ * \return zero in case of success, a negative error code otherwise
  */
 int create_aggregate(char *directory);
 
