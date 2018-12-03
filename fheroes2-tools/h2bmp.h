@@ -21,8 +21,9 @@
  ***************************************************************************/
 
 
+extern "C" {
 #include "yImage.h"
-
+}
 
 // colors definitions
 /** Default color for pixels of type 0 */

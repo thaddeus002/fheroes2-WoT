@@ -29,8 +29,10 @@
 #include <sstream>
 #include <cstring>
 
+extern "C" {
 #include "yImage.h"
-#include "ySaveImage.h"
+#include "yImage_io.h"
+}
 #include "palette.h"
 #include <vector>
 
@@ -118,9 +120,9 @@ yImage *icnsprite::converti_en_yImage(){
     if(data == NULL || data_size == 0) return NULL;
 
 
-    im=create_yImage(&err, NULL, width, height);
+    im=y_create_image(&err, NULL, width, height);
     if(im==NULL) return NULL;
-    transp(im);
+    y_transp(im);
 
     const uint8_t *max = data + data_size; // position of end of data for sprite
     uint8_t *cur = data;
@@ -170,7 +172,7 @@ yImage *icnsprite::converti_en_yImage(){
                     }
 
                     color = getColor(*cur);
-                    yImage_set_pixel(im, &color, x, y);
+                    y_set_pixel(im, &color, x, y);
 
                     ++x;
                     ++cur;
@@ -184,7 +186,7 @@ yImage *icnsprite::converti_en_yImage(){
                 while(c--)
                 {
                     color = getColor(1);
-                    yImage_set_pixel(im, &color, x, y);
+                    y_set_pixel(im, &color, x, y);
                     ++x;
                 }
                 ++cur;
@@ -219,7 +221,7 @@ yImage *icnsprite::converti_en_yImage(){
             if(DEBUG) std::cout << (int) c << " pixels of shadow" << std::endl;
 
             while(c--){
-                yImage_set_pixel(im, &shadow, x, y);
+                y_set_pixel(im, &shadow, x, y);
 
                 ++x;
             }
@@ -238,7 +240,7 @@ yImage *icnsprite::converti_en_yImage(){
             color = getColor(*cur);
             if(DEBUG) std::cout << "writing " << (int) c << " pixels of color " << *cur << std::endl;
             while(c--){
-                yImage_set_pixel(im, &color, x, y);
+                y_set_pixel(im, &color, x, y);
                 ++x;
             }
             ++cur;
@@ -253,7 +255,7 @@ yImage *icnsprite::converti_en_yImage(){
                 ++cur;
                 while(c--){
                     color = getColor(*cur);
-                    yImage_set_pixel(im, &color, x, y);
+                    y_set_pixel(im, &color, x, y);
                     ++x;
                 }
             }
@@ -404,10 +406,10 @@ int icnfile::create_files(std::string dir){
         #else
             dstfile += ".png";
             shortdstfile += ".png";
-            sauve_png(image, dstfile.c_str());
+            y_save_png(image, dstfile.c_str());
         #endif
 
-        destroy_yImage(image);
+        y_destroy_image(image);
 
         fd_spec << " <sprite index=\"" << i+1 << "\" name=\"" << shortdstfile.c_str() << "\" ox=\"" << headers[i].offsetX << "\" oy=\"" << headers[i].offsetY << "\"/>" << std::endl;
     }

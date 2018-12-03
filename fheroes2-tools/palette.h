@@ -6,8 +6,6 @@
 #ifndef PALETTE_H
 #define PALETTE_H
 
-#include "yImage.h"
-
 
 /**
  * Read palette data from a file.

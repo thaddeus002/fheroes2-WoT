@@ -10,7 +10,7 @@ ifndef CC
 CC := gcc
 endif
 
-YIMAGE_TARGETS := yImage.o yColor.o ySaveImage.o
+YIMAGE_TARGETS := yImage.o yColor.o yImage_io.o
 AUDIO_TARGETS := 82m2wav xmi2mid
 GENERAL_TARGETS := extractor aggregator
 TARGETS := $(GENERAL_TARGETS) $(IMAGE_TARGETS) $(AUDIO_TARGETS)
@@ -79,31 +79,31 @@ convert: convert.cpp icn2img.o yImage.o palette.o
 	$(CXX) -o $@ $@.o icn2img.o yImage.o palette.o $(shell libpng-config --ldflags)
 
 
-palette.o : palette.c palette.h
-	$(CXX) -c palette.c
+palette.o : palette.cpp palette.h
+	$(CXX) -c palette.cpp -IyImage
 
 
-til2img: til2img.cpp palette.o yImage.o yColor.o ySaveImage.o
-	$(CXX) -c $@.cpp $(YG_CFLAGS) -DHAVE_LIBPNG -DWITH_IMAGE
-	$(CXX) -o $@ $@.o yImage.o yColor.o ySaveImage.o palette.o -L/usr/lib -lpng
+til2img: til2img.cpp palette.o $(YIMAGE_TARGETS)
+	$(CXX) -c $@.cpp $(YG_CFLAGS) -DHAVE_LIBPNG -DWITH_IMAGE -IyImage
+	$(CXX) -o $@ $@.o $(YIMAGE_TARGETS) palette.o -L/usr/lib -lpng
 
-bmp2img: bmp2img.cpp yImage.o yColor.o ySaveImage.o h2bmp.o
-	$(CXX) -c $< $(YG_CFLAGS)
-	$(CXX) -o $@ $@.o yImage.o yColor.o ySaveImage.o h2bmp.o $(YG_LDFLAGS)
+bmp2img: bmp2img.cpp $(YIMAGE_TARGETS) h2bmp.o
+	$(CXX) -c $< $(YG_CFLAGS) -IyImage
+	$(CXX) -o $@ $@.o $(YIMAGE_TARGETS) h2bmp.o $(YG_LDFLAGS)
 
-icn2img: icn2img.cpp yImage.o yColor.o ySaveImage.o palette.o h2icn.o
-	$(CXX) -c $< -DHAVE_LIBPNG $(shell libpng-config --cflags)
-	$(CXX) -o $@ $@.o yImage.o yColor.o ySaveImage.o palette.o h2icn.o $(YG_LDFLAGS)
+icn2img: icn2img.cpp $(YIMAGE_TARGETS) palette.o h2icn.o
+	$(CXX) -c $< -DHAVE_LIBPNG $(shell libpng-config --cflags) -IyImage
+	$(CXX) -o $@ $@.o $(YIMAGE_TARGETS) palette.o h2icn.o $(YG_LDFLAGS)
 
 
-$(YIMAGE_TARGETS): $(subst .o,.c,$@)
-	$(CXX) -c $(subst .o,.c,$@) -DHAVE_LIBPNG
+$(YIMAGE_TARGETS): yImage/$(subst .o,.c,$@) yImage/$(subst .o,.h,$@)
+	$(CC) -o $@ -c yImage/$(subst .o,.c,$@) -DHAVE_LIBPNG
 
 h2bmp.o: h2bmp.cpp h2bmp.h
-	$(CXX) -c $<
+	$(CXX) -c $< -IyImage
 
 h2icn.o: h2icn.cpp h2icn.h
-	$(CXX) -c -DHAVE_LIBPNG $<
+	$(CXX) -c -DHAVE_LIBPNG $< -IyImage
 
 .PHONY: clean
 

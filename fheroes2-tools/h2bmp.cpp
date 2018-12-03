@@ -29,8 +29,6 @@
 #include <iostream>
 #include <cstring>
 #include "h2bmp.h"
-#include "yImage.h"
-
 
 
 H2bmp::H2bmp(std::string file, int color0, int color1, int color2){
@@ -114,7 +112,7 @@ yImage *H2bmp::convert_to_yImage(){
     y_init_color(&col2, color2*256+255);
     y_init_color(&colErr, 255);
 
-    im=create_yImage(&err, NULL, width, height);
+    im=y_create_image(&err, NULL, width, height);
 
 
     for(int y=0; y<height; y++) for(int x=0; x<width; x++)
@@ -137,7 +135,7 @@ yImage *H2bmp::convert_to_yImage(){
                 col=&colErr;
         }
 
-        yImage_set_pixel(im, col, x, y);
+        y_set_pixel(im, col, x, y);
     }
 
     return(im);

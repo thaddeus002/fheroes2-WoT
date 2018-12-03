@@ -26,9 +26,11 @@
 #include <cstring>
 #include <iostream>
 #include "h2bmp.h"
-#include "ySaveImage.h"
-#include "yImage.h"
 
+extern "C" {
+#include "yImage_io.h"
+#include "yImage.h"
+}
 
 
 /****************************************************/
@@ -83,10 +85,10 @@ int main(int argc, char **argv)
 
     std::string outfile = extractDir+"/"+infile;
     outfile.replace(outfile.find(".bmp"), 4, ".png");
-    sauve_png(im, outfile.c_str());
+    y_save_png(im, outfile.c_str());
     std::cout << "expanded to: " << outfile << std::endl;
 
-    destroy_yImage(im);
+    y_destroy_image(im);
 
     return EXIT_SUCCESS;
 }

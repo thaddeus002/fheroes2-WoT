@@ -32,8 +32,10 @@
 #include <libgen.h> //basename()
 #include <string.h> // strlen()
 
+extern "C" {
 #include "yImage.h"
-#include "ySaveImage.h"
+#include "yImage_io.h"
+}
 #include "palette.h"
 
 int main(int argc, char **argv)
@@ -112,14 +114,14 @@ int main(int argc, char **argv)
         int err;
         unsigned char *rgb_data;
         rgb_data=create_bitmap((unsigned char *) &body[width * height * cur], width * height);
-        im=create_yImage(&err, rgb_data, width, height);
+        im=y_create_image(&err, rgb_data, width, height);
         free(rgb_data);
         if(err) {
             fprintf(stderr, "Image creation failed : %d\n", err);
         } else {
-            err = sauve_png(im, dstfile.c_str());
+            err = y_save_png(im, dstfile.c_str());
             fprintf(stdout, "File %s created : %d\n", dstfile.c_str(), err);
-            destroy_yImage(im);
+            y_destroy_image(im);
         }
     }
 

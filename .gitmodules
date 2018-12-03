@@ -1,0 +1,3 @@
+[submodule "fheroes2-tools/yImage"]
+	path = fheroes2-tools/yImage
+	url = https://github.com/thaddeus002/yImage

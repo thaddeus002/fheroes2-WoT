@@ -5,7 +5,9 @@
 
 #include <stdio.h>
 #include <stdlib.h> //malloc()
-#include "ySaveImage.h"
+extern "C" {
+#include "yImage_io.h"
+}
 #include "palette.h"
 
 
@@ -141,10 +143,9 @@ int translate(int index) {
         i=i%256;
     }
 
-
-
     return i;
 }
+
 
 /**
  * Find a color in a palette. Default palette is used if none had been setted by homeinit_palette() function.
@@ -221,7 +222,7 @@ int draw_palette(const char *filename){
 
     fprintf(stdout, "Dessin de la palette dans le fichier %s\n", filename);
 
-    im=create_yImage(&err, NULL, 16*16, 16*16);
+    im=y_create_image(&err, NULL, 16*16, 16*16);
 
     if(err) {
         return err;
@@ -242,12 +243,12 @@ int draw_palette(const char *filename){
         //fprintf(stdout, " %d", index);
 
         color = getColor(index);
-        yImage_set_pixel(im, &color, x, y);
+        y_set_pixel(im, &color, x, y);
     }
 
-    err = sauve_png(im, filename);
+    err = y_save_png(im, filename);
 
-    destroy_yImage(im);
+    y_destroy_image(im);
     return err;
 }
 
