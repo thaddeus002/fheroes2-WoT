@@ -79,8 +79,8 @@ convert: convert.cpp icn2img.o yImage.o palette.o
 	$(CXX) -o $@ $@.o icn2img.o yImage.o palette.o $(shell libpng-config --ldflags)
 
 
-palette.o : palette.cpp palette.h
-	$(CXX) -c palette.cpp -IyImage
+palette.o : palette.c palette.h
+	$(CC) -c palette.c -IyImage
 
 
 til2img: til2img.cpp palette.o $(YIMAGE_TARGETS)

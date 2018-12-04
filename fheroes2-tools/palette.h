@@ -9,11 +9,10 @@
 
 /**
  * Read palette data from a file.
- * \param palette A 256 bytes pre-allocated table
  * \param filename The name of a pal file.
  * \return 0 in case of success. An error code otherwise
  */
-int homm_init_palette(const char *filename);
+int homm2_init_palette(const char *filename);
 
 /**
  * Read palette data from a file.
@@ -25,7 +24,8 @@ int homm_init_palette(const char *filename, int homm_version);
 
 
 /**
- * Find a color in a palette. Default palette is used if none had been setted by homeinit_palette() function.
+ * Find a color in a palette. Default palette is used if none had been
+ * setted by homm_init_palette() function.
  * \param index The number of the color in palette. Must be >= 0 and <256
  * \return the corresponding color (transparent if number is out of range)
  */

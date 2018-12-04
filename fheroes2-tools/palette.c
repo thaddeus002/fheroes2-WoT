@@ -5,9 +5,7 @@
 
 #include <stdio.h>
 #include <stdlib.h> //malloc()
-extern "C" {
 #include "yImage_io.h"
-}
 #include "palette.h"
 
 
@@ -76,7 +74,7 @@ int version = 2;
  * \param filename The name of a pal file.
  * \return 0 in case of success. An error code otherwise
  */
-int homm_init_palette(const char *filename){
+int homm2_init_palette(const char *filename){
     return homm_init_palette(filename, 2);
 }
 
@@ -101,7 +99,7 @@ int homm_init_palette(const char *filename, int homm_version){
 
 
     if(fd == NULL){
-        fprintf(stderr, "Impossible de lire le fichier %s\n", filename);
+        fprintf(stderr, "Could not read file %s\n", filename);
         return -1;
     }
 
@@ -124,7 +122,7 @@ int homm_init_palette(const char *filename, int homm_version){
     fclose(fd);
 
     if(!success) {
-        fprintf(stderr, "Echec de création de la palette, utilisation de la palette par défaut\n", filename);
+        fprintf(stderr, "Failled to create the palette, using the default one\n", filename);
         return -1;
     }
     palette = pal;

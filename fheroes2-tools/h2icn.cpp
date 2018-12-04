@@ -32,8 +32,8 @@
 extern "C" {
 #include "yImage.h"
 #include "yImage_io.h"
-}
 #include "palette.h"
+}
 #include <vector>
 
 #include "h2icn.h"
@@ -139,7 +139,7 @@ yImage *icnsprite::converti_en_yImage(){
     if(version == 1){
         homm_init_palette("extractions/HEROES.AGG/kb.pal", 1);
     } else {
-        homm_init_palette("extractions/HEROES2.AGG/kb.pal");
+        homm2_init_palette("extractions/HEROES2.AGG/kb.pal");
     }
 
     yColor color; /* for coloring current pixel */

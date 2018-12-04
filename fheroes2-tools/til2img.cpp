@@ -35,8 +35,8 @@
 extern "C" {
 #include "yImage.h"
 #include "yImage_io.h"
-}
 #include "palette.h"
+}
 
 int main(int argc, char **argv)
 {
