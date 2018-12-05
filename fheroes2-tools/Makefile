@@ -79,6 +79,11 @@ convert: convert.cpp icn2img.o yImage.o palette.o
 	$(CXX) -o $@ $@.o icn2img.o yImage.o palette.o $(shell libpng-config --ldflags)
 
 
+toPalette: toPalette.c $(YIMAGE_TARGETS) palette.o
+	$(CC) -c $@.c -IyImage
+	$(CC) -o $@ $@.o $(YIMAGE_TARGETS) palette.o $(shell libpng-config --ldflags)
+
+
 palette.o : palette.c palette.h
 	$(CC) -c palette.c -IyImage
 

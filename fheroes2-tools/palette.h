@@ -6,6 +6,7 @@
 #ifndef PALETTE_H
 #define PALETTE_H
 
+#include "yColor.h"
 
 /**
  * Read palette data from a file.
