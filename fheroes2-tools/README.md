@@ -1,6 +1,6 @@
 # Tools to handle the game's data
 
-Tools are a set of programs. Use `- h` option to see a short help message. 
+Tools are a set of programs. Use `-h` option to see a short help message. 
 
 ## AGG tools
 
@@ -19,3 +19,7 @@ Tools are a set of programs. Use `- h` option to see a short help message.
 * xmi2mid     - xmi to midi convertor.
 
 * bmp2img     - convert the game's bmp to png file.
+
+## others tools
+
+* toPalette  - A program to modify an image for using only the available colors in the game's palette.

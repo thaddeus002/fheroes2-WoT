@@ -1,5 +1,7 @@
 /**
  * \file toPalette.c
+ * \brief A program to modify an image for using only the available
+ * colors in a palette.
  */
 
 
@@ -10,18 +12,23 @@
 #include "yImage_io.h"
 
 
+/**
+ * The usage function.
+ */
 static void usage(char *prog) {
     fprintf(stdout, "Usage : %s <png_image>\n", prog);
     exit(1);
 }
 
 
+
+/**
+ * Distance indicator between two colors.
+ */
 static int distance(yColor c1, yColor c2) {
 
     return (c1.r-c2.r)*(c1.r-c2.r)+(c1.g-c2.g)*(c1.g-c2.g)+(c1.b-c2.b)*(c1.b-c2.b);
 }
-
-
 
 
 /**
@@ -31,7 +38,7 @@ static int distance(yColor c1, yColor c2) {
 static unsigned char palette_nearest(const unsigned char *rgb) {
 
     unsigned char index = -1;
-    int minSqrDist = 210000;
+    int minSqrDist = 1700000000;
     yColor color;
     y_set_color(&color, rgb[0], rgb[1], rgb[2], 255);
 
@@ -53,7 +60,6 @@ static unsigned char palette_nearest(const unsigned char *rgb) {
 /**
  * \return a newly allocated array of color index
  */
-// TODO this not manage transparent pixels
 static unsigned char *toPalette(yImage *image) {
 
     unsigned char *colormap = malloc(sizeof(unsigned char) * image->rgbWidth * image->rgbHeight);
@@ -61,10 +67,29 @@ static unsigned char *toPalette(yImage *image) {
     if(colormap == NULL) return NULL;
 
     for(int i = 0; i < image->rgbWidth * image->rgbHeight; i++) {
+
         colormap[i] = palette_nearest(image->rgbData+3*i);
     }
     
     return colormap;
+}
+
+
+// restore transparent and shadow pixels from input image
+static void copy_transparency(yImage *input, yImage *output){
+    for(int i = 0; i < input->rgbWidth * input->rgbHeight; i++) {
+        if(input->alphaChanel[i]==0) {
+            output->alphaChanel[i] = 0;
+        } else if(input->alphaChanel[i]<250) {
+            // put a shadow pixel
+            output->alphaChanel[i] = 0x40;
+            output->rgbData[3*i] = 0;
+            output->rgbData[3*i+1] = 0;
+            output->rgbData[3*i+2] = 0;
+        } else {
+           output->alphaChanel[i] = 255;
+        }
+    }
 }
 
 
@@ -86,7 +111,7 @@ int main(int argc, char **argv) {
         y_destroy_image(input);
         return 3;
     }
-    
+
     unsigned char *bitmap = create_bitmap(colorMap, input->rgbWidth * input->rgbHeight);
     free(colorMap);
     if(bitmap == NULL) {
@@ -97,18 +122,20 @@ int main(int argc, char **argv) {
 
     int err = 0;
     yImage *output = y_create_image(&err, bitmap, input->rgbWidth, input->rgbHeight);
-    y_destroy_image(input);
     free(bitmap);
 
     if(err) {
         fprintf(stderr, "An error occured while creating image : %d\n", err);
     } else {
+        // restore transparent and shadow pixels from input image
+        copy_transparency(input, output);
         err = y_save_png(output, "toPalette.png");
+        if(err) {
+            fprintf(stderr, "An error occured while saving image : %d\n", err);
+        }
     }
 
-    if(err) {
-        fprintf(stderr, "An error occured while saving image : %d\n", err);
-    }
+    y_destroy_image(input);
 
     return err;
 }
