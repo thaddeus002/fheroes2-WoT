@@ -72,7 +72,6 @@ int hash(char* filename) {
 
 <li><b>PAL</b>: <p>There is only one file of this type in the archive : the file "kb.pal". This file is the palette. It contains the colors to use to interpret the images in ICN files. It is a 3*256 bytes file. All group of 3 bytes represent a RGB color. You may notice that this palette is very dark (each byte is letter or equal than 0x3F). You must multiplicate all the bytes by 4 to obtain the real game's colors.</p>
 <p>Note for Heroes I : there are two pal files in HEROES.AGG archive but they are identical. Caution, in this version the palette must be translate to retrieve the good colors.</p>
-
 <p>Some palette ranges are for color animation (cycling colors) for phoenix, fire elementaries, lava, water :
 <ul>
 <li>214-217 (red)
@@ -81,6 +80,7 @@ int hash(char* filename) {
 <li>238-241 (blue)
 </ul>
 <p>The color cycling is an in-game feature. Simply put, if you place color 214, it will be put in a cycle automatically: 214-215-216-217-214-... etc. If you start from color 215, it will go in the game like 215-216-217-214-215-... etc.</p>
+<p>Note : in Heroes II, the ten first and the ten last palette's colors are black, as the color of index 36. So twenty colors are lost. Counting others nineteen for cycling, only 217 colors are available for the artwork.</p>
 
 <li><b>TIL</b>:
     <p>TIL files contains tiles for the maps. In these files, the first three groups of 2 bytes are :
