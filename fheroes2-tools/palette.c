@@ -218,7 +218,7 @@ int draw_palette(const char *filename){
         return -1;
     }
 
-    fprintf(stdout, "Dessin de la palette dans le fichier %s\n", filename);
+    fprintf(stdout, "Drawing the palette in file %s\n", filename);
 
     im=y_create_image(&err, NULL, 16*16, 16*16);
 
@@ -237,8 +237,6 @@ int draw_palette(const char *filename){
         k=x/16; l=y/16;
 
         index = l*16 + k;
-
-        //fprintf(stdout, " %d", index);
 
         color = getColor(index);
         y_set_pixel(im, &color, x, y);
