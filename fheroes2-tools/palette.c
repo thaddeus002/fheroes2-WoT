@@ -115,8 +115,6 @@ int homm_init_palette(const char *filename, int homm_version){
             success=0;
             break;
         }
-
-        //pal[i]=pal[i]*4;
     }
 
     fclose(fd);

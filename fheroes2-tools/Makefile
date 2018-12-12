@@ -63,7 +63,7 @@ aggregation.o : aggregation.c
 	$(CC) -c aggregation.c -Wall -O2
 
 YG_CFLAGS=$(shell libpng-config --cflags)
-YG_LDFLAGS=$(shell libpng-config --ldflags)
+YG_LDFLAGS=$(shell libpng-config --ldflags) -Ltinyxml -ltinyxml
 
 
 $(AUDIO_TARGETS): $(addsuffix .cpp, $(AUDIO_TARGETS))
@@ -96,10 +96,12 @@ bmp2img: bmp2img.cpp $(YIMAGE_TARGETS) h2bmp.o
 	$(CXX) -c $< $(YG_CFLAGS) -IyImage
 	$(CXX) -o $@ $@.o $(YIMAGE_TARGETS) h2bmp.o $(YG_LDFLAGS)
 
-icn2img: icn2img.cpp $(YIMAGE_TARGETS) palette.o h2icn.o
+icn2img: icn2img.cpp $(YIMAGE_TARGETS) palette.o h2icn.o tinyxml/libtinyxml.a
 	$(CXX) -c $< -DHAVE_LIBPNG $(shell libpng-config --cflags) -IyImage
 	$(CXX) -o $@ $@.o $(YIMAGE_TARGETS) palette.o h2icn.o $(YG_LDFLAGS)
 
+img2icn: img2icn.cpp $(YIMAGE_TARGETS) palette.o h2icn.o tinyxml/libtinyxml.a
+	$(CXX) img2icn.cpp -o img2icn -IyImage $(YIMAGE_TARGETS) palette.o h2icn.o $(YG_LDFLAGS)
 
 $(YIMAGE_TARGETS): yImage/$(subst .o,.c,$@) yImage/$(subst .o,.h,$@)
 	$(CC) -o $@ -c yImage/$(subst .o,.c,$@) -DHAVE_LIBPNG
@@ -109,6 +111,9 @@ h2bmp.o: h2bmp.cpp h2bmp.h
 
 h2icn.o: h2icn.cpp h2icn.h
 	$(CXX) -c -DHAVE_LIBPNG $< -IyImage
+
+tinyxml/libtinyxml.a:
+	make -C tinyxml
 
 .PHONY: clean
 

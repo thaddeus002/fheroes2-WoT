@@ -28,16 +28,18 @@
 #include <fstream>
 #include <sstream>
 #include <cstring>
+#include <cctype>
+#include <endian.h>
+#include <vector>
 
 extern "C" {
 #include "yImage.h"
 #include "yImage_io.h"
 #include "palette.h"
 }
-#include <vector>
 
+#include "tinyxml/tinyxml.h"
 #include "h2icn.h"
-#include <endian.h>
 
 // change to 1 to show debug messages
 #define DEBUG 0
@@ -46,27 +48,56 @@ extern "C" {
 
 void icnheader::read(std::fstream & fd)
 {
-        if(fd.fail()) return;
+    if(fd.fail()) return;
 
-        fd.read(reinterpret_cast<char *>(& offsetX), sizeof(int16_t));
-        offsetX=le16toh(offsetX);
+    fd.read(reinterpret_cast<char *>(& offsetX), sizeof(int16_t));
+    offsetX=le16toh(offsetX);
 
-        fd.read(reinterpret_cast<char *>(& offsetY), sizeof(int16_t));
-        offsetY=le16toh(offsetY);
+    fd.read(reinterpret_cast<char *>(& offsetY), sizeof(int16_t));
+    offsetY=le16toh(offsetY);
 
-        fd.read(reinterpret_cast<char *>(& width), sizeof(uint16_t));
-        width=le16toh(width);
+    fd.read(reinterpret_cast<char *>(& width), sizeof(uint16_t));
+    width=le16toh(width);
 
-        fd.read(reinterpret_cast<char *>(& height), sizeof(uint16_t));
-        height=le16toh(height);
+    fd.read(reinterpret_cast<char *>(& height), sizeof(uint16_t));
+    height=le16toh(height);
 
-        if(version == 2){
-            fd.read(reinterpret_cast<char *>(& type), sizeof(uint8_t));
-        }
+    if(version == 2){
+        fd.read(reinterpret_cast<char *>(& type), sizeof(uint8_t));
+    }
 
-        fd.read(reinterpret_cast<char *>(& offsetData), sizeof(uint32_t));
-        offsetData=le32toh(offsetData);
+    fd.read(reinterpret_cast<char *>(& offsetData), sizeof(uint32_t));
+    offsetData=le32toh(offsetData);
 }
+
+
+/** write ICN Header in a stream */
+void icnheader::write(std::fstream & fd){
+    if(fd.fail()) {
+        std::cerr << "Cannot write header to output" << std::endl;
+        return;
+    }
+
+    int16_t int16_out = htole16(offsetX);
+    fd.write(reinterpret_cast<char *>(& int16_out), sizeof(int16_t));
+
+    int16_out = htole16(offsetY);
+    fd.write(reinterpret_cast<char *>(& int16_out), sizeof(int16_t));
+
+    uint16_t uint16_out = htole16(width);
+    fd.write(reinterpret_cast<char *>(& uint16_out), sizeof(uint16_t));
+
+    uint16_out = htole16(height);
+    fd.write(reinterpret_cast<char *>(& uint16_out), sizeof(uint16_t));
+
+    if(version == 2){
+        fd.write(reinterpret_cast<char *>(& type), sizeof(uint8_t));
+    }
+
+    uint32_t uint32_out = htole32(offsetData);
+    fd.write(reinterpret_cast<char *>(& uint32_out), sizeof(uint32_t));
+}
+
 
 void icnheader::present(int number)
 {
@@ -89,7 +120,7 @@ void icnheader::present(int number)
 
 /* CLASS ICNSPRITE */
 
-icnsprite::icnsprite(icnheader header, int dataSize, unsigned char *dataContent){
+icnsprite::icnsprite(icnheader *header, int dataSize, unsigned char *dataContent){
 
     data=(unsigned char *) malloc(dataSize);
     if(data==NULL) return;
@@ -97,13 +128,22 @@ icnsprite::icnsprite(icnheader header, int dataSize, unsigned char *dataContent)
     memcpy(data, dataContent, dataSize);
     data_size=dataSize;
 
-    width=header.width;
-    height=header.height;
-    type=header.type;
-    version=header.version;
+    width=header->width;
+    height=header->height;
+    type=header->type;
+    version=header->version;
 }
 
+icnsprite::icnsprite(std::string filename, int ox, int oy) {
 
+    offsetX = ox;
+    offsetY = oy;
+    type = 0;
+
+    data_size = 0;
+    data = NULL;
+    // TODO read the file
+}
 
 icnsprite::~icnsprite(){
     if(data!=NULL) free(data);
@@ -289,6 +329,87 @@ icnfile::icnfile(std::string filename, int version){
 }
 
 
+static bool IsDirectory(const std::string & name)
+{
+    struct stat fs;
+
+    if(stat(name.c_str(), &fs) || !S_ISDIR(fs.st_mode))
+        return false;
+
+    return S_IRUSR & fs.st_mode;
+}
+
+
+icnfile::icnfile(std::string dirname){
+    headers=NULL;
+    icndata=NULL;
+    this->version=2;
+
+    if(!IsDirectory(dirname)) {
+        std::cerr << dirname << " is not a directory" << std::endl;
+        return;
+    }
+  
+    std::string specfile(dirname);
+    specfile += "/spec.xml";
+
+    // parse spec.xml
+
+    TiXmlDocument doc;
+    const TiXmlElement* xml_icn = NULL;
+
+    if(doc.LoadFile(specfile.c_str()) &&
+        NULL != (xml_icn = doc.FirstChildElement("icn")))
+    {
+        int count;
+        xml_icn->Attribute("count", &count);
+        count_sprite = count;
+        std::cout << count_sprite << " files in this ICN" << std::endl;
+
+        headers = new icnheader * [count_sprite];
+
+        const TiXmlElement *xml_sprite = xml_icn->FirstChildElement("sprite");
+
+        int offset = 13 * count_sprite;
+
+        for(; xml_sprite; xml_sprite = xml_sprite->NextSiblingElement("sprite"))
+        {
+            int index;
+            int ox, oy;
+            std::string name;
+            
+            xml_sprite->Attribute("index", &index);
+            name = xml_sprite->Attribute("name");
+            xml_sprite->Attribute("ox", &ox);
+            xml_sprite->Attribute("oy", &oy);
+
+            headers[index-1] = new icnsprite(name, ox, oy);
+
+            // calculate the data offsets
+            headers[index-1]->offsetData = offset;
+            offset += ((icnsprite *) headers[index-1])->get_data_size();
+            std::cout << index  << " : " << name << " -> " << offset << std::endl;
+        }
+
+        // Total file size
+        total_size = offset;
+
+        // TODO copy/concat data 
+        icndata = (unsigned char *) malloc((total_size-(count_sprite*13)) * sizeof(unsigned char));
+        if(icndata!=NULL) {
+            for(int i=0; i < count_sprite; i++) {
+                memcpy(icndata+(headers[i]->offsetData-count_sprite*13), ((icnsprite *) headers[i])->get_data(), ((icnsprite *) headers[i])->get_data_size());
+            }
+        }
+        
+    } else {
+        std::cerr << specfile << " is not a valid icn spec file" << std::endl;
+    }
+}
+
+
+
+
 void icnfile::read_icnfile(std::string file){
 
     int i; /* counter */
@@ -311,7 +432,7 @@ void icnfile::read_icnfile(std::string file){
 
     std::cout << count_sprite << " sprite(s) on " << total_size << " bytes" << std::endl;
 
-    headers = new icnheader[count_sprite];
+    headers = new icnheader * [count_sprite];
 
     icndata=(unsigned char *) malloc(total_size-(count_sprite*header_size));
     if(icndata==NULL){
@@ -320,9 +441,10 @@ void icnfile::read_icnfile(std::string file){
     }
 
     for(i=0; i<count_sprite; i++){
-        headers[i].version = version;
-        headers[i].read(fd);
-        if(DEBUG) headers[i].present();
+        headers[i] = new icnheader();
+        headers[i]->version = version;
+        headers[i]->read(fd);
+        if(DEBUG) headers[i]->present();
     }
 
     fd.read(reinterpret_cast<char *>(icndata), total_size-(count_sprite*header_size));
@@ -334,9 +456,9 @@ int icnfile::sprite_size(int numOfSprite){
     if(numOfSprite>count_sprite) return(0);
 
     if(numOfSprite==count_sprite)
-        return(total_size-headers[count_sprite-1].offsetData);
+        return(total_size-headers[count_sprite-1]->offsetData);
 
-    return(headers[numOfSprite].offsetData-headers[numOfSprite-1].offsetData);
+    return(headers[numOfSprite]->offsetData-headers[numOfSprite-1]->offsetData);
 }
 
 
@@ -351,12 +473,11 @@ unsigned char *icnfile::sprite_data(int numOfSprite){
 
     if(!size) return(NULL);
 
-    return(icndata+headers[numOfSprite-1].offsetData-(count_sprite*header_size));
+    return(icndata+headers[numOfSprite-1]->offsetData-(count_sprite*header_size));
 }
 
 
-icnheader icnfile::get_icnheader(int numOfSprite){
-
+icnheader *icnfile::get_icnheader(int numOfSprite){
     return(headers[numOfSprite-1]);
 }
 
@@ -411,13 +532,48 @@ int icnfile::create_files(std::string dir){
 
         y_destroy_image(image);
 
-        fd_spec << " <sprite index=\"" << i+1 << "\" name=\"" << shortdstfile.c_str() << "\" ox=\"" << headers[i].offsetX << "\" oy=\"" << headers[i].offsetY << "\"/>" << std::endl;
+        fd_spec << " <sprite index=\"" << i+1 << "\" name=\"" << shortdstfile.c_str() << "\" ox=\"" << headers[i]->offsetX << "\" oy=\"" << headers[i]->offsetY << "\"/>" << std::endl;
     }
 
     fd_spec << "</icn>" << std::endl;
     fd_spec.close();
 
     std::cout << "expanded to: " << dir << std::endl;
+
+    return(0);
+}
+
+
+/**
+ * \brief Create an HOMM II compatible icn file.
+ * \param filename the name of the new icn file (may have ".icn"
+ *             extension
+ * \return 0 on succes
+ */
+int icnfile::create_icn_file(std::string filename) {
+
+    std::fstream fd_icn(filename.c_str(), std::ios::out | std::ios::binary);
+    if(fd_icn.fail())
+    {
+        std::cout << "error : could not create file " << filename << std::endl;
+        return -1;
+    }
+
+    uint16_t two_bytes_out = htole16(count_sprite);
+    fd_icn.write(reinterpret_cast<char *>(& two_bytes_out), sizeof(uint16_t));
+
+    uint32_t four_bytes_out = htole32(total_size);
+    fd_icn.write(reinterpret_cast<char *>(& four_bytes_out), sizeof(uint32_t));
+
+    for(int i=1; i<=count_sprite; i++) {
+        get_icnheader(i)->write(fd_icn);
+    }
+
+    int header_size = 13;
+    fd_icn.write(reinterpret_cast<char *>(icndata), total_size-(count_sprite*header_size));
+
+    fd_icn.close();
+    std::cout << "file created: " << filename << std::endl;
 
     return(0);
 }
@@ -431,7 +587,7 @@ void icnfile::show_infos() {
     int monoSprites = 0;
 
     for(i=0; i<count_sprite; i++) {
-        icnheader *current = headers+i;
+        icnheader *current = headers[i];
 
         if(current->width > maxwidth) {
             maxwidth = current->width;

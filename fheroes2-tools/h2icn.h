@@ -50,6 +50,9 @@ class icnheader
     /** read ICN Header from stream */
     void read(std::fstream & fd);
 
+    /** write ICN Header in a stream */
+    void write(std::fstream & fd);
+
     /** write the content of the header on standart output */
     void present(int number=-1);
 };
@@ -69,8 +72,20 @@ class icnsprite : public icnheader {
 
     public:
         /** create the sprite by assemble all the data */
-        icnsprite(icnheader header, int dataSize, unsigned char *dataContent);
+        icnsprite(icnheader *header, int dataSize, unsigned char *dataContent);
+        /**
+         * \brief Create the sprite from an image file.
+         * \param filename the complete path of image file
+         * \param ox X offset for this sprite
+         * \param oy Y offset for this sprite
+         */
+        icnsprite(std::string filename, int ox, int oy);
+        
         ~icnsprite();
+
+        int get_data_size() { return data_size; }
+
+        unsigned char *get_data() { return data; } 
 
         /** convert the data in a image */
         yImage *converti_en_yImage();
@@ -89,7 +104,7 @@ class icnfile {
         uint16_t count_sprite; /* number of sprites */
         uint32_t total_size; /* size of icnfile without the general header */
 
-        icnheader *headers; /* array of "count_sprite" icnheader */
+        icnheader **headers; /* array of "count_sprite" pointers to icnheader */
 
         unsigned char *icndata; /* the data of sprites */
 
@@ -99,26 +114,53 @@ class icnfile {
         /* initialize the objet with the containt of a file */
         void read_icnfile(std::string file);
 
+        /**
+         * \param numOfSprite number of sprite : 1 to count_sprite
+         */
         int sprite_size(int numOfSprite);
         unsigned char *sprite_data(int numOfSprite);
-        icnheader get_icnheader(int numOfSprite);
+        icnheader *get_icnheader(int numOfSprite);
 
     public:
 
+        /**
+         * \brief Read the data from an ICN file.
+         * \param filename the data filename
+         * \param version HOMM version of datafile (1 or 2)
+         */
         icnfile(std::string filename, int version);
 
+        /**
+         * \brief Read the data from files in a directory.
+         * \param dirname the path to the directory where are extracted
+         *            the data
+         */
+        icnfile(std::string dirname);
+
         ~icnfile() {
-            int i;
             if(headers!=NULL){
+                for(int i = 0; i < count_sprite; i++)
+                    if(headers[i] != NULL) delete headers[i];
                 delete [] headers;
                 if(icndata!=NULL) free(icndata);
             }
         }
 
         /**
-         * \brief Create the files (images + spec.xml) in the specified directory.
+         * \brief Create the files (images + spec.xml) in the specified
+         * directory.
+         * \param dir the directory name in which the extracted data
+         *            will be stored
          */
         int create_files(std::string dir);
+
+        /**
+         * \brief Create an HOMM II compatible icn file.
+         * \param filename the name of the new icn file (may have ".icn"
+         *             extension
+         * \return 0 on succes
+         */
+        int create_icn_file(std::string filename);
 
         /**
          * \brief Show infos about the content of this icnfile.
