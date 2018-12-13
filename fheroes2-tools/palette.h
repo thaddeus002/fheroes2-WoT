@@ -6,7 +6,9 @@
 #ifndef PALETTE_H
 #define PALETTE_H
 
+#include "yImage.h"
 #include "yColor.h"
+
 
 /**
  * Read palette data from a file.
@@ -26,7 +28,7 @@ int homm_init_palette(const char *filename, int homm_version);
 
 /**
  * Find a color in a palette. Default palette is used if none had been
- * setted by homm_init_palette() function.
+ * setted by homm_init_palette() homm2_init_palette() function.
  * \param index The number of the color in palette. Must be >= 0 and <256
  * \return the corresponding color (transparent if number is out of range)
  */
@@ -48,6 +50,25 @@ unsigned char *create_bitmap(unsigned char *data, int size);
  * \return 0 in case of success
  */
 int draw_palette(const char *filename);
+
+
+/**
+ * Find the nearest color of a given one in the palette.
+ * 
+ * \param rbg a three unsigned chars array representing a rgb color
+ * \return the index of the nearest color in the palette
+ */
+unsigned char palette_nearest(const unsigned char *rgb);
+
+
+/**
+ * Create an array of palette's indexes corresponding to an image's
+ * pixels.
+ * 
+ * \return a newly allocated array of color indexes
+ */
+unsigned char *toPalette(yImage *image);
+
 
 
 #endif

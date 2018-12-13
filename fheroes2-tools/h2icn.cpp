@@ -44,6 +44,13 @@ extern "C" {
 // change to 1 to show debug messages
 #define DEBUG 0
 
+// the type of sprite's pixels
+typedef enum {
+    TRANSPARENT,
+    SHADOW,
+    COLOR
+} pixel_type_t;
+
 /* CLASS ICNHEADER */
 
 void icnheader::read(std::fstream & fd)
@@ -134,15 +141,72 @@ icnsprite::icnsprite(icnheader *header, int dataSize, unsigned char *dataContent
     version=header->version;
 }
 
+
+/**
+ * Create the icndata array from a colormap.
+ * \param colormap the palette color's indexes for pixels
+ * \param typemap the type of pixels
+ * \param data_size to store the size of the data array
+ * \return a newly allocated data array
+ */
+static unsigned char *colormap2icndata(const unsigned char *colormap, const char *typemap, int *data_size) {
+    // TODO
+    *data_size = 0;
+    return NULL;
+}
+
+
 icnsprite::icnsprite(std::string filename, int ox, int oy) {
 
     offsetX = ox;
     offsetY = oy;
+    offsetData = 0;
     type = 0;
 
     data_size = 0;
     data = NULL;
-    // TODO read the file
+
+    yImage *image = y_load_png(filename.c_str());
+    if(image == NULL) {
+        std::cerr << "Could not init image from file " << filename << ". May be it's not a valid PNG file." << std::endl;
+        return;
+    }
+
+    width = image->rgbWidth;
+    height = image->rgbHeight;
+
+    unsigned char *colormap = toPalette(image);
+    if(colormap == NULL) {
+        std::cerr << "Could not calculate colormap for " << filename << std::endl;
+        y_destroy_image(image);
+        return;
+    }
+
+    char *typemap = (char *) malloc(sizeof(char) * width * height);
+    if(typemap == NULL) {
+        std::cerr << "Could not allocate memory for conversion of " << filename << std::endl;
+        y_destroy_image(image);
+        free(colormap);
+        return;
+    }
+
+    for(int i = 0; i < width*height; i++) {
+        if(image->alphaChanel[i]==0) {
+            typemap[i] = TRANSPARENT;
+        } else if(image->alphaChanel[i]<250) {
+            typemap[i] = SHADOW;
+        } else {
+            typemap[i] = COLOR;
+        }
+    }
+
+    y_destroy_image(image);
+
+    // convert the colormap+typemap to icndata
+    data = colormap2icndata(colormap, typemap, &data_size);
+
+    free(colormap);
+    free(typemap);
 }
 
 icnsprite::~icnsprite(){
@@ -383,7 +447,7 @@ icnfile::icnfile(std::string dirname){
             xml_sprite->Attribute("ox", &ox);
             xml_sprite->Attribute("oy", &oy);
 
-            headers[index-1] = new icnsprite(name, ox, oy);
+            headers[index-1] = new icnsprite(dirname+"/"+name, ox, oy);
 
             // calculate the data offsets
             headers[index-1]->offsetData = offset;

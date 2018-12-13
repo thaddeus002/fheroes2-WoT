@@ -144,7 +144,7 @@ int translate(int index) {
 
 
 /**
- * Find a color in a palette. Default palette is used if none had been setted by homeinit_palette() function.
+ * Find a color in a palette. Default palette is used if none had been setted by homm_init_palette() function.
  * \param index The number of the color in palette. Must be >= 0 and <256
  * \return the corresponding color (transparent if number is out of range)
  */
@@ -244,5 +244,71 @@ int draw_palette(const char *filename){
 
     y_destroy_image(im);
     return err;
+}
+
+
+/**
+ * The classic distance in a 3D space.
+ * \return the squarred distance value between two colors
+ */
+static int distance_euclid(yColor c1, yColor c2) {
+    return (c1.r-c2.r)*(c1.r-c2.r)+(c1.g-c2.g)*(c1.g-c2.g)+(c1.b-c2.b)*(c1.b-c2.b);
+}
+
+
+/**
+ * Distance indicator between two colors.
+ */
+static int distance(yColor c1, yColor c2) {
+    return distance_euclid(c1, c2);
+}
+
+
+/**
+ * Find the nearest color of a given one in the palette.
+ * 
+ * \param rbg a three unsigned chars array representing a rgb color
+ * \return the index of the nearest color in the palette
+ */
+unsigned char palette_nearest(const unsigned char *rgb) {
+
+    unsigned char index = -1;
+    int minSqrDist = 1700000000;
+    yColor color;
+    y_set_color(&color, rgb[0], rgb[1], rgb[2], 255);
+
+
+    for(int i = 0; i < 256; i++) {
+        // TODO skip cycling colors
+        int sqrDist = distance(color, getColor(i));
+        if(sqrDist < minSqrDist) {
+            minSqrDist = sqrDist;
+            index = i;
+        }
+        if(sqrDist == 0) break;
+    }
+
+    return index;
+}
+
+
+/**
+ * Create an array of palette's indexes corresponding to an image's
+ * pixels.
+ * 
+ * \return a newly allocated array of color indexes
+ */
+unsigned char *toPalette(yImage *image) {
+
+    unsigned char *colormap = malloc(sizeof(unsigned char) * image->rgbWidth * image->rgbHeight);
+
+    if(colormap == NULL) return NULL;
+
+    for(int i = 0; i < image->rgbWidth * image->rgbHeight; i++) {
+
+        colormap[i] = palette_nearest(image->rgbData+3*i);
+    }
+    
+    return colormap;
 }
 

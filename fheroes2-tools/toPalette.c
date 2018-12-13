@@ -10,6 +10,7 @@
 #include "palette.h"
 #include "yImage.h"
 #include "yImage_io.h"
+#include "color_distance.h"
 
 
 /**
@@ -21,57 +22,13 @@ static void usage(char *prog) {
 }
 
 
+// may replace the standard distance calculation between colors
+static int distance_ciede2000(yColor c1, yColor c2) {
 
-/**
- * Distance indicator between two colors.
- */
-static int distance(yColor c1, yColor c2) {
+    int rgb1 = c1.r*256*256+c1.g*256+c1.b;
+    int rgb2 = c2.r*256*256+c2.g*256+c2.b;
 
-    return (c1.r-c2.r)*(c1.r-c2.r)+(c1.g-c2.g)*(c1.g-c2.g)+(c1.b-c2.b)*(c1.b-c2.b);
-}
-
-
-/**
- * \param rbg a three unsigned chars array representing a rgb color
- * \return the index of the nearest color in the palette
- */
-static unsigned char palette_nearest(const unsigned char *rgb) {
-
-    unsigned char index = -1;
-    int minSqrDist = 1700000000;
-    yColor color;
-    y_set_color(&color, rgb[0], rgb[1], rgb[2], 255);
-
-
-    for(int i = 0; i < 256; i++) {
-        // TODO skip cycling colors
-        int sqrDist = distance(color, getColor(i));
-        if(sqrDist < minSqrDist) {
-            minSqrDist = sqrDist;
-            index = i;
-        }
-        if(sqrDist == 0) break;
-    }
-
-    return index;
-}
-
-
-/**
- * \return a newly allocated array of color index
- */
-static unsigned char *toPalette(yImage *image) {
-
-    unsigned char *colormap = malloc(sizeof(unsigned char) * image->rgbWidth * image->rgbHeight);
-
-    if(colormap == NULL) return NULL;
-
-    for(int i = 0; i < image->rgbWidth * image->rgbHeight; i++) {
-
-        colormap[i] = palette_nearest(image->rgbData+3*i);
-    }
-    
-    return colormap;
+    return color_diff(rgb1, rgb2);
 }
 
 
