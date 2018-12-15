@@ -143,16 +143,116 @@ icnsprite::icnsprite(icnheader *header, int dataSize, unsigned char *dataContent
 
 
 /**
+ * Find the number of same pixel's type next coming in the current line.
+ *
+ * \param typemap where look for
+ * \param type the type to look for
+ * \param length number of pixel remaining in the line
+ * \return the number of pixels of interest
+ */
+static int coming(const char *typemap, char type, int length) {
+    int n = 0;
+
+    while(typemap[n]==type && n<length) {
+        n++;
+    }
+
+    return n;
+}
+
+
+/**
  * Create the icndata array from a colormap.
  * \param colormap the palette color's indexes for pixels
  * \param typemap the type of pixels
  * \param data_size to store the size of the data array
  * \return a newly allocated data array
  */
-static unsigned char *colormap2icndata(const unsigned char *colormap, const char *typemap, int *data_size) {
-    // TODO
-    *data_size = 0;
-    return NULL;
+static unsigned char *colormap2icndata(const unsigned char *colormap, const char *typemap, int width, int height, int *data_size) {
+
+    /*
+    0x00 - end of line reached, go to the first pixel of next line. All of remaining pixels of current line are transparent.
+    0x01 to 0x7F - number n of data. The next n bytes are the colors of the next n pixels.
+    0x80 - end of data. The sprite is yet totaly describe.
+    0x81 to 0xBF - number of pixels to skip + 0x80. The (n - 128) pixels are transparents.
+    0xC0 - put here n pixels of shadow. If the next byte modulo 4 is not null, n equals the next byte modulo 4, otherwise n equals the second next byte.
+    0xC1 - next byte is the number of next pixels of same color. The second next byte is the color of these pixels.
+    0xC2 to 0xFF - number of pixels of same color plus 0xC0. Next byte is the color of these pixels.
+    */
+
+
+    // this must be the max possible final size
+    int nallocated = 2*width*height + height + 1;
+    unsigned char *icndata = (unsigned char *) malloc(sizeof(unsigned char)*nallocated);
+
+    if(icndata==NULL) {
+        std::cerr << "Could not allocate " << nallocated << " bytes for sprite treatment" << std::endl;
+        return NULL;
+    }
+
+    *data_size = 0; // used size
+    int i,j; // line and column indexes of next pixel
+    i = 0;
+    j = 0;
+
+    while(i<height) {
+        while(j<width) {
+            int pos = i*width+j;
+            int n = coming(typemap+pos, (typemap+pos)[0], width-j);
+            switch((typemap+pos)[0]) {
+            case COLOR:
+                if(n > 127) n = 127;
+                icndata[*data_size]= n;
+                for(int k=0; k<n; k++) {
+                    // TODO find when there are pixels of same color side by side
+                    icndata[(*data_size)+k+1]=colormap[pos+k];
+                }
+                (*data_size)+=n+1;
+                break;
+            case TRANSPARENT:
+                if(n!=width-j) {
+                    if(n > 63) n = 63;
+                    icndata[*data_size]= 128+n;
+                    (*data_size)++;
+                }
+                break;
+            case SHADOW:
+                icndata[*data_size]= 0xC0;
+                if(n<=3) {
+                    icndata[(*data_size) + 1]=n;
+                    (*data_size)+=2;
+                } else {
+                    icndata[(*data_size) + 1]=4;
+                    icndata[(*data_size) + 2]=n;
+                    (*data_size)+=3;
+                }
+                break;
+            default:
+                std::cerr << "unexpected pixel type : " << (typemap+pos)[0] << std::endl;
+            }
+            j+=n;
+            if(n==0) {
+                std::cerr << "unexpected null value" << std::endl;
+                j++; // avoid infinite loop
+            }
+        }
+        icndata[*data_size]=0x00;
+        (*data_size)++;
+        i++;
+        j=0;
+    }
+
+    icndata[*data_size]=0x80;
+    (*data_size)++;
+
+    // free unused memory
+    unsigned char *reallocated = (unsigned char *) realloc(icndata, *data_size);
+    if(reallocated == NULL) {
+        std::cerr << "Realloc failed" << std::endl;
+        return icndata;
+    }
+
+    return reallocated;
 }
 
 
@@ -203,7 +303,7 @@ icnsprite::icnsprite(std::string filename, int ox, int oy) {
     y_destroy_image(image);
 
     // convert the colormap+typemap to icndata
-    data = colormap2icndata(colormap, typemap, &data_size);
+    data = colormap2icndata(colormap, typemap, width, height, &data_size);
 
     free(colormap);
     free(typemap);
